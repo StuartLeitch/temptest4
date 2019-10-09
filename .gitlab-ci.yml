@@ -1,0 +1,41 @@
+default:
+  image: node:12-alpine
+
+stages:
+  - setup
+  - test
+  - lint
+
+install:
+  stage: setup
+  artifacts:
+    paths:
+      - node_modules/
+  script:
+    - npm ci
+
+info:
+  stage: setup
+  script:
+    - npm version
+    - env
+
+test:
+  stage: test
+  script:
+    - npm run nx -- test shared --code-coverage
+    - npm run nx -- test react-components --code-coverage
+    - npm run nx -- test invoicing-graphql --code-coverage
+  only:
+    - monorepo-nx
+  dependencies:
+    - install
+
+lint:
+  stage: test
+  script:
+    - npm run nx -- lint shared
+    - npm run nx -- lint react-components
+    - npm run nx -- lint invoicing-graphql
+  only:
+    - monorepo-nx
