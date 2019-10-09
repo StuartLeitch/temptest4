@@ -13,14 +13,14 @@ import {PayerId} from '../../payers/domain/PayerId';
 // import {PayerType} from '../../payers/domain/PayerType';
 // import {Coupon} from '../../coupons/domain/Coupon';
 
-export enum STATUS {
+export enum InvoiceStatus {
   DRAFT, // after the internal object has been created
   ACTIVE, // when the customer is being notified
   FINAL // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
 }
 
 interface InvoiceProps {
-  status: STATUS;
+  status: InvoiceStatus;
   invoiceNumber?: string; // TODO: AutoIncrement?...Smells bad!
   transactionId?: TransactionId;
   payerId?: PayerId;
@@ -49,7 +49,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.props.payerId;
   }
 
-  get status(): STATUS {
+  get status(): InvoiceStatus {
     return this.props.status;
   }
 
@@ -95,14 +95,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public markAsActive(): void {
     const now = new Date();
     this.props.dateUpdated = now;
-    this.props.status = STATUS.ACTIVE;
+    this.props.status = InvoiceStatus.ACTIVE;
     // this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
   }
 
   public markAsPaid(): void {
     const now = new Date();
     this.props.dateUpdated = now;
-    this.props.status = STATUS.FINAL;
+    this.props.status = InvoiceStatus.FINAL;
     this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
   }
 

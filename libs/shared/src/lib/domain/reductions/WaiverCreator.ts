@@ -1,5 +1,5 @@
-import {Result} from '../../../core/logic/Result';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
+import {Result} from '../../core/logic/Result';
+import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 
 import {BaseReductionCreator} from './BaseReductionCreator';
 import {ReductionProps} from './Reduction';

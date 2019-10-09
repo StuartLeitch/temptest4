@@ -1,5 +1,6 @@
-const path = require('path');
-import Knex = require('knex');
+import * as path from 'path';
+import {default as Knex} from 'knex';
+
 const {config} = require('./config/knexfile');
 
 export {Knex};
@@ -45,4 +46,4 @@ export async function clearTable(db: Knex, ...tables: string[]): Promise<Knex> {
   return db;
 }
 
-export const connection = () => Knex(config);
+export const KnexDB = () => Knex(config);

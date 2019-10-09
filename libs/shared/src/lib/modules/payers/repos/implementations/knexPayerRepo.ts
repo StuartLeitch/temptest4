@@ -5,7 +5,7 @@ import {
   PayerId,
   PayerMap,
   Knex
-} from '../../../..';
+} from '../../../../..';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 

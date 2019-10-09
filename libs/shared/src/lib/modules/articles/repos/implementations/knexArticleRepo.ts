@@ -4,7 +4,7 @@ import {
   ArticleRepoContract,
   ArticleMap,
   Knex
-} from '../../../..';
+} from '../../../../..';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 
 export class ArticleKnexRepo extends AbstractBaseDBRepo<Knex, Article>

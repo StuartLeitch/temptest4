@@ -1,7 +1,7 @@
 import * as Chai from 'chai';
 
-import {JobContract} from '../../../lib/infrastructure/message-queues/contracts/Job';
-import {QueueAdapterContract} from '../../../lib/infrastructure/message-queues/contracts/QueueAdapter';
+import {JobContract} from '../../../src/lib/infrastructure/message-queues/contracts/Job';
+import {QueueAdapterContract} from '../../../src/lib/infrastructure/message-queues/contracts/QueueAdapter';
 
 function randomInt(low: number, high: number) {
   return Math.floor(Math.random() * (high - low) + low);

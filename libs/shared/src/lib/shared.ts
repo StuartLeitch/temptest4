@@ -26,11 +26,7 @@ export * from './modules/articles/repos/implementations/jsonPriceRepo';
 export * from './modules/articles/mappers/PriceMap';
 
 // * Export Transaction Subdomain
-export {
-  Transaction,
-  TransactionCollection,
-  STATUS as TransactionStatus
-} from './modules/transactions/domain/Transaction';
+export * from './modules/transactions/domain/Transaction';
 export * from './modules/transactions/domain/TransactionId';
 export * from './modules/transactions/domain/TransactionAmount';
 // export * from './transactions/domain/events/transactionCreatedEvent';
@@ -43,11 +39,7 @@ export * from './modules/transactions/usecases/createTransaction/createTransacti
 export * from './modules/transactions/mappers/TransactionMap';
 
 // * Export Invoice Subdomain
-export {
-  Invoice,
-  InvoiceCollection,
-  STATUS as InvoiceStatus
-} from './modules/invoices/domain/Invoice';
+export * from './modules/invoices/domain/Invoice';
 export * from './modules/invoices/domain/InvoiceId';
 export * from './modules/invoices/domain/InvoiceItem';
 export * from './modules/invoices/domain/policies/PoliciesRegister';

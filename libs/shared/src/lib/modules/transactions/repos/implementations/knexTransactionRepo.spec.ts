@@ -1,14 +1,13 @@
 import {
   UniqueEntityID,
-  Amount,
   Transaction,
   TransactionId,
   TransactionMap,
-  TransactionStatus,
+  STATUS as TransactionStatus,
   clearTable,
   makeDb,
   destroyDb
-} from '../../../..';
+} from '../../../../..';
 import {KnexTransactionRepo} from './knexTransactionRepo';
 
 function makeTransactionData(overwrites?: any): Transaction {

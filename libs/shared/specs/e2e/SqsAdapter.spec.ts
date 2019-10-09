@@ -1,4 +1,4 @@
-import {JobContract} from '../../lib/infrastructure/message-queues/contracts/Job';
+import {JobContract} from '../../src/lib/infrastructure/message-queues/contracts/Job';
 import {default as sqsAdapter} from './TestableSqsAdapter';
 import {AdapterTestProvider} from './helpers/AdapterTestProvider';
 

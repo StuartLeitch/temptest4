@@ -1,18 +1,18 @@
-import {
-  Invoice,
-  InvoiceId,
-  UniqueEntityID,
-  InvoiceRepoContract,
-  InvoiceMap,
-  TransactionId
-} from '../../../..';
+import {Knex} from '@hindawi/shared';
+
+import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+
+import {Invoice} from '../../domain/Invoice';
+import {InvoiceId} from '../../domain/InvoiceId';
+import {InvoiceMap} from '../../mappers/InvoiceMap';
+import {TransactionId} from './../../../transactions/domain/TransactionId';
+
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
-import {Knex} from '../../../../infrastructure/database/knex';
+import {InvoiceRepoContract} from '../invoiceRepo';
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
-
   async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const {db} = this;
 

@@ -11,7 +11,7 @@ import {
 
 import {ArticleId} from './../../../articles/domain/ArticleId';
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
-import {Invoice, STATUS as InvoiceStatus} from '../../domain/Invoice';
+import {Invoice, InvoiceStatus} from '../../domain/Invoice';
 import {SendInvoiceUsecase, SendInvoiceContext} from './sendInvoice';
 import {AfterInvoiceSentEvent} from '../../subscribers/AfterInvoiceSentEvents';
 

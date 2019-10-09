@@ -10,11 +10,7 @@ import {
 } from '../../../transactions/domain/Transaction';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
-import {
-  Invoice,
-  InvoiceCollection,
-  STATUS as InvoiceStatus
-} from '../../domain/Invoice';
+import {Invoice, InvoiceCollection, InvoiceStatus} from '../../domain/Invoice';
 import {CreateInvoiceContext, CreateInvoiceUsecase} from './createInvoice';
 
 let usecase: CreateInvoiceUsecase;
@@ -28,8 +24,7 @@ let invoiceCollection: InvoiceCollection;
 let transactionCollection: TransactionCollection;
 let transactionId;
 
-const defaultContext: CreateInvoiceContext = { roles: [Roles.SUPER_ADMIN] };
-
+const defaultContext: CreateInvoiceContext = {roles: [Roles.SUPER_ADMIN]};
 
 describe('CreateInvoiceUseCase', () => {
   beforeEach(() => {
@@ -62,9 +57,12 @@ describe('CreateInvoiceUseCase', () => {
 
     describe('And Transaction ID is INVALID', () => {
       it('should NOT create a draft invoice', async () => {
-        result = await usecase.execute({
-          transactionId: null
-        }, defaultContext);
+        result = await usecase.execute(
+          {
+            transactionId: null
+          },
+          defaultContext
+        );
         expect(result.isFailure).toBeTruthy();
       });
     });
@@ -77,9 +75,12 @@ describe('CreateInvoiceUseCase', () => {
         invoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
         expect(invoiceCollection.length).toEqual(0);
 
-        result = await usecase.execute({
-          transactionId
-        }, defaultContext);
+        result = await usecase.execute(
+          {
+            transactionId
+          },
+          defaultContext
+        );
 
         expect(result.isSuccess).toBeTruthy();
 

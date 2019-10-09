@@ -1,6 +1,6 @@
 // * Core Domain
-import {Result} from '../../../core/logic/Result';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
+import {Result} from '../../core/logic/Result';
+import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 
 import {Reduction, ReductionProps} from './Reduction';
 

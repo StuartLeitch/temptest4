@@ -3,7 +3,7 @@ import {UseCase} from '../../../../core/domain/UseCase';
 import {Result} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 
-import {Invoice, STATUS as InvoiceStatus} from '../../domain/Invoice';
+import {Invoice, InvoiceStatus} from '../../domain/Invoice';
 import {InvoiceRepoContract} from '../../repos/invoiceRepo';
 import {TransactionRepoContract} from '../../../transactions/repos/transactionRepo';
 import {Transaction} from '../../../transactions/domain/Transaction';

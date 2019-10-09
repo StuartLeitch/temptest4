@@ -1,18 +1,12 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- **/
+import {KnexDB} from '@hindawi/shared';
 
-import * as express from 'express';
+import {makeContext} from './app/context';
+import {makeServer} from './app/server';
 
-const app = express();
+const db = KnexDB();
+const context = makeContext(db);
+const server = makeServer(context);
 
-app.get('/api', (req, res) => {
-  res.send({message: 'Welcome to invoicing-graphql!'});
+server.listen().then(({url}) => {
+  console.log(`🚀 Server ready at ${url}`);
 });
-
-const port = process.env.port || 3333;
-const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
-});
-server.on('error', console.error);

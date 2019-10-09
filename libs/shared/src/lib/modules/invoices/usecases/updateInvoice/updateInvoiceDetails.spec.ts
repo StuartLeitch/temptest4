@@ -8,7 +8,7 @@ import {PayerName} from '../../../payers/domain/PayerName';
 import {PayerType} from '../../../payers/domain/PayerType';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
-import {Invoice, STATUS as InvoiceStatus} from '../../domain/Invoice';
+import {Invoice, InvoiceStatus} from '../../domain/Invoice';
 
 import {
   UpdateInvoiceDetailsUsecase,

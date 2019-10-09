@@ -1,4 +1,4 @@
-import {makeDb, destroyDb} from '../../../..';
+import {makeDb, destroyDb} from '../../../../..';
 import {ArticleKnexRepo as ArticleRepo} from './knexArticleRepo';
 
 describe('ArticleRepo', () => {

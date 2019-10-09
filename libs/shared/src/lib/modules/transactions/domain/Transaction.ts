@@ -6,10 +6,8 @@ import {Result} from '../../../core/logic/Result';
 // * Subdomain
 import {TransactionId} from './TransactionId';
 import {ManuscriptId} from './ManuscriptId';
-// import {Amount} from '../../../shared/domain/Amount';
-// import {ArticleId} from '../../articles/domain/ArticleId';
 import {Invoice} from '../../invoices/domain/Invoice';
-import {InvoiceItem} from '../../../../../shared/lib/modules/invoices/domain/InvoiceItem';
+import {InvoiceItem} from '../../../modules/invoices/domain/InvoiceItem';
 
 export enum STATUS {
   DRAFT, // after the internal object has been created

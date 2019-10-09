@@ -1,6 +1,6 @@
-import {Repo} from '../../../../core/infra/Repo';
-import {Payment} from '../../domain/Payment';
-import {PaymentId} from '../../domain/PaymentId';
+import {Repo} from '../../../infrastructure/Repo';
+import {Payment} from '../domain/Payment';
+import {PaymentId} from '../domain/PaymentId';
 
 export interface PaymentRepoContract extends Repo<Payment> {
   getPaymentById(paymentId: PaymentId): Promise<Payment>;

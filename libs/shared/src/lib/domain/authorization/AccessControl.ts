@@ -1,6 +1,6 @@
 import {AccessControlPlus} from 'accesscontrol-plus';
 
-import {Roles} from '../../../../../../phenom-finance/packages/shared/lib/modules/users/domain/enums/Roles';
+import {Roles} from '../../modules/users/domain/enums/Roles';
 
 export interface AccessControlContext {
   userId?: string;

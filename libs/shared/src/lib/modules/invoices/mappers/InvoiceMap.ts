@@ -1,6 +1,6 @@
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Mapper} from '../../../infrastructure/Mapper';
-import {Invoice, STATUS as InvoiceStatus} from '../domain/Invoice';
+import {Invoice, InvoiceStatus} from '../domain/Invoice';
 import {TransactionId} from '../../transactions/domain/TransactionId';
 
 export interface InvoicePersistenceDTO {

@@ -3,11 +3,7 @@ import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {Roles} from '../../../users/domain/enums/Roles';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
-import {
-  Invoice,
-  InvoiceCollection,
-  STATUS as InvoiceStatus
-} from '../../domain/Invoice';
+import {Invoice, InvoiceCollection, InvoiceStatus} from '../../domain/Invoice';
 import {
   ConfirmPaidInvoiceUsecase,
   ConfirmPaidInvoiceContext

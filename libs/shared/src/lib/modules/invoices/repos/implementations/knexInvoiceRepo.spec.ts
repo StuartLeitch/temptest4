@@ -8,7 +8,7 @@ import {
   clearTable,
   makeDb,
   destroyDb
-} from '../../../../';
+} from '../../../../..';
 import {RepoError} from '../../../../infrastructure/RepoError';
 import {KnexInvoiceRepo as InvoiceRepo} from './knexInvoiceRepo';
 

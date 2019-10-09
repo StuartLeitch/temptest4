@@ -1,8 +1,4 @@
 import * as AWS from 'aws-sdk';
-// import * as AWSMock from 'aws-sdk-mock';
-// import {MockAWS as AWS} from 'aws-mocks';
-// AWSMock.setSDKInstance(AWS);
-
 import {SQSMock} from './mocks/SQSMock';
 
 require('dotenv').config();
@@ -10,11 +6,11 @@ require('dotenv').config();
 import {
   SqsConfig,
   SqsQueueConfig
-} from '../../lib/modules/payments/infrastructure/message-queues/sqs/SqsConfig';
-import {JsonEncoder} from '../../lib/modules/payments/infrastructure/message-queues/JsonEncoder';
-import {SqsAdapter} from '../../lib/modules/payments/infrastructure/message-queues/sqs/SqsAdapter';
+} from '../../src/lib/modules/payments/infrastructure/message-queues/sqs/SqsConfig';
+import {JsonEncoder} from '../../src/lib/modules/payments/infrastructure/message-queues/JsonEncoder';
+import {SqsAdapter} from '../../src/lib/modules/payments/infrastructure/message-queues/sqs/SqsAdapter';
+import {StdOutErrorHandler} from '../../src/lib/modules/payments/infrastructure/message-queues/StdOutErrorHandler';
 
-import {StdOutErrorHandler} from '../../lib/modules/payments/infrastructure/message-queues/StdOutErrorHandler';
 import {ConcurrencyConfig} from './helpers/ConcurrencyConfig';
 
 class TestableSqsAdapter extends SqsAdapter {

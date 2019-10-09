@@ -4,7 +4,7 @@ import {
   PaymentMethodRepoContract,
   PaymentMethodMap,
   Knex
-} from '../../../..';
+} from '../../../../..';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoErrorCode, RepoError} from '../../../../infrastructure/RepoError';
 

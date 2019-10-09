@@ -1,12 +1,13 @@
-import { GluegunToolbox } from 'gluegun'
+import {GluegunToolbox} from 'gluegun';
 
-import { makeDb, destroyDb } from '@hindawi/server/testUtils/db'
-import { Roles } from '@hindawi/shared'
-
-import { CreateTransactionUsecase } from '../../../../../../../shared/lib/modules/transactions/usecases/createTransaction/createTransaction'
-
-import { ArticleKnexRepo as ArticleRepo } from '../../../../../../server/src/repos/knex/ArticleRepo'
-import { TransactionKnexRepo as TransactionRepo } from '../../../../../../server/src/repos/knex/TransactionRepo'
+import {
+  Roles,
+  CreateTransactionUsecase,
+  makeDb,
+  destroyDb,
+  // KnexArticleRepo as ArticleRepo,
+  KnexTransactionRepo as TransactionRepo
+} from '@hindawi/shared';
 
 module.exports = {
   dashed: true,
@@ -27,7 +28,7 @@ module.exports = {
       }
       //   prompt,
       //   createTransactionFlow
-    } = toolbox
+    } = toolbox;
     // // if not, let's prompt the user for one and then assign that to `name`
     // if (!articleId) {
     //   info(blue('************************'))
@@ -47,17 +48,17 @@ module.exports = {
     //   return
     // }
 
-    const db = await makeDb({ filename: './dev.sqlite3' })
-    const transactionRepo = new TransactionRepo(db)
-    const articleRepo = new ArticleRepo(db)
+    const db = await makeDb({filename: './dev.sqlite3'});
+    const transactionRepo = new TransactionRepo(db);
+    const articleRepo = new ArticleRepo(db);
     const createTransactionUsecase = new CreateTransactionUsecase(
       transactionRepo,
       articleRepo
-    )
+    );
 
     // * create spinner
-    const spinner = spin()
-    spinner.color = 'cyan'
+    const spinner = spin();
+    spinner.color = 'cyan';
 
     const [
       articleId,
@@ -65,9 +66,9 @@ module.exports = {
       title,
       articleTypeId,
       created
-    ] = parameters.array
+    ] = parameters.array;
 
-    spinner.start('Execute createTransactionUsecase')
+    spinner.start('Execute createTransactionUsecase');
     const result = await createTransactionUsecase.execute(
       {
         articleId,
@@ -79,18 +80,18 @@ module.exports = {
       {
         roles: [Roles.ADMIN]
       }
-    )
+    );
 
-    await destroyDb(db)
+    await destroyDb(db);
 
     if (result.isSuccess) {
-      const newlyCreatedTransaction = result.getValue()
-      spinner.succeed('Successfully created a new transaction.')
-      success(newlyCreatedTransaction)
+      const newlyCreatedTransaction = result.getValue();
+      spinner.succeed('Successfully created a new transaction.');
+      success(newlyCreatedTransaction);
     } else {
-      const { error: usecaseError } = result
-      spinner.fail(usecaseError.toString())
-      error(usecaseError)
+      const {error: usecaseError} = result;
+      spinner.fail(usecaseError.toString());
+      error(usecaseError);
     }
   }
-}
+};

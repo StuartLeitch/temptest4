@@ -1,13 +1,14 @@
 require('dotenv').config();
 
 const {
+  FINANCE_IS_PRODUCTION,
   FINANCE_DB_USER,
   FINANCE_DB_PASS,
   FINANCE_DB_DEVELOPMENT_FILENAME,
-  FINANCE_DB_STAGING_DB_NAME,
-  // FINANCE_DB_PRODUCTION_DB_NAME,
-  NODE_ENV
+  FINANCE_DB_STAGING_DB_NAME
 } = process.env;
+
+const NODE_ENV = FINANCE_IS_PRODUCTION === 'false' ? 'development' : 'staging';
 
 const knexConfiguration = {
   development: {

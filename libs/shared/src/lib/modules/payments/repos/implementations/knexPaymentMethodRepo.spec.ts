@@ -6,7 +6,7 @@ import {
   clearTable,
   makeDb,
   destroyDb
-} from '../../../..';
+} from '../../../../..';
 import {KnexPaymentMethodRepo as PaymentMethodRepo} from './knexPaymentMethodRepo';
 
 function makePaymentMethodData(overwrites?: any): PaymentMethod {

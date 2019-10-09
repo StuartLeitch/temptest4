@@ -1,12 +1,12 @@
-import {
-  Transaction,
-  TransactionId,
-  TransactionMap,
-  TransactionRepoContract,
-  Knex
-} from '../../../..';
+import {Knex} from '@hindawi/shared';
+
+import {Transaction} from '../../domain/Transaction';
+import {TransactionId} from '../../domain/TransactionId';
+import {TransactionMap} from '../../mappers/TransactionMap';
+
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError} from '../../../../infrastructure/RepoError';
+import {TransactionRepoContract} from '../transactionRepo';
 
 export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   implements TransactionRepoContract {

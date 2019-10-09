@@ -1,9 +1,13 @@
-import { GluegunToolbox } from 'gluegun'
+import {GluegunToolbox} from 'gluegun';
 
-import { CreateInvoiceUsecase, Roles } from '@hindawi/shared'
-import { makeDb, destroyDb } from '@hindawi/server/testUtils/db'
-import { InvoiceKnexRepo as InvoiceRepo } from '@hindawi/server/repos/knex/InvoiceRepo'
-import { TransactionKnexRepo as TransactionRepo } from '@hindawi/server/repos/knex/TransactionRepo'
+import {
+  CreateInvoiceUsecase,
+  Roles,
+  makeDb,
+  destroyDb,
+  KnexInvoiceRepo as InvoiceRepo,
+  KnexTransactionRepo as TransactionRepo
+} from '@hindawi/shared';
 
 module.exports = {
   dashed: true,
@@ -20,17 +24,17 @@ module.exports = {
         success,
         info,
         error,
-        colors: { blue }
+        colors: {blue}
       }
       //   prompt,
       //   createTransactionFlow
-    } = toolbox
+    } = toolbox;
     //   // // if not, let's prompt the user for one and then assign that to `name`
     //   // if (!articleId) {
-    info(blue('************************'))
-    info(blue('*    Create Invoice    *'))
-    info(blue('************************'))
-    const transactionId = parameters.first
+    info(blue('************************'));
+    info(blue('*    Create Invoice    *'));
+    info(blue('************************'));
+    const transactionId = parameters.first;
     //   //   const result = await prompt.ask({
     //   //     type: 'input',
     //   //     name: 'articleId',
@@ -44,17 +48,17 @@ module.exports = {
     //   //   error('No article ID specified!')
     //   //   return
     //   // }
-    const db = await makeDb({ filename: './dev.sqlite3' })
-    const transactionRepo = new TransactionRepo(db)
-    const invoiceRepo = new InvoiceRepo(db)
+    const db = await makeDb({filename: './dev.sqlite3'});
+    const transactionRepo = new TransactionRepo(db);
+    const invoiceRepo = new InvoiceRepo(db);
     const createInvoiceUsecase = new CreateInvoiceUsecase(
       invoiceRepo,
       transactionRepo
-    )
+    );
     // * create spinner
-    const spinner = spin()
-    spinner.color = 'cyan'
-    spinner.start('Execute createInvoiceUsecase')
+    const spinner = spin();
+    spinner.color = 'cyan';
+    spinner.start('Execute createInvoiceUsecase');
     const result = await createInvoiceUsecase.execute(
       {
         transactionId
@@ -62,18 +66,18 @@ module.exports = {
       {
         roles: [Roles.ADMIN]
       }
-    )
+    );
 
-    await destroyDb(db)
+    await destroyDb(db);
 
     if (result.isSuccess) {
-      const newlyCreatedInvoice = result.getValue()
-      spinner.succeed('Successfully created a new invoice.')
-      success(newlyCreatedInvoice)
+      const newlyCreatedInvoice = result.getValue();
+      spinner.succeed('Successfully created a new invoice.');
+      success(newlyCreatedInvoice);
     } else {
-      const { error: usecaseError } = result
-      spinner.fail(usecaseError.toString())
-      error(usecaseError)
+      const {error: usecaseError} = result;
+      spinner.fail(usecaseError.toString());
+      error(usecaseError);
     }
   }
-}
+};
