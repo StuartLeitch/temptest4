@@ -14,8 +14,10 @@ stages:
 
 install:
   stage: setup
+  coverage: '/Lines \W+: (\d+\.\d+)%.*/'
   artifacts:
     paths:
+      - coverage/
       - node_modules/
   script:
     - npm ci

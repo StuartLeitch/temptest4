@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {default as Knex} from 'knex';
+import Knex from 'knex';
 
 const {config} = require('./config/knexfile');
 
