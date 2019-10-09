@@ -7,7 +7,7 @@ export abstract class BaseJsonRepo<T> {
 
   public setItem(t: T): void {
     let found = false;
-    for (let item of this._items) {
+    for (const item of this._items) {
       if (this.compareJsonItems(item, t)) {
         found = true;
       }

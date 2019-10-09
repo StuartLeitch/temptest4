@@ -117,10 +117,10 @@ describe('UpdateInvoiceDetailsUsecase', () => {
 
         expect(result.isSuccess).toBeTruthy();
 
-        payerCollection = await mockPayerRepo.getCollection();
-        expect(payerCollection.length).toEqual(1);
+        const secondPayerCollection = await mockPayerRepo.getCollection();
+        expect(secondPayerCollection.length).toEqual(1);
 
-        const [payer] = payerCollection;
+        const [payer] = secondPayerCollection;
         expect(payer.type.value).toBe(payerType);
       });
     });

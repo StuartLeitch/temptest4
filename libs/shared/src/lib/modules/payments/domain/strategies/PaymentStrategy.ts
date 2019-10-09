@@ -16,10 +16,7 @@ export class PaymentStrategy implements PaymentStrategyContract {
     this.paymentServices = new Map(paymentServices);
   }
 
-  public async makePayment(
-    model: PaymentModel,
-    amount: number = 0
-  ): Promise<unknown> {
+  public async makePayment(model: PaymentModel, amount = 0): Promise<unknown> {
     return this.getPaymentService(model).makePayment(model, amount);
   }
 

@@ -26,7 +26,7 @@ export class EditorPolicy implements PolicyContract<EditorRule> {
     return new EditorRule(journalId, editorialBoardMembers, author);
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.EDITOR;
   }
 }

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import Knex from 'knex';
 
-const {config} = require('./config/knexfile');
+import {config} from './config/knexfile';
 
 export {Knex};
 

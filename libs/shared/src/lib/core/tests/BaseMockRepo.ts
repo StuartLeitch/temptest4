@@ -7,7 +7,7 @@ export abstract class BaseMockRepo<T> {
 
   public addFakeItem(t: T): void {
     let found = false;
-    for (let item of this._items) {
+    for (const item of this._items) {
       if (this.compareFakeItems(item, t)) {
         found = true;
       }

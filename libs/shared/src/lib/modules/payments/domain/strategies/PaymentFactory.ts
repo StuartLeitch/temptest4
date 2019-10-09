@@ -24,7 +24,7 @@ export class PaymentFactory {
     return this.payments.get(this.createSymbolOf(paymentType));
   }
 
-  private createSymbolOf(value: string): Symbol {
+  private createSymbolOf(value: string): symbol {
     return Symbol.for(`@${value}`);
   }
 }

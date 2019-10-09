@@ -95,8 +95,8 @@ export class UKVATTreatmentArticleProcessingChargesRule
 
   public constructor(
     countryCode: string,
-    asBusiness: boolean = false,
-    VATRegistered: boolean = true
+    asBusiness = false,
+    VATRegistered = true
   ) {
     this.CountryCode = countryCode;
     this.AsBusiness = asBusiness;

@@ -2,11 +2,8 @@
 import {Flow} from '../../../../core/domain/Flow';
 import {Result} from '../../../../core/logic/Result';
 
-import {Invoice /*, STATUS as InvoiceStatus */} from '../../domain/Invoice';
-import {
-  Transaction
-  /*STATUS as TransactionStatus*/
-} from '../../../transactions/domain/Transaction';
+import {Invoice} from '../../domain/Invoice';
+import {Transaction} from '../../../transactions/domain/Transaction';
 import {TransactionId} from '../../../transactions/domain/TransactionId';
 import {TransactionRepoContract} from '../../../transactions/repos/transactionRepo';
 import {InvoiceRepoContract} from '../../repos/invoiceRepo';
@@ -60,7 +57,7 @@ export class SendInvoiceUsecase
   private async getTransactionForArticle(
     request: SendInvoiceRequestDTO
   ): Promise<Result<Transaction>> {
-    let {manuscriptId} = request;
+    const {manuscriptId} = request;
 
     const transaction = await this.transactionRepo.getTransactionByManuscriptId(
       manuscriptId

@@ -1,4 +1,4 @@
-export const up = function(knex) {
+export const up = function(knex: any) {
   return knex.schema.createTable('invoice_items', function(table) {
     table.uuid('id', 36).primary();
     table.string('invoiceId', 40);
@@ -8,4 +8,4 @@ export const up = function(knex) {
   });
 };
 
-export const down = function(knex) {};
+export const down = (knex: any) => ({});

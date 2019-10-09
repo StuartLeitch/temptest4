@@ -1,4 +1,4 @@
-import {TaxRuleContract} from 'modules/invoices/domain/contracts/TaxRuleContract';
+import {TaxRuleContract} from '../contracts/TaxRuleContract';
 
 export class UKVATAnnualInstitutionalMembershipRule implements TaxRuleContract {
   public AsBusiness: boolean;
@@ -7,8 +7,8 @@ export class UKVATAnnualInstitutionalMembershipRule implements TaxRuleContract {
 
   public constructor(
     countryCode: string,
-    asBusiness: boolean = false,
-    inBusiness: boolean = true
+    asBusiness = false,
+    inBusiness = true
   ) {
     this.AsBusiness = asBusiness;
     this.InBusiness = inBusiness;

@@ -26,7 +26,7 @@ export class WaivedEditorPolicy implements PolicyContract<WaivedEditorRule> {
     return new WaivedEditorRule(journalId, editorialBoardMembers, author);
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.WAIVED_EDITOR;
   }
 }

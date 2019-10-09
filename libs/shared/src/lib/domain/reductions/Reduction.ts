@@ -2,18 +2,13 @@
 import {AggregateRoot} from '../../core/domain/AggregateRoot';
 import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 
-// * Subdomain
-// import {ProductId} from './ProductId';
-import {ReductionContract} from './contracts/Reduction';
-
 export interface ReductionProps {
   readonly type?: string;
   isAutomatic?: boolean;
   isValid?: boolean;
 }
 
-export abstract class Reduction extends AggregateRoot<ReductionProps>
-  implements ReductionContract {
+export abstract class Reduction extends AggregateRoot<ReductionProps> {
   protected readonly reductionPercentage: number = 0;
 
   public get id(): UniqueEntityID {

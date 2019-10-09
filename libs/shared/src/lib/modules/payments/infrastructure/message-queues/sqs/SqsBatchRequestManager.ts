@@ -1,4 +1,4 @@
-// 22ZZBNHBRW
+// tslint:disable:no-this-alias
 
 import {SQS} from 'aws-sdk';
 import lodash = require('lodash');
@@ -29,19 +29,18 @@ class SqsBatchRequestManager {
   }
 
   public deleteMessage(queueUrl: string, message: AWS.SQS.Message) {
-    var self = this;
+    this.deleteMessageBag[queueUrl].push(message);
 
-    self.deleteMessageBag[queueUrl].push(message);
-
-    if (self.deleteMessageBag[queueUrl].length >= 10) {
-      self.flushMessagesToBeDeleted(queueUrl);
+    if (this.deleteMessageBag[queueUrl].length >= 10) {
+      this.flushMessagesToBeDeleted(queueUrl);
     }
   }
 
   protected startFlushMessagesToBeDeletedInterval(milliseconds: number) {
-    var self = this;
+    // tslint:disable:no-this-alias
+    const self = this;
 
-    self.flushMessagesToBeDeletedIntervalHandler = setInterval(function() {
+    this.flushMessagesToBeDeletedIntervalHandler = setInterval(function() {
       Object.keys(self.deleteMessageBag).forEach(function(key) {
         self.flushMessagesToBeDeleted(key);
       });
@@ -49,20 +48,21 @@ class SqsBatchRequestManager {
   }
 
   protected flushMessagesToBeDeleted(queueUrl: string) {
-    var self = this;
+    const self = this;
 
-    var deleteMessageBag = this.deleteMessageBag[queueUrl];
+    const deleteMessageBag = this.deleteMessageBag[queueUrl];
     self.deleteMessageBag[queueUrl] = [];
-    var deleteMessageBagChunks = lodash.chunk(deleteMessageBag, 10);
+    const deleteMessageBagChunks = lodash.chunk(deleteMessageBag, 10);
 
     deleteMessageBagChunks.forEach(function(chunk: SQS.Message[]) {
-      var params = self.getDeleteMessageBatchParams(queueUrl, chunk);
+      const params = self.getDeleteMessageBatchParams(queueUrl, chunk);
       self.localDeleteMessageBatchQueue.push(params);
     });
   }
 
   protected initializeLocalMessageDeletionQueue() {
-    var self = this;
+    // tslint:disable-next-line:no-this-alias
+    const self = this;
 
     self.localDeleteMessageBatchQueue = async.queue(function(
       params: SQS.DeleteMessageBatchRequest,
@@ -85,7 +85,7 @@ class SqsBatchRequestManager {
     queueUrl: string,
     messages: SQS.Message[]
   ) {
-    var params: SQS.DeleteMessageBatchRequest = {
+    const params: SQS.DeleteMessageBatchRequest = {
       Entries: [],
       QueueUrl: queueUrl
     };

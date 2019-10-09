@@ -36,6 +36,4 @@ export class RabbitMqJob extends JobContract {
       }
     });
   }
-
-  done(): void {}
 }

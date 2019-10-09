@@ -23,9 +23,6 @@ let result: Result<Transaction>;
 
 let transactionCollection: TransactionCollection;
 
-// let mockInvoiceRepo: MockInvoiceRepo;
-// let invoiceCollection: InvoiceCollection;
-
 let manuscriptId: string;
 
 const defaultContext: CreateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
@@ -52,10 +49,10 @@ describe('CreateTransactionUseCase', () => {
 
       expect(result.isSuccess).toBeTruthy();
 
-      transactionCollection = await mockTransactionRepo.getTransactionCollection();
-      expect(transactionCollection.length).toEqual(1);
+      const secondTransactionCollection = await mockTransactionRepo.getTransactionCollection();
+      expect(secondTransactionCollection.length).toEqual(1);
 
-      const [transaction] = transactionCollection;
+      const [transaction] = secondTransactionCollection;
       expect(transaction.status).toBe(TransactionStatus.DRAFT);
     });
   });
@@ -107,10 +104,10 @@ describe('CreateTransactionUseCase', () => {
 
         expect(result.isSuccess).toBeTruthy();
 
-        transactionCollection = await mockTransactionRepo.getTransactionCollection(
+        const secondTransactionCollection = await mockTransactionRepo.getTransactionCollection(
           [manuscriptId]
         );
-        expect(transactionCollection.length).toEqual(1);
+        expect(secondTransactionCollection.length).toEqual(1);
       });
     });
   });

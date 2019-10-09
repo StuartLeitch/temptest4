@@ -4,11 +4,8 @@ import {Result} from '../../../../../core/logic/Result';
 import {CatalogItem} from '../../../domain/CatalogItem';
 import {CatalogRepoContract} from '../../../repos/catalogRepo';
 
-interface GetAllCatalogItemsUseCaseRequestDTO {}
-
 export class GetAllCatalogItemsUseCase
-  implements
-    UseCase<GetAllCatalogItemsUseCaseRequestDTO, Result<CatalogItem[]>> {
+  implements UseCase<{}, Result<CatalogItem[]>> {
   private catalogRepo: CatalogRepoContract;
 
   constructor(catalogRepo: CatalogRepoContract) {
@@ -25,9 +22,7 @@ export class GetAllCatalogItemsUseCase
     return Result.ok<CatalogItem[]>(catalogItems);
   }
 
-  public async execute(
-    request: GetAllCatalogItemsUseCaseRequestDTO
-  ): Promise<Result<CatalogItem[]>> {
+  public async execute(request: {}): Promise<Result<CatalogItem[]>> {
     try {
       const catalogItemsOrError = await this.getCatalogItems();
       if (catalogItemsOrError.isFailure) {

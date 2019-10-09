@@ -10,14 +10,12 @@ variables:
 stages:
   - setup
   - test
-  - lint
+#  - lint
 
 install:
   stage: setup
-  coverage: '/Lines \W+: (\d+\.\d+)%.*/'
   artifacts:
     paths:
-      - coverage/
       - node_modules/
   script:
     - npm ci
@@ -30,6 +28,10 @@ info:
 
 test:
   stage: test
+  coverage: '/Lines \W+: (\d+\.\d+)%.*/'
+  artifacts:
+    paths:
+      - coverage/
   script:
     - npm run nx -- test shared --code-coverage
     - npm run nx -- test react-components --code-coverage
@@ -38,12 +40,11 @@ test:
     - monorepo-nx
   dependencies:
     - install
-
-lint:
-  stage: test
-  script:
-    - npm run nx -- lint shared
-    - npm run nx -- lint react-components
-    - npm run nx -- lint invoicing-graphql
-  only:
-    - monorepo-nx
+# lint:
+#   stage: test
+#   script:
+#     - npm run nx -- lint shared
+#     - npm run nx -- lint react-components
+#     - npm run nx -- lint invoicing-graphql
+#   only:
+#     - monorepo-nx

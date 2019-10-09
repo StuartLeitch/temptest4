@@ -1,6 +1,7 @@
 import * as braintree from 'braintree';
 
-let environment: string, BraintreeGateway: braintree.BraintreeGateway;
+let environment = '';
+let BraintreeGateway: braintree.BraintreeGateway = null;
 
 require('dotenv').config();
 

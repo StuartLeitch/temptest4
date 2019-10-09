@@ -37,7 +37,7 @@ describe('InvoiceRepo', () => {
     afterAll(() => clearTable(db, 'invoices'));
 
     it('should find the invoice', async () => {
-      const invoiceId: string = 'invoice-1';
+      const invoiceId = 'invoice-1';
 
       const invoice = makeInvoiceData({id: invoiceId});
       await repo.save(invoice);
@@ -111,7 +111,7 @@ describe('InvoiceRepo', () => {
       });
 
       it('should reject promise for unknown invoices', () => {
-        const id: string = 'unknown-invoice';
+        const id = 'unknown-invoice';
         const invoice = makeInvoiceData({id});
 
         expect(repo.delete(invoice)).rejects.toThrowErrorMatchingInlineSnapshot(
@@ -139,7 +139,7 @@ describe('InvoiceRepo', () => {
       });
 
       it('should reject promise when invoice does not exist', async () => {
-        const id: string = 'unknown-invoice';
+        const id = 'unknown-invoice';
         const invoice = makeInvoiceData({id});
 
         expect(repo.update(invoice)).rejects.toThrowErrorMatchingInlineSnapshot(

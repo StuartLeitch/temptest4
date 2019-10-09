@@ -2,8 +2,6 @@
 import {Result} from '../../../core/logic/Result';
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Product, ProductProps} from './Product';
-// import {ArticleId} from '../../articles/domain/ArticleId';
-// import {BaseProductCreator} from './BaseProductCreator';
 
 export class Journal extends Product {
   public create(props: ProductProps, id?: UniqueEntityID): Result<Journal> {

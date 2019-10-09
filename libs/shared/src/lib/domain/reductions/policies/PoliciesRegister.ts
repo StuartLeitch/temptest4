@@ -5,11 +5,11 @@ export class PoliciesRegister {
     this.policies.set(policy.getType(), policy);
   }
 
-  get(name: Symbol) {
+  get(name: symbol) {
     return this.policies.get(name);
   }
 
-  applyPolicy(policy: Symbol, conditions: any[]) {
+  applyPolicy(policy: symbol, conditions: any[]) {
     return this.get(policy).getDiscount(...conditions);
   }
 }

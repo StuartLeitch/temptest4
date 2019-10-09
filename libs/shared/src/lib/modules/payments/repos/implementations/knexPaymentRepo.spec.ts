@@ -36,7 +36,7 @@ describe('KnexPaymentRepo', () => {
 
   describe('.getPaymentById()', () => {
     it('should return the payment entity', async () => {
-      const id: string = 'payment-2';
+      const id = 'payment-2';
       const payment = makePaymentData({id});
       await repo.save(payment);
       const foundPayment = await repo.getPaymentById(payment.paymentId);

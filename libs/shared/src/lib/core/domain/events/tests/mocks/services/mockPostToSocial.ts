@@ -7,8 +7,6 @@ export class MockPostToSocial
   implements
     HandleContract<MockJobCreatedEvent>,
     HandleContract<MockJobDeletedEvent> {
-  constructor() {}
-
   /**
    * This is how we may setup subscriptions to domain events.
    */

@@ -22,7 +22,7 @@ export class WaivedCountryPolicy implements PolicyContract<WaivedCountryRule> {
     return new WaivedCountryRule(correspondingAuthorInstitutionCountryCode);
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.WAIVED_COUNTRY;
   }
 }

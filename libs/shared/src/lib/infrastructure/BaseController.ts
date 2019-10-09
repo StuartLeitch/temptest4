@@ -19,7 +19,7 @@ export abstract class BaseController {
   }
 
   public ok<T>(response: any, dto?: T) {
-    if (!!dto) {
+    if (dto) {
       return response.status(200).json(dto);
     } else {
       return response.sendStatus(200);

@@ -1,10 +1,10 @@
 import * as Chai from 'chai';
-// import Promise = require('bluebird');
-import sqsAdapter from '../../../../../../specs/e2e/TestableSqsAdapter';
-import {ConfigTestProvider} from '../../../../../../specs/e2e/helpers/ConfigTestProvider';
+
+import sqsAdapter from '../../../../../../../specs/e2e/TestableSqsAdapter';
+import {ConfigTestProvider} from '../../../../../../../specs/e2e/helpers/ConfigTestProvider';
 
 describe('SqsConfig', function() {
-  var config = sqsAdapter.config;
+  const config = sqsAdapter.config;
 
   describe('#getPollFrequencyMilliseconds()', function() {
     it('check whether getPollFrequencyMilliseconds() returns the correct poll frequency for given queues', function(done) {

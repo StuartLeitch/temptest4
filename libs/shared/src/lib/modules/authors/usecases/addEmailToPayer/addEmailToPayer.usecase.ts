@@ -19,15 +19,10 @@ export class AddEmailToPayerUseCase
       Result<Email>,
       AddEmailToPayerContext
     > {
-  constructor() {}
-
   // @Authorize([Roles.ADMIN, Roles.SUPER_ADMIN, Roles.CUSTOMER])
   public async execute(
     request: AddEmailToPayerUseCaseRequestDTO
   ): Promise<Result<Email>> {
-    const {payerId} = request;
-
-    let payer: Payer;
     let email: Email;
 
     try {

@@ -4,7 +4,6 @@ import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 
 // * Subdomain
 import {ProductId} from './ProductId';
-import {ProductContract} from './contracts/ProductContract';
 
 export interface ProductProps {
   type: string;
@@ -14,8 +13,7 @@ export interface ProductProps {
   isActive: boolean;
 }
 
-export abstract class Product extends AggregateRoot<ProductProps>
-  implements ProductContract {
+export abstract class Product extends AggregateRoot<ProductProps> {
   public get id(): UniqueEntityID {
     return this._id;
   }

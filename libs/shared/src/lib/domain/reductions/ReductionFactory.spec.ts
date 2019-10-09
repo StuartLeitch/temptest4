@@ -5,7 +5,7 @@ describe('ReductionFactory', () => {
   beforeEach(() => {});
 
   it('Should create a Discount instance', () => {
-    let reductionType = 'DISCOUNT';
+    const reductionType = 'DISCOUNT';
     const discount = ReductionFactory.createReduction(
       reductionType,
       {} as ReductionProps

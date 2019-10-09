@@ -20,8 +20,8 @@ export class VATTreatmentPublicationNotOwnedPolicy
    */
   public getVAT(
     countryCode: string,
-    asBusiness: boolean = false,
-    VATRegistered: boolean = true
+    asBusiness = false,
+    VATRegistered = true
   ): UKVATTreatmentArticleProcessingChargesRule {
     return new UKVATTreatmentArticleProcessingChargesRule(
       countryCode,
@@ -30,7 +30,7 @@ export class VATTreatmentPublicationNotOwnedPolicy
     );
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.VAT_TREATMENT_PUBLICATION_NOT_OWNED;
   }
 }

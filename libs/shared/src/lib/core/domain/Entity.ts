@@ -1,8 +1,4 @@
-import { UniqueEntityID } from './UniqueEntityID';
-
-const isEntity = (v: any): v is Entity<any> => {
-  return v instanceof Entity;
-};
+import {UniqueEntityID} from './UniqueEntityID';
 
 export abstract class Entity<T> {
   protected readonly _id: UniqueEntityID;
@@ -29,3 +25,7 @@ export abstract class Entity<T> {
     return this._id.equals(object._id);
   }
 }
+
+const isEntity = (v: any): v is Entity<any> => {
+  return v instanceof Entity;
+};

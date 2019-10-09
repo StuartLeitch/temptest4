@@ -39,7 +39,7 @@ export class DomainEvents {
     id: UniqueEntityID
   ): AggregateRoot<any> {
     let found: AggregateRoot<any> = null;
-    for (let aggregate of this.markedAggregates) {
+    for (const aggregate of this.markedAggregates) {
       if (aggregate.id.equals(id)) {
         found = aggregate;
       }
@@ -62,7 +62,7 @@ export class DomainEvents {
     callback: (event: DomainEventContract) => void,
     eventClassName: string
   ): void {
-    if (!this.handlersMap.hasOwnProperty(eventClassName)) {
+    if (!Object.hasOwnProperty.call(this.handlersMap, eventClassName)) {
       this.handlersMap[eventClassName] = [];
     }
     this.handlersMap[eventClassName].push(callback);
@@ -79,9 +79,9 @@ export class DomainEvents {
   private static dispatch(event: DomainEventContract): void {
     const eventClassName: string = event.constructor.name;
 
-    if (this.handlersMap.hasOwnProperty(eventClassName)) {
+    if (Object.hasOwnProperty.call(this.handlersMap, eventClassName)) {
       const handlers: any[] = this.handlersMap[eventClassName];
-      for (let handler of handlers) {
+      for (const handler of handlers) {
         handler(event);
       }
     }

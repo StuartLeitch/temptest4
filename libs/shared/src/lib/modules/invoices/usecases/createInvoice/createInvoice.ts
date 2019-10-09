@@ -68,7 +68,7 @@ export class CreateInvoiceUsecase
     request: CreateInvoiceRequestDTO,
     context?: CreateInvoiceContext
   ): Promise<Result<Invoice>> {
-    let {transactionId: rawTransactionId} = request;
+    const {transactionId: rawTransactionId} = request;
 
     let transactionId: TransactionId;
 

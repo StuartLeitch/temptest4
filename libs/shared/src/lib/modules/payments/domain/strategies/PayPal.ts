@@ -3,26 +3,26 @@ import {PaymentModel} from '../contracts/PaymentModel';
 export class PayPal implements PaymentModel {
   PAYPAL_PAYMENT = Symbol.for('@PayPalPayment');
 
-  public UserName: string;
-  public Password: string;
+  public _userName: string;
+  public _password: string;
 
   get userName(): string {
-    return this.UserName;
-  }
-
-  get password(): string {
-    return this.Password;
+    return this._userName;
   }
 
   set userName(value: string) {
-    this.UserName = value;
+    this._userName = value;
+  }
+
+  get password(): string {
+    return this._password;
   }
 
   set password(value: string) {
-    this.Password = value;
+    this._password = value;
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.PAYPAL_PAYMENT;
   }
 }

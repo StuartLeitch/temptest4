@@ -27,7 +27,7 @@ xdescribe('SqsAdapter', function() {
 
   describe('#produce()', function() {
     it('produces a job', async () => {
-      var queueName = 'queueadapter_test_produce';
+      const queueName = 'queueadapter_test_produce';
       await sqsAdapter.produce(queueName, {hey: 'ho'});
     });
   });

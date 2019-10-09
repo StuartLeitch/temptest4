@@ -26,7 +26,7 @@ export class UKVATTreatmentOfHardCopyPublicationsPolicy
    */
   public getVAT(
     countryCode: string,
-    asBusiness: boolean = false
+    asBusiness = false
   ): UKVATTreatmentOfHardCopyPublicationsRule {
     return new UKVATTreatmentOfHardCopyPublicationsRule(
       countryCode,
@@ -34,7 +34,7 @@ export class UKVATTreatmentOfHardCopyPublicationsPolicy
     );
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.UK_VAT_TREATMENT_HARD_COPY_PUBLICATIONS;
   }
 }

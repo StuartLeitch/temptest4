@@ -5,7 +5,7 @@ export class UKVATTreatmentOfHardCopyPublicationsRule
   public IsBusiness: boolean;
   public CountryCode: string;
 
-  public constructor(countryCode: string, asBusiness: boolean = false) {
+  public constructor(countryCode: string, asBusiness = false) {
     this.IsBusiness = asBusiness;
     this.CountryCode = countryCode;
   }

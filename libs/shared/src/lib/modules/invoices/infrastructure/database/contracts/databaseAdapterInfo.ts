@@ -1,6 +1,6 @@
 import {DatabaseAdapterConfigContract} from './databaseAdapterConfig';
 
-export interface IDatabaseAdapterInfo<T extends DatabaseAdapterConfigContract> {
+export interface DatabaseAdapterInfo<T extends DatabaseAdapterConfigContract> {
   type: string;
   config: T;
 }

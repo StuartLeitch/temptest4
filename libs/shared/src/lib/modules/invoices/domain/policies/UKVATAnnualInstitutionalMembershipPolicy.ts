@@ -1,4 +1,4 @@
-import {PolicyContract} from 'modules/invoices/domain/contracts/PolicyContract';
+import {PolicyContract} from '../contracts/PolicyContract';
 import {UKVATAnnualInstitutionalMembershipRule} from './UKVATAnnualInstitutionalMembershipRule';
 
 /**
@@ -25,8 +25,8 @@ export class UKVATTreatmentOAnnualInstitutionalMembershipPolicy
    */
   public getVAT(
     countryCode: string,
-    asBusiness: boolean = false,
-    inBusiness: boolean = true
+    asBusiness = false,
+    inBusiness = true
   ): UKVATAnnualInstitutionalMembershipRule {
     return new UKVATAnnualInstitutionalMembershipRule(
       countryCode,
@@ -35,7 +35,7 @@ export class UKVATTreatmentOAnnualInstitutionalMembershipPolicy
     );
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.UK_VAT_TREATMENT_ANNUAL_INSTITUTIONAL_MEMBERSHIP;
   }
 }

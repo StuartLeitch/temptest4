@@ -9,5 +9,7 @@ export class AddEmailToPayerController extends BaseController {
     this.useCase = useCase;
   }
 
-  public async executeImpl(): Promise<any> {}
+  public async executeImpl(): Promise<any> {
+    return;
+  }
 }

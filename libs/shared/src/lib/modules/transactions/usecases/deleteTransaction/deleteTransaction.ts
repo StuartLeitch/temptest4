@@ -72,8 +72,6 @@ export class DeleteTransactionUsecase
     request: DeleteTransactionRequestDTO,
     context?: DeleteTransactionContext
   ): Promise<Result<unknown>> {
-    let {transactionId: rawTransactionId} = request;
-
     try {
       // * System deletes transaction
       const transactionOrError = await this.getTransaction(request);

@@ -34,7 +34,7 @@ describe('PaymentMethodRepo', () => {
 
   describe('.getPaymentMethodById()', () => {
     it('should return the paymentMethod entity', async () => {
-      const id: string = 'paymentMethod-2';
+      const id = 'paymentMethod-2';
       const paymentMethod = makePaymentMethodData({id});
       await repo.save(paymentMethod);
 

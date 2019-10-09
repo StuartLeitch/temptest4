@@ -10,7 +10,7 @@ import {
 } from '../../../transactions/domain/Transaction';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
-import {Invoice, InvoiceCollection, InvoiceStatus} from '../../domain/Invoice';
+import {Invoice, InvoiceCollection} from '../../domain/Invoice';
 import {CreateInvoiceContext, CreateInvoiceUsecase} from './createInvoice';
 
 let usecase: CreateInvoiceUsecase;
@@ -22,7 +22,7 @@ let invoiceCollection: InvoiceCollection;
 
 // let mockInvoiceRepo: MockInvoiceRepo;
 let transactionCollection: TransactionCollection;
-let transactionId;
+let transactionId: string;
 
 const defaultContext: CreateInvoiceContext = {roles: [Roles.SUPER_ADMIN]};
 
@@ -84,8 +84,8 @@ describe('CreateInvoiceUseCase', () => {
 
         expect(result.isSuccess).toBeTruthy();
 
-        invoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
-        expect(invoiceCollection.length).toEqual(1);
+        const secondInvoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
+        expect(secondInvoiceCollection.length).toEqual(1);
       });
     });
   });

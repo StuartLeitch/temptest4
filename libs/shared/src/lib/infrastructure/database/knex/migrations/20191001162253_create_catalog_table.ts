@@ -2,11 +2,11 @@ export const up = function(knex) {
   const moneyType = {
     symbol: '$',
     name: 'US Dollar',
-    symbol_native: '$',
-    decimal_digits: 2,
+    symbolNative: '$',
+    decimalDigits: 2,
     rounding: 0,
     code: 'USD',
-    name_plural: 'US dollars'
+    namePlural: 'US dollars'
   };
   return knex.schema.createTable('catalog', function(table) {
     table.uuid('id').primary();

@@ -61,7 +61,7 @@ export class Result<T> {
   }
 
   public static combine(results: Result<any>[]): Result<any> {
-    for (let result of results) {
+    for (const result of results) {
       if (result.isFailure) return result;
     }
     return Result.ok();

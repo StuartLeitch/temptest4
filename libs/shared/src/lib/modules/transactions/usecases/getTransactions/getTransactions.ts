@@ -5,10 +5,8 @@ import {Result} from '../../../../core/logic/Result';
 import {Transaction} from '../../domain/Transaction';
 import {TransactionRepoContract} from '../../repos/transactionRepo';
 
-interface GetTransactionsRequestDTO {}
-
 export class GetTransactionsUsecase
-  implements UseCase<GetTransactionsRequestDTO, Result<Transaction[]>> {
+  implements UseCase<{}, Result<Transaction[]>> {
   private transactionRepo: TransactionRepoContract;
 
   constructor(transactionRepo: TransactionRepoContract) {
@@ -25,11 +23,7 @@ export class GetTransactionsUsecase
     return Result.ok<Transaction[]>(transactions);
   }
 
-  public async execute(
-    request: GetTransactionsRequestDTO
-  ): Promise<Result<Transaction[]>> {
-    // const {params} = request;
-
+  public async execute(request: {}): Promise<Result<Transaction[]>> {
     try {
       // * System searches for transactions matching query params
       const transactionsOrError = await this.getTransactions();

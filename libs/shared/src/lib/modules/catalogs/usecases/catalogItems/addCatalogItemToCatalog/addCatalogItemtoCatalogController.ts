@@ -9,5 +9,7 @@ export class AddCatalogItemToCatalogController extends BaseController {
     this.useCase = useCase;
   }
 
-  public async executeImpl(): Promise<any> {}
+  public async executeImpl(): Promise<any> {
+    // do nothing yet
+  }
 }

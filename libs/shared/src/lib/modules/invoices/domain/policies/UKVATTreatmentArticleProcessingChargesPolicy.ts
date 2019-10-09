@@ -15,8 +15,8 @@ export class UKVATTreatmentArticleProcessingChargesPolicy
    */
   public getVAT(
     countryCode: string,
-    asBusiness: boolean = false,
-    VATRegistered: boolean = true
+    asBusiness = false,
+    VATRegistered = true
   ): UKVATTreatmentArticleProcessingChargesRule {
     return new UKVATTreatmentArticleProcessingChargesRule(
       countryCode,
@@ -25,7 +25,7 @@ export class UKVATTreatmentArticleProcessingChargesPolicy
     );
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.UK_VAT_TREATMENT_ARTICLE_PROCESSING_CHARGES;
   }
 }

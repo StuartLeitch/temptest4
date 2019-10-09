@@ -23,7 +23,7 @@ export class WaivedCountryPolicy
     return new SanctionedCountryRule(correspondingAuthorInstitutionCountryCode);
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.SANCTIONED_COUNTRY;
   }
 }

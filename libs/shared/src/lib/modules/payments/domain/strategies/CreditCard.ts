@@ -12,35 +12,31 @@ export class CreditCard implements PaymentModel {
     return this.CardHolderName;
   }
 
-  get cardNumber(): string {
-    return this.CardNumber;
-  }
-
-  get expirationMonth(): number {
-    return this.ExpirationMonth;
-  }
-
-  get expirationYear(): number {
-    return this.ExpirationYear;
-  }
-
   set cardHolder(value: string) {
     this.CardHolderName = value;
   }
 
+  get cardNumber(): string {
+    return this.CardNumber;
+  }
   set cardNumber(value: string) {
     this.CardNumber = value;
   }
-
+  get expirationMonth(): number {
+    return this.ExpirationMonth;
+  }
   set expirationMonth(value: number) {
     this.ExpirationMonth = value;
+  }
+  get expirationYear(): number {
+    return this.ExpirationYear;
   }
 
   set expirationYear(value: number) {
     this.ExpirationYear = value;
   }
 
-  public getType(): Symbol {
+  public getType(): symbol {
     return this.CREDIT_CARD_PAYMENT;
   }
 }

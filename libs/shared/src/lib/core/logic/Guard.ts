@@ -1,17 +1,17 @@
-export interface IGuardResult {
+export interface GuardResult {
   succeeded: boolean;
   message: string;
 }
 
-export interface IGuardArgument {
+export interface GuardArgument {
   argument: any;
   argumentName: string;
 }
 
-export type GuardArgumentCollection = IGuardArgument[];
+export type GuardArgumentCollection = GuardArgument[];
 
 export class Guard {
-  public static combine(guardResults: IGuardResult[]): IGuardResult {
+  public static combine(guardResults: GuardResult[]): GuardResult {
     for (let result of guardResults) {
       if (result.succeeded === false) return result;
     }
@@ -22,7 +22,7 @@ export class Guard {
   public static againstNullOrUndefined(
     argument: any,
     argumentName: string
-  ): IGuardResult {
+  ): GuardResult {
     if (argument === null || argument === undefined) {
       return {
         succeeded: false,
@@ -35,7 +35,7 @@ export class Guard {
 
   public static againstNullOrUndefinedBulk(
     args: GuardArgumentCollection
-  ): IGuardResult {
+  ): GuardResult {
     for (let arg of args) {
       const result = this.againstNullOrUndefined(
         arg.argument,
@@ -51,7 +51,7 @@ export class Guard {
     value: any,
     validValues: any[],
     argumentName: string
-  ): IGuardResult {
+  ): GuardResult {
     let isValid = false;
     for (let validValue of validValues) {
       if (value === validValue) {
@@ -76,7 +76,7 @@ export class Guard {
     min: number,
     max: number,
     argumentName: string
-  ): IGuardResult {
+  ): GuardResult {
     const isInRange = num >= min && num <= max;
     if (!isInRange) {
       return {
@@ -93,7 +93,7 @@ export class Guard {
     min: number,
     max: number,
     argumentName: string
-  ): IGuardResult {
+  ): GuardResult {
     let failingResult;
     for (let num of numbers) {
       const numIsInRangeResult = this.inRange(num, min, max, argumentName);

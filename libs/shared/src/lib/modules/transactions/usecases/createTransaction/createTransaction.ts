@@ -96,7 +96,7 @@ export class CreateTransactionUsecase
     request: CreateTransactionRequestDTO,
     context?: CreateTransactionContext
   ): Promise<Result<Transaction>> {
-    let {manuscriptId: rawArticleId} = request;
+    const {manuscriptId: rawArticleId} = request;
 
     let manuscriptId: ArticleId;
 

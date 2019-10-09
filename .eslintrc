@@ -1,4 +1,3 @@
-
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
@@ -9,11 +8,11 @@
   },
   "plugins": ["@typescript-eslint", "@nrwl/nx"],
   "extends": [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
-    'prettier/@typescript-eslint'
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "prettier/@typescript-eslint"
   ],
   "rules": {
     "@typescript-eslint/explicit-member-accessibility": "off",
@@ -24,8 +23,15 @@
       {
         "allow": [],
         "depConstraints": [
-          { "sourceTag": "*", "onlyDependOnLibsWithTags": ["*"] }
+          {"sourceTag": "*", "onlyDependOnLibsWithTags": ["*"]}
         ]
+      }
+    ],
+    "@typescript-eslint/no-this-alias": [
+      "error",
+      {
+        "allowDestructuring": true, // Allow `const { props, state } = this`; false by default
+        "allowedNames": ["self"] // Allow `const self = this`; `[]` by default
       }
     ]
   },
