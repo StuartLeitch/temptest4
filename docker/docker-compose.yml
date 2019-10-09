@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:10
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: $USER
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+      - /c/Users/Lucian/Projects/Hindawi/xpub-review/scripts/test.sql:/docker-entrypoint-initdb.d/test.sql
+    # stdin_open: true
+    # tty: true
+
+volumes:
+  postgres-volume:
+    name: postgres-db

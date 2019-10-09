@@ -1,8 +1,283 @@
 {
   "version": 1,
-  "projects": {},
+  "projects": {
+    "invoicing-cli": {
+      "root": "apps/invoicing-cli",
+      "sourceRoot": "apps/invoicing-cli/src",
+      "projectType": "application",
+      "prefix": "invoicing-cli",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/invoicing-cli",
+            "main": "apps/invoicing-cli/src/main.ts",
+            "tsConfig": "apps/invoicing-cli/tsconfig.app.json",
+            "assets": ["apps/invoicing-cli/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/invoicing-cli/src/environments/environment.ts",
+                  "with": "apps/invoicing-cli/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "invoicing-cli:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/invoicing-cli/.eslintrc",
+            "tsConfig": [
+              "apps/invoicing-cli/tsconfig.app.json",
+              "apps/invoicing-cli/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-cli/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/invoicing-cli/jest.config.js",
+            "tsConfig": "apps/invoicing-cli/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "invoicing-graphql": {
+      "root": "apps/invoicing-graphql",
+      "sourceRoot": "apps/invoicing-graphql/src",
+      "projectType": "application",
+      "prefix": "invoicing-graphql",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/invoicing-graphql",
+            "main": "apps/invoicing-graphql/src/main.ts",
+            "tsConfig": "apps/invoicing-graphql/tsconfig.app.json",
+            "assets": ["apps/invoicing-graphql/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/invoicing-graphql/src/environments/environment.ts",
+                  "with": "apps/invoicing-graphql/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "invoicing-graphql:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/invoicing-graphql/.eslintrc",
+            "tsConfig": [
+              "apps/invoicing-graphql/tsconfig.app.json",
+              "apps/invoicing-graphql/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-graphql/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/invoicing-graphql/jest.config.js",
+            "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "shared": {
+      "root": "libs/shared",
+      "sourceRoot": "libs/shared/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "libs/shared/.eslintrc",
+            "tsConfig": [
+              "libs/shared/tsconfig.lib.json",
+              "libs/shared/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/shared/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/shared/jest.config.js",
+            "tsConfig": "libs/shared/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "react-components": {
+      "root": "libs/react-components",
+      "sourceRoot": "libs/react-components/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "libs/react-components/.eslintrc",
+            "tsConfig": [
+              "libs/react-components/tsconfig.lib.json",
+              "libs/react-components/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/react-components/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/react-components/jest.config.js",
+            "tsConfig": "libs/react-components/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "invoicing-web": {
+      "root": "apps/invoicing-web",
+      "sourceRoot": "apps/invoicing-web/src",
+      "projectType": "application",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/web:build",
+          "options": {
+            "outputPath": "dist/apps/invoicing-web",
+            "index": "apps/invoicing-web/src/index.html",
+            "main": "apps/invoicing-web/src/main.tsx",
+            "polyfills": "apps/invoicing-web/src/polyfills.ts",
+            "tsConfig": "apps/invoicing-web/tsconfig.app.json",
+            "assets": [
+              "apps/invoicing-web/src/favicon.ico",
+              "apps/invoicing-web/src/assets"
+            ],
+            "styles": ["apps/invoicing-web/src/styles.scss"],
+            "scripts": [],
+            "webpackConfig": "@nrwl/react/plugins/babel"
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/invoicing-web/src/environments/environment.ts",
+                  "with": "apps/invoicing-web/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/web:dev-server",
+          "options": {
+            "buildTarget": "invoicing-web:build"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "invoicing-web:build:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/invoicing-web/.eslintrc",
+            "tsConfig": [
+              "apps/invoicing-web/tsconfig.app.json",
+              "apps/invoicing-web/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-web/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/invoicing-web/jest.config.js",
+            "tsConfig": "apps/invoicing-web/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "invoicing-web-e2e": {
+      "root": "apps/invoicing-web-e2e",
+      "sourceRoot": "apps/invoicing-web-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/invoicing-web-e2e/cypress.json",
+            "tsConfig": "apps/invoicing-web-e2e/tsconfig.e2e.json",
+            "devServerTarget": "invoicing-web:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "invoicing-web:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/invoicing-web-e2e/.eslintrc",
+            "tsConfig": ["apps/invoicing-web-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-web-e2e/**"]
+          }
+        }
+      }
+    }
+  },
   "cli": {
-    "defaultCollection": "@nrwl/workspace"
+    "defaultCollection": "@nrwl/node"
   },
   "schematics": {
     "@nrwl/workspace": {
@@ -17,14 +292,21 @@
     },
     "@nrwl/react": {
       "application": {
-        "linter": "eslint"
+        "style": "scss",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "scss"
       },
       "library": {
+        "style": "scss",
         "linter": "eslint"
       }
     },
     "@nrwl/next": {
       "application": {
+        "style": "scss",
         "linter": "eslint"
       }
     },
@@ -48,5 +330,6 @@
         "linter": "eslint"
       }
     }
-  }
+  },
+  "defaultProject": "invoicing-cli"
 }

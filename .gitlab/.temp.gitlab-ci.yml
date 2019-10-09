@@ -1,0 +1,142 @@
+variables:
+  CONFIGURATION_REPOSITORY: https://gitlab.coko.foundation/bogdan/xpub-faraday-deployment-config.git
+  DOCKER_REPO: $CI_ECR_URL
+  DOCKER_REPO_REVIEW: $REVIEW_ECR
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - test
+  - push
+  - deploy
+
+build:
+  image: docker:latest
+  stage: build
+  script:
+    - export AWS_REGION="eu-west-1"
+    - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    - apk update
+    - apk --no-cache add --update curl python python-dev py-pip
+    - pip install awscli --upgrade --user
+    - export PATH=~/.local/bin:/usr/bin/:$PATH
+    - CERT=`aws ecr get-login --no-include-email --region ${AWS_REGION}`
+    - ${CERT}
+    # Build
+    - docker build -t ${CI_PROJECT_NAME}:$CI_COMMIT_SHA .
+    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_SHA $DOCKER_REPO:$CI_COMMIT_SHA
+    - docker push $DOCKER_REPO:$CI_COMMIT_SHA
+
+lint:
+  image: $DOCKER_REPO:$CI_COMMIT_SHA
+  stage: test
+  allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - cd ${HOME}
+    - npm run lint
+
+test:
+  image: $DOCKER_REPO:$CI_COMMIT_SHA
+  stage: test
+  allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - cd ${HOME}
+    - npm run test
+
+push:qa:
+  image: docker:latest
+  stage: push
+  only:
+    - develop
+  variables:
+    NODE_ENV: test
+  script:
+    - export AWS_REGION="eu-west-1"
+    - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    - apk update
+    - apk --no-cache add --update curl python python-dev py-pip
+    - pip install awscli --upgrade --user
+    - export PATH=~/.local/bin:/usr/bin/:$PATH
+    - CERT=`aws ecr get-login --no-include-email --region ${AWS_REGION}`
+    - ${CERT}
+    # Tag
+    - docker tag $DOCKER_REPO:$CI_COMMIT_SHA $DOCKER_REPO:latest
+    - docker push $DOCKER_REPO:latest
+
+push:gql:
+  image: docker:latest
+  stage: push
+  when: manual
+  variables:
+    NODE_ENV: test
+  script:
+    - export AWS_REGION="eu-west-1"
+    - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    - apk update
+    - apk --no-cache add --update curl python python-dev py-pip
+    - pip install awscli --upgrade --user
+    - export PATH=~/.local/bin:/usr/bin/:$PATH
+    - CERT=`aws ecr get-login --no-include-email --region ${AWS_REGION}`
+    - ${CERT}
+    # Tag
+    - docker tag $DOCKER_REPO:$CI_COMMIT_SHA $DOCKER_REPO:gql
+    - docker push $DOCKER_REPO:gql
+
+deploy:qa:
+  image: pubsweet/deployer:latest
+  stage: deploy
+  only:
+    - develop
+  variables:
+    PACKAGE_NAME: xpub-review
+    IMAGE_REPO: $CI_ECR_URL
+    IMAGE_TAG: latest
+    NODE_ENV: test
+  environment:
+    name: qa
+    url: http://qa.review.hindawi.com
+  script:
+    - source deploy.sh
+    - create_deployment
+
+deploy:gql:
+  image: pubsweet/deployer:latest
+  stage: deploy
+  when: manual
+  variables:
+    PACKAGE_NAME: xpub-review
+    IMAGE_REPO: $CI_ECR_URL
+    IMAGE_TAG: gql
+    NODE_ENV: test
+  environment:
+    name: gql
+    url: http://gql.review.hindawi.com
+  script:
+    - source deploy.sh
+    - create_deployment
+
+deploy:styleguide:
+  image: pubsweet/deployer:latest
+  stage: deploy
+  when: manual
+  only:
+    - develop
+  variables:
+    PACKAGE_NAME: xpub-styleguide
+    IMAGE_REPO: $CI_ECR_URL
+    IMAGE_TAG: latest
+  environment:
+    name: styleguide
+    url: http://styleguide.review.hindawi.com
+  script:
+    - source deploy.sh
+    - create_deployment

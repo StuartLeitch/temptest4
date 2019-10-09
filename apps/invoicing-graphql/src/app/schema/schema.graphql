@@ -1,0 +1,15 @@
+type Invoice {
+  id: String
+  totalAmount: Float
+  netAmount: Float
+}
+
+type Query {
+  invoice(id: String): Invoice!
+  echo(value: String): String
+}
+
+type Mutation {
+  createInvoice(totalAmount: Float): Invoice
+  deleteInvoice(id: String!): Boolean
+}
