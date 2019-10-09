@@ -1,6 +1,12 @@
 default:
   image: node:12-alpine
 
+variables:
+  BT_ENVIRONMENT: 'Sandbox'
+  BT_MERCHANT_ID: 'test-merchant-id'
+  BT_PUBLIC_KEY: 'test-public-key'
+  BT_PRIVATE_KEY: 'test-private-key'
+
 stages:
   - setup
   - test
