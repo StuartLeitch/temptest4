@@ -1,11 +1,11 @@
-import { GluegunToolbox } from 'gluegun'
+import {GluegunToolbox} from 'gluegun';
 
 import {
-  // AddCatalogItemToCatalogUseCase
-  GetAllCatalogItemsUseCase
-} from '@hindawi/shared'
-import { makeDb, destroyDb } from '@hindawi/server/testUtils/db'
-import { CatalogKnexRepo as CatalogRepo } from '@hindawi/server/repos/knex/CatalogRepo'
+  GetAllCatalogItemsUseCase,
+  makeDb,
+  destroyDb,
+  KnexCatalogRepo as CatalogRepo
+} from '@hindawi/shared';
 // import { TransactionKnexRepo as TransactionRepo } from '@hindawi/server/repos/knex/TransactionRepo'
 
 module.exports = {
@@ -25,23 +25,23 @@ module.exports = {
         table,
         info,
         error,
-        colors: { blue }
+        colors: {blue}
       }
       //   prompt,
       //   createTransactionFlow
-    } = toolbox
+    } = toolbox;
 
-    info(blue('************************'))
-    info(blue('*     Show Catalog     *'))
-    info(blue('************************'))
-    newline()
+    info(blue('************************'));
+    info(blue('*     Show Catalog     *'));
+    info(blue('************************'));
+    newline();
 
-    const db = await makeDb({ filename: './dev.sqlite3' })
-    const catalogRepo = new CatalogRepo(db)
+    const db = await makeDb({filename: './dev.sqlite3'});
+    const catalogRepo = new CatalogRepo(db);
 
     // * create spinner
-    const spinner = spin()
-    spinner.color = 'cyan'
+    const spinner = spin();
+    spinner.color = 'cyan';
 
     // const addCatalogItemToCatalogUseCase = new AddCatalogItemToCatalogUseCase(
     //   catalogRepo
@@ -63,29 +63,31 @@ module.exports = {
     //   error(usecaseError)
     // }
 
-    const getAllCatalogItemsUseCase = new GetAllCatalogItemsUseCase(catalogRepo)
+    const getAllCatalogItemsUseCase = new GetAllCatalogItemsUseCase(
+      catalogRepo
+    );
 
-    spinner.start('Execute getAllCatalogItemsUseCase')
-    const result = await getAllCatalogItemsUseCase.execute({})
-    spinner.stop()
+    spinner.start('Execute getAllCatalogItemsUseCase');
+    const result = await getAllCatalogItemsUseCase.execute({});
+    spinner.stop();
 
     if (result.isSuccess) {
-      const catalog = result.getValue()
+      const catalog = result.getValue();
       // debug(catalog)
-      const tableColumns = ['Type', 'Price']
+      const tableColumns = ['Type', 'Price'];
       // spinner.succeed('Successfully created a CatalogItem.')
       // success(newlyCreatedCatalogItem)
-      const tableData = catalog.map(ci => [ci.type, ci.price])
-      tableData.unshift(tableColumns)
+      const tableData = catalog.map(ci => [ci.type, ci.price]);
+      tableData.unshift(tableColumns);
       table(tableData, {
         format: 'lean'
-      })
+      });
     } else {
-      const { error: usecaseError } = result
-      spinner.fail(usecaseError.toString())
-      error(usecaseError)
+      const {error: usecaseError} = result;
+      spinner.fail(usecaseError.toString());
+      error(usecaseError);
     }
 
-    await destroyDb(db)
+    await destroyDb(db);
   }
-}
+};

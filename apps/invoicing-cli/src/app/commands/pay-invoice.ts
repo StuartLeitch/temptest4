@@ -1,4 +1,4 @@
-import { GluegunToolbox } from 'gluegun'
+import {GluegunToolbox} from 'gluegun';
 
 import {
   Roles,
@@ -9,11 +9,11 @@ import {
   PaymentStrategy,
   CreditCardPayment,
   CreditCard,
-  BraintreeGateway
-} from '@hindawi/shared'
-import { makeDb, destroyDb } from '@hindawi/server/testUtils/db'
-import { InvoiceKnexRepo as InvoiceRepo } from '@hindawi/server/repos/knex/InvoiceRepo'
-// import { TransactionKnexRepo as TransactionRepo } from '@hindawi/server/repos/knex/TransactionRepo'
+  BraintreeGateway,
+  KnexInvoiceRepo as InvoiceRepo,
+  makeDb,
+  destroyDb
+} from '@hindawi/shared';
 
 module.exports = {
   dashed: true,
@@ -32,41 +32,41 @@ module.exports = {
         // table,
         info,
         error,
-        colors: { muted, blue }
+        colors: {muted, blue}
       }
       //   prompt,
       //   createTransactionFlow
-    } = toolbox
+    } = toolbox;
 
     // let payPal = new PayPal();
-    let creditCard = new CreditCard()
+    let creditCard = new CreditCard();
 
-    const paymentFactory: PaymentFactory = new PaymentFactory()
-    paymentFactory.registerPayment(creditCard)
+    const paymentFactory: PaymentFactory = new PaymentFactory();
+    paymentFactory.registerPayment(creditCard);
     const paymentMethod: PaymentModel = paymentFactory.create(
       'CreditCardPayment'
-    )
+    );
 
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
       ['CreditCard', new CreditCardPayment(BraintreeGateway)]
-    ])
+    ]);
 
-    info(blue('************************'))
-    info(blue('*    Execute Payment   *'))
-    info(blue('************************'))
-    newline()
+    info(blue('************************'));
+    info(blue('*    Execute Payment   *'));
+    info(blue('************************'));
+    newline();
 
-    const invoiceId = parameters.first
-    info(muted(`Invoice ID = ${invoiceId}`))
+    const invoiceId = parameters.first;
+    info(muted(`Invoice ID = ${invoiceId}`));
 
-    const db = await makeDb({ filename: './dev.sqlite3' })
-    const invoiceRepo = new InvoiceRepo(db)
-    const getInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(invoiceRepo)
+    const db = await makeDb({filename: './dev.sqlite3'});
+    const invoiceRepo = new InvoiceRepo(db);
+    const getInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
 
     // * create spinner
-    const spinner = spin()
-    spinner.color = 'cyan'
-    spinner.stop()
+    const spinner = spin();
+    spinner.color = 'cyan';
+    spinner.stop();
 
     const result = await getInvoiceDetailsUsecase.execute(
       {
@@ -75,18 +75,18 @@ module.exports = {
       {
         roles: [Roles.ADMIN]
       }
-    )
+    );
 
     // let invoice: Invoice
     if (result.isSuccess) {
       // let invoice = result.getValue()
-      spinner.succeed('Successfully retrieved Invoice details.')
+      spinner.succeed('Successfully retrieved Invoice details.');
     } else {
-      const { error: usecaseError } = result
-      spinner.fail(usecaseError.toString())
-      error(usecaseError)
+      const {error: usecaseError} = result;
+      spinner.fail(usecaseError.toString());
+      error(usecaseError);
     }
-    spinner.stopAndPersist()
+    spinner.stopAndPersist();
 
     // const payment: any = await paymentStrategy.makePayment(paymentMethod, invoice.value)
 
@@ -96,6 +96,6 @@ module.exports = {
     //   error(payment.message)
     // }
 
-    await destroyDb(db)
+    await destroyDb(db);
   }
-}
+};

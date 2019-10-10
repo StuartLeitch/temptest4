@@ -2,13 +2,13 @@ import {
   CatalogItem,
   // CatalogId,
   CatalogRepoContract,
-  CatalogMap
+  CatalogMap,
+  Knex
 } from '@hindawi/shared';
 
-import {Knex} from '../../../../../../apps/server/src/services/db';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 
-export class CatalogKnexRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
+export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {
   exists(catalogItem: CatalogItem): Promise<boolean> {
     return Promise.resolve(true);

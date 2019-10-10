@@ -18,7 +18,7 @@ export * from './modules/articles/domain/ArticleId';
 export * from './modules/articles/domain/Price';
 export * from './modules/articles/domain/PriceId';
 export * from './modules/articles/domain/PriceValue';
-export * from './modules/articles/repos/articleRepo';
+export * from './modules/articles/repos';
 export * from './modules/articles/repos/implementations/jsonArticleRepo';
 export * from './modules/articles/mappers/ArticleMap';
 export * from './modules/articles/repos/priceRepo';
@@ -83,7 +83,7 @@ export * from './modules/addresses/domain/AddressId';
 // * Export Catalog Subdomain
 export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
 // export * from './modules/catalogs/domain/CatalogId';
-export * from './modules/catalogs/repos/catalogRepo';
+export * from './modules/catalogs/repos';
 export * from './modules/catalogs/mappers/CatalogMap';
 export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';

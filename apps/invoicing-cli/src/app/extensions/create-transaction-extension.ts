@@ -1,8 +1,8 @@
-import {UniqueEntityID} from './../../../../../../../shared/lib/core/domain/UniqueEntityID';
 import {GluegunToolbox} from 'gluegun';
-import JSONDB from '../../../../../phenom-finance/packages/apps/payment/src/delivery/cli/src/lowdb';
 
 import {
+  UniqueEntityID,
+  makeDb,
   // CreateTransactionForAPCFlow,
   // TransactionRepoContract,
   // TransactionJsonRepo,
@@ -10,11 +10,11 @@ import {
   // InvoiceJsonRepo,
   Article,
   ArticleRepoContract,
-  ArticleJsonRepo
+  KnexArticleRepo
   // Price,
   // PriceId,
   // PriceValue
-} from '../../../../../phenom-finance/packages/shared/lib';
+} from '@hindawi/shared';
 
 const CLI_ARTICLE_ID = 'test-article-cli';
 // const CLI_PRICE_ID = 'test-price-cli'
@@ -30,10 +30,10 @@ let articleRepo: ArticleRepoContract;
 module.exports = async (toolbox: GluegunToolbox) => {
   // const jsondb = JSONDB.getInstance()
   // await jsondb.prepare()
-  const db = JSONDB.getDBInstance();
+  const db = await makeDb();
 
   // transactionRepo = new TransactionJsonRepo(db)
-  articleRepo = new ArticleJsonRepo(db);
+  articleRepo = new KnexArticleRepo(db);
   // invoiceRepo = new InvoiceJsonRepo(db)
 
   // creates a new price value and save it
@@ -56,16 +56,6 @@ module.exports = async (toolbox: GluegunToolbox) => {
       },
       new UniqueEntityID(CLI_ARTICLE_ID)
     ).getValue();
-    await articleRepo.save(article);
+    // await articleRepo.save(article);
   }
-
-  // const createTransactionFlow = new CreateTransactionForAPCFlow(
-  //   transactionRepo,
-  //   invoiceRepo,
-  //   articleRepo
-  // )
-  const createTransactionFlow = {};
-
-  // attach the flow to the toolbox
-  toolbox.createTransactionFlow = createTransactionFlow;
 };

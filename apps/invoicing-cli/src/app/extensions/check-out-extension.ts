@@ -1,5 +1,5 @@
 import {GluegunToolbox} from 'gluegun';
-import JSONDB from '../../../../../phenom-finance/packages/apps/payment/src/delivery/cli/src/lowdb';
+// import JSONDB from '../../../../../phenom-finance/packages/apps/payment/src/delivery/cli/src/lowdb';
 
 import {
   // CreateTransactionForAPCFlow,
@@ -9,15 +9,15 @@ import {
   // InvoiceJsonRepo,
   // Article,
   ArticleRepoContract,
-  ArticleJsonRepo,
+  KnexArticleRepo,
   PriceRepoContract,
-  PriceJsonRepo
-} from '../../../../../phenom-finance/packages/shared/lib';
+  // KnexPriceRepo,
+  makeDb
+} from '@hindawi/shared';
 
 let articleRepo: ArticleRepoContract;
 let transactionRepo: TransactionRepoContract;
-// let invoiceRepo: InvoiceRepoContract
-let priceRepo: PriceRepoContract;
+// let priceRepo: PriceRepoContract;
 
 /**
  * Create the repos and kick it off
@@ -25,16 +25,16 @@ let priceRepo: PriceRepoContract;
 module.exports = async (toolbox: GluegunToolbox) => {
   // const jsondb = JSONDB.getInstance()
   // await jsondb.prepare()
-  const db = JSONDB.getDBInstance();
+  const db = await makeDb();
 
   // transactionRepo = new TransactionJsonRepo(db)
-  articleRepo = new ArticleJsonRepo(db);
+  articleRepo = new KnexArticleRepo(db);
   // invoiceRepo = new InvoiceJsonRepo(db)
-  priceRepo = new PriceJsonRepo(db);
+  // priceRepo = new PriceJsonRepo(db);
 
   // attach the flow to the toolbox
   toolbox.transactionRepo = transactionRepo;
   toolbox.articleRepo = articleRepo;
-  toolbox.priceRepo = priceRepo;
+  // toolbox.priceRepo = priceRepo;
   // toolbox.createTransactionFlow = createTransactionFlow
 };

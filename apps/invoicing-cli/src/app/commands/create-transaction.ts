@@ -5,7 +5,7 @@ import {
   CreateTransactionUsecase,
   makeDb,
   destroyDb,
-  // KnexArticleRepo as ArticleRepo,
+  KnexArticleRepo as ArticleRepo,
   KnexTransactionRepo as TransactionRepo
 } from '@hindawi/shared';
 
@@ -61,7 +61,7 @@ module.exports = {
     spinner.color = 'cyan';
 
     const [
-      articleId,
+      manuscriptId,
       journalId,
       title,
       articleTypeId,
@@ -71,7 +71,7 @@ module.exports = {
     spinner.start('Execute createTransactionUsecase');
     const result = await createTransactionUsecase.execute(
       {
-        articleId,
+        manuscriptId,
         journalId,
         title,
         articleTypeId,

@@ -1,4 +1,4 @@
-import { GluegunToolbox } from 'gluegun'
+import {GluegunToolbox} from 'gluegun';
 
 import {
   UniqueEntityID,
@@ -18,14 +18,14 @@ import {
   PaymentStrategy,
   CreditCardPayment,
   CreditCard,
-  BraintreeGateway
-} from '@hindawi/shared'
-import { makeDb, destroyDb } from '@hindawi/server/testUtils/db'
-// import { InvoiceKnexRepo as InvoiceRepo } from '@hindawi/server/repos/knex/InvoiceRepo'
-import { TransactionKnexRepo as TransactionRepo } from '@hindawi/server/repos/knex/TransactionRepo'
-import { CatalogKnexRepo as CatalogRepo } from '@hindawi/server/repos/knex/CatalogRepo'
+  BraintreeGateway,
+  makeDb,
+  destroyDb,
+  KnexTransactionRepo as TransactionRepo,
+  KnexCatalogRepo as CatalogRepo
+} from '@hindawi/shared';
 
-const AMOUNTS = {}
+const AMOUNTS = {};
 
 module.exports = {
   dashed: true,
@@ -45,28 +45,28 @@ module.exports = {
         table,
         newline,
         error,
-        colors: { muted, red, blue, magenta }
+        colors: {muted, red, blue, magenta}
       },
       prompt
       //   createTransactionFlow
-    } = toolbox
+    } = toolbox;
 
-    info(blue('************************'))
-    info(blue('*  Split Transaction   *'))
-    info(blue('************************'))
-    const transactionId = parameters.first
+    info(blue('************************'));
+    info(blue('*  Split Transaction   *'));
+    info(blue('************************'));
+    const transactionId = parameters.first;
 
-    const db = await makeDb({ filename: './dev.sqlite3' })
-    const transactionRepo = new TransactionRepo(db)
-    const catalogRepo = new CatalogRepo(db)
-    const getTransactionUsecase = new GetTransactionUsecase(transactionRepo)
-    const policiesRegister = new PoliciesRegister()
-    const APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy = new UKVATTreatmentArticleProcessingChargesPolicy()
-    policiesRegister.registerPolicy(APCPolicy)
+    const db = await makeDb({filename: './dev.sqlite3'});
+    const transactionRepo = new TransactionRepo(db);
+    const catalogRepo = new CatalogRepo(db);
+    const getTransactionUsecase = new GetTransactionUsecase(transactionRepo);
+    const policiesRegister = new PoliciesRegister();
+    const APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
+    policiesRegister.registerPolicy(APCPolicy);
 
     // * create spinner
-    const spinner = spin()
-    spinner.color = 'cyan'
+    const spinner = spin();
+    spinner.color = 'cyan';
 
     const result = await getTransactionUsecase.execute(
       {
@@ -75,39 +75,39 @@ module.exports = {
       {
         roles: [Roles.ADMIN]
       }
-    )
+    );
 
-    let transaction: Transaction
+    let transaction: Transaction;
     if (result.isSuccess) {
-      transaction = result.getValue()
-      spinner.succeed('Successfully retrieved Transaction value.')
+      transaction = result.getValue();
+      spinner.succeed('Successfully retrieved Transaction value.');
     } else {
-      const { error: usecaseError } = result
-      spinner.fail(usecaseError.toString())
-      error(usecaseError)
+      const {error: usecaseError} = result;
+      spinner.fail(usecaseError.toString());
+      error(usecaseError);
     }
 
-    spinner.stopAndPersist()
+    spinner.stopAndPersist();
 
-    const catalogItem = await catalogRepo.getPriceByType()
-    newline()
-    const text1 = magenta('Transaction net value is:')
-    const text2 = red(`${catalogItem}`)
-    info(`${text1} ${text2}`)
-    newline()
+    const catalogItem = await catalogRepo.getPriceByType();
+    newline();
+    const text1 = magenta('Transaction net value is:');
+    const text2 = red(`${catalogItem}`);
+    info(`${text1} ${text2}`);
+    newline();
 
-    const { payersCount } = await prompt.ask([
+    const {payersCount} = await prompt.ask([
       {
         type: 'input',
         name: 'payersCount',
         message: 'How many payers will split the transaction?',
         initial: 1
       }
-    ])
+    ]);
 
     const payerInput = i => {
-      newline()
-      info(muted(`Please add Payer #${i} details:`))
+      newline();
+      info(muted(`Please add Payer #${i} details:`));
       return prompt.ask([
         {
           type: 'input',
@@ -127,20 +127,20 @@ module.exports = {
           name: 'individualConfirmed',
           message: 'Is individual?'
         }
-      ])
-    }
+      ]);
+    };
 
-    const payersInputs = Array.from({ length: payersCount }, (_, i) =>
+    const payersInputs = Array.from({length: payersCount}, (_, i) =>
       payerInput.bind(null, i + 1)
-    )
+    );
 
-    const payersData = []
+    const payersData = [];
     for (let pi of payersInputs) {
-      const { name, country, individualConfirmed } = await Reflect.apply(
+      const {name, country, individualConfirmed} = await Reflect.apply(
         pi,
         null,
         []
-      )
+      );
 
       // const payerId = `test-payer-${name}`
       const payerEntity = Payer.create(
@@ -150,7 +150,7 @@ module.exports = {
           type: PayerType.create('FooBar').getValue()
         },
         new UniqueEntityID()
-      ).getValue()
+      ).getValue();
 
       // const invoiceId = 'test-invoice1'
       const invoiceEntity = Invoice.create(
@@ -159,29 +159,29 @@ module.exports = {
           payerId: payerEntity.payerId
         },
         new UniqueEntityID()
-      ).getValue()
+      ).getValue();
 
       const invoiceItem = InvoiceItem.create(
         {
           invoiceId: invoiceEntity.invoiceId
         },
         new UniqueEntityID()
-      ).getValue()
+      ).getValue();
 
-      invoiceItem.price = Math.round(catalogItem / payersCount)
+      invoiceItem.price = Math.round(catalogItem / payersCount);
 
       const calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
         country,
         !individualConfirmed,
         individualConfirmed ? false : true
-      ])
-      const VAT = calculateVAT.getVAT()
+      ]);
+      const VAT = calculateVAT.getVAT();
 
-      invoiceEntity.addInvoiceItem(invoiceItem)
-      const totalAmount = invoiceEntity.addTax(VAT)
-      AMOUNTS[invoiceEntity.id.toString()] = totalAmount
+      invoiceEntity.addInvoiceItem(invoiceItem);
+      const totalAmount = invoiceEntity.addTax(VAT);
+      AMOUNTS[invoiceEntity.id.toString()] = totalAmount;
 
-      transaction.addInvoice(invoiceEntity)
+      transaction.addInvoice(invoiceEntity);
 
       payersData.push({
         transactionID: transaction.id.toString(),
@@ -192,40 +192,40 @@ module.exports = {
         individualConfirmed,
         netAmount: invoiceItem.price,
         totalAmount
-      })
+      });
     }
 
-    newline()
+    newline();
 
-    buildTable(payersData, table)
+    buildTable(payersData, table);
 
-    newline()
-    const { sendInvoicesConfirmation } = await prompt.ask([
+    newline();
+    const {sendInvoicesConfirmation} = await prompt.ask([
       {
         type: 'confirm',
         name: 'sendInvoicesConfirmation',
         message: 'Do you wish to send invoices to their payers?'
       }
-    ])
+    ]);
 
     if (sendInvoicesConfirmation) {
-      newline()
+      newline();
       // send invoices to the payers
       transaction.invoices.forEach((invoice: Invoice) => {
-        invoice.markAsActive()
+        invoice.markAsActive();
 
         payersData.forEach(row => {
           if (row.invoiceID === invoice.id.toString()) {
-            row.invoiceStatus = InvoiceStatus[invoice.status]
+            row.invoiceStatus = InvoiceStatus[invoice.status];
           }
-        })
-      })
+        });
+      });
 
-      buildTable(payersData, table)
+      buildTable(payersData, table);
     }
 
-    newline()
-    const { payInvoicesConfirmation, selectedInvoice } = await prompt.ask([
+    newline();
+    const {payInvoicesConfirmation, selectedInvoice} = await prompt.ask([
       {
         type: 'confirm',
         name: 'payInvoicesConfirmation',
@@ -237,45 +237,45 @@ module.exports = {
         message: 'Select invoice to pay:',
         choices: payersData.map(row => row.invoiceID)
       }
-    ])
+    ]);
 
     if (payInvoicesConfirmation) {
-      newline()
+      newline();
       const invoice = transaction.invoices.find(
         (invoice: Invoice) => invoice.id.toString() === selectedInvoice
-      )
+      );
 
-      let creditCard = new CreditCard()
-      const paymentFactory: PaymentFactory = new PaymentFactory()
-      paymentFactory.registerPayment(creditCard)
+      let creditCard = new CreditCard();
+      const paymentFactory: PaymentFactory = new PaymentFactory();
+      paymentFactory.registerPayment(creditCard);
       const paymentMethod: PaymentModel = paymentFactory.create(
         'CreditCardPayment'
-      )
+      );
       const paymentStrategy: PaymentStrategy = new PaymentStrategy([
         ['CreditCard', new CreditCardPayment(BraintreeGateway)]
-      ])
+      ]);
 
       const payment: any = await paymentStrategy.makePayment(
         paymentMethod,
         AMOUNTS[invoice.id.toString()]
-      )
+      );
 
       if (payment.success) {
-        invoice.markAsPaid()
+        invoice.markAsPaid();
         payersData.forEach(row => {
           if (row.invoiceID === invoice.id.toString()) {
-            row.invoiceStatus = InvoiceStatus[invoice.status]
+            row.invoiceStatus = InvoiceStatus[invoice.status];
           }
-        })
+        });
 
-        buildTable(payersData, table)
+        buildTable(payersData, table);
 
-        newline()
+        newline();
         success(
           'Invoice paid! CreditCard Payment ID: ' + payment.transaction.id
-        )
+        );
       } else {
-        error(payment.message)
+        error(payment.message);
       }
     }
 
@@ -287,9 +287,9 @@ module.exports = {
     //   info(payInvoiceCmd)
     // })
 
-    await destroyDb(db)
+    await destroyDb(db);
   }
-}
+};
 
 function buildTable(data, tableRenderer) {
   const tableColumns = [
@@ -301,7 +301,7 @@ function buildTable(data, tableRenderer) {
     'Type',
     'Net Amount',
     'Total Amount'
-  ]
+  ];
 
   const tableData = data.map(
     ({
@@ -323,9 +323,9 @@ function buildTable(data, tableRenderer) {
       netAmount,
       parseFloat(String(totalAmount)).toFixed(2)
     ]
-  )
-  tableData.unshift(tableColumns)
+  );
+  tableData.unshift(tableColumns);
   tableRenderer(tableData, {
     format: 'lean'
-  })
+  });
 }

@@ -1,13 +1,8 @@
-import {
-  Article,
-  ArticleId,
-  ArticleRepoContract,
-  ArticleMap,
-  Knex
-} from '../../../../..';
+import {Article, ArticleId, ArticleMap, Knex} from '../../../../..';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+import {ArticleRepoContract} from './../articleRepo';
 
-export class ArticleKnexRepo extends AbstractBaseDBRepo<Knex, Article>
+export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
   implements ArticleRepoContract {
   async findById(articleId: string): Promise<Article> {
     const articleData = await this.db('articles')
