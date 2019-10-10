@@ -4,7 +4,6 @@ import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Result} from '../../../core/logic/Result';
 
 // * Subdomain
-import {CouponId} from './CouponId';
 import {CouponName} from './CouponName';
 import {CouponValue} from './CouponValue';
 

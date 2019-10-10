@@ -98,6 +98,12 @@ export * from './modules/payments/domain/strategies/PaymentStrategy';
 export * from './modules/payments/domain/strategies/CreditCardPayment';
 export * from './modules/payments/domain/strategies/CreditCard';
 
+// * Export Coupon Subdomain
+export * from './domain/reductions/ReductionFactory';
+export * from './domain/reductions/Coupon';
+export * from './modules/coupons/mappers/CouponMap';
+export * from './modules/coupons/repos';
+
 // Infra
 // export * from './infra/http/app';
 export {

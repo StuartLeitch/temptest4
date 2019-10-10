@@ -5,7 +5,18 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest'
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
-  coverageDirectory: '../../coverage/libs/shared'
+  reporters: [
+    [
+      'jest-junit',
+      {
+        outputDirectory: 'coverage/libs/shared',
+        outputName: 'junit.xml'
+      }
+    ]
+  ]
+  // coverageReporters: ['jest-junit'],
+  // "outputDirectory": "coverage/junit",
+  // "outputName": "junit.xml",
   // transform: {
   // 	'^.+\\.(t|j)sx?$': 'ts-jest'
   // },

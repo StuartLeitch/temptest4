@@ -1,17 +1,17 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-import {UniqueEntityID} from '../../lib/core/domain/UniqueEntityID';
+import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
 import {
   Invoice,
-  STATUS as InvoiceStatus
-} from '../../lib/modules/invoices/domain/Invoice';
+  InvoiceStatus
+} from '../../src/lib/modules/invoices/domain/Invoice';
 
-import {Payer} from '../../lib/modules/payers/domain/Payer';
-import {PayerName} from '../../lib/modules/payers/domain/PayerName';
-import {PayerType} from '../../lib/modules/payers/domain/PayerType';
+import {Payer} from '../../src/lib/modules/payers/domain/Payer';
+import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
+import {PayerType} from '../../src/lib/modules/payers/domain/PayerType';
 
-import {PoliciesRegister} from '../../lib/domain/reductions/policies/PoliciesRegister';
-import {WaivedCountryPolicy} from '../../lib/domain/reductions/policies/WaivedCountryPolicy';
+import {PoliciesRegister} from '../../src/lib/domain/reductions/policies/PoliciesRegister';
+import {WaivedCountryPolicy} from '../../src/lib/domain/reductions/policies/WaivedCountryPolicy';
 
 const feature = loadFeature('./specs/features/reduction-policies.feature');
 

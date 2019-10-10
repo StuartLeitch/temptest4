@@ -1,7 +1,7 @@
 import * as path from 'path';
 import Knex from 'knex';
 
-import {config} from './config/knexfile';
+import {config} from './knexfile';
 
 export {Knex};
 

@@ -6,6 +6,22 @@ import {ReductionProps} from './Reduction';
 import {Discount} from './Discount';
 
 export class Coupon extends Discount {
+  private constructor(props: ReductionProps, id?: UniqueEntityID) {
+    super(props, id);
+  }
+
+  get name(): string {
+    return this.props.name;
+  }
+
+  get reduction(): number {
+    return this.props.reduction;
+  }
+
+  get created(): Date {
+    return this.props.created;
+  }
+
   public static create(
     props: ReductionProps,
     id?: UniqueEntityID

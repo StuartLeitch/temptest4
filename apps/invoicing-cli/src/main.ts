@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const {build} = require('gluegun');
 const path = require('path');
 /**
