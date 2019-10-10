@@ -5,6 +5,11 @@ module.exports = {
   transform: {
     '^.+\\.[tj]sx?$': 'ts-jest'
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
-  coverageDirectory: '../../coverage/libs/react-components'
+  reporters: ['default',
+    ['jest-junit', {
+      outputDirectory: 'coverage/libs/react-components',
+      outputName: 'junit.xml'
+    }]
+  ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html']
 };
