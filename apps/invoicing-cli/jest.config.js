@@ -1,5 +1,10 @@
 module.exports = {
   name: 'invoicing-cli',
   preset: '../../jest.config.js',
-  coverageDirectory: '../../coverage/apps/invoicing-cli'
+  reporters: ['default',
+    ['jest-junit', {
+      outputDirectory: 'coverage/apps/invoicing-cli',
+      outputName: 'junit.xml'
+    }]
+  ],
 };
