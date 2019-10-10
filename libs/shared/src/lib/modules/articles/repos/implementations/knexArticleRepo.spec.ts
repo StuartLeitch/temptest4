@@ -1,5 +1,5 @@
 import {makeDb, destroyDb} from '../../../../..';
-import {KnexArticleRepo as ArticleRepo} from './knexArticleRepo';
+import {KnexArticleRepo} from './knexArticleRepo';
 
 describe('ArticleRepo', () => {
   let db;
@@ -13,7 +13,7 @@ describe('ArticleRepo', () => {
   });
 
   test.skip('findById()', async () => {
-    const repo = new ArticleRepo(db);
+    const repo = new KnexArticleRepo(db);
 
     const result = await repo.findById('a1');
 

@@ -32,12 +32,22 @@ test:
   artifacts:
     paths:
       - coverage/
+    reports:
+      junit:
+        - coverage/apps/invoicing-cli/junit.xml
+        - coverage/apps/invoicing-graphql/junit.xml
+        - coverage/apps/invoicing-web/junit.xml
+        - coverage/libs/shared/junit.xml
+        - coverage/libs/react-components/junit.xml
   script:
     - npm run nx -- test shared --code-coverage
     - npm run nx -- test react-components --code-coverage
     - npm run nx -- test invoicing-graphql --code-coverage
+    - npm run nx -- test invoicing-web --code-coverage
+    - npm run nx -- test invoicing-cli --code-coverage
   only:
     - monorepo-nx
+    - /^FM-\d+/
   dependencies:
     - install
 # lint:
