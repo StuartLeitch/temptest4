@@ -1,6 +1,5 @@
 const {build} = require('gluegun');
 const path = require('path');
-
 /**
  * Create the cli and kick it off
  */

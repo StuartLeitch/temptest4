@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "bin": {
-    "phenom": "bin/phenom.ts"
+    "phenom": "bin/phenom"
   },
   "scripts": {
     "nx": "nx",

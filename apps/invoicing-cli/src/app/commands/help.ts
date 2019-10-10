@@ -1,4 +1,4 @@
-import { GluegunToolbox } from 'gluegun';
+import {GluegunToolbox} from 'gluegun';
 
 module.exports = {
   dashed: true,
@@ -10,15 +10,17 @@ module.exports = {
         printCommands,
         info,
         newline,
-        colors: { magenta }
+        colors: {magenta}
       }
-    } = toolbox
+    } = toolbox;
 
-    newline()
-    await require('../brand/header')() // eslint-disable-line
-    printCommands(toolbox)
-    newline()
-    info(magenta('If you need additional help, give us a call!'))
-    newline()
+    newline();
+    await require('../brand/header')(); // eslint-disable-line
+    printCommands(toolbox);
+    newline();
+    info(magenta('If you need additional help, give us a call!'));
+    newline();
+
+    process.exit();
   }
-}
+};
