@@ -25,7 +25,8 @@
     "format:check": "nx format:check",
     "workspace-schematic": "nx workspace-schematic",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "ci:coverage": "istanbul-combine -r html coverage/*/*/coverage-final.json"
   },
   "private": true,
   "dependencies": {
@@ -46,6 +47,7 @@
     "express": "4.17.1",
     "graphql": "^14.5.8",
     "graphql-import-node": "0.0.4",
+    "istanbul-combine": "^0.3.0",
     "knex": "^0.19.5",
     "lodash": "^4.17.15",
     "next": "9.1.1",

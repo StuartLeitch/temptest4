@@ -10,5 +10,6 @@ module.exports = {
       outputDirectory: 'coverage/apps/invoicing-web',
       outputName: 'junit.xml'
     }]
-  ]
+  ],
+  coverageDirectory: '../../coverage/apps/invoicing-web'
 };

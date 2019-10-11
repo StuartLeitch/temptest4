@@ -14,5 +14,7 @@ module.exports = {
         outputName: 'junit.xml'
       }
     ]
-  ]
+  ],
+  collectCoverage: true,
+  coverageDirectory: '../../coverage/libs/shared'
 };

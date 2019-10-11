@@ -7,4 +7,5 @@ module.exports = {
       outputName: 'junit.xml'
     }]
   ],
+  coverageDirectory: '../../coverage/apps/invoicing-cli'
 };

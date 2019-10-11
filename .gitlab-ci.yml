@@ -10,7 +10,8 @@ variables:
 stages:
   - setup
   - test
-#  - lint
+  - lint
+  - deploy
 
 install:
   stage: setup
@@ -28,7 +29,7 @@ info:
 
 test:
   stage: test
-  coverage: '/All\sfiles.*?\s+(\d+.\d+)/'
+  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
       - coverage/
@@ -45,11 +46,13 @@ test:
     - npm run nx -- test invoicing-graphql --code-coverage
     - npm run nx -- test invoicing-web --code-coverage
     - npm run nx -- test invoicing-cli --code-coverage
+    - npm run ci:coverage
   only:
     - monorepo-nx
     - /^FM-\d+/
   dependencies:
     - install
+
 # lint:
 #   stage: test
 #   script:
@@ -58,3 +61,18 @@ test:
 #     - npm run nx -- lint invoicing-graphql
 #   only:
 #     - monorepo-nx
+
+pages:
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp coverage/*.* public/
+    - mv public/index.html public/coverage.html
+  artifacts:
+    paths:
+      - public
+  dependencies:
+    - test
+  only:
+    - develop
+    - /^FM-\d+/

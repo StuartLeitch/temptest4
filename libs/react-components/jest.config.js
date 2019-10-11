@@ -11,5 +11,6 @@ module.exports = {
       outputName: 'junit.xml'
     }]
   ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html']
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
+  coverageDirectory: '../../coverage/libs/react-components'
 };
