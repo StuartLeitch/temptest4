@@ -14,6 +14,7 @@ stages:
   - deploy
 
 install:
+  interruptible: true
   stage: setup
   artifacts:
     paths:
@@ -22,12 +23,14 @@ install:
     - npm ci
 
 info:
+  interruptible: true
   stage: setup
   script:
     - npm version
     - env
 
 test:
+  interruptible: true
   stage: test
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
@@ -48,12 +51,14 @@ test:
     - npm run nx -- test invoicing-cli --code-coverage
     - npm run ci:coverage
   only:
-    - monorepo-nx
+    - develop
+    - master
     - /^FM-\d+/
   dependencies:
     - install
 
 # lint:
+#   interruptible: true
 #   stage: test
 #   script:
 #     - npm run nx -- lint shared
@@ -63,6 +68,7 @@ test:
 #     - monorepo-nx
 
 pages:
+  interruptible: true
   stage: deploy
   script:
     - mkdir -p public
@@ -75,4 +81,3 @@ pages:
     - test
   only:
     - develop
-    - /^FM-\d+/
