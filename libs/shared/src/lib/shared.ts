@@ -42,7 +42,6 @@ export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/invoices/domain/Invoice';
 export * from './modules/invoices/domain/InvoiceId';
 export * from './modules/invoices/domain/InvoiceItem';
-export * from './modules/invoices/domain/policies/PoliciesRegister';
 // export * from './invoices/domain/events/invoiceSentEvent';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
@@ -53,6 +52,9 @@ export * from './modules/invoices/usecases/createInvoice/createInvoice';
 // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
 
+export {
+  PoliciesRegister as InvoicePoliciesRegister
+} from './modules/invoices/domain/policies/PoliciesRegister';
 export * from './modules/invoices/domain/policies/UKVATHardCopyPolicy';
 export * from './modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 export * from './modules/invoices/domain/policies/VATTreatmentPublicationNotOwnedPolicy';
@@ -101,6 +103,12 @@ export * from './modules/payments/domain/strategies/CreditCard';
 // * Export Coupon Subdomain
 export * from './domain/reductions/ReductionFactory';
 export * from './domain/reductions/Coupon';
+export {
+  PoliciesRegister as ReductionsPoliciesRegister
+} from './domain/reductions/policies/PoliciesRegister';
+export * from './domain/reductions/policies/WaivedCountryPolicy';
+export * from './domain/reductions/policies/SanctionedCountryPolicy';
+
 export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/coupons/repos';
 

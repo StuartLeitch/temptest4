@@ -11,8 +11,13 @@ import {
   Invoice,
   InvoiceItem,
   InvoiceStatus,
-  PoliciesRegister,
+  ReductionsPoliciesRegister,
+  SanctionedCountryPolicy,
+  InvoicePoliciesRegister as PoliciesRegister,
   UKVATTreatmentArticleProcessingChargesPolicy,
+  Coupon,
+  CouponMap,
+  KnexCouponRepo as CouponRepo,
   PaymentFactory,
   PaymentModel,
   PaymentStrategy,
@@ -59,10 +64,14 @@ module.exports = {
     const db = await makeDb({filename: './dev.sqlite3'});
     const transactionRepo = new TransactionRepo(db);
     const catalogRepo = new CatalogRepo(db);
+    const couponRepo = new CouponRepo(db);
     const getTransactionUsecase = new GetTransactionUsecase(transactionRepo);
     const policiesRegister = new PoliciesRegister();
     const APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
     policiesRegister.registerPolicy(APCPolicy);
+    const reductionsPoliciesRegister = new ReductionsPoliciesRegister();
+    const sanctionedCountryPolicy: SanctionedCountryPolicy = new SanctionedCountryPolicy();
+    reductionsPoliciesRegister.registerPolicy(sanctionedCountryPolicy);
 
     // * create spinner
     const spinner = spin();
@@ -120,7 +129,7 @@ module.exports = {
           type: 'select',
           name: 'country',
           message: 'Payer is from:',
-          choices: ['UK', 'RO']
+          choices: ['UK', 'RO', 'MD', 'KP']
         },
         {
           type: 'confirm',
@@ -178,6 +187,32 @@ module.exports = {
       const VAT = calculateVAT.getVAT();
 
       invoiceEntity.addInvoiceItem(invoiceItem);
+
+      const invoiceValue = invoiceEntity.getValue();
+
+      const reductions = reductionsPoliciesRegister.applyPolicy(
+        sanctionedCountryPolicy.getType(),
+        [country]
+      );
+      const reduction = reductions.getReduction();
+
+      if (reduction) {
+        newline();
+        info(
+          muted(`Automatic Waiver applied to ${invoiceEntity.id.toString()}`)
+        );
+
+        if (reduction.percentage === -1) {
+          info(red(`Country is sanctioned!`));
+          process.exit();
+        }
+
+        // const reducedInvoiceValue = Math.floor(
+        //   invoiceValue * reduction.reductionPercentage
+        // ); //.toFixed(2);2
+        // invoiceItem.price = invoiceValue - reducedInvoiceValue;
+      }
+
       const totalAmount = invoiceEntity.addTax(VAT);
       AMOUNTS[invoiceEntity.id.toString()] = totalAmount;
 
@@ -224,59 +259,97 @@ module.exports = {
       buildTable(payersData, table);
     }
 
+    // retrieve coupons
+    const coupons = await couponRepo.getCouponCollection();
+    const couponsData = coupons.map((c: Coupon) => CouponMap.toPersistence(c));
+
     newline();
-    const {payInvoicesConfirmation, selectedInvoice} = await prompt.ask([
+    const {
+      payInvoicesConfirmation,
+      selectedInvoice,
+      selectedCoupons
+    } = await prompt.ask([
       {
         type: 'confirm',
         name: 'payInvoicesConfirmation',
-        message: 'Do you wish pay for an invoice?'
+        message: 'Do you wish to pay for an invoice?'
       },
       {
         type: 'select',
         name: 'selectedInvoice',
         message: 'Select invoice to pay:',
         choices: payersData.map(row => row.invoiceID)
+      },
+      {
+        type: 'multiselect',
+        name: 'selectedCoupons',
+        message: 'Redeem coupon:',
+        choices: couponsData.map(row => row.name)
       }
     ]);
 
-    if (payInvoicesConfirmation) {
-      newline();
-      const invoice = transaction.invoices.find(
-        (invoice: Invoice) => invoice.id.toString() === selectedInvoice
-      );
+    newline();
+    const invoice = transaction.invoices.find(
+      (invoice: Invoice) => invoice.id.toString() === selectedInvoice
+    );
 
-      let creditCard = new CreditCard();
-      const paymentFactory: PaymentFactory = new PaymentFactory();
-      paymentFactory.registerPayment(creditCard);
-      const paymentMethod: PaymentModel = paymentFactory.create(
-        'CreditCardPayment'
-      );
-      const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-        ['CreditCard', new CreditCardPayment(BraintreeGateway)]
-      ]);
+    // redeem coupons
+    selectedCoupons.forEach(sc => {
+      const coupon = couponsData.find(c => c.name === sc);
 
-      const payment: any = await paymentStrategy.makePayment(
-        paymentMethod,
-        AMOUNTS[invoice.id.toString()]
-      );
+      info(muted(`Coupon "${sc}" is ${coupon.valid ? 'valid' : 'invalid'}.`));
 
-      if (payment.success) {
-        invoice.markAsPaid();
-        payersData.forEach(row => {
-          if (row.invoiceID === invoice.id.toString()) {
-            row.invoiceStatus = InvoiceStatus[invoice.status];
-          }
-        });
-
-        buildTable(payersData, table);
-
-        newline();
-        success(
-          'Invoice paid! CreditCard Payment ID: ' + payment.transaction.id
-        );
-      } else {
-        error(payment.message);
+      // apply coupon
+      if (coupon.valid) {
+        info(muted(`Coupon "${sc}" of ${coupon.reduction * 100}% applied.`));
+        const totalAmount = invoice.redeemCoupon(coupon.reduction);
+        AMOUNTS[invoice.id.toString()] = totalAmount;
       }
+    });
+
+    newline();
+    info(muted(`After coupon(s) redeeming`));
+
+    payersData.forEach(row => {
+      if (row.invoiceID === invoice.id.toString()) {
+        row.netAmount = AMOUNTS[row.invoiceID];
+        row.totalAmount = row.totalAmount - row.netAmount;
+      }
+    });
+
+    buildTable(payersData, table);
+
+    newline();
+
+    if (payInvoicesConfirmation) {
+      // let creditCard = new CreditCard();
+      // const paymentFactory: PaymentFactory = new PaymentFactory();
+      // paymentFactory.registerPayment(creditCard);
+      // const paymentMethod: PaymentModel = paymentFactory.create(
+      //   'CreditCardPayment'
+      // );
+      // const paymentStrategy: PaymentStrategy = new PaymentStrategy([
+      //   ['CreditCard', new CreditCardPayment(BraintreeGateway)]
+      // ]);
+      // const payment: any = await paymentStrategy.makePayment(
+      //   paymentMethod,
+      //   AMOUNTS[invoice.id.toString()]
+      // );
+      // if (payment.success) {
+      //   invoice.markAsPaid();
+      //   payersData.forEach(row => {
+      //     if (row.invoiceID === invoice.id.toString()) {
+      //       row.invoiceStatus = InvoiceStatus[invoice.status];
+      //     }
+      //   });
+      //   buildTable(payersData, table);
+      //   newline();
+      //   success(
+      //     'Invoice paid! CreditCard Payment ID: ' + payment.transaction.id
+      //   );
+      // } else {
+      //   error(payment.message);
+      // }
     }
 
     // info(muted('To pay the issued invoices, execute these phenom commands:'))

@@ -1,12 +1,12 @@
 import {GluegunToolbox} from 'gluegun';
 
 import {
+  // AddCatalogItemToCatalogUseCase,
   GetAllCatalogItemsUseCase,
   makeDb,
   destroyDb,
   KnexCatalogRepo as CatalogRepo
 } from '@hindawi/shared';
-// import { TransactionKnexRepo as TransactionRepo } from '@hindawi/server/repos/knex/TransactionRepo'
 
 module.exports = {
   dashed: true,
@@ -45,22 +45,22 @@ module.exports = {
 
     // const addCatalogItemToCatalogUseCase = new AddCatalogItemToCatalogUseCase(
     //   catalogRepo
-    // )
+    // );
 
-    // spinner.start('Execute addCatalogItemToCatalogUseCase')
+    // spinner.start('Execute addCatalogItemToCatalogUseCase');
     // const result = await addCatalogItemToCatalogUseCase.execute({
     //   type: 'APC',
     //   price: 1900
-    // })
+    // });
 
     // if (result.isSuccess) {
-    //   const newlyCreatedCatalogItem = result.getValue()
-    //   spinner.succeed('Successfully created a CatalogItem.')
-    //   success(newlyCreatedCatalogItem)
+    //   const newlyCreatedCatalogItem = result.getValue();
+    //   spinner.succeed('Successfully created a CatalogItem.');
+    //   success(newlyCreatedCatalogItem);
     // } else {
-    //   const { error: usecaseError } = result
-    //   spinner.fail(usecaseError.toString())
-    //   error(usecaseError)
+    //   const {error: usecaseError} = result;
+    //   spinner.fail(usecaseError.toString());
+    //   error(usecaseError);
     // }
 
     const getAllCatalogItemsUseCase = new GetAllCatalogItemsUseCase(
@@ -89,5 +89,6 @@ module.exports = {
     }
 
     await destroyDb(db);
+    process.exit();
   }
 };

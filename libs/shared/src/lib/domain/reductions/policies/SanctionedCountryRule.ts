@@ -22,7 +22,9 @@ export class SanctionedCountryRule implements ReductionRuleContract<Reduction> {
     if (
       this.correspondingAuthorInstitutionCountryCode in SANCTIONED_COUNTRIES
     ) {
-      return ReductionFactory.createReduction('WAIVER', {} as ReductionProps);
+      return ReductionFactory.createReduction('WAIVER', {
+        reduction: -1
+      } as ReductionProps);
     }
   }
 }

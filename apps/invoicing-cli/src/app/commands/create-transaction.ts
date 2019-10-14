@@ -65,7 +65,10 @@ module.exports = {
       journalId,
       title,
       articleTypeId,
-      created
+      created,
+      authorEmail,
+      authorCountry,
+      authorSurname
     ] = parameters.array;
 
     spinner.start('Execute createTransactionUsecase');
@@ -75,7 +78,10 @@ module.exports = {
         journalId,
         title,
         articleTypeId,
-        created
+        created,
+        authorEmail,
+        authorCountry,
+        authorSurname
       },
       {
         roles: [Roles.ADMIN]
@@ -93,5 +99,7 @@ module.exports = {
       spinner.fail(usecaseError.toString());
       error(usecaseError);
     }
+
+    process.exit();
   }
 };

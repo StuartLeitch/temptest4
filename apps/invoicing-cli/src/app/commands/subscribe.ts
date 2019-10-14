@@ -1,4 +1,4 @@
-import { GluegunToolbox } from 'gluegun'
+import {GluegunToolbox} from 'gluegun';
 
 module.exports = {
   name: 'subscribe',
@@ -13,24 +13,24 @@ module.exports = {
         info,
         success,
         // error,
-        colors: { yellow }
+        colors: {yellow}
       },
       configService,
       createQueueService
-    } = toolbox
+    } = toolbox;
 
-    info(yellow(`Node Environment = ${configService.get('NODE_ENV')}`))
+    info(yellow(`Node Environment = ${configService.get('NODE_ENV')}`));
     info(
       yellow(`AWS_SNS_SQS_REGION = ${configService.get('AWS_SNS_SQS_REGION')}`)
-    )
-    info(yellow(`AWS_SQS_ENDPOINT = ${configService.get('AWS_SQS_ENDPOINT')}`))
-    info(yellow(`AWS_SNS_ENDPOINT = ${configService.get('AWS_SNS_ENDPOINT')}`))
+    );
+    info(yellow(`AWS_SQS_ENDPOINT = ${configService.get('AWS_SQS_ENDPOINT')}`));
+    info(yellow(`AWS_SNS_ENDPOINT = ${configService.get('AWS_SNS_ENDPOINT')}`));
     info(
       yellow(`AWS_SQS_QUEUE_NAME = ${configService.get('AWS_SQS_QUEUE_NAME')}`)
-    )
-    info(yellow(`AWS_SNS_TOPIC = ${configService.get('AWS_SNS_TOPIC')}`))
+    );
+    info(yellow(`AWS_SNS_TOPIC = ${configService.get('AWS_SNS_TOPIC')}`));
 
-    debug('Create Queue Service...')
+    debug('Create Queue Service...');
     const queueService = await createQueueService({
       region: configService.get('AWS_SNS_SQS_REGION'),
       accessKeyId: configService.get('AWS_SNS_SQS_ACCESS_KEY'),
@@ -39,34 +39,43 @@ module.exports = {
       sqsEndpoint: configService.get('AWS_SQS_ENDPOINT'),
       topicName: configService.get('AWS_SNS_TOPIC'),
       queueName: configService.get('AWS_SQS_QUEUE_NAME')
-    })
+    });
 
     if ('start' in queueService) {
-      debug('Queue Service created.')
-      debug('Register Event Handlers...')
+      debug('Queue Service created.');
+      debug('Register Event Handlers...');
 
       queueService.registerEventHandler({
         event: 'ManuscriptSubmitted',
         handler: async data => {
-          success(`Manuscript ID: ${data.manuscript.id}`)
+          success(`Manuscript ID: ${data.manuscript.id}`);
 
           const {
             id: articleId,
             journalId,
             title,
             articleTypeId,
-            created
-          } = data.manuscript
+            created,
+            teams: [
+              {
+                members: [
+                  {
+                    alias: {email, country, surname}
+                  }
+                ]
+              }
+            ]
+          } = data.manuscript;
 
-          const appCmd = `phenom ct ${articleId} ${journalId} ${title} ${articleTypeId} ${created}`
+          const appCmd = `phenom ct ${articleId} ${journalId} ${title} ${articleTypeId} ${created} ${email} ${country} ${surname}`;
 
-          const stdout = await system.run(appCmd)
-          debug(stdout)
+          const stdout = await system.run(appCmd);
+          debug(stdout);
         }
-      })
+      });
 
-      debug('Start Queue Service...')
-      queueService.start()
+      debug('Start Queue Service...');
+      queueService.start();
     }
   }
-}
+};

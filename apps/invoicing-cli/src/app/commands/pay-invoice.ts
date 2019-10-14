@@ -97,5 +97,7 @@ module.exports = {
     // }
 
     await destroyDb(db);
+
+    process.exit();
   }
 };

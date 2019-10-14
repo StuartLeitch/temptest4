@@ -8,6 +8,9 @@ interface ArticleProps {
   title?: string;
   articleTypeId?: string;
   created?: Date;
+  authorEmail?: string;
+  authorCountry?: string;
+  authorSurname?: string;
 }
 
 export class Article extends AggregateRoot<ArticleProps> {

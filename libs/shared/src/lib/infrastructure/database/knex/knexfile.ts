@@ -55,4 +55,4 @@ const knexConfiguration = {
 const config = knexConfiguration[NODE_ENV];
 
 export {config};
-// module.exports = {config};
+// module.exports = config;
