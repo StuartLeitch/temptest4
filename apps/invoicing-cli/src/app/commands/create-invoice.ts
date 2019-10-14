@@ -79,5 +79,7 @@ module.exports = {
       spinner.fail(usecaseError.toString());
       error(usecaseError);
     }
+
+    process.exit();
   }
 };

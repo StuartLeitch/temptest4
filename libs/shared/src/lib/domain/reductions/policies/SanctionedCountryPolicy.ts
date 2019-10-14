@@ -8,7 +8,7 @@ import {SanctionedCountryRule} from './SanctionedCountryRule';
  * * IF (waiverCountries[correspondingAuthor.country])
  * * THEN {APC = 0}
  */
-export class WaivedCountryPolicy
+export class SanctionedCountryPolicy
   implements PolicyContract<SanctionedCountryRule> {
   SANCTIONED_COUNTRY = Symbol.for('@SanctionedCountryPolicy');
 

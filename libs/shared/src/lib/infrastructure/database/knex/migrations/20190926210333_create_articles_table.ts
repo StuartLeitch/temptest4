@@ -4,6 +4,9 @@ export const up = function(knex) {
     table.string('journalId');
     table.string('title');
     table.string('articleTypeId');
+    table.string('authorEmail');
+    table.string('authorCountry');
+    table.string('authorSurname');
     table.datetime('created', {precision: 2, useTz: false});
   });
 };

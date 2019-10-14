@@ -24,6 +24,6 @@ export class Waiver extends Discount {
   }
 
   get percentage(): number {
-    return this.reductionPercentage;
+    return this.props.reduction || this.reductionPercentage;
   }
 }

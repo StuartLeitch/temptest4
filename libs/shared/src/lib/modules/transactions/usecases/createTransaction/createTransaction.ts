@@ -27,6 +27,9 @@ export interface CreateTransactionRequestDTO {
   title?: string;
   articleTypeId?: string;
   created?: string;
+  authorEmail?: string;
+  authorCountry?: string;
+  authorSurname?: string;
 }
 
 export type CreateTransactionContext = AuthorizationContext<Roles>;
@@ -58,12 +61,20 @@ export class CreateTransactionUsecase
     request: CreateTransactionRequestDTO,
     context?: CreateTransactionContext
   ): Promise<Result<Article>> {
-    const {manuscriptId, journalId, title, articleTypeId} = request;
+    const {
+      manuscriptId,
+      journalId,
+      title,
+      articleTypeId,
+      authorEmail,
+      authorCountry,
+      authorSurname
+    } = request;
     const isArticleIdProvided = TextUtil.isUUID(manuscriptId);
 
     if (isArticleIdProvided) {
       if (!manuscriptId) {
-        return Result.fail<Article>(`Invalid article id=${manuscriptId}`);
+        return Result.fail<Article>(`Invalid manuscript id=${manuscriptId}`);
       }
 
       const article = await this.articleRepo.findById(manuscriptId);
@@ -73,14 +84,17 @@ export class CreateTransactionUsecase
         return Result.ok<Article>(article);
       } else {
         return Result.fail<Article>(
-          `Couldn't find article by id=${manuscriptId}`
+          `Couldn't find manuscript by id=${manuscriptId}`
         );
       }
     } else {
       const newArticleResult: Result<Article> = Article.create({
         journalId,
         title,
-        articleTypeId
+        articleTypeId,
+        authorEmail,
+        authorCountry,
+        authorSurname
       });
       await this.articleRepo.save(newArticleResult.getValue());
       return newArticleResult;

@@ -8,7 +8,10 @@ export class ArticleMap extends Mapper<Article> {
       {
         journalId: raw.journalId,
         title: raw.title,
-        articleTypeId: raw.articleTypeId
+        articleTypeId: raw.articleTypeId,
+        authorEmail: raw.authorEmail,
+        authorCountry: raw.authorCountry,
+        authorSurname: raw.authorSurname
       },
       new UniqueEntityID(raw.id)
     );
@@ -23,7 +26,10 @@ export class ArticleMap extends Mapper<Article> {
       id: article.id.toString(),
       journalId: article.props.journalId.toString(),
       title: article.props.title,
-      articleTypeId: article.props.articleTypeId
+      articleTypeId: article.props.articleTypeId,
+      authorEmail: article.props.authorEmail,
+      authorCountry: article.props.authorCountry,
+      authorSurname: article.props.authorSurname
     };
   }
 }

@@ -142,4 +142,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     const taxValue = (netAmount * taxRate) / 100;
     return netAmount + taxValue;
   }
+
+  public redeemCoupon(reduction: number) {
+    const netAmount = this.getValue();
+    const reductionValue = netAmount * reduction;
+    return netAmount - reductionValue;
+  }
 }

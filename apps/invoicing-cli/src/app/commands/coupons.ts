@@ -50,6 +50,7 @@ module.exports = {
     //   //   return
     //   // }
     const db = await makeDb({filename: './dev.sqlite3'});
+    // console.info(db);
     // const transactionRepo = new TransactionRepo(db);
     const couponRepo = new CouponRepo(db);
     const coupons = await couponRepo.getCouponCollection();
@@ -117,16 +118,14 @@ module.exports = {
         reduction,
         isValid: valid
       }) as Coupon;
-      const savedCoupon = await couponRepo.save(newCoupon);
+      await couponRepo.save(newCoupon);
 
       const coupons = await couponRepo.getCouponCollection();
       const couponsData = coupons.map((c: Coupon) =>
         CouponMap.toPersistence(c)
       );
 
-      console.info(couponsData);
-
-      // buildTable(couponsData, table);
+      buildTable(couponsData, table);
 
       newline();
     }

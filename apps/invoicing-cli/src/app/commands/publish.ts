@@ -1,5 +1,5 @@
-import { GluegunToolbox } from 'gluegun'
-import * as shell from 'shelljs'
+import {GluegunToolbox} from 'gluegun';
+import * as shell from 'shelljs';
 
 module.exports = {
   name: 'publish',
@@ -7,10 +7,10 @@ module.exports = {
     'Publishes a fake `ManuscriptSubmitted` event to trigger the execution of `createTransaction` usecase',
   run: async (toolbox: GluegunToolbox) => {
     const {
-      print: { debug }
-    } = toolbox
+      print: {debug}
+    } = toolbox;
 
-    debug('Publish a fake ManuscriptSubmitted Event...')
+    debug('Publish a fake ManuscriptSubmitted Event...');
 
     const fakeManuscript = {
       id: 'd312c43f-9fde-4e2c-9091-075e501798e4',
@@ -21,7 +21,7 @@ module.exports = {
       title: '123',
       abstract: 'hei',
       customId: '4093107',
-      publicationDates: [{ date: 1566804110596, type: 'technicalChecks' }],
+      publicationDates: [{date: 1566804110596, type: 'technicalChecks'}],
       version: 1,
       hasPassedEqs: null,
       hasPassedEqa: null,
@@ -55,7 +55,7 @@ module.exports = {
                 aff: 'ts',
                 email: 'anca.ursachi+author@thinslices.com',
                 title: 'miss',
-                country: 'AX',
+                country: 'RO',
                 surname: 'Author',
                 givenNames: 'Author'
               },
@@ -112,20 +112,20 @@ module.exports = {
         surname: 'admin',
         givenNames: 'admin'
       }
-    }
+    };
 
     const message = {
       event: 'ManuscriptSubmitted',
-      data: { manuscript: fakeManuscript }
-    }
+      data: {manuscript: fakeManuscript}
+    };
 
     // const publishCommand = `aws sns publish --topic-arn arn:aws:sns:us-east-1:1465414804035:test1 --endpoint-url http://localhost:9911 --message "{\"event\": \"ManuscriptSubmitted\", \"data\": {}}"`
 
     const publishCommand = `aws sns publish --topic-arn arn:aws:sns:us-east-1:1465414804035:test1 --endpoint-url http://localhost:9911 --message "${JSON.stringify(
       message
-    ).replace(/"/g, '\\"')}"`
+    ).replace(/"/g, '\\"')}"`;
 
     // info(publishCommand)
-    shell.exec(publishCommand)
+    shell.exec(publishCommand);
   }
-}
+};
