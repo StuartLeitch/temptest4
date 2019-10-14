@@ -12,6 +12,10 @@ import {TransactionRepoContract} from '../../repos/transactionRepo';
 import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
 import {Article} from '../../../articles/domain/Article';
 import {ArticleId} from '../../../articles/domain/ArticleId';
+import {Invoice, InvoiceStatus} from './../../../invoices/domain/Invoice';
+import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
+import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
+import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
 
 import {
   Authorize,
@@ -46,15 +50,16 @@ export class CreateTransactionUsecase
       CreateTransactionContext,
       AccessControlContext
     > {
-  private transactionRepo: TransactionRepoContract;
-  private articleRepo: ArticleRepoContract;
-
   constructor(
-    transactionRepo: TransactionRepoContract,
-    articleRepo: ArticleRepoContract
+    private transactionRepo: TransactionRepoContract,
+    private articleRepo: ArticleRepoContract,
+    private invoiceRepo: InvoiceRepoContract,
+    private invoiceItemRepo: InvoiceItemRepoContract
   ) {
     this.transactionRepo = transactionRepo;
     this.articleRepo = articleRepo;
+    this.invoiceRepo = invoiceRepo;
+    this.invoiceItemRepo = invoiceItemRepo;
   }
 
   private async getArticle(
@@ -110,7 +115,7 @@ export class CreateTransactionUsecase
     request: CreateTransactionRequestDTO,
     context?: CreateTransactionContext
   ): Promise<Result<Transaction>> {
-    const {manuscriptId: rawArticleId} = request;
+    const {manuscriptId: rawManuscriptId} = request;
 
     let manuscriptId: ArticleId;
 
@@ -119,7 +124,7 @@ export class CreateTransactionUsecase
       if (articleOrError.isFailure) {
         return Result.fail<Transaction>(articleOrError.error);
       }
-      manuscriptId = ArticleId.create(new UniqueEntityID(rawArticleId));
+      manuscriptId = ArticleId.create(new UniqueEntityID(rawManuscriptId));
     }
 
     try {
@@ -141,6 +146,31 @@ export class CreateTransactionUsecase
       // This is where all the magic happens
       const transaction = transactionOrError.getValue();
       await this.transactionRepo.save(transaction);
+
+      // * System creates DRAFT invoice
+      const invoiceProps = {
+        status: InvoiceStatus.DRAFT,
+        transactionId: transaction.transactionId
+      };
+
+      const invoiceOrError = Invoice.create(invoiceProps);
+      if (invoiceOrError.isFailure) {
+        return Result.fail<Transaction>(invoiceOrError.error);
+      }
+      const invoice = invoiceOrError.getValue();
+      await this.invoiceRepo.save(invoice);
+
+      //* System creates invoice item(s)
+      const invoiceItemProps = {
+        invoiceId: invoice.invoiceId,
+        dateCreated: new Date()
+      };
+      const invoiceItemOrError = InvoiceItem.create(invoiceItemProps);
+      if (invoiceItemOrError.isFailure) {
+        return Result.fail<Transaction>(invoiceItemOrError.error);
+      }
+      const invoiceItem = invoiceItemOrError.getValue();
+      await this.invoiceItemRepo.save(invoiceItem);
 
       return Result.ok<Transaction>(transaction);
     } catch (err) {

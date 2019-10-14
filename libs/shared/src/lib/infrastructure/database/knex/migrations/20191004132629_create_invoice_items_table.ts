@@ -5,6 +5,8 @@ export const up = function(knex: any) {
     table.string('name', 40);
     table.string('type').defaultTo('APC');
     table.float('price');
+    table.integer('deleted').defaultTo(1);
+    table.datetime('dateCreated', {precision: 2, useTz: false});
   });
 };
 

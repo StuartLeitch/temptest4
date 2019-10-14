@@ -47,7 +47,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     const deletedRows = await db('invoices')
       .where('id', invoice.id.toString())
-      .delete();
+      .update({...InvoiceMap.toPersistence(invoice), deleted: 1});
 
     if (!deletedRows) {
       throw RepoError.createEntityNotFoundError(

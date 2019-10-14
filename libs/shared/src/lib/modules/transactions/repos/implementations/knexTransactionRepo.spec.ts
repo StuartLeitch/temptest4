@@ -66,12 +66,18 @@ describe('TransactionKnexRepo', () => {
     afterEach(() => clearTable(db, 'transactions'));
 
     describe('.delete()', () => {
-      it('should delete the record', async () => {
+      it('should soft delete the record', async () => {
         const transaction = await repo.getTransactionById(
           TransactionId.create(new UniqueEntityID('transaction-1'))
         );
 
         expect(repo.delete(transaction)).resolves.toBeTruthy();
+
+        const secondTimeTransaction = await repo.getTransactionById(
+          TransactionId.create(new UniqueEntityID('transaction-1'))
+        );
+
+        expect(secondTimeTransaction.deleted).toEqual(1);
       });
 
       it('should reject promise for unknown transactions', () => {

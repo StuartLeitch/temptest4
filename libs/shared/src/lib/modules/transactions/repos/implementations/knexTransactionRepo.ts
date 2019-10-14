@@ -42,7 +42,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
 
     const deletedRows = await db('transactions')
       .where('id', transaction.id.toString())
-      .delete();
+      .update({...TransactionMap.toPersistence(transaction), deleted: 1});
 
     return deletedRows
       ? deletedRows

@@ -74,6 +74,24 @@ module.exports = {
         }
       });
 
+      queueService.registerEventHandler({
+        event: 'ManuscriptRejected',
+        handler: async data => {
+          success(`Manuscript ID: ${data.manuscript.id}`);
+
+          // do nothing yet
+        }
+      });
+
+      queueService.registerEventHandler({
+        event: 'ManuscriptAccepted',
+        handler: async data => {
+          success(`Manuscript ID: ${data.manuscript.id}`);
+
+          // do nothing yet
+        }
+      });
+
       debug('Start Queue Service...');
       queueService.start();
     }

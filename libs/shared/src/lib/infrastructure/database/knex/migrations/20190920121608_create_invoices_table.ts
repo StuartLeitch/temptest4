@@ -3,8 +3,7 @@ export const up = function(knex) {
     table.uuid('id', 36).primary();
     table.string('transactionId', 40);
     table.integer('status').defaultTo(0);
-    // table.float('totalAmount');
-    // table.float('netAmount');
+    table.integer('deleted').defaultsTo(0);
     table.datetime('dateCreated', {precision: 2, useTz: false}); //.defaultTo(knex.fn.now(2));
   });
 };

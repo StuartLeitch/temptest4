@@ -10,6 +10,7 @@ export class TransactionPersistenceDTO {
   // articleId: string;
   status: TransactionStatus;
   // amount: number;
+  deleted?: number;
   dateCreated: Date;
   dateUpdated: Date;
 }
@@ -20,6 +21,7 @@ export class TransactionMap extends Mapper<Transaction> {
       {
         // articleId: ArticleId.create(new UniqueEntityID(raw.articleId)),
         // amount: Amount.create(raw.amount).getValue(),
+        deleted: raw.deleted,
         status: raw.status,
         dateCreated: new Date(raw.dateCreated),
         dateUpdated: new Date(raw.dateUpdated)

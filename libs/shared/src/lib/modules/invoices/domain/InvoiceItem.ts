@@ -4,6 +4,7 @@ import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Result} from '../../../core/logic/Result';
 
 import {InvoiceId} from './InvoiceId';
+import {InvoiceItemId} from './InvoiceItemId';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
@@ -12,6 +13,7 @@ export interface InvoiceItemProps {
   type?: InvoiceItemType;
   name?: string;
   price?: number;
+  dateCreated: Date;
 }
 
 export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
@@ -27,7 +29,8 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
       {
         ...props,
         name: props.name ? props.name : 'APC',
-        type: props.type ? props.type : 'APC'
+        type: props.type ? props.type : 'APC',
+        dateCreated: props.dateCreated ? props.dateCreated : new Date()
       },
       id
     );
@@ -42,6 +45,14 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this._id;
   }
 
+  get invoiceItemId(): InvoiceItemId {
+    return InvoiceItemId.create(this.id);
+  }
+
+  get invoiceId(): InvoiceId {
+    return this.props.invoiceId;
+  }
+
   public get type(): InvoiceItemType {
     return this.props.type;
   }
@@ -52,5 +63,9 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
   public get price(): number {
     return this.props.price;
+  }
+
+  public get dateCreated(): Date {
+    return this.props.dateCreated;
   }
 }
