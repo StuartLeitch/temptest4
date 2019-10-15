@@ -34,12 +34,8 @@ interface InvoiceProps {
 export type InvoiceCollection = Invoice[];
 
 export class Invoice extends AggregateRoot<InvoiceProps> {
-  get id(): UniqueEntityID {
-    return this._id;
-  }
-
   get invoiceId(): InvoiceId {
-    return InvoiceId.create(this.id);
+    return InvoiceId.create(this._id).getValue();
   }
 
   get transactionId(): TransactionId {

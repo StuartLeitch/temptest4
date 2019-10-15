@@ -3,6 +3,7 @@ import {Knex} from '@hindawi/shared';
 import {Transaction} from '../../domain/Transaction';
 import {TransactionId} from '../../domain/TransactionId';
 import {TransactionMap} from '../../mappers/TransactionMap';
+import {InvoiceId} from './../../../invoices/domain/InvoiceId';
 
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError} from '../../../../infrastructure/RepoError';
@@ -16,6 +17,17 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
     const transactionRow = await db('transactions')
       .select()
       .where('id', transactionId.id.toString())
+      .first();
+
+    return transactionRow ? TransactionMap.toDomain(transactionRow) : null;
+  }
+
+  async getTransactionByInvoiceId(invoiceId: InvoiceId): Promise<Transaction> {
+    const {db} = this;
+
+    const transactionRow = await db('transactions')
+      .select()
+      .where('invoice_id', invoiceId.id.toString())
       .first();
 
     return transactionRow ? TransactionMap.toDomain(transactionRow) : null;

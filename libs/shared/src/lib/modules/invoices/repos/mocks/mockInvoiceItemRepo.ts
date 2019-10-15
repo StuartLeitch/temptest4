@@ -3,6 +3,7 @@ import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
 import {InvoiceItemRepoContract} from '../invoiceItemRepo';
 import {InvoiceItem} from '../../domain/InvoiceItem';
 import {InvoiceItemId} from '../../domain/InvoiceItemId';
+import {ManuscriptId} from '../../domain/ManuscriptId';
 
 export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   implements InvoiceItemRepoContract {
@@ -21,18 +22,12 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
     }
   }
 
-  // public async getInvoicesByTransactionId(
-  //   transactionId: TransactionId
-  // ): Promise<Invoice[]> {
-  //   const matches = this._items.filter(i =>
-  //     i.transactionId.equals(transactionId)
-  //   );
-  //   if (matches.length !== 0) {
-  //     return matches;
-  //   } else {
-  //     return null;
-  //   }
-  // }
+  public async getInvoiceItemByManuscriptId(
+    manuscriptId: ManuscriptId
+  ): Promise<InvoiceItem> {
+    const match = this._items.find(i => i.manuscriptId.equals(manuscriptId));
+    return match ? match : null;
+  }
 
   public async getInvoiceItemCollection(): Promise<InvoiceItem[]> {
     return this._items;
@@ -72,8 +67,8 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
     return invoiceItem;
   }
 
-  public async delete(invoiceItem: InvoiceItem): Promise<boolean> {
-    return true;
+  public async delete(invoiceItem: InvoiceItem): Promise<void> {
+    this.removeMockItem(invoiceItem);
   }
 
   public async exists(invoiceItem: InvoiceItem): Promise<boolean> {

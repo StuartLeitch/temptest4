@@ -3,6 +3,7 @@ import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
 import {InvoiceRepoContract} from '../invoiceRepo';
 import {Invoice} from '../../domain/Invoice';
 import {InvoiceId} from '../../domain/InvoiceId';
+import {InvoiceItemId} from '../../domain/InvoiceItemId';
 import {TransactionId} from '../../../transactions/domain/TransactionId';
 
 export class MockInvoiceRepo extends BaseMockRepo<Invoice>
@@ -18,6 +19,18 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     } else {
       return null;
     }
+  }
+
+  public async getInvoiceByInvoiceItemId(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Invoice> {
+    const match = this._items.find(i =>
+      i.invoiceItems
+        .getItems()
+        .some(ii => ii.invoiceItemId.equals(invoiceItemId))
+    );
+
+    return match ? match : null;
   }
 
   public async getInvoicesByTransactionId(
@@ -71,8 +84,8 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     return invoice;
   }
 
-  public async delete(invoice: Invoice): Promise<boolean> {
-    return true;
+  public async delete(invoice: Invoice): Promise<void> {
+    this.removeMockItem(invoice);
   }
 
   public async exists(invoice: Invoice): Promise<boolean> {

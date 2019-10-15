@@ -22,7 +22,7 @@ import {MockArticleRepo} from '../../../src/lib/modules/articles/repos/mocks/moc
 import {MockInvoiceItemRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 
 const feature = loadFeature(
-  '../../features/reviewEvents/on-manuscript-submit.feature',
+  '../../features/reviewEvents/on-manuscript-accept.feature',
   {loadRelativePath: true}
 );
 
@@ -58,10 +58,10 @@ defineFeature(feature, test => {
   //   mockInvoiceRepo.save(invoice);
   // });
 
-  test('Manuscript Submit Handler', ({given, when, then, and}) => {
+  test('Manuscript Accept Handler', ({given, when, then, and}) => {
     given('Invoicing listening to events emitted by Review', () => {});
 
-    when('A manuscript submit event is published', async () => {
+    when('A manuscript accept event is published', async () => {
       result = await usecase.execute(
         {
           manuscriptId
@@ -70,34 +70,45 @@ defineFeature(feature, test => {
       );
     });
 
-    then('A DRAFT Transaction should be created', async () => {
-      expect(result.isSuccess).toBe(true);
+    then(
+      'The DRAFT Transaction associated with the manuscript should be updated',
+      async () => {
+        expect(result.isSuccess).toBe(true);
 
-      const lastSavedTransactions = await mockTransactionRepo.getTransactionCollection();
+        const lastSavedTransactions = await mockTransactionRepo.getTransactionCollection();
 
-      expect(lastSavedTransactions.length).toEqual(1);
-      expect(lastSavedTransactions[0].status).toEqual(TransactionStatus.DRAFT);
-      transactionId = lastSavedTransactions[0].transactionId;
-    });
+        expect(lastSavedTransactions.length).toEqual(1);
+        expect(lastSavedTransactions[0].status).toEqual(
+          TransactionStatus.DRAFT
+        );
+        transactionId = lastSavedTransactions[0].transactionId;
+      }
+    );
 
-    and('A DRAFT Invoice should be created', async () => {
-      const lastSavedInvoices = await mockInvoiceRepo.getInvoiceCollection();
+    and(
+      'The DRAFT Invoice associated with the manuscript should be updated',
+      async () => {
+        const lastSavedInvoices = await mockInvoiceRepo.getInvoiceCollection();
 
-      expect(lastSavedInvoices.length).toEqual(1);
-      expect(lastSavedInvoices[0].status).toEqual(InvoiceStatus.DRAFT);
-      expect(lastSavedInvoices[0].transactionId.id.toString()).toEqual(
-        transactionId.id.toString()
-      );
-      invoiceId = lastSavedInvoices[0].invoiceId;
-    });
+        expect(lastSavedInvoices.length).toEqual(1);
+        expect(lastSavedInvoices[0].status).toEqual(InvoiceStatus.DRAFT);
+        expect(lastSavedInvoices[0].transactionId.id.toString()).toEqual(
+          transactionId.id.toString()
+        );
+        invoiceId = lastSavedInvoices[0].invoiceId;
+      }
+    );
 
-    and('An Invoice Item should be created', async () => {
-      const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+    and(
+      'The Invoice Item associated with the manuscript should be updated',
+      async () => {
+        const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
 
-      expect(lastSavedInvoiceItems.length).toEqual(1);
-      expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).toEqual(
-        invoiceId.id.toString()
-      );
-    });
+        expect(lastSavedInvoiceItems.length).toEqual(1);
+        expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).toEqual(
+          invoiceId.id.toString()
+        );
+      }
+    );
   });
 });

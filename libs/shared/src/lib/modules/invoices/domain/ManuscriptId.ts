@@ -1,3 +1,4 @@
+import {Result} from './../../../core/logic/Result';
 import {Entity} from '../../../core/domain/Entity';
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 
@@ -10,7 +11,7 @@ export class ManuscriptId extends Entity<any> {
     super(null, id);
   }
 
-  public static create(id?: UniqueEntityID): ManuscriptId {
-    return new ManuscriptId(id);
+  public static create(id?: UniqueEntityID): Result<ManuscriptId> {
+    return Result.ok<ManuscriptId>(new ManuscriptId(id));
   }
 }

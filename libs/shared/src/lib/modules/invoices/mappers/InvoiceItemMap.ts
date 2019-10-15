@@ -2,21 +2,28 @@ import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Mapper} from '../../../infrastructure/Mapper';
 import {InvoiceItem, InvoiceItemType} from '../domain/InvoiceItem';
 import {InvoiceId} from '../domain/InvoiceId';
+import {ManuscriptId} from 'libs/shared/src/lib/modules/invoices/domain/ManuscriptId';
 
 export interface InvoiceItemPersistenceDTO {
-  id: string;
+  id?: string;
   invoiceId: string;
-  type: InvoiceItemType;
-  name: string;
-  price: number;
-  dateCreated: Date;
+  manuscriptId: string;
+  type?: InvoiceItemType;
+  name?: string;
+  price?: number;
+  dateCreated?: Date;
 }
 
 export class InvoiceItemMap extends Mapper<InvoiceItem> {
   public static toDomain(raw: InvoiceItemPersistenceDTO): InvoiceItem {
     const invoiceItemOrError = InvoiceItem.create(
       {
-        invoiceId: InvoiceId.create(new UniqueEntityID(raw.invoiceId)),
+        invoiceId: InvoiceId.create(
+          new UniqueEntityID(raw.invoiceId)
+        ).getValue(),
+        manuscriptId: ManuscriptId.create(
+          new UniqueEntityID(raw.manuscriptId)
+        ).getValue(),
         type: raw.type,
         name: raw.name,
         price: raw.price,
@@ -38,6 +45,7 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
     return {
       id: invoiceItem.id.toString(),
       invoiceId: invoiceItem.invoiceId.id.toString(),
+      manuscriptId: invoiceItem.manuscriptId.id.toString(),
       type: invoiceItem.type,
       name: invoiceItem.name,
       price: invoiceItem.price,

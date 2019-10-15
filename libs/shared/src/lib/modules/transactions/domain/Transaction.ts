@@ -4,9 +4,9 @@ import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Result} from '../../../core/logic/Result';
 
 // * Subdomain
+import {Invoice} from '../../../modules/invoices/domain/Invoice';
 import {TransactionId} from './TransactionId';
 import {Invoices} from './Invoices';
-// import {InvoiceItem} from '../../../modules/invoices/domain/InvoiceItem';
 
 export enum STATUS {
   DRAFT, // after the internal object has been created
@@ -20,6 +20,7 @@ interface TransactionProps {
   dateCreated?: Date; // CreateTimestamp
   dateUpdated?: Date; // LastUpdateTimestamp
   deleted?: number; // soft delete
+  totalNumInvoices?: number;
 }
 
 export type TransactionCollection = Transaction[];
@@ -56,6 +57,10 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     return this.props.invoices;
   }
 
+  get totalNumInvoices(): number {
+    return this.props.totalNumInvoices;
+  }
+
   // get netAmount(): number {
   //   return this.props.invoices.reduce((amount: number, invoice: Invoice) => {
   //     // invoice.netAmount = Math.round(
@@ -83,6 +88,7 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     const defaultValues: TransactionProps = {
       ...props,
       invoices: props.invoices ? props.invoices : Invoices.create([]),
+      totalNumInvoices: props.totalNumInvoices ? props.totalNumInvoices : 0,
       dateCreated: props.dateCreated ? props.dateCreated : new Date()
     };
     const transaction = new Transaction(defaultValues, id);
@@ -98,21 +104,19 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     return Result.ok<Transaction>(transaction);
   }
 
-  // public addInvoice(invoice: Invoice): void {
-  //   const maxLengthExceeded =
-  //     this.props.invoices.length >=
-  //     Transaction.MAX_NUMBER_INVOICES_PER_TRANSACTION;
+  private removeInvoiceIfExists(invoice: Invoice): void {
+    if (this.props.invoices.exists(invoice)) {
+      this.props.invoices.remove(invoice);
+    }
+  }
 
-  //   const alreadyAdded = this.props.invoices.find(i => i.id.equals(invoice.id));
-
-  //   if (!alreadyAdded && !maxLengthExceeded) {
-  //     Object.assign(invoice, {transactionId: this.transactionId});
-  //     this.props.invoices.push(invoice);
-  //   }
-
-  //   // adjust invoices net amounts
-  //   this.adjustInvoices();
-  // }
+  public addInvoice(invoice: Invoice): Result<void> {
+    this.removeInvoiceIfExists(invoice);
+    this.props.invoices.add(invoice);
+    this.props.totalNumInvoices++;
+    // this.addDomainEvent(new CommentPosted(this, comment));
+    return Result.ok<void>();
+  }
 
   // public removeInvoice(invoice: Invoice): void {
   //   this.props.invoices = this.props.invoices.filter(

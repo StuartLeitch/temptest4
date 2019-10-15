@@ -1,24 +1,29 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
+import {UniqueEntityID} from './../../../src/lib/core/domain/UniqueEntityID';
 import {Result} from '../../../src/lib/core/logic/Result';
 import {Roles} from '../../../src/lib/modules/users/domain/enums/Roles';
 
+import {Invoice} from '../../../src/lib/modules/invoices/domain/Invoice';
+import {InvoiceItem} from '../../../src/lib/modules/invoices/domain/InvoiceItem';
 import {InvoiceStatus} from '../../../src/lib/modules/invoices/domain/Invoice';
 import {InvoiceId} from '../../../src/lib/modules/invoices/domain/InvoiceId';
+import {InvoiceMap} from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import {InvoiceItemMap} from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import {
-  CreateTransactionContext,
-  CreateTransactionUsecase
-} from '../../../src/lib/modules/transactions/usecases/createTransaction/createTransaction';
+  DeleteTransactionContext,
+  SoftDeleteDraftTransactionUsecase
+} from '../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 
 import {
   Transaction,
   STATUS as TransactionStatus
 } from '../../../src/lib/modules/transactions/domain/Transaction';
 import {TransactionId} from '../../../src/lib/modules/transactions/domain/TransactionId';
+import {TransactionMap} from './../../../src/lib/modules/transactions/mappers/TransactionMap';
 import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
 import {MockInvoiceRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import {MockArticleRepo} from '../../../src/lib/modules/articles/repos/mocks/mockArticleRepo';
 import {MockInvoiceItemRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 
 const feature = loadFeature(
@@ -26,12 +31,11 @@ const feature = loadFeature(
   {loadRelativePath: true}
 );
 
-const defaultContext: CreateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: DeleteTransactionContext = {roles: [Roles.SUPER_ADMIN]};
 
 defineFeature(feature, test => {
   let mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
   let mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
-  let mockArticleRepo: MockArticleRepo = new MockArticleRepo();
   let mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
   let result: Result<Transaction>;
 
@@ -39,24 +43,36 @@ defineFeature(feature, test => {
   let transactionId: TransactionId;
   let invoiceId: InvoiceId;
 
-  let usecase: CreateTransactionUsecase = new CreateTransactionUsecase(
+  let usecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
     mockTransactionRepo,
-    mockArticleRepo,
-    mockInvoiceRepo,
-    mockInvoiceItemRepo
+    mockInvoiceItemRepo,
+    mockInvoiceRepo
   );
 
-  // beforeEach(() => {
-  //   const transaction = TransactionMap.toDomain({
-  //     status: TransactionStatus.DRAFT
-  //   });
-  //   mockTransactionRepo.save(transaction);
-  //   const invoice = InvoiceMap.toDomain({
-  //     status: InvoiceStatus.DRAFT,
-  //     invoiceId: transaction.transactionId
-  //   });
-  //   mockInvoiceRepo.save(invoice);
-  // });
+  let transaction: Transaction;
+  let invoice: Invoice;
+  let invoiceItem: InvoiceItem;
+
+  beforeEach(() => {
+    transaction = TransactionMap.toDomain({
+      status: TransactionStatus.DRAFT
+    });
+    invoice = InvoiceMap.toDomain({
+      status: InvoiceStatus.DRAFT,
+      transactionId: transaction.transactionId
+    });
+    invoiceItem = InvoiceItemMap.toDomain({
+      manuscriptId,
+      invoiceId: invoice.invoiceId.id.toString()
+    });
+
+    invoice.addInvoiceItem(invoiceItem);
+    transaction.addInvoice(invoice);
+
+    mockTransactionRepo.save(transaction);
+    mockInvoiceRepo.save(invoice);
+    mockInvoiceItemRepo.save(invoiceItem);
+  });
 
   test('Manuscript Reject Handler', ({given, when, then, and}) => {
     given('Invoicing listening to events emitted by Review', () => {});
@@ -75,39 +91,24 @@ defineFeature(feature, test => {
       async () => {
         expect(result.isSuccess).toBe(true);
 
-        const lastSavedTransactions = await mockTransactionRepo.getTransactionCollection();
-
-        expect(lastSavedTransactions.length).toEqual(1);
-        expect(lastSavedTransactions[0].status).toEqual(
-          TransactionStatus.DRAFT
-        );
-        transactionId = lastSavedTransactions[0].transactionId;
+        const transactions = await mockTransactionRepo.getTransactionCollection();
+        expect(transactions.length).toEqual(0);
       }
     );
 
     and(
       'The DRAFT Invoice associated with the manuscript should be soft deleted',
       async () => {
-        const lastSavedInvoices = await mockInvoiceRepo.getInvoiceCollection();
-
-        expect(lastSavedInvoices.length).toEqual(1);
-        expect(lastSavedInvoices[0].status).toEqual(InvoiceStatus.DRAFT);
-        expect(lastSavedInvoices[0].transactionId.id.toString()).toEqual(
-          transactionId.id.toString()
-        );
-        invoiceId = lastSavedInvoices[0].invoiceId;
+        const invoices = await mockInvoiceRepo.getInvoiceCollection();
+        expect(invoices.length).toEqual(0);
       }
     );
 
     and(
       'The Invoice Item associated with the manuscript should be soft deleted',
       async () => {
-        const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
-
-        expect(lastSavedInvoiceItems.length).toEqual(1);
-        expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).toEqual(
-          invoiceId.id.toString()
-        );
+        const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+        expect(invoiceItems.length).toEqual(0);
       }
     );
   });

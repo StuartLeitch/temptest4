@@ -4,15 +4,15 @@ import {Guard, GuardArgument} from './../../../core/logic/Guard';
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Result} from '../../../core/logic/Result';
 
-import {ArticleId} from './../../articles/domain/ArticleId';
 import {InvoiceId} from './InvoiceId';
 import {InvoiceItemId} from './InvoiceItemId';
+import {ManuscriptId} from './ManuscriptId';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
 export interface InvoiceItemProps {
   invoiceId: InvoiceId;
-  manuscriptId: ArticleId;
+  manuscriptId: ManuscriptId;
   type?: InvoiceItemType;
   name?: string;
   price?: number;
@@ -30,6 +30,10 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
   get invoiceId(): InvoiceId {
     return this.props.invoiceId;
+  }
+
+  get manuscriptId(): ManuscriptId {
+    return this.props.manuscriptId;
   }
 
   get type(): InvoiceItemType {
