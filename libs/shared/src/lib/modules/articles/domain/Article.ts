@@ -22,6 +22,14 @@ export class Article extends AggregateRoot<ArticleProps> {
     return this._id;
   }
 
+  get title(): string {
+    return this.props.title;
+  }
+
+  get articleTypeId(): string {
+    return this.props.articleTypeId;
+  }
+
   public static create(
     props: ArticleProps,
     id?: UniqueEntityID

@@ -62,6 +62,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.payerId = payerId;
   }
 
+  get invoiceNumber(): string {
+    return this.props.invoiceNumber;
+  }
+
   set transactionId(transactionId: TransactionId) {
     this.props.transactionId = transactionId;
   }
