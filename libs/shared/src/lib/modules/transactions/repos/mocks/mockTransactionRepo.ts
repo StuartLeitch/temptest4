@@ -30,20 +30,6 @@ export class MockTransactionRepo extends BaseMockRepo<Transaction>
     return transaction;
   }
 
-  public async getTransactionByManuscriptId(
-    manuscriptId: string
-  ): Promise<Transaction> {
-    const matches = this._items.filter(
-      t => t.manuscriptId.id.toString() === manuscriptId
-    );
-
-    if (matches.length !== 0) {
-      return matches[0];
-    } else {
-      return null;
-    }
-  }
-
   public async getTransactionById(
     transactionId: TransactionId
   ): Promise<Transaction> {

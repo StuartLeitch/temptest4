@@ -1,26 +1,11 @@
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Mapper} from '../../../infrastructure/Mapper';
 import {Transaction} from '../domain/Transaction';
-import {STATUS as TransactionStatus} from '../domain/Transaction';
-
-// import {ArticleId} from '../../articles/domain/ArticleId';
-
-export class TransactionPersistenceDTO {
-  id: string;
-  // articleId: string;
-  status: TransactionStatus;
-  // amount: number;
-  deleted?: number;
-  dateCreated: Date;
-  dateUpdated: Date;
-}
 
 export class TransactionMap extends Mapper<Transaction> {
-  public static toDomain(raw: TransactionPersistenceDTO): Transaction {
+  public static toDomain(raw: any): Transaction {
     const transactionOrError = Transaction.create(
       {
-        // articleId: ArticleId.create(new UniqueEntityID(raw.articleId)),
-        // amount: Amount.create(raw.amount).getValue(),
         deleted: raw.deleted,
         status: raw.status,
         dateCreated: new Date(raw.dateCreated),
@@ -34,14 +19,10 @@ export class TransactionMap extends Mapper<Transaction> {
     return transactionOrError.isSuccess ? transactionOrError.getValue() : null;
   }
 
-  public static toPersistence(
-    transaction: Transaction
-  ): TransactionPersistenceDTO {
+  public static toPersistence(transaction: Transaction): any {
     return {
       id: transaction.id.toString(),
-      // articleId: transaction.articleId.toString(),
       status: transaction.status,
-      // amount: transaction.amount.value,
       dateCreated: transaction.dateCreated,
       dateUpdated: transaction.dateUpdated
     };

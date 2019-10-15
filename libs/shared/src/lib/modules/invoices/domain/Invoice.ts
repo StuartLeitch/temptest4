@@ -6,6 +6,7 @@ import {Result} from '../../../core/logic/Result';
 // * Subdomains
 import {InvoiceId} from './InvoiceId';
 import {InvoiceItem} from './InvoiceItem';
+import {InvoiceItems} from './InvoiceItems';
 import {InvoiceSentEvent} from './events/invoiceSentEvent';
 import {InvoicePaidEvent} from './events/invoicePaidEvent';
 import {TransactionId} from '../../transactions/domain/TransactionId';
@@ -22,12 +23,12 @@ export enum InvoiceStatus {
 interface InvoiceProps {
   status: InvoiceStatus;
   invoiceNumber?: string; // TODO: AutoIncrement?...Smells bad!
-  transactionId?: TransactionId;
+  transactionId: TransactionId;
   payerId?: PayerId;
-  invoiceItems?: InvoiceItem[];
+  invoiceItems?: InvoiceItems;
   dateCreated?: Date;
   dateUpdated?: Date;
-  // coupons?: Coupon[];
+  totalNumInvoiceItems?: number;
 }
 
 export type InvoiceCollection = Invoice[];
@@ -57,7 +58,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.props.dateCreated;
   }
 
-  get invoiceItems(): InvoiceItem[] {
+  get invoiceItems(): InvoiceItems {
     return this.props.invoiceItems;
   }
 
@@ -69,6 +70,20 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.transactionId = transactionId;
   }
 
+  private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
+    if (this.props.invoiceItems.exists(invoiceItem)) {
+      this.props.invoiceItems.remove(invoiceItem);
+    }
+  }
+
+  public addInvoiceItem(invoiceItem: InvoiceItem): Result<void> {
+    this.removeInvoiceItemIfExists(invoiceItem);
+    this.props.invoiceItems.add(invoiceItem);
+    this.props.totalNumInvoiceItems++;
+    // this.addDomainEvent(new InvoiceItemIssued(this, invoiceItem));
+    return Result.ok<void>();
+  }
+
   private constructor(props: InvoiceProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -77,14 +92,25 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     props: InvoiceProps,
     id?: UniqueEntityID
   ): Result<Invoice> {
-    const invoice = new Invoice(
-      {
-        ...props,
-        invoiceItems: props.invoiceItems ? props.invoiceItems : [],
-        dateCreated: props.dateCreated ? props.dateCreated : new Date()
-      },
-      id
-    );
+    const defaultValues = {
+      ...props,
+      invoiceItems: props.invoiceItems
+        ? props.invoiceItems
+        : InvoiceItems.create([]),
+      dateCreated: props.dateCreated ? props.dateCreated : new Date()
+    };
+
+    const isNewInvoice = !!id === false;
+    const invoice = new Invoice(defaultValues, id);
+
+    if (isNewInvoice) {
+      // invoice.addDomainEvent(new InvoiceCreated(invoice));
+      // Create with initial invoice item from whomever created the invoice
+      // invoice.addInvoiceItem(
+      //   InvoiceItem.create(props.invoiceId, invoice.manuscriptId).getValue()
+      // );
+    }
+
     return Result.ok<Invoice>(invoice);
   }
 
@@ -106,46 +132,46 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
   }
 
-  public getValue(): number {
-    return this.invoiceItems.reduce(
-      (value: number, invoiceItem: InvoiceItem) => {
-        value += invoiceItem.price;
-        return value;
-      },
-      0
-    );
-  }
+  // public getValue(): number {
+  //   return this.invoiceItems.reduce(
+  //     (value: number, invoiceItem: InvoiceItem) => {
+  //       value += invoiceItem.price;
+  //       return value;
+  //     },
+  //     0
+  //   );
+  // }
 
-  public addInvoiceItem(invoiceItem: InvoiceItem): void {
-    const alreadyAdded = this.props.invoiceItems.find(i =>
-      i.id.equals(invoiceItem.id)
-    );
+  // public addInvoiceItem(invoiceItem: InvoiceItem): void {
+  //   const alreadyAdded = this.props.invoiceItems.find(i =>
+  //     i.id.equals(invoiceItem.id)
+  //   );
 
-    if (!alreadyAdded) {
-      Object.assign(invoiceItem, {invoiceId: this.invoiceId});
-      this.props.invoiceItems.push(invoiceItem);
-    }
-  }
+  //   if (!alreadyAdded) {
+  //     Object.assign(invoiceItem, {invoiceId: this.invoiceId});
+  //     this.props.invoiceItems.push(invoiceItem);
+  //   }
+  // }
 
-  public removeInvoiceItems(invoiceItem: InvoiceItem): void {
-    this.props.invoiceItems = this.props.invoiceItems.filter(
-      i => !i.id.equals(invoiceItem.id)
-    );
-  }
+  // public removeInvoiceItems(invoiceItem: InvoiceItem): void {
+  //   this.props.invoiceItems = this.props.invoiceItems.filter(
+  //     i => !i.id.equals(invoiceItem.id)
+  //   );
+  // }
 
-  public clearInvoiceItems(): void {
-    this.props.invoiceItems = [];
-  }
+  // public clearInvoiceItems(): void {
+  //   this.props.invoiceItems = [];
+  // }
 
-  public addTax(taxRate: number) {
-    const netAmount = this.getValue();
-    const taxValue = (netAmount * taxRate) / 100;
-    return netAmount + taxValue;
-  }
+  // public addTax(taxRate: number) {
+  //   const netAmount = this.getValue();
+  //   const taxValue = (netAmount * taxRate) / 100;
+  //   return netAmount + taxValue;
+  // }
 
-  public redeemCoupon(reduction: number) {
-    const netAmount = this.getValue();
-    const reductionValue = netAmount * reduction;
-    return netAmount - reductionValue;
-  }
+  // public redeemCoupon(reduction: number) {
+  //   const netAmount = this.getValue();
+  //   const reductionValue = netAmount * reduction;
+  //   return netAmount - reductionValue;
+  // }
 }

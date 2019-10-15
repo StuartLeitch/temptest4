@@ -1,8 +1,10 @@
 // * Core Domain
 import {AggregateRoot} from '../../../core/domain/AggregateRoot';
+import {Guard, GuardArgument} from './../../../core/logic/Guard';
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Result} from '../../../core/logic/Result';
 
+import {ArticleId} from './../../articles/domain/ArticleId';
 import {InvoiceId} from './InvoiceId';
 import {InvoiceItemId} from './InvoiceItemId';
 
@@ -10,6 +12,7 @@ export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
 export interface InvoiceItemProps {
   invoiceId: InvoiceId;
+  manuscriptId: ArticleId;
   type?: InvoiceItemType;
   name?: string;
   price?: number;
@@ -17,31 +20,7 @@ export interface InvoiceItemProps {
 }
 
 export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
-  private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
-    super(props, id);
-  }
-
-  public static create(
-    props: InvoiceItemProps,
-    id?: UniqueEntityID
-  ): Result<InvoiceItem> {
-    const invoiceItem = new InvoiceItem(
-      {
-        ...props,
-        name: props.name ? props.name : 'APC',
-        type: props.type ? props.type : 'APC',
-        dateCreated: props.dateCreated ? props.dateCreated : new Date()
-      },
-      id
-    );
-    return Result.ok<InvoiceItem>(invoiceItem);
-  }
-
-  public set price(priceValue: number) {
-    this.props.price = priceValue;
-  }
-
-  public get id(): UniqueEntityID {
+  get id(): UniqueEntityID {
     return this._id;
   }
 
@@ -53,19 +32,53 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this.props.invoiceId;
   }
 
-  public get type(): InvoiceItemType {
+  get type(): InvoiceItemType {
     return this.props.type;
   }
 
-  public get name(): string {
+  get name(): string {
     return this.props.name;
   }
 
-  public get price(): number {
+  get price(): number {
     return this.props.price;
   }
 
-  public get dateCreated(): Date {
+  get dateCreated(): Date {
     return this.props.dateCreated;
+  }
+
+  private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
+    super(props, id);
+  }
+
+  set price(priceValue: number) {
+    this.props.price = priceValue;
+  }
+
+  public static create(
+    props: InvoiceItemProps,
+    id?: UniqueEntityID
+  ): Result<InvoiceItem> {
+    const guardArgs: GuardArgument[] = [
+      {argument: props.invoiceId, argumentName: 'invoiceId'},
+      {argument: props.manuscriptId, argumentName: 'manuscriptId'}
+    ];
+
+    const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
+
+    if (!guardResult.succeeded) {
+      return Result.fail<InvoiceItem>(guardResult.message);
+    }
+
+    const defaultValues: InvoiceItemProps = {
+      ...props,
+      name: props.name ? props.name : 'APC',
+      type: props.type ? props.type : 'APC',
+      dateCreated: props.dateCreated ? props.dateCreated : new Date()
+    };
+
+    const invoiceItem = new InvoiceItem(defaultValues, id);
+    return Result.ok<InvoiceItem>(invoiceItem);
   }
 }

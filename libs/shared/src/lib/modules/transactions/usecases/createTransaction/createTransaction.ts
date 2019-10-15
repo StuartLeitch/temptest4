@@ -132,10 +132,6 @@ export class CreateTransactionUsecase
         status: TransactionStatus.DRAFT
       } as any;
 
-      if (manuscriptId) {
-        transactionProps.manuscriptId = manuscriptId;
-      }
-
       // * System creates DRAFT transaction
       const transactionOrError = Transaction.create(transactionProps);
 
@@ -162,6 +158,7 @@ export class CreateTransactionUsecase
 
       //* System creates invoice item(s)
       const invoiceItemProps = {
+        manuscriptId,
         invoiceId: invoice.invoiceId,
         dateCreated: new Date()
       };

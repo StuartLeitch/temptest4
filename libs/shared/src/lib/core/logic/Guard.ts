@@ -1,6 +1,6 @@
 export interface GuardResult {
   succeeded: boolean;
-  message: string;
+  message?: string;
 }
 
 export interface GuardArgument {
@@ -16,7 +16,19 @@ export class Guard {
       if (result.succeeded === false) return result;
     }
 
-    return {succeeded: true, message: ''};
+    return {succeeded: true};
+  }
+
+  public static greaterThan(
+    minValue: number,
+    actualValue: number
+  ): GuardResult {
+    return actualValue > minValue
+      ? {succeeded: true}
+      : {
+          succeeded: false,
+          message: `Number given {${actualValue}} is not greater than {${minValue}}`
+        };
   }
 
   public static againstNullOrUndefined(
@@ -29,8 +41,26 @@ export class Guard {
         message: `${argumentName} is null or undefined`
       };
     } else {
-      return {succeeded: true, message: ''};
+      return {succeeded: true};
     }
+  }
+
+  public static againstAtLeast(numChars: number, text: string): GuardResult {
+    return text.length >= numChars
+      ? {succeeded: true}
+      : {
+          succeeded: false,
+          message: `Text is not at least ${numChars} chars.`
+        };
+  }
+
+  public static againstAtMost(numChars: number, text: string): GuardResult {
+    return text.length <= numChars
+      ? {succeeded: true}
+      : {
+          succeeded: false,
+          message: `Text is greater than ${numChars} chars.`
+        };
   }
 
   public static againstNullOrUndefinedBulk(
@@ -60,7 +90,7 @@ export class Guard {
     }
 
     if (isValid) {
-      return {succeeded: true, message: ''};
+      return {succeeded: true};
     } else {
       return {
         succeeded: false,
@@ -84,7 +114,7 @@ export class Guard {
         message: `${argumentName} is not within range ${min} to ${max}.`
       };
     } else {
-      return {succeeded: true, message: ''};
+      return {succeeded: true};
     }
   }
 
@@ -106,7 +136,7 @@ export class Guard {
         message: `${argumentName} is not within the range.`
       };
     } else {
-      return {succeeded: true, message: ''};
+      return {succeeded: true};
     }
   }
 }

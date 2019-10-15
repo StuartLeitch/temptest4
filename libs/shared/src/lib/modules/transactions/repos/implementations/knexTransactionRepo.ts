@@ -21,11 +21,6 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
     return transactionRow ? TransactionMap.toDomain(transactionRow) : null;
   }
 
-  getTransactionByManuscriptId(articleId: string): Promise<Transaction> {
-    // TODO: Please read `docs/typescript/COMMANDMENTS.ts` to understand why `{} as Transaction` is a lie.
-    return Promise.resolve({} as Transaction);
-  }
-
   async getTransactionCollection(): Promise<Transaction[]> {
     const {db} = this;
 
