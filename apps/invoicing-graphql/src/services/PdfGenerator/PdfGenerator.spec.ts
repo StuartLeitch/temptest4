@@ -4,22 +4,6 @@ import streamToPromise from 'stream-to-promise';
 import fs from 'fs';
 import path from 'path';
 
-function writeSampleSnapshot(data: Buffer, fileName: string) {
-  const snapshotDir = path.join(__dirname, '__snapshots__');
-  fs.mkdirSync(snapshotDir, { recursive: true });
-  const outFile = path.join(snapshotDir, fileName);
-
-  if (fs.existsSync(outFile)) {
-    fs.unlinkSync(outFile);
-  }
-
-  fs.writeFileSync(outFile, data);
-}
-
-function stripDate(data: string): string {
-  return data.replace(/CreationDate\s\(D:\d+\)/, '/CreationDate (D:20190102030405)');
-}
-
 describe('PdfGeneratorService', () => {
   const generator = new PdfGeneratorService();
   generator.addTemplate('invoice', 'invoice.ejs');
@@ -47,7 +31,6 @@ describe('PdfGeneratorService', () => {
 
 
   it('should generate an invoice', async () => {
-
     const stream = await generator.getInvoice({
       invoice,
       author,
@@ -56,10 +39,6 @@ describe('PdfGeneratorService', () => {
     });
     const buffer = await streamToPromise(stream);
 
-    process.env.DEBUG_PDF && writeSampleSnapshot(buffer, 'invoice.pdf');
-
-    const data = stripDate(buffer.toString('utf-8'));
-
-    expect(data).toMatchSnapshot();
+    await expect(buffer).toMatchPdf('invoice-1');
   });
 });
