@@ -8,7 +8,7 @@ export interface InvoiceItemRepoContract extends Repo<InvoiceItem> {
   getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
   ): Promise<InvoiceItem>;
-  // getInvoicesByTransactionId(transactionId: TransactionId): Promise<Invoice[]>;
+  getInvoiceItemCollection(): Promise<InvoiceItem[]>;
   delete(invoiceItem: InvoiceItem): Promise<void>;
   // update(invoice: Invoice): Promise<Invoice>;
 }

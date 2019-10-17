@@ -55,11 +55,6 @@ defineFeature(feature, test => {
   let result: any;
 
   let manuscriptId = 'manuscript-id';
-  let title = 'manuscript-title';
-  let articleTypeId = 'article-type-id';
-  let authorEmail = 'author@email.com';
-  let authorCountry = 'MD';
-  let authorSurname = 'Author Surname';
 
   let usecase: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
     mockTransactionRepo,
@@ -77,24 +72,12 @@ defineFeature(feature, test => {
   let manuscript: Article;
 
   beforeEach(() => {
-    manuscript = ArticleMap.toDomain({
-      id: manuscriptId,
-      title,
-      articleTypeId,
-      authorEmail,
-      authorCountry,
-      authorSurname
-    });
     transaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT
     });
     invoice = InvoiceMap.toDomain({
       status: InvoiceStatus.DRAFT,
       transactionId: transaction.transactionId
-    });
-    catalogItem = CatalogMap.toDomain({
-      type: 'APC',
-      price: 1900
     });
     invoiceItem = InvoiceItemMap.toDomain({
       manuscriptId,
@@ -104,8 +87,6 @@ defineFeature(feature, test => {
     invoice.addInvoiceItem(invoiceItem);
     transaction.addInvoice(invoice);
 
-    mockCatalogRepo.save(catalogItem);
-    mockArticleRepo.save(manuscript);
     mockTransactionRepo.save(transaction);
     mockInvoiceRepo.save(invoice);
     mockInvoiceItemRepo.save(invoiceItem);
@@ -114,8 +95,31 @@ defineFeature(feature, test => {
   test('Manuscript Accept Handler', ({given, when, then, and}) => {
     given('Invoicing listening to events emitted by Review', () => {});
 
-    // and('The APC Catalog Item has a price of 100', () => {});
-    // and('The Author is from a Waived Country', () => {});
+    and('The APC Catalog Item has a price of 100', () => {
+      catalogItem = CatalogMap.toDomain({
+        type: 'APC',
+        price: 1900
+      });
+      mockCatalogRepo.save(catalogItem);
+    });
+
+    and('The Author is from a Waived Country', () => {
+      let title = 'manuscript-title';
+      let articleTypeId = 'article-type-id';
+      let authorEmail = 'author@email.com';
+      let authorCountry = 'MD';
+      let authorSurname = 'Author Surname';
+
+      manuscript = ArticleMap.toDomain({
+        id: manuscriptId,
+        title,
+        articleTypeId,
+        authorEmail,
+        authorCountry,
+        authorSurname
+      });
+      mockArticleRepo.save(manuscript);
+    });
 
     when('A manuscript accept event is published', async () => {
       result = await usecase.execute(
@@ -130,37 +134,25 @@ defineFeature(feature, test => {
       'The Transaction associated with the manuscript should be ACTIVE',
       async () => {
         expect(result.value.isSuccess).toBe(true);
-        // const lastSavedTransactions = await mockTransactionRepo.getTransactionCollection();
-        // expect(lastSavedTransactions.length).toEqual(1);
-        // expect(lastSavedTransactions[0].status).toEqual(
-        //   TransactionStatus.DRAFT
-        // );
-        // transactionId = lastSavedTransactions[0].transactionId;
+
+        // const transactions = await mockTransactionRepo.getTransactionCollection();
+        // console.info(transactions);
+        // const [
+        //   transaction
+        // ] = await mockTransactionRepo.getTransactionCollection();
+
+        // expect(transaction.status).toEqual(TransactionStatus.ACTIVE);
       }
     );
 
-    // and(
-    //   'The DRAFT Invoice associated with the manuscript should have waivers applied',
-    //   async () => {
-    //     const lastSavedInvoices = await mockInvoiceRepo.getInvoiceCollection();
-    //     expect(lastSavedInvoices.length).toEqual(1);
-    //     expect(lastSavedInvoices[0].status).toEqual(InvoiceStatus.DRAFT);
-    //     expect(lastSavedInvoices[0].transactionId.id.toString()).toEqual(
-    //       transactionId.id.toString()
-    //     );
-    //     invoiceId = lastSavedInvoices[0].invoiceId;
-    //   }
-    // );
-
-    // and(
-    //   'The Invoice Item associated with the manuscript should have waivers applied',
-    //   async () => {
-    //     const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
-    //     expect(lastSavedInvoiceItems.length).toEqual(1);
-    //     expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).toEqual(
-    //       invoiceId.id.toString()
-    //     );
-    //   }
-    // );
+    and(
+      'The Invoice Item associated with the manuscript should have the price of 50',
+      async () => {
+        // const [
+        //   invoiceItem
+        // ] = await mockInvoiceItemRepo.getInvoiceItemCollection();
+        // expect(invoiceItem.price).toEqual(50);
+      }
+    );
   });
 });
