@@ -1,4 +1,5 @@
 import React from 'react';
+import {action} from '@storybook/addon-actions';
 import {select, color, number} from '@storybook/addon-knobs';
 
 import Icon, {IconNames} from './Icon';
@@ -62,6 +63,15 @@ const iconNames = [
 
 export const Default = () => (
   <Icon
+    name={select('Icon name', iconNames, 'tooltip') as IconNames}
+    size={number('Size', 8)}
+    color={color('Color', '#3399FF')}
+  />
+);
+
+export const WithClickHandler = () => (
+  <Icon
+    onClick={action('Icon clicked')}
     name={select('Icon name', iconNames, 'tooltip') as IconNames}
     size={number('Size', 8)}
     color={color('Color', '#3399FF')}

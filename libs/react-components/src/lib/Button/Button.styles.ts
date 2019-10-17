@@ -1,12 +1,16 @@
-import {space} from 'styled-system';
+import {space, layout} from 'styled-system';
 import styled, {css, AnyStyledComponent} from 'styled-components';
 
 import {lighten, th} from '../Theme';
 
-const buttonType = ({type}: {type: string}) => {
+const buttonType = ({disabled, type}: {disabled: boolean; type: string}) => {
+  if (disabled)
+    return css`
+      background-color: ${th('buttons.disabled.bg')};
+      color: ${th('buttons.disabled.color')};
+    `;
   switch (type) {
     case 'primary':
-      console.log('sunt primary');
       return css`
         color: ${th('buttons.primary.color')};
         background-color: ${th('buttons.primary.bg')};
@@ -77,4 +81,5 @@ export const Button: AnyStyledComponent = styled.button`
   ${buttonType};
   ${buttonSize};
   ${space};
+  ${layout};
 `;

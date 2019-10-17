@@ -1,15 +1,21 @@
+import colors from './colors';
+
 export default {
   primary: {
-    bg: '#81BA40',
-    color: '#FFF'
+    bg: colors.primary.action,
+    color: colors.white
   },
   secondary: {
     bg: '#333',
-    color: '#FFF'
+    color: colors.white
   },
   outline: {
     border: '2px solid #333',
-    bg: '#FFF',
+    bg: colors.white,
     color: '#333'
+  },
+  disabled: {
+    bg: colors.background,
+    color: colors.white
   }
 };

@@ -1,9 +1,9 @@
 import React from 'react';
-import styled, {css} from 'styled-components';
-import {space, SpaceProps} from 'styled-system';
+import {SpaceProps} from 'styled-system';
 
 import icons from './icons';
-import {th} from '../Theme';
+
+import {Icon as Root} from './Icon.styles';
 
 export type IconNames =
   | 'arrowDown'
@@ -65,6 +65,8 @@ export interface Props extends SpaceProps {
   color?: string;
   size?: number;
   name: IconNames;
+  disabled?: boolean;
+  onClick?(e: React.MouseEvent<HTMLElement>): void;
 }
 
 const Icon: React.FunctionComponent<Props> = ({name, ...rest}) => (
@@ -80,23 +82,8 @@ const Icon: React.FunctionComponent<Props> = ({name, ...rest}) => (
 
 Icon.defaultProps = {
   size: 4,
-  color: 'colors.white'
+  color: 'colors.white',
+  disabled: false
 };
 
 export default Icon;
-
-// #region styles
-const iconSize = ({size}: {size: number}) => css`
-  width: calc(${th('gridUnit')} * ${size});
-  height: calc(${th('gridUnit')} * ${size});
-`;
-
-const Root = styled.svg`
-  & path {
-    fill: ${({color}: {color: string}) => th(color)};
-  }
-
-  ${iconSize};
-  ${space};
-`;
-// #endregion
