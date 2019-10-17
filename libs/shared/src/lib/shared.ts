@@ -111,6 +111,9 @@ export * from './domain/reductions/policies/SanctionedCountryPolicy';
 export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/coupons/repos';
 
+// * Export  Author Subdomain
+export * from './modules/authors/domain/Author';
+
 // Infra
 // export * from './infra/http/app';
 export {

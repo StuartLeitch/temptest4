@@ -10,5 +10,6 @@ module.exports = {
       outputName: 'junit.xml'
     }]
   ],
+  setupFilesAfterEnv: ['./tests/setupTests.ts'],
   coverageDirectory: '../../coverage/apps/invoicing-graphql'
 };
