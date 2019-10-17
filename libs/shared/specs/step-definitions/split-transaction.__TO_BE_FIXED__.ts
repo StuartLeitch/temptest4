@@ -1,28 +1,30 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-import {UniqueEntityID} from '../../lib/core/domain/UniqueEntityID';
-import {Roles} from '../../lib/modules/users/domain/enums/Roles';
+import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
+import {Roles} from '../../src/lib/modules/users/domain/enums/Roles';
 
-import {Payer} from '../../lib/modules/payers/domain/Payer';
-import {PayerName} from '../../lib/modules/payers/domain/PayerName';
-import {PayerType} from '../../lib/modules/payers/domain/PayerType';
+import {Payer} from '../../src/lib/modules/payers/domain/Payer';
+import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
+import {PayerType} from '../../src/lib/modules/payers/domain/PayerType';
 import {
   Invoice,
-  STATUS as InvoiceStatus
-} from '../../lib/modules/invoices/domain/Invoice';
+  InvoiceStatus
+} from '../../src/lib/modules/invoices/domain/Invoice';
 import {
   GetTransactionUsecase,
   GetTransactionContext
-} from '../../lib/modules/transactions/usecases/getTransaction/getTransaction';
+} from '../../src/lib/modules/transactions/usecases/getTransaction/getTransaction';
 
-import {MockTransactionRepo} from '../../lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import {MockTransactionRepo} from '../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 import {
   Transaction,
   STATUS as TransactionStatus
-} from '../../lib/modules/transactions/domain/Transaction';
-import {TransactionAmount} from '../../lib/modules/transactions/domain/TransactionAmount';
+} from '../../src/lib/modules/transactions/domain/Transaction';
+import {TransactionAmount} from '../../src/lib/modules/transactions/domain/TransactionAmount';
 
-const feature = loadFeature('./specs/features/split-transaction.feature');
+const feature = loadFeature('./specs/features/split-transaction.feature', {
+  loadRelativePath: true
+});
 
 const defaultContext: GetTransactionContext = {roles: [Roles.SUPER_ADMIN]};
 

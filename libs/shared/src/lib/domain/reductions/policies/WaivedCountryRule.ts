@@ -84,7 +84,9 @@ export class WaivedCountryRule implements ReductionRuleContract<Reduction> {
     if (
       this.correspondingAuthorInstitutionCountryCode in WAIVER_POLICY_COUNTRIES
     ) {
-      return ReductionFactory.createReduction('WAIVER', {} as ReductionProps);
+      return ReductionFactory.createReduction('WAIVER', {
+        reduction: 0.5
+      } as ReductionProps);
     }
   }
 }

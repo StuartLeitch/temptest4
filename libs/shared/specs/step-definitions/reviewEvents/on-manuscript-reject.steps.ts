@@ -1,6 +1,5 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-import {UniqueEntityID} from './../../../src/lib/core/domain/UniqueEntityID';
 import {Result} from '../../../src/lib/core/logic/Result';
 import {Roles} from '../../../src/lib/modules/users/domain/enums/Roles';
 

@@ -19,10 +19,8 @@ export * from './modules/articles/domain/Price';
 export * from './modules/articles/domain/PriceId';
 export * from './modules/articles/domain/PriceValue';
 export * from './modules/articles/repos';
-export * from './modules/articles/repos/implementations/jsonArticleRepo';
 export * from './modules/articles/mappers/ArticleMap';
 export * from './modules/articles/repos/priceRepo';
-export * from './modules/articles/repos/implementations/jsonPriceRepo';
 export * from './modules/articles/mappers/PriceMap';
 
 // * Export Transaction Subdomain
@@ -48,7 +46,6 @@ export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
-// export * from './invoices/repos/invoiceJsonRepo';
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';

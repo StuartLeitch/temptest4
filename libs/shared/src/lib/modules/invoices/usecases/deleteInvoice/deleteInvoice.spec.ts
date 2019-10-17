@@ -4,6 +4,7 @@ import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {Roles} from '../../../users/domain/enums/Roles';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
+import {TransactionId} from './../../../transactions/domain/TransactionId';
 import {Invoice, InvoiceCollection, InvoiceStatus} from '../../domain/Invoice';
 import {DeleteInvoiceUsecase, DeleteInvoiceContext} from './deleteInvoice';
 
@@ -23,6 +24,9 @@ describe('DeleteInvoiceUsecase', () => {
     invoiceId = 'test-invoice';
     const invoice = Invoice.create(
       {
+        transactionId: TransactionId.create(
+          new UniqueEntityID('transaction-id-2')
+        ),
         status: InvoiceStatus.DRAFT
       },
       new UniqueEntityID(invoiceId)

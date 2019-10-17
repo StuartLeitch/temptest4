@@ -46,7 +46,7 @@ export class ConfirmPaidInvoiceUsecase
     }
 
     const invoice = await this.invoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId))
+      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
     const found = !!invoice;
 

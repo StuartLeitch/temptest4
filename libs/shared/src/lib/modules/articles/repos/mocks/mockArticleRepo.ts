@@ -3,6 +3,7 @@ import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
 import {ArticleRepoContract} from '../articleRepo';
 import {Article} from '../../domain/Article';
 import {ArticleId} from '../../domain/ArticleId';
+import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
 
 export class MockArticleRepo extends BaseMockRepo<Article>
   implements ArticleRepoContract {
@@ -10,13 +11,10 @@ export class MockArticleRepo extends BaseMockRepo<Article>
     super();
   }
 
-  public async findById(articleId: string): Promise<Article> {
-    const matches = this._items.filter(i => i.id.toString() === articleId);
-    if (matches.length !== 0) {
-      return matches[0];
-    } else {
-      return null;
-    }
+  public async findById(manuscriptId: ManuscriptId): Promise<Article> {
+    const match = this._items.find(i => i.manuscriptId.equals(manuscriptId));
+
+    return match ? match : null;
   }
 
   public async getAuthorOfArticle(articleId: ArticleId): Promise<unknown> {

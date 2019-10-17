@@ -15,7 +15,9 @@ describe('Payment', () => {
 
   it('Should be able to be created', () => {
     paymentOrError = Payment.create({
-      invoiceId: InvoiceId.create(new UniqueEntityID('test-invoice')),
+      invoiceId: InvoiceId.create(
+        new UniqueEntityID('test-invoice')
+      ).getValue(),
       payerId: PayerId.create(new UniqueEntityID('test-payer')),
       amount: Amount.create(100).getValue()
     });

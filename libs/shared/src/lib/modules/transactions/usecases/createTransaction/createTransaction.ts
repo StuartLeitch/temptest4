@@ -16,6 +16,7 @@ import {Invoice, InvoiceStatus} from './../../../invoices/domain/Invoice';
 import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
+import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
 
 import {
   Authorize,
@@ -82,7 +83,9 @@ export class CreateTransactionUsecase
         return Result.fail<Article>(`Invalid manuscript id=${manuscriptId}`);
       }
 
-      const article = await this.articleRepo.findById(manuscriptId);
+      const article = await this.articleRepo.findById(
+        ManuscriptId.create(new UniqueEntityID(manuscriptId)).getValue()
+      );
       const found = !!article;
 
       if (found) {

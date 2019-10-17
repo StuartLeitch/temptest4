@@ -14,7 +14,9 @@ import {KnexInvoiceItemRepo as InvoiceItemRepo} from './knexInvoiceItemRepo';
 function makeInvoiceItemData(overwrites?: any): InvoiceItem {
   return InvoiceItemMap.toDomain({
     id: 'invoice--item-id-1',
+    manuscriptId: 'manuscript-id-1',
     invoiceId: 'invoice-id-1',
+    price: 0,
     dateCreated: new Date(),
     ...overwrites
   });
@@ -22,7 +24,7 @@ function makeInvoiceItemData(overwrites?: any): InvoiceItem {
 
 describe('InvoiceItemRepo', () => {
   let db: any;
-  let repo: any;
+  let repo: InvoiceItemRepo;
 
   beforeAll(async () => {
     db = await makeDb();
@@ -48,12 +50,12 @@ describe('InvoiceItemRepo', () => {
     });
 
     it('should reject with ENTITY_NOT_FOUND if invoice item does not exist', async () => {
-      const id = new UniqueEntityID('unknown-id');
+      const id = new UniqueEntityID('unknown-invoice-item');
 
       expect(
-        repo.getInvoiceItemById(id)
+        repo.getInvoiceItemById(InvoiceItemId.create(id))
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Entity(invoice item) with id[unknown-id] not found"`
+        `"Entity(invoice item) with id[unknown-invoice-item] not found"`
       );
     });
   });
@@ -71,17 +73,17 @@ describe('InvoiceItemRepo', () => {
 
     describe('.delete()', () => {
       it('should soft delete the record', async () => {
-        expect(repo.delete(invoiceItem)).resolves.toBeTruthy();
+        expect(repo.delete(invoiceItem)).resolves.toBeFalsy();
       });
 
       it('should reject promise for unknown invoice items', () => {
-        const id = 'unknown-invoice-item';
+        const id = 'unknown-item-id';
         const invoiceItem = makeInvoiceItemData({id});
 
         expect(
           repo.delete(invoiceItem)
         ).rejects.toThrowErrorMatchingInlineSnapshot(
-          `"Entity(invoice item) with id[unknown-invoice] not found"`
+          `"Entity(invoice item) with id[unknown-item-id] not found"`
         );
       });
     });
@@ -89,19 +91,17 @@ describe('InvoiceItemRepo', () => {
     describe('.update()', () => {
       it('should update record and return it', async () => {
         const invoiceItemId = InvoiceItemId.create(
-          new UniqueEntityID('invoice-1')
+          new UniqueEntityID('invoice-item-1')
         );
-        const invoiceItem = await repo.getInvoiceById(invoiceItemId);
-        const invoiceId = InvoiceId.create(new UniqueEntityID('invoice-1'));
-        invoiceItem.invoiceId = invoiceId;
+        const invoiceItem = await repo.getInvoiceItemById(invoiceItemId);
+        const invoiceItemPrice = 0;
+        invoiceItem.price = invoiceItemPrice;
 
         const updatedInvoiceItem = await repo.update(invoiceItem);
-        expect(updatedInvoiceItem.invoiceId).toBe(invoiceId);
+        expect(updatedInvoiceItem.price).toEqual(invoiceItemPrice);
 
         const savedInvoiceItem = await repo.getInvoiceItemById(invoiceItemId);
-        expect(savedInvoiceItem.invoiceId.toString()).toBe(
-          invoiceId.toString()
-        );
+        expect(savedInvoiceItem.price).toEqual(invoiceItemPrice);
       });
 
       it('should reject promise when invoice item does not exist', async () => {
@@ -111,7 +111,7 @@ describe('InvoiceItemRepo', () => {
         expect(
           repo.update(invoiceItem)
         ).rejects.toThrowErrorMatchingInlineSnapshot(
-          `"Entity(invoice item) with id[unknown-invoice] not found"`
+          `"Entity(invoice item) with id[unknown-invoice-item] not found"`
         );
       });
     });

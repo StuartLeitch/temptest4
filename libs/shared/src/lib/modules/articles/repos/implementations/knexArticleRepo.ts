@@ -1,13 +1,20 @@
 import {Article, ArticleId, ArticleMap, Knex} from '../../../../..';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {ArticleRepoContract} from './../articleRepo';
+import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
+import {UniqueEntityID} from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
   implements ArticleRepoContract {
-  async findById(articleId: string): Promise<Article> {
+  async findById(manuscriptId: ManuscriptId | string): Promise<Article> {
+    if (typeof manuscriptId === 'string') {
+      manuscriptId = ManuscriptId.create(
+        new UniqueEntityID(manuscriptId)
+      ).getValue();
+    }
     const articleData = await this.db('articles')
       .select()
-      .where('id', articleId)
+      .where('id', manuscriptId.id.toString())
       .first();
 
     return articleData ? ArticleMap.toDomain(articleData) : null;

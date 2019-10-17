@@ -33,13 +33,11 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
     }, []);
   }
 
-  async getPriceByType(type = 'APC'): Promise<number> {
+  async getCatalogItemByType(type = 'APC'): Promise<CatalogItem> {
     const {db} = this;
 
-    const catalogItem = await db('catalog')
+    return await db('catalog')
       .where({type})
       .first();
-
-    return catalogItem.price as number;
   }
 }

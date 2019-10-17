@@ -6,7 +6,7 @@ export class ArticleMap extends Mapper<Article> {
   public static toDomain(raw: any): Article {
     const articleOrError = Article.create(
       {
-        journalId: raw.journalId,
+        // journalId: JournalId.create(new UniqueEntityID(raw.journalId)).getValue(),
         title: raw.title,
         articleTypeId: raw.articleTypeId,
         authorEmail: raw.authorEmail,

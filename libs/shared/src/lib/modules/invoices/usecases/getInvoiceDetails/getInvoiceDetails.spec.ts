@@ -4,6 +4,8 @@ import {Roles} from '../../../users/domain/enums/Roles';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
 import {Invoice, InvoiceCollection, InvoiceStatus} from '../../domain/Invoice';
+import {TransactionId} from './../../../transactions/domain/TransactionId';
+
 import {
   GetInvoiceDetailsUsecase,
   GetInvoiceDetailsContext
@@ -42,6 +44,9 @@ describe('GetInvoiceDetailsUsecase', () => {
       invoiceId = 'test-invoice';
       const invoice = Invoice.create(
         {
+          transactionId: TransactionId.create(
+            new UniqueEntityID('transaction-2')
+          ),
           status: InvoiceStatus.DRAFT
         },
         new UniqueEntityID(invoiceId)

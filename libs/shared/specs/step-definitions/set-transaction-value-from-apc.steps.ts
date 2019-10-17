@@ -1,32 +1,33 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-import {Result} from '../../lib/core/logic/Result';
-import {UniqueEntityID} from '../../lib/core/domain/UniqueEntityID';
-import {Roles} from '../../lib/modules/users/domain/enums/Roles';
+import {Result} from '../../src/lib/core/logic/Result';
+import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
+import {Roles} from '../../src/lib/modules/users/domain/enums/Roles';
 
 import {
   Invoice
   // STATUS as InvoiceStatus
-} from '../../lib/modules/invoices/domain/Invoice';
+} from '../../src/lib/modules/invoices/domain/Invoice';
 import {
   GetTransactionUsecase,
   GetTransactionContext
-} from '../../lib/modules/transactions/usecases/getTransaction/getTransaction';
+} from '../../src/lib/modules/transactions/usecases/getTransaction/getTransaction';
 import {
   UpdateTransactionUsecase,
   UpdateTransactionContext
-} from '../../lib/modules/transactions/usecases/updateTransaction/updateTransaction';
+} from '../../src/lib/modules/transactions/usecases/updateTransaction/updateTransaction';
 
-import {MockInvoiceRepo} from '../../lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import {MockTransactionRepo} from '../../lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import {MockInvoiceRepo} from '../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import {MockTransactionRepo} from '../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 import {
   Transaction,
   STATUS as TransactionStatus
-} from '../../lib/modules/transactions/domain/Transaction';
+} from '../../src/lib/modules/transactions/domain/Transaction';
 // import {TransactionAmount} from '../../lib/transactions/domain/TransactionAmount';
 
 const feature = loadFeature(
-  './specs/features/set-transaction-value-from-apc.feature'
+  '../features/set-transaction-value-from-apc.feature',
+  {loadRelativePath: true}
 );
 
 const defaultContext: UpdateTransactionContext & GetTransactionContext = {

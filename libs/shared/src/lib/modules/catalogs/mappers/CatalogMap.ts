@@ -6,18 +6,8 @@ import {CatalogItem} from '../domain/CatalogItem';
 // import {CatalogId} from '../domain/CatalogId';
 // import {STATUS as TransactionStatus} from '../domain/Transaction';
 
-export class CatalogPersistenceDTO {
-  id: string;
-  type: string;
-  // articleId: string;
-  // status: TransactionStatus;
-  price: number;
-  // dateAdded?: Date;
-  // dateUpdated?: Date;
-}
-
 export class CatalogMap extends Mapper<CatalogItem> {
-  public static toDomain(raw: CatalogPersistenceDTO): CatalogItem {
+  public static toDomain(raw: any): CatalogItem {
     const catalogOrError = CatalogItem.create(
       {
         // articleId: ArticleId.create(new UniqueEntityID(raw.articleId)),
@@ -32,7 +22,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
     return catalogOrError.isSuccess ? catalogOrError.getValue() : null;
   }
 
-  public static toPersistence(catalogItem: CatalogItem): CatalogPersistenceDTO {
+  public static toPersistence(catalogItem: CatalogItem): any {
     return {
       id: catalogItem.id.toString(),
       type: catalogItem.type,

@@ -18,6 +18,7 @@ function makeTransactionData(overwrites?: any): Transaction {
     date: new Date(),
     dateCreated: new Date(),
     dateUpdated: new Date(),
+    deleted: 0,
     ...overwrites
   });
 }

@@ -6,6 +6,7 @@ import {MockPayerRepo} from '../../../payers/repos/mocks/mockPayerRepo';
 import {Payer, PayerCollection} from '../../../payers/domain/Payer';
 import {PayerName} from '../../../payers/domain/PayerName';
 import {PayerType} from '../../../payers/domain/PayerType';
+import {TransactionId} from './../../../transactions/domain/TransactionId';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
 import {Invoice, InvoiceStatus} from '../../domain/Invoice';
@@ -63,6 +64,9 @@ describe('UpdateInvoiceDetailsUsecase', () => {
       const invoice = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
+          transactionId: TransactionId.create(
+            new UniqueEntityID('transaction-2')
+          ),
           payerId: payer.payerId
         },
         new UniqueEntityID(invoiceId)
