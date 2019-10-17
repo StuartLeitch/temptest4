@@ -39,6 +39,7 @@ describe('PdfGeneratorService', () => {
     });
     const buffer = await streamToPromise(stream);
 
+
     await expect(buffer).toMatchPdf('invoice-1');
   });
 });
