@@ -1,21 +1,17 @@
 export const up = function(knex) {
-  const moneyType = {
-    symbol: '$',
-    name: 'US Dollar',
-    symbolNative: '$',
-    decimalDigits: 2,
-    rounding: 0,
-    code: 'USD',
-    namePlural: 'US dollars'
-  };
   return knex.schema.createTable('catalog', function(table) {
-    table.uuid('id').primary();
+    table
+      .uuid('id', 36)
+      .unique()
+      .notNullable()
+      .primary();
+    table.string('journalTitle');
+    table.string('issn');
     table.string('type');
-    table.integer('count');
-    // table.number('price');
+    table.float('amount').defaultTo(0);
+    table.string('currency').defaultTo('USD');
     table.datetime('created', {precision: 2, useTz: false});
     table.datetime('updated', {precision: 2, useTz: false});
-    table.specificType('price', moneyType);
   });
 };
 

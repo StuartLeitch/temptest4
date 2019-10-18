@@ -1,6 +1,6 @@
 export const up = function(knex) {
   return knex.schema.createTable('payers', function(table) {
-    table.string('id', 40).primary();
+    table.uuid('id', 40).primary();
     table.string('title');
     table.string('surname');
     table.string('name');

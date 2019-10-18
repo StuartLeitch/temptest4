@@ -1,6 +1,6 @@
 export const up = function(knex) {
   return knex.schema.createTable('payments', function(table) {
-    table.string('id', 40).primary();
+    table.uuid('id', 40).primary();
     table.string('invoiceId', 40);
     table.string('payerId', 40);
     table.string('paymentMethodId', 40);

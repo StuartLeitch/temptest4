@@ -1,6 +1,14 @@
-export const up = function(knex) {
+import {uuid} from 'uuid/v4';
+
+export const up = async function(knex) {
+  //await knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid"');
+
   return knex.schema.createTable('invoices', function(table) {
-    table.uuid('id', 36).primary();
+    table
+      .uuid('id', 36)
+      .unique()
+      .notNullable()
+      .primary();
     table.string('transactionId', 40);
     table.integer('status').defaultTo(0);
     table.integer('deleted').defaultsTo(0);
@@ -8,6 +16,7 @@ export const up = function(knex) {
   });
 };
 
-export const down = function(knex) {
+export const down = async function(knex) {
+  //await knex.raw('DROP EXTENSION IF EXISTS "uuid"');
   return knex.schema.dropTable('invoices');
 };
