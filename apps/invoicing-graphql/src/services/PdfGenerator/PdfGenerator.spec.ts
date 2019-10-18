@@ -1,4 +1,4 @@
-import { Invoice, PayerName, PayerType, Payer, Author, Article, UniqueEntityID, InvoiceStatus } from '@hindawi/shared';
+import { TransactionId, Invoice, PayerName, PayerType, Payer, Author, Article, UniqueEntityID, InvoiceStatus } from '@hindawi/shared';
 import { PdfGeneratorService } from './PdfGenerator';
 import streamToPromise from 'stream-to-promise';
 import fs from 'fs';
@@ -11,7 +11,8 @@ describe('PdfGeneratorService', () => {
   const invoice = Invoice.create({
     status: InvoiceStatus.DRAFT,
     invoiceNumber: 'invoice-1234',
-    // dateCreated: new Date(2019, 1, 2, 3, 4, 5, 1),
+    transactionId: TransactionId.create(new UniqueEntityID('transaction1')),
+    dateCreated: new Date(2019, 1, 2, 3, 4, 5, 1),
   }, new UniqueEntityID('invoice-1')).getValue();
 
   const author = Author.create({

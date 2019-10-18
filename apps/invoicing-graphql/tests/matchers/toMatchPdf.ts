@@ -1,12 +1,11 @@
 import path from 'path';
 import fs from 'fs';
 import gm from 'gm';
-import tempy from 'tempy';
 import { matcherHint, matcherErrorMessage, RECEIVED_COLOR, DIM_COLOR, printDiffOrStringify } from 'jest-matcher-utils';
 
-function compare(a: string, b:string): Promise<number> {
+function compare(a: string, b:string, options): Promise<number> {
   return new Promise((resolve, reject) => {
-    gm.compare(a, b, (err, isEqual, equality) => {
+    gm.compare(a, b, options, (err, isEqual, equality) => {
       if (err) {
         return reject(err);
       }
@@ -24,8 +23,12 @@ async function toMatchPdf(received, name: string, tolerance: number = 0) {
     '__snapshots__'
   );
   const snapshotFile = path.join(snapshotDir, `${name}.snap.pdf`);
-  const actualFile = tempy.file({ name: `${name}.actual.pdf` });
-
+  const actualFile = path.join(snapshotDir, `${name}.actual.pdf`);
+  const diffFile = path.join(snapshotDir, `${name}.diff.png`);
+  const compareOptions = {
+    file: diffFile,
+    tolerance
+  };
 
   if (!fs.existsSync(snapshotFile)) {
     fs.writeFileSync(snapshotFile, received);
@@ -42,12 +45,13 @@ async function toMatchPdf(received, name: string, tolerance: number = 0) {
 
   fs.writeFileSync(actualFile, received);
 
-  let equality = await compare(actualFile, snapshotFile);
+  let equality = await compare(actualFile, snapshotFile, compareOptions);
   const matcherName='toMatchPdf';
   equality = Math.round(equality * 100 * PRECISION) / PRECISION;
 
   if (equality <= tolerance) {
     fs.unlinkSync(actualFile);
+    fs.unlinkSync(diffFile);
     return {
       message: () =>
         matcherHint(matcherName, actualFile, snapshotFile, { comment: "foo" }),
@@ -63,7 +67,9 @@ async function toMatchPdf(received, name: string, tolerance: number = 0) {
         printDiffOrStringify(tolerance, equality, 'Expected difference (%)', 'Actual difference (%)', true) +
         `\n\n${DIM_COLOR('If you want to update the snapshot remove it and re-run tests.')}`+
         `\n\n${DIM_COLOR('The actual file was not removed, you can inspect it: ')} \n\n` +
-        RECEIVED_COLOR(actualFile)
+        RECEIVED_COLOR(actualFile) +
+        `\n\n${DIM_COLOR('You can also checkout the diff image: ')} \n\n` +
+        RECEIVED_COLOR(diffFile)
       ),
     pass: false
   };
