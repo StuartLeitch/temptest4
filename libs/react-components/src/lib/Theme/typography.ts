@@ -1,5 +1,3 @@
-import colors from './colors';
-
 export const fontSizes = {
   titleHero: '30px',
   titlePrimary: '20px',
@@ -11,7 +9,8 @@ export const fontSizes = {
   labelSmall: '11px',
   textRegular: '14px',
   textMessage: '12px',
-  textPlaceholder: '14px'
+  textPlaceholder: '14px',
+  lineHeight: 1.3
 };
 
 export const defaultFont = 'Nunito, sans-serif';

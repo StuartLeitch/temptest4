@@ -6,6 +6,6 @@ import Loader from './Loader';
 export const Default = () => <Loader size={number('Size', 4)} />;
 
 export default {
-  title: 'Loader',
+  title: 'Components|Loader',
   component: Loader
 };

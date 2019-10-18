@@ -60,6 +60,6 @@ export const Small = () => (
 );
 
 export default {
-  title: 'Title',
+  title: 'Typography|Title',
   component: Title
 };

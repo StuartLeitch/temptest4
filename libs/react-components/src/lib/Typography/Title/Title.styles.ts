@@ -2,9 +2,9 @@ import {capitalize} from 'lodash';
 import styled, {css} from 'styled-components';
 import {space, typography} from 'styled-system';
 
-import {th} from '../Theme';
+import {th} from '../../Theme';
 import {Titles} from './Title';
-import * as fontTypes from './fontTypes';
+import * as fontTypes from '../fontTypes';
 
 const fontSize = ({type}: {type: Titles}) => {
   return css`

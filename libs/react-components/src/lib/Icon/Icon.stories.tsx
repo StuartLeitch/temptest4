@@ -79,6 +79,6 @@ export const WithClickHandler = () => (
 );
 
 export default {
-  title: 'Icon',
+  title: 'Components|Icon',
   component: Icon
 };
