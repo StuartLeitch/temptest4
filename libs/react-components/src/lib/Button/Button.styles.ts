@@ -1,24 +1,10 @@
-import {space, layout} from 'styled-system';
+import {space, layout, flexbox} from 'styled-system';
 import styled, {css, AnyStyledComponent} from 'styled-components';
 
 import {lighten, th} from '../Theme';
 
-const buttonType = ({disabled, type}: {disabled: boolean; type: string}) => {
-  if (disabled)
-    return css`
-      background-color: ${th('buttons.disabled.bg')};
-      color: ${th('buttons.disabled.color')};
-    `;
+const buttonType = ({type}: {type: string}) => {
   switch (type) {
-    case 'primary':
-      return css`
-        color: ${th('buttons.primary.color')};
-        background-color: ${th('buttons.primary.bg')};
-
-        &:hover {
-          background-color: ${lighten('buttons.primary.bg', 10)};
-        }
-      `;
     case 'secondary':
       return css`
         color: ${th('buttons.secondary.color')};
@@ -41,9 +27,15 @@ const buttonType = ({disabled, type}: {disabled: boolean; type: string}) => {
           color: ${th('buttons.outline.bg')};
         }
       `;
+    case 'primary':
     default:
       return css`
-        background-color: salmon;
+        color: ${th('buttons.primary.color')};
+        background-color: ${th('buttons.primary.bg')};
+
+        &:hover {
+          background-color: ${lighten('buttons.primary.bg', 10)};
+        }
       `;
   }
 };
@@ -82,4 +74,16 @@ export const Button: AnyStyledComponent = styled.button`
   ${buttonSize};
   ${space};
   ${layout};
+  ${flexbox};
+
+  &:disabled {
+    border: none;
+    background-color: ${th('buttons.disabled.bg')};
+    color: ${th('buttons.disabled.color')};
+
+    & > * {
+      color: ${th('buttons.disabled.color')};
+      fill: ${th('buttons.disabled.color')};
+    }
+  }
 `;

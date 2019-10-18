@@ -8,10 +8,7 @@ const iconSize = ({size}: {size: number}) => css`
 `;
 
 export const Icon = styled.svg`
-  & path {
-    fill: ${({color, disabled}: {color: string; disabled: boolean}) =>
-      disabled ? th('colors.white') : th(color)};
-  }
+  fill: ${({color}: {color: string}) => th(color)};
 
   ${iconSize};
   ${space};

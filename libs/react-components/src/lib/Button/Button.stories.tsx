@@ -170,7 +170,7 @@ export const Disabled = () => (
       loading={boolean('Loading', false)}
     >
       Disabled Button
-      <Icon name="leftEnd" color="black" />
+      <Icon name="leftEnd" color="red" />
     </Button>
     <Button
       mb={4}

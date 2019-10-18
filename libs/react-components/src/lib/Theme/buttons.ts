@@ -2,17 +2,17 @@ import colors from './colors';
 
 export default {
   primary: {
-    bg: colors.primary.action,
+    bg: colors.actionPrimary,
     color: colors.white
   },
   secondary: {
-    bg: '#333',
+    bg: colors.textPrimary,
     color: colors.white
   },
   outline: {
     border: '2px solid #333',
     bg: colors.white,
-    color: '#333'
+    color: colors.textPrimary
   },
   disabled: {
     bg: colors.background,

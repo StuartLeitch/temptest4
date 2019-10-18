@@ -24,11 +24,11 @@ export const Loader = styled.div`
   :before {
     animation: spin 1s infinite;
     border: calc(${th('gridUnit')} / 2) solid ${th('colors.furniture')};
-    border-top-color: ${th('colors.primary.action')};
+    border-top-color: ${th('colors.actionPrimary')};
     z-index: 1;
   }
   :after {
-    border: calc(${th('gridUnit')} / 2) solid ${th('colors.primary.action')};
+    border: calc(${th('gridUnit')} / 2) solid ${th('colors.actionPrimary')};
   }
   @keyframes spin {
     0% {

@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {SpaceProps, LayoutProps} from 'styled-system';
+import {SpaceProps, LayoutProps, FlexboxProps} from 'styled-system';
 
 import {Button as Root} from './Button.styles';
 import Loader from '../Loader';
@@ -7,7 +7,7 @@ import Loader from '../Loader';
 type ButtonSizes = 'large' | 'medium' | 'small';
 type ButtonTypes = 'primary' | 'secondary' | 'outline';
 
-export interface Props extends SpaceProps, LayoutProps {
+export interface Props extends SpaceProps, LayoutProps, FlexboxProps {
   size?: ButtonSizes;
   type?: ButtonTypes;
   disabled?: boolean;
@@ -38,16 +38,7 @@ const Button: React.FunctionComponent<Props> = ({
       onClick={loading ? null : onClick}
       {...rest}
     >
-      {!disabled && loading ? (
-        <Loader />
-      ) : (
-        React.Children.map(children, c => {
-          if (!React.isValidElement(c)) {
-            return c;
-          }
-          return React.cloneElement(c, {disabled});
-        })
-      )}
+      {!disabled && loading ? <Loader /> : children}
     </Root>
   );
 };
