@@ -1,27 +1,27 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
 // import {Result} from '../../lib/core/Result';
-import {UniqueEntityID} from '../../lib/core/domain/UniqueEntityID';
+import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
 import {
   Invoice,
-  STATUS as InvoiceStatus
-} from '../../lib/modules/invoices/domain/Invoice';
-import {MockInvoiceRepo} from '../../lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+  InvoiceStatus
+} from '../../src/lib/modules/invoices/domain/Invoice';
+import {MockInvoiceRepo} from '../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import {
   GetInvoiceDetailsUsecase,
   GetInvoiceDetailsContext
-} from '../../lib/modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-import {Roles} from '../../lib/modules/users/domain/enums/Roles';
+} from '../../src/lib/modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import {Roles} from '../../src/lib/modules/users/domain/enums/Roles';
 
-import {Payer} from '../../lib/modules/payers/domain/Payer';
-import {PayerName} from '../../lib/modules/payers/domain/PayerName';
-import {PayerType} from '../../lib/modules/payers/domain/PayerType';
-import {MockPayerRepo} from '../../lib/modules/payers/repos/mocks/mockPayerRepo';
+import {Payer} from '../../src/lib/modules/payers/domain/Payer';
+import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
+import {PayerType} from '../../src/lib/modules/payers/domain/PayerType';
+import {MockPayerRepo} from '../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 
-import {PoliciesRegister} from '../../lib/modules/invoices/domain/policies/PoliciesRegister';
-import {UKVATTreatmentOfHardCopyPublicationsPolicy} from '../../lib/modules/invoices/domain/policies/UKVATHardCopyPolicy';
-import {UKVATTreatmentArticleProcessingChargesPolicy} from '../../lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
-import {VATTreatmentPublicationNotOwnedPolicy} from '../../lib/modules/invoices/domain/policies/VATTreatmentPublicationNotOwnedPolicy';
+import {PoliciesRegister} from '../../src/lib/modules/invoices/domain/policies/PoliciesRegister';
+import {UKVATTreatmentOfHardCopyPublicationsPolicy} from '../../src/lib/modules/invoices/domain/policies/UKVATHardCopyPolicy';
+import {UKVATTreatmentArticleProcessingChargesPolicy} from '../../src/lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
+import {VATTreatmentPublicationNotOwnedPolicy} from '../../src/lib/modules/invoices/domain/policies/VATTreatmentPublicationNotOwnedPolicy';
 
 const feature = loadFeature('./specs/features/vat-policies.feature');
 
