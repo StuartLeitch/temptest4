@@ -1,7 +1,7 @@
-import {space} from 'styled-system';
 import styled from 'styled-components';
+import {space} from 'styled-system';
 
-export const CheckboxContainer = styled.div`
+export const RadioContainer = styled.div`
   align-items: center;
   cursor: pointer;
   display: inline-flex;
