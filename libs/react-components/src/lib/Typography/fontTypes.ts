@@ -27,7 +27,7 @@ export const semiboldItalic = () => css`
 
 export const bold = () => css`
   font-family: ${th('fontFamily')};
-  font-weight: 600;
+  font-weight: 700;
   font-style: normal;
 `;
 
