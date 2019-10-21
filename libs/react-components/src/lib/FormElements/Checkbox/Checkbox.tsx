@@ -1,10 +1,9 @@
 import React from 'react';
-import {SpaceProps} from 'styled-system';
 
 import {Label} from '../../Typography';
-import {CheckboxContainer} from './Checkbox.styles';
+import Flex, {FlexProps} from '../../Flex';
 
-export interface Props extends SpaceProps {
+export interface Props extends FlexProps {
   id?: string;
   label?: string;
   required?: boolean;
@@ -17,12 +16,12 @@ const Checkbox: React.FunctionComponent<Props> = ({
   ...rest
 }) => {
   return (
-    <CheckboxContainer {...rest}>
+    <Flex {...rest}>
       <input id={id} type="checkbox" required={required} />
       <Label ml={1} htmlFor={id} required={required}>
         {label}
       </Label>
-    </CheckboxContainer>
+    </Flex>
   );
 };
 

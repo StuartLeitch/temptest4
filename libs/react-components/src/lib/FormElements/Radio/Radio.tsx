@@ -1,10 +1,9 @@
 import React from 'react';
-import {SpaceProps} from 'styled-system';
 
 import {Label} from '../../Typography';
-import {RadioContainer} from './Radio.styles';
+import Flex, {FlexProps} from '../../Flex';
 
-export interface Props extends SpaceProps {
+export interface Props extends FlexProps {
   id?: string;
   name?: string;
   label?: string;
@@ -12,12 +11,12 @@ export interface Props extends SpaceProps {
 
 const Radio: React.FunctionComponent<Props> = ({id, label, name, ...rest}) => {
   return (
-    <RadioContainer {...rest}>
+    <Flex {...rest}>
       <input id={id} name={name} type="radio" />
       <Label ml={1} htmlFor={id}>
         {label}
       </Label>
-    </RadioContainer>
+    </Flex>
   );
 };
 
