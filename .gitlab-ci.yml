@@ -10,7 +10,7 @@ variables:
 stages:
   - setup
   - test
-  - lint
+  - build
   - deploy
 
 install:
@@ -79,5 +79,16 @@ pages:
       - public
   dependencies:
     - test
+  only:
+    - develop
+
+build:
+  interruptible: true
+  stage: build
+  script:
+    - npm run nx -- build invoicing-web --prod
+    - npm run nx -- build invoicing-graphql --prod
+  dependencies:
+    - install
   only:
     - develop
