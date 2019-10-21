@@ -85,6 +85,7 @@ export const Button: AnyStyledComponent = styled.button`
     border: none;
     background-color: ${th('buttons.disabled.bg')};
     color: ${th('buttons.disabled.color')};
+    cursor: not-allowed;
 
     & > * {
       color: ${th('buttons.disabled.color')};

@@ -1,6 +1,6 @@
 export default {
   actionPrimary: '#81BA40',
-  actionSecondary: '#828282',
+  actionSecondary: '#007E92',
   background: '#F5F5F5',
   furniture: '#E0E0E0',
   info: '#FCB74B',
