@@ -43,6 +43,6 @@ export const WithIconDisabled = () => (
 );
 
 export default {
-  title: 'TextButton',
+  title: 'Components|TextButton',
   component: TextButton
 };

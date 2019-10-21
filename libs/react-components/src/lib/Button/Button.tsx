@@ -33,6 +33,7 @@ const Button: React.FunctionComponent<Props> = ({
   return (
     <Root
       ref={btnRef}
+      role="button"
       minWidth={btnWidth}
       disabled={disabled}
       onClick={loading ? null : onClick}
