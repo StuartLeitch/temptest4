@@ -1,3 +1,4 @@
+import {capitalize} from 'lodash';
 import {space, layout, flexbox} from 'styled-system';
 import styled, {css, AnyStyledComponent} from 'styled-components';
 
@@ -11,7 +12,7 @@ const buttonType = ({type}: {type: string}) => {
         background-color: ${th('buttons.secondary.bg')};
 
         &:hover {
-          background-color: ${lighten('buttons.secondary.bg', 10)};
+          background-color: ${lighten('buttons.secondary.bg', 30)};
         }
       `;
     case 'outline':
@@ -57,6 +58,7 @@ const buttonSize = ({size}: {size: string}) => {
       return css`
         height: calc(${th('gridUnit')} * 10);
         min-width: calc(${th('gridUnit')} * 35);
+        text-transform: uppercase;
       `;
   }
 };
@@ -65,7 +67,10 @@ export const Button: AnyStyledComponent = styled.button`
   align-items: center;
   border: none;
   border-radius: ${th('gridUnit')};
+  cursor: pointer;
   display: flex;
+  font-size: ${({size}) => th(`fontSizes.button${capitalize(size)}`)};
+  line-height: ${th('fontSizes.lineHeight')};
   justify-content: center;
   padding: 0 calc(${th('gridUnit')} * 2);
   white-space: nowrap;

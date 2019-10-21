@@ -4,6 +4,7 @@ export const fontSizes = {
   titleSmall: '16px',
   buttonSmall: '13px',
   buttonMedium: '14px',
+  buttonLarge: '14px',
   buttonText: '13px',
   labelRegular: '14px',
   labelSmall: '11px',
