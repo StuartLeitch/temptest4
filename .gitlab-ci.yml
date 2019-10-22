@@ -117,6 +117,10 @@ package_images:
     - docker push $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA
     - docker build -t $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA apps/invoicing-graphql
     - docker push $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA
+    - docker tag $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-graphql:dev
+    - docker tag $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-web:dev
+    - docker push $AWS_REGISTRY/invoicing-graphql:dev
+    - docker push $AWS_REGISTRY/invoicing-web:dev
   dependencies:
     - build_code
   only:
@@ -135,8 +139,6 @@ deploy_dev:
     - pip install awscli
     - $(aws ecr get-login --no-include-email --region "${REGION}")
   script:
-    - docker tag $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-graphql:dev
-    - docker tag $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-web:dev
     - aws elasticbeanstalk update-environment --environment-name invoicing-web-dev --version-label invoicing-web-dev
     - aws elasticbeanstalk update-environment --environment-name invoicing-graphql-dev --version-label invoicing-graphql-dev
 
