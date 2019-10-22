@@ -2,15 +2,21 @@ default:
   image: node:12-alpine
 
 variables:
+  REGION: 'eu-west-1'
+  AWS_REPOSITORY_URL: '918602980697.dkr.ecr.eu-west-1.amazonaws.com/invoicing-web'
   BT_ENVIRONMENT: 'Sandbox'
   BT_MERCHANT_ID: 'test-merchant-id'
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
 
+services:
+  - docker:dind
+
 stages:
   - setup
   - test
   - build
+  - package
   - deploy
 
 install:
@@ -31,6 +37,7 @@ info:
 
 test:
   interruptible: true
+  allow_failure: true
   stage: test
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
@@ -82,7 +89,7 @@ pages:
   only:
     - develop
 
-build:
+build_code:
   interruptible: true
   stage: build
   script:
@@ -90,5 +97,27 @@ build:
     - npm run nx -- build invoicing-graphql --prod
   dependencies:
     - install
+  artifacts:
+    paths:
+      - apps/invoicing-web/dist
+      - apps/invoicing-graphql/dist
+  only:
+    - develop
+
+package_images:
+  interruptible: true
+  stage: package
+  image: docker
+  before_script:
+    - env
+    - apk add --no-cache curl jq python py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+  script:
+    - env
+    - docker build -t $AWS_REPOSITORY_URL:$CI_COMMIT_SHA apps/invoicing-web
+    - docker push $AWS_REPOSITORY_URL:$CI_COMMIT_SHA
+  dependencies:
+    - build_code
   only:
     - develop
