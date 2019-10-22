@@ -1,12 +1,12 @@
 import React from 'react';
-import {SpaceProps} from 'styled-system';
+import {SpaceProps, PositionProps} from 'styled-system';
 
 import icons from './icons';
 
 import {IconNames} from './Icon.types';
 import {Icon as Root} from './Icon.styles';
 
-export interface Props extends SpaceProps {
+export interface Props extends SpaceProps, PositionProps {
   color?: string;
   size?: number;
   name: IconNames;

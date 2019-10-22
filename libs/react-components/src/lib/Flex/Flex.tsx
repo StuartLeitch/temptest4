@@ -12,6 +12,7 @@ export interface FlexProps extends LayoutProps, SpaceProps, FlexboxProps {}
 
 const Flex: AnyStyledComponent = styled.div`
   align-items: center;
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
 

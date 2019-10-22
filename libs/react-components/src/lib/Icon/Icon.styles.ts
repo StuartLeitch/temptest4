@@ -1,5 +1,5 @@
 import styled, {css} from 'styled-components';
-import {space} from 'styled-system';
+import {space, position} from 'styled-system';
 import {th} from '../Theme';
 
 const iconSize = ({size}: {size: number}) => css`
@@ -12,4 +12,5 @@ export const Icon = styled.svg`
 
   ${iconSize};
   ${space};
+  ${position};
 `;

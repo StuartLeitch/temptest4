@@ -3,24 +3,24 @@ import Color from 'color';
 
 export type Theme = {
   colors: {
-    primary: {
-      action: string;
-      text: string;
-      info: string;
-      warning: string;
-    };
-    seconday: {
-      action: string;
-      text: string;
-      title: string;
-    };
-    approved: string;
+    actionPrimary: string;
+    actionSecondary: string;
     background: string;
     furniture: string;
+    info: string;
+    border: string;
+    textPrimary: string;
+    textSecondary: string;
+    transparent: string;
+    warning: string;
+    white: string;
+    statusPending: string;
+    statusInvite: string;
+    statusApproved: string;
     disabled: string;
   };
   gridUnit: string;
-  sizes: [number];
+  sizes: number[];
 };
 
 /**
