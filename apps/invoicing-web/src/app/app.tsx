@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link, useHistory } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Route, useHistory } from "react-router-dom";
 
 // * Antd components
 import Row from "antd/es/row";
@@ -17,7 +17,8 @@ import { PaymentSteps } from "./components/payment-steps/payment-steps";
 // import CreditCardForm from "./components/credit-card-payment-form/credit-card-payment-form";
 
 // * pages
-// import { Index } from "./pages/index/index";
+import { Index } from "./pages/index/index";
+import { Payment } from "./pages/payment/payment";
 import { BillingAddress } from "./pages/billing-address/billing-address";
 
 const { Text } = Typography;
@@ -51,23 +52,15 @@ const charges = [
 ];
 
 export const App = () => {
-  let history = useHistory();
-  let routes = ["/", "/billing-address", "/invoice-payment"];
-
-  const state = {
-    current: 0,
-  };
+  const [current, setCurrent] = useState(0);
+  const history = useHistory();
+  const routes = ["/", "/billing-address", "/invoice-payment"];
 
   const onChange = current => {
-    console.log("onChange:", current);
-    this.setState({ current });
-    history.push(routes[current]);
+    setCurrent(current);
+    history.replace(routes[current]);
   };
-  /*
-   * Replace the elements below with your own.
-   *
-   * Note: The corresponding styles are in the ./${fileName}.${style} file.
-   */
+
   return (
     <div className="app">
       <header className="flex">
@@ -77,66 +70,16 @@ export const App = () => {
         <h1>Payment Details</h1>
       </header>
       <main>
-        <PaymentSteps current={1} onChange={onChange} />
+        <PaymentSteps current={current} onChange={onChange} />
 
         <Row>
           <Col span={12}>
             <Card>
-              <Router>
-                <Switch>
-                  <Route exact path="/">
-                    <BillingAddress />
-                  </Route>
-                  <Route path="/billing-address">
-                    <BillingAddress />
-                  </Route>
-                  <Route path="/invoice-payment">
-                    <BillingAddress />
-                  </Route>
-                </Switch>
-              </Router>
+              <Route path="/" exact render={() => <Index />} />
+              <Route path="/billing-address" exact render={() => <BillingAddress />} />
+              <Route path="/invoice-payment" exact render={() => <Payment />} />
             </Card>
           </Col>
-          {/*<Col span={12}>
-            <Panel title="INVOICE">
-              <Avatar size={64} icon="file-pdf" /> Download Invoice
-            </Panel>
-
-            <Panel title="PAYMENT METHODS">
-              <Tabs defaultActiveKey="1">
-                <TabPane
-                  tab={
-                    <span>
-                      <Icon style={{ fontSize: 36 }} theme="filled" type="credit-card" />
-                    </span>
-                  }
-                  key="1"
-                >
-                  <CreditCardForm />
-                </TabPane>
-                <TabPane
-                  tab={
-                    <span>
-                      <Icon style={{ fontSize: 36 }} type="dollar" />
-                    </span>
-                  }
-                  key="2"
-                >
-                  PayPal Payment Method
-                </TabPane>
-                <TabPane
-                  tab={
-                    <span>
-                      <Icon style={{ fontSize: 36 }} theme="filled" type="bank" />
-                    </span>
-                  }
-                  key="3"
-                >
-                  Bank Transfer Payment Method
-                </TabPane>
-              </Tabs>
-            </Panel>
-                </Col>*/}
           <Col span={12}>
             <Card>
               <Card type="inner" title="ARTICLE DETAILS">
@@ -174,26 +117,6 @@ export const App = () => {
           </Col>
         </Row>
       </main>
-
-      <Route
-        path="/"
-        exact
-        render={() => (
-          <div>
-            <Link to="/billing-address">Click here for billing address.</Link>
-          </div>
-        )}
-      />
-      <Route
-        path="/billing-address"
-        exact
-        render={() => (
-          <div>
-            <Link to="/">Click here to go back to landing page.</Link>
-          </div>
-        )}
-      />
-      {/* END: routes */}
     </div>
   );
 };
