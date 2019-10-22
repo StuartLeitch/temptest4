@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link, useHistory } from "react-router-dom";
 
 // * Antd components
@@ -7,21 +7,21 @@ import Col from "antd/es/col";
 import Card from "antd/es/card";
 import List from "antd/es/list";
 import Typography from "antd/es/typography";
-import Avatar from "antd/es/avatar";
-import Tabs from "antd/es/tabs";
-import Icon from "antd/es/icon";
+// import Avatar from "antd/es/avatar";
+// import Tabs from "antd/es/tabs";
+// import Icon from "antd/es/icon";
 
 // * components
-import { Panel } from "./components/panel/panel";
+// import { Panel } from "./components/panel/panel";
 import { PaymentSteps } from "./components/payment-steps/payment-steps";
-import CreditCardForm from "./components/credit-card-payment-form/credit-card-payment-form";
+// import CreditCardForm from "./components/credit-card-payment-form/credit-card-payment-form";
 
 // * pages
-import { Index } from "./pages/index/index";
+// import { Index } from "./pages/index/index";
 import { BillingAddress } from "./pages/billing-address/billing-address";
 
 const { Text } = Typography;
-const { TabPane } = Tabs;
+// const { TabPane } = Tabs;
 
 // * app styles
 import "./app.scss";
