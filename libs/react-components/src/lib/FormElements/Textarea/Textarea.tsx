@@ -1,19 +1,15 @@
 import React from 'react';
-import {SpaceProps, LayoutProps} from 'styled-system';
 
 import Icon from '../../Icon';
 import {FormFieldProps} from '../CommonTypes';
-import {Input as Root, Container} from '../CommonStyles';
 
-export type InputTypes = 'text' | 'password';
-
-export interface Props extends FormFieldProps, SpaceProps, LayoutProps {
-  type?: InputTypes;
+export interface Props extends FormFieldProps {
   placeholder?: string;
 }
 
-const Input: React.FunctionComponent<Props> = ({
-  type,
+import {Container, Input} from '../CommonStyles';
+
+const Textarea: React.FunctionComponent<Props> = ({
   status,
   placeholder,
   // input props
@@ -25,10 +21,16 @@ const Input: React.FunctionComponent<Props> = ({
   ...rest
 }) => {
   return (
-    <Container status={status} {...rest}>
-      <Root
+    <Container
+      status={status}
+      height="100%"
+      width="fit-content"
+      position="relative"
+      {...rest}
+    >
+      <Input
+        as="textarea"
         name={name}
-        type={type}
         value={value}
         onBlur={onBlur}
         onFocus={onFocus}
@@ -37,8 +39,9 @@ const Input: React.FunctionComponent<Props> = ({
       />
       {(status === 'warning' || status === 'info') && (
         <Icon
-          ml={1}
-          mr={2}
+          position="absolute"
+          top={1}
+          right={1}
           name={status === 'warning' ? 'warningFilled' : 'infoFilled'}
           color={status === 'warning' ? 'colors.warning' : 'colors.info'}
         />
@@ -47,9 +50,4 @@ const Input: React.FunctionComponent<Props> = ({
   );
 };
 
-Input.defaultProps = {
-  type: 'text',
-  status: 'none'
-};
-
-export default Input;
+export default Textarea;

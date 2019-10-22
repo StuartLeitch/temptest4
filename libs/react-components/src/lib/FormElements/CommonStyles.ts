@@ -1,12 +1,11 @@
+import {space, layout, position} from 'styled-system';
 import styled, {css, AnyStyledComponent} from 'styled-components';
-import {space, layout} from 'styled-system';
 
-import {th, lighten, Theme} from '../../Theme';
-import {regular, regularItalic} from '../../Typography';
+import {th, lighten} from '../Theme';
+import {FormFieldStatus} from './CommonTypes';
+import {regular, regularItalic} from '../Typography';
 
-import {InputStatus} from './Input';
-
-const statusColor = ({status}: {status: InputStatus}) => {
+const statusColor = ({status}: {status: FormFieldStatus}) => {
   switch (status) {
     case 'warning':
       return css`
@@ -71,19 +70,23 @@ export const Container = styled.div`
   border-radius: ${th('gridUnit')};
   display: inline-flex;
   height: calc(${th('gridUnit')} * 8);
-  padding: 0 calc(${th('gridUnit')} * 2);
   width: calc(${th('gridUnit')} * 40);
 
   ${statusColor};
   ${space};
   ${layout};
+  ${position};
 `;
 
 export const Input: AnyStyledComponent = styled.input`
+  border-radius: ${th('gridUnit')};
   border: none;
+  box-sizing: border-box;
   font-size: ${th('fontSizes.textRegular')};
-  line-height: ${th('fontSizes.lineHeight')};
+  line-height: ${th('fontSizes.lineHei ght')};
   outline: none;
+  height: 100%;
+  padding: calc(${th('gridUnit')} * 2);
   width: 100%;
 
   &::placeholder {

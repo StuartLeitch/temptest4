@@ -1,11 +1,17 @@
 import {KeyboardEvent, MouseEvent, FormEvent} from 'react';
 
+export type FormFieldStatus = 'none' | 'success' | 'info' | 'warning';
+
 type InputEvent =
   | FormEvent<HTMLElement>
   | KeyboardEvent<HTMLElement>
   | MouseEvent<HTMLElement>;
 
-export default interface InputProps {
+export interface FormField {
+  status?: FormFieldStatus;
+}
+
+export interface FormFieldProps extends FormField {
   value?: any;
   name?: string;
   onBlur?(e: InputEvent): void;
