@@ -7,7 +7,7 @@ import {
   ValidateVATUsecase
 } from './../../src/lib/modules/invoices/usecases/validateVAT/validateVAT';
 import {ValidateVATErrors} from './../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
-import {VATService} from './../../src/lib/modules/invoices/domain/services/VATService';
+import {VATService} from '../../src/lib/domain/services/VATService';
 
 import {Roles} from './../../src/lib/modules/users/domain/enums/Roles';
 

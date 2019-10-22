@@ -17,7 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@hindawi/shared": ["libs/shared/src/index.ts"],
-      "@hindawi/react-components": ["libs/react-components/src/index.ts"]
+      "@hindawi/react-components": ["libs/react-components/src/index.ts"],
+      "@hindawi/pisi": ["libs/pisi/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -36,7 +36,7 @@ import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/m
 import {MockInvoiceRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import {MockCatalogRepo} from '../../../src/lib/modules/catalogs/repos/mocks/mockCatalogRepo';
 import {MockInvoiceItemRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import {WaiverService} from './../../../src/lib/modules/invoices/domain/services/WaiverService';
+import {WaiverService} from '../../../src/lib/domain/services/WaiverService';
 
 const feature = loadFeature(
   '../../features/reviewEvents/on-manuscript-accept.feature',

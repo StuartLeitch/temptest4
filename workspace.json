@@ -275,6 +275,31 @@
           }
         }
       }
+    },
+    "pisi": {
+      "root": "libs/pisi",
+      "sourceRoot": "libs/pisi/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/pisi/tsconfig.lib.json",
+              "libs/pisi/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/pisi/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/pisi/jest.config.js",
+            "tsConfig": "libs/pisi/tsconfig.spec.json"
+          }
+        }
+      }
     }
   },
   "cli": {

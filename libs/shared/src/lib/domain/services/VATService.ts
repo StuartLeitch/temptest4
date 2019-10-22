@@ -1,9 +1,11 @@
 import {createClient} from 'soap';
+import EuroVat from 'eu-vat';
 
 require('dotenv').config();
 
 const {VAT_VALIDATION_SERVICE_ENDPOINT: endpoint} = process.env;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
+const vat = new EuroVat();
 
 export class VATService {
   private async createClient() {
@@ -58,5 +60,10 @@ export class VATService {
     }
 
     return result;
+  }
+
+  public async getRates(countryCode?: string) {
+    const rates = await vat.getRates(countryCode);
+    return rates;
   }
 }

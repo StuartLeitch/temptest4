@@ -1,10 +1,68 @@
-import React from 'react';
+import React, { Component } from "react";
+import { BrowserRouter as Router, Switch, Route, Link, useHistory } from "react-router-dom";
 
-import './app.scss';
+// * Antd components
+import Row from "antd/es/row";
+import Col from "antd/es/col";
+import Card from "antd/es/card";
+import List from "antd/es/list";
+import Typography from "antd/es/typography";
+import Avatar from "antd/es/avatar";
+import Tabs from "antd/es/tabs";
+import Icon from "antd/es/icon";
 
-import {Route, Link} from 'react-router-dom';
+// * components
+import { Panel } from "./components/panel/panel";
+import { PaymentSteps } from "./components/payment-steps/payment-steps";
+import CreditCardForm from "./components/credit-card-payment-form/credit-card-payment-form";
+
+// * pages
+import { Index } from "./pages/index/index";
+import { BillingAddress } from "./pages/billing-address/billing-address";
+
+const { Text } = Typography;
+const { TabPane } = Tabs;
+
+// * app styles
+import "./app.scss";
+
+const articleDetails = [
+  ["Journal Title", "Advances in Condensed Matter Physics"],
+  ["Article Title", "RNA detection based on graphene field effect transistor biosensor"],
+  ["Article ID", "8146765"],
+  ["Article Type", "Research Article"],
+  ["CC License", "CC-BY 4.0"],
+  ["Corresponding Author", "Shicai Xu"],
+  ["Additional Authors", "view author list"],
+];
+
+const invoiceDetails = [
+  ["Invoice Issue Date", "19 September 2019"],
+  ["Date of Supply", "19 September 2019"],
+  ["Reference Number", "483/2019"],
+  ["Terms", "Payable upon Receipt"],
+];
+
+const charges = [
+  ["Article Processing Charges", 1250.0],
+  ["Net Charges", 1250.0],
+  ["VAT (+20%)", 250.0],
+  ["Total", 1500.0],
+];
 
 export const App = () => {
+  let history = useHistory();
+  let routes = ["/", "/billing-address", "/invoice-payment"];
+
+  const state = {
+    current: 0,
+  };
+
+  const onChange = current => {
+    console.log("onChange:", current);
+    this.setState({ current });
+    history.push(routes[current]);
+  };
   /*
    * Replace the elements below with your own.
    *
@@ -13,136 +71,125 @@ export const App = () => {
   return (
     <div className="app">
       <header className="flex">
-        <img
-          alt=""
-          width="75"
-          src="https://nx.dev/assets/images/nx-logo-white.svg"
-        />
-        <h1>Welcome to invoicing-web!</h1>
+        <a href="#" className="logo">
+          <img src="/assets/images/hindawi.svg" alt="Hindawi Publishing Corporation"></img>
+        </a>
+        <h1>Payment Details</h1>
       </header>
       <main>
-        <h2>Resources &amp; Tools</h2>
-        <p>Thank you for using and showing some ♥ for Nx.</p>
-        <div className="flex github-star-container">
-          <a
-            href="https://github.com/nrwl/nx"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {' '}
-            If you like Nx, please give it a star:
-            <div className="github-star-badge">
-              <svg
-                className="material-icons"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-              >
-                <path d="M0 0h24v24H0z" fill="none" />
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-              </svg>
-              Star
-            </div>
-          </a>
-        </div>
-        <p>Here are some links to help you get started.</p>
-        <ul className="resources">
-          <li className="col-span-2">
-            <li className="col-span-2">
-              <a
-                className="resource flex"
-                href="https://connect.nrwl.io/app/courses/nx-workspaces/intro"
-              >
-                Nx video course
-              </a>
-            </li>
-            <a
-              className="resource flex"
-              href="https://nx.dev/react/getting-started/what-is-nx"
-            >
-              Nx video tutorial
-            </a>
-          </li>
-          <li className="col-span-2">
-            <a
-              className="resource flex"
-              href="https://nx.dev/react/tutorial/01-create-application"
-            >
-              Interactive tutorial
-            </a>
-          </li>
-          <li className="col-span-2">
-            <a className="resource flex" href="https://connect.nrwl.io/">
-              <img
-                height="36"
-                alt="Nrwl Connect"
-                src="https://connect.nrwl.io/assets/img/CONNECT_ColorIcon.png"
-              />
-              <span className="gutter-left">Nrwl Connect</span>
-            </a>
-          </li>
-        </ul>
-        <h2>Next Steps</h2>
-        <p>Here are some things you can do with Nx.</p>
-        <details open>
-          <summary>Add UI library</summary>
-          <pre>{`# Generate UI lib
-nx g @nrwl/react:lib ui
+        <PaymentSteps current={1} onChange={onChange} />
 
-# Add a component
-nx g @nrwl/react:component xyz --project ui`}</pre>
-        </details>
-        <details>
-          <summary>View dependency graph</summary>
-          <pre>{`nx dep-graph`}</pre>
-        </details>
-        <details>
-          <summary>Run affected commands</summary>
-          <pre>{`# see what's been affected by changes
-nx affected:dep-graph
+        <Row>
+          <Col span={12}>
+            <Card>
+              <Router>
+                <Switch>
+                  <Route exact path="/">
+                    <BillingAddress />
+                  </Route>
+                  <Route path="/billing-address">
+                    <BillingAddress />
+                  </Route>
+                  <Route path="/invoice-payment">
+                    <BillingAddress />
+                  </Route>
+                </Switch>
+              </Router>
+            </Card>
+          </Col>
+          {/*<Col span={12}>
+            <Panel title="INVOICE">
+              <Avatar size={64} icon="file-pdf" /> Download Invoice
+            </Panel>
 
-# run tests for current changes
-nx affected:test
-
-# run e2e tests for current changes
-nx affected:e2e
-`}</pre>
-        </details>
+            <Panel title="PAYMENT METHODS">
+              <Tabs defaultActiveKey="1">
+                <TabPane
+                  tab={
+                    <span>
+                      <Icon style={{ fontSize: 36 }} theme="filled" type="credit-card" />
+                    </span>
+                  }
+                  key="1"
+                >
+                  <CreditCardForm />
+                </TabPane>
+                <TabPane
+                  tab={
+                    <span>
+                      <Icon style={{ fontSize: 36 }} type="dollar" />
+                    </span>
+                  }
+                  key="2"
+                >
+                  PayPal Payment Method
+                </TabPane>
+                <TabPane
+                  tab={
+                    <span>
+                      <Icon style={{ fontSize: 36 }} theme="filled" type="bank" />
+                    </span>
+                  }
+                  key="3"
+                >
+                  Bank Transfer Payment Method
+                </TabPane>
+              </Tabs>
+            </Panel>
+                </Col>*/}
+          <Col span={12}>
+            <Card>
+              <Card type="inner" title="ARTICLE DETAILS">
+                <List
+                  dataSource={articleDetails}
+                  renderItem={item => (
+                    <List.Item>
+                      <Text strong>{item[0]}</Text> {item[1]}
+                    </List.Item>
+                  )}
+                />
+              </Card>
+              <Card type="inner" title="INVOICE DETAILS">
+                <List
+                  dataSource={invoiceDetails}
+                  renderItem={item => (
+                    <List.Item>
+                      <Text strong>{item[0]}</Text> {item[1]}
+                    </List.Item>
+                  )}
+                />
+              </Card>
+              <Card type="inner" title="CHARGES">
+                <List
+                  dataSource={charges}
+                  renderItem={item => (
+                    <List.Item>
+                      <Text strong>{item[0]}</Text> <Text strong>$</Text>
+                      {item[1]}
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </Card>
+          </Col>
+        </Row>
       </main>
 
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
       <Route
         path="/"
         exact
         render={() => (
           <div>
-            This is the generated root route.{' '}
-            <Link to="/page-2">Click here for page 2.</Link>
+            <Link to="/billing-address">Click here for billing address.</Link>
           </div>
         )}
       />
       <Route
-        path="/page-2"
+        path="/billing-address"
         exact
         render={() => (
           <div>
-            <Link to="/">Click here to go back to root page.</Link>
+            <Link to="/">Click here to go back to landing page.</Link>
           </div>
         )}
       />

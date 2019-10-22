@@ -25,6 +25,9 @@
     },
     "invoicing-web-e2e": {
       "tags": []
+    },
+    "pisi": {
+      "tags": []
     }
   }
 }

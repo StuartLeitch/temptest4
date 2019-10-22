@@ -15,7 +15,7 @@ import {ValidateVATErrors} from './ValidateVATErrors';
 // import {TransactionRepoContract} from '../../repos/transactionRepo';
 // import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 // import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
-import {VATService} from '../../../invoices/domain/services/VATService';
+import {VATService} from '../../../../domain/services/VATService';
 // import {Transaction} from '../../domain/Transaction';
 // import {Article} from '../../../articles/domain/Article';
 // import {ArticleRepoContract} from './../../../articles/repos/articleRepo';

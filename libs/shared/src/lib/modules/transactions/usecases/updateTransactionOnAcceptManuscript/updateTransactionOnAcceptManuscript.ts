@@ -13,7 +13,7 @@ import {InvoiceItem} from '../../../invoices/domain/InvoiceItem';
 import {TransactionRepoContract} from '../../repos/transactionRepo';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
-import {WaiverService} from '../../../invoices/domain/services/WaiverService';
+import {WaiverService} from '../../../../domain/services/WaiverService';
 import {Transaction} from '../../domain/Transaction';
 import {Article} from '../../../articles/domain/Article';
 import {ArticleRepoContract} from './../../../articles/repos/articleRepo';
