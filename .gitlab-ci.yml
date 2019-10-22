@@ -20,9 +20,7 @@ stages:
   - deploy
 
 install:
-  interruptible: true
-  stage: setup
-  artifacts:
+  interruptible: true stage: setup artifacts:
     paths:
       - node_modules/
   script:
@@ -115,10 +113,27 @@ package_images:
   script:
     - docker build -t $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA apps/invoicing-web
     - docker push $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA
-
     - docker build -t $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA apps/invoicing-graphql
     - docker push $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA
   dependencies:
     - build_code
   only:
     - develop
+
+deploy_dev:
+  stage: deploy
+  image: docker
+  dependencies: package_images
+  when: manual
+  only:
+    - develop
+  before_script:
+    - apk add --no-cache curl jq python py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+  script:
+    - docker tag $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-graphql:dev
+    - docker tag $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-web:dev
+    - aws elasticbeanstalk update-environment --environment-name invoicing-web-dev --version-label invoicing-web-dev
+    - aws elasticbeanstalk update-environment --environment-name invoicing-graphql-dev --version-label invoicing-graphql-dev
+
