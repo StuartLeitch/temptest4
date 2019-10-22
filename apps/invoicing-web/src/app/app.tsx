@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Route, useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 // * Antd components
 import Row from "antd/es/row";
@@ -15,6 +16,10 @@ import Typography from "antd/es/typography";
 // import { Panel } from "./components/panel/panel";
 import { PaymentSteps } from "./components/payment-steps/payment-steps";
 // import CreditCardForm from "./components/credit-card-payment-form/credit-card-payment-form";
+
+import { appRedux } from "./state-management/redux";
+
+const { fetchManuscriptAction } = appRedux;
 
 // * pages
 import { Index } from "./pages/index/index";
@@ -51,15 +56,24 @@ const charges = [
   ["Total", 1500.0],
 ];
 
+// const handleAppInit = () => {
+//   console.log("App INIT called!!");
+// };
+
 export const App = () => {
   const [current, setCurrent] = useState(0);
   const history = useHistory();
+  const dispatch = useDispatch();
   const routes = ["/", "/billing-address", "/invoice-payment"];
 
   const onChange = current => {
     setCurrent(current);
     history.replace(routes[current]);
   };
+
+  useEffect(() => {
+    dispatch(fetchManuscriptAction(null));
+  });
 
   return (
     <div className="app">
