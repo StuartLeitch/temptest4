@@ -20,7 +20,9 @@ stages:
   - deploy
 
 install:
-  interruptible: true stage: setup artifacts:
+  interruptible: true
+  stage: setup
+  artifacts:
     paths:
       - node_modules/
   script:
@@ -123,7 +125,8 @@ package_images:
 deploy_dev:
   stage: deploy
   image: docker
-  dependencies: package_images
+  dependencies:
+    - package_images
   when: manual
   only:
     - develop
