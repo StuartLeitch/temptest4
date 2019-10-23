@@ -20,12 +20,11 @@ const initAppFulfilled = app => ({
 
 interface InitActionType {
   type: string;
-  app: any;
+  app?: any;
 }
 
-export const fetchManuscriptAction = (app: any): InitActionType => ({
+export const appInitAction = (): InitActionType => ({
   type: CONSTANTS.INIT,
-  app,
 });
 
 // * epic

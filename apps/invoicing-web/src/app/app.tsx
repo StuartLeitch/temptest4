@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Route, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import JsonGraphqlServer from "json-graphql-server";
+
+const axios = require("axios").default;
 
 // * Antd components
 import Row from "antd/es/row";
@@ -19,7 +22,9 @@ import { PaymentSteps } from "./components/payment-steps/payment-steps";
 
 import { appRedux } from "./state-management/redux";
 
-const { fetchManuscriptAction } = appRedux;
+import data from "./db";
+
+const { appInitAction } = appRedux;
 
 // * pages
 import { Index } from "./pages/index/index";
@@ -72,8 +77,29 @@ export const App = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchManuscriptAction(null));
-  });
+    const loadGraphqlServer = async () => {
+      const server = JsonGraphqlServer({
+        data,
+        url: "http://localhost:4200/graphql",
+      });
+      server.start();
+
+      const { data: response } = await axios({
+        url: "http://localhost:4200/graphql",
+        method: "POST",
+        data: JSON.stringify({ query: "query allPosts { allPosts { id } }" }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      return response;
+    };
+
+    loadGraphqlServer();
+    dispatch(appInitAction());
+  }, []);
 
   return (
     <div className="app">

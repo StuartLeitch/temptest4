@@ -104,11 +104,11 @@ defineFeature(feature, test => {
     });
 
     and('The Author is from a Waived Country', () => {
-      let title = 'manuscript-title';
-      let articleTypeId = 'article-type-id';
-      let authorEmail = 'author@email.com';
-      let authorCountry = 'MD';
-      let authorSurname = 'Author Surname';
+      const title = 'manuscript-title';
+      const articleTypeId = 'article-type-id';
+      const authorEmail = 'author@email.com';
+      const authorCountry = 'MD';
+      const authorSurname = 'Author Surname';
 
       manuscript = ArticleMap.toDomain({
         id: manuscriptId,
