@@ -22,7 +22,6 @@ export const Authorize = <R, C extends AuthorizationContext>(
   propertyDescriptor: PropertyDescriptor
 ): PropertyDescriptor => {
   const method = propertyDescriptor.value;
-
   propertyDescriptor.value = async function(request: R, context: C) {
     const {roles} = context;
     const accessControlContext = await (_target as any).getAccessControlContext(

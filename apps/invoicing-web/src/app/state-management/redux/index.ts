@@ -3,5 +3,6 @@
 
 import * as manuscriptRedux from "./manuscript";
 import * as appRedux from "./app";
+import * as userRedux from "./user";
 
-export { manuscriptRedux, appRedux };
+export { manuscriptRedux, appRedux, userRedux };

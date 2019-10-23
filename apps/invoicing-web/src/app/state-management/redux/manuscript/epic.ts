@@ -1,33 +1,24 @@
-import {ofType} from 'redux-observable';
-import {mergeMap, map} from 'rxjs/operators';
-import {ajax} from 'rxjs/ajax';
+import { ofType } from "redux-observable";
+import { mergeMap, map } from "rxjs/operators";
+const Axios = require("axios-observable").Axios;
 
-import {ManuscriptId} from '@hindawi/shared';
+import { ManuscriptId, ArticleMap } from "@hindawi/shared";
 
-// import {all, call, put, takeLatest} from 'redux-saga/effects';
-// import {Credential, User} from '../../entities';
-// import {updateUserAction} from './user';
-// import {SignInInteractor, SignUpInteractor} from '../../useCases';
-// import {SampleService} from '../../services';
-
-import CONSTANTS from './constants';
+import CONSTANTS from "./constants";
 
 // * Action Creators
 const fetchManuscriptFulfilled = payload => ({
   type: CONSTANTS.FETCH_FULFILLED,
-  payload
+  payload,
 });
 
 interface ManuscriptFetchActionType {
   type: string;
-  manuscriptId: ManuscriptId;
+  manuscriptId?: ManuscriptId;
 }
 
-export const fetchManuscriptAction = (
-  manuscriptId: ManuscriptId
-): ManuscriptFetchActionType => ({
+export const fetchManuscriptAction = (): ManuscriptFetchActionType => ({
   type: CONSTANTS.FETCH,
-  manuscriptId
 });
 
 // * epic
@@ -35,8 +26,26 @@ export const fetchManuscriptEpic = (action$: any) =>
   action$.pipe(
     ofType(CONSTANTS.FETCH),
     mergeMap((action: ManuscriptFetchActionType) =>
-      ajax
-        .getJSON(`https://api.github.com/users/${action.manuscriptId}`)
-        .pipe(map(response => fetchManuscriptFulfilled(response)))
-    )
+      Axios.post(
+        "http://localhost:4200/graphql",
+        JSON.stringify({
+          query:
+            "query allManuscripts { allManuscripts { id, title, articleTypeId, authorEmail, authorCountry, authorSurname } }",
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        },
+      ).pipe(
+        map((response: any) => {
+          const manuscript = ArticleMap.toDomain(response.data.data.allManuscripts[0]);
+          return fetchManuscriptFulfilled({
+            id: manuscript.manuscriptId.id.toString(),
+            ...manuscript.props,
+          });
+        }),
+      ),
+    ),
   );

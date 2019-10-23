@@ -3,8 +3,6 @@ import { Route, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import JsonGraphqlServer from "json-graphql-server";
 
-const axios = require("axios").default;
-
 // * Antd components
 import Row from "antd/es/row";
 import Col from "antd/es/col";
@@ -20,11 +18,13 @@ import Typography from "antd/es/typography";
 import { PaymentSteps } from "./components/payment-steps/payment-steps";
 // import CreditCardForm from "./components/credit-card-payment-form/credit-card-payment-form";
 
-import { appRedux } from "./state-management/redux";
+import { appRedux, userRedux, manuscriptRedux } from "./state-management/redux";
 
 import data from "./db";
 
 const { appInitAction } = appRedux;
+const { fetchUsersAction } = userRedux;
+const { fetchManuscriptAction } = manuscriptRedux;
 
 // * pages
 import { Index } from "./pages/index/index";
@@ -61,10 +61,6 @@ const charges = [
   ["Total", 1500.0],
 ];
 
-// const handleAppInit = () => {
-//   console.log("App INIT called!!");
-// };
-
 export const App = () => {
   const [current, setCurrent] = useState(0);
   const history = useHistory();
@@ -77,27 +73,21 @@ export const App = () => {
   };
 
   useEffect(() => {
-    const loadGraphqlServer = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const invoiceId = urlParams.get("invoiceId");
+    console.info(`Invoice ID = ${invoiceId}`);
+    const startGraphqlServer = async () => {
       const server = JsonGraphqlServer({
         data,
         url: "http://localhost:4200/graphql",
       });
-      server.start();
+      await server.start();
 
-      const { data: response } = await axios({
-        url: "http://localhost:4200/graphql",
-        method: "POST",
-        data: JSON.stringify({ query: "query allPosts { allPosts { id } }" }),
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
-
-      return response;
+      dispatch(fetchUsersAction());
+      dispatch(fetchManuscriptAction());
     };
 
-    loadGraphqlServer();
+    startGraphqlServer();
     dispatch(appInitAction());
   }, []);
 

@@ -11,7 +11,7 @@ export interface ActionType {
 
 export interface FetchManuscriptActionType {
   type: string;
-  manuscript: Article | null;
+  payload: Article | null;
 }
 
 export const manuscriptSelector = (state: StateType): StateSlice => state.manuscript;
@@ -20,7 +20,7 @@ const fetchHandler = (
   state: StateSlice,
   action: FetchManuscriptActionType,
 ): StateType["manuscript"] => {
-  return action.manuscript;
+  return action.payload;
 };
 
 export const manuscript = (

@@ -29,17 +29,17 @@ const feature = loadFeature(
 const defaultContext: CreateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
 
 defineFeature(feature, test => {
-  let mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
-  let mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
-  let mockArticleRepo: MockArticleRepo = new MockArticleRepo();
-  let mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
+  const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
+  const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
+  const mockArticleRepo: MockArticleRepo = new MockArticleRepo();
+  const mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
   let result: Result<Transaction>;
 
-  let manuscriptId = 'manuscript-id';
+  const manuscriptId = 'manuscript-id';
   let transactionId: TransactionId;
   let invoiceId: InvoiceId;
 
-  let usecase: CreateTransactionUsecase = new CreateTransactionUsecase(
+  const usecase: CreateTransactionUsecase = new CreateTransactionUsecase(
     mockTransactionRepo,
     mockArticleRepo,
     mockInvoiceRepo,

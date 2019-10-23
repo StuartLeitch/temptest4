@@ -46,17 +46,17 @@ const feature = loadFeature(
 const defaultContext: UpdateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
 
 defineFeature(feature, test => {
-  let mockTransactionRepo: TransactionRepoContract = new MockTransactionRepo();
-  let mockInvoiceRepo: InvoiceRepoContract = new MockInvoiceRepo();
-  let mockCatalogRepo: CatalogRepoContract = new MockCatalogRepo();
-  let mockInvoiceItemRepo: InvoiceItemRepoContract = new MockInvoiceItemRepo();
-  let mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
-  let waiverService: WaiverService = new WaiverService();
+  const mockTransactionRepo: TransactionRepoContract = new MockTransactionRepo();
+  const mockInvoiceRepo: InvoiceRepoContract = new MockInvoiceRepo();
+  const mockCatalogRepo: CatalogRepoContract = new MockCatalogRepo();
+  const mockInvoiceItemRepo: InvoiceItemRepoContract = new MockInvoiceItemRepo();
+  const mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
+  const waiverService: WaiverService = new WaiverService();
   let result: any;
 
-  let manuscriptId = 'manuscript-id';
+  const manuscriptId = 'manuscript-id';
 
-  let usecase: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
+  const usecase: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
     mockTransactionRepo,
     mockInvoiceItemRepo,
     mockInvoiceRepo,
@@ -90,6 +90,10 @@ defineFeature(feature, test => {
     mockTransactionRepo.save(transaction);
     mockInvoiceRepo.save(invoice);
     mockInvoiceItemRepo.save(invoiceItem);
+
+    console.info(TransactionMap.toPersistence(transaction));
+    console.info(InvoiceMap.toPersistence(invoice));
+    console.info(InvoiceItemMap.toPersistence(invoiceItem));
   });
 
   test('Manuscript Accept Handler', ({given, when, then, and}) => {
@@ -101,6 +105,7 @@ defineFeature(feature, test => {
         price: 1900
       });
       mockCatalogRepo.save(catalogItem);
+      console.info(CatalogMap.toPersistence(catalogItem));
     });
 
     and('The Author is from a Waived Country', () => {
@@ -118,6 +123,7 @@ defineFeature(feature, test => {
         authorCountry,
         authorSurname
       });
+      console.info(ArticleMap.toPersistence(manuscript));
       mockArticleRepo.save(manuscript);
     });
 

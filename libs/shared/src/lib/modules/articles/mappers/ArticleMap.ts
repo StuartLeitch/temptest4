@@ -24,7 +24,7 @@ export class ArticleMap extends Mapper<Article> {
   public static toPersistence(article: Article): any {
     return {
       id: article.id.toString(),
-      journalId: article.props.journalId.toString(),
+      journalId: article.props.journalId && article.props.journalId.toString(),
       title: article.props.title,
       articleTypeId: article.props.articleTypeId,
       authorEmail: article.props.authorEmail,
