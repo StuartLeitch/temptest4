@@ -85,3 +85,8 @@ export const Input: AnyStyledComponent = styled.input`
   ${space};
   ${layout};
 `;
+
+export const RelativeParent = styled.div`
+  position: relative;
+  width: 100%;
+`;

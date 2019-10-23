@@ -75,11 +75,11 @@ export const Button: AnyStyledComponent = styled.button`
   padding: 0 calc(${th('gridUnit')} * 2);
   white-space: nowrap;
 
-  ${buttonType};
-  ${buttonSize};
   ${space};
   ${layout};
   ${flexbox};
+  ${buttonSize};
+  ${buttonType};
 
   &:disabled {
     border: none;

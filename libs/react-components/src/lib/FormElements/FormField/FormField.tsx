@@ -1,54 +1,51 @@
 import React from 'react';
-import {LayoutProps, SpaceProps} from 'styled-system';
+import {Field, FieldProps} from 'formik';
+import {FlexboxProps, LayoutProps, SpaceProps} from 'styled-system';
 
 import Input from '../Input';
-import Icon from '../../Icon';
 import Flex from '../../Flex';
 import {Label, Text} from '../../Typography';
 import {FormFieldProps} from '../CommonTypes';
 
-export interface Props extends FormFieldProps, LayoutProps, SpaceProps {
-  id?: string;
+export interface Props extends FlexboxProps, LayoutProps, SpaceProps {
+  name: string;
   label?: string;
   required?: boolean;
-  type?: 'text' | 'password';
   component?: React.ComponentType<FormFieldProps>;
 }
 
 const FormField: React.FunctionComponent<Props> = ({
-  id,
-  error,
+  name,
   label,
-  status,
   required,
   component: Component,
   ...rest
 }) => {
-  const hasIssue = status === 'warning' || status === 'info';
   return (
-    <Flex position="relative" vertical {...rest}>
-      <Label required={required} htmlFor={id}>
-        {label}
-      </Label>
-      <Component id={id} status={status} {...rest} />
-      {hasIssue && (
-        <Icon
-          top={6}
-          right={2}
-          position="absolute"
-          name={status === 'warning' ? 'warningFilled' : 'infoFilled'}
-          color={status === 'warning' ? 'colors.warning' : 'colors.info'}
-        />
-      )}
-      <Flex minHeight={5}>
-        {hasIssue && <Text type={status}>{error}</Text>}
-      </Flex>
-    </Flex>
+    <Field name={name}>
+      {({field, form}: FieldProps) => {
+        const error = form.errors[name];
+        return (
+          <Flex vertical {...rest}>
+            <Label required={required} htmlFor={field.name}>
+              {label}
+            </Label>
+            <Component
+              name={field.name}
+              status={error ? 'warning' : 'none'}
+              {...field}
+            />
+            <Flex minHeight={6}>
+              {error && <Text type="warning">{error}</Text>}
+            </Flex>
+          </Flex>
+        );
+      }}
+    </Field>
   );
 };
 
 FormField.defaultProps = {
-  width: 40,
   component: Input
 };
 

@@ -1,67 +1,34 @@
 import React from 'react';
-import {select} from '@storybook/addon-knobs';
+import {Formik} from 'formik';
 
+import Button from '../../Button';
 import FormField from './FormField';
-import Textarea from '../Textarea';
 
 export const Default = () => (
-  <div style={{display: 'flex', flexDirection: 'column'}}>
-    <FormField
-      required
-      label="Email"
-      error="Something is wrong..."
-      id="email-field"
-      status={select(
-        'Email status',
-        ['none', 'success', 'info', 'warning'],
-        'none'
-      )}
-    />
-    <FormField
-      required
-      type="password"
-      label="Password"
-      id="password-field"
-      status={select(
-        'Password status',
-        ['none', 'success', 'info', 'warning'],
-        'none'
-      )}
-    />
-  </div>
-);
-
-export const withTextarea = () => (
-  <div style={{display: 'flex', flexDirection: 'column'}}>
-    <FormField
-      component={Textarea}
-      required
-      label="Email"
-      error="Something is wrong..."
-      id="email-field"
-      status={select(
-        'Email status',
-        ['none', 'success', 'info', 'warning'],
-        'none'
-      )}
-    />
-    <FormField
-      required
-      label="Password"
-      type="password"
-      id="password-field"
-      status={select(
-        'Password status',
-        ['none', 'success', 'info', 'warning'],
-        'none'
-      )}
-      width={50}
-      component={props => <Textarea {...props} />}
-    />
-  </div>
+  <Formik
+    validate={() => {
+      return {
+        email: 'Required'
+      };
+    }}
+    initialValues={{email: 'alexandru.munt@gmail.com'}}
+    onSubmit={() => {}}
+  >
+    {props => {
+      return (
+        <div>
+          <FormField required label="Email" name="email" mr={2} />
+          <FormField label="Password" name="password" />
+          <Button type="secondary" size="medium" onClick={props.handleSubmit}>
+            Submit
+          </Button>
+        </div>
+      );
+    }}
+  </Formik>
 );
 
 export default {
-  title: 'Form Elements|Form Field',
+  title: 'Form Elements|FormField',
   component: FormField
 };

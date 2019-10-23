@@ -11,12 +11,13 @@ export interface FormField {
   status?: FormFieldStatus;
 }
 
+type ValidationStatuses = 'none' | 'success' | 'info' | 'error';
+
 export interface FormFieldProps extends FormField {
-  id?: string;
   value?: any;
   name?: string;
   error?: string;
   onBlur?(e: InputEvent): void;
-  onFocus?(e: InputEvent): void;
   onChange?(e: InputEvent): void;
+  validationStatus?: ValidationStatuses;
 }
