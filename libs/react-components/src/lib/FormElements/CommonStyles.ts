@@ -1,4 +1,4 @@
-import {space, layout, position} from 'styled-system';
+import {space, layout} from 'styled-system';
 import styled, {css, AnyStyledComponent} from 'styled-components';
 
 import {th, lighten} from '../Theme';
@@ -44,6 +44,7 @@ const statusColor = ({status}: {status: FormFieldStatus}) => {
         &:focus,
         &:active {
           border-color: ${th('colors.actionPrimary')};
+          border-color: red;
         }
       `;
     case 'none':
@@ -63,29 +64,14 @@ const statusColor = ({status}: {status: FormFieldStatus}) => {
   }
 };
 
-export const Container = styled.div`
-  align-items: center;
-  box-sizing: border-box;
-  border: 1px solid;
-  border-radius: ${th('gridUnit')};
-  display: inline-flex;
-  height: calc(${th('gridUnit')} * 8);
-  width: calc(${th('gridUnit')} * 40);
-
-  ${statusColor};
-  ${space};
-  ${layout};
-  ${position};
-`;
-
 export const Input: AnyStyledComponent = styled.input`
   border-radius: ${th('gridUnit')};
-  border: none;
+  border: 1px solid;
   box-sizing: border-box;
   font-size: ${th('fontSizes.textRegular')};
-  line-height: ${th('fontSizes.lineHei ght')};
+  line-height: ${th('fontSizes.lineHeight')};
   outline: none;
-  height: 100%;
+  height: calc(${th('gridUnit')} * 8);
   padding: calc(${th('gridUnit')} * 2);
   width: 100%;
 
@@ -95,4 +81,7 @@ export const Input: AnyStyledComponent = styled.input`
   }
 
   ${regular};
+  ${statusColor};
+  ${space};
+  ${layout};
 `;

@@ -1,53 +1,26 @@
 import React from 'react';
 
-import Icon from '../../Icon';
 import {FormFieldProps} from '../CommonTypes';
+
+type ResizeOptions = 'both' | 'none' | 'vertical' | 'horizontal';
 
 export interface Props extends FormFieldProps {
   placeholder?: string;
+  resize?: ResizeOptions;
 }
 
-import {Container, Input} from '../CommonStyles';
+import {Textarea as Input} from './Textarea.styles';
 
 const Textarea: React.FunctionComponent<Props> = ({
   status,
-  placeholder,
-  // input props
-  name,
-  value,
-  onBlur,
-  onFocus,
-  onChange,
+  resize,
   ...rest
 }) => {
-  return (
-    <Container
-      status={status}
-      height="100%"
-      width="fit-content"
-      position="relative"
-      {...rest}
-    >
-      <Input
-        as="textarea"
-        name={name}
-        value={value}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        onChange={onChange}
-        placeholder={placeholder}
-      />
-      {(status === 'warning' || status === 'info') && (
-        <Icon
-          position="absolute"
-          top={1}
-          right={1}
-          name={status === 'warning' ? 'warningFilled' : 'infoFilled'}
-          color={status === 'warning' ? 'colors.warning' : 'colors.info'}
-        />
-      )}
-    </Container>
-  );
+  return <Input as="textarea" status={status} resize={resize} {...rest} />;
+};
+
+Textarea.defaultProps = {
+  resize: 'both'
 };
 
 export default Textarea;

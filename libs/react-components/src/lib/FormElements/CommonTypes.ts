@@ -12,8 +12,10 @@ export interface FormField {
 }
 
 export interface FormFieldProps extends FormField {
+  id?: string;
   value?: any;
   name?: string;
+  error?: string;
   onBlur?(e: InputEvent): void;
   onFocus?(e: InputEvent): void;
   onChange?(e: InputEvent): void;

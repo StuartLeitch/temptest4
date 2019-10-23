@@ -9,6 +9,17 @@ export const Default = () => (
   />
 );
 
+export const ControlResizing = () => (
+  <Textarea
+    resize={select(
+      'Resize',
+      ['both', 'none', 'vertical', 'horizontal'],
+      'both'
+    )}
+    status={select('Status', ['none', 'success', 'info', 'warning'], 'none')}
+  />
+);
+
 export default {
   title: 'Form Elements|Textarea',
   component: Textarea

@@ -12,7 +12,8 @@ const theme = {
   fontSizes,
   fontFamily: defaultFont,
   gridUnit: `${GRID_UNIT}px`,
-  space: generateSpaces(GRID_UNIT)
+  space: generateSpaces(GRID_UNIT),
+  sizes: generateSpaces(GRID_UNIT)
 };
 
 export * from './helpers';
