@@ -30,7 +30,19 @@ export const selectAuthor = createSelector(
     }
   },
 );
-// export const manuscriptSelector = (state: StateType): StateSlice => state.manuscript;
+export const selectManuscript = createSelector(
+  getManuscript,
+  (manuscript: any) => {
+    if (!manuscript) {
+      return null;
+    } else {
+      return {
+        id: manuscript.id,
+        title: manuscript.title,
+      };
+    }
+  },
+);
 
 const fetchHandler = (
   state: StateSlice,
