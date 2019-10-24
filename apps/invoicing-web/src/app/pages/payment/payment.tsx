@@ -1,4 +1,9 @@
 import React from "react";
+const client = require("braintree-web/client");
+const hostedFields = require("braintree-web/hosted-fields");
+
+import { environment } from "../../../environments/environment";
+
 import Avatar from "antd/es/avatar";
 import Tabs from "antd/es/tabs";
 import Icon from "antd/es/icon";
@@ -8,11 +13,16 @@ import CreditCardForm from "../../components/credit-card-payment-form/credit-car
 
 const { TabPane } = Tabs;
 
-interface Props {
-  onSubmit?(cardValues: any): void;
-}
+client
+  .create({
+    authorization: environment.BT_TOKENIZATION_KEY,
+  })
+  .then(function(clientInstance) {
+    console.info(clientInstance);
+    // hostedFields.create(/* ... */);
+  });
 
-export const Payment: React.FC<Props> = props => (
+export const Payment = props => (
   <React.Fragment>
     <Panel title="INVOICE">
       <Avatar size={64} icon="file-pdf" /> Download Invoice

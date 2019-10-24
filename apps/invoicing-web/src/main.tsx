@@ -2,15 +2,17 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
-
-import App from "./app/app";
+import JsonGraphqlServer from "json-graphql-server";
 
 import { configureStore } from "./app/frameworks/redux";
+import App from "./app/app";
+import data from "./app/db";
 
-// import { TRANSACTIONS_FEATURE_KEY, transactionsReducer } from "./app/transactions.slice";
-// const store = configureStore({
-//   reducer: { [TRANSACTIONS_FEATURE_KEY]: transactionsReducer },
-// });
+const server = JsonGraphqlServer({
+  data,
+  url: "http://localhost:4200/graphql",
+});
+server.start();
 
 ReactDOM.render(
   <Provider store={configureStore()}>

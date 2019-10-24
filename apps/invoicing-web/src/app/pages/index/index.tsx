@@ -45,18 +45,6 @@ export const Index: React.FC<Props> = props => {
     [setValues, setAuthor],
   );
 
-  // const handleChange = useCallback(
-  //   event => {
-  //     const { name, value } = event.target;
-  //     setValues(v => ({ ...v, [name]: value }));
-  //   },
-  //   [setValues],
-  // );
-
-  // const [focused, setFocus] = React.useState<any | undefined>(undefined);
-  // const handleFocus = React.useCallback(event => setFocus(event.target.name as any), [setFocus]);
-  // const handleBlur = React.useCallback(() => setFocus(undefined), [setFocus]);
-
   const formItemLayout = {
     labelCol: {
       xs: { span: 24 },

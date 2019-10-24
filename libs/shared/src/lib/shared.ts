@@ -71,7 +71,7 @@ export * from './modules/invoices/mappers/InvoiceMap';
 // export * from './modules/payments/repos/paymentMethodRepo';
 
 // // * Export Payer Subdomain
-// export {Payer} from './modules/payers/domain/Payer';
+export {Payer} from './modules/payers/domain/Payer';
 // export * from './modules/payers/domain/PayerId';
 // export * from './modules/payers/domain/PayerName';
 // export * from './modules/payers/domain/PayerType';
