@@ -10,6 +10,10 @@ const mapStateToProps = (state: any) => ({
   manuscript: selectManuscript(state),
 });
 
+// const mapDispatchToProps = () => ({
+//   onSubmit: () => {},
+// });
+
 // export const IndexContainer = Index;
 export const IndexContainer = connect(
   mapStateToProps,

@@ -2,12 +2,19 @@ import { combineReducers, applyMiddleware, createStore, compose } from "redux";
 import { createLogger } from "redux-logger";
 import { combineEpics, createEpicMiddleware } from "redux-observable";
 
-import { manuscriptRedux, appRedux, userRedux, invoiceRedux } from "../../state-management/redux";
+import {
+  manuscriptRedux,
+  appRedux,
+  userRedux,
+  invoiceRedux,
+  payerRedux,
+} from "../../state-management/redux";
 
 const { manuscript, fetchManuscriptEpic } = manuscriptRedux;
 const { app, initEpic } = appRedux;
 const { user, fetchUsersEpic } = userRedux;
 const { invoice, fetchInvoiceEpic } = invoiceRedux;
+const { payer } = payerRedux;
 
 export const rootEpic = combineEpics(
   fetchManuscriptEpic,
@@ -20,6 +27,7 @@ export const rootReducer = combineReducers({
   app,
   user,
   invoice,
+  payer,
 });
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

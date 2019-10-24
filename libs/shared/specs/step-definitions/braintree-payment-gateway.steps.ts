@@ -19,7 +19,7 @@ defineFeature(feature, test => {
   let paymentStrategy: PaymentStrategy;
 
   // let payPal = new PayPal();
-  let creditCard = new CreditCard();
+  const creditCard = new CreditCard();
   let paymentMethod: PaymentModel;
 
   beforeEach(() => {

@@ -7,7 +7,7 @@ import Button from "antd/es/button";
 
 // import styles from "./index.css";
 
-const PayerForm = props => {
+const PayerForm = (props: any) => {
   const [author, setAuthor] = useState({ name: "", email: "", country: "" });
   const [values, setValues] = useState({
     confirmDirty: false,
@@ -25,9 +25,11 @@ const PayerForm = props => {
     e.preventDefault();
     // this.props.form.validateFieldsAndScroll((err, values) => {
     //  if (!err) {
-    console.log("Received values of form: ", values);
+    //    console.log("Received values of form: ", values);
+    //    console.log("Received values of form: ", author);
     //  }
     // });
+    props.onSubmit(1, { ...values, ...author });
   };
 
   const onChange = useCallback(
@@ -44,18 +46,6 @@ const PayerForm = props => {
     },
     [setValues, setAuthor],
   );
-
-  // const handleChange = useCallback(
-  //   event => {
-  //     const { name, value } = event.target;
-  //     setValues(v => ({ ...v, [name]: value }));
-  //   },
-  //   [setValues],
-  // );
-
-  // const [focused, setFocus] = React.useState<any | undefined>(undefined);
-  // const handleFocus = React.useCallback(event => setFocus(event.target.name as any), [setFocus]);
-  // const handleBlur = React.useCallback(() => setFocus(undefined), [setFocus]);
 
   const formItemLayout = {
     labelCol: {
@@ -113,6 +103,8 @@ const PayerForm = props => {
   );
 };
 
-const WrappedPayerForm = Form.create({ name: "billing_address_form" })(PayerForm);
+const WrappedPayerForm = Form.create({
+  name: "billing_address_form",
+})(PayerForm);
 
 export const Index = WrappedPayerForm;

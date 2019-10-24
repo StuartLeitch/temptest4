@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Route, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import JsonGraphqlServer from "json-graphql-server";
 
 // * Antd components
 import Row from "antd/es/row";
@@ -14,14 +13,19 @@ import { ManuscriptDetails } from "./components/manuscript-details/manuscript-de
 import { InvoiceDetails } from "./components/invoice-details/invoice-details";
 import { Charges } from "./components/charges/charges";
 
-import { appRedux, userRedux, manuscriptRedux, invoiceRedux } from "./state-management/redux";
-
-import data from "./db";
+import {
+  appRedux,
+  userRedux,
+  manuscriptRedux,
+  invoiceRedux,
+  payerRedux,
+} from "./state-management/redux";
 
 const { appInitAction } = appRedux;
 const { fetchUsersAction } = userRedux;
 const { fetchManuscriptAction } = manuscriptRedux;
 const { fetchInvoiceAction } = invoiceRedux;
+const { updatePayerAction } = payerRedux;
 
 // * pages
 import { IndexContainer } from "./pages/index/index-container";
@@ -32,32 +36,29 @@ import { BillingAddress } from "./pages/billing-address/billing-address";
 import "./app.scss";
 
 export const App = () => {
+  const routes = ["/", "/billing-address", "/invoice-payment"];
+
   const [current, setCurrent] = useState(0);
   const history = useHistory();
   const dispatch = useDispatch();
-  const routes = ["/", "/billing-address", "/invoice-payment"];
 
-  const onChange = current => {
+  const onChange = (current: number) => {
     setCurrent(current);
     history.replace(routes[current]);
+
+    // dispatch(updatePayerAction(form));
   };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const invoiceId = urlParams.get("invoiceId");
-    const startGraphqlServer = async () => {
-      const server = JsonGraphqlServer({
-        data,
-        url: "http://localhost:4200/graphql",
-      });
-      await server.start();
 
-      dispatch(fetchUsersAction());
-      dispatch(fetchManuscriptAction());
+    if (invoiceId) {
       dispatch(fetchInvoiceAction(invoiceId));
-    };
+    }
 
-    startGraphqlServer();
+    dispatch(fetchUsersAction());
+    dispatch(fetchManuscriptAction());
     dispatch(appInitAction());
   }, []);
 
