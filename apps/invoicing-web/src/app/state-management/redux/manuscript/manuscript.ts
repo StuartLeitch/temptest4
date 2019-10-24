@@ -1,3 +1,4 @@
+import { createSelector } from "reselect";
 import { Article } from "@hindawi/shared";
 
 import CONSTANTS from "./constants";
@@ -14,7 +15,22 @@ export interface FetchManuscriptActionType {
   payload: Article | null;
 }
 
-export const manuscriptSelector = (state: StateType): StateSlice => state.manuscript;
+const getManuscript = (state: StateType): StateSlice => state.manuscript;
+export const selectAuthor = createSelector(
+  getManuscript,
+  (manuscript: any) => {
+    if (!manuscript) {
+      return null;
+    } else {
+      return {
+        name: manuscript.authorSurname,
+        email: manuscript.authorEmail,
+        country: manuscript.authorCountry,
+      };
+    }
+  },
+);
+// export const manuscriptSelector = (state: StateType): StateSlice => state.manuscript;
 
 const fetchHandler = (
   state: StateSlice,

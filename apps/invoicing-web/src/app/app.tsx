@@ -28,7 +28,8 @@ const { fetchManuscriptAction } = manuscriptRedux;
 const { fetchInvoiceAction } = invoiceRedux;
 
 // * pages
-import { Index } from "./pages/index/index";
+// import { Index as IndexContainer } from "./pages/index/index";
+import { IndexContainer } from "./pages/index/index-container";
 import { Payment } from "./pages/payment/payment";
 import { BillingAddress } from "./pages/billing-address/billing-address";
 
@@ -106,7 +107,7 @@ export const App = () => {
         <Row>
           <Col span={12}>
             <Card>
-              <Route path="/" exact render={() => <Index />} />
+              <Route path="/" exact render={() => <IndexContainer />} />
               <Route path="/billing-address" exact render={() => <BillingAddress />} />
               <Route path="/invoice-payment" exact render={() => <Payment />} />
             </Card>

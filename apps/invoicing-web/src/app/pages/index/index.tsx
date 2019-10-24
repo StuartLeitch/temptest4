@@ -1,23 +1,25 @@
-import React, { useState, useCallback } from "react";
-
-// import { formatMessage } from "umi-plugin-locale";
+import React, { useState, useEffect, useCallback } from "react";
 
 import Form from "antd/es/form";
 import Checkbox from "antd/es/checkbox";
-import Icon from "antd/es/icon";
 import Input from "antd/es/input";
 import Button from "antd/es/button";
 
-import styles from "./index.css";
+// import styles from "./index.css";
 
-const PayerForm = () => {
+const PayerForm = props => {
+  const [author, setAuthor] = useState({ name: "", email: "", country: "" });
   const [values, setValues] = useState({
     confirmDirty: false,
-    name: "",
-    email: "",
     vatNumber: "",
     isIndividual: true,
   });
+
+  useEffect(() => {
+    if (props.author) {
+      setAuthor(props.author);
+    }
+  }, [props.author]);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -32,13 +34,15 @@ const PayerForm = () => {
     event => {
       const { name, value, checked } = event.target;
 
+      if (name === "name" || name === "email") {
+        setAuthor(v => ({ ...v, [name]: value }));
+      }
+
       if (name === "isIndividual") {
         setValues(v => ({ ...v, [name]: checked }));
-      } else {
-        setValues(v => ({ ...v, [name]: value }));
       }
     },
-    [setValues],
+    [setValues, setAuthor],
   );
 
   // const handleChange = useCallback(
@@ -82,10 +86,13 @@ const PayerForm = () => {
   return (
     <Form {...formItemLayout} style={{ marginTop: "30px" }} onSubmit={handleSubmit}>
       <Form.Item label="Name">
-        <Input placeholder="name" name="name" value={values.name} onChange={onChange} />
+        <Input placeholder="name" name="name" value={author.name} onChange={onChange} />
       </Form.Item>
       <Form.Item label="E-mail">
-        <Input name="email" value={values.email} onChange={onChange} />
+        <Input name="email" value={author.email} onChange={onChange} />
+      </Form.Item>
+      <Form.Item label="Country">
+        <Input name="country" value={author.country} readOnly />
       </Form.Item>
       <Form.Item label="Is Individual?">
         <Checkbox name="isIndividual" checked={values.isIndividual} onChange={onChange}>

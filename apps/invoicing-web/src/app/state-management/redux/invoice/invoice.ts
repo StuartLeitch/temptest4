@@ -1,3 +1,5 @@
+import { createSelector } from "reselect";
+
 import { Invoice } from "@hindawi/shared";
 
 import CONSTANTS from "./constants";
@@ -14,7 +16,11 @@ export interface FetchInvoiceActionType {
   invoice: Invoice | null;
 }
 
-export const invoiceSelector = (state: StateType): StateSlice => state.invoice;
+const getInvoice = (state: StateType): StateSlice => state.invoice;
+export const selectInvoice = createSelector(
+  getInvoice,
+  invoice => invoice,
+);
 
 const fetchHandler = (state: StateSlice, action: FetchInvoiceActionType): StateType["invoice"] => {
   return action.invoice;
