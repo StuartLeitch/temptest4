@@ -1,5 +1,5 @@
 import React from "react";
-import Form from "antd/es/form";
+import Form, { FormComponentProps } from "antd/es/form";
 // import Icon from "antd/es/icon";
 import Input from "antd/es/input";
 import Button from "antd/es/button";
@@ -14,7 +14,11 @@ const styles: React.CSSProperties = {
   flexDirection: "column",
 };
 
-export default function CreditCardForm() {
+interface Props {
+  onSubmit?(cardValues: any): void;
+}
+
+const CreditCardForm: React.FC<Props> = props => {
   const [values, setValues] = React.useState({
     name: "",
     number: "",
@@ -35,45 +39,13 @@ export default function CreditCardForm() {
   ]);
   const handleBlur = React.useCallback(() => setFocus(undefined), [setFocus]);
 
-  const formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 8 },
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 16 },
-    },
-  };
-
-  const tailFormItemLayout = {
-    wrapperCol: {
-      xs: {
-        span: 24,
-        offset: 0,
-      },
-      sm: {
-        span: 16,
-        offset: 8,
-      },
-    },
-  };
-
-  const creditCardItemLayout = {
-    wrapperCol: {
-      xs: {
-        span: 24,
-        offset: 0,
-      },
-      sm: {
-        span: 16,
-        offset: 3,
-      },
-    },
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    props.onSubmit(values);
   };
 
   return (
-    <Form {...formItemLayout}>
+    <Form {...formItemLayout} onSubmit={handleSubmit}>
       <Form.Item {...creditCardItemLayout}>
         <ReactCreditCard {...values} focused={focused} />
       </Form.Item>
@@ -122,4 +94,45 @@ export default function CreditCardForm() {
       </Form.Item>
     </Form>
   );
-}
+};
+
+export default CreditCardForm;
+
+export // #region styles
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 8 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 16 },
+  },
+};
+
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0,
+    },
+    sm: {
+      span: 16,
+      offset: 8,
+    },
+  },
+};
+
+const creditCardItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0,
+    },
+    sm: {
+      span: 16,
+      offset: 3,
+    },
+  },
+};
+// #endregion

@@ -8,8 +8,12 @@ import CreditCardForm from "../../components/credit-card-payment-form/credit-car
 
 const { TabPane } = Tabs;
 
-export const Payment = () => (
-  <div>
+interface Props {
+  onSubmit?(cardValues: any): void;
+}
+
+export const Payment: React.FC<Props> = props => (
+  <React.Fragment>
     <Panel title="INVOICE">
       <Avatar size={64} icon="file-pdf" /> Download Invoice
     </Panel>
@@ -23,7 +27,7 @@ export const Payment = () => (
           }
           key="1"
         >
-          <CreditCardForm />
+          <CreditCardForm onSubmit={props.onSubmit} />
         </TabPane>
         <TabPane
           tab={
@@ -47,5 +51,5 @@ export const Payment = () => (
         </TabPane>
       </Tabs>
     </Panel>
-  </div>
+  </React.Fragment>
 );

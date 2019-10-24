@@ -86,7 +86,9 @@ export const App = () => {
 
       dispatch(fetchUsersAction());
       dispatch(fetchManuscriptAction());
-      dispatch(fetchInvoiceAction(invoiceId));
+      if (invoiceId) {
+        dispatch(fetchInvoiceAction(invoiceId));
+      }
     };
 
     startGraphqlServer();
@@ -107,9 +109,41 @@ export const App = () => {
         <Row>
           <Col span={12}>
             <Card>
-              <Route path="/" exact render={() => <IndexContainer />} />
-              <Route path="/billing-address" exact render={() => <BillingAddress />} />
-              <Route path="/invoice-payment" exact render={() => <Payment />} />
+              <Route
+                path="/"
+                exact
+                render={() => (
+                  <IndexContainer
+                    onSubmit={(step, payerValues) => {
+                      onChange(step);
+                      console.log("payer values ", payerValues);
+                    }}
+                  />
+                )}
+              />
+              <Route
+                path="/billing-address"
+                exact
+                render={() => (
+                  <BillingAddress
+                    onSubmit={(step, billingValues) => {
+                      onChange(step);
+                      console.log("billing values ", billingValues);
+                    }}
+                  />
+                )}
+              />
+              <Route
+                path="/invoice-payment"
+                exact
+                render={() => (
+                  <Payment
+                    onSubmit={cardValues => {
+                      console.log("CC values ", cardValues);
+                    }}
+                  />
+                )}
+              />
             </Card>
           </Col>
           <Col span={12}>

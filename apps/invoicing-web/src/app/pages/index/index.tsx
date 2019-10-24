@@ -6,8 +6,12 @@ import Input from "antd/es/input";
 import Button from "antd/es/button";
 
 // import styles from "./index.css";
+interface Props {
+  author?: any;
+  onSubmit?(step: number, formValues: any): void;
+}
 
-const PayerForm = props => {
+export const Index: React.FC<Props> = props => {
   const [author, setAuthor] = useState({ name: "", email: "", country: "" });
   const [values, setValues] = useState({
     confirmDirty: false,
@@ -23,11 +27,7 @@ const PayerForm = props => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // this.props.form.validateFieldsAndScroll((err, values) => {
-    //  if (!err) {
-    console.log("Received values of form: ", values);
-    //  }
-    // });
+    props.onSubmit(1, { ...values, ...author });
   };
 
   const onChange = useCallback(
@@ -112,7 +112,3 @@ const PayerForm = props => {
     </Form>
   );
 };
-
-const WrappedPayerForm = Form.create({ name: "billing_address_form" })(PayerForm);
-
-export const Index = WrappedPayerForm;

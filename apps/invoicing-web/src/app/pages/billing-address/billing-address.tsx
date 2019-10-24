@@ -1,18 +1,26 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import Form from "antd/es/form";
-import Icon from "antd/es/icon";
 import Input from "antd/es/input";
 import Button from "antd/es/button";
 
-const BillingAddressForm = () => {
-  const [values, setValues] = React.useState({
+interface Props {
+  onSubmit?(step: number, formValues: any): void;
+}
+
+export const BillingAddress: React.FC<Props> = props => {
+  const [values, setValues] = useState({
     street: "",
     zip: "",
     city: "",
     country: "",
   });
 
-  const handleChange = React.useCallback(
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    props.onSubmit(2, values);
+  };
+
+  const handleChange = useCallback(
     event => {
       const { name, value } = event.target;
       setValues(v => ({ ...v, [name]: value }));
@@ -20,47 +28,19 @@ const BillingAddressForm = () => {
     [setValues],
   );
 
-  const [focused, setFocus] = React.useState<any | undefined>(undefined);
-  const handleFocus = React.useCallback(event => setFocus(event.target.name as any), [setFocus]);
-  const handleBlur = React.useCallback(() => setFocus(undefined), [setFocus]);
-
-  const formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 8 },
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 16 },
-    },
-  };
-
-  const tailFormItemLayout = {
-    wrapperCol: {
-      xs: {
-        span: 24,
-        offset: 0,
-      },
-      sm: {
-        span: 16,
-        offset: 8,
-      },
-    },
-  };
-
   return (
-    <Form {...formItemLayout} style={{ marginTop: "30px" }}>
+    <Form {...formItemLayout} style={{ marginTop: "30px" }} onSubmit={handleSubmit}>
       <Form.Item label="Street Address">
-        <Input placeholder="street" name="street" value={values.street} />
+        <Input placeholder="street" name="street" value={values.street} onChange={handleChange} />
       </Form.Item>
       <Form.Item label="Zip Code">
-        <Input name="zip" value={values.zip} />
+        <Input name="zip" value={values.zip} onChange={handleChange} />
       </Form.Item>
       <Form.Item label="City">
-        <Input name="city" placeholder="City" value={values.city} />
+        <Input name="city" placeholder="City" value={values.city} onChange={handleChange} />
       </Form.Item>
       <Form.Item label="Country">
-        <Input name="country" value={values.country} />
+        <Input name="country" value={values.country} onChange={handleChange} />
       </Form.Item>
       <Form.Item {...tailFormItemLayout}>
         <Button type="primary" htmlType="submit">
@@ -71,6 +51,28 @@ const BillingAddressForm = () => {
   );
 };
 
-const WrappedBillingAddressForm = Form.create({ name: "billing_address_form" })(BillingAddressForm);
+// #region styles
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 8 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 16 },
+  },
+};
 
-export const BillingAddress = WrappedBillingAddressForm;
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0,
+    },
+    sm: {
+      span: 16,
+      offset: 8,
+    },
+  },
+};
+// #endregion
