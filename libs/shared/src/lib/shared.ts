@@ -37,8 +37,8 @@ export * from './modules/articles/mappers/ArticleMap';
 // export * from './modules/transactions/mappers/TransactionMap';
 
 // // * Export Invoice Subdomain
-// export * from './modules/invoices/domain/Invoice';
-// export * from './modules/invoices/domain/InvoiceId';
+export * from './modules/invoices/domain/Invoice';
+export * from './modules/invoices/domain/InvoiceId';
 // export * from './modules/invoices/domain/InvoiceItem';
 // export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
@@ -49,7 +49,7 @@ export * from './modules/invoices/domain/ManuscriptId';
 // export * from './modules/invoices/usecases/createInvoice/createInvoice';
 // // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
-// export * from './modules/invoices/mappers/InvoiceMap';
+export * from './modules/invoices/mappers/InvoiceMap';
 // export * from './modules/invoices/mappers/InvoiceItemMap';
 
 // export {

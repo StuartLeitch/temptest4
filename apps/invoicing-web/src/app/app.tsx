@@ -18,13 +18,14 @@ import Typography from "antd/es/typography";
 import { PaymentSteps } from "./components/payment-steps/payment-steps";
 // import CreditCardForm from "./components/credit-card-payment-form/credit-card-payment-form";
 
-import { appRedux, userRedux, manuscriptRedux } from "./state-management/redux";
+import { appRedux, userRedux, manuscriptRedux, invoiceRedux } from "./state-management/redux";
 
 import data from "./db";
 
 const { appInitAction } = appRedux;
 const { fetchUsersAction } = userRedux;
 const { fetchManuscriptAction } = manuscriptRedux;
+const { fetchInvoiceAction } = invoiceRedux;
 
 // * pages
 import { Index } from "./pages/index/index";
@@ -75,7 +76,6 @@ export const App = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const invoiceId = urlParams.get("invoiceId");
-    console.info(`Invoice ID = ${invoiceId}`);
     const startGraphqlServer = async () => {
       const server = JsonGraphqlServer({
         data,
@@ -85,6 +85,7 @@ export const App = () => {
 
       dispatch(fetchUsersAction());
       dispatch(fetchManuscriptAction());
+      dispatch(fetchInvoiceAction(invoiceId));
     };
 
     startGraphqlServer();
