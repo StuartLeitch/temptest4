@@ -27,7 +27,7 @@ export const createPaymentEpic = (
   return action$.pipe(
     ofType(CONSTANTS.CREATE_PAYMENT),
     map(() => selectPayer(state$.value)),
-    mergeMap(action =>
+    mergeMap(paymentInfo =>
       Axios.post(
         "http://localhost:3000/api/checkout",
         // JSON.stringify({
