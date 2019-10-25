@@ -12,10 +12,6 @@ export default {
     authorCountry: 'MD',
     authorSurname: 'Author Surname'
   }],
-  // comments: [
-  //   { id: 987, post_id: 1, body: "Consectetur adipiscing elit", date: new Date() },
-  //   { id: 995, post_id: 1, body: "Nam molestie pellentesque dui", date: new Date() },
-  // ],
   invoices: [
     {
       "id": 'invoice-1',
@@ -27,7 +23,7 @@ export default {
   ],
   invoiceItems: [{
     id: 'bc825b44-81a8-4d40-93f1-217ae56c762e',
-    invoiceId: '93c86e96-cc3d-49d7-957f-99a731bdc5e3',
+    invoiceId: 'invoice-1',
     manuscriptId: 'manuscript-id',
     type: 'APC',
     name: 'APC',

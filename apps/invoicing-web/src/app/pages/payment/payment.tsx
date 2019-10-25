@@ -22,8 +22,8 @@ client
     // hostedFields.create(/* ... */);
   });
 
-export const Payment = () => (
-  <div>
+export const Payment = props => (
+  <React.Fragment>
     <Panel title="INVOICE">
       <Avatar size={64} icon="file-pdf" /> Download Invoice
     </Panel>
@@ -37,7 +37,7 @@ export const Payment = () => (
           }
           key="1"
         >
-          <CreditCardForm />
+          <CreditCardForm onSubmit={props.onSubmit} />
         </TabPane>
         <TabPane
           tab={
@@ -61,5 +61,5 @@ export const Payment = () => (
         </TabPane>
       </Tabs>
     </Panel>
-  </div>
+  </React.Fragment>
 );

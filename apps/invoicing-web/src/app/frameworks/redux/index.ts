@@ -14,13 +14,14 @@ const { manuscript, fetchManuscriptEpic } = manuscriptRedux;
 const { app, initEpic } = appRedux;
 const { user, fetchUsersEpic } = userRedux;
 const { invoice, fetchInvoiceEpic } = invoiceRedux;
-const { payer } = payerRedux;
+const { payer, createPaymentEpic } = payerRedux;
 
 export const rootEpic = combineEpics(
   fetchManuscriptEpic,
   initEpic,
   fetchUsersEpic,
   fetchInvoiceEpic,
+  createPaymentEpic,
 );
 export const rootReducer = combineReducers({
   manuscript,
@@ -37,7 +38,7 @@ export const configureStore = () => {
   const epicMiddleware = createEpicMiddleware();
 
   middleware.push(epicMiddleware);
-  if (process.env.NODE_ENV !== "production") {
+  if (false && process.env.NODE_ENV !== "production") {
     middleware.push(createLogger());
   }
 

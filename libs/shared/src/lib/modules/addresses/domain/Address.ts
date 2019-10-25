@@ -7,10 +7,10 @@ import {Result} from '../../../core/logic/Result';
 import {AddressId} from './AddressId';
 
 interface AddressProps {
-  companyName: string;
+  companyName?: string;
   addressLine1: string;
-  addressLine2: string;
-  addressLine3: string;
+  addressLine2?: string;
+  addressLine3?: string;
   city: string;
   country: string;
   postalCode: string;
