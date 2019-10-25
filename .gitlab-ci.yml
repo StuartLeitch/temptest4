@@ -10,7 +10,7 @@ variables:
   BT_PRIVATE_KEY: 'test-private-key'
 
 services:
-  - docker:dind
+  - docker:18-dind
 
 stages:
   - setup
