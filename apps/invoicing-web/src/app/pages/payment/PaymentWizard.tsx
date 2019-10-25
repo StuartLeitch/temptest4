@@ -64,11 +64,13 @@ function usePaymentWizard() {
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
   const changeHandler = step => event => {
+    const v = event.target.value;
+    console.log(v);
     dispatch({
       type: CHANGE_VALUE,
       step,
       name: event.target.name,
-      value: event.target.value,
+      value: v,
     });
   };
 
@@ -92,7 +94,7 @@ const PaymentWizard = ({ author, createPayment, fetchInvoice, updatePayer }) => 
 
   useEffect(() => {
     fetchInvoice(invoiceId);
-  }, []);
+  }, [invoiceId]);
 
   useEffect(() => {
     setPayer(author);

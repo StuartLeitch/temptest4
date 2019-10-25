@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
+
+import Button from "antd/es/Button";
+import Card from "antd/es/Card";
 
 import { appRedux, userRedux, manuscriptRedux } from "./state-management/redux";
 
@@ -13,6 +16,15 @@ import PaymentWizard from "./pages/payment/PaymentWizard";
 
 // * app styles
 import "./app.scss";
+
+const InvoiceCard = () => {
+  const history = useHistory();
+  return (
+    <Card title="Invoice #1" style={{ width: "33%" }}>
+      <Button onClick={() => history.push(`/payment/invoice-1/payer`)}>Pay invoice</Button>
+    </Card>
+  );
+};
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -31,6 +43,8 @@ export const App = () => {
         </a>
         <h1>Payment Details</h1>
       </header>
+
+      <Route path="/" exact component={InvoiceCard} />
 
       <Route component={PaymentWizard} path="/payment/:invoiceId" />
     </div>
