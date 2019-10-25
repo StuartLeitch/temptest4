@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import Form, { FormComponentProps } from "antd/es/form";
 // import Icon from "antd/es/icon";
 import Input from "antd/es/input";
@@ -135,4 +135,3 @@ const creditCardItemLayout = {
     },
   },
 };
-// #endregion

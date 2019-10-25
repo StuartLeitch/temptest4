@@ -9,6 +9,10 @@ export interface UpdatePayerActionType extends ActionType {
   payer: Payer | null;
 }
 
+export interface PaymentDoneActionType extends ActionType {
+  payment: any | null;
+}
+
 // Action creators
 export const updatePayerAction = payer => ({
   type: CONSTANTS.UPDATE,

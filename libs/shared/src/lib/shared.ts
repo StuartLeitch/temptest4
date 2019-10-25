@@ -94,11 +94,11 @@ export {Payer} from './modules/payers/domain/Payer';
 // export {Roles} from './modules/users/domain/enums/Roles';
 
 // // * Export Payments Subdomain
-// export * from './modules/payments/domain/contracts/PaymentModel';
+export * from './modules/payments/domain/contracts/PaymentModel';
 export * from './modules/payments/domain/strategies/PaymentFactory';
 export * from './modules/payments/domain/strategies/PaymentStrategy';
 export * from './modules/payments/domain/strategies/CreditCardPayment';
-// export * from './modules/payments/domain/strategies/CreditCard';
+export * from './modules/payments/domain/strategies/CreditCard';
 
 // // * Export Coupon Subdomain
 // export * from './domain/reductions/ReductionFactory';
@@ -122,9 +122,9 @@ export * from './modules/users/mappers/UserMap';
 
 // Infra
 // export * from './infra/http/app';
-export {
-  BraintreeGateway
-} from './modules/payments/infrastructure/gateways/braintree/gateway';
+// export {
+//   BraintreeGateway
+// } from './modules/payments/infrastructure/gateways/braintree/gateway';
 // export * from './infrastructure/database/knex';
 
 // Redux Stuff
