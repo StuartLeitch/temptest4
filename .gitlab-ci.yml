@@ -107,7 +107,7 @@ build_code:
 package_images:
   interruptible: true
   stage: package
-  image: docker
+  image: docker:18
   before_script:
     - apk add --no-cache curl jq python py-pip
     - pip install awscli
@@ -128,7 +128,7 @@ package_images:
 
 deploy_dev:
   stage: deploy
-  image: docker
+  image: docker:18
   dependencies:
     - package_images
   when: manual
