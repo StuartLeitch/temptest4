@@ -25,7 +25,7 @@ const { appInitAction } = appRedux;
 const { fetchUsersAction } = userRedux;
 const { fetchManuscriptAction } = manuscriptRedux;
 const { fetchInvoiceAction } = invoiceRedux;
-const { updatePayerAction } = payerRedux;
+const { updatePayerAction, createPaymentAction } = payerRedux;
 
 // * pages
 import { IndexContainer } from "./pages/index/index-container";
@@ -45,8 +45,22 @@ export const App = () => {
   const onChange = (current: number) => {
     setCurrent(current);
     history.replace(routes[current]);
+  };
 
-    // dispatch(updatePayerAction(form));
+  const handleSubmit = (step: number, formData: any) => {
+    switch (step) {
+      case 1:
+        onChange(step);
+        dispatch(updatePayerAction(formData));
+        break;
+      case 2:
+        onChange(step);
+        dispatch(updatePayerAction({ billingAddress: formData }));
+        break;
+      default:
+        dispatch(updatePayerAction({ cardDetails: formData }));
+        dispatch(createPaymentAction());
+    }
   };
 
   useEffect(() => {
@@ -76,40 +90,16 @@ export const App = () => {
         <Row>
           <Col span={12}>
             <Card>
-              <Route
-                path="/"
-                exact
-                render={() => (
-                  <IndexContainer
-                    onSubmit={(step, payerValues) => {
-                      onChange(step);
-                      console.log("payer values ", payerValues);
-                    }}
-                  />
-                )}
-              />
+              <Route path="/" exact render={() => <IndexContainer onSubmit={handleSubmit} />} />
               <Route
                 path="/billing-address"
                 exact
-                render={() => (
-                  <BillingAddress
-                    onSubmit={(step, billingValues) => {
-                      onChange(step);
-                      console.log("billing values ", billingValues);
-                    }}
-                  />
-                )}
+                render={() => <BillingAddress onSubmit={handleSubmit} />}
               />
               <Route
                 path="/invoice-payment"
                 exact
-                render={() => (
-                  <Payment
-                    onSubmit={cardValues => {
-                      console.log("CC values ", cardValues);
-                    }}
-                  />
-                )}
+                render={() => <Payment onSubmit={handleSubmit} />}
               />
             </Card>
           </Col>
