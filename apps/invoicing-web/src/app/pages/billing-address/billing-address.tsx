@@ -1,46 +1,38 @@
-import React, { useState, useCallback } from "react";
+import React from "react";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
 import Button from "antd/es/button";
 
 interface Props {
-  onSubmit?(step: number, formValues: any): void;
+  billingAddress?: any;
+  onSubmit?(step: number, billingAddress: any): void;
+  onChange?(e: React.SyntheticEvent<HTMLElement>): void;
 }
 
-export const BillingAddress: React.FC<Props> = props => {
-  const [values, setValues] = useState({
-    street: "",
-    zip: "",
-    city: "",
-    country: "",
-  });
-
+export const BillingAddress: React.FC<Props> = ({ billingAddress, onChange, onSubmit }) => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    props.onSubmit(2, values);
+    onSubmit(2, billingAddress);
   };
-
-  const handleChange = useCallback(
-    event => {
-      const { name, value } = event.target;
-      setValues(v => ({ ...v, [name]: value }));
-    },
-    [setValues],
-  );
 
   return (
     <Form {...formItemLayout} style={{ marginTop: "30px" }} onSubmit={handleSubmit}>
       <Form.Item label="Street Address">
-        <Input placeholder="street" name="street" value={values.street} onChange={handleChange} />
+        <Input
+          name="address"
+          onChange={onChange}
+          placeholder="street"
+          value={billingAddress.address}
+        />
       </Form.Item>
       <Form.Item label="Zip Code">
-        <Input name="zip" value={values.zip} onChange={handleChange} />
+        <Input name="postalCode" value={billingAddress.postalCode} onChange={onChange} />
       </Form.Item>
       <Form.Item label="City">
-        <Input name="city" placeholder="City" value={values.city} onChange={handleChange} />
+        <Input name="city" placeholder="City" value={billingAddress.city} onChange={onChange} />
       </Form.Item>
       <Form.Item label="Country">
-        <Input name="country" value={values.country} onChange={handleChange} />
+        <Input name="country" value={billingAddress.country} onChange={onChange} />
       </Form.Item>
       <Form.Item {...tailFormItemLayout}>
         <Button type="primary" htmlType="submit">

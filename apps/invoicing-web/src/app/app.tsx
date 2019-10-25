@@ -1,76 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Route, useHistory } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Route, Switch } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-// * Antd components
-import Row from "antd/es/row";
-import Col from "antd/es/col";
-import Card from "antd/es/card";
-
-// * components
-import { PaymentSteps } from "./components/payment-steps/payment-steps";
-import { ManuscriptDetails } from "./components/manuscript-details/manuscript-details";
-import { InvoiceDetails } from "./components/invoice-details/invoice-details";
-import { Charges } from "./components/charges/charges";
-
-import {
-  appRedux,
-  userRedux,
-  manuscriptRedux,
-  invoiceRedux,
-  payerRedux,
-} from "./state-management/redux";
+import { appRedux, userRedux, manuscriptRedux } from "./state-management/redux";
 
 const { appInitAction } = appRedux;
 const { fetchUsersAction } = userRedux;
 const { fetchManuscriptAction } = manuscriptRedux;
-const { fetchInvoiceAction } = invoiceRedux;
-const { updatePayerAction, createPaymentAction } = payerRedux;
 
 // * pages
-import { IndexContainer } from "./pages/index/index-container";
-import { Payment } from "./pages/payment/payment";
-import { BillingAddress } from "./pages/billing-address/billing-address";
+import PaymentWizard from "./pages/payment/PaymentWizard";
 
 // * app styles
 import "./app.scss";
 
 export const App = () => {
-  const routes = ["/", "/billing-address", "/invoice-payment"];
-
-  const [current, setCurrent] = useState(0);
-  const history = useHistory();
   const dispatch = useDispatch();
 
-  const onChange = (current: number) => {
-    setCurrent(current);
-    history.replace(routes[current]);
-  };
-
-  const handleSubmit = (step: number, formData: any) => {
-    switch (step) {
-      case 1:
-        onChange(step);
-        dispatch(updatePayerAction(formData));
-        break;
-      case 2:
-        onChange(step);
-        dispatch(updatePayerAction({ billingAddress: formData }));
-        break;
-      default:
-        dispatch(updatePayerAction({ cardDetails: formData }));
-        dispatch(createPaymentAction());
-    }
-  };
-
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const invoiceId = urlParams.get("invoiceId");
-
-    if (invoiceId) {
-      dispatch(fetchInvoiceAction(invoiceId));
-    }
-
     dispatch(fetchUsersAction());
     dispatch(fetchManuscriptAction());
     dispatch(appInitAction());
@@ -84,34 +31,8 @@ export const App = () => {
         </a>
         <h1>Payment Details</h1>
       </header>
-      <main>
-        <PaymentSteps current={current} onChange={onChange} />
 
-        <Row>
-          <Col span={12}>
-            <Card>
-              <Route path="/" exact render={() => <IndexContainer onSubmit={handleSubmit} />} />
-              <Route
-                path="/billing-address"
-                exact
-                render={() => <BillingAddress onSubmit={handleSubmit} />}
-              />
-              <Route
-                path="/invoice-payment"
-                exact
-                render={() => <Payment onSubmit={handleSubmit} />}
-              />
-            </Card>
-          </Col>
-          <Col span={12}>
-            <Card>
-              <ManuscriptDetails title="ARTICLE DETAILS" />
-              <InvoiceDetails title="INVOICE DETAILS" />
-              <Charges title="CHARGES" />
-            </Card>
-          </Col>
-        </Row>
-      </main>
+      <Route component={PaymentWizard} path="/payment/:invoiceId" />
     </div>
   );
 };

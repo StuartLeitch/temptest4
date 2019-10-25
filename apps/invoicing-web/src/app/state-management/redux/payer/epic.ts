@@ -25,7 +25,7 @@ export const createPaymentEpic = (
   return action$.pipe(
     ofType(CONSTANTS.CREATE_PAYMENT),
     map(() => selectPayer(state$.value)),
-    mergeMap(action =>
+    mergeMap(paymentInfo =>
       Axios.post(
         "http://localhost:4200/graphql",
         JSON.stringify({
@@ -39,7 +39,7 @@ export const createPaymentEpic = (
         },
       ).pipe(
         map((response: any) => {
-          return createPaymentFulfilled(response.data.data);
+          return createPaymentFulfilled(paymentInfo);
         }),
       ),
     ),

@@ -1,38 +1,18 @@
 import React from "react";
-import Form, { FormComponentProps } from "antd/es/form";
-// import Icon from "antd/es/icon";
+import Form from "antd/es/form";
 import Input from "antd/es/input";
 import Button from "antd/es/button";
 import ReactCreditCard from "@repay/react-credit-card";
 
 type FOCUS_TYPE = "number" | "cvc" | "expiration" | "name";
 
-const styles: React.CSSProperties = {
-  padding: "40px",
-  margin: "40px",
-  display: "flex",
-  flexDirection: "column",
-};
-
 interface Props {
-  onSubmit?(v: any, cardValues: any): void;
+  onChange?: any;
+  cardDetails?: any;
+  onSubmit?(step: number, formValues: any): void;
 }
 
-const CreditCardForm: React.FC<Props> = props => {
-  const [values, setValues] = React.useState({
-    name: "",
-    number: "",
-    expiration: "",
-    cvc: "",
-  });
-  const handleChange = React.useCallback(
-    event => {
-      const { name, value } = event.target;
-      setValues(v => ({ ...v, [name]: value }));
-    },
-    [setValues],
-  );
-
+const CreditCardForm: React.FC<Props> = ({ cardDetails, onChange, onSubmit }) => {
   const [focused, setFocus] = React.useState<FOCUS_TYPE | undefined>(undefined);
   const handleFocus = React.useCallback(event => setFocus(event.target.name as FOCUS_TYPE), [
     setFocus,
@@ -41,50 +21,50 @@ const CreditCardForm: React.FC<Props> = props => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    props.onSubmit(undefined, values);
+    onSubmit(undefined, cardDetails);
   };
 
   return (
     <Form {...formItemLayout} onSubmit={handleSubmit}>
       <Form.Item {...creditCardItemLayout}>
-        <ReactCreditCard {...values} focused={focused} />
+        <ReactCreditCard {...cardDetails} focused={focused} />
       </Form.Item>
       <Form.Item label="Name on card">
         <Input
           placeholder="name"
           name="name"
-          onChange={handleChange}
+          onChange={onChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          value={values.name}
+          value={cardDetails.name}
         />
       </Form.Item>
       <Form.Item label="Card number">
         <Input
           name="number"
-          onChange={handleChange}
+          onChange={onChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          value={values.number}
+          value={cardDetails.number}
         />
       </Form.Item>
       <Form.Item label="Expiration Date">
         <Input
           name="expiration"
           placeholder="MM/YY"
-          onChange={handleChange}
+          onChange={onChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          value={values.expiration}
+          value={cardDetails.expiration}
         />
       </Form.Item>
       <Form.Item label="CVC">
         <Input
           name="cvc"
-          onChange={handleChange}
+          onChange={onChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          value={values.cvc}
+          value={cardDetails.cvc}
         />
       </Form.Item>
       <Form.Item {...tailFormItemLayout}>

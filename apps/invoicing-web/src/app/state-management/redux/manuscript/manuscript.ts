@@ -22,6 +22,7 @@ export const selectAuthor = createSelector(
     if (!manuscript) {
       return null;
     } else {
+      console.log("WAAI", manuscript);
       return {
         name: manuscript.authorSurname,
         email: manuscript.authorEmail,

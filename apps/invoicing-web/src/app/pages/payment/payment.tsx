@@ -37,7 +37,11 @@ export const Payment = props => (
           }
           key="1"
         >
-          <CreditCardForm onSubmit={props.onSubmit} />
+          <CreditCardForm
+            onSubmit={props.onSubmit}
+            onChange={props.onChange}
+            cardDetails={props.cardDetails}
+          />
         </TabPane>
         <TabPane
           tab={
