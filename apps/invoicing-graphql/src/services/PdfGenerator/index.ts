@@ -1,7 +1,7 @@
-import { PdfGeneratorService } from './PdfGenerator';
+// import { PdfGeneratorService } from './PdfGenerator';
 
-export { PdfGeneratorService };
+// export { PdfGeneratorService };
 
-export const pdfGeneratorService = new PdfGeneratorService();
+// export const pdfGeneratorService = new PdfGeneratorService();
 
-pdfGeneratorService.addTemplate('invoice', 'invoice.ejs');
+// pdfGeneratorService.addTemplate('invoice', 'invoice.ejs');
