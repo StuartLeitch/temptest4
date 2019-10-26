@@ -19,9 +19,33 @@ stages:
   - package
   - deploy
 
+Fusion:
+  interruptible: true
+  stage: setup
+  script:
+    # fetches the latest image (not failing if image is not found)
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    # builds the project, passing proxy variables, and vcs vars for LABEL
+    # notice the cache-from, which is going to use the image we just pulled locally
+    # the built image is tagged locally with the commit SHA, and then pushed to
+    # the GitLab registry
+    - >
+      docker build
+      --pull
+      --build-arg VCS_REF=$CI_COMMIT_SHA
+      --build-arg VCS_URL=$CI_PROJECT_URL
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
 install:
   interruptible: true
   stage: setup
+  variables:
+    # We are just playing with Docker here.
+    # We do not need GitLab to clone the source code.
+    GIT_STRATEGY: none
   artifacts:
     paths:
       - node_modules/
@@ -141,4 +165,3 @@ deploy_dev:
   script:
     - aws elasticbeanstalk update-environment --environment-name invoicing-web-dev --version-label invoicing-web-dev
     - aws elasticbeanstalk update-environment --environment-name invoicing-graphql-dev --version-label invoicing-graphql-dev
-
