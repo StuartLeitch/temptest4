@@ -27,14 +27,17 @@ stages:
   #- package
   #- deploy
 
+Info:
+  interruptible: true
+  stage: setup
+  script:
+    - npm version
+    - env
+
 Setup:
   interruptible: true
   stage: setup
   script:
-    - echo $CI_REGISTRY_IMAGE
-    - echo $CI_PROJECT_URL
-    - echo $CI_COMMIT_SHA
-    - echo $CI_JOB_TOKEN
     # fetches the latest image (not failing if image is not found)
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     # builds the project, passing proxy variables, and vcs vars for LABEL
@@ -62,13 +65,6 @@ Setup:
 #       - node_modules/
 #   script:
 #     - npm ci
-
-# info:
-#   interruptible: true
-#   stage: setup
-#   script:
-#     - npm version
-#     - env
 
 # test:
 #   interruptible: true
