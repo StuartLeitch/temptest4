@@ -1,5 +1,5 @@
 default:
-  image: node:12-alpine
+  image: docker:latest
 
 variables:
   REGION: 'eu-west-1'
@@ -28,10 +28,10 @@ Setup:
   interruptible: true
   stage: setup
   script:
-    - echo -n $CI_REGISTRY_IMAGE
-    - echo -n $CI_PROJECT_URL
-    - echo -n $CI_COMMIT_SHA
-    - echo -n $CI_JOB_TOKEN
+    - echo $CI_REGISTRY_IMAGE
+    - echo $CI_PROJECT_URL
+    - echo $CI_COMMIT_SHA
+    - echo $CI_JOB_TOKEN
     # fetches the latest image (not failing if image is not found)
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     # builds the project, passing proxy variables, and vcs vars for LABEL
