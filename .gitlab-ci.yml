@@ -27,13 +27,6 @@ stages:
   #- package
   #- deploy
 
-Info:
-  interruptible: true
-  stage: setup
-  script:
-    - npm version
-    - env
-
 Setup:
   interruptible: true
   stage: setup
@@ -65,6 +58,13 @@ Setup:
 #       - node_modules/
 #   script:
 #     - npm ci
+
+# Info:
+#   interruptible: true
+#   stage: setup
+#   script:
+#     - npm version
+#     - env
 
 # test:
 #   interruptible: true
