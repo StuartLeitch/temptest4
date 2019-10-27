@@ -9,8 +9,8 @@ variables:
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
 
-# services:
-#   - docker:18-dind
+services:
+  - docker:18-dind
 
 stages:
   - setup
