@@ -19,6 +19,11 @@ stages:
   #- package
   #- deploy
 
+before_script:
+  # docker login asks for the password to be passed through stdin for security
+  # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
+  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
 Setup:
   interruptible: true
   stage: setup
@@ -27,20 +32,20 @@ Setup:
     - echo $CI_PROJECT_URL
     - echo $CI_COMMIT_SHA
     # fetches the latest image (not failing if image is not found)
-    # - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
     # builds the project, passing proxy variables, and vcs vars for LABEL
     # notice the cache-from, which is going to use the image we just pulled locally
     # the built image is tagged locally with the commit SHA, and then pushed to
     # the GitLab registry
-    # - >
-    #   docker build
-    #   --pull
-    #   --build-arg VCS_REF=$CI_COMMIT_SHA
-    #   --build-arg VCS_URL=$CI_PROJECT_URL
-    #   --cache-from $CI_REGISTRY_IMAGE:latest
-    #   --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    #   .
-    # - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - >
+      docker build
+      --pull
+      --build-arg VCS_REF=$CI_COMMIT_SHA
+      --build-arg VCS_URL=$CI_PROJECT_URL
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 # install:
 #   interruptible: true
 #   stage: setup
