@@ -5,6 +5,7 @@ WORKDIR /
 
 # Install app dependencies
 COPY package.json .
+COPY package-lock.json .
 RUN npm ci
 
 # Bundle app source
