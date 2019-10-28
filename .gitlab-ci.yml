@@ -1,5 +1,5 @@
 # do not use "latest" here, if you want this to work in the future
-image: node:latest
+image: docker:$DOCKER_VERSION
 
 stages:
   - setup
@@ -7,6 +7,9 @@ stages:
   #- build
   #- package
   #- deploy
+
+setup:
+  image: node:latest
 
 variables:
   DOCKER_TLS_CERTDIR: '/certs'
