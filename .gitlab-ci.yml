@@ -8,9 +8,6 @@ stages:
   #- package
   #- deploy
 
-setup:
-  image: node:latest
-
 variables:
   DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_DRIVER: overlay2
@@ -32,6 +29,7 @@ before_script:
 
 Install_Dependencies:
   stage: setup
+  image: node:latest
   cache:
     key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
     paths:
