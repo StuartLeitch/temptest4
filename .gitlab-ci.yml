@@ -27,7 +27,7 @@ before_script:
   # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
   - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
-Install_Dependencies:
+Install Dependencies:
   stage: setup
   image: node:latest
   cache:
