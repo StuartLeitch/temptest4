@@ -1,5 +1,5 @@
 # do not use "latest" here, if you want this to work in the future
-image: docker:$DOCKER_VERSION
+image: lts-alpine
 
 stages:
   - setup
@@ -27,7 +27,7 @@ before_script:
   # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
   - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
-Install Dependencies:
+Install_Dependencies:
   stage: setup
   cache:
     key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
