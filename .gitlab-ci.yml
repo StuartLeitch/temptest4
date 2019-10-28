@@ -37,7 +37,7 @@ Install Dependencies:
   script:
     # - npm version
     # - env
-    - npm ci --only=production
+    # - npm ci --only=production
     - >
       echo 'Fetching Base Commit from Deploy Cache'
       if [[ ! -f dist/last-deploy.txt ]]; then mkdir dist && git rev-parse HEAD~1 > dist/last-deploy.txt; fi
