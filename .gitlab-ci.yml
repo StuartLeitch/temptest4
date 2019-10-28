@@ -114,7 +114,7 @@ Build:
       - node_modules/
     policy: pull
   script:
-    - ls -al
+    - ls -al ./node_modules/.bin
     - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
   dependencies:
     - Install Dependencies
