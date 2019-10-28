@@ -20,15 +20,16 @@ default:
     - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 stages:
-  - setup
+  - cache
+  - push
   #- test
   #- build
   #- package
   #- deploy
 
-Setup Environment Variables:
+Cache:
   interruptible: true
-  stage: setup
+  stage: cache
   script:
     # fetches the latest image (not failing if image is not found)
     - docker pull $CI_REGISTRY_IMAGE:latest || true
@@ -45,6 +46,40 @@ Setup Environment Variables:
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
       .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+# Here, the goal is to tag the "develop" branch as "latest"
+Push latest:
+  variables:
+    # We are just playing with Docker here.
+    # We do not need GitLab to clone the source code.
+    GIT_STRATEGY: none
+  stage: push
+  only:
+    # Only "develop" should be tagged "latest"
+    - develop
+  script:
+    # Because we have no guarantee that this job will be picked up by the same runner
+    # that built the image in the previous step, we pull it again locally
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    # Then we tag it "latest"
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    # Annnd we push it.
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+# Finally, the goal here is to Docker tag any Git tag
+# GitLab will start a new pipeline every time a Git tag is created, which is pretty awesome
+Push tag:
+  variables:
+    # Again, we do not need the source code here. Just playing with Docker.
+    GIT_STRATEGY: none
+  stage: push
+  only:
+    # We want this job to be run on tags only.
+    - tags
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 # install:
 #   interruptible: true
 #   stage: setup
