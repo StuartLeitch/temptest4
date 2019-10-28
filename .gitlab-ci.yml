@@ -37,7 +37,7 @@ Install Dependencies:
       - node_modules/
   script:
     # - npm version
-    # - env
+    - env
     # - npm ci --only=production
     - ./scripts/affected.sh
 
