@@ -4,7 +4,7 @@ image: docker:$DOCKER_VERSION
 stages:
   - setup
   #- test
-  #- build
+  - build
   #- package
   #- deploy
 
@@ -38,31 +38,11 @@ Install Dependencies:
   script:
     # - npm version
     - export AFFECTED_ARGS=$(./scripts/affected.sh)
-    - env
+    # - env
     # - npm ci --only=production
-
   only:
     changes:
       - package-lock.json
-# install:
-#   interruptible: true
-#   stage: setup
-#   variables:
-#     # We are just playing with Docker here.
-#     # We do not need GitLab to clone the source code.
-#     GIT_STRATEGY: none
-#   artifacts:
-#     paths:
-#       - node_modules/
-#   script:
-#     - npm ci
-
-# Info:
-#   interruptible: true
-#   stage: setup
-#   script:
-#     - npm version
-#     - env
 # test:
 #   interruptible: true
 #   allow_failure: true
@@ -92,15 +72,15 @@ Install Dependencies:
 #   dependencies:
 #     - install
 
-# # lint:
-# #   interruptible: true
-# #   stage: test
-# #   script:
-# #     - npm run nx -- lint shared
-# #     - npm run nx -- lint react-components
-# #     - npm run nx -- lint invoicing-graphql
-# #   only:
-# #     - monorepo-nx
+# lint:
+#   interruptible: true
+#   stage: test
+#   script:
+#     - npm run nx -- lint shared
+#     - npm run nx -- lint react-components
+#     - npm run nx -- lint invoicing-graphql
+#   only:
+#     - monorepo-nx
 
 # pages:
 #   interruptible: true
@@ -117,21 +97,23 @@ Install Dependencies:
 #   only:
 #     - develop
 
-# build_code:
-#   interruptible: true
-#   stage: build
-#   script:
-#     - npm run nx -- build invoicing-web --prod
-#     - npm run nx -- build invoicing-graphql --prod
-#   dependencies:
-#     - install
-#   artifacts:
-#     paths:
-#       - apps/invoicing-web/dist
-#       - apps/invoicing-graphql/dist
-#   only:
-#     - develop
-
+Build:
+  interruptible: true
+  stage: build
+  cache:
+    key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
+    paths:
+      - node_modules/
+    policy: pull
+  script:
+    - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
+  dependencies:
+    - setup
+  artifacts:
+    paths:
+      - apps/*/dist
+  only:
+    - develop
 # package_images:
 #   interruptible: true
 #   stage: package
