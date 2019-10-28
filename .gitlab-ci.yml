@@ -22,6 +22,7 @@ default:
 stages:
   - cache
   - push
+  - setup
   #- test
   #- build
   #- package
@@ -80,6 +81,20 @@ Push tag:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+
+Setup Env Vars:
+  stage: setup
+  script:
+    - >
+      echo 'Fetching Base Commit from Deploy Cache'
+      if [[ ! -f dist/last-deploy.txt ]]
+      then
+        mkdir dist && git rev-parse HEAD~1 > dist/last-deploy.txt
+      fi
+      echo 'export AFFECTED_ARGS="--base $(cat dist/last-deploy.txt)"' >> $BASH_ENV
+      source $BASH_ENV
+      echo $AFFECTED_ARGS
+
 # install:
 #   interruptible: true
 #   stage: setup
