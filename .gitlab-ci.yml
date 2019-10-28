@@ -27,17 +27,6 @@ before_script:
   # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
   # - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
-# aliases must be defined before they used
-.script-1: &script-1 |
-  # This is a shell multi-line script to be included
-  echo 'Fetching Base Commit from Deploy Cache'
-  if [[ ! -f dist/last-deploy.txt ]] then
-    mkdir dist && git rev-parse HEAD~1 > dist/last-deploy.txt
-  fi
-  echo 'export AFFECTED_ARGS="--base $(cat dist/last-deploy.txt)"' >> $BASH_ENV
-  source $BASH_ENV
-  echo $AFFECTED_ARGS
-
 Install Dependencies:
   stage: setup
   image: node:latest
@@ -48,8 +37,13 @@ Install Dependencies:
   script:
     # - npm version
     # - env
-    # - npm ci --only=production
-    - *script-1
+    - npm ci --only=production
+    - >
+      echo 'Fetching Base Commit from Deploy Cache'
+      if [[ ! -f dist/last-deploy.txt ]]; then mkdir dist && git rev-parse HEAD~1 > dist/last-deploy.txt; fi
+      echo 'export AFFECTED_ARGS="--base $(cat dist/last-deploy.txt)"' >> $BASH_ENV
+      source $BASH_ENV
+      echo $AFFECTED_ARGS
   only:
     changes:
       - package-lock.json
