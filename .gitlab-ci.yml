@@ -35,11 +35,12 @@ Install_Dependencies:
     paths:
       - node_modules/
   script:
+    - npm version
+    - env
     - npm ci --only=production
   only:
     changes:
       - package-lock.json
-
 # Setup Env Vars:
 #   stage: setup
 #   script:
@@ -66,12 +67,12 @@ Install_Dependencies:
 #   script:
 #     - npm ci
 
-Info:
-  interruptible: true
-  stage: setup
-  script:
-    - npm version
-    - env
+# Info:
+#   interruptible: true
+#   stage: setup
+#   script:
+#     - npm version
+#     - env
 # test:
 #   interruptible: true
 #   allow_failure: true
