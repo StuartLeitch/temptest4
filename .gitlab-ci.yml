@@ -9,6 +9,7 @@ stages:
   #- deploy
 
 variables:
+  AFFECTED: ''
   DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_DRIVER: overlay2
   DOCKER_VERSION: 18.09.0
@@ -36,9 +37,9 @@ Install Dependencies:
       - node_modules/
   script:
     # - npm version
+    - export AFFECTED_ARGS=$(./scripts/affected.sh)
     - env
     # - npm ci --only=production
-    - ./scripts/affected.sh
 
   only:
     changes:
