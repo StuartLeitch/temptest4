@@ -38,14 +38,6 @@ Install Dependencies:
     # - npm version
     # - env
     - npm ci --only=production
-    - git rev-parse HEAD~1
-  only:
-    changes:
-      - package-lock.json
-
-Setup Env Vars:
-  stage: setup
-  script:
     - >
       echo 'Fetching Base Commit from Deploy Cache'
       if [[ ! -f dist/last-deploy.txt ]]
@@ -55,7 +47,9 @@ Setup Env Vars:
       echo 'export AFFECTED_ARGS="--base $(cat dist/last-deploy.txt)"' >> $BASH_ENV
       source $BASH_ENV
       echo $AFFECTED_ARGS
-
+  only:
+    changes:
+      - package-lock.json
 # install:
 #   interruptible: true
 #   stage: setup
