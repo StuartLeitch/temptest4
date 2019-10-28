@@ -9,6 +9,7 @@ stages:
   #- deploy
 
 variables:
+  BASH_ENV: ''
   DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_DRIVER: overlay2
   DOCKER_VERSION: 18.09.0
