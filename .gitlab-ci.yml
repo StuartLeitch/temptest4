@@ -1,5 +1,5 @@
 # do not use "latest" here, if you want this to work in the future
-image: lts-alpine
+image: node:latest
 
 stages:
   - setup
