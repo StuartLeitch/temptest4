@@ -108,7 +108,7 @@ Build:
   script:
     - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
   dependencies:
-    - setup
+    - Install Dependencies
   artifacts:
     paths:
       - apps/*/dist
