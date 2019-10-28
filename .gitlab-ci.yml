@@ -37,12 +37,19 @@ Install Dependencies:
       - node_modules/
   script:
     # - npm version
-    - export AFFECTED_ARGS=$(./scripts/affected.sh)
+    # - export AFFECTED_ARGS=$(./scripts/affected.sh)
     # - env
-    # - npm ci --only=production
+    - npm ci --only=production
   only:
     changes:
       - package-lock.json
+
+Identify Affected:
+  stage: setup
+  image: node:latest
+  script:
+    - export AFFECTED_ARGS=$(./scripts/affected.sh)
+
 # test:
 #   interruptible: true
 #   allow_failure: true
