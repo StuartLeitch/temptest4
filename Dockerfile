@@ -9,14 +9,20 @@ WORKDIR /cache/
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json .
+COPY package*.json /cache/
 # Uncomment below if you're using .npmrc
 # COPY .npmrc .
 
 RUN npm prune
 RUN npm ci --only=production
 
-# Bundle app source
+# STAGE 2 - Builder
+FROM node:10-alpine
+WORKDIR /root/
+
+COPY --from=node_cache /cache/ .
+
+# Bundle app source (copy source file, and possibly invalidate so we have to rebuild)
 COPY apps ./apps
 COPY libs ./libs
 
