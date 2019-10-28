@@ -126,6 +126,7 @@ export * from './modules/users/mappers/UserMap';
 //   BraintreeGateway
 // } from './modules/payments/infrastructure/gateways/braintree/gateway';
 // export * from './infrastructure/database/knex';
+export {Emailer} from './infrastructure/communication-channels';
 
 // Redux Stuff
 // export * from './infrastructure/frameworks/redux';

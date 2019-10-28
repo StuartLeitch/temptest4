@@ -3,10 +3,13 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import JsonGraphqlServer from "json-graphql-server";
+import config from "config";
 
 import { configureStore } from "./app/frameworks/redux";
 import App from "./app/app";
 import data from "./app/db";
+
+console.log("client cfg -> ", config);
 
 const server = JsonGraphqlServer({
   data,

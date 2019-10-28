@@ -20,11 +20,15 @@ import {Logger} from './lib/logger';
 import {winstonLoader} from './loaders/winston';
 import {expressLoader} from './loaders/express';
 import {iocLoader} from './loaders/ioc';
-// import {graphqlLoader} from './loaders/graphql';
+import {graphqlLoader} from './loaders/graphql';
 import {swaggerLoader} from './loaders/swagger';
 import {publicLoader} from './loaders/public';
 import {monitorLoader} from './loaders/monitor';
 import {homeLoader} from './loaders/home';
+
+import config from 'config';
+
+console.log('cfg ->', config);
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
