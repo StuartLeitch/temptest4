@@ -15,7 +15,6 @@ default:
   services:
     - docker:$DOCKER_VERSION-dind
   before_script:
-    - docker info
     # docker login asks for the password to be passed through stdin for security
     # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
     - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
@@ -27,7 +26,7 @@ stages:
   #- package
   #- deploy
 
-Setup:
+Setup Environment Variables:
   interruptible: true
   stage: setup
   script:
