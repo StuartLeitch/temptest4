@@ -29,7 +29,7 @@ before_script:
 
 Install Dependencies:
   stage: setup
-  # image: node:latest
+  image: node:latest
   cache:
     key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
     paths:
