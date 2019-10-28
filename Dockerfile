@@ -9,7 +9,8 @@ COPY package-lock.json .
 RUN npm ci
 
 # Bundle app source
-COPY src ./src
+COPY apps ./apps
+COPY libs ./libs
 
 # EXPOSE ${PORT:-3000}
 # CMD [ "node", "src/main.js" ]
