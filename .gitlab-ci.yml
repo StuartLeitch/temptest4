@@ -38,6 +38,7 @@ Install_Dependencies:
     - npm version
     - env
     - npm ci --only=production
+    - git rev-parse HEAD~1
   only:
     changes:
       - package-lock.json
