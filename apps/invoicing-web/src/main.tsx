@@ -9,8 +9,6 @@ import { configureStore } from "./app/frameworks/redux";
 import App from "./app/app";
 import data from "./app/db";
 
-console.log("client cfg -> ", config);
-
 const server = JsonGraphqlServer({
   data,
   url: "http://localhost:4200/graphql",
