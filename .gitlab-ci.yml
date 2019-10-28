@@ -107,6 +107,7 @@ Identify Affected:
 Build:
   interruptible: true
   stage: build
+  image: node:latest
   cache:
     key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
     paths:
