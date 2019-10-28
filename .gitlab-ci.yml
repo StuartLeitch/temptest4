@@ -39,7 +39,7 @@ Install Dependencies:
     # - npm version
     # - export AFFECTED_ARGS=$(./scripts/affected.sh)
     # - env
-    - npm ci --only=production
+    - npm ci
   only:
     changes:
       - package-lock.json
