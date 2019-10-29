@@ -5,11 +5,13 @@ stages:
   - setup
   #- test
   - build
-  #- package
+  - package
   #- deploy
 
 variables:
   AFFECTED_ARGS: '--base=origin/develop'
+  AFFECTED_APPS: ''
+  AFFECTED_LIBS: ''
   DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_DRIVER: overlay2
   DOCKER_VERSION: 18.09.0
@@ -37,7 +39,6 @@ Install Dependencies:
       - node_modules/
   script:
     # - npm version
-    # - export AFFECTED_ARGS=$(./scripts/affected.sh)
     # - env
     - npm ci
   only:
@@ -48,7 +49,9 @@ Identify Affected:
   stage: setup
   image: node:latest
   script:
-    - export AFFECTED_ARGS=$(./scripts/affected.sh)
+    - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
+    - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
+    - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
 
 # test:
 #   interruptible: true
@@ -119,43 +122,36 @@ Build:
     - Install Dependencies
   artifacts:
     paths:
-      - apps/*/dist
+      - dist
   only:
     - develop
-# package_images:
-#   interruptible: true
-#   stage: package
-#   image: docker:18
-#   before_script:
-#     - apk add --no-cache curl jq python py-pip
-#     - pip install awscli
-#     - $(aws ecr get-login --no-include-email --region "${REGION}")
-#   script:
-#     - docker build -t $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA apps/invoicing-web
-#     - docker push $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA
-#     - docker build -t $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA apps/invoicing-graphql
-#     - docker push $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA
-#     - docker tag $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-graphql:dev
-#     - docker tag $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-web:dev
-#     - docker push $AWS_REGISTRY/invoicing-graphql:dev
-#     - docker push $AWS_REGISTRY/invoicing-web:dev
-#   dependencies:
-#     - build_code
-#   only:
-#     - develop
 
-# deploy_dev:
-#   stage: deploy
-#   image: docker:18
-#   dependencies:
-#     - package_images
-#   when: manual
-#   only:
-#     - develop
-#   before_script:
-#     - apk add --no-cache curl jq python py-pip
-#     - pip install awscli
-#     - $(aws ecr get-login --no-include-email --region "${REGION}")
-#   script:
-#     - aws elasticbeanstalk update-environment --environment-name invoicing-web-dev --version-label invoicing-web-dev
-#     - aws elasticbeanstalk update-environment --environment-name invoicing-graphql-dev --version-label invoicing-graphql-dev
+Package Images:
+  interruptible: true
+  stage: package
+  image: docker:$DOCKER_VERSION
+  before_script:
+    - apk add --no-cache curl jq python py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+  script:
+    - ./tools/scripts/dockerize.sh
+  dependencies:
+    - Build
+  only:
+    - develop
+
+Deploy to Dev:
+  stage: deploy
+  image: docker:$DOCKER_VERSION
+  dependencies:
+    - Package Images
+  when: manual
+  only:
+    - develop
+  before_script:
+    - apk add --no-cache curl jq python py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+  script:
+    - ./tools/scripts/deploy.sh

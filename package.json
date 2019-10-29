@@ -6,6 +6,7 @@
     "phenom": "bin/phenom"
   },
   "scripts": {
+    "deploy": "ts-node --skip-project tools/scripts/deploy",
     "nx": "nx",
     "start": "nx serve",
     "build": "nx build",

@@ -11,7 +11,7 @@
         "build": {
           "builder": "@nrwl/node:build",
           "options": {
-            "outputPath": "apps/invoicing-graphql/dist",
+            "outputPath": "dist/apps/invoicing-graphql",
             "main": "apps/invoicing-graphql/src/main.ts",
             "tsConfig": "apps/invoicing-graphql/tsconfig.app.json",
             "assets": ["apps/invoicing-graphql/src/assets"],
@@ -121,7 +121,7 @@
         "build": {
           "builder": "@nrwl/web:build",
           "options": {
-            "outputPath": "apps/invoicing-web/dist",
+            "outputPath": "dist/apps/invoicing-web",
             "index": "apps/invoicing-web/src/index.html",
             "main": "apps/invoicing-web/src/main.tsx",
             "polyfills": "apps/invoicing-web/src/polyfills.ts",
