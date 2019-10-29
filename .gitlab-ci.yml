@@ -9,7 +9,7 @@ stages:
   - deploy
 
 variables:
-  AFFECTED_ARGS: '--base=origin/develop'
+  AFFECTED_ARGS: '--base=remotes/origin/develop'
   AFFECTED_APPS: ''
   AFFECTED_LIBS: ''
   DOCKER_TLS_CERTDIR: '/certs'
