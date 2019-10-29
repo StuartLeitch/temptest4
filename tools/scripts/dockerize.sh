@@ -1,3 +1,6 @@
+echo $AFFECTED_APPS
+echo $AFFECTED_LIBS
+
 for APP in $AFFECTED_APPS
 do
   # BUILD="$(basename -- $dir)"
