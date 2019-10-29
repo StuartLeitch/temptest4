@@ -141,6 +141,7 @@ Package Images:
     - pip install awscli
     - $(aws ecr get-login --no-include-email --region "${REGION}")
   script:
+    - env
     - ./tools/scripts/dockerize.sh
   dependencies:
     - Build
