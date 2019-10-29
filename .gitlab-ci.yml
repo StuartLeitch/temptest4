@@ -120,8 +120,8 @@ Build:
       - node_modules/
     policy: pull
   script:
-    - npm run affected:apps -- --plain
-    - npm run affected:libs -- --plain
+    - npm run affected:apps -- --base=remotes/origin/develop --plain
+    - npm run affected:libs -- --base=remotes/origin/develop --plain
     - export AFFECTED_APPS=$(npm run affected:apps -- --plain 2>&1 | (head -n1 && tail -n1))
     - export AFFECTED_LIBS=$(npm run affected:libs -- --plain 2>&1 | (head -n1 && tail -n1))
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
