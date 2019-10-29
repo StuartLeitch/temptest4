@@ -20,7 +20,7 @@ export class CheckoutController {
 
   @Get()
   public hello(): Promise<any> {
-    return Promise.resolve({ddddddd: 'Hello World!'});
+    return Promise.resolve({bbbbb: 'Hello World!'});
   }
 
   @Post()

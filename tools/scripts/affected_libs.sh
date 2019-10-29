@@ -1,3 +1,3 @@
-affected_libs=$(npm run affected:libs -- --base=remotes/origin/develop --plain 2>&1 | (head -n1 && tail -n1))
+affected_libs=$(npm run affected:libs -- ${AFFECTED_APPS} --plain 2>&1 | tail -1)
 
-echo $affected_libs;
+echo ($(echo $affected_libs | tr " "));
