@@ -14,7 +14,10 @@
             "outputPath": "dist/apps/invoicing-graphql",
             "main": "apps/invoicing-graphql/src/main.ts",
             "tsConfig": "apps/invoicing-graphql/tsconfig.app.json",
-            "assets": ["apps/invoicing-graphql/src/assets"],
+            "assets": [
+              "apps/invoicing-graphql/src/assets",
+              "apps/invoicing-graphql/src/Dockerfile"
+            ],
             "webpackConfig": "apps/invoicing-graphql/webpack.config.js"
           },
           "configurations": {

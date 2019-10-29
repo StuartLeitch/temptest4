@@ -1,9 +1,6 @@
-echo $AFFECTED_APPS
-echo $AFFECTED_LIBS
-
 for APP in $AFFECTED_APPS
 do
-  # BUILD="$(basename -- $dir)"
+  cp .env dist/apps/$APP/.env
   echo "Build Docker image for application '${APP}' using dist files from 'dist/apps/${APP}'"
   docker build -t $AWS_REGISTRY/$APP:$CI_COMMIT_SHA dist/apps/$APP
   echo "Pushed image to ${AWS_REGISTRY}/${APP}:${CI_COMMIT_SHA}"

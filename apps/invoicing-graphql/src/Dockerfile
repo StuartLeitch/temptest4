@@ -1,5 +1,5 @@
 FROM node:12-alpine
 
-COPY dist/main.js /main.js
+COPY dist/apps/invoicing-graphql ./
 
 CMD ["node", "main.js"]

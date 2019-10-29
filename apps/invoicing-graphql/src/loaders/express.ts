@@ -11,7 +11,7 @@ import {environment} from '../environments/environment';
 
 import {CheckoutController} from '../api/controllers/checkoutController';
 
-import {MailController} from '../api/controllers/mailingController';
+// import {MailController} from '../api/controllers/__mailing__Controller__';
 
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -32,7 +32,7 @@ export const expressLoader: MicroframeworkLoader = (
        * We can add options about how routing-controllers should configure itself.
        * Here we specify what controllers should be registered in our express server.
        */
-      controllers: [CheckoutController, MailController]
+      controllers: [CheckoutController/* , MailController*/]
       // controllers: environment.app.dirs.controllers
       // middlewares: environment.app.dirs.middlewares,
       // interceptors: environment.app.dirs.interceptors
