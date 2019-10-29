@@ -1,62 +1,6 @@
 {
   "version": 1,
   "projects": {
-    "invoicing-cli": {
-      "root": "apps/invoicing-cli",
-      "sourceRoot": "apps/invoicing-cli/src",
-      "projectType": "application",
-      "prefix": "invoicing-cli",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "outputPath": "dist/apps/invoicing-cli",
-            "main": "apps/invoicing-cli/src/main.ts",
-            "tsConfig": "apps/invoicing-cli/tsconfig.app.json",
-            "assets": ["apps/invoicing-cli/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/invoicing-cli/src/environments/environment.ts",
-                  "with": "apps/invoicing-cli/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "builder": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "invoicing-cli:build"
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:lint",
-          "options": {
-            "linter": "eslint",
-            "config": "apps/invoicing-cli/.eslintrc",
-            "tsConfig": [
-              "apps/invoicing-cli/tsconfig.app.json",
-              "apps/invoicing-cli/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!apps/invoicing-cli/**"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "apps/invoicing-cli/jest.config.js",
-            "tsConfig": "apps/invoicing-cli/tsconfig.spec.json"
-          }
-        }
-      }
-    },
     "invoicing-graphql": {
       "root": "apps/invoicing-graphql",
       "sourceRoot": "apps/invoicing-graphql/src",
@@ -67,7 +11,7 @@
         "build": {
           "builder": "@nrwl/node:build",
           "options": {
-            "outputPath": "apps/invoicing-graphql/dist",
+            "outputPath": "dist/apps/invoicing-graphql",
             "main": "apps/invoicing-graphql/src/main.ts",
             "tsConfig": "apps/invoicing-graphql/tsconfig.app.json",
             "assets": ["apps/invoicing-graphql/src/assets"],
@@ -177,7 +121,7 @@
         "build": {
           "builder": "@nrwl/web:build",
           "options": {
-            "outputPath": "apps/invoicing-web/dist",
+            "outputPath": "dist/apps/invoicing-web",
             "index": "apps/invoicing-web/src/index.html",
             "main": "apps/invoicing-web/src/main.tsx",
             "polyfills": "apps/invoicing-web/src/polyfills.ts",
@@ -272,31 +216,6 @@
             "config": "apps/invoicing-web-e2e/.eslintrc",
             "tsConfig": ["apps/invoicing-web-e2e/tsconfig.e2e.json"],
             "exclude": ["**/node_modules/**", "!apps/invoicing-web-e2e/**"]
-          }
-        }
-      }
-    },
-    "pisi": {
-      "root": "libs/pisi",
-      "sourceRoot": "libs/pisi/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/pisi/tsconfig.lib.json",
-              "libs/pisi/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!libs/pisi/**"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/pisi/jest.config.js",
-            "tsConfig": "libs/pisi/tsconfig.spec.json"
           }
         }
       }

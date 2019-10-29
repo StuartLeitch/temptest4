@@ -1,7 +1,19 @@
+# do not use "latest" here, if you want this to work in the future
+image: docker:$DOCKER_VERSION
+
+stages:
+  - setup
+  #- test
+  - build
+  - package
+  - deploy
+
 variables:
+  AFFECTED_ARGS: '--base=remotes/origin/develop'
+  AFFECTED_APPS: ''
+  AFFECTED_LIBS: ''
   DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_DRIVER: overlay2
-  # DOCKER_HOST: tcp://docker:2375/
   DOCKER_VERSION: 18.09.0
   REGION: 'eu-west-1'
   AWS_REGISTRY: '918602980697.dkr.ecr.eu-west-1.amazonaws.com'
@@ -10,60 +22,39 @@ variables:
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
 
-default:
-  image: docker:$DOCKER_VERSION
-  services:
-    - docker:$DOCKER_VERSION-dind
-  before_script:
-    # docker login asks for the password to be passed through stdin for security
-    # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
-    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+services:
+  - docker:$DOCKER_VERSION-dind
 
-stages:
-  - setup
-  #- test
-  #- build
-  #- package
-  #- deploy
+before_script:
+  # docker login asks for the password to be passed through stdin for security
+  # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
+  # - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
-Setup Environment Variables:
-  interruptible: true
+Install Dependencies:
   stage: setup
+  image: node:latest
+  cache:
+    key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
+    paths:
+      - node_modules/
   script:
-    # fetches the latest image (not failing if image is not found)
-    - docker pull $CI_REGISTRY_IMAGE:latest || true
-    # builds the project, passing proxy variables, and vcs vars for LABEL
-    # notice the cache-from, which is going to use the image we just pulled locally
-    # the built image is tagged locally with the commit SHA, and then pushed to
-    # the GitLab registry
-    - >
-      docker build
-      --pull
-      --build-arg VCS_REF=$CI_COMMIT_SHA
-      --build-arg VCS_URL=$CI_PROJECT_URL
-      --cache-from $CI_REGISTRY_IMAGE:latest
-      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-      .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-# install:
-#   interruptible: true
+    # - npm version
+    # - env
+    - npm ci
+  only:
+    changes:
+      - package-lock.json
+
+# Identify Affected:
 #   stage: setup
-#   variables:
-#     # We are just playing with Docker here.
-#     # We do not need GitLab to clone the source code.
-#     GIT_STRATEGY: none
+#   image: node:latest
+#   script:
+#     - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
+#     - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
+#     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
 #   artifacts:
 #     paths:
-#       - node_modules/
-#   script:
-#     - npm ci
-
-# Info:
-#   interruptible: true
-#   stage: setup
-#   script:
-#     - npm version
-#     - env
+#       - dist
 
 # test:
 #   interruptible: true
@@ -94,15 +85,15 @@ Setup Environment Variables:
 #   dependencies:
 #     - install
 
-# # lint:
-# #   interruptible: true
-# #   stage: test
-# #   script:
-# #     - npm run nx -- lint shared
-# #     - npm run nx -- lint react-components
-# #     - npm run nx -- lint invoicing-graphql
-# #   only:
-# #     - monorepo-nx
+# lint:
+#   interruptible: true
+#   stage: test
+#   script:
+#     - npm run nx -- lint shared
+#     - npm run nx -- lint react-components
+#     - npm run nx -- lint invoicing-graphql
+#   only:
+#     - monorepo-nx
 
 # pages:
 #   interruptible: true
@@ -119,55 +110,54 @@ Setup Environment Variables:
 #   only:
 #     - develop
 
-# build_code:
-#   interruptible: true
-#   stage: build
-#   script:
-#     - npm run nx -- build invoicing-web --prod
-#     - npm run nx -- build invoicing-graphql --prod
-#   dependencies:
-#     - install
-#   artifacts:
-#     paths:
-#       - apps/invoicing-web/dist
-#       - apps/invoicing-graphql/dist
-#   only:
-#     - develop
+Build:
+  interruptible: true
+  stage: build
+  image: node:latest
+  cache:
+    key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
+    paths:
+      - node_modules/
+    policy: pull
+  script:
+    - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
+    - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
+    - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
+    - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
+  dependencies:
+    - Install Dependencies
+  artifacts:
+    paths:
+      - dist
+  only:
+    - develop
 
-# package_images:
-#   interruptible: true
-#   stage: package
-#   image: docker:18
-#   before_script:
-#     - apk add --no-cache curl jq python py-pip
-#     - pip install awscli
-#     - $(aws ecr get-login --no-include-email --region "${REGION}")
-#   script:
-#     - docker build -t $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA apps/invoicing-web
-#     - docker push $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA
-#     - docker build -t $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA apps/invoicing-graphql
-#     - docker push $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA
-#     - docker tag $AWS_REGISTRY/invoicing-graphql:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-graphql:dev
-#     - docker tag $AWS_REGISTRY/invoicing-web:$CI_COMMIT_SHA $AWS_REGISTRY/invoicing-web:dev
-#     - docker push $AWS_REGISTRY/invoicing-graphql:dev
-#     - docker push $AWS_REGISTRY/invoicing-web:dev
-#   dependencies:
-#     - build_code
-#   only:
-#     - develop
+Package Images:
+  interruptible: true
+  stage: package
+  image: docker:$DOCKER_VERSION
+  before_script:
+    - apk add --no-cache curl jq python py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+  script:
+    - ./tools/scripts/dockerize.sh
+  dependencies:
+    - Build
+  only:
+    - develop
 
-# deploy_dev:
-#   stage: deploy
-#   image: docker:18
-#   dependencies:
-#     - package_images
-#   when: manual
-#   only:
-#     - develop
-#   before_script:
-#     - apk add --no-cache curl jq python py-pip
-#     - pip install awscli
-#     - $(aws ecr get-login --no-include-email --region "${REGION}")
-#   script:
-#     - aws elasticbeanstalk update-environment --environment-name invoicing-web-dev --version-label invoicing-web-dev
-#     - aws elasticbeanstalk update-environment --environment-name invoicing-graphql-dev --version-label invoicing-graphql-dev
+Deploy to Dev:
+  stage: deploy
+  image: docker:$DOCKER_VERSION
+  dependencies:
+    - Package Images
+  when: manual
+  only:
+    - develop
+  before_script:
+    - apk add --no-cache curl jq python py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+  script:
+    - ./tools/scripts/deploy.sh
