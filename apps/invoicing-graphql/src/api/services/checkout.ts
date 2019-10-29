@@ -10,6 +10,7 @@ import {
   PaymentFactory,
   CreditCard
 } from '@hindawi/shared';
+// tslint:disable-next-line
 import {BraintreeGateway} from './../../../../../libs/shared/src/lib/modules/payments/infrastructure/gateways/braintree/gateway';
 
 // import {

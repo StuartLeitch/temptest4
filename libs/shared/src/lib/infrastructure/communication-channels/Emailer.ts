@@ -4,19 +4,34 @@ export interface EmailCommunicator {
   sendEmail(): Promise<any>;
 }
 
-export interface EmailerConfig {
-  mailer: {
-    path: {
-      transport: any;
-    };
+interface ITemplateProps {
+  type: string;
+  fromEmail: string;
+  toUser: {
+    email: string;
+    name?: string;
+  };
+  content: {
+    ctaText: string;
+    signatureJournal?: string;
+    signatureName?: string;
+    subject: string;
+    paragraph?: string;
+    unsubscribeLink: string;
+    ctaLink?: string;
+  };
+  bodyProps: {
+    hasLink: boolean;
+    hasIntro: boolean;
+    hasSignature: boolean;
   };
 }
 
 class Emailer implements EmailCommunicator {
   email: any;
-  constructor(private config?: EmailerConfig) {}
+  constructor() {}
 
-  public createTemplate(templateProps): EmailCommunicator {
+  public createTemplate(templateProps: ITemplateProps): EmailCommunicator {
     this.email = new EmailTemplate(templateProps);
     return this;
   }
