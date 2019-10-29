@@ -45,16 +45,16 @@ Install Dependencies:
     changes:
       - package-lock.json
 
-Identify Affected:
-  stage: setup
-  image: node:latest
-  script:
-    - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
-    - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
-    - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
-  artifacts:
-    paths:
-      - dist
+# Identify Affected:
+#   stage: setup
+#   image: node:latest
+#   script:
+#     - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
+#     - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
+#     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
+#   artifacts:
+#     paths:
+#       - dist
 
 # test:
 #   interruptible: true
