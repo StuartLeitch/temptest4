@@ -120,6 +120,8 @@ Build:
       - node_modules/
     policy: pull
   script:
+    - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
+    - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
     - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
   dependencies:
@@ -135,8 +137,6 @@ Package Images:
   stage: package
   image: docker:$DOCKER_VERSION
   before_script:
-    - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
-    - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
     - apk add --no-cache curl jq python py-pip
     - pip install awscli
     - $(aws ecr get-login --no-include-email --region "${REGION}")
