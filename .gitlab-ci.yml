@@ -9,7 +9,7 @@ stages:
   #- deploy
 
 variables:
-  AFFECTED: ''
+  AFFECTED: '--base=origin/develop'
   DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_DRIVER: overlay2
   DOCKER_VERSION: 18.09.0
@@ -114,7 +114,6 @@ Build:
       - node_modules/
     policy: pull
   script:
-    - ls -al ./node_modules/.bin
     - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
   dependencies:
     - Install Dependencies
