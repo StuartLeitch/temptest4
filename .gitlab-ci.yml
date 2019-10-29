@@ -127,7 +127,7 @@ Build:
     - Install Dependencies
   artifacts:
     paths:
-      - .ci-status
+      - .ci_status
       - dist
   only:
     - develop
