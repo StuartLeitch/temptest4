@@ -10,8 +10,6 @@ stages:
 
 variables:
   AFFECTED_ARGS: '--base=remotes/origin/develop'
-  AFFECTED_APPS: ''
-  AFFECTED_LIBS: ''
   DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_DRIVER: overlay2
   DOCKER_VERSION: 18.09.0
@@ -122,12 +120,14 @@ Build:
   script:
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
     - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
-    - export AFFECTED_APPS=$(npm run affected:apps -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1 | tr " " "\n")
-    - export AFFECTED_LIBS=$(npm run affected:libs -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1 | tr " " "\n")
+    - mkdir -p .ci_status
+    - echo $(npm run affected:apps -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1) > .ci_status/affected_apps
+    - echo $(npm run affected:libs -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1) > .ci_status/affected_libs
   dependencies:
     - Install Dependencies
   artifacts:
     paths:
+      - .ci-status/
       - dist
   only:
     - develop
@@ -141,6 +141,8 @@ Package Images:
     - pip install awscli
     - $(aws ecr get-login --no-include-email --region "${REGION}")
   script:
+    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+    - export AFFECTED_LIBS=$(cat .ci_status/affected_libs)
     - env
     - ./tools/scripts/dockerize.sh
   dependencies:
