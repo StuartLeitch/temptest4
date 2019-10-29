@@ -2,8 +2,6 @@ import React, { useEffect } from "react";
 import { Route, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-// import Card from "antd/es/Card";
-
 import { appRedux, userRedux, manuscriptRedux } from "./state-management/redux";
 
 const { appInitAction } = appRedux;

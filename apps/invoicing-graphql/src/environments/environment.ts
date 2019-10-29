@@ -83,5 +83,9 @@ export const environment = {
     route: getOsEnv('MONITOR_ROUTE'),
     username: getOsEnv('MONITOR_USERNAME'),
     password: getOsEnv('MONITOR_PASSWORD')
+  },
+  mailing: {
+    fromEmail: 'alexandru.munteanu@hindawi.com',
+    toEmail: 'alexandru.munteanu@hindawi.com'
   }
 };
