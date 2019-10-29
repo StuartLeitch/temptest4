@@ -6,7 +6,7 @@ stages:
   #- test
   - build
   - package
-  #- deploy
+  - deploy
 
 variables:
   AFFECTED_ARGS: '--base=origin/develop'
