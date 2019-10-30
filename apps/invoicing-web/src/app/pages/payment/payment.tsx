@@ -11,6 +11,7 @@ import Icon from "antd/es/icon";
 import { Panel } from "../../components/panel/panel";
 import Paypal from "../../components/paypal/paypal";
 import CreditCardForm from "../../components/credit-card-payment-form/credit-card-payment-form";
+import { createPaypalPayment } from "../../state-management/redux/payer";
 
 const { TabPane } = Tabs;
 
@@ -22,6 +23,16 @@ client
     console.info(clientInstance);
     // hostedFields.create(/* ... */);
   });
+
+const dummyPayload = {
+  paid: true,
+  cancelled: false,
+  payerID: "KTPABCEEW92NA",
+  paymentID: "PAYID-LW4YA5A45D12593SE205670G",
+  paymentToken: "EC-72K73389X86790054",
+  returnUrl:
+    "https://www.paypal.com/checkoutnow/error?paymentId=PAYID-LW4YA5A45D12593SE205670G&token=EC-72K73389X86790054&PayerID=KTPABCEEW92NA",
+};
 
 export const Payment = props => (
   <React.Fragment>
@@ -52,18 +63,17 @@ export const Payment = props => (
           }
           key="2"
         >
+          <button onClick={() => props.createPaypalPayment(dummyPayload)}>FAKE PAYPAL</button>
           <Paypal
             total={0.01}
             currency="EUR"
             onCancel={(...args) => {
-              console.log("sunt pe cancel", args);
+              console.log("payment canceled ->", args);
             }}
-            onError={(err) => {
-              console.log("a dat eroare", err);
+            onError={err => {
+              console.error("payment error -> ", err);
             }}
-            onSuccess={payment => {
-              console.log(payment);
-            }}
+            onSuccess={props.createPaypalPayment}
           />
         </TabPane>
         <TabPane

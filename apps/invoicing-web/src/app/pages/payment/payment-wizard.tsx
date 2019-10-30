@@ -20,7 +20,7 @@ import { manuscriptRedux, invoiceRedux, payerRedux } from "../../state-managemen
 
 const { fetchInvoiceAction } = invoiceRedux;
 const { selectAuthor, selectManuscript } = manuscriptRedux;
-const { updatePayerAction, createPaymentAction } = payerRedux;
+const { updatePayerAction, createPaymentAction, createPaypalPayment } = payerRedux;
 
 const initialState = {
   payer: {
@@ -84,7 +84,13 @@ function usePaymentWizard() {
 }
 
 const routes = ["/payer", "/billing-address", "/card-details"];
-const PaymentWizard = ({ author, createPayment, fetchInvoice, updatePayer }) => {
+const PaymentWizard = ({
+  author,
+  updatePayer,
+  fetchInvoice,
+  createPayment,
+  createPaypalPayment,
+}) => {
   const { invoiceId } = useParams();
   const match = useRouteMatch();
   const history = useHistory();
@@ -154,6 +160,7 @@ const PaymentWizard = ({ author, createPayment, fetchInvoice, updatePayer }) => 
               render={() => (
                 <Payment
                   onSubmit={handleSubmit}
+                  createPaypalPayment={createPaypalPayment}
                   cardDetails={formState.cardDetails}
                   onChange={changeHandler("cardDetails")}
                 />
@@ -182,6 +189,7 @@ const mapDispatchToProps = dispatch => ({
   fetchInvoice: invoiceId => dispatch(fetchInvoiceAction(invoiceId)),
   updatePayer: payer => dispatch(updatePayerAction(payer)),
   createPayment: () => dispatch(createPaymentAction()),
+  createPaypalPayment: payment => dispatch(createPaypalPayment(payment)),
 });
 
 export default connect(
