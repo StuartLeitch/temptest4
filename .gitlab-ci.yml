@@ -163,4 +163,6 @@ Deploy to Dev:
     - pip install awscli
     - $(aws ecr get-login --no-include-email --region "${REGION}")
   script:
+    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+    - export AFFECTED_LIBS=$(cat .ci_status/affected_libs)
     - ./tools/scripts/deploy.sh
