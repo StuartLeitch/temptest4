@@ -147,6 +147,10 @@ Package Images:
     - ./tools/scripts/dockerize.sh
   dependencies:
     - Build
+  artifacts:
+    paths:
+      - .ci_status
+      - dist
   only:
     - develop
 
