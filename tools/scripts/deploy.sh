@@ -1,11 +1,3 @@
-# for dir in $(ls -d dist/apps/* | sed 's#\/\/##'); do
-#   BUILD="$(basename -- $dir)"
-
-#   aws elasticbeanstalk update-environment --environment-name $BUILD-dev --version-label $BUILD-dev
-# done
-
-AFFECTED_APPS='invoicing-graphql'
-
 for APP in $AFFECTED_APPS
 do
   echo "Deploy application on environment '${APP}-dev'"
