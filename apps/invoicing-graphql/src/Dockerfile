@@ -2,6 +2,6 @@ FROM node:12-alpine
 
 # COPY dist/main.js /main.js
 
-EXPOSE 80
+EXPOSE 3000
 
 CMD ["node", "main.js"]
