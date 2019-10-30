@@ -9,7 +9,7 @@ export class CheckoutController {
 
   @Get()
   public hello(): Promise<any> {
-    return Promise.resolve({faceem: 'Hello World!'});
+    return Promise.resolve({hi: 'Hello World!'});
   }
 
   @Post()
