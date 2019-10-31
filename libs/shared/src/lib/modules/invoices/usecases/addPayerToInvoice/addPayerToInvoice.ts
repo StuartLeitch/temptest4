@@ -4,11 +4,9 @@ import {Result, left, right} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 
 import {AppError} from '../../../../core/logic/AppError';
-import {CreatePayerErrors} from './createPayerErrors';
-import {CreatePayerResponse} from './createPayerResponse';
+import {AddPayerToInvoiceErrors} from './addPayerToInvoiceErrors';
+import {AddPayerToInvoiceResponse} from './addPayerToInvoiceResponse';
 
-import {PayerRepoContract} from '../../repos/payerRepo';
-import {PayerMap} from '../../mapper/Payer';
 import {Invoice} from '../../../invoices/domain/Invoice';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 
@@ -19,35 +17,29 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
 import {Roles} from '../../../users/domain/enums/Roles';
-import {Payer} from '../../domain/Payer';
 import {InvoiceId} from '../../../invoices/domain/InvoiceId';
+import {PayerId} from '../../../payers/domain/PayerId';
 
-export interface CreatePayerRequestDTO {
+export interface AddPayerToInvoiceRequestDTO {
   invoiceId: string;
-  name: string;
-  surname: string;
-  type: string;
+  payerId: string;
 }
 
-export type CreatePayerContext = AuthorizationContext<Roles>;
+export type AddPayerToInvoiceContext = AuthorizationContext<Roles>;
 
-export class CreatePayerUsecase
+export class AddPayerToInvoiceUsecase
   implements
     UseCase<
-      CreatePayerRequestDTO,
-      Promise<CreatePayerResponse>,
-      CreatePayerContext
+      AddPayerToInvoiceRequestDTO,
+      Promise<AddPayerToInvoiceResponse>,
+      AddPayerToInvoiceContext
     >,
     AccessControlledUsecase<
-      CreatePayerRequestDTO,
-      CreatePayerContext,
+      AddPayerToInvoiceRequestDTO,
+      AddPayerToInvoiceContext,
       AccessControlContext
     > {
-  constructor(
-    private payerRepo: PayerRepoContract,
-    private invoiceRepo: InvoiceRepoContract
-  ) {
-    this.payerRepo = payerRepo;
+  constructor(private invoiceRepo: InvoiceRepoContract) {
     this.invoiceRepo = invoiceRepo;
   }
 
@@ -57,11 +49,10 @@ export class CreatePayerUsecase
 
   @Authorize('transaction:update')
   public async execute(
-    request: CreatePayerRequestDTO,
-    context?: CreatePayerContext
-  ): Promise<CreatePayerResponse> {
-    const {name, surname, type, invoiceId} = request;
-    let payer: Payer;
+    request: AddPayerToInvoiceRequestDTO,
+    context?: AddPayerToInvoiceContext
+  ): Promise<AddPayerToInvoiceResponse> {
+    const {invoiceId, payerId} = request;
     let invoice: Invoice;
 
     try {
@@ -70,15 +61,16 @@ export class CreatePayerUsecase
           InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
         );
       } catch (err) {
-        return left(new CreatePayerErrors.InvoiceNotFoundError(invoiceId));
+        return left(
+          new AddPayerToInvoiceErrors.InvoiceNotFoundError(invoiceId)
+        );
       }
 
-      payer = PayerMap.toDomain({name, surname, type});
-      invoice.payerId = payer.payerId;
+      invoice.payerId = PayerId.create(new UniqueEntityID(payerId));
 
-      await this.payerRepo.save(payer);
+      invoice = await this.invoiceRepo.save(invoice);
 
-      return right(Result.ok<Payer>(payer));
+      return right(Result.ok<Invoice>(invoice));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }
