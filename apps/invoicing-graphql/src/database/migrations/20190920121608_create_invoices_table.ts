@@ -1,8 +1,4 @@
-const uuid = require('uuid/v4');
-
 module.exports.up = async function(knex) {
-  //await knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid"');
-
   return knex.schema.createTable('invoices', function(table) {
     table
       .uuid('id', 36)
@@ -17,8 +13,5 @@ module.exports.up = async function(knex) {
 };
 
 module.exports.down = async function(knex) {
-  //await knex.raw('DROP EXTENSION IF EXISTS "uuid"');
   return knex.schema.dropTable('invoices');
 };
-
-export {};

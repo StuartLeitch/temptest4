@@ -71,6 +71,15 @@ export const environment = {
     route: getOsEnv('GRAPHQL_ROUTE'),
     editor: toBool(getOsEnv('GRAPHQL_EDITOR'))
   },
+  eventsQueue: {
+    region: getOsEnv('AWS_SNS_SQS_REGION'),
+    accessKeyId: getOsEnv('AWS_SNS_SQS_ACCESS_KEY'),
+    secretAccessKey: getOsEnv('AWS_SNS_SQS_SECRET_KEY'),
+    snsEndpoint: getOsEnv('AWS_SNS_ENDPOINT'),
+    sqsEndpoint: getOsEnv('AWS_SQS_ENDPOINT'),
+    topicName: getOsEnv('AWS_SNS_TOPIC'),
+    queueName: getOsEnv('AWS_SQS_QUEUE_NAME')
+  },
   swagger: {
     enabled: toBool(getOsEnv('SWAGGER_ENABLED')),
     route: getOsEnv('SWAGGER_ROUTE'),

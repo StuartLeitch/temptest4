@@ -1,4 +1,4 @@
-import * as path from 'path';
+// import * as path from 'path';
 import { MicroframeworkLoader, MicroframeworkSettings } from 'microframework-w3tec';
 // import { createConnection, getConnectionOptions } from 'typeorm';
 import Knex from 'knex';

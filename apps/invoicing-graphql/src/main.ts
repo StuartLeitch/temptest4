@@ -26,6 +26,7 @@ import {publicLoader} from './loaders/public';
 import {monitorLoader} from './loaders/monitor';
 import {homeLoader} from './loaders/home';
 import {knexLoader} from './loaders/knex';
+import {eventSubscriberLoader} from './loaders/eventSubscriber';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -51,7 +52,8 @@ bootstrapMicroframework({
     swaggerLoader,
     monitorLoader,
     homeLoader,
-    publicLoader
+    publicLoader,
+    eventSubscriberLoader
     // graphqlLoader
   ]
 })
