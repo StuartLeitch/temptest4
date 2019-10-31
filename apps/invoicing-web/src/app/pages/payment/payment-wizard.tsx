@@ -20,7 +20,7 @@ import { manuscriptRedux, invoiceRedux, payerRedux } from "../../state-managemen
 
 const { fetchInvoiceAction } = invoiceRedux;
 const { selectAuthor, selectManuscript } = manuscriptRedux;
-const { updatePayerAction, createPaymentAction, createPaypalPayment } = payerRedux;
+const { updatePayerAction, createPaymentAction, createPaypalPayment, createPayer } = payerRedux;
 
 const initialState = {
   payer: {
@@ -86,6 +86,7 @@ function usePaymentWizard() {
 const routes = ["/payer", "/billing-address", "/card-details"];
 const PaymentWizard = ({
   author,
+  createPayer,
   updatePayer,
   fetchInvoice,
   createPayment,
@@ -116,6 +117,7 @@ const PaymentWizard = ({
       case 1:
         changeStep(step);
         updatePayer(formData);
+        createPayer(formData);
         break;
       case 2:
         changeStep(step);
@@ -186,9 +188,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchInvoice: invoiceId => dispatch(fetchInvoiceAction(invoiceId)),
+  createPayer: payer => dispatch(createPayer(payer)),
   updatePayer: payer => dispatch(updatePayerAction(payer)),
   createPayment: () => dispatch(createPaymentAction()),
+  fetchInvoice: invoiceId => dispatch(fetchInvoiceAction(invoiceId)),
   createPaypalPayment: payment => dispatch(createPaypalPayment(payment)),
 });
 

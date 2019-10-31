@@ -1,5 +1,5 @@
 import React from "react";
-const client = require("braintree-web/client");
+// const client = require("braintree-web/client");
 
 import { environment } from "../../../environments/environment";
 
@@ -10,14 +10,14 @@ import Icon from "antd/es/icon";
 import { Panel } from "../../components/panel/panel";
 // import Paypal from "../../components/paypal/paypal";
 import CreditCardForm from "../../components/credit-card-payment-form/credit-card-payment-form";
-import { createPaypalPayment } from "../../state-management/redux/payer";
+import { createPaypalPayment } from "../../state-management/redux/payment/actions";
 
 const { TabPane } = Tabs;
 
-client
-  .create({
-    authorization: (window as any)._env_.BT_TOKENIZATION_KEY,
-  });
+// client
+//   .create({
+//     authorization: (window as any)._env_.BT_TOKENIZATION_KEY,
+//   });
 
 const dummyPayload = {
   paid: true,

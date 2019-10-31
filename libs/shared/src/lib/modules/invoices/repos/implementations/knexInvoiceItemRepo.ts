@@ -106,4 +106,12 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
 
     return this.getInvoiceItemById(invoiceItem.invoiceItemId);
   }
+
+  getInvoiceItemCollection(): Promise<InvoiceItem[] | any> {
+    return Promise.resolve(42);
+  }
+
+  getItemsByInvoiceId(): Promise<InvoiceItem[] | any> {
+    return Promise.resolve(42);
+  }
 }
