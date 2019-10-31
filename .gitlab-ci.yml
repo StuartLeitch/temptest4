@@ -43,7 +43,8 @@ Install Dependencies:
 
 Test:
   interruptible: true
-  stage: build
+  allow_failure: false
+  stage: test
   image: node:latest
   cache:
     key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
@@ -54,19 +55,14 @@ Test:
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
     - npm run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage --configuration production
     - npm run ci:coverage
-  allow_failure: false
-  stage: test
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
       - coverage/
     reports:
       junit:
-        - coverage/apps/invoicing-cli/junit.xml
-        - coverage/apps/invoicing-graphql/junit.xml
-        - coverage/apps/invoicing-web/junit.xml
-        - coverage/libs/shared/junit.xml
-        - coverage/libs/react-components/junit.xml
+        - coverage/apps/**/junit.xml
+        - coverage/libs/**/junit.xml
   only:
     - develop
     - master
@@ -95,7 +91,7 @@ Pages:
     paths:
       - public
   dependencies:
-    - test
+    - Test
   only:
     - develop
 
