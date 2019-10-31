@@ -1,5 +1,5 @@
 // import * as Knex from 'knex';
-const uuid = require('uuid/v4');
+const seed_ci_uuid = require('uuid/v4');
 
 const catalog_items = [
   {
@@ -1178,7 +1178,7 @@ const ci_seed = async (knex) => {
     } = ci;
 
     const catalogItem = {
-      id: uuid(),
+      id: seed_ci_uuid(),
       journalTitle,
       issn: ISSN,
       type: 'APC',
@@ -1191,5 +1191,3 @@ const ci_seed = async (knex) => {
 
   await Promise.all(inserts);
 };
-
-export {};

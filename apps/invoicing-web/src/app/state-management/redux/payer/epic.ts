@@ -30,7 +30,7 @@ export const createPaymentEpic = (
     map(() => selectPayer(state$.value)),
     mergeMap(paymentInfo =>
       Axios.post(
-        "http://localhost:3000/api/checkout",
+        `http://${(window as any)._env_.API_URL}/api/checkout`,
         // JSON.stringify({
         //   ...state$.value.payer.cardDetails,
         // }),
