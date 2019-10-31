@@ -1,6 +1,5 @@
 import React from "react";
 const client = require("braintree-web/client");
-const hostedFields = require("braintree-web/hosted-fields");
 
 import { environment } from "../../../environments/environment";
 

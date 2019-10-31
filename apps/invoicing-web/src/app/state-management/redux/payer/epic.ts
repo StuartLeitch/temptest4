@@ -44,7 +44,6 @@ export const createPaymentEpic = (
         },
       ).pipe(
         map((response: any) => {
-          // Message.success(response.data);
           return createPaymentFulfilled(response.data);
         }),
       ),
@@ -56,7 +55,7 @@ export const paymentDoneEpic = action$ =>
   action$.pipe(
     ofType(CONSTANTS.CREATE_PAYMENT_FULFILLED),
     tap(({ payment }) => {
-      Message.success(`Payment succesfully processed! Braintree payment id ==> ${payment.id}`, 7);
+      Message.success(`Payment successfully processed! Braintree payment id ==> ${payment.id}`, 7);
     }),
     ignoreElements(),
   );

@@ -25,6 +25,7 @@ import {swaggerLoader} from './loaders/swagger';
 import {publicLoader} from './loaders/public';
 import {monitorLoader} from './loaders/monitor';
 import {homeLoader} from './loaders/home';
+import {knexLoader} from './loaders/knex';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -45,7 +46,7 @@ bootstrapMicroframework({
     winstonLoader,
     iocLoader,
     // eventDispatchLoader,
-    // typeormLoader,
+    knexLoader,
     expressLoader,
     swaggerLoader,
     monitorLoader,
@@ -55,4 +56,4 @@ bootstrapMicroframework({
   ]
 })
   .then(() => banner(log))
-  .catch(error => log.error('Application is crashed: ' + error));
+  .catch(error => log.error('💥 Application is crashed: ' + error));

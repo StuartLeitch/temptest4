@@ -14,8 +14,6 @@ import PaymentWizard from "./pages/payment/payment-wizard";
 // * app styles
 import "./app.scss";
 
-const styles = {};
-
 const InvoiceCard = () => {
   const history = useHistory();
   return (
@@ -41,6 +39,7 @@ export const App = () => {
           <img src="/assets/images/hindawi.svg" alt="Hindawi Publishing Corporation"></img>
         </a>
         <h1>Payment Details</h1>
+        <p>API_URL: {(window as any)._env_.API_URL}</p>
       </header>
 
       <Route path="/" exact component={InvoiceCard} />

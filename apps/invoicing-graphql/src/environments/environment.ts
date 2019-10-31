@@ -40,10 +40,10 @@ export const environment = {
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     banner: toBool(getOsEnv('APP_BANNER')),
     dirs: {
-      migrations: getOsPaths('TYPEORM_MIGRATIONS'),
-      migrationsDir: getOsPath('TYPEORM_MIGRATIONS_DIR'),
-      entities: getOsPaths('TYPEORM_ENTITIES'),
-      entitiesDir: getOsPath('TYPEORM_ENTITIES_DIR'),
+      migrations: getOsPaths('DB_MIGRATIONS'),
+      migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
+      seeds: getOsPaths('DB_SEEDS'),
+      seedsDir: getOsPath('DB_SEEDS_DIR'),
       controllers: getOsPaths('CONTROLLERS'),
       middlewares: getOsPaths('MIDDLEWARES'),
       interceptors: getOsPaths('INTERCEPTORS'),
@@ -57,14 +57,14 @@ export const environment = {
     output: getOsEnv('LOG_OUTPUT')
   },
   db: {
-    type: getOsEnv('TYPEORM_CONNECTION'),
-    host: getOsEnvOptional('TYPEORM_HOST'),
-    port: toNumber(getOsEnvOptional('TYPEORM_PORT')),
-    username: getOsEnvOptional('TYPEORM_USERNAME'),
-    password: getOsEnvOptional('TYPEORM_PASSWORD'),
-    database: getOsEnv('TYPEORM_DATABASE'),
-    synchronize: toBool(getOsEnvOptional('TYPEORM_SYNCHRONIZE')),
-    logging: getOsEnv('TYPEORM_LOGGING')
+    type: getOsEnv('DB_CONNECTION'),
+    host: getOsEnvOptional('DB_HOST'),
+    port: toNumber(getOsEnvOptional('DB_PORT')),
+    username: getOsEnvOptional('DB_USERNAME'),
+    password: getOsEnvOptional('DB_PASSWORD'),
+    database: getOsEnv('DB_DATABASE'),
+    synchronize: toBool(getOsEnvOptional('DB_SYNCHRONIZE')),
+    logging: getOsEnv('DB_LOGGING')
   },
   graphql: {
     enabled: toBool(getOsEnv('GRAPHQL_ENABLED')),
