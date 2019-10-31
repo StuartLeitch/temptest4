@@ -30,18 +30,18 @@ export const knexLoader: MicroframeworkLoader = async (settings: MicroframeworkS
         password: environment.db.password,
         database: environment.db.database,
       },
-      migrations: {
-        directory: environment.app.dirs.migrationsDir
-      },
-      seeds: {
-        directory: environment.app.dirs.seedsDir
-      },
+      // migrations: {
+      //   directory: environment.app.dirs.migrationsDir
+      // },
+      // seeds: {
+      //   directory: environment.app.dirs.seedsDir
+      // },
       pool: {min: 0, max: 10, idleTimeoutMillis: 500},
       useNullAsDefault: true
     });
 
-    await connection.migrate.latest();
-    await connection.seed.run();
+    // await connection.migrate.latest();
+    // await connection.seed.run();
 
     if (settings) {
         settings.setData('connection', connection);
