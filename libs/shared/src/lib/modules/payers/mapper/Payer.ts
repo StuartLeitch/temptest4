@@ -11,19 +11,19 @@ import {PayerName} from '../domain/PayerName';
 import {PayerType} from '../domain/PayerType';
 
 export interface PayerPersistenceDTO {
-  id: string;
-  title: string;
+  id?: string;
+  title?: string;
   surname: string;
   name: string;
-  organization: string;
-  uniqueIdentificationNumber: string;
-  email: string;
-  phone: string;
+  organization?: string;
+  uniqueIdentificationNumber?: string;
+  email?: string;
+  phone?: string;
   type: string;
-  shippingAddressId: string;
-  billingAddressId: string;
-  VATId: string;
-  dateAdded: Date;
+  shippingAddressId?: string;
+  billingAddressId?: string;
+  VATId?: string;
+  dateAdded?: Date;
 }
 
 export class PayerMap extends Mapper<Payer> {

@@ -8,7 +8,7 @@ import Tabs from "antd/es/tabs";
 import Icon from "antd/es/icon";
 
 import { Panel } from "../../components/panel/panel";
-// import Paypal from "../../components/paypal/paypal";
+import Paypal from "../../components/paypal/paypal";
 // import { createPaypalPayment } from "../../state-management/redux/payer";
 import CreditCardForm from "../../components/credit-card-payment-form/credit-card-payment-form";
 
@@ -59,7 +59,7 @@ export const Payment = props => (
           key="2"
         >
           <button onClick={() => props.createPaypalPayment(dummyPayload)}>FAKE PAYPAL</button>
-          {/*<Paypal
+          <Paypal
             total={0.01}
             currency="EUR"
             onCancel={(...args) => {
@@ -69,7 +69,7 @@ export const Payment = props => (
               console.error("payment error -> ", err);
             }}
             onSuccess={props.createPaypalPayment}
-          />*/}
+          />
         </TabPane>
         <TabPane
           tab={

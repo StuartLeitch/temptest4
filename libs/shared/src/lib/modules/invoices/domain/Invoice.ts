@@ -46,6 +46,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.props.payerId;
   }
 
+  set payerId(payerId: PayerId) {
+    this.props.payerId = payerId;
+  }
+
   get status(): InvoiceStatus {
     return this.props.status;
   }
@@ -60,10 +64,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get invoiceItems(): InvoiceItems {
     return this.props.invoiceItems;
-  }
-
-  set payerId(payerId: PayerId) {
-    this.props.payerId = payerId;
   }
 
   get invoiceNumber(): string {
