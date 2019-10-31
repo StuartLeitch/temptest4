@@ -1,7 +1,4 @@
-import {Knex} from '@hindawi/shared';
-
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-
+import {Knex} from '../../../../infrastructure/database/knex';
 import {Invoice} from '../../domain/Invoice';
 import {InvoiceId} from '../../domain/InvoiceId';
 import {InvoiceItemId} from '../../domain/InvoiceItemId';
