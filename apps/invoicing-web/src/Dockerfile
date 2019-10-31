@@ -12,3 +12,5 @@ RUN apk add --no-cache bash
 RUN chmod +x env.sh
 RUN ./env.sh
 COPY env-config.js /usr/share/nginx/html
+
+EXPOSE 80
