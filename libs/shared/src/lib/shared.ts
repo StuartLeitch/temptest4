@@ -80,7 +80,8 @@ export {Payer} from './modules/payers/domain/Payer';
 // export * from './modules/payers/mapper/Payer';
 
 // // * Export Address Subdomain
-// export * from './modules/addresses/domain/AddressId';
+export * from './modules/addresses/domain/AddressId';
+export * from './modules/addresses/domain/Address';
 
 // // * Export Catalog Subdomain
 // export {CatalogItem} from './modules/catalogs/domain/CatalogItem';

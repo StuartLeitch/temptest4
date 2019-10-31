@@ -14,7 +14,13 @@ const { manuscript, fetchManuscriptEpic } = manuscriptRedux;
 const { app, initEpic } = appRedux;
 const { user, fetchUsersEpic } = userRedux;
 const { invoice, fetchInvoiceEpic } = invoiceRedux;
-const { payer, createPaymentEpic, paymentDoneEpic, createPaypalPaymentEpic } = payerRedux;
+const {
+  payer,
+  createPaymentEpic,
+  paymentDoneEpic,
+  createPaypalPaymentEpic,
+  createPayerEpic,
+} = payerRedux;
 
 export const rootEpic = combineEpics(
   fetchManuscriptEpic,
@@ -24,6 +30,7 @@ export const rootEpic = combineEpics(
   createPaymentEpic,
   paymentDoneEpic,
   createPaypalPaymentEpic,
+  createPayerEpic,
 );
 export const rootReducer = combineReducers({
   manuscript,

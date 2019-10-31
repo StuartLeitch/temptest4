@@ -37,3 +37,8 @@ export const paypalPaymentFulfilled = payment => ({
   type: CONSTANTS.CREATE_PAYPAL_PAYMENT_FULFILLED,
   payment,
 });
+
+export const createPayer = payer => ({
+  type: CONSTANTS.CREATE_PAYER,
+  payer,
+});

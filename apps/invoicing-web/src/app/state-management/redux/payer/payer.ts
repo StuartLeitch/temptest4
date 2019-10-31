@@ -1,5 +1,3 @@
-import { createSelector } from "reselect";
-
 import CONSTANTS from "./constants";
 import { PaymentDoneActionType, UpdatePayerActionType } from "./actions";
 import { initialState, StateType, StateSlice } from "./state";

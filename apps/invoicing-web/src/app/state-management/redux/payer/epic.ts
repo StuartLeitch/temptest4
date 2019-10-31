@@ -7,18 +7,6 @@ import { selectPayer, StateSlice } from "./state";
 import { createPaymentFulfilled } from "./actions";
 
 import Message from "antd/es/message";
-import { of } from "rxjs";
-
-// * Action Creators
-interface InvoiceFetchActionType {
-  type: string;
-  invoiceId?: string;
-}
-
-export const fetchInvoiceAction = (invoiceId: string): InvoiceFetchActionType => ({
-  type: CONSTANTS.CREATE_PAYMENT,
-  invoiceId,
-});
 
 // * epic
 export const createPaymentEpic = (
@@ -83,6 +71,18 @@ export const createPaypalPaymentEpic = (
           },
         },
       );
+    }),
+  );
+};
+
+export const createPayerEpic = (
+  action$: ActionsObservable<any>,
+  state$: StateObservable<StateSlice>,
+) => {
+  return action$.pipe(
+    ofType(CONSTANTS.CREATE_PAYER),
+    tap((args: any) => {
+      console.log("create payer", args);
     }),
     ignoreElements(),
   );

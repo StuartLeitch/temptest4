@@ -50,6 +50,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.props.status;
   }
 
+  set status(status: InvoiceStatus) {
+    this.props.status = status;
+  }
+
   get dateCreated(): Date {
     return this.props.dateCreated;
   }
@@ -88,6 +92,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     super(props, id);
   }
 
+  // tslint:disable-next-line
   public static create(
     props: InvoiceProps,
     id?: UniqueEntityID
@@ -130,6 +135,12 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.FINAL;
     this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
+  }
+
+  public getInvoiceTotal(): number {
+    return this.invoiceItems
+      .getItems()
+      .reduce((acc, item) => acc + item.price, 0);
   }
 
   // public getValue(): number {

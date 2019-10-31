@@ -1,5 +1,5 @@
 import React from "react";
-const client = require("braintree-web/client");
+// const client = require("braintree-web/client");
 
 import { environment } from "../../../environments/environment";
 
@@ -14,10 +14,10 @@ import CreditCardForm from "../../components/credit-card-payment-form/credit-car
 
 const { TabPane } = Tabs;
 
-client
-  .create({
-    authorization: (window as any)._env_.BT_TOKENIZATION_KEY,
-  });
+// client
+//   .create({
+//     authorization: (window as any)._env_.BT_TOKENIZATION_KEY,
+//   });
 
 const dummyPayload = {
   paid: true,
