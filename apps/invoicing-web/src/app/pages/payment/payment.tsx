@@ -8,7 +8,7 @@ import Tabs from "antd/es/tabs";
 import Icon from "antd/es/icon";
 
 import { Panel } from "../../components/panel/panel";
-import Paypal from "../../components/paypal/paypal";
+// import Paypal from "../../components/paypal/paypal";
 import CreditCardForm from "../../components/credit-card-payment-form/credit-card-payment-form";
 import { createPaypalPayment } from "../../state-management/redux/payer";
 
@@ -16,11 +16,7 @@ const { TabPane } = Tabs;
 
 client
   .create({
-    authorization: environment.BT_TOKENIZATION_KEY,
-  })
-  .then(function(clientInstance) {
-    console.info(clientInstance);
-    // hostedFields.create(/* ... */);
+    authorization: (window as any)._env_.BT_TOKENIZATION_KEY,
   });
 
 const dummyPayload = {
@@ -63,7 +59,7 @@ export const Payment = props => (
           key="2"
         >
           <button onClick={() => props.createPaypalPayment(dummyPayload)}>FAKE PAYPAL</button>
-          <Paypal
+          {/*<Paypal
             total={0.01}
             currency="EUR"
             onCancel={(...args) => {
@@ -73,7 +69,7 @@ export const Payment = props => (
               console.error("payment error -> ", err);
             }}
             onSuccess={props.createPaypalPayment}
-          />
+          />*/}
         </TabPane>
         <TabPane
           tab={
