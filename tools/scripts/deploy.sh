@@ -1,6 +1,6 @@
 #  aws elasticbeanstalk create-application-version \
 #       --application-name Invoicing-graphql-dev --version-label invoicing-graphql-dev
-
+AFFECTED_APPS='invoicing-web'
 for APP in $AFFECTED_APPS
 do
   echo "Deploy application on environment '${APP}-dev'"
