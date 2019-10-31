@@ -1,5 +1,5 @@
 import { ofType, ActionsObservable, StateObservable } from "redux-observable";
-import { mergeMap, map, ignoreElements, tap } from "rxjs/operators";
+import { mergeMap, map, ignoreElements, tap, switchMap, withLatestFrom } from "rxjs/operators";
 const Axios = require("axios-observable").Axios;
 
 import CONSTANTS from "./constants";
@@ -7,6 +7,7 @@ import { selectPayer, StateSlice } from "./state";
 import { createPaymentFulfilled } from "./actions";
 
 import Message from "antd/es/message";
+import { of } from "rxjs";
 
 // * Action Creators
 interface InvoiceFetchActionType {
@@ -59,3 +60,30 @@ export const paymentDoneEpic = action$ =>
     }),
     ignoreElements(),
   );
+
+export const createPaypalPaymentEpic = (
+  action$: ActionsObservable<any>,
+  state$: StateObservable<StateSlice>,
+) => {
+  return action$.pipe(
+    ofType(CONSTANTS.CREATE_PAYPAL_PAYMENT),
+    withLatestFrom(state$),
+    switchMap(([{ payment }, state]) => {
+      const payer = selectPayer(state);
+      return Axios.post(
+        "http://localhost:80/api/paypal-payment-created",
+        {
+          payer,
+          payment,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        },
+      );
+    }),
+    ignoreElements(),
+  );
+};

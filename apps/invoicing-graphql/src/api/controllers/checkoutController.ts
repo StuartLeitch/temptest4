@@ -1,15 +1,4 @@
-import {
-  // Authorized,
-  Body,
-  // Delete,
-  Get,
-  JsonController,
-  // OnUndefined,
-  // Param,
-  Post
-  // Put
-} from 'routing-controllers';
-
+import {Body, Get, JsonController, Post} from 'routing-controllers';
 
 import {CheckoutService} from '../services/checkout';
 
