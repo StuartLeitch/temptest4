@@ -10,5 +10,5 @@ RUN apk add --no-cache bash
 
 # Make our shell script executable
 RUN chmod +x env.sh
-RUN /bin/bash -c env.sh
+RUN ./env.sh
 COPY env-config.js /usr/share/nginx/html
