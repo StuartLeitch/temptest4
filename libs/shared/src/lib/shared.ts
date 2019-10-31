@@ -77,7 +77,7 @@ export {Payer} from './modules/payers/domain/Payer';
 // export * from './modules/payers/domain/PayerType';
 // export * from './modules/payers/domain/PayerTitle';
 // export * from './modules/payers/repos/payerRepo';
-// export * from './modules/payers/mapper/Payer';
+export * from './modules/payers/mapper/Payer';
 
 // // * Export Address Subdomain
 export * from './modules/addresses/domain/AddressId';

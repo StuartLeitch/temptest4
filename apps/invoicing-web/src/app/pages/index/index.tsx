@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-import Form from "antd/es/form";
-import Checkbox from "antd/es/checkbox";
-import Input from "antd/es/input";
-import Button from "antd/es/button";
+import Form from "antd/lib/form";
+import Checkbox from "antd/lib/checkbox";
+import Input from "antd/lib/input";
+import Button from "antd/lib/button";
 
 // import styles from "./index.css";
 interface Props {

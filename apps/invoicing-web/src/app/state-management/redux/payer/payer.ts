@@ -1,21 +1,17 @@
 import CONSTANTS from "./constants";
 import { PaymentDoneActionType, UpdatePayerActionType } from "./actions";
-import { initialState, StateType, StateSlice } from "./state";
+import { initialState, StateSlice } from "./state";
 
 // * State handlers
-const updateHandler = (state: StateSlice, action: UpdatePayerActionType): StateType["payer"] => {
-  return {
-    ...state,
-    ...action.payer,
-  } as StateType["payer"];
-};
+const updateHandler = (state: StateSlice, action: UpdatePayerActionType): StateSlice => ({
+  ...state,
+  ...action.payer,
+}) as StateSlice;
 
-const paymentDone = (state: StateSlice, action: PaymentDoneActionType): StateType["payer"] => {
-  return {
-    ...state,
-    ...action.payment,
-  } as StateType["payer"];
-};
+const paymentDone = (state: StateSlice, action: PaymentDoneActionType): StateSlice => ({
+  ...state,
+  ...action.payment,
+});
 
 export const payer = (state: StateSlice = initialState.payer, action: any): StateSlice => {
   switch (action.type) {

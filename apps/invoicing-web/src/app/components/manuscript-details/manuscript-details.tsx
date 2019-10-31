@@ -1,7 +1,7 @@
 import React from "react";
-import Card from "antd/es/card";
-import List from "antd/es/list";
-import Typography from "antd/es/typography";
+import Card from "antd/lib/card";
+import List from "antd/lib/list";
+import Typography from "antd/lib/typography";
 
 const { Text } = Typography;
 

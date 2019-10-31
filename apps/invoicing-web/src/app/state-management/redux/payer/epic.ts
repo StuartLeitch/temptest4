@@ -1,12 +1,12 @@
 import { ofType, ActionsObservable, StateObservable } from "redux-observable";
 import { mergeMap, map, ignoreElements, tap, switchMap, withLatestFrom } from "rxjs/operators";
+import Message from "antd/lib/message";
 const Axios = require("axios-observable").Axios;
 
 import CONSTANTS from "./constants";
 import { selectPayer, StateSlice } from "./state";
 import { createPaymentFulfilled } from "./actions";
 
-import Message from "antd/es/message";
 
 // * epic
 export const createPaymentEpic = (

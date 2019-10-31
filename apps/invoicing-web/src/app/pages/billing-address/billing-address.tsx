@@ -1,7 +1,7 @@
 import React from "react";
-import Form from "antd/es/form";
-import Input from "antd/es/input";
-import Button from "antd/es/button";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import Button from "antd/lib/button";
 
 interface Props {
   billingAddress?: any;
