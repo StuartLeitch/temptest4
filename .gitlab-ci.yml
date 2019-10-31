@@ -3,7 +3,7 @@ image: docker:$DOCKER_VERSION
 
 stages:
   - setup
-  #- test
+  - test
   - build
   - package
   - deploy
@@ -36,52 +36,43 @@ Install Dependencies:
     paths:
       - node_modules/
   script:
-    # - npm version
-    # - env
     - npm ci
   only:
     changes:
       - package-lock.json
 
-# Identify Affected:
-#   stage: setup
-#   image: node:latest
-#   script:
-#     - export AFFECTED_APPS=$(./tools/scripts/affected_apps.sh)
-#     - export AFFECTED_LIBS=$(./tools/scripts/affected_libs.sh)
-#     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
-#   artifacts:
-#     paths:
-#       - dist
-
-# test:
-#   interruptible: true
-#   allow_failure: true
-#   stage: test
-#   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
-#   artifacts:
-#     paths:
-#       - coverage/
-#     reports:
-#       junit:
-#         - coverage/apps/invoicing-cli/junit.xml
-#         - coverage/apps/invoicing-graphql/junit.xml
-#         - coverage/apps/invoicing-web/junit.xml
-#         - coverage/libs/shared/junit.xml
-#         - coverage/libs/react-components/junit.xml
-#   script:
-#     - npm run nx -- test shared --code-coverage
-#     - npm run nx -- test react-components --code-coverage
-#     - npm run nx -- test invoicing-graphql --code-coverage
-#     - npm run nx -- test invoicing-web --code-coverage
-#     - npm run nx -- test invoicing-cli --code-coverage
-#     - npm run ci:coverage
-#   only:
-#     - develop
-#     - master
-#     - /^FM-\d+/
-#   dependencies:
-#     - install
+Test:
+  interruptible: true
+  stage: build
+  image: node:latest
+  cache:
+    key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
+    paths:
+      - node_modules/
+    policy: pull
+  script:
+    - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
+    - npm run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage --configuration production
+    - npm run ci:coverage
+  allow_failure: false
+  stage: test
+  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
+  artifacts:
+    paths:
+      - coverage/
+    reports:
+      junit:
+        - coverage/apps/invoicing-cli/junit.xml
+        - coverage/apps/invoicing-graphql/junit.xml
+        - coverage/apps/invoicing-web/junit.xml
+        - coverage/libs/shared/junit.xml
+        - coverage/libs/react-components/junit.xml
+  only:
+    - develop
+    - master
+    - /^FM-\d+/
+  # dependencies:
+  #   - install
 
 # lint:
 #   interruptible: true
@@ -93,20 +84,20 @@ Install Dependencies:
 #   only:
 #     - monorepo-nx
 
-# pages:
-#   interruptible: true
-#   stage: deploy
-#   script:
-#     - mkdir -p public
-#     - cp coverage/*.* public/
-#     - mv public/index.html public/coverage.html
-#   artifacts:
-#     paths:
-#       - public
-#   dependencies:
-#     - test
-#   only:
-#     - develop
+Pages:
+  interruptible: true
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp coverage/*.* public/
+    - mv public/index.html public/coverage.html
+  artifacts:
+    paths:
+      - public
+  dependencies:
+    - test
+  only:
+    - develop
 
 Build:
   interruptible: true
