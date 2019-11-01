@@ -1,24 +1,15 @@
 import CONSTANTS from "./constants";
-import { Payer } from "@hindawi/shared";
+import { StateSlice } from "./state";
 
 export interface ActionType {
   type: string;
-}
-
-export interface UpdatePayerActionType extends ActionType {
-  payer: Payer | null;
 }
 
 export interface PaymentDoneActionType extends ActionType {
   payment: any | null;
 }
 
-// Action creators
-export const updatePayerAction = payer => ({
-  type: CONSTANTS.UPDATE,
-  payer,
-});
-
+// * Action creators
 export const createPaymentAction = () => ({
   type: CONSTANTS.CREATE_PAYMENT,
 });
@@ -28,17 +19,48 @@ export const createPaymentFulfilled = payment => ({
   payment,
 });
 
+// * Create or update payer action
+export interface PayerInfoActionType extends ActionType {
+  payerInfo: StateSlice["payerInfo"];
+}
+
+export const createPayer = (payerInfo: StateSlice["payerInfo"]) => ({
+  type: CONSTANTS.CREATE_PAYER,
+  payerInfo,
+});
+
+export const updatePayerAction = (payerInfo: StateSlice["payerInfo"]) => ({
+  type: CONSTANTS.UPDATE_PAYER,
+  payerInfo,
+});
+
+// * Update payer address
+export interface UpdatePayerAddressActionType extends ActionType {
+  billingAddress: StateSlice["billingAddress"];
+}
+
+export const updateBillingAddress = (billingAddress: StateSlice["billingAddress"]) => ({
+  type: CONSTANTS.UPDATE_ADDRESS,
+  billingAddress,
+});
+
+// * Update card details
+export interface UpdateCardActionType extends ActionType {
+  creditCard: StateSlice["creditCard"];
+}
+
+export const updateCreditCard = (creditCard: StateSlice["creditCard"]) => ({
+  type: CONSTANTS.UPDATE_CARD,
+  creditCard,
+});
+
+// * Paypal payments
 export const createPaypalPayment = payment => ({
   type: CONSTANTS.CREATE_PAYPAL_PAYMENT,
   payment,
 });
 
-export const paypalPaymentFulfilled = payment => ({
+export const paypalPaymentFulfilled = (payment: any) => ({
   type: CONSTANTS.CREATE_PAYPAL_PAYMENT_FULFILLED,
   payment,
-});
-
-export const createPayer = payer => ({
-  type: CONSTANTS.CREATE_PAYER,
-  payer,
 });

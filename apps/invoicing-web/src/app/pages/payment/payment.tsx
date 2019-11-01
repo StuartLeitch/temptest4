@@ -68,7 +68,7 @@ export const Payment = props => (
             onError={err => {
               console.error("payment error -> ", err);
             }}
-            onSuccess={props.createPaypalPayment}
+            onSuccess={props.paypalPaymentFulfilled}
           />
         </TabPane>
         <TabPane
