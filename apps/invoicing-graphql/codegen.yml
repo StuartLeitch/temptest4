@@ -1,12 +1,12 @@
 overwrite: true
-schema: './src/server/schema/schema.graphql'
+schema: "./src/server/schema/schema.graphql"
 documents: null
 generates:
   src/server/schema/generated.ts:
     plugins:
-      - 'typescript'
-      - 'typescript-resolvers'
-      - 'typescript-document-nodes'
+      - "typescript"
+      - "typescript-resolvers"
+      - "typescript-document-nodes"
   # ./graphql.schema.json:
   #   plugins:
   #     - "introspection"

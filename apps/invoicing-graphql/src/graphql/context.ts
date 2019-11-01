@@ -1,5 +1,5 @@
-import {KnexInvoiceRepo} from '../../../../libs/shared/src/lib/modules/invoices/repos/implementations/knexInvoiceRepo'
-import {KnexTransactionRepo} from '../../../../libs/shared/src/lib/modules/transactions/repos/implementations/knexTransactionRepo'
+import Knex from 'knex';
+import {KnexInvoiceRepo, KnexTransactionRepo} from '@hindawi/shared';
 
 export interface ReposContext {
   invoice: KnexInvoiceRepo;
@@ -12,7 +12,7 @@ export interface Context {
 
 export type ContextCreator = (params: any) => Context;
 
-export function makeContext(db): ContextCreator {
+export function makeContext(db: Knex): ContextCreator {
   return () => ({
     repos: {
       invoice: new KnexInvoiceRepo(db),

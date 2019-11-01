@@ -28,7 +28,7 @@ export * from './modules/transactions/domain/Transaction';
 export * from './modules/transactions/domain/TransactionId';
 // export * from './modules/transactions/domain/TransactionAmount';
 // // export * from './transactions/domain/events/transactionCreatedEvent';
-// export * from './modules/transactions/repos';
+export * from './modules/transactions/repos';
 // // export * from './transactions/repos/transactionJsonRepo';
 // export * from './modules/transactions/usecases/getTransactions/getTransactions';
 // export * from './modules/transactions/usecases/getTransaction/getTransaction';
@@ -43,14 +43,14 @@ export * from './modules/invoices/domain/InvoiceItem';
 export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
 // // export * from './invoices/domain/events/invoiceSentEvent';
-// export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-// export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
-// export * from './modules/invoices/repos';
-// export * from './modules/invoices/usecases/createInvoice/createInvoice';
-// // export * from './invoices/usecases/sendInvoice/sendInvoice';
+export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
+export * from './modules/invoices/repos';
+export * from './modules/invoices/usecases/createInvoice/createInvoice';
+// export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
-export * from './modules/invoices/dtos/InvoiceDTO';
+// export * from './modules/invoices/dtos/InvoiceDTO';
 export * from './modules/invoices/mappers/InvoiceItemMap';
 
 // export {
@@ -74,9 +74,9 @@ export * from './modules/payments/repos/paymentMethodRepo';
 // * Export Payer Subdomain
 export {Payer} from './modules/payers/domain/Payer';
 export * from './modules/payers/domain/PayerId';
-// export * from './modules/payers/domain/PayerName';
-// export * from './modules/payers/domain/PayerType';
-// export * from './modules/payers/domain/PayerTitle';
+export * from './modules/payers/domain/PayerName';
+export * from './modules/payers/domain/PayerType';
+export * from './modules/payers/domain/PayerTitle';
 export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/mapper/Payer';
 
@@ -115,7 +115,7 @@ export * from './modules/payments/domain/strategies/CreditCard';
 // export * from './modules/coupons/repos';
 
 // // * Export Author Subdomain
-// export * from './modules/authors/domain/Author';
+export * from './modules/authors/domain/Author';
 
 // * Export user Subdomain
 export * from './modules/users/domain/User';
