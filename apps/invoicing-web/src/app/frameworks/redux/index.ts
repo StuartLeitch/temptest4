@@ -59,5 +59,6 @@ export const configureStore = () => {
   const store = createStore(rootReducer, composeEnhancers(applyMiddleware(...middleware)));
 
   epicMiddleware.run(rootEpic);
+
   return store;
 };
