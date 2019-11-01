@@ -1,4 +1,4 @@
-export const up = function(knex) {
+module.exports.up = function(knex) {
   return knex.schema.createTable('articles', function(table) {
     table.uuid('id').primary();
     table.string('journalId');
@@ -11,6 +11,6 @@ export const up = function(knex) {
   });
 };
 
-export const down = function(knex) {
+module.exports.down = function(knex) {
   return knex.schema.dropTable('articles');
 };

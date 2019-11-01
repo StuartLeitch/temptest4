@@ -1,18 +1,22 @@
 import {makeDb} from './services/knex';
 
+import {makeConfig} from './config';
 import {makeContext} from './context';
 import {makeGraphqlServer} from './graphql';
 import {makeExpressServer} from './api';
 
-const db = makeDb();
-const context = makeContext(db);
+async function main() {
+  const config = await makeConfig();
+  const db = await makeDb(config);
+  const context = makeContext(db);
 
-const graphqlServer = makeGraphqlServer(context);
-const expressServer = makeExpressServer(context);
+  const graphqlServer = makeGraphqlServer(context);
+  const expressServer = makeExpressServer(context);
 
-graphqlServer.applyMiddleware({
-  app: expressServer,
-  path: '/graphql',
-});
+  graphqlServer.applyMiddleware({
+    app: expressServer,
+    path: '/graphql',
+  });
 
-expressServer.listen(process.env.PORT || 4000);
+  expressServer.listen(process.env.PORT || 4000);
+}

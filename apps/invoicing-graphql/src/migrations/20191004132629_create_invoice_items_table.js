@@ -1,6 +1,6 @@
-export const up = function(knex: any) {
+module.exports.up = function(knex) {
   return knex.schema.createTable('invoice_items', function(table) {
-    table.uuid('id', 36).primary();
+    table.uuid('id').primary();
     table.string('invoiceId', 40);
     table.string('manuscriptId', 40);
     table.string('name', 40);
@@ -11,4 +11,6 @@ export const up = function(knex: any) {
   });
 };
 
-export const down = (knex: any) => ({});
+module.exports.down = function(knex) {
+  return knex.schema.dropTable('invoice_items');
+}

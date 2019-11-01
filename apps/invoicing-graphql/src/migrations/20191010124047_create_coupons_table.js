@@ -1,6 +1,4 @@
-import * as Knex from 'knex';
-
-export async function up(knex: Knex): Promise<any> {
+module.exports.up = function(knex) {
   return knex.schema.createTable('coupons', function(table) {
     table.uuid('id').primary();
     table.string('name');
@@ -10,4 +8,6 @@ export async function up(knex: Knex): Promise<any> {
   });
 }
 
-export async function down(knex: Knex): Promise<any> {}
+module.exports.down = function (knex) {
+  return knex.schema.removeTable('coupons');
+}

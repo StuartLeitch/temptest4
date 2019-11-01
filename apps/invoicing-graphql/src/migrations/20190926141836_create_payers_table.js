@@ -1,6 +1,6 @@
-export const up = function(knex) {
+module.exports.up = function(knex) {
   return knex.schema.createTable('payers', function(table) {
-    table.uuid('id', 40).primary();
+    table.uuid('id').primary();
     table.string('title');
     table.string('surname');
     table.string('name');
@@ -16,6 +16,6 @@ export const up = function(knex) {
   });
 };
 
-export const down = function(knex) {
+module.exports.down = function(knex) {
   return knex.schema.dropTable('payers');
 };
