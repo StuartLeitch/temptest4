@@ -10,6 +10,7 @@ import Container from 'typedi';
 
 import {environment} from '../environments/environment';
 import {getErrorCode, getErrorMessage, handlingErrors} from '../lib/graphql';
+import { InvoiceResolver } from './../api/resolvers/invoiceResolver';
 
 export const graphqlLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -18,7 +19,7 @@ export const graphqlLoader: MicroframeworkLoader = async (
     const expressApp = settings.getData('express_app');
 
     const schema = await buildSchema({
-      resolvers: environment.app.dirs.resolvers,
+      resolvers: [InvoiceResolver],
       // automatically create `schema.gql` file with schema definition in current folder
       emitSchemaFile: path.resolve(__dirname, '../src/api', 'schema.graphql')
     });

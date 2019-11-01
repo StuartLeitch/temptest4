@@ -106,7 +106,7 @@ Build:
     policy: pull
   script:
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
-    - npm run affected:build -- ${AFFECTED_ARGS} --parallel --configuration production
+    - npm run affected:build -- ${AFFECTED_ARGS} --parallel --exclude=shared,react-components --configuration production
     - mkdir .ci_status
     - echo $(npm run affected:apps -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1) > .ci_status/affected_apps
     - echo $(npm run affected:libs -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1) > .ci_status/affected_libs

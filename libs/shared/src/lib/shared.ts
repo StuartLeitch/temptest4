@@ -10,7 +10,7 @@ export * from './domain/Email';
 export * from './domain/PhoneNumber';
 export * from './domain/authorization';
 
-// // * Export Article Subdomain
+// * Export Article Subdomain
 export * from './modules/articles/domain/Article';
 // export * from './modules/articles/dtos/ArticleDTO';
 export * from './modules/articles/mappers/ArticleMap';
@@ -36,7 +36,7 @@ export * from './modules/articles/mappers/ArticleMap';
 // // export * from './transactions/subscribers/AfterTransactionCreatedEvents';
 // export * from './modules/transactions/mappers/TransactionMap';
 
-// // * Export Invoice Subdomain
+// * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
 export * from './modules/invoices/domain/InvoiceId';
 // export * from './modules/invoices/domain/InvoiceItem';
@@ -50,6 +50,7 @@ export * from './modules/invoices/domain/ManuscriptId';
 // // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
+export * from './modules/invoices/dtos/InvoiceDTO';
 // export * from './modules/invoices/mappers/InvoiceItemMap';
 
 // export {
@@ -70,7 +71,7 @@ export * from './modules/invoices/mappers/InvoiceMap';
 // export * from './modules/payments/repos/paymentRepo';
 // export * from './modules/payments/repos/paymentMethodRepo';
 
-// // * Export Payer Subdomain
+// * Export Payer Subdomain
 export {Payer} from './modules/payers/domain/Payer';
 // export * from './modules/payers/domain/PayerId';
 // export * from './modules/payers/domain/PayerName';
@@ -79,7 +80,7 @@ export {Payer} from './modules/payers/domain/Payer';
 // export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/mapper/Payer';
 
-// // * Export Address Subdomain
+// * Export Address Subdomain
 export * from './modules/addresses/domain/AddressId';
 export * from './modules/addresses/domain/Address';
 
@@ -94,7 +95,7 @@ export * from './modules/addresses/domain/Address';
 // // * Export User Subdomain
 // export {Roles} from './modules/users/domain/enums/Roles';
 
-// // * Export Payments Subdomain
+// * Export Payments Subdomain
 export * from './modules/payments/domain/contracts/PaymentModel';
 export * from './modules/payments/domain/strategies/PaymentFactory';
 export * from './modules/payments/domain/strategies/PaymentStrategy';
@@ -121,7 +122,8 @@ export * from './modules/users/domain/User';
 export * from './modules/users/domain/UserId';
 export * from './modules/users/mappers/UserMap';
 
-// Infra
+// ? Should we export this
+// * Infra
 // export * from './infra/http/app';
 // export {
 //   BraintreeGateway
@@ -129,6 +131,7 @@ export * from './modules/users/mappers/UserMap';
 // export * from './infrastructure/database/knex';
 // export {Emailer} from './infrastructure/communication-channels';
 
-// Redux Stuff
+// ? Should we export this
+// * Redux Stuff
 // export * from './infrastructure/frameworks/redux';
 // export * from './infrastructure/state-management/redux';

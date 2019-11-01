@@ -1,4 +1,5 @@
-import {Knex} from '@hindawi/shared';
+// import {Knex} from '@hindawi/shared';
+import Knex from 'knex'
 
 import {Transaction} from '../../domain/Transaction';
 import {TransactionId} from '../../domain/TransactionId';

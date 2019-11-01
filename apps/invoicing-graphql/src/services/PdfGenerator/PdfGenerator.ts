@@ -8,7 +8,7 @@ import { Invoice, Article, Payer } from '@hindawi/shared';
 
 export interface InvoicePayload {
   invoice: Invoice;
-  // author: Author;
+  author: any;
   article: Article;
   payer: Payer;
 }
