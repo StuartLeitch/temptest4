@@ -1,13 +1,10 @@
-import {
-  CatalogItem,
-  // CatalogId,
-  CatalogRepoContract,
-  CatalogMap,
-  JournalId
-} from '@hindawi/shared';
-
 import {Knex} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+
+import {JournalId} from './../../domain/JournalId';
+import {CatalogMap} from './../../mappers/CatalogMap';
+import {CatalogRepoContract} from './../catalogRepo';
+import {CatalogItem} from './../../domain/CatalogItem';
 
 export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {

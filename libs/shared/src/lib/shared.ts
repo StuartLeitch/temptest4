@@ -60,17 +60,6 @@ export * from './modules/invoices/mappers/InvoiceItemMap';
 // export * from './modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 // export * from './modules/invoices/domain/policies/VATTreatmentPublicationNotOwnedPolicy';
 
-// * Export Payment Subdomain
-export * from './modules/payments/domain/Payment';
-export {PaymentMethod} from './modules/payments/domain/PaymentMethod';
-export * from './modules/payments/domain/PaymentId';
-export * from './modules/payments/domain/PaymentMethodId';
-export * from './modules/payments/mapper/Payment';
-export * from './modules/payments/mapper/PaymentMethod';
-
-export * from './modules/payments/repos/paymentRepo';
-export * from './modules/payments/repos/paymentMethodRepo';
-
 // * Export Payer Subdomain
 export {Payer} from './modules/payers/domain/Payer';
 export * from './modules/payers/domain/PayerId';
@@ -96,14 +85,19 @@ export * from './modules/catalogs/mappers/CatalogMap';
 // export {Roles} from './modules/users/domain/enums/Roles';
 
 // * Export Payments Subdomain
+export * from './modules/payments/domain/Payment';
+export * from './modules/payments/domain/PaymentId';
+export {PaymentMethod} from './modules/payments/domain/PaymentMethod';
+export * from './modules/payments/domain/PaymentMethodId';
 export * from './modules/payments/domain/contracts/PaymentModel';
 export * from './modules/payments/domain/strategies/PaymentFactory';
 export * from './modules/payments/domain/strategies/PaymentStrategy';
 export * from './modules/payments/domain/strategies/CreditCardPayment';
 export * from './modules/payments/domain/strategies/CreditCard';
 export * from './modules/payments/usecases/payment/recordPayment';
-export * from './modules/payments/repos/implementations/knexPaymentRepo';
-export * from './modules/payments/repos/implementations/knexPaymentMethodRepo';
+export * from './modules/payments/mapper/Payment';
+export * from './modules/payments/mapper/PaymentMethod';
+export * from './modules/payments/repos';
 
 // // * Export Coupon Subdomain
 // export * from './domain/reductions/ReductionFactory';
@@ -128,7 +122,9 @@ export * from './modules/users/mappers/UserMap';
 // ? Should we export this
 // * Infra
 // export * from './infra/http/app';
-export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
+export {
+  BraintreeGateway
+} from './modules/payments/infrastructure/gateways/braintree/gateway';
 // export * from './infrastructure/database/knex';
 // export {Emailer} from './infrastructure/communication-channels';
 
