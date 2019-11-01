@@ -29,6 +29,11 @@ export const createPayer = (payerInfo: StateSlice["payerInfo"]) => ({
   payerInfo,
 });
 
+export const createPayerFulfilled = payerInfo => ({
+  type: CONSTANTS.CREATE_PAYER_FULFILLED,
+  payerInfo,
+});
+
 export const updatePayerAction = (payerInfo: StateSlice["payerInfo"]) => ({
   type: CONSTANTS.UPDATE_PAYER,
   payerInfo,

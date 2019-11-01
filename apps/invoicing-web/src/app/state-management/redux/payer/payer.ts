@@ -37,6 +37,8 @@ export const payer = (state: StateSlice = initialState.payer, action: any): Stat
     case CONSTANTS.CREATE_PAYER:
     case CONSTANTS.UPDATE_PAYER:
       return createOrUpdatePayer(state, action);
+    case CONSTANTS.CREATE_PAYER_FULFILLED:
+      return createOrUpdatePayer(state, action);
     case CONSTANTS.UPDATE_ADDRESS:
       return updateBillingAddress(state, action);
     case CONSTANTS.UPDATE_CARD:
