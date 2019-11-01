@@ -1,4 +1,4 @@
-import { User } from "@hindawi/shared";
+import { User } from "../../../../../../../libs/shared/src/lib/modules/users/domain/User";
 
 import CONSTANTS from "./constants";
 import { initialState, StateType } from "./state";

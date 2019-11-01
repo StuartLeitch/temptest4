@@ -1,4 +1,4 @@
-import { Invoice } from "@hindawi/shared";
+import { Invoice } from "../../../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice";
 
 export interface StateType {
   readonly invoice: Invoice | null;

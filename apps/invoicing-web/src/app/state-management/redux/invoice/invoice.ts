@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 
-import { Invoice } from "@hindawi/shared";
+import { Invoice } from "../../../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice";
 
 import CONSTANTS from "./constants";
 import { initialState, StateType } from "./state";

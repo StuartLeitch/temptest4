@@ -1,14 +1,6 @@
 import { ofType } from "redux-observable";
 import { of } from "rxjs";
 import { mergeMap } from "rxjs/operators";
-// import { ajax } from "rxjs/ajax";
-
-// import {ManuscriptId} from '@hindawi/shared';
-// import {all, call, put, takeLatest} from 'redux-saga/effects';
-// import {Credential, User} from '../../entities';
-// import {updateUserAction} from './user';
-// import {SignInInteractor, SignUpInteractor} from '../../useCases';
-// import {SampleService} from '../../services';
 
 import CONSTANTS from "./constants";
 
@@ -32,10 +24,6 @@ export const initEpic = (action$: any) =>
   action$.pipe(
     ofType(CONSTANTS.INIT),
     mergeMap((action: InitActionType) => {
-      // ajax
-      //   .getJSON(`https://api.github.com/users/${action.manuscriptId}`)
-      //   .pipe(map(response => fetchManuscriptFulfilled(response))),
-
       return of(initAppFulfilled({ foo: "bau-bau" }));
     }),
   );

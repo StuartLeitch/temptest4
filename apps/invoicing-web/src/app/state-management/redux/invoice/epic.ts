@@ -2,8 +2,7 @@ import { ofType, ActionsObservable } from "redux-observable";
 import { mergeMap, map, switchMap, ignoreElements, tap } from "rxjs/operators";
 const Axios = require("axios-observable").Axios;
 
-import { InvoiceId, InvoiceMap } from "@hindawi/shared";
-
+import { InvoiceMap } from "../../../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap";
 import CONSTANTS from "./constants";
 
 // * Action Creators
