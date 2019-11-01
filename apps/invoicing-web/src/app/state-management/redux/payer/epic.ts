@@ -1,12 +1,14 @@
+import Message from "antd/lib/message";
 import { ofType, ActionsObservable, StateObservable } from "redux-observable";
 import { mergeMap, map, ignoreElements, tap, switchMap, withLatestFrom } from "rxjs/operators";
-import Message from "antd/lib/message";
-const Axios = require("axios-observable").Axios;
+import { Axios } from "axios-observable";
+import gql from "graphql-tag";
+import { print } from "graphql";
 
 import CONSTANTS from "./constants";
 import { selectPayer, StateSlice } from "./state";
-import { createPaymentFulfilled } from "./actions";
-
+import { createPaymentFulfilled, createPayerFulfilled } from "./actions";
+import { of } from "rxjs";
 
 // * epic
 export const createPaymentEpic = (
@@ -90,15 +92,28 @@ export const paypalPaymentFulfilledEpic = (action$: ActionsObservable<any>) => {
 };
 
 // * create payer
-export const createPayerEpic = (
-  action$: ActionsObservable<any>,
-  state$: StateObservable<StateSlice>,
-) => {
+
+const createPayer = gql`
+  mutation createPayer($input: PayerInput!) {
+    createPayer(input: $input) {
+      id
+      name
+      email
+    }
+  }
+`;
+
+export const createPayerEpic = (action$: ActionsObservable<any>) => {
   return action$.pipe(
     ofType(CONSTANTS.CREATE_PAYER),
-    tap((args: any) => {
-      console.log("create payer", args, state$.value);
+    mergeMap(({ payerInfo }) =>
+      Axios.post("http://localhost:4000/graphql", {
+        query: print(createPayer),
+        variables: { input: payerInfo },
+      }),
+    ),
+    map(({ data }) => {
+      return createPayerFulfilled(data.data.createPayer);
     }),
-    ignoreElements(),
   );
 };
