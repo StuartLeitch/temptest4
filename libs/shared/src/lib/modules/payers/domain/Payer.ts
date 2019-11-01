@@ -27,7 +27,7 @@ interface PayerProps {
   shippingAddressId?: AddressId;
   VATId?: string;
   dateAdded?: Date;
-  country: string;
+  country?: string;
 }
 
 export type PayerCollection = Payer[];

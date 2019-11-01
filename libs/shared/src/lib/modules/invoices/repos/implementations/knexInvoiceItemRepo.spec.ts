@@ -1,13 +1,10 @@
 import {
   UniqueEntityID,
-  InvoiceId,
   InvoiceItem,
   InvoiceItemId,
   InvoiceItemMap,
-  clearTable,
-  makeDb,
-  destroyDb
 } from '../../../../..';
+import {Knex, clearTable, makeDb, destroyDb} from '../../../../infrastructure/database/knex';
 import {RepoError} from '../../../../infrastructure/RepoError';
 import {KnexInvoiceItemRepo as InvoiceItemRepo} from './knexInvoiceItemRepo';
 
@@ -23,7 +20,7 @@ function makeInvoiceItemData(overwrites?: any): InvoiceItem {
 }
 
 describe('InvoiceItemRepo', () => {
-  let db: any;
+  let db: Knex;
   let repo: InvoiceItemRepo;
 
   beforeAll(async () => {
@@ -78,7 +75,7 @@ describe('InvoiceItemRepo', () => {
 
       it('should reject promise for unknown invoice items', () => {
         const id = 'unknown-item-id';
-        const invoiceItem = makeInvoiceItemData({id});
+        invoiceItem = makeInvoiceItemData({id});
 
         expect(
           repo.delete(invoiceItem)
@@ -92,8 +89,8 @@ describe('InvoiceItemRepo', () => {
       it('should update record and return it', async () => {
         const invoiceItemId = InvoiceItemId.create(
           new UniqueEntityID('invoice-item-1')
-        );
-        const invoiceItem = await repo.getInvoiceItemById(invoiceItemId);
+          );
+        invoiceItem = await repo.getInvoiceItemById(invoiceItemId);
         const invoiceItemPrice = 0;
         invoiceItem.price = invoiceItemPrice;
 
@@ -106,7 +103,7 @@ describe('InvoiceItemRepo', () => {
 
       it('should reject promise when invoice item does not exist', async () => {
         const id = 'unknown-invoice-item';
-        const invoiceItem = makeInvoiceItemData({id});
+        invoiceItem = makeInvoiceItemData({id});
 
         expect(
           repo.update(invoiceItem)
@@ -118,14 +115,14 @@ describe('InvoiceItemRepo', () => {
 
     describe('.exists()', () => {
       it('should return true for existing invoice items', async () => {
-        const invoiceItem = makeInvoiceItemData({id: 'invoice-item-1'});
+        invoiceItem = makeInvoiceItemData({id: 'invoice-item-1'});
         const result = await repo.exists(invoiceItem);
 
         expect(result).toBe(true);
       });
 
       it('should return false for inexistent invoice items', async () => {
-        const invoiceItem = makeInvoiceItemData({id: 'unknown-invoice-item'});
+        invoiceItem = makeInvoiceItemData({id: 'unknown-invoice-item'});
         const result = await repo.exists(invoiceItem);
 
         expect(result).toBe(false);
@@ -134,14 +131,14 @@ describe('InvoiceItemRepo', () => {
 
     describe('.save()', () => {
       it('should save a new invoice item', async () => {
-        const invoiceItem = makeInvoiceItemData({id: 'invoice-item-2'});
+        invoiceItem = makeInvoiceItemData({id: 'invoice-item-2'});
         const result = await repo.save(invoiceItem);
 
         expect(result).toEqual(invoiceItem);
       });
 
       it('should throw if invoice item already exists', async () => {
-        const invoiceItem = makeInvoiceItemData({id: 'invoice-item-1'});
+        invoiceItem = makeInvoiceItemData({id: 'invoice-item-1'});
         expect(repo.save(invoiceItem)).rejects.toThrow(RepoError);
       });
     });

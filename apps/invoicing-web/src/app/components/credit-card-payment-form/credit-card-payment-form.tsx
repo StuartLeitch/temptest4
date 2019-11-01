@@ -1,8 +1,8 @@
 import * as React from "react";
-import Form, { FormComponentProps } from "antd/es/form";
+import Form, { FormComponentProps } from "antd/lib/form";
 // import Icon from "antd/es/icon";
-import Input from "antd/es/input";
-import Button from "antd/es/button";
+import Input from "antd/lib/input";
+import Button from "antd/lib/button";
 import ReactCreditCard from "@repay/react-credit-card";
 
 type FOCUS_TYPE = "number" | "cvc" | "expiration" | "name";

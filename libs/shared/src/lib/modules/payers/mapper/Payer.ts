@@ -30,10 +30,10 @@ export class PayerMap extends Mapper<Payer> {
   public static toDomain(raw: PayerPersistenceDTO): Payer {
     const result = Payer.create(
       {
+        name: PayerName.create(raw.name).getValue(),
         title: PayerTitle.create(raw.title).getValue(),
         type: PayerType.create(raw.type).getValue(),
         surname: PayerName.create(raw.surname).getValue(),
-        name: PayerName.create(raw.name).getValue(),
         organization: Name.create(raw.organization).getValue(),
         email: Email.create(raw.email).getValue(),
         phone: PhoneNumber.create(raw.phone).getValue(),

@@ -3,9 +3,9 @@ import React from "react";
 
 import { environment } from "../../../environments/environment";
 
-import Avatar from "antd/es/avatar";
-import Tabs from "antd/es/tabs";
-import Icon from "antd/es/icon";
+import Avatar from "antd/lib/avatar";
+import Tabs from "antd/lib/tabs";
+import Icon from "antd/lib/icon";
 
 import { Panel } from "../../components/panel/panel";
 import Paypal from "../../components/paypal/paypal";

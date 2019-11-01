@@ -90,10 +90,6 @@ defineFeature(feature, test => {
     mockTransactionRepo.save(transaction);
     mockInvoiceRepo.save(invoice);
     mockInvoiceItemRepo.save(invoiceItem);
-
-    console.info(TransactionMap.toPersistence(transaction));
-    console.info(InvoiceMap.toPersistence(invoice));
-    console.info(InvoiceItemMap.toPersistence(invoiceItem));
   });
 
   test('Manuscript Accept Handler', ({given, when, then, and}) => {
@@ -105,7 +101,6 @@ defineFeature(feature, test => {
         price: 1900
       });
       mockCatalogRepo.save(catalogItem);
-      console.info(CatalogMap.toPersistence(catalogItem));
     });
 
     and('The Author is from a Waived Country', () => {
@@ -123,7 +118,6 @@ defineFeature(feature, test => {
         authorCountry,
         authorSurname
       });
-      console.info(ArticleMap.toPersistence(manuscript));
       mockArticleRepo.save(manuscript);
     });
 

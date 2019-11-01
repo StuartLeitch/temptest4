@@ -1,11 +1,10 @@
 import {
-  UniqueEntityID,
   Payer,
   PayerRepoContract,
   PayerId,
   PayerMap,
-  Knex
-} from '../../../../..';
+} from '../../../../shared';
+import {Knex} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 

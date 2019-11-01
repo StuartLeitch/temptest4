@@ -11,7 +11,7 @@ import {environment} from '../environments/environment';
 
 import {CheckoutController} from '../api/controllers/checkoutController';
 import {PaypalController} from '../api/controllers/paypalController';
-// import {MailController} from '../api/controllers/__mailing__Controller__';
+import {MailController} from '../api/controllers/mailingController';
 
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -33,7 +33,7 @@ export const expressLoader: MicroframeworkLoader = (
        * Here we specify what controllers should be registered in our express server.
        */
 
-      controllers: [CheckoutController, PaypalController /* , MailController*/]
+      controllers: [CheckoutController, PaypalController, MailController]
       // controllers: environment.app.dirs.controllers
       // middlewares: environment.app.dirs.middlewares,
       // interceptors: environment.app.dirs.interceptors

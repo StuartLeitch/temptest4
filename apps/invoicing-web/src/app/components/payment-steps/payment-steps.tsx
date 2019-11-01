@@ -1,5 +1,5 @@
 import React from "react";
-import Steps from "antd/es/steps";
+import Steps from "antd/lib/steps";
 
 const { Step } = Steps;
 

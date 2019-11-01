@@ -1,48 +1,49 @@
-// import {createTestClient} from 'apollo-server-testing';
-// import gql from 'graphql-tag';
-// import {makeDb, destroyDb} from '@hindawi/shared';
+import {createTestClient} from 'apollo-server-testing';
+import gql from 'graphql-tag';
 
-// import {makeServer} from '../server';
-// import {makeContext} from '../context';
+import {makeDb, destroyDb} from '../../../../../libs/shared/src/lib/infrastructure/database/knex';
 
-// describe('Query.invoice', () => {
-//   let db: any;
-//   let server: any;
-//   let context: any;
-//   let client: any;
+import {makeServer} from '../../app/server';
+import {makeContext} from '../../app/context';
 
-//   beforeAll(async () => {
-//     db = await makeDb();
-//     context = makeContext(db);
-//     server = makeServer(context);
-//     client = createTestClient(server);
-//   });
+describe('Query.invoice', () => {
+  let db: any;
+  let server: any;
+  let context: any;
+  let client: any;
 
-//   afterAll(() => destroyDb(db));
+  beforeAll(async () => {
+    db = await makeDb();
+    context = makeContext(db);
+    server = makeServer(context);
+    client = createTestClient(server);
+  });
 
-//   it('should work', async () => {
-//     const query = gql`
-//       query invoice($id: String!) {
-//         invoice(id: $id) {
-//           id
-//           totalAmount
-//         }
-//       }
-//     `;
+  afterAll(() => destroyDb(db));
 
-//     await db('invoices').insert({
-//       id: 'invoice-1',
-//       transactionId: 'transaction-1',
-//       status: 'draft'
-//     });
+  it('should work', async () => {
+    const query = gql`
+      query invoice($id: String!) {
+        invoice(id: $id) {
+          id
+          totalAmount
+        }
+      }
+    `;
 
-//     const res = await client.query({
-//       query,
-//       variables: {
-//         id: 'invoice-1'
-//       }
-//     });
+    await db('invoices').insert({
+      id: 'invoice-1',
+      transactionId: 'transaction-1',
+      status: 'draft'
+    });
 
-//     expect(res.data).toMatchSnapshot();
-//   });
-// });
+    const res = await client.query({
+      query,
+      variables: {
+        id: 'invoice-1'
+      }
+    });
+
+    expect(res.data).toMatchSnapshot();
+  });
+});

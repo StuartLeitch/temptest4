@@ -3,8 +3,8 @@ import {
   PaymentMethodId,
   PaymentMethodRepoContract,
   PaymentMethodMap,
-  Knex
 } from '../../../../..';
+import {Knex,} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoErrorCode, RepoError} from '../../../../infrastructure/RepoError';
 

@@ -10,7 +10,7 @@ export function banner(log: LoggerContract): void {
       `${environment.app.schema}://${environment.app.host}:${environment.app.port}`;
     log.info(``);
     log.info(
-      `Hi, your app is ready on ${route()}${environment.app.routePrefix}`
+      `🚀 App is ready on ${route()}${environment.app.routePrefix}`
     );
     log.info(`To shut it down, press <CTRL> + C at any time.`);
     log.info(``);

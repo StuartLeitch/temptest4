@@ -3,9 +3,9 @@ import { produce } from "immer";
 import { connect } from "react-redux";
 import { Route, useParams, useRouteMatch, useHistory } from "react-router-dom";
 
-import Row from "antd/es/row";
-import Col from "antd/es/col";
-import Card from "antd/es/card";
+import Row from "antd/lib/row";
+import Col from "antd/lib/col";
+import Card from "antd/lib/card";
 
 import { Charges } from "../../components/charges/charges";
 import { PaymentSteps } from "../../components/payment-steps/payment-steps";

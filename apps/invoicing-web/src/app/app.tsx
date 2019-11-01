@@ -42,8 +42,7 @@ export const App = () => {
       </header>
 
       <Route path="/" exact component={InvoiceCard} />
-
-      <Route component={PaymentWizard} path="/payment/:invoiceId" />
+      <Route path="/payment/:invoiceId" component={PaymentWizard}  />
     </div>
   );
 };
