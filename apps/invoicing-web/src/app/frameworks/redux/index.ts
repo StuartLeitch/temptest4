@@ -21,6 +21,7 @@ const {
   createPaypalPaymentEpic,
   createPayerEpic,
   paypalPaymentFulfilledEpic,
+  updateAddressEpic,
 } = payerRedux;
 
 export const rootEpic = combineEpics(
@@ -34,6 +35,7 @@ export const rootEpic = combineEpics(
   createInvoiceMailEpic,
   createPaypalPaymentEpic,
   paypalPaymentFulfilledEpic,
+  updateAddressEpic,
 );
 export const rootReducer = combineReducers({
   manuscript,

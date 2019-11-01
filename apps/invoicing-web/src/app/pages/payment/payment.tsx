@@ -58,7 +58,7 @@ export const Payment = props => (
           }
           key="2"
         >
-          <button onClick={() => props.createPaypalPayment(dummyPayload)}>FAKE PAYPAL</button>
+          {/* <button onClick={() => props.createPaypalPayment(dummyPayload)}>FAKE PAYPAL</button> */}
           <Paypal
             total={0.01}
             currency="EUR"
