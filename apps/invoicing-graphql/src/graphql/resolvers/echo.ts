@@ -1,5 +1,5 @@
 import {Resolvers} from '../schema';
-import {Context} from '../context';
+import {Context} from '../../context';
 
 export const echo: Resolvers<Context> = {
   Query: {

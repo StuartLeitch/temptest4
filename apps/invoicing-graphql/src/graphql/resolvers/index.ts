@@ -1,6 +1,6 @@
 import {merge} from 'lodash';
 import {Resolvers} from '../schema';
-import {Context} from '../context';
+import {Context} from '../../context';
 
 import {echo} from './echo';
 import {invoice} from './invoice';
