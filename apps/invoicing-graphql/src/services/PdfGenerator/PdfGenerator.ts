@@ -1,14 +1,14 @@
-import fs from 'fs';
-import path from 'path';
 import { Readable } from 'stream';
 import { format } from 'date-fns';
+import fs from 'fs';
+import path from 'path';
 import ejs from 'ejs';
+import { Invoice, Author, Article, Payer } from '@hindawi/shared';
 import pdf from 'html-pdf';
-import { Invoice, Article, Payer } from '@hindawi/shared';
 
 export interface InvoicePayload {
   invoice: Invoice;
-  author: any;
+  author: Author;
   article: Article;
   payer: Payer;
 }

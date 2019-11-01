@@ -1,12 +1,11 @@
-import {JsonController, Get} from 'routing-controllers';
+import {JsonController, Post} from 'routing-controllers';
 
 import {environment} from '../../environments/environment';
-// tslint:disable-next-line
 import {Emailer} from '../../../../../libs/shared/src/lib/infrastructure/communication-channels';
 
 @JsonController('/mail')
 export class MailController {
-  @Get()
+  @Post()
   public sendDummyMail() {
     const mailer = new Emailer();
     return mailer
@@ -15,12 +14,12 @@ export class MailController {
         fromEmail: environment.mailing.fromEmail,
         toUser: {
           email: environment.mailing.toEmail,
-          name: `Testez`
+          name: `Some Guy In A Suit`
         },
         content: {
           ctaText: 'PAY INVOICE',
           signatureJournal: 'Finance & Bubblegum',
-          signatureName: `Hindawi Finance Suits`,
+          signatureName: `Hindawi Finance`,
           subject: `Invoice #123 emitted`,
           paragraph:
             'Please visit Phenom Invoice and pay the attached invoice.',

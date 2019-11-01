@@ -13,24 +13,27 @@ import {
 const { manuscript, fetchManuscriptEpic } = manuscriptRedux;
 const { app, initEpic } = appRedux;
 const { user, fetchUsersEpic } = userRedux;
-const { invoice, fetchInvoiceEpic } = invoiceRedux;
+const { invoice, fetchInvoiceEpic, createInvoiceMailEpic } = invoiceRedux;
 const {
   payer,
   createPaymentEpic,
   paymentDoneEpic,
   createPaypalPaymentEpic,
   createPayerEpic,
+  paypalPaymentFulfilledEpic,
 } = payerRedux;
 
 export const rootEpic = combineEpics(
-  fetchManuscriptEpic,
   initEpic,
   fetchUsersEpic,
+  createPayerEpic,
+  paymentDoneEpic,
   fetchInvoiceEpic,
   createPaymentEpic,
-  paymentDoneEpic,
+  fetchManuscriptEpic,
+  createInvoiceMailEpic,
   createPaypalPaymentEpic,
-  createPayerEpic,
+  paypalPaymentFulfilledEpic,
 );
 export const rootReducer = combineReducers({
   manuscript,

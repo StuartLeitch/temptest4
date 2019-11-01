@@ -1,7 +1,6 @@
 import * as path from 'path';
 import Knex from 'knex';
 
-import {config} from './knexfile';
 
 export {Knex};
 
@@ -46,4 +45,3 @@ export async function clearTable(db: Knex, ...tables: string[]): Promise<Knex> {
   return db;
 }
 
-export const KnexDB = () => Knex(config);

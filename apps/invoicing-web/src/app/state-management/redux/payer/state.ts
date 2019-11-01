@@ -1,34 +1,36 @@
 import { createSelector } from "reselect";
-import { Payer } from "@hindawi/shared";
 
 export interface StateType {
-  readonly payer: Payer | null;
+  readonly payer: {
+    payerId: any;
+    payerInfo: any;
+    billingAddress: any;
+    creditCard: any;
+  };
 }
 
 export const initialState: StateType = {
-  payer: null,
+  payer: {
+    payerId: null,
+    payerInfo: {},
+    billingAddress: {},
+    creditCard: {},
+  },
 };
 
 export type StateSlice = StateType["payer"];
 
 // selectors
-const getPayer = (state: any): StateSlice => state.payer;
+const getPayer = (state: StateType): StateSlice => state.payer;
 
 export const selectPayer = createSelector(
   getPayer,
-  (payer: any) => {
-    if (!payer) {
-      return null;
-    } else {
-      return {
-        payerInfo: {
-          name: payer.name,
-          email: payer.email,
-          country: payer.country,
-        },
-        billingAddress: payer.billingAddress,
-        cardDetails: payer.cardDetails,
-      };
-    }
+  (payer: StateSlice) => {
+    return {
+      id: payer.payerId,
+      payerInfo: payer.payerInfo,
+      billingAddress: payer.billingAddress,
+      cardDetails: payer.creditCard,
+    };
   },
 );

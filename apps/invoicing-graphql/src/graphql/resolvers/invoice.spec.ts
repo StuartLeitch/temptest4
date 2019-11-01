@@ -1,10 +1,9 @@
 import {createTestClient} from 'apollo-server-testing';
 import gql from 'graphql-tag';
+import {makeDb, destroyDb} from '@hindawi/shared';
 
-import {makeDb, destroyDb} from '../../../../../libs/shared/src/lib/infrastructure/database/knex';
-
-import {makeServer} from '../../app/server';
-import {makeContext} from '../../app/context';
+import {makeServer} from '../server';
+import {makeContext} from '../../context';
 
 describe('Query.invoice', () => {
   let db: any;

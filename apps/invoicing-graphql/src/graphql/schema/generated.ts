@@ -50,6 +50,7 @@ export type QueryEchoArgs = {
 };
 
 
+
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
@@ -165,4 +166,3 @@ export type Resolvers<ContextType = any> = {
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
 */
 export type IResolvers<ContextType = any> = Resolvers<ContextType>;
-import gql from 'graphql-tag';

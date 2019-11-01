@@ -11,7 +11,7 @@ import { createPaymentFulfilled } from "./actions";
 // * epic
 export const createPaymentEpic = (
   action$: ActionsObservable<any>,
-  state$: StateObservable<StateSlice>,
+  state$: StateObservable<any>,
 ) => {
   return action$.pipe(
     ofType(CONSTANTS.CREATE_PAYMENT),
@@ -49,9 +49,10 @@ export const paymentDoneEpic = action$ =>
     ignoreElements(),
   );
 
+// * paypal epics
 export const createPaypalPaymentEpic = (
   action$: ActionsObservable<any>,
-  state$: StateObservable<StateSlice>,
+  state$: StateObservable<any>,
 ) => {
   return action$.pipe(
     ofType(CONSTANTS.CREATE_PAYPAL_PAYMENT),
@@ -59,7 +60,7 @@ export const createPaypalPaymentEpic = (
     switchMap(([{ payment }, state]) => {
       const payer = selectPayer(state);
       return Axios.post(
-        "http://localhost:80/api/paypal-payment-created",
+        "http://localhost:3000/api/paypal-payment-created",
         {
           payer,
           payment,
@@ -75,6 +76,20 @@ export const createPaypalPaymentEpic = (
   );
 };
 
+export const paypalPaymentFulfilledEpic = (action$: ActionsObservable<any>) => {
+  return action$.pipe(
+    ofType(CONSTANTS.CREATE_PAYPAL_PAYMENT_FULFILLED),
+    tap(({ payment }) => {
+      Message.success(
+        `Payment successfully processed! Paypal payment id ==> ${payment.paymentID}`,
+        7,
+      );
+    }),
+    ignoreElements(),
+  );
+};
+
+// * create payer
 export const createPayerEpic = (
   action$: ActionsObservable<any>,
   state$: StateObservable<StateSlice>,
@@ -82,7 +97,7 @@ export const createPayerEpic = (
   return action$.pipe(
     ofType(CONSTANTS.CREATE_PAYER),
     tap((args: any) => {
-      console.log("create payer", args);
+      console.log("create payer", args, state$.value);
     }),
     ignoreElements(),
   );

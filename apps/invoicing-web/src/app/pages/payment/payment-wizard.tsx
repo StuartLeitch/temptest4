@@ -20,7 +20,16 @@ import { manuscriptRedux, invoiceRedux, payerRedux } from "../../state-managemen
 
 const { fetchInvoiceAction } = invoiceRedux;
 const { selectAuthor, selectManuscript } = manuscriptRedux;
-const { updatePayerAction, createPaymentAction, createPaypalPayment, createPayer } = payerRedux;
+const {
+  selectPayer,
+  createPayer,
+  updateCreditCard,
+  updatePayerAction,
+  createPaypalPayment,
+  createPaymentAction,
+  updateBillingAddress,
+  paypalPaymentFulfilled,
+} = payerRedux;
 
 const initialState = {
   payer: {
@@ -65,7 +74,6 @@ function usePaymentWizard() {
 
   const changeHandler = step => event => {
     const v = event.target.value;
-    console.log(v);
     dispatch({
       type: CHANGE_VALUE,
       step,
@@ -84,13 +92,17 @@ function usePaymentWizard() {
 }
 
 const routes = ["/payer", "/billing-address", "/card-details"];
+
 const PaymentWizard = ({
   author,
   createPayer,
   updatePayer,
   fetchInvoice,
   createPayment,
+  updateCreditCard,
   createPaypalPayment,
+  updateBillingAddress,
+  paypalPaymentFulfilled,
 }) => {
   const { invoiceId } = useParams();
   const match = useRouteMatch();
@@ -116,16 +128,15 @@ const PaymentWizard = ({
     switch (step) {
       case 1:
         changeStep(step);
-        updatePayer(formData);
         createPayer(formData);
         break;
       case 2:
         changeStep(step);
-        updatePayer({ billingAddress: formData });
+        updateBillingAddress(formData);
         break;
       default:
-        updatePayer({ cardDetails: formData });
-        createPayment();
+        updateCreditCard(formData);
+      // createPayment();
     }
   };
 
@@ -162,6 +173,7 @@ const PaymentWizard = ({
               render={() => (
                 <Payment
                   onSubmit={handleSubmit}
+                  paypalPaymentFulfilled={paypalPaymentFulfilled}
                   createPaypalPayment={createPaypalPayment}
                   cardDetails={formState.cardDetails}
                   onChange={changeHandler("cardDetails")}
@@ -185,6 +197,7 @@ const PaymentWizard = ({
 const mapStateToProps = state => ({
   author: selectAuthor(state),
   manuscript: selectManuscript(state),
+  payer: selectPayer(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -193,6 +206,9 @@ const mapDispatchToProps = dispatch => ({
   createPayment: () => dispatch(createPaymentAction()),
   fetchInvoice: invoiceId => dispatch(fetchInvoiceAction(invoiceId)),
   createPaypalPayment: payment => dispatch(createPaypalPayment(payment)),
+  updateCreditCard: creditCard => dispatch(updateCreditCard(creditCard)),
+  paypalPaymentFulfilled: payment => dispatch(paypalPaymentFulfilled(payment)),
+  updateBillingAddress: billingAddress => dispatch(updateBillingAddress(billingAddress)),
 });
 
 export default connect(
