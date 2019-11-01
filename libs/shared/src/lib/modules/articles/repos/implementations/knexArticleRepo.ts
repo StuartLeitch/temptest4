@@ -1,8 +1,8 @@
-import {Article, ArticleId, ArticleMap, Knex} from '../../../../..';
+import {UniqueEntityID, Article, ArticleId, ArticleMap} from '../../../../shared';
+import {Knex} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {ArticleRepoContract} from './../articleRepo';
 import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
-import {UniqueEntityID} from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import {ArticleRepoContract} from '../articleRepo';
 
 export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
   implements ArticleRepoContract {

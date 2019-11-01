@@ -3,10 +3,8 @@ import {
   PaymentMethod,
   PaymentMethodMap,
   PaymentMethodId,
-  clearTable,
-  makeDb,
-  destroyDb
-} from '../../../../..';
+} from '../../../../shared';
+import {Knex, clearTable, makeDb, destroyDb} from '../../../../infrastructure/database/knex';
 import {KnexPaymentMethodRepo as PaymentMethodRepo} from './knexPaymentMethodRepo';
 
 function makePaymentMethodData(overwrites?: any): PaymentMethod {
@@ -22,8 +20,8 @@ function makePaymentMethodData(overwrites?: any): PaymentMethod {
 }
 
 describe('PaymentMethodRepo', () => {
-  let db: any;
-  let repo: any;
+  let db: Knex;
+  let repo: PaymentMethodRepo;
 
   beforeAll(async () => {
     db = await makeDb();

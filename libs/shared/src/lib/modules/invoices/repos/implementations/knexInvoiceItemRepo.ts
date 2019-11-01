@@ -1,16 +1,14 @@
-import {Knex} from '@hindawi/shared';
-
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import {Knex } from '../../../../infrastructure/database/knex';
+import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 
 import {InvoiceItem} from '../../domain/InvoiceItem';
 import {InvoiceItemId} from '../../domain/InvoiceItemId';
+import {ManuscriptId} from '../../domain/ManuscriptId';
 import {InvoiceItemMap} from '../../mappers/InvoiceItemMap';
 // import {TransactionId} from './../../../transactions/domain/TransactionId';
 
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 import {InvoiceItemRepoContract} from '../invoiceItemRepo';
-import {ManuscriptId} from '../../domain/ManuscriptId';
 
 export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
   implements InvoiceItemRepoContract {

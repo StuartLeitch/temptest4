@@ -5,10 +5,8 @@ import {
   Invoice,
   InvoiceId,
   InvoiceMap,
-  clearTable,
-  makeDb,
-  destroyDb
-} from '../../../../..';
+} from '../../../../shared';
+import {Knex, clearTable, makeDb, destroyDb} from '../../../../infrastructure/database/knex';
 import {RepoError} from '../../../../infrastructure/RepoError';
 import {KnexInvoiceRepo as InvoiceRepo} from './knexInvoiceRepo';
 
@@ -24,7 +22,7 @@ function makeInvoiceData(overwrites?: any): Invoice {
 }
 
 describe('InvoiceRepo', () => {
-  let db: any;
+  let db: Knex;
   let repo: InvoiceRepo;
 
   beforeAll(async () => {

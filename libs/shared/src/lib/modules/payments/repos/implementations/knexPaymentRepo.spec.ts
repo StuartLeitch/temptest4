@@ -2,30 +2,32 @@ import {
   UniqueEntityID,
   Payment,
   PaymentId,
-  PaymentMap,
-  clearTable,
-  makeDb,
-  destroyDb
-} from '../../../../..';
+  PaymentMap
+} from '../../../../shared';
+import {Knex, makeDb, destroyDb, clearTable} from '../../../../infrastructure/database/knex';
 import {KnexPaymentRepo} from './knexPaymentRepo';
+
+const paymentData = {
+  id: 'payment-1',
+  payerId: 'payer-1',
+  invoiceId: 'invoice-1',
+  amount: 100,
+  paymentMethodId: 'pay-method-1',
+  foreignPaymentId: 'foreign-pay-1',
+  datePaid: new Date(),
+  paymentProof: {name: 'foo', src: 'bar'},
+};
 
 function makePaymentData(overwrites?: any): Payment {
   return PaymentMap.toDomain({
-    id: 'payment-1',
-    payerId: 'payer-1',
-    invoiceId: 'invoice-1',
-    amount: 100,
-    paymentMethodId: 'pay-method-1',
-    foreignPaymentId: 'foreign-pay-1',
-    datePaid: new Date(),
-    paymentProof: {name: 'foo', src: 'bar'},
+    ...paymentData,
     ...overwrites
   });
 }
 
 describe('KnexPaymentRepo', () => {
-  let db: any;
-  let repo: any;
+  let db: Knex;
+  let repo: KnexPaymentRepo;
 
   beforeAll(async () => {
     db = await makeDb();
@@ -55,8 +57,8 @@ describe('KnexPaymentRepo', () => {
     });
   });
 
-  xdescribe('CRUD methods', () => {
-    beforeEach(() => db('payments').insert(makePaymentData({id: 'payment-1'})));
+  describe('CRUD methods', () => {
+    beforeEach(() => db('payments').insert(PaymentMap.toPersistence(makePaymentData({id: 'payment-1'}))));
 
     afterEach(() => clearTable(db, 'payments'));
 
