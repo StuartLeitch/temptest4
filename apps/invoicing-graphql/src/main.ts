@@ -54,7 +54,7 @@ bootstrapMicroframework({
     homeLoader,
     publicLoader,
     eventSubscriberLoader,
-    graphqlLoader
+    // graphqlLoader
   ]
 })
   .then(() => banner(log))

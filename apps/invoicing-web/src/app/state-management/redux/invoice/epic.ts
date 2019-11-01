@@ -1,5 +1,5 @@
-import { ofType } from "redux-observable";
-import { mergeMap, map } from "rxjs/operators";
+import { ofType, ActionsObservable } from "redux-observable";
+import { mergeMap, map, switchMap, ignoreElements, tap } from "rxjs/operators";
 const Axios = require("axios-observable").Axios;
 
 import { InvoiceId, InvoiceMap } from "@hindawi/shared";
@@ -51,3 +51,15 @@ export const fetchInvoiceEpic = (action$: any) =>
       ),
     ),
   );
+
+// !demo mail
+export const createInvoiceMailEpic = (action$: ActionsObservable<any>) => {
+  return action$.pipe(
+    ofType(CONSTANTS.CREATE_INVOICE_MAIL),
+    switchMap(() => Axios.post("http://localhost:3000/api/mail")),
+    tap(ceva => {
+      console.log("sending mail...", ceva);
+    }),
+    ignoreElements(),
+  );
+};

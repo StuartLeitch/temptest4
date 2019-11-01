@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
-import { Route, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { Route, useHistory } from "react-router-dom";
 
-import { appRedux, userRedux, manuscriptRedux } from "./state-management/redux";
+import { appRedux, userRedux, manuscriptRedux, invoiceRedux } from "./state-management/redux";
 
 const { appInitAction } = appRedux;
 const { fetchUsersAction } = userRedux;
 const { fetchManuscriptAction } = manuscriptRedux;
+const { createInvoiceMailAction } = invoiceRedux;
 
 // * pages
 import PaymentWizard from "./pages/payment/payment-wizard";
@@ -22,6 +23,34 @@ const InvoiceCard = () => {
     </div>
   );
 };
+
+const SendMail = () => {
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <button
+        onClick={() =>
+          dispatch(
+            createInvoiceMailAction({
+              hello: "world",
+            }),
+          )
+        }
+      >
+        SEND MAIL
+      </button>
+    </div>
+  );
+};
+
+const IndexComponent = () => (
+  <div>
+    <SendMail />
+    <hr />
+    <InvoiceCard />
+  </div>
+);
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -41,8 +70,8 @@ export const App = () => {
         <h1>Payment Details</h1>
       </header>
 
-      <Route path="/" exact component={InvoiceCard} />
-      <Route path="/payment/:invoiceId" component={PaymentWizard}  />
+      <Route path="/" exact component={IndexComponent} />
+      <Route path="/payment/:invoiceId" component={PaymentWizard} />
     </div>
   );
 };
