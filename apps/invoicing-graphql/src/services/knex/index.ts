@@ -4,6 +4,9 @@ import { Config } from '../../config';
 export async function makeDb(config: Config): Promise<Knex> {
   const knex = Knex({
     client: 'pg',
+    migrations: {
+      directory: config.dbMigrationsDir,
+    },
     connection: {
       host: config.dbHost,
       user: config.dbUser,
@@ -11,8 +14,6 @@ export async function makeDb(config: Config): Promise<Knex> {
       database: config.dbDatabase,
     },
   });
-
-  console.log(await knex.migrate.list());
 
   await knex.migrate.latest();
   return knex;

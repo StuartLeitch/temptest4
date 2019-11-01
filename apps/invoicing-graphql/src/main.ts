@@ -1,3 +1,5 @@
+// require('dotenv').config();
+
 import {makeDb} from './services/knex';
 
 import {makeConfig} from './config';
@@ -20,3 +22,9 @@ async function main() {
 
   expressServer.listen(process.env.PORT || 4000);
 }
+
+main().catch((err) => {
+  console.log('Unexpected error');
+  console.error(err);
+  process.exit(1);
+});

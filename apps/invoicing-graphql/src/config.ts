@@ -3,13 +3,14 @@ export class Config {
   dbHost: string;
   dbDatabase: string;
   dbPassword: string;
+  dbMigrationsDir: string;
 
   constructor() {
-    this.dbUser = process.env.DB_USER;
     this.dbHost = process.env.DB_HOST;
-    this.dbDatabase = process.env.DB_DATABASE;
+    this.dbUser = process.env.DB_USERNAME;
     this.dbPassword = process.env.DB_PASSWORD;
-
+    this.dbDatabase = process.env.DB_DATABASE;
+    this.dbMigrationsDir = process.env.DB_MIGRATIONS_DIR || './migations';
   }
 }
 
