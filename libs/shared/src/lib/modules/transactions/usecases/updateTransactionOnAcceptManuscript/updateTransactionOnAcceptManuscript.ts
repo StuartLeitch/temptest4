@@ -53,14 +53,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     private catalogRepo: CatalogRepoContract,
     private articleRepo: ArticleRepoContract,
     private waiverService: WaiverService
-  ) {
-    this.transactionRepo = transactionRepo;
-    this.invoiceItemRepo = invoiceItemRepo;
-    this.invoiceRepo = invoiceRepo;
-    this.catalogRepo = catalogRepo;
-    this.articleRepo = articleRepo;
-    this.waiverService = waiverService;
-  }
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};

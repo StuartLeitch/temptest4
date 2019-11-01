@@ -19,6 +19,7 @@ const seed = async (knex: Knex) => {
 
     const catalogItem = {
       id: uuid(),
+      journalId: 'cbe06eaa-66b9-4849-839f-3d75f233357e',
       journalTitle,
       issn: ISSN,
       type: 'APC',

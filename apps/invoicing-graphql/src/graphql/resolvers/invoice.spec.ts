@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import {makeDb, destroyDb} from '@hindawi/shared';
 
 import {makeServer} from '../server';
-import {makeContext} from '../context';
+import {makeContext} from '../../context';
 
 describe('Query.invoice', () => {
   let db: any;

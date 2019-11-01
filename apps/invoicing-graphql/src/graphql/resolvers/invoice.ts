@@ -9,7 +9,7 @@ import {
 } from '@hindawi/shared';
 
 import {Resolvers} from '../schema';
-import {Context} from '../context';
+import {Context} from '../../context';
 
 export const invoice: Resolvers<Context> = {
   Query: {

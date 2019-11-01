@@ -3,9 +3,10 @@ import {
   // CatalogId,
   CatalogRepoContract,
   CatalogMap,
-  Knex
+  JournalId
 } from '@hindawi/shared';
 
+import {Knex} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 
 export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
@@ -38,6 +39,14 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
 
     return await db('catalog')
       .where({type})
+      .first();
+  }
+
+  async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
+    const {db} = this;
+
+    return await db('catalog')
+      .where({journal_id: journalId.id.toString()})
       .first();
   }
 }

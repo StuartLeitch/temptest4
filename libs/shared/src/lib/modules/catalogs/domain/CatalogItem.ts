@@ -2,10 +2,12 @@
 import {AggregateRoot} from '../../../core/domain/AggregateRoot';
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Result} from '../../../core/logic/Result';
+import {JournalId} from '../domain/JournalId';
 
 export interface CatalogItemProps {
   type: string;
   price: number;
+  journalId: JournalId;
 }
 
 export class CatalogItem extends AggregateRoot<CatalogItemProps> {
@@ -36,5 +38,9 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   public get price(): number {
     return this.props.price;
+  }
+
+  public get journalId(): JournalId {
+    return this.props.journalId;
   }
 }

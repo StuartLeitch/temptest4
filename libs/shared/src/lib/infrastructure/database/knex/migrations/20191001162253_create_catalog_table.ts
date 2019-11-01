@@ -5,6 +5,7 @@ export const up = function(knex) {
       .unique()
       .notNullable()
       .primary();
+    table.string('journalId');
     table.string('journalTitle');
     table.string('issn');
     table.string('type');

@@ -84,11 +84,11 @@ export * from './modules/payers/mapper/Payer';
 export * from './modules/addresses/domain/AddressId';
 export * from './modules/addresses/domain/Address';
 
-// // * Export Catalog Subdomain
-// export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
-// // export * from './modules/catalogs/domain/CatalogId';
-// export * from './modules/catalogs/repos';
-// export * from './modules/catalogs/mappers/CatalogMap';
+// * Export Catalog Subdomain
+export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
+export * from './modules/catalogs/domain/JournalId';
+export * from './modules/catalogs/repos';
+export * from './modules/catalogs/mappers/CatalogMap';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
@@ -101,6 +101,9 @@ export * from './modules/payments/domain/strategies/PaymentFactory';
 export * from './modules/payments/domain/strategies/PaymentStrategy';
 export * from './modules/payments/domain/strategies/CreditCardPayment';
 export * from './modules/payments/domain/strategies/CreditCard';
+export * from './modules/payments/usecases/payment/recordPayment';
+export * from './modules/payments/repos/implementations/knexPaymentRepo';
+export * from './modules/payments/repos/implementations/knexPaymentMethodRepo';
 
 // // * Export Coupon Subdomain
 // export * from './domain/reductions/ReductionFactory';
@@ -125,9 +128,7 @@ export * from './modules/users/mappers/UserMap';
 // ? Should we export this
 // * Infra
 // export * from './infra/http/app';
-// export {
-//   BraintreeGateway
-// } from './modules/payments/infrastructure/gateways/braintree/gateway';
+export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
 // export * from './infrastructure/database/knex';
 // export {Emailer} from './infrastructure/communication-channels';
 
