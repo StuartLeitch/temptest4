@@ -3,11 +3,14 @@ import {
   Transaction,
   TransactionId,
   TransactionMap,
-  STATUS as TransactionStatus,
+  STATUS as TransactionStatus
 } from '../../../../shared';
-import {Knex, clearTable,
+import {
+  Knex,
+  clearTable,
   makeDb,
-  destroyDb} from '../../../../infrastructure/database/knex';
+  destroyDb
+} from '../../../../infrastructure/database/knex';
 import {KnexTransactionRepo} from './knexTransactionRepo';
 
 function makeTransactionData(overwrites?: any): Transaction {

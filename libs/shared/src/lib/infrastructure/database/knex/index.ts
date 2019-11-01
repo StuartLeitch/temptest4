@@ -5,9 +5,9 @@ import {config} from './knexfile';
 
 export {Knex};
 
-type DbOptions = {
+interface DbOptions {
   filename: string;
-};
+}
 
 const defaultDbOptions: DbOptions = {
   filename: ':memory:'
