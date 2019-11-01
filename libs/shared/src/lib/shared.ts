@@ -84,11 +84,11 @@ export * from './modules/payers/mapper/Payer';
 export * from './modules/addresses/domain/AddressId';
 export * from './modules/addresses/domain/Address';
 
-// // * Export Catalog Subdomain
-// export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
-// // export * from './modules/catalogs/domain/CatalogId';
-// export * from './modules/catalogs/repos';
-// export * from './modules/catalogs/mappers/CatalogMap';
+// * Export Catalog Subdomain
+export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
+export * from './modules/catalogs/domain/JournalId';
+export * from './modules/catalogs/repos';
+export * from './modules/catalogs/mappers/CatalogMap';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 

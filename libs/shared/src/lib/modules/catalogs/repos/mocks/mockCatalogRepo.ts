@@ -1,7 +1,9 @@
+import {shallowEqual} from 'shallow-equal-object';
 import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
 
 import {CatalogRepoContract} from '../catalogRepo';
 import {CatalogItem} from '../../domain/CatalogItem';
+import {JournalId} from '../../domain/JournalId';
 
 export class MockCatalogRepo extends BaseMockRepo<CatalogItem>
   implements CatalogRepoContract {
@@ -11,6 +13,13 @@ export class MockCatalogRepo extends BaseMockRepo<CatalogItem>
 
   public async getCatalogItemByType(type: string): Promise<CatalogItem> {
     const match = this._items.find(i => i.type === type);
+    return match ? match : null;
+  }
+
+  public async getCatalogItemByJournalId(
+    journalId: JournalId
+  ): Promise<CatalogItem> {
+    const match = this._items.find(i => i.journalId.equals(journalId));
     return match ? match : null;
   }
 
