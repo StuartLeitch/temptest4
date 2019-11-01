@@ -11,7 +11,7 @@ import {PayerName} from '../domain/PayerName';
 import {PayerType} from '../domain/PayerType';
 
 export interface PayerPersistenceDTO {
-  id: string;
+  id?: string;
   title?: string;
   surname: string;
   name: string;
