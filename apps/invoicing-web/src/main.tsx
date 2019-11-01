@@ -14,8 +14,10 @@ const server = JsonGraphqlServer({
 });
 server.start();
 
+const store: any = configureStore();
+
 ReactDOM.render(
-  <Provider store={configureStore()}>
+  <Provider store={store}>
     <BrowserRouter>
       <App />
     </BrowserRouter>
