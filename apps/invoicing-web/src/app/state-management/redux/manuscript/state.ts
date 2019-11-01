@@ -1,4 +1,4 @@
-import { Article } from "@hindawi/shared";
+import { Article } from "../../../../../../../libs/shared/src/lib/modules/articles/domain/Article";
 
 export interface StateType {
   readonly manuscript: Article | null;

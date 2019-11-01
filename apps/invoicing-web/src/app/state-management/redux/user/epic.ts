@@ -2,7 +2,8 @@ import { mergeMap, map } from "rxjs/operators";
 import { ofType } from "redux-observable";
 const Axios = require("axios-observable").Axios;
 
-import { UserId, UserMap } from "@hindawi/shared";
+import { UserId } from "../../../../../../../libs/shared/src/lib/modules/users/domain/UserId";
+import { UserMap } from "../../../../../../../libs/shared/src/lib/modules/users/mappers/UserMap";
 
 import CONSTANTS from "./constants";
 

@@ -1,5 +1,6 @@
 import { createSelector } from "reselect";
-import { Article } from "@hindawi/shared";
+
+import { Article } from "../../../../../../../libs/shared/src/lib/modules/articles/domain/Article";
 
 import CONSTANTS from "./constants";
 import { initialState, StateType } from "./state";
