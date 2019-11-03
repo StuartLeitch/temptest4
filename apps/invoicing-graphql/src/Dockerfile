@@ -10,6 +10,8 @@ RUN npm ci --only=production
 
 # Copying the rest of the code to the working directory
 COPY dist/apps/invoicing-graphql .
+COPY lib/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
+COPY lib/shared/src/lib/infrastructure/database/knex/seeds/ ./seeds/
 
 # Make port 3000 available to the world outside this container
 EXPOSE 3000

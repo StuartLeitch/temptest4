@@ -125,7 +125,7 @@ export * from './modules/users/mappers/UserMap';
 export {
   BraintreeGateway
 } from './modules/payments/infrastructure/gateways/braintree/gateway';
-// export * from './infrastructure/database/knex';
+export * from './infrastructure/database/knex';
 // export {Emailer} from './infrastructure/communication-channels';
 
 // ? Should we export this

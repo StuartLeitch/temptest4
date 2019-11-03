@@ -1,7 +1,6 @@
 import * as path from 'path';
 import Knex from 'knex';
 
-
 export {Knex};
 
 interface DbOptions {

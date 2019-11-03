@@ -6,8 +6,8 @@ import {Result, left, right} from '../../../../core/logic/Result';
 import {AppError} from '../../../../core/logic/AppError';
 
 // import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';
-import {ValidateVATResponse} from './ValidateVATResponse';
-import {ValidateVATErrors} from './ValidateVATErrors';
+import {ValidateVATResponse} from './validateVATResponse';
+import {ValidateVATErrors} from './validateVATErrors';
 
 // import {Invoice} from '../../../invoices/domain/Invoice';
 // import {CatalogItem} from './../../../catalogs/domain/CatalogItem';
