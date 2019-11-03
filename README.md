@@ -21,11 +21,12 @@ If you're adding new ENV variables make sure to update the `.env.sample` to make
 #### invoicing-web
 
 The frontend app will have it's configuration available at `window._env_`. 
-The file that provides this is `/assets/env-config.js` which is generated at
-container startup and uses the container's ENVIRONMENT as a source of values.
 
-For local development create your own `env-config.js` under `apps/invoicing-web/src/assets`. 
+The file that provides this is `/assets/env-config.js` which is generated (in **production** environments) at
+container startup and uses the container's ENVIRONMENT as a source of values and
+this template: [`env-template.js`](https://gitlab.com/hindawi/phenom/blob/develop/apps/invoicing-web/src/env-template.js).
+
+For **local development** create your own `env-config.js` under `apps/invoicing-web/src/assets`. 
 Use `env-config.sample.js` as a sample file.
 
 Both `.env` and `env-config.js` are in `.gitignore` and should not be versioned.
-
