@@ -3,4 +3,5 @@ window._env_ = {
   APP_URL: "http://localhost:4000",
   GQL_ROOT: "http://localhost:3000/graphql",
   API_ROOT: "http://localhost:3000/api",
+  PP_CLIENT_ID: "paypallclientid",
 };
