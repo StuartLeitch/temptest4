@@ -10,7 +10,7 @@ export class Config {
     this.dbUser = process.env.DB_USERNAME;
     this.dbPassword = process.env.DB_PASSWORD;
     this.dbDatabase = process.env.DB_DATABASE;
-    this.dbMigrationsDir = process.env.DB_MIGRATIONS_DIR || './migations';
+    this.dbMigrationsDir = process.env.DB_MIGRATIONS_DIR || './migrations';
   }
 }
 
