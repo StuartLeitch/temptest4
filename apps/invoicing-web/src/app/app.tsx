@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Route, useHistory } from "react-router-dom";
+import { Route, useHistory, Link } from "react-router-dom";
 
 import { Button } from "@hindawi/react-components";
 
@@ -13,6 +13,9 @@ const { createInvoiceMailAction } = invoiceRedux;
 
 // * pages
 import PaymentWizard from "./pages/payment/payment-wizard";
+
+// * payment screen
+import { Payment } from "./Payments";
 
 // * app styles
 import "./app.scss";
@@ -71,9 +74,12 @@ export const App = () => {
           <img src="/assets/images/hindawi.svg" alt="Hindawi Publishing Corporation"></img>
         </a>
         <h1>Payment Details</h1>
+
+        <Link to="/new-paments">To payment</Link>
       </header>
 
       <Route path="/" exact component={IndexComponent} />
+      <Route path="/new-paments" component={Payment} />
       <Route path="/payment/:invoiceId" component={PaymentWizard} />
     </div>
   );

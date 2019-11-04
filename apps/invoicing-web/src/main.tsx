@@ -5,10 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { theme } from "@hindawi/react-components";
 
-import { configureStore } from "./app/frameworks/redux";
 import App from "./app/app";
-
-const store: any = configureStore();
+import { store } from "./setup";
 
 ReactDOM.render(
   <Provider store={store}>
