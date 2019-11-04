@@ -27,9 +27,9 @@ export namespace UpdateTransactionOnAcceptManuscriptErrors {
   }
 
   export class CatalogItemNotFoundError extends Result<UseCaseError> {
-    constructor(type: string) {
+    constructor(journalId: string) {
       super(false, {
-        message: `Couldn't find a Catalog Item for type {${type}}.`
+        message: `Couldn't find a Catalog Item for Journal id {${journalId}}.`
       } as UseCaseError);
     }
   }

@@ -6,11 +6,11 @@ export class Invoices extends WatchedList<Invoice> {
     super(initialInvoices);
   }
 
-  public compareItems(a: Invoice, b: Invoice): boolean {
-    return a.equals(b);
-  }
-
   public static create(invoices?: Invoice[]): Invoices {
     return new Invoices(invoices ? invoices : []);
+  }
+
+  public compareItems(a: Invoice, b: Invoice): boolean {
+    return a.equals(b);
   }
 }

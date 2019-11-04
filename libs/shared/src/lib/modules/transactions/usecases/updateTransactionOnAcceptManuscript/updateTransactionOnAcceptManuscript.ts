@@ -14,11 +14,15 @@ import {TransactionRepoContract} from '../../repos/transactionRepo';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
 import {WaiverService} from '../../../../domain/services/WaiverService';
+import {Waiver} from '../../../../domain/reductions/Waiver';
+import {WaiverMap} from '../../../../domain/reductions/mappers/WaiverMap';
 import {Transaction} from '../../domain/Transaction';
 import {Article} from '../../../articles/domain/Article';
 import {ArticleRepoContract} from './../../../articles/repos/articleRepo';
 import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
 import {CatalogRepoContract} from './../../../catalogs/repos/catalogRepo';
+import {WaiverRepoContract} from '../../../../domain/reductions/repos/waiverRepo';
+import {JournalId} from './../../../catalogs/domain/JournalId';
 
 import {
   Authorize,
@@ -28,21 +32,19 @@ import {
 import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
 import {Roles} from '../../../users/domain/enums/Roles';
 
-export interface UpdateTransactionRequestDTO {
-  manuscriptId: string;
-}
+import {UpdateTransactionOnAcceptManuscriptDTO} from './UpdateTransactionOnAcceptManuscriptDTOs';
 
 export type UpdateTransactionContext = AuthorizationContext<Roles>;
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   implements
     UseCase<
-      UpdateTransactionRequestDTO,
+      UpdateTransactionOnAcceptManuscriptDTO,
       Promise<UpdateTransactionOnAcceptManuscriptResponse>,
       UpdateTransactionContext
     >,
     AccessControlledUsecase<
-      UpdateTransactionRequestDTO,
+      UpdateTransactionOnAcceptManuscriptDTO,
       UpdateTransactionContext,
       AccessControlContext
     > {
@@ -52,6 +54,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     private invoiceRepo: InvoiceRepoContract,
     private catalogRepo: CatalogRepoContract,
     private articleRepo: ArticleRepoContract,
+    private waiverRepo: WaiverRepoContract,
     private waiverService: WaiverService
   ) {}
 
@@ -61,7 +64,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
   @Authorize('transaction:update')
   public async execute(
-    request: UpdateTransactionRequestDTO,
+    request: UpdateTransactionOnAcceptManuscriptDTO,
     context?: UpdateTransactionContext
   ): Promise<UpdateTransactionOnAcceptManuscriptResponse> {
     let transaction: Transaction;
@@ -69,9 +72,16 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     let invoiceItem: InvoiceItem;
     let catalogItem: CatalogItem;
     let manuscript: Article;
+    let waiver: Waiver;
 
+    // * get a proper ManuscriptId
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
+    ).getValue();
+
+    // * get a proper JournalId
+    const journalId = JournalId.create(
+      new UniqueEntityID(request.journalId)
     ).getValue();
 
     try {
@@ -101,13 +111,13 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       try {
         // * System identifies catalog item
-        catalogItem = await this.catalogRepo.getCatalogItemByType(
-          invoiceItem.type
+        catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+          journalId
         );
       } catch (err) {
         return left(
           new UpdateTransactionOnAcceptManuscriptErrors.CatalogItemNotFoundError(
-            invoiceItem.type
+            journalId.id.toString()
           )
         );
       }
@@ -138,23 +148,25 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         );
       }
 
-      // * this is where the magic happens
-      invoice.addInvoiceItem(invoiceItem);
-      transaction.addInvoice(invoice);
+      // * Mark transaction as ACTIVE
+      transaction.markAsActive();
+
       const {price} = catalogItem;
 
       // * get author details
       const {authorCountry} = manuscript;
 
-      // apply waivers
+      // * Identify applicable waiver(s)
+      // TODO: Handle the case where multiple reductions are applied
       const reduction = this.waiverService.applyWaivers({
         country: authorCountry
       });
 
-      // * update invoice item price after waivers applied
-      invoiceItem.price = price * reduction.percentage;
-
-      await this.invoiceItemRepo.save(invoiceItem);
+      waiver = WaiverMap.toPersistence(reduction);
+      await this.waiverRepo.attachWaiverToInvoice(
+        waiver.waiverId,
+        invoice.invoiceId
+      );
 
       return right(Result.ok<void>());
     } catch (err) {

@@ -1,8 +1,13 @@
 import * as path from 'path';
 import Knex from 'knex';
 
-
 export {Knex};
+
+export enum TABLES {
+  INVOICES = 'invoices',
+  WAIVERS = 'waivers',
+  INVOICES_WAIVERS = 'invoices_waivers'
+}
 
 interface DbOptions {
   filename: string;
@@ -44,4 +49,3 @@ export async function clearTable(db: Knex, ...tables: string[]): Promise<Knex> {
 
   return db;
 }
-

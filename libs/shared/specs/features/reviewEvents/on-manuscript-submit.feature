@@ -2,7 +2,6 @@ Feature: On Manuscript Submit
 
   Scenario: Manuscript Submit Handler
     Given Invoicing listening to events emitted by Review
-    # And The Journal ID is
     When A manuscript submit event is published
     Then A DRAFT Transaction should be created
     And A DRAFT Invoice should be created

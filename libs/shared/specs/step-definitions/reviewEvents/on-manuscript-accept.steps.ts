@@ -19,6 +19,7 @@ import {TransactionRepoContract} from './../../../src/lib/modules/transactions/r
 import {InvoiceItemRepoContract} from './../../../src/lib/modules/invoices/repos/invoiceItemRepo';
 import {InvoiceRepoContract} from './../../../src/lib/modules/invoices/repos/invoiceRepo';
 import {CatalogRepoContract} from './../../../src/lib/modules/catalogs/repos/catalogRepo';
+import {WaiverRepoContract} from './../../../src/lib/domain/reductions/repos/waiverRepo';
 
 import {
   UpdateTransactionContext,
@@ -36,6 +37,7 @@ import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/m
 import {MockInvoiceRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import {MockCatalogRepo} from '../../../src/lib/modules/catalogs/repos/mocks/mockCatalogRepo';
 import {MockInvoiceItemRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import {MockWaiverRepo} from '../../../src/lib/domain/reductions/repos/mocks/mockWaiverRepo';
 import {WaiverService} from '../../../src/lib/domain/services/WaiverService';
 
 const feature = loadFeature(
@@ -51,10 +53,12 @@ defineFeature(feature, test => {
   const mockCatalogRepo: CatalogRepoContract = new MockCatalogRepo();
   const mockInvoiceItemRepo: InvoiceItemRepoContract = new MockInvoiceItemRepo();
   const mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
+  const mockWaiverRepo: WaiverRepoContract = new MockWaiverRepo();
   const waiverService: WaiverService = new WaiverService();
   let result: any;
 
   const manuscriptId = 'manuscript-id';
+  const journalId = 'journal-id';
 
   const usecase: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
     mockTransactionRepo,
@@ -62,6 +66,7 @@ defineFeature(feature, test => {
     mockInvoiceRepo,
     mockCatalogRepo,
     mockArticleRepo,
+    mockWaiverRepo,
     waiverService
   );
 
@@ -73,7 +78,10 @@ defineFeature(feature, test => {
 
   beforeEach(() => {
     transaction = TransactionMap.toDomain({
-      status: TransactionStatus.DRAFT
+      status: TransactionStatus.DRAFT,
+      deleted: 0,
+      dateCreated: new Date(),
+      dateUpdated: new Date()
     });
     invoice = InvoiceMap.toDomain({
       status: InvoiceStatus.DRAFT,
@@ -95,8 +103,9 @@ defineFeature(feature, test => {
   test('Manuscript Accept Handler', ({given, when, then, and}) => {
     given('Invoicing listening to events emitted by Review', () => {});
 
-    and('The APC Catalog Item has a price of 100', () => {
+    and('The APC Catalog Item has a price of 1900', () => {
       catalogItem = CatalogMap.toDomain({
+        journalId,
         type: 'APC',
         price: 1900
       });
@@ -124,7 +133,8 @@ defineFeature(feature, test => {
     when('A manuscript accept event is published', async () => {
       result = await usecase.execute(
         {
-          manuscriptId
+          manuscriptId,
+          journalId
         },
         defaultContext
       );
@@ -135,23 +145,20 @@ defineFeature(feature, test => {
       async () => {
         expect(result.value.isSuccess).toBe(true);
 
-        // const transactions = await mockTransactionRepo.getTransactionCollection();
-        // console.info(transactions);
-        // const [
-        //   transaction
-        // ] = await mockTransactionRepo.getTransactionCollection();
+        const transactions = await mockTransactionRepo.getTransactionCollection();
+        const [associatedTransaction] = transactions;
 
-        // expect(transaction.status).toEqual(TransactionStatus.ACTIVE);
+        expect(associatedTransaction.status).toEqual(TransactionStatus.ACTIVE);
       }
     );
 
     and(
-      'The Invoice Item associated with the manuscript should have the price of 50',
+      'The Invoice Item associated with the manuscript should have the price of 950',
       async () => {
-        // const [
-        //   invoiceItem
-        // ] = await mockInvoiceItemRepo.getInvoiceItemCollection();
-        // expect(invoiceItem.price).toEqual(50);
+        const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+        const [associatedInvoiceItem] = invoiceItems;
+
+        expect(associatedInvoiceItem.price).toEqual(950);
       }
     );
   });

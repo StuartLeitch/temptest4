@@ -24,13 +24,11 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   public async getInvoiceByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Invoice> {
-    const match = this._items.find(i =>
+    return this._items.find(i =>
       i.invoiceItems
         .getItems()
         .some(ii => ii.invoiceItemId.equals(invoiceItemId))
     );
-
-    return match ? match : null;
   }
 
   public async getInvoicesByTransactionId(

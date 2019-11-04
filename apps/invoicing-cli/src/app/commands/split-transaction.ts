@@ -246,7 +246,7 @@ module.exports = {
     if (sendInvoicesConfirmation) {
       newline();
       // send invoices to the payers
-      transaction.invoices.forEach((invoice: Invoice) => {
+      transaction.invoices.getItems().forEach((invoice: Invoice) => {
         invoice.markAsActive();
 
         payersData.forEach(row => {
@@ -289,9 +289,9 @@ module.exports = {
     ]);
 
     newline();
-    const invoice = transaction.invoices.find(
-      (invoice: Invoice) => invoice.id.toString() === selectedInvoice
-    );
+    const invoice = transaction.invoices
+      .getItems()
+      .find((invoice: Invoice) => invoice.id.toString() === selectedInvoice);
 
     // redeem coupons
     selectedCoupons.forEach(sc => {
