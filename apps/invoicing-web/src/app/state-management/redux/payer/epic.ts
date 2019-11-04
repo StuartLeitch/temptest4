@@ -106,14 +106,28 @@ const createPayer = gql`
 export const createPayerEpic = (action$: ActionsObservable<any>) => {
   return action$.pipe(
     ofType(CONSTANTS.CREATE_PAYER),
-    mergeMap(({ payerInfo }) =>
-      Axios.post("http://localhost:4000/graphql", {
-        query: print(createPayer),
-        variables: { input: payerInfo },
-      }),
-    ),
-    map(({ data }) => {
-      return createPayerFulfilled(data.data.createPayer);
+    tap(({ payerInfo }) => {
+      Message.success(`Creating payer -> ${payerInfo.email}`, 3);
     }),
+    // mergeMap(({ payerInfo }) =>
+    //   Axios.post("http://localhost:4000/graphql", {
+    //     query: print(createPayer),
+    //     variables: { input: payerInfo },
+    //   }),
+    // ),
+    // map(({ data }) => {
+    //   return createPayerFulfilled(data.data.createPayer);
+    // }),
+    ignoreElements(),
+  );
+};
+
+export const updateAddressEpic = (action$: ActionsObservable<any>) => {
+  return action$.pipe(
+    ofType(CONSTANTS.UPDATE_ADDRESS),
+    tap(({ billingAddress }) => {
+      Message.success(`Creating address -> ${billingAddress.address}`, 3);
+    }),
+    ignoreElements(),
   );
 };
