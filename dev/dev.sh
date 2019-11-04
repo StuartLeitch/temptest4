@@ -2,7 +2,7 @@
 
 cd dev
 
-mkdir -p .data/db
+mkdir -p data/db
 
 case $1 in
   up)
