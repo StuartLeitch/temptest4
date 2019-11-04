@@ -3,6 +3,7 @@ import {space, layout, flexbox} from 'styled-system';
 import styled, {css, AnyStyledComponent} from 'styled-components';
 
 import {lighten, th} from '../Theme';
+import {bold} from '../Typography/fontTypes';
 
 const buttonType = ({type}: {type: string}) => {
   switch (type) {
@@ -68,13 +69,14 @@ export const Button: AnyStyledComponent = styled.button`
   border: none;
   border-radius: ${th('gridUnit')};
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   font-size: ${({size}) => th(`fontSizes.button${capitalize(size)}`)};
   line-height: ${th('fontSizes.lineHeight')};
   justify-content: center;
   padding: 0 calc(${th('gridUnit')} * 2);
   white-space: nowrap;
 
+  ${bold};
   ${space};
   ${layout};
   ${flexbox};

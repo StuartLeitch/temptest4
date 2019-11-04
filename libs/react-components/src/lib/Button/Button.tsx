@@ -13,7 +13,7 @@ export interface Props extends SpaceProps, LayoutProps, FlexboxProps {
   disabled?: boolean;
   loading?: boolean;
   children?: React.ReactNode;
-  onClick?(
+  onClick(
     e: React.MouseEvent<HTMLElement> | React.FormEvent<HTMLElement>
   ): void;
 }

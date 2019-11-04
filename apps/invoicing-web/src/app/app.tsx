@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Route, useHistory } from "react-router-dom";
 
+import { Button } from "@hindawi/react-components";
+
 import { appRedux, userRedux, manuscriptRedux, invoiceRedux } from "./state-management/redux";
 
 const { appInitAction } = appRedux;
@@ -29,7 +31,8 @@ const SendMail = () => {
 
   return (
     <div>
-      <button
+      <Button
+        size="medium"
         onClick={() =>
           dispatch(
             createInvoiceMailAction({
@@ -39,7 +42,7 @@ const SendMail = () => {
         }
       >
         SEND MAIL
-      </button>
+      </Button>
     </div>
   );
 };
