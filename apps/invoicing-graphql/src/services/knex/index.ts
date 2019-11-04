@@ -1,15 +1,20 @@
 import Knex from 'knex';
+import { Config } from '../../config';
 
-export function makeDb(): Knex {
-
-  return Knex({
+export async function makeDb(config: Config): Promise<Knex> {
+  const knex = Knex({
     client: 'pg',
+    migrations: {
+      directory: config.dbMigrationsDir,
+    },
     connection: {
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-    }
+      host: config.dbHost,
+      user: config.dbUser,
+      password: config.dbPassword,
+      database: config.dbDatabase,
+    },
   });
 
+  await knex.migrate.latest();
+  return knex;
 }

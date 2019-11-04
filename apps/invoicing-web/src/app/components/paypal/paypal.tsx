@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import scriptLoader from "react-async-script-loader";
 
-import { environment } from "../../../environments/environment";
+import { config } from '../../../config';
 
 interface Props {
   total: number;
@@ -15,10 +15,11 @@ interface Props {
 }
 
 const CLIENT = {
-  sandbox: environment.PP_CLIENT_ID,
-  production: `${environment.PP_CLIENT_ID}_prod`,
+  sandbox: config.paypallClientId,
+  production: `${config.paypallClientId}_prod`,
 };
-const ENV = environment.production ? "production" : "sandbox";
+
+const ENV = config.env === 'production' ? "production" : "sandbox";
 
 const Paypal: React.FunctionComponent<Props> = ({
   total,

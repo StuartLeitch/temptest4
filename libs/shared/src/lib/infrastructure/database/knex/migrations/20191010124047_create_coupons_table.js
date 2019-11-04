@@ -1,6 +1,4 @@
-const Knex = require('knex');
-
-module.exports.up = async function (knex) {
+module.exports.up = function(knex) {
   return knex.schema.createTable('coupons', function(table) {
     table.uuid('id').primary();
     table.string('name');
@@ -10,4 +8,6 @@ module.exports.up = async function (knex) {
   });
 }
 
-module.exports.down = async function (knex) {}
+module.exports.down = function (knex) {
+  return knex.schema.removeTable('coupons');
+}

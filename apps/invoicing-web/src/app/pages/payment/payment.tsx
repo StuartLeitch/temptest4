@@ -1,8 +1,6 @@
 import React from "react";
 // const client = require("braintree-web/client");
 
-import { environment } from "../../../environments/environment";
-
 import Avatar from "antd/lib/avatar";
 import Tabs from "antd/lib/tabs";
 import Icon from "antd/lib/icon";
