@@ -3,11 +3,14 @@ import {
   Transaction,
   TransactionId,
   TransactionMap,
-  STATUS as TransactionStatus,
+  STATUS as TransactionStatus
+} from '../../../../shared';
+import {
+  Knex,
   clearTable,
   makeDb,
   destroyDb
-} from '../../../../..';
+} from '../../../../infrastructure/database/knex';
 import {KnexTransactionRepo} from './knexTransactionRepo';
 
 function makeTransactionData(overwrites?: any): Transaction {
@@ -18,13 +21,14 @@ function makeTransactionData(overwrites?: any): Transaction {
     date: new Date(),
     dateCreated: new Date(),
     dateUpdated: new Date(),
+    deleted: 0,
     ...overwrites
   });
 }
 
 describe('TransactionKnexRepo', () => {
-  let db: any;
-  let repo: any;
+  let db: Knex;
+  let repo: KnexTransactionRepo;
 
   beforeAll(async () => {
     db = await makeDb();

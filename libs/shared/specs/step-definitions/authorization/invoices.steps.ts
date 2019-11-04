@@ -1,12 +1,14 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-import {Roles} from '../../../lib/modules/users/domain/enums/Roles';
+import {Roles} from '../../../src/lib/modules/users/domain/enums/Roles';
 import {
   accessControl,
   AccessControlContext
-} from '../../../lib/domain/authorization';
+} from '../../../src/lib/domain/authorization';
 
-const feature = loadFeature('./specs/features/authorization/invoices.feature');
+const feature = loadFeature('../../features/authorization/invoices.feature', {
+  loadRelativePath: true
+});
 
 // const systemRoles = Object.values(Roles);
 // const filterAllowedRoles = row => systemRoles.filter(role => row[role].toLowerCase() === 'y');

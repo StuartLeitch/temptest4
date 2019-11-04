@@ -1,14 +1,13 @@
-import {Knex} from '@hindawi/shared';
-
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import {Knex } from '../../../../infrastructure/database/knex';
+import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 
 import {InvoiceItem} from '../../domain/InvoiceItem';
 import {InvoiceItemId} from '../../domain/InvoiceItemId';
+import {ManuscriptId} from '../../domain/ManuscriptId';
 import {InvoiceItemMap} from '../../mappers/InvoiceItemMap';
 // import {TransactionId} from './../../../transactions/domain/TransactionId';
 
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 import {InvoiceItemRepoContract} from '../invoiceItemRepo';
 
 export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
@@ -23,7 +22,7 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
 
     if (!invoiceItem) {
       throw RepoError.createEntityNotFoundError(
-        'invoiceItem',
+        'invoice item',
         invoiceItemId.id.toString()
       );
     }
@@ -31,56 +30,52 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
     return InvoiceItemMap.toDomain(invoiceItem);
   }
 
-  // async getInvoicesByTransactionId(
-  //   transactionId: TransactionId
-  // ): Promise<Invoice[]> {
-  //   const {db} = this;
-  //   const invoices = await db('invoices')
-  //     .select()
-  //     .where('transactionId', transactionId.id.toString());
+  public async getInvoiceItemByManuscriptId(
+    manuscriptId: ManuscriptId
+  ): Promise<InvoiceItem> {
+    const {db} = this;
+    const invoice = await db('invoice_items')
+      .select()
+      .where('manuscriptId', manuscriptId.id.toString())
+      .first();
 
-  //   return invoices.map(i => InvoiceMap.toDomain(i));
-  // }
+    return InvoiceItemMap.toDomain(invoice);
+  }
 
-  async delete(invoiceItem: InvoiceItem): Promise<unknown> {
+  async update(invoiceItem: InvoiceItem): Promise<InvoiceItem> {
     const {db} = this;
 
-    const deletedRows = await db('invoices')
+    const updated = await db('invoice_items')
+      .where({id: invoiceItem.invoiceItemId.id.toString()})
+      .update({
+        dateCreated: invoiceItem.dateCreated,
+        invoiceId: invoiceItem.invoiceId.id.toString()
+      });
+
+    if (!updated) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice item',
+        invoiceItem.id.toString()
+      );
+    }
+
+    return invoiceItem;
+  }
+
+  async delete(invoiceItem: InvoiceItem): Promise<void> {
+    const {db} = this;
+
+    const deletedRows = await db('invoice_items')
       .where('id', invoiceItem.id.toString())
       .update({...InvoiceItemMap.toPersistence(invoiceItem), deleted: 1});
 
     if (!deletedRows) {
       throw RepoError.createEntityNotFoundError(
-        'invoiceItem',
+        'invoice item',
         invoiceItem.id.toString()
       );
     }
-
-    return deletedRows;
   }
-
-  // async update(invoice: Invoice): Promise<Invoice> {
-  //   const {db} = this;
-
-  //   const updated = await db('invoices')
-  //     .where({id: invoice.id.toString()})
-  //     .update({
-  //       status: invoice.status,
-  //       // totalAmount: invoice.totalAmount,
-  //       // netAmount: invoice.netAmount,
-  //       dateCreated: invoice.dateCreated,
-  //       transactionId: invoice.transactionId.id.toString()
-  //     });
-
-  //   if (!updated) {
-  //     throw RepoError.createEntityNotFoundError(
-  //       'invoice',
-  //       invoice.id.toString()
-  //     );
-  //   }
-
-  //   return invoice;
-  // }
 
   async exists(invoiceItem: InvoiceItem): Promise<boolean> {
     try {
@@ -110,7 +105,11 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
     return this.getInvoiceItemById(invoiceItem.invoiceItemId);
   }
 
-  // static makeId(id: string): InvoiceId {
-  //   return InvoiceId.create(new UniqueEntityID(id));
-  // }
+  getInvoiceItemCollection(): Promise<InvoiceItem[] | any> {
+    return Promise.resolve(42);
+  }
+
+  getItemsByInvoiceId(): Promise<InvoiceItem[] | any> {
+    return Promise.resolve(42);
+  }
 }

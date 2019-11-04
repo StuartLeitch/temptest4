@@ -1,6 +1,6 @@
 // * Core Domain
 import {UseCase} from '../../../../core/domain/UseCase';
-import {Result, right, left} from '../../../../core/logic/Result';
+import {Result, left} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 
 import {AppError} from '../../../../core/logic/AppError';
@@ -8,12 +8,10 @@ import {AppError} from '../../../../core/logic/AppError';
 import {Invoice} from './../../../invoices/domain/Invoice';
 import {InvoiceId} from './../../../invoices/domain/InvoiceId';
 import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
-import {InvoiceItemId} from './../../../invoices/domain/InvoiceItemId';
 import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
 import {Transaction} from '../../domain/Transaction';
-// import {TransactionId} from '../../domain/TransactionId';
 import {TransactionRepoContract} from '../../repos/transactionRepo';
 
 import {

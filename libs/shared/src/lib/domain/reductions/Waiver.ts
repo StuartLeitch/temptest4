@@ -4,9 +4,14 @@ import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 
 import {ReductionProps} from './Reduction';
 import {Discount} from './Discount';
+import {WaiverId} from './WaiverId';
 
 export class Waiver extends Discount {
   readonly reductionPercentage: number = 1;
+
+  get waiverId(): WaiverId {
+    return WaiverId.create(this._id).getValue();
+  }
 
   public static create(
     props: ReductionProps,
@@ -16,7 +21,7 @@ export class Waiver extends Discount {
       new Waiver(
         {
           ...props,
-          type: 'WAIVER'
+          type: props.type ? props.type : 'WAIVER'
         },
         id
       )

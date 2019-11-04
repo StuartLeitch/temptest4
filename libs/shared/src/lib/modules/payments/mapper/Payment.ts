@@ -23,7 +23,9 @@ export class PaymentMap extends Mapper<Payment> {
     const invoiceOrError = Payment.create(
       {
         payerId: PayerId.create(new UniqueEntityID(raw.payerId)),
-        invoiceId: InvoiceId.create(new UniqueEntityID(raw.invoiceId)),
+        invoiceId: InvoiceId.create(
+          new UniqueEntityID(raw.invoiceId)
+        ).getValue(),
         amount: Amount.create(raw.amount).getValue(),
         paymentMethodId: PaymentMethodId.create(
           new UniqueEntityID(raw.paymentMethodId)

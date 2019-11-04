@@ -8,9 +8,6 @@
     "nx.json": "*"
   },
   "projects": {
-    "invoicing-cli": {
-      "tags": []
-    },
     "invoicing-graphql": {
       "tags": []
     },

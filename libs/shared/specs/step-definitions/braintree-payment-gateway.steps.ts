@@ -1,25 +1,25 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-import {PaymentModel} from '../../lib/modules/payments/domain/contracts/PaymentModel';
-import {PaymentFactory} from '../../lib/modules/payments/domain/strategies/PaymentFactory';
-import {PaymentStrategy} from '../../lib/modules/payments/domain/strategies/PaymentStrategy';
-import {CreditCardPayment} from '../../lib/modules/payments/domain/strategies/CreditCardPayment';
-import {CreditCard} from '../../lib/modules/payments/domain/strategies/CreditCard';
+import {PaymentModel} from '../../src/lib/modules/payments/domain/contracts/PaymentModel';
+import {PaymentFactory} from '../../src/lib/modules/payments/domain/strategies/PaymentFactory';
+import {PaymentStrategy} from '../../src/lib/modules/payments/domain/strategies/PaymentStrategy';
+import {CreditCardPayment} from '../../src/lib/modules/payments/domain/strategies/CreditCardPayment';
+import {CreditCard} from '../../src/lib/modules/payments/domain/strategies/CreditCard';
 // import {PayPalPayment} from './../../lib/payments/domain/strategies/PayPalPayment';
 // import {PayPal} from '../../lib/payments/domain/strategies/PayPal';
 
-import {BraintreeGateway} from '../../lib/modules/payments/infrastructure/gateways/braintree/gateway';
+import {BraintreeGateway} from '../../src/lib/modules/payments/infrastructure/gateways/braintree/gateway';
 
-const feature = loadFeature(
-  './specs/features/braintree-payment-gateway.feature'
-);
+const feature = loadFeature('../features/braintree-payment-gateway.feature', {
+  loadRelativePath: true
+});
 
 defineFeature(feature, test => {
   let paymentFactory: PaymentFactory;
   let paymentStrategy: PaymentStrategy;
 
   // let payPal = new PayPal();
-  let creditCard = new CreditCard();
+  const creditCard = new CreditCard();
   let paymentMethod: PaymentModel;
 
   beforeEach(() => {

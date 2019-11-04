@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "name": "hindawi-schematics-collection",
+  "version": "0.0.1",
+  "extends": ["@nrwl/schematics"],
+  "schematics": {
+    "umi": {
+      "factory": "../../dist/out-tsc/tools/schematics/umi",
+      "schema": "./schema.json",
+      "description": "Do awesome stuff"
+    }
+  }
+}

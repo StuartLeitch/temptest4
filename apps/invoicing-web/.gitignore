@@ -1,0 +1,14 @@
+src/assets/env-config.js
+
+# dependencies
+
+# production
+dist
+
+# misc
+.DS_Store
+
+# umi
+.umi
+.umi-production
+

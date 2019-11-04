@@ -1,12 +1,11 @@
-import {
-  Payment,
-  PaymentId,
-  PaymentRepoContract,
-  PaymentMap,
-  Knex
-} from '../../../../..';
+import {Knex} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
+
+import {PaymentMap} from './../../mapper/Payment';
+import {PaymentRepoContract} from './../paymentRepo';
+import {PaymentId} from './../../domain/PaymentId';
+import {Payment} from './../../domain/Payment';
 
 export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
   implements PaymentRepoContract {

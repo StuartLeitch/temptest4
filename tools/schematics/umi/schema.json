@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "umi",
+  "title": "Add Nx Umi Schematics",
+  "type": "object",
+  "properties": {
+    "application": {
+      "type": "string",
+      "description": "target application",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    }
+  },
+  "required": ["application"]
+}

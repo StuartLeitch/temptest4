@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import "~antd/dist/antd.css";
+@import "~@repay/react-credit-card/dist/react-credit-card.css";
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  margin: 0;
+  background: #ededed;
+  color: #787878;
+}
+
+#root {
+  width: 113.6rem;
+  max-width: 113.6rem;
+  margin: 3rem auto 0;
+}

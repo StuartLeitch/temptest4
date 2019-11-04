@@ -3,27 +3,19 @@
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Mapper} from '../../../infrastructure/Mapper';
 import {CatalogItem} from '../domain/CatalogItem';
-// import {CatalogId} from '../domain/CatalogId';
+import {JournalId} from '../domain/JournalId';
 // import {STATUS as TransactionStatus} from '../domain/Transaction';
 
-export class CatalogPersistenceDTO {
-  id: string;
-  type: string;
-  // articleId: string;
-  // status: TransactionStatus;
-  price: number;
-  // dateAdded?: Date;
-  // dateUpdated?: Date;
-}
-
 export class CatalogMap extends Mapper<CatalogItem> {
-  public static toDomain(raw: CatalogPersistenceDTO): CatalogItem {
+  public static toDomain(raw: any): CatalogItem {
     const catalogOrError = CatalogItem.create(
       {
-        // articleId: ArticleId.create(new UniqueEntityID(raw.articleId)),
-        // price: Money.fromInteger({amount: raw.amount, currency: Currencies.USD})
+        journalId: JournalId.create(
+          new UniqueEntityID(raw.journalId)
+        ).getValue(),
         type: raw.type,
         price: raw.price
+        // price: Money.fromInteger({amount: raw.amount, currency: Currencies.USD})
         // dateUpdated: new Date(raw.dateUpdated)
       },
       new UniqueEntityID(raw.id)
@@ -32,12 +24,12 @@ export class CatalogMap extends Mapper<CatalogItem> {
     return catalogOrError.isSuccess ? catalogOrError.getValue() : null;
   }
 
-  public static toPersistence(catalogItem: CatalogItem): CatalogPersistenceDTO {
+  public static toPersistence(catalogItem: CatalogItem): any {
     return {
       id: catalogItem.id.toString(),
       type: catalogItem.type,
-      price: catalogItem.price
-      // articleId: catalog.articleId.toString(),
+      price: catalogItem.price,
+      journalId: catalogItem.journalId.toString()
       // status: catalog.status,
       // amount: catalog.amount.value,
       // dateAdded: catalog.dateAdded,

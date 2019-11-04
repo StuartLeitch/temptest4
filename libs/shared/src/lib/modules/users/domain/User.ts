@@ -15,8 +15,9 @@ import {CountryId} from '../../countries/domain/CountryId';
 // import {UserCreatedEvent} from './events/userCreatedEvent';
 
 export interface UserProps {
-  email: UserEmail;
-  password: UserPassword;
+  name: string;
+  email?: UserEmail;
+  password?: UserPassword;
   dateAdded?: Date;
   addressId?: AddressId;
   countryId?: CountryId;
@@ -33,6 +34,10 @@ export class User extends AggregateRoot<UserProps> {
 
   get userId(): UserId {
     return UserId.create(this.id);
+  }
+
+  get name(): string {
+    return this.props.name;
   }
 
   get email(): UserEmail {
@@ -73,8 +78,8 @@ export class User extends AggregateRoot<UserProps> {
 
   public static create(props: UserProps, id?: UniqueEntityID): Result<User> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
-      {argument: props.email, argumentName: 'email'},
-      {argument: props.password, argumentName: 'password'}
+      {argument: props.email, argumentName: 'email'}
+      // {argument: props.password, argumentName: 'password'}
     ]);
     if (!guardResult.succeeded) {
       return Result.fail<User>(guardResult.message);

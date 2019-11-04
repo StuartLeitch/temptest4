@@ -1,9 +1,7 @@
-import {Knex} from '@hindawi/shared';
-
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-
+import {Knex} from '../../../../infrastructure/database/knex';
 import {Invoice} from '../../domain/Invoice';
 import {InvoiceId} from '../../domain/InvoiceId';
+import {InvoiceItemId} from '../../domain/InvoiceItemId';
 import {InvoiceMap} from '../../mappers/InvoiceMap';
 import {TransactionId} from './../../../transactions/domain/TransactionId';
 
@@ -13,7 +11,7 @@ import {InvoiceRepoContract} from '../invoiceRepo';
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
-  async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
+  public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const {db} = this;
 
     const invoice = await db('invoices')
@@ -25,6 +23,26 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       throw RepoError.createEntityNotFoundError(
         'invoice',
         invoiceId.id.toString()
+      );
+    }
+
+    return InvoiceMap.toDomain(invoice);
+  }
+
+  public async getInvoiceByInvoiceItemId(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Invoice> {
+    const {db} = this;
+
+    const invoice = await db('invoice_items')
+      .select()
+      .where('id', invoiceItemId.id.toString())
+      .first();
+
+    if (!invoice) {
+      throw RepoError.createEntityNotFoundError(
+        'invoiceItem',
+        invoiceItemId.id.toString()
       );
     }
 
@@ -63,11 +81,9 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const {db} = this;
 
     const updated = await db('invoices')
-      .where({id: invoice.id.toString()})
+      .where({id: invoice.invoiceId.id.toString()})
       .update({
         status: invoice.status,
-        // totalAmount: invoice.totalAmount,
-        // netAmount: invoice.netAmount,
         dateCreated: invoice.dateCreated,
         transactionId: invoice.transactionId.id.toString()
       });
@@ -108,9 +124,5 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     }
 
     return this.getInvoiceById(invoice.invoiceId);
-  }
-
-  static makeId(id: string): InvoiceId {
-    return InvoiceId.create(new UniqueEntityID(id));
   }
 }

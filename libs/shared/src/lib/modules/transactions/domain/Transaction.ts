@@ -139,6 +139,13 @@ export class Transaction extends AggregateRoot<TransactionProps> {
   //   });
   // }
 
+  public markAsActive(): void {
+    const now = new Date();
+    this.props.dateUpdated = now;
+    this.props.status = STATUS.ACTIVE;
+    // this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
+  }
+
   public markAsFinal(): void {
     const now = new Date();
     this.props.dateUpdated = now;

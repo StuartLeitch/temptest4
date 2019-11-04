@@ -2,6 +2,7 @@
 import {AggregateRoot} from '../../../core/domain/AggregateRoot';
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
 import {Result} from '../../../core/logic/Result';
+import {ManuscriptId} from './../../invoices/domain/ManuscriptId';
 
 interface ArticleProps {
   journalId?: string;
@@ -14,12 +15,32 @@ interface ArticleProps {
 }
 
 export class Article extends AggregateRoot<ArticleProps> {
-  private constructor(props: ArticleProps, id?: UniqueEntityID) {
-    super(props, id);
-  }
-
   get id(): UniqueEntityID {
     return this._id;
+  }
+
+  get manuscriptId(): ManuscriptId {
+    return ManuscriptId.create(this._id).getValue();
+  }
+
+  get authorEmail(): string {
+    return this.props.authorEmail;
+  }
+
+  get authorCountry(): string {
+    return this.props.authorCountry;
+  }
+
+  get title(): string {
+    return this.props.title;
+  }
+
+  get articleTypeId(): string {
+    return this.props.articleTypeId;
+  }
+
+  private constructor(props: ArticleProps, id?: UniqueEntityID) {
+    super(props, id);
   }
 
   public static create(

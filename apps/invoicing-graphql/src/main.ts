@@ -1,12 +1,30 @@
-import {KnexDB} from '@hindawi/shared';
+// require('dotenv').config();
 
-import {makeContext} from './app/context';
-import {makeServer} from './app/server';
+import {makeDb} from './services/knex';
 
-const db = KnexDB();
-const context = makeContext(db);
-const server = makeServer(context);
+import {makeConfig} from './config';
+import {makeContext} from './context';
+import {makeGraphqlServer} from './graphql';
+import {makeExpressServer} from './api';
 
-server.listen().then(({url}) => {
-  console.log(`🚀 Server ready at ${url}`);
+async function main() {
+  const config = await makeConfig();
+  const db = await makeDb(config);
+  const context = makeContext(db);
+
+  const graphqlServer = makeGraphqlServer(context);
+  const expressServer = makeExpressServer(context);
+
+  graphqlServer.applyMiddleware({
+    app: expressServer,
+    path: '/graphql',
+  });
+
+  expressServer.listen(process.env.PORT || 4000);
+}
+
+main().catch((err) => {
+  console.log('Unexpected error');
+  console.error(err);
+  process.exit(1);
 });

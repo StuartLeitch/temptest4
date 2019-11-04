@@ -3,34 +3,40 @@ import {
   Payer,
   PayerMap,
   PayerId,
+} from '../../../../shared';
+import {
+  Knex,
   clearTable,
   makeDb,
   destroyDb
-} from '../../../../..';
+} from '../../../../infrastructure/database/knex';
 import {KnexPayerRepo} from './knexPayerRepo';
 
+const payerData = {
+  id: 'payer-1',
+  type: 'rebel',
+  surname: 'Luke',
+  title: 'Mr',
+  name: 'Skywalker',
+  organization: 'Rebel Alliance',
+  uniqueIdentificationNumber: '123456233',
+  email: 'luke@rebelalliance.universe',
+  phone: '911',
+  shippingAddressId: 'Tatooine',
+  billingAddressId: 'Tatooine',
+  vatId: 'vat-1',
+  dateAdded: new Date()
+}
 function makePayerData(overwrites?: any): Payer {
   return PayerMap.toDomain({
-    id: 'payer-1',
-    type: 'rebel',
-    surname: 'Luke',
-    title: 'Mr',
-    name: 'Skywalker',
-    organization: 'Rebel Alliance',
-    uniqueIdentificationNumber: '123456233',
-    email: 'luke@rebelalliance.universe',
-    phone: '911',
-    shippingAddressId: 'Tatooine',
-    billingAddressId: 'Tatooine',
-    vatId: 'vat-1',
-    dateAdded: new Date(),
+    ...payerData,
     ...overwrites
   });
 }
 
 describe('KnexPayerRepo', () => {
-  let db: any;
-  let repo: any;
+  let db: Knex;
+  let repo: KnexPayerRepo;
 
   beforeAll(async () => {
     db = await makeDb();
@@ -59,11 +65,7 @@ describe('KnexPayerRepo', () => {
   });
 
   describe('CRUD methods', () => {
-    beforeEach(() =>
-      db('payers').insert(
-        PayerMap.toPersistence(makePayerData({id: 'payer-1'}))
-      )
-    );
+    beforeEach(() => db('payers').insert(PayerMap.toPersistence(makePayerData({id: 'payer-1'}))));
 
     afterEach(() => clearTable(db, 'payers'));
 

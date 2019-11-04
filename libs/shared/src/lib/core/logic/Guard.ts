@@ -12,7 +12,7 @@ export type GuardArgumentCollection = GuardArgument[];
 
 export class Guard {
   public static combine(guardResults: GuardResult[]): GuardResult {
-    for (let result of guardResults) {
+    for (const result of guardResults) {
       if (result.succeeded === false) return result;
     }
 

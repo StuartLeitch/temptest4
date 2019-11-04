@@ -1,62 +1,6 @@
 {
   "version": 1,
   "projects": {
-    "invoicing-cli": {
-      "root": "apps/invoicing-cli",
-      "sourceRoot": "apps/invoicing-cli/src",
-      "projectType": "application",
-      "prefix": "invoicing-cli",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "outputPath": "dist/apps/invoicing-cli",
-            "main": "apps/invoicing-cli/src/main.ts",
-            "tsConfig": "apps/invoicing-cli/tsconfig.app.json",
-            "assets": ["apps/invoicing-cli/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/invoicing-cli/src/environments/environment.ts",
-                  "with": "apps/invoicing-cli/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "builder": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "invoicing-cli:build"
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:lint",
-          "options": {
-            "linter": "eslint",
-            "config": "apps/invoicing-cli/.eslintrc",
-            "tsConfig": [
-              "apps/invoicing-cli/tsconfig.app.json",
-              "apps/invoicing-cli/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!apps/invoicing-cli/**"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "apps/invoicing-cli/jest.config.js",
-            "tsConfig": "apps/invoicing-cli/tsconfig.spec.json"
-          }
-        }
-      }
-    },
     "invoicing-graphql": {
       "root": "apps/invoicing-graphql",
       "sourceRoot": "apps/invoicing-graphql/src",
@@ -70,20 +14,14 @@
             "outputPath": "dist/apps/invoicing-graphql",
             "main": "apps/invoicing-graphql/src/main.ts",
             "tsConfig": "apps/invoicing-graphql/tsconfig.app.json",
-            "assets": ["apps/invoicing-graphql/src/assets"],
+            "assets": ["apps/invoicing-graphql/src/Dockerfile"],
             "webpackConfig": "apps/invoicing-graphql/webpack.config.js"
           },
           "configurations": {
             "production": {
               "optimization": true,
               "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/invoicing-graphql/src/environments/environment.ts",
-                  "with": "apps/invoicing-graphql/src/environments/environment.prod.ts"
-                }
-              ]
+              "inspect": false
             }
           }
         },
@@ -184,7 +122,9 @@
             "tsConfig": "apps/invoicing-web/tsconfig.app.json",
             "assets": [
               "apps/invoicing-web/src/favicon.ico",
-              "apps/invoicing-web/src/assets"
+              "apps/invoicing-web/src/assets",
+              "apps/invoicing-web/src/env-template.js",
+              "apps/invoicing-web/src/Dockerfile"
             ],
             "styles": ["apps/invoicing-web/src/styles.scss"],
             "scripts": [],
@@ -192,12 +132,6 @@
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/invoicing-web/src/environments/environment.ts",
-                  "with": "apps/invoicing-web/src/environments/environment.prod.ts"
-                }
-              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,

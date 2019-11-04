@@ -1,13 +1,17 @@
 import * as path from 'path';
 import Knex from 'knex';
 
-import {config} from './knexfile';
-
 export {Knex};
 
-type DbOptions = {
+export enum TABLES {
+  INVOICES = 'invoices',
+  WAIVERS = 'waivers',
+  INVOICES_WAIVERS = 'invoices_waivers'
+}
+
+interface DbOptions {
   filename: string;
-};
+}
 
 const defaultDbOptions: DbOptions = {
   filename: ':memory:'
@@ -45,5 +49,3 @@ export async function clearTable(db: Knex, ...tables: string[]): Promise<Knex> {
 
   return db;
 }
-
-export const KnexDB = () => Knex(config);

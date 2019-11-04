@@ -1,12 +1,10 @@
-import {
-  CatalogItem,
-  // CatalogId,
-  CatalogRepoContract,
-  CatalogMap,
-  Knex
-} from '@hindawi/shared';
-
+import {Knex} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+
+import {JournalId} from './../../domain/JournalId';
+import {CatalogMap} from './../../mappers/CatalogMap';
+import {CatalogRepoContract} from './../catalogRepo';
+import {CatalogItem} from './../../domain/CatalogItem';
 
 export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {
@@ -33,13 +31,19 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
     }, []);
   }
 
-  async getPriceByType(type = 'APC'): Promise<number> {
+  async getCatalogItemByType(type = 'APC'): Promise<CatalogItem> {
     const {db} = this;
 
-    const catalogItem = await db('catalog')
+    return await db('catalog')
       .where({type})
       .first();
+  }
 
-    return catalogItem.price as number;
+  async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
+    const {db} = this;
+
+    return await db('catalog')
+      .where({journal_id: journalId.id.toString()})
+      .first();
   }
 }

@@ -81,4 +81,8 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   public compareMockItems(a: InvoiceItem, b: InvoiceItem): boolean {
     return a.id.equals(b.id);
   }
+  
+  getItemsByInvoiceId(): Promise<InvoiceItem[] | any> {
+    return Promise.resolve(42);
+  }
 }

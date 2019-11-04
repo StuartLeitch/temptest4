@@ -1,8 +1,12 @@
 // * Core Domain
 import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
+import {Result, left, right} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {TextUtil} from '../../../../utils/TextUtil';
+
+import {AppError} from '../../../../core/logic/AppError';
+import {CreateTransactionResponse} from './createTransactionResponse';
+import {CreateTransactionErrors} from './createTransactionErrors';
 
 import {
   Transaction,
@@ -11,11 +15,15 @@ import {
 import {TransactionRepoContract} from '../../repos/transactionRepo';
 import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
 import {Article} from '../../../articles/domain/Article';
-import {ArticleId} from '../../../articles/domain/ArticleId';
+import {JournalId} from './../../../catalogs/domain/JournalId';
+// import {ArticleId} from '../../../articles/domain/ArticleId';
+import {CatalogItem} from './../../../catalogs/domain/CatalogItem';
 import {Invoice, InvoiceStatus} from './../../../invoices/domain/Invoice';
 import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
+import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
+import {CatalogRepoContract} from './../../../catalogs/repos/catalogRepo';
 
 import {
   Authorize,
@@ -42,7 +50,7 @@ export class CreateTransactionUsecase
   implements
     UseCase<
       CreateTransactionRequestDTO,
-      Result<Transaction>,
+      Promise<CreateTransactionResponse>,
       CreateTransactionContext
     >,
     AccessControlledUsecase<
@@ -52,59 +60,10 @@ export class CreateTransactionUsecase
     > {
   constructor(
     private transactionRepo: TransactionRepoContract,
-    private articleRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract
-  ) {
-    this.transactionRepo = transactionRepo;
-    this.articleRepo = articleRepo;
-    this.invoiceRepo = invoiceRepo;
-    this.invoiceItemRepo = invoiceItemRepo;
-  }
-
-  private async getArticle(
-    request: CreateTransactionRequestDTO,
-    context?: CreateTransactionContext
-  ): Promise<Result<Article>> {
-    const {
-      manuscriptId,
-      journalId,
-      title,
-      articleTypeId,
-      authorEmail,
-      authorCountry,
-      authorSurname
-    } = request;
-    const isArticleIdProvided = TextUtil.isUUID(manuscriptId);
-
-    if (isArticleIdProvided) {
-      if (!manuscriptId) {
-        return Result.fail<Article>(`Invalid manuscript id=${manuscriptId}`);
-      }
-
-      const article = await this.articleRepo.findById(manuscriptId);
-      const found = !!article;
-
-      if (found) {
-        return Result.ok<Article>(article);
-      } else {
-        return Result.fail<Article>(
-          `Couldn't find manuscript by id=${manuscriptId}`
-        );
-      }
-    } else {
-      const newArticleResult: Result<Article> = Article.create({
-        journalId,
-        title,
-        articleTypeId,
-        authorEmail,
-        authorCountry,
-        authorSurname
-      });
-      await this.articleRepo.save(newArticleResult.getValue());
-      return newArticleResult;
-    }
-  }
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private catalogRepo: CatalogRepoContract
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -114,32 +73,27 @@ export class CreateTransactionUsecase
   public async execute(
     request: CreateTransactionRequestDTO,
     context?: CreateTransactionContext
-  ): Promise<Result<Transaction>> {
-    const {manuscriptId: rawManuscriptId} = request;
+  ): Promise<CreateTransactionResponse> {
+    let catalogItem: CatalogItem;
 
-    let manuscriptId: ArticleId;
+    const manuscriptId = ManuscriptId.create(
+      new UniqueEntityID(request.manuscriptId)
+    ).getValue();
+    const journalId = JournalId.create(
+      new UniqueEntityID(request.journalId)
+    ).getValue();
 
-    if ('manuscriptId' in request) {
-      const articleOrError = await this.getArticle(request);
-      if (articleOrError.isFailure) {
-        return Result.fail<Transaction>(articleOrError.error);
-      }
-      manuscriptId = ArticleId.create(new UniqueEntityID(rawManuscriptId));
-    }
+    const transactionProps = {
+      status: TransactionStatus.DRAFT
+    } as any;
 
     try {
-      const transactionProps = {
-        status: TransactionStatus.DRAFT
-      } as any;
-
       // * System creates DRAFT transaction
       const transactionOrError = Transaction.create(transactionProps);
-
       if (transactionOrError.isFailure) {
-        return Result.fail<Transaction>(transactionOrError.error);
+        return left(new CreateTransactionErrors.TransactionCreatedError());
       }
 
-      // This is where all the magic happens
       const transaction = transactionOrError.getValue();
       await this.transactionRepo.save(transaction);
 
@@ -151,7 +105,7 @@ export class CreateTransactionUsecase
 
       const invoiceOrError = Invoice.create(invoiceProps);
       if (invoiceOrError.isFailure) {
-        return Result.fail<Transaction>(invoiceOrError.error);
+        return left(new CreateTransactionErrors.InvoiceCreatedError());
       }
       const invoice = invoiceOrError.getValue();
       await this.invoiceRepo.save(invoice);
@@ -162,17 +116,36 @@ export class CreateTransactionUsecase
         invoiceId: invoice.invoiceId,
         dateCreated: new Date()
       };
+
       const invoiceItemOrError = InvoiceItem.create(invoiceItemProps);
       if (invoiceItemOrError.isFailure) {
-        return Result.fail<Transaction>(invoiceItemOrError.error);
+        return left(new CreateTransactionErrors.InvoiceItemCreatedError());
       }
       const invoiceItem = invoiceItemOrError.getValue();
+
+      try {
+        // * System identifies catalog item
+        catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+          journalId
+        );
+      } catch (err) {
+        return left(
+          new CreateTransactionErrors.CatalogItemNotFoundError(
+            journalId.id.toString()
+          )
+        );
+      }
+
+      const {price} = catalogItem;
+
+      // * Set price for the Invoice Item
+      invoiceItem.price = price;
+
       await this.invoiceItemRepo.save(invoiceItem);
 
-      return Result.ok<Transaction>(transaction);
+      return right(Result.ok<Transaction>(transaction));
     } catch (err) {
-      console.log(err);
-      return Result.fail<Transaction>(err);
+      return left(new AppError.UnexpectedError(err));
     }
   }
 }

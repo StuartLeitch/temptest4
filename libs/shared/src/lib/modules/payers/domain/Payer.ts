@@ -27,6 +27,7 @@ interface PayerProps {
   shippingAddressId?: AddressId;
   VATId?: string;
   dateAdded?: Date;
+  country?: string;
 }
 
 export type PayerCollection = Payer[];
@@ -86,6 +87,10 @@ export class Payer extends AggregateRoot<PayerProps> {
 
   get VATId(): string {
     return this.props.VATId;
+  }
+
+  get country(): string {
+    return this.props.country;
   }
 
   private constructor(props: PayerProps, id?: UniqueEntityID) {

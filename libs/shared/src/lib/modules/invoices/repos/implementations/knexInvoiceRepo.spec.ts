@@ -5,10 +5,8 @@ import {
   Invoice,
   InvoiceId,
   InvoiceMap,
-  clearTable,
-  makeDb,
-  destroyDb
-} from '../../../../..';
+} from '../../../../shared';
+import {Knex, clearTable, makeDb, destroyDb} from '../../../../infrastructure/database/knex';
 import {RepoError} from '../../../../infrastructure/RepoError';
 import {KnexInvoiceRepo as InvoiceRepo} from './knexInvoiceRepo';
 
@@ -18,13 +16,14 @@ function makeInvoiceData(overwrites?: any): Invoice {
     transactionId: 'transaction-id-1',
     status: InvoiceStatus.DRAFT,
     dateCreated: new Date(),
+    deleted: 0,
     ...overwrites
   });
 }
 
 describe('InvoiceRepo', () => {
-  let db: any;
-  let repo: any;
+  let db: Knex;
+  let repo: InvoiceRepo;
 
   beforeAll(async () => {
     db = await makeDb();
@@ -48,7 +47,7 @@ describe('InvoiceRepo', () => {
     });
 
     it('should reject with ENTITY_NOT_FOUND if invoice does not exist', async () => {
-      const id = InvoiceRepo.makeId('unknown-id');
+      const id = InvoiceId.create(new UniqueEntityID('unknown-id')).getValue();
 
       expect(
         repo.getInvoiceById(id)
@@ -122,7 +121,9 @@ describe('InvoiceRepo', () => {
 
     describe('.update()', () => {
       it('should update record and return it', async () => {
-        const invoiceId = InvoiceId.create(new UniqueEntityID('invoice-1'));
+        const invoiceId = InvoiceId.create(
+          new UniqueEntityID('invoice-1')
+        ).getValue();
         const invoice = await repo.getInvoiceById(invoiceId);
         const transactionId = TransactionId.create(
           new UniqueEntityID('transaction-1')
