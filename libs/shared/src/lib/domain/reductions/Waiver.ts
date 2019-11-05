@@ -5,12 +5,17 @@ import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 import {ReductionProps} from './Reduction';
 import {Discount} from './Discount';
 import {WaiverId} from './WaiverId';
+import {InvoiceId} from './../../modules/invoices/domain/InvoiceId';
 
 export class Waiver extends Discount {
   readonly reductionPercentage: number = 1;
 
   get waiverId(): WaiverId {
     return WaiverId.create(this._id).getValue();
+  }
+
+  get invoiceId(): InvoiceId {
+    return this.props.invoiceId;
   }
 
   public static create(

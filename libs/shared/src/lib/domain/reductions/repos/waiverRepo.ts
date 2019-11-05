@@ -7,7 +7,7 @@ import {InvoiceId} from '../../../modules//invoices/domain/InvoiceId';
 
 export interface WaiverRepoContract extends Repo<Waiver> {
   getWaiverById(waiverId: WaiverId): Promise<Waiver>;
-  // getWaiverByInvoiceId(invoiceItemId: InvoiceItemId): Promise<Invoice>;
+  getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]>;
   // getInvoicesByTransactionId(transactionId: TransactionId): Promise<Invoice[]>;
   // delete(invoice: Invoice): Promise<unknown>;
   // update(invoice: Invoice): Promise<Invoice>;

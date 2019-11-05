@@ -1,10 +1,13 @@
 // * Core Domain
 import {AggregateRoot} from '../../core/domain/AggregateRoot';
 import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
+
+import {InvoiceId} from './../../modules/invoices/domain/InvoiceId';
 import {ReductionId} from './ReductionId';
 
 export interface ReductionProps {
   reductionId?: ReductionId;
+  invoiceId: InvoiceId;
   name: string;
   reduction: number;
   readonly type?: string;

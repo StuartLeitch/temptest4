@@ -1,11 +1,10 @@
 // * Core Domain
 import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
+import {Result, left, right} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import {AppError} from '../../../../core/logic/AppError';
 
-import {Invoice /* , STATUS as InvoiceStatus*/} from '../../domain/Invoice';
-import {InvoiceId} from '../../domain/InvoiceId';
-import {InvoiceRepoContract} from '../../repos/invoiceRepo';
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
@@ -14,48 +13,41 @@ import {
 import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
 import {Roles} from '../../../users/domain/enums/Roles';
 
-export interface GetInvoiceDetailsRequestDTO {
-  invoiceId?: string;
-}
+import {Invoice /* , STATUS as InvoiceStatus*/} from '../../domain/Invoice';
+import {InvoiceId} from '../../domain/InvoiceId';
+import {InvoiceRepoContract} from '../../repos/invoiceRepo';
+import {WaiverRepoContract} from '../../../../domain/reductions/repos/waiverRepo';
+import {Waiver} from '../../../../domain/reductions/Waiver';
+import {WaiverService} from '../../../../domain/services/WaiverService';
+// import {WaiverMap} from '../../../../domain/reductions/mappers/WaiverMap';
+
+import {VATService} from './../../../../domain/services/VATService';
+
+// * Usecase specific
+import {GetInvoiceDetailsResponse} from './getInvoiceDetailsResponse';
+import {GetInvoiceDetailsErrors} from './getInvoiceDetailsErrors';
+import {GetInvoiceDetailsDTO} from './getInvoiceDetailsDTOs';
 
 export type GetInvoiceDetailsContext = AuthorizationContext<Roles>;
 
 export class GetInvoiceDetailsUsecase
   implements
     UseCase<
-      GetInvoiceDetailsRequestDTO,
-      Result<Invoice>,
+      GetInvoiceDetailsDTO,
+      Promise<GetInvoiceDetailsResponse>,
       GetInvoiceDetailsContext
     >,
     AccessControlledUsecase<
-      GetInvoiceDetailsRequestDTO,
+      GetInvoiceDetailsDTO,
       GetInvoiceDetailsContext,
       AccessControlContext
     > {
-  constructor(private invoiceRepo: InvoiceRepoContract) {
-    this.invoiceRepo = invoiceRepo;
-  }
-
-  private async getInvoice(
-    request: GetInvoiceDetailsRequestDTO
-  ): Promise<Result<Invoice>> {
-    const {invoiceId} = request;
-
-    if (!invoiceId) {
-      return Result.fail<Invoice>(`Invalid invoice id=${invoiceId}`);
-    }
-
-    const invoice = await this.invoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
-    );
-    const found = !!invoice;
-
-    if (found) {
-      return Result.ok<Invoice>(invoice);
-    } else {
-      return Result.fail<Invoice>(`Couldn't find invoice by id=${invoiceId}`);
-    }
-  }
+  constructor(
+    private invoiceRepo: InvoiceRepoContract,
+    private waiverRepo: WaiverRepoContract,
+    private vatService: VATService,
+    private waiverService: WaiverService
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -63,34 +55,69 @@ export class GetInvoiceDetailsUsecase
 
   @Authorize('invoice:read')
   public async execute(
-    request: GetInvoiceDetailsRequestDTO,
+    request: GetInvoiceDetailsDTO,
     context?: GetInvoiceDetailsContext
-  ): Promise<Result<Invoice>> {
-    // if ('transactionId' in request) {
-    //   const transactionOrError = await this.getTransaction(request);
-    //   if (transactionOrError.isFailure) {
-    //     return Result.fail<Invoice>(transactionOrError.error);
-    //   }
-    //   transactionId = TransactionId.create(
-    //     new UniqueEntityID(rawTransactionId)
-    //   );
-    // }
+  ): Promise<GetInvoiceDetailsResponse> {
+    let invoice: Invoice;
+    let waivers: Waiver | Waiver[];
+    let payerFromCountry: string;
+    let payerIsAnIndividual: boolean;
+
+    // * get a proper InvoiceId
+    const invoiceId = InvoiceId.create(
+      new UniqueEntityID(request.invoiceId)
+    ).getValue();
+
+    if ('payerFromCountry' in request) {
+      payerFromCountry = request.payerFromCountry;
+    }
+
+    if ('payerIsAnIndividual' in request) {
+      payerIsAnIndividual = request.payerIsAnIndividual;
+    }
 
     try {
-      // * System looks-up the invoice
-      const invoiceOrError = await this.getInvoice(request);
-
-      if (invoiceOrError.isFailure) {
-        return Result.fail<Invoice>(invoiceOrError.error);
+      // * System identifies invoice by Invoice Id
+      try {
+        invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+      } catch (err) {
+        return left(
+          new GetInvoiceDetailsErrors.InvoiceNotFoundError(
+            invoiceId.id.toString()
+          )
+        );
       }
 
-      const invoice = invoiceOrError.getValue();
+      // * Mark invoice as ACTIVE
+      invoice.markAsActive();
+
+      // * System identifies the associated waivers, if any
+      waivers = await this.waiverRepo.getWaiversByInvoiceId(invoiceId);
+
+      let invoiceCharge = invoice.getInvoiceTotal();
+      waivers.forEach((waiver: any) => {
+        const percentage = waiver.percentage;
+        invoiceCharge -= invoiceCharge * percentage;
+      });
+      invoice.charge = invoiceCharge;
+
+      // * Save the newly calculated charge
+      await this.invoiceRepo.update(invoice);
+
+      // * Apply and save VAT scheme
+      const vat = this.vatService.calculateVAT(
+        payerFromCountry,
+        payerIsAnIndividual
+      );
+      invoice.vat = vat;
+
+      // * Save the associated VAT scheme
+      await this.invoiceRepo.update(invoice);
 
       // * This is where all the magic happens
-      return Result.ok<Invoice>(invoice);
+      return right(Result.ok<Invoice>(invoice));
     } catch (err) {
-      console.log(err);
-      return Result.fail<Invoice>(err);
+      return left(new AppError.UnexpectedError(err));
     }
   }
 }

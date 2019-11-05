@@ -2,10 +2,16 @@
 import {UseCase} from '../../../../core/domain/UseCase';
 import {Result, left, right} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-
 import {AppError} from '../../../../core/logic/AppError';
-import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';
-import {UpdateTransactionOnAcceptManuscriptErrors} from './updateTransactionOnAcceptManuscriptErrors';
+
+// * Authorization Logic
+import {
+  Authorize,
+  AccessControlledUsecase,
+  AuthorizationContext
+} from '../../../../domain/authorization/decorators/Authorize';
+import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
+import {Roles} from '../../../users/domain/enums/Roles';
 
 import {Invoice} from '../../../invoices/domain/Invoice';
 import {CatalogItem} from './../../../catalogs/domain/CatalogItem';
@@ -24,14 +30,9 @@ import {CatalogRepoContract} from './../../../catalogs/repos/catalogRepo';
 import {WaiverRepoContract} from '../../../../domain/reductions/repos/waiverRepo';
 import {JournalId} from './../../../catalogs/domain/JournalId';
 
-import {
-  Authorize,
-  AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
-
+// * Usecase specific
+import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';
+import {UpdateTransactionOnAcceptManuscriptErrors} from './updateTransactionOnAcceptManuscriptErrors';
 import {UpdateTransactionOnAcceptManuscriptDTO} from './UpdateTransactionOnAcceptManuscriptDTOs';
 
 export type UpdateTransactionContext = AuthorizationContext<Roles>;
@@ -150,8 +151,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       // * Mark transaction as ACTIVE
       transaction.markAsActive();
-
-      const {price} = catalogItem;
 
       // * get author details
       const {authorCountry} = manuscript;

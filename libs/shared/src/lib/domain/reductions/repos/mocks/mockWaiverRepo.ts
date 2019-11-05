@@ -21,30 +21,14 @@ export class MockWaiverRepo extends BaseMockRepo<Waiver>
     }
   }
 
-  // public async getInvoiceByInvoiceItemId(
-  //   invoiceItemId: InvoiceItemId
-  // ): Promise<Invoice> {
-  //   const match = this._items.find(i =>
-  //     i.invoiceItems
-  //       .getItems()
-  //       .some(ii => ii.invoiceItemId.equals(invoiceItemId))
-  //   );
-
-  //   return match ? match : null;
-  // }
-
-  // public async getInvoicesByTransactionId(
-  //   transactionId: TransactionId
-  // ): Promise<Invoice[]> {
-  //   const matches = this._items.filter(i =>
-  //     i.transactionId.equals(transactionId)
-  //   );
-  //   if (matches.length !== 0) {
-  //     return matches;
-  //   } else {
-  //     return null;
-  //   }
-  // }
+  public async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
+    const matches = this._items.filter(w => w.invoiceId.equals(invoiceId));
+    if (matches.length !== 0) {
+      return matches;
+    } else {
+      return null;
+    }
+  }
 
   public async attachWaiverToInvoice(
     waiverId: WaiverId,

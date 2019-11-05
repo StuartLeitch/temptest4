@@ -1,12 +1,10 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-import {Result} from '../../../src/lib/core/logic/Result';
 import {Roles} from '../../../src/lib/modules/users/domain/enums/Roles';
 
 import {Invoice} from '../../../src/lib/modules/invoices/domain/Invoice';
 import {InvoiceItem} from '../../../src/lib/modules/invoices/domain/InvoiceItem';
 import {InvoiceStatus} from '../../../src/lib/modules/invoices/domain/Invoice';
-// import {InvoiceId} from '../../../src/lib/modules/invoices/domain/InvoiceId';
 import {InvoiceMap} from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import {InvoiceItemMap} from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import {CatalogItem} from './../../../src/lib/modules/catalogs/domain/CatalogItem';
@@ -30,7 +28,7 @@ import {
   Transaction,
   STATUS as TransactionStatus
 } from '../../../src/lib/modules/transactions/domain/Transaction';
-// import {TransactionId} from '../../../src/lib/modules/transactions/domain/TransactionId';
+
 import {TransactionMap} from './../../../src/lib/modules/transactions/mappers/TransactionMap';
 import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 

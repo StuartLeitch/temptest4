@@ -22,12 +22,14 @@ export enum InvoiceStatus {
 
 interface InvoiceProps {
   status: InvoiceStatus;
-  invoiceNumber?: string; // TODO: AutoIncrement?...Smells bad!
+  invoiceNumber?: string; // TODO: Auto Increment!?...Smells bad!
   transactionId: TransactionId;
   payerId?: PayerId;
   invoiceItems?: InvoiceItems;
   dateCreated?: Date;
   dateUpdated?: Date;
+  charge?: number;
+  vat?: number;
   totalNumInvoiceItems?: number;
 }
 
@@ -56,6 +58,22 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set status(status: InvoiceStatus) {
     this.props.status = status;
+  }
+
+  get charge(): number {
+    return this.props.charge;
+  }
+
+  set charge(charge: number) {
+    this.props.charge = charge;
+  }
+
+  set vat(vat: number) {
+    this.props.vat = vat;
+  }
+
+  get vat(): number {
+    return this.props.vat;
   }
 
   get dateCreated(): Date {
