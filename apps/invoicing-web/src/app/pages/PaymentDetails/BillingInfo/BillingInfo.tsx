@@ -75,7 +75,7 @@ const BillingInfo = () => (
                   label="Address"
                   component={FormTextarea}
                 />
-                <Flex vertical flex={1}>
+                <Flex vertical flex={1} ml={4}>
                   <FormField required label="Country" name="country" />
                   <FormField required label="City" name="city" />
                 </Flex>

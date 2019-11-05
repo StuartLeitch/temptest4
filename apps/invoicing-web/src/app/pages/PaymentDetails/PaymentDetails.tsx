@@ -2,6 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 
 import { BillingInfo } from "./BillingInfo";
+import { Details } from "./Details";
 
 interface Props {}
 
@@ -10,8 +11,8 @@ const PaymentDetails: React.FunctionComponent<Props> = () => {
 
   return (
     <div>
-      payment details should be here
       <BillingInfo />
+      <Details />
     </div>
   );
 };

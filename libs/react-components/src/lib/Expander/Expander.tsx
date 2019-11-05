@@ -1,7 +1,7 @@
 import {FlexboxProps, LayoutProps, SpaceProps} from 'styled-system';
 import React, {ReactNode, useState} from 'react';
 
-import {ExpansionPanel as Root} from './ExpansionPanel.styles';
+import {Expander as Root} from './Expander.styles';
 import ExpansionTitle from './ExpansionTitle';
 
 export interface Props extends SpaceProps, LayoutProps, FlexboxProps {
@@ -18,12 +18,11 @@ const getComponentState = (
   if (onClick) {
     return [expanded, onClick];
   } else {
-    const [a, b] = useState(expanded);
-    return [a, b];
+    return useState(expanded);
   }
 };
 
-const ExpansionPanel: React.FunctionComponent<Props> = ({
+const Expander: React.FunctionComponent<Props> = ({
   children,
   expanded,
   title,
@@ -36,21 +35,21 @@ const ExpansionPanel: React.FunctionComponent<Props> = ({
   );
 
   return (
-    <Root expanded={expandedState} {...rest}>
-      <ExpansionTitle
-        expanded={expandedState}
-        title={title}
-        onClick={() => setExpandedState(!expandedState)}
-      ></ExpansionTitle>
+    <Root
+      expanded={expandedState}
+      onClick={() => setExpandedState(!expandedState)}
+      {...rest}
+    >
+      <ExpansionTitle expanded={expandedState} title={title} />
       {expandedState ? children : null}
     </Root>
   );
 };
 
-ExpansionPanel.defaultProps = {
+Expander.defaultProps = {
   children: null,
   title: '',
   onClick: null
 };
 
-export default ExpansionPanel;
+export default Expander;

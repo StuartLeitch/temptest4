@@ -37,7 +37,7 @@ const FormField: React.FunctionComponent<Props> = ({
               status={error ? 'warning' : 'none'}
               {...field}
             />
-            <Flex minHeight={6}>
+            <Flex minHeight={6} justifyContent="flex-start">
               {error && <Text type="warning">{error}</Text>}
             </Flex>
           </Flex>
