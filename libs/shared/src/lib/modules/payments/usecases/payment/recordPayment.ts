@@ -7,6 +7,7 @@ import {Result} from 'libs/shared/src/lib/core/logic/Result';
 import {Invoice} from '../../../invoices/domain/Invoice';
 import {PayerId} from '../../../payers/domain/PayerId';
 import {Amount} from 'libs/shared/src/lib/domain/Amount';
+import {PaymentDone} from './../../domain/events/paymentDone';
 
 interface PaypementPayload {
   amount: number;
@@ -33,6 +34,7 @@ export class RecordPayment {
     };
 
     const payment = Payment.create(paymentPayload).getValue();
+
     await this.paymentRepo.save(payment);
 
     const invoice = await this.InvoiceRepo.getInvoiceById(

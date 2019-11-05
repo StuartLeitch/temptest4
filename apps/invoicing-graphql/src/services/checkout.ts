@@ -11,11 +11,6 @@ export class CheckoutService {
   public async pay(payment: any): Promise<any> {
     console.log('Create a new payment => ', payment);
 
-    // pet.id = uuid.v1();
-    // const newPet = await this.petRepository.save(pet);
-    // this.eventDispatcher.dispatch(events.pet.created, newPet);
-    // return newPet;
-
     const paymentFactory: PaymentFactory = new PaymentFactory();
     const creditCard = new CreditCard();
     paymentFactory.registerPayment(creditCard);

@@ -3,12 +3,12 @@ import { ofType, ActionsObservable, StateObservable } from "redux-observable";
 import { mergeMap, map, ignoreElements, tap, switchMap, withLatestFrom } from "rxjs/operators";
 import { Axios } from "axios-observable";
 import gql from "graphql-tag";
-import { print } from "graphql";
+// import { print } from "graphql";
 
 import CONSTANTS from "./constants";
 import { selectPayer, StateSlice } from "./state";
 import { createPaymentFulfilled, createPayerFulfilled } from "./actions";
-import { of } from "rxjs";
+// import { of } from "rxjs";
 
 // * epic
 export const createPaymentEpic = (

@@ -72,6 +72,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
       },
       id
     );
+
     return Result.ok<Payment>(payment);
   }
 }

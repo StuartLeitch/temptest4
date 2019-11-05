@@ -99,6 +99,7 @@ export * from './modules/payments/mapper/Payment';
 export * from './modules/payments/mapper/PaymentMethod';
 export * from './modules/payments/repos';
 
+export * from './modules/payments/domain/events/paymentDone';
 // // * Export Coupon Subdomain
 // export * from './domain/reductions/ReductionFactory';
 // export * from './domain/reductions/Coupon';
