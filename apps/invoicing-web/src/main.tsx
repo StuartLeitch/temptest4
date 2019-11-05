@@ -6,7 +6,8 @@ import { ThemeProvider } from "styled-components";
 import { theme } from "@hindawi/react-components";
 
 import App from "./app/app";
-import { store } from "./setup";
+
+import store from "./app/state/store";
 
 ReactDOM.render(
   <Provider store={store}>
