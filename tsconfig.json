@@ -18,6 +18,8 @@
     "paths": {
       "@hindawi/shared": ["libs/shared/src/index.ts"],
       "@hindawi/react-components": ["libs/react-components/src/index.ts"],
+      "@hindawi/invoicing-web/*": ["apps/invoicing-web/src/*"],
+      "@hindawi/invoicing-graphql/*": ["apps/invoicing-graphql/src/*"],
       "@hindawi/pisi": ["libs/pisi/src/index.ts"]
     }
   },
