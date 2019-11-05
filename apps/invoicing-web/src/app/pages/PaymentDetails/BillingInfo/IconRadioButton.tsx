@@ -11,7 +11,7 @@ interface Props extends SpaceProps {
   isSelected?: boolean;
 }
 
-const IconRadioButton: React.FunctionComponent<Props> = ({ icon, label, onChange, ...rest }) => {
+const IconRadioButton: React.FunctionComponent<Props> = ({ icon, label, ...rest }) => {
   return (
     <Root {...rest}>
       <Icon size={6} name={icon} color="#667080" mr={3} />
