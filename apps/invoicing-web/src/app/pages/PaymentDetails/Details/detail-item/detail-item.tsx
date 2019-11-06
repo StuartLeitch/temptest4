@@ -19,13 +19,11 @@ const getTextContent = (text: string | string[]) => {
 const DetailItem: React.FC<Props> = ({ label, text }) => {
   return (
     <Root>
-      <Flex alignItems="flex-start" justifyContent="flex-start">
-        <Flex flex={1} justifyContent="flex-start">
-          <Label>{label}</Label>
-        </Flex>
-        <Flex flex={5} justifyContent="flex-start">
-          {getTextContent(text)}
-        </Flex>
+      <Flex flex={1.2} justifyContent="flex-start">
+        <Label>{label}</Label>
+      </Flex>
+      <Flex flex={2} justifyContent="flex-start">
+        {getTextContent(text)}
       </Flex>
     </Root>
   );

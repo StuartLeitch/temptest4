@@ -1,4 +1,6 @@
-import { combineEpics } from 'redux-observable';
-import payerEpics from '../modules/payer/epics';
+import { combineEpics } from "redux-observable";
 
-export default combineEpics(...payerEpics);
+import payerEpics from "../modules/payer/epics";
+import invoiceEpics from "../modules/invoice/epics";
+
+export default combineEpics(...payerEpics, ...invoiceEpics);

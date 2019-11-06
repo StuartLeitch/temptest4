@@ -1,12 +1,11 @@
-import { ofType } from "redux-observable";
-import { tap, ignoreElements } from "rxjs/operators";
+import { RootEpic, isActionOf } from "typesafe-actions";
+import { tap, ignoreElements, filter } from "rxjs/operators";
 
-import CONSTANTS from "./constants";
+import { getInvoice } from "./actions";
 
-const fetchInvoiceEpic = (action$: any) =>
+const fetchInvoiceEpic: RootEpic = action$ =>
   action$.pipe(
-    ofType(CONSTANTS.FETCH),
-    tap(() => console.log("fetching invoice epic")),
+    filter(isActionOf(getInvoice.request)),
     ignoreElements(),
   );
 

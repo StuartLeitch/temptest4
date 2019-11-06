@@ -7,8 +7,10 @@ import { BillingInfo } from "./BillingInfo";
 import { Details } from "./Details";
 
 import { payerActions } from "../../state/modules/payer";
+import { invoiceActions } from "../../state/modules/invoice";
 
 interface Props {
+  getInvoice: any;
   createPayer: any;
 }
 
@@ -28,11 +30,12 @@ const articleDetails = {
   ],
 };
 
-const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer }) => {
+const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer, getInvoice }) => {
   const { invoiceId } = useParams();
 
   return (
     <Root>
+      <button onClick={() => getInvoice("singurel")}>getInvoice</button>
       <button onClick={() => createPayer({ id: "123", name: "Aurel" })}>createPayer</button>
       <BillingInfo />
       <Details articleDetails={articleDetails} />
@@ -44,6 +47,7 @@ export default connect(
   null,
   {
     createPayer: payerActions.createPayerAsync.request,
+    getInvoice: invoiceActions.getInvoice.request,
   },
 )(PaymentDetails);
 

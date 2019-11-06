@@ -8,7 +8,7 @@ import { createPayerAsync } from "./actions";
 const createPayerAsyncEpic: RootEpic = (action$, state$) => {
   return action$.pipe(
     filter(isActionOf(createPayerAsync.request)),
-    tap((action) => console.log("se ruleaza epicul -> createPayerAsyncEpic")),
+    tap(action => console.log("se ruleaza epicul -> createPayerAsyncEpic")),
     ignoreElements(),
   );
 };

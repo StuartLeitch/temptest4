@@ -23,10 +23,11 @@ authService.$state.subscribe((s) => {
 });
 
 import { config } from './config';
-import { Context } from './app/context';
+import { Context } from './context';
 import { makeStore } from "./app/state";
+import { actions } from './app/state/modules/system';
 
-const context = new Context();
+const context = new Context(config);
 const store = makeStore(config, context);
 
 ReactDOM.render(
@@ -38,4 +39,7 @@ ReactDOM.render(
     </ThemeProvider>
   </Provider>,
   document.getElementById("root"),
+  () => {
+    store.dispatch(actions.init())
+  }
 );

@@ -2,10 +2,12 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 import { RootAction, RootState } from 'typesafe-actions';
 
+import { Context } from '@hindawi/invoicing-web/context';
+import { Config } from '@hindawi/invoicing-web/config';
+
 import rootReducer from './root-reducer';
 import rootEpic from './root-epic';
-import { Context } from '../../context';
-import { Config } from '../../../config';
+
 
 export default function makeStore(config: Config, context: Context) {
   const composeEnhancers =
@@ -21,6 +23,7 @@ export default function makeStore(config: Config, context: Context) {
 
   // configure middlewares
   const middlewares = [epicMiddleware];
+
   // compose enhancers
   const enhancer = composeEnhancers(applyMiddleware(...middlewares));
 
