@@ -15,17 +15,8 @@ const initialState: PayerState = {
   error: null,
 };
 
-export default createReducer(initialState).handleAction(
-  createPayerAsync.request,
-  (state, action) => {
+export default createReducer(initialState)
+  .handleAction(createPayerAsync.request, (state, action) => {
     console.log("se face un request", state, action);
     return state;
-  },
-);
-
-// export default (state = initialState, action) => {
-//   switch (action.type) {
-//     default:
-//       return state;
-//   }
-// };
+  });

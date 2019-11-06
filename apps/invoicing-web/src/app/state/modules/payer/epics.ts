@@ -1,14 +1,14 @@
-import { isActionOf } from "typesafe-actions";
+import { RootEpic, isActionOf } from "typesafe-actions";
 import { ignoreElements, tap, filter } from "rxjs/operators";
-import { ofType, ActionsObservable, Epic } from "redux-observable";
+import { ofType, ActionsObservable } from "redux-observable";
 
 import CONSTANTS from "./constants";
 import { createPayerAsync } from "./actions";
 
-const createPayerAsyncEpic = (action$: ActionsObservable<any>) => {
+const createPayerAsyncEpic: RootEpic = (action$, state$) => {
   return action$.pipe(
     filter(isActionOf(createPayerAsync.request)),
-    tap(() => console.log("se ruleaza epicul -> createPayerAsyncEpic")),
+    tap((action) => console.log("se ruleaza epicul -> createPayerAsyncEpic")),
     ignoreElements(),
   );
 };

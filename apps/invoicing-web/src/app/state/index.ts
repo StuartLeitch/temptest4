@@ -1,1 +1,3 @@
-export * from './redux';
+import makeStore from './redux';
+
+export { makeStore };
