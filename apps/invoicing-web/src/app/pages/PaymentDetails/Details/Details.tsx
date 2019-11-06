@@ -1,9 +1,9 @@
 import React from "react";
 import { Expander } from "@hindawi/react-components";
 
-import { DetailItem } from "./detail-item";
+import { DetailItem } from "./DetailItem";
 
-import { Details as Root } from "./details.styles";
+import { Details as Root } from "./Details.styles";
 
 interface Props {
   articleDetails: any;

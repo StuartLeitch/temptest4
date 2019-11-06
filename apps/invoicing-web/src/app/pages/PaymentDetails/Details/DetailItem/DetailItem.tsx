@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Label, Text, ActionLink } from "@hindawi/react-components";
 
-import { DetailItem as Root } from "./detail-item.styles";
+import { DetailItem as Root } from "./DetailItem.styles";
 
 interface Props {
   text: string | string[];
