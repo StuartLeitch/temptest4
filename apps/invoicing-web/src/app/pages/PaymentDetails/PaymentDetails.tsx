@@ -12,6 +12,22 @@ interface Props {
   createPayer: any;
 }
 
+const articleDetails = {
+  journalTitle: "Parkinson's Disease",
+  title:
+    "A Key Major Guideline for Engineering Bioactive Multicomponent Nanofunctionalization for Biomedicine and Other Applications: Fundamental Models Confirmed by Both Direct and Indirect Evidence",
+  id: 2016970,
+  type: "Research Article",
+  ccLicense: "CC-BY 4.0",
+  correspondingAuthor: "Patrick M. Sullivan",
+  authors: [
+    "Patrick M. Sullivan",
+    "Patrick M. Sullivan1",
+    "Patrick M. Sullivan2",
+    "Patrick M. Sullivan3",
+  ],
+};
+
 const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer }) => {
   const { invoiceId } = useParams();
 
@@ -19,7 +35,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer }) => {
     <Root>
       <button onClick={() => createPayer({ id: "123", name: "Aurel" })}>createPayer</button>
       <BillingInfo />
-      <Details />
+      <Details articleDetails={articleDetails} />
     </Root>
   );
 };
