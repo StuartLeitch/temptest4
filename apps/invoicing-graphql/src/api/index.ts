@@ -1,9 +1,11 @@
 import express from 'express';
 import {Context} from '../context';
 import {RecordPayment} from '@hindawi/shared';
+import { AuthMiddleware } from './middleware/auth';
 
 export function makeExpressServer(context: Context) {
   const app = express();
+  const auth = new AuthMiddleware(context);
 
   app.post('/api/paypal-payment-completed', async (req, res) => {
     console.log('paypal payment created');
@@ -29,6 +31,10 @@ export function makeExpressServer(context: Context) {
       console.log(err);
       return res.status(500);
     }
+  });
+
+  app.get('/api/jwt-test', auth.enforce(), (req, res) => {
+    res.status(200).json(req.auth);
   });
 
   return app;

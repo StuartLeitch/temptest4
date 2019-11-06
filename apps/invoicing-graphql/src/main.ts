@@ -10,7 +10,7 @@ import {makeExpressServer} from './api';
 async function main() {
   const config = await makeConfig();
   const db = await makeDb(config);
-  const context = makeContext(db);
+  const context = makeContext(config, db);
 
   const graphqlServer = makeGraphqlServer(context);
   const expressServer = makeExpressServer(context);
