@@ -22,5 +22,9 @@ export abstract class BaseMockRepo<T> {
     this._items = this._items.filter(item => !this.compareMockItems(item, t));
   }
 
+  public clear(): void {
+    this._items = [];
+  }
+
   abstract compareMockItems(a: T, b: T): boolean;
 }

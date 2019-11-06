@@ -15,12 +15,13 @@ export class Name extends ValueObject<NameProps> {
     super(props);
   }
 
-  public static create(name: string): Result<Name> {
-    const guardResult = Guard.againstNullOrUndefined(name, 'name');
-    if (!guardResult.succeeded) {
-      return Result.fail<Name>(guardResult.message);
-    } else {
-      return Result.ok<Name>(new Name({value: name}));
+  public static create(props: NameProps): Result<Name> {
+    const nullGuardResult = Guard.againstNullOrUndefined(name, 'name');
+
+    if (!nullGuardResult.succeeded) {
+      return Result.fail<Name>(nullGuardResult.message);
     }
+
+    return Result.ok<Name>(new Name(props));
   }
 }

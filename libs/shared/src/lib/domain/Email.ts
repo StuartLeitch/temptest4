@@ -15,12 +15,15 @@ export class Email extends ValueObject<EmailProps> {
     super(props);
   }
 
-  public static create(email: string): Result<Email> {
-    const guardResult = Guard.againstNullOrUndefined(email, 'email');
+  public static create(props: EmailProps): Result<Email> {
+    const guardResult = Guard.againstNullOrUndefined(
+      props.value,
+      'editorEmail'
+    );
     if (!guardResult.succeeded) {
       return Result.fail<Email>(guardResult.message);
-    } else {
-      return Result.ok<Email>(new Email({value: email}));
     }
+
+    return Result.ok<Email>(new Email(props));
   }
 }
