@@ -1,7 +1,7 @@
 import React from 'react';
 import {action} from '@storybook/addon-actions';
 
-import ActionLink from './action-link';
+import ActionLink from './ActionLink';
 
 export const Action = () => (
   <React.Fragment>

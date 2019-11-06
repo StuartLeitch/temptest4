@@ -1,4 +1,5 @@
 import styled, {AnyStyledComponent, css} from 'styled-components';
+import {space} from 'styled-system';
 
 import {th, lighten} from '../Theme';
 
@@ -24,8 +25,9 @@ export const ActionLink: AnyStyledComponent = styled.a`
   line-height: 18px;
   font-size: 13px;
 
-  ${regular};
   ${linkType};
+  ${regular};
+  ${space};
 
   &:hover {
     color: ${lighten('colors.actionSecondary', 10)};

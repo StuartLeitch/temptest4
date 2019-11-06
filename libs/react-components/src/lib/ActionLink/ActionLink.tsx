@@ -1,7 +1,7 @@
 import {FlexboxProps, LayoutProps, SpaceProps} from 'styled-system';
 import React from 'react';
 
-import {ActionLink as Root} from './action-link.styles';
+import {ActionLink as Root} from './ActionLink.styles';
 
 type ActionType = 'action' | 'link';
 
