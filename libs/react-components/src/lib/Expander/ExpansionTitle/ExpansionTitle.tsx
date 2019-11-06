@@ -21,7 +21,7 @@ const ExpansionTitle: React.FunctionComponent<Props> = ({
 }) => {
   return (
     <Root {...rest}>
-      <Icon color="colors.actionSecondary" name={iconName(expanded)} />
+      <Icon size={5} color="colors.actionSecondary" name={iconName(expanded)} />
       <Title type="small">{title}</Title>
     </Root>
   );

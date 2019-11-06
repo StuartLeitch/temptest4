@@ -13,5 +13,6 @@
 
     "types": ["node", "jest"]
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx", "typings", "**/*.d.ts"],
+  "typeAcquisition": {}
 }

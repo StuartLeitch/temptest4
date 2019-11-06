@@ -7,7 +7,12 @@ import {regular} from '../Typography/fontTypes';
 export const Expander: AnyStyledComponent = styled.section`
   border: 1px solid ${th('colors.furniture')};
   background-color: ${th('colors.white')};
-  border-radius: 6px;
+  border-radius: ${th('gridUnit')};
+
+  align-self: flex-start;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 
   ${regular};
   ${layout};

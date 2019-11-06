@@ -96,10 +96,13 @@ export default BillingInfo;
 
 // #region styles
 const Root = styled.div`
+  align-self: flex-start;
   display: flex;
+  flex: 2;
   flex-direction: column;
   padding: calc(${th("gridUnit")} * 4);
 
+  margin-right: calc(${th("gridUnit")} * 2);
   background-color: aliceblue;
 `;
 // #endregion

@@ -22,7 +22,12 @@ authService.$state.subscribe((s) => {
   }
 });
 
-import store from "./app/state/store";
+import { config } from './config';
+import { Context } from './app/context';
+import { makeStore } from "./app/state";
+
+const context = new Context();
+const store = makeStore(config, context);
 
 ReactDOM.render(
   <Provider store={store}>
