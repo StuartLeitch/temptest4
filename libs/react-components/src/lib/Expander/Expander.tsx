@@ -35,12 +35,12 @@ const Expander: React.FunctionComponent<Props> = ({
   );
 
   return (
-    <Root
-      expanded={expandedState}
-      onClick={() => setExpandedState(!expandedState)}
-      {...rest}
-    >
-      <ExpansionTitle expanded={expandedState} title={title} />
+    <Root expanded={expandedState} {...rest}>
+      <ExpansionTitle
+        expanded={expandedState}
+        title={title}
+        onClick={() => setExpandedState(!expandedState)}
+      />
       {expandedState ? children : null}
     </Root>
   );
