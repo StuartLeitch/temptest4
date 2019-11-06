@@ -1,5 +1,5 @@
-import {space, layout} from 'styled-system';
 import styled, {AnyStyledComponent} from 'styled-components';
+import {layout, space, flex} from 'styled-system';
 
 import {th} from '../Theme';
 import {regular} from '../Typography/fontTypes';
@@ -17,4 +17,5 @@ export const Expander: AnyStyledComponent = styled.section`
   ${regular};
   ${layout};
   ${space};
+  ${flex};
 `;

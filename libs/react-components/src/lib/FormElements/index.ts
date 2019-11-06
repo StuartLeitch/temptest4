@@ -3,4 +3,4 @@ export {default as Input} from './Input';
 export {default as Checkbox} from './Checkbox';
 export {default as Textarea} from './Textarea';
 
-export {FormField} from './FormField';
+export {default as FormField} from './FormField';
