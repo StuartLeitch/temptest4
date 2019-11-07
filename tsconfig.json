@@ -16,6 +16,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@env/*": ["apps/invoicing-graphql/src/environments/*"],
       "@hindawi/shared": ["libs/shared/src/index.ts"],
       "@hindawi/react-components": ["libs/react-components/src/index.ts"],
       "@hindawi/invoicing-web/*": ["apps/invoicing-web/src/*"],

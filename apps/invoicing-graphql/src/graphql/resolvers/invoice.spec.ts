@@ -1,24 +1,45 @@
 import {createTestClient} from 'apollo-server-testing';
 import gql from 'graphql-tag';
-import {makeDb, destroyDb} from '@hindawi/shared';
+import Knex from 'knex';
+import path from 'path';
 
+import {Config} from '../../config';
 import {makeServer} from '../server';
 import {makeContext} from '../../context';
 
+const migrationsDirPath = path.resolve(
+  __dirname,
+  '../../../../../libs/shared/src/lib/infrastructure/database/knex/migrations'
+);
+
+const config = new Config();
+const db = Knex({
+  client: 'sqlite3',
+  pool: {
+    min: 1,
+    max: 1
+  },
+  migrations: {
+    directory: migrationsDirPath
+  },
+  connection: ':memory:',
+  useNullAsDefault: true
+});
+
 describe('Query.invoice', () => {
-  let db: any;
   let server: any;
   let context: any;
   let client: any;
 
   beforeAll(async () => {
-    db = await makeDb();
-    context = makeContext(db);
+    await db.migrate.latest();
+
+    context = makeContext(config, db);
     server = makeServer(context);
     client = createTestClient(server);
   });
 
-  afterAll(() => destroyDb(db));
+  afterAll(async () => db.destroy());
 
   it('should work', async () => {
     const query = gql`
@@ -33,7 +54,7 @@ describe('Query.invoice', () => {
     await db('invoices').insert({
       id: 'invoice-1',
       transactionId: 'transaction-1',
-      status: 'draft'
+      status: 0
     });
 
     const res = await client.query({

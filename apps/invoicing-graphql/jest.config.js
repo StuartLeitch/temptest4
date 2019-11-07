@@ -4,11 +4,15 @@ module.exports = {
   transform: {
     '^.+\\.graphql$': 'graphql-import-node/jest'
   },
-  reporters: ['default',
-    ['jest-junit', {
-      outputDirectory: 'coverage/apps/invoicing-graphql',
-      outputName: 'junit.xml'
-    }]
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        outputDirectory: 'coverage/apps/invoicing-graphql',
+        outputName: 'junit.xml'
+      }
+    ]
   ],
   setupFilesAfterEnv: ['./tests/setupTests.ts'],
   coverageDirectory: '../../coverage/apps/invoicing-graphql'
