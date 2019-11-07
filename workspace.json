@@ -266,5 +266,5 @@
       }
     }
   },
-  "defaultProject": "invoicing-cli"
+  "defaultProject": "invoicing-graphql"
 }
