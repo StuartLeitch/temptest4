@@ -30,6 +30,13 @@ const articleDetails = {
   ],
 };
 
+const invoiceDetails = {
+  terms: "Payable upon Receipt",
+  referenceNumber: "617/2019",
+  supplyDate: "xxxxxxxx",
+  issueDate: "xxxxxxxx",
+};
+
 const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer, getInvoice }) => {
   const { invoiceId } = useParams();
 
@@ -38,7 +45,9 @@ const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer, getInvoic
       <button onClick={() => getInvoice("singurel")}>getInvoice</button>
       <button onClick={() => createPayer({ id: "123", name: "Aurel" })}>createPayer</button>
       <BillingInfo />
-      <Details articleDetails={articleDetails} />
+      <div>
+        <Details articleDetails={articleDetails} invoiceDetails={invoiceDetails}></Details>
+      </div>
     </Root>
   );
 };
