@@ -14,7 +14,7 @@ import {PayerName} from './PayerName';
 import {PayerType} from './PayerType';
 import {PayerTitle} from './PayerTitle';
 
-interface PayerProps {
+export interface PayerProps {
   type: PayerType;
   title?: PayerTitle;
   surname: PayerName;
