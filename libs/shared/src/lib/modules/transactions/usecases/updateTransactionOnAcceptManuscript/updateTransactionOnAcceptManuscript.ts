@@ -14,7 +14,7 @@ import {AccessControlContext} from '../../../../domain/authorization/AccessContr
 import {Roles} from '../../../users/domain/enums/Roles';
 
 import {Invoice} from '../../../invoices/domain/Invoice';
-import {CatalogItem} from './../../../catalogs/domain/CatalogItem';
+import {CatalogItem} from './../../../journals/domain/CatalogItem';
 import {InvoiceItem} from '../../../invoices/domain/InvoiceItem';
 import {TransactionRepoContract} from '../../repos/transactionRepo';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
@@ -26,9 +26,9 @@ import {Transaction} from '../../domain/Transaction';
 import {Article} from '../../../articles/domain/Article';
 import {ArticleRepoContract} from './../../../articles/repos/articleRepo';
 import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
-import {CatalogRepoContract} from './../../../catalogs/repos/catalogRepo';
+import {CatalogRepoContract} from './../../../journals/repos/catalogRepo';
 import {WaiverRepoContract} from '../../../../domain/reductions/repos/waiverRepo';
-import {JournalId} from './../../../catalogs/domain/JournalId';
+import {JournalId} from './../../../journals/domain/JournalId';
 
 // * Usecase specific
 import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';

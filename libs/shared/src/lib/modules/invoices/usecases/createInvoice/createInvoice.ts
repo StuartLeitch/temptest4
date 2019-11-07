@@ -1,29 +1,37 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import {UseCase} from '../../../../core/domain/UseCase';
+import {Result, right, left} from '../../../../core/logic/Result';
+import {AppError} from '../../../../core/logic/AppError';
 
 import {Invoice, InvoiceStatus} from '../../domain/Invoice';
 import {InvoiceRepoContract} from '../../repos/invoiceRepo';
 import {TransactionRepoContract} from '../../../transactions/repos/transactionRepo';
 import {Transaction} from '../../../transactions/domain/Transaction';
 import {TransactionId} from '../../../transactions/domain/TransactionId';
+
 import {
   Authorize,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
-
-export interface CreateInvoiceRequestDTO {
-  transactionId?: string;
-}
-
-export type CreateInvoiceContext = AuthorizationContext<Roles>;
+  AccessControlledUsecase,
+  AccessControlContext,
+  CreateInvoiceAuthorizationContext
+} from './createInvoiceAuthorizationContext';
+import {CreateInvoiceRequestDTO} from './createInvoiceDTO';
+import {CreateInvoiceResponse} from './createInvoiceResponse';
+import {CreateInvoiceErrors} from './createInvoiceErrors';
 
 export class CreateInvoiceUsecase
   implements
-    UseCase<CreateInvoiceRequestDTO, Result<Invoice>, CreateInvoiceContext> {
+    UseCase<
+      CreateInvoiceRequestDTO,
+      Promise<CreateInvoiceResponse>,
+      CreateInvoiceAuthorizationContext
+    >,
+    AccessControlledUsecase<
+      CreateInvoiceRequestDTO,
+      CreateInvoiceAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private transactionRepo: TransactionRepoContract
@@ -32,33 +40,9 @@ export class CreateInvoiceUsecase
     this.transactionRepo = transactionRepo;
   }
 
-  private async getTransaction(
-    request: CreateInvoiceRequestDTO
-  ): Promise<Result<Transaction>> {
-    const {transactionId} = request;
-    if (!transactionId) {
-      return Result.fail<Transaction>(
-        `Invalid transaction id=${transactionId}`
-      );
-    }
-
-    const transaction = await this.transactionRepo.getTransactionById(
-      TransactionId.create(new UniqueEntityID(transactionId))
-    );
-    const found = !!transaction;
-
-    if (found) {
-      return Result.ok<Transaction>(transaction);
-    } else {
-      return Result.fail<Transaction>(
-        `Couldn't find transaction by id=${transactionId}`
-      );
-    }
-  }
-
-  public async getAccessControlContext(
+  private async getAccessControlContext(
     request: CreateInvoiceRequestDTO,
-    context?: CreateInvoiceContext
+    context?: CreateInvoiceAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
@@ -66,26 +50,32 @@ export class CreateInvoiceUsecase
   @Authorize('create:invoice')
   public async execute(
     request: CreateInvoiceRequestDTO,
-    context?: CreateInvoiceContext
-  ): Promise<Result<Invoice>> {
-    const {transactionId: rawTransactionId} = request;
+    context?: CreateInvoiceAuthorizationContext
+  ): Promise<CreateInvoiceResponse> {
+    let transaction: Transaction;
 
-    let transactionId: TransactionId;
-
-    if ('transactionId' in request) {
-      const transactionOrError = await this.getTransaction(request);
-      if (transactionOrError.isFailure) {
-        return Result.fail<Invoice>(transactionOrError.error);
-      }
-      transactionId = TransactionId.create(
-        new UniqueEntityID(rawTransactionId)
-      );
-    }
+    // * build the TransactionId
+    const transactionId = TransactionId.create(
+      new UniqueEntityID(request.transactionId)
+    );
 
     try {
+      try {
+        // * System identifies transaction by Id
+        transaction = await this.transactionRepo.getTransactionById(
+          transactionId
+        );
+      } catch (err) {
+        return left(
+          new CreateInvoiceErrors.TransactionNotFoundError(
+            request.transactionId
+          )
+        );
+      }
+
       const invoiceProps = {
         status: InvoiceStatus.DRAFT
-      } as any;
+      } as any; // TODO: should reference the real invoice props, as in its domain
       if (transactionId) {
         invoiceProps.transactionId = transactionId;
       }
@@ -93,18 +83,13 @@ export class CreateInvoiceUsecase
       // * System creates DRAFT invoice
       const invoiceOrError = Invoice.create(invoiceProps);
 
-      if (invoiceOrError.isFailure) {
-        return Result.fail<Invoice>(invoiceOrError.error);
-      }
-
       // This is where all the magic happens
       const invoice = invoiceOrError.getValue();
       await this.invoiceRepo.save(invoice);
 
-      return Result.ok<Invoice>(invoice);
+      return right(Result.ok<Invoice>(invoice));
     } catch (err) {
-      console.log(err);
-      return Result.fail<Invoice>(err);
+      return left(new AppError.UnexpectedError(err));
     }
   }
 }

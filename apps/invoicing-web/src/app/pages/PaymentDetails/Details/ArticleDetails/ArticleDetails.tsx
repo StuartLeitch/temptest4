@@ -11,7 +11,7 @@ interface Props {
 
 const ArticleDetails: React.FunctionComponent<Props> = ({ articleDetails }) => {
   return (
-    <Expander title="Article details" expanded={true}>
+    <Expander title="Article details" expanded={false}>
       <Root>
         <DetailItem label="Journal title" text={articleDetails.journalTitle} />
         <DetailItem label="Article title" text={articleDetails.title} />
