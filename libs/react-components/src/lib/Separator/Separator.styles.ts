@@ -5,17 +5,23 @@ import {th} from '../Theme';
 
 import {SeparatorDirection} from './SeparatorTypes';
 
-const separatorDirection = ({direction}: {direction: SeparatorDirection}) => {
+const separatorDirection = ({
+  direction,
+  fraction
+}: {
+  direction: SeparatorDirection;
+  fraction: number;
+}) => {
   switch (direction) {
     case 'vertical':
       return css`
         border-right-width: 1px;
-        height: 100%;
+        height: ${fraction}%;
       `;
     case 'horizontal':
       return css`
         border-bottom-width: 1px;
-        width: 100%;
+        width: ${fraction}%;
       `;
     default:
       return css``;

@@ -1,4 +1,5 @@
-import styled, { AnyStyledComponent } from "styled-components";
+import styled, { AnyStyledComponent, css } from "styled-components";
+import { layout, space, flex } from "styled-system";
 
 import { th } from "@hindawi/react-components";
 
@@ -7,7 +8,15 @@ export const ChargeItem: AnyStyledComponent = styled.div`
   align-items: flex-start;
   display: flex;
 
-  & > :first-child {
+  ${layout};
+  ${space};
+  ${flex};
+
+  & > * {
     margin-right: calc(${th("gridUnit")} * 4);
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 `;
