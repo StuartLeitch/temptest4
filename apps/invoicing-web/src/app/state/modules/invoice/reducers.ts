@@ -6,7 +6,7 @@ import { getInvoice } from "./actions";
 const initialState: InvoiceState = {
   invoice: null,
   error: null,
-  loading: false,
+  loading: true,
 };
 
 export default createReducer(initialState)
