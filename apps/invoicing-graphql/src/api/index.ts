@@ -1,7 +1,7 @@
 import express from 'express';
 import {Context} from '../context';
 import {RecordPayment} from '@hindawi/shared';
-import { AuthMiddleware } from './middleware/auth';
+import {AuthMiddleware} from './middleware/auth';
 
 export function makeExpressServer(context: Context) {
   const app = express();

@@ -1,9 +1,9 @@
 import {HandleContract} from '../../../core/domain/events/contracts/Handle';
 import {DomainEvents} from '../../../core/domain/events/DomainEvents';
-import {InvoiceCreatedEvent} from '../domain/events/invoiceCreatedEvent';
+import {InvoicePaidEvent} from '../domain/events/invoicePaid';
 import {InvoiceRepoContract} from '../repos/invoiceRepo';
 
-export class AfterInvoiceEvent implements HandleContract<InvoiceCreatedEvent> {
+export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
   private invoiceRepo: InvoiceRepoContract;
 
   constructor() {
@@ -12,21 +12,18 @@ export class AfterInvoiceEvent implements HandleContract<InvoiceCreatedEvent> {
 
   setupSubscriptions() {
     DomainEvents.register(
-      this.onInvoiceCreatedEvent.bind(this),
-      InvoiceCreatedEvent.name
+      this.onInvoicePaidEvent.bind(this),
+      InvoicePaidEvent.name
     );
   }
 
-  private async onInvoiceCreatedEvent(
-    event: InvoiceCreatedEvent
-  ): Promise<any> {
+  private async onInvoicePaidEvent(event: InvoicePaidEvent): Promise<any> {
     // Get invoice from repo
     const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
 
     if (invoice) {
       // Get all payers interested in this invoice
-      // for payer in payers
-      // Craft and send 'You got an invoice!' email with invoice link included
+      // Craft and send 'Invoice paid!' email with invoice link included
     }
   }
 }

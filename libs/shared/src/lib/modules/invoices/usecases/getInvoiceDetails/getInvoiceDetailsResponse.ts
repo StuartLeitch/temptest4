@@ -5,8 +5,6 @@ import {GetInvoiceDetailsErrors} from './getInvoiceDetailsErrors';
 import {Invoice} from './../../domain/Invoice';
 
 export type GetInvoiceDetailsResponse = Either<
-  | GetInvoiceDetailsErrors.InvoiceNotFoundError
-  | AppError.UnexpectedError
-  | Result<any>,
+  GetInvoiceDetailsErrors.InvoiceNotFoundError | AppError.UnexpectedError,
   Result<Invoice>
 >;

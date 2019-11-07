@@ -48,6 +48,7 @@ export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDT
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
+export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
@@ -75,10 +76,10 @@ export * from './modules/addresses/domain/AddressId';
 export * from './modules/addresses/domain/Address';
 
 // * Export Catalog Subdomain
-// export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
-// export * from './modules/catalogs/domain/JournalId';
-// export * from './modules/catalogs/repos';
-// export * from './modules/catalogs/mappers/CatalogMap';
+export {CatalogItem} from './modules/journals/domain/CatalogItem';
+export * from './modules/journals/domain/JournalId';
+export * from './modules/journals/repos';
+export * from './modules/journals/mappers/CatalogMap';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
