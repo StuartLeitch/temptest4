@@ -1,22 +1,22 @@
 import { createReducer } from "typesafe-actions";
 
-import { Payer, PayerInput } from "./types";
+import { PayerState } from "./types";
 import { createPayerAsync } from "./actions";
 
-interface PayerState {
-  payer: any;
-  loading: boolean;
-  error: any;
-}
-
 const initialState: PayerState = {
-  payer: null,
-  loading: false,
+  payer: {
+    paymentType: null,
+    firstName: "",
+    lastName: "",
+    city: "",
+    country: "",
+    email: "",
+  },
   error: null,
+  loading: false,
 };
 
-export default createReducer(initialState)
-  .handleAction(createPayerAsync.request, (state, action) => {
-    console.log("se face un request", state, action);
-    return state;
-  });
+export default createReducer(initialState).handleAction(
+  createPayerAsync.request,
+  state => ({ ...state, loading: true }),
+);

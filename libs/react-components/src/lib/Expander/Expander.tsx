@@ -6,8 +6,9 @@ import ExpansionTitle from './ExpansionTitle';
 
 export interface Props extends SpaceProps, LayoutProps, FlexboxProps {
   children: ReactNode;
-  expanded?: boolean;
   title: string;
+  expanded?: boolean;
+  iconSize?: number;
   onClick?(e: boolean): void;
 }
 
@@ -27,6 +28,7 @@ const Expander: React.FunctionComponent<Props> = ({
   expanded,
   title,
   onClick,
+  iconSize,
   ...rest
 }) => {
   const [expandedState, setExpandedState] = getComponentState(
@@ -37,8 +39,9 @@ const Expander: React.FunctionComponent<Props> = ({
   return (
     <Root expanded={expandedState} {...rest}>
       <ExpansionTitle
-        expanded={expandedState}
         title={title}
+        iconSize={iconSize}
+        expanded={expandedState}
         onClick={() => setExpandedState(!expandedState)}
       />
       {expandedState ? children : null}
@@ -49,7 +52,8 @@ const Expander: React.FunctionComponent<Props> = ({
 Expander.defaultProps = {
   children: null,
   title: '',
-  onClick: null
+  onClick: null,
+  iconSize: 6
 };
 
 export default Expander;
