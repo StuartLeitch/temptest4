@@ -9,7 +9,7 @@ import {makeExpressServer} from './api';
 
 import {queueService} from './queue_service';
 
-async function main() {
+async function main(): Promise<void> {
   const config = await makeConfig();
   const db = await makeDb(config);
   const context = makeContext(config, db);
@@ -22,8 +22,8 @@ async function main() {
     path: '/graphql'
   });
 
-  queueService.start();
-  (global as any).applicationEventBus = queueService;
+  // const queue = await queueService;
+  // queue.start();
 
   expressServer.listen(process.env.PORT || 4000);
 }

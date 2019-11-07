@@ -1,11 +1,19 @@
+enum InvoiceStatus {
+  DRAFT
+  ACTIVE
+  FINAL
+}
+
 type Invoice {
   id: String
-  totalAmount: Float
-  netAmount: Float
+  dateCreated: String
+  dateChanged: String
+  vat: Float
+  status: InvoiceStatus
 }
 
 type Query {
-  invoice(id: String): Invoice!
+  invoice(id: String): Invoice
   echo(value: String): String
 }
 
