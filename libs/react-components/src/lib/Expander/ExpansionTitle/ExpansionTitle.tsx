@@ -1,4 +1,4 @@
-import React, {ReactNode, useState} from 'react';
+import React from 'react';
 import {SpaceProps, LayoutProps, FlexboxProps} from 'styled-system';
 
 import {ExpansionTitle as Root} from './ExpansionTitle.styles';
@@ -8,7 +8,7 @@ import Title from '../../Typography/Title';
 export interface Props extends SpaceProps, LayoutProps, FlexboxProps {
   expanded: boolean;
   title: string;
-  onClick(e: React.MouseEvent): void;
+  onClick?(e: React.MouseEvent<HTMLElement>): void;
 }
 
 const iconName = (state: boolean) => {
@@ -17,17 +17,13 @@ const iconName = (state: boolean) => {
 
 const ExpansionTitle: React.FunctionComponent<Props> = ({
   expanded,
-  onClick,
   title,
+  onClick,
   ...rest
 }) => {
   return (
-    <Root {...rest}>
-      <Icon
-        color="colors.actionSecondary"
-        name={iconName(expanded)}
-        onClick={e => onClick(e)}
-      ></Icon>
+    <Root {...rest} onClick={onClick}>
+      <Icon color="colors.actionSecondary" name={iconName(expanded)} />
       <Title type="small">{title}</Title>
     </Root>
   );

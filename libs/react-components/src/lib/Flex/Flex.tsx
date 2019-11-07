@@ -38,7 +38,7 @@ const verticalFn = ({vertical}: {vertical: boolean}) => {
 const Flex: AnyStyledComponent = styled.div`
   display: ${({inline}) => (inline ? 'inline-flex' : 'flex')};
   box-sizing: border-box;
-  width: fit-content;
+  width: 100%;
 
   ${verticalFn};
   ${space};
@@ -48,7 +48,7 @@ const Flex: AnyStyledComponent = styled.div`
 `;
 
 Flex.defaultProps = {
-  inline: true,
+  inline: false,
   vertical: false
 };
 

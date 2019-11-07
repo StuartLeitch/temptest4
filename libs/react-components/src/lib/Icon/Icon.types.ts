@@ -23,6 +23,7 @@ export type IconNames =
   | 'expand'
   | 'info'
   | 'infoFilled'
+  | 'institution'
   | 'edit'
   | 'externalLink'
   | 'impersonate'

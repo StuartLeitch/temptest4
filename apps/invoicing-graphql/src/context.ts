@@ -32,11 +32,10 @@ export function makeContext(config: Config, db: Knex): Context {
       invoice: new KnexInvoiceRepo(db),
       transaction: new KnexTransactionRepo(db),
       payment: new KnexPaymentRepo(db),
-      waiver: new KnexWaiverRepo(db)
+      waiver: new KnexWaiverRepo(db),
     },
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),
     vatService: new VATService(),
-    waiverService: new WaiverService()
   };
 }

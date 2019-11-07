@@ -34,8 +34,8 @@ export class PayerMap extends Mapper<Payer> {
         title: PayerTitle.create(raw.title).getValue(),
         type: PayerType.create(raw.type).getValue(),
         surname: PayerName.create(raw.surname).getValue(),
-        organization: Name.create(raw.organization).getValue(),
-        email: Email.create(raw.email).getValue(),
+        organization: Name.create({ value: raw.organization }).getValue(),
+        email: Email.create({ value: raw.email }).getValue(),
         phone: PhoneNumber.create(raw.phone).getValue(),
         shippingAddressId: AddressId.create(
           new UniqueEntityID(raw.shippingAddressId)

@@ -32,13 +32,13 @@ export const invoice: Resolvers<Context> = {
         return undefined;
       }
 
-      const invoice = result.value.getValue();
+      const entity = result.value.getValue();
 
       return {
-        id: invoice.id.toString(),
-        invoice
-        // totalAmount: invoice.totalAmount,
-        // netAmount: invoice.netAmount
+        id: entity.id.toString(),
+        entity
+        // totalAmount: entity.totalAmount,
+        // netAmount: entity.netAmount
       };
     }
   },
