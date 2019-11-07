@@ -18,6 +18,14 @@ export class Waiver extends Discount {
     return this.props.invoiceId;
   }
 
+  set invoiceId(invoiceId: InvoiceId) {
+    this.props.invoiceId = invoiceId;
+  }
+
+  get percentage(): number {
+    return this.props.reduction || this.reductionPercentage;
+  }
+
   public static create(
     props: ReductionProps,
     id?: UniqueEntityID
@@ -31,9 +39,5 @@ export class Waiver extends Discount {
         id
       )
     );
-  }
-
-  get percentage(): number {
-    return this.props.reduction || this.reductionPercentage;
   }
 }

@@ -18,8 +18,8 @@ const feature = loadFeature('../features/vat-check.feature', {
 const defaultContext: ValidateVATContext = {roles: [Roles.SUPER_ADMIN]};
 
 defineFeature(feature, test => {
-  let vatService: VATService = new VATService();
-  let validateVATUsecase = new ValidateVATUsecase(vatService);
+  const vatService: VATService = new VATService();
+  const validateVATUsecase = new ValidateVATUsecase(vatService);
   let countryCode: string;
   let VATNumber: string;
   let result: any;

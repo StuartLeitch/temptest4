@@ -2,6 +2,8 @@
 // import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {Roles} from '../../../users/domain/enums/Roles';
 
+import {WaiverService} from './../../../../domain/services/WaiverService';
+import {VATService} from './../../../../domain/services/VATService';
 import {MockWaiverRepo} from './../../../../domain/reductions/repos/mocks/mockWaiverRepo';
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
 import {InvoiceCollection, InvoiceStatus} from '../../domain/Invoice';
@@ -11,11 +13,14 @@ import {
   GetInvoiceDetailsUsecase,
   GetInvoiceDetailsContext
 } from './getInvoiceDetails';
+
 // import {GetInvoiceDetailsResponse} from './getInvoiceDetailsResponse';
 
 let usecase: GetInvoiceDetailsUsecase;
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockWaiverRepo: MockWaiverRepo;
+let vatService: VATService;
+let waiverService: WaiverService;
 let result: any;
 
 let invoiceCollection: InvoiceCollection;
@@ -24,25 +29,12 @@ let invoiceId: string;
 const defaultContext: GetInvoiceDetailsContext = {roles: [Roles.SUPER_ADMIN]};
 
 describe('GetInvoiceDetailsUsecase', () => {
-  // describe('When NO Invoice ID is provided', () => {
-  //   beforeEach(() => {
-  //     mockInvoiceRepo = new MockInvoiceRepo();
-
-  //     usecase = new GetInvoiceDetailsUsecase(mockInvoiceRepo);
-  //   });
-
-  //   it('should fail', async () => {
-  //     // * act
-  //     result = await usecase.execute({invoiceId: undefined}, defaultContext);
-
-  //     expect(result.isFailure).toBeTruthy();
-  //   });
-  // });
-
   describe('When Invoice ID is provided', () => {
     beforeEach(() => {
       mockInvoiceRepo = new MockInvoiceRepo();
       mockWaiverRepo = new MockWaiverRepo();
+      vatService = new VATService();
+      waiverService = new WaiverService();
 
       invoiceId = 'test-invoice';
       const invoice = InvoiceMap.toDomain({
@@ -52,20 +44,13 @@ describe('GetInvoiceDetailsUsecase', () => {
       });
       mockInvoiceRepo.save(invoice);
 
-      usecase = new GetInvoiceDetailsUsecase(mockInvoiceRepo, mockWaiverRepo);
+      usecase = new GetInvoiceDetailsUsecase(
+        mockInvoiceRepo,
+        mockWaiverRepo,
+        vatService,
+        waiverService
+      );
     });
-
-    // describe('And Invoice ID is INVALID', () => {
-    //   it('should fail', async () => {
-    //     result = await usecase.execute(
-    //       {
-    //         invoiceId: null
-    //       },
-    //       defaultContext
-    //     );
-    //     expect(result.isFailure).toBeTruthy();
-    //   });
-    // });
 
     describe('And Invoice ID is VALID', () => {
       it('should return the invoice details', async () => {
@@ -81,9 +66,6 @@ describe('GetInvoiceDetailsUsecase', () => {
         );
 
         expect(result.isSuccess).toBeTruthy();
-        // expect(
-        //   result.getValue().invoiceId.id.toString() === invoiceId
-        // ).toBeTruthy();
       });
     });
   });

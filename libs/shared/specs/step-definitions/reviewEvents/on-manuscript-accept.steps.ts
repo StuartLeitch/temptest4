@@ -7,16 +7,16 @@ import {InvoiceItem} from '../../../src/lib/modules/invoices/domain/InvoiceItem'
 import {InvoiceStatus} from '../../../src/lib/modules/invoices/domain/Invoice';
 import {InvoiceMap} from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import {InvoiceItemMap} from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
-import {CatalogItem} from './../../../src/lib/modules/catalogs/domain/CatalogItem';
+import {CatalogItem} from './../../../src/lib/modules/journals/domain/CatalogItem';
 import {Article} from './../../../src/lib/modules/articles/domain/Article';
 import {ArticleRepoContract} from './../../../src/lib/modules/articles/repos/articleRepo';
 import {MockArticleRepo} from './../../../src/lib/modules/articles/repos/mocks/mockArticleRepo';
-import {CatalogMap} from './../../../src/lib/modules/catalogs/mappers/CatalogMap';
+import {CatalogMap} from './../../../src/lib/modules/journals/mappers/CatalogMap';
 import {ArticleMap} from './../../../src/lib/modules/articles/mappers/ArticleMap';
 import {TransactionRepoContract} from './../../../src/lib/modules/transactions/repos/transactionRepo';
 import {InvoiceItemRepoContract} from './../../../src/lib/modules/invoices/repos/invoiceItemRepo';
 import {InvoiceRepoContract} from './../../../src/lib/modules/invoices/repos/invoiceRepo';
-import {CatalogRepoContract} from './../../../src/lib/modules/catalogs/repos/catalogRepo';
+import {CatalogRepoContract} from './../../../src/lib/modules/journals/repos/catalogRepo';
 import {WaiverRepoContract} from './../../../src/lib/domain/reductions/repos/waiverRepo';
 
 import {
@@ -33,7 +33,7 @@ import {TransactionMap} from './../../../src/lib/modules/transactions/mappers/Tr
 import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
 import {MockInvoiceRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import {MockCatalogRepo} from '../../../src/lib/modules/catalogs/repos/mocks/mockCatalogRepo';
+import {MockCatalogRepo} from '../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import {MockInvoiceItemRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import {MockWaiverRepo} from '../../../src/lib/domain/reductions/repos/mocks/mockWaiverRepo';
 import {WaiverService} from '../../../src/lib/domain/services/WaiverService';
