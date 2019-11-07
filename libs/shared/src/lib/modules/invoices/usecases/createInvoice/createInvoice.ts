@@ -83,10 +83,6 @@ export class CreateInvoiceUsecase
       // * System creates DRAFT invoice
       const invoiceOrError = Invoice.create(invoiceProps);
 
-      if (invoiceOrError.isFailure) {
-        return left(invoiceOrError);
-      }
-
       // This is where all the magic happens
       const invoice = invoiceOrError.getValue();
       await this.invoiceRepo.save(invoice);
