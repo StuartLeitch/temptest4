@@ -5,7 +5,8 @@ import {
   DeleteInvoiceRequestDTO,
   CreateInvoiceUsecase,
   CreateInvoiceRequestDTO,
-  InvoiceMap
+  InvoiceMap,
+  Invoice
 } from '@hindawi/shared';
 
 import {Resolvers} from '../schema';
@@ -13,7 +14,7 @@ import {Context} from '../../context';
 
 export const invoice: Resolvers<Context> = {
   Query: {
-    async invoice(parent, args, context, info) {
+    async invoice(parent, args, context) {
       const {repos, vatService, waiverService} = context;
       const usecase = new GetInvoiceDetailsUsecase(
         repos.invoice,
@@ -31,12 +32,12 @@ export const invoice: Resolvers<Context> = {
       if (result.isLeft()) {
         return undefined;
       } else {
-        const resolvedInvoice = result.value.getValue();
+        const invoice = result.value.getValue();
+
         return {
-          ...resolvedInvoice,
-          id: resolvedInvoice.id.toString()
-          // totalAmount: invoice.totalAmount,
-          // netAmount: invoice.netAmount
+          id: invoice.id.toString(),
+          // totalAmount: entity.totalAmount,
+          // netAmount: entity.netAmount
         };
       }
     }

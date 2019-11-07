@@ -12,7 +12,9 @@ export const App = () => {
         path="/"
         exact
         component={() => (
-          <Link to="/payment-details/invoice-1">To payment details</Link>
+          <Link to="/payment-details/e23b6c52-eee8-4ca9-bfec-5c9a9d8b00c9">
+            To payment details
+          </Link>
         )}
       />
 
