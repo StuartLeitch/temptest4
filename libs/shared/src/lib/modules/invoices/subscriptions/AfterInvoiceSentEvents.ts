@@ -1,7 +1,7 @@
 // * Core Domain
 import {HandleContract} from '../../../core/domain/events/contracts/Handle';
 import {DomainEvents} from '../../../core/domain/events/DomainEvents';
-import {InvoiceSentEvent} from '../domain/events/invoiceSentEvent';
+import {InvoiceSentEvent} from '../domain/events/invoiceSent';
 
 import {InvoiceRepoContract} from '../repos/invoiceRepo';
 import {EmailCommunicatorContract} from '../infrastructure/communication-channels/contracts/EmailCommunicatorContract';

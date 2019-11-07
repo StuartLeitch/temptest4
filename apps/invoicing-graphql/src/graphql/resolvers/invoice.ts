@@ -28,18 +28,17 @@ export const invoice: Resolvers<Context> = {
 
       const result = await usecase.execute(request);
 
-      if (!result.value.isSuccess) {
+      if (result.isLeft()) {
         return undefined;
+      } else {
+        const resolvedInvoice = result.value.getValue();
+        return {
+          ...resolvedInvoice,
+          id: resolvedInvoice.id.toString()
+          // totalAmount: invoice.totalAmount,
+          // netAmount: invoice.netAmount
+        };
       }
-
-      const invoice = result.value.getValue();
-
-      return {
-        id: invoice.id.toString(),
-        invoice
-        // totalAmount: invoice.totalAmount,
-        // netAmount: invoice.netAmount
-      };
     }
   },
 
@@ -68,9 +67,18 @@ export const invoice: Resolvers<Context> = {
         transactionId: 'transaction-1'
       };
 
-      const result = await usecase.execute(request);
+      try {
+        const result = await this.useCase.execute(request);
 
-      return InvoiceMap.toPersistence(result.getValue());
+        if (result.isLeft()) {
+          const error = result.value;
+          // TODO: Handle errors in this block
+        } else {
+          return result.value.getValue();
+        }
+      } catch (err) {
+        // TODO: Also handle errors in here
+      }
     }
   }
 };

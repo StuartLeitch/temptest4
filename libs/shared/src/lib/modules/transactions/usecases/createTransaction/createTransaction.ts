@@ -2,7 +2,7 @@
 import {UseCase} from '../../../../core/domain/UseCase';
 import {Result, left, right} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {TextUtil} from '../../../../utils/TextUtil';
+import {TextUtils} from '../../../../utils/TextUtils';
 
 import {AppError} from '../../../../core/logic/AppError';
 import {CreateTransactionResponse} from './createTransactionResponse';
