@@ -44,6 +44,7 @@ export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
 // // export * from './invoices/domain/events/invoiceSentEvent';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDTOs';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
@@ -74,10 +75,10 @@ export * from './modules/addresses/domain/AddressId';
 export * from './modules/addresses/domain/Address';
 
 // * Export Catalog Subdomain
-export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
-export * from './modules/catalogs/domain/JournalId';
-export * from './modules/catalogs/repos';
-export * from './modules/catalogs/mappers/CatalogMap';
+// export {CatalogItem} from './modules/catalogs/domain/CatalogItem';
+// export * from './modules/catalogs/domain/JournalId';
+// export * from './modules/catalogs/repos';
+// export * from './modules/catalogs/mappers/CatalogMap';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
@@ -133,3 +134,6 @@ export * from './infrastructure/database/knex';
 // * Redux Stuff
 // export * from './infrastructure/frameworks/redux';
 // export * from './infrastructure/state-management/redux';
+export * from './domain/reductions/repos/implementations/knexWaiverRepo';
+export * from './domain/services/VATService';
+export * from './domain/services/WaiverService';

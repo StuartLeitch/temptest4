@@ -1,5 +1,6 @@
 import {Knex, TABLES} from '../../../../infrastructure/database/knex';
 import {Invoice} from '../../../../modules//invoices/domain/Invoice';
+import {InvoiceId} from '../../../../modules//invoices/domain/InvoiceId';
 import {Waiver} from '../../Waiver';
 import {WaiverId} from '../../WaiverId';
 import {WaiverMap} from '../../mappers/WaiverMap';
@@ -27,6 +28,10 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     }
 
     return WaiverMap.toDomain(waiver);
+  }
+
+  public async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
+    return [];
   }
 
   // public async getInvoiceByInvoiceItemId(
