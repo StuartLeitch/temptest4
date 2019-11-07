@@ -1,5 +1,5 @@
 import {
-  GetInvoiceDetailsRequestDTO,
+  GetInvoiceDetailsDTO,
   GetInvoiceDetailsUsecase,
   DeleteInvoiceUsecase,
   DeleteInvoiceRequestDTO,
@@ -15,25 +15,30 @@ export const invoice: Resolvers<Context> = {
   Query: {
     async invoice(parent, args, context, info) {
       const {repos} = context;
-      const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
+      const usecase = new GetInvoiceDetailsUsecase(
+        repos.invoice,
+        repos.waiver,
+        context.vatService,
+        context.waiverService
+      );
 
-      const request: GetInvoiceDetailsRequestDTO = {
+      const request: GetInvoiceDetailsDTO = {
         invoiceId: args.id
       };
 
       const result = await usecase.execute(request);
 
-      if (!result.isSuccess) {
+      if (!result.value.isSuccess) {
         return undefined;
       }
 
-      const invoice = result.getValue();
+      const entity = result.value.getValue();
 
       return {
-        id: invoice.id.toString(),
-        invoice
-        // totalAmount: invoice.totalAmount,
-        // netAmount: invoice.netAmount
+        id: entity.id.toString(),
+        entity
+        // totalAmount: entity.totalAmount,
+        // netAmount: entity.netAmount
       };
     }
   },
