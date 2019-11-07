@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "typesafe-actions";
 import { useParams } from "react-router-dom";
-import { Flex, Loader, Text } from "@hindawi/react-components";
+import { Flex, Loader, Text, th } from "@hindawi/react-components";
 
 import { Details } from "./Details";
 import { BillingInfo } from "./BillingInfo";
@@ -123,6 +123,8 @@ export default connect(
 
 // #region styles
 const Root = styled.div`
+  align-items: flex-start;
   display: flex;
+  padding: calc(${th("gridUnit")} * 6) calc(${th("gridUnit")} * 8);
 `;
 // #endregion
