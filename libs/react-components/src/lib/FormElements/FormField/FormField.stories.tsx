@@ -19,6 +19,11 @@ export const Default = () => (
         <div>
           <FormField required label="Email" name="email" mr={2} />
           <FormField label="Password" name="password" />
+          <FormField
+            label="Something else"
+            name="something-else"
+            component={() => <div>altceva</div>}
+          />
           <Button type="secondary" size="medium" onClick={props.handleSubmit}>
             Submit
           </Button>

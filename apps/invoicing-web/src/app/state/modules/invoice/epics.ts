@@ -1,12 +1,16 @@
-import { ofType } from "redux-observable";
-import { tap, ignoreElements } from "rxjs/operators";
+import { RootEpic, isActionOf } from "typesafe-actions";
+import { ignoreElements, filter, switchMap, map } from "rxjs/operators";
 
-import CONSTANTS from "./constants";
+import { getInvoice } from "./actions";
+import { queries } from "./graphql";
 
-const fetchInvoiceEpic = (action$: any) =>
+const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) =>
   action$.pipe(
-    ofType(CONSTANTS.FETCH),
-    tap(() => console.log("fetching invoice epic")),
+    filter(isActionOf(getInvoice.request)),
+    switchMap(action => graphqlAdapter.send(queries.getInvoice, { id: action.payload })),
+    map(r => {
+      console.log("the response", r);
+    }),
     ignoreElements(),
   );
 

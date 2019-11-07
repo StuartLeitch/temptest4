@@ -1,4 +1,5 @@
 import {Knex, TABLES} from '../../../../infrastructure/database/knex';
+import {Invoice} from '../../../../modules//invoices/domain/Invoice';
 import {Waiver} from '../../Waiver';
 import {WaiverId} from '../../WaiverId';
 import {WaiverMap} from '../../mappers/WaiverMap';

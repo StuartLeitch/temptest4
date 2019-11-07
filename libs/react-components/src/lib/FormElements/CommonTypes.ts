@@ -17,7 +17,7 @@ export interface FormFieldProps extends FormField {
   value?: any;
   name?: string;
   error?: string;
+  validationStatus?: ValidationStatuses;
   onBlur?(e: InputEvent): void;
   onChange?(e: InputEvent): void;
-  validationStatus?: ValidationStatuses;
 }

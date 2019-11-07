@@ -5,6 +5,6 @@ import {Invoice} from './../../domain/Invoice';
 import {CreateInvoiceErrors} from './createInvoiceErrors';
 
 export type CreateInvoiceResponse = Either<
-  CreateInvoiceErrors.TransactionDoesntExistError | AppError.UnexpectedError,
+  CreateInvoiceErrors.TransactionNotFoundError | AppError.UnexpectedError,
   Result<Invoice>
 >;

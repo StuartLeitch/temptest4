@@ -45,20 +45,20 @@ export const invoice: Resolvers<Context> = {
   Mutation: {
     async deleteInvoice(parent, args, context) {
       const {repos} = context;
-      const usecase = new DeleteInvoiceUsecase(repos.invoice);
 
+      const usecase = new DeleteInvoiceUsecase(repos.invoice);
       const request: DeleteInvoiceRequestDTO = {
         invoiceId: args.id
       };
 
       const result = await usecase.execute(request);
-
       return result.isSuccess;
     },
 
     async createInvoice(parent, args, context) {
       const {repos} = context;
-      const usecase = new CreateInvoiceUsecase(
+
+      const useCase = new CreateInvoiceUsecase(
         repos.invoice,
         repos.transaction
       );
@@ -67,17 +67,15 @@ export const invoice: Resolvers<Context> = {
         transactionId: 'transaction-1'
       };
 
-      try {
-        const result = await this.useCase.execute(request);
+      const result = await useCase.execute(request);
 
-        if (result.isLeft()) {
-          const error = result.value;
-          // TODO: Handle errors in this block
-        } else {
-          return result.value.getValue();
-        }
-      } catch (err) {
-        // TODO: Also handle errors in here
+      if (result.isLeft()) {
+        const error = result.value;
+        // TODO: Handle errors in this block
+        return error;
+      } else {
+        const newInvoice = result.value.getValue();
+        return InvoiceMap.toPersistence(newInvoice);
       }
     }
   }

@@ -5,6 +5,7 @@ import {FormFieldProps} from '../CommonTypes';
 type ResizeOptions = 'both' | 'none' | 'vertical' | 'horizontal';
 
 export interface Props extends FormFieldProps {
+  id?: string;
   placeholder?: string;
   resize?: ResizeOptions;
 }

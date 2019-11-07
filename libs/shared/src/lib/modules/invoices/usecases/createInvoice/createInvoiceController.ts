@@ -1,9 +1,9 @@
 import {ExpressController} from '../../../../infrastructure/http/models/implementations/expressController';
 import {DecodedExpressRequest} from '../../../../infrastructure/http/models/implementations/expressDecodedRequest';
+
 import {CreateInvoiceUsecase} from './createInvoice';
 import {CreateInvoiceRequestDTO} from './createInvoiceDTO';
 import {CreateInvoiceErrors} from './createInvoiceErrors';
-// import {TextUtil} from '../../../../utils/TextUtil';
 
 export class CreateInvoiceController extends ExpressController {
   private useCase: CreateInvoiceUsecase;

@@ -139,3 +139,6 @@ export * from './infrastructure/database/knex';
 // * Redux Stuff
 // export * from './infrastructure/frameworks/redux';
 // export * from './infrastructure/state-management/redux';
+export * from './domain/reductions/repos/implementations/knexWaiverRepo';
+export * from './domain/services/VATService';
+export * from './domain/services/WaiverService';
