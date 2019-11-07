@@ -1,17 +1,34 @@
-import React from "react";
+import React, { Fragment, useEffect } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
+import { RootState } from "typesafe-actions";
 import { useParams } from "react-router-dom";
+import { Flex, Loader, Text } from "@hindawi/react-components";
 
-import { BillingInfo } from "./BillingInfo";
 import { Details } from "./Details";
+import { BillingInfo } from "./BillingInfo";
 
-import { payerActions } from "../../state/modules/payer";
-import { invoiceActions } from "../../state/modules/invoice";
+import {
+  invoiceTypes,
+  invoiceActions,
+  invoiceSelectors,
+} from "../../state/modules/invoice";
+
+import {
+  payerActions,
+  payerSelectors,
+  payerTypes,
+} from "../../state/modules/payer";
 
 interface Props {
-  getInvoice: any;
-  createPayer: any;
+  invoiceError: string;
+  invoiceLoading: boolean;
+  invoice: invoiceTypes.Invoice | null;
+  payer: payerTypes.Payer | null;
+  payerError: string;
+  payerLoading: boolean;
+  getInvoice(id: string): any;
+  createPayer(payer: payerTypes.PayerInput): any;
 }
 
 const articleDetails = {
@@ -37,23 +54,70 @@ const invoiceDetails = {
   issueDate: "xxxxxxxx",
 };
 
-const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer, getInvoice }) => {
+const PaymentDetails: React.FunctionComponent<Props> = ({
+  invoice,
+  invoiceError,
+  invoiceLoading,
+  getInvoice,
+  // payer
+  payer,
+  payerError,
+  payerLoading,
+  createPayer,
+}) => {
   const { invoiceId } = useParams();
+
+  useEffect(() => {
+    getInvoice(invoiceId);
+  }, []);
+
+  if (invoiceError) {
+    return (
+      <Flex>
+        <Text type="warning">{invoiceError}</Text>
+      </Flex>
+    );
+  }
+
+  if (invoiceLoading) {
+    return (
+      <Flex alignItems="center" vertical>
+        <Text mb={2}>Fetching invoice...</Text>
+        <Loader size={6} />
+      </Flex>
+    );
+  }
 
   return (
     <Root>
-      <button onClick={() => getInvoice("123")}>Invoice</button>
-      <BillingInfo />
-      <Details articleDetails={articleDetails} invoiceDetails={invoiceDetails}></Details>
+      <BillingInfo
+        payer={payer}
+        error={payerError}
+        handleSubmit={createPayer}
+        loading={payerLoading}
+      />
+      <Details
+        articleDetails={articleDetails}
+        invoiceDetails={invoiceDetails}
+      />
     </Root>
   );
 };
 
+const mapStateToProps = (state: RootState) => ({
+  invoice: invoiceSelectors.invoice(state),
+  invoiceError: invoiceSelectors.invoiceError(state),
+  invoiceLoading: invoiceSelectors.invoiceLoading(state),
+  payer: payerSelectors.payer(state),
+  payerError: payerSelectors.payerError(state),
+  payerLoading: payerSelectors.payerLoading(state),
+});
+
 export default connect(
-  null,
+  mapStateToProps,
   {
-    createPayer: payerActions.createPayerAsync.request,
     getInvoice: invoiceActions.getInvoice.request,
+    createPayer: payerActions.createPayerAsync.request,
   },
 )(PaymentDetails);
 
