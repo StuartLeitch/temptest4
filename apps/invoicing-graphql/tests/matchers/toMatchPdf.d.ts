@@ -1,5 +1,5 @@
 declare namespace jest {
-  interface Matchers<R> {
+  interface Matchers<R, T> {
     toMatchPdf(name: string): R;
   }
 }

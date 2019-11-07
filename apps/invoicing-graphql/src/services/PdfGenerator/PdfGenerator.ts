@@ -1,10 +1,10 @@
-import { Readable } from 'stream';
-import { format } from 'date-fns';
 import fs from 'fs';
 import path from 'path';
+import {Readable} from 'stream';
+import {format} from 'date-fns';
 import ejs from 'ejs';
-import { Invoice, Author, Article, Payer } from '@hindawi/shared';
 import pdf from 'html-pdf';
+import {Invoice, Author, Article, Payer} from '@hindawi/shared';
 
 export interface InvoicePayload {
   invoice: Invoice;
@@ -17,8 +17,8 @@ export class PdfGeneratorService {
   private templates: {
     [key: string]: {
       fileName: string;
-      compile?: ejs.TemplateFunction
-    }
+      compile?: ejs.TemplateFunction;
+    };
   } = {};
 
   public getInvoice(payload: InvoicePayload): Promise<Readable> {
@@ -29,19 +29,19 @@ export class PdfGeneratorService {
         ...payload
       });
 
-      const pdfOptions: pdf.CreateOptions ={
+      const pdfOptions: pdf.CreateOptions = {
         border: {
           left: '1cm',
           right: '1cm',
           bottom: '0.75cm',
-          top: '0.25cm',
+          top: '0.25cm'
         },
         format: 'A4',
         footer: {
-          height: '2cm',
+          height: '2cm'
         },
         header: {
-          height: '2.5cm',
+          height: '2.5cm'
         }
       };
 
@@ -56,7 +56,7 @@ export class PdfGeneratorService {
   }
 
   public addTemplate(name: string, fileName: string): PdfGeneratorService {
-    this.templates[name] = { fileName };
+    this.templates[name] = {fileName};
     return this;
   }
 
