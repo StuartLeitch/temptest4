@@ -1,6 +1,6 @@
 module.exports.up = function(knex) {
   return knex.schema.createTable('journals', function(table) {
-    table.uuid('id').primary();
+    table.string('id', 40).primary();
     table.string('name');
     table.integer('apc');
     table.string('code');

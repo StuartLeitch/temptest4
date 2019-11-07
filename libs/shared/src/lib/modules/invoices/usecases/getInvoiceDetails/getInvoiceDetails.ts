@@ -88,34 +88,36 @@ export class GetInvoiceDetailsUsecase
         );
       }
 
-      // * Mark invoice as ACTIVE
-      invoice.markAsActive();
-
-      // * System identifies the associated waivers, if any
-      waivers = await this.waiverRepo.getWaiversByInvoiceId(invoiceId);
-
-      let invoiceCharge = invoice.getInvoiceTotal();
-      waivers.forEach((waiver: any) => {
-        const percentage = waiver.percentage;
-        invoiceCharge -= invoiceCharge * percentage;
-      });
-      invoice.charge = invoiceCharge;
-
-      // * Save the newly calculated charge
-      await this.invoiceRepo.update(invoice);
-
-      // * Apply and save VAT scheme
-      const vat = this.vatService.calculateVAT(
-        payerFromCountry,
-        payerIsAnIndividual
-      );
-      invoice.vat = vat;
-
-      // * Save the associated VAT scheme
-      await this.invoiceRepo.update(invoice);
-
-      // * This is where all the magic happens
       return right(Result.ok<Invoice>(invoice));
+
+      // // * Mark invoice as ACTIVE
+      // invoice.markAsActive();
+
+      // // * System identifies the associated waivers, if any
+      // waivers = await this.waiverRepo.getWaiversByInvoiceId(invoiceId);
+
+      // let invoiceCharge = invoice.getInvoiceTotal();
+      // waivers.forEach((waiver: any) => {
+      //   const percentage = waiver.percentage;
+      //   invoiceCharge -= invoiceCharge * percentage;
+      // });
+      // invoice.charge = invoiceCharge;
+
+      // // * Save the newly calculated charge
+      // await this.invoiceRepo.update(invoice);
+
+      // // * Apply and save VAT scheme
+      // const vat = this.vatService.calculateVAT(
+      //   payerFromCountry,
+      //   payerIsAnIndividual
+      // );
+      // invoice.vat = vat;
+
+      // // * Save the associated VAT scheme
+      // await this.invoiceRepo.update(invoice);
+
+      // // * This is where all the magic happens
+      // return right(Result.ok<Invoice>(invoice));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }
