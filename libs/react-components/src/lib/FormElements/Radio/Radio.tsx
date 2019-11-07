@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Label} from '../../Typography';
-import Flex, {FlexProps} from '../../Flex';
+import {FlexProps, Flex} from '../../Flex';
 
 export interface Props extends FlexProps {
   id?: string;

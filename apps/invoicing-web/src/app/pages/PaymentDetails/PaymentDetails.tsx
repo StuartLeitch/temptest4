@@ -42,12 +42,9 @@ const PaymentDetails: React.FunctionComponent<Props> = ({ createPayer, getInvoic
 
   return (
     <Root>
-      <button onClick={() => getInvoice("singurel")}>getInvoice</button>
-      <button onClick={() => createPayer({ id: "123", name: "Aurel" })}>createPayer</button>
+      <button onClick={() => getInvoice("123")}>Invoice</button>
       <BillingInfo />
-      <div>
-        <Details articleDetails={articleDetails} invoiceDetails={invoiceDetails}></Details>
-      </div>
+      <Details articleDetails={articleDetails} invoiceDetails={invoiceDetails}></Details>
     </Root>
   );
 };

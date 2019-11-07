@@ -3,7 +3,7 @@ import {Field, FieldProps} from 'formik';
 import {FlexboxProps, LayoutProps, SpaceProps} from 'styled-system';
 
 import Input from '../Input';
-import Flex from '../../Flex';
+import {Flex} from '../../Flex';
 import {Label, Text} from '../../Typography';
 import {FormFieldProps} from '../CommonTypes';
 
