@@ -10,7 +10,7 @@ interface Props {
 }
 
 const InvoiceDetails: React.FC<Props> = ({ invoiceDetails }) => (
-  <Expander title="Invoice Details" expanded={true}>
+  <Expander title="Invoice Details" expanded={false}>
     <Root>
       <DetailItem label="Invoice Issue Date" text={invoiceDetails.issueDate}></DetailItem>
       <DetailItem label="Date of Supply" text={invoiceDetails.supplyDate}></DetailItem>

@@ -7,7 +7,7 @@ import { PaymentDetails } from "./pages/PaymentDetails";
 export const App = () => {
   return (
     <div>
-      <Header></Header>
+      <Header path="Payment Details"></Header>
       <Link to="/payment-details/invoice-1">to payment details</Link>
       <Route path="/payment-details/:invoiceId" component={PaymentDetails} />
     </div>
