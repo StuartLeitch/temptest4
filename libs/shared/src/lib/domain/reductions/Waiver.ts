@@ -7,6 +7,8 @@ import {Discount} from './Discount';
 import {WaiverId} from './WaiverId';
 import {InvoiceId} from './../../modules/invoices/domain/InvoiceId';
 
+export type WaiverCollection = Waiver[];
+
 export class Waiver extends Discount {
   readonly reductionPercentage: number = 1;
 

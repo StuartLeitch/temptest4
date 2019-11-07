@@ -19,6 +19,10 @@ import {AccessControlContext} from '../../../../domain/authorization/AccessContr
 import {Roles} from '../../../users/domain/enums/Roles';
 import {InvoiceId} from '../../../invoices/domain/InvoiceId';
 import {PayerId} from '../../../payers/domain/PayerId';
+import {WaiverRepoContract} from '../../../../domain/reductions/repos/waiverRepo';
+import {WaiverService} from '../../../../domain/services/WaiverService';
+import {VATService} from './../../../../domain/services/VATService';
+import {WaiverCollection} from '../../../../domain/reductions/Waiver';
 
 export interface AddPayerToInvoiceRequestDTO {
   invoiceId: string;
@@ -39,36 +43,73 @@ export class AddPayerToInvoiceUsecase
       AddPayerToInvoiceContext,
       AccessControlContext
     > {
-  constructor(private invoiceRepo: InvoiceRepoContract) {
-    this.invoiceRepo = invoiceRepo;
-  }
+  constructor(
+    private invoiceRepo: InvoiceRepoContract,
+    private waiverRepo: WaiverRepoContract,
+    private vatService: VATService,
+    private waiverService: WaiverService
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
   }
 
-  @Authorize('transaction:update')
+  @Authorize('invoice:update')
   public async execute(
     request: AddPayerToInvoiceRequestDTO,
     context?: AddPayerToInvoiceContext
   ): Promise<AddPayerToInvoiceResponse> {
-    const {invoiceId, payerId} = request;
     let invoice: Invoice;
+    let waivers: WaiverCollection;
+
+    // * get a proper InvoiceId
+    const invoiceId = InvoiceId.create(
+      new UniqueEntityID(request.invoiceId)
+    ).getValue();
+
+    // * get a proper PayerId
+    const payerId = PayerId.create(new UniqueEntityID(request.payerId));
 
     try {
       try {
-        invoice = await this.invoiceRepo.getInvoiceById(
-          InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
-        );
+        invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
       } catch (err) {
         return left(
-          new AddPayerToInvoiceErrors.InvoiceNotFoundError(invoiceId)
+          new AddPayerToInvoiceErrors.InvoiceNotFoundError(
+            invoiceId.id.toString()
+          )
         );
       }
 
-      invoice.payerId = PayerId.create(new UniqueEntityID(payerId));
+      invoice.payerId = payerId;
 
       invoice = await this.invoiceRepo.save(invoice);
+
+      // * Mark invoice as ACTIVE
+      invoice.markAsActive();
+
+      // * System identifies the associated waivers, if any
+      waivers = await this.waiverRepo.getWaiversByInvoiceId(invoiceId);
+
+      let invoiceCharge = invoice.getInvoiceTotal();
+      waivers.forEach((waiver: any) => {
+        const percentage = waiver.percentage;
+        invoiceCharge -= invoiceCharge * percentage;
+      });
+      invoice.charge = invoiceCharge;
+
+      // * Save the newly calculated charge
+      await this.invoiceRepo.update(invoice);
+
+      // * Apply and save VAT scheme
+      // const vat = this.vatService.calculateVAT(
+      //   payerFromCountry,
+      //   payerIsAnIndividual
+      // );
+      // invoice.vat = vat;
+
+      // * Save the associated VAT scheme
+      await this.invoiceRepo.update(invoice);
 
       return right(Result.ok<Invoice>(invoice));
     } catch (err) {
