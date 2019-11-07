@@ -44,7 +44,7 @@ export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
 // // export * from './invoices/domain/events/invoiceSentEvent';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDTOs';
+export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDTO';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';

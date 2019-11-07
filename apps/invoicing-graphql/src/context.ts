@@ -37,5 +37,6 @@ export function makeContext(config: Config, db: Knex): Context {
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),
     vatService: new VATService(),
+    waiverService: new WaiverService(),
   };
 }
