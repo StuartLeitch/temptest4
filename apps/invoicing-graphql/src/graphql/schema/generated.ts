@@ -13,9 +13,17 @@ export type Scalars = {
 export type Invoice = {
    __typename?: 'Invoice',
   id?: Maybe<Scalars['String']>,
-  totalAmount?: Maybe<Scalars['Float']>,
-  netAmount?: Maybe<Scalars['Float']>,
+  dateCreated?: Maybe<Scalars['String']>,
+  dateChanged?: Maybe<Scalars['String']>,
+  vat?: Maybe<Scalars['Float']>,
+  status?: Maybe<InvoiceStatus>,
 };
+
+export enum InvoiceStatus {
+  Draft = 'DRAFT',
+  Active = 'ACTIVE',
+  Final = 'FINAL'
+}
 
 export type Mutation = {
    __typename?: 'Mutation',
@@ -35,7 +43,7 @@ export type MutationDeleteInvoiceArgs = {
 
 export type Query = {
    __typename?: 'Query',
-  invoice: Invoice,
+  invoice?: Maybe<Invoice>,
   echo?: Maybe<Scalars['String']>,
 };
 
@@ -124,6 +132,7 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>,
   Invoice: ResolverTypeWrapper<Invoice>,
   Float: ResolverTypeWrapper<Scalars['Float']>,
+  InvoiceStatus: InvoiceStatus,
   Mutation: ResolverTypeWrapper<{}>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
 };
@@ -134,14 +143,17 @@ export type ResolversParentTypes = {
   String: Scalars['String'],
   Invoice: Invoice,
   Float: Scalars['Float'],
+  InvoiceStatus: InvoiceStatus,
   Mutation: {},
   Boolean: Scalars['Boolean'],
 };
 
 export type InvoiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Invoice'] = ResolversParentTypes['Invoice']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  totalAmount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  netAmount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  dateCreated?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  dateChanged?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>,
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -150,7 +162,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  invoice?: Resolver<ResolversTypes['Invoice'], ParentType, ContextType, QueryInvoiceArgs>,
+  invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
 };
 

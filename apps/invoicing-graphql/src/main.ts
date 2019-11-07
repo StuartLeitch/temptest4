@@ -7,7 +7,7 @@ import {makeContext} from './context';
 import {makeGraphqlServer} from './graphql';
 import {makeExpressServer} from './api';
 
-import {queueService} from './queue_service';
+// import {queueService} from './queue_service';
 
 async function main(): Promise<void> {
   const config = await makeConfig();

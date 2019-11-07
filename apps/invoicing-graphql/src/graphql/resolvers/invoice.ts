@@ -6,6 +6,7 @@ import {
   CreateInvoiceUsecase,
   CreateInvoiceRequestDTO,
   InvoiceMap,
+  Roles,
   Invoice
 } from '@hindawi/shared';
 
@@ -27,7 +28,11 @@ export const invoice: Resolvers<Context> = {
         invoiceId: args.id
       };
 
-      const result = await usecase.execute(request);
+      const usecaseContext = {
+        roles: [Roles.PAYER],
+      };
+
+      const result = await usecase.execute(request, usecaseContext);
 
       if (result.isLeft()) {
         return undefined;
