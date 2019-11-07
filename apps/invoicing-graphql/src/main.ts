@@ -7,6 +7,8 @@ import {makeContext} from './context';
 import {makeGraphqlServer} from './graphql';
 import {makeExpressServer} from './api';
 
+import {queueService} from './queue_service';
+
 async function main() {
   const config = await makeConfig();
   const db = await makeDb(config);
@@ -17,13 +19,16 @@ async function main() {
 
   graphqlServer.applyMiddleware({
     app: expressServer,
-    path: '/graphql',
+    path: '/graphql'
   });
+
+  queueService.start();
+  (global as any).applicationEventBus = queueService;
 
   expressServer.listen(process.env.PORT || 4000);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.log('Unexpected error');
   console.error(err);
   process.exit(1);

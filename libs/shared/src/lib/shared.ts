@@ -44,6 +44,7 @@ export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
 // // export * from './invoices/domain/events/invoiceSentEvent';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDTO';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
@@ -100,7 +101,8 @@ export * from './modules/payments/mapper/PaymentMethod';
 export * from './modules/payments/repos';
 
 export * from './modules/payments/domain/events/paymentDone';
-// // * Export Coupon Subdomain
+
+// * Export Waiver, Coupon Subdomain
 // export * from './domain/reductions/ReductionFactory';
 // export * from './domain/reductions/Coupon';
 // export {
@@ -108,6 +110,9 @@ export * from './modules/payments/domain/events/paymentDone';
 // } from './domain/reductions/policies/PoliciesRegister';
 // export * from './domain/reductions/policies/WaivedCountryPolicy';
 // export * from './domain/reductions/policies/SanctionedCountryPolicy';
+export * from './domain/reductions/repos/implementations/knexWaiverRepo';
+export {VATService} from './domain/services/VATService';
+export {WaiverService} from './domain/services/WaiverService';
 
 // export * from './modules/coupons/mappers/CouponMap';
 // export * from './modules/coupons/repos';

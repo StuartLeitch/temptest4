@@ -26,7 +26,7 @@ import {VATService} from './../../../../domain/services/VATService';
 // * Usecase specific
 import {GetInvoiceDetailsResponse} from './getInvoiceDetailsResponse';
 import {GetInvoiceDetailsErrors} from './getInvoiceDetailsErrors';
-import {GetInvoiceDetailsDTO} from './getInvoiceDetailsDTOs';
+import {GetInvoiceDetailsDTO} from './getInvoiceDetailsDTO';
 
 export type GetInvoiceDetailsContext = AuthorizationContext<Roles>;
 

@@ -1,5 +1,5 @@
 import {
-  GetInvoiceDetailsRequestDTO,
+  GetInvoiceDetailsDTO,
   GetInvoiceDetailsUsecase,
   DeleteInvoiceUsecase,
   DeleteInvoiceRequestDTO,
@@ -14,20 +14,25 @@ import {Context} from '../../context';
 export const invoice: Resolvers<Context> = {
   Query: {
     async invoice(parent, args, context, info) {
-      const {repos} = context;
-      const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
+      const {repos, vatService, waiverService} = context;
+      const usecase = new GetInvoiceDetailsUsecase(
+        repos.invoice,
+        repos.waiver,
+        vatService,
+        waiverService
+      );
 
-      const request: GetInvoiceDetailsRequestDTO = {
+      const request: GetInvoiceDetailsDTO = {
         invoiceId: args.id
       };
 
       const result = await usecase.execute(request);
 
-      if (!result.isSuccess) {
+      if (!result.value.isSuccess) {
         return undefined;
       }
 
-      const invoice = result.getValue();
+      const invoice = result.value.getValue();
 
       return {
         id: invoice.id.toString(),

@@ -1,9 +1,8 @@
 import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {Invoice} from '../../../../modules//invoices/domain/Invoice';
 import {Waiver} from '../../Waiver';
 import {WaiverId} from '../../WaiverId';
 import {WaiverMap} from '../../mappers/WaiverMap';
-// import {TransactionId} from './../../../transactions/domain/TransactionId';
+import {InvoiceId} from './../../../../modules/invoices/domain/InvoiceId';
 
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
@@ -29,25 +28,15 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     return WaiverMap.toDomain(waiver);
   }
 
-  // public async getInvoiceByInvoiceItemId(
-  //   invoiceItemId: InvoiceItemId
-  // ): Promise<Invoice> {
-  //   const {db} = this;
+  public async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
+    const {db} = this;
 
-  //   const invoice = await db('invoice_items')
-  //     .select()
-  //     .where('id', invoiceItemId.id.toString())
-  //     .first();
+    const waivers = await db(TABLES.WAIVERS)
+      .select()
+      .where('invoiceId', invoiceId.id.toString());
 
-  //   if (!invoice) {
-  //     throw RepoError.createEntityNotFoundError(
-  //       'invoiceItem',
-  //       invoiceItemId.id.toString()
-  //     );
-  //   }
-
-  //   return InvoiceMap.toDomain(invoice);
-  // }
+    return waivers.map(i => WaiverMap.toDomain(i));
+  }
 
   // async getInvoicesByTransactionId(
   //   transactionId: TransactionId
@@ -122,10 +111,6 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     } catch (e) {
       throw RepoError.fromDBError(e);
     }
-
-    // if (invoice) {
-    //  await this.attachWaiverToInvoice({waiverId, invoiceId});
-    // }
 
     return this.getWaiverById(waiver.waiverId);
   }

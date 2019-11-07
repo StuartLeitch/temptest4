@@ -33,6 +33,7 @@
   },
   "private": true,
   "dependencies": {
+    "@hindawi/queue-service": "^1.0.3",
     "@pubsweet/component-email-templating": "^0.2.6",
     "@pubsweet/logger": "^0.2.34",
     "@repay/react-credit-card": "^1.0.1",
