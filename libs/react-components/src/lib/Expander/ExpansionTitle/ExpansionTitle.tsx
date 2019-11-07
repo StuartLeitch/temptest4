@@ -8,6 +8,7 @@ import Title from '../../Typography/Title';
 export interface Props extends SpaceProps, LayoutProps, FlexboxProps {
   expanded: boolean;
   title: string;
+  iconSize?: number;
   onClick?(e: React.MouseEvent<HTMLElement>): void;
 }
 
@@ -16,14 +17,19 @@ const iconName = (state: boolean) => {
 };
 
 const ExpansionTitle: React.FunctionComponent<Props> = ({
-  expanded,
   title,
   onClick,
+  expanded,
+  iconSize,
   ...rest
 }) => {
   return (
     <Root {...rest} onClick={onClick}>
-      <Icon color="colors.actionSecondary" name={iconName(expanded)} />
+      <Icon
+        color="colors.actionSecondary"
+        name={iconName(expanded)}
+        size={iconSize}
+      />
       <Title type="small">{title}</Title>
     </Root>
   );

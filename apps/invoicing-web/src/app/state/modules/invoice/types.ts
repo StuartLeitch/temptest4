@@ -3,7 +3,7 @@ export interface Invoice {
 }
 
 export interface InvoiceState {
-  invoice: Invoice;
+  invoice: Invoice | null;
   loading: boolean;
   error: string | null;
 }

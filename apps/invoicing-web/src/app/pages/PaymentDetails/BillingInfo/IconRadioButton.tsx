@@ -11,7 +11,11 @@ interface Props extends SpaceProps {
   isSelected?: boolean;
 }
 
-const IconRadioButton: React.FunctionComponent<Props> = ({ icon, label, ...rest }) => {
+const IconRadioButton: React.FunctionComponent<Props> = ({
+  icon,
+  label,
+  ...rest
+}) => {
   return (
     <Root {...rest}>
       <Icon size={6} name={icon} color="#667080" mr={3} />
@@ -26,8 +30,11 @@ export default IconRadioButton;
 const Root = styled(Flex)`
   align-items: center;
   border-radius: ${th("gridUnit")};
-  border: 1px solid ${({ isSelected }) => (isSelected ? "#1BD2AD" : th("colors.furniture"))};
-  background-color: ${({ isSelected }) => (isSelected ? th("colors.background") : "transparent")};
+  border: 1px solid
+    ${({ isSelected }) =>
+      isSelected ? th("colors.statusApproved") : th("colors.furniture")};
+  background-color: ${({ isSelected }) =>
+    isSelected ? th("colors.background") : "transparent"};
   cursor: pointer;
   display: flex;
   flex: 1;

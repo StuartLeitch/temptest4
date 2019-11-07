@@ -8,7 +8,14 @@ export const App = () => {
   return (
     <div>
       <Header path="Payment Details"></Header>
-      <Link to="/payment-details/invoice-1">to payment details</Link>
+      <Route
+        path="/"
+        exact
+        component={() => (
+          <Link to="/payment-details/invoice-1">To payment details</Link>
+        )}
+      />
+
       <Route path="/payment-details/:invoiceId" component={PaymentDetails} />
     </div>
   );
