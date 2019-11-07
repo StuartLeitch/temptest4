@@ -5,15 +5,17 @@ import {th} from '../Theme';
 
 import {SeparatorDirection} from './SeparatorTypes';
 
-const direction = ({direction}: {direction: SeparatorDirection}) => {
+const separatorDirection = ({direction}: {direction: SeparatorDirection}) => {
   switch (direction) {
     case 'vertical':
       return css`
         border-right-width: 1px;
+        height: 100%;
       `;
     case 'horizontal':
       return css`
         border-bottom-width: 1px;
+        width: 100%;
       `;
     default:
       return css``;
@@ -22,10 +24,11 @@ const direction = ({direction}: {direction: SeparatorDirection}) => {
 
 export const Separator: AnyStyledComponent = styled.div`
   border-color: ${th('colors.furniture')};
+  box-sizing: border-box;
   border-style: solid;
-  height: 100%;
+  border-width: 0;
 
-  ${direction}
+  ${separatorDirection}
   ${layout};
   ${space};
   ${flex};

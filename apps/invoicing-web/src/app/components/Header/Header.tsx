@@ -1,15 +1,20 @@
 import React from "react";
 
-import { Separator } from "@hindawi/react-components";
+import { Separator, Title } from "@hindawi/react-components";
 
 import { Header as Root } from "./Header.styles";
 
-interface Props {}
+interface Props {
+  path: string;
+}
 
-const Header: React.FC<Props> = props => (
+const Header: React.FC<Props> = ({ path }) => (
   <Root>
     <img src="../../assets/images/hindawi-horizontal.svg" alt="Hindawi" />
-    <Separator direction="vertical"></Separator>
+    <div style={{ height: "30px" }}>
+      <Separator direction="vertical"></Separator>
+    </div>
+    <Title type="small">{path}</Title>
   </Root>
 );
 
