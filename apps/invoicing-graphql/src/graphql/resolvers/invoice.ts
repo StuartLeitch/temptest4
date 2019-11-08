@@ -1,10 +1,6 @@
 import {
   GetInvoiceDetailsDTO,
   GetInvoiceDetailsUsecase,
-  DeleteInvoiceUsecase,
-  DeleteInvoiceRequestDTO,
-  CreateInvoiceUsecase,
-  CreateInvoiceRequestDTO,
   InvoiceMap,
   Roles,
   Invoice
@@ -38,48 +34,11 @@ export const invoice: Resolvers<Context> = {
           id: invoice.id.toString(),
           status: invoice.status,
           vat: invoice.vat,
+          charge: invoice.charge,
           dateCreated: invoice.dateCreated.toISOString(),
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
         };
-      }
-    }
-  },
-
-  Mutation: {
-    async deleteInvoice(parent, args, context) {
-      const {repos} = context;
-
-      const usecase = new DeleteInvoiceUsecase(repos.invoice);
-      const request: DeleteInvoiceRequestDTO = {
-        invoiceId: args.id
-      };
-
-      const result = await usecase.execute(request);
-      return result.isSuccess;
-    },
-
-    async createInvoice(parent, args, context) {
-      const {repos} = context;
-
-      const useCase = new CreateInvoiceUsecase(
-        repos.invoice,
-        repos.transaction
-      );
-
-      const request: CreateInvoiceRequestDTO = {
-        transactionId: 'transaction-1'
-      };
-
-      const result = await useCase.execute(request);
-
-      if (result.isLeft()) {
-        const error = result.value;
-        // TODO: Handle errors in this block
-        return error;
-      } else {
-        const newInvoice = result.value.getValue();
-        return InvoiceMap.toPersistence(newInvoice);
       }
     }
   }

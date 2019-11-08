@@ -16,6 +16,7 @@ export type Invoice = {
   dateCreated?: Maybe<Scalars['String']>,
   dateChanged?: Maybe<Scalars['String']>,
   vat?: Maybe<Scalars['Float']>,
+  charge?: Maybe<Scalars['Float']>,
   status?: Maybe<InvoiceStatus>,
 };
 
@@ -27,8 +28,15 @@ export enum InvoiceStatus {
 
 export type Mutation = {
    __typename?: 'Mutation',
+  updateInvoicePayer: Payer,
   createInvoice?: Maybe<Invoice>,
   deleteInvoice?: Maybe<Scalars['Boolean']>,
+};
+
+
+export type MutationUpdateInvoicePayerArgs = {
+  payerId: Scalars['String'],
+  payer: PayerInput
 };
 
 
@@ -40,6 +48,29 @@ export type MutationCreateInvoiceArgs = {
 export type MutationDeleteInvoiceArgs = {
   id: Scalars['String']
 };
+
+export type Payer = {
+   __typename?: 'Payer',
+  name?: Maybe<Scalars['String']>,
+  id?: Maybe<Scalars['String']>,
+  country?: Maybe<Scalars['String']>,
+  billingAddress?: Maybe<Scalars['String']>,
+  organization?: Maybe<Scalars['String']>,
+  type?: Maybe<PayerType>,
+};
+
+export type PayerInput = {
+  type?: Maybe<PayerType>,
+  country?: Maybe<Scalars['String']>,
+  name?: Maybe<Scalars['String']>,
+  billingAddress?: Maybe<Scalars['String']>,
+  organization?: Maybe<Scalars['String']>,
+};
+
+export enum PayerType {
+  INSTITUTION = 'INSTITUTION',
+  INDIVIDUAL = 'INDIVIDUAL'
+}
 
 export type Query = {
    __typename?: 'Query',
@@ -134,6 +165,9 @@ export type ResolversTypes = {
   Float: ResolverTypeWrapper<Scalars['Float']>,
   InvoiceStatus: InvoiceStatus,
   Mutation: ResolverTypeWrapper<{}>,
+  PayerInput: PayerInput,
+  PayerType: PayerType,
+  Payer: ResolverTypeWrapper<Payer>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
 };
 
@@ -145,6 +179,9 @@ export type ResolversParentTypes = {
   Float: Scalars['Float'],
   InvoiceStatus: InvoiceStatus,
   Mutation: {},
+  PayerInput: PayerInput,
+  PayerType: PayerType,
+  Payer: Payer,
   Boolean: Scalars['Boolean'],
 };
 
@@ -153,12 +190,23 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   dateCreated?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   dateChanged?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  charge?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>,
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  updateInvoicePayer?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationUpdateInvoicePayerArgs, 'payerId' | 'payer'>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
+};
+
+export type PayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payer'] = ResolversParentTypes['Payer']> = {
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  billingAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  organization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  type?: Resolver<Maybe<ResolversTypes['PayerType']>, ParentType, ContextType>,
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -169,6 +217,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type Resolvers<ContextType = any> = {
   Invoice?: InvoiceResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
+  Payer?: PayerResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
 };
 
