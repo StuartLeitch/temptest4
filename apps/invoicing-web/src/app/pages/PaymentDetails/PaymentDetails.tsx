@@ -7,6 +7,7 @@ import { Flex, Loader, Text, th } from "@hindawi/react-components";
 
 import { Details } from "./Details";
 import { BillingInfo } from "./BillingInfo";
+import { PaymentHeader } from "./PaymentHeader";
 
 import {
   invoiceTypes,
@@ -103,19 +104,25 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   }
 
   return (
-    <Root>
-      <BillingInfo
-        payer={payer}
-        error={payerError}
-        handleSubmit={createPayer}
-        loading={payerLoading}
-      />
-      <Details
-        articleDetails={articleDetails}
-        invoiceDetails={invoiceDetails}
-        charges={charges}
-      />
-    </Root>
+    <Fragment>
+      <PaymentHeader articleTitle={articleDetails.title}></PaymentHeader>
+      <Root>
+        <BillingInfo
+          payer={payer}
+          error={payerError}
+          handleSubmit={createPayer}
+          loading={payerLoading}
+        />
+        <Details
+          articleDetailsExpanded={true}
+          invoiceDetailsExpanded={true}
+          articleDetails={articleDetails}
+          invoiceDetails={invoiceDetails}
+          charges={charges}
+          mt={-44}
+        />
+      </Root>
+    </Fragment>
   );
 };
 
