@@ -7,18 +7,25 @@ import { ArticleDetails as Root } from "./ArticleDetails.styles";
 
 interface Props {
   articleDetails: any;
+  expanded?: boolean;
 }
 
-const ArticleDetails: React.FunctionComponent<Props> = ({ articleDetails }) => {
+const ArticleDetails: React.FunctionComponent<Props> = ({
+  articleDetails,
+  expanded,
+}) => {
   return (
-    <Expander title="Article details" expanded={false}>
+    <Expander title="Article details" expanded={expanded}>
       <Root>
         <DetailItem label="Journal title" text={articleDetails.journalTitle} />
         <DetailItem label="Article title" text={articleDetails.title} />
         <DetailItem label="Article ID" text={articleDetails.id.toString()} />
         <DetailItem label="Article Type" text={articleDetails.type} />
         <DetailItem label="CC License" text={articleDetails.ccLicense} />
-        <DetailItem label="Corresponding Author" text={articleDetails.correspondingAuthor} />
+        <DetailItem
+          label="Corresponding Author"
+          text={articleDetails.correspondingAuthor}
+        />
         <DetailItem label="Additional Authors" text={articleDetails.authors} />
       </Root>
     </Expander>
