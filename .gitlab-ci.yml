@@ -49,7 +49,7 @@ Test:
   image: node:latest
   before_script:
     - apt-get update
-    - apt-get -y install imagemagick
+    - apt-get -y install imagemagick graphicsmagick
   cache:
     key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
     paths:
