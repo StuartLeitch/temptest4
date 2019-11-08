@@ -4,7 +4,7 @@ exports[`Query.invoice should work 1`] = `
 Object {
   "invoice": Object {
     "id": "invoice-1",
-    "status": null,
+    "status": "DRAFT",
   },
 }
 `;

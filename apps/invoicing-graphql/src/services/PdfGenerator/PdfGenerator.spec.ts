@@ -4,6 +4,7 @@ import {InvoiceStatus} from './../../../../../libs/shared/src/lib/modules/invoic
 import {InvoiceMap} from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 import {AuthorMap} from './../../../../../libs/shared/src/lib/modules/authors/mappers/AuthorMap';
 import {PayerMap} from './../../../../../libs/shared/src/lib/modules/payers/mapper/Payer';
+import {PayerType} from './../../../../../libs/shared/src/lib/modules/payers/domain/Payer';
 import {ArticleMap} from './../../../../../libs/shared/src/lib/modules/articles/mappers/ArticleMap';
 
 import {PdfGeneratorService} from './PdfGenerator';
@@ -33,9 +34,8 @@ describe('PdfGeneratorService', () => {
 
   const payer = PayerMap.toDomain({
     id: 'payer-1',
-    type: 'individual',
-    name: 'Darth Vader',
-    surname: 'Sith'
+    type: PayerType.INDIVIDUAL,
+    name: 'Darth Vader'
   });
 
   it('should generate an invoice', async () => {
