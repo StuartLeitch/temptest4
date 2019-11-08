@@ -11,7 +11,9 @@ import {
   FormField,
 } from "@hindawi/react-components";
 
+import ConfirmationModal from "./ConfirmationModal";
 import IconRadioButton from "./IconRadioButton";
+import { Modal, useModalActions } from "../../../providers/modal";
 import { Payer, PayerInput } from "../../../state/modules/payer/types";
 
 const PAYMENT_TYPES = {
@@ -45,7 +47,7 @@ const validateFn = values => {
     errors.address = "Required";
   }
 
-  return errors;
+  return {};
 };
 
 interface Props {
@@ -61,6 +63,7 @@ const BillingInfo: React.FC<Props> = ({
   loading,
   handleSubmit,
 }) => {
+  const { showModal, hideModal } = useModalActions();
   return (
     <Expander title="1. Payer details" flex={2} mr={2}>
       <Root>
@@ -71,91 +74,110 @@ const BillingInfo: React.FC<Props> = ({
         >
           {({ handleSubmit, setFieldValue, values }) => {
             return (
-              <Flex m={2} vertical>
-                <Label required>Who is making the payment?</Label>
-                <Flex mt={1} mb={4}>
-                  <IconRadioButton
-                    isSelected={values.paymentType === PAYMENT_TYPES.individual}
-                    onClick={() =>
-                      setFieldValue("paymentType", PAYMENT_TYPES.individual)
-                    }
-                    icon="user"
-                    label="Pay as Individual"
-                    mr={1}
-                  />
-                  <IconRadioButton
-                    isSelected={
-                      values.paymentType === PAYMENT_TYPES.institution
-                    }
-                    onClick={() =>
-                      setFieldValue("paymentType", PAYMENT_TYPES.institution)
-                    }
-                    icon="institution"
-                    label="Pay as Institution"
-                    ml={1}
-                  />
-                </Flex>
-
-                {values.paymentType === PAYMENT_TYPES.institution && (
-                  <Flex>
-                    <FormField
-                      mr={4}
-                      flex={2}
-                      required
-                      label="Institution name"
-                      name="institution"
+              <Fragment>
+                <Flex m={2} vertical>
+                  <Label required>Who is making the payment?</Label>
+                  <Flex mt={1} mb={4}>
+                    <IconRadioButton
+                      isSelected={
+                        values.paymentType === PAYMENT_TYPES.individual
+                      }
+                      onClick={() =>
+                        setFieldValue("paymentType", PAYMENT_TYPES.individual)
+                      }
+                      icon="user"
+                      label="Pay as Individual"
+                      mr={1}
                     />
-                    <FormField
-                      required
-                      label="EC VAT Reg. No"
-                      name="vat"
-                      flex={1}
+                    <IconRadioButton
+                      isSelected={
+                        values.paymentType === PAYMENT_TYPES.institution
+                      }
+                      onClick={() =>
+                        setFieldValue("paymentType", PAYMENT_TYPES.institution)
+                      }
+                      icon="institution"
+                      label="Pay as Institution"
+                      ml={1}
                     />
                   </Flex>
-                )}
 
-                {values.paymentType !== null && (
-                  <Fragment>
+                  {values.paymentType === PAYMENT_TYPES.institution && (
                     <Flex>
-                      <Flex flex={2} mr={4}>
-                        <FormField
-                          mr={4}
-                          required
-                          name="firstName"
-                          label="First Name"
-                        />
-                        <FormField required label="Last Name" name="lastName" />
-                      </Flex>
-                      <FormField required label="Email" name="email" flex={1} />
-                    </Flex>
-
-                    <Flex
-                      alignItems="flex-start"
-                      justifyContent="space-between"
-                    >
                       <FormField
+                        mr={4}
                         flex={2}
                         required
-                        name="address"
-                        label="Address"
-                        component={FormTextarea}
+                        label="Institution name"
+                        name="institution"
                       />
-                      <Flex vertical flex={1} ml={4}>
-                        <FormField required label="Country" name="country" />
-                        <FormField required label="City" name="city" />
-                      </Flex>
+                      <FormField
+                        required
+                        label="EC VAT Reg. No"
+                        name="vat"
+                        flex={1}
+                      />
                     </Flex>
+                  )}
 
-                    <Button
-                      onClick={handleSubmit}
-                      size="medium"
-                      alignSelf="flex-end"
-                    >
-                      Create invoice
-                    </Button>
-                  </Fragment>
-                )}
-              </Flex>
+                  {values.paymentType !== null && (
+                    <Fragment>
+                      <Flex>
+                        <Flex flex={2} mr={4}>
+                          <FormField
+                            mr={4}
+                            required
+                            name="firstName"
+                            label="First Name"
+                          />
+                          <FormField
+                            required
+                            label="Last Name"
+                            name="lastName"
+                          />
+                        </Flex>
+                        <FormField
+                          required
+                          label="Email"
+                          name="email"
+                          flex={1}
+                        />
+                      </Flex>
+
+                      <Flex
+                        alignItems="flex-start"
+                        justifyContent="space-between"
+                      >
+                        <FormField
+                          flex={2}
+                          required
+                          name="address"
+                          label="Address"
+                          component={FormTextarea}
+                        />
+                        <Flex vertical flex={1} ml={4}>
+                          <FormField required label="Country" name="country" />
+                          <FormField required label="City" name="city" />
+                        </Flex>
+                      </Flex>
+
+                      <Button
+                        onClick={showModal}
+                        size="medium"
+                        alignSelf="flex-end"
+                      >
+                        Create invoice
+                      </Button>
+                    </Fragment>
+                  )}
+                </Flex>
+                <Modal>
+                  <ConfirmationModal
+                    onAccept={handleSubmit}
+                    onCancel={hideModal}
+                  />
+                </Modal>
+              </Fragment>
             );
           }}
         </Formik>
