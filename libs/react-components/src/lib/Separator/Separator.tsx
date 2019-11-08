@@ -1,13 +1,13 @@
 import React from 'react';
 import {FlexboxProps, LayoutProps, SpaceProps} from 'styled-system';
 
-import {SeparatorDirection} from './SeparatorTypes';
+import {SeparatorDirection, SeparatorFraction} from './SeparatorTypes';
 
 import {Separator as Root} from './Separator.styles';
 
 interface Props extends FlexboxProps, LayoutProps, SpaceProps {
   direction?: SeparatorDirection;
-  fraction?: number;
+  fraction?: SeparatorFraction;
 }
 
 const Separator: React.FC<Props> = props => <Root {...props}></Root>;

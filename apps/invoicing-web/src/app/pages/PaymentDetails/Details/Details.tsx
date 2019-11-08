@@ -8,13 +8,18 @@ import { Charges } from "./Charges";
 interface Props {
   articleDetails: any;
   invoiceDetails: any;
+  charges: any;
 }
 
-const Details: React.FC<Props> = ({ articleDetails, invoiceDetails }) => (
+const Details: React.FC<Props> = ({
+  articleDetails,
+  invoiceDetails,
+  charges,
+}) => (
   <Root>
     <ArticleDetails articleDetails={articleDetails}></ArticleDetails>
     <InvoiceDetails invoiceDetails={invoiceDetails}></InvoiceDetails>
-    <Charges></Charges>
+    <Charges charges={charges} mt="25"></Charges>
   </Root>
 );
 

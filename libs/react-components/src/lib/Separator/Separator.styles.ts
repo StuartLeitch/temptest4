@@ -3,14 +3,14 @@ import {layout, space, flex} from 'styled-system';
 
 import {th} from '../Theme';
 
-import {SeparatorDirection} from './SeparatorTypes';
+import {SeparatorDirection, SeparatorFraction} from './SeparatorTypes';
 
 const separatorDirection = ({
   direction,
   fraction
 }: {
   direction: SeparatorDirection;
-  fraction: number;
+  fraction: SeparatorFraction;
 }) => {
   switch (direction) {
     case 'vertical':
