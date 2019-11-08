@@ -3,8 +3,8 @@ import styled, {css} from 'styled-components';
 import {space, typography} from 'styled-system';
 
 import {th} from '../../Theme';
-import {Titles} from './Title';
 import * as fontTypes from '../fontTypes';
+import {Titles, Color} from './TitleTypes';
 
 const fontSize = ({type}: {type: Titles}) => {
   return css`
@@ -22,8 +22,22 @@ const ellipsis = ({ellipsis}: {ellipsis: boolean}) => {
   }
 };
 
+const setColor = ({color}: {color: Color}) => {
+  switch (color) {
+    case 'light':
+      return css`
+        color: ${th('colors.textPrimary')};
+      `;
+    case 'dark':
+      return css`
+        color: ${th('colors.white')};
+      `;
+    default:
+      return css``;
+  }
+};
+
 export const Title = styled.h1`
-  color: ${th('colors.textPrimary')};
   line-height: 1.3;
   margin-block-end: 0;
   margin-block-start: 0;
@@ -35,4 +49,5 @@ export const Title = styled.h1`
   ${fontTypes.bold};
   ${space};
   ${typography};
+  ${setColor};
 `;

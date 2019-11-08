@@ -1,10 +1,9 @@
 import React from 'react';
 import {SpaceProps, TypographyProps} from 'styled-system';
 
-import {Title as Root} from './Title.styles';
+import {Headings, Titles, Color} from './TitleTypes';
 
-export type Headings = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-export type Titles = 'hero' | 'primary' | 'small';
+import {Title as Root} from './Title.styles';
 
 export interface Props extends SpaceProps, TypographyProps {
   as?: Headings;
@@ -12,6 +11,7 @@ export interface Props extends SpaceProps, TypographyProps {
   upper?: boolean;
   ellipsis?: boolean;
   type?: Titles;
+  color?: Color;
 }
 
 const Title: React.FunctionComponent<Props> = ({children, ...rest}) => {
@@ -21,7 +21,8 @@ const Title: React.FunctionComponent<Props> = ({children, ...rest}) => {
 Title.defaultProps = {
   as: 'h1',
   upper: false,
-  type: 'primary'
+  type: 'primary',
+  color: 'light'
 };
 
 export default Title;
