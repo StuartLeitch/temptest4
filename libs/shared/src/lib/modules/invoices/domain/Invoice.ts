@@ -15,9 +15,9 @@ import {PayerId} from '../../payers/domain/PayerId';
 // import {Coupon} from '../../coupons/domain/Coupon';
 
 export enum InvoiceStatus {
-  DRAFT, // after the internal object has been created
-  ACTIVE, // when the customer is being notified
-  FINAL // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
+  DRAFT = 'DRAFT', // after the internal object has been created
+  ACTIVE = 'ACTIVE', // when the customer is being notified
+  FINAL = 'FINAL' // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
 }
 
 interface InvoiceProps {
