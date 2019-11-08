@@ -2,8 +2,10 @@ import {Result} from '../../../../core/logic/Result';
 import {Roles} from '../../../users/domain/enums/Roles';
 
 import {MockPayerRepo} from '../../../payers/repos/mocks/mockPayerRepo';
-import {PayerType, PayerCollection} from '../../../payers/domain/Payer';
 import {PayerMap} from '../../../payers/mapper/Payer';
+import {Payer, PayerType, PayerCollection} from '../../../payers/domain/Payer';
+import {PayerName} from '../../../payers/domain/PayerName';
+import {TransactionId} from './../../../transactions/domain/TransactionId';
 
 import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
 import {Invoice, InvoiceStatus} from '../../domain/Invoice';
@@ -100,11 +102,11 @@ describe('UpdateInvoiceDetailsUsecase', () => {
       it('should return the updated invoice details', async () => {
         payerCollection = await mockPayerRepo.getCollection();
         expect(payerCollection.length).toEqual(1);
-
+        // arrange
         result = await usecase.execute(
           {
             invoiceId,
-            name: '',
+            name: 'name',
             payerType: PayerType.INDIVIDUAL
           },
           defaultContext
@@ -112,11 +114,11 @@ describe('UpdateInvoiceDetailsUsecase', () => {
 
         // expect(result.isSuccess).toBeTruthy();
 
-        // const secondPayerCollection = await mockPayerRepo.getCollection();
-        // expect(secondPayerCollection.length).toEqual(1);
+        const secondPayerCollection = await mockPayerRepo.getCollection();
+        expect(secondPayerCollection.length).toEqual(1);
 
-        // const [payer] = secondPayerCollection;
-        // expect(payer.type).toBe(PayerType.INDIVIDUAL);
+        const [payer] = secondPayerCollection;
+        expect(payer.type).toBe(PayerType.INDIVIDUAL);
       });
     });
   });

@@ -6,9 +6,8 @@ import {
   InvoiceStatus
 } from '../../src/lib/modules/invoices/domain/Invoice';
 
-import {Payer} from '../../src/lib/modules/payers/domain/Payer';
+import {Payer, PayerType} from '../../src/lib/modules/payers/domain/Payer';
 import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
-import {PayerType} from '../../src/lib/modules/payers/domain/PayerType';
 
 import {PoliciesRegister} from '../../src/lib/domain/reductions/policies/PoliciesRegister';
 import {WaivedCountryPolicy} from '../../src/lib/domain/reductions/policies/WaivedCountryPolicy';
@@ -34,8 +33,7 @@ defineFeature(feature, test => {
     const payer = Payer.create(
       {
         name: PayerName.create('foo').getValue(),
-        surname: PayerName.create('bar').getValue(),
-        type: PayerType.create('individual').getValue()
+        type: PayerType.INDIVIDUAL
       },
       new UniqueEntityID(payerId)
     ).getValue();

@@ -63,10 +63,9 @@ export * from './modules/invoices/mappers/InvoiceItemMap';
 // export * from './modules/invoices/domain/policies/VATTreatmentPublicationNotOwnedPolicy';
 
 // * Export Payer Subdomain
-export {Payer} from './modules/payers/domain/Payer';
+export * from './modules/payers/domain/Payer';
 export * from './modules/payers/domain/PayerId';
 export * from './modules/payers/domain/PayerName';
-export * from './modules/payers/domain/PayerType';
 export * from './modules/payers/domain/PayerTitle';
 export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/repos/implementations/knexPayerRepo';

@@ -3,9 +3,8 @@ import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {Roles} from '../../../users/domain/enums/Roles';
 
 import {MockPayerRepo} from '../../repos/mocks/mockPayerRepo';
-import {Payer} from '../../domain/Payer';
+import {Payer, PayerType} from '../../domain/Payer';
 import {PayerName} from '../../domain/PayerName';
-import {PayerType} from '../../domain/PayerType';
 import {GetPayerUsecase, GetPayerContext} from './getPayer';
 
 let usecase: GetPayerUsecase;
@@ -40,8 +39,7 @@ describe('GetPayerUsecase', () => {
       const payer = Payer.create(
         {
           name: PayerName.create('foo').getValue(),
-          surname: PayerName.create('bar').getValue(),
-          type: PayerType.create('individual').getValue()
+          type: PayerType.INDIVIDUAL
         },
         new UniqueEntityID(payerId)
       ).getValue();

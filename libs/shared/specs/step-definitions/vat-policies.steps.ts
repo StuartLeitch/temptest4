@@ -13,7 +13,7 @@ import {
 } from '../../src/lib/modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import {Roles} from '../../src/lib/modules/users/domain/enums/Roles';
 
-import {Payer} from '../../src/lib/modules/payers/domain/Payer';
+import {Payer, PayerType} from '../../src/lib/modules/payers/domain/Payer';
 import {PayerMap} from '../../src/lib/modules/payers/mapper/Payer';
 // import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
 // import {PayerType} from '../../src/lib/modules/payers/domain/PayerType';
@@ -58,8 +58,7 @@ defineFeature(feature, test => {
     payer = PayerMap.toDomain({
       id: payerId,
       name: 'foo',
-      surname: 'bar',
-      type: 'individual'
+      type: PayerType.INSTITUTION
     });
     mockPayerRepo.save(payer);
 
