@@ -33,7 +33,7 @@ import {JournalId} from './../../../journals/domain/JournalId';
 // * Usecase specific
 import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';
 import {UpdateTransactionOnAcceptManuscriptErrors} from './updateTransactionOnAcceptManuscriptErrors';
-import {UpdateTransactionOnAcceptManuscriptDTO} from './UpdateTransactionOnAcceptManuscriptDTOs';
+import {UpdateTransactionOnAcceptManuscriptDTO} from './updateTransactionOnAcceptManuscriptDTOs';
 
 export type UpdateTransactionContext = AuthorizationContext<Roles>;
 

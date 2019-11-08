@@ -1,14 +1,16 @@
 // import {defineFeature, loadFeature} from 'jest-cucumber';
 
-// import {PaymentModel} from '../../lib/modules/payments/domain/contracts/PaymentModel';
-// import {PaymentFactory} from '../../lib/modules/payments/domain/strategies/PaymentFactory';
-// import {PaymentStrategy} from '../../lib/modules/payments/domain/strategies/PaymentStrategy';
-// // import {PayPalPayment} from '../../lib/modules/payments/domain/strategies/PayPalPayment';
-// // import {CreditCardPayment} from '../../lib/modules/payments/domain/strategies/CreditCardPayment';
-// import {CreditCard} from '../../lib/modules/payments/domain/strategies/CreditCard';
-// import {PayPal} from '../../lib/modules/payments/domain/strategies/PayPal';
+// import {PaymentModel} from '../../src/lib/modules/payments/domain/contracts/PaymentModel';
+// import {PaymentFactory} from '../../src/lib/modules/payments/domain/strategies/PaymentFactory';
+// import {PaymentStrategy} from '../../src/lib/modules/payments/domain/strategies/PaymentStrategy';
+// import {PayPalPayment} from '../../src/lib/modules/payments/domain/strategies/PayPalPayment';
+// import {CreditCardPayment} from '../../src/lib/modules/payments/domain/strategies/CreditCardPayment';
+// import {CreditCard} from '../../src/lib/modules/payments/domain/strategies/CreditCard';
+// import {PayPal} from '../../src/lib/modules/payments/domain/strategies/PayPal';
 
-// const feature = loadFeature('./specs/features/payment-methods.feature');
+// const feature = loadFeature('../features/payment-methods.feature', {
+//   loadRelativePath: true
+// });
 
 // defineFeature(feature, test => {
 //   let paymentFactory: PaymentFactory;
@@ -23,10 +25,10 @@
 //     paymentFactory.registerPayment(payPal);
 //     paymentFactory.registerPayment(creditCard);
 
-//     // paymentStrategy = new PaymentStrategy([
-//     //   ['CreditCard', new CreditCardPayment()],
-//     //   ['PayPal', new PayPalPayment()]
-//     // ]);
+//     paymentStrategy = new PaymentStrategy([
+//       ['CreditCard', new CreditCardPayment()],
+//       ['PayPal', new PayPalPayment()]
+//     ]);
 //   });
 
 //   afterEach(() => {
