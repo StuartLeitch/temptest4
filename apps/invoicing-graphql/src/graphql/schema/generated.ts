@@ -20,9 +20,9 @@ export type Invoice = {
 };
 
 export enum InvoiceStatus {
-  Draft = 'DRAFT',
-  Active = 'ACTIVE',
-  Final = 'FINAL'
+  DRAFT = 'DRAFT',
+  ACTIVE = 'ACTIVE',
+  FINAL = 'FINAL'
 }
 
 export type Mutation = {
