@@ -16,10 +16,7 @@ export const updateInvoicePayer: ASTNode = gql`
       id
       type
       name
-      city
       email
-      country
-      billingAddress
       organization
     }
   }
