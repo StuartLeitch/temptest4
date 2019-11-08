@@ -33,7 +33,7 @@ import {JournalId} from './../../../journals/domain/JournalId';
 // * Usecase specific
 import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';
 import {UpdateTransactionOnAcceptManuscriptErrors} from './updateTransactionOnAcceptManuscriptErrors';
-import {UpdateTransactionOnAcceptManuscriptDTO} from './UpdateTransactionOnAcceptManuscriptDTOs';
+import {UpdateTransactionOnAcceptManuscriptDTO} from './updateTransactionOnAcceptManuscriptDTOs';
 
 export type UpdateTransactionContext = AuthorizationContext<Roles>;
 
@@ -166,8 +166,9 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.waiverRepo.save(waiver);
 
       // * apply waiver to the invoice through invoice item
-      // invoiceItem.price *= waiver.percentage;
-      // await this.invoiceItemRepo.save(invoiceItem);
+      invoiceItem.price = catalogItem.price * Number(waiver.percentage);
+
+      await this.invoiceItemRepo.save(invoiceItem);
 
       return right(Result.ok<void>());
     } catch (err) {

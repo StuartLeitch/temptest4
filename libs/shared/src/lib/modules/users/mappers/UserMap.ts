@@ -17,7 +17,6 @@ export class UserMap extends Mapper<User> {
     );
 
     // userOrError.isFailure ? console.log(transactionOrError) : '';
-
     return userOrError.isSuccess ? userOrError.getValue() : null;
   }
 

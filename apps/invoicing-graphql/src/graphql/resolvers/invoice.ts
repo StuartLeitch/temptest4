@@ -32,10 +32,13 @@ export const invoice: Resolvers<Context> = {
       if (result.isLeft()) {
         return undefined;
       } else {
-        const invoiceDetails = result.value.getValue();
+        const invoice = result.value.getValue();
 
         return {
-          id: invoiceDetails.invoiceId.id.toString()
+          id: invoice.id.toString(),
+          status: invoice.status,
+          vat: invoice.vat,
+          dateCreated: invoice.dateCreated.toISOString(),
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
         };

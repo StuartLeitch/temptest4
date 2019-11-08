@@ -1,7 +1,5 @@
 import {defineFeature, loadFeature} from 'jest-cucumber';
 
-// import {Result} from '../../src/lib/core/logic/Result';
-// import {UniqueEntityID} from '../../lib/core/domain/UniqueEntityID';
 import {
   ValidateVATContext,
   ValidateVATUsecase
@@ -77,6 +75,8 @@ defineFeature(feature, test => {
           case ValidateVATErrors.InvalidInputError.name:
             vatResponse = error.errorValue();
         }
+      } else {
+        vatResponse = result.value.getValue();
       }
     });
 

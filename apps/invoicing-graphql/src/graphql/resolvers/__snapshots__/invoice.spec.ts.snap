@@ -1,3 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Query.invoice should work 1`] = `null`;
+exports[`Query.invoice should work 1`] = `
+Object {
+  "invoice": Object {
+    "id": "invoice-1",
+    "status": null,
+  },
+}
+`;

@@ -15,10 +15,11 @@ variables:
   DOCKER_VERSION: 18.09.0
   REGION: 'eu-west-1'
   AWS_REGISTRY: '918602980697.dkr.ecr.eu-west-1.amazonaws.com'
-  BT_ENVIRONMENT: 'Sandbox'
+  BT_ENVIRONMENT: 'sandbox'
   BT_MERCHANT_ID: 'test-merchant-id'
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
+  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
 
 services:
   - docker:$DOCKER_VERSION-dind
@@ -53,7 +54,7 @@ Test:
     policy: pull
   script:
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
-    - npm run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage --configuration production
+    - npm run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage
     - npm run ci:coverage
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
@@ -69,31 +70,6 @@ Test:
     - /^FM-\d+/
   # dependencies:
   #   - install
-
-# lint:
-#   interruptible: true
-#   stage: test
-#   script:
-#     - npm run nx -- lint shared
-#     - npm run nx -- lint react-components
-#     - npm run nx -- lint invoicing-graphql
-#   only:
-#     - monorepo-nx
-
-Pages:
-  interruptible: true
-  stage: deploy
-  script:
-    - mkdir -p public
-    - cp coverage/*.* public/
-    - mv public/index.html public/coverage.html
-  artifacts:
-    paths:
-      - public
-  dependencies:
-    - Test
-  only:
-    - develop
 
 Build:
   interruptible: true
@@ -157,3 +133,27 @@ Deploy to Dev:
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - export AFFECTED_LIBS=$(cat .ci_status/affected_libs)
     - ./tools/scripts/deploy.sh
+
+Pages:
+  interruptible: true
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp coverage/*.* public/
+    - mv public/index.html public/coverage.html
+  artifacts:
+    paths:
+      - public
+  dependencies:
+    - Test
+  only:
+    - develop
+# Lint:
+#   interruptible: true
+#   stage: test
+#   script:
+#     - npm run nx -- lint shared
+#     - npm run nx -- lint react-components
+#     - npm run nx -- lint invoicing-graphql
+#   only:
+#     - monorepo-nx

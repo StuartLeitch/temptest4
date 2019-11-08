@@ -1,12 +1,12 @@
 import {createClient} from 'soap';
 import EuroVat from 'eu-vat';
 
-require('dotenv').config();
+import {environment} from '@env/environment';
 
 import {PoliciesRegister} from './../reductions/policies/PoliciesRegister';
 import {UKVATTreatmentArticleProcessingChargesPolicy} from './../../modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 
-const {VAT_VALIDATION_SERVICE_ENDPOINT: endpoint} = process.env;
+const {VAT_VALIDATION_SERVICE_ENDPOINT: endpoint} = environment;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
 const vat = new EuroVat();
 const policiesRegister = new PoliciesRegister();
