@@ -1,5 +1,3 @@
-// import {Result} from '../../../../core/logic/Result';
-// import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {Roles} from '../../../users/domain/enums/Roles';
 
 import {WaiverService} from './../../../../domain/services/WaiverService';
@@ -13,8 +11,6 @@ import {
   GetInvoiceDetailsUsecase,
   GetInvoiceDetailsContext
 } from './getInvoiceDetails';
-
-// import {GetInvoiceDetailsResponse} from './getInvoiceDetailsResponse';
 
 let usecase: GetInvoiceDetailsUsecase;
 let mockInvoiceRepo: MockInvoiceRepo;
@@ -44,12 +40,7 @@ describe('GetInvoiceDetailsUsecase', () => {
       });
       mockInvoiceRepo.save(invoice);
 
-      usecase = new GetInvoiceDetailsUsecase(
-        mockInvoiceRepo,
-        mockWaiverRepo,
-        vatService,
-        waiverService
-      );
+      usecase = new GetInvoiceDetailsUsecase(mockInvoiceRepo);
     });
 
     describe('And Invoice ID is VALID', () => {
@@ -65,7 +56,7 @@ describe('GetInvoiceDetailsUsecase', () => {
           defaultContext
         );
 
-        expect(result.isSuccess).toBeTruthy();
+        expect(result.value.isSuccess).toBe(true);
       });
     });
   });

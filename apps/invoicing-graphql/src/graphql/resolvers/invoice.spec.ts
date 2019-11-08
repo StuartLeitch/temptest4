@@ -46,7 +46,7 @@ describe('Query.invoice', () => {
       query invoice($id: String!) {
         invoice(id: $id) {
           id
-          totalAmount
+          status
         }
       }
     `;
@@ -63,7 +63,6 @@ describe('Query.invoice', () => {
         id: 'invoice-1'
       }
     });
-
     expect(res.data).toMatchSnapshot();
   });
 });
