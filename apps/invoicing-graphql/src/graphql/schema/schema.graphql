@@ -11,6 +11,7 @@ type Invoice {
   vat: Float
   charge: Float
   status: InvoiceStatus
+  payer: Payer
 }
 
 input PayerInput {

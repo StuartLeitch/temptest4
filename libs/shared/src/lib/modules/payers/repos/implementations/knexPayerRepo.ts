@@ -2,6 +2,7 @@ import {
   Payer,
   PayerRepoContract,
   PayerId,
+  InvoiceId,
   PayerMap,
 } from '../../../../shared';
 import {Knex} from '../../../../infrastructure/database/knex';
@@ -22,6 +23,20 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
       throw RepoError.createEntityNotFoundError('payer', payerId.id.toString());
     }
 
+
+    return PayerMap.toDomain(payerRow);
+  }
+
+  async getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Payer> {
+    const {db} = this;
+    const payerRow = await db('payers')
+      .select()
+      .where('invoiceId', invoiceId.id.toString())
+      .first();
+
+    if (!payerRow) {
+      throw RepoError.createEntityNotFoundError('invoice', invoiceId.id.toString());
+    }
 
     return PayerMap.toDomain(payerRow);
   }

@@ -8,10 +8,12 @@ import {Mapper} from '../../../infrastructure/Mapper';
 import {Payer, PayerType} from '../domain/Payer';
 import {PayerTitle} from '../domain/PayerTitle';
 import {PayerName} from '../domain/PayerName';
+import { InvoiceId } from '../../invoices/domain/InvoiceId';
 
 export interface PayerPersistenceDTO {
   id?: string;
   title?: string;
+  invoiceId: string;
   name: string;
   organization?: string;
   uniqueIdentificationNumber?: string;
@@ -29,6 +31,7 @@ export class PayerMap extends Mapper<Payer> {
     const result = Payer.create(
       {
         name: PayerName.create(raw.name).getValue(),
+        invoiceId: InvoiceId.create(new UniqueEntityID(raw.invoiceId)).getValue(),
         title: raw.title ? PayerTitle.create(raw.title).getValue() : null,
         type: raw.type,
         organization: raw.organization
@@ -58,6 +61,7 @@ export class PayerMap extends Mapper<Payer> {
   public static toPersistence(payer: Payer): PayerPersistenceDTO {
     return {
       id: payer.id.toString(),
+      invoiceId: payer.invoiceId.toString(),
       type: payer.type,
       title: payer.title.value,
       name: payer.name.value,

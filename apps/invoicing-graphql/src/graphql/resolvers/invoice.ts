@@ -1,10 +1,13 @@
 import {
+  InvoiceId,
+  PayerMap,
+  UniqueEntityID,
   GetInvoiceDetailsDTO,
   GetInvoiceDetailsUsecase,
   Roles
 } from '@hindawi/shared';
 
-import {Resolvers} from '../schema';
+import {Resolvers, Invoice} from '../schema';
 import {Context} from '../../context';
 
 export const invoice: Resolvers<Context> = {
@@ -38,6 +41,18 @@ export const invoice: Resolvers<Context> = {
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
         };
+      }
+    }
+  },
+
+  Invoice: {
+    async payer(parent: Invoice, args, context) {
+      const payer = await context.repos.payer.getPayerByInvoiceId(
+        InvoiceId.create(new UniqueEntityID(parent.id)).getValue()
+      );
+
+      return {
+        ...PayerMap.toPersistence(payer)
       }
     }
   }
