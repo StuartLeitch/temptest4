@@ -4,7 +4,7 @@ import {AppError} from '../../../.././core/logic/AppError';
 // import {UpdateTransactionErrors} from './updateTransactionErrors';
 
 export type UpdateTransactionOnAcceptManuscriptResponse = Either<
-  // | UpdateTransactionErrors.SomethingWrong
+  // | UpdateTransactionErrors.SomeError
   AppError.UnexpectedError,
   Result<void>
 >;
