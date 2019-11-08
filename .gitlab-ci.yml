@@ -48,7 +48,8 @@ Test:
   stage: test
   image: node:latest
   before_script:
-    - apk add --no-cache imagemagick
+    - apt-get update
+    - apt-get -y install imagemagick
   cache:
     key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
     paths:
