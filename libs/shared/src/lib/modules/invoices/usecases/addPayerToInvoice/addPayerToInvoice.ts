@@ -28,22 +28,17 @@ import {PayerRepoContract} from './../../../payers/repos/payerRepo';
 import {Payer} from './../../../payers/domain/Payer';
 import {PayerMap} from './../../../payers/mapper/Payer';
 
-export interface AddPayerToInvoiceRequestDTO {
-  invoiceId: string;
-  payerId: string;
-}
-
 export type AddPayerToInvoiceContext = AuthorizationContext<Roles>;
 
 export class AddPayerToInvoiceUsecase
   implements
     UseCase<
-      AddPayerToInvoiceRequestDTO,
+      AddPayerToInvoiceDTO,
       Promise<AddPayerToInvoiceResponse>,
       AddPayerToInvoiceContext
     >,
     AccessControlledUsecase<
-      AddPayerToInvoiceRequestDTO,
+      AddPayerToInvoiceDTO,
       AddPayerToInvoiceContext,
       AccessControlContext
     > {
