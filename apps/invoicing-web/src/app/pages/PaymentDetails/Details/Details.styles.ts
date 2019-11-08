@@ -1,4 +1,5 @@
 import styled, { AnyStyledComponent } from "styled-components";
+import { layout, space } from "styled-system";
 
 import { th } from "@hindawi/react-components";
 
@@ -13,6 +14,9 @@ export const Details: AnyStyledComponent = styled.div`
   border-radius: 6px;
   display: flex;
   flex: 1;
+
+  ${layout};
+  ${space};
 
   & > * {
     margin-bottom: calc(${th("gridUnit")} * 4);
