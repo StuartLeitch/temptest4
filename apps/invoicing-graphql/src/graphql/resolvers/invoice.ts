@@ -16,20 +16,15 @@ import {Context} from '../../context';
 export const invoice: Resolvers<Context> = {
   Query: {
     async invoice(parent, args, context) {
-      const {repos, vatService, waiverService} = context;
-      const usecase = new GetInvoiceDetailsUsecase(
-        repos.invoice,
-        repos.waiver,
-        vatService,
-        waiverService
-      );
+      const {repos} = context;
+      const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
         invoiceId: args.id
       };
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles: [Roles.PAYER]
       };
 
       const result = await usecase.execute(request, usecaseContext);
@@ -37,10 +32,10 @@ export const invoice: Resolvers<Context> = {
       if (result.isLeft()) {
         return undefined;
       } else {
-        const invoice = result.value.getValue();
+        const invoiceDetails = result.value.getValue();
 
         return {
-          id: invoice.id.toString(),
+          id: invoiceDetails.invoiceId.id.toString()
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
         };

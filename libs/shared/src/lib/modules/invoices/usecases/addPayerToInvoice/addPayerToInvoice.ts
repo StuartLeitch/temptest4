@@ -76,7 +76,6 @@ export class AddPayerToInvoiceUsecase
     try {
       try {
         payer = PayerMap.toDomain({
-          invoiceId: request.invoiceId,
           ...request.payer
         });
       } catch (err) {

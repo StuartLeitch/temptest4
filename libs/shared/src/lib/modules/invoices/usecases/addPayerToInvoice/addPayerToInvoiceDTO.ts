@@ -1,8 +1,9 @@
-export interface GetInvoiceDetailsDTO {
+export interface AddPayerToInvoiceDTO {
   invoiceId: string;
   payer: {
-    firstName: string;
-    lastName: string;
+    type: string;
+    name: string;
+    surname: string;
     email: string;
     address: string;
     country: string;
