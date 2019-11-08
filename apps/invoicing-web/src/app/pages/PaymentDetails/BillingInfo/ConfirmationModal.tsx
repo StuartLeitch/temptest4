@@ -1,13 +1,24 @@
-import React from "react";
+import React, { Fragment } from "react";
 import styled from "styled-components";
-import { Button, Flex, Title, Text, th } from "@hindawi/react-components";
+import {
+  Flex,
+  Text,
+  Title,
+  Loader,
+  Button,
+  th,
+} from "@hindawi/react-components";
 
 interface Props {
   onAccept: any;
   onCancel: any;
+  loading: boolean;
+  error: string;
 }
 
 const ConfirmationModal: React.FunctionComponent<Props> = ({
+  loading,
+  error,
   onAccept,
   onCancel,
 }) => {
@@ -15,13 +26,25 @@ const ConfirmationModal: React.FunctionComponent<Props> = ({
     <Root>
       <Title mt={10}>Create Invoice?</Title>
       <Text mt={6}>Once created, the payment details can't be modified.</Text>
+      {error && (
+        <Text mt={4} type="warning">
+          {error}
+        </Text>
+      )}
+
       <Flex mt={6} mb={10}>
-        <Button type="outline" onClick={onCancel} mr={3}>
-          CANCEL
-        </Button>
-        <Button type="primary" onClick={onAccept} ml={3}>
-          YES, CREATE
-        </Button>
+        {loading ? (
+          <Loader size={8} />
+        ) : (
+          <Fragment>
+            <Button type="outline" onClick={onCancel} mr={3}>
+              CANCEL
+            </Button>
+            <Button type="primary" onClick={onAccept} ml={3}>
+              YES, CREATE
+            </Button>
+          </Fragment>
+        )}
       </Flex>
     </Root>
   );

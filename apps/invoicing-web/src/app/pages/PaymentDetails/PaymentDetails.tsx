@@ -119,7 +119,7 @@ export default connect(
   mapStateToProps,
   {
     getInvoice: invoiceActions.getInvoice.request,
-    createPayer: payerActions.createPayerAsync.request,
+    createPayer: payerActions.updatePayerAsync.request,
   },
 )(PaymentDetails);
 

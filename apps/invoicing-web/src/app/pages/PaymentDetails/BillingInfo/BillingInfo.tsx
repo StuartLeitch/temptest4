@@ -25,6 +25,19 @@ const FormTextarea = field => (
   <Textarea height={26} {...field} resize="vertical" />
 );
 
+const imperativeValidation = (formFns, showModal) => () => {
+  formFns.validateForm().then(errors => {
+    const errorFields = Object.keys(errors);
+    if (!errorFields.length) {
+      showModal();
+    } else {
+      formFns.setTouched(
+        errorFields.reduce((acc, el) => ({ ...acc, [el]: true }), {}),
+      );
+    }
+  });
+};
+
 const validateFn = values => {
   const errors: any = {};
 
@@ -45,6 +58,15 @@ const validateFn = values => {
   }
   if (!values.address) {
     errors.address = "Required";
+  }
+
+  if (values.paymentType === PAYMENT_TYPES.institution) {
+    if (!values.institution) {
+      errors.institution = "Required";
+    }
+    if (!values.vat) {
+      errors.vat = "Required";
+    }
   }
 
   return {};
@@ -72,7 +94,13 @@ const BillingInfo: React.FC<Props> = ({
           validate={validateFn}
           onSubmit={handleSubmit}
         >
-          {({ handleSubmit, setFieldValue, values }) => {
+          {({
+            values,
+            setTouched,
+            handleSubmit,
+            validateForm,
+            setFieldValue,
+          }) => {
             return (
               <Fragment>
                 <Flex m={2} vertical>
@@ -162,7 +190,13 @@ const BillingInfo: React.FC<Props> = ({
                       </Flex>
 
                       <Button
-                        onClick={showModal}
+                        onClick={imperativeValidation(
+                          {
+                            setTouched,
+                            validateForm,
+                          },
+                          showModal,
+                        )}
                         size="medium"
                         alignSelf="flex-end"
                       >
@@ -173,8 +207,10 @@ const BillingInfo: React.FC<Props> = ({
                 </Flex>
                 <Modal>
                   <ConfirmationModal
-                    onAccept={handleSubmit}
+                    error={error}
+                    loading={loading}
                     onCancel={hideModal}
+                    onAccept={handleSubmit}
                   />
                 </Modal>
               </Fragment>
