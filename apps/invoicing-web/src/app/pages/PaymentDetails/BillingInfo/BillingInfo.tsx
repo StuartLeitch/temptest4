@@ -87,7 +87,7 @@ const BillingInfo: React.FC<Props> = ({
 }) => {
   const { showModal, hideModal } = useModalActions();
   return (
-    <Expander title="1. Payer details" flex={2} mr={2}>
+    <Expander title="1. Payer details" flex={2} mb={6}>
       <Root>
         <Formik
           initialValues={payer}

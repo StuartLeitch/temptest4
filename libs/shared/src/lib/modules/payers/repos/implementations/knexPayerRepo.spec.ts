@@ -9,8 +9,7 @@ import {KnexPayerRepo} from './knexPayerRepo';
 
 const payerData = {
   id: 'payer-1',
-  type: 'rebel',
-  surname: 'Luke',
+  type: PayerType.INDIVIDUAL,
   title: 'Mr',
   name: 'Skywalker',
   organization: 'Rebel Alliance',

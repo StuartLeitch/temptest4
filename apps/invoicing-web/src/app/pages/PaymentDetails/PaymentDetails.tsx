@@ -7,6 +7,7 @@ import { Flex, Loader, Text, th } from "@hindawi/react-components";
 
 import { Details } from "./Details";
 import { BillingInfo } from "./BillingInfo";
+import { InvoicePayment } from "./InvoicePayment";
 
 import {
   invoiceTypes,
@@ -104,12 +105,15 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 
   return (
     <Root>
-      <BillingInfo
-        payer={payer}
-        error={payerError}
-        handleSubmit={createPayer}
-        loading={payerLoading}
-      />
+      <FormsContainer>
+        <BillingInfo
+          payer={payer}
+          error={payerError}
+          handleSubmit={createPayer}
+          loading={payerLoading}
+        />
+        <InvoicePayment />
+      </FormsContainer>
       <Details
         articleDetails={articleDetails}
         invoiceDetails={invoiceDetails}
@@ -141,5 +145,12 @@ const Root = styled.div`
   align-items: flex-start;
   display: flex;
   padding: calc(${th("gridUnit")} * 6) calc(${th("gridUnit")} * 8);
+`;
+
+const FormsContainer = styled.div`
+  display: flex;
+  flex: 2;
+  flex-direction: column;
+  margin-right: calc(${th("gridUnit")} * 4);
 `;
 // #endregion

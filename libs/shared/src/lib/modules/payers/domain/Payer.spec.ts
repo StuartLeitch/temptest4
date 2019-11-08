@@ -1,8 +1,7 @@
 import {Result} from '../../../core/logic/Result';
 
-import {Payer} from './Payer';
+import {Payer, PayerType} from './Payer';
 import {PayerName} from './PayerName';
-import {PayerType} from './PayerType';
 
 let payerOrError: Result<Payer>;
 // let payer: Payer;
@@ -16,8 +15,7 @@ describe('Payer', () => {
   it('Should be able to be created', () => {
     payerOrError = Payer.create({
       name: PayerName.create('Foo').getValue(),
-      surname: PayerName.create('Bar').getValue(),
-      type: PayerType.create('FooBar').getValue()
+      type: PayerType.INSTITUTION
     });
 
     expect(payerOrError.isSuccess).toBeTruthy();
