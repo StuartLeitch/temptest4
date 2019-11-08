@@ -1,9 +1,7 @@
 import {
   GetInvoiceDetailsDTO,
   GetInvoiceDetailsUsecase,
-  InvoiceMap,
-  Roles,
-  Invoice
+  Roles
 } from '@hindawi/shared';
 
 import {Resolvers} from '../schema';
@@ -28,14 +26,15 @@ export const invoice: Resolvers<Context> = {
       if (result.isLeft()) {
         return undefined;
       } else {
-        const invoice = result.value.getValue();
+        // There is a TSLint error for when try to use a shadowed variable!
+        const invoiceDetails = result.value.getValue();
 
         return {
-          id: invoice.id.toString(),
-          status: invoice.status,
-          vat: invoice.vat,
-          charge: invoice.charge,
-          dateCreated: invoice.dateCreated.toISOString(),
+          id: invoiceDetails.id.toString(),
+          status: invoiceDetails.status,
+          vat: invoiceDetails.vat,
+          charge: invoiceDetails.charge,
+          dateCreated: invoiceDetails.dateCreated.toISOString()
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
         };

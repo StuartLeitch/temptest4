@@ -3,7 +3,7 @@ import {UseCase} from '../../../../core/domain/UseCase';
 import {Result} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 
-// import {PayerType} from '../../../payers/domain/PayerType';
+import {PayerType} from '../../../payers/domain/PayerType';
 
 import {Invoice} from '../../domain/Invoice';
 import {InvoiceId} from '../../domain/InvoiceId';
@@ -23,6 +23,7 @@ import {Roles} from '../../../users/domain/enums/Roles';
 export interface UpdateInvoiceDetailsRequestDTO {
   invoiceId?: string;
   payerType?: string; // to map PayerType;
+  name?: string;
 }
 
 export type UpdateInvoiceContext = AuthorizationContext<Roles>;
@@ -88,15 +89,16 @@ export class UpdateInvoiceDetailsUsecase
       const invoice = invoiceOrError.getValue();
 
       // * This is where all the magic happens
-      const {payerType} = request;
+      const {payerType, name} = request;
 
       // * If "payerType" is defined, update payer
       if (payerType) {
         const updatePayerUsecase = new UpdatePayerUsecase(this.payerRepo);
         const updatePayer = await updatePayerUsecase.execute(
           {
-            payerId: invoice.payerId.id.toString(),
-            type: payerType
+            payerId: invoice.payerId ? invoice.payerId.id.toString() : null,
+            name,
+            type: PayerType[payerType]
           },
           context
         );

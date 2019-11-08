@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 import Knex from 'knex';
 import path from 'path';
 
+import {InvoiceStatus} from '../schema/generated';
 import {Config} from '../../config';
 import {makeServer} from '../server';
 import {makeContext} from '../../context';
@@ -54,7 +55,7 @@ describe('Query.invoice', () => {
     await db('invoices').insert({
       id: 'invoice-1',
       transactionId: 'transaction-1',
-      status: 0
+      status: InvoiceStatus.DRAFT
     });
 
     const res = await client.query({
