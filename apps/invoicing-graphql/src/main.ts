@@ -29,7 +29,7 @@ async function main(): Promise<void> {
 }
 
 main().catch(err => {
-  console.log('Unexpected error');
+  console.log('Unexpected error!');
   console.error(err);
   process.exit(1);
 });
