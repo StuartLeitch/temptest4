@@ -11,13 +11,16 @@ import {PhoneNumber} from '../../../domain/PhoneNumber';
 import {AddressId} from '../../addresses/domain/AddressId';
 import {PayerId} from './PayerId';
 import {PayerName} from './PayerName';
-import {PayerType} from './PayerType';
 import {PayerTitle} from './PayerTitle';
+
+export enum PayerType {
+  INDIVIDUAL = 'INDIVIDUAL',
+  INSTITUTION = 'INSTITUTION'
+}
 
 export interface PayerProps {
   type: PayerType;
   title?: PayerTitle;
-  surname: PayerName;
   name: PayerName;
   organization?: Name;
   uniqueIdentificationNumber?: string;
@@ -47,10 +50,6 @@ export class Payer extends AggregateRoot<PayerProps> {
 
   get title(): PayerTitle {
     return this.props.title;
-  }
-
-  get surname(): PayerName {
-    return this.props.surname;
   }
 
   get name(): PayerName {
@@ -100,7 +99,6 @@ export class Payer extends AggregateRoot<PayerProps> {
   public static create(props: PayerProps, id?: UniqueEntityID): Result<Payer> {
     const propsResult = Guard.againstNullOrUndefinedBulk([
       {argument: props.name, argumentName: 'name'},
-      {argument: props.surname, argumentName: 'surname'},
       {argument: props.type, argumentName: 'type'}
     ]);
     if (!propsResult.succeeded) {

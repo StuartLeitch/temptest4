@@ -5,7 +5,8 @@ import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 
 import {Payer} from '../../domain/Payer';
 import {PayerId} from '../../domain/PayerId';
-import {PayerType} from '../../domain/PayerType';
+import {PayerName} from '../../domain/PayerName';
+import {PayerType} from '../../domain/Payer';
 import {PayerRepoContract} from '../../repos/payerRepo';
 
 import {
@@ -18,7 +19,8 @@ import {Roles} from '../../../users/domain/enums/Roles';
 
 export interface UpdatePayerRequestDTO {
   payerId?: string;
-  type?: string; // to map PayerType
+  type?: PayerType; // to map PayerType
+  name: string;
 }
 
 export type UpdatePayerContext = AuthorizationContext<Roles>;
@@ -79,12 +81,9 @@ export class UpdatePayerUsecase
       const payer = payerOrError.getValue();
 
       // * This is where all the magic happens
-      const {type: rawType} = request;
 
-      if (rawType) {
-        const type = PayerType.create(rawType).getValue();
-        payer.set('type', type);
-      }
+      payer.set('type', request.type);
+      payer.set('name', PayerName.create(request.name).getValue());
 
       await this.payerRepo.update(payer);
 

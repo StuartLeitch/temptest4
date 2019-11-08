@@ -5,7 +5,7 @@ import {bold} from '../../Typography/fontTypes';
 import {th} from '../../Theme';
 
 const collapse = css`
-  border-radius: 5px;
+  border-radius: ${th('gridUnit')};
 `;
 
 const collapseBody = ({expanded}: {expanded: boolean}) => {
@@ -17,8 +17,8 @@ export const ExpansionTitle: AnyStyledComponent = styled.div`
   border-bottom: 1px solid ${th('colors.transparent')};
   background-color: ${th('colors.background')};
   color: ${th('colors.textPrimary')};
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  border-top-left-radius: ${th('gridUnit')};
+  border-top-right-radius: ${th('gridUnit')};
   justify-content: flex-start;
   align-items: center;
   flex-direction: row;

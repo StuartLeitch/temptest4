@@ -69,7 +69,9 @@ export * from './modules/payers/domain/PayerName';
 export * from './modules/payers/domain/PayerType';
 export * from './modules/payers/domain/PayerTitle';
 export * from './modules/payers/repos/payerRepo';
+export * from './modules/payers/repos/implementations/knexPayerRepo';
 export * from './modules/payers/mapper/Payer';
+export * from './modules/payers/usecases/updatePayer/updatePayer';
 
 // * Export Address Subdomain
 export * from './modules/addresses/domain/AddressId';

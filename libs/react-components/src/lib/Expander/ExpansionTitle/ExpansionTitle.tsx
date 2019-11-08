@@ -24,7 +24,7 @@ const ExpansionTitle: React.FunctionComponent<Props> = ({
   ...rest
 }) => {
   return (
-    <Root {...rest} onClick={onClick}>
+    <Root expanded={expanded} {...rest} onClick={onClick}>
       <Icon
         color="colors.actionSecondary"
         name={iconName(expanded)}
