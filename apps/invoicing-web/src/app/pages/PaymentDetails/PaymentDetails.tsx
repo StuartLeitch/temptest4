@@ -20,6 +20,8 @@ import {
   payerTypes,
 } from "../../state/modules/payer";
 
+import { Modal, useModalActions } from "../../providers/modal";
+
 interface Props {
   invoiceError: string;
   invoiceLoading: boolean;
@@ -29,6 +31,8 @@ interface Props {
   payerLoading: boolean;
   getInvoice(id: string): any;
   createPayer(payer: payerTypes.PayerInput): any;
+  showModal: any;
+  hideModal: any;
 }
 
 const articleDetails = {
@@ -66,6 +70,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   createPayer,
 }) => {
   const { invoiceId } = useParams();
+  const { showModal, hideModal } = useModalActions();
 
   useEffect(() => {
     getInvoice(invoiceId);
@@ -90,6 +95,13 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 
   return (
     <Root>
+      <button onClick={showModal}>Arata</button>
+      <Modal>
+        <div style={{ backgroundColor: "wheat" }}>
+          <h2>sunt contentul modalului</h2>
+          <button onClick={hideModal}>close</button>
+        </div>
+      </Modal>
       <BillingInfo
         payer={payer}
         error={payerError}
