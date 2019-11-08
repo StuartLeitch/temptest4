@@ -31,7 +31,6 @@ export const payerResolvers: Resolvers<Context> = {
       const updatedPayer = result.getValue();
 
       const payerDto = PayerMap.toPersistence(updatedPayer);
-      console.log('payerDto ->', JSON.stringify(payerDto));
       return {
         ...payerDto
       };

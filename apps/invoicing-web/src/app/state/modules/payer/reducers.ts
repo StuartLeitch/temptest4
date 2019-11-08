@@ -25,4 +25,9 @@ export default createReducer(initialState)
     ...state,
     loading: false,
     error: action.payload,
+  }))
+  .handleAction(updatePayerAsync.success, (state, action) => ({
+    error: null,
+    loading: false,
+    payer: action.payload,
   }));

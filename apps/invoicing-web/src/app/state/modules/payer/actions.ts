@@ -6,4 +6,4 @@ export const updatePayerAsync = createAsyncAction(
   "payer/CREATE_REQUEST",
   "payer/CREATE_SUCCESS",
   "payer/CREATE_ERROR",
-)<PayerInput, Payer, string>();
+)<Payer, Payer, string>();
