@@ -16,7 +16,7 @@ export class Name extends ValueObject<NameProps> {
   }
 
   public static create(props: NameProps): Result<Name> {
-    const nullGuardResult = Guard.againstNullOrUndefined(name, 'name');
+    const nullGuardResult = Guard.againstNullOrUndefined(props.value, 'name');
 
     if (!nullGuardResult.succeeded) {
       return Result.fail<Name>(nullGuardResult.message);

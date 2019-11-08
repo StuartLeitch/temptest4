@@ -3,6 +3,7 @@ import {
   KnexInvoiceRepo,
   KnexTransactionRepo,
   KnexPaymentRepo,
+  KnexPayerRepo,
   KnexWaiverRepo,
   VATService,
   WaiverService
@@ -16,6 +17,7 @@ export interface ReposContext {
   transaction: KnexTransactionRepo;
   payment: KnexPaymentRepo;
   waiver: KnexWaiverRepo;
+  payer: KnexPayerRepo;
 }
 
 export interface Context {
@@ -33,6 +35,7 @@ export function makeContext(config: Config, db: Knex): Context {
       transaction: new KnexTransactionRepo(db),
       payment: new KnexPaymentRepo(db),
       waiver: new KnexWaiverRepo(db),
+      payer: new KnexPayerRepo(db),
     },
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),

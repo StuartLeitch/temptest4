@@ -22,6 +22,7 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
       throw RepoError.createEntityNotFoundError('payer', payerId.id.toString());
     }
 
+
     return PayerMap.toDomain(payerRow);
   }
 

@@ -5,21 +5,19 @@ import {Email} from '../../../domain/Email';
 import {AddressId} from '../../addresses/domain/AddressId';
 import {Mapper} from '../../../infrastructure/Mapper';
 
-import {Payer} from '../domain/Payer';
+import {Payer, PayerType} from '../domain/Payer';
 import {PayerTitle} from '../domain/PayerTitle';
 import {PayerName} from '../domain/PayerName';
-import {PayerType} from '../domain/PayerType';
 
 export interface PayerPersistenceDTO {
   id?: string;
   title?: string;
-  surname: string;
   name: string;
   organization?: string;
   uniqueIdentificationNumber?: string;
   email?: string;
   phone?: string;
-  type: string;
+  type: PayerType;
   shippingAddressId?: string;
   billingAddressId?: string;
   VATId?: string;
@@ -32,8 +30,7 @@ export class PayerMap extends Mapper<Payer> {
       {
         name: PayerName.create(raw.name).getValue(),
         title: raw.title ? PayerTitle.create(raw.title).getValue() : null,
-        type: PayerType.create(raw.type).getValue(),
-        surname: PayerName.create(raw.surname).getValue(),
+        type: raw.type,
         organization: Name.create({value: raw.organization}).getValue(),
         email: raw.email ? Email.create({value: raw.email}).getValue() : null,
         phone: raw.phone ? PhoneNumber.create(raw.phone).getValue() : null,
@@ -50,7 +47,7 @@ export class PayerMap extends Mapper<Payer> {
     );
 
     if (result.isFailure) {
-      console.log(result);
+      console.log('Error:', result);
     }
 
     return result.isSuccess ? result.getValue() : null;
@@ -59,9 +56,8 @@ export class PayerMap extends Mapper<Payer> {
   public static toPersistence(payer: Payer): PayerPersistenceDTO {
     return {
       id: payer.id.toString(),
-      type: payer.type.value,
+      type: payer.type,
       title: payer.title.value,
-      surname: payer.surname.value,
       name: payer.name.value,
       organization: payer.organization.value,
       email: payer.email.value,
