@@ -5,12 +5,12 @@ import { updatePayerAsync } from "./actions";
 
 const initialState: PayerState = {
   payer: {
-    paymentType: null,
-    firstName: "",
-    lastName: "",
+    type: null,
+    name: "",
     city: "",
-    country: "",
     email: "",
+    country: "",
+    billingAddress: "",
   },
   error: null,
   loading: false,

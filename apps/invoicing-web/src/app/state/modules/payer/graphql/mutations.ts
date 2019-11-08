@@ -9,3 +9,18 @@ export const createPayer: ASTNode = gql`
     }
   }
 `;
+
+export const updateInvoicePayer: ASTNode = gql`
+  mutation updateInvoicePayer($payerId: String!, $payer: PayerInput!) {
+    updateInvoicePayer(payerId: $payerId, payer: $payer) {
+      id
+      type
+      name
+      city
+      email
+      country
+      billingAddress
+      organization
+    }
+  }
+`;
