@@ -54,7 +54,7 @@ Test:
     policy: pull
   script:
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
-    - npm run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage --configuration production
+    - npm run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage
     - npm run ci:coverage
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
@@ -70,31 +70,6 @@ Test:
     - /^FM-\d+/
   # dependencies:
   #   - install
-
-# lint:
-#   interruptible: true
-#   stage: test
-#   script:
-#     - npm run nx -- lint shared
-#     - npm run nx -- lint react-components
-#     - npm run nx -- lint invoicing-graphql
-#   only:
-#     - monorepo-nx
-
-Pages:
-  interruptible: true
-  stage: deploy
-  script:
-    - mkdir -p public
-    - cp coverage/*.* public/
-    - mv public/index.html public/coverage.html
-  artifacts:
-    paths:
-      - public
-  dependencies:
-    - Test
-  only:
-    - develop
 
 Build:
   interruptible: true
@@ -158,3 +133,27 @@ Deploy to Dev:
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - export AFFECTED_LIBS=$(cat .ci_status/affected_libs)
     - ./tools/scripts/deploy.sh
+
+Pages:
+  interruptible: true
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp coverage/*.* public/
+    - mv public/index.html public/coverage.html
+  artifacts:
+    paths:
+      - public
+  dependencies:
+    - Test
+  only:
+    - develop
+# Lint:
+#   interruptible: true
+#   stage: test
+#   script:
+#     - npm run nx -- lint shared
+#     - npm run nx -- lint react-components
+#     - npm run nx -- lint invoicing-graphql
+#   only:
+#     - monorepo-nx
