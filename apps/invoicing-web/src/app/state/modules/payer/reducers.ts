@@ -1,7 +1,7 @@
 import { createReducer } from "typesafe-actions";
 
 import { PayerState } from "./types";
-import { createPayerAsync } from "./actions";
+import { updatePayerAsync } from "./actions";
 
 const initialState: PayerState = {
   payer: {
@@ -16,7 +16,13 @@ const initialState: PayerState = {
   loading: false,
 };
 
-export default createReducer(initialState).handleAction(
-  createPayerAsync.request,
-  state => ({ ...state, loading: true }),
-);
+export default createReducer(initialState)
+  .handleAction(updatePayerAsync.request, state => ({
+    ...state,
+    loading: true,
+  }))
+  .handleAction(updatePayerAsync.failure, (state, action) => ({
+    ...state,
+    loading: false,
+    error: action.payload,
+  }));

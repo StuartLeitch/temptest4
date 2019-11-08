@@ -44,7 +44,7 @@ Install Dependencies:
 
 Test:
   interruptible: true
-  allow_failure: false
+  allow_failure: true
   stage: test
   image: node:latest
   before_script:
