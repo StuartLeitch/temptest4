@@ -31,6 +31,8 @@ export abstract class AggregateRoot<T> extends Entity<T> {
   private logDomainEventAdded(domainEvent: DomainEventContract): void {
     const thisClass = Reflect.getPrototypeOf(this);
     const domainEventClass = Reflect.getPrototypeOf(domainEvent);
+
+    // tslint:disable-next-line:no-console
     console.info(
       `[Domain Event Created]:`,
       thisClass.constructor.name,

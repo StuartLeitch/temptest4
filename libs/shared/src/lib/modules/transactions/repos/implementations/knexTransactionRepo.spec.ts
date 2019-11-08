@@ -13,7 +13,7 @@ import {
 } from '../../../../infrastructure/database/knex';
 import {KnexTransactionRepo} from './knexTransactionRepo';
 
-function makeTransactionData(overwrites?: any): Transaction {
+function makeTransactionData(overwrites?: Record<string, any>): Transaction {
   return TransactionMap.toDomain({
     id: 'transaction-id-1',
     articleId: 'article-1',
@@ -38,7 +38,7 @@ describe('TransactionKnexRepo', () => {
   afterAll(async () => destroyDb(db));
 
   describe('.getTransactionById()', () => {
-    afterAll(() => clearTable(db, 'transactions'));
+    afterAll(async () => await clearTable(db, 'transactions'));
 
     it('should find the transaction', async () => {
       const transaction = makeTransactionData({id: 'transaction-1'});
@@ -67,7 +67,7 @@ describe('TransactionKnexRepo', () => {
       )
     );
 
-    afterEach(() => clearTable(db, 'transactions'));
+    afterEach(async () => await clearTable(db, 'transactions'));
 
     describe('.delete()', () => {
       it('should soft delete the record', async () => {

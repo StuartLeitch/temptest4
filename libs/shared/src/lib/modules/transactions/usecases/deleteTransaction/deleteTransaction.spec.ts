@@ -8,7 +8,10 @@ import {
   TransactionCollection,
   STATUS as TransactionStatus
 } from '../../domain/Transaction';
-import {DeleteTransactionUsecase, DeleteTransactionContext} from './deleteTransaction';
+import {
+  DeleteTransactionUsecase,
+  DeleteTransactionContext
+} from './deleteTransaction';
 
 let usecase: DeleteTransactionUsecase;
 let mockTransactionRepo: MockTransactionRepo;
@@ -18,10 +21,10 @@ let transactionCollection: TransactionCollection;
 
 let transactionId;
 
-const defaultContext: DeleteTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: DeleteTransactionContext = {roles: [Roles.SUPER_ADMIN]};
 
 describe('DeleteTransactionUsecase', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     mockTransactionRepo = new MockTransactionRepo();
     transactionId = 'test-transaction';
     const transaction = Transaction.create(
@@ -30,7 +33,7 @@ describe('DeleteTransactionUsecase', () => {
       },
       new UniqueEntityID(transactionId)
     ).getValue();
-    mockTransactionRepo.save(transaction);
+    await mockTransactionRepo.save(transaction);
     usecase = new DeleteTransactionUsecase(mockTransactionRepo);
   });
 

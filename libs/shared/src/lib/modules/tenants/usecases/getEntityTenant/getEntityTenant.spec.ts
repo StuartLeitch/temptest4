@@ -1,6 +1,6 @@
 import {Tenant} from '../../domain/Tenant';
-import {TenantId} from '../../domain/TenantId';
-import {TenantRepoContract} from '../../repos/contracts/tenantRepoContract';
+// import {TenantId} from '../../domain/TenantId';
+// import {TenantRepoContract} from '../../repos/contracts/tenantRepoContract';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {GetEntityTenantUsecase} from './getEntityTenant';
 
@@ -14,9 +14,9 @@ const repo = {
 };
 
 describe('GetEntityTenantUsecase', () => {
-  let usecase;
-  let mockTenant;
-  let request;
+  let usecase: GetEntityTenantUsecase;
+  let mockTenant: Tenant;
+  let request: any;
 
   beforeEach(() => {
     usecase = new GetEntityTenantUsecase(repo);
@@ -25,7 +25,10 @@ describe('GetEntityTenantUsecase', () => {
       possessionId: new UniqueEntityID('invoice-1')
     };
 
-    mockTenant = Tenant.create({name: 'foo'}, new UniqueEntityID('tenant-1'));
+    mockTenant = Tenant.create(
+      {name: 'foo'},
+      new UniqueEntityID('tenant-1')
+    ).getValue();
   });
 
   it('should return tenant', async () => {
@@ -55,7 +58,7 @@ describe('GetEntityTenantUsecase', () => {
   });
 
   it('should return failed result if repo fails', async () => {
-    const error = new Error('DBERrro');
+    const error = new Error('DBError');
     repo.getTenantByPossession.mockRejectedValue(error);
 
     const result = await usecase.execute(request);

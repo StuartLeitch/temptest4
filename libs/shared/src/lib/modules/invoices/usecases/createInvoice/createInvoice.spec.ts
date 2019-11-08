@@ -19,7 +19,6 @@ let usecase: CreateInvoiceUsecase;
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockTransactionRepo: MockTransactionRepo;
 let result: CreateInvoiceResponse;
-let invoiceCollection: InvoiceCollection;
 
 const transactionId = 'transaction-foo';
 
@@ -42,8 +41,8 @@ describe('Create Invoice UseCase', () => {
   });
 
   it('should create a new Invoice', async () => {
-    invoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
-    expect(invoiceCollection.length).toEqual(0);
+    const invoiceCollectionBefore: InvoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
+    expect(invoiceCollectionBefore.length).toEqual(0);
 
     result = await usecase.execute(
       {
@@ -53,7 +52,7 @@ describe('Create Invoice UseCase', () => {
     );
     expect(result.value.isSuccess).toBe(true);
 
-    invoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
-    expect(invoiceCollection.length).toEqual(1);
+    const invoiceCollectionAfter: InvoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
+    expect(invoiceCollectionAfter.length).toEqual(1);
   });
 });
