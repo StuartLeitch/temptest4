@@ -26,8 +26,27 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
     return PayerMap.toDomain(payerRow);
   }
 
-  async update(payerId: PayerId): Promise<Payer> {
-    return Promise.resolve({} as Payer);
+  async update(payer: Payer): Promise<Payer> {
+    const {db} = this;
+
+    const updated = await db('payers')
+      .where({id: payer.payerId.id.toString()})
+      .update({
+        name: payer.name.value,
+        email: payer.email.value,
+        phone: payer.phone.value,
+        organization: payer.organization.value,
+        type: payer.type,
+      });
+
+    if (!updated) {
+      throw RepoError.createEntityNotFoundError(
+        'payer',
+        payer.id.toString()
+      );
+    }
+
+    return payer;
   }
 
   async save(payer: Payer): Promise<Payer> {
