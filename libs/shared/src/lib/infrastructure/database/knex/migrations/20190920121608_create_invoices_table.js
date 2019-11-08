@@ -1,7 +1,7 @@
 module.exports.up = async function(knex) {
   return knex.schema
     .createTable('invoices', function(table) {
-      table.uuid('id').primary();
+      table.string('id', 40).primary();
       table.string('transactionId', 40);
       table.integer('status').defaultTo(0);
       table.integer('charge').defaultTo(0);

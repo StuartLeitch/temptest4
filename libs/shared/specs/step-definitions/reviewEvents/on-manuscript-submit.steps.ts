@@ -11,7 +11,7 @@ import {
   // Transaction,
   STATUS as TransactionStatus
 } from '../../../src/lib/modules/transactions/domain/Transaction';
-import {CatalogMap} from './../../../src/lib/modules/catalogs/mappers/CatalogMap';
+import {CatalogMap} from './../../../src/lib/modules/journals/mappers/CatalogMap';
 
 // * Usecases imports
 import {
@@ -24,7 +24,7 @@ import {CreateTransactionResponse} from './../../../src/lib/modules/transactions
 import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 import {MockInvoiceRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import {MockInvoiceItemRepo} from './../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import {MockCatalogRepo} from './../../../src/lib/modules/catalogs/repos/mocks/mockCatalogRepo';
+import {MockCatalogRepo} from './../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 
 const feature = loadFeature(
   '../../features/reviewEvents/on-manuscript-submit.feature',

@@ -7,6 +7,8 @@ import {Discount} from './Discount';
 import {WaiverId} from './WaiverId';
 import {InvoiceId} from './../../modules/invoices/domain/InvoiceId';
 
+export type WaiverCollection = Waiver[];
+
 export class Waiver extends Discount {
   readonly reductionPercentage: number = 1;
 
@@ -16,6 +18,14 @@ export class Waiver extends Discount {
 
   get invoiceId(): InvoiceId {
     return this.props.invoiceId;
+  }
+
+  set invoiceId(invoiceId: InvoiceId) {
+    this.props.invoiceId = invoiceId;
+  }
+
+  get percentage(): number {
+    return this.props.reduction || this.reductionPercentage;
   }
 
   public static create(
@@ -31,9 +41,5 @@ export class Waiver extends Discount {
         id
       )
     );
-  }
-
-  get percentage(): number {
-    return this.props.reduction || this.reductionPercentage;
   }
 }

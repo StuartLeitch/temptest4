@@ -84,7 +84,7 @@ export * from './modules/journals/mappers/CatalogMap';
 // export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
 // // * Export User Subdomain
-// export {Roles} from './modules/users/domain/enums/Roles';
+export {Roles} from './modules/users/domain/enums/Roles';
 
 // * Export Payments Subdomain
 export * from './modules/payments/domain/Payment';

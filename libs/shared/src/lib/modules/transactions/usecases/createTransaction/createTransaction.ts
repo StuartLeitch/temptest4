@@ -2,7 +2,7 @@
 import {UseCase} from '../../../../core/domain/UseCase';
 import {Result, left, right} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {TextUtils} from '../../../../utils/TextUtils';
+// import {TextUtils} from '../../../../utils/TextUtils';
 
 import {AppError} from '../../../../core/logic/AppError';
 import {CreateTransactionResponse} from './createTransactionResponse';
@@ -13,17 +13,18 @@ import {
   STATUS as TransactionStatus
 } from '../../domain/Transaction';
 import {TransactionRepoContract} from '../../repos/transactionRepo';
-import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
-import {Article} from '../../../articles/domain/Article';
-import {JournalId} from './../../../catalogs/domain/JournalId';
+// import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
+// import {Article} from '../../../articles/domain/Article';
 // import {ArticleId} from '../../../articles/domain/ArticleId';
-import {CatalogItem} from './../../../catalogs/domain/CatalogItem';
 import {Invoice, InvoiceStatus} from './../../../invoices/domain/Invoice';
 import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
 import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
 import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
 import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
-import {CatalogRepoContract} from './../../../catalogs/repos/catalogRepo';
+
+import {JournalId} from './../../../journals/domain/JournalId';
+import {CatalogItem} from './../../../journals/domain/CatalogItem';
+import {CatalogRepoContract} from './../../../journals/repos/catalogRepo';
 
 import {
   Authorize,

@@ -157,15 +157,17 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       // * Identify applicable waiver(s)
       // TODO: Handle the case where multiple reductions are applied
-      const reduction = this.waiverService.applyWaivers({
+      waiver = this.waiverService.applyWaivers({
         country: authorCountry
       });
 
-      waiver = WaiverMap.toPersistence(reduction);
-      await this.waiverRepo.attachWaiverToInvoice(
-        waiver.waiverId,
-        invoice.invoiceId
-      );
+      // * associate waiver to the given invoice
+      waiver.invoiceId = invoice.invoiceId;
+      await this.waiverRepo.save(waiver);
+
+      // * apply waiver to the invoice through invoice item
+      // invoiceItem.price *= waiver.percentage;
+      // await this.invoiceItemRepo.save(invoiceItem);
 
       return right(Result.ok<void>());
     } catch (err) {

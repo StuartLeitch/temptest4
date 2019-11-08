@@ -1,6 +1,6 @@
 module.exports.up = function(knex) {
   return knex.schema.createTable('transactions', function(table) {
-    table.uuid('id').primary();
+    table.string('id', 40).primary();
     table.string('articleId', 40);
     table.integer('status').defaultTo(0);
     table.integer('deleted').defaultTo(0);

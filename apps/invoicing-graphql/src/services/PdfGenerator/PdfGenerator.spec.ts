@@ -1,22 +1,10 @@
-import {PayerMap} from './../../../../../libs/shared/src/lib/modules/payers/mapper/Payer';
-import {ArticleMap} from './../../../../../libs/shared/src/lib/modules/articles/mappers/ArticleMap';
-// import {
-//   TransactionId,
-//   Invoice,
-//   PayerName,
-//   PayerType,
-//   Payer,
-//   Author,
-//   Article,
-//   UniqueEntityID,
-//   InvoiceStatus
-// } from '@hindawi/shared';
-
 import streamToPromise from 'stream-to-promise';
 
 import {InvoiceStatus} from './../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
 import {InvoiceMap} from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 import {AuthorMap} from './../../../../../libs/shared/src/lib/modules/authors/mappers/AuthorMap';
+import {PayerMap} from './../../../../../libs/shared/src/lib/modules/payers/mapper/Payer';
+import {ArticleMap} from './../../../../../libs/shared/src/lib/modules/articles/mappers/ArticleMap';
 
 import {PdfGeneratorService} from './PdfGenerator';
 
@@ -58,9 +46,11 @@ describe('PdfGeneratorService', () => {
       payer
     });
 
+    let buffer: any;
     try {
-      const buffer = await streamToPromise(stream);
-      (expect(buffer) as any).toMatchPdf('invoice-1');
+      buffer = await streamToPromise(stream);
     } catch {}
+
+    (expect(buffer) as any).toMatchPdf('invoice-1');
   });
 });

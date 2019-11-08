@@ -1,7 +1,7 @@
 module.exports.up = function(knex) {
   return knex.schema.createTable('editors', function(table) {
-    table.uuid('id').primary();
-    table.uuid('journalId');
+    table.string('id', 40).primary();
+    table.string('journalId', 40);
     table.string('name');
     table.string('email');
     table.string('roleLabel');
