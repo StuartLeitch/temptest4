@@ -1,4 +1,10 @@
-import {UniqueEntityID, Payer, PayerMap, PayerId} from '../../../../shared';
+import {
+  UniqueEntityID,
+  Payer,
+  PayerType,
+  PayerMap,
+  PayerId
+} from '../../../../shared';
 import {
   Knex,
   clearTable,
