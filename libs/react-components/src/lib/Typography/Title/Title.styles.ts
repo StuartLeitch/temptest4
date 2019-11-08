@@ -23,7 +23,7 @@ const ellipsis = ({ellipsis}: {ellipsis: boolean}) => {
 };
 
 export const Title = styled.h1`
-  color: ${th('textPrimary')};
+  color: ${th('colors.textPrimary')};
   line-height: 1.3;
   margin-block-end: 0;
   margin-block-start: 0;

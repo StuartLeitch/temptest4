@@ -15,12 +15,10 @@ import {
 } from "../../state/modules/invoice";
 
 import {
+  payerTypes,
   payerActions,
   payerSelectors,
-  payerTypes,
 } from "../../state/modules/payer";
-
-import { Modal, useModalActions } from "../../providers/modal";
 
 interface Props {
   invoiceError: string;
@@ -58,6 +56,18 @@ const invoiceDetails = {
   issueDate: "xxxxxxxx",
 };
 
+const charges = {
+  items: [{ name: "Article Processing Charges", price: "$1,250.00" }],
+  netTotal: "$1,250.00",
+  vat: {
+    percent: "20",
+    value: "$250.00",
+    details: "VAT amount in GBP is 109.04 GBP, 1 GBP = 1.6 USD",
+  },
+  total: "$4,500.00",
+  warning: "UK VAT applies to this invoice, based on the country of the payer.",
+};
+
 const PaymentDetails: React.FunctionComponent<Props> = ({
   invoice,
   invoiceError,
@@ -70,7 +80,6 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   createPayer,
 }) => {
   const { invoiceId } = useParams();
-  const { showModal, hideModal } = useModalActions();
 
   useEffect(() => {
     getInvoice(invoiceId);
@@ -95,13 +104,6 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 
   return (
     <Root>
-      <button onClick={showModal}>Arata</button>
-      <Modal>
-        <div style={{ backgroundColor: "wheat" }}>
-          <h2>sunt contentul modalului</h2>
-          <button onClick={hideModal}>close</button>
-        </div>
-      </Modal>
       <BillingInfo
         payer={payer}
         error={payerError}
@@ -111,6 +113,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
       <Details
         articleDetails={articleDetails}
         invoiceDetails={invoiceDetails}
+        charges={charges}
       />
     </Root>
   );
