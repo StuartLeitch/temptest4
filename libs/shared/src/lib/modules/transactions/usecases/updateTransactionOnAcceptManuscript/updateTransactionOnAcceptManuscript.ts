@@ -166,8 +166,9 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.waiverRepo.save(waiver);
 
       // * apply waiver to the invoice through invoice item
-      // invoiceItem.price *= waiver.percentage;
-      // await this.invoiceItemRepo.save(invoiceItem);
+      invoiceItem.price = catalogItem.price * Number(waiver.percentage);
+
+      await this.invoiceItemRepo.save(invoiceItem);
 
       return right(Result.ok<void>());
     } catch (err) {
