@@ -4,6 +4,7 @@ import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 
 import {ReductionProps} from './Reduction';
 import {Discount} from './Discount';
+import {CouponCreated} from './../../modules/coupons/domain/events/couponCreated';
 
 export class Coupon extends Discount {
   private constructor(props: ReductionProps, id?: UniqueEntityID) {
@@ -26,14 +27,22 @@ export class Coupon extends Discount {
     props: ReductionProps,
     id?: UniqueEntityID
   ): Result<Coupon> {
-    return Result.ok<Coupon>(
-      new Coupon(
-        {
-          ...props,
-          type: 'COUPON'
-        },
-        id
-      )
+    const coupon = new Coupon(
+      {
+        ...props,
+        type: 'COUPON'
+      },
+      id
     );
+
+    coupon.addDomainEvent(new CouponCreated(coupon));
+    // coupon.addDomainEvent(new AfterCouponCreated(coupon));
+
+    return Result.ok<Coupon>(coupon);
   }
+
+  // public publish(coupon: Coupon): Result<void> {
+  //   this.addDomainEvent(new CouponCreated(coupon));
+  //   return Result.ok<void>();
+  // }
 }

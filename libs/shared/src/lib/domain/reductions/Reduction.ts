@@ -7,7 +7,7 @@ import {ReductionId} from './ReductionId';
 
 export interface ReductionProps {
   reductionId?: ReductionId;
-  invoiceId: InvoiceId;
+  invoiceId?: InvoiceId;
   name: string;
   reduction: number;
   readonly type?: string;

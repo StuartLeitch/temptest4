@@ -7,7 +7,7 @@ export class CouponPersistenceDTO {
   name: string;
   valid: boolean;
   reduction: number;
-  created: Date;
+  created?: Date;
 }
 
 export class CouponMap extends Mapper<Coupon> {

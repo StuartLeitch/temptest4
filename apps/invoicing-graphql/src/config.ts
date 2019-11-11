@@ -1,3 +1,5 @@
+import path from 'path';
+
 export class Config {
   dbUser: string;
   dbHost: string;
@@ -10,7 +12,12 @@ export class Config {
     this.dbUser = process.env.DB_USERNAME;
     this.dbPassword = process.env.DB_PASSWORD;
     this.dbDatabase = process.env.DB_DATABASE;
-    this.dbMigrationsDir = process.env.DB_MIGRATIONS_DIR || './migrations';
+    this.dbMigrationsDir =
+      process.env.DB_MIGRATIONS_DIR ||
+      path.join(
+        __dirname,
+        '../../../libs/shared/src/lib/infrastructure/database/knex/migrations'
+      );
   }
 }
 
