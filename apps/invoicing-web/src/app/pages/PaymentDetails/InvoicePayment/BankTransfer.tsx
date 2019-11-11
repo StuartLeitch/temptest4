@@ -2,14 +2,14 @@ import React, { Fragment } from "react";
 import { Flex, Label, Title, Text } from "@hindawi/react-components";
 
 interface Props {
-  accountName: string;
-  accountType: string;
-  accountNumber: string;
-  sortCode: string;
-  switft: string;
-  iban: string;
-  bankAddress: string;
-  beneficiaryAddress: string;
+  accountName?: string;
+  accountType?: string;
+  accountNumber?: string;
+  sortCode?: string;
+  switft?: string;
+  iban?: string;
+  bankAddress?: string;
+  beneficiaryAddress?: string;
 }
 
 const BankTransferRow = ({ label, value }) => (
