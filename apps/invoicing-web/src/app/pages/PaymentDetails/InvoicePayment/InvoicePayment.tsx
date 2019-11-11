@@ -4,12 +4,14 @@ import styled from "styled-components";
 import { Expander, th } from "@hindawi/react-components";
 
 import Paypal from "./Paypal";
+import BankTransfer from "./BankTransfer";
 import ChoosePayment from "./ChoosePayment";
 import CreditCardForm from "./CreditCardForm";
 
 const PAYMENT_METHODS = {
   paypal: "paypal",
   creditCard: "creditCard",
+  bankTransfer: "bankTransfer",
 };
 
 interface Props {}
@@ -46,6 +48,9 @@ const InvoicePayment: React.FunctionComponent<Props> = () => {
               <ChoosePayment setFieldValue={setFieldValue} values={values} />
               {values.paymentMethod === PAYMENT_METHODS.creditCard && (
                 <CreditCardForm handleSubmit={handleSubmit} />
+              )}
+              {values.paymentMethod === PAYMENT_METHODS.bankTransfer && (
+                <BankTransfer />
               )}
               {values.paymentMethod === PAYMENT_METHODS.paypal && (
                 <Paypal onSuccess={p => console.log("pe success", p)} />

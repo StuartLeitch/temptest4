@@ -2,6 +2,7 @@ export type IconNames =
   | 'arrowDown'
   | 'arrowUp'
   | 'addUser'
+  | 'bankTransfer'
   | 'breadcrumbs'
   | 'calendar'
   | 'caretDown'
