@@ -1,21 +1,20 @@
 import { RootEpic, isActionOf } from "typesafe-actions";
-import { of } from "rxjs";
+import { of, from } from "rxjs";
 import {
-  map,
+  delay,
+  mapTo,
   filter,
+  mergeMap,
   switchMap,
   catchError,
-  delay,
-  mergeMap,
 } from "rxjs/operators";
+import { modalActions } from "../../../providers/modal";
 
-import { getInvoice } from "./actions";
-import { queries } from "./graphql";
+import { queries, mutations } from "./graphql";
+import { getInvoice, updatePayerAsync } from "./actions";
 
-import { updatePayerAsync } from "../payer/actions";
-
-const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) =>
-  action$.pipe(
+const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
+  return action$.pipe(
     filter(isActionOf(getInvoice.request)),
     delay(1000),
     switchMap(action =>
@@ -30,5 +29,27 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) =>
     }),
     catchError(err => of(getInvoice.failure(err.message))),
   );
+};
 
-export default [fetchInvoiceEpic];
+const payerId = "d57f51a5-bcc0-45eb-ad36-ad9d1f44e924";
+const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
+  return action$.pipe(
+    filter(isActionOf(updatePayerAsync.request)),
+    switchMap(action => {
+      const { id, ...payer } = action.payload;
+      return graphqlAdapter.send(mutations.updateInvoicePayer, {
+        payerId,
+        payer,
+      });
+    }),
+    mergeMap(r => {
+      return from([
+        modalActions.hideModal(),
+        updatePayerAsync.success(r.data.updateInvoicePayer),
+      ]);
+    }),
+    catchError(err => mapTo(updatePayerAsync.failure(err.message))),
+  );
+};
+
+export default [fetchInvoiceEpic, updatePayerEpic];

@@ -186,7 +186,7 @@ const BillingInfo: React.FC<Props> = ({
                         size="medium"
                         alignSelf="flex-end"
                       >
-                        Create invoice
+                        Confirm Invoice
                       </Button>
                     </Fragment>
                   )}

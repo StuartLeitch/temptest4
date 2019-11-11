@@ -16,23 +16,14 @@ import {
   invoiceSelectors,
 } from "../../state/modules/invoice";
 
-import {
-  payerTypes,
-  payerActions,
-  payerSelectors,
-} from "../../state/modules/payer";
-
 interface Props {
   invoiceError: string;
   invoiceLoading: boolean;
   invoice: invoiceTypes.Invoice | null;
-  payer: payerTypes.Payer | null;
   payerError: string;
   payerLoading: boolean;
   getInvoice(id: string): any;
-  updatePayer(payer: payerTypes.Payer): any;
-  showModal: any;
-  hideModal: any;
+  updatePayer(payer: any): any;
 }
 
 const articleDetails = {
@@ -74,11 +65,9 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   invoice,
   invoiceError,
   invoiceLoading,
-  getInvoice,
-  // payer
-  payer,
   payerError,
   payerLoading,
+  getInvoice,
   updatePayer,
 }) => {
   const { invoiceId } = useParams();
@@ -110,7 +99,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
       <Root>
         <FormsContainer>
           <BillingInfo
-            payer={payer}
+            payer={invoice.payer}
             error={payerError}
             handleSubmit={updatePayer}
             loading={payerLoading}
@@ -134,16 +123,15 @@ const mapStateToProps = (state: RootState) => ({
   invoice: invoiceSelectors.invoice(state),
   invoiceError: invoiceSelectors.invoiceError(state),
   invoiceLoading: invoiceSelectors.invoiceLoading(state),
-  payer: payerSelectors.payer(state),
-  payerError: payerSelectors.payerError(state),
-  payerLoading: payerSelectors.payerLoading(state),
+  payerError: invoiceSelectors.payerError(state),
+  payerLoading: invoiceSelectors.payerLoading(state),
 });
 
 export default connect(
   mapStateToProps,
   {
     getInvoice: invoiceActions.getInvoice.request,
-    updatePayer: payerActions.updatePayerAsync.request,
+    updatePayer: invoiceActions.updatePayerAsync.request,
   },
 )(PaymentDetails);
 
