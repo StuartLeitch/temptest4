@@ -14,10 +14,12 @@ const initialLoading: LoadingState = {
   error: null,
 };
 
-const invoice = createReducer(initialState).handleAction(
-  getInvoice.success,
-  (_, action) => action.payload,
-);
+const invoice = createReducer(initialState)
+  .handleAction(getInvoice.success, (_, action) => action.payload)
+  .handleAction(updatePayerAsync.success, (state, action) => ({
+    ...state,
+    payer: action.payload,
+  }));
 
 const payerLoading = createReducer(initialLoading)
   .handleAction(

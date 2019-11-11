@@ -7,6 +7,7 @@ import {
   mergeMap,
   switchMap,
   catchError,
+  map,
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
@@ -20,13 +21,7 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
     switchMap(action =>
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
-    mergeMap(({ data }) => {
-      const payer = data.data.invoice.payer;
-      return [
-        updatePayerAsync.success(payer),
-        getInvoice.success(data.data.invoice),
-      ];
-    }),
+    map(r => getInvoice.success(r.data.data.invoice)),
     catchError(err => of(getInvoice.failure(err.message))),
   );
 };
@@ -45,7 +40,7 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
     mergeMap(r => {
       return from([
         modalActions.hideModal(),
-        updatePayerAsync.success(r.data.updateInvoicePayer),
+        updatePayerAsync.success(r.data.data.updateInvoicePayer),
       ]);
     }),
     catchError(err => mapTo(updatePayerAsync.failure(err.message))),
