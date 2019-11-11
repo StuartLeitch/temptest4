@@ -31,7 +31,7 @@ export class AfterCouponCreated implements HandleContract<CouponCreated> {
       );
     } catch (err) {
       console.log(
-        `[AfterUserCreated]: Failed to execute PublishCouponCreated use case AfterUserCreated.`
+        `[AfterCouponCreated]: Failed to execute PublishCouponCreated use case AfterCouponCreated.`
       );
     }
   }

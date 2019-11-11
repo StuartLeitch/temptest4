@@ -4,7 +4,11 @@ import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 
 import {ReductionProps} from './Reduction';
 import {Discount} from './Discount';
+
+// * Coupon Domain Events
 import {CouponCreated} from './../../modules/coupons/domain/events/couponCreated';
+import {CouponUpdated} from './../../modules/coupons/domain/events/couponUpdated';
+import {CouponApplied} from './../../modules/coupons/domain/events/couponApplied';
 
 export class Coupon extends Discount {
   private constructor(props: ReductionProps, id?: UniqueEntityID) {
@@ -36,13 +40,7 @@ export class Coupon extends Discount {
     );
 
     coupon.addDomainEvent(new CouponCreated(coupon));
-    // coupon.addDomainEvent(new AfterCouponCreated(coupon));
 
     return Result.ok<Coupon>(coupon);
   }
-
-  // public publish(coupon: Coupon): Result<void> {
-  //   this.addDomainEvent(new CouponCreated(coupon));
-  //   return Result.ok<void>();
-  // }
 }
