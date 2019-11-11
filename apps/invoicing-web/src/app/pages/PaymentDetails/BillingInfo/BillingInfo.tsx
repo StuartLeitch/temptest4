@@ -62,7 +62,7 @@ const validateFn = values => {
     errors.organization = "Required";
   }
 
-  return {};
+  return errors;
 };
 
 interface Props {
