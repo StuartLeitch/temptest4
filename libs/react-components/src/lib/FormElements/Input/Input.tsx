@@ -10,6 +10,7 @@ export type InputTypes = 'text' | 'password';
 export interface Props extends FormFieldProps, SpaceProps, LayoutProps {
   type?: InputTypes;
   placeholder?: string;
+  onFocus?: any;
 }
 
 const Input: React.FunctionComponent<Props> = ({

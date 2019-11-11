@@ -11,8 +11,10 @@ import {
   FormField,
 } from "@hindawi/react-components";
 
-import ConfirmationModal from "./ConfirmationModal";
+import CountryField from "./CountryField";
 import IconRadioButton from "./IconRadioButton";
+import ConfirmationModal from "./ConfirmationModal";
+
 import { Modal, useModalActions } from "../../../providers/modal";
 import { Payer, PayerInput } from "../../../state/modules/payer/types";
 
@@ -163,7 +165,12 @@ const BillingInfo: React.FC<Props> = ({
                           component={FormTextarea}
                         />
                         <Flex vertical flex={1} ml={4}>
-                          <FormField required label="Country" name="country" />
+                          <FormField
+                            required
+                            label="Country"
+                            name="country"
+                            component={CountryField}
+                          />
                           <FormField required label="City" name="city" />
                         </Flex>
                       </Flex>
