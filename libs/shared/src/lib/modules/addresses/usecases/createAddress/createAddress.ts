@@ -6,12 +6,7 @@ import {Address} from '../../domain/Address';
 import {AddressMap} from '../../mappers/AddressMap';
 import {AddressRepoContract} from '../../repos/addressRepo';
 import {CreateAddressResponse} from './createAddressResponse';
-
-export interface CreateAddressRequestDTO {
-  city: string;
-  country: string;
-  addressLine1: string;
-}
+import {CreateAddressRequestDTO} from './createAddressDTO';
 
 export class CreateAddress
   implements UseCase<CreateAddressRequestDTO, Promise<CreateAddressResponse>> {

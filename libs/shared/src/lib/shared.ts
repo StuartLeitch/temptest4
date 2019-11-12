@@ -12,7 +12,9 @@ export * from './domain/authorization';
 
 // * Export Address Subdomain
 export * from './modules/addresses/repos/addressRepo';
-export * from './modules/addresses/repos/implementations/knexAddressRepo'
+export * from './modules/addresses/usecases/getAddress/getAddress';
+export * from './modules/addresses/repos/implementations/knexAddressRepo';
+export * from './modules/addresses/mappers/AddressMap'
 
 // * Export Article Subdomain
 export * from './modules/articles/domain/Article';

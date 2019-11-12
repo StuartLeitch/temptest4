@@ -6,6 +6,7 @@ import { getInvoice, updatePayerAsync } from "./actions";
 
 const initialState: Invoice = {
   id: null,
+  status: null,
   payer: null,
 };
 

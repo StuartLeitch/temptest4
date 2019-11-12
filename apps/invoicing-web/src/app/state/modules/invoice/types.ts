@@ -2,6 +2,7 @@ type PaymentType = "INDIVIDUAL" | "INSTITUTION";
 
 export interface Invoice {
   id: string;
+  status: "DRAFT" | "ACTIVE" | "FINAL" | null;
   payer: Payer | null;
 }
 

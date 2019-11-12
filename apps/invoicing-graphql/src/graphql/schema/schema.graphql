@@ -33,11 +33,15 @@ type Payer {
   id: String
   type: PayerType
   name: String
-  city: String
   email: String
-  country: String
-  billingAddress: String
   organization: String
+  address: Address
+}
+
+type Address {
+  city: String
+  country: String
+  addressLine1: String
 }
 
 type Query {

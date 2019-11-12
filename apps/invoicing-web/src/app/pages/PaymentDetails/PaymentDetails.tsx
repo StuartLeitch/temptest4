@@ -71,7 +71,6 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   updatePayer,
 }) => {
   const { invoiceId } = useParams();
-
   useEffect(() => {
     getInvoice(invoiceId);
   }, []);
@@ -99,6 +98,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
       <Root>
         <FormsContainer>
           <BillingInfo
+            status={invoice.status}
             payer={invoice.payer}
             error={payerError}
             handleSubmit={updatePayer}

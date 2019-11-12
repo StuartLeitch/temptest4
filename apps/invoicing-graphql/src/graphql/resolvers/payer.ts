@@ -1,10 +1,13 @@
 import {
   Roles,
-  Address,
   Payer,
-  PayerMap,
+  Address,
   Invoice,
-  UpdatePayerUsecase
+  PayerMap,
+  AddressMap,
+  GetAddressUseCase,
+  UpdatePayerUsecase,
+  PayerPersistenceDTO
 } from '@hindawi/shared';
 
 import {Resolvers} from '../schema';
@@ -67,6 +70,21 @@ export const payerResolvers: Resolvers<Context> = {
       }
 
       return PayerMap.toPersistence(updatedPayer);
+    }
+  },
+  Payer: {
+    async address(payer: PayerPersistenceDTO, args: any, context) {
+      const getAddressUseCase = new GetAddressUseCase(context.repos.address);
+
+      const address = await getAddressUseCase.execute({
+        billingAddressId: payer.billingAddressId
+      });
+
+      if (address.isLeft()) {
+        throw new Error(`Can't get address for payer ${payer.id}`);
+      }
+
+      return AddressMap.toPersistence(address.value.getValue());
     }
   }
 };
