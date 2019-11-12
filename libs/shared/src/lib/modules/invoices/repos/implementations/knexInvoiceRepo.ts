@@ -1,20 +1,20 @@
-import {Knex} from '../../../../infrastructure/database/knex';
+import {Knex, TABLES} from '../../../../infrastructure/database/knex';
 import {Invoice} from '../../domain/Invoice';
 import {InvoiceId} from '../../domain/InvoiceId';
-import {InvoiceItemId} from '../../domain/InvoiceItemId';
 import {InvoiceMap} from '../../mappers/InvoiceMap';
+import {InvoiceItemId} from '../../domain/InvoiceItemId';
 import {TransactionId} from './../../../transactions/domain/TransactionId';
 
+import {InvoiceRepoContract} from '../invoiceRepo';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
-import {InvoiceRepoContract} from '../invoiceRepo';
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const {db} = this;
 
-    const invoice = await db('invoices')
+    const invoice = await db(TABLES.INVOICES)
       .select()
       .where('id', invoiceId.id.toString())
       .first();
@@ -34,7 +34,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   ): Promise<Invoice> {
     const {db} = this;
 
-    const invoice = await db('invoice_items')
+    const invoice = await db(TABLES.INVOICE_ITEMS)
       .select()
       .where('id', invoiceItemId.id.toString())
       .first();
@@ -53,7 +53,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     transactionId: TransactionId
   ): Promise<Invoice[]> {
     const {db} = this;
-    const invoices = await db('invoices')
+    const invoices = await db(TABLES.INVOICES)
       .select()
       .where('transactionId', transactionId.id.toString());
 
@@ -63,7 +63,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   async delete(invoice: Invoice): Promise<unknown> {
     const {db} = this;
 
-    const deletedRows = await db('invoices')
+    const deletedRows = await db(TABLES.INVOICES)
       .where('id', invoice.id.toString())
       .update({...InvoiceMap.toPersistence(invoice), deleted: 1});
 
@@ -80,7 +80,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   async update(invoice: Invoice): Promise<Invoice> {
     const {db} = this;
 
-    const updated = await db('invoices')
+    const updated = await db(TABLES.INVOICES)
       .where({id: invoice.invoiceId.id.toString()})
       .update({
         status: invoice.status,
@@ -118,7 +118,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const rawInvoice = InvoiceMap.toPersistence(invoice);
 
     try {
-      await db('invoices').insert(rawInvoice);
+      await db(TABLES.INVOICES).insert(rawInvoice);
     } catch (e) {
       throw RepoError.fromDBError(e);
     }

@@ -1,14 +1,14 @@
 // * Core Domain
 import {UseCase} from '../../../../core/domain/UseCase';
+import {AppError} from '../../../../core/logic/AppError';
 import {Result, left, right} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {AppError} from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import {
   Authorize,
-  AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
+  AccessControlledUsecase
 } from '../../../../domain/authorization/decorators/Authorize';
 import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
 import {Roles} from '../../../users/domain/enums/Roles';
@@ -36,9 +36,7 @@ export class GetInvoiceDetailsUsecase
       GetInvoiceDetailsContext,
       AccessControlContext
     > {
-  constructor(
-    private invoiceRepo: InvoiceRepoContract // private waiverRepo: WaiverRepoContract, // private vatService: VATService, // private waiverService: WaiverService
-  ) {}
+  constructor(private invoiceRepo: InvoiceRepoContract) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -51,13 +49,11 @@ export class GetInvoiceDetailsUsecase
   ): Promise<GetInvoiceDetailsResponse> {
     let invoice: Invoice;
 
-    // * get a proper InvoiceId
     const invoiceId = InvoiceId.create(
       new UniqueEntityID(request.invoiceId)
     ).getValue();
 
     try {
-      // * System identifies invoice by Invoice Id
       try {
         invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
       } catch (err) {
@@ -68,7 +64,6 @@ export class GetInvoiceDetailsUsecase
         );
       }
 
-      // * This is where all the magic happens
       return right(Result.ok<Invoice>(invoice));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));

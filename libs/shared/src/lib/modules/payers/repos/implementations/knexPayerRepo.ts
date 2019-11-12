@@ -1,11 +1,11 @@
 import {
   Payer,
-  PayerRepoContract,
   PayerId,
+  PayerMap,
   InvoiceId,
-  PayerMap
+  PayerRepoContract
 } from '../../../../shared';
-import {Knex} from '../../../../infrastructure/database/knex';
+import {Knex, TABLES} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 
@@ -14,7 +14,7 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
   async getPayerById(payerId: PayerId): Promise<Payer> {
     const {db} = this;
 
-    const payerRow = await db('payers')
+    const payerRow = await db(TABLES.PAYERS)
       .select()
       .where('id', payerId.id.toString())
       .first();
@@ -28,7 +28,7 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
 
   async getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Payer> {
     const {db} = this;
-    const payerRow = await db('payers')
+    const payerRow = await db(TABLES.PAYERS)
       .select()
       .where('invoiceId', invoiceId.id.toString())
       .first();
@@ -46,7 +46,7 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
   async update(payer: Payer): Promise<Payer> {
     const {db} = this;
 
-    const updated = await db('payers')
+    const updated = await db(TABLES.PAYERS)
       .where({id: payer.payerId.id.toString()})
       .update(PayerMap.toPersistence(payer));
 
@@ -60,7 +60,7 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
   async save(payer: Payer): Promise<Payer> {
     const {db} = this;
 
-    await db('payers').insert(PayerMap.toPersistence(payer));
+    await db(TABLES.PAYERS).insert(PayerMap.toPersistence(payer));
 
     return await this.getPayerById(payer.payerId);
   }

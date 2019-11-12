@@ -5,9 +5,17 @@ export {Knex};
 
 export enum TABLES {
   ADDRESSES = 'addresses',
+  ARTICLES = 'articles',
+  CATALOG = 'catalog',
+  COUPONS = 'coupons',
   INVOICES = 'invoices',
-  WAIVERS = 'waivers',
-  INVOICES_WAIVERS = 'invoices_waivers'
+  INVOICE_ITEMS = 'invoice_items',
+  INVOICES_WAIVERS = 'invoices_waivers',
+  PAYERS = 'payers',
+  PAYMENTS = 'payments',
+  PAYMENT_METHODS = 'payment_methods',
+  TRANSACTIONS = 'transactions',
+  WAIVERS = 'waivers'
 }
 
 interface DbOptions {
