@@ -3,7 +3,7 @@ import {
   PayerRepoContract,
   PayerId,
   InvoiceId,
-  PayerMap,
+  PayerMap
 } from '../../../../shared';
 import {Knex} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
@@ -23,7 +23,6 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
       throw RepoError.createEntityNotFoundError('payer', payerId.id.toString());
     }
 
-
     return PayerMap.toDomain(payerRow);
   }
 
@@ -35,7 +34,10 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
       .first();
 
     if (!payerRow) {
-      throw RepoError.createEntityNotFoundError('invoice', invoiceId.id.toString());
+      throw RepoError.createEntityNotFoundError(
+        'invoice',
+        invoiceId.id.toString()
+      );
     }
 
     return PayerMap.toDomain(payerRow);
@@ -46,19 +48,10 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
 
     const updated = await db('payers')
       .where({id: payer.payerId.id.toString()})
-      .update({
-        name: payer.name.value,
-        email: payer.email.value,
-        phone: payer.phone.value,
-        organization: payer.organization.value,
-        type: payer.type,
-      });
+      .update(PayerMap.toPersistence(payer));
 
     if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'payer',
-        payer.id.toString()
-      );
+      throw RepoError.createEntityNotFoundError('payer', payer.id.toString());
     }
 
     return payer;

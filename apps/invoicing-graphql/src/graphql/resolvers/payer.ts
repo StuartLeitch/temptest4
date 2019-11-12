@@ -1,10 +1,4 @@
-import {
-  Payer,
-  PayerMap,
-  Roles,
-  UpdatePayerUsecase,
-  Address
-} from '@hindawi/shared';
+import {Roles, Address, UpdatePayerUsecase} from '@hindawi/shared';
 
 import {Resolvers} from '../schema';
 import {Context} from '../../context';
@@ -39,22 +33,22 @@ export const payerResolvers: Resolvers<Context> = {
         address = addressResult.value.getValue();
       }
 
-      // const updatePayerRequest = {
-      //   payerId,
-      //   type: payer.type,
-      //   name: payer.name,
-      //   email: payer.email,
-      //   addressId: address.id
-      // };
+      const updatePayerRequest = {
+        payerId,
+        type: payer.type,
+        name: payer.name,
+        email: payer.email,
+        addressId: address.id.toString()
+      };
 
-      // try {
-      //   updatedPayer = await updatePayerUseCase.execute(
-      //     updatePayerRequest,
-      //     usecaseContext
-      //   );
-      // } catch (err) {
-      //   throw new Error(err.message);
-      // }
+      const payerResult = await updatePayerUseCase.execute(
+        updatePayerRequest,
+        usecaseContext
+      );
+
+      if (payerResult.isRight()) {
+        updatedPayer = payerResult.value.getValue();
+      }
 
       // try {
       //   invoice = await changeInvoiceStatusUseCase.execute(

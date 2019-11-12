@@ -127,4 +127,8 @@ export class Payer extends AggregateRoot<PayerProps> {
   public set(key: string, value: any) {
     this.props[key] = value;
   }
+
+  public setProperties(props: Partial<PayerProps>) {
+    Object.assign(this.props, props);
+  }
 }
