@@ -1,15 +1,33 @@
-import {AddressProps} from '../../domain/Address';
+import {UseCase} from '../../../../core/domain/UseCase';
+import {AppError} from '../../../../core/logic/AppError';
+import {Result, right, left} from '../../../../core/logic/Result';
+
+import {Address} from '../../domain/Address';
 import {AddressMap} from '../../mappers/AddressMap';
 import {AddressRepoContract} from '../../repos/addressRepo';
+import {CreateAddressResponse} from './createAddressResponse';
 
-export class CreateAddress {
+export interface CreateAddressRequestDTO {
+  city: string;
+  country: string;
+  addressLine1: string;
+}
+
+export class CreateAddress
+  implements UseCase<CreateAddressRequestDTO, Promise<CreateAddressResponse>> {
   constructor(private addressRepo: AddressRepoContract) {}
 
-  public execute(addressProps: AddressProps) {
+  public async execute(
+    request: CreateAddressRequestDTO
+  ): Promise<CreateAddressResponse> {
     try {
-      return AddressMap.toDomain(addressProps);
+      const address = AddressMap.toDomain(request);
+
+      await this.addressRepo.save(address);
+
+      return right(Result.ok<Address>(address));
     } catch (err) {
-      throw new Error(err.message);
+      return left(new AppError.UnexpectedError(err));
     }
   }
 }

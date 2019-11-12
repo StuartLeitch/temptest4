@@ -4,7 +4,7 @@ import Knex from 'knex';
 export {Knex};
 
 export enum TABLES {
-  ADDRESS = 'address',
+  ADDRESSES = 'addresses',
   INVOICES = 'invoices',
   WAIVERS = 'waivers',
   INVOICES_WAIVERS = 'invoices_waivers'

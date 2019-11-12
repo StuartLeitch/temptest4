@@ -13,6 +13,8 @@ export interface AddressProps {
   city: string;
   country: string;
   postalCode?: string;
+  dateCreated?: Date;
+  dateUpdated?: Date;
 }
 
 export class Address extends AggregateRoot<AddressProps> {
@@ -21,7 +23,7 @@ export class Address extends AggregateRoot<AddressProps> {
   }
 
   get addressId(): AddressId {
-    return AddressId.caller(this.id);
+    return AddressId.create(this.id);
   }
 
   get companyName(): string {
@@ -35,9 +37,13 @@ export class Address extends AggregateRoot<AddressProps> {
   get country(): string {
     return this.props.country;
   }
-  
+
   get addressLine1(): string {
     return this.props.addressLine1;
+  }
+
+  get dateCreated(): Date {
+    return this.props.dateCreated;
   }
 
   private constructor(props: AddressProps, id?: UniqueEntityID) {

@@ -10,7 +10,7 @@ export class KnexAddressRepo extends AbstractBaseDBRepo<Knex, Address>
   implements AddressRepoContract {
   async save(address: Address): Promise<Address> {
     const {db} = this;
-    await db(TABLES.ADDRESS).insert(AddressMap.toPersistence(address));
+    await db(TABLES.ADDRESSES).insert(AddressMap.toPersistence(address));
 
     return await this.findById(address.addressId);
   }
@@ -18,7 +18,7 @@ export class KnexAddressRepo extends AbstractBaseDBRepo<Knex, Address>
   async findById(addressId: AddressId): Promise<Address> {
     const {db} = this;
 
-    const addressRow = await db(TABLES.ADDRESS)
+    const addressRow = await db(TABLES.ADDRESSES)
       .select()
       .where('id', addressId.id.toString())
       .first();

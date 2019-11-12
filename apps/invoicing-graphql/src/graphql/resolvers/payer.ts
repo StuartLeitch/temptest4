@@ -1,4 +1,10 @@
-import {Payer, PayerMap, Roles, UpdatePayerUsecase} from '@hindawi/shared';
+import {
+  Payer,
+  PayerMap,
+  Roles,
+  UpdatePayerUsecase,
+  Address
+} from '@hindawi/shared';
 
 import {Resolvers} from '../schema';
 import {Context} from '../../context';
@@ -11,7 +17,7 @@ export const payerResolvers: Resolvers<Context> = {
 
   Mutation: {
     async confirmInvoice(parent, args, context) {
-      let address;
+      let address: Address;
       let updatedPayer;
       let invoice;
 
@@ -23,15 +29,15 @@ export const payerResolvers: Resolvers<Context> = {
       const updatePayerUseCase = new UpdatePayerUsecase(repos.payer);
       const changeInvoiceStatusUseCase = new ChangeInvoiceStatus();
 
-      // try {
-      //   address = await createAddressUseCase.execute({
-      //     city: payer.city,
-      //     addressLine1: payer.billingAddress,
-      //     country: payer.country
-      //   });
-      // } catch (err) {
-      //   throw new Error(err.message);
-      // }
+      const addressResult = await createAddressUseCase.execute({
+        city: payer.city,
+        country: payer.country,
+        addressLine1: payer.billingAddress
+      });
+
+      if (addressResult.isRight()) {
+        address = addressResult.value.getValue();
+      }
 
       // const updatePayerRequest = {
       //   payerId,
