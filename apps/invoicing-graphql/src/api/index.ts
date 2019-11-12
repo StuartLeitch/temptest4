@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {response} from 'express';
 import {Context} from '../context';
 import {RecordPayment} from '@hindawi/shared';
 import {AuthMiddleware} from './middleware/auth';
@@ -35,6 +35,24 @@ export function makeExpressServer(context: Context) {
 
   app.get('/api/jwt-test', auth.enforce(), (req, res) => {
     res.status(200).json(req.auth);
+  });
+
+  app.get('/api/invoice/:invoiceId', async (req, res) => {
+    const {invoicePdfService} = context;
+
+    const eitherPdf = await invoicePdfService.getPdf(req.params.invoiceId);
+    if (eitherPdf.isRight()) {
+      const pdf = eitherPdf.value.getValue();
+
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=${req.params.invoiceId}.pdf`,
+        'Content-Length': pdf.length
+      });
+      res.end(pdf);
+    } else {
+      return res.status(400).send(eitherPdf.value);
+    }
   });
 
   return app;

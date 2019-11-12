@@ -121,6 +121,7 @@ export {WaiverService} from './domain/services/WaiverService';
 
 // // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
+export * from './modules/authors/mappers/AuthorMap';
 
 // * Export user Subdomain
 export * from './modules/users/domain/User';

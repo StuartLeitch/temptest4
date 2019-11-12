@@ -14,7 +14,14 @@
             "outputPath": "dist/apps/invoicing-graphql",
             "main": "apps/invoicing-graphql/src/main.ts",
             "tsConfig": "apps/invoicing-graphql/tsconfig.app.json",
-            "assets": ["apps/invoicing-graphql/src/Dockerfile"],
+            "assets": [
+              "apps/invoicing-graphql/src/Dockerfile",
+              {
+                "glob": "**/*",
+                "input": "apps/invoicing-graphql/src/services/PdfGenerator/templates",
+                "output": "templates"
+              }
+            ],
             "webpackConfig": "apps/invoicing-graphql/webpack.config.js"
           },
           "configurations": {

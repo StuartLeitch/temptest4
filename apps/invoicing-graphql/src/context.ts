@@ -11,6 +11,7 @@ import {
 import {Config} from './config';
 import {CheckoutService} from './services/checkout';
 import {AuthService} from './services/auth';
+import {InvoicePdfService} from './services/InvoicePdf';
 
 export interface ReposContext {
   invoice: KnexInvoiceRepo;
@@ -26,20 +27,24 @@ export interface Context {
   authService: AuthService;
   vatService: VATService;
   waiverService: WaiverService;
+  invoicePdfService: InvoicePdfService;
 }
 
 export function makeContext(config: Config, db: Knex): Context {
+  const repos = {
+    invoice: new KnexInvoiceRepo(db),
+    transaction: new KnexTransactionRepo(db),
+    payment: new KnexPaymentRepo(db),
+    waiver: new KnexWaiverRepo(db),
+    payer: new KnexPayerRepo(db)
+  };
+
   return {
-    repos: {
-      invoice: new KnexInvoiceRepo(db),
-      transaction: new KnexTransactionRepo(db),
-      payment: new KnexPaymentRepo(db),
-      waiver: new KnexWaiverRepo(db),
-      payer: new KnexPayerRepo(db),
-    },
+    repos,
+    invoicePdfService: new InvoicePdfService(repos.invoice),
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),
     vatService: new VATService(),
-    waiverService: new WaiverService(),
+    waiverService: new WaiverService()
   };
 }
