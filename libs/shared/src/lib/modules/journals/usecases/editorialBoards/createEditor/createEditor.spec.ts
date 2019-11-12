@@ -16,7 +16,6 @@ const defaultContext: CreateEditorAuthorizationContext = {
 let usecase: CreateEditor;
 let mockEditorRepo: MockEditorRepo;
 let result: CreateEditorResponse;
-let editorCollection: EditorCollection;
 
 describe('Create Editor UseCase', () => {
   beforeEach(() => {
@@ -26,8 +25,8 @@ describe('Create Editor UseCase', () => {
   });
 
   it('should create a new editor entry', async () => {
-    editorCollection = await mockEditorRepo.getEditorCollection();
-    expect(editorCollection.length).toEqual(0);
+    const editorCollectionBefore: EditorCollection = await mockEditorRepo.getEditorCollection();
+    expect(editorCollectionBefore.length).toEqual(0);
 
     result = await usecase.execute(
       {
@@ -41,7 +40,7 @@ describe('Create Editor UseCase', () => {
     );
     expect(result.value.isSuccess).toBe(true);
 
-    editorCollection = await mockEditorRepo.getEditorCollection();
-    expect(editorCollection.length).toEqual(1);
+    const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorCollection();
+    expect(editorCollectionAfter.length).toEqual(1);
   });
 });

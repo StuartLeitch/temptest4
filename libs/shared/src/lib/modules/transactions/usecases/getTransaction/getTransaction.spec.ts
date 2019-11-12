@@ -13,10 +13,9 @@ import {GetTransactionUsecase, GetTransactionContext} from './getTransaction';
 let usecase: GetTransactionUsecase;
 let mockTransactionRepo: MockTransactionRepo;
 let result: Result<Transaction>;
+let transactionId: string;
 
-let transactionId;
-
-const defaultContext: GetTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: GetTransactionContext = {roles: [Roles.SUPER_ADMIN]};
 
 describe('GetTransactionUsecase', () => {
   describe('When NO Transaction ID is provided', () => {
@@ -35,7 +34,7 @@ describe('GetTransactionUsecase', () => {
   });
 
   describe('When Transaction ID is provided', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       mockTransactionRepo = new MockTransactionRepo();
 
       transactionId = 'test-transaction';
@@ -43,16 +42,19 @@ describe('GetTransactionUsecase', () => {
         {status: TransactionStatus.DRAFT},
         new UniqueEntityID(transactionId)
       ).getValue();
-      mockTransactionRepo.save(transaction);
+      await mockTransactionRepo.save(transaction);
 
       usecase = new GetTransactionUsecase(mockTransactionRepo);
     });
 
     describe('And Payer ID is INVALID', () => {
       it('should fail', async () => {
-        result = await usecase.execute({
-          transactionId: null
-        }, defaultContext);
+        result = await usecase.execute(
+          {
+            transactionId: null
+          },
+          defaultContext
+        );
         expect(result.isFailure).toBeTruthy();
       });
     });
@@ -60,9 +62,12 @@ describe('GetTransactionUsecase', () => {
     describe('And Transaction ID is VALID', () => {
       it('should return the transaction details', async () => {
         // arrange
-        result = await usecase.execute({
-          transactionId
-        }, defaultContext);
+        result = await usecase.execute(
+          {
+            transactionId
+          },
+          defaultContext
+        );
 
         expect(result.isSuccess).toBeTruthy();
         expect(

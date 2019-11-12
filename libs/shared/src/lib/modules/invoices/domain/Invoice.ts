@@ -9,6 +9,7 @@ import {InvoiceItem} from './InvoiceItem';
 import {InvoiceItems} from './InvoiceItems';
 import {InvoiceSentEvent} from './events/invoiceSent';
 import {InvoicePaidEvent} from './events/invoicePaid';
+import {InvoiceActivated} from './events/invoiceActivated';
 import {TransactionId} from '../../transactions/domain/TransactionId';
 import {PayerId} from '../../payers/domain/PayerId';
 // import {PayerType} from '../../payers/domain/PayerType';
@@ -145,7 +146,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     const now = new Date();
     this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.ACTIVE;
-    // this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
+    this.addDomainEvent(new InvoiceActivated(this, now));
   }
 
   public markAsPaid(): void {

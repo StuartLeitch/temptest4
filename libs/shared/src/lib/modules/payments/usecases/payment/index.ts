@@ -1,1 +1,1 @@
-export {RecordPayment} from './recordPayment'
+export {RecordPayment} from './recordPayment';

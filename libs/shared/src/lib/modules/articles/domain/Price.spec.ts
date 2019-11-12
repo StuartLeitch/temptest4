@@ -3,7 +3,7 @@ import {Price} from './Price';
 import {PriceValue} from './PriceValue';
 
 let priceOrError: Result<Price>;
-// let price: Price;
+const price = 100;
 
 describe('Price', () => {
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe('Price', () => {
 
   it('Should be able to be created', () => {
     priceOrError = Price.create({
-      value: PriceValue.create(100).getValue()
+      value: PriceValue.create(price).getValue()
     });
 
     expect(priceOrError.isSuccess).toBeTruthy();

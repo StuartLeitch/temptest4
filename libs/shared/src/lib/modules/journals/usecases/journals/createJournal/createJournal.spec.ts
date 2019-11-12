@@ -16,7 +16,7 @@ const defaultContext: CreateJournalAuthorizationContext = {
 let usecase: CreateJournal;
 let mockJournalRepo: MockJournalRepo;
 let result: CreateJournalResponse;
-let journalCollection: JournalCollection;
+// let journalCollection: JournalCollection;
 
 describe('Create Journal UseCase', () => {
   beforeEach(() => {
@@ -30,8 +30,8 @@ describe('Create Journal UseCase', () => {
   });
 
   it('should create a new journal', async () => {
-    journalCollection = await mockJournalRepo.getJournalCollection();
-    expect(journalCollection.length).toEqual(0);
+    const journalCollectionBefore: JournalCollection = await mockJournalRepo.getJournalCollection();
+    expect(journalCollectionBefore.length).toEqual(0);
 
     result = await usecase.execute(
       {
@@ -46,7 +46,7 @@ describe('Create Journal UseCase', () => {
     );
     expect(result.value.isSuccess).toBe(true);
 
-    journalCollection = await mockJournalRepo.getJournalCollection();
-    expect(journalCollection.length).toEqual(1);
+    const journalCollectionAfter: JournalCollection = await mockJournalRepo.getJournalCollection();
+    expect(journalCollectionAfter.length).toEqual(1);
   });
 });

@@ -118,13 +118,11 @@ export * from './modules/payments/domain/events/paymentDone';
 // export * from './domain/reductions/policies/WaivedCountryPolicy';
 // export * from './domain/reductions/policies/SanctionedCountryPolicy';
 export * from './domain/reductions/repos/implementations/knexWaiverRepo';
-export {VATService} from './domain/services/VATService';
-export {WaiverService} from './domain/services/WaiverService';
 
 // export * from './modules/coupons/mappers/CouponMap';
 // export * from './modules/coupons/repos';
 
-// // * Export Author Subdomain
+// * Export Author Subdomain
 export * from './modules/authors/domain/Author';
 export * from './modules/authors/mappers/AuthorMap';
 

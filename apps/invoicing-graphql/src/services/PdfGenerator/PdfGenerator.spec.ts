@@ -18,7 +18,7 @@ describe('PdfGeneratorService', () => {
     transactionId: 'transaction1',
     status: InvoiceStatus.DRAFT,
     invoiceNumber: 'invoice-1234',
-    dateCreated: new Date(2019, 1, 2, 3, 4, 5, 1)
+    dateCreated: new Date(2019, 1, 2)
   });
 
   const author = AuthorMap.toDomain({
@@ -46,10 +46,10 @@ describe('PdfGeneratorService', () => {
       payer
     });
 
-    let buffer: any;
+    let buffer: Buffer;
     try {
       buffer = await streamToPromise(stream);
-    } catch {}
+    } catch (e) {}
 
     (expect(buffer) as any).toMatchPdf('invoice-1');
   });

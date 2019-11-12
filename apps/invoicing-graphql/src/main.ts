@@ -1,13 +1,10 @@
-// require('dotenv').config();
-
 import {makeDb} from './services/knex';
 
 import {makeConfig} from './config';
 import {makeContext} from './context';
 import {makeGraphqlServer} from './graphql';
 import {makeExpressServer} from './api';
-
-// import {queueService} from './queue_service';
+import {queueService} from './queue_service';
 
 async function main(): Promise<void> {
   const config = await makeConfig();
@@ -22,8 +19,8 @@ async function main(): Promise<void> {
     path: '/graphql'
   });
 
-  // const queue = await queueService;
-  // queue.start();
+  const queue = await queueService;
+  await queue.start();
 
   expressServer.listen(process.env.PORT || 4000);
 }
