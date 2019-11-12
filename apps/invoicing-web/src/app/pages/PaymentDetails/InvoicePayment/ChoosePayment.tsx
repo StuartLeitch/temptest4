@@ -12,6 +12,7 @@ interface Props {
 const PAYMENT_METHODS = {
   paypal: "paypal",
   creditCard: "creditCard",
+  bankTransfer: "bankTransfer",
 };
 
 const ChoosePayment: React.FunctionComponent<Props> = ({
@@ -29,6 +30,15 @@ const ChoosePayment: React.FunctionComponent<Props> = ({
           }
           icon="creditCard"
           label="Credit Card"
+          mr={1}
+        />
+        <IconRadioButton
+          isSelected={values.paymentMethod === PAYMENT_METHODS.bankTransfer}
+          onClick={() =>
+            setFieldValue("paymentMethod", PAYMENT_METHODS.bankTransfer)
+          }
+          icon="bankTransfer"
+          label="Bank Transfer"
           mr={1}
         />
         <IconRadioButton
