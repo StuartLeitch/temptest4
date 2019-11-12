@@ -1,4 +1,11 @@
-import {Roles, Address, UpdatePayerUsecase} from '@hindawi/shared';
+import {
+  Roles,
+  Address,
+  Payer,
+  PayerMap,
+  Invoice,
+  UpdatePayerUsecase
+} from '@hindawi/shared';
 
 import {Resolvers} from '../schema';
 import {Context} from '../../context';
@@ -12,8 +19,8 @@ export const payerResolvers: Resolvers<Context> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
       let address: Address;
-      let updatedPayer;
-      let invoice;
+      let updatedPayer: Payer;
+      let invoice: Invoice;
 
       const {repos} = context;
       const usecaseContext = {roles: [Roles.PAYER]};
@@ -21,7 +28,7 @@ export const payerResolvers: Resolvers<Context> = {
 
       const createAddressUseCase = new CreateAddress(repos.address);
       const updatePayerUseCase = new UpdatePayerUsecase(repos.payer);
-      const changeInvoiceStatusUseCase = new ChangeInvoiceStatus();
+      const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(repos.invoice);
 
       const addressResult = await createAddressUseCase.execute({
         city: payer.city,
@@ -50,17 +57,16 @@ export const payerResolvers: Resolvers<Context> = {
         updatedPayer = payerResult.value.getValue();
       }
 
-      // try {
-      //   invoice = await changeInvoiceStatusUseCase.execute(
-      //     updatedPayer.invoiceId,
-      //     'ACTIVE'
-      //   );
-      // } catch (err) {
-      //   throw new Error(err.message);
-      // }
+      const invoiceResult = await changeInvoiceStatusUseCase.execute({
+        invoiceId: updatedPayer.invoiceId.id.toString(),
+        status: 'ACTIVE'
+      });
 
-      // return PayerMap.toPersistence(updatedPayer.getValue());
-      return payer;
+      if (invoiceResult.isRight()) {
+        invoice = invoiceResult.value.getValue();
+      }
+
+      return PayerMap.toPersistence(updatedPayer);
     }
   }
 };
