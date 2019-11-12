@@ -10,9 +10,9 @@ export const createPayer: ASTNode = gql`
   }
 `;
 
-export const updateInvoicePayer: ASTNode = gql`
-  mutation updateInvoicePayer($payerId: String!, $payer: PayerInput!) {
-    updateInvoicePayer(payerId: $payerId, payer: $payer) {
+export const confirmInvoice: ASTNode = gql`
+  mutation confirmInvoice($payerId: String!, $payer: PayerInput!) {
+    confirmInvoice(payerId: $payerId, payer: $payer) {
       id
       type
       name

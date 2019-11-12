@@ -1,13 +1,17 @@
 // * Core Domain
 import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
+import {Result, Either} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 
+import {Address, AddressProps} from '../../../addresses/domain/Address';
 import {Payer} from '../../domain/Payer';
-import {PayerId} from '../../domain/PayerId';
-import {PayerName} from '../../domain/PayerName';
+
 import {PayerType} from '../../domain/Payer';
+import {PayerId} from '../../domain/PayerId';
+import {Email} from '../../../../domain/Email';
+import {PayerName} from '../../domain/PayerName';
 import {PayerRepoContract} from '../../repos/payerRepo';
+import {AddressRepoContract} from '../../../addresses/repos/addressRepo';
 
 import {
   Authorize,
@@ -16,11 +20,15 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
 import {Roles} from '../../../users/domain/enums/Roles';
+import {AppError} from '../../../../core/logic/AppError';
+import {InvoiceRepoContract} from '../../../invoices/repos';
 
 export interface UpdatePayerRequestDTO {
   payerId?: string;
   type?: PayerType; // to map PayerType
   name: string;
+  email: string;
+  addressId: string;
 }
 
 export type UpdatePayerContext = AuthorizationContext<Roles>;
@@ -33,9 +41,7 @@ export class UpdatePayerUsecase
       UpdatePayerContext,
       AccessControlContext
     > {
-  constructor(
-    private payerRepo: PayerRepoContract // private transactionRepo: TransactionRepoContract
-  ) {
+  constructor(private payerRepo: PayerRepoContract) {
     this.payerRepo = payerRepo;
   }
 
@@ -84,12 +90,12 @@ export class UpdatePayerUsecase
 
       payer.set('type', request.type);
       payer.set('name', PayerName.create(request.name).getValue());
+      payer.set('email', Email.create({value: request.email}).getValue());
 
       await this.payerRepo.update(payer);
 
       return Result.ok<Payer>(payer);
     } catch (err) {
-      console.log(err);
       return Result.fail<Payer>(err);
     }
   }

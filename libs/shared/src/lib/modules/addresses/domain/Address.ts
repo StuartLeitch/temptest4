@@ -6,14 +6,13 @@ import {Result} from '../../../core/logic/Result';
 // * Subdomain
 import {AddressId} from './AddressId';
 
-interface AddressProps {
+export interface AddressProps {
   companyName?: string;
   addressLine1: string;
   addressLine2?: string;
-  addressLine3?: string;
   city: string;
   country: string;
-  postalCode: string;
+  postalCode?: string;
 }
 
 export class Address extends AggregateRoot<AddressProps> {
@@ -27,6 +26,18 @@ export class Address extends AggregateRoot<AddressProps> {
 
   get companyName(): string {
     return this.props.companyName;
+  }
+
+  get city(): string {
+    return this.props.city;
+  }
+
+  get country(): string {
+    return this.props.country;
+  }
+  
+  get addressLine1(): string {
+    return this.props.addressLine1;
   }
 
   private constructor(props: AddressProps, id?: UniqueEntityID) {

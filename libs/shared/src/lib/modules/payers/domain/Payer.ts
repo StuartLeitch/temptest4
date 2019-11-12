@@ -105,8 +105,10 @@ export class Payer extends AggregateRoot<PayerProps> {
   public static create(props: PayerProps, id?: UniqueEntityID): Result<Payer> {
     const propsResult = Guard.againstNullOrUndefinedBulk([
       {argument: props.name, argumentName: 'Payer Name'},
-      {argument: props.type, argumentName: 'Payer Type'}
+      {argument: props.type, argumentName: 'Payer Type'},
+      {argument: props.billingAddressId, argumentName: 'Address Id'}
     ]);
+
     if (!propsResult.succeeded) {
       return Result.fail<Payer>(propsResult.message);
     }

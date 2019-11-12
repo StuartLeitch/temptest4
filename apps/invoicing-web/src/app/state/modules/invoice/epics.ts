@@ -26,14 +26,13 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   );
 };
 
-const payerId = "d57f51a5-bcc0-45eb-ad36-ad9d1f44e924";
 const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(updatePayerAsync.request)),
     switchMap(action => {
       const { id, ...payer } = action.payload;
-      return graphqlAdapter.send(mutations.updateInvoicePayer, {
-        payerId,
+      return graphqlAdapter.send(mutations.confirmInvoice, {
+        payerId: id,
         payer,
       });
     }),

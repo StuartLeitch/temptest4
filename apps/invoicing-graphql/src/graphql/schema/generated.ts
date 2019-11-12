@@ -29,13 +29,13 @@ export enum InvoiceStatus {
 
 export type Mutation = {
    __typename?: 'Mutation',
-  updateInvoicePayer: Payer,
+  confirmInvoice: Payer,
   createInvoice?: Maybe<Invoice>,
   deleteInvoice?: Maybe<Scalars['Boolean']>,
 };
 
 
-export type MutationUpdateInvoicePayerArgs = {
+export type MutationConfirmInvoiceArgs = {
   payerId: Scalars['String'],
   payer: PayerInput
 };
@@ -201,7 +201,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  updateInvoicePayer?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationUpdateInvoicePayerArgs, 'payerId' | 'payer'>>,
+  confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payerId' | 'payer'>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
 };

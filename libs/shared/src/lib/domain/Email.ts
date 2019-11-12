@@ -16,10 +16,8 @@ export class Email extends ValueObject<EmailProps> {
   }
 
   public static create(props: EmailProps): Result<Email> {
-    const guardResult = Guard.againstNullOrUndefined(
-      props.value,
-      'editorEmail'
-    );
+    const guardResult = Guard.againstInvalidEmail(props.value);
+
     if (!guardResult.succeeded) {
       return Result.fail<Email>(guardResult.message);
     }

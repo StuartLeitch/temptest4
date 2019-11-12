@@ -3,37 +3,64 @@ import {Payer, PayerMap, Roles, UpdatePayerUsecase} from '@hindawi/shared';
 import {Resolvers} from '../schema';
 import {Context} from '../../context';
 
+import {CreateAddress} from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
+import {ChangeInvoiceStatus} from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
+
 export const payerResolvers: Resolvers<Context> = {
   Query: {},
 
   Mutation: {
-    async updateInvoicePayer(parent, args, context) {
+    async confirmInvoice(parent, args, context) {
+      let address;
+      let updatedPayer;
+      let invoice;
+
       const {repos} = context;
-      const usecase = new UpdatePayerUsecase(repos.payer);
       const usecaseContext = {roles: [Roles.PAYER]};
-
       const {payerId, payer} = args;
-      console.log('the payer ', payer);
 
-      const usecaseRequest = {
-        payerId,
-        type: payer.type,
-        name: payer.name
-      };
+      const createAddressUseCase = new CreateAddress();
+      const updatePayerUseCase = new UpdatePayerUsecase(repos.payer);
+      const changeInvoiceStatusUseCase = new ChangeInvoiceStatus();
 
-      const result = await usecase.execute(usecaseRequest, usecaseContext);
+      // try {
+      //   address = await createAddressUseCase.execute({
+      //     city: payer.city,
+      //     addressLine1: payer.billingAddress,
+      //     country: payer.country
+      //   });
+      // } catch (err) {
+      //   throw new Error(err.message);
+      // }
 
-      console.log(result);
-      if (!result.isSuccess) {
-        return undefined;
-      }
+      // const updatePayerRequest = {
+      //   payerId,
+      //   type: payer.type,
+      //   name: payer.name,
+      //   email: payer.email,
+      //   addressId: address.id
+      // };
 
-      const updatedPayer = result.getValue();
+      // try {
+      //   updatedPayer = await updatePayerUseCase.execute(
+      //     updatePayerRequest,
+      //     usecaseContext
+      //   );
+      // } catch (err) {
+      //   throw new Error(err.message);
+      // }
 
-      const payerDto = PayerMap.toPersistence(updatedPayer);
-      return {
-        ...payerDto
-      };
+      // try {
+      //   invoice = await changeInvoiceStatusUseCase.execute(
+      //     updatedPayer.invoiceId,
+      //     'ACTIVE'
+      //   );
+      // } catch (err) {
+      //   throw new Error(err.message);
+      // }
+
+      // return PayerMap.toPersistence(updatedPayer.getValue());
+      return payer;
     }
   }
 };

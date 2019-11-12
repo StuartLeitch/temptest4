@@ -46,7 +46,7 @@ type Query {
 }
 
 type Mutation {
-  updateInvoicePayer(payerId: String!, payer: PayerInput!): Payer!
+  confirmInvoice(payerId: String!, payer: PayerInput!): Payer!
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: String!): Boolean
 }

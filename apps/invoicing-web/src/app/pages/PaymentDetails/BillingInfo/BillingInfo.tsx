@@ -16,7 +16,6 @@ import IconRadioButton from "./IconRadioButton";
 import ConfirmationModal from "./ConfirmationModal";
 
 import { Modal, useModalActions } from "../../../providers/modal";
-import { Payer, PayerInput } from "../../../state/modules/payer/types";
 
 const PAYMENT_TYPES = {
   individual: "INDIVIDUAL",
@@ -68,10 +67,10 @@ const validateFn = values => {
 };
 
 interface Props {
-  payer: Payer;
+  payer: any;
   error: string;
   loading: boolean;
-  handleSubmit(payer: PayerInput): any;
+  handleSubmit(payer: any): any;
 }
 
 const BillingInfo: React.FC<Props> = ({
