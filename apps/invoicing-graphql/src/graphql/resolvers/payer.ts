@@ -19,7 +19,7 @@ export const payerResolvers: Resolvers<Context> = {
       const usecaseContext = {roles: [Roles.PAYER]};
       const {payerId, payer} = args;
 
-      const createAddressUseCase = new CreateAddress();
+      const createAddressUseCase = new CreateAddress(repos.address);
       const updatePayerUseCase = new UpdatePayerUsecase(repos.payer);
       const changeInvoiceStatusUseCase = new ChangeInvoiceStatus();
 

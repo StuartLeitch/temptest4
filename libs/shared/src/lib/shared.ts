@@ -10,6 +10,10 @@ export * from './domain/Email';
 export * from './domain/PhoneNumber';
 export * from './domain/authorization';
 
+// * Export Address Subdomain
+export * from './modules/addresses/repos/addressRepo';
+export * from './modules/addresses/repos/implementations/knexAddressRepo'
+
 // * Export Article Subdomain
 export * from './modules/articles/domain/Article';
 // export * from './modules/articles/dtos/ArticleDTO';
