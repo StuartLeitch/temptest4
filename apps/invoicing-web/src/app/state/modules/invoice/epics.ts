@@ -1,9 +1,18 @@
 import { RootEpic, isActionOf } from "typesafe-actions";
 import { of } from "rxjs";
-import { map, filter, switchMap, catchError, delay } from "rxjs/operators";
+import {
+  map,
+  filter,
+  switchMap,
+  catchError,
+  delay,
+  mergeMap,
+} from "rxjs/operators";
 
 import { getInvoice } from "./actions";
 import { queries } from "./graphql";
+
+import { updatePayerAsync } from "../payer/actions";
 
 const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) =>
   action$.pipe(
@@ -12,7 +21,13 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) =>
     switchMap(action =>
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
-    map(r => getInvoice.success({ id: "123" })),
+    mergeMap(({ data }) => {
+      const payer = data.data.invoice.payer;
+      return [
+        updatePayerAsync.success(payer),
+        getInvoice.success(data.data.invoice),
+      ];
+    }),
     catchError(err => of(getInvoice.failure(err.message))),
   );
 

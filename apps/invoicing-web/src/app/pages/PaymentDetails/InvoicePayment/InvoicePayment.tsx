@@ -1,29 +1,44 @@
 import React from "react";
 import { Formik } from "formik";
 import styled from "styled-components";
-import {
-  Button,
-  Expander,
-  Label,
-  Flex,
-  FormField,
-  th,
-} from "@hindawi/react-components";
+import { Expander, th } from "@hindawi/react-components";
 
-import CreditCardForm from "./CreditCardForm";
+import Paypal from "./Paypal";
+import BankTransfer from "./BankTransfer";
 import ChoosePayment from "./ChoosePayment";
+import CreditCardForm from "./CreditCardForm";
 
 const PAYMENT_METHODS = {
   paypal: "paypal",
   creditCard: "creditCard",
+  bankTransfer: "bankTransfer",
 };
 
 interface Props {}
+
+const validateFn = values => {
+  if (values.paymentMethod === PAYMENT_METHODS.paypal) return {};
+
+  const errors: any = {};
+
+  if (!values.cardNumber) {
+    errors.cardNumber = "Required";
+  }
+  if (!values.expiration) {
+    errors.expiration = "Required";
+  }
+  if (!values.cvv) {
+    errors.cvv = "Required";
+  }
+
+  return errors;
+};
 
 const InvoicePayment: React.FunctionComponent<Props> = () => {
   return (
     <Expander title="2. Invoice & Payment">
       <Formik
+        validate={validateFn}
         initialValues={{ paymentMethod: null }}
         onSubmit={values => console.log("the values")}
       >
@@ -33,6 +48,12 @@ const InvoicePayment: React.FunctionComponent<Props> = () => {
               <ChoosePayment setFieldValue={setFieldValue} values={values} />
               {values.paymentMethod === PAYMENT_METHODS.creditCard && (
                 <CreditCardForm handleSubmit={handleSubmit} />
+              )}
+              {values.paymentMethod === PAYMENT_METHODS.bankTransfer && (
+                <BankTransfer />
+              )}
+              {values.paymentMethod === PAYMENT_METHODS.paypal && (
+                <Paypal onSuccess={p => console.log("pe success", p)} />
               )}
             </Root>
           );

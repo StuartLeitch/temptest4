@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import scriptLoader from "react-async-script-loader";
 
-import { config } from '../../../config';
+import { config } from "../../../../config";
 
 interface Props {
   total: number;
@@ -19,7 +19,7 @@ const CLIENT = {
   production: `${config.paypallClientId}_prod`,
 };
 
-const ENV = config.env === 'production' ? "production" : "sandbox";
+const ENV = config.env === "production" ? "production" : "sandbox";
 
 const Paypal: React.FunctionComponent<Props> = ({
   total,
@@ -91,4 +91,6 @@ Paypal.defaultProps = {
   total: 0.01,
 };
 
-export default scriptLoader("https://www.paypalobjects.com/api/checkout.js")(Paypal);
+export default scriptLoader("https://www.paypalobjects.com/api/checkout.js")(
+  Paypal,
+);

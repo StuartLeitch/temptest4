@@ -11,14 +11,16 @@ import {
   FormField,
 } from "@hindawi/react-components";
 
-import ConfirmationModal from "./ConfirmationModal";
+import CountryField from "./CountryField";
 import IconRadioButton from "./IconRadioButton";
+import ConfirmationModal from "./ConfirmationModal";
+
 import { Modal, useModalActions } from "../../../providers/modal";
 import { Payer, PayerInput } from "../../../state/modules/payer/types";
 
 const PAYMENT_TYPES = {
-  individual: "individual",
-  institution: "institution",
+  individual: "INDIVIDUAL",
+  institution: "INSTITUTION",
 };
 
 const FormTextarea = field => (
@@ -41,12 +43,10 @@ const imperativeValidation = (formFns, showModal) => () => {
 const validateFn = values => {
   const errors: any = {};
 
-  if (!values.firstName) {
-    errors.firstName = "Required";
+  if (!values.name) {
+    errors.name = "Required";
   }
-  if (!values.lastName) {
-    errors.lastName = "Required";
-  }
+
   if (!values.email) {
     errors.email = "Required";
   }
@@ -56,20 +56,15 @@ const validateFn = values => {
   if (!values.city) {
     errors.city = "Required";
   }
-  if (!values.address) {
-    errors.address = "Required";
+  if (!values.billingAddress) {
+    errors.billingAddress = "Required";
   }
 
-  if (values.paymentType === PAYMENT_TYPES.institution) {
-    if (!values.institution) {
-      errors.institution = "Required";
-    }
-    if (!values.vat) {
-      errors.vat = "Required";
-    }
+  if (values.type === PAYMENT_TYPES.institution && !values.organization) {
+    errors.organization = "Required";
   }
 
-  return {};
+  return errors;
 };
 
 interface Props {
@@ -107,22 +102,18 @@ const BillingInfo: React.FC<Props> = ({
                   <Label required>Who is making the payment?</Label>
                   <Flex mt={1} mb={4}>
                     <IconRadioButton
-                      isSelected={
-                        values.paymentType === PAYMENT_TYPES.individual
-                      }
+                      isSelected={values.type === PAYMENT_TYPES.individual}
                       onClick={() =>
-                        setFieldValue("paymentType", PAYMENT_TYPES.individual)
+                        setFieldValue("type", PAYMENT_TYPES.individual)
                       }
                       icon="user"
                       label="Pay as Individual"
                       mr={1}
                     />
                     <IconRadioButton
-                      isSelected={
-                        values.paymentType === PAYMENT_TYPES.institution
-                      }
+                      isSelected={values.type === PAYMENT_TYPES.institution}
                       onClick={() =>
-                        setFieldValue("paymentType", PAYMENT_TYPES.institution)
+                        setFieldValue("type", PAYMENT_TYPES.institution)
                       }
                       icon="institution"
                       label="Pay as Institution"
@@ -130,40 +121,30 @@ const BillingInfo: React.FC<Props> = ({
                     />
                   </Flex>
 
-                  {values.paymentType === PAYMENT_TYPES.institution && (
+                  {values.type === PAYMENT_TYPES.institution && (
                     <Flex>
                       <FormField
                         mr={4}
                         flex={2}
                         required
                         label="Institution name"
-                        name="institution"
+                        name="organization"
                       />
-                      <FormField
-                        required
-                        label="EC VAT Reg. No"
-                        name="vat"
-                        flex={1}
-                      />
+                      <FormField label="EC VAT Reg. No" name="vat" flex={1} />
                     </Flex>
                   )}
 
-                  {values.paymentType !== null && (
+                  {values.type !== null && (
                     <Fragment>
                       <Flex>
-                        <Flex flex={2} mr={4}>
-                          <FormField
-                            mr={4}
-                            required
-                            name="firstName"
-                            label="First Name"
-                          />
-                          <FormField
-                            required
-                            label="Last Name"
-                            name="lastName"
-                          />
-                        </Flex>
+                        <FormField
+                          mr={4}
+                          flex={2}
+                          required
+                          name="name"
+                          label="Name"
+                        />
+
                         <FormField
                           required
                           label="Email"
@@ -179,12 +160,17 @@ const BillingInfo: React.FC<Props> = ({
                         <FormField
                           flex={2}
                           required
-                          name="address"
+                          name="billingAddress"
                           label="Address"
                           component={FormTextarea}
                         />
                         <Flex vertical flex={1} ml={4}>
-                          <FormField required label="Country" name="country" />
+                          <FormField
+                            required
+                            label="Country"
+                            name="country"
+                            component={CountryField}
+                          />
                           <FormField required label="City" name="city" />
                         </Flex>
                       </Flex>

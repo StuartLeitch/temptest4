@@ -30,7 +30,7 @@ interface Props {
   payerError: string;
   payerLoading: boolean;
   getInvoice(id: string): any;
-  createPayer(payer: payerTypes.PayerInput): any;
+  updatePayer(payer: payerTypes.Payer): any;
   showModal: any;
   hideModal: any;
 }
@@ -79,7 +79,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   payer,
   payerError,
   payerLoading,
-  createPayer,
+  updatePayer,
 }) => {
   const { invoiceId } = useParams();
 
@@ -112,7 +112,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
           <BillingInfo
             payer={payer}
             error={payerError}
-            handleSubmit={createPayer}
+            handleSubmit={updatePayer}
             loading={payerLoading}
           />
           <InvoicePayment />
@@ -143,7 +143,7 @@ export default connect(
   mapStateToProps,
   {
     getInvoice: invoiceActions.getInvoice.request,
-    createPayer: payerActions.updatePayerAsync.request,
+    updatePayer: payerActions.updatePayerAsync.request,
   },
 )(PaymentDetails);
 

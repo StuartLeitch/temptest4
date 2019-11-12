@@ -1,12 +1,13 @@
+type PaymentType = "INDIVIDUAL" | "INSTITUTION";
+
 export interface PayerInput {
-  paymentType: string;
-  institution?: string;
-  vat?: number;
-  firstName: string;
-  lastName: string;
+  type: PaymentType;
+  name: string;
+  city: string;
   email: string;
   country: string;
-  city: string;
+  billingAddress: string;
+  organization?: string;
 }
 
 export interface Payer extends PayerInput {

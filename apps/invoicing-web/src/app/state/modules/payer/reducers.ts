@@ -5,12 +5,12 @@ import { updatePayerAsync } from "./actions";
 
 const initialState: PayerState = {
   payer: {
-    paymentType: null,
-    firstName: "",
-    lastName: "",
+    type: null,
+    name: "",
     city: "",
-    country: "",
     email: "",
+    country: "",
+    billingAddress: "",
   },
   error: null,
   loading: false,
@@ -25,4 +25,9 @@ export default createReducer(initialState)
     ...state,
     loading: false,
     error: action.payload,
+  }))
+  .handleAction(updatePayerAsync.success, (state, action) => ({
+    error: null,
+    loading: false,
+    payer: action.payload,
   }));

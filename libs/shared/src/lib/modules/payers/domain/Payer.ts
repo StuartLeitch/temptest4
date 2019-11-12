@@ -5,6 +5,7 @@ import {Result} from '../../../core/logic/Result';
 import {Guard} from '../../../core/logic/Guard';
 
 // * Subdomain imports
+import {InvoiceId} from '../../invoices/domain/InvoiceId';
 import {Name} from '../../../domain/Name';
 import {Email} from '../../../domain/Email';
 import {PhoneNumber} from '../../../domain/PhoneNumber';
@@ -22,6 +23,7 @@ export interface PayerProps {
   type: PayerType;
   title?: PayerTitle;
   name: PayerName;
+  invoiceId: InvoiceId;
   organization?: Name;
   uniqueIdentificationNumber?: string;
   email?: Email;
@@ -42,6 +44,10 @@ export class Payer extends AggregateRoot<PayerProps> {
 
   get payerId(): PayerId {
     return PayerId.create(this.id);
+  }
+
+  get invoiceId(): InvoiceId {
+    return this.props.invoiceId;
   }
 
   get type(): PayerType {
