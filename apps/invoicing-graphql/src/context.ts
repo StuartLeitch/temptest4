@@ -41,7 +41,7 @@ export function makeContext(config: Config, db: Knex): Context {
 
   return {
     repos,
-    invoicePdfService: new InvoicePdfService(repos.invoice),
+    invoicePdfService: new InvoicePdfService(repos.invoice, repos.payer),
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),
     vatService: new VATService(),

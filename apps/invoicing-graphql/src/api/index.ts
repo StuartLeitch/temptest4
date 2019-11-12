@@ -40,18 +40,17 @@ export function makeExpressServer(context: Context) {
   app.get('/api/invoice/:invoiceId', async (req, res) => {
     const {invoicePdfService} = context;
 
-    const eitherPdf = await invoicePdfService.getPdf(req.params.invoiceId);
-    if (eitherPdf.isRight()) {
-      const pdf = eitherPdf.value.getValue();
+    const pdfResult = await invoicePdfService.getPdf(req.params.invoiceId);
 
+    if ('isLeft' in pdfResult) {
+      return res.status(400).send(pdfResult.value);
+    } else {
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename=${req.params.invoiceId}.pdf`,
-        'Content-Length': pdf.length
+        'Content-Length': pdfResult.length
       });
-      res.end(pdf);
-    } else {
-      return res.status(400).send(eitherPdf.value);
+      res.end(pdfResult);
     }
   });
 

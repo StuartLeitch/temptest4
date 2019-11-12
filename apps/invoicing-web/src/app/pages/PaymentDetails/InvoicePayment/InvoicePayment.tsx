@@ -1,7 +1,13 @@
 import React from "react";
 import { Formik } from "formik";
 import styled from "styled-components";
-import { Expander, th } from "@hindawi/react-components";
+import {
+  Expander,
+  Label,
+  ActionLink,
+  Icon,
+  th,
+} from "@hindawi/react-components";
 
 import Paypal from "./Paypal";
 import BankTransfer from "./BankTransfer";
@@ -37,6 +43,13 @@ const validateFn = values => {
 const InvoicePayment: React.FunctionComponent<Props> = () => {
   return (
     <Expander title="2. Invoice & Payment">
+      <Label my="4" ml="4">
+        Your Invoice
+        <ActionLink type="action" ml="4">
+          <Icon name="download" color="colors.actionSecondary" mr="1" />
+          Download
+        </ActionLink>
+      </Label>
       <Formik
         validate={validateFn}
         initialValues={{ paymentMethod: null }}

@@ -1,9 +1,9 @@
 import {FlexboxProps, LayoutProps, SpaceProps} from 'styled-system';
 import React from 'react';
 
-import {ActionLink as Root} from './ActionLink.styles';
+import {ActionType} from './ActionLinkTypes';
 
-type ActionType = 'action' | 'link';
+import {ActionLink as Root} from './ActionLink.styles';
 
 export interface Props extends FlexboxProps, LayoutProps, SpaceProps {
   children?: React.ReactNode;

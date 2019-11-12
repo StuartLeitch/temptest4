@@ -22,6 +22,8 @@ export * from './modules/articles/domain/ArticleId';
 // export * from './modules/articles/mappers/ArticleMap';
 // export * from './modules/articles/repos/priceRepo';
 // export * from './modules/articles/mappers/PriceMap';
+export * from './modules/articles/usecases/getArticleDetails/getArticleDetails';
+export * from './modules/articles/usecases/getArticleDetails/getArticleDetailsDTO';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -71,6 +73,9 @@ export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/repos/implementations/knexPayerRepo';
 export * from './modules/payers/mapper/Payer';
 export * from './modules/payers/usecases/updatePayer/updatePayer';
+export * from './modules/payers/usecases/getPayer/getPayer';
+export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
+export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
 
 // * Export Address Subdomain
 export * from './modules/addresses/domain/AddressId';
@@ -122,6 +127,9 @@ export {WaiverService} from './domain/services/WaiverService';
 // // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
 export * from './modules/authors/mappers/AuthorMap';
+
+export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetails';
+export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetailsDTO';
 
 // * Export user Subdomain
 export * from './modules/users/domain/User';

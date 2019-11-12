@@ -3,138 +3,109 @@ import streamToPromise from 'stream-to-promise';
 import {pdfGeneratorService} from '../PdfGenerator';
 import {InvoicePayload} from '../PdfGenerator/PdfGenerator';
 import {
-  PayerMap,
-  ArticleMap,
-  AuthorMap,
-  PayerType,
-  Invoice,
-  Article,
-  Author,
-  Payer,
+  GetArticleDetailsUsecase,
+  GetAuthorDetailsUsecase,
   GetInvoiceDetailsUsecase,
+  GetPayerDetailsUsecase,
   KnexInvoiceRepo,
-  Roles,
-  AuthorizationContext
+  KnexPayerRepo,
+  AuthorizationContext,
+  Invoice,
+  Author,
+  Article,
+  Payer,
+  ManuscriptId,
+  AuthorMap,
+  Roles
 } from '@hindawi/shared';
 
-import {
-  Either,
-  left,
-  right,
-  Result
-} from '../../../../../libs/shared/src/lib/core/logic/Result';
-
 export class InvoicePdfService {
-  constructor(private invoiceRepo: KnexInvoiceRepo) {}
+  authorizationContext: AuthorizationContext<Roles> = {
+    roles: [Roles.PAYER]
+  };
+
+  constructor(
+    private invoiceRepo: KnexInvoiceRepo,
+    private payerRepo: KnexPayerRepo
+  ) {}
+
+  private async constructPayload(invoiceId: string) {
+    const invoicePayload: InvoicePayload = {
+      article: null,
+      invoice: null,
+      author: null,
+      payer: null
+    };
+
+    const invoiceResult = await this.getInvoiceDetails(invoiceId);
+    if (invoiceResult.isLeft()) return invoiceResult;
+    invoicePayload.invoice = invoiceResult.value.getValue();
+    console.log(invoicePayload.invoice);
+
+    const payerResult = await this.getPayerDetails(invoicePayload.invoice);
+    if (payerResult.isLeft()) return payerResult;
+    invoicePayload.payer = payerResult.value.getValue();
+
+    const apcItems = invoicePayload.invoice.invoiceItems.currentItems.filter(
+      item => item.type === 'APC'
+    );
+    if (apcItems.length > 0) {
+      const articleResult = await this.getArticleDetails(
+        apcItems[0].manuscriptId
+      );
+      if (articleResult.isLeft()) return articleResult;
+      invoicePayload.article = articleResult.value.getValue();
+    }
+
+    invoicePayload.author = await this.getAuthorDetails(invoicePayload.article);
+
+    return invoicePayload;
+  }
 
   async getPdf(invoiceId: string) {
     const invoicePayload = await this.constructPayload(invoiceId);
-    if (invoicePayload.isLeft()) {
+    if ('isLeft' in invoicePayload) {
       return invoicePayload;
     }
-    const stream = await pdfGeneratorService.getInvoice(
-      invoicePayload.value.getValue()
-    );
+    const stream = await pdfGeneratorService.getInvoice(invoicePayload);
     const pdf = await streamToPromise(stream);
-    return right(Result.ok(pdf));
+    return pdf;
   }
 
-  private async constructPayload(invoiceId: string) {
-    const usecaseContext = {
-      roles: [Roles.PAYER]
-    };
-    const article = await this.getArticleDetails(invoiceId, usecaseContext);
-    const invoice = await this.getInvoiceDetails(invoiceId, usecaseContext);
-    const author = await this.getAuthorDetails(invoiceId, usecaseContext);
-    const payer = await this.getPayerDetails(invoiceId, usecaseContext);
-    const eitherPayload = {
-      article,
-      invoice,
-      author,
-      payer
-    };
-
-    const emptyPayload: Either<Error, Result<InvoicePayload>> = right(
-      Result.ok({
-        article: null,
-        invoice: null,
-        author: null,
-        payer: null
-      })
-    );
-
-    const a = Object.entries(eitherPayload).reduce((acc, [key, value]) => {
-      if (acc.isLeft()) {
-        return acc;
-      }
-      if (value.isLeft()) {
-        return value;
-      }
-      const tmp = acc.value.getValue();
-      tmp[key] = value.value.getValue();
-      return right(Result.ok(tmp));
-    }, emptyPayload);
-
-    return Promise.resolve(a);
-  }
-
-  private async getInvoiceDetails(
-    invoiceId: string,
-    authorizationContext: AuthorizationContext<Roles>
-  ) {
+  private async getInvoiceDetails(invoiceId: string) {
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
-    const result = await usecase.execute({invoiceId}, authorizationContext);
+    const result = await usecase.execute(
+      {invoiceId},
+      this.authorizationContext
+    );
     return result;
   }
 
-  private async getAuthorDetails(
-    invoiceId: string,
-    authorizationContext: AuthorizationContext<Roles>
-  ) {
-    return Promise.resolve(
-      right<Error, Result<Author>>(
-        Result.ok(
-          AuthorMap.toDomain({
-            id: 'author-1',
-            name: 'Luke Skywalker'
-          })
-        )
-      )
-    );
+  private async getAuthorDetails(article: Article) {
+    // const usecase = new GetAuthorDetailsUsecase();
+    // const result = await usecase.execute({authorId}, this.authorizationContext);
+    // return result;
+    return AuthorMap.toDomain({
+      id: '',
+      name: article.authorSurname
+    });
   }
 
-  private async getArticleDetails(
-    invoiceId: string,
-    authorizationContext: AuthorizationContext<Roles>
-  ) {
-    return Promise.resolve(
-      right<Error, Result<Article>>(
-        Result.ok(
-          ArticleMap.toDomain({
-            id: 'article-1',
-            title: 'Death Star critical flaw white paper',
-            articleTypeId: 'type1'
-          })
-        )
-      )
+  private async getArticleDetails(articleId: ManuscriptId) {
+    const usecase = new GetArticleDetailsUsecase();
+    const result = await usecase.execute(
+      {articleId: articleId.id.toString()},
+      this.authorizationContext
     );
+    return result;
   }
 
-  private async getPayerDetails(
-    invoiceId: string,
-    authorizationContext: AuthorizationContext<Roles>
-  ) {
-    return Promise.resolve(
-      right<Error, Result<Payer>>(
-        Result.ok(
-          PayerMap.toDomain({
-            id: 'payer-1',
-            type: PayerType.INDIVIDUAL,
-            name: 'Darth Vader',
-            invoiceId: invoiceId
-          })
-        )
-      )
+  private async getPayerDetails(invoice: Invoice) {
+    const usecase = new GetPayerDetailsUsecase(this.payerRepo);
+    const result = await usecase.execute(
+      {payerId: invoice.payerId.id.toString()},
+      this.authorizationContext
     );
+    return result;
   }
 }
