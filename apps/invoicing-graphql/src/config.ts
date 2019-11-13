@@ -1,4 +1,15 @@
 import path from 'path';
+import {environment} from '@env/environment';
+
+const dbConfig = {
+  dbUser: process.env.DB_USERNAME || environment.DB_USERNAME,
+  dbHost: process.env.DB_HOST || environment.DB_HOST,
+  dbDatabase: process.env.DB_DATABASE || environment.DB_DATABASE,
+  dbPassword: process.env.DB_PASSWORD || environment.DB_PASSWORD,
+  dbMigrationsDir:
+    process.env.DB_MIGRATIONS_DIR ||
+    path.join(__dirname, environment.DB_MIGRATIONS_DIR)
+};
 
 export class Config {
   dbUser: string;
@@ -8,16 +19,7 @@ export class Config {
   dbMigrationsDir: string;
 
   constructor() {
-    this.dbHost = process.env.DB_HOST;
-    this.dbUser = process.env.DB_USERNAME;
-    this.dbPassword = process.env.DB_PASSWORD;
-    this.dbDatabase = process.env.DB_DATABASE;
-    this.dbMigrationsDir =
-      process.env.DB_MIGRATIONS_DIR ||
-      path.join(
-        __dirname,
-        '../../../libs/shared/src/lib/infrastructure/database/knex/migrations'
-      );
+    return Object.assign({}, this, dbConfig);
   }
 }
 
