@@ -75,37 +75,43 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     getInvoice(invoiceId);
   }, []);
 
-  if (invoiceError) {
-    return (
-      <Flex>
-        <Text type="warning">{invoiceError}</Text>
-      </Flex>
-    );
-  }
-
-  if (invoiceLoading) {
-    return (
-      <Flex alignItems="center" vertical>
-        <Text mb={2}>Fetching invoice...</Text>
-        <Loader size={6} />
-      </Flex>
-    );
-  }
-
   return (
     <Fragment>
       <PaymentHeader articleTitle={articleDetails.title}></PaymentHeader>
+
       <Root>
-        <FormsContainer>
-          <BillingInfo
-            status={invoice.status}
-            payer={invoice.payer}
-            error={payerError}
-            handleSubmit={updatePayer}
-            loading={payerLoading}
-          />
-          <InvoicePayment />
-        </FormsContainer>
+        {(function() {
+          if (invoiceError) {
+            return (
+              <Flex flex={2}>
+                <Text type="warning">{invoiceError}</Text>
+              </Flex>
+            );
+          }
+
+          if (invoiceLoading) {
+            return (
+              <Flex alignItems="center" vertical flex={2}>
+                <Text mb={2}>Fetching invoice...</Text>
+                <Loader size={6} />
+              </Flex>
+            );
+          }
+
+          return (
+            <FormsContainer>
+              <BillingInfo
+                status={invoice.status}
+                payer={invoice.payer}
+                error={payerError}
+                handleSubmit={updatePayer}
+                loading={payerLoading}
+              />
+              <InvoicePayment />
+            </FormsContainer>
+          );
+        })()}
+
         <Details
           articleDetailsExpanded={true}
           invoiceDetailsExpanded={true}

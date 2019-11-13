@@ -8,9 +8,12 @@ import {
   mergeMap,
   switchMap,
   catchError,
+  withLatestFrom,
+  pluck,
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
+import { invoice } from "./selectors";
 import { queries, mutations } from "./graphql";
 import { getInvoice, updatePayerAsync } from "./actions";
 
@@ -30,15 +33,16 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(updatePayerAsync.request)),
     switchMap(action => {
-      const {} = action.payload
       return graphqlAdapter.send(mutations.confirmInvoice, {
         payer: action.payload,
       });
     }),
-    mergeMap(r => {
+    withLatestFrom(state$.pipe(map(invoice))),
+    mergeMap(([r, invoice]) => {
       return from([
         modalActions.hideModal(),
         updatePayerAsync.success(r.data.data.updateInvoicePayer),
+        getInvoice.request(invoice.id),
       ]);
     }),
     catchError(err => mapTo(updatePayerAsync.failure(err.message))),
