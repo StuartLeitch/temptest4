@@ -7,15 +7,13 @@ import {
   GetAuthorDetailsUsecase,
   GetInvoiceDetailsUsecase,
   GetPayerDetailsUsecase,
+  AuthorizationContext,
   KnexInvoiceRepo,
   KnexPayerRepo,
-  AuthorizationContext,
-  Invoice,
-  Author,
-  Article,
-  Payer,
   ManuscriptId,
   AuthorMap,
+  Article,
+  Payer,
   Roles
 } from '@hindawi/shared';
 
@@ -29,7 +27,7 @@ export class InvoicePdfService {
     private payerRepo: KnexPayerRepo
   ) {}
 
-  private async constructPayload(invoiceId: string) {
+  private async constructPayload(payerId: string) {
     const invoicePayload: InvoicePayload = {
       article: null,
       invoice: null,
@@ -37,24 +35,23 @@ export class InvoicePdfService {
       payer: null
     };
 
-    const invoiceResult = await this.getInvoiceDetails(invoiceId);
-    if (invoiceResult.isLeft()) return invoiceResult;
-    invoicePayload.invoice = invoiceResult.value.getValue();
-    console.log(invoicePayload.invoice);
+    const payerEither = await this.getPayerDetails(payerId);
+    if (payerEither.isLeft()) return payerEither;
+    invoicePayload.payer = payerEither.value.getValue();
 
-    const payerResult = await this.getPayerDetails(invoicePayload.invoice);
-    if (payerResult.isLeft()) return payerResult;
-    invoicePayload.payer = payerResult.value.getValue();
+    const invoiceEither = await this.getInvoiceDetails(invoicePayload.payer);
+    if (invoiceEither.isLeft()) return invoiceEither;
+    invoicePayload.invoice = invoiceEither.value.getValue();
 
     const apcItems = invoicePayload.invoice.invoiceItems.currentItems.filter(
       item => item.type === 'APC'
     );
     if (apcItems.length > 0) {
-      const articleResult = await this.getArticleDetails(
+      const articleEither = await this.getArticleDetails(
         apcItems[0].manuscriptId
       );
-      if (articleResult.isLeft()) return articleResult;
-      invoicePayload.article = articleResult.value.getValue();
+      if (articleEither.isLeft()) return articleEither;
+      invoicePayload.article = articleEither.value.getValue();
     }
 
     invoicePayload.author = await this.getAuthorDetails(invoicePayload.article);
@@ -62,8 +59,8 @@ export class InvoicePdfService {
     return invoicePayload;
   }
 
-  async getPdf(invoiceId: string) {
-    const invoicePayload = await this.constructPayload(invoiceId);
+  async getPdf(payerId: string) {
+    const invoicePayload = await this.constructPayload(payerId);
     if ('isLeft' in invoicePayload) {
       return invoicePayload;
     }
@@ -72,10 +69,10 @@ export class InvoicePdfService {
     return pdf;
   }
 
-  private async getInvoiceDetails(invoiceId: string) {
+  private async getInvoiceDetails(payer: Payer) {
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     const result = await usecase.execute(
-      {invoiceId},
+      {invoiceId: payer.invoiceId.id.toString()},
       this.authorizationContext
     );
     return result;
@@ -100,12 +97,9 @@ export class InvoicePdfService {
     return result;
   }
 
-  private async getPayerDetails(invoice: Invoice) {
+  private async getPayerDetails(payerId: string) {
     const usecase = new GetPayerDetailsUsecase(this.payerRepo);
-    const result = await usecase.execute(
-      {payerId: invoice.payerId.id.toString()},
-      this.authorizationContext
-    );
+    const result = await usecase.execute({payerId}, this.authorizationContext);
     return result;
   }
 }

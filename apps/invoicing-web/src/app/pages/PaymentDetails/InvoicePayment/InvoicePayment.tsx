@@ -20,7 +20,9 @@ const PAYMENT_METHODS = {
   bankTransfer: "bankTransfer",
 };
 
-interface Props {}
+interface Props {
+  payerId: string;
+}
 
 const validateFn = values => {
   if (values.paymentMethod === PAYMENT_METHODS.paypal) return {};
@@ -40,12 +42,12 @@ const validateFn = values => {
   return errors;
 };
 
-const InvoicePayment: React.FunctionComponent<Props> = () => {
+const InvoicePayment: React.FunctionComponent<Props> = ({ payerId }) => {
   return (
     <Expander title="2. Invoice & Payment">
       <Label my="4" ml="4">
         Your Invoice
-        <ActionLink type="action" ml="4">
+        <ActionLink type="action" ml="4" link={`./api/invoice/${payerId}`}>
           <Icon name="download" color="colors.actionSecondary" mr="1" />
           Download
         </ActionLink>

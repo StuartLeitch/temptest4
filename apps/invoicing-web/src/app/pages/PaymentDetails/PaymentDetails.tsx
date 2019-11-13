@@ -115,7 +115,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
             handleSubmit={updatePayer}
             loading={payerLoading}
           />
-          <InvoicePayment />
+          <InvoicePayment payerId={payer.id} />
         </FormsContainer>
         <Details
           articleDetailsExpanded={true}

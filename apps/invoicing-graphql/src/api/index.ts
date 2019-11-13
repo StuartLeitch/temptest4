@@ -43,7 +43,7 @@ export function makeExpressServer(context: Context) {
     const pdfResult = await invoicePdfService.getPdf(req.params.invoiceId);
 
     if ('isLeft' in pdfResult) {
-      return res.status(400).send(pdfResult.value);
+      return res.status(400).send(pdfResult.value.errorValue());
     } else {
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
