@@ -27,16 +27,17 @@ export const payerResolvers: Resolvers<Context> = {
 
       const {repos} = context;
       const usecaseContext = {roles: [Roles.PAYER]};
-      const {payerId, payer} = args;
+      const {payer} = args;
+      console.log('the payer -> ', payer);
 
       const createAddressUseCase = new CreateAddress(repos.address);
       const updatePayerUseCase = new UpdatePayerUsecase(repos.payer);
       const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(repos.invoice);
 
       const addressResult = await createAddressUseCase.execute({
-        city: payer.city,
-        country: payer.country,
-        addressLine1: payer.billingAddress
+        city: payer.address.city,
+        country: payer.address.country,
+        addressLine1: payer.address.addressLine1
       });
 
       if (addressResult.isRight()) {
@@ -44,7 +45,7 @@ export const payerResolvers: Resolvers<Context> = {
       }
 
       const updatePayerRequest = {
-        payerId,
+        payerId: payer.id,
         type: payer.type,
         name: payer.name,
         email: payer.email,

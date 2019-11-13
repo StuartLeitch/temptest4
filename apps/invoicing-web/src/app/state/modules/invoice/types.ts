@@ -6,15 +6,19 @@ export interface Invoice {
   payer: Payer | null;
 }
 
+export interface Address {
+  city: string;
+  country: string;
+  addressLine1: string;
+}
+
 export interface Payer {
   id: string;
   type: PaymentType;
   name: string;
-  city: string;
   email: string;
-  country: string;
-  billingAddress: string;
   organization?: string;
+  address: Address;
 }
 
 export interface LoadingState {

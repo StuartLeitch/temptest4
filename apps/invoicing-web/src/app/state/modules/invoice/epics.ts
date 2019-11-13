@@ -1,13 +1,13 @@
 import { RootEpic, isActionOf } from "typesafe-actions";
 import { of, from } from "rxjs";
 import {
+  map,
   delay,
   mapTo,
   filter,
   mergeMap,
   switchMap,
   catchError,
-  map,
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
@@ -30,10 +30,9 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(updatePayerAsync.request)),
     switchMap(action => {
-      const { id, ...payer } = action.payload;
+      const {} = action.payload
       return graphqlAdapter.send(mutations.confirmInvoice, {
-        payerId: id,
-        payer,
+        payer: action.payload,
       });
     }),
     mergeMap(r => {

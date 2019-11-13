@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { set, isEmpty } from "lodash";
 import { Formik } from "formik";
 import {
   Flex,
@@ -25,15 +26,26 @@ const FormTextarea = field => (
   <Textarea height={26} {...field} resize="vertical" />
 );
 
+const parseErrors = (errors, prefix = "") => {
+  return Object.entries(errors).reduce((acc, [key, value]) => {
+    if (typeof value === "object") {
+      return { ...acc, ...parseErrors(value, `${prefix}${key}.`) };
+    } else {
+      return {
+        ...acc,
+        [`${prefix}${key}`]: true,
+      };
+    }
+  }, {});
+};
+
 const imperativeValidation = (formFns, showModal) => () => {
   formFns.validateForm().then(errors => {
-    const errorFields = Object.keys(errors);
-    if (!errorFields.length) {
+    const errorFields = parseErrors(errors);
+    if (isEmpty(errorFields)) {
       showModal();
     } else {
-      formFns.setTouched(
-        errorFields.reduce((acc, el) => ({ ...acc, [el]: true }), {}),
-      );
+      formFns.setTouched(errorFields);
     }
   });
 };
@@ -48,14 +60,14 @@ const validateFn = values => {
   if (!values.email) {
     errors.email = "Required";
   }
-  if (!values.country) {
-    errors.country = "Required";
+  if (!values.address.country) {
+    set(errors, "address.country", "Required");
   }
-  if (!values.city) {
-    errors.city = "Required";
+  if (!values.address.city) {
+    set(errors, "address.city", "Required");
   }
-  if (!values.billingAddress) {
-    errors.billingAddress = "Required";
+  if (!values.address.addressLine1) {
+    set(errors, "address.addressLine1", "Required");
   }
 
   if (values.type === PAYMENT_TYPES.institution && !values.organization) {
@@ -74,7 +86,14 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
   const { showModal, hideModal } = useModalActions();
   return (
     <Formik initialValues={payer} validate={validateFn} onSubmit={handleSubmit}>
-      {({ values, setTouched, handleSubmit, validateForm, setFieldValue }) => {
+      {({
+        values,
+        setTouched,
+        handleSubmit,
+        validateForm,
+        setFieldValue,
+        errors,
+      }) => {
         return (
           <Fragment>
             <Flex m={2} vertical>
@@ -131,7 +150,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                     <FormField
                       flex={2}
                       required
-                      name="billingAddress"
+                      name="address.addressLine1"
                       label="Address"
                       component={FormTextarea}
                     />
@@ -139,10 +158,10 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                       <FormField
                         required
                         label="Country"
-                        name="country"
+                        name="address.country"
                         component={CountryField}
                       />
-                      <FormField required label="City" name="city" />
+                      <FormField required label="City" name="address.city" />
                     </Flex>
                   </Flex>
 

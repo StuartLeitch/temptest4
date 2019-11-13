@@ -17,6 +17,12 @@ export type Address = {
   addressLine1?: Maybe<Scalars['String']>,
 };
 
+export type AddressInput = {
+  city?: Maybe<Scalars['String']>,
+  country?: Maybe<Scalars['String']>,
+  addressLine1?: Maybe<Scalars['String']>,
+};
+
 export type Invoice = {
    __typename?: 'Invoice',
   id?: Maybe<Scalars['String']>,
@@ -43,7 +49,6 @@ export type Mutation = {
 
 
 export type MutationConfirmInvoiceArgs = {
-  payerId: Scalars['String'],
   payer: PayerInput
 };
 
@@ -68,13 +73,12 @@ export type Payer = {
 };
 
 export type PayerInput = {
+  id?: Maybe<Scalars['String']>,
   type?: Maybe<PayerType>,
   name?: Maybe<Scalars['String']>,
-  city?: Maybe<Scalars['String']>,
   email?: Maybe<Scalars['String']>,
-  country?: Maybe<Scalars['String']>,
-  billingAddress?: Maybe<Scalars['String']>,
   organization?: Maybe<Scalars['String']>,
+  address?: Maybe<AddressInput>,
 };
 
 export enum PayerType {
@@ -179,6 +183,7 @@ export type ResolversTypes = {
   Address: ResolverTypeWrapper<Address>,
   Mutation: ResolverTypeWrapper<{}>,
   PayerInput: PayerInput,
+  AddressInput: AddressInput,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
 };
 
@@ -194,6 +199,7 @@ export type ResolversParentTypes = {
   Address: Address,
   Mutation: {},
   PayerInput: PayerInput,
+  AddressInput: AddressInput,
   Boolean: Scalars['Boolean'],
 };
 
@@ -214,7 +220,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payerId' | 'payer'>>,
+  confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
 };

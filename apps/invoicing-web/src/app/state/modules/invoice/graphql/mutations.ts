@@ -1,6 +1,8 @@
 import gql from "graphql-tag";
 import { ASTNode } from "graphql";
 
+import { payerFragment } from "./fragments";
+
 export const createPayer: ASTNode = gql`
   mutation createPayer($input: string) {
     createPayer(input: $input) {
@@ -11,13 +13,10 @@ export const createPayer: ASTNode = gql`
 `;
 
 export const confirmInvoice: ASTNode = gql`
-  mutation confirmInvoice($payerId: String!, $payer: PayerInput!) {
-    confirmInvoice(payerId: $payerId, payer: $payer) {
-      id
-      type
-      name
-      email
-      organization
+  mutation confirmInvoice($payer: PayerInput!) {
+    confirmInvoice(payer: $payer) {
+      ...payerFragment
     }
   }
+  ${payerFragment}
 `;
