@@ -1,0 +1,10 @@
+{
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "types": ["node"],
+    "lib": ["es6", "dom"]
+  }
+}
