@@ -39,6 +39,10 @@ export class Article extends AggregateRoot<ArticleProps> {
     return this.props.articleTypeId;
   }
 
+  get jojurnalId(): string {
+    return this.props.journalId;
+  }
+
   private constructor(props: ArticleProps, id?: UniqueEntityID) {
     super(props, id);
   }
