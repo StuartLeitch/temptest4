@@ -37,7 +37,7 @@ describe('UpdateTransactionUsecase', () => {
   });
 
   describe('When Transaction ID is provided', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       mockTransactionRepo = new MockTransactionRepo();
 
       transactionId = 'test-transaction';
@@ -48,7 +48,7 @@ describe('UpdateTransactionUsecase', () => {
         },
         new UniqueEntityID(transactionId)
       ).getValue();
-      mockTransactionRepo.save(transaction);
+      await mockTransactionRepo.save(transaction);
 
       usecase = new UpdateTransactionUsecase(mockTransactionRepo);
     });

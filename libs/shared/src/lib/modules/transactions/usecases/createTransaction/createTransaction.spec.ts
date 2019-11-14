@@ -1,31 +1,29 @@
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {Result} from '../../../../core/logic/Result';
+// import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+// import {Result} from '../../../../core/logic/Result';
 
-import {Roles} from '../../../users/domain/enums/Roles';
+// import {Roles} from '../../../users/domain/enums/Roles';
 
-import {MockTransactionRepo} from '../../repos/mocks/mockTransactionRepo';
-import {
-  Transaction,
-  TransactionCollection,
-  STATUS as TransactionStatus
-} from '../../domain/Transaction';
-import {
-  CreateTransactionUsecase,
-  CreateTransactionContext
-} from './createTransaction';
-import {Article} from '../../../articles/domain/Article';
-import {MockArticleRepo} from '../../../articles/repos/mocks/mockArticleRepo';
+// import {MockTransactionRepo} from '../../repos/mocks/mockTransactionRepo';
+// import {
+//   Transaction,
+//   TransactionCollection,
+//   STATUS as TransactionStatus
+// } from '../../domain/Transaction';
+// import {
+//   CreateTransactionUsecase,
+//   CreateTransactionContext
+// } from './createTransaction';
+// import {Article} from '../../../articles/domain/Article';
+// import {MockArticleRepo} from '../../../articles/repos/mocks/mockArticleRepo';
 
-let usecase: CreateTransactionUsecase;
-let mockTransactionRepo: MockTransactionRepo;
-let mockArticleRepo: MockArticleRepo;
-let result: Result<Transaction>;
+// let usecase: CreateTransactionUsecase;
+// let mockTransactionRepo: MockTransactionRepo;
+// let mockArticleRepo: MockArticleRepo;
+// let result: Result<Transaction>;
+// let transactionCollection: TransactionCollection;
+// let manuscriptId: string;
 
-let transactionCollection: TransactionCollection;
-
-let manuscriptId: string;
-
-const defaultContext: CreateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
+// const defaultContext: CreateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
 
 describe('CreateTransactionUseCase', () => {
   describe('When NO Manuscript ID is provided', () => {
@@ -47,7 +45,8 @@ describe('CreateTransactionUseCase', () => {
     //       expect(transactionCollection.length).toEqual(0);
     //       result = await usecase.execute({}, defaultContext);
     //       expect(result.isSuccess).toBeTruthy();
-    //       const secondTransactionCollection = await mockTransactionRepo.getTransactionCollection();
+    //       const secondTransactionCollection =
+    //         await mockTransactionRepo.getTransactionCollection();
     //       expect(secondTransactionCollection.length).toEqual(1);
     //       const [transaction] = secondTransactionCollection;
     //       expect(transaction.status).toBe(TransactionStatus.DRAFT);
@@ -93,9 +92,10 @@ describe('CreateTransactionUseCase', () => {
     //           defaultContext
     //         );
     //         expect(result.isSuccess).toBeTruthy();
-    //         const secondTransactionCollection = await mockTransactionRepo.getTransactionCollection(
-    //           [manuscriptId]
-    //         );
+    //         const secondTransactionCollection =
+    //           await mockTransactionRepo.getTransactionCollection(
+    //              [manuscriptId]
+    //           );
     //         expect(secondTransactionCollection.length).toEqual(1);
     //       });
     //     });

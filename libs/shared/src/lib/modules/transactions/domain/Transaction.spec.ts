@@ -1,9 +1,8 @@
 import {Result} from '../../../core/logic/Result';
 
 import {Transaction, STATUS as TransactionStatus} from './Transaction';
-import {TransactionAmount} from './TransactionAmount';
-
-import {ArticleId} from '../../articles/domain/ArticleId';
+// import {TransactionAmount} from './TransactionAmount';
+// import {ArticleId} from '../../articles/domain/ArticleId';
 
 let transactionOrError: Result<Transaction>;
 let transaction: Transaction;
@@ -28,7 +27,7 @@ describe('Transaction', () => {
   });
 
   it('Should be able to set amount', () => {
-    const amount = 100;
+    // const amount = 100;
     transactionOrError = Transaction.create({
       status: TransactionStatus.DRAFT
     });
@@ -45,11 +44,11 @@ describe('Transaction', () => {
   //   });
   //   transaction = transactionOrError.getValue();
 
-  //   // Add several products
-  //   // transaction.addGenre(Genre.create('Post-punk').getValue());
-  //   // transaction.addGenre(Genre.create('New wave').getValue());
-  //   // transaction.addGenre(Genre.create('No wave').getValue());
+  // Add several products
+  // transaction.addGenre(Genre.create('Post-punk').getValue());
+  // transaction.addGenre(Genre.create('New wave').getValue());
+  // transaction.addGenre(Genre.create('No wave').getValue());
 
-  //   // expect(transaction.genres.length).toBe(3);
+  // expect(transaction.genres.length).toBe(3);
   // });
 });

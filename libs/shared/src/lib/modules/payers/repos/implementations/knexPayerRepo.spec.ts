@@ -3,7 +3,7 @@ import {
   Payer,
   PayerType,
   PayerMap,
-  PayerId,
+  PayerId
 } from '../../../../shared';
 import {
   Knex,
@@ -26,7 +26,8 @@ const payerData = {
   billingAddressId: 'Tatooine',
   vatId: 'vat-1',
   dateAdded: new Date()
-}
+};
+
 function makePayerData(overwrites?: any): Payer {
   return PayerMap.toDomain({
     ...payerData,
@@ -65,7 +66,11 @@ describe('KnexPayerRepo', () => {
   });
 
   describe('CRUD methods', () => {
-    beforeEach(() => db('payers').insert(PayerMap.toPersistence(makePayerData({id: 'payer-1'}))));
+    beforeEach(() =>
+      db('payers').insert(
+        PayerMap.toPersistence(makePayerData({id: 'payer-1'}))
+      )
+    );
 
     afterEach(() => clearTable(db, 'payers'));
 

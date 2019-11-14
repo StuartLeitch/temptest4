@@ -1,3 +1,4 @@
+import {CouponCreated} from './../domain/events/couponCreated';
 // * Core domain
 import {AggregateRoot} from '../../../core/domain/AggregateRoot';
 import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';

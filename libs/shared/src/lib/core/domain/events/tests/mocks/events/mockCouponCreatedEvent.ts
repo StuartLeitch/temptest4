@@ -1,13 +1,13 @@
 import {DomainEventContract} from '../../../contracts/DomainEvent';
 import {UniqueEntityID} from '../../../../UniqueEntityID';
 
-export class MockJobDeletedEvent implements DomainEventContract {
+export class MockCouponCreatedEvent implements DomainEventContract {
   dateTimeOccurred: Date;
   id: UniqueEntityID;
 
   constructor(id: UniqueEntityID) {
-    this.dateTimeOccurred = new Date();
     this.id = id;
+    this.dateTimeOccurred = new Date();
   }
 
   getAggregateId(): UniqueEntityID {

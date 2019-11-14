@@ -13,7 +13,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async save(catalogItem: CatalogItem): Promise<CatalogItem> {
-    const {db} = this;
+    const { db } = this;
 
     await db(TABLES.CATALOG).insert(CatalogMap.toPersistence(catalogItem));
 
@@ -21,7 +21,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async getCatalogCollection(): Promise<CatalogItem[]> {
-    const {db} = this;
+    const { db } = this;
 
     const catalogsRows = await db(TABLES.CATALOG);
 
@@ -32,7 +32,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async getCatalogItemByType(type = 'APC'): Promise<CatalogItem> {
-    const {db} = this;
+    const { db } = this;
 
     return await db(TABLES.CATALOG)
       .where({type})
@@ -40,7 +40,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
-    const {db} = this;
+    const { db } = this;
 
     return await db(TABLES.CATALOG)
       .where({journal_id: journalId.id.toString()})

@@ -1,5 +1,5 @@
-import {DomainEvents} from './../../../core/domain/events/DomainEvents';
-import {HandleContract} from './../../../core/domain/events/contracts/Handle';
+import {DomainEvents} from '../../../core/domain/events/DomainEvents';
+import {HandleContract} from '../../../core/domain/events/contracts/Handle';
 import {Invoice} from '../domain/Invoice';
 import {CreateInvoiceUsecase} from '../usecases/createInvoice/createInvoice';
 import {InvoiceCreated} from '../domain/events/invoiceCreated';
