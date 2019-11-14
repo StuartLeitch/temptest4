@@ -50,10 +50,7 @@ export const invoice: Resolvers<Context> = {
       const payer = await context.repos.payer.getPayerByInvoiceId(
         InvoiceId.create(new UniqueEntityID(parent.id)).getValue()
       );
-
-      return {
-        ...PayerMap.toPersistence(payer)
-      }
+      return PayerMap.toPersistence(payer);
     }
   }
 };

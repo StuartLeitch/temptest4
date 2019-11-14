@@ -1,4 +1,4 @@
-import {Knex} from '@hindawi/shared';
+import {Knex, TABLES} from '@hindawi/shared';
 
 import {Coupon} from '../../../../domain/reductions/Coupon';
 import {CouponMap} from '../../mappers/CouponMap';
@@ -13,7 +13,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   async getCouponById(couponId: ReductionId): Promise<Coupon> {
     const {db} = this;
 
-    const couponRow = await db('coupons')
+    const couponRow = await db(TABLES.COUPONS)
       .select()
       .where('id', couponId.id.toString())
       .first();
@@ -29,7 +29,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   async getCouponCollection(): Promise<Coupon[]> {
     const {db} = this;
 
-    const couponsRows = await db('coupons');
+    const couponsRows = await db(TABLES.COUPONS);
 
     return couponsRows.reduce((aggregator: any[], t) => {
       aggregator.push(CouponMap.toDomain(t));
@@ -82,7 +82,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
     const data = CouponMap.toPersistence(coupon);
 
-    await db('coupons').insert(data);
+    await db(TABLES.COUPONS).insert(data);
 
     return this.getCouponById(coupon.reductionId);
   }

@@ -14,14 +14,20 @@ type Invoice {
   payer: Payer
 }
 
+input AddressInput {
+  city: String
+  country: String
+  addressLine1: String
+}
+
 input PayerInput {
+  id: String
   type: PayerType
   name: String
-  city: String
   email: String
-  country: String
-  billingAddress: String
   organization: String
+  vatId: String
+  address: AddressInput
 }
 
 enum PayerType {
@@ -33,11 +39,15 @@ type Payer {
   id: String
   type: PayerType
   name: String
-  city: String
   email: String
-  country: String
-  billingAddress: String
   organization: String
+  address: Address
+}
+
+type Address {
+  city: String
+  country: String
+  addressLine1: String
 }
 
 type Query {
@@ -46,7 +56,7 @@ type Query {
 }
 
 type Mutation {
-  updateInvoicePayer(payerId: String!, payer: PayerInput!): Payer!
+  confirmInvoice(payer: PayerInput!): Payer!
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: String!): Boolean
 }

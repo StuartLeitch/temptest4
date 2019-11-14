@@ -1,7 +1,13 @@
-import {UniqueEntityID, Article, ArticleId, ArticleMap} from '../../../../shared';
-import {Knex} from '../../../../infrastructure/database/knex';
+import {
+  Article,
+  ArticleId,
+  ArticleMap,
+  UniqueEntityID
+} from '../../../../shared';
+import {Knex, TABLES} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
+
 import {ArticleRepoContract} from '../articleRepo';
 
 export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
@@ -12,7 +18,7 @@ export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
         new UniqueEntityID(manuscriptId)
       ).getValue();
     }
-    const articleData = await this.db('articles')
+    const articleData = await this.db(TABLES.ARTICLES)
       .select()
       .where('id', manuscriptId.id.toString())
       .first();
@@ -31,7 +37,7 @@ export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
   async save(article: Article): Promise<Article> {
     const {db} = this;
 
-    await db('articles').insert(ArticleMap.toPersistence(article));
+    await db(TABLES.ARTICLES).insert(ArticleMap.toPersistence(article));
 
     return article;
   }

@@ -1,10 +1,10 @@
-import { Knex } from '../../../../infrastructure/database/knex';
-import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import {Knex, TABLES} from '../../../../infrastructure/database/knex';
+import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 
-import { JournalId } from './../../domain/JournalId';
-import { CatalogMap } from './../../mappers/CatalogMap';
-import { CatalogRepoContract } from './../catalogRepo';
-import { CatalogItem } from './../../domain/CatalogItem';
+import {JournalId} from './../../domain/JournalId';
+import {CatalogRepoContract} from './../catalogRepo';
+import {CatalogMap} from './../../mappers/CatalogMap';
+import {CatalogItem} from './../../domain/CatalogItem';
 
 export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {
@@ -15,7 +15,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   async save(catalogItem: CatalogItem): Promise<CatalogItem> {
     const { db } = this;
 
-    await db('catalog').insert(CatalogMap.toPersistence(catalogItem));
+    await db(TABLES.CATALOG).insert(CatalogMap.toPersistence(catalogItem));
 
     return catalogItem;
   }
@@ -23,7 +23,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   async getCatalogCollection(): Promise<CatalogItem[]> {
     const { db } = this;
 
-    const catalogsRows = await db('catalog');
+    const catalogsRows = await db(TABLES.CATALOG);
 
     return catalogsRows.reduce((aggregator: any[], t) => {
       aggregator.push(CatalogMap.toDomain(t));
@@ -34,16 +34,16 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   async getCatalogItemByType(type = 'APC'): Promise<CatalogItem> {
     const { db } = this;
 
-    return await db('catalog')
-      .where({ type })
+    return await db(TABLES.CATALOG)
+      .where({type})
       .first();
   }
 
   async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
     const { db } = this;
 
-    return await db('catalog')
-      .where({ journalId: journalId.id.toString() })
+    return await db(TABLES.CATALOG)
+      .where({journal_id: journalId.id.toString()})
       .first();
   }
 }

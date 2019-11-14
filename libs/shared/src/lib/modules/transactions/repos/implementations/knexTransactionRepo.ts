@@ -1,6 +1,4 @@
-// import {Knex} from '@hindawi/shared';
-import Knex from 'knex'
-
+import {Knex, TABLES} from '@hindawi/shared';
 import {Transaction} from '../../domain/Transaction';
 import {TransactionId} from '../../domain/TransactionId';
 import {TransactionMap} from '../../mappers/TransactionMap';
@@ -15,7 +13,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   async getTransactionById(transactionId: TransactionId): Promise<Transaction> {
     const {db} = this;
 
-    const transactionRow = await db('transactions')
+    const transactionRow = await db(TABLES.TRANSACTIONS)
       .select()
       .where('id', transactionId.id.toString())
       .first();
@@ -26,7 +24,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   async getTransactionByInvoiceId(invoiceId: InvoiceId): Promise<Transaction> {
     const {db} = this;
 
-    const transactionRow = await db('transactions')
+    const transactionRow = await db(TABLES.TRANSACTIONS)
       .select()
       .where('invoice_id', invoiceId.id.toString())
       .first();
@@ -37,7 +35,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   async getTransactionCollection(): Promise<Transaction[]> {
     const {db} = this;
 
-    const transactionsRows = await db('transactions');
+    const transactionsRows = await db(TABLES.TRANSACTIONS);
 
     return transactionsRows.reduce((aggregator: any[], t) => {
       aggregator.push(TransactionMap.toDomain(t));
@@ -48,7 +46,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   async delete(transaction: Transaction): Promise<unknown> {
     const {db} = this;
 
-    const deletedRows = await db('transactions')
+    const deletedRows = await db(TABLES.TRANSACTIONS)
       .where('id', transaction.id.toString())
       .update({...TransactionMap.toPersistence(transaction), deleted: 1});
 
@@ -65,7 +63,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   async update(transaction: Transaction): Promise<Transaction> {
     const {db} = this;
 
-    const updated = await db('transactions')
+    const updated = await db(TABLES.TRANSACTIONS)
       .where({id: transaction.id.toString()})
       .update(TransactionMap.toPersistence(transaction));
 
@@ -90,7 +88,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
 
     const data = TransactionMap.toPersistence(transaction);
 
-    await db('transactions').insert(data);
+    await db(TABLES.TRANSACTIONS).insert(data);
 
     return this.getTransactionById(transaction.transactionId);
   }
