@@ -10,11 +10,11 @@ import {
   PayerPersistenceDTO
 } from '@hindawi/shared';
 
-import {Resolvers} from '../schema';
-import {Context} from '../../context';
+import { Resolvers } from '../schema';
+import { Context } from '../../context';
 
-import {CreateAddress} from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
-import {ChangeInvoiceStatus} from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
+import { CreateAddress } from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
+import { ChangeInvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
 
 export const payerResolvers: Resolvers<Context> = {
   Query: {},
@@ -25,9 +25,9 @@ export const payerResolvers: Resolvers<Context> = {
       let updatedPayer: Payer;
       let invoice: Invoice;
 
-      const {repos, vatService} = context;
-      const usecaseContext = {roles: [Roles.PAYER]};
-      const {payer} = args;
+      const { repos, vatService } = context;
+      const usecaseContext = { roles: [Roles.PAYER] };
+      const { payer } = args;
       console.log('the payer -> ', payer);
 
       const createAddressUseCase = new CreateAddress(repos.address);
@@ -41,7 +41,7 @@ export const payerResolvers: Resolvers<Context> = {
         });
 
         if (!vatResult.valid) {
-          return new Error('VAT number not valid.');
+          console.log(`VAT ${payer.vatId} is not valid.`);
         }
       }
 
