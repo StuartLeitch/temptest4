@@ -1,11 +1,14 @@
 import Knex from 'knex';
-import {Config} from '../../config';
+import { Config } from '../../config';
 
 export async function makeDb(config: Config): Promise<Knex> {
   const knex = Knex({
     client: 'pg',
     migrations: {
       directory: config.dbMigrationsDir
+    },
+    seeds: {
+      directory: config.dbSeedsDir
     },
     connection: {
       host: config.dbHost,
@@ -16,6 +19,10 @@ export async function makeDb(config: Config): Promise<Knex> {
   });
 
   await knex.migrate.latest();
+
+  // ! Disable seeding for now
+  // await knex.seed.run();
+
   return knex;
 }
 

@@ -1,10 +1,10 @@
-import {Knex} from '../../../../infrastructure/database/knex';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+import { Knex } from '../../../../infrastructure/database/knex';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 
-import {JournalId} from './../../domain/JournalId';
-import {CatalogMap} from './../../mappers/CatalogMap';
-import {CatalogRepoContract} from './../catalogRepo';
-import {CatalogItem} from './../../domain/CatalogItem';
+import { JournalId } from './../../domain/JournalId';
+import { CatalogMap } from './../../mappers/CatalogMap';
+import { CatalogRepoContract } from './../catalogRepo';
+import { CatalogItem } from './../../domain/CatalogItem';
 
 export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {
@@ -13,7 +13,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async save(catalogItem: CatalogItem): Promise<CatalogItem> {
-    const {db} = this;
+    const { db } = this;
 
     await db('catalog').insert(CatalogMap.toPersistence(catalogItem));
 
@@ -21,7 +21,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async getCatalogCollection(): Promise<CatalogItem[]> {
-    const {db} = this;
+    const { db } = this;
 
     const catalogsRows = await db('catalog');
 
@@ -32,18 +32,18 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async getCatalogItemByType(type = 'APC'): Promise<CatalogItem> {
-    const {db} = this;
+    const { db } = this;
 
     return await db('catalog')
-      .where({type})
+      .where({ type })
       .first();
   }
 
   async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
-    const {db} = this;
+    const { db } = this;
 
     return await db('catalog')
-      .where({journal_id: journalId.id.toString()})
+      .where({ journalId: journalId.id.toString() })
       .first();
   }
 }

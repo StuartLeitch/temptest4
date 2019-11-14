@@ -1,12 +1,12 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
-import {JournalId} from '../domain/JournalId';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
+import { JournalId } from '../domain/JournalId';
 
 export interface CatalogItemProps {
   type: string;
-  price: number;
+  amount: number;
   journalId: JournalId;
 }
 
@@ -36,8 +36,8 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
     return this.props.type;
   }
 
-  public get price(): number {
-    return this.props.price;
+  public get amount(): number {
+    return this.props.amount;
   }
 
   public get journalId(): JournalId {

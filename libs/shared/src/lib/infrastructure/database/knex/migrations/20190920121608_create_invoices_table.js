@@ -7,7 +7,7 @@ module.exports.up = async function(knex) {
       table.integer('charge').defaultTo(0);
       table.integer('vat').defaultTo(0);
       table.integer('deleted').defaultsTo(0);
-      table.datetime('dateCreated', {precision: 2, useTz: false}); //.defaultTo(knex.fn.now(2));
+      table.datetime('dateCreated', { precision: 2, useTz: false }); //.defaultTo(knex.fn.now(2));
     })
     .then(function() {
       return knex.schema.createTable('waivers', function(table) {
