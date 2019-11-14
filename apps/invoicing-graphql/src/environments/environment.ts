@@ -17,10 +17,11 @@ export const environment = {
     'https://sqs.eu-west-1.amazonaws.com/496598730381/invoicing-dev',
   AWS_SQS_QUEUE_NAME: 'invoicing-dev',
 
-  DB_HOST: 'aaqq6wxw5rhdo4.caews8gzu4su.eu-west-1.rds.amazonaws.com',
+  DB_HOST: 'dev-invoicing-graphql.caews8gzu4su.eu-west-1.rds.amazonaws.com',
   DB_USERNAME: 'invoicingSandbox',
-  DB_PASSWORD: 'invoicingDevelopment',
   DB_DATABASE: 'ebdb',
   DB_MIGRATIONS_DIR:
-    '../../../libs/shared/src/lib/infrastructure/database/knex/migrations'
+    '../../../libs/shared/src/lib/infrastructure/database/knex/migrations',
+  DB_SEEDS_DIR:
+    '../../../libs/shared/src/lib/infrastructure/database/knex/seeds'
 };

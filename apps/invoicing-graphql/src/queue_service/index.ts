@@ -1,7 +1,12 @@
 const logger = require('@pubsweet/logger');
-const {createQueueService} = require('@hindawi/queue-service');
+const { createQueueService } = require('@hindawi/queue-service');
 
-import {environment} from '@env/environment';
+import { makeDb } from '../services/knex';
+import { makeConfig } from '../config';
+import { makeContext } from '../context';
+
+import { environment } from '@env/environment';
+import * as eventHandlers from './handlers';
 
 const config = {
   accessKeyId: process.env.AWS_SNS_SQS_ACCESS_KEY,
@@ -16,13 +21,21 @@ const config = {
   serviceName: environment.SERVICE_NAME
 };
 
-const events = {};
-
 export const queueService = createQueueService(config)
-  .then((messageQueue: any) => {
-    Object.keys(events).forEach((handler, event) =>
-      messageQueue.registerEventHandler({event, handler})
-    );
+  .then(async (messageQueue: any) => {
+    const queueServiceConfig = await makeConfig();
+    const db = await makeDb(queueServiceConfig);
+    const context = makeContext(queueServiceConfig, db);
+
+    Object.keys(eventHandlers).forEach((eventHandler: string) => {
+      const { handler, event } = eventHandlers[eventHandler];
+
+      messageQueue.registerEventHandler({
+        event,
+        handler: handler.bind(context)
+      });
+    });
+
     return messageQueue;
   })
   .catch((err: any) => {

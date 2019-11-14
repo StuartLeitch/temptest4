@@ -1,38 +1,38 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result, left, right} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result, left, right } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 // import {TextUtils} from '../../../../utils/TextUtils';
 
-import {AppError} from '../../../../core/logic/AppError';
-import {CreateTransactionResponse} from './createTransactionResponse';
-import {CreateTransactionErrors} from './createTransactionErrors';
+import { AppError } from '../../../../core/logic/AppError';
+import { CreateTransactionResponse } from './createTransactionResponse';
+import { CreateTransactionErrors } from './createTransactionErrors';
 
 import {
   Transaction,
   STATUS as TransactionStatus
 } from '../../domain/Transaction';
-import {TransactionRepoContract} from '../../repos/transactionRepo';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
 // import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
 // import {Article} from '../../../articles/domain/Article';
 // import {ArticleId} from '../../../articles/domain/ArticleId';
-import {Invoice, InvoiceStatus} from './../../../invoices/domain/Invoice';
-import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
-import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
-import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
-import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
+import { Invoice, InvoiceStatus } from './../../../invoices/domain/Invoice';
+import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
+import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 
-import {JournalId} from './../../../journals/domain/JournalId';
-import {CatalogItem} from './../../../journals/domain/CatalogItem';
-import {CatalogRepoContract} from './../../../journals/repos/catalogRepo';
+import { JournalId } from './../../../journals/domain/JournalId';
+import { CatalogItem } from './../../../journals/domain/CatalogItem';
+import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 
 import {
   Authorize,
   AccessControlledUsecase,
   AuthorizationContext
 } from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 
 export interface CreateTransactionRequestDTO {
   manuscriptId?: string;
@@ -137,10 +137,12 @@ export class CreateTransactionUsecase
         );
       }
 
-      const {price} = catalogItem;
+      console.info(catalogItem);
+
+      const { amount } = catalogItem;
 
       // * Set price for the Invoice Item
-      invoiceItem.price = price;
+      invoiceItem.price = amount;
 
       await this.invoiceItemRepo.save(invoiceItem);
 

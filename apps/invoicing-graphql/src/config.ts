@@ -1,14 +1,16 @@
 import path from 'path';
-import {environment} from '@env/environment';
+import { environment } from '@env/environment';
 
 const dbConfig = {
   dbUser: process.env.DB_USERNAME || environment.DB_USERNAME,
   dbHost: process.env.DB_HOST || environment.DB_HOST,
   dbDatabase: process.env.DB_DATABASE || environment.DB_DATABASE,
-  dbPassword: process.env.DB_PASSWORD || environment.DB_PASSWORD,
+  dbPassword: process.env.DB_PASSWORD,
   dbMigrationsDir:
     process.env.DB_MIGRATIONS_DIR ||
-    path.join(__dirname, environment.DB_MIGRATIONS_DIR)
+    path.join(__dirname, environment.DB_MIGRATIONS_DIR),
+  dbSeedsDir:
+    process.env.DB_SEEDS_DIR || path.join(__dirname, environment.DB_SEEDS_DIR)
 };
 
 export class Config {
@@ -17,6 +19,7 @@ export class Config {
   dbDatabase: string;
   dbPassword: string;
   dbMigrationsDir: string;
+  dbSeedsDir: string;
 
   constructor() {
     return Object.assign({}, this, dbConfig);
