@@ -1,3 +1,5 @@
+scalar Date
+
 enum InvoiceStatus {
   DRAFT
   ACTIVE
@@ -55,8 +57,23 @@ type Query {
   echo(value: String): String
 }
 
+input CreditCardInput {
+  cardNumber: String!
+  expiration: String!
+  cvv: String!
+}
+
+type Payment {
+  id: String!
+  invoiceId: String
+  paymentMethodId: String
+  amount: Float
+  datePaid: Date
+}
+
 type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: String!): Boolean
+  recordCardPayment(input: CreditCardInput!): Payment!
 }

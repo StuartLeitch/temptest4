@@ -7,13 +7,13 @@ import {
   Roles
 } from '@hindawi/shared';
 
-import {Resolvers, Invoice} from '../schema';
-import {Context} from '../../context';
+import { Resolvers, Invoice } from '../schema';
+import { Context } from '../../context';
 
 export const invoice: Resolvers<Context> = {
   Query: {
     async invoice(parent, args, context) {
-      const {repos} = context;
+      const { repos } = context;
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
@@ -44,7 +44,6 @@ export const invoice: Resolvers<Context> = {
       }
     }
   },
-
   Invoice: {
     async payer(parent: Invoice, args, context) {
       const payer = await context.repos.payer.getPayerByInvoiceId(

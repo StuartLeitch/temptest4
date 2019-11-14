@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
@@ -8,6 +8,7 @@ export type Scalars = {
   Boolean: boolean,
   Int: number,
   Float: number,
+  Date: any,
 };
 
 export type Address = {
@@ -22,6 +23,13 @@ export type AddressInput = {
   country?: Maybe<Scalars['String']>,
   addressLine1?: Maybe<Scalars['String']>,
 };
+
+export type CreditCardInput = {
+  cardNumber: Scalars['String'],
+  expiration: Scalars['String'],
+  cvv: Scalars['String'],
+};
+
 
 export type Invoice = {
    __typename?: 'Invoice',
@@ -45,6 +53,7 @@ export type Mutation = {
   confirmInvoice: Payer,
   createInvoice?: Maybe<Invoice>,
   deleteInvoice?: Maybe<Scalars['Boolean']>,
+  recordCardPayment: Payment,
 };
 
 
@@ -60,6 +69,11 @@ export type MutationCreateInvoiceArgs = {
 
 export type MutationDeleteInvoiceArgs = {
   id: Scalars['String']
+};
+
+
+export type MutationRecordCardPaymentArgs = {
+  input: CreditCardInput
 };
 
 export type Payer = {
@@ -86,6 +100,15 @@ export enum PayerType {
   INSTITUTION = 'INSTITUTION',
   INDIVIDUAL = 'INDIVIDUAL'
 }
+
+export type Payment = {
+   __typename?: 'Payment',
+  id: Scalars['String'],
+  invoiceId?: Maybe<Scalars['String']>,
+  paymentMethodId?: Maybe<Scalars['String']>,
+  amount?: Maybe<Scalars['Float']>,
+  datePaid?: Maybe<Scalars['Date']>,
+};
 
 export type Query = {
    __typename?: 'Query',
@@ -186,6 +209,9 @@ export type ResolversTypes = {
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
+  CreditCardInput: CreditCardInput,
+  Payment: ResolverTypeWrapper<Payment>,
+  Date: ResolverTypeWrapper<Scalars['Date']>,
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -202,6 +228,9 @@ export type ResolversParentTypes = {
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Boolean: Scalars['Boolean'],
+  CreditCardInput: CreditCardInput,
+  Payment: Payment,
+  Date: Scalars['Date'],
 };
 
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
@@ -209,6 +238,10 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
+
+export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
+  name: 'Date'
+}
 
 export type InvoiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Invoice'] = ResolversParentTypes['Invoice']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -224,6 +257,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
+  recordCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordCardPaymentArgs, 'input'>>,
 };
 
 export type PayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payer'] = ResolversParentTypes['Payer']> = {
@@ -235,6 +269,14 @@ export type PayerResolvers<ContextType = any, ParentType extends ResolversParent
   address?: Resolver<Maybe<ResolversTypes['Address']>, ParentType, ContextType>,
 };
 
+export type PaymentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  paymentMethodId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  amount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  datePaid?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
@@ -242,9 +284,11 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type Resolvers<ContextType = any> = {
   Address?: AddressResolvers<ContextType>,
+  Date?: GraphQLScalarType,
   Invoice?: InvoiceResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Payer?: PayerResolvers<ContextType>,
+  Payment?: PaymentResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
 };
 
