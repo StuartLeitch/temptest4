@@ -14,7 +14,11 @@ const PAYMENT_METHODS = {
   bankTransfer: "bankTransfer",
 };
 
-interface Props {}
+interface Props {
+  loading: boolean;
+  error: string;
+  onSubmit: any;
+}
 
 const validateFn = values => {
   if (values.paymentMethod === PAYMENT_METHODS.paypal) return {};
@@ -34,20 +38,23 @@ const validateFn = values => {
   return errors;
 };
 
-const InvoicePayment: React.FunctionComponent<Props> = () => {
+const InvoicePayment: React.FunctionComponent<Props> = ({
+  loading,
+  onSubmit,
+}) => {
   return (
     <Expander title="2. Invoice & Payment">
       <Formik
         validate={validateFn}
         initialValues={{ paymentMethod: null }}
-        onSubmit={values => console.log("the values")}
+        onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values }) => {
           return (
             <Root>
               <ChoosePayment setFieldValue={setFieldValue} values={values} />
               {values.paymentMethod === PAYMENT_METHODS.creditCard && (
-                <CreditCardForm handleSubmit={handleSubmit} />
+                <CreditCardForm handleSubmit={handleSubmit} loading={loading} />
               )}
               {values.paymentMethod === PAYMENT_METHODS.bankTransfer && (
                 <BankTransfer />

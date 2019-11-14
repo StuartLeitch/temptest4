@@ -1,7 +1,7 @@
 import { createSelector } from "reselect";
 import { RootState } from "typesafe-actions";
 
-import { Invoice, InvoiceState } from "./types";
+import { InvoiceState } from "./types";
 
 const _getInvoice = (state: RootState): InvoiceState =>
   state.invoice as InvoiceState;
@@ -34,4 +34,14 @@ export const payerError = createSelector(
 export const payerLoading = createSelector(
   _getInvoice,
   (invoiceSlice: InvoiceState) => invoiceSlice.payerLoading.loading,
+);
+
+export const paymentError = createSelector(
+  _getInvoice,
+  (invoiceSlice: InvoiceState) => invoiceSlice.paymentLoading.error,
+);
+
+export const paymentLoading = createSelector(
+  _getInvoice,
+  (invoiceSlice: InvoiceState) => invoiceSlice.paymentLoading.loading,
 );

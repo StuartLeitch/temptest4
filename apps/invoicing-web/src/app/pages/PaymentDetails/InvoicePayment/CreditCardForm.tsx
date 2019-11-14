@@ -1,19 +1,23 @@
 import React from "react";
 import styled from "styled-components";
 import {
-  Button,
-  Expander,
-  Label,
   Flex,
+  Label,
+  Loader,
+  Button,
   FormField,
   th,
 } from "@hindawi/react-components";
 
 interface Props {
   handleSubmit: any;
+  loading: boolean;
 }
 
-const CreditCardForm: React.FunctionComponent<Props> = ({ handleSubmit }) => (
+const CreditCardForm: React.FunctionComponent<Props> = ({
+  loading,
+  handleSubmit,
+}) => (
   <Flex vertical>
     <Label>Credit Card Details</Label>
     <CardContainer mt={2}>
@@ -21,7 +25,8 @@ const CreditCardForm: React.FunctionComponent<Props> = ({ handleSubmit }) => (
       <FormField required label="Expiration Date" name="expiration" mr={4} />
       <FormField required label="CVV" name="cvv" mr={4} />
       <FormField label="Postal Code" name="postalCode" mr={4} />
-      <Button mb={2} size="medium" onClick={handleSubmit}>
+
+      <Button mb={2} size="medium" onClick={handleSubmit} loading={loading}>
         Pay
       </Button>
     </CardContainer>

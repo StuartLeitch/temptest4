@@ -22,8 +22,11 @@ interface Props {
   invoice: invoiceTypes.Invoice | null;
   payerError: string;
   payerLoading: boolean;
+  paymentError: string;
+  paymentLoading: boolean;
   getInvoice(id: string): any;
   updatePayer(payer: any): any;
+  payWithCard(): any;
 }
 
 const articleDetails = {
@@ -62,13 +65,18 @@ const charges = {
 };
 
 const PaymentDetails: React.FunctionComponent<Props> = ({
+  getInvoice,
   invoice,
   invoiceError,
   invoiceLoading,
+  //
+  updatePayer,
   payerError,
   payerLoading,
-  getInvoice,
-  updatePayer,
+  //
+  payWithCard,
+  paymentError,
+  paymentLoading,
 }) => {
   const { invoiceId } = useParams();
   useEffect(() => {
@@ -107,7 +115,11 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 handleSubmit={updatePayer}
                 loading={payerLoading}
               />
-              <InvoicePayment />
+              <InvoicePayment
+                error={paymentError}
+                onSubmit={payWithCard}
+                loading={paymentLoading}
+              />
             </FormsContainer>
           );
         })()}
@@ -131,6 +143,8 @@ const mapStateToProps = (state: RootState) => ({
   invoiceLoading: invoiceSelectors.invoiceLoading(state),
   payerError: invoiceSelectors.payerError(state),
   payerLoading: invoiceSelectors.payerLoading(state),
+  paymentError: invoiceSelectors.paymentError(state),
+  paymentLoading: invoiceSelectors.paymentLoading(state),
 });
 
 export default connect(
@@ -138,6 +152,7 @@ export default connect(
   {
     getInvoice: invoiceActions.getInvoice.request,
     updatePayer: invoiceActions.updatePayerAsync.request,
+    payWithCard: invoiceActions.recordCardPayment.request,
   },
 )(PaymentDetails);
 

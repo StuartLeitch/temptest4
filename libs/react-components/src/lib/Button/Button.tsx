@@ -1,7 +1,7 @@
-import React, {useRef, useEffect, useState} from 'react';
-import {SpaceProps, LayoutProps, FlexboxProps} from 'styled-system';
+import React, { useRef, useEffect, useState } from 'react';
+import { SpaceProps, LayoutProps, FlexboxProps } from 'styled-system';
 
-import {Button as Root} from './Button.styles';
+import { Button as Root } from './Button.styles';
 import Loader from '../Loader';
 
 type ButtonSizes = 'large' | 'medium' | 'small';
@@ -35,13 +35,13 @@ const Button: React.FunctionComponent<Props> = ({
   return (
     <Root
       ref={btnRef}
-      role="button"
+      role='button'
       minWidth={btnWidth}
       disabled={disabled}
       onClick={loading ? null : onClick}
       {...rest}
     >
-      {!disabled && loading ? <Loader /> : children}
+      {!disabled && loading ? <Loader size={4} /> : children}
     </Root>
   );
 };
