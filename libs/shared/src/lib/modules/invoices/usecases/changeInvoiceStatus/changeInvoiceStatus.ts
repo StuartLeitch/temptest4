@@ -8,6 +8,7 @@ import {Invoice} from '../../domain/Invoice';
 import {InvoiceId} from '../../domain/InvoiceId';
 import {InvoiceStatus} from '../../domain/Invoice';
 import {InvoiceRepoContract} from '../../repos/invoiceRepo';
+import {ChangeInvoiceStatusErrors} from './changeInvoiceStatusErrors';
 
 import {ChangeInvoiceStatusResponse} from './changeInvoiceStatusResponse';
 
@@ -27,13 +28,26 @@ export class ChangeInvoiceStatus
   public async execute(
     request: ChangeInvoiceStatusRequestDTO
   ): Promise<ChangeInvoiceStatusResponse> {
+    let invoice: Invoice;
     try {
-      const invoice = await this.invoiceRepo.getInvoiceById(
-        InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
-      );
+      try {
+        invoice = await this.invoiceRepo.getInvoiceById(
+          InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
+        );
+      } catch (err) {
+        return left(
+          new ChangeInvoiceStatusErrors.InvoiceNotFoundError(request.invoiceId)
+        );
+      }
 
-      invoice.status = InvoiceStatus[request.status];
-      await this.invoiceRepo.update(invoice);
+      try {
+        invoice.status = InvoiceStatus[request.status];
+        await this.invoiceRepo.update(invoice);
+      } catch (err) {
+        return left(
+          new ChangeInvoiceStatusErrors.ChangeStatusError(request.invoiceId)
+        );
+      }
 
       return right(Result.ok<Invoice>(invoice));
     } catch (err) {
