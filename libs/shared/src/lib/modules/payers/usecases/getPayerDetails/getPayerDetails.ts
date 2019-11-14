@@ -40,7 +40,6 @@ export class GetPayerDetailsUsecase
     > {
   constructor(private payerRepo: PayerRepoContract) {}
 
-  @Authorize('payer:read')
   public async execute(
     request: GetPayerDetailsDTO,
     context?: GetPayerDetailsContext
@@ -52,7 +51,7 @@ export class GetPayerDetailsUsecase
             id: 'payer-1',
             type: PayerType.INDIVIDUAL,
             name: 'Darth Vader',
-            invoiceId: ''
+            invoiceId: '40ec4344-d2c9-48f9-ad82-cbf101b9e9a1'
           })
         )
       )

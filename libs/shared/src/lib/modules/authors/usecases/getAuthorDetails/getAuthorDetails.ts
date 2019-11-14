@@ -38,7 +38,6 @@ export class GetAuthorDetailsUsecase
     > {
   constructor() {}
 
-  @Authorize('author:read')
   public async execute(
     request: GetAuthorDetailsDTO,
     context?: GetAuthorDetailsContext

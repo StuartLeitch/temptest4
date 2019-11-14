@@ -40,7 +40,6 @@ export class GetArticleDetailsUsecase
     > {
   constructor() {}
 
-  @Authorize('article:read')
   public async execute(
     request: GetArticleDetailsDTO,
     context?: GetArticleDetailsContext
@@ -51,7 +50,8 @@ export class GetArticleDetailsUsecase
           ArticleMap.toDomain({
             id: 'article-1',
             title: 'The strange case of John Doe and Jane Doe',
-            articleTypeId: 'type-1'
+            articleTypeId: 'type-1',
+            authorSurname: 'John Doe'
           })
         )
       )

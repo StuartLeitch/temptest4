@@ -1,6 +1,6 @@
 import express, {response} from 'express';
 import {Context} from '../context';
-import {RecordPayment} from '@hindawi/shared';
+import {RecordPayment, Roles, GetInvoicePdfUsecase} from '@hindawi/shared';
 import {AuthMiddleware} from './middleware/auth';
 
 export function makeExpressServer(context: Context) {
@@ -37,20 +37,26 @@ export function makeExpressServer(context: Context) {
     res.status(200).json(req.auth);
   });
 
-  app.get('/api/invoice/:invoiceId', async (req, res) => {
-    const {invoicePdfService} = context;
+  app.get('/api/invoice/:payerId', async (req, res) => {
+    const {repos} = context;
+    const authContext = {roles: [Roles.PAYER]};
 
-    const pdfResult = await invoicePdfService.getPdf(req.params.invoiceId);
+    const usecase = new GetInvoicePdfUsecase(repos.invoice, repos.payer);
+    const pdfEither = await usecase.execute(
+      {payerId: req.params.payerId},
+      authContext
+    );
 
-    if ('isLeft' in pdfResult) {
-      return res.status(400).send(pdfResult.value.errorValue());
+    if (pdfEither.isLeft()) {
+      return res.status(400).send(pdfEither.value.errorValue());
     } else {
+      const value = pdfEither.value.getValue();
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename=${req.params.invoiceId}.pdf`,
-        'Content-Length': pdfResult.length
+        'Content-Length': value.length
       });
-      res.end(pdfResult);
+      res.end(value);
     }
   });
 

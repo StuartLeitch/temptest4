@@ -51,6 +51,8 @@ export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
 export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
+export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
+export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';

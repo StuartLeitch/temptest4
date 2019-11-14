@@ -1,1 +1,0 @@
-export {InvoicePdfService} from './InvoicePdf';

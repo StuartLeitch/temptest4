@@ -11,7 +11,6 @@ import {
 import {Config} from './config';
 import {CheckoutService} from './services/checkout';
 import {AuthService} from './services/auth';
-import {InvoicePdfService} from './services/InvoicePdf';
 
 export interface ReposContext {
   invoice: KnexInvoiceRepo;
@@ -27,7 +26,6 @@ export interface Context {
   authService: AuthService;
   vatService: VATService;
   waiverService: WaiverService;
-  invoicePdfService: InvoicePdfService;
 }
 
 export function makeContext(config: Config, db: Knex): Context {
@@ -41,7 +39,6 @@ export function makeContext(config: Config, db: Knex): Context {
 
   return {
     repos,
-    invoicePdfService: new InvoicePdfService(repos.invoice, repos.payer),
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),
     vatService: new VATService(),
