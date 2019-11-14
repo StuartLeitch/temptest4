@@ -128,7 +128,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                     label="Institution name"
                     name="organization"
                   />
-                  <FormField label="EC VAT Reg. No" name="vat" flex={1} />
+                  <FormField label="EC VAT Reg. No" name="vatId" flex={1} />
                 </Flex>
               )}
 

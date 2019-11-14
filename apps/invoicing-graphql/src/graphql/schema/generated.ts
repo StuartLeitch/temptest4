@@ -78,6 +78,7 @@ export type PayerInput = {
   name?: Maybe<Scalars['String']>,
   email?: Maybe<Scalars['String']>,
   organization?: Maybe<Scalars['String']>,
+  vatId?: Maybe<Scalars['String']>,
   address?: Maybe<AddressInput>,
 };
 

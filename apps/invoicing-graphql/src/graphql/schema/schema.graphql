@@ -26,6 +26,7 @@ input PayerInput {
   name: String
   email: String
   organization: String
+  vatId: String
   address: AddressInput
 }
 

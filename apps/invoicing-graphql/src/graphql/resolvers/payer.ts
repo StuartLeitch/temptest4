@@ -25,7 +25,7 @@ export const payerResolvers: Resolvers<Context> = {
       let updatedPayer: Payer;
       let invoice: Invoice;
 
-      const {repos} = context;
+      const {repos, vatService} = context;
       const usecaseContext = {roles: [Roles.PAYER]};
       const {payer} = args;
       console.log('the payer -> ', payer);
@@ -33,6 +33,17 @@ export const payerResolvers: Resolvers<Context> = {
       const createAddressUseCase = new CreateAddress(repos.address);
       const updatePayerUseCase = new UpdatePayerUsecase(repos.payer);
       const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(repos.invoice);
+
+      if (payer.type === 'INSTITUTION') {
+        const vatResult = await vatService.checkVAT({
+          countryCode: payer.address.country,
+          vatNumber: payer.vatId
+        });
+
+        if (!vatResult.valid) {
+          return new Error('VAT number not valid.');
+        }
+      }
 
       const addressResult = await createAddressUseCase.execute({
         city: payer.address.city,
@@ -49,6 +60,8 @@ export const payerResolvers: Resolvers<Context> = {
         type: payer.type,
         name: payer.name,
         email: payer.email,
+        vatId: payer.vatId,
+        organization: payer.organization || ' ',
         addressId: address.id.toString()
       };
 

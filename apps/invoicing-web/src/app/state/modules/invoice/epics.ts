@@ -24,7 +24,9 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
     switchMap(action =>
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
-    map(r => getInvoice.success(r.data.data.invoice)),
+    map(r => {
+      return getInvoice.success(r.data.invoice);
+    }),
     catchError(err => of(getInvoice.failure(err.message))),
   );
 };
@@ -41,11 +43,13 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
     mergeMap(([r, invoice]) => {
       return from([
         modalActions.hideModal(),
-        updatePayerAsync.success(r.data.data.updateInvoicePayer),
+        updatePayerAsync.success(r.data.updateInvoicePayer),
         getInvoice.request(invoice.id),
       ]);
     }),
-    catchError(err => mapTo(updatePayerAsync.failure(err.message))),
+    catchError(err => {
+      return of(updatePayerAsync.failure(err.message));
+    }),
   );
 };
 

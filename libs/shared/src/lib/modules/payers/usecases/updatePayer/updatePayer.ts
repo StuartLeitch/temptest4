@@ -4,7 +4,7 @@ import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
 import {Result, left, right} from '../../../../core/logic/Result';
 
 import {PayerId} from '../../domain/PayerId';
-import {PayerMap} from '../../mapper/Payer';
+import {Name} from '../../../../domain/Name';
 import {Email} from '../../../../domain/Email';
 import {PayerName} from '../../domain/PayerName';
 import {Payer, PayerType} from '../../domain/Payer';
@@ -27,6 +27,8 @@ export interface UpdatePayerRequestDTO {
   name: string;
   email: string;
   addressId: string;
+  vadId?: string;
+  organization?: string;
 }
 
 export type UpdatePayerContext = AuthorizationContext<Roles>;
@@ -76,19 +78,18 @@ export class UpdatePayerUsecase
     context?: UpdatePayerContext
   ): Promise<UpdatePayerResponse> {
     const payerOrError = await this.getPayer(request);
-
     if (payerOrError.isFailure) {
       return left(new AppError.UnexpectedError(payerOrError.errorValue()));
     }
 
-    // * System retrieves payer details
     const payer = payerOrError.getValue();
 
-    // * This is where all the magic happens
     payer.setProperties({
+      VATId: request.vadId,
       type: PayerType[request.type],
       name: PayerName.create(request.name).getValue(),
       email: Email.create({value: request.email}).getValue(),
+      organization: Name.create({value: request.organization}).getValue(),
       billingAddressId: AddressId.create(new UniqueEntityID(request.addressId))
     });
 
