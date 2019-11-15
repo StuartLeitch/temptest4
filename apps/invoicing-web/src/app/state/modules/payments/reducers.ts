@@ -9,7 +9,13 @@ const initialState: PaymentsSlice = {
   methods: [],
 };
 
-const payments = createReducer(initialState);
+const payments = createReducer(initialState).handleAction(
+  getPaymentMethods.success,
+  (state, action) => ({
+    ...state,
+    methods: action.payload,
+  }),
+);
 
 const getMethodsLoading = createLoadingReducer(getPaymentMethods);
 

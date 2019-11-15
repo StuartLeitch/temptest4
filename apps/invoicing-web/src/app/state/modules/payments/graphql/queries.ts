@@ -1,11 +1,12 @@
 import gql from "graphql-tag";
 
+import { paymentMethodFragment } from "./fragments";
+
 export const getPaymentMethods = gql`
   query {
     getPaymentMethods {
-      id
-      name
-      active
+      ...paymentMethodFragment
     }
   }
+  ${paymentMethodFragment}
 `;

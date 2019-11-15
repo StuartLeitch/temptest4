@@ -69,7 +69,7 @@ type Payment {
 type PaymentMethod {
   id: String!
   name: String!
-  active: Boolean
+  isActive: Boolean
 }
 
 type Query {

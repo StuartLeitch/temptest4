@@ -13,8 +13,7 @@ const getPaymentsMethodsEpic: RootEpic = (
     filter(isActionOf(getPaymentMethods.request)),
     switchMap(() => graphqlAdapter.send(queries.getPaymentMethods)),
     map(r => {
-      console.log("am primit raspuns!", r);
-      return getPaymentMethods.success(r.data);
+      return getPaymentMethods.success(r.data.getPaymentMethods);
     }),
   );
 };

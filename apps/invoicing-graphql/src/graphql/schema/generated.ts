@@ -114,7 +114,7 @@ export type PaymentMethod = {
    __typename?: 'PaymentMethod',
   id: Scalars['String'],
   name: Scalars['String'],
-  active?: Maybe<Scalars['Boolean']>,
+  isActive?: Maybe<Scalars['Boolean']>,
 };
 
 export type Query = {
@@ -284,7 +284,7 @@ export type PaymentResolvers<ContextType = any, ParentType extends ResolversPare
 export type PaymentMethodResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaymentMethod'] = ResolversParentTypes['PaymentMethod']> = {
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  active?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
+  isActive?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {

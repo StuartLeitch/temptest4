@@ -1,5 +1,6 @@
 import Knex from 'knex';
 import {
+  KnexPaymentMethodRepo,
   KnexAddressRepo,
   KnexInvoiceItemRepo,
   KnexInvoiceRepo,
@@ -21,6 +22,7 @@ export interface ReposContext {
   invoiceItem: KnexInvoiceItemRepo;
   transaction: KnexTransactionRepo;
   payment: KnexPaymentRepo;
+  paymentMethods: KnexPaymentMethodRepo;
   waiver: KnexWaiverRepo;
   payer: KnexPayerRepo;
   catalog: KnexCatalogRepo;
@@ -42,6 +44,7 @@ export function makeContext(config: Config, db: Knex): Context {
       invoiceItem: new KnexInvoiceItemRepo(db),
       transaction: new KnexTransactionRepo(db),
       payment: new KnexPaymentRepo(db),
+      paymentMethods: new KnexPaymentMethodRepo(db),
       waiver: new KnexWaiverRepo(db),
       payer: new KnexPayerRepo(db),
       catalog: new KnexCatalogRepo(db)
