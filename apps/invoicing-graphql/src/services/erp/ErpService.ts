@@ -97,8 +97,8 @@ export class ErpService implements ErpServiceContract {
 
     const name =
       payer.type === PayerType.INDIVIDUAL
-        ? `${payer.name.value} ${article.manuscriptId}`
-        : `${payer.organization.value} ${article.manuscriptId}`;
+        ? `${payer.name.value} ${article.manuscriptId.id.toString()}`
+        : `${payer.organization.value} ${article.manuscriptId.id.toString()}`;
 
     const accountData = {
       'Name': name.slice(0, 70),
