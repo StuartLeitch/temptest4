@@ -1,9 +1,33 @@
+type PaymentType = "INDIVIDUAL" | "INSTITUTION";
+
 export interface Invoice {
   id: string;
+  status: "DRAFT" | "ACTIVE" | "FINAL" | null;
+  payer: Payer | null;
+}
+
+export interface Address {
+  city: string;
+  country: string;
+  addressLine1: string;
+}
+
+export interface Payer {
+  id: string;
+  type: PaymentType;
+  name: string;
+  email: string;
+  organization?: string;
+  address: Address;
+}
+
+export interface LoadingState {
+  loading: boolean;
+  error: string | null;
 }
 
 export interface InvoiceState {
-  invoice: Invoice | null;
-  loading: boolean;
-  error: string | null;
+  invoice: Invoice;
+  payerLoading: LoadingState;
+  invoiceLoading: LoadingState;
 }

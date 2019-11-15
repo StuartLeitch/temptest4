@@ -1,17 +1,17 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
 
 // * Subdomains
-import {InvoiceId} from './InvoiceId';
-import {InvoiceItem} from './InvoiceItem';
-import {InvoiceItems} from './InvoiceItems';
-import {InvoiceSentEvent} from './events/invoiceSent';
-import {InvoicePaidEvent} from './events/invoicePaid';
-import {InvoiceActivated} from './events/invoiceActivated';
-import {TransactionId} from '../../transactions/domain/TransactionId';
-import {PayerId} from '../../payers/domain/PayerId';
+import { InvoiceId } from './InvoiceId';
+import { InvoiceItem } from './InvoiceItem';
+import { InvoiceItems } from './InvoiceItems';
+import { InvoiceSentEvent } from './events/invoiceSent';
+import { InvoicePaidEvent } from './events/invoicePaid';
+import { InvoiceActivated } from './events/invoiceActivated';
+import { TransactionId } from '../../transactions/domain/TransactionId';
+import { PayerId } from '../../payers/domain/PayerId';
 // import {PayerType} from '../../payers/domain/PayerType';
 // import {Coupon} from '../../coupons/domain/Coupon';
 

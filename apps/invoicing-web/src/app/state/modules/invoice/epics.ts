@@ -1,34 +1,56 @@
 import { RootEpic, isActionOf } from "typesafe-actions";
-import { of } from "rxjs";
+import { of, from } from "rxjs";
 import {
   map,
+  delay,
+  mapTo,
   filter,
+  mergeMap,
   switchMap,
   catchError,
-  delay,
-  mergeMap,
+  withLatestFrom,
+  pluck,
 } from "rxjs/operators";
+import { modalActions } from "../../../providers/modal";
 
-import { getInvoice } from "./actions";
-import { queries } from "./graphql";
+import { invoice } from "./selectors";
+import { queries, mutations } from "./graphql";
+import { getInvoice, updatePayerAsync } from "./actions";
 
-import { updatePayerAsync } from "../payer/actions";
-
-const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) =>
-  action$.pipe(
+const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
+  return action$.pipe(
     filter(isActionOf(getInvoice.request)),
     delay(1000),
     switchMap(action =>
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
-    mergeMap(({ data }) => {
-      const payer = data.data.invoice.payer;
-      return [
-        updatePayerAsync.success(payer),
-        getInvoice.success(data.data.invoice),
-      ];
+    map(r => {
+      return getInvoice.success(r.data.invoice);
     }),
     catchError(err => of(getInvoice.failure(err.message))),
   );
+};
 
-export default [fetchInvoiceEpic];
+const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
+  return action$.pipe(
+    filter(isActionOf(updatePayerAsync.request)),
+    switchMap(action => {
+      return graphqlAdapter.send(mutations.confirmInvoice, {
+        payer: action.payload,
+      });
+    }),
+    withLatestFrom(state$.pipe(map(invoice))),
+    mergeMap(([r, invoice]) => {
+      return from([
+        modalActions.hideModal(),
+        updatePayerAsync.success(r.data.updateInvoicePayer),
+        getInvoice.request(invoice.id),
+      ]);
+    }),
+    catchError(err => {
+      return of(updatePayerAsync.failure(err.message));
+    }),
+  );
+};
+
+export default [fetchInvoiceEpic, updatePayerEpic];

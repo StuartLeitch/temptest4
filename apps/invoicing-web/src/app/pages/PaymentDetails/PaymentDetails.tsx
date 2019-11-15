@@ -16,23 +16,14 @@ import {
   invoiceSelectors,
 } from "../../state/modules/invoice";
 
-import {
-  payerTypes,
-  payerActions,
-  payerSelectors,
-} from "../../state/modules/payer";
-
 interface Props {
   invoiceError: string;
   invoiceLoading: boolean;
   invoice: invoiceTypes.Invoice | null;
-  payer: payerTypes.Payer | null;
   payerError: string;
   payerLoading: boolean;
   getInvoice(id: string): any;
-  updatePayer(payer: payerTypes.Payer): any;
-  showModal: any;
-  hideModal: any;
+  updatePayer(payer: any): any;
 }
 
 const articleDetails = {
@@ -74,49 +65,53 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   invoice,
   invoiceError,
   invoiceLoading,
-  getInvoice,
-  // payer
-  payer,
   payerError,
   payerLoading,
+  getInvoice,
   updatePayer,
 }) => {
   const { invoiceId } = useParams();
-
   useEffect(() => {
     getInvoice(invoiceId);
   }, []);
 
-  if (invoiceError) {
-    return (
-      <Flex>
-        <Text type="warning">{invoiceError}</Text>
-      </Flex>
-    );
-  }
-
-  if (invoiceLoading) {
-    return (
-      <Flex alignItems="center" vertical>
-        <Text mb={2}>Fetching invoice...</Text>
-        <Loader size={6} />
-      </Flex>
-    );
-  }
-
   return (
     <Fragment>
       <PaymentHeader articleTitle={articleDetails.title}></PaymentHeader>
+
       <Root>
-        <FormsContainer>
-          <BillingInfo
-            payer={payer}
-            error={payerError}
-            handleSubmit={updatePayer}
-            loading={payerLoading}
-          />
-          <InvoicePayment />
-        </FormsContainer>
+        {(function() {
+          if (invoiceError) {
+            return (
+              <Flex flex={2}>
+                <Text type="warning">{invoiceError}</Text>
+              </Flex>
+            );
+          }
+
+          if (invoiceLoading) {
+            return (
+              <Flex alignItems="center" vertical flex={2}>
+                <Text mb={2}>Fetching invoice...</Text>
+                <Loader size={6} />
+              </Flex>
+            );
+          }
+
+          return (
+            <FormsContainer>
+              <BillingInfo
+                status={invoice.status}
+                payer={invoice.payer}
+                error={payerError}
+                handleSubmit={updatePayer}
+                loading={payerLoading}
+              />
+              <InvoicePayment payer={invoice.payer} />
+            </FormsContainer>
+          );
+        })()}
+
         <Details
           articleDetailsExpanded={true}
           invoiceDetailsExpanded={true}
@@ -134,16 +129,15 @@ const mapStateToProps = (state: RootState) => ({
   invoice: invoiceSelectors.invoice(state),
   invoiceError: invoiceSelectors.invoiceError(state),
   invoiceLoading: invoiceSelectors.invoiceLoading(state),
-  payer: payerSelectors.payer(state),
-  payerError: payerSelectors.payerError(state),
-  payerLoading: payerSelectors.payerLoading(state),
+  payerError: invoiceSelectors.payerError(state),
+  payerLoading: invoiceSelectors.payerLoading(state),
 });
 
 export default connect(
   mapStateToProps,
   {
     getInvoice: invoiceActions.getInvoice.request,
-    updatePayer: payerActions.updatePayerAsync.request,
+    updatePayer: invoiceActions.updatePayerAsync.request,
   },
 )(PaymentDetails);
 

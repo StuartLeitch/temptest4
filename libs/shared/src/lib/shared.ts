@@ -10,18 +10,29 @@ export * from './domain/Email';
 export * from './domain/PhoneNumber';
 export * from './domain/authorization';
 
+// * Export Address Subdomain
+export * from './modules/addresses/domain/AddressId';
+export * from './modules/addresses/domain/Address';
+export * from './modules/addresses/usecases/getAddress/getAddress';
+export * from './modules/addresses/mappers/AddressMap';
+export * from './modules/addresses/repos/implementations/knexAddressRepo';
+export * from './modules/addresses/mappers/AddressMap';
+// export * from './modules/manuscripts/domain/ArticleIdMap';
+
 // * Export Article Subdomain
-export * from './modules/articles/domain/Article';
+export * from './modules/manuscripts/domain/Article';
 // export * from './modules/articles/dtos/ArticleDTO';
-export * from './modules/articles/mappers/ArticleMap';
-export * from './modules/articles/domain/ArticleId';
+export * from './modules/manuscripts/mappers/ArticleMap';
+export * from './modules/manuscripts/domain/ArticleId';
 // export * from './modules/articles/domain/Price';
 // export * from './modules/articles/domain/PriceId';
 // export * from './modules/articles/domain/PriceValue';
-// export * from './modules/articles/repos';
+export * from './modules/manuscripts/repos';
 // export * from './modules/articles/mappers/ArticleMap';
 // export * from './modules/articles/repos/priceRepo';
 // export * from './modules/articles/mappers/PriceMap';
+export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
+export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetailsDTO';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -49,6 +60,8 @@ export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
 export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
+export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
+export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
@@ -71,26 +84,26 @@ export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/repos/implementations/knexPayerRepo';
 export * from './modules/payers/mapper/Payer';
 export * from './modules/payers/usecases/updatePayer/updatePayer';
-
-// * Export Address Subdomain
-export * from './modules/addresses/domain/AddressId';
-export * from './modules/addresses/domain/Address';
+export * from './modules/payers/usecases/getPayer/getPayer';
+export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
+export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
 
 // * Export Catalog Subdomain
-export {CatalogItem} from './modules/journals/domain/CatalogItem';
+export { CatalogItem } from './modules/journals/domain/CatalogItem';
 export * from './modules/journals/domain/JournalId';
+export * from './modules/journals/domain/Journal';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
 // // * Export User Subdomain
-export {Roles} from './modules/users/domain/enums/Roles';
+export { Roles } from './modules/users/domain/enums/Roles';
 
 // * Export Payments Subdomain
 export * from './modules/payments/domain/Payment';
 export * from './modules/payments/domain/PaymentId';
-export {PaymentMethod} from './modules/payments/domain/PaymentMethod';
+export { PaymentMethod } from './modules/payments/domain/PaymentMethod';
 export * from './modules/payments/domain/PaymentMethodId';
 export * from './modules/payments/domain/contracts/PaymentModel';
 export * from './modules/payments/domain/strategies/PaymentFactory';
@@ -113,12 +126,19 @@ export * from './modules/payments/domain/events/paymentDone';
 // export * from './domain/reductions/policies/WaivedCountryPolicy';
 // export * from './domain/reductions/policies/SanctionedCountryPolicy';
 export * from './domain/reductions/repos/implementations/knexWaiverRepo';
+export { VATService } from './domain/services/VATService';
+export { WaiverService } from './domain/services/WaiverService';
+export * from './domain/services/ErpService';
 
 // export * from './modules/coupons/mappers/CouponMap';
 // export * from './modules/coupons/repos';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
+export * from './modules/authors/mappers/AuthorMap';
+
+export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetails';
+export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetailsDTO';
 
 // * Export user Subdomain
 export * from './modules/users/domain/User';

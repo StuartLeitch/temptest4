@@ -1,3 +1,5 @@
+import { any } from "prop-types";
+
 declare module "*.css";
 declare module "*.png";
 
@@ -7,3 +9,6 @@ declare interface Window {
 
 declare const process: any;
 
+declare interface Object {
+  entries: any;
+}

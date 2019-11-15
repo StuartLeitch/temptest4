@@ -1,12 +1,12 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {Guard, GuardArgument} from './../../../core/logic/Guard';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { Guard, GuardArgument } from './../../../core/logic/Guard';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
 
-import {InvoiceId} from './InvoiceId';
-import {InvoiceItemId} from './InvoiceItemId';
-import {ManuscriptId} from './ManuscriptId';
+import { InvoiceId } from './InvoiceId';
+import { InvoiceItemId } from './InvoiceItemId';
+import { ManuscriptId } from './ManuscriptId';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
@@ -14,7 +14,6 @@ export interface InvoiceItemProps {
   invoiceId: InvoiceId;
   manuscriptId: ManuscriptId;
   type?: InvoiceItemType;
-  name?: string;
   price?: number;
   dateCreated: Date;
 }
@@ -40,10 +39,6 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this.props.type;
   }
 
-  get name(): string {
-    return this.props.name;
-  }
-
   get price(): number {
     return this.props.price;
   }
@@ -65,8 +60,8 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     id?: UniqueEntityID
   ): Result<InvoiceItem> {
     const guardArgs: GuardArgument[] = [
-      {argument: props.invoiceId, argumentName: 'invoiceId'},
-      {argument: props.manuscriptId, argumentName: 'manuscriptId'}
+      { argument: props.invoiceId, argumentName: 'invoiceId' },
+      { argument: props.manuscriptId, argumentName: 'manuscriptId' }
     ];
 
     const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
@@ -77,7 +72,6 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
     const defaultValues: InvoiceItemProps = {
       ...props,
-      name: props.name ? props.name : 'APC',
       type: props.type ? props.type : 'APC',
       dateCreated: props.dateCreated ? props.dateCreated : new Date()
     };

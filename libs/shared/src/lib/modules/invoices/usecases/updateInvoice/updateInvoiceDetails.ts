@@ -1,24 +1,24 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import {PayerType} from '../../../payers/domain/PayerType';
+import { PayerType } from '../../../payers/domain/PayerType';
 
-import {Invoice} from '../../domain/Invoice';
-import {InvoiceId} from '../../domain/InvoiceId';
-import {InvoiceRepoContract} from '../../repos/invoiceRepo';
+import { Invoice } from '../../domain/Invoice';
+import { InvoiceId } from '../../domain/InvoiceId';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
-import {PayerRepoContract} from '../../../payers/repos/payerRepo';
-import {UpdatePayerUsecase} from '../../../payers/usecases/updatePayer/updatePayer';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+import { UpdatePayerUsecase } from '../../../payers/usecases/updatePayer/updatePayer';
 
 import {
   Authorize,
   AccessControlledUsecase,
   AuthorizationContext
 } from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 
 export interface UpdateInvoiceDetailsRequestDTO {
   invoiceId?: string;
@@ -51,7 +51,7 @@ export class UpdateInvoiceDetailsUsecase
   private async getInvoice(
     request: UpdateInvoiceDetailsRequestDTO
   ): Promise<Result<Invoice>> {
-    const {invoiceId} = request;
+    const { invoiceId } = request;
 
     if (!invoiceId) {
       return Result.fail<Invoice>(`Invalid invoice id=${invoiceId}`);
@@ -89,22 +89,22 @@ export class UpdateInvoiceDetailsUsecase
       const invoice = invoiceOrError.getValue();
 
       // * This is where all the magic happens
-      const {payerType, name} = request;
+      const { payerType, name } = request;
 
       // * If "payerType" is defined, update payer
       if (payerType) {
         const updatePayerUsecase = new UpdatePayerUsecase(this.payerRepo);
         const updatePayer = await updatePayerUsecase.execute(
           {
-            payerId: invoice.payerId ? invoice.payerId.id.toString() : null,
             name,
-            type: PayerType[payerType]
+            email: '',
+            addressId: ''
           },
           context
         );
 
-        if (updatePayer.isFailure) {
-          return Result.fail<Invoice>(updatePayer.error);
+        if (updatePayer.value.isFailure) {
+          return Result.fail<Invoice>(updatePayer.value.error);
         }
       }
 

@@ -13,6 +13,7 @@ import {
   STATUS as TransactionStatus
 } from '../../domain/Transaction';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
+import { TransactionMap } from './../../mappers/TransactionMap';
 // import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
 // import {Article} from '../../../articles/domain/Article';
 // import {ArticleId} from '../../../articles/domain/ArticleId';
@@ -77,6 +78,11 @@ export class CreateTransactionUsecase
   ): Promise<CreateTransactionResponse> {
     let catalogItem: CatalogItem;
 
+    console.log(`
+[CreateTransactionUsecase Request Data]:
+${JSON.stringify(request)}
+    `);
+
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
     ).getValue();
@@ -86,7 +92,7 @@ export class CreateTransactionUsecase
 
     const transactionProps = {
       status: TransactionStatus.DRAFT
-    } as any;
+    };
 
     try {
       // * System creates DRAFT transaction
@@ -96,7 +102,6 @@ export class CreateTransactionUsecase
       }
 
       const transaction = transactionOrError.getValue();
-      await this.transactionRepo.save(transaction);
 
       // * System creates DRAFT invoice
       const invoiceProps = {
@@ -109,7 +114,6 @@ export class CreateTransactionUsecase
         return left(new CreateTransactionErrors.InvoiceCreatedError());
       }
       const invoice = invoiceOrError.getValue();
-      await this.invoiceRepo.save(invoice);
 
       //* System creates invoice item(s)
       const invoiceItemProps = {
@@ -137,16 +141,30 @@ export class CreateTransactionUsecase
         );
       }
 
-      console.info(catalogItem);
+      // ! If no catalog item found for a given journalId
+      if (catalogItem) {
+        const { amount } = catalogItem;
 
-      const { amount } = catalogItem;
+        // * Set price for the Invoice Item
+        invoiceItem.price = amount;
 
-      // * Set price for the Invoice Item
-      invoiceItem.price = amount;
+        await this.invoiceRepo.save(invoice);
+        await this.invoiceItemRepo.save(invoiceItem);
+        await this.transactionRepo.save(transaction);
 
-      await this.invoiceItemRepo.save(invoiceItem);
+        console.log(`
+[CreateTransactionUsecase Result Data]:
+${JSON.stringify(TransactionMap.toPersistence(transaction))}
+      `);
 
-      return right(Result.ok<Transaction>(transaction));
+        return right(Result.ok<Transaction>(transaction));
+      } else {
+        return left(
+          new CreateTransactionErrors.CatalogItemNotFoundError(
+            journalId.id.toString()
+          )
+        );
+      }
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

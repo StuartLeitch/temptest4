@@ -1,4 +1,4 @@
-import {Knex} from '../../../../infrastructure/database/knex';
+import {Knex, TABLES} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
 
@@ -12,7 +12,7 @@ export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
   async getPaymentById(paymentId: PaymentId): Promise<Payment> {
     const {db} = this;
 
-    const paymentRow = await db('payments')
+    const paymentRow = await db(TABLES.PAYMENTS)
       .select()
       .where('id', paymentId.id.toString())
       .first();
@@ -31,7 +31,7 @@ export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
     const {db} = this;
 
     try {
-      await db('payments').insert(PaymentMap.toPersistence(payment));
+      await db(TABLES.PAYMENTS).insert(PaymentMap.toPersistence(payment));
     } catch (e) {
       throw RepoError.fromDBError(e);
     }
