@@ -9,7 +9,6 @@ import {
   KnexPayerRepo,
   KnexWaiverRepo,
   KnexCatalogRepo,
-  KnexArticleRepo,
   VATService,
   WaiverService
 } from '@hindawi/shared';
@@ -18,7 +17,6 @@ import { CheckoutService } from './services/checkout';
 import { AuthService } from './services/auth';
 
 export interface ReposContext {
-  article: KnexArticleRepo;
   address: KnexAddressRepo;
   invoice: KnexInvoiceRepo;
   catalog: KnexCatalogRepo;
