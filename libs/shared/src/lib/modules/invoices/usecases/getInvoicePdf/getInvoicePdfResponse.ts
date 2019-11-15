@@ -1,5 +1,13 @@
-import {Either, Result} from '../../../../core/logic/Result';
+import { Either, Result } from '../../../../core/logic/Result';
 
-import {GetInvoicePdfErrors} from './getInvoicePdfErrors';
+import { GetInvoicePdfErrors } from './getInvoicePdfErrors';
 
-export type GetInvoicePdfResponse = Either<GetInvoicePdfErrors, Result<Buffer>>;
+export interface PdfResponse {
+  fileName: string;
+  file: Buffer;
+}
+
+export type GetInvoicePdfResponse = Either<
+  GetInvoicePdfErrors,
+  Result<PdfResponse>
+>;

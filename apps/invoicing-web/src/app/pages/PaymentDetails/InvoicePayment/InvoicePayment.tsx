@@ -21,7 +21,7 @@ const PAYMENT_METHODS = {
 };
 
 interface Props {
-  invoiceId: string;
+  payer: any;
 }
 
 const validateFn = values => {
@@ -42,15 +42,23 @@ const validateFn = values => {
   return errors;
 };
 
-const InvoicePayment: React.FunctionComponent<Props> = ({ invoiceId }) => {
+const addInvoiceDownloadLink = payer => {
+  if (payer) {
+    return (
+      <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
+        <Icon name="download" color="colors.actionSecondary" mr="1" />
+        Download
+      </ActionLink>
+    );
+  }
+};
+
+const InvoicePayment: React.FunctionComponent<Props> = ({ payer }) => {
   return (
     <Expander title="2. Invoice & Payment">
       <Label my="4" ml="4">
         Your Invoice
-        <ActionLink type="action" ml="4" link={`./api/invoice/${invoiceId}`}>
-          <Icon name="download" color="colors.actionSecondary" mr="1" />
-          Download
-        </ActionLink>
+        {addInvoiceDownloadLink(payer)}
       </Label>
       <Formik
         validate={validateFn}

@@ -21,22 +21,20 @@ import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
-import { Author } from '../../../authors/domain/Author';
 import { Invoice } from '../../domain/Invoice';
 
-import { GetInvoicePdfResponse } from './getInvoicePdfResponse';
+import { GetInvoicePdfResponse, PdfResponse } from './getInvoicePdfResponse';
 import { GetInvoicePdfDTO } from './getInvoicePdfDTO';
 
-import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
+import { GetAuthorDetailsErrors } from '../../../authors/usecases/getAuthorDetails/getAuthorDetailsErrors';
 import { GetArticleDetailsUsecase } from '../../../articles/usecases/getArticleDetails/getArticleDetails';
 import { GetPayerDetailsUsecase } from '../../../payers/usecases/getPayerDetails/getPayerDetails';
+import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 import { AuthorMap } from '../../../authors/mappers/AuthorMap';
-
-import { GetAuthorDetailsErrors } from '../../../authors/usecases/getAuthorDetails/getAuthorDetailsErrors';
 
 import { InvoicePayload } from '../../../../domain/services/PdfGenerator/PdfGenerator';
 import { pdfGeneratorService } from '../../../../domain/services';
-import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 
 export type GetInvoicePdfContext = AuthorizationContext<Roles>;
 
@@ -60,6 +58,7 @@ export class GetInvoicePdfUsecase
     private payerRepo: PayerRepoContract
   ) {}
 
+  // @Authorize('payer:read')
   public async execute(
     request: GetInvoicePdfDTO,
     context?: GetInvoicePdfContext
@@ -73,7 +72,7 @@ export class GetInvoicePdfUsecase
       payer: null
     };
 
-    const payload = await chain(
+    const payloadEither = await chain(
       [
         this.getPayloadWithPayer(payerId).bind(this),
         this.getPayloadWithInvoice.bind(this),
@@ -88,9 +87,29 @@ export class GetInvoicePdfUsecase
         pdfGeneratorService.getInvoice.bind(pdfGeneratorService),
         streamToPromise
       ],
-      payload
+      payloadEither
     );
-    return pdfEither.map(pdf => Result.ok(pdf)) as GetInvoicePdfResponse;
+
+    return this.addFileNameToResponse(payloadEither, pdfEither).map(pdf =>
+      Result.ok(pdf)
+    ) as GetInvoicePdfResponse;
+  }
+
+  private addFileNameToResponse(
+    payloadEither: Either<any, InvoicePayload>,
+    pdfEither: Either<any, Buffer>
+  ) {
+    return payloadEither.chain<Buffer | PdfResponse>(payload => {
+      return pdfEither.map<PdfResponse>(pdf => {
+        const date = payload.invoice.dateCreated;
+        const parsedDate = `${date.getUTCFullYear()}-${date.getUTCMonth() +
+          1}-${date.getUTCDate()}`;
+        return {
+          fileName: `${payload.invoice.id}-${parsedDate}.pdf`,
+          file: pdf
+        };
+      });
+    });
   }
 
   private getPayloadWithPayer(payerId: string) {

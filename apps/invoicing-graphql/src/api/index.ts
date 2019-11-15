@@ -54,13 +54,13 @@ export function makeExpressServer(context: Context) {
     if (pdfEither.isLeft()) {
       return res.status(400).send(pdfEither.value.errorValue());
     } else {
-      const value = pdfEither.value.getValue();
+      const { fileName, file } = pdfEither.value.getValue();
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename=${req.params.payerId}.pdf`,
-        'Content-Length': value.length
+        'Content-Disposition': `attachment; filename=${fileName}`,
+        'Content-Length': file.length
       });
-      res.end(value);
+      res.end(file);
     }
   });
 
