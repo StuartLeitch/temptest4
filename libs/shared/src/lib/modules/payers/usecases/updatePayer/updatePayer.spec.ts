@@ -1,19 +1,18 @@
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { Result } from '../../../../core/logic/Result';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {MockPayerRepo} from '../../repos/mocks/mockPayerRepo';
-import {Payer, PayerType} from '../../domain/Payer';
-import {PayerMap} from '../../mapper/Payer';
-import {UpdatePayerUsecase, UpdatePayerContext} from './updatePayer';
+import { MockPayerRepo } from '../../repos/mocks/mockPayerRepo';
+import { Payer, PayerType } from '../../domain/Payer';
+import { PayerMap } from '../../mapper/Payer';
+import { UpdatePayerUsecase, UpdatePayerContext } from './updatePayer';
 
 let usecase: UpdatePayerUsecase;
 let mockPayerRepo: MockPayerRepo;
-let result: Result<Payer>;
+let result: any;
 
-let payerId;
+let payerId: string;
 
-const defaultContext: UpdatePayerContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: UpdatePayerContext = { roles: [Roles.SUPER_ADMIN] };
 
 describe('UpdatePayerUsecase', () => {
   describe('When NO Payer ID is provided', () => {
@@ -25,9 +24,12 @@ describe('UpdatePayerUsecase', () => {
 
     it('should fail', async () => {
       // * act
-      result = await usecase.execute({name: ''}, defaultContext);
+      result = await usecase.execute(
+        { name: '', email: '', addressId: '' },
+        defaultContext
+      );
 
-      expect(result.isFailure).toBeTruthy();
+      expect(result.value.isFailure).toBeTruthy();
     });
   });
 
@@ -38,6 +40,7 @@ describe('UpdatePayerUsecase', () => {
       payerId = 'test-payer';
       const payer = PayerMap.toDomain({
         id: payerId,
+        invoiceId: 'invoice-foo',
         name: 'foo',
         type: PayerType.INDIVIDUAL
       });
@@ -51,7 +54,9 @@ describe('UpdatePayerUsecase', () => {
         result = await usecase.execute(
           {
             payerId: null,
-            name: ''
+            name: '',
+            addressId: '',
+            email: ''
           },
           defaultContext
         );
@@ -65,7 +70,9 @@ describe('UpdatePayerUsecase', () => {
         result = await usecase.execute(
           {
             payerId,
-            name: 'boo'
+            name: 'boo',
+            email: 'foo@bar.com',
+            addressId: 'address-foo'
           },
           defaultContext
         );
@@ -84,6 +91,8 @@ describe('UpdatePayerUsecase', () => {
           {
             payerId,
             name: 'Foo',
+            email: 'foo@bar.com',
+            addressId: 'address-foo',
             type: PayerType.INSTITUTION
           },
           defaultContext
