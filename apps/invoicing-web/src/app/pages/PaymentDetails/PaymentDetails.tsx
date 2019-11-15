@@ -16,6 +16,11 @@ import {
   invoiceSelectors,
 } from "../../state/modules/invoice";
 
+import {
+  paymentsActions,
+  paymentsSelectors,
+} from "../../state/modules/payments";
+
 interface Props {
   invoiceError: string;
   invoiceLoading: boolean;
@@ -27,6 +32,7 @@ interface Props {
   getInvoice(id: string): any;
   updatePayer(payer: any): any;
   payWithCard(): any;
+  getPaymentMethods(): any;
 }
 
 const articleDetails = {
@@ -74,6 +80,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   payerError,
   payerLoading,
   //
+  getPaymentMethods,
   payWithCard,
   paymentError,
   paymentLoading,
@@ -81,6 +88,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   const { invoiceId } = useParams();
   useEffect(() => {
     getInvoice(invoiceId);
+    getPaymentMethods();
   }, []);
 
   return (
@@ -153,6 +161,7 @@ export default connect(
     getInvoice: invoiceActions.getInvoice.request,
     updatePayer: invoiceActions.updatePayerAsync.request,
     payWithCard: invoiceActions.recordCardPayment.request,
+    getPaymentMethods: paymentsActions.getPaymentMethods.request,
   },
 )(PaymentDetails);
 

@@ -3,13 +3,11 @@ import { of, from } from "rxjs";
 import {
   map,
   delay,
-  mapTo,
   filter,
   mergeMap,
   switchMap,
   catchError,
   withLatestFrom,
-  pluck,
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 

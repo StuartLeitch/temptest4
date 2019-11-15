@@ -1,12 +1,14 @@
 import { combineReducers } from "redux";
 
-import invoiceReducer from "../modules/invoice/reducers";
+import invoice from "../modules/invoice";
+import payments from "../modules/payments";
 
 import { modalReducer } from "../../providers/modal";
 
 const rootReducer = combineReducers({
   modal: modalReducer,
-  invoice: invoiceReducer,
+  invoice,
+  payments,
 });
 
 export default rootReducer;

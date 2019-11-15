@@ -19,8 +19,8 @@ async function main(): Promise<void> {
     path: '/graphql'
   });
 
-  const queue = await queueService;
-  queue.start();
+  // const queue = await queueService;
+  // queue.start();
 
   expressServer.listen(process.env.PORT || 4000);
 }

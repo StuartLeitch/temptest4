@@ -36,10 +36,10 @@ export const SubmissionSubmittedHandler = {
       ]
     } = data;
 
-    console.log(`
-      [SubmissionSubmittedHandler Incoming Event Data]:
-      ${JSON.stringify(data)}
-  `);
+    //   console.log(`
+    //     [SubmissionSubmittedHandler Incoming Event Data]:
+    //     ${JSON.stringify(data)}
+    // `);
 
     const {
       repos: {
@@ -70,10 +70,10 @@ export const SubmissionSubmittedHandler = {
     } else {
       const newTransaction = result.value.getValue();
 
-      console.log(`
-        [SubmissionSubmittedHandler]:
-        ${JSON.stringify(newTransaction)}
-      `);
+      // console.log(`
+      //   [SubmissionSubmittedHandler]:
+      //   ${JSON.stringify(newTransaction)}
+      // `);
     }
   }
 };

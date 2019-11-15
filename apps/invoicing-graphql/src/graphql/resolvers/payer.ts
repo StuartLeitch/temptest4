@@ -16,9 +16,7 @@ import { Context } from '../../context';
 import { CreateAddress } from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
 import { ChangeInvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
 
-export const payerResolvers: Resolvers<Context> = {
-  Query: {},
-
+export const payer: Resolvers<Context> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
       let address: Address;

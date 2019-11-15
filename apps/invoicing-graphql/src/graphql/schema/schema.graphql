@@ -52,11 +52,6 @@ type Address {
   addressLine1: String
 }
 
-type Query {
-  invoice(id: String): Invoice
-  echo(value: String): String
-}
-
 input CreditCardInput {
   cardNumber: String!
   expiration: String!
@@ -69,6 +64,17 @@ type Payment {
   paymentMethodId: String
   amount: Float
   datePaid: Date
+}
+
+type PaymentMethod {
+  id: String!
+  name: String!
+  active: Boolean
+}
+
+type Query {
+  invoice(id: String): Invoice
+  getPaymentMethods: [PaymentMethod]
 }
 
 type Mutation {

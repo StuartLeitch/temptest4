@@ -27,7 +27,7 @@ export class GraphqlAdapter {
     return data;
   }
 
-  send(query: ASTNode, variables): Observable<any> {
+  send(query: ASTNode, variables?): Observable<any> {
     return this.axios.axiosInstance.post("", {
       query: print(query),
       variables,

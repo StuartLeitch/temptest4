@@ -110,20 +110,22 @@ export type Payment = {
   datePaid?: Maybe<Scalars['Date']>,
 };
 
+export type PaymentMethod = {
+   __typename?: 'PaymentMethod',
+  id: Scalars['String'],
+  name: Scalars['String'],
+  active?: Maybe<Scalars['Boolean']>,
+};
+
 export type Query = {
    __typename?: 'Query',
   invoice?: Maybe<Invoice>,
-  echo?: Maybe<Scalars['String']>,
+  getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>,
 };
 
 
 export type QueryInvoiceArgs = {
   id?: Maybe<Scalars['String']>
-};
-
-
-export type QueryEchoArgs = {
-  value?: Maybe<Scalars['String']>
 };
 
 
@@ -205,10 +207,11 @@ export type ResolversTypes = {
   Payer: ResolverTypeWrapper<Payer>,
   PayerType: PayerType,
   Address: ResolverTypeWrapper<Address>,
+  PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   Mutation: ResolverTypeWrapper<{}>,
   PayerInput: PayerInput,
   AddressInput: AddressInput,
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   CreditCardInput: CreditCardInput,
   Payment: ResolverTypeWrapper<Payment>,
   Date: ResolverTypeWrapper<Scalars['Date']>,
@@ -224,10 +227,11 @@ export type ResolversParentTypes = {
   Payer: Payer,
   PayerType: PayerType,
   Address: Address,
+  PaymentMethod: PaymentMethod,
+  Boolean: Scalars['Boolean'],
   Mutation: {},
   PayerInput: PayerInput,
   AddressInput: AddressInput,
-  Boolean: Scalars['Boolean'],
   CreditCardInput: CreditCardInput,
   Payment: Payment,
   Date: Scalars['Date'],
@@ -277,9 +281,15 @@ export type PaymentResolvers<ContextType = any, ParentType extends ResolversPare
   datePaid?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
 };
 
+export type PaymentMethodResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaymentMethod'] = ResolversParentTypes['PaymentMethod']> = {
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  active?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
-  echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
+  getPaymentMethods?: Resolver<Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>, ParentType, ContextType>,
 };
 
 export type Resolvers<ContextType = any> = {
@@ -289,6 +299,7 @@ export type Resolvers<ContextType = any> = {
   Mutation?: MutationResolvers<ContextType>,
   Payer?: PayerResolvers<ContextType>,
   Payment?: PaymentResolvers<ContextType>,
+  PaymentMethod?: PaymentMethodResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
 };
 
