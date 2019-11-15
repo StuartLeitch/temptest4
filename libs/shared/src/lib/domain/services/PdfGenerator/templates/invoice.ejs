@@ -198,17 +198,21 @@
     <tr>
       <td>
         <table class="data biling">
+          <% for (let i = 0; i < invoice.invoiceItems.currentItems.length; i++) { %>
           <tr>
             <th>Article Processing Charges</th>
-            <td><%= invoice.totalAmount %></td>
+            <td><%= invoice.invoiceItems.currentItems[i].price %></td>
           </tr>
+          <% } %>
           <tr>
             <th>Net Charges</th>
-            <td><%= invoice.charge %></td>
+            <td><%= invoice.getInvoiceTotal() %></td>
           </tr>
           <tr>
             <th class="summary">Total</th>
-            <td class="summary"><%= invoice.getInvoiceTotal() %></td>
+            <td class="summary">
+              <%= invoice.getInvoiceTotal() + (invoice.vat ? invoice.vat : 0) %>
+            </td>
           </tr>
         </table>
       </td>
