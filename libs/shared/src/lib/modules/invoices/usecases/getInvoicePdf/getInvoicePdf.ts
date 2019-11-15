@@ -26,15 +26,17 @@ import { Invoice } from '../../domain/Invoice';
 import { GetInvoicePdfResponse, PdfResponse } from './getInvoicePdfResponse';
 import { GetInvoicePdfDTO } from './getInvoicePdfDTO';
 
-import { GetAuthorDetailsErrors } from '../../../authors/usecases/getAuthorDetails/getAuthorDetailsErrors';
 import { GetArticleDetailsUsecase } from '../../../articles/usecases/getArticleDetails/getArticleDetails';
+import { GetAuthorDetailsUsecase } from '../../../authors/usecases/getAuthorDetails/getAuthorDetails';
 import { GetPayerDetailsUsecase } from '../../../payers/usecases/getPayerDetails/getPayerDetails';
+import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
-import { AuthorMap } from '../../../authors/mappers/AuthorMap';
 
 import { InvoicePayload } from '../../../../domain/services/PdfGenerator/PdfGenerator';
 import { pdfGeneratorService } from '../../../../domain/services';
+import { ArticleRepoContract } from '../../../articles/repos';
+import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 
 export type GetInvoicePdfContext = AuthorizationContext<Roles>;
 
@@ -54,6 +56,8 @@ export class GetInvoicePdfUsecase
 
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private addressRepo: AddressRepoContract,
+    private articleRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract
   ) {}
@@ -66,6 +70,7 @@ export class GetInvoicePdfUsecase
     this.authorizationContext = context;
     const { payerId } = request;
     const emptyPayload: InvoicePayload = {
+      address: null,
       article: null,
       invoice: null,
       author: null,
@@ -75,6 +80,7 @@ export class GetInvoicePdfUsecase
     const payloadEither = await chain(
       [
         this.getPayloadWithPayer(payerId).bind(this),
+        this.getPayloadWithAddress.bind(this),
         this.getPayloadWithInvoice.bind(this),
         this.getPayloadWithArticle.bind(this),
         this.getPayloadWithAuthor.bind(this)
@@ -124,6 +130,19 @@ export class GetInvoicePdfUsecase
         payer: payerResult.getValue()
       }));
     };
+  }
+
+  private async getPayloadWithAddress(payload: InvoicePayload) {
+    const { billingAddressId } = payload.payer;
+    const usecase = new GetAddressUseCase(this.addressRepo);
+    const addressEither = await usecase.execute({
+      billingAddressId: billingAddressId.id.toString()
+    });
+
+    return addressEither.map(addressResult => ({
+      ...payload,
+      address: addressResult.getValue()
+    }));
   }
 
   private async getInvoiceItems(invoiceId: string) {
@@ -187,7 +206,7 @@ export class GetInvoicePdfUsecase
         })
       );
     } else {
-      const usecase = new GetArticleDetailsUsecase();
+      const usecase = new GetArticleDetailsUsecase(this.articleRepo);
       const articleEither = await usecase.execute(
         { articleId: articleIdEither.value },
         this.authorizationContext
@@ -199,23 +218,27 @@ export class GetInvoicePdfUsecase
     }
   }
 
-  private async getPayloadWithAuthor(
-    payload: InvoicePayload
-  ): Promise<
-    Either<GetAuthorDetailsErrors.AuthorNotFoundError, InvoicePayload>
-  > {
+  private async getPayloadWithAuthor(payload: InvoicePayload) {
     const { article } = payload;
-
-    if (!article) {
-      return right(payload);
-    } else {
-      try {
-        const authorName = payload.article.authorSurname;
-        const author = AuthorMap.toDomain({ name: authorName, id: '' });
-        return right({ ...payload, author });
-      } catch (e) {
-        return left(Result.fail(e.message));
-      }
-    }
+    const usecase = new GetAuthorDetailsUsecase();
+    const authorEither = await usecase.execute(
+      { article },
+      this.authorizationContext
+    );
+    return authorEither.map(authorResult => ({
+      ...payload,
+      author: authorResult.getValue()
+    }));
+    // if (!article) {
+    //   return right(payload);
+    // } else {
+    //   try {
+    //     const authorName = payload.article.authorSurname;
+    //     const author = AuthorMap.toDomain({ name: authorName, id: '' });
+    //     return right({ ...payload, author });
+    //   } catch (e) {
+    //     return left(Result.fail(e.message));
+    //   }
+    // }
   }
 }

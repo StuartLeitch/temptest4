@@ -1,15 +1,17 @@
 import fs from 'fs';
 import path from 'path';
-import {Readable} from 'stream';
-import {format} from 'date-fns';
+import { Readable } from 'stream';
+import { format } from 'date-fns';
 import ejs from 'ejs';
 import pdf from 'html-pdf';
-import {Invoice, Author, Article, Payer} from '@hindawi/shared';
+
+import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 
 export interface InvoicePayload {
+  address: Address;
+  article: Article;
   invoice: Invoice;
   author: Author;
-  article: Article;
   payer: Payer;
 }
 
@@ -56,7 +58,7 @@ export class PdfGeneratorService {
   }
 
   public addTemplate(name: string, fileName: string): PdfGeneratorService {
-    this.templates[name] = {fileName};
+    this.templates[name] = { fileName };
     return this;
   }
 

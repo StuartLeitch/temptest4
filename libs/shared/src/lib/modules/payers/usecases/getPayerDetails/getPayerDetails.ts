@@ -1,28 +1,26 @@
 // * Core Domain
-import {Result, left, right} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {AppError} from '../../../../core/logic/AppError';
-import {UseCase} from '../../../../core/domain/UseCase';
+import { Result, left, right } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { AppError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import {PayerRepoContract} from '../../repos/payerRepo';
-import {PayerType, Payer} from '../../domain/Payer';
-import {PayerId} from '../../domain/PayerId';
+import { PayerRepoContract } from '../../repos/payerRepo';
+import { PayerId } from '../../domain/PayerId';
+import { Payer } from '../../domain/Payer';
 
 // * Usecase specific
-import {GetPayerDetailsResponse} from './getPayerDetailsResponse';
-import {GetPayerDetailsErrors} from './getPayerDetailsErrors';
-import {GetPayerDetailsDTO} from './getPayerDetailsDTO';
-
-import {PayerMap} from '../../mapper/Payer';
+import { GetPayerDetailsResponse } from './getPayerDetailsResponse';
+import { GetPayerDetailsErrors } from './getPayerDetailsErrors';
+import { GetPayerDetailsDTO } from './getPayerDetailsDTO';
 
 export type GetPayerDetailsContext = AuthorizationContext<Roles>;
 
@@ -44,17 +42,22 @@ export class GetPayerDetailsUsecase
     request: GetPayerDetailsDTO,
     context?: GetPayerDetailsContext
   ): Promise<GetPayerDetailsResponse> {
-    return Promise.resolve(
-      right(
-        Result.ok(
-          PayerMap.toDomain({
-            id: 'payer-1',
-            type: PayerType.INDIVIDUAL,
-            name: 'Darth Vader',
-            invoiceId: '40ec4344-d2c9-48f9-ad82-cbf101b9e9a1'
-          })
-        )
-      )
-    );
+    let payer: Payer;
+
+    const payerId = PayerId.create(new UniqueEntityID(request.payerId));
+
+    try {
+      try {
+        payer = await this.payerRepo.getPayerById(payerId);
+      } catch (e) {
+        return left(
+          new GetPayerDetailsErrors.PayerNotFoundError(payer.id.toString())
+        );
+      }
+
+      return right(Result.ok(payer));
+    } catch (e) {
+      return left(new AppError.UnexpectedError(e));
+    }
   }
 }

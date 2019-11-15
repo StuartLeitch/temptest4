@@ -1,3 +1,5 @@
+import { Article } from '../../../articles/domain/Article';
+
 export interface GetAuthorDetailsDTO {
-  authorId: string;
+  article: Article;
 }

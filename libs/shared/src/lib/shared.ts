@@ -14,7 +14,7 @@ export * from './domain/authorization';
 export * from './modules/addresses/repos/addressRepo';
 export * from './modules/addresses/usecases/getAddress/getAddress';
 export * from './modules/addresses/repos/implementations/knexAddressRepo';
-export * from './modules/addresses/mappers/AddressMap'
+export * from './modules/addresses/mappers/AddressMap';
 
 // * Export Article Subdomain
 export * from './modules/articles/domain/Article';
@@ -24,7 +24,7 @@ export * from './modules/articles/domain/ArticleId';
 // export * from './modules/articles/domain/Price';
 // export * from './modules/articles/domain/PriceId';
 // export * from './modules/articles/domain/PriceValue';
-// export * from './modules/articles/repos';
+export * from './modules/articles/repos';
 // export * from './modules/articles/mappers/ArticleMap';
 // export * from './modules/articles/repos/priceRepo';
 // export * from './modules/articles/mappers/PriceMap';
@@ -90,7 +90,7 @@ export * from './modules/addresses/domain/AddressId';
 export * from './modules/addresses/domain/Address';
 
 // * Export Catalog Subdomain
-export {CatalogItem} from './modules/journals/domain/CatalogItem';
+export { CatalogItem } from './modules/journals/domain/CatalogItem';
 export * from './modules/journals/domain/JournalId';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
@@ -98,12 +98,12 @@ export * from './modules/journals/mappers/CatalogMap';
 // export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
 // // * Export User Subdomain
-export {Roles} from './modules/users/domain/enums/Roles';
+export { Roles } from './modules/users/domain/enums/Roles';
 
 // * Export Payments Subdomain
 export * from './modules/payments/domain/Payment';
 export * from './modules/payments/domain/PaymentId';
-export {PaymentMethod} from './modules/payments/domain/PaymentMethod';
+export { PaymentMethod } from './modules/payments/domain/PaymentMethod';
 export * from './modules/payments/domain/PaymentMethodId';
 export * from './modules/payments/domain/contracts/PaymentModel';
 export * from './modules/payments/domain/strategies/PaymentFactory';

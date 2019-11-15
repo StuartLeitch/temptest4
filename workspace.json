@@ -18,7 +18,7 @@
               "apps/invoicing-graphql/src/Dockerfile",
               {
                 "glob": "**/*",
-                "input": "apps/invoicing-graphql/src/services/PdfGenerator/templates",
+                "input": "libs/shared/src/lib/domain/services/PdfGenerator/templates",
                 "output": "templates"
               }
             ],
