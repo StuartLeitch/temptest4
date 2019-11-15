@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Formik } from "formik";
 import styled from "styled-components";
 import { Expander, th } from "@hindawi/react-components";
@@ -8,20 +8,15 @@ import BankTransfer from "./BankTransfer";
 import ChoosePayment from "./ChoosePayment";
 import CreditCardForm from "./CreditCardForm";
 
-const PAYMENT_METHODS = {
-  paypal: "paypal",
-  creditCard: "creditCard",
-  bankTransfer: "bankTransfer",
-};
-
 interface Props {
-  loading: boolean;
   error: string;
   onSubmit: any;
+  loading: boolean;
+  methods: Record<string, string>;
 }
 
-const validateFn = values => {
-  if (values.paymentMethod === PAYMENT_METHODS.paypal) return {};
+const validateFn = methods => values => {
+  if (methods[values.paymentMethodId] === "Paypal") return {};
 
   const errors: any = {};
 
@@ -39,27 +34,42 @@ const validateFn = values => {
 };
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
+  methods,
   loading,
   onSubmit,
 }) => {
+  const parsedMethods = useMemo(
+    () =>
+      Object.entries(methods).map(([id, name]) => ({
+        id,
+        name,
+        isActive: true,
+      })),
+    [methods],
+  );
+
   return (
     <Expander title="2. Invoice & Payment">
       <Formik
-        validate={validateFn}
-        initialValues={{ paymentMethod: null }}
+        validate={validateFn(methods)}
+        initialValues={{ paymentMethodId: null }}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values }) => {
           return (
             <Root>
-              <ChoosePayment setFieldValue={setFieldValue} values={values} />
-              {values.paymentMethod === PAYMENT_METHODS.creditCard && (
+              <ChoosePayment
+                methods={parsedMethods}
+                setFieldValue={setFieldValue}
+                values={values}
+              />
+              {methods[values.paymentMethodId] === "Credit Card" && (
                 <CreditCardForm handleSubmit={handleSubmit} loading={loading} />
               )}
-              {values.paymentMethod === PAYMENT_METHODS.bankTransfer && (
+              {methods[values.paymentMethodId] === "Bank Transfer" && (
                 <BankTransfer />
               )}
-              {values.paymentMethod === PAYMENT_METHODS.paypal && (
+              {methods[values.paymentMethodId] === "Paypal" && (
                 <Paypal onSuccess={p => console.log("pe success", p)} />
               )}
             </Root>

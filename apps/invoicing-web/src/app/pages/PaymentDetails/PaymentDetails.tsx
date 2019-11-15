@@ -20,6 +20,7 @@ import {
   paymentsActions,
   paymentsSelectors,
 } from "../../state/modules/payments";
+import { PaymentMethod } from "../../state/modules/payments/types";
 
 interface Props {
   invoiceError: string;
@@ -29,6 +30,9 @@ interface Props {
   payerLoading: boolean;
   paymentError: string;
   paymentLoading: boolean;
+  getMethodsError: string;
+  getMethodsLoading: boolean;
+  paymentMethods: Record<string, string>;
   getInvoice(id: string): any;
   updatePayer(payer: any): any;
   payWithCard(): any;
@@ -84,6 +88,9 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   payWithCard,
   paymentError,
   paymentLoading,
+  paymentMethods,
+  getMethodsError,
+  getMethodsLoading,
 }) => {
   const { invoiceId } = useParams();
   useEffect(() => {
@@ -124,6 +131,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 loading={payerLoading}
               />
               <InvoicePayment
+                methods={paymentMethods}
                 error={paymentError}
                 onSubmit={payWithCard}
                 loading={paymentLoading}
@@ -151,8 +159,11 @@ const mapStateToProps = (state: RootState) => ({
   invoiceLoading: invoiceSelectors.invoiceLoading(state),
   payerError: invoiceSelectors.payerError(state),
   payerLoading: invoiceSelectors.payerLoading(state),
-  paymentError: invoiceSelectors.paymentError(state),
-  paymentLoading: invoiceSelectors.paymentLoading(state),
+  getMethodsError: paymentsSelectors.paymentMethodsError(state),
+  getMethodsLoading: paymentsSelectors.paymentMethodsLoading(state),
+  paymentMethods: paymentsSelectors.getPaymentMethods(state),
+  paymentError: paymentsSelectors.recordPaymentError(state),
+  paymentLoading: paymentsSelectors.recordPaymentLoading(state),
 });
 
 export default connect(

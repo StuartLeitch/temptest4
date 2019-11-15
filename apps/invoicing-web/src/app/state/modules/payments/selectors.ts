@@ -5,7 +5,10 @@ const _getPayments = (state: RootState) => state.payments;
 
 export const getPaymentMethods = createSelector(
   _getPayments,
-  p => p.payments.methods,
+  p =>
+    p.payments.methods
+      .filter(m => m.isActive)
+      .reduce((acc, el) => ({ ...acc, [el.id]: el.name }), {}),
 );
 
 export const paymentMethodsLoading = createSelector(

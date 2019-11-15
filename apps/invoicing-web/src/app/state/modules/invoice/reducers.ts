@@ -22,11 +22,8 @@ const payerLoading = createLoadingReducer(updatePayerAsync);
 
 const invoiceLoading = createLoadingReducer(getInvoice);
 
-const paymentLoading = createLoadingReducer(recordCardPayment);
-
 export default combineReducers({
   invoice,
   payerLoading,
   invoiceLoading,
-  paymentLoading,
 });

@@ -35,13 +35,3 @@ export const payerLoading = createSelector(
   _getInvoice,
   (invoiceSlice: InvoiceState) => invoiceSlice.payerLoading.loading,
 );
-
-export const paymentError = createSelector(
-  _getInvoice,
-  (invoiceSlice: InvoiceState) => invoiceSlice.paymentLoading.error,
-);
-
-export const paymentLoading = createSelector(
-  _getInvoice,
-  (invoiceSlice: InvoiceState) => invoiceSlice.paymentLoading.loading,
-);

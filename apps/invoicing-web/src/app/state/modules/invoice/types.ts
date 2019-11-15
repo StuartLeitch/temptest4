@@ -30,7 +30,6 @@ export interface InvoiceState {
   invoice: Invoice;
   payerLoading: LoadingState;
   invoiceLoading: LoadingState;
-  paymentLoading: LoadingState;
 }
 
 export interface CreditCardInput {

@@ -3,51 +3,39 @@ import styled from "styled-components";
 import { Label, Flex, th } from "@hindawi/react-components";
 
 import IconRadioButton from "../BillingInfo/IconRadioButton";
+import { PaymentMethod } from "@hindawi/invoicing-web/app/state/modules/payments/types";
 
 interface Props {
   values?: any;
   setFieldValue?: any;
+  methods: PaymentMethod[];
 }
 
-const PAYMENT_METHODS = {
-  paypal: "paypal",
-  creditCard: "creditCard",
-  bankTransfer: "bankTransfer",
+const icons = {
+  Paypal: "paypal",
+  "Credit Card": "creditCard",
+  "Bank Transfer": "bankTransfer",
 };
 
 const ChoosePayment: React.FunctionComponent<Props> = ({
   values,
+  methods,
   setFieldValue,
 }) => {
   return (
     <Root>
       <Label required>Choose Payment Method</Label>
       <Flex mt={2} mb={4}>
-        <IconRadioButton
-          isSelected={values.paymentMethod === PAYMENT_METHODS.creditCard}
-          onClick={() =>
-            setFieldValue("paymentMethod", PAYMENT_METHODS.creditCard)
-          }
-          icon="creditCard"
-          label="Credit Card"
-          mr={1}
-        />
-        <IconRadioButton
-          isSelected={values.paymentMethod === PAYMENT_METHODS.bankTransfer}
-          onClick={() =>
-            setFieldValue("paymentMethod", PAYMENT_METHODS.bankTransfer)
-          }
-          icon="bankTransfer"
-          label="Bank Transfer"
-          mr={1}
-        />
-        <IconRadioButton
-          isSelected={values.paymentMethod === PAYMENT_METHODS.paypal}
-          onClick={() => setFieldValue("paymentMethod", PAYMENT_METHODS.paypal)}
-          icon="paypal"
-          label="PayPal"
-          ml={1}
-        />
+        {methods.map(m => (
+          <IconRadioButton
+            mr={1}
+            key={m.id}
+            label={m.name}
+            icon={icons[m.name]}
+            isSelected={values.paymentMethodId === m.id}
+            onClick={() => setFieldValue("paymentMethodId", m.id)}
+          />
+        ))}
       </Flex>
     </Root>
   );

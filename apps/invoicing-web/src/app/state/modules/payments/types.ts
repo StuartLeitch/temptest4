@@ -15,7 +15,7 @@ export interface Payment {
 export interface PaymentMethod {
   id: string;
   name: string;
-  active: boolean;
+  isActive: boolean;
 }
 
 export interface PaymentsSlice {

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import Knex from 'knex';
 
-export {Knex};
+export { Knex };
 
 export enum TABLES {
   ADDRESSES = 'addresses',

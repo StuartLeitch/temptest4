@@ -7,8 +7,8 @@
     "allowSyntheticDefaultImports": true,
 
     "strict": false,
-    "target": "ES5",
-    "lib": ["es6", "dom"],
+    "target": "es6",
+    "lib": ["es2017", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
 

@@ -16,6 +16,7 @@ export interface InvoiceItemProps {
   type?: InvoiceItemType;
   price?: number;
   dateCreated: Date;
+  name?: string;
 }
 
 export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
@@ -45,6 +46,10 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
   get dateCreated(): Date {
     return this.props.dateCreated;
+  }
+
+  get name(): string {
+    return this.props.name;
   }
 
   private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
