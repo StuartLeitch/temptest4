@@ -5,9 +5,9 @@ import {InvoiceMap} from './../../../../../libs/shared/src/lib/modules/invoices/
 import {AuthorMap} from './../../../../../libs/shared/src/lib/modules/authors/mappers/AuthorMap';
 import {PayerMap} from './../../../../../libs/shared/src/lib/modules/payers/mapper/Payer';
 import {PayerType} from './../../../../../libs/shared/src/lib/modules/payers/domain/Payer';
-import {ArticleMap} from './../../../../../libs/shared/src/lib/modules/articles/mappers/ArticleMap';
 
 import {PdfGeneratorService} from './PdfGenerator';
+import { ArticleMap } from '@hindawi/shared';
 
 describe('PdfGeneratorService', () => {
   const generator = new PdfGeneratorService();

@@ -44,7 +44,7 @@ export function makeExpressServer(context: Context) {
     const usecase = new GetInvoicePdfUsecase(
       repos.invoiceItem,
       repos.address,
-      repos.article,
+      repos.manuscript,
       repos.invoice,
       repos.payer
     );

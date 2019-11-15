@@ -1,11 +1,12 @@
 // * Core domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
-import {ManuscriptId} from './../../invoices/domain/ManuscriptId';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
+import { ManuscriptId } from '../../invoices/domain/ManuscriptId';
 
-interface ArticleProps {
+interface ManuscriptProps {
   journalId?: string;
+  customId?: string;
   title?: string;
   articleTypeId?: string;
   created?: Date;
@@ -14,17 +15,13 @@ interface ArticleProps {
   authorSurname?: string;
 }
 
-export class Article extends AggregateRoot<ArticleProps> {
+export class Manuscript extends AggregateRoot<ManuscriptProps> {
   get id(): UniqueEntityID {
     return this._id;
   }
 
   get manuscriptId(): ManuscriptId {
     return ManuscriptId.create(this._id).getValue();
-  }
-
-  get authorSurname(): string {
-    return this.props.authorSurname;
   }
 
   get authorEmail(): string {
@@ -39,19 +36,27 @@ export class Article extends AggregateRoot<ArticleProps> {
     return this.props.title;
   }
 
+  get journalId(): string {
+    return this.props.journalId;
+  }
+
+  get customId(): string {
+    return this.props.customId;
+  }
+
   get articleTypeId(): string {
     return this.props.articleTypeId;
   }
 
-  private constructor(props: ArticleProps, id?: UniqueEntityID) {
+  private constructor(props: ManuscriptProps, id?: UniqueEntityID) {
     super(props, id);
   }
 
   public static create(
-    props: ArticleProps,
+    props: ManuscriptProps,
     id?: UniqueEntityID
-  ): Result<Article> {
-    const article = new Article(
+  ): Result<Manuscript> {
+    const manuscript = new Manuscript(
       {
         ...props,
         created: props.created ? props.created : new Date()
@@ -59,6 +64,6 @@ export class Article extends AggregateRoot<ArticleProps> {
       id
     );
 
-    return Result.ok<Article>(article);
+    return Result.ok<Manuscript>(manuscript);
   }
 }

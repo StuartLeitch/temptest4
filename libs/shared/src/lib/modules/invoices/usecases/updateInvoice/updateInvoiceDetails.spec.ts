@@ -1,15 +1,19 @@
-import {Result} from '../../../../core/logic/Result';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { Result } from '../../../../core/logic/Result';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {MockPayerRepo} from '../../../payers/repos/mocks/mockPayerRepo';
-import {PayerMap} from '../../../payers/mapper/Payer';
-import {Payer, PayerType, PayerCollection} from '../../../payers/domain/Payer';
-import {PayerName} from '../../../payers/domain/PayerName';
-import {TransactionId} from './../../../transactions/domain/TransactionId';
+import { MockPayerRepo } from '../../../payers/repos/mocks/mockPayerRepo';
+import { PayerMap } from '../../../payers/mapper/Payer';
+import {
+  Payer,
+  PayerType,
+  PayerCollection
+} from '../../../payers/domain/Payer';
+import { PayerName } from '../../../payers/domain/PayerName';
+import { TransactionId } from './../../../transactions/domain/TransactionId';
 
-import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
-import {Invoice, InvoiceStatus} from '../../domain/Invoice';
-import {InvoiceMap} from './../../mappers/InvoiceMap';
+import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
+import { Invoice, InvoiceStatus } from '../../domain/Invoice';
+import { InvoiceMap } from './../../mappers/InvoiceMap';
 
 import {
   UpdateInvoiceDetailsUsecase,
@@ -25,7 +29,7 @@ let payerCollection: PayerCollection;
 let invoiceId;
 let payerId;
 
-const defaultContext: UpdateInvoiceContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: UpdateInvoiceContext = { roles: [Roles.SUPER_ADMIN] };
 
 describe('UpdateInvoiceDetailsUsecase', () => {
   describe('When NO Invoice ID is provided', () => {
@@ -49,15 +53,17 @@ describe('UpdateInvoiceDetailsUsecase', () => {
       mockInvoiceRepo = new MockInvoiceRepo();
 
       payerId = 'test-payer';
+      invoiceId = 'test-invoice';
+
       const payer = PayerMap.toDomain({
         id: payerId,
+        invoiceId,
         name: 'foo',
         type: PayerType.INDIVIDUAL
       });
 
       mockPayerRepo.save(payer);
 
-      invoiceId = 'test-invoice';
       const invoice = InvoiceMap.toDomain({
         payerId,
         id: invoiceId,

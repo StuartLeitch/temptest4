@@ -1,9 +1,9 @@
-import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
+import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
-import {ArticleRepoContract} from '../articleRepo';
-import {Article} from '../../domain/Article';
-import {ArticleId} from '../../domain/ArticleId';
-import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
+import { ArticleRepoContract } from '../articleRepo';
+import { Article } from '../../domain/Article';
+import { ArticleId } from '../../domain/ArticleId';
+import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 
 export class MockArticleRepo extends BaseMockRepo<Article>
   implements ArticleRepoContract {

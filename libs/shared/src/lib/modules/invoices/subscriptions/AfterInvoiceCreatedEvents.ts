@@ -1,7 +1,7 @@
-import {HandleContract} from '../../../core/domain/events/contracts/Handle';
-import {DomainEvents} from '../../../core/domain/events/DomainEvents';
-import {InvoiceCreated} from '../domain/events/invoiceCreated';
-import {InvoiceRepoContract} from '../repos/invoiceRepo';
+import { HandleContract } from '../../../core/domain/events/contracts/Handle';
+import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { InvoiceCreated } from '../domain/events/invoiceCreated';
+import { InvoiceRepoContract } from '../repos/invoiceRepo';
 
 export class AfterInvoiceEvent implements HandleContract<InvoiceCreated> {
   private invoiceRepo: InvoiceRepoContract;

@@ -26,7 +26,7 @@ import { Invoice } from '../../domain/Invoice';
 import { GetInvoicePdfResponse, PdfResponse } from './getInvoicePdfResponse';
 import { GetInvoicePdfDTO } from './getInvoicePdfDTO';
 
-import { GetArticleDetailsUsecase } from '../../../articles/usecases/getArticleDetails/getArticleDetails';
+import { GetArticleDetailsUsecase } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetails';
 import { GetAuthorDetailsUsecase } from '../../../authors/usecases/getAuthorDetails/getAuthorDetails';
 import { GetPayerDetailsUsecase } from '../../../payers/usecases/getPayerDetails/getPayerDetails';
 import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
@@ -34,9 +34,9 @@ import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvo
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
 import { InvoicePayload } from '../../../../domain/services/PdfGenerator/PdfGenerator';
-import { pdfGeneratorService } from '../../../../domain/services';
-import { ArticleRepoContract } from '../../../articles/repos';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+import { pdfGeneratorService } from '../../../../domain/services';
+import { ArticleRepoContract } from '../../../manuscripts/repos';
 
 export type GetInvoicePdfContext = AuthorizationContext<Roles>;
 
