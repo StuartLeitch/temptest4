@@ -16,6 +16,7 @@ export * from './modules/addresses/domain/Address';
 export * from './modules/addresses/usecases/getAddress/getAddress';
 export * from './modules/addresses/mappers/AddressMap';
 export * from './modules/addresses/repos/implementations/knexAddressRepo';
+export * from './modules/addresses/mappers/AddressMap';
 // export * from './modules/manuscripts/domain/ArticleIdMap';
 
 // * Export Article Subdomain
@@ -30,6 +31,8 @@ export * from './modules/manuscripts/repos';
 // export * from './modules/articles/mappers/ArticleMap';
 // export * from './modules/articles/repos/priceRepo';
 // export * from './modules/articles/mappers/PriceMap';
+export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
+export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetailsDTO';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -57,6 +60,8 @@ export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
 export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
 export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
+export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
+export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
@@ -79,6 +84,9 @@ export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/repos/implementations/knexPayerRepo';
 export * from './modules/payers/mapper/Payer';
 export * from './modules/payers/usecases/updatePayer/updatePayer';
+export * from './modules/payers/usecases/getPayer/getPayer';
+export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
+export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
 
 // * Export Catalog Subdomain
 export { CatalogItem } from './modules/journals/domain/CatalogItem';
@@ -127,6 +135,10 @@ export * from './domain/services/ErpService';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
+export * from './modules/authors/mappers/AuthorMap';
+
+export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetails';
+export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetailsDTO';
 
 // * Export user Subdomain
 export * from './modules/users/domain/User';

@@ -1,7 +1,13 @@
 import React from "react";
 import { Formik } from "formik";
 import styled from "styled-components";
-import { Expander, th } from "@hindawi/react-components";
+import {
+  Expander,
+  Label,
+  ActionLink,
+  Icon,
+  th,
+} from "@hindawi/react-components";
 
 import Paypal from "./Paypal";
 import BankTransfer from "./BankTransfer";
@@ -14,7 +20,9 @@ const PAYMENT_METHODS = {
   bankTransfer: "bankTransfer",
 };
 
-interface Props {}
+interface Props {
+  payer: any;
+}
 
 const validateFn = values => {
   if (values.paymentMethod === PAYMENT_METHODS.paypal) return {};
@@ -34,9 +42,24 @@ const validateFn = values => {
   return errors;
 };
 
-const InvoicePayment: React.FunctionComponent<Props> = () => {
+const addInvoiceDownloadLink = payer => {
+  if (payer) {
+    return (
+      <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
+        <Icon name="download" color="colors.actionSecondary" mr="1" />
+        Download
+      </ActionLink>
+    );
+  }
+};
+
+const InvoicePayment: React.FunctionComponent<Props> = ({ payer }) => {
   return (
     <Expander title="2. Invoice & Payment">
+      <Label my="4" ml="4">
+        Your Invoice
+        {addInvoiceDownloadLink(payer)}
+      </Label>
       <Formik
         validate={validateFn}
         initialValues={{ paymentMethod: null }}

@@ -14,4 +14,12 @@ export class Left<L, A> {
   isRight(): this is Right<L, A> {
     return false;
   }
+
+  map() {
+    return this;
+  }
+
+  chain() {
+    return this;
+  }
 }

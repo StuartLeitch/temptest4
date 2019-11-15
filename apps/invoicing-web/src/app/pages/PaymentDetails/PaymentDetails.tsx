@@ -107,7 +107,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 handleSubmit={updatePayer}
                 loading={payerLoading}
               />
-              <InvoicePayment />
+              <InvoicePayment payer={invoice.payer} />
             </FormsContainer>
           );
         })()}

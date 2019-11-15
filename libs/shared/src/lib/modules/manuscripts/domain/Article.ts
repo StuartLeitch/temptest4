@@ -23,6 +23,10 @@ export class Article extends AggregateRoot<ArticleProps> {
     return ManuscriptId.create(this._id).getValue();
   }
 
+  get authorSurname(): string {
+    return this.props.authorSurname;
+  }
+
   get authorEmail(): string {
     return this.props.authorEmail;
   }
