@@ -1,5 +1,5 @@
-import {Right} from './Right';
-import {Either} from './Result';
+import { Right } from './Right';
+import { Either } from './Result';
 
 function isEither<A>(a: Either<any, A> | A): a is Either<any, A> {
   if ('isLeft' in a || 'isRight' in a) {
@@ -17,7 +17,7 @@ function getValueOfA<A>(a: Right<any, A> | A) {
   }
 }
 
-export async function chain<A>(fns: Function[], init: A) {
+export async function chain<A>(fns: Function[], init: Either<any, A> | A) {
   if (isEither(init) && init.isLeft()) {
     return init;
   }
@@ -30,7 +30,7 @@ export async function chain<A>(fns: Function[], init: A) {
         return cumRes;
       }
       const next = fns[i];
-      const {value} = cumRes;
+      const { value } = cumRes;
       return next(value);
     });
   }

@@ -1,7 +1,7 @@
-import express, {response} from 'express';
-import {Context} from '../context';
-import {RecordPayment, Roles, GetInvoicePdfUsecase} from '@hindawi/shared';
-import {AuthMiddleware} from './middleware/auth';
+import express, { response } from 'express';
+import { Context } from '../context';
+import { RecordPayment, Roles, GetInvoicePdfUsecase } from '@hindawi/shared';
+import { AuthMiddleware } from './middleware/auth';
 
 export function makeExpressServer(context: Context) {
   const app = express();
@@ -14,7 +14,7 @@ export function makeExpressServer(context: Context) {
   });
 
   app.post('/api/checkout', async (req, res) => {
-    const {checkoutService} = context;
+    const { checkoutService } = context;
 
     const payment = req.body;
 
@@ -38,12 +38,16 @@ export function makeExpressServer(context: Context) {
   });
 
   app.get('/api/invoice/:payerId', async (req, res) => {
-    const {repos} = context;
-    const authContext = {roles: [Roles.PAYER]};
+    const { repos } = context;
+    const authContext = { roles: [Roles.PAYER] };
 
-    const usecase = new GetInvoicePdfUsecase(repos.invoice, repos.payer);
+    const usecase = new GetInvoicePdfUsecase(
+      repos.invoiceItem,
+      repos.invoice,
+      repos.payer
+    );
     const pdfEither = await usecase.execute(
-      {payerId: req.params.payerId},
+      { payerId: req.params.payerId },
       authContext
     );
 
@@ -53,7 +57,7 @@ export function makeExpressServer(context: Context) {
       const value = pdfEither.value.getValue();
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename=${req.params.invoiceId}.pdf`,
+        'Content-Disposition': `attachment; filename=${req.params.payerId}.pdf`,
         'Content-Length': value.length
       });
       res.end(value);
