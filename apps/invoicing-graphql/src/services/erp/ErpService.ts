@@ -48,7 +48,7 @@ export class ErpService implements ErpServiceContract {
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
-  async registerInvoice(data: ErpData): Promise<true> {
+  async registerInvoice(data: ErpData): Promise<object> {
     const { payer, invoice, article, journal, items } = data;
 
     const accountId = await this.registerPayer(data);
@@ -58,11 +58,14 @@ export class ErpService implements ErpServiceContract {
       items.map(item => this.registerInvoiceItem(tradeDocumentId, data, item))
     );
 
-    return true;
+    return {
+      accountId,
+      tradeDocumentId,
+      tradeItemIds,
+    };
   }
 
   async registerPayment(payment): Promise<boolean> {
-    // TODO
     return true;
   }
 
@@ -80,12 +83,14 @@ export class ErpService implements ErpServiceContract {
 
       this.connection.authorize;
       await this.loginPromise;
+      console.log('ERP login successfull');
     }
 
     return this.connection;
   }
 
   private async registerPayer(data: Partial<ErpData>): Promise<string> {
+    console.log('Register payer');
     const connection = await this.getConnection();
 
     const { article, payer } = data;
@@ -95,14 +100,16 @@ export class ErpService implements ErpServiceContract {
         ? `${payer.name.value} ${article.manuscriptId}`
         : `${payer.organization.value} ${article.manuscriptId}`;
 
-    const account = await connection.sobject('Account').create({
-      Name: name.slice(0, 70),
-      AccountNumber: article.manuscriptId,
-      BillingAddress: payer.billingAddressId,
-      s2cor__Country_Code__c: payer.country,
-      s2cor__Registration_Number_Type__c: 'VAT Registration Number',
-      s2cor__VAT_Registration_Number__c: payer.VATId
-    });
+    const accountData = {
+      'Name': name.slice(0, 70),
+      'AccountNumber': article.manuscriptId.id.toString(),
+      // 'BillingAddress': payer.billingAddressId.id.toString(),
+      's2cor__Country_Code__c': payer.country,
+      's2cor__Registration_Number_Type__c': 'VAT Registration Number',
+      's2cor__VAT_Registration_Number__c': payer.VATId,
+    }
+
+    const account = await connection.sobject('Account').create(accountData);
 
     const payerEmail = payer.email.value;
 
@@ -110,24 +117,32 @@ export class ErpService implements ErpServiceContract {
       throw account;
     }
 
-    const existingContact = await connection
-      .sobject('Contact')
-      .select({ id: true })
+    console.log('Account object registered: ', account.id);
+
+    const existingContact = await connection.sobject('Contact')
+      .select({ Id: true })
       .where({ Email: payerEmail })
       .execute();
 
-    if (!existingContact) {
-      const names = payer.name.value.split(' ');
-      const firstName = names[0];
-      names.shift();
-      const lastName = names.join(' ');
+    if (existingContact.length) {
+      console.log('Contact object reused: ', (existingContact[0] as any).Id);
+      return account.id;
+    }
 
-      await connection.sobject('Contact').create({
-        AccountId: account.id,
-        Email: payerEmail,
-        FirstName: firstName,
-        LastName: lastName
-      });
+    const names = payer.name.value.split(' ');
+    const firstName = names[0];
+    names.shift();
+    const lastName = names.join(' ');
+
+    const contact = await connection.sobject('Contact').create({
+      'AccountId': account.id,
+      'Email': payerEmail,
+      'FirstName': firstName,
+      'LastName': lastName,
+    });
+
+    if (!contact.success) {
+      throw contact;
     }
 
     return account.id;
@@ -169,6 +184,8 @@ export class ErpService implements ErpServiceContract {
       throw tradeDocument;
     }
 
+    console.log('Trade Document registered: ', tradeDocument.id);
+
     return tradeDocument.id;
   }
 
@@ -178,7 +195,7 @@ export class ErpService implements ErpServiceContract {
     invoiceItem: InvoiceItem
   ): Promise<string> {
     const connection = await this.getConnection();
-    const { journal, article } = data;
+    const { journal, article, payer } = data;
 
     const description =
       invoiceItem.type === 'APC'
@@ -188,32 +205,34 @@ export class ErpService implements ErpServiceContract {
     const tradeItem = await connection
       .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
       .create({
-        s2cor__Trade_Document__c: tradeDocumentId,
-        s2cor__Description__c: description,
-        s2cor__Discount_Type__c: 'Amount',
-        s2cor__Quantity__c: '1',
-        s2cor__Tax_Code__c: 'a680Y0000000CvBQAU', // TODO
-        s2cor__Tax_Treatment__c: 'a6B0Y000000fyOuUAI', // TODO
-        s2cor__Unit_Price__c: invoiceItem.price,
-        s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
-        s2cor__Discount_Amount__c: '0' // TODO fetch from applied coupons/waivers
+        's2cor__Trade_Document__c': tradeDocumentId,
+        's2cor__Description__c': description,
+        's2cor__Discount_Type__c': 'Amount',
+        's2cor__Quantity__c': '1',
+        's2cor__Tax_Code__c': this.getTaxCode(payer),
+        's2cor__Tax_Treatment__c': this.getTaxTreatment(payer),
+        's2cor__Unit_Price__c': invoiceItem.price,
+        's2cor__Product__c': '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
+        's2cor__Discount_Amount__c': '0', // TODO fetch from applied coupons/waivers
       });
 
     if (!tradeItem.success) {
       throw tradeItem;
     }
 
+    console.log('Trade Document Item: ', tradeItem.id);
+
     return tradeItem.id;
   }
 
   private getTaxCode(payer: Payer): string {
     // TODO datermine this based on payer country and VAT number
-    return '';
+    return 'a680Y0000000CvBQAU';
   }
 
-  private get TaxType(): string {
+  private getTaxTreatment(payer: Payer): string {
     // TODO datermine this based on payer country and VAT number
-    return '';
+    return 'a6B0Y000000fyOyUAI';
   }
 
   private getVatNote(payer: Payer): string {
