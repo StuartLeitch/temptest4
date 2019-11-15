@@ -10,6 +10,19 @@ export type Scalars = {
   Float: number,
 };
 
+export type Address = {
+   __typename?: 'Address',
+  city?: Maybe<Scalars['String']>,
+  country?: Maybe<Scalars['String']>,
+  addressLine1?: Maybe<Scalars['String']>,
+};
+
+export type AddressInput = {
+  city?: Maybe<Scalars['String']>,
+  country?: Maybe<Scalars['String']>,
+  addressLine1?: Maybe<Scalars['String']>,
+};
+
 export type Invoice = {
    __typename?: 'Invoice',
   id?: Maybe<Scalars['String']>,
@@ -29,14 +42,13 @@ export enum InvoiceStatus {
 
 export type Mutation = {
    __typename?: 'Mutation',
-  updateInvoicePayer: Payer,
+  confirmInvoice: Payer,
   createInvoice?: Maybe<Invoice>,
   deleteInvoice?: Maybe<Scalars['Boolean']>,
 };
 
 
-export type MutationUpdateInvoicePayerArgs = {
-  payerId: Scalars['String'],
+export type MutationConfirmInvoiceArgs = {
   payer: PayerInput
 };
 
@@ -55,21 +67,19 @@ export type Payer = {
   id?: Maybe<Scalars['String']>,
   type?: Maybe<PayerType>,
   name?: Maybe<Scalars['String']>,
-  city?: Maybe<Scalars['String']>,
   email?: Maybe<Scalars['String']>,
-  country?: Maybe<Scalars['String']>,
-  billingAddress?: Maybe<Scalars['String']>,
   organization?: Maybe<Scalars['String']>,
+  address?: Maybe<Address>,
 };
 
 export type PayerInput = {
+  id?: Maybe<Scalars['String']>,
   type?: Maybe<PayerType>,
   name?: Maybe<Scalars['String']>,
-  city?: Maybe<Scalars['String']>,
   email?: Maybe<Scalars['String']>,
-  country?: Maybe<Scalars['String']>,
-  billingAddress?: Maybe<Scalars['String']>,
   organization?: Maybe<Scalars['String']>,
+  vatId?: Maybe<Scalars['String']>,
+  address?: Maybe<AddressInput>,
 };
 
 export enum PayerType {
@@ -171,8 +181,10 @@ export type ResolversTypes = {
   InvoiceStatus: InvoiceStatus,
   Payer: ResolverTypeWrapper<Payer>,
   PayerType: PayerType,
+  Address: ResolverTypeWrapper<Address>,
   Mutation: ResolverTypeWrapper<{}>,
   PayerInput: PayerInput,
+  AddressInput: AddressInput,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
 };
 
@@ -185,9 +197,17 @@ export type ResolversParentTypes = {
   InvoiceStatus: InvoiceStatus,
   Payer: Payer,
   PayerType: PayerType,
+  Address: Address,
   Mutation: {},
   PayerInput: PayerInput,
+  AddressInput: AddressInput,
   Boolean: Scalars['Boolean'],
+};
+
+export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
+  city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
 
 export type InvoiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Invoice'] = ResolversParentTypes['Invoice']> = {
@@ -201,7 +221,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  updateInvoicePayer?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationUpdateInvoicePayerArgs, 'payerId' | 'payer'>>,
+  confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
 };
@@ -210,11 +230,9 @@ export type PayerResolvers<ContextType = any, ParentType extends ResolversParent
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['PayerType']>, ParentType, ContextType>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  billingAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   organization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  address?: Resolver<Maybe<ResolversTypes['Address']>, ParentType, ContextType>,
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -223,6 +241,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type Resolvers<ContextType = any> = {
+  Address?: AddressResolvers<ContextType>,
   Invoice?: InvoiceResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Payer?: PayerResolvers<ContextType>,

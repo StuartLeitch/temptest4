@@ -139,4 +139,21 @@ export class Guard {
       return {succeeded: true};
     }
   }
+
+  public static againstInvalidEmail(email: string): GuardResult {
+    const emailRegex = new RegExp(
+      /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
+    );
+
+    if (!emailRegex.test(email)) {
+      return {
+        succeeded: false,
+        message: `${email} is an invalid email address.`
+      };
+    }
+
+    return {
+      succeeded: true
+    };
+  }
 }

@@ -1,6 +1,5 @@
 // * Core Domain
 import { Result, Either, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { chain } from '../../../../core/logic/EitherChain';
@@ -26,7 +25,6 @@ import { Author } from '../../../authors/domain/Author';
 import { Invoice } from '../../domain/Invoice';
 
 import { GetInvoicePdfResponse } from './getInvoicePdfResponse';
-import { GetInvoicePdfErrors } from './getInvoicePdfErrors';
 import { GetInvoicePdfDTO } from './getInvoicePdfDTO';
 
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';

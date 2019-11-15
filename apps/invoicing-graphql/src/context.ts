@@ -1,5 +1,6 @@
 import Knex from 'knex';
 import {
+  KnexAddressRepo,
   KnexInvoiceItemRepo,
   KnexInvoiceRepo,
   KnexTransactionRepo,
@@ -15,6 +16,7 @@ import { CheckoutService } from './services/checkout';
 import { AuthService } from './services/auth';
 
 export interface ReposContext {
+  address: KnexAddressRepo;
   invoice: KnexInvoiceRepo;
   invoiceItem: KnexInvoiceItemRepo;
   transaction: KnexTransactionRepo;
@@ -43,6 +45,7 @@ export function makeContext(config: Config, db: Knex): Context {
 
   return {
     repos: {
+      address: new KnexAddressRepo(db),
       invoice: new KnexInvoiceRepo(db),
       invoiceItem: new KnexInvoiceItemRepo(db),
       transaction: new KnexTransactionRepo(db),

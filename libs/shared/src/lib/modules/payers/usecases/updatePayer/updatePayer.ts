@@ -1,43 +1,51 @@
 // * Core Domain
 import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
 import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import {Result, left, right} from '../../../../core/logic/Result';
 
-import {Payer} from '../../domain/Payer';
 import {PayerId} from '../../domain/PayerId';
+import {Name} from '../../../../domain/Name';
+import {Email} from '../../../../domain/Email';
 import {PayerName} from '../../domain/PayerName';
-import {PayerType} from '../../domain/Payer';
+import {Payer, PayerType} from '../../domain/Payer';
 import {PayerRepoContract} from '../../repos/payerRepo';
 
 import {
   Authorize,
-  AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
+  AccessControlledUsecase
 } from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
 import {Roles} from '../../../users/domain/enums/Roles';
+import {AppError} from '../../../../core/logic/AppError';
+import {UpdatePayerResponse} from './updatePayerResponse';
+import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
+import {AddressId} from '../../../addresses/domain/AddressId';
 
 export interface UpdatePayerRequestDTO {
   payerId?: string;
-  type?: PayerType; // to map PayerType
+  type?: string;
   name: string;
+  email: string;
+  addressId: string;
+  vadId?: string;
+  organization?: string;
 }
 
 export type UpdatePayerContext = AuthorizationContext<Roles>;
 
 export class UpdatePayerUsecase
   implements
-    UseCase<UpdatePayerRequestDTO, Result<Payer>, UpdatePayerContext>,
+    UseCase<
+      UpdatePayerRequestDTO,
+      Promise<UpdatePayerResponse>,
+      UpdatePayerContext
+    >,
     AccessControlledUsecase<
       UpdatePayerRequestDTO,
       UpdatePayerContext,
       AccessControlContext
     > {
-  constructor(
-    private payerRepo: PayerRepoContract // private transactionRepo: TransactionRepoContract
-  ) {
-    this.payerRepo = payerRepo;
-  }
+  constructor(private payerRepo: PayerRepoContract) {}
 
   private async getPayer(
     request: UpdatePayerRequestDTO
@@ -68,29 +76,29 @@ export class UpdatePayerUsecase
   public async execute(
     request: UpdatePayerRequestDTO,
     context?: UpdatePayerContext
-  ): Promise<Result<Payer>> {
-    try {
-      // * System looks-up the payer
-      const payerOrError = await this.getPayer(request);
-
-      if (payerOrError.isFailure) {
-        return Result.fail<Payer>(payerOrError.error);
-      }
-
-      // * System retrieves payer details
-      const payer = payerOrError.getValue();
-
-      // * This is where all the magic happens
-
-      payer.set('type', request.type);
-      payer.set('name', PayerName.create(request.name).getValue());
-
-      await this.payerRepo.update(payer);
-
-      return Result.ok<Payer>(payer);
-    } catch (err) {
-      console.log(err);
-      return Result.fail<Payer>(err);
+  ): Promise<UpdatePayerResponse> {
+    const payerOrError = await this.getPayer(request);
+    if (payerOrError.isFailure) {
+      return left(new AppError.UnexpectedError(payerOrError.errorValue()));
     }
+
+    const payer = payerOrError.getValue();
+
+    payer.setProperties({
+      VATId: request.vadId,
+      type: PayerType[request.type],
+      name: PayerName.create(request.name).getValue(),
+      email: Email.create({value: request.email}).getValue(),
+      organization: Name.create({value: request.organization}).getValue(),
+      billingAddressId: AddressId.create(new UniqueEntityID(request.addressId))
+    });
+
+    try {
+      await this.payerRepo.update(payer);
+    } catch (err) {
+      return left(new AppError.UnexpectedError(err));
+    }
+
+    return right(Result.ok<Payer>(payer));
   }
 }

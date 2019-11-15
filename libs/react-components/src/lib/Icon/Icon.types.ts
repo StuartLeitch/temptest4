@@ -42,6 +42,7 @@ export type IconNames =
   | 'preview'
   | 'radioFilled'
   | 'radioUnfilled'
+  | 'reassign'
   | 'remove'
   | 'removeFilled'
   | 'reports'

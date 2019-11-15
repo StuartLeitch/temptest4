@@ -21,7 +21,7 @@ const PAYMENT_METHODS = {
 };
 
 interface Props {
-  payerId: string;
+  invoiceId: string;
 }
 
 const validateFn = values => {
@@ -42,12 +42,12 @@ const validateFn = values => {
   return errors;
 };
 
-const InvoicePayment: React.FunctionComponent<Props> = ({ payerId }) => {
+const InvoicePayment: React.FunctionComponent<Props> = ({ invoiceId }) => {
   return (
     <Expander title="2. Invoice & Payment">
       <Label my="4" ml="4">
         Your Invoice
-        <ActionLink type="action" ml="4" link={`./api/invoice/${payerId}`}>
+        <ActionLink type="action" ml="4" link={`./api/invoice/${invoiceId}`}>
           <Icon name="download" color="colors.actionSecondary" mr="1" />
           Download
         </ActionLink>

@@ -1,4 +1,4 @@
-import {Knex} from '../../../../infrastructure/database/knex';
+import {Knex, TABLES} from '../../../../infrastructure/database/knex';
 import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
 import {RepoErrorCode, RepoError} from '../../../../infrastructure/RepoError';
 
@@ -15,7 +15,7 @@ export class KnexPaymentMethodRepo
   ): Promise<PaymentMethod> {
     const {db} = this;
 
-    const paymentMethodRow = await db('payment_methods')
+    const paymentMethodRow = await db(TABLES.PAYMENT_METHODS)
       .select()
       .where('id', paymentMethodId.id.toString())
       .first();
@@ -34,7 +34,7 @@ export class KnexPaymentMethodRepo
     const {db} = this;
 
     try {
-      await db('payment_methods').insert(
+      await db(TABLES.PAYMENT_METHODS).insert(
         PaymentMethodMap.toPersistence(paymentMethod)
       );
     } catch (e) {

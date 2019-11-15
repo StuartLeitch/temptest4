@@ -15,7 +15,7 @@ export abstract class BaseController {
   }
 
   public static jsonResponse(response: any, code: number, message: string) {
-    return response.status(code).json({message});
+    return response.status(code).json({ message });
   }
 
   public ok<T>(response: any, dto?: T) {

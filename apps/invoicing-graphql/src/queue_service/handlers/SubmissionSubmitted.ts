@@ -36,6 +36,11 @@ export const SubmissionSubmittedHandler = {
       ]
     } = data;
 
+    console.log(`
+      [SubmissionSubmittedHandler Incoming Event Data]:
+      ${JSON.stringify(data)}
+  `);
+
     const {
       repos: {
         transaction: transactionRepo,
@@ -60,6 +65,15 @@ export const SubmissionSubmittedHandler = {
       defaultContext
     );
 
-    console.info(result);
+    if (result.isLeft()) {
+      throw result.value.error;
+    } else {
+      const newTransaction = result.value.getValue();
+
+      console.log(`
+        [SubmissionSubmittedHandler]:
+        ${JSON.stringify(newTransaction)}
+      `);
+    }
   }
 };
