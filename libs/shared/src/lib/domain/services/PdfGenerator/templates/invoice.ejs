@@ -197,12 +197,15 @@
   <table class="columns">
     <tr>
       <td>
-        <table class="data biling">
+        <table class="data billing">
           <% for (let i = 0; i < invoice.invoiceItems.currentItems.length; i++) { %>
+          <% const item = invoice.invoiceItems.currentItems[i]%>
+          <% if (item.type === 'APC') { %>
           <tr>
             <th>Article Processing Charges</th>
             <td><%= invoice.invoiceItems.currentItems[i].price %></td>
           </tr>
+          <% } %>
           <% } %>
           <tr>
             <th>Net Charges</th>
