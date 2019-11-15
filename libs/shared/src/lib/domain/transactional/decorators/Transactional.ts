@@ -1,7 +1,11 @@
+import 'reflect-metadata';
+
 // import { Result } from '../../../core/logic/Result';
 
+import { NAMESPACE_NAME } from './../common';
 import { IsolationLevel } from './../IsolationLevel';
 import { Propagation } from './../Propagation';
+import { runInNewHookContext } from './../Hook';
 
 export type TRANSACTIONAL = '__Transactional__';
 
@@ -17,6 +21,10 @@ export const Transactional = (options?: {
   const isolationLevel: IsolationLevel | undefined =
     options && options.isolationLevel;
 
+  console.info(`connectionName = ${connectionName}`);
+  console.info(`propagationStrategy = ${propagation}`);
+  console.info(`isolationLevel = ${isolationLevel}`);
+
   return (
     target: any, // Class of the decorated method
     methodName: string | symbol, // method name
@@ -25,27 +33,33 @@ export const Transactional = (options?: {
     const originalMethod = descriptor.value;
 
     descriptor.value = function(...args: any[]) {
+      const context = NAMESPACE_NAME;
       const runOriginal = async () => originalMethod.apply(this, [...args]);
+      const runWithNewHook = async () =>
+        runInNewHookContext(context, runOriginal);
 
-      // const runWithNewTransaction = async () => {
-      //   const transactionCallback = async (entityManager: any) => {
-      //     const result = await originalMethod.apply(this, [...args]);
-      //     return result;
-      //   };
+      const runWithNewTransaction = async () => {
+        const transactionCallback = async (entityManager: any) => {
+          // setEntityManagerForConnection(connectionName, context, entityManager)
+          const result = await originalMethod.apply(this, [...args]);
+          // setEntityManagerForConnection(connectionName, context, null)
+          return result;
+        };
 
-      //   if (isolationLevel) {
-      //     return await runInNewHookContext(context, () =>
-      //       getManager(connectionName).transaction(
-      //         isolationLevel,
-      //         transactionCallback
-      //       )
-      //     );
-      //   } else {
-      //     return await runInNewHookContext(context, () =>
-      //       getManager(connectionName).transaction(transactionCallback)
-      //     );
-      //   }
-      // };
+        if (isolationLevel) {
+          return await runInNewHookContext(context, () => {
+            return context;
+            // getManager(connectionName).transaction(
+            //   isolationLevel,
+            //   transactionCallback
+            // )
+          });
+        } else {
+          // return await runInNewHookContext(context, () =>
+          //   getManager(connectionName).transaction(transactionCallback)
+          // );
+        }
+      };
 
       return runOriginal();
     };

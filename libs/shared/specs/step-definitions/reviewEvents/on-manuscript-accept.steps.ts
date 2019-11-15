@@ -1,23 +1,23 @@
-import {defineFeature, loadFeature} from 'jest-cucumber';
+import { defineFeature, loadFeature } from 'jest-cucumber';
 
-import {Roles} from '../../../src/lib/modules/users/domain/enums/Roles';
+import { Roles } from '../../../src/lib/modules/users/domain/enums/Roles';
 
-import {Invoice} from '../../../src/lib/modules/invoices/domain/Invoice';
-import {InvoiceItem} from '../../../src/lib/modules/invoices/domain/InvoiceItem';
-import {InvoiceStatus} from '../../../src/lib/modules/invoices/domain/Invoice';
-import {InvoiceMap} from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
-import {InvoiceItemMap} from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
-import {CatalogItem} from './../../../src/lib/modules/journals/domain/CatalogItem';
-import {Article} from './../../../src/lib/modules/articles/domain/Article';
-import {ArticleRepoContract} from './../../../src/lib/modules/articles/repos/articleRepo';
-import {MockArticleRepo} from './../../../src/lib/modules/articles/repos/mocks/mockArticleRepo';
-import {CatalogMap} from './../../../src/lib/modules/journals/mappers/CatalogMap';
-import {ArticleMap} from './../../../src/lib/modules/articles/mappers/ArticleMap';
-import {TransactionRepoContract} from './../../../src/lib/modules/transactions/repos/transactionRepo';
-import {InvoiceItemRepoContract} from './../../../src/lib/modules/invoices/repos/invoiceItemRepo';
-import {InvoiceRepoContract} from './../../../src/lib/modules/invoices/repos/invoiceRepo';
-import {CatalogRepoContract} from './../../../src/lib/modules/journals/repos/catalogRepo';
-import {WaiverRepoContract} from './../../../src/lib/domain/reductions/repos/waiverRepo';
+import { Invoice } from '../../../src/lib/modules/invoices/domain/Invoice';
+import { InvoiceItem } from '../../../src/lib/modules/invoices/domain/InvoiceItem';
+import { InvoiceStatus } from '../../../src/lib/modules/invoices/domain/Invoice';
+import { InvoiceMap } from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { InvoiceItemMap } from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { CatalogItem } from './../../../src/lib/modules/journals/domain/CatalogItem';
+import { Article } from '../../../src/lib/modules/manuscripts/domain/Article';
+import { ArticleRepoContract } from '../../../src/lib/modules/manuscripts/repos/articleRepo';
+import { MockArticleRepo } from '../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { CatalogMap } from './../../../src/lib/modules/journals/mappers/CatalogMap';
+import { ArticleMap } from '../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import { TransactionRepoContract } from './../../../src/lib/modules/transactions/repos/transactionRepo';
+import { InvoiceItemRepoContract } from './../../../src/lib/modules/invoices/repos/invoiceItemRepo';
+import { InvoiceRepoContract } from './../../../src/lib/modules/invoices/repos/invoiceRepo';
+import { CatalogRepoContract } from './../../../src/lib/modules/journals/repos/catalogRepo';
+import { WaiverRepoContract } from './../../../src/lib/domain/reductions/repos/waiverRepo';
 
 import {
   UpdateTransactionContext,
@@ -29,21 +29,21 @@ import {
   STATUS as TransactionStatus
 } from '../../../src/lib/modules/transactions/domain/Transaction';
 
-import {TransactionMap} from './../../../src/lib/modules/transactions/mappers/TransactionMap';
-import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import { TransactionMap } from './../../../src/lib/modules/transactions/mappers/TransactionMap';
+import { MockTransactionRepo } from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
-import {MockInvoiceRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import {MockCatalogRepo} from '../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
-import {MockInvoiceItemRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import {MockWaiverRepo} from '../../../src/lib/domain/reductions/repos/mocks/mockWaiverRepo';
-import {WaiverService} from '../../../src/lib/domain/services/WaiverService';
+import { MockInvoiceRepo } from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockCatalogRepo } from '../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import { MockInvoiceItemRepo } from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockWaiverRepo } from '../../../src/lib/domain/reductions/repos/mocks/mockWaiverRepo';
+import { WaiverService } from '../../../src/lib/domain/services/WaiverService';
 
 const feature = loadFeature(
   '../../features/reviewEvents/on-manuscript-accept.feature',
-  {loadRelativePath: true}
+  { loadRelativePath: true }
 );
 
-const defaultContext: UpdateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 defineFeature(feature, test => {
   const mockTransactionRepo: TransactionRepoContract = new MockTransactionRepo();
@@ -98,7 +98,7 @@ defineFeature(feature, test => {
     mockInvoiceItemRepo.save(invoiceItem);
   });
 
-  test('Manuscript Accept Handler', ({given, when, then, and}) => {
+  test('Manuscript Accept Handler', ({ given, when, then, and }) => {
     given('Invoicing listening to events emitted by Review', () => {});
 
     and('The APC Catalog Item has a price of 1900', () => {

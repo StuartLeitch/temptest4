@@ -8,6 +8,7 @@ import {
   KnexPayerRepo,
   KnexWaiverRepo,
   KnexCatalogRepo,
+  KnexArticleRepo,
   VATService,
   WaiverService
 } from '@hindawi/shared';
@@ -24,6 +25,7 @@ export interface ReposContext {
   waiver: KnexWaiverRepo;
   payer: KnexPayerRepo;
   catalog: KnexCatalogRepo;
+  manuscript: KnexArticleRepo;
 }
 
 export interface Context {
@@ -44,7 +46,8 @@ export function makeContext(config: Config, db: Knex): Context {
       payment: new KnexPaymentRepo(db),
       waiver: new KnexWaiverRepo(db),
       payer: new KnexPayerRepo(db),
-      catalog: new KnexCatalogRepo(db)
+      catalog: new KnexCatalogRepo(db),
+      manuscript: new KnexArticleRepo(db)
     },
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),

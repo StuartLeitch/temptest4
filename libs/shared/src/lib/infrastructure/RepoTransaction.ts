@@ -1,5 +1,5 @@
 /**
- * Transaction objects are are simple wrappers around a Connection that also implement the Queryable API,
+ * Transaction objects are simple wrappers around a Connection that also implement the Queryable API,
  * but guarantee that all queries take place within a single database transaction or not at all. Note that
  * begin also understands how to acquire (and release) a connection from a ConnectionPool as well, so you
  * can simply pass a pool to it: var tx = begin(pool)

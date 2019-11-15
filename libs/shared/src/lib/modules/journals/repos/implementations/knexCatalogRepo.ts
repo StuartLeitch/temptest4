@@ -1,10 +1,10 @@
-import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 
-import {JournalId} from './../../domain/JournalId';
-import {CatalogRepoContract} from './../catalogRepo';
-import {CatalogMap} from './../../mappers/CatalogMap';
-import {CatalogItem} from './../../domain/CatalogItem';
+import { JournalId } from './../../domain/JournalId';
+import { CatalogRepoContract } from './../catalogRepo';
+import { CatalogMap } from './../../mappers/CatalogMap';
+import { CatalogItem } from './../../domain/CatalogItem';
 
 export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {
@@ -35,7 +35,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
     const { db } = this;
 
     return await db(TABLES.CATALOG)
-      .where({type})
+      .where({ type })
       .first();
   }
 
@@ -43,7 +43,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
     const { db } = this;
 
     return await db(TABLES.CATALOG)
-      .where({journal_id: journalId.id.toString()})
+      .where({ journalId: journalId.id.toString() })
       .first();
   }
 }
