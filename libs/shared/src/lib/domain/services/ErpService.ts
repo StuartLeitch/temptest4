@@ -10,5 +10,4 @@ export interface ErpData {
 
 export interface ErpServiceContract {
   registerInvoice(data: ErpData): Promise<object>;
-  registerPayment(payment: Payment): Promise<object>;
 }
