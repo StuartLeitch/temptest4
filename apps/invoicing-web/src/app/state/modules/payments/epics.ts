@@ -18,4 +18,12 @@ const getPaymentsMethodsEpic: RootEpic = (
   );
 };
 
-export default [getPaymentsMethodsEpic];
+const creditCardPaymentEpic: RootEpic = (
+  action$,
+  state$,
+  { graphqlAdapter },
+) => {
+  return action$.pipe();
+};
+
+export default [creditCardPaymentEpic, getPaymentsMethodsEpic];

@@ -61,7 +61,10 @@ input CreditCardInput {
 type Payment {
   id: String!
   invoiceId: String
+  payerId: String
   paymentMethodId: String
+  foreignPaymentId: String
+  paymentProof: String
   amount: Float
   datePaid: Date
 }
@@ -81,5 +84,9 @@ type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: String!): Boolean
-  recordCardPayment(input: CreditCardInput!): Payment!
+  creditCardPayment(
+    invoiceId: String!
+    paymentMethodId: String!
+    creditCard: CreditCardInput!
+  ): Payment!
 }

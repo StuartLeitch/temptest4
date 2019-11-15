@@ -103,13 +103,13 @@ export * from './modules/payments/domain/strategies/PaymentFactory';
 export * from './modules/payments/domain/strategies/PaymentStrategy';
 export * from './modules/payments/domain/strategies/CreditCardPayment';
 export * from './modules/payments/domain/strategies/CreditCard';
-export * from './modules/payments/usecases/payment/recordPayment';
 export * from './modules/payments/mapper/Payment';
 export * from './modules/payments/mapper/PaymentMethod';
 export * from './modules/payments/repos';
 
 export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
+export * from './modules/payments/usecases/createPayment/CreatePayment';
 
 // * Export Waiver, Coupon Subdomain
 // export * from './domain/reductions/ReductionFactory';

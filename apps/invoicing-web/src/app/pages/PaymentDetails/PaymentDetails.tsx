@@ -89,8 +89,6 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   paymentError,
   paymentLoading,
   paymentMethods,
-  getMethodsError,
-  getMethodsLoading,
 }) => {
   const { invoiceId } = useParams();
   useEffect(() => {
@@ -171,7 +169,7 @@ export default connect(
   {
     getInvoice: invoiceActions.getInvoice.request,
     updatePayer: invoiceActions.updatePayerAsync.request,
-    payWithCard: invoiceActions.recordCardPayment.request,
+    payWithCard: paymentsActions.recordCardPayment.request,
     getPaymentMethods: paymentsActions.getPaymentMethods.request,
   },
 )(PaymentDetails);

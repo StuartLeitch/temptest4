@@ -1,6 +1,6 @@
 import { createAsyncAction } from "typesafe-actions";
 
-import { Invoice, Payer, CreditCardInput, Payment } from "./types";
+import { Invoice, Payer } from "./types";
 
 export const getInvoice = createAsyncAction(
   "invoice/GET_REQUEST",
@@ -13,9 +13,3 @@ export const updatePayerAsync = createAsyncAction(
   "invoice/UPDATE_PAYER_SUCCESS",
   "invoice/UPDATE_PAYER_ERROR",
 )<Payer, Payer, string>();
-
-export const recordCardPayment = createAsyncAction(
-  "payments/RECORD_CARD_REQUEST",
-  "payments/RECORD_CARD_SUCCESS",
-  "payments/RECORD_CARD_ERROR",
-)<CreditCardInput, Payment, string>();

@@ -1,6 +1,6 @@
 import { GetPaymentMethodsUseCase } from '@hindawi/shared';
 
-import { Resolvers, Payment } from '../schema';
+import { Resolvers } from '../schema';
 import { Context } from '../../context';
 
 export const payments: Resolvers<Context> = {
@@ -20,14 +20,19 @@ export const payments: Resolvers<Context> = {
     }
   },
   Mutation: {
-    async recordCardPayment(parent, args, context) {
-      console.log('record the card payment', args);
+    async creditCardPayment(parent, args, context) {
+      const { checkoutService } = context;
+      const { invoiceId, paymentMethodId, creditCard } = args;
 
       return Promise.resolve({
         id: '123',
-        invoiceId: '234',
-        paymentMethodId: '12341',
-        amount: 123.3
+        invoiceId: '345',
+        payerId: '1231',
+        paymentMethodId: '12312312',
+        foreignPaymentId: '132131',
+        paymentProof: '1231312',
+        amount: 123.4,
+        datePaid: new Date()
       });
     }
   }

@@ -3,7 +3,7 @@ import { createReducer } from "typesafe-actions";
 
 import { Invoice } from "./types";
 import { createLoadingReducer } from "../../redux/helpers";
-import { getInvoice, updatePayerAsync, recordCardPayment } from "./actions";
+import { getInvoice, updatePayerAsync } from "./actions";
 
 const initialState: Invoice = {
   id: null,

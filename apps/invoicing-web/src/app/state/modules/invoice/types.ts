@@ -31,17 +31,3 @@ export interface InvoiceState {
   payerLoading: LoadingState;
   invoiceLoading: LoadingState;
 }
-
-export interface CreditCardInput {
-  cardNumber: string;
-  expiration: string;
-  cvv: string;
-}
-
-export interface Payment {
-  id: string;
-  invoiceId: string;
-  paymentMethodId: string;
-  amount: number;
-  datePaid: Date;
-}
