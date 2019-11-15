@@ -48,7 +48,6 @@ export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/invoices/domain/Invoice';
 export * from './modules/invoices/domain/InvoiceId';
 export * from './modules/invoices/domain/InvoiceItem';
-// export * from './modules/invoices/domain/InvoiceItemType';
 export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
 // // export * from './invoices/domain/events/invoiceSentEvent';

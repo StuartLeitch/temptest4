@@ -32,7 +32,7 @@ export class Config {
 
 
   constructor() {
-    return Object.assign({}, this, dbConfig);
+    Object.assign(this, dbConfig);
 
     this.salesForce = {
       user: process.env.SAGE_USER,
@@ -43,7 +43,7 @@ export class Config {
   }
 }
 
-export async function makeConfig(): Promise<Config> {
+export function makeConfig(): Config {
   return new Config();
 }
 
