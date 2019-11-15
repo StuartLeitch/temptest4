@@ -65,10 +65,6 @@ export class ErpService implements ErpServiceContract {
     };
   }
 
-  async registerPayment(payment): Promise<boolean> {
-    return true;
-  }
-
   private async getConnection(): Promise<Connection> {
     const { user, password, securityToken, loginUrl } = this.config.salesForce;
 
