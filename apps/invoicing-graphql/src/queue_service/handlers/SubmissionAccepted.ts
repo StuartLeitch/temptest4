@@ -4,30 +4,18 @@
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import {
-  CreateTransactionContext,
-  CreateTransactionUsecase
-} from '../../../../../libs/shared/src/lib/modules/transactions/usecases/createTransaction/createTransaction';
-import { CreateManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscript';
-import { CreateManuscriptDTO } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
-
+  UpdateTransactionContext,
+  UpdateTransactionOnAcceptManuscriptUsecase
+} from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 const SUBMISSION_ACCEPTED = 'SubmissionAccepted';
-const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 export const SubmissionAcceptedHandler = {
   event: SUBMISSION_ACCEPTED,
   handler: async function submissionSubmittedHandler(data: any) {
     const {
       submissionId,
-      manuscripts: [
-        {
-          customId,
-          journalId,
-          title,
-          articleType: { name },
-          created,
-          authors: [{ email, country, surname }]
-        }
-      ]
+      manuscripts: [{ journalId }]
     } = data;
 
     console.log(`
@@ -41,18 +29,23 @@ ${JSON.stringify(data)}
         invoice: invoiceRepo,
         invoiceItem: invoiceItemRepo,
         catalog: catalogRepo,
-        manuscript: manuscriptRepo
-      }
+        manuscript: manuscriptRepo,
+        waiver: waiverRepo
+      },
+      waiverService
     } = this;
 
-    const createTransactionUsecase: CreateTransactionUsecase = new CreateTransactionUsecase(
+    const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
       transactionRepo,
-      invoiceRepo,
       invoiceItemRepo,
-      catalogRepo
+      invoiceRepo,
+      catalogRepo,
+      manuscriptRepo,
+      waiverRepo,
+      waiverService
     );
 
-    const result = await createTransactionUsecase.execute(
+    const result = await updateTransactionOnAcceptManuscript.execute(
       {
         manuscriptId: submissionId,
         journalId
@@ -63,44 +56,44 @@ ${JSON.stringify(data)}
     if (result.isLeft()) {
       console.error(result.value.error);
     } else {
-      const newTransaction = result.value.getValue();
+      const changedTransaction = result.value.getValue();
 
       console.log(`
-[SubmissionSubmittedHandler Transaction Data]:
-${JSON.stringify(newTransaction)}
+[SubmissionAcceptedHandler Transaction Data]:
+${JSON.stringify(changedTransaction)}
         `);
 
-      const manuscriptProps: CreateManuscriptDTO = {
-        manuscriptId: submissionId,
-        customId,
-        journalId,
-        title,
-        articleTypeId: name,
-        authorEmail: email,
-        authorCountry: country,
-        authorSurname: surname,
-        created
-      };
+      //       const manuscriptProps: CreateManuscriptDTO = {
+      //         manuscriptId: submissionId,
+      //         customId,
+      //         journalId,
+      //         title,
+      //         articleTypeId: name,
+      //         authorEmail: email,
+      //         authorCountry: country,
+      //         authorSurname: surname,
+      //         created
+      //       };
 
-      const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(
-        manuscriptRepo
-      );
+      //       const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(
+      //         manuscriptRepo
+      //       );
 
-      const createManuscriptResult = await createManuscript.execute(
-        manuscriptProps,
-        defaultContext
-      );
+      //       const createManuscriptResult = await createManuscript.execute(
+      //         manuscriptProps,
+      //         defaultContext
+      //       );
 
-      if (createManuscriptResult.isLeft()) {
-        throw result.value.error;
-      } else {
-        const newManuscript = result.value.getValue();
+      //       if (createManuscriptResult.isLeft()) {
+      //         throw result.value.error;
+      //       } else {
+      //         const newManuscript = result.value.getValue();
 
-        console.log(`
-[SubmissionSubmittedHandler Manuscript Data]:
-${JSON.stringify(newManuscript)}
-          `);
-      }
+      //         console.log(`
+      // [SubmissionSubmittedHandler Manuscript Data]:
+      // ${JSON.stringify(newManuscript)}
+      //           `);
+      //       }
     }
   }
 };

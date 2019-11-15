@@ -1,9 +1,9 @@
-import {AppError} from '../../../../core/logic/AppError';
+import { AppError } from '../../../../core/logic/AppError';
 
-import {GetArticleDetailsErrors} from '../../../articles/usecases/getArticleDetails/getArticleDetailsErrors';
-import {GetAuthorDetailsErrors} from '../../../authors/usecases/getAuthorDetails/getAuthorDetailsErrors';
-import {GetPayerDetailsErrors} from '../../../payers/usecases/getPayerDetails/getPayerDetailsErrors';
-import {GetInvoiceDetailsErrors} from '../getInvoiceDetails/getInvoiceDetailsErrors';
+import { GetArticleDetailsErrors } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetailsErrors';
+import { GetAuthorDetailsErrors } from '../../../authors/usecases/getAuthorDetails/getAuthorDetailsErrors';
+import { GetPayerDetailsErrors } from '../../../payers/usecases/getPayerDetails/getPayerDetailsErrors';
+import { GetInvoiceDetailsErrors } from '../getInvoiceDetails/getInvoiceDetailsErrors';
 
 export type GetInvoicePdfErrors =
   | GetArticleDetailsErrors.ArticleNotFoundError
