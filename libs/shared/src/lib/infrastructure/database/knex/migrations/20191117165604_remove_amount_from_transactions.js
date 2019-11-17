@@ -1,10 +1,11 @@
-import * as Knex from "knex";
+exports.up = function(knex, Promise) {
+  return knex.schema.table('transactions', function(table) {
+    table.dropColumn('amount');
+  });
+};
 
-
-export async function up(knex: Knex): Promise<any> {
-}
-
-
-export async function down(knex: Knex): Promise<any> {
-}
-
+exports.down = function(knex, Promise) {
+  return knex.schema.table('transactions', function(table) {
+    table.float('amount');
+  });
+};

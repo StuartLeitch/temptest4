@@ -1,11 +1,11 @@
 exports.up = function(knex, Promise) {
   return knex.schema.table('transactions', function(table) {
-    table.dropColumn('amount');
+    table.dropColumn('articleId');
   });
 };
 
 exports.down = function(knex, Promise) {
   return knex.schema.table('transactions', function(table) {
-    table.float('amount');
+    table.string('articleId', 40);
   });
 };
