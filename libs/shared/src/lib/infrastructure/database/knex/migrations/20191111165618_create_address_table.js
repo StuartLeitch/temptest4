@@ -6,11 +6,11 @@ module.exports.up = function(knex) {
     table.string('addressLine1');
     table.string('addressLine2');
     table.string('postalCode');
-    table.dateTime('dateCreated', {precision: 2, useTz: false});
-    table.dateTime('dateUpdated', {precision: 2, useTz: false});
+    table.dateTime('dateCreated', { precision: 2, useTz: false });
+    table.dateTime('dateUpdated', { precision: 2, useTz: false });
   });
 };
 
 module.exports.down = function(knex) {
-  return knex.schema.removeTable('address');
+  return knex.schema.removeTable('addresses');
 };
