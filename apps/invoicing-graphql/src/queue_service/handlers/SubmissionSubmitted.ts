@@ -75,7 +75,7 @@ ${JSON.stringify(newTransaction)}
         customId,
         journalId,
         title,
-        articleTypeId: name,
+        articleType: name,
         authorEmail: email,
         authorCountry: country,
         authorSurname: surname,

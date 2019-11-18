@@ -1,12 +1,12 @@
 import streamToPromise from 'stream-to-promise';
 
-import {InvoiceStatus} from './../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
-import {InvoiceMap} from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
-import {AuthorMap} from './../../../../../libs/shared/src/lib/modules/authors/mappers/AuthorMap';
-import {PayerMap} from './../../../../../libs/shared/src/lib/modules/payers/mapper/Payer';
-import {PayerType} from './../../../../../libs/shared/src/lib/modules/payers/domain/Payer';
+import { InvoiceStatus } from './../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
+import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
+import { AuthorMap } from './../../../../../libs/shared/src/lib/modules/authors/mappers/AuthorMap';
+import { PayerMap } from './../../../../../libs/shared/src/lib/modules/payers/mapper/Payer';
+import { PayerType } from './../../../../../libs/shared/src/lib/modules/payers/domain/Payer';
 
-import {PdfGeneratorService} from './PdfGenerator';
+import { PdfGeneratorService } from './PdfGenerator';
 import { ArticleMap } from '@hindawi/shared';
 
 describe('PdfGeneratorService', () => {
@@ -29,7 +29,7 @@ describe('PdfGeneratorService', () => {
   const article = ArticleMap.toDomain({
     id: 'article-1',
     title: 'Death Star critical flaw white paper',
-    articleTypeId: 'type1'
+    articleType: 'type1'
   });
 
   const payer = PayerMap.toDomain({

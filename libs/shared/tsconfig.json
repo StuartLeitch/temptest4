@@ -17,6 +17,10 @@
   "include": [
     "**/*.ts",
     "src/lib/infrastructure/database/knex/migrations/20191105154102_create_journals_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20191105154722_create_editors_table.js"
+    "src/lib/infrastructure/database/knex/migrations/20191105154722_create_editors_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20191117165604_remove_amount_from_transactions.js",
+    "src/lib/infrastructure/database/knex/migrations/20191117115511_remove_articleid_from_transactions.js",
+    "src/lib/infrastructure/database/knex/migrations/20191116110637_add_customid_to_articles.js",
+    "src/lib/infrastructure/database/knex/migrations/20191116111901_renamed_articletypeid_in_articles.js"
   ]
 }

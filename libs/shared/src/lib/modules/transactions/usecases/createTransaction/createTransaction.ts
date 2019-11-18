@@ -39,7 +39,7 @@ export interface CreateTransactionRequestDTO {
   manuscriptId?: string;
   journalId?: string;
   title?: string;
-  articleTypeId?: string;
+  articleType?: string;
   created?: string;
   authorEmail?: string;
   authorCountry?: string;
