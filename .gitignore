@@ -2,6 +2,7 @@
 
 .env
 /dev/data
+/apps/invoicing-graphql/src/environments/*
 
 # compiled output
 dist/
