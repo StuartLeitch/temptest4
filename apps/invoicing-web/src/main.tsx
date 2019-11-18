@@ -14,18 +14,16 @@ import { actions } from "./app/state/modules/system";
 const context = new Context(config);
 const store = makeStore(config, context);
 
-const X = () => <div>salut</div>;
-
-{
-  /* <Provider store={store}>
+ReactDOM.render(
+  <Provider store={store}>
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
     </ThemeProvider>
-  </Provider> */
-}
-
-ReactDOM.render(<X />, document.getElementById("root"), () => {
-  store.dispatch(actions.init());
-});
+  </Provider>,
+  document.getElementById("root"),
+  () => {
+    store.dispatch(actions.init());
+  },
+);
