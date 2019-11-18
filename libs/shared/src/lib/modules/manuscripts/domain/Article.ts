@@ -6,6 +6,7 @@ import { ManuscriptId } from '../../invoices/domain/ManuscriptId';
 
 interface ArticleProps {
   journalId?: string;
+  customId: string;
   title?: string;
   articleType?: string;
   created?: Date;
@@ -45,6 +46,14 @@ export class Article extends AggregateRoot<ArticleProps> {
 
   get journalId(): string {
     return this.props.journalId;
+  }
+
+  get customId(): string {
+    return this.props.customId;
+  }
+
+  get created(): Date {
+    return this.props.created;
   }
 
   private constructor(props: ArticleProps, id?: UniqueEntityID) {
