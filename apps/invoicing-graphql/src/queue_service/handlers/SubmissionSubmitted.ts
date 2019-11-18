@@ -3,6 +3,7 @@
 
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
+import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 import {
   CreateTransactionContext,
   CreateTransactionUsecase
@@ -16,6 +17,11 @@ const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 export const SubmissionSubmittedHandler = {
   event: SUBMISSION_SUBMITTED,
   handler: async function submissionSubmittedHandler(data: any) {
+    console.log(`
+[SubmissionSubmittedHandler Incoming Event Data]:
+${JSON.stringify(data)}
+    `);
+
     const {
       submissionId,
       manuscripts: [
@@ -25,15 +31,18 @@ export const SubmissionSubmittedHandler = {
           title,
           articleType: { name },
           created,
-          authors: [{ email, country, surname }]
+          authors
         }
       ]
     } = data;
 
-    console.log(`
-[SubmissionSubmittedHandler Incoming Event Data]:
-${JSON.stringify(data)}
-    `);
+    const { email, country, surname, givenNames } = authors.find(
+      (a: any) => a.isCorresponding
+    );
+
+    if (name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
 
     const {
       repos: {
@@ -71,7 +80,7 @@ ${JSON.stringify(newTransaction)}
         `);
 
       const manuscriptProps: CreateManuscriptDTO = {
-        manuscriptId: submissionId,
+        id: submissionId,
         customId,
         journalId,
         title,
@@ -79,6 +88,7 @@ ${JSON.stringify(newTransaction)}
         authorEmail: email,
         authorCountry: country,
         authorSurname: surname,
+        authorFirstName: givenNames,
         created
       };
 

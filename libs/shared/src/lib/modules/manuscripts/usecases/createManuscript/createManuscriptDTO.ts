@@ -1,5 +1,5 @@
 export interface CreateManuscriptDTO {
-  manuscriptId: string;
+  id: string;
   customId: string;
   journalId: string;
   title: string;
@@ -7,5 +7,6 @@ export interface CreateManuscriptDTO {
   authorEmail: string;
   authorCountry: string;
   authorSurname: string;
+  authorFirstName: string;
   created: Date;
 }

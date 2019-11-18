@@ -13,7 +13,8 @@ export class ArticleMap extends Mapper<Article> {
         articleType: raw.articleType,
         authorEmail: raw.authorEmail,
         authorCountry: raw.authorCountry,
-        authorSurname: raw.authorSurname
+        authorSurname: raw.authorSurname,
+        authorFirstName: raw.authorFirstName
       },
       new UniqueEntityID(raw.id)
     );
@@ -32,6 +33,7 @@ export class ArticleMap extends Mapper<Article> {
       authorEmail: article.props.authorEmail,
       authorCountry: article.props.authorCountry,
       authorSurname: article.props.authorSurname,
+      authorFirstName: article.props.authorFirstName,
       created: article.props.created,
       customId: article.props.customId
     };
