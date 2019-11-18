@@ -1,11 +1,11 @@
-import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoErrorCode, RepoError} from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 
-import {PaymentMethodMap} from './../../mapper/PaymentMethod';
-import {PaymentMethodRepoContract} from './../paymentMethodRepo';
-import {PaymentMethodId} from './../../domain/PaymentMethodId';
-import {PaymentMethod} from './../../domain/PaymentMethod';
+import { PaymentMethodMap } from './../../mapper/PaymentMethod';
+import { PaymentMethodRepoContract } from './../paymentMethodRepo';
+import { PaymentMethodId } from './../../domain/PaymentMethodId';
+import { PaymentMethod } from './../../domain/PaymentMethod';
 
 export class KnexPaymentMethodRepo
   extends AbstractBaseDBRepo<Knex, PaymentMethod>
@@ -13,7 +13,7 @@ export class KnexPaymentMethodRepo
   async getPaymentMethodById(
     paymentMethodId: PaymentMethodId
   ): Promise<PaymentMethod> {
-    const {db} = this;
+    const { db } = this;
 
     const paymentMethodRow = await db(TABLES.PAYMENT_METHODS)
       .select()
@@ -31,7 +31,7 @@ export class KnexPaymentMethodRepo
   }
 
   async save(paymentMethod: PaymentMethod): Promise<PaymentMethod> {
-    const {db} = this;
+    const { db } = this;
 
     try {
       await db(TABLES.PAYMENT_METHODS).insert(
@@ -45,7 +45,16 @@ export class KnexPaymentMethodRepo
   }
 
   async getPaymentMethodCollection(): Promise<PaymentMethod[]> {
-    return [];
+    const { db } = this;
+
+    const paymentMethods = await db(TABLES.PAYMENT_METHODS).select();
+    if (!paymentMethods) {
+      throw new Error('No payment methods available!');
+    }
+
+    return paymentMethods.map(paymentMethod =>
+      PaymentMethodMap.toDomain(paymentMethod)
+    );
   }
 
   async exists(paymentMethod: PaymentMethod): Promise<boolean> {

@@ -1,16 +1,21 @@
 import express, { response } from 'express';
 import { Context } from '../context';
-import { RecordPayment, Roles, GetInvoicePdfUsecase } from '@hindawi/shared';
+import {
+  RecordPaymentUsecase,
+  Roles,
+  GetInvoicePdfUsecase
+} from '@hindawi/shared';
 import { AuthMiddleware } from './middleware/auth';
 
 export function makeExpressServer(context: Context) {
   const app = express();
   const auth = new AuthMiddleware(context);
+  app.use(express.json());
 
   app.post('/api/paypal-payment-completed', async (req, res) => {
-    console.log('paypal payment created');
-    console.log(req.body);
-    return res.status(200).send('42');
+    console.info(req.body);
+
+    return res.status(200);
   });
 
   app.post('/api/checkout', async (req, res) => {
@@ -20,16 +25,18 @@ export function makeExpressServer(context: Context) {
 
     const transaction = await checkoutService.pay(payment);
 
-    const useCase = new RecordPayment(
+    const useCase = new RecordPaymentUsecase(
       context.repos.payment,
       context.repos.invoice
     );
 
-    try {
-      return useCase.execute(transaction);
-    } catch (err) {
-      console.log(err);
+    const resultEither = await useCase.execute(transaction);
+
+    if (resultEither.isLeft()) {
+      console.log(resultEither.value.errorValue());
       return res.status(500);
+    } else {
+      return resultEither.value.getValue();
     }
   });
 
