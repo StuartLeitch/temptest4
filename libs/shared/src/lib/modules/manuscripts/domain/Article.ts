@@ -13,6 +13,7 @@ interface ArticleProps {
   authorEmail?: string;
   authorCountry?: string;
   authorSurname?: string;
+  authorFirstName?: string;
 }
 
 export class Article extends AggregateRoot<ArticleProps> {
@@ -34,6 +35,10 @@ export class Article extends AggregateRoot<ArticleProps> {
 
   get authorCountry(): string {
     return this.props.authorCountry;
+  }
+
+  get authorFirstName(): string {
+    return this.props.authorFirstName;
   }
 
   get title(): string {

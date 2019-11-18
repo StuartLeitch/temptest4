@@ -13,6 +13,7 @@ interface ManuscriptProps {
   authorEmail?: string;
   authorCountry?: string;
   authorSurname?: string;
+  authorFirstName?: string;
 }
 
 export class Manuscript extends AggregateRoot<ManuscriptProps> {
@@ -30,6 +31,14 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
 
   get authorCountry(): string {
     return this.props.authorCountry;
+  }
+
+  get authorSurname(): string {
+    return this.props.authorSurname;
+  }
+
+  get authorFirstName(): string {
+    return this.props.authorFirstName;
   }
 
   get title(): string {
