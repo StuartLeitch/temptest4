@@ -8,11 +8,12 @@ interface ManuscriptProps {
   journalId?: string;
   customId?: string;
   title?: string;
-  articleTypeId?: string;
+  articleType?: string;
   created?: Date;
   authorEmail?: string;
   authorCountry?: string;
   authorSurname?: string;
+  authorFirstName?: string;
 }
 
 export class Manuscript extends AggregateRoot<ManuscriptProps> {
@@ -32,6 +33,14 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.authorCountry;
   }
 
+  get authorSurname(): string {
+    return this.props.authorSurname;
+  }
+
+  get authorFirstName(): string {
+    return this.props.authorFirstName;
+  }
+
   get title(): string {
     return this.props.title;
   }
@@ -44,8 +53,8 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.customId;
   }
 
-  get articleTypeId(): string {
-    return this.props.articleTypeId;
+  get articleType(): string {
+    return this.props.articleType;
   }
 
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {

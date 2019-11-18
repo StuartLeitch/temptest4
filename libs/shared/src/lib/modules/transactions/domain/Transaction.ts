@@ -10,9 +10,9 @@ import { TransactionId } from './TransactionId';
 import { Invoices } from './Invoices';
 
 export enum STATUS {
-  DRAFT, // after the internal object has been created
-  ACTIVE, // after the Author confirms the list of Payers. An event shall be publicized on the Event Bus.
-  FINAL // after all its associated invoices are being set to final. An event shall be publicized on the Event Bus.
+  DRAFT = 'DRAFT', // after the internal object has been created
+  ACTIVE = 'ACTIVE', // after the Author confirms the list of Payers. An event shall be publicized on the Event Bus.
+  FINAL = 'FINAL' // after all its associated invoices are being set to final. An event shall be publicized on the Event Bus.
 }
 
 interface TransactionProps {
