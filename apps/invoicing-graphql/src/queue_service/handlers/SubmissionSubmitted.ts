@@ -25,7 +25,7 @@ export const SubmissionSubmittedHandler = {
           title,
           articleType: { name },
           created,
-          authors: [{ email, country, surname }]
+          authors: [{ email, country, surname, givenNames }]
         }
       ]
     } = data;
@@ -71,7 +71,7 @@ ${JSON.stringify(newTransaction)}
         `);
 
       const manuscriptProps: CreateManuscriptDTO = {
-        manuscriptId: submissionId,
+        id: submissionId,
         customId,
         journalId,
         title,
@@ -79,6 +79,7 @@ ${JSON.stringify(newTransaction)}
         authorEmail: email,
         authorCountry: country,
         authorSurname: surname,
+        authorFirstName: givenNames,
         created
       };
 

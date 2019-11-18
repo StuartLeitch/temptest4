@@ -5,7 +5,7 @@ module.exports.up = function(knex) {
     table.string('manuscriptId', 40);
     table.string('type').defaultTo('APC');
     table.float('price');
-    table.integer('deleted').defaultTo(0);
+    table.integer('deleted').defaultTo(1);
     table.datetime('dateCreated', { precision: 2, useTz: false });
   });
 };

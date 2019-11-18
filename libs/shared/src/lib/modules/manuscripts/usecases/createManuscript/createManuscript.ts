@@ -1,11 +1,9 @@
 // * Core Domain
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
 import { Manuscript } from '../../domain/Manuscript';
-import { ArticleId as ManuscriptId } from '../../domain/ArticleId';
 import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
 
 import {
@@ -17,6 +15,7 @@ import {
 import { CreateManuscriptDTO } from './createManuscriptDTO';
 import { CreateManuscriptResponse } from './createManuscriptResponse';
 import { CreateManuscriptErrors } from './createManuscriptErrors';
+import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class CreateManuscriptUsecase
   implements
@@ -50,7 +49,10 @@ export class CreateManuscriptUsecase
       const manuscriptProps: CreateManuscriptDTO = request;
 
       // * System creates manuscript
-      const manuscriptOrError = Manuscript.create(manuscriptProps);
+      const manuscriptOrError = Manuscript.create(
+        manuscriptProps,
+        new UniqueEntityID(manuscriptProps.id)
+      );
 
       // This is where all the magic happens
       manuscript = manuscriptOrError.getValue();
