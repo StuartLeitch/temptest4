@@ -92,9 +92,9 @@ ${JSON.stringify(newTransaction)}
       );
 
       if (createManuscriptResult.isLeft()) {
-        throw result.value.error;
+        throw createManuscriptResult.value.error;
       } else {
-        const newManuscript = result.value.getValue();
+        const newManuscript = createManuscriptResult.value.getValue();
 
         console.log(`
 [SubmissionSubmittedHandler Manuscript Data]:
