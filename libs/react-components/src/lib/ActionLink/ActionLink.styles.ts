@@ -2,10 +2,11 @@ import styled, {AnyStyledComponent, css} from 'styled-components';
 import {space} from 'styled-system';
 
 import {th, lighten} from '../Theme';
-
 import {semibold, bold, regular} from '../Typography/fontTypes';
 
-const linkType = ({type}: {type: string}) => {
+import {ActionType} from './ActionLinkTypes';
+
+const linkType = ({type}: {type: ActionType}) => {
   switch (type) {
     case 'action':
       return css`

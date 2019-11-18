@@ -1,8 +1,8 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result, left, right} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {AppError} from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result, left, right } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { AppError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import {
@@ -10,30 +10,30 @@ import {
   AccessControlledUsecase,
   AuthorizationContext
 } from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {Invoice} from '../../../invoices/domain/Invoice';
-import {CatalogItem} from './../../../journals/domain/CatalogItem';
-import {InvoiceItem} from '../../../invoices/domain/InvoiceItem';
-import {TransactionRepoContract} from '../../repos/transactionRepo';
-import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
-import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
-import {WaiverService} from '../../../../domain/services/WaiverService';
-import {Waiver} from '../../../../domain/reductions/Waiver';
-import {WaiverMap} from '../../../../domain/reductions/mappers/WaiverMap';
-import {Transaction} from '../../domain/Transaction';
-import {Article} from '../../../articles/domain/Article';
-import {ArticleRepoContract} from './../../../articles/repos/articleRepo';
-import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
-import {CatalogRepoContract} from './../../../journals/repos/catalogRepo';
-import {WaiverRepoContract} from '../../../../domain/reductions/repos/waiverRepo';
-import {JournalId} from './../../../journals/domain/JournalId';
+import { Invoice } from '../../../invoices/domain/Invoice';
+import { CatalogItem } from './../../../journals/domain/CatalogItem';
+import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
+import { WaiverService } from '../../../../domain/services/WaiverService';
+import { Waiver } from '../../../../domain/reductions/Waiver';
+import { WaiverMap } from '../../../../domain/reductions/mappers/WaiverMap';
+import { Transaction } from '../../domain/Transaction';
+import { Article } from '../../../manuscripts/domain/Article';
+import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
+import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
+import { WaiverRepoContract } from '../../../../domain/reductions/repos/waiverRepo';
+import { JournalId } from './../../../journals/domain/JournalId';
 
 // * Usecase specific
-import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';
-import {UpdateTransactionOnAcceptManuscriptErrors} from './updateTransactionOnAcceptManuscriptErrors';
-import {UpdateTransactionOnAcceptManuscriptDTO} from './updateTransactionOnAcceptManuscriptDTOs';
+import { UpdateTransactionOnAcceptManuscriptResponse } from './updateTransactionOnAcceptManuscriptResponse';
+import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
+import { UpdateTransactionOnAcceptManuscriptDTO } from './updateTransactionOnAcceptManuscriptDTOs';
 
 export type UpdateTransactionContext = AuthorizationContext<Roles>;
 
@@ -153,7 +153,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       transaction.markAsActive();
 
       // * get author details
-      const {authorCountry} = manuscript;
+      const { authorCountry } = manuscript;
 
       // * Identify applicable waiver(s)
       // TODO: Handle the case where multiple reductions are applied
@@ -166,7 +166,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.waiverRepo.save(waiver);
 
       // * apply waiver to the invoice through invoice item
-      invoiceItem.price = catalogItem.price * Number(waiver.percentage);
+      invoiceItem.price = catalogItem.amount * Number(waiver.percentage);
 
       await this.invoiceItemRepo.save(invoiceItem);
 

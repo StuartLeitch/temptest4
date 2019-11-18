@@ -7,7 +7,7 @@ module.exports.up = function(knex) {
     table.string('authorEmail');
     table.string('authorCountry');
     table.string('authorSurname');
-    table.datetime('created', {precision: 2, useTz: false});
+    table.datetime('created', { precision: 2, useTz: false });
   });
 };
 

@@ -1,11 +1,13 @@
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {MockPayerRepo} from '../../repos/mocks/mockPayerRepo';
-import {Payer, PayerType} from '../../domain/Payer';
-import {PayerName} from '../../domain/PayerName';
-import {GetPayerUsecase, GetPayerContext} from './getPayer';
+import { MockPayerRepo } from '../../repos/mocks/mockPayerRepo';
+import { Payer, PayerType } from '../../domain/Payer';
+import { PayerName } from '../../domain/PayerName';
+import { PayerMap } from './../../mapper/Payer';
+
+import { GetPayerUsecase, GetPayerContext } from './getPayer';
 
 let usecase: GetPayerUsecase;
 let mockPayerRepo: MockPayerRepo;
@@ -36,13 +38,12 @@ describe('GetPayerUsecase', () => {
       mockPayerRepo = new MockPayerRepo();
 
       payerId = 'test-payer';
-      const payer = Payer.create(
-        {
-          name: PayerName.create('foo').getValue(),
-          type: PayerType.INDIVIDUAL
-        },
-        new UniqueEntityID(payerId)
-      ).getValue();
+      const payer = PayerMap.toDomain({
+        id: payerId,
+        invoiceId: 'invoice-foo',
+        name: 'foo',
+        type: PayerType.INDIVIDUAL
+      });
       mockPayerRepo.save(payer);
 
       usecase = new GetPayerUsecase(mockPayerRepo);
@@ -50,9 +51,12 @@ describe('GetPayerUsecase', () => {
 
     describe('And Payer ID is INVALID', () => {
       it('should fail', async () => {
-        result = await usecase.execute({
-          payerId: null
-        }, defaultContext);
+        result = await usecase.execute(
+          {
+            payerId: null
+          },
+          defaultContext
+        );
         expect(result.isFailure).toBeTruthy();
       });
     });
@@ -60,9 +64,12 @@ describe('GetPayerUsecase', () => {
     describe('And Payer ID is VALID', () => {
       it('should return the payer details', async () => {
         // arrange
-        result = await usecase.execute({
-          payerId
-        }, defaultContext);
+        result = await usecase.execute(
+          {
+            payerId
+          },
+          defaultContext
+        );
 
         expect(result.isSuccess).toBeTruthy();
         expect(

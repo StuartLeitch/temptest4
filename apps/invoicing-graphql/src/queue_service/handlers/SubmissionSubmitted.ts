@@ -1,22 +1,15 @@
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
-// import {InvoiceId} from './../../../src/lib/modules/invoices/domain/InvoiceId';
-// import {TransactionId} from './../../../src/lib/modules/transactions/domain/TransactionId';
-// import {
-//   // Transaction,
-//   STATUS as TransactionStatus
-// } from '../../../src/lib/modules/transactions/domain/Transaction';
-// import {CatalogMap} from './../../../src/lib/modules/journals/mappers/CatalogMap';
 
-import { Context } from '../../context';
-
-// // * Usecases imports
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
+
 import {
   CreateTransactionContext,
   CreateTransactionUsecase
 } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/createTransaction/createTransaction';
-// import {CreateTransactionResponse} from './../../../src/lib/modules/transactions/usecases/createTransaction/createTransactionResponse';
+import { CreateManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscript';
+import { CreateManuscriptDTO } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
+
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
@@ -27,6 +20,7 @@ export const SubmissionSubmittedHandler = {
       submissionId,
       manuscripts: [
         {
+          customId,
           journalId,
           title,
           articleType: { name },
@@ -36,17 +30,18 @@ export const SubmissionSubmittedHandler = {
       ]
     } = data;
 
-    //   console.log(`
-    //     [SubmissionSubmittedHandler Incoming Event Data]:
-    //     ${JSON.stringify(data)}
-    // `);
+    console.log(`
+[SubmissionSubmittedHandler Incoming Event Data]:
+${JSON.stringify(data)}
+    `);
 
     const {
       repos: {
         transaction: transactionRepo,
         invoice: invoiceRepo,
         invoiceItem: invoiceItemRepo,
-        catalog: catalogRepo
+        catalog: catalogRepo,
+        manuscript: manuscriptRepo
       }
     } = this;
 
@@ -66,14 +61,46 @@ export const SubmissionSubmittedHandler = {
     );
 
     if (result.isLeft()) {
-      throw result.value.error;
+      console.error(result.value.error);
     } else {
       const newTransaction = result.value.getValue();
 
-      // console.log(`
-      //   [SubmissionSubmittedHandler]:
-      //   ${JSON.stringify(newTransaction)}
-      // `);
+      console.log(`
+[SubmissionSubmittedHandler Transaction Data]:
+${JSON.stringify(newTransaction)}
+        `);
+
+      const manuscriptProps: CreateManuscriptDTO = {
+        manuscriptId: submissionId,
+        customId,
+        journalId,
+        title,
+        articleType: name,
+        authorEmail: email,
+        authorCountry: country,
+        authorSurname: surname,
+        created
+      };
+
+      const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(
+        manuscriptRepo
+      );
+
+      const createManuscriptResult = await createManuscript.execute(
+        manuscriptProps,
+        defaultContext
+      );
+
+      if (createManuscriptResult.isLeft()) {
+        throw createManuscriptResult.value.error;
+      } else {
+        const newManuscript = createManuscriptResult.value.getValue();
+
+        console.log(`
+[SubmissionSubmittedHandler Manuscript Data]:
+${JSON.stringify(newManuscript)}
+          `);
+      }
     }
   }
 };

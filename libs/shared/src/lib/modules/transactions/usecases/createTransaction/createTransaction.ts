@@ -13,6 +13,7 @@ import {
   STATUS as TransactionStatus
 } from '../../domain/Transaction';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
+import { TransactionMap } from './../../mappers/TransactionMap';
 // import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
 // import {Article} from '../../../articles/domain/Article';
 // import {ArticleId} from '../../../articles/domain/ArticleId';
@@ -38,7 +39,7 @@ export interface CreateTransactionRequestDTO {
   manuscriptId?: string;
   journalId?: string;
   title?: string;
-  articleTypeId?: string;
+  articleType?: string;
   created?: string;
   authorEmail?: string;
   authorCountry?: string;
@@ -78,8 +79,8 @@ export class CreateTransactionUsecase
     let catalogItem: CatalogItem;
 
     console.log(`
-      [CreateTransactionUsecase Request Data]:
-      ${JSON.stringify(request)}
+[CreateTransactionUsecase Request Data]:
+${JSON.stringify(request)}
     `);
 
     const manuscriptId = ManuscriptId.create(
@@ -140,21 +141,30 @@ export class CreateTransactionUsecase
         );
       }
 
-      const { amount } = catalogItem;
+      // ! If no catalog item found for a given journalId
+      if (catalogItem) {
+        const { amount } = catalogItem;
 
-      // * Set price for the Invoice Item
-      invoiceItem.price = amount;
+        // * Set price for the Invoice Item
+        invoiceItem.price = amount;
 
-      await this.invoiceRepo.save(invoice);
-      await this.invoiceItemRepo.save(invoiceItem);
-      await this.transactionRepo.save(transaction);
+        await this.invoiceRepo.save(invoice);
+        await this.invoiceItemRepo.save(invoiceItem);
+        await this.transactionRepo.save(transaction);
 
-      console.log(`
-        [CreateTransactionUsecase Result Data]:
-        ${JSON.stringify(transaction)}
+        console.log(`
+[CreateTransactionUsecase Result Data]:
+${JSON.stringify(TransactionMap.toPersistence(transaction))}
       `);
 
-      return right(Result.ok<Transaction>(transaction));
+        return right(Result.ok<Transaction>(transaction));
+      } else {
+        return left(
+          new CreateTransactionErrors.CatalogItemNotFoundError(
+            journalId.id.toString()
+          )
+        );
+      }
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

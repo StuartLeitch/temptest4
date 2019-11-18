@@ -129,6 +129,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 loading={payerLoading}
               />
               <InvoicePayment
+                payer={invoice.payer}
                 methods={paymentMethods}
                 error={paymentError}
                 onSubmit={payWithCard}

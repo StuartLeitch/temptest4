@@ -1,5 +1,5 @@
 import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
+import { SubmissionAcceptedHandler } from './SubmissionAccepted';
 // export * from './ManuscriptRejected';
-// export * from './ManuscriptAccepted';
 
-export { SubmissionSubmittedHandler };
+export { SubmissionSubmittedHandler, SubmissionAcceptedHandler };

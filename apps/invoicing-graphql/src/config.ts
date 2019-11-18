@@ -13,6 +13,13 @@ const dbConfig = {
     process.env.DB_SEEDS_DIR || path.join(__dirname, environment.DB_SEEDS_DIR)
 };
 
+export interface SalesForceConfig {
+  user: string;
+  password: string;
+  loginUrl: string;
+  securityToken: string;
+}
+
 export class Config {
   dbUser: string;
   dbHost: string;
@@ -21,12 +28,22 @@ export class Config {
   dbMigrationsDir: string;
   dbSeedsDir: string;
 
+  salesForce: SalesForceConfig;
+
+
   constructor() {
-    return Object.assign({}, this, dbConfig);
+    Object.assign(this, dbConfig);
+
+    this.salesForce = {
+      user: process.env.SAGE_USER,
+      password: process.env.SAGE_PASSWORD,
+      loginUrl: process.env.SAGE_LOGIN_URL,
+      securityToken: process.env.SAGE_SECURITY_TOKEN,
+    };
   }
 }
 
-export async function makeConfig(): Promise<Config> {
+export function makeConfig(): Config {
   return new Config();
 }
 

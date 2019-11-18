@@ -1,12 +1,13 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
 
 // * Subdomain
-import {Invoice} from '../../../modules/invoices/domain/Invoice';
-import {TransactionId} from './TransactionId';
-import {Invoices} from './Invoices';
+import { Invoice } from '../../../modules/invoices/domain/Invoice';
+import { TransactionCreatedEvent } from './events/transactionCreatedEvent';
+import { TransactionId } from './TransactionId';
+import { Invoices } from './Invoices';
 
 export enum STATUS {
   DRAFT, // after the internal object has been created
@@ -93,11 +94,10 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     };
     const transaction = new Transaction(defaultValues, id);
 
-    // TODO: Waiting confirmation from the PO.
     // const idWasProvided = !!id;
     // if (!idWasProvided) {
     //   transaction.addDomainEvent(
-    //     new TransactionCreatedEvent(transaction, new Date())
+    //     new TransactionCreatedEvent(transaction.transactionId, new Date())
     //   );
     // }
 

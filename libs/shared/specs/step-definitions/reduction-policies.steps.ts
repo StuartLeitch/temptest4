@@ -1,17 +1,18 @@
-import {defineFeature, loadFeature} from 'jest-cucumber';
+import { defineFeature, loadFeature } from 'jest-cucumber';
 
-import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../src/lib/core/domain/UniqueEntityID';
 import {
   Invoice,
   InvoiceStatus
 } from '../../src/lib/modules/invoices/domain/Invoice';
 
-import {Payer, PayerType} from '../../src/lib/modules/payers/domain/Payer';
-import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
+import { Payer, PayerType } from '../../src/lib/modules/payers/domain/Payer';
+import { PayerName } from '../../src/lib/modules/payers/domain/PayerName';
+import { PayerMap } from './../../src/lib/modules/payers/mapper/Payer';
 
-import {PoliciesRegister} from '../../src/lib/domain/reductions/policies/PoliciesRegister';
-import {WaivedCountryPolicy} from '../../src/lib/domain/reductions/policies/WaivedCountryPolicy';
-import {TransactionId} from './../../src/lib/modules/transactions/domain/TransactionId';
+import { PoliciesRegister } from '../../src/lib/domain/reductions/policies/PoliciesRegister';
+import { WaivedCountryPolicy } from '../../src/lib/domain/reductions/policies/WaivedCountryPolicy';
+import { TransactionId } from './../../src/lib/modules/transactions/domain/TransactionId';
 
 const feature = loadFeature('../features/reduction-policies.feature', {
   loadRelativePath: true
@@ -30,15 +31,15 @@ defineFeature(feature, test => {
 
   beforeEach(() => {
     payerId = 'test-payer';
-    const payer = Payer.create(
-      {
-        name: PayerName.create('foo').getValue(),
-        type: PayerType.INDIVIDUAL
-      },
-      new UniqueEntityID(payerId)
-    ).getValue();
-
     invoiceId = 'test-invoice';
+
+    const payer = PayerMap.toDomain({
+      id: payerId,
+      invoiceId,
+      name: 'foo',
+      type: PayerType.INDIVIDUAL
+    });
+
     invoice = Invoice.create(
       {
         transactionId: TransactionId.create(
@@ -57,7 +58,7 @@ defineFeature(feature, test => {
     // do nothing yet
   });
 
-  test('WaiverCountry reduction', ({given, when, and, then}) => {
+  test('WaiverCountry reduction', ({ given, when, and, then }) => {
     given(/^The Author is in (\w+)$/, (country: string) => {
       countryCode = country;
       waivedCountryPolicy = new WaivedCountryPolicy();

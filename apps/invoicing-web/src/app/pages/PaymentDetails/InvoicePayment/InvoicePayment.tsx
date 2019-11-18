@@ -1,14 +1,27 @@
 import React, { useMemo } from "react";
 import { Formik } from "formik";
 import styled from "styled-components";
-import { Expander, th } from "@hindawi/react-components";
+import {
+  Expander,
+  Label,
+  ActionLink,
+  Icon,
+  th,
+} from "@hindawi/react-components";
 
 import Paypal from "./Paypal";
 import BankTransfer from "./BankTransfer";
 import ChoosePayment from "./ChoosePayment";
 import CreditCardForm from "./CreditCardForm";
 
+const PAYMENT_METHODS = {
+  paypal: "paypal",
+  creditCard: "creditCard",
+  bankTransfer: "bankTransfer",
+};
+
 interface Props {
+  payer: any;
   error: string;
   onSubmit: any;
   loading: boolean;
@@ -33,7 +46,19 @@ const validateFn = methods => values => {
   return errors;
 };
 
+const addInvoiceDownloadLink = payer => {
+  if (payer) {
+    return (
+      <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
+        <Icon name="download" color="colors.actionSecondary" mr="1" />
+        Download
+      </ActionLink>
+    );
+  }
+};
+
 const InvoicePayment: React.FunctionComponent<Props> = ({
+  payer,
   methods,
   loading,
   onSubmit,
@@ -47,9 +72,12 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       })),
     [methods],
   );
-
   return (
     <Expander title="2. Invoice & Payment">
+      <Label my="4" ml="4">
+        Your Invoice
+        {addInvoiceDownloadLink(payer)}
+      </Label>
       <Formik
         validate={validateFn(methods)}
         initialValues={{ paymentMethodId: null }}

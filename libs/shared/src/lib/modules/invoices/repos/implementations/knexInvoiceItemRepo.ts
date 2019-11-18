@@ -1,17 +1,18 @@
-import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
-import {InvoiceItem} from '../../domain/InvoiceItem';
-import {ManuscriptId} from '../../domain/ManuscriptId';
-import {InvoiceItemId} from '../../domain/InvoiceItemId';
-import {InvoiceItemRepoContract} from '../invoiceItemRepo';
-import {InvoiceItemMap} from '../../mappers/InvoiceItemMap';
+import { InvoiceId } from '../../domain/InvoiceId';
+import { InvoiceItem } from '../../domain/InvoiceItem';
+import { ManuscriptId } from '../../domain/ManuscriptId';
+import { InvoiceItemId } from '../../domain/InvoiceItemId';
+import { InvoiceItemRepoContract } from '../invoiceItemRepo';
+import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
 
 export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
   implements InvoiceItemRepoContract {
   async getInvoiceItemById(invoiceItemId: InvoiceItemId): Promise<InvoiceItem> {
-    const {db} = this;
+    const { db } = this;
 
     const invoiceItem = await db(TABLES.INVOICE_ITEMS)
       .select()
@@ -31,7 +32,7 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
   public async getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
   ): Promise<InvoiceItem> {
-    const {db} = this;
+    const { db } = this;
     const invoice = await db(TABLES.INVOICE_ITEMS)
       .select()
       .where('manuscriptId', manuscriptId.id.toString())
@@ -41,10 +42,10 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
   }
 
   async update(invoiceItem: InvoiceItem): Promise<InvoiceItem> {
-    const {db} = this;
+    const { db } = this;
 
     const updated = await db(TABLES.INVOICE_ITEMS)
-      .where({id: invoiceItem.invoiceItemId.id.toString()})
+      .where({ id: invoiceItem.invoiceItemId.id.toString() })
       .update({
         dateCreated: invoiceItem.dateCreated,
         invoiceId: invoiceItem.invoiceId.id.toString()
@@ -61,11 +62,11 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
   }
 
   async delete(invoiceItem: InvoiceItem): Promise<void> {
-    const {db} = this;
+    const { db } = this;
 
     const deletedRows = await db(TABLES.INVOICE_ITEMS)
       .where('id', invoiceItem.id.toString())
-      .update({...InvoiceItemMap.toPersistence(invoiceItem), deleted: 1});
+      .update({ ...InvoiceItemMap.toPersistence(invoiceItem), deleted: 1 });
 
     if (!deletedRows) {
       throw RepoError.createEntityNotFoundError(
@@ -90,7 +91,7 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
   }
 
   async save(invoiceItem: InvoiceItem): Promise<InvoiceItem> {
-    const {db} = this;
+    const { db } = this;
 
     const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
 
@@ -107,7 +108,20 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
     return Promise.resolve(42);
   }
 
-  getItemsByInvoiceId(): Promise<InvoiceItem[] | any> {
-    return Promise.resolve(42);
+  async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
+    const { db } = this;
+
+    const items = await db(TABLES.INVOICE_ITEMS)
+      .select()
+      .where('invoiceId', invoiceId.id.toString());
+
+    if (!items) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice-items',
+        invoiceId.id.toString()
+      );
+    }
+
+    return items.map(item => InvoiceItemMap.toDomain(item));
   }
 }
