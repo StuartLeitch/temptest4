@@ -3,7 +3,7 @@ export interface CreateManuscriptDTO {
   customId: string;
   journalId: string;
   title: string;
-  articleTypeId: string;
+  articleType: string;
   authorEmail: string;
   authorCountry: string;
   authorSurname: string;

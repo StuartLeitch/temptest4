@@ -75,7 +75,7 @@ ${JSON.stringify(newTransaction)}
         customId,
         journalId,
         title,
-        articleTypeId: name,
+        articleType: name,
         authorEmail: email,
         authorCountry: country,
         authorSurname: surname,
@@ -92,9 +92,9 @@ ${JSON.stringify(newTransaction)}
       );
 
       if (createManuscriptResult.isLeft()) {
-        throw result.value.error;
+        throw createManuscriptResult.value.error;
       } else {
-        const newManuscript = result.value.getValue();
+        const newManuscript = createManuscriptResult.value.getValue();
 
         console.log(`
 [SubmissionSubmittedHandler Manuscript Data]:

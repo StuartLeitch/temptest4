@@ -8,7 +8,7 @@ interface ManuscriptProps {
   journalId?: string;
   customId?: string;
   title?: string;
-  articleTypeId?: string;
+  articleType?: string;
   created?: Date;
   authorEmail?: string;
   authorCountry?: string;
@@ -44,8 +44,8 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.customId;
   }
 
-  get articleTypeId(): string {
-    return this.props.articleTypeId;
+  get articleType(): string {
+    return this.props.articleType;
   }
 
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {

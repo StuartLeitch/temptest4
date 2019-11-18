@@ -94,6 +94,8 @@
     "rxjs": "^6.5.3",
     "shallow-equal-object": "^1.1.1",
     "soap": "^0.30.0",
+    "stream": "0.0.2",
+    "stream-to-promise": "^2.2.0",
     "sqs-consumer": "^5.4.0",
     "styled-components": "^4.4.1",
     "styled-system": "^5.1.2"
@@ -168,8 +170,6 @@
     "shelljs": "^0.8.3",
     "sinon": "^7.5.0",
     "sqlite3": "^4.1.0",
-    "stream": "0.0.2",
-    "stream-to-promise": "^2.2.0",
     "ts-jest": "24.1.0",
     "ts-node": "~8.4.1",
     "tsconfig-paths": "^3.9.0",
