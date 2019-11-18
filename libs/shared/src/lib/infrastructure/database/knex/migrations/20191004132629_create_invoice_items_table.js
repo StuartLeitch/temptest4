@@ -4,6 +4,7 @@ module.exports.up = function(knex) {
     table.string('invoiceId', 40);
     table.string('manuscriptId', 40);
     table.string('type').defaultTo('APC');
+    table.string('name', 40);
     table.float('price');
     table.integer('deleted').defaultTo(1);
     table.datetime('dateCreated', { precision: 2, useTz: false });

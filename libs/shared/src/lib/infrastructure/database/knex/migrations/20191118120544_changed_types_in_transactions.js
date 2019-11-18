@@ -4,14 +4,14 @@ exports.up = function(knex) {
       table.dropColumn('status');
     })
     .then(() => {
-      knex.schema.table('transactions', function(table) {
-        table.enum('status', ['DRAFT', 'ACTIVE', 'FINAL']).defaultTo('DRAFT');
+      return knex.schema.table('transactions', function(table) {
+        table.enum('status', ['DRAFT', 'ACTIVE', 'FINAL']);
       });
     });
 };
 
 exports.down = function(knex, Promise) {
-  return knex.schema.table('invoice_items', function(table) {
+  return knex.schema.table('transactions', function(table) {
     table.integer('status').defaultTo(0);
   });
 };

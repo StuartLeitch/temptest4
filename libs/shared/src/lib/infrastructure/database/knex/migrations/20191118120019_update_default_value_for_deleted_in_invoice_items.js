@@ -4,12 +4,12 @@ exports.up = function(knex) {
       table.dropColumn('deleted');
     })
     .then(() => {
-      return knex('invoice_items', function(table) {
+      return knex.schema.table('invoice_items', function(table) {
         table.integer('deleted').defaultTo(0);
       });
     })
     .then(() => {
-      return knex('invoice_items', function(table) {
+      return knex.schema.table('invoice_items', function(table) {
         table.dropColumn('name');
       });
     });
