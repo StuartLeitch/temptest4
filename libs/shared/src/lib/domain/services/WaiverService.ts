@@ -1,8 +1,8 @@
-import {PoliciesRegister as ReductionsPoliciesRegister} from '../reductions/policies/PoliciesRegister';
-import {WaivedCountryPolicy} from '../reductions/policies/WaivedCountryPolicy';
+import { PoliciesRegister as ReductionsPoliciesRegister } from '../reductions/policies/PoliciesRegister';
+import { WaivedCountryPolicy } from '../reductions/policies/WaivedCountryPolicy';
 
 export class WaiverService {
-  public applyWaivers({country}: {price?: number; country: string}): any {
+  public applyWaivers({ country }: { price?: number; country: string }): any {
     const reductionsPoliciesRegister = new ReductionsPoliciesRegister();
     const waivedCountryPolicy: WaivedCountryPolicy = new WaivedCountryPolicy();
     reductionsPoliciesRegister.registerPolicy(waivedCountryPolicy);
