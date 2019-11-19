@@ -10,6 +10,7 @@ import { BillingInfo } from "./BillingInfo";
 import { InvoicePayment } from "./InvoicePayment";
 import { PaymentHeader } from "./PaymentHeader";
 
+import { paymentActions, paymentTypes } from "../../state/modules/payment";
 import {
   invoiceTypes,
   invoiceActions,
@@ -24,6 +25,7 @@ interface Props {
   payerLoading: boolean;
   getInvoice(id: string): any;
   updatePayer(payer: any): any;
+  recordPayPalPayment(payment: paymentTypes.PayPalPayment): any;
 }
 
 const articleDetails = {
@@ -61,6 +63,16 @@ const charges = {
   warning: "UK VAT applies to this invoice, based on the country of the payer.",
 };
 
+const recordPayment = (recordAction, payer) => {
+  return data => {
+    // console.log(data, payer);
+    return recordAction({
+      payerId: payer.id,
+      payPalPaymentId: data.paymentID,
+    });
+  };
+};
+
 const PaymentDetails: React.FunctionComponent<Props> = ({
   invoice,
   invoiceError,
@@ -69,6 +81,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   payerLoading,
   getInvoice,
   updatePayer,
+  recordPayPalPayment,
 }) => {
   const { invoiceId } = useParams();
   useEffect(() => {
@@ -107,7 +120,10 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 handleSubmit={updatePayer}
                 loading={payerLoading}
               />
-              <InvoicePayment payer={invoice.payer} />
+              <InvoicePayment
+                payer={invoice.payer}
+                onSuccess={recordPayment(recordPayPalPayment, invoice.payer)}
+              />
             </FormsContainer>
           );
         })()}
@@ -138,6 +154,7 @@ export default connect(
   {
     getInvoice: invoiceActions.getInvoice.request,
     updatePayer: invoiceActions.updatePayerAsync.request,
+    recordPayPalPayment: paymentActions.recordPayPalPayment.request,
   },
 )(PaymentDetails);
 

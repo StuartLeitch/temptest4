@@ -47,33 +47,39 @@ export class RecordPaymentUsecase
   ) {}
 
   public async execute(
-    payload: RecordPaymentDTO
+    payload: RecordPaymentDTO,
+    context?: RecordPaymentContext
   ): Promise<RecordPaymentResponse> {
     const paymentPayload = {
       invoiceId: InvoiceId.create(
         new UniqueEntityID(payload.invoiceId)
       ).getValue(),
-      foreignPaymentId: payload.foreignPaymentId,
       amount: Amount.create(payload.amount).getValue(),
       payerId: PayerId.create(new UniqueEntityID(payload.payerId))
     };
 
-    const payment = Payment.create(paymentPayload).getValue();
+    try {
+      const payment = Payment.create(paymentPayload).getValue();
 
-    await this.paymentRepo.save(payment);
+      await this.paymentRepo.save(payment);
 
-    const invoice = await this.invoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(payload.invoiceId)).getValue()
-    );
-    const invoiceTotal = invoice.getInvoiceTotal();
+      const invoice = await this.invoiceRepo.getInvoiceById(
+        InvoiceId.create(new UniqueEntityID(payload.invoiceId)).getValue()
+      );
+      const invoiceTotal = invoice.getInvoiceTotal();
 
-    if (payment.amount.value < invoiceTotal) {
-      return left(new RecordPaymentErrors.InvalidPaymentAmount(payload.amount));
+      if (payment.amount.value < invoiceTotal) {
+        return left(
+          new RecordPaymentErrors.InvalidPaymentAmount(payload.amount)
+        );
+      }
+
+      invoice.markAsPaid();
+      await this.invoiceRepo.update(invoice);
+
+      return right(Result.ok(invoice));
+    } catch (e) {
+      return left(new AppError.UnexpectedError(e));
     }
-
-    invoice.markAsPaid();
-    await this.invoiceRepo.update(invoice);
-
-    return right(Result.ok(invoice));
   }
 }

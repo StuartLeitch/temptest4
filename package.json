@@ -34,6 +34,7 @@
   "private": true,
   "dependencies": {
     "@hindawi/queue-service": "^1.0.3",
+    "@paypal/checkout-server-sdk": "^1.0.1",
     "@pubsweet/component-email-templating": "^0.2.6",
     "@pubsweet/logger": "^0.2.34",
     "@repay/react-credit-card": "^1.0.1",
@@ -94,9 +95,9 @@
     "rxjs": "^6.5.3",
     "shallow-equal-object": "^1.1.1",
     "soap": "^0.30.0",
+    "sqs-consumer": "^5.4.0",
     "stream": "0.0.2",
     "stream-to-promise": "^2.2.0",
-    "sqs-consumer": "^5.4.0",
     "styled-components": "^4.4.1",
     "styled-system": "^5.1.2"
   },

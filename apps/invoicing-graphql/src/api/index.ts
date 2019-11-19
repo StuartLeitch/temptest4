@@ -1,9 +1,10 @@
-import express, { response } from 'express';
+import express from 'express';
 import { Context } from '../context';
 import {
   RecordPaymentUsecase,
-  Roles,
-  GetInvoicePdfUsecase
+  GetInvoicePdfUsecase,
+  RecordPayPalPaymentUsecase,
+  Roles
 } from '@hindawi/shared';
 import { AuthMiddleware } from './middleware/auth';
 
@@ -13,9 +14,28 @@ export function makeExpressServer(context: Context) {
   app.use(express.json());
 
   app.post('/api/paypal-payment-completed', async (req, res) => {
-    console.info(req.body);
+    // const paymentAmount = req.body.resource.amount.value;
+    // console.info(req.body);
+    console.log('-----------------------------');
+    // console.info(req.body.resource);
+    console.log(JSON.stringify(req.body));
+    // console.info(context.payPalService);
+
+    // const usecase = new RecordPayPalPaymentUsecase(
+    //   context.repos.paymentMethod,
+    //   context.repos.payment,
+    //   context.repos.invoice
+    // );
+    // usecase.execute(req.body);
 
     return res.status(200);
+  });
+
+  app.post('/api/paypal-payment/:payerId/:orderId', async (req, res) => {
+    console.log('++++++++++++++++++++++++++++');
+    console.info(req.params.payerId);
+    console.info(req.params.orderId);
+    console.log('++++++++++++++++++++++++++++');
   });
 
   app.post('/api/checkout', async (req, res) => {

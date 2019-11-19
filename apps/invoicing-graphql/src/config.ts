@@ -20,6 +20,12 @@ export interface SalesForceConfig {
   securityToken: string;
 }
 
+export interface PayPalConfig {
+  clientSecret: string;
+  environment: string;
+  clientId: string;
+}
+
 export class Config {
   dbUser: string;
   dbHost: string;
@@ -29,7 +35,7 @@ export class Config {
   dbSeedsDir: string;
 
   salesForce: SalesForceConfig;
-
+  payPal: PayPalConfig;
 
   constructor() {
     Object.assign(this, dbConfig);
@@ -38,7 +44,13 @@ export class Config {
       user: process.env.SAGE_USER,
       password: process.env.SAGE_PASSWORD,
       loginUrl: process.env.SAGE_LOGIN_URL,
-      securityToken: process.env.SAGE_SECURITY_TOKEN,
+      securityToken: process.env.SAGE_SECURITY_TOKEN
+    };
+
+    this.payPal = {
+      clientSecret: process.env.PP_CLIENT_SECRET,
+      environment: process.env.PP_ENVIRONMENT,
+      clientId: process.env.PP_CLIENT_ID
     };
   }
 }

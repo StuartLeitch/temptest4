@@ -22,6 +22,9 @@ const PAYMENT_METHODS = {
 
 interface Props {
   payer: any;
+  onError?(data?: any): void;
+  onCancel?(data?: any): void;
+  onSuccess?(data?: any): void;
 }
 
 const validateFn = values => {
@@ -53,7 +56,12 @@ const addInvoiceDownloadLink = payer => {
   }
 };
 
-const InvoicePayment: React.FunctionComponent<Props> = ({ payer }) => {
+const InvoicePayment: React.FunctionComponent<Props> = ({
+  payer,
+  onSuccess,
+  onCancel,
+  onError,
+}) => {
   return (
     <Expander title="2. Invoice & Payment">
       <Label my="4" ml="4">
@@ -76,7 +84,11 @@ const InvoicePayment: React.FunctionComponent<Props> = ({ payer }) => {
                 <BankTransfer />
               )}
               {values.paymentMethod === PAYMENT_METHODS.paypal && (
-                <Paypal onSuccess={p => console.log("pe success", p)} />
+                <Paypal
+                  onSuccess={onSuccess}
+                  onCancel={onCancel}
+                  onError={onError}
+                />
               )}
             </Root>
           );
