@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useCallback } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "typesafe-actions";
@@ -35,7 +35,7 @@ interface Props {
   paymentMethods: Record<string, string>;
   getInvoice(id: string): any;
   updatePayer(payer: any): any;
-  payWithCard(): any;
+  payWithCard(payload: any): any;
   getPaymentMethods(): any;
 }
 
@@ -96,6 +96,11 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     getPaymentMethods();
   }, []);
 
+  const payByCard = useCallback(
+    values => payWithCard({ invoiceId, ...values }),
+    [invoiceId],
+  );
+
   return (
     <Fragment>
       <PaymentHeader articleTitle={articleDetails.title}></PaymentHeader>
@@ -132,7 +137,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 payer={invoice.payer}
                 methods={paymentMethods}
                 error={paymentError}
-                onSubmit={payWithCard}
+                onSubmit={payByCard}
                 loading={paymentLoading}
               />
             </FormsContainer>

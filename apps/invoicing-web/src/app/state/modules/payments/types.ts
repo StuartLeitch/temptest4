@@ -2,6 +2,9 @@ export interface CreditCardInput {
   cardNumber: string;
   expiration: string;
   cvv: string;
+  postalCode: string;
+  paymentMethodId: string;
+  invoiceId: string;
 }
 
 export interface Payment {

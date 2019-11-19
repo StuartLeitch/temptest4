@@ -28,6 +28,7 @@ export type CreditCardInput = {
   cardNumber: Scalars['String'],
   expiration: Scalars['String'],
   cvv: Scalars['String'],
+  postalCode?: Maybe<Scalars['String']>,
 };
 
 

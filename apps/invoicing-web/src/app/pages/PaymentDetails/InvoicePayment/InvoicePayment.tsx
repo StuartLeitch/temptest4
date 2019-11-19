@@ -2,8 +2,9 @@ import React, { useMemo } from "react";
 import { Formik } from "formik";
 import styled from "styled-components";
 import {
-  Expander,
+  Text,
   Label,
+  Expander,
   ActionLink,
   Icon,
   th,
@@ -42,11 +43,14 @@ const validateFn = methods => values => {
   if (!values.cvv) {
     errors.cvv = "Required";
   }
+  if (!values.postalCode) {
+    errors.postalCode = "Required";
+  }
 
   return errors;
 };
 
-const addInvoiceDownloadLink = payer => {
+const InvoiceDownloadLink = payer => {
   if (payer) {
     return (
       <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
@@ -58,6 +62,7 @@ const addInvoiceDownloadLink = payer => {
 };
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
+  error,
   payer,
   methods,
   loading,
@@ -76,7 +81,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     <Expander title="2. Invoice & Payment">
       <Label my="4" ml="4">
         Your Invoice
-        {addInvoiceDownloadLink(payer)}
+        <InvoiceDownloadLink payer={payer} />
       </Label>
       <Formik
         validate={validateFn(methods)}
@@ -100,6 +105,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
               {methods[values.paymentMethodId] === "Paypal" && (
                 <Paypal onSuccess={p => console.log("pe success", p)} />
               )}
+              {error && <Text type="warning">{error}</Text>}
             </Root>
           );
         }}
