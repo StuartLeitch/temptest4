@@ -20,6 +20,7 @@ const paymentMethods = [
 ];
 
 const seed = async knex => {
+  console.log('seeding payment methods...');
   await knex('payment_methods').truncate();
 
   await Promise.all(
@@ -27,4 +28,4 @@ const seed = async knex => {
   );
 };
 
-exports.seed = async knex => seed(knex);
+exports.seed = seed;

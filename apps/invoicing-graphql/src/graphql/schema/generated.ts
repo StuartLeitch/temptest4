@@ -24,6 +24,19 @@ export type AddressInput = {
   addressLine1?: Maybe<Scalars['String']>,
 };
 
+export type Article = {
+   __typename?: 'Article',
+  id?: Maybe<Scalars['String']>,
+  journalId?: Maybe<Scalars['String']>,
+  customId?: Maybe<Scalars['String']>,
+  title?: Maybe<Scalars['String']>,
+  articleType?: Maybe<Scalars['String']>,
+  authorEmail?: Maybe<Scalars['String']>,
+  authorCountry?: Maybe<Scalars['String']>,
+  authorSurname?: Maybe<Scalars['String']>,
+  authorFirstName?: Maybe<Scalars['String']>,
+};
+
 export type CreditCardInput = {
   cardNumber: Scalars['String'],
   expiration: Scalars['String'],
@@ -41,6 +54,16 @@ export type Invoice = {
   charge?: Maybe<Scalars['Float']>,
   status?: Maybe<InvoiceStatus>,
   payer?: Maybe<Payer>,
+  invoiceItems?: Maybe<Array<Maybe<InvoiceItem>>>,
+};
+
+export type InvoiceItem = {
+   __typename?: 'InvoiceItem',
+  id?: Maybe<Scalars['String']>,
+  invoiceId?: Maybe<Scalars['String']>,
+  manuscriptId?: Maybe<Scalars['String']>,
+  price?: Maybe<Scalars['Float']>,
+  article?: Maybe<Article>,
 };
 
 export enum InvoiceStatus {
@@ -213,6 +236,8 @@ export type ResolversTypes = {
   Payer: ResolverTypeWrapper<Payer>,
   PayerType: PayerType,
   Address: ResolverTypeWrapper<Address>,
+  InvoiceItem: ResolverTypeWrapper<InvoiceItem>,
+  Article: ResolverTypeWrapper<Article>,
   PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   Mutation: ResolverTypeWrapper<{}>,
@@ -233,6 +258,8 @@ export type ResolversParentTypes = {
   Payer: Payer,
   PayerType: PayerType,
   Address: Address,
+  InvoiceItem: InvoiceItem,
+  Article: Article,
   PaymentMethod: PaymentMethod,
   Boolean: Scalars['Boolean'],
   Mutation: {},
@@ -249,6 +276,18 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
 
+export type ArticleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Article'] = ResolversParentTypes['Article']> = {
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  journalId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  articleType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  authorEmail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  authorCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  authorSurname?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  authorFirstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+};
+
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date'
 }
@@ -261,6 +300,15 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   charge?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>,
   payer?: Resolver<Maybe<ResolversTypes['Payer']>, ParentType, ContextType>,
+  invoiceItems?: Resolver<Maybe<Array<Maybe<ResolversTypes['InvoiceItem']>>>, ParentType, ContextType>,
+};
+
+export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  manuscriptId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  article?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType>,
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -303,8 +351,10 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type Resolvers<ContextType = any> = {
   Address?: AddressResolvers<ContextType>,
+  Article?: ArticleResolvers<ContextType>,
   Date?: GraphQLScalarType,
   Invoice?: InvoiceResolvers<ContextType>,
+  InvoiceItem?: InvoiceItemResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Payer?: PayerResolvers<ContextType>,
   Payment?: PaymentResolvers<ContextType>,

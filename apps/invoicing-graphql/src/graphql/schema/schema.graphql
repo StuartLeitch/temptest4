@@ -6,6 +6,26 @@ enum InvoiceStatus {
   FINAL
 }
 
+type Article {
+  id: String
+  journalId: String
+  customId: String
+  title: String
+  articleType: String
+  authorEmail: String
+  authorCountry: String
+  authorSurname: String
+  authorFirstName: String
+}
+
+type InvoiceItem {
+  id: String
+  invoiceId: String
+  manuscriptId: String
+  price: Float
+  article: Article
+}
+
 type Invoice {
   id: String
   dateCreated: String
@@ -14,6 +34,7 @@ type Invoice {
   charge: Float
   status: InvoiceStatus
   payer: Payer
+  invoiceItems: [InvoiceItem]
 }
 
 input AddressInput {

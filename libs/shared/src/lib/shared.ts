@@ -62,6 +62,7 @@ export * from './modules/invoices/usecases/createInvoice/createInvoice';
 export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
+export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';

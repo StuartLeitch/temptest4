@@ -1,9 +1,13 @@
 import {
   InvoiceId,
   PayerMap,
+  ArticleMap,
   UniqueEntityID,
+  InvoiceItemMap,
   GetInvoiceDetailsDTO,
   GetInvoiceDetailsUsecase,
+  GetArticleDetailsUsecase,
+  GetItemsForInvoiceUsecase,
   Roles
 } from '@hindawi/shared';
 
@@ -50,6 +54,37 @@ export const invoice: Resolvers<Context> = {
         InvoiceId.create(new UniqueEntityID(parent.id)).getValue()
       );
       return PayerMap.toPersistence(payer);
+    },
+    async invoiceItems(parent: Invoice, args, context) {
+      const getItemsUseCase = new GetItemsForInvoiceUsecase(
+        context.repos.invoiceItem,
+        context.repos.invoice
+      );
+
+      const items = await getItemsUseCase.execute({ invoiceId: parent.id });
+
+      if (items.isLeft()) {
+        throw items.value.errorValue();
+      }
+
+      return items.value.getValue().map(InvoiceItemMap.toPersistence);
+    }
+  },
+  InvoiceItem: {
+    async article(parent, args, context) {
+      const getArticleUseCase = new GetArticleDetailsUsecase(
+        context.repos.manuscript
+      );
+
+      const article = await getArticleUseCase.execute({
+        articleId: parent.manuscriptId
+      });
+
+      if (article.isLeft()) {
+        throw article.value.errorValue();
+      }
+
+      return ArticleMap.toPersistence(article.value.getValue());
     }
   }
 };
