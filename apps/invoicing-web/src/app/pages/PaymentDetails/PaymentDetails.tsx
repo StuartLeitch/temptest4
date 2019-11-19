@@ -125,33 +125,32 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
           }
 
           return (
-            <FormsContainer>
-              <BillingInfo
-                status={invoice.status}
-                payer={invoice.payer}
-                error={payerError}
-                handleSubmit={updatePayer}
-                loading={payerLoading}
+            <Fragment>
+              <FormsContainer>
+                <BillingInfo
+                  status={invoice.status}
+                  payer={invoice.payer}
+                  error={payerError}
+                  handleSubmit={updatePayer}
+                  loading={payerLoading}
+                />
+                <InvoicePayment
+                  payer={invoice.payer}
+                  methods={paymentMethods}
+                  error={paymentError}
+                  onSubmit={payByCard}
+                  loading={paymentLoading}
+                />
+              </FormsContainer>
+
+              <Details
+                invoiceDetails={invoice.invoiceItems[0]}
+                charges={charges}
+                mt={-44}
               />
-              <InvoicePayment
-                payer={invoice.payer}
-                methods={paymentMethods}
-                error={paymentError}
-                onSubmit={payByCard}
-                loading={paymentLoading}
-              />
-            </FormsContainer>
+            </Fragment>
           );
         })()}
-
-        <Details
-          articleDetailsExpanded={true}
-          invoiceDetailsExpanded={true}
-          articleDetails={articleDetails}
-          invoiceDetails={invoiceDetails}
-          charges={charges}
-          mt={-44}
-        />
       </Root>
     </Fragment>
   );

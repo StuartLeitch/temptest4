@@ -10,8 +10,8 @@ const initialLoading: LoadingState = {
   error: null,
 };
 
-export function createLoadingReducer(actions) {
-  return createReducer(initialLoading)
+export function createLoadingReducer(actions, startLoading: boolean = false) {
+  return createReducer({ ...initialLoading, loading: startLoading })
     .handleAction(
       actions.request,
       (): LoadingState => ({ loading: true, error: null }),

@@ -7,31 +7,15 @@ import { InvoiceDetails } from "./InvoiceDetails";
 import { Charges } from "./Charges";
 
 interface Props extends LayoutProps, SpaceProps {
-  articleDetailsExpanded?: boolean;
-  invoiceDetailsExpanded?: boolean;
-  articleDetails: any;
   invoiceDetails: any;
   charges: any;
 }
 
-const Details: React.FC<Props> = ({
-  articleDetailsExpanded,
-  invoiceDetailsExpanded,
-  articleDetails,
-  invoiceDetails,
-  charges,
-  ...rest
-}) => (
+const Details: React.FC<Props> = ({ invoiceDetails, charges, ...rest }) => (
   <Root {...rest}>
-    <ArticleDetails
-      articleDetails={articleDetails}
-      expanded={articleDetailsExpanded}
-    ></ArticleDetails>
-    <InvoiceDetails
-      invoiceDetails={invoiceDetails}
-      expanded={invoiceDetailsExpanded}
-    ></InvoiceDetails>
-    <Charges charges={charges} mt="25"></Charges>
+    <ArticleDetails article={invoiceDetails.article} />
+    <InvoiceDetails invoiceDetails={invoiceDetails} />
+    <Charges charges={charges} mt="10"></Charges>
   </Root>
 );
 

@@ -11,7 +11,7 @@ interface Props {
 }
 
 const InvoiceDetails: React.FC<Props> = ({ invoiceDetails, expanded }) => (
-  <Expander title="Invoice Details" expanded={expanded}>
+  <Expander title="Invoice Details" expanded>
     <Root>
       <DetailItem
         label="Invoice Issue Date"

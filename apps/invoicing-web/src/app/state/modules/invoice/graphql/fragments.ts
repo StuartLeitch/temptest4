@@ -22,6 +22,20 @@ export const payerFragment = gql`
   ${addressFragment}
 `;
 
+export const articleFragment = gql`
+  fragment articleFragment on Article {
+    id
+    title
+    articleType
+    authorCountry
+    authorEmail
+    customId
+    journalId
+    authorSurname
+    authorFirstName
+  }
+`;
+
 export const invoiceFragment = gql`
   fragment invoiceFragment on Invoice {
     id
@@ -29,6 +43,15 @@ export const invoiceFragment = gql`
     payer {
       ...payerFragment
     }
+    invoiceItems {
+      id
+      price
+      manuscriptId
+      article {
+        ...articleFragment
+      }
+    }
   }
   ${payerFragment}
+  ${articleFragment}
 `;

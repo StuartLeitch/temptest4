@@ -9,6 +9,7 @@ const initialState: Invoice = {
   id: null,
   status: null,
   payer: null,
+  invoiceItems: [],
 };
 
 const invoice = createReducer(initialState)
@@ -20,7 +21,7 @@ const invoice = createReducer(initialState)
 
 const payerLoading = createLoadingReducer(updatePayerAsync);
 
-const invoiceLoading = createLoadingReducer(getInvoice);
+const invoiceLoading = createLoadingReducer(getInvoice, true);
 
 export default combineReducers({
   invoice,
