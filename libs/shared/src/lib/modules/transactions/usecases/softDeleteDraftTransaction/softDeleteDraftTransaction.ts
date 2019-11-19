@@ -1,123 +1,47 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result, left} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result, left, right } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { AppError } from '../../../../core/logic/AppError';
 
-import {AppError} from '../../../../core/logic/AppError';
+import { Invoice } from './../../../invoices/domain/Invoice';
+import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
+import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
+import { Transaction } from '../../domain/Transaction';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
+import { Manuscript } from './../../../manuscripts/domain/Manuscript';
+import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
 
-import {Invoice} from './../../../invoices/domain/Invoice';
-import {InvoiceId} from './../../../invoices/domain/InvoiceId';
-import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
-import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
-import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
-import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
-import {Transaction} from '../../domain/Transaction';
-import {TransactionRepoContract} from '../../repos/transactionRepo';
-
+import { SoftDeleteDraftTransactionRequestDTO } from './softDeleteDraftTransactionDTOs';
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
-
-export interface SoftDeleteDraftTransactionRequestDTO {
-  manuscriptId: string;
-}
-
-export type DeleteTransactionContext = AuthorizationContext<Roles>;
+  AccessControlContext,
+  SoftDeleteDraftTransactionAuthorizationContext
+} from './softDeleteDraftTransactionAuthorizationContext';
+import { SoftDeleteDraftTransactionErrors } from './softDeleteDraftTransactionErrors';
+import { SoftDeleteDraftTransactionResponse } from './softDeleteDraftTransactionResponse';
 
 export class SoftDeleteDraftTransactionUsecase
   implements
     UseCase<
       SoftDeleteDraftTransactionRequestDTO,
-      Result<void>,
-      DeleteTransactionContext
+      Promise<SoftDeleteDraftTransactionResponse>,
+      SoftDeleteDraftTransactionAuthorizationContext
     >,
     AccessControlledUsecase<
       SoftDeleteDraftTransactionRequestDTO,
-      DeleteTransactionContext,
+      SoftDeleteDraftTransactionAuthorizationContext,
       AccessControlContext
     > {
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private invoiceRepo: InvoiceRepoContract
-  ) {
-    this.transactionRepo = transactionRepo;
-    this.invoiceItemRepo = invoiceItemRepo;
-    this.invoiceRepo = invoiceRepo;
-  }
-
-  private async getInvoiceItemByManuscriptId(
-    request: SoftDeleteDraftTransactionRequestDTO
-  ): Promise<Result<InvoiceItem>> {
-    const {manuscriptId} = request;
-
-    if (!manuscriptId) {
-      return Result.fail<InvoiceItem>(`Invalid Manuscript ID=${manuscriptId}`);
-    }
-
-    const invoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
-      ManuscriptId.create(new UniqueEntityID(manuscriptId)).getValue()
-    );
-    const found = !!invoiceItem;
-
-    if (found) {
-      return Result.ok<InvoiceItem>(invoiceItem);
-    } else {
-      return Result.fail<InvoiceItem>(
-        `Couldn't find Invoice Item by manuscript id=${manuscriptId}`
-      );
-    }
-  }
-
-  private async getInvoiceByInvoiceItemId(
-    invoiceItemId
-  ): Promise<Result<Invoice>> {
-    if (!invoiceItemId) {
-      return Result.fail<Invoice>(
-        `Invalid Invoice Item Id=${invoiceItemId.id.toString()}`
-      );
-    }
-
-    const invoice = await this.invoiceRepo.getInvoiceByInvoiceItemId(
-      invoiceItemId
-    );
-    const found = !!invoice;
-
-    if (found) {
-      return Result.ok<Invoice>(invoice);
-    } else {
-      return Result.fail<Invoice>(
-        `Couldn't find Invoice by Invoice Item id=${invoiceItemId.id.toString()}`
-      );
-    }
-  }
-
-  private async getTransactionByInvoiceId(
-    invoiceId: InvoiceId
-  ): Promise<Result<Transaction>> {
-    if (!invoiceId) {
-      return Result.fail<Transaction>(
-        `Invalid Invoice Id=${invoiceId.id.toString()}`
-      );
-    }
-
-    const transaction = await this.transactionRepo.getTransactionByInvoiceId(
-      invoiceId
-    );
-    const found = !!transaction;
-
-    if (found) {
-      return Result.ok<Transaction>(transaction);
-    } else {
-      return Result.fail<Transaction>(
-        `Couldn't find Transaction by Invoice id=${invoiceId.id.toString()}`
-      );
-    }
-  }
+    private invoiceRepo: InvoiceRepoContract,
+    private manuscriptRepo: ManuscriptRepoContract
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -126,49 +50,79 @@ export class SoftDeleteDraftTransactionUsecase
   @Authorize('transaction:delete')
   public async execute(
     request: SoftDeleteDraftTransactionRequestDTO,
-    context?: DeleteTransactionContext
-  ): Promise<any> {
+    context?: SoftDeleteDraftTransactionAuthorizationContext
+  ): Promise<SoftDeleteDraftTransactionResponse> {
+    let invoiceItem: InvoiceItem;
+    let invoice: Invoice;
+    let transaction: Transaction;
+    let manuscript: Manuscript;
+
+    // * build the ManuscriptId
+    const manuscriptId = ManuscriptId.create(
+      new UniqueEntityID(request.manuscriptId)
+    ).getValue();
+
     try {
-      // * System identifies invoice item by manuscript Id
-      const invoiceItemOrError = await this.getInvoiceItemByManuscriptId(
-        request
-      );
-
-      if (invoiceItemOrError.isFailure) {
-        return Result.fail<Transaction>(invoiceItemOrError.error);
+      try {
+        // * System identifies article by manuscript Id
+        manuscript = await this.manuscriptRepo.findById(manuscriptId);
+      } catch (err) {
+        return left(
+          new SoftDeleteDraftTransactionErrors.InvoiceItemNotFoundError(
+            request.manuscriptId
+          )
+        );
       }
 
-      const invoiceItem: InvoiceItem = invoiceItemOrError.getValue();
-
-      // * System identifies invoice by invoice item Id
-      const invoiceOrError = await this.getInvoiceByInvoiceItemId(
-        invoiceItem.invoiceItemId
-      );
-
-      if (invoiceOrError.isFailure) {
-        return Result.fail<Transaction>(invoiceOrError.error);
+      try {
+        // * System identifies invoice item by manuscript Id
+        invoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+          manuscriptId
+        );
+      } catch (err) {
+        return left(
+          new SoftDeleteDraftTransactionErrors.InvoiceItemNotFoundError(
+            request.manuscriptId
+          )
+        );
       }
 
-      const invoice: Invoice = invoiceOrError.getValue();
-
-      // * System identifies transaction by invoice Id
-      const transactionOrError = await this.getTransactionByInvoiceId(
-        invoice.invoiceId
-      );
-
-      if (transactionOrError.isFailure) {
-        return Result.fail<Transaction>(transactionOrError.error);
+      try {
+        // * System identifies invoice by invoice item Id
+        invoice = await this.invoiceRepo.getInvoiceById(invoiceItem.invoiceId);
+      } catch (err) {
+        return left(
+          new SoftDeleteDraftTransactionErrors.InvoiceNotFoundError(
+            invoiceItem.invoiceItemId.id.toString()
+          )
+        );
       }
 
-      const transaction: Transaction = transactionOrError.getValue();
+      try {
+        // * System identifies transaction by invoice Id
+        transaction = await this.transactionRepo.getTransactionById(
+          invoice.transactionId
+        );
+      } catch (err) {
+        return left(
+          new SoftDeleteDraftTransactionErrors.TransactionNotFoundError(
+            invoice.invoiceId.id.toString()
+          )
+        );
+      }
 
-      // This is where all the magic happens
+      // This is where all the magic happens!
+
       // * System soft deletes transaction
       await this.transactionRepo.delete(transaction);
+      // * System soft deletes invoice
       await this.invoiceRepo.delete(invoice);
+      // * System soft deletes invoice item
       await this.invoiceItemRepo.delete(invoiceItem);
+      // * System soft deletes manuscript
+      await this.manuscriptRepo.delete(manuscript);
 
-      return Result.ok<void>();
+      return right(Result.ok<void>());
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

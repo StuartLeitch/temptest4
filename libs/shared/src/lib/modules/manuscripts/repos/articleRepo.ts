@@ -7,4 +7,6 @@ import { ManuscriptId } from '../../invoices/domain/ManuscriptId';
 export interface ArticleRepoContract extends Repo<Article | Manuscript> {
   findById(manuscriptId: ManuscriptId): Promise<Article>;
   getAuthorOfArticle(articleId: ArticleId): Promise<unknown>;
+  delete(manuscript: Manuscript): Promise<unknown>;
+  update(manuscript: Manuscript): Promise<Manuscript>;
 }

@@ -4,11 +4,15 @@ import {
   ArticleMap,
   UniqueEntityID
 } from '../../../../shared';
-import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {ManuscriptId} from '../../../invoices/domain/ManuscriptId';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
-import {ArticleRepoContract} from '../articleRepo';
+import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
+import { Manuscript } from './../../domain/Manuscript';
+import { ManuscriptMap } from './../../mappers/ManuscriptMap';
+
+import { ArticleRepoContract } from '../articleRepo';
 
 export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
   implements ArticleRepoContract {
@@ -35,10 +39,44 @@ export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
   }
 
   async save(article: Article): Promise<Article> {
-    const {db} = this;
+    const { db } = this;
 
     await db(TABLES.ARTICLES).insert(ArticleMap.toPersistence(article));
 
     return article;
+  }
+
+  async update(manuscript: Manuscript): Promise<Manuscript> {
+    const { db } = this;
+
+    const updated = await db(TABLES.ARTICLES)
+      .where({ id: manuscript.id.toString() })
+      .update(ManuscriptMap.toPersistence(manuscript));
+
+    if (!updated) {
+      throw RepoError.createEntityNotFoundError(
+        'manuscript',
+        manuscript.id.toString()
+      );
+    }
+
+    return manuscript;
+  }
+
+  async delete(manuscript: Manuscript): Promise<unknown> {
+    const { db } = this;
+
+    const deletedRows = await db(TABLES.ARTICLES)
+      .where('id', manuscript.id.toString())
+      .update({ ...ManuscriptMap.toPersistence(manuscript), deleted: 1 });
+
+    return deletedRows
+      ? deletedRows
+      : Promise.reject(
+          RepoError.createEntityNotFoundError(
+            'manuscript',
+            manuscript.id.toString()
+          )
+        );
   }
 }
