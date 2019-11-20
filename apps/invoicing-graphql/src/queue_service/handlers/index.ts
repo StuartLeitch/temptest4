@@ -2,7 +2,7 @@ import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
 import { SubmissionQualityCheckPassedHandler } from './SubmissionQualityCheckPassed';
 import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
 import { SubmissionQualityCheckRTCd } from './SubmissionQualityCheckRTCd';
-import { SubmissionPeerReviewRejected } from './SubmissionPeerReviewRejected';
+import { SubmissionRejected } from './SubmissionRejected';
 import { SubmissionWithdrawn } from './SubmissionWithdrawn';
 
 export {
@@ -11,5 +11,5 @@ export {
   SubmissionWithdrawn,
   SubmissionScreeningRTCd,
   SubmissionQualityCheckRTCd,
-  SubmissionPeerReviewRejected
+  SubmissionRejected
 };

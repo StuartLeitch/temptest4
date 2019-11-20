@@ -5,9 +5,23 @@ import { invoiceFragment } from "./fragments";
 
 export const getInvoice: ASTNode = gql`
   query invoice($id: String) {
-    invoice(id: $id) {
+    invoice(invoiceId: $id) {
       ...invoiceFragment
     }
   }
   ${invoiceFragment}
+`;
+
+export const getInvoices: ASTNode = gql`
+  query fetchInvoices {
+    invoices {
+      id: invoiceId
+      status
+      manuscriptTitle: title
+      type
+      price
+      customId
+      dateCreated
+    }
+  }
 `;

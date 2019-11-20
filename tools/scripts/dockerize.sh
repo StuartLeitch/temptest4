@@ -1,4 +1,4 @@
-# AFFECTED_APPS='invoicing-web'
+AFFECTED_APPS='invoicing-graphql'
 for APP in $AFFECTED_APPS
 do
   if [ -s "dist/apps/${APP}/Dockerfile" ]

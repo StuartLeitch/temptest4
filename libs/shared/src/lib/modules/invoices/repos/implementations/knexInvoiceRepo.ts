@@ -49,6 +49,29 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return InvoiceMap.toDomain(invoice);
   }
 
+  async getRecentInvoices(): Promise<any[]> {
+    const { db } = this;
+
+    const invoices = await db(TABLES.INVOICES)
+      .select()
+      .whereNot(`${TABLES.INVOICES}.deleted`, 1)
+      .join(
+        TABLES.INVOICE_ITEMS,
+        `${TABLES.INVOICES}.id`,
+        '=',
+        `${TABLES.INVOICE_ITEMS}.invoiceId`
+      )
+      .join(
+        TABLES.ARTICLES,
+        `${TABLES.INVOICE_ITEMS}.manuscriptId`,
+        '=',
+        `${TABLES.ARTICLES}.id`
+      )
+      .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc');
+
+    return invoices; // .map(i => InvoiceMap.toDomain(i));
+  }
+
   async getInvoicesByTransactionId(
     transactionId: TransactionId
   ): Promise<Invoice[]> {

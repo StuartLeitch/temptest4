@@ -54,6 +54,7 @@ export type CreditCardInput = {
 };
 
 export type Invoice = {
+<<<<<<< Updated upstream
   __typename?: 'Invoice';
   id?: Maybe<Scalars['String']>;
   dateCreated?: Maybe<Scalars['String']>;
@@ -73,6 +74,20 @@ export type InvoiceItem = {
   price?: Maybe<Scalars['Float']>;
   article?: Maybe<Article>;
   dateCreated?: Maybe<Scalars['Date']>;
+=======
+   __typename?: 'Invoice',
+  invoiceId?: Maybe<Scalars['String']>,
+  dateCreated?: Maybe<Scalars['String']>,
+  dateChanged?: Maybe<Scalars['String']>,
+  vat?: Maybe<Scalars['Float']>,
+  charge?: Maybe<Scalars['Float']>,
+  status?: Maybe<InvoiceStatus>,
+  payer?: Maybe<Payer>,
+  title?: Maybe<Scalars['String']>,
+  price?: Maybe<Scalars['Float']>,
+  customId?: Maybe<Scalars['String']>,
+  type?: Maybe<Scalars['String']>,
+>>>>>>> Stashed changes
 };
 
 export enum InvoiceStatus {
@@ -132,6 +147,7 @@ export enum PayerType {
   INDIVIDUAL = 'INDIVIDUAL'
 }
 
+<<<<<<< Updated upstream
 export type Payment = {
   __typename?: 'Payment';
   id: Scalars['String'];
@@ -149,6 +165,18 @@ export type PaymentMethod = {
   id: Scalars['String'];
   name: Scalars['String'];
   isActive?: Maybe<Scalars['Boolean']>;
+=======
+export type Query = {
+   __typename?: 'Query',
+  invoice?: Maybe<Invoice>,
+  invoices?: Maybe<Array<Maybe<Invoice>>>,
+  echo?: Maybe<Scalars['String']>,
+};
+
+
+export type QueryInvoiceArgs = {
+  invoiceId?: Maybe<Scalars['String']>
+>>>>>>> Stashed changes
 };
 
 export type Query = {
@@ -319,6 +347,7 @@ export type AddressResolvers<
   >;
 };
 
+<<<<<<< Updated upstream
 export type ArticleResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Article'] = ResolversParentTypes['Article']
@@ -362,6 +391,20 @@ export type ArticleResolvers<
     ParentType,
     ContextType
   >;
+=======
+export type InvoiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Invoice'] = ResolversParentTypes['Invoice']> = {
+  invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  dateCreated?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  dateChanged?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  charge?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>,
+  payer?: Resolver<Maybe<ResolversTypes['Payer']>, ParentType, ContextType>,
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+>>>>>>> Stashed changes
 };
 
 export interface DateScalarConfig
@@ -423,6 +466,7 @@ export type InvoiceItemResolvers<
   >;
 };
 
+<<<<<<< Updated upstream
 export type MutationResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
@@ -454,6 +498,12 @@ export type MutationResolvers<
       'invoiceId' | 'paymentMethodId' | 'creditCard'
     >
   >;
+=======
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
+  invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+  echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
+>>>>>>> Stashed changes
 };
 
 export type PayerResolvers<

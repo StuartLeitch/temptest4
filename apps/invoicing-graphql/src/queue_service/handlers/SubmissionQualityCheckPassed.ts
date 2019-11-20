@@ -1,6 +1,7 @@
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 
+import { VersionCompare } from './../../../../../libs/shared/src/lib/utils/VersionCompare';
 import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
@@ -18,17 +19,21 @@ export const SubmissionQualityCheckPassedHandler = {
 ${JSON.stringify(data)}
     `);
 
+    const { submissionId, manuscripts } = data;
+
+    const maxVersion = manuscripts.reduce((max, m: any) => {
+      const version = VersionCompare.versionCompare(m.version, max)
+        ? m.version
+        : max;
+      return version;
+    }, manuscripts[0].version);
+
     const {
-      submissionId,
-      manuscripts: [
-        {
-          customId,
-          title,
-          articleType: { name },
-          authors
-        }
-      ]
-    } = data;
+      customId,
+      title,
+      articleType: { name },
+      authors
+    } = manuscripts.find((m: any) => m.version === maxVersion);
 
     const { email, country, surname, givenNames } = authors.find(
       (a: any) => a.isCorresponding

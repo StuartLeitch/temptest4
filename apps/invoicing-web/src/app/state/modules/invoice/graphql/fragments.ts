@@ -39,7 +39,7 @@ export const articleFragment = gql`
 
 export const invoiceFragment = gql`
   fragment invoiceFragment on Invoice {
-    id
+    invoiceId
     status
     dateCreated
     payer {

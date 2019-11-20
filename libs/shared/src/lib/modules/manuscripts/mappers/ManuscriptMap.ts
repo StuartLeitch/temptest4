@@ -32,6 +32,7 @@ export class ManuscriptMap extends Mapper<Manuscript> {
       authorEmail: manuscript.props.authorEmail,
       authorCountry: manuscript.props.authorCountry,
       authorSurname: manuscript.props.authorSurname,
+      authorFirstName: manuscript.props.authorFirstName,
       created: manuscript.props.created,
       customId: manuscript.props.customId
     };

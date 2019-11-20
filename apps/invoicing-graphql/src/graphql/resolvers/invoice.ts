@@ -11,6 +11,8 @@ import {
   GetItemsForInvoiceUsecase,
   Roles
 } from '@hindawi/shared';
+import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
+import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { Resolvers, Invoice } from '../schema';
 import { Context } from '../../context';
@@ -22,7 +24,7 @@ export const invoice: Resolvers<Context> = {
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
-        invoiceId: args.id
+        invoiceId: args.invoiceId
       };
 
       const usecaseContext = {
@@ -38,7 +40,7 @@ export const invoice: Resolvers<Context> = {
         const invoiceDetails = result.value.getValue();
 
         return {
-          id: invoiceDetails.id.toString(),
+          invoiceId: invoiceDetails.id.toString(),
           status: invoiceDetails.status,
           vat: invoiceDetails.vat,
           charge: invoiceDetails.charge,
@@ -47,6 +49,21 @@ export const invoice: Resolvers<Context> = {
           // netAmount: entity.netAmount
         };
       }
+    },
+
+    async invoices(parent, args, context) {
+      const { repos } = context;
+      const usecase = new GetRecentInvoicesUsecase(repos.invoice);
+      const usecaseContext = {
+        roles: [Roles.ADMIN]
+      };
+      const result = await usecase.execute({}, usecaseContext);
+
+      if (result.isLeft()) {
+        return undefined;
+      }
+
+      return result.value.getValue();
     }
   },
   Invoice: {

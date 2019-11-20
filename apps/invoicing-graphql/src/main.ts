@@ -23,132 +23,377 @@ async function main(): Promise<void> {
   // queue.start();
 
   // queue.__LOCAL__.handler({
-  //   submissionId: 'a2eb9a08-d0c8-4638-85c1-74d926d3cb15',
+  //   submissionId: '7b61bbdc-d68a-46c3-8a78-6a3f67040de4',
   //   manuscripts: [
   //     {
-  //       id: '439303d8-bdb4-43f2-a7e0-7a4a341a04a1',
-  //       journalId: '25dc63a9-67f4-4ae1-b41d-a09850263c64',
-  //       created: '2019-11-06T09:53:00.361Z',
-  //       updated: '2019-11-06T09:58:27.365Z',
-  //       title: 'Renal Replacement Therapy in the Critical Care Setting',
-  //       abstract:
-  //         'Renal replacement therapy (RRT) is frequently required to manage critically ill patients with acute kidney injury (AKI). There is limited evidence to support the current practice of RRT in intensive care units (ICUs). Recently published randomized control trials (RCTs) have further questioned our understanding of RRT in critical care. The optimal timing and dosing continues to be debatable; however, current evidence suggests delayed strategy with less intensive dosing when utilising RRT. Various modes of RRT are complementary to each other with no definite benefits to mortality or renal function preservation. Choice of anticoagulation remains regional citrate anticoagulation in continuous renal replacement therapy (CRRT) with lower bleeding risk when compared with heparin. RRT can be used to support resistant cardiac failure, but evolving therapies such as haemoperfusion are currently not recommended in sepsis.',
-  //       customId: '3980345',
-  //       version: 1,
+  //       id: 'ac8be855-cef8-454a-86e9-347355957eaf',
+  //       created: '2019-11-19T08:14:21.834Z',
+  //       updated: '2019-11-19T08:15:07.267Z',
+  //       customId: '1218339',
+  //       submissionId: '7b61bbdc-d68a-46c3-8a78-6a3f67040de4',
+  //       journalId: '1cce5e57-8b44-407c-8e05-9c066e1f15f9',
+  //       title: 'INV-test-multiple versions',
+  //       abstract: 'ssdsd',
+  //       version: '1',
   //       conflictOfInterest: '',
-  //       dataAvailability: 'test',
-  //       fundingStatement: 'yes',
-  //       sectionId: null,
-  //       specialIssueId: null,
-  //       files: [
-  //         {
-  //           id: '81400b99-4119-4222-a80e-e28942b9fa7c',
-  //           created: '2019-11-06T09:56:31.484Z',
-  //           updated: '2019-11-06T09:56:31.484Z',
-  //           type: 'manuscript',
-  //           label: null,
-  //           fileName: 'manuscript copy 2.pdf',
-  //           url: null,
-  //           mimeType: 'application/pdf',
-  //           size: 140477,
-  //           originalName: 'manuscript copy 2.pdf',
-  //           position: null,
-  //           providerKey:
-  //             '439303d8-bdb4-43f2-a7e0-7a4a341a04a1/8a0ffb71-7698-4c76-8bdf-87368ece5669'
-  //         }
-  //       ],
+  //       dataAvailability: 'ssd',
+  //       fundingStatement: 'dsdsds',
   //       articleType: {
-  //         name: 'Research Article'
+  //         name: 'Case Series'
   //       },
-  //       reviews: [
-  //         {
-  //           id: '26e3e086-db1a-4e3a-9b8b-57e3901b9a96',
-  //           reviewerId: '7c109fe8-4ec7-4bc9-b1fb-80899eb26b7c',
-  //           created: '2019-11-06T09:57:44.527Z',
-  //           updated: '2019-11-06T09:57:55.460Z',
-  //           submitted: '2019-11-06T07:57:55.455Z',
-  //           recommendation: 'publish',
-  //           comments: [
-  //             {
-  //               id: '80a560a2-2fae-44b4-8af3-4f548adea5dc',
-  //               created: '2019-11-06T09:57:44.546Z',
-  //               updated: '2019-11-06T09:57:53.490Z',
-  //               type: 'public',
-  //               content: 'all good',
-  //               files: []
-  //             }
-  //           ]
-  //         },
-  //         {
-  //           id: 'c811edb3-3b7d-4aa1-87e4-d03fa02208b4',
-  //           reviewerId: 'b7ec7fc4-5c3f-49cc-a5fd-81d8a03a7053',
-  //           created: '2019-11-06T09:58:14.114Z',
-  //           updated: '2019-11-06T09:58:14.114Z',
-  //           submitted: '2019-11-06T07:58:14.112Z',
-  //           recommendation: 'publish',
-  //           comments: [
-  //             {
-  //               id: '5a7d0ee1-fced-4789-96f5-f005048ea59f',
-  //               created: '2019-11-06T09:58:14.127Z',
-  //               updated: '2019-11-06T09:58:14.127Z',
-  //               type: 'public',
-  //               content: 'publish with ae as well',
-  //               files: []
-  //             }
-  //           ]
-  //         },
-  //         {
-  //           id: '97883057-89c1-4dea-b32d-18791d588f25',
-  //           reviewerId: '80cb0d12-63cd-490b-ae1d-2ac1584242f0',
-  //           created: '2019-11-06T09:58:27.347Z',
-  //           updated: '2019-11-06T09:58:27.347Z',
-  //           submitted: '2019-11-06T07:58:27.345Z',
-  //           recommendation: 'publish',
-  //           comments: []
-  //         }
-  //       ],
   //       authors: [
   //         {
-  //           id: '493e1e9c-1b1b-4ea4-bf4d-46786e4f0a7e',
-  //           created: '2019-11-06T09:56:06.346Z',
-  //           updated: '2019-11-06T09:56:06.422Z',
-  //           userId: 'dda62ea8-4f91-4fd6-9902-8a2cf9197b6b',
+  //           id: '31a9d8a0-7749-4461-95ec-dcc542603282',
+  //           created: '2019-11-19T08:14:21.837Z',
+  //           updated: '2019-11-19T08:14:55.154Z',
+  //           surname: 'inv',
+  //           givenNames: 'autor',
+  //           email: 'georgiana.olaru+autor@hindawi.com',
+  //           aff: 'addsds',
+  //           country: 'AL',
   //           isSubmitting: true,
-  //           isCorresponding: true,
-  //           status: 'pending',
-  //           aff: 'Hin',
-  //           email: 'email+author1@domain.com',
-  //           country: 'RO',
-  //           surname: 'auhtor1',
-  //           givenNames: 'author1'
+  //           isCorresponding: true
   //         }
   //       ],
-  //       reviewers: [
+  //       files: [
   //         {
-  //           id: '7c109fe8-4ec7-4bc9-b1fb-80899eb26b7c',
-  //           created: '2019-11-06T09:57:28.925Z',
-  //           updated: '2019-11-06T09:57:55.504Z',
-  //           userId: '23c567d8-49db-45d6-bb7b-0c78e32a7dc0',
-  //           status: 'submitted',
-  //           email: 'email+rev@domain.com',
-  //           surname: 'rev',
-  //           givenNames: 'rev',
-  //           responded: '2019-11-06T05:57:44.439Z'
+  //           id: 'e8e4deb4-0e13-4c2a-a1f5-62d6c49db8f6',
+  //           created: '2019-11-19T08:14:21.837Z',
+  //           updated: '2019-11-19T08:14:22.436Z',
+  //           type: 'manuscript',
+  //           fileName: '02 Revenue Recognition.pdf',
+  //           mimeType: 'application/pdf',
+  //           size: 322902,
+  //           originalName: '02 Revenue Recognition.pdf',
+  //           providerKey:
+  //             'ac8be855-cef8-454a-86e9-347355957eaf/7c8b4c16-da96-4805-bd5d-f641094c3bff'
+  //         }
+  //       ],
+  //       editors: []
+  //     },
+  //     {
+  //       id: 'ac8be855-cef8-454a-86e9-347355957eaf',
+  //       created: '2019-11-19T08:30:05.845Z',
+  //       updated: '2019-11-19T08:30:05.845Z',
+  //       customId: '1218339',
+  //       submissionId: '7b61bbdc-d68a-46c3-8a78-6a3f67040de4',
+  //       journalId: '1cce5e57-8b44-407c-8e05-9c066e1f15f9',
+  //       title: 'INV-test-multiple versions',
+  //       abstract: 'ssdsd',
+  //       version: '1.2',
+  //       conflictOfInterest: '',
+  //       dataAvailability: 'ssd',
+  //       fundingStatement: 'dsdsds',
+  //       articleType: {
+  //         name: 'Case Series'
+  //       },
+  //       authors: [
+  //         {
+  //           id: '785e5339-c057-41d4-9bab-41320a992a81',
+  //           created: '2019-11-19T08:30:05.850Z',
+  //           updated: '2019-11-19T08:30:05.850Z',
+  //           surname: 'inv',
+  //           givenNames: 'autor',
+  //           email: 'georgiana.olaru+autor@hindawi.com',
+  //           aff: 'addsds',
+  //           country: 'AL',
+  //           isSubmitting: true,
+  //           isCorresponding: true
+  //         }
+  //       ],
+  //       files: [
+  //         {
+  //           id: 'edea9378-17a4-4312-b2fb-0581eb1ac3fa',
+  //           created: '2019-11-19T08:30:05.850Z',
+  //           updated: '2019-11-19T08:30:05.850Z',
+  //           type: 'manuscript',
+  //           fileName: '02 Revenue Recognition.pdf',
+  //           mimeType: 'application/pdf',
+  //           size: 322902,
+  //           originalName: '02 Revenue Recognition.pdf',
+  //           providerKey: null
   //         }
   //       ],
   //       editors: [
   //         {
-  //           id: '80a32365-939e-4813-a320-7802d82001b2',
-  //           userId: 'a6d95e36-5370-43af-935c-9daaac694b8f',
-  //           aff: 'Hin',
-  //           email: 'email+ae2@domain.com',
-  //           title: 'miss',
+  //           id: 'e69da3fd-0ce1-48d4-b3e3-f1ec7a873d3b',
+  //           aff: 'ssdds',
+  //           email: 'georgiana.olaru+ce1@hindawi.com',
+  //           title: 'mrs',
   //           country: 'RO',
-  //           surname: 'ae2',
-  //           givenNames: 'ae2',
+  //           surname: 'editor_inv',
+  //           givenNames: 'chief',
+  //           role: {
+  //             type: 'triageEditor',
+  //             label: 'Chief Editor'
+  //           }
+  //         },
+  //         {
+  //           id: '51364c0d-6b22-4a14-b484-4fe320a98690',
+  //           aff: 'sdsd',
+  //           email: 'georgiana.olaru+ae1@hindawi.com',
+  //           title: 'mrs',
+  //           country: 'AG',
+  //           surname: 'editor_inv',
+  //           givenNames: 'academic',
   //           role: {
   //             type: 'academicEditor',
   //             label: 'Academic Editor'
+  //           }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       id: 'a3fdb064-9485-49ac-85f2-fe952a12a715',
+  //       created: '2019-11-19T08:30:05.845Z',
+  //       updated: '2019-11-19T08:31:24.435Z',
+  //       customId: '1218339',
+  //       submissionId: '7b61bbdc-d68a-46c3-8a78-6a3f67040de4',
+  //       journalId: '1cce5e57-8b44-407c-8e05-9c066e1f15f9',
+  //       title: 'INV-test-multiple versions_v2minor',
+  //       abstract: 'ssdsd',
+  //       version: '2',
+  //       conflictOfInterest: '',
+  //       dataAvailability: 'ssd',
+  //       fundingStatement: 'dsdsds',
+  //       articleType: {
+  //         name: 'Case Series'
+  //       },
+  //       authors: [
+  //         {
+  //           id: 'c09302cf-6122-43b7-a941-5d2b2556490f',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:44.196Z',
+  //           surname: 'dsds',
+  //           givenNames: 'dd',
+  //           email: 'georgiana.olaru+autor2@hindawi.com',
+  //           aff: 'dd',
+  //           country: 'AR',
+  //           isSubmitting: false,
+  //           isCorresponding: true
+  //         },
+  //         {
+  //           id: '7528d388-73d9-4325-8776-5c6deaf43d7c',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:44.213Z',
+  //           surname: 'inv',
+  //           givenNames: 'autor',
+  //           email: 'georgiana.olaru+autor@hindawi.com',
+  //           aff: 'addsds',
+  //           country: 'AL',
+  //           isSubmitting: true,
+  //           isCorresponding: false
+  //         }
+  //       ],
+  //       files: [
+  //         {
+  //           id: 'a02895ce-7f33-463e-92b1-b16d248f4a8d',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:06.655Z',
+  //           type: 'manuscript',
+  //           fileName: '02 Revenue Recognition.pdf',
+  //           mimeType: 'application/pdf',
+  //           size: 322902,
+  //           originalName: '02 Revenue Recognition.pdf',
+  //           providerKey:
+  //             'a3fdb064-9485-49ac-85f2-fe952a12a715/a409f7c4-374c-40e7-9103-d96c20a14de1'
+  //         }
+  //       ],
+  //       editors: [
+  //         {
+  //           id: 'bef865b4-fefe-4120-b659-afc4858b6c5e',
+  //           aff: 'sdsd',
+  //           email: 'georgiana.olaru+ae1@hindawi.com',
+  //           title: 'mrs',
+  //           country: 'AG',
+  //           surname: 'editor_inv',
+  //           givenNames: 'academic',
+  //           role: {
+  //             type: 'academicEditor',
+  //             label: 'Academic Editor'
+  //           }
+  //         },
+  //         {
+  //           id: 'd1a8427d-6117-4d33-8456-68d402a56194',
+  //           aff: 'ssdds',
+  //           email: 'georgiana.olaru+ce1@hindawi.com',
+  //           title: 'mrs',
+  //           country: 'RO',
+  //           surname: 'editor_inv',
+  //           givenNames: 'chief',
+  //           role: {
+  //             type: 'triageEditor',
+  //             label: 'Chief Editor'
+  //           }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       id: 'a3fdb064-9485-49ac-85f2-fe952a12a715',
+  //       created: '2019-11-19T08:30:05.845Z',
+  //       updated: '2019-11-19T08:31:24.435Z',
+  //       customId: '1218339',
+  //       submissionId: '7b61bbdc-d68a-46c3-8a78-6a3f67040de4',
+  //       journalId: '1cce5e57-8b44-407c-8e05-9c066e1f15f9',
+  //       title: 'INV-test-multiple versions_v2.3minor',
+  //       abstract: 'ssdsd',
+  //       version: '2.3',
+  //       conflictOfInterest: '',
+  //       dataAvailability: 'ssd',
+  //       fundingStatement: 'dsdsds',
+  //       articleType: {
+  //         name: 'Case Series'
+  //       },
+  //       authors: [
+  //         {
+  //           id: 'c09302cf-6122-43b7-a941-5d2b2556490f',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:44.196Z',
+  //           surname: 'dsds',
+  //           givenNames: 'dd',
+  //           email: 'georgiana.olaru+autor2@hindawi.com',
+  //           aff: 'dd',
+  //           country: 'AR',
+  //           isSubmitting: false,
+  //           isCorresponding: true
+  //         },
+  //         {
+  //           id: '7528d388-73d9-4325-8776-5c6deaf43d7c',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:44.213Z',
+  //           surname: 'inv',
+  //           givenNames: 'autor',
+  //           email: 'georgiana.olaru+autor@hindawi.com',
+  //           aff: 'addsds',
+  //           country: 'AL',
+  //           isSubmitting: true,
+  //           isCorresponding: false
+  //         }
+  //       ],
+  //       files: [
+  //         {
+  //           id: 'a02895ce-7f33-463e-92b1-b16d248f4a8d',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:06.655Z',
+  //           type: 'manuscript',
+  //           fileName: '02 Revenue Recognition.pdf',
+  //           mimeType: 'application/pdf',
+  //           size: 322902,
+  //           originalName: '02 Revenue Recognition.pdf',
+  //           providerKey:
+  //             'a3fdb064-9485-49ac-85f2-fe952a12a715/a409f7c4-374c-40e7-9103-d96c20a14de1'
+  //         }
+  //       ],
+  //       editors: [
+  //         {
+  //           id: 'bef865b4-fefe-4120-b659-afc4858b6c5e',
+  //           aff: 'sdsd',
+  //           email: 'georgiana.olaru+ae1@hindawi.com',
+  //           title: 'mrs',
+  //           country: 'AG',
+  //           surname: 'editor_inv',
+  //           givenNames: 'academic',
+  //           role: {
+  //             type: 'academicEditor',
+  //             label: 'Academic Editor'
+  //           }
+  //         },
+  //         {
+  //           id: 'd1a8427d-6117-4d33-8456-68d402a56194',
+  //           aff: 'ssdds',
+  //           email: 'georgiana.olaru+ce1@hindawi.com',
+  //           title: 'mrs',
+  //           country: 'RO',
+  //           surname: 'editor_inv',
+  //           givenNames: 'chief',
+  //           role: {
+  //             type: 'triageEditor',
+  //             label: 'Chief Editor'
+  //           }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       id: 'a3fdb064-9485-49ac-85f2-fe952a12a715',
+  //       created: '2019-11-19T08:30:05.845Z',
+  //       updated: '2019-11-19T08:31:24.435Z',
+  //       customId: '1218339',
+  //       submissionId: '7b61bbdc-d68a-46c3-8a78-6a3f67040de4',
+  //       journalId: '1cce5e57-8b44-407c-8e05-9c066e1f15f9',
+  //       title: 'INV-test-multiple versions_v2.2.7minor',
+  //       abstract: 'ssdsd',
+  //       version: '2.2.7',
+  //       conflictOfInterest: '',
+  //       dataAvailability: 'ssd',
+  //       fundingStatement: 'dsdsds',
+  //       articleType: {
+  //         name: 'Case Series'
+  //       },
+  //       authors: [
+  //         {
+  //           id: 'c09302cf-6122-43b7-a941-5d2b2556490f',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:44.196Z',
+  //           surname: 'dsds',
+  //           givenNames: 'dd',
+  //           email: 'georgiana.olaru+autor2@hindawi.com',
+  //           aff: 'dd',
+  //           country: 'AR',
+  //           isSubmitting: false,
+  //           isCorresponding: true
+  //         },
+  //         {
+  //           id: '7528d388-73d9-4325-8776-5c6deaf43d7c',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:44.213Z',
+  //           surname: 'inv',
+  //           givenNames: 'autor',
+  //           email: 'georgiana.olaru+autor@hindawi.com',
+  //           aff: 'addsds',
+  //           country: 'AL',
+  //           isSubmitting: true,
+  //           isCorresponding: false
+  //         }
+  //       ],
+  //       files: [
+  //         {
+  //           id: 'a02895ce-7f33-463e-92b1-b16d248f4a8d',
+  //           created: '2019-11-19T08:30:05.857Z',
+  //           updated: '2019-11-19T08:30:06.655Z',
+  //           type: 'manuscript',
+  //           fileName: '02 Revenue Recognition.pdf',
+  //           mimeType: 'application/pdf',
+  //           size: 322902,
+  //           originalName: '02 Revenue Recognition.pdf',
+  //           providerKey:
+  //             'a3fdb064-9485-49ac-85f2-fe952a12a715/a409f7c4-374c-40e7-9103-d96c20a14de1'
+  //         }
+  //       ],
+  //       editors: [
+  //         {
+  //           id: 'bef865b4-fefe-4120-b659-afc4858b6c5e',
+  //           aff: 'sdsd',
+  //           email: 'georgiana.olaru+ae1@hindawi.com',
+  //           title: 'mrs',
+  //           country: 'AG',
+  //           surname: 'editor_inv',
+  //           givenNames: 'academic',
+  //           role: {
+  //             type: 'academicEditor',
+  //             label: 'Academic Editor'
+  //           }
+  //         },
+  //         {
+  //           id: 'd1a8427d-6117-4d33-8456-68d402a56194',
+  //           aff: 'ssdds',
+  //           email: 'georgiana.olaru+ce1@hindawi.com',
+  //           title: 'mrs',
+  //           country: 'RO',
+  //           surname: 'editor_inv',
+  //           givenNames: 'chief',
+  //           role: {
+  //             type: 'triageEditor',
+  //             label: 'Chief Editor'
   //           }
   //         }
   //       ]
