@@ -55,19 +55,19 @@ export const invoice: Resolvers<Context> = {
       );
       return PayerMap.toPersistence(payer);
     },
-    async invoiceItems(parent: Invoice, args, context) {
+    async invoiceItem(parent: Invoice, args, context) {
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
         context.repos.invoiceItem,
         context.repos.invoice
       );
 
-      const items = await getItemsUseCase.execute({ invoiceId: parent.id });
+      const item = await getItemsUseCase.execute({ invoiceId: parent.id });
 
-      if (items.isLeft()) {
-        throw items.value.errorValue();
+      if (item.isLeft()) {
+        throw item.value.errorValue();
       }
 
-      return items.value.getValue().map(InvoiceItemMap.toPersistence);
+      return InvoiceItemMap.toPersistence(item.value.getValue()[0]);
     }
   },
   InvoiceItem: {

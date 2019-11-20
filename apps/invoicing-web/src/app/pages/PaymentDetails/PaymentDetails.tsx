@@ -39,22 +39,6 @@ interface Props {
   getPaymentMethods(): any;
 }
 
-const articleDetails = {
-  journalTitle: "Parkinson's Disease",
-  title:
-    "A Key Major Guideline for Engineering Bioactive Multicomponent Nanofunctionalization for Biomedicine and Other Applications: Fundamental Models Confirmed by Both Direct and Indirect Evidence",
-  id: 2016970,
-  type: "Research Article",
-  ccLicense: "CC-BY 4.0",
-  correspondingAuthor: "Patrick M. Sullivan",
-  authors: [
-    "Patrick M. Sullivan",
-    "Patrick M. Sullivan1",
-    "Patrick M. Sullivan2",
-    "Patrick M. Sullivan3",
-  ],
-};
-
 const invoiceDetails = {
   terms: "Payable upon Receipt",
   referenceNumber: "617/2019",
@@ -101,59 +85,50 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     [invoiceId],
   );
 
-  return (
-    <Fragment>
-      <PaymentHeader articleTitle={articleDetails.title}></PaymentHeader>
+  return (function() {
+    if (invoiceError) {
+      return (
+        <Flex flex={2}>
+          <Text type="warning">{invoiceError}</Text>
+        </Flex>
+      );
+    }
 
-      <Root>
-        {(function() {
-          if (invoiceError) {
-            return (
-              <Flex flex={2}>
-                <Text type="warning">{invoiceError}</Text>
-              </Flex>
-            );
-          }
+    if (invoiceLoading) {
+      return (
+        <Flex alignItems="center" vertical flex={2}>
+          <Text mb={2}>Fetching invoice...</Text>
+          <Loader size={6} />
+        </Flex>
+      );
+    }
 
-          if (invoiceLoading) {
-            return (
-              <Flex alignItems="center" vertical flex={2}>
-                <Text mb={2}>Fetching invoice...</Text>
-                <Loader size={6} />
-              </Flex>
-            );
-          }
+    return (
+      <Fragment>
+        <PaymentHeader articleTitle={invoice.article.title} />
+        <Root>
+          <FormsContainer>
+            <BillingInfo
+              status={invoice.status}
+              payer={invoice.payer}
+              error={payerError}
+              handleSubmit={updatePayer}
+              loading={payerLoading}
+            />
+            <InvoicePayment
+              payer={invoice.payer}
+              methods={paymentMethods}
+              error={paymentError}
+              onSubmit={payByCard}
+              loading={paymentLoading}
+            />
+          </FormsContainer>
 
-          return (
-            <Fragment>
-              <FormsContainer>
-                <BillingInfo
-                  status={invoice.status}
-                  payer={invoice.payer}
-                  error={payerError}
-                  handleSubmit={updatePayer}
-                  loading={payerLoading}
-                />
-                <InvoicePayment
-                  payer={invoice.payer}
-                  methods={paymentMethods}
-                  error={paymentError}
-                  onSubmit={payByCard}
-                  loading={paymentLoading}
-                />
-              </FormsContainer>
-
-              <Details
-                invoiceDetails={invoice.invoiceItems[0]}
-                charges={charges}
-                mt={-44}
-              />
-            </Fragment>
-          );
-        })()}
-      </Root>
-    </Fragment>
-  );
+          <Details invoice={invoice} mt={-44} />
+        </Root>
+      </Fragment>
+    );
+  })();
 };
 
 const mapStateToProps = (state: RootState) => ({

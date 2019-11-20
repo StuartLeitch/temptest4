@@ -26,6 +26,7 @@ export const articleFragment = gql`
   fragment articleFragment on Article {
     id
     title
+    created
     articleType
     authorCountry
     authorEmail
@@ -40,13 +41,14 @@ export const invoiceFragment = gql`
   fragment invoiceFragment on Invoice {
     id
     status
+    dateCreated
     payer {
       ...payerFragment
     }
-    invoiceItems {
+    invoiceItem {
       id
       price
-      manuscriptId
+      dateCreated
       article {
         ...articleFragment
       }

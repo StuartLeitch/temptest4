@@ -2,7 +2,7 @@ type PaymentType = "INDIVIDUAL" | "INSTITUTION";
 
 export interface Article {
   id: string;
-  journalId: string;
+  journal: string;
   customId: string;
   title: string;
   articleType: string;
@@ -17,14 +17,16 @@ export interface InvoiceItem {
   invoiceId: string;
   manuscriptId: string;
   price: number;
-  article: Article;
+  vat: number;
 }
 
 export interface Invoice {
   id: string;
   status: "DRAFT" | "ACTIVE" | "FINAL" | null;
   payer: Payer | null;
-  invoiceItems: InvoiceItem[] | [];
+  referenceNumber: string | null;
+  invoiceItem: InvoiceItem | null;
+  article: Article | null;
 }
 
 export interface Address {

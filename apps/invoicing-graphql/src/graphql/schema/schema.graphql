@@ -10,6 +10,7 @@ type Article {
   id: String
   journalId: String
   customId: String
+  created: Date
   title: String
   articleType: String
   authorEmail: String
@@ -24,6 +25,7 @@ type InvoiceItem {
   manuscriptId: String
   price: Float
   article: Article
+  dateCreated: Date
 }
 
 type Invoice {
@@ -34,7 +36,7 @@ type Invoice {
   charge: Float
   status: InvoiceStatus
   payer: Payer
-  invoiceItems: [InvoiceItem]
+  invoiceItem: InvoiceItem
 }
 
 input AddressInput {

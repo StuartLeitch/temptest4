@@ -23,7 +23,15 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
     map(r => {
-      return getInvoice.success(r.data.invoice);
+      const invoice = r.data.invoice;
+      const { article, ...invoiceItem } = invoice.invoiceItem;
+
+      return getInvoice.success({
+        ...invoice,
+        referenceNumber: "HARDCODED_617/2019",
+        invoiceItem: { ...invoiceItem, vat: 20 },
+        article,
+      });
     }),
     catchError(err => of(getInvoice.failure(err.message))),
   );

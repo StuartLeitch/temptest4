@@ -7,9 +7,11 @@ import { getInvoice, updatePayerAsync } from "./actions";
 
 const initialState: Invoice = {
   id: null,
-  status: null,
   payer: null,
-  invoiceItems: [],
+  status: null,
+  referenceNumber: null,
+  invoiceItem: null,
+  article: null,
 };
 
 const invoice = createReducer(initialState)

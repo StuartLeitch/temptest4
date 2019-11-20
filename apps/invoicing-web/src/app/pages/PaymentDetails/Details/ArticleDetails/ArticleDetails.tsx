@@ -18,7 +18,9 @@ const ArticleDetails: React.FunctionComponent<Props> = ({ article }) => {
         <DetailItem
           link
           label="DOI Number"
-          text={`https://doi.org/10.1155/year/${article.customId}`}
+          text={`https://doi.org/10.1155/${new Date(
+            article.created,
+          ).getFullYear()}/${article.customId}`}
         />
         <DetailItem label="Article ID" text={article.customId} />
         <DetailItem label="Article Type" text={article.articleType} />

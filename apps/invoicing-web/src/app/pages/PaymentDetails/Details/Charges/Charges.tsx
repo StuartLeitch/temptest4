@@ -8,9 +8,10 @@ import { Charges as Root } from "./Charges.styles";
 import { TotalCharges } from "../TotalCharges";
 import { ChargeItem } from "../ChargeItem";
 import { VatCharge } from "../VatCharge";
+import invoice from "@hindawi/invoicing-web/app/state/modules/invoice";
 
 interface Props extends LayoutProps, SpaceProps {
-  charges: any;
+  invoiceItem: any;
 }
 
 const showWarning = (warning: string) => {
@@ -24,21 +25,30 @@ const showWarning = (warning: string) => {
   }
 };
 
-const Charges: React.FC<Props> = ({ charges, ...rest }) => (
+const Charges: React.FC<Props> = ({ invoiceItem, ...rest }) => (
   <Root {...rest}>
     <Separator direction="horizontal" fraction="auto" mx={-4} />
     <Title type="small" mt="4">
       Charges
     </Title>
-    <ChargeItemGroup items={charges.items} mt="4" />
+    <ChargeItem
+      mt="4"
+      price={invoiceItem.price}
+      name="Article Processing Charges"
+    />
     <Flex justifyContent="flex-end" mt="2">
       <Separator direction="horizontal" fraction={20} />
     </Flex>
-    <ChargeItem price={charges.netTotal} name="Net Charges" mt="2" />
-    <VatCharge vat={charges.vat} mt="2"></VatCharge>
+    <ChargeItem price={invoiceItem.price} name="Net Charges" mt="2" />
+    <VatCharge vat={invoiceItem.vat} price={invoiceItem.price} rate={1.3} />
     <Separator direction="horizontal" fraction="auto" mx={-2} mt={2} />
-    <TotalCharges total={charges.total} mt="2"></TotalCharges>
-    {showWarning(charges.warning)}
+    <TotalCharges price={invoiceItem.price} vat={invoiceItem.vat} mt="2" />
+    <Flex mt={4} justifyContent="flex-end">
+      <Icon name="warningFilled" color="colors.info" mr={2} />
+      <Text>
+        UK VAT applies to this invoice, based on the country of the payer.
+      </Text>
+    </Flex>
   </Root>
 );
 
