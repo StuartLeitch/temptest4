@@ -1,7 +1,7 @@
 import { createSelector } from "reselect";
 import { RootState } from "typesafe-actions";
 
-import { Invoice, InvoiceState } from "./types";
+import { InvoiceState } from "./types";
 
 const _getInvoice = (state: RootState): InvoiceState =>
   state.invoice as InvoiceState;

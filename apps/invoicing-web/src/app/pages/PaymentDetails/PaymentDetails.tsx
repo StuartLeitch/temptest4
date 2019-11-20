@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useCallback } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "typesafe-actions";
@@ -17,32 +17,29 @@ import {
   invoiceSelectors,
 } from "../../state/modules/invoice";
 
+import {
+  paymentsActions,
+  paymentsSelectors,
+} from "../../state/modules/payments";
+import { PaymentMethod } from "../../state/modules/payments/types";
+
 interface Props {
   invoiceError: string;
   invoiceLoading: boolean;
   invoice: invoiceTypes.Invoice | null;
   payerError: string;
   payerLoading: boolean;
+  paymentError: string;
+  paymentLoading: boolean;
+  getMethodsError: string;
+  getMethodsLoading: boolean;
+  paymentMethods: Record<string, string>;
   getInvoice(id: string): any;
   updatePayer(payer: any): any;
   recordPayPalPayment(payment: paymentTypes.PayPalPayment): any;
+  payWithCard(payload: any): any;
+  getPaymentMethods(): any;
 }
-
-const articleDetails = {
-  journalTitle: "Parkinson's Disease",
-  title:
-    "A Key Major Guideline for Engineering Bioactive Multicomponent Nanofunctionalization for Biomedicine and Other Applications: Fundamental Models Confirmed by Both Direct and Indirect Evidence",
-  id: 2016970,
-  type: "Research Article",
-  ccLicense: "CC-BY 4.0",
-  correspondingAuthor: "Patrick M. Sullivan",
-  authors: [
-    "Patrick M. Sullivan",
-    "Patrick M. Sullivan1",
-    "Patrick M. Sullivan2",
-    "Patrick M. Sullivan3",
-  ],
-};
 
 const invoiceDetails = {
   terms: "Payable upon Receipt",
@@ -74,71 +71,77 @@ const recordPayment = (recordAction, invoice) => {
 };
 
 const PaymentDetails: React.FunctionComponent<Props> = ({
+  getInvoice,
   invoice,
   invoiceError,
   invoiceLoading,
+  //
+  updatePayer,
   payerError,
   payerLoading,
-  getInvoice,
-  updatePayer,
+  //
   recordPayPalPayment,
+  getPaymentMethods,
+  payWithCard,
+  paymentError,
+  paymentLoading,
+  paymentMethods,
 }) => {
   const { invoiceId } = useParams();
   useEffect(() => {
     getInvoice(invoiceId);
+    getPaymentMethods();
   }, []);
 
-  return (
-    <Fragment>
-      <PaymentHeader articleTitle={articleDetails.title}></PaymentHeader>
-
-      <Root>
-        {(function() {
-          if (invoiceError) {
-            return (
-              <Flex flex={2}>
-                <Text type="warning">{invoiceError}</Text>
-              </Flex>
-            );
-          }
-
-          if (invoiceLoading) {
-            return (
-              <Flex alignItems="center" vertical flex={2}>
-                <Text mb={2}>Fetching invoice...</Text>
-                <Loader size={6} />
-              </Flex>
-            );
-          }
-
-          return (
-            <FormsContainer>
-              <BillingInfo
-                status={invoice.status}
-                payer={invoice.payer}
-                error={payerError}
-                handleSubmit={updatePayer}
-                loading={payerLoading}
-              />
-              <InvoicePayment
-                payer={invoice.payer}
-                onSuccess={recordPayment(recordPayPalPayment, invoice)}
-              />
-            </FormsContainer>
-          );
-        })()}
-
-        <Details
-          articleDetailsExpanded={true}
-          invoiceDetailsExpanded={true}
-          articleDetails={articleDetails}
-          invoiceDetails={invoiceDetails}
-          charges={charges}
-          mt={-44}
-        />
-      </Root>
-    </Fragment>
+  const payByCard = useCallback(
+    values => payWithCard({ invoiceId, ...values }),
+    [invoiceId],
   );
+
+  return (function() {
+    if (invoiceError) {
+      return (
+        <Flex flex={2}>
+          <Text type="warning">{invoiceError}</Text>
+        </Flex>
+      );
+    }
+
+    if (invoiceLoading) {
+      return (
+        <Flex alignItems="center" vertical flex={2}>
+          <Text mb={2}>Fetching invoice...</Text>
+          <Loader size={6} />
+        </Flex>
+      );
+    }
+
+    return (
+      <Fragment>
+        <PaymentHeader articleTitle={invoice.article.title} />
+        <Root>
+          <FormsContainer>
+            <BillingInfo
+              status={invoice.status}
+              payer={invoice.payer}
+              error={payerError}
+              handleSubmit={updatePayer}
+              loading={payerLoading}
+            />
+            <InvoicePayment
+              payer={invoice.payer}
+              methods={paymentMethods}
+              error={paymentError}
+              onSubmit={payByCard}
+              loading={paymentLoading}
+            />
+          </FormsContainer>
+
+          <Details invoice={invoice} mt={-44} />
+        </Root>
+      </Fragment>
+    );
+  })();
 };
 
 const mapStateToProps = (state: RootState) => ({
@@ -147,6 +150,11 @@ const mapStateToProps = (state: RootState) => ({
   invoiceLoading: invoiceSelectors.invoiceLoading(state),
   payerError: invoiceSelectors.payerError(state),
   payerLoading: invoiceSelectors.payerLoading(state),
+  getMethodsError: paymentsSelectors.paymentMethodsError(state),
+  getMethodsLoading: paymentsSelectors.paymentMethodsLoading(state),
+  paymentMethods: paymentsSelectors.getPaymentMethods(state),
+  paymentError: paymentsSelectors.recordPaymentError(state),
+  paymentLoading: paymentsSelectors.recordPaymentLoading(state),
 });
 
 export default connect(
@@ -155,6 +163,8 @@ export default connect(
     getInvoice: invoiceActions.getInvoice.request,
     updatePayer: invoiceActions.updatePayerAsync.request,
     recordPayPalPayment: paymentActions.recordPayPalPayment.request,
+    payWithCard: paymentsActions.recordCardPayment.request,
+    getPaymentMethods: paymentsActions.getPaymentMethods.request,
   },
 )(PaymentDetails);
 

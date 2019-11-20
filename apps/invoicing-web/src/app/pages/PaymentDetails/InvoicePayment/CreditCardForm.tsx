@@ -1,27 +1,34 @@
 import React from "react";
 import styled from "styled-components";
-import {
-  Button,
-  Expander,
-  Label,
-  Flex,
-  FormField,
-  th,
-} from "@hindawi/react-components";
+import { Flex, Label, Button, FormField, th } from "@hindawi/react-components";
+import { Visa, MasterCard, Amex, Discover, JCB } from "./ValidCreditCards";
 
 interface Props {
   handleSubmit: any;
+  loading: boolean;
 }
 
-const CreditCardForm: React.FunctionComponent<Props> = ({ handleSubmit }) => (
+const CreditCardForm: React.FunctionComponent<Props> = ({
+  loading,
+  handleSubmit,
+}) => (
   <Flex vertical>
-    <Label>Credit Card Details</Label>
+    <Flex justifyContent="flex-start">
+      <Label>Credit Card Details</Label>
+      <Visa ml={1} />
+      <MasterCard ml={1} />
+      <Amex ml={1} />
+      <JCB ml={1} />
+      <Discover ml={1} />
+    </Flex>
+
     <CardContainer mt={2}>
       <FormField required label="Card Number" name="cardNumber" mr={4} />
       <FormField required label="Expiration Date" name="expiration" mr={4} />
       <FormField required label="CVV" name="cvv" mr={4} />
-      <FormField label="Postal Code" name="postalCode" mr={4} />
-      <Button mb={2} size="medium" onClick={handleSubmit}>
+      <FormField required label="Postal Code" name="postalCode" mr={4} />
+
+      <Button mb={2} size="medium" onClick={handleSubmit} loading={loading}>
         Pay
       </Button>
     </CardContainer>

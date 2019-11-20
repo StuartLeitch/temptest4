@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Formik } from "formik";
 import styled from "styled-components";
 import {
-  Expander,
+  Text,
   Label,
+  Expander,
   ActionLink,
   Icon,
   th,
@@ -22,13 +23,14 @@ const PAYMENT_METHODS = {
 
 interface Props {
   payer: any;
-  onError?(data?: any): void;
-  onCancel?(data?: any): void;
-  onSuccess?(data?: any): void;
+  error: string;
+  onSubmit: any;
+  loading: boolean;
+  methods: Record<string, string>;
 }
 
-const validateFn = values => {
-  if (values.paymentMethod === PAYMENT_METHODS.paypal) return {};
+const validateFn = methods => values => {
+  if (methods[values.paymentMethodId] === "Paypal") return {};
 
   const errors: any = {};
 
@@ -41,11 +43,14 @@ const validateFn = values => {
   if (!values.cvv) {
     errors.cvv = "Required";
   }
+  if (!values.postalCode) {
+    errors.postalCode = "Required";
+  }
 
   return errors;
 };
 
-const addInvoiceDownloadLink = payer => {
+const InvoiceDownloadLink = payer => {
   if (payer) {
     return (
       <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
@@ -57,39 +62,50 @@ const addInvoiceDownloadLink = payer => {
 };
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
+  error,
   payer,
-  onSuccess,
-  onCancel,
-  onError,
+  methods,
+  loading,
+  onSubmit,
 }) => {
+  const parsedMethods = useMemo(
+    () =>
+      Object.entries(methods).map(([id, name]) => ({
+        id,
+        name,
+        isActive: true,
+      })),
+    [methods],
+  );
   return (
     <Expander title="2. Invoice & Payment">
       <Label my="4" ml="4">
         Your Invoice
-        {addInvoiceDownloadLink(payer)}
+        <InvoiceDownloadLink payer={payer} />
       </Label>
       <Formik
-        validate={validateFn}
-        initialValues={{ paymentMethod: null }}
-        onSubmit={values => console.log("the values")}
+        validate={validateFn(methods)}
+        initialValues={{ paymentMethodId: null }}
+        onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values }) => {
           return (
             <Root>
-              <ChoosePayment setFieldValue={setFieldValue} values={values} />
-              {values.paymentMethod === PAYMENT_METHODS.creditCard && (
-                <CreditCardForm handleSubmit={handleSubmit} />
+              <ChoosePayment
+                methods={parsedMethods}
+                setFieldValue={setFieldValue}
+                values={values}
+              />
+              {methods[values.paymentMethodId] === "Credit Card" && (
+                <CreditCardForm handleSubmit={handleSubmit} loading={loading} />
               )}
-              {values.paymentMethod === PAYMENT_METHODS.bankTransfer && (
+              {methods[values.paymentMethodId] === "Bank Transfer" && (
                 <BankTransfer />
               )}
-              {values.paymentMethod === PAYMENT_METHODS.paypal && (
-                <Paypal
-                  onSuccess={onSuccess}
-                  onCancel={onCancel}
-                  onError={onError}
-                />
+              {methods[values.paymentMethodId] === "Paypal" && (
+                <Paypal onSuccess={p => console.log("pe success", p)} />
               )}
+              {error && <Text type="warning">{error}</Text>}
             </Root>
           );
         }}

@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
-import uuid from 'uuid/v4';
+/* eslint-disable */
+const { v4 } = require('uuid');
 
 const catalogItems = [
   {
@@ -1167,7 +1166,7 @@ const catalogItems = [
   }
 ];
 
-const seed = async (knex, Promise) => {
+const seed = async knex => {
   await knex('catalog').del();
 
   const cis = Object.values(catalogItems);
@@ -1180,7 +1179,7 @@ const seed = async (knex, Promise) => {
     } = ci;
 
     const catalogItem = {
-      id: uuid(),
+      id: v4(),
       journalTitle,
       issn: ISSN,
       type: 'APC',

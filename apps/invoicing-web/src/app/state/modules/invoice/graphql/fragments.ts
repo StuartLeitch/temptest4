@@ -22,13 +22,38 @@ export const payerFragment = gql`
   ${addressFragment}
 `;
 
+export const articleFragment = gql`
+  fragment articleFragment on Article {
+    id
+    title
+    created
+    articleType
+    authorCountry
+    authorEmail
+    customId
+    journalTitle
+    authorSurname
+    authorFirstName
+  }
+`;
+
 export const invoiceFragment = gql`
   fragment invoiceFragment on Invoice {
     id
     status
+    dateCreated
     payer {
       ...payerFragment
     }
+    invoiceItem {
+      id
+      price
+      dateCreated
+      article {
+        ...articleFragment
+      }
+    }
   }
   ${payerFragment}
+  ${articleFragment}
 `;

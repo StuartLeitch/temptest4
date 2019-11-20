@@ -1,7 +1,32 @@
+scalar Date
+
 enum InvoiceStatus {
   DRAFT
   ACTIVE
   FINAL
+}
+
+type Article {
+  id: String
+  journalId: String
+  journalTitle: String
+  customId: String
+  created: Date
+  title: String
+  articleType: String
+  authorEmail: String
+  authorCountry: String
+  authorSurname: String
+  authorFirstName: String
+}
+
+type InvoiceItem {
+  id: String
+  invoiceId: String
+  manuscriptId: String
+  price: Float
+  article: Article
+  dateCreated: Date
 }
 
 type Invoice {
@@ -12,6 +37,7 @@ type Invoice {
   charge: Float
   status: InvoiceStatus
   payer: Payer
+  invoiceItem: InvoiceItem
 }
 
 input AddressInput {
@@ -50,13 +76,42 @@ type Address {
   addressLine1: String
 }
 
+input CreditCardInput {
+  cardNumber: String!
+  expiration: String!
+  cvv: String!
+  postalCode: String
+}
+
+type Payment {
+  id: String!
+  invoiceId: String
+  payerId: String
+  paymentMethodId: String
+  foreignPaymentId: String
+  paymentProof: String
+  amount: Float
+  datePaid: Date
+}
+
+type PaymentMethod {
+  id: String!
+  name: String!
+  isActive: Boolean
+}
+
 type Query {
   invoice(id: String): Invoice
-  echo(value: String): String
+  getPaymentMethods: [PaymentMethod]
 }
 
 type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: String!): Boolean
+  creditCardPayment(
+    invoiceId: String!
+    paymentMethodId: String!
+    creditCard: CreditCardInput!
+  ): Payment!
 }

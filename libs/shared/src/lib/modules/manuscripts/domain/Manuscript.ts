@@ -29,20 +29,40 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.authorEmail;
   }
 
+  set authorEmail(authorEmail: string) {
+    this.props.authorEmail = authorEmail;
+  }
+
   get authorCountry(): string {
     return this.props.authorCountry;
+  }
+
+  set authorCountry(country: string) {
+    this.props.authorCountry = country;
   }
 
   get authorSurname(): string {
     return this.props.authorSurname;
   }
 
+  set authorSurname(surname: string) {
+    this.props.authorSurname = surname;
+  }
+
   get authorFirstName(): string {
     return this.props.authorFirstName;
   }
 
+  set authorFirstName(firstName: string) {
+    this.props.authorFirstName = firstName;
+  }
+
   get title(): string {
     return this.props.title;
+  }
+
+  set title(title: string) {
+    this.props.title = title;
   }
 
   get journalId(): string {
@@ -53,8 +73,16 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.customId;
   }
 
+  set customId(customId: string) {
+    this.props.customId = customId;
+  }
+
   get articleType(): string {
     return this.props.articleType;
+  }
+
+  set articleType(articleType: string) {
+    this.props.articleType = articleType;
   }
 
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {

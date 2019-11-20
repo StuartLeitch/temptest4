@@ -1,9 +1,9 @@
 import express from 'express';
 import { Context } from '../context';
 import {
+  RecordPayPalPaymentUsecase,
   RecordPaymentUsecase,
   GetInvoicePdfUsecase,
-  RecordPayPalPaymentUsecase,
   Roles
 } from '@hindawi/shared';
 import { AuthMiddleware } from './middleware/auth';

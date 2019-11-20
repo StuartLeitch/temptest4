@@ -5,7 +5,8 @@ import { Flex, Text, Label } from "@hindawi/react-components";
 interface Props {
   name: string;
   email: string;
-  type: "DRAFT" | "ACTIVE" | "FINAL";
+  organization: string;
+  type: "INSTITUTION" | "INDIVIDUAL";
   address: {
     city: string;
     country: string;
@@ -18,6 +19,7 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
   type,
   email,
   address,
+  organization,
 }) => {
   return (
     <Fragment>
@@ -30,7 +32,7 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
           <Label>Email</Label>
           <Text>{email}</Text>
         </Flex>
-        <Flex vertical flex={2}>
+        <Flex vertical flex={1}>
           <Label>Payer type</Label>
           <Text>{type}</Text>
         </Flex>
@@ -44,11 +46,17 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
           <Label>Country</Label>
           <Text>{countryList.getName(address.country)}</Text>
         </Flex>
-        <Flex vertical flex={2}>
+        <Flex vertical flex={1}>
           <Label>Address</Label>
           <Text>{address.addressLine1}</Text>
         </Flex>
       </Flex>
+      {type === "INSTITUTION" && (
+        <Flex vertical mt={2}>
+          <Label>Organization</Label>
+          <Text>{organization}</Text>
+        </Flex>
+      )}
     </Fragment>
   );
 };

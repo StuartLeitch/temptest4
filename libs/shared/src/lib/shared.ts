@@ -62,6 +62,7 @@ export * from './modules/invoices/usecases/createInvoice/createInvoice';
 export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
+export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
@@ -94,8 +95,8 @@ export * from './modules/journals/domain/JournalId';
 export * from './modules/journals/domain/Journal';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
+export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
-// export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
 // // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
@@ -120,6 +121,8 @@ export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPayme
 export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPaymentDTO';
 
 export * from './modules/payments/domain/events/paymentDone';
+export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
+export * from './modules/payments/usecases/createPayment/CreatePayment';
 
 // * Export Waiver, Coupon Subdomain
 // export * from './domain/reductions/ReductionFactory';

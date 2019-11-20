@@ -1,12 +1,12 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
 import { Article } from '../domain/Article';
-// import {PriceId} from '../domain/PriceId';
+
 export class ArticleMap extends Mapper<Article> {
   public static toDomain(raw: any): Article {
     const articleOrError = Article.create(
       {
-        // journalId: JournalId.create(new UniqueEntityID(raw.journalId)).getValue(),
+        journalId: raw.journalId,
         title: raw.title,
         customId: raw.customId,
         created: raw.created,

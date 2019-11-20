@@ -1,5 +1,6 @@
 import Knex from 'knex';
 import {
+  KnexPaymentMethodRepo,
   KnexAddressRepo,
   KnexArticleRepo,
   KnexInvoiceItemRepo,
@@ -46,15 +47,14 @@ function makePayPalEnvironment(
   clientSecret: string,
   environment: string
 ) {
-  return new checkoutNodeJsSDK.core.SandboxEnvironment(clientId, clientSecret);
-  // if (environment === 'sandbox') {
-  //   return new checkoutNodeJsSDK.core.SandboxEnvironment(
-  //     clientId,
-  //     clientSecret
-  //   );
-  // } else {
-  //   return new checkoutNodeJsSDK.core.Environment(clientId, clientSecret);
-  // }
+  if (environment === 'sandbox') {
+    return new checkoutNodeJsSDK.core.SandboxEnvironment(
+      clientId,
+      clientSecret
+    );
+  } else {
+    return new checkoutNodeJsSDK.core.Environment(clientId, clientSecret);
+  }
 }
 
 function makePayPal(config: Config) {

@@ -6,27 +6,29 @@ import { DetailItem } from "../DetailItem";
 import { ArticleDetails as Root } from "./ArticleDetails.styles";
 
 interface Props {
-  articleDetails: any;
-  expanded?: boolean;
+  article: any;
 }
 
-const ArticleDetails: React.FunctionComponent<Props> = ({
-  articleDetails,
-  expanded,
-}) => {
+const ArticleDetails: React.FunctionComponent<Props> = ({ article }) => {
   return (
-    <Expander title="Article details" expanded={expanded}>
+    <Expander title="Article details" expanded>
       <Root>
-        <DetailItem label="Journal title" text={articleDetails.journalTitle} />
-        <DetailItem label="Article title" text={articleDetails.title} />
-        <DetailItem label="Article ID" text={articleDetails.id.toString()} />
-        <DetailItem label="Article Type" text={articleDetails.type} />
-        <DetailItem label="CC License" text={articleDetails.ccLicense} />
+        <DetailItem label="Journal Title" text={article.journalTitle} />
+        <DetailItem label="Article Title" text={article.title} />
+        <DetailItem
+          link
+          label="DOI Number"
+          text={`https://doi.org/10.1155/${new Date(
+            article.created,
+          ).getFullYear()}/${article.customId}`}
+        />
+        <DetailItem label="Article ID" text={article.customId} />
+        <DetailItem label="Article Type" text={article.articleType} />
+        <DetailItem label="CC License" text="CC-BY 4.0" />
         <DetailItem
           label="Corresponding Author"
-          text={articleDetails.correspondingAuthor}
+          text={`${article.authorFirstName} ${article.authorSurname}`}
         />
-        <DetailItem label="Additional Authors" text={articleDetails.authors} />
       </Root>
     </Expander>
   );

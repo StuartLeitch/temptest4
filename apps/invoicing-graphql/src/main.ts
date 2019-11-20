@@ -1,5 +1,4 @@
 import { makeDb } from './services/knex';
-
 import { makeConfig } from './config';
 import { makeContext } from './context';
 import { makeGraphqlServer } from './graphql';

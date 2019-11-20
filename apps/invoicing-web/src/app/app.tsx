@@ -7,7 +7,7 @@ import { PaymentDetails } from "./pages/PaymentDetails";
 export const App = () => {
   return (
     <div>
-      <Header path="Payment Details"></Header>
+      <Header path="Payment Details" />
       <Route
         path="/"
         exact
