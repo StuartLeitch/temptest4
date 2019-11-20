@@ -14,29 +14,31 @@ export function makeExpressServer(context: Context) {
   app.use(express.json());
 
   app.post('/api/paypal-payment-completed', async (req, res) => {
-    // const paymentAmount = req.body.resource.amount.value;
-    // console.info(req.body);
-    console.log('-----------------------------');
-    // console.info(req.body.resource);
-    console.log(JSON.stringify(req.body));
-    // console.info(context.payPalService);
-
-    // const usecase = new RecordPayPalPaymentUsecase(
-    //   context.repos.paymentMethod,
-    //   context.repos.payment,
-    //   context.repos.invoice
-    // );
-    // usecase.execute(req.body);
-
     return res.status(200);
   });
 
-  app.post('/api/paypal-payment/:payerId/:orderId', async (req, res) => {
-    console.log('++++++++++++++++++++++++++++');
-    console.info(req.params.payerId);
-    console.info(req.params.orderId);
-    console.log('++++++++++++++++++++++++++++');
-  });
+  app.post(
+    '/api/paypal-payment/:payerId/:invoiceId/:orderId',
+    async (req, res) => {
+      const usecase = new RecordPayPalPaymentUsecase(
+        context.repos.paymentMethod,
+        context.repos.payment,
+        context.repos.invoice,
+        context.payPalService
+      );
+      const result = await usecase.execute({
+        invoiceId: req.params.invoiceId,
+        orderId: req.params.orderId,
+        payerId: req.params.payerId
+      });
+      if (result.isLeft()) {
+        res.status(404);
+        res.send(result.value.errorValue());
+      }
+      res.status(200);
+      res.send();
+    }
+  );
 
   app.post('/api/checkout', async (req, res) => {
     const { checkoutService } = context;

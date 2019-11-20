@@ -63,12 +63,12 @@ const charges = {
   warning: "UK VAT applies to this invoice, based on the country of the payer.",
 };
 
-const recordPayment = (recordAction, payer) => {
+const recordPayment = (recordAction, invoice) => {
   return data => {
-    // console.log(data, payer);
     return recordAction({
-      payerId: payer.id,
-      payPalPaymentId: data.paymentID,
+      payerId: invoice.payer.id,
+      payPalOrderId: data.orderID,
+      invoiceId: invoice.id,
     });
   };
 };
@@ -122,7 +122,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               />
               <InvoicePayment
                 payer={invoice.payer}
-                onSuccess={recordPayment(recordPayPalPayment, invoice.payer)}
+                onSuccess={recordPayment(recordPayPalPayment, invoice)}
               />
             </FormsContainer>
           );

@@ -26,6 +26,7 @@ import { RecordPaymentErrors } from './recordPaymentErrors';
 import { RecordPaymentDTO } from './recordPaymentDTO';
 
 import { PaymentDone } from '../../domain/events/paymentDone';
+import { PaymentMethodId } from '../../domain/PaymentMethodId';
 
 export type RecordPaymentContext = AuthorizationContext<Roles>;
 
@@ -55,7 +56,11 @@ export class RecordPaymentUsecase
         new UniqueEntityID(payload.invoiceId)
       ).getValue(),
       amount: Amount.create(payload.amount).getValue(),
-      payerId: PayerId.create(new UniqueEntityID(payload.payerId))
+      payerId: PayerId.create(new UniqueEntityID(payload.payerId)),
+      foreignPaymentId: payload.foreignPaymentId,
+      paymentMethodId: PaymentMethodId.create(
+        new UniqueEntityID(payload.paymentMethodId)
+      )
     };
 
     try {

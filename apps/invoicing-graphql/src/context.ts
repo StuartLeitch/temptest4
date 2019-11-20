@@ -46,14 +46,15 @@ function makePayPalEnvironment(
   clientSecret: string,
   environment: string
 ) {
-  if (environment === 'sandbox') {
-    return new checkoutNodeJsSDK.core.SandboxEnvironment(
-      clientId,
-      clientSecret
-    );
-  } else {
-    return new checkoutNodeJsSDK.core.Environment(clientId, clientSecret);
-  }
+  return new checkoutNodeJsSDK.core.SandboxEnvironment(clientId, clientSecret);
+  // if (environment === 'sandbox') {
+  //   return new checkoutNodeJsSDK.core.SandboxEnvironment(
+  //     clientId,
+  //     clientSecret
+  //   );
+  // } else {
+  //   return new checkoutNodeJsSDK.core.Environment(clientId, clientSecret);
+  // }
 }
 
 function makePayPal(config: Config) {
@@ -81,6 +82,6 @@ export function makeContext(config: Config, db: Knex): Context {
     authService: new AuthService(config),
     vatService: new VATService(),
     waiverService: new WaiverService(),
-    payPalService: makePayPal(config)
+    payPalService: () => makePayPal(config)
   };
 }

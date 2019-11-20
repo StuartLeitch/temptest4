@@ -1,4 +1,5 @@
 export interface PayPalPayment {
-  payPalPaymentId: string;
+  payPalOrderId: string;
+  invoiceId: string;
   payerId: string;
 }

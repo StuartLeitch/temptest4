@@ -32,6 +32,8 @@ import { RecordPaymentDTO } from '../recordPayment/recordPaymentDTO';
 import { PaymentMethodRepoContract } from '../../repos';
 import { GetPaymentMethodByNameUsecase } from '../getPaymentMethodByName/getPaymentMethodByName';
 
+const checkoutNodeJsSDK = require('@paypal/checkout-server-sdk');
+
 export type RecordPayPalPaymentContext = AuthorizationContext<Roles>;
 
 export class RecordPayPalPaymentUsecase
@@ -49,66 +51,115 @@ export class RecordPayPalPaymentUsecase
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private paymentRepo: PaymentRepoContract,
-    private invoiceRepo: InvoiceRepoContract
+    private invoiceRepo: InvoiceRepoContract,
+    private payPalService: any
   ) {}
 
   public async execute(
     request: RecordPayPalPaymentDTO,
     context?: RecordPayPalPaymentContext
   ): Promise<RecordPayPalPaymentResponse> {
-    const paymentMethodUseCase = new GetPaymentMethodByNameUsecase(
-      this.paymentMethodRepo
-    );
-    const eitherMethod = paymentMethodUseCase.execute({ name: 'PayPal' });
-
-    const payload: Either<any, RecordPaymentDTO> = await this.constructPayload(
-      request
-    );
-
+    const payloadEither: Either<
+      any,
+      RecordPaymentDTO
+    > = await this.constructPayload(request);
     const usecase = new RecordPaymentUsecase(
       this.paymentRepo,
       this.invoiceRepo
     );
-    return usecase.execute(payload.value);
+
+    const a: any = await chain(
+      [payload => usecase.execute(payload)],
+      payloadEither
+    );
+    return a as RecordPayPalPaymentResponse;
   }
 
   private async constructPayload(request: RecordPayPalPaymentDTO) {
-    const payloadEither = chain(
+    const partialPayloadEither = await chain(
       [
-        this.getPayloadWithPaymentMethodId,
-        this.getPayloadWithAmount.bind(null, request)
+        this.getPayloadWithPaymentMethodId.bind(this),
+        this.getPayloadWithAmount.bind(this, request.orderId)
       ],
       this.getEmptyPayload()
+    );
+
+    const payloadEither = map(
+      [
+        this.getPayloadWithPayPalForeignPaymentId.bind(this, request.orderId),
+        this.getPayloadWithInvoiceID.bind(this, request.invoiceId),
+        this.getPayloadWithPayerId.bind(this, request.payerId)
+      ],
+      partialPayloadEither
     );
 
     return payloadEither;
   }
 
   private getEmptyPayload() {
-    return right({
+    return {
+      foreignPaymentId: null,
       paymentMethodId: null,
       invoiceId: null,
       payerId: null,
       amount: null
-    });
+    };
   }
 
   private async getPayloadWithPaymentMethodId(payload: RecordPaymentDTO) {
     const usecase = new GetPaymentMethodByNameUsecase(this.paymentMethodRepo);
     const either = await usecase.execute({ name: 'PayPal' });
-    return either.map(paymentMethodResult => ({
+    return either.map(async paymentMethodResult => ({
       ...payload,
-      paymentMethodId: paymentMethodResult.getValue().id
+      paymentMethodId: paymentMethodResult.getValue().id.toString()
     }));
   }
 
+  private async getPayPalOrderDetails(orderId: string) {
+    try {
+      const request = new checkoutNodeJsSDK.orders.OrdersCaptureRequest(
+        orderId
+      );
+      const order = await this.payPalService().execute(request);
+      return right(order.result);
+    } catch (e) {
+      console.log(e);
+      return left(new RecordPayPalPaymentErrors.PaymentNotFond(orderId));
+    }
+  }
+
   private async getPayloadWithAmount(
-    request: RecordPayPalPaymentDTO,
+    payPalOrderId: string,
     payload: RecordPaymentDTO
   ) {
-    return right({
-      ...payload,
-      amount: parseInt(request.resource.amount.value, 10)
+    const allDetailsEither = await this.getPayPalOrderDetails(payPalOrderId);
+    const payPalDetails = allDetailsEither.map(details => {
+      return details.purchase_units[0].payments.captures.reduce(
+        (acc: number, capture) => acc + parseFloat(capture.amount.value),
+        0
+      );
     });
+    return payPalDetails.map(sum => ({ ...payload, amount: sum }));
+  }
+
+  private async getPayloadWithPayPalForeignPaymentId(
+    orderId: string,
+    payload: RecordPaymentDTO
+  ) {
+    return { ...payload, foreignPaymentId: orderId };
+  }
+
+  private async getPayloadWithPayerId(
+    payerId: string,
+    payload: RecordPaymentDTO
+  ) {
+    return { ...payload, payerId };
+  }
+
+  private async getPayloadWithInvoiceID(
+    invoiceId: string,
+    payload: RecordPaymentDTO
+  ) {
+    return { ...payload, invoiceId };
   }
 }
