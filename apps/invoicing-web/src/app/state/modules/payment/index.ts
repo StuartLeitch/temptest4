@@ -1,6 +1,10 @@
+import * as paymentSelectors from "./selectors";
 import * as paymentActions from "./actions";
 import * as paymentTypes from "./types";
 
+import payment from "./reducers";
 import paymentEpics from "./epics";
 
-export { paymentActions, paymentEpics, paymentTypes };
+export { paymentSelectors, paymentActions, paymentEpics, paymentTypes };
+
+export default payment;

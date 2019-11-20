@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 
 import invoice from "../modules/invoice";
-import payments from "../modules/payments";
+import payments from "../modules/payment";
 
 import { modalReducer } from "../../providers/modal";
 

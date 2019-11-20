@@ -24,9 +24,10 @@ const PAYMENT_METHODS = {
 interface Props {
   payer: any;
   error: string;
-  onSubmit: any;
   loading: boolean;
   methods: Record<string, string>;
+  payByCardSubmit: (data: any) => void;
+  payByPayPalSubmit: (data: any) => void;
 }
 
 const validateFn = methods => values => {
@@ -66,7 +67,8 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   payer,
   methods,
   loading,
-  onSubmit,
+  payByCardSubmit,
+  payByPayPalSubmit,
 }) => {
   const parsedMethods = useMemo(
     () =>
@@ -86,7 +88,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       <Formik
         validate={validateFn(methods)}
         initialValues={{ paymentMethodId: null }}
-        onSubmit={onSubmit}
+        onSubmit={payByCardSubmit}
       >
         {({ handleSubmit, setFieldValue, values }) => {
           return (
@@ -102,8 +104,8 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
               {methods[values.paymentMethodId] === "Bank Transfer" && (
                 <BankTransfer />
               )}
-              {methods[values.paymentMethodId] === "Paypal" && (
-                <Paypal onSuccess={p => console.log("pe success", p)} />
+              {methods[values.paymentMethodId] === "PayPal" && (
+                <Paypal onSuccess={payByPayPalSubmit} />
               )}
               {error && <Text type="warning">{error}</Text>}
             </Root>

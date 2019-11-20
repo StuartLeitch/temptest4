@@ -10,7 +10,6 @@ import { BillingInfo } from "./BillingInfo";
 import { InvoicePayment } from "./InvoicePayment";
 import { PaymentHeader } from "./PaymentHeader";
 
-import { paymentActions, paymentTypes } from "../../state/modules/payment";
 import {
   invoiceTypes,
   invoiceActions,
@@ -18,10 +17,10 @@ import {
 } from "../../state/modules/invoice";
 
 import {
-  paymentsActions,
-  paymentsSelectors,
-} from "../../state/modules/payments";
-import { PaymentMethod } from "../../state/modules/payments/types";
+  paymentSelectors,
+  paymentActions,
+  paymentTypes,
+} from "../../state/modules/payment";
 
 interface Props {
   invoiceError: string;
@@ -41,26 +40,7 @@ interface Props {
   getPaymentMethods(): any;
 }
 
-const invoiceDetails = {
-  terms: "Payable upon Receipt",
-  referenceNumber: "617/2019",
-  supplyDate: "xxxxxxxx",
-  issueDate: "xxxxxxxx",
-};
-
-const charges = {
-  items: [{ name: "Article Processing Charges", price: "$1,250.00" }],
-  netTotal: "$1,250.00",
-  vat: {
-    percent: "20",
-    value: "$250.00",
-    details: "VAT amount in GBP is 109.04 GBP, 1 GBP = 1.6 USD",
-  },
-  total: "$4,500.00",
-  warning: "UK VAT applies to this invoice, based on the country of the payer.",
-};
-
-const recordPayment = (recordAction, invoice) => {
+const payByPayPal = (recordAction, invoice) => {
   return data => {
     return recordAction({
       payerId: invoice.payer.id,
@@ -132,7 +112,8 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               payer={invoice.payer}
               methods={paymentMethods}
               error={paymentError}
-              onSubmit={payByCard}
+              payByCardSubmit={payByCard}
+              payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
               loading={paymentLoading}
             />
           </FormsContainer>
@@ -150,21 +131,21 @@ const mapStateToProps = (state: RootState) => ({
   invoiceLoading: invoiceSelectors.invoiceLoading(state),
   payerError: invoiceSelectors.payerError(state),
   payerLoading: invoiceSelectors.payerLoading(state),
-  getMethodsError: paymentsSelectors.paymentMethodsError(state),
-  getMethodsLoading: paymentsSelectors.paymentMethodsLoading(state),
-  paymentMethods: paymentsSelectors.getPaymentMethods(state),
-  paymentError: paymentsSelectors.recordPaymentError(state),
-  paymentLoading: paymentsSelectors.recordPaymentLoading(state),
+  getMethodsError: paymentSelectors.paymentMethodsError(state),
+  getMethodsLoading: paymentSelectors.paymentMethodsLoading(state),
+  paymentMethods: paymentSelectors.getPaymentMethods(state),
+  paymentError: paymentSelectors.recordPaymentError(state),
+  paymentLoading: paymentSelectors.recordPaymentLoading(state),
 });
 
 export default connect(
   mapStateToProps,
   {
-    getInvoice: invoiceActions.getInvoice.request,
-    updatePayer: invoiceActions.updatePayerAsync.request,
     recordPayPalPayment: paymentActions.recordPayPalPayment.request,
-    payWithCard: paymentsActions.recordCardPayment.request,
-    getPaymentMethods: paymentsActions.getPaymentMethods.request,
+    getPaymentMethods: paymentActions.getPaymentMethods.request,
+    payWithCard: paymentActions.recordCardPayment.request,
+    updatePayer: invoiceActions.updatePayerAsync.request,
+    getInvoice: invoiceActions.getInvoice.request,
   },
 )(PaymentDetails);
 
