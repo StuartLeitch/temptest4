@@ -1,10 +1,10 @@
 import EmailTemplate from '@pubsweet/component-email-templating';
 
-export interface EmailCommunicator {
+export interface EmailAdapter {
   sendEmail(): Promise<any>;
 }
 
-interface ITemplateProps {
+interface TemplateProps {
   type: string;
   fromEmail: string;
   toUser: {
@@ -27,11 +27,11 @@ interface ITemplateProps {
   };
 }
 
-class Emailer implements EmailCommunicator {
+class Emailer implements EmailAdapter {
   email: any;
   constructor() {}
 
-  public createTemplate(templateProps: ITemplateProps): EmailCommunicator {
+  public createTemplate(templateProps: TemplateProps): EmailAdapter {
     this.email = new EmailTemplate(templateProps);
     return this;
   }

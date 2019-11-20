@@ -1,5 +1,4 @@
 import { makeDb } from './services/knex';
-
 import { makeConfig } from './config';
 import { makeContext } from './context';
 import { makeGraphqlServer } from './graphql';
@@ -19,8 +18,8 @@ async function main(): Promise<void> {
     path: '/graphql'
   });
 
-  // const queue = await queueService;
-  // queue.start();
+  const queue = await queueService;
+  queue.start();
 
   // queue.__LOCAL__.handler({
   //   submissionId: 'a2eb9a08-d0c8-4638-85c1-74d926d3cb15',

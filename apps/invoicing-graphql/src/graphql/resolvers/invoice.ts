@@ -12,6 +12,8 @@ import {
   Roles
 } from '@hindawi/shared';
 
+import EmailTemplate from '@pubsweet/component-email-templating';
+
 import { Resolvers, Invoice } from '../schema';
 import { Context } from '../../context';
 
@@ -30,6 +32,31 @@ export const invoice: Resolvers<Context> = {
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      // const email = new EmailTemplate({
+      //   type: 'user',
+      //   fromEmail: 'aurel@hindawi.com',
+      //   toUser: {
+      //     email: 'alexandru.munt@gmail.com',
+      //     name: 'hai sa vedem'
+      //   },
+      //   content: {
+      //     ctaText: 'MANUSCRIPT DETAILS',
+      //     signatureJournal: 'ABC jurnal',
+      //     signatureName: `Costel Costelovici`,
+      //     subject: `un-id: Manuscript Update`,
+      //     paragraph: 'bine ati venit!',
+      //     unsubscribeLink: `http://localhost:3000/unsubscribe/123`,
+      //     ctaLink: `http://localhost:3000/projects/123/versions/123/details`
+      //   },
+      //   bodyProps: {
+      //     hasLink: true,
+      //     hasIntro: true,
+      //     hasSignature: true
+      //   }
+      // });
+
+      // email.sendEmail();
 
       if (result.isLeft()) {
         return undefined;
