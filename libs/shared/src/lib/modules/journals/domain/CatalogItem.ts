@@ -8,7 +8,7 @@ export interface CatalogItemProps {
   type: string;
   amount: number;
   journalId: JournalId;
-  journalTitle: string;
+  journalTitle?: string;
 }
 
 export class CatalogItem extends AggregateRoot<CatalogItemProps> {

@@ -25,7 +25,6 @@ export class ArticleMap extends Mapper<Article> {
   }
 
   public static toPersistence(article: Article): any {
-    console.log('din persistance', article);
     return {
       id: article.id.toString(),
       journalId: article.props.journalId && article.props.journalId.toString(),
