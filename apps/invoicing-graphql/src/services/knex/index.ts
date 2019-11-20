@@ -21,7 +21,7 @@ export async function makeDb(config: Config): Promise<Knex> {
   await knex.migrate.latest();
 
   // ! Disable seeding for now
-  await knex.seed.run();
+  // await knex.seed.run();
 
   return knex;
 }

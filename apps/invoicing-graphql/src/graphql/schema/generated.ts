@@ -35,6 +35,7 @@ export type Article = {
   __typename?: 'Article';
   id?: Maybe<Scalars['String']>;
   journalId?: Maybe<Scalars['String']>;
+  journalTitle?: Maybe<Scalars['String']>;
   customId?: Maybe<Scalars['String']>;
   created?: Maybe<Scalars['Date']>;
   title?: Maybe<Scalars['String']>;
@@ -324,6 +325,11 @@ export type ArticleResolvers<
 > = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   journalId?: Resolver<
+    Maybe<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >;
+  journalTitle?: Resolver<
     Maybe<ResolversTypes['String']>,
     ParentType,
     ContextType

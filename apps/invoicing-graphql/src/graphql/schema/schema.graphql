@@ -9,6 +9,7 @@ enum InvoiceStatus {
 type Article {
   id: String
   journalId: String
+  journalTitle: String
   customId: String
   created: Date
   title: String

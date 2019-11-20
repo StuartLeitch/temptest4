@@ -1,6 +1,7 @@
 import {
-  InvoiceId,
   PayerMap,
+  InvoiceId,
+  JournalId,
   ArticleMap,
   UniqueEntityID,
   InvoiceItemMap,
@@ -85,6 +86,15 @@ export const invoice: Resolvers<Context> = {
       }
 
       return ArticleMap.toPersistence(article.value.getValue());
+    }
+  },
+  Article: {
+    async journalTitle(parent, args, context) {
+      const catalogItem = await context.repos.catalog.getCatalogItemByJournalId(
+        JournalId.create(new UniqueEntityID(parent.journalId)).getValue()
+      );
+
+      return catalogItem.journalTitle;
     }
   }
 };

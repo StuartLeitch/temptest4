@@ -95,8 +95,8 @@ export * from './modules/journals/domain/JournalId';
 export * from './modules/journals/domain/Journal';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
+export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
-// export * from './modules/catalogs/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 
 // // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';

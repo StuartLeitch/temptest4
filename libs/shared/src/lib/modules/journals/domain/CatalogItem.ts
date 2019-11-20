@@ -8,6 +8,7 @@ export interface CatalogItemProps {
   type: string;
   amount: number;
   journalId: JournalId;
+  journalTitle: string;
 }
 
 export class CatalogItem extends AggregateRoot<CatalogItemProps> {
@@ -42,5 +43,9 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   public get journalId(): JournalId {
     return this.props.journalId;
+  }
+
+  public get journalTitle(): string {
+    return this.props.journalTitle;
   }
 }

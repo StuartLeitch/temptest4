@@ -31,7 +31,7 @@ export const articleFragment = gql`
     authorCountry
     authorEmail
     customId
-    journalId
+    journalTitle
     authorSurname
     authorFirstName
   }
