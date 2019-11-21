@@ -19,7 +19,7 @@ async function main(): Promise<void> {
   });
 
   const queue = await queueService;
-  // queue.start();
+  queue.start();
 
   // queue.__LOCAL__.handler({
   //   submissionId: 'a2eb9a08-d0c8-4638-85c1-74d926d3cb15',
