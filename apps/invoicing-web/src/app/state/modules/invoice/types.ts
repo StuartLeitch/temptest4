@@ -22,6 +22,7 @@ export interface InvoiceItem {
 
 export interface Invoice {
   id: string;
+  invoiceId: string;
   status: "DRAFT" | "ACTIVE" | "FINAL" | null;
   payer: Payer | null;
   referenceNumber: string | null;

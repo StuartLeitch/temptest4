@@ -50,7 +50,7 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
       return from([
         modalActions.hideModal(),
         updatePayerAsync.success(r.data.updateInvoicePayer),
-        getInvoice.request(invoice.id),
+        getInvoice.request(invoice.invoiceId),
       ]);
     }),
     catchError(err => {

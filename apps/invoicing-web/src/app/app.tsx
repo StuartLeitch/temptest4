@@ -25,6 +25,10 @@ export const App = ({ invoices }) => {
                       Invoice #{invoice.id}
                     </InvoiceLink>
                     <InvoiceSubtitle>
+                      <dt>STATUS:</dt>
+                      <dd className={invoice.status.toLowerCase()}>
+                        {invoice.status}
+                      </dd>
                       <dt>Manuscript Custom ID:</dt>
                       <dd>{invoice.customId}</dd>
                       <dt>Manuscript Title:</dt>
@@ -125,6 +129,14 @@ const InvoiceSubtitle = styled.dl`
     min-height: 1em;
     font-weight: bold;
     border-right: 1px solid rgba(120, 120, 120, 0.5);
+  }
+
+  dd.draft {
+    color: #598296;
+  }
+
+  dd.active {
+    color: #1fc06f;
   }
 
   dd:last-of-type {

@@ -6,8 +6,7 @@ import {
   PayerMap,
   AddressMap,
   GetAddressUseCase,
-  UpdatePayerUsecase,
-  PayerPersistenceDTO
+  UpdatePayerUsecase
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
@@ -15,6 +14,7 @@ import { Context } from '../../context';
 
 import { CreateAddress } from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
 import { ChangeInvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
+import { CreatePayerUsecase } from './../../../../../libs/shared/src/lib/modules/payers/usecases/createPayer/createPayer';
 
 export const payer: Resolvers<Context> = {
   Mutation: {
@@ -26,10 +26,9 @@ export const payer: Resolvers<Context> = {
       const { repos, vatService } = context;
       const usecaseContext = { roles: [Roles.PAYER] };
       const { payer } = args;
-      console.log('the payer -> ', payer);
 
       const createAddressUseCase = new CreateAddress(repos.address);
-      const updatePayerUseCase = new UpdatePayerUsecase(repos.payer);
+      const createPayerUseCase = new CreatePayerUsecase(repos.payer);
       const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(repos.invoice);
 
       if (payer.type === 'INSTITUTION') {
@@ -53,18 +52,18 @@ export const payer: Resolvers<Context> = {
         address = addressResult.value.getValue();
       }
 
-      const updatePayerRequest = {
-        payerId: payer.id,
+      const createPayerRequest = {
+        invoiceId: payer.invoiceId,
         type: payer.type,
         name: payer.name,
         email: payer.email,
         vatId: payer.vatId,
         organization: payer.organization || ' ',
-        addressId: address.id.toString()
+        addressId: address.addressId.id.toString()
       };
 
-      const payerResult = await updatePayerUseCase.execute(
-        updatePayerRequest,
+      const payerResult = await createPayerUseCase.execute(
+        createPayerRequest,
         usecaseContext
       );
 
@@ -85,7 +84,7 @@ export const payer: Resolvers<Context> = {
     }
   },
   Payer: {
-    async address(payer: PayerPersistenceDTO, args: any, context) {
+    async address(payer: any, args: any, context) {
       const getAddressUseCase = new GetAddressUseCase(context.repos.address);
 
       const address = await getAddressUseCase.execute({

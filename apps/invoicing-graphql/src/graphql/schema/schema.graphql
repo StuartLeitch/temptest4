@@ -52,6 +52,7 @@ input AddressInput {
 
 input PayerInput {
   id: String
+  invoiceId: String
   type: PayerType
   name: String
   email: String
@@ -105,14 +106,10 @@ type PaymentMethod {
 }
 
 type Query {
-<<<<<<< Updated upstream
-  invoice(id: String): Invoice
   getPaymentMethods: [PaymentMethod]
-=======
   invoice(invoiceId: String): Invoice
   invoices: [Invoice]
   echo(value: String): String
->>>>>>> Stashed changes
 }
 
 type Mutation {

@@ -5,14 +5,15 @@ import {
   InvoiceId,
   PayerRepoContract
 } from '../../../../shared';
-import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
+import { PayerType } from '../../../payers/domain/Payer';
 
 export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
   implements PayerRepoContract {
   async getPayerById(payerId: PayerId): Promise<Payer> {
-    const {db} = this;
+    const { db } = this;
 
     const payerRow = await db(TABLES.PAYERS)
       .select()
@@ -27,27 +28,28 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
   }
 
   async getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Payer> {
-    const {db} = this;
+    const { db } = this;
     const payerRow = await db(TABLES.PAYERS)
       .select()
       .where('invoiceId', invoiceId.id.toString())
       .first();
 
     if (!payerRow) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice',
-        invoiceId.id.toString()
-      );
+      // throw RepoError.createEntityNotFoundError(
+      //   'payer',
+      //   invoiceId.id.toString()
+      // );
+      return null;
     }
 
     return PayerMap.toDomain(payerRow);
   }
 
   async update(payer: Payer): Promise<Payer> {
-    const {db} = this;
+    const { db } = this;
 
     const updated = await db(TABLES.PAYERS)
-      .where({id: payer.payerId.id.toString()})
+      .where({ id: payer.payerId.id.toString() })
       .update(PayerMap.toPersistence(payer));
 
     if (!updated) {
@@ -58,7 +60,7 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
   }
 
   async save(payer: Payer): Promise<Payer> {
-    const {db} = this;
+    const { db } = this;
 
     await db(TABLES.PAYERS).insert(PayerMap.toPersistence(payer));
 

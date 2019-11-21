@@ -1,5 +1,5 @@
 import express, { response } from 'express';
-import { RecordPayment, Roles, GetInvoicePdfUsecase } from '@hindawi/shared';
+import { Roles, GetInvoicePdfUsecase } from '@hindawi/shared';
 
 import { Context } from '../context';
 import { AuthMiddleware } from './middleware/auth';

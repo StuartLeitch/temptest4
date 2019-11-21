@@ -68,24 +68,41 @@ export const invoice: Resolvers<Context> = {
   },
   Invoice: {
     async payer(parent: Invoice, args, context) {
-      const payer = await context.repos.payer.getPayerByInvoiceId(
-        InvoiceId.create(new UniqueEntityID(parent.id)).getValue()
-      );
+      const {
+        repos: { payer: payerRepo }
+      } = context;
+      const invoiceId = InvoiceId.create(
+        new UniqueEntityID(parent.invoiceId)
+      ).getValue();
+
+      const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
+
+      if (!payer) {
+        return null;
+      }
       return PayerMap.toPersistence(payer);
     },
     async invoiceItem(parent: Invoice, args, context) {
+      const {
+        repos: { invoiceItem: invoiceItemRepo, invoice: invoiceRepo }
+      } = context;
+
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
-        context.repos.invoiceItem,
-        context.repos.invoice
+        invoiceItemRepo,
+        invoiceRepo
       );
 
-      const item = await getItemsUseCase.execute({ invoiceId: parent.id });
+      const result = await getItemsUseCase.execute({
+        invoiceId: parent.invoiceId
+      });
 
-      if (item.isLeft()) {
-        throw item.value.errorValue();
+      if (result.isLeft()) {
+        throw result.value.errorValue();
       }
 
-      return InvoiceItemMap.toPersistence(item.value.getValue()[0]);
+      const [item] = result.value.getValue();
+
+      return InvoiceItemMap.toPersistence(item);
     }
   },
   InvoiceItem: {

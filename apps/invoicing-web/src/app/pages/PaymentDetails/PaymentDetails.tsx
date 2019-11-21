@@ -97,7 +97,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     if (invoiceLoading) {
       return (
         <Flex alignItems="center" vertical flex={2}>
-          <Text mb={2}>Fetching invoice...</Text>
+          <Text mb={2}>Fetching invoice&hellip;</Text>
           <Loader size={6} />
         </Flex>
       );
@@ -105,7 +105,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 
     return (
       <Fragment>
-        {/* <PaymentHeader articleTitle={invoice.article.title} /> */}
+        <PaymentHeader articleTitle={invoice.article.title} />
         <Root>
           <FormsContainer>
             <BillingInfo
@@ -115,16 +115,16 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               handleSubmit={updatePayer}
               loading={payerLoading}
             />
-            {/* <InvoicePayment
+            <InvoicePayment
               payer={invoice.payer}
               methods={paymentMethods}
               error={paymentError}
               onSubmit={payByCard}
               loading={paymentLoading}
-            /> */}
+            />
           </FormsContainer>
 
-          {/* <Details invoice={invoice} mt={-44} /> */}
+          <Details invoice={invoice} mt={-44} />
         </Root>
       </Fragment>
     );
