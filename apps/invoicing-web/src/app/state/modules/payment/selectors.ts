@@ -6,7 +6,7 @@ const _getPayments = (state: RootState) => state.payments;
 export const getPaymentMethods = createSelector(
   _getPayments,
   p =>
-    p.payments.methods
+    p.payment.methods
       .filter(m => m.isActive)
       .reduce((acc, el) => ({ ...acc, [el.id]: el.name }), {}),
 );

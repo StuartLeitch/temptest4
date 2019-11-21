@@ -1,12 +1,12 @@
 import { actions as systemActions } from "../modules/system";
+import { paymentActions } from "../modules/payment";
 import { invoiceActions } from "../modules/invoice";
-import { paymentsActions } from "../modules/payments";
 
 import { modalActions } from "../../providers/modal";
 
 export default {
-  modal: modalActions,
   invoice: invoiceActions,
-  payments: paymentsActions,
+  payment: paymentActions,
   system: systemActions,
+  modal: modalActions,
 };

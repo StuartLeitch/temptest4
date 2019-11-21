@@ -6,6 +6,6 @@ export interface PaymentMethodRepoContract extends Repo<PaymentMethod> {
   getPaymentMethodById(
     paymentMethodId: PaymentMethodId
   ): Promise<PaymentMethod>;
+  getPaymentMethodCollection(): Promise<PaymentMethod[]>;
   getPaymentMethods(): Promise<PaymentMethod[]>;
-  // getPaymentMethodCollection(params: string[]): Promise<PaymentMethod[]>;
 }

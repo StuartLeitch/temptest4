@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Label, Flex, th } from "@hindawi/react-components";
 
 import IconRadioButton from "../BillingInfo/IconRadioButton";
-import { PaymentMethod } from "@hindawi/invoicing-web/app/state/modules/payments/types";
+import { PaymentMethod } from "@hindawi/invoicing-web/app/state/modules/payment/types";
 
 interface Props {
   values?: any;

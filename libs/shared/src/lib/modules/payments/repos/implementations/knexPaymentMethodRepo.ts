@@ -55,7 +55,21 @@ export class KnexPaymentMethodRepo
   }
 
   async getPaymentMethodCollection(): Promise<PaymentMethod[]> {
-    return [];
+    const { db } = this;
+    let paymentMethods: any[];
+
+    try {
+      paymentMethods = await db(TABLES.PAYMENT_METHODS).select();
+      if (!paymentMethods) {
+        throw new Error('No payment methods available!');
+      }
+    } catch (e) {
+      throw RepoError.fromDBError(e);
+    }
+
+    return paymentMethods.map(paymentMethod =>
+      PaymentMethodMap.toDomain(paymentMethod)
+    );
   }
 
   async exists(paymentMethod: PaymentMethod): Promise<boolean> {

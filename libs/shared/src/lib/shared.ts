@@ -111,9 +111,14 @@ export * from './modules/payments/domain/strategies/PaymentFactory';
 export * from './modules/payments/domain/strategies/PaymentStrategy';
 export * from './modules/payments/domain/strategies/CreditCardPayment';
 export * from './modules/payments/domain/strategies/CreditCard';
+export * from './modules/payments/usecases/recordPayment/recordPayment';
+export * from './modules/payments/usecases/recordPayment/recordPaymentDTO';
 export * from './modules/payments/mapper/Payment';
 export * from './modules/payments/mapper/PaymentMethod';
 export * from './modules/payments/repos';
+export * from './modules/payments/usecases/getPaymentMethodByName/getPaymentMethodByName';
+export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPayment';
+export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPaymentDTO';
 
 export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';

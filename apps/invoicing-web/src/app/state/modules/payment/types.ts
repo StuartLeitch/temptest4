@@ -24,3 +24,9 @@ export interface PaymentMethod {
 export interface PaymentsSlice {
   methods: PaymentMethod[];
 }
+
+export interface PayPalPayment {
+  payPalOrderId: string;
+  invoiceId: string;
+  payerId: string;
+}
