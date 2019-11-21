@@ -51,7 +51,7 @@ const validateFn = methods => values => {
   return errors;
 };
 
-const InvoiceDownloadLink = payer => {
+const InvoiceDownloadLink = ({ payer }) => {
   if (payer) {
     return (
       <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
@@ -104,7 +104,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
               {methods[values.paymentMethodId] === "Bank Transfer" && (
                 <BankTransfer />
               )}
-              {methods[values.paymentMethodId] === "PayPal" && (
+              {methods[values.paymentMethodId] === "Paypal" && (
                 <Paypal onSuccess={payByPayPalSubmit} />
               )}
               {error && <Text type="warning">{error}</Text>}
