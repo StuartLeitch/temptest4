@@ -36,7 +36,7 @@
     "@hindawi/queue-service": "^1.0.3",
     "@pubsweet/component-email-templating": "^0.2.7",
     "@pubsweet/logger": "^0.2.35",
-    "@paypal/checkout-server-sdk": "^1.0.1",
+    "@paypal/checkout-server-sdk": "^1.0.2",
     "@repay/react-credit-card": "^1.0.1",
     "@types/jsonwebtoken": "^8.3.5",
     "accesscontrol-plus": "^1.0.1",
