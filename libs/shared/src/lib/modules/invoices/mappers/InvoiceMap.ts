@@ -3,6 +3,7 @@ import {Mapper} from '../../../infrastructure/Mapper';
 
 import {Invoice} from '../domain/Invoice';
 import {TransactionId} from '../../transactions/domain/TransactionId';
+import { raw } from 'body-parser';
 
 export class InvoiceMap extends Mapper<Invoice> {
   public static toDomain(raw: any): Invoice {
@@ -12,6 +13,7 @@ export class InvoiceMap extends Mapper<Invoice> {
           new UniqueEntityID(raw.transactionId)
         ),
         status: raw.status,
+        invoiceNumber: raw.invoiceNumber,
         dateCreated: new Date(raw.dateCreated)
       },
       new UniqueEntityID(raw.id)
@@ -27,6 +29,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       id: invoice.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
       status: invoice.status,
+      invoiceNumber: invoice.invoiceNumber,
       dateCreated: invoice.dateCreated
     };
   }

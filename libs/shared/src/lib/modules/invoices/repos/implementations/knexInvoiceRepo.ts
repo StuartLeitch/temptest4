@@ -60,6 +60,34 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return invoices.map(i => InvoiceMap.toDomain(i));
   }
 
+  async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
+    // TODO: this should be atomic
+    const { db } = this;
+    const invoiceNumberKey = 'invoiceNumber'
+    let invoiceMaxReference = await db(TABLES.INVOICES)
+      .whereNotNull(invoiceNumberKey)
+      .max(invoiceNumberKey)
+      .first()
+    
+    // should look at starting reference configuration and compare
+    let lastReferenceNumber = invoiceMaxReference.max || 0;
+
+    const updated = await db(TABLES.INVOICES)
+      .where({ id: invoiceId.id.toString() })
+      .update({
+        invoiceNumberKey: lastReferenceNumber + 1
+      });
+
+    if (!updated) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice',
+        invoiceId.id.toString()
+      );
+    }
+
+    return this.getInvoiceById(invoiceId);
+  }
+
   async delete(invoice: Invoice): Promise<unknown> {
     const { db } = this;
 
