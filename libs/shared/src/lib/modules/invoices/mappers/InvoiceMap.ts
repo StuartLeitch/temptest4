@@ -3,7 +3,6 @@ import {Mapper} from '../../../infrastructure/Mapper';
 
 import {Invoice} from '../domain/Invoice';
 import {TransactionId} from '../../transactions/domain/TransactionId';
-import { raw } from 'body-parser';
 
 export class InvoiceMap extends Mapper<Invoice> {
   public static toDomain(raw: any): Invoice {
