@@ -154,7 +154,7 @@ export {
   BraintreeGateway
 } from './modules/payments/infrastructure/gateways/braintree/gateway';
 export * from './infrastructure/database/knex';
-// export {Emailer} from './infrastructure/communication-channels';
+export { EmailService } from './infrastructure/communication-channels';
 
 // ? Should we export this
 // * Redux Stuff

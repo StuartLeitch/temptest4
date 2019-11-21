@@ -1,11 +1,11 @@
-const {SES} = require('aws-sdk');
+const { SES } = require('aws-sdk');
 
 module.exports = {
   transport: {
     SES: new SES({
-      secretAccessKey: '/0Eol8v4kuojmqKp4hpqL5qeLaZ3oAFlCG+pj1O4',
-      accessKeyId: 'AKIAIGOL6SNQYTP2HWNA',
-      region: 'eu-west-1'
+      secretAccessKey: process.env.AWS_SES_SECRET_KEY,
+      accessKeyId: process.env.AWS_SES_ACCESS_KEY,
+      region: process.env.AWS_SES_REGION
     })
   }
 };

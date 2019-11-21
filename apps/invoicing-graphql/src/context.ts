@@ -11,7 +11,8 @@ import {
   KnexWaiverRepo,
   KnexCatalogRepo,
   VATService,
-  WaiverService
+  WaiverService,
+  EmailService
 } from '@hindawi/shared';
 import { Config } from './config';
 import { CheckoutService } from './services/checkout';
@@ -36,6 +37,7 @@ export interface Context {
   authService: AuthService;
   vatService: VATService;
   waiverService: WaiverService;
+  emailService: EmailService;
 }
 
 export function makeContext(config: Config, db: Knex): Context {
@@ -55,6 +57,7 @@ export function makeContext(config: Config, db: Knex): Context {
     checkoutService: new CheckoutService(),
     authService: new AuthService(config),
     vatService: new VATService(),
-    waiverService: new WaiverService()
+    waiverService: new WaiverService(),
+    emailService: new EmailService()
   };
 }

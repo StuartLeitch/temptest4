@@ -6,6 +6,7 @@ import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/e
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
+import { Context } from '../../context';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
@@ -45,18 +46,24 @@ ${JSON.stringify(data)}
         invoice: invoiceRepo,
         invoiceItem: invoiceItemRepo,
         manuscript: manuscriptRepo,
-        waiver: waiverRepo
+        waiver: waiverRepo,
+        catalog: catalogRepo
       },
-      waiverService
-    } = this;
+      waiverService,
+      emailService
+    } = this as Context;
+
+    // catalogRepo.getCatalogItemByJournalId();
 
     const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
+      catalogRepo,
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
       manuscriptRepo,
       waiverRepo,
-      waiverService
+      waiverService,
+      emailService
     );
 
     const result = await updateTransactionOnAcceptManuscript.execute(
