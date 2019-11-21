@@ -45,7 +45,7 @@ const payByPayPal = (recordAction, invoice) => {
     return recordAction({
       payerId: invoice.payer.id,
       payPalOrderId: data.orderID,
-      invoiceId: invoice.id,
+      invoiceId: invoice.invoiceId,
     });
   };
 };
