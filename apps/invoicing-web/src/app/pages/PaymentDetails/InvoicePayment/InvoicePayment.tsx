@@ -104,7 +104,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
               {methods[values.paymentMethodId] === "Bank Transfer" && (
                 <BankTransfer />
               )}
-              {methods[values.paymentMethodId] === "PayPal" && (
+              {methods[values.paymentMethodId] === "Paypal" && (
                 <Paypal onSuccess={payByPayPalSubmit} />
               )}
               {error && <Text type="warning">{error}</Text>}
