@@ -10,9 +10,9 @@ import {
   KnexPayerRepo,
   KnexWaiverRepo,
   KnexCatalogRepo,
-  KnexPaymentMethodRepo,
   VATService,
-  WaiverService
+  WaiverService,
+  EmailService
 } from '@hindawi/shared';
 import { Config } from './config';
 import { CheckoutService } from './services/checkout';
@@ -40,6 +40,7 @@ export interface Context {
   vatService: VATService;
   waiverService: WaiverService;
   payPalService: any;
+  emailService: EmailService;
 }
 
 function makePayPalEnvironment(
@@ -82,6 +83,7 @@ export function makeContext(config: Config, db: Knex): Context {
     authService: new AuthService(config),
     vatService: new VATService(),
     waiverService: new WaiverService(),
-    payPalService: () => makePayPal(config)
+    payPalService: () => makePayPal(config),
+    emailService: new EmailService()
   };
 }
