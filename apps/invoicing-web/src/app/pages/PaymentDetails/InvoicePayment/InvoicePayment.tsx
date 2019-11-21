@@ -25,6 +25,7 @@ interface Props {
   payer: any;
   error: string;
   loading: boolean;
+  status: "DRAFT" | "ACTIVE" | "FINAL";
   methods: Record<string, string>;
   payByCardSubmit: (data: any) => void;
   payByPayPalSubmit: (data: any) => void;
@@ -67,6 +68,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   payer,
   methods,
   loading,
+  status,
   payByCardSubmit,
   payByPayPalSubmit,
 }) => {
@@ -80,7 +82,10 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
   return (
-    <Expander title="2. Invoice & Payment">
+    <Expander
+      title="2. Invoice & Payment"
+      expanded={status === "ACTIVE" ? true : false}
+    >
       <Label my="4" ml="4">
         Your Invoice
         <InvoiceDownloadLink payer={payer} />

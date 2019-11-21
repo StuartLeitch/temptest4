@@ -24,6 +24,7 @@ const BillingInfo: React.FC<Props> = ({
     <Expander
       mb={6}
       flex={2}
+      expanded={true}
       title={status === "ACTIVE" ? "1. Invoice details" : "1. Payer details"}
     >
       <Root>

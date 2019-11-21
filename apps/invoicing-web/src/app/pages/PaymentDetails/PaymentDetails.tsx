@@ -111,6 +111,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
             <InvoicePayment
               payer={invoice.payer}
               methods={paymentMethods}
+              status={invoice.status}
               error={paymentError}
               payByCardSubmit={payByCard}
               payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
