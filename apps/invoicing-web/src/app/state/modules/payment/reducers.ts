@@ -9,7 +9,7 @@ const initialState: PaymentsSlice = {
   methods: [],
 };
 
-const payments = createReducer(initialState).handleAction(
+const payment = createReducer(initialState).handleAction(
   getPaymentMethods.success,
   (state, action) => ({
     ...state,
@@ -22,7 +22,7 @@ const getMethodsLoading = createLoadingReducer(getPaymentMethods);
 const recordPaymentLoading = createLoadingReducer(recordCardPayment);
 
 export default combineReducers({
-  payments,
-  getMethodsLoading,
   recordPaymentLoading,
+  getMethodsLoading,
+  payment,
 });

@@ -2,9 +2,10 @@ import { combineReducers } from "redux";
 import { createSelector } from "reselect";
 import { createReducer } from "typesafe-actions";
 
-import payments from "../modules/payments";
 import invoiceReducer from "../modules/invoice/reducers";
 import { getInvoices } from "../modules/invoice/actions";
+import invoice from "../modules/invoice";
+import payments from "../modules/payment";
 
 import { modalReducer } from "../../providers/modal";
 
@@ -32,9 +33,8 @@ const invoices = createReducer(initialInvoicesState).handleAction(
 );
 
 const _getInvoices = state => state.invoices;
-export const invoicesMap = createSelector(
-  _getInvoices,
-  invoices => Object.values(invoices.byId),
+export const invoicesMap = createSelector(_getInvoices, invoices =>
+  Object.values(invoices.byId),
 );
 
 const rootReducer = combineReducers({

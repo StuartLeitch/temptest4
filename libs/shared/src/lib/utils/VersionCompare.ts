@@ -3,8 +3,8 @@ export class VersionCompare {
     const lexicographical = options && options.lexicographical;
     const zeroExtend = options && options.zeroExtend;
 
-    let v1parts: string[] | number[] = v1.split('.');
-    let v2parts: string[] | number[] = v2.split('.');
+    let v1parts: string[] | number[] = String(v1).split('.');
+    let v2parts: string[] | number[] = String(v2).split('.');
 
     function isValidPart(x: string) {
       return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);

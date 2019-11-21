@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { SES } = require('aws-sdk');
 
 module.exports = {

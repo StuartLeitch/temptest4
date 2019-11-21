@@ -1,9 +1,14 @@
-import { of } from "rxjs";
+import { catchError, switchMap, filter, map } from "rxjs/operators";
 import { isActionOf, RootEpic } from "typesafe-actions";
-import { filter, switchMap, map, catchError } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
+import { of } from "rxjs";
 
 import { queries, mutations } from "./graphql";
-import { getPaymentMethods, recordCardPayment } from "./actions";
+import {
+  recordPayPalPayment,
+  getPaymentMethods,
+  recordCardPayment,
+} from "./actions";
 
 const getPaymentsMethodsEpic: RootEpic = (
   action$,
@@ -41,4 +46,23 @@ const creditCardPaymentEpic: RootEpic = (
   );
 };
 
-export default [creditCardPaymentEpic, getPaymentsMethodsEpic];
+const recordPayPalPaymentEpic: RootEpic = (action$, state$) => {
+  return action$.pipe(
+    filter(isActionOf(recordPayPalPayment.request)),
+    switchMap(action =>
+      ajax.post(
+        `./api/paypal-payment/${action.payload.payerId}/${action.payload.invoiceId}/${action.payload.payPalOrderId}`,
+      ),
+    ),
+    map(r => {
+      return recordPayPalPayment.success("");
+    }),
+    catchError(err => of(recordPayPalPayment.failure(err.message))),
+  );
+};
+
+export default [
+  recordPayPalPaymentEpic,
+  getPaymentsMethodsEpic,
+  creditCardPaymentEpic,
+];
