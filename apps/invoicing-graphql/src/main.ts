@@ -1,3 +1,5 @@
+import 'config';
+
 import { makeDb } from './services/knex';
 import { makeConfig } from './config';
 import { makeContext } from './context';
