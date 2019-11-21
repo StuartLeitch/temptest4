@@ -90,7 +90,6 @@ const Paypal: React.FunctionComponent<Props> = ({
 
 Paypal.defaultProps = {
   currency: "USD",
-  total: 0.01,
 };
 
 export default scriptLoader("https://www.paypalobjects.com/api/checkout.js")(

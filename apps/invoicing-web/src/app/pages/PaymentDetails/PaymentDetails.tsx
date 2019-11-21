@@ -109,7 +109,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               loading={payerLoading}
             />
             <InvoicePayment
-              payer={invoice.payer}
+              invoice={invoice}
               methods={paymentMethods}
               status={invoice.status}
               error={paymentError}
