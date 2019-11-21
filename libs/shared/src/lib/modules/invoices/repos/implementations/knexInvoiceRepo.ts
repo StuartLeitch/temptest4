@@ -61,21 +61,22 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   }
 
   async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
-    // TODO: this should be atomic
     const { db } = this;
-    const invoiceNumberKey = 'invoiceNumber'
-    let invoiceMaxReference = await db(TABLES.INVOICES)
-      .whereNotNull(invoiceNumberKey)
-      .max(invoiceNumberKey)
-      .first()
-    
-    // should look at starting reference configuration and compare
-    let lastReferenceNumber = invoiceMaxReference.max || 0;
+
+    const invoice = await this.getInvoiceById(invoiceId);
+    if (invoice.invoiceNumber) {
+      throw RepoError.fromDBError(new Error('Invoice number already set'));
+    }
 
     const updated = await db(TABLES.INVOICES)
       .where({ id: invoiceId.id.toString() })
       .update({
-        invoiceNumberKey: lastReferenceNumber + 1
+        invoiceNumber: db.raw(`ifnull((select max("invoiceNumber") + 1 as max from (
+          select max("invoiceNumber") as "invoiceNumber" from invoices
+            union
+            select "invoiceReferenceNumber" as "invoiceNumber" from configurations
+          ) referenceNumbers), 1)
+        `)
       });
 
     if (!updated) {
