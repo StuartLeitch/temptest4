@@ -15,9 +15,8 @@ interface Props {
 }
 
 const CLIENT = {
-  sandbox:
-    "ARX972c4FBKB9eSzi2kNA2Sxga3H0iY9u9VwXJ8F4C_mYnxSmmVZjzmzBeQfKeHKWYZlcDtofos8-Pyc",
-  // production: `${config.paypallClientId}_prod`,
+  sandbox: config.paypallClientId,
+  production: config.paypallClientId,
 };
 
 const ENV = config.env === "production" ? "production" : "sandbox";

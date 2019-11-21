@@ -79,7 +79,7 @@ export class RecordPayPalPaymentUsecase
     const partialPayloadEither = await chain(
       [
         this.getPayloadWithPaymentMethodId.bind(this),
-        this.getPayloadWithAmount.bind(this, request.orderId)
+        this.getPayloadWithAmountAndDate.bind(this, request.orderId)
       ],
       this.getEmptyPayload()
     );
@@ -101,6 +101,7 @@ export class RecordPayPalPaymentUsecase
       foreignPaymentId: null,
       paymentMethodId: null,
       invoiceId: null,
+      datePaid: null,
       payerId: null,
       amount: null
     };
@@ -128,18 +129,36 @@ export class RecordPayPalPaymentUsecase
     }
   }
 
-  private async getPayloadWithAmount(
+  private calculateTotalPaid(payPalTransactionDetails) {
+    const paymentCaptures =
+      payPalTransactionDetails.purchase_units[0].payments.captures;
+    const totalPaid = paymentCaptures.reduce(
+      (acc: number, capture) => acc + parseFloat(capture.amount.value),
+      0
+    );
+    return totalPaid;
+  }
+
+  private getDateOfPayment(payPalTransactionDetails) {
+    return payPalTransactionDetails.purchase_units[0].payments.captures[0]
+      .create_time;
+  }
+
+  private async getPayloadWithAmountAndDate(
     payPalOrderId: string,
     payload: RecordPaymentDTO
   ) {
     const allDetailsEither = await this.getPayPalOrderDetails(payPalOrderId);
     const payPalDetails = allDetailsEither.map(details => {
-      return details.purchase_units[0].payments.captures.reduce(
-        (acc: number, capture) => acc + parseFloat(capture.amount.value),
-        0
-      );
+      const totalPaid = this.calculateTotalPaid(details);
+      const datePaid = this.getDateOfPayment(details);
+      return { totalPayed: totalPaid, datePaid };
     });
-    return payPalDetails.map(sum => ({ ...payload, amount: sum }));
+    return payPalDetails.map(({ totalPayed, datePaid }) => ({
+      ...payload,
+      amount: totalPayed,
+      datePaid
+    }));
   }
 
   private async getPayloadWithPayPalForeignPaymentId(

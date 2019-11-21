@@ -60,7 +60,8 @@ export class RecordPaymentUsecase
       foreignPaymentId: payload.foreignPaymentId,
       paymentMethodId: PaymentMethodId.create(
         new UniqueEntityID(payload.paymentMethodId)
-      )
+      ),
+      datePaid: new Date(payload.datePaid)
     };
 
     try {

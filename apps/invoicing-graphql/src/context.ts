@@ -47,13 +47,13 @@ function makePayPalEnvironment(
   clientSecret: string,
   environment: string
 ) {
-  if (environment === 'sandbox') {
+  if (environment === 'live' || environment === 'production') {
+    return new checkoutNodeJsSDK.core.LiveEnvironment(clientId, clientSecret);
+  } else {
     return new checkoutNodeJsSDK.core.SandboxEnvironment(
       clientId,
       clientSecret
     );
-  } else {
-    return new checkoutNodeJsSDK.core.Environment(clientId, clientSecret);
   }
 }
 
