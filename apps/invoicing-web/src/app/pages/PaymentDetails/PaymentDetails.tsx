@@ -9,6 +9,7 @@ import { Details } from "./Details";
 import { BillingInfo } from "./BillingInfo";
 import { InvoicePayment } from "./InvoicePayment";
 import { PaymentHeader } from "./PaymentHeader";
+import { PaymentFooter } from "./PaymentFooter";
 
 import {
   invoiceTypes,
@@ -121,6 +122,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 
           <Details invoice={invoice} mt={-44} />
         </Root>
+        <PaymentFooter></PaymentFooter>
       </Fragment>
     );
   })();
