@@ -109,6 +109,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
           onViewInvoice={() => {
             console.info(`./api/invoice/${invoice.payer.id}`);
           }}
+          payerId={invoice.payer.id}
         />
       ) : (
         [
@@ -140,7 +141,10 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                     <BankTransfer />
                   )}
                   {methods[values.paymentMethodId] === "Paypal" && (
-                    <Paypal onSuccess={payByPayPalSubmit} />
+                    <Paypal
+                      onSuccess={payByPayPalSubmit}
+                      total={calculateTotalToBePaid(invoice)}
+                    />
                   )}
                   {error && <Text type="warning">{error}</Text>}
                 </Root>
@@ -161,7 +165,10 @@ const mapStateToProps = (state: RootState) => ({
   invoiceIsPaid: invoiceSelectors.invoiceIsPaid(state),
 });
 
-export default connect(mapStateToProps, {})(InvoicePayment);
+export default connect(
+  mapStateToProps,
+  {},
+)(InvoicePayment);
 
 // #region styles
 const Root = styled.div`

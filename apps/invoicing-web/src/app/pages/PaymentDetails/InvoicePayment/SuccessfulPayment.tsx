@@ -4,12 +4,14 @@ import { Flex, th, Separator, Title, Button } from "@hindawi/react-components";
 
 interface Props {
   title?: string;
+  payerId: string;
   onViewInvoice?: () => void;
 }
 
 const SuccessfulPayment: React.FunctionComponent<Props> = ({
   title = "Payment was sent successfuly",
   onViewInvoice,
+  payerId,
 }) => (
   <Flex alignItems="center" vertical flex={2}>
     <Flex vertical alignItems="center" style={{ padding: "40px" }}>
@@ -27,9 +29,11 @@ const SuccessfulPayment: React.FunctionComponent<Props> = ({
       </div>
 
       <Fragment>
-        <Button type="primary" onClick={onViewInvoice} mr={3}>
-          VIEW INVOICE
-        </Button>
+        <a href={`./api/invoice/${payerId}`}>
+          <Button type="primary" onClick={null} mr={3}>
+            VIEW INVOICE
+          </Button>
+        </a>
       </Fragment>
     </Flex>
   </Flex>
