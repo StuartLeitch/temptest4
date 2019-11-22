@@ -6,9 +6,7 @@ import { Context } from '../../context';
 export const payments: Resolvers<Context> = {
   Query: {
     async getPaymentMethods(parent, args, context) {
-      const usecase = new GetPaymentMethodsUseCase(
-        context.repos.paymentMethods
-      );
+      const usecase = new GetPaymentMethodsUseCase(context.repos.paymentMethod);
 
       const result = await usecase.execute();
 

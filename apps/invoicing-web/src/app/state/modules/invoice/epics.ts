@@ -13,7 +13,7 @@ import { modalActions } from "../../../providers/modal";
 
 import { invoice } from "./selectors";
 import { queries, mutations } from "./graphql";
-import { getInvoice, updatePayerAsync } from "./actions";
+import { getInvoice, getInvoices, updatePayerAsync } from "./actions";
 
 const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
@@ -49,7 +49,7 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
       return from([
         modalActions.hideModal(),
         updatePayerAsync.success(r.data.updateInvoicePayer),
-        getInvoice.request(invoice.id),
+        getInvoice.request(invoice.invoiceId),
       ]);
     }),
     catchError(err => {
@@ -58,4 +58,16 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   );
 };
 
-export default [fetchInvoiceEpic, updatePayerEpic];
+const fetchInvoicesEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
+  return action$.pipe(
+    filter(isActionOf(getInvoices.request)),
+    delay(500),
+    switchMap(action => graphqlAdapter.send(queries.getInvoices)),
+    map(r => {
+      return getInvoices.success(r.data.invoices);
+    }),
+    catchError(err => of(getInvoices.failure(err.message))),
+  );
+};
+
+export default [fetchInvoiceEpic, updatePayerEpic, fetchInvoicesEpic];

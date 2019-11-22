@@ -1,6 +1,11 @@
 import { createAsyncAction } from "typesafe-actions";
 
-import { CreditCardInput, Payment, PaymentMethod } from "./types";
+import {
+  CreditCardInput,
+  PaymentMethod,
+  PayPalPayment,
+  Payment,
+} from "./types";
 
 export const getPaymentMethods = createAsyncAction(
   "payments/GET_PAYMENT_METHODS_REQUEST",
@@ -13,3 +18,9 @@ export const recordCardPayment = createAsyncAction(
   "payments/RECORD_CARD_SUCCESS",
   "payments/RECORD_CARD_ERROR",
 )<CreditCardInput, Payment, string>();
+
+export const recordPayPalPayment = createAsyncAction(
+  "payment/RECORD_PAY_PAL_REQUEST",
+  "payment/RECORD_PAY_PAL_SUCCESS",
+  "payment/RECORD_PAY_PAL_ERROR",
+)<PayPalPayment, string, string>();

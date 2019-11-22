@@ -1,3 +1,5 @@
+import 'config';
+
 import { makeDb } from './services/knex';
 import { makeConfig } from './config';
 import { makeContext } from './context';
@@ -22,18 +24,18 @@ async function main(): Promise<void> {
   queue.start();
 
   // queue.__LOCAL__.handler({
-  //   submissionId: 'a2eb9a08-d0c8-4638-85c1-74d926d3cb15',
+  //   submissionId: '42e12839-188b-4e60-9f09-5636f5e73ae4',
   //   manuscripts: [
   //     {
   //       id: '439303d8-bdb4-43f2-a7e0-7a4a341a04a1',
-  //       journalId: '25dc63a9-67f4-4ae1-b41d-a09850263c64',
+  //       journalId: '03c177e1-f55e-4008-9299-25e9f3421e10',
   //       created: '2019-11-06T09:53:00.361Z',
   //       updated: '2019-11-06T09:58:27.365Z',
   //       title: 'Renal Replacement Therapy in the Critical Care Setting',
   //       abstract:
   //         'Renal replacement therapy (RRT) is frequently required to manage critically ill patients with acute kidney injury (AKI). There is limited evidence to support the current practice of RRT in intensive care units (ICUs). Recently published randomized control trials (RCTs) have further questioned our understanding of RRT in critical care. The optimal timing and dosing continues to be debatable; however, current evidence suggests delayed strategy with less intensive dosing when utilising RRT. Various modes of RRT are complementary to each other with no definite benefits to mortality or renal function preservation. Choice of anticoagulation remains regional citrate anticoagulation in continuous renal replacement therapy (CRRT) with lower bleeding risk when compared with heparin. RRT can be used to support resistant cardiac failure, but evolving therapies such as haemoperfusion are currently not recommended in sepsis.',
   //       customId: '3980345',
-  //       version: 1,
+  //       version: '1',
   //       conflictOfInterest: '',
   //       dataAvailability: 'test',
   //       fundingStatement: 'yes',
@@ -116,10 +118,10 @@ async function main(): Promise<void> {
   //           isCorresponding: true,
   //           status: 'pending',
   //           aff: 'Hin',
-  //           email: 'email+author1@domain.com',
+  //           email: 'lucian.lature@hindawi.com',
   //           country: 'RO',
-  //           surname: 'auhtor1',
-  //           givenNames: 'author1'
+  //           surname: 'Lucian',
+  //           givenNames: 'Lature'
   //         }
   //       ],
   //       reviewers: [

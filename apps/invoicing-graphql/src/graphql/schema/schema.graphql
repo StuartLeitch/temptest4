@@ -30,7 +30,7 @@ type InvoiceItem {
 }
 
 type Invoice {
-  id: String
+  invoiceId: String
   dateCreated: String
   dateChanged: String
   vat: Float
@@ -39,6 +39,10 @@ type Invoice {
   payer: Payer
   referenceNumber: String
   invoiceItem: InvoiceItem
+  title: String
+  price: Float
+  customId: String
+  type: String
 }
 
 input AddressInput {
@@ -49,6 +53,7 @@ input AddressInput {
 
 input PayerInput {
   id: String
+  invoiceId: String
   type: PayerType
   name: String
   email: String
@@ -102,8 +107,10 @@ type PaymentMethod {
 }
 
 type Query {
-  invoice(id: String): Invoice
   getPaymentMethods: [PaymentMethod]
+  invoice(invoiceId: String): Invoice
+  invoices: [Invoice]
+  echo(value: String): String
 }
 
 type Mutation {

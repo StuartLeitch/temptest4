@@ -10,6 +10,7 @@ import { config } from "./config";
 import { Context } from "./context";
 import { makeStore } from "./app/state";
 import { actions } from "./app/state/modules/system";
+import { getInvoices } from "./app/state/modules/invoice/actions";
 
 const context = new Context(config);
 const store = makeStore(config, context);
@@ -24,6 +25,7 @@ ReactDOM.render(
   </Provider>,
   document.getElementById("root"),
   () => {
-    store.dispatch(actions.init());
+    // store.dispatch(actions.init());
+    store.dispatch(getInvoices.request(null));
   },
 );

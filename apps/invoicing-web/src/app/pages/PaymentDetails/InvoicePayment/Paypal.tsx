@@ -16,7 +16,7 @@ interface Props {
 
 const CLIENT = {
   sandbox: config.paypallClientId,
-  production: `${config.paypallClientId}_prod`,
+  production: config.paypallClientId,
 };
 
 const ENV = config.env === "production" ? "production" : "sandbox";
@@ -57,6 +57,7 @@ const Paypal: React.FunctionComponent<Props> = ({
 
   const onAuthorize = (data, actions) =>
     actions.payment.execute().then(() => {
+      console.log(data);
       const payment = {
         paid: true,
         cancelled: false,
@@ -64,6 +65,7 @@ const Paypal: React.FunctionComponent<Props> = ({
         paymentID: data.paymentID,
         paymentToken: data.paymentToken,
         returnUrl: data.returnUrl,
+        orderID: data.orderID,
       };
       onSuccess(payment);
     }, onError);
@@ -88,7 +90,6 @@ const Paypal: React.FunctionComponent<Props> = ({
 
 Paypal.defaultProps = {
   currency: "USD",
-  total: 0.01,
 };
 
 export default scriptLoader("https://www.paypalobjects.com/api/checkout.js")(

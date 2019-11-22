@@ -13,3 +13,9 @@ export const updatePayerAsync = createAsyncAction(
   "invoice/UPDATE_PAYER_SUCCESS",
   "invoice/UPDATE_PAYER_ERROR",
 )<Payer, Payer, string>();
+
+export const getInvoices = createAsyncAction(
+  "invoice/FETCH_INVOICES_REQUEST",
+  "invoice/FETCH_INVOICES_SUCCESS",
+  "invoice/FETCH_INVOICES_ERROR",
+)<string, Invoice[], string>();

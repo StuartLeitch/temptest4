@@ -26,6 +26,7 @@
     "src/lib/infrastructure/database/knex/migrations/20191116111901_renamed_articletypeid_in_articles.js",
     "src/lib/infrastructure/database/knex/migrations/20191118120544_changed_types_in_transactions.js",
     "src/lib/infrastructure/database/knex/migrations/20191118120019_update_default_value_for_deleted_in_invoice_items.js",
-    "src/lib/infrastructure/database/knex/migrations/20191118115806_add_authorFistName_to_articles.js"
+    "src/lib/infrastructure/database/knex/migrations/20191118115806_add_authorFistName_to_articles.js",
+    "src/lib/infrastructure/database/knex/migrations/20191118173201_add_soft_delete_to_articles.js"
   ]
 }

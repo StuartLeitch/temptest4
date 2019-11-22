@@ -22,11 +22,13 @@ const PAYMENT_METHODS = {
 };
 
 interface Props {
-  payer: any;
+  invoice: any;
   error: string;
-  onSubmit: any;
   loading: boolean;
+  status: "DRAFT" | "ACTIVE" | "FINAL";
   methods: Record<string, string>;
+  payByCardSubmit: (data: any) => void;
+  payByPayPalSubmit: (data: any) => void;
 }
 
 const validateFn = methods => values => {
@@ -50,7 +52,14 @@ const validateFn = methods => values => {
   return errors;
 };
 
-const InvoiceDownloadLink = payer => {
+const calculateTotalToBePaid = invoice => {
+  const netValue = invoice.invoiceItem.price;
+  const vatPercent = invoice.invoiceItem.vat;
+  const vat = (netValue * vatPercent) / 100;
+  return netValue + vat;
+};
+
+const InvoiceDownloadLink = ({ payer }) => {
   if (payer) {
     return (
       <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
@@ -63,10 +72,12 @@ const InvoiceDownloadLink = payer => {
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
   error,
-  payer,
+  invoice,
   methods,
   loading,
-  onSubmit,
+  status,
+  payByCardSubmit,
+  payByPayPalSubmit,
 }) => {
   const parsedMethods = useMemo(
     () =>
@@ -78,15 +89,18 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
   return (
-    <Expander title="2. Invoice & Payment">
+    <Expander
+      title="2. Invoice & Payment"
+      expanded={status === "ACTIVE" ? true : false}
+    >
       <Label my="4" ml="4">
         Your Invoice
-        <InvoiceDownloadLink payer={payer} />
+        <InvoiceDownloadLink payer={invoice.payer} />
       </Label>
       <Formik
         validate={validateFn(methods)}
         initialValues={{ paymentMethodId: null }}
-        onSubmit={onSubmit}
+        onSubmit={payByCardSubmit}
       >
         {({ handleSubmit, setFieldValue, values }) => {
           return (
@@ -103,7 +117,10 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                 <BankTransfer />
               )}
               {methods[values.paymentMethodId] === "Paypal" && (
-                <Paypal onSuccess={p => console.log("pe success", p)} />
+                <Paypal
+                  onSuccess={payByPayPalSubmit}
+                  total={calculateTotalToBePaid(invoice)}
+                />
               )}
               {error && <Text type="warning">{error}</Text>}
             </Root>

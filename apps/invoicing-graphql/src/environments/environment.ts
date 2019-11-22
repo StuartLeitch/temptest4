@@ -17,6 +17,8 @@ export const environment = {
     'https://sqs.eu-west-1.amazonaws.com/496598730381/invoicing-dev',
   AWS_SQS_QUEUE_NAME: 'invoicing-dev',
 
+  AWS_SES_REGION: 'eu-west-1',
+
   DB_HOST: 'dev-invoicing-graphql.caews8gzu4su.eu-west-1.rds.amazonaws.com',
   DB_USERNAME: 'invoicingSandbox',
   DB_DATABASE: 'ebdb',

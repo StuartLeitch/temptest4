@@ -11,8 +11,8 @@ import {
   GetItemsForInvoiceUsecase,
   Roles
 } from '@hindawi/shared';
-
-import EmailTemplate from '@pubsweet/component-email-templating';
+import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
+import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { Resolvers, Invoice } from '../schema';
 import { Context } from '../../context';
@@ -24,7 +24,7 @@ export const invoice: Resolvers<Context> = {
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
-        invoiceId: args.id
+        invoiceId: args.invoiceId
       };
 
       const usecaseContext = {
@@ -33,31 +33,6 @@ export const invoice: Resolvers<Context> = {
 
       const result = await usecase.execute(request, usecaseContext);
 
-      // const email = new EmailTemplate({
-      //   type: 'user',
-      //   fromEmail: 'aurel@hindawi.com',
-      //   toUser: {
-      //     email: 'alexandru.munt@gmail.com',
-      //     name: 'hai sa vedem'
-      //   },
-      //   content: {
-      //     ctaText: 'MANUSCRIPT DETAILS',
-      //     signatureJournal: 'ABC jurnal',
-      //     signatureName: `Costel Costelovici`,
-      //     subject: `un-id: Manuscript Update`,
-      //     paragraph: 'bine ati venit!',
-      //     unsubscribeLink: `http://localhost:3000/unsubscribe/123`,
-      //     ctaLink: `http://localhost:3000/projects/123/versions/123/details`
-      //   },
-      //   bodyProps: {
-      //     hasLink: true,
-      //     hasIntro: true,
-      //     hasSignature: true
-      //   }
-      // });
-
-      // email.sendEmail();
-
       if (result.isLeft()) {
         return undefined;
       } else {
@@ -65,7 +40,7 @@ export const invoice: Resolvers<Context> = {
         const invoiceDetails = result.value.getValue();
 
         return {
-          id: invoiceDetails.id.toString(),
+          invoiceId: invoiceDetails.id.toString(),
           status: invoiceDetails.status,
           vat: invoiceDetails.vat,
           charge: invoiceDetails.charge,
@@ -79,28 +54,60 @@ export const invoice: Resolvers<Context> = {
           // netAmount: entity.netAmount
         };
       }
+    },
+
+    async invoices(parent, args, context) {
+      const { repos } = context;
+      const usecase = new GetRecentInvoicesUsecase(repos.invoice);
+      const usecaseContext = {
+        roles: [Roles.ADMIN]
+      };
+      const result = await usecase.execute({}, usecaseContext);
+
+      if (result.isLeft()) {
+        return undefined;
+      }
+
+      return result.value.getValue();
     }
   },
   Invoice: {
     async payer(parent: Invoice, args, context) {
-      const payer = await context.repos.payer.getPayerByInvoiceId(
-        InvoiceId.create(new UniqueEntityID(parent.id)).getValue()
-      );
+      const {
+        repos: { payer: payerRepo }
+      } = context;
+      const invoiceId = InvoiceId.create(
+        new UniqueEntityID(parent.invoiceId)
+      ).getValue();
+
+      const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
+
+      if (!payer) {
+        return null;
+      }
       return PayerMap.toPersistence(payer);
     },
     async invoiceItem(parent: Invoice, args, context) {
+      const {
+        repos: { invoiceItem: invoiceItemRepo, invoice: invoiceRepo }
+      } = context;
+
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
-        context.repos.invoiceItem,
-        context.repos.invoice
+        invoiceItemRepo,
+        invoiceRepo
       );
 
-      const item = await getItemsUseCase.execute({ invoiceId: parent.id });
+      const result = await getItemsUseCase.execute({
+        invoiceId: parent.invoiceId
+      });
 
-      if (item.isLeft()) {
-        throw item.value.errorValue();
+      if (result.isLeft()) {
+        throw result.value.errorValue();
       }
 
-      return InvoiceItemMap.toPersistence(item.value.getValue()[0]);
+      const [item] = result.value.getValue();
+
+      return InvoiceItemMap.toPersistence(item);
     }
   },
   InvoiceItem: {

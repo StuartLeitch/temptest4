@@ -1,17 +1,45 @@
-import express, { response } from 'express';
+import express from 'express';
+import {
+  RecordPayPalPaymentUsecase,
+  RecordPaymentUsecase,
+  GetInvoicePdfUsecase,
+  Roles
+} from '@hindawi/shared';
+
 import { Context } from '../context';
-import { Roles, GetInvoicePdfUsecase } from '@hindawi/shared';
 import { AuthMiddleware } from './middleware/auth';
 
 export function makeExpressServer(context: Context) {
   const app = express();
   const auth = new AuthMiddleware(context);
+  app.use(express.json());
 
   app.post('/api/paypal-payment-completed', async (req, res) => {
-    console.log('paypal payment created');
-    console.log(req.body);
-    return res.status(200).send('42');
+    return res.status(200);
   });
+
+  app.post(
+    '/api/paypal-payment/:payerId/:invoiceId/:orderId',
+    async (req, res) => {
+      const usecase = new RecordPayPalPaymentUsecase(
+        context.repos.paymentMethod,
+        context.repos.payment,
+        context.repos.invoice,
+        context.payPalService
+      );
+      const result = await usecase.execute({
+        invoiceId: req.params.invoiceId,
+        orderId: req.params.orderId,
+        payerId: req.params.payerId
+      });
+      if (result.isLeft()) {
+        res.status(404);
+        res.send(result.value.errorValue());
+      }
+      res.status(200);
+      res.send();
+    }
+  );
 
   app.post('/api/checkout', async (req, res) => {
     const { checkoutService } = context;
@@ -20,16 +48,18 @@ export function makeExpressServer(context: Context) {
 
     const transaction = await checkoutService.pay(payment);
 
-    // const useCase = new RecordPayment(
-    //   context.repos.payment,
-    //   context.repos.invoice
-    // );
+    const useCase = new RecordPaymentUsecase(
+      context.repos.payment,
+      context.repos.invoice
+    );
 
-    try {
-      // return useCase.execute(transaction);
-    } catch (err) {
-      console.log(err);
+    const resultEither = await useCase.execute(transaction);
+
+    if (resultEither.isLeft()) {
+      console.log(resultEither.value.errorValue());
       return res.status(500);
+    } else {
+      return resultEither.value.getValue();
     }
   });
 

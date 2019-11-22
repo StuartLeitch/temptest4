@@ -1,6 +1,6 @@
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Mapper} from '../../../infrastructure/Mapper';
-import {Transaction} from '../domain/Transaction';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Mapper } from '../../../infrastructure/Mapper';
+import { Transaction } from '../domain/Transaction';
 
 export class TransactionMap extends Mapper<Transaction> {
   public static toDomain(raw: any): Transaction {
@@ -9,7 +9,7 @@ export class TransactionMap extends Mapper<Transaction> {
         deleted: raw.deleted,
         status: raw.status,
         dateCreated: new Date(raw.dateCreated),
-        dateUpdated: new Date(raw.dateUpdated)
+        dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : new Date()
       },
       new UniqueEntityID(raw.id)
     );

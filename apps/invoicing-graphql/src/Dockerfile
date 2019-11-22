@@ -9,6 +9,7 @@ COPY package-lock.json .
 RUN npm ci --only=production
 
 # Copying the rest of the code to the working directory
+COPY config/ ./config/
 COPY dist/apps/invoicing-graphql .
 COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
 

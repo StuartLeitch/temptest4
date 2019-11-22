@@ -10,6 +10,7 @@ import { TransactionRepoContract } from '../../repos/transactionRepo';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { WaiverService } from '../../../../domain/services/WaiverService';
+import { EmailService } from '../../../../infrastructure/communication-channels';
 import { Waiver } from '../../../../domain/reductions/Waiver';
 import { Transaction } from '../../domain/Transaction';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
@@ -28,6 +29,9 @@ import {
   AccessControlContext,
   UpdateTransactionContext
 } from './updateTransactionOnAcceptManuscriptAuthorizationContext';
+import { CatalogRepoContract } from '../../../journals/repos';
+import { CatalogItem } from '../../../journals/domain/CatalogItem';
+import { JournalId } from '../../../journals/domain/JournalId';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   implements
@@ -42,12 +46,14 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       AccessControlContext
     > {
   constructor(
+    private catalogRepo: CatalogRepoContract,
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private articleRepo: ArticleRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private waiverService: WaiverService
+    private waiverService: WaiverService,
+    private emailService: EmailService
   ) {}
 
   private async getAccessControlContext(request, context?) {
@@ -64,6 +70,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     let invoiceItem: InvoiceItem;
     let manuscript: Manuscript;
     let waiver: Waiver;
+    let catalogItem: CatalogItem;
 
     // * get a proper ManuscriptId
     const manuscriptId = ManuscriptId.create(
@@ -115,6 +122,19 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         return left(
           new UpdateTransactionOnAcceptManuscriptErrors.TransactionNotFoundError(
             invoice.invoiceId.id.toString()
+          )
+        );
+      }
+
+      try {
+        // * System looks-up the catalog item for the manuscript
+        catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+        );
+      } catch (err) {
+        return left(
+          new UpdateTransactionOnAcceptManuscriptErrors.CatalogItemNotFoundError(
+            manuscript.journalId
           )
         );
       }
@@ -172,6 +192,10 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.transactionRepo.update(transaction);
       await this.articleRepo.update(manuscript);
       await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
+
+      this.emailService
+        .createInvoicePaymentTemplate(manuscript, catalogItem, invoiceItem)
+        .sendEmail();
 
       return right(Result.ok<void>());
     } catch (err) {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {FormFieldProps} from '../CommonTypes';
+import { FormFieldProps } from '../CommonTypes';
 
 type ResizeOptions = 'both' | 'none' | 'vertical' | 'horizontal';
 
@@ -10,14 +10,14 @@ export interface Props extends FormFieldProps {
   resize?: ResizeOptions;
 }
 
-import {Textarea as Input} from './Textarea.styles';
+import { Textarea as Input } from './Textarea.styles';
 
 const Textarea: React.FunctionComponent<Props> = ({
   status,
   resize,
   ...rest
 }) => {
-  return <Input as="textarea" status={status} resize={resize} {...rest} />;
+  return <Input status={status} resize={resize} {...rest} />;
 };
 
 Textarea.defaultProps = {

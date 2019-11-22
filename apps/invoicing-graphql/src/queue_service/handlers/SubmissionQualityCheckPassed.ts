@@ -1,10 +1,12 @@
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 
+import { VersionCompare } from './../../../../../libs/shared/src/lib/utils/VersionCompare';
 import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
+import { Context } from '../../context';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
@@ -18,17 +20,21 @@ export const SubmissionQualityCheckPassedHandler = {
 ${JSON.stringify(data)}
     `);
 
+    const { submissionId, manuscripts } = data;
+
+    const maxVersion = manuscripts.reduce((max, m: any) => {
+      const version = VersionCompare.versionCompare(m.version, max)
+        ? m.version
+        : max;
+      return version;
+    }, manuscripts[0].version);
+
     const {
-      submissionId,
-      manuscripts: [
-        {
-          customId,
-          title,
-          articleType: { name },
-          authors
-        }
-      ]
-    } = data;
+      customId,
+      title,
+      articleType: { name },
+      authors
+    } = manuscripts.find((m: any) => m.version === maxVersion);
 
     const { email, country, surname, givenNames } = authors.find(
       (a: any) => a.isCorresponding
@@ -40,18 +46,24 @@ ${JSON.stringify(data)}
         invoice: invoiceRepo,
         invoiceItem: invoiceItemRepo,
         manuscript: manuscriptRepo,
-        waiver: waiverRepo
+        waiver: waiverRepo,
+        catalog: catalogRepo
       },
-      waiverService
-    } = this;
+      waiverService,
+      emailService
+    } = this as Context;
+
+    // catalogRepo.getCatalogItemByJournalId();
 
     const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
+      catalogRepo,
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
       manuscriptRepo,
       waiverRepo,
-      waiverService
+      waiverService,
+      emailService
     );
 
     const result = await updateTransactionOnAcceptManuscript.execute(

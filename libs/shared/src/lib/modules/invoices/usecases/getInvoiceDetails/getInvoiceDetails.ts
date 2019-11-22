@@ -1,8 +1,8 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {AppError} from '../../../../core/logic/AppError';
-import {Result, left, right} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { AppError } from '../../../../core/logic/AppError';
+import { Result, left, right } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
@@ -10,17 +10,17 @@ import {
   AuthorizationContext,
   AccessControlledUsecase
 } from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {Invoice} from '../../domain/Invoice';
-import {InvoiceId} from '../../domain/InvoiceId';
-import {InvoiceRepoContract} from '../../repos/invoiceRepo';
+import { Invoice } from '../../domain/Invoice';
+import { InvoiceId } from '../../domain/InvoiceId';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
-import {GetInvoiceDetailsResponse} from './getInvoiceDetailsResponse';
-import {GetInvoiceDetailsErrors} from './getInvoiceDetailsErrors';
-import {GetInvoiceDetailsDTO} from './getInvoiceDetailsDTO';
+import { GetInvoiceDetailsResponse } from './getInvoiceDetailsResponse';
+import { GetInvoiceDetailsErrors } from './getInvoiceDetailsErrors';
+import { GetInvoiceDetailsDTO } from './getInvoiceDetailsDTO';
 
 export type GetInvoiceDetailsContext = AuthorizationContext<Roles>;
 

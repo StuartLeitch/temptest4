@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { useParams } from "react-router-dom";
 import { set, isEmpty } from "lodash";
 import { Formik } from "formik";
 import {
@@ -9,11 +10,11 @@ import {
   FormField,
 } from "@hindawi/react-components";
 
+import { Modal, useModalActions } from "../../../providers/modal";
 import { PAYMENT_TYPES } from "./types";
 import CountryField from "./CountryField";
 import IconRadioButton from "./IconRadioButton";
 import ConfirmationModal from "./ConfirmationModal";
-import { Modal, useModalActions } from "../../../providers/modal";
 
 interface Props {
   payer: any;
@@ -83,7 +84,19 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
   loading,
   handleSubmit,
 }) => {
+  const { invoiceId } = useParams();
   const { showModal, hideModal } = useModalActions();
+
+  if (!payer) {
+    payer = {
+      invoiceId,
+      type: null,
+      address: {
+        country: "",
+      },
+    };
+  }
+
   return (
     <Formik initialValues={payer} validate={validateFn} onSubmit={handleSubmit}>
       {({
@@ -100,7 +113,11 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
               <Label required>Who is making the payment?</Label>
               <Flex mt={1} mb={4}>
                 <IconRadioButton
-                  isSelected={values.type === PAYMENT_TYPES.individual}
+                  isSelected={
+                    values &&
+                    values.type &&
+                    values.type === PAYMENT_TYPES.individual
+                  }
                   onClick={() =>
                     setFieldValue("type", PAYMENT_TYPES.individual)
                   }
@@ -109,7 +126,11 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                   mr={1}
                 />
                 <IconRadioButton
-                  isSelected={values.type === PAYMENT_TYPES.institution}
+                  isSelected={
+                    values &&
+                    values.type &&
+                    values.type === PAYMENT_TYPES.institution
+                  }
                   onClick={() =>
                     setFieldValue("type", PAYMENT_TYPES.institution)
                   }
@@ -119,20 +140,22 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                 />
               </Flex>
 
-              {values.type === PAYMENT_TYPES.institution && (
-                <Flex>
-                  <FormField
-                    mr={4}
-                    flex={2}
-                    required
-                    label="Institution name"
-                    name="organization"
-                  />
-                  <FormField label="EC VAT Reg. No" name="vatId" flex={1} />
-                </Flex>
-              )}
+              {values &&
+                values.type &&
+                values.type === PAYMENT_TYPES.institution && (
+                  <Flex>
+                    <FormField
+                      mr={4}
+                      flex={2}
+                      required
+                      label="Institution name"
+                      name="organization"
+                    />
+                    <FormField label="EC VAT Reg. No" name="vatId" flex={1} />
+                  </Flex>
+                )}
 
-              {values.type !== null && (
+              {values && values.type !== null && (
                 <Fragment>
                   <Flex>
                     <FormField

@@ -7,6 +7,7 @@ import { JournalId } from '../domain/JournalId';
 export interface CatalogItemProps {
   type: string;
   amount: number;
+  currency?: string;
   journalId: JournalId;
   journalTitle?: string;
 }
@@ -47,5 +48,9 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   public get journalTitle(): string {
     return this.props.journalTitle;
+  }
+
+  public get currency(): string {
+    return this.props.currency;
   }
 }
