@@ -1,11 +1,11 @@
-import {space, layout} from 'styled-system';
-import styled, {css, AnyStyledComponent} from 'styled-components';
+import { space, layout } from 'styled-system';
+import styled, { css, AnyStyledComponent } from 'styled-components';
 
-import {th, lighten} from '../Theme';
-import {FormFieldStatus} from './CommonTypes';
-import {regular, regularItalic} from '../Typography';
+import { th, lighten } from '../Theme';
+import { FormFieldStatus } from './CommonTypes';
+import { regular, regularItalic } from '../Typography';
 
-const statusColor = ({status}: {status: FormFieldStatus}) => {
+const statusColor = ({ status }: { status: FormFieldStatus }) => {
   switch (status) {
     case 'warning':
       return css`
@@ -65,6 +65,28 @@ const statusColor = ({status}: {status: FormFieldStatus}) => {
 };
 
 export const Input: AnyStyledComponent = styled.input`
+  border-radius: ${th('gridUnit')};
+  border: 1px solid;
+  box-sizing: border-box;
+  font-size: ${th('fontSizes.textRegular')};
+  line-height: ${th('fontSizes.lineHeight')};
+  outline: none;
+  height: calc(${th('gridUnit')} * 8);
+  padding: calc(${th('gridUnit')} * 2);
+  width: 100%;
+
+  &::placeholder {
+    color: ${lighten('colors.textPrimary', 60)};
+    ${regularItalic};
+  }
+
+  ${regular};
+  ${statusColor};
+  ${space};
+  ${layout};
+`;
+
+export const TextArea: AnyStyledComponent = styled.textarea`
   border-radius: ${th('gridUnit')};
   border: 1px solid;
   box-sizing: border-box;

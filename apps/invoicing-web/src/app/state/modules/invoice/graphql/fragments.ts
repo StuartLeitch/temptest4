@@ -42,6 +42,7 @@ export const invoiceFragment = gql`
     invoiceId
     status
     dateCreated
+    referenceNumber
     payer {
       ...payerFragment
     }

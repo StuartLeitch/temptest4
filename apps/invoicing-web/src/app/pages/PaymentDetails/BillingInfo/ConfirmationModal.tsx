@@ -24,8 +24,8 @@ const ConfirmationModal: React.FunctionComponent<Props> = ({
 }) => {
   return (
     <Root>
-      <Title mt={10}>Create Invoice?</Title>
-      <Text mt={6}>Once created, the payment details can't be modified.</Text>
+      <Title mt={10}>Confirm Invoice?</Title>
+      <Text mt={6}>Once confirmed, the payment details can't be modified.</Text>
       {error && (
         <Text mt={4} type="warning">
           {error}
@@ -41,7 +41,7 @@ const ConfirmationModal: React.FunctionComponent<Props> = ({
               CANCEL
             </Button>
             <Button type="primary" onClick={onAccept} ml={3}>
-              YES, CREATE
+              YES, CONFIRM
             </Button>
           </Fragment>
         )}

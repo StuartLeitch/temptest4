@@ -1,7 +1,7 @@
-import styled, {AnyStyledComponent} from 'styled-components';
+import styled, { AnyStyledComponent } from 'styled-components';
 
-import {Input} from '../CommonStyles';
+import { TextArea } from '../CommonStyles';
 
-export const Textarea: AnyStyledComponent = styled(Input)`
-  resize: ${({resize}) => resize};
+export const Textarea: AnyStyledComponent = styled(TextArea)`
+  resize: ${({ resize }) => resize};
 `;

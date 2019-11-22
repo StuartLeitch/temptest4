@@ -149,6 +149,52 @@ describe('InvoiceRepo', () => {
       });
     });
 
+    describe('.assignInvoiceNumber()', () => {
+      it('should update invoice with invoice number 1 when tables empty', async () => {
+        const invoice = makeInvoiceData({id: 'invoice-number-test'});
+        await repo.save(invoice)
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
+        expect(updatedInvoice.invoiceNumber).toEqual(1)
+      })
+
+      it('should update invoice with invoice number 2 when another with 1 exists', async () => {
+        await repo.save(makeInvoiceData({id: 'invoice-number-test', invoiceNumber: 1}));
+        const invoice = makeInvoiceData({id: 'invoice-number-test-2'});
+        await repo.save(invoice)
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
+        expect(updatedInvoice.invoiceNumber).toEqual(2)
+      })
+
+      it('should update invoice with invoice number 9001 when configuration is 9000', async () => {
+        await repo.save(makeInvoiceData({id: 'invoice-number-test', invoiceNumber: 1}));
+        
+        const invoice = makeInvoiceData({id: 'invoice-number-test-2'});
+
+        await repo.save(invoice)
+        await db("configurations").insert({invoiceReferenceNumber: 9000})
+
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
+        expect(updatedInvoice.invoiceNumber).toEqual(9001)
+      })
+
+      it('should update invoice with invoice number 9002 when configuration is 9000', async () => {
+        await repo.save(makeInvoiceData({id: 'invoice-number-test', invoiceNumber: 9001}));
+        const invoice = makeInvoiceData({id: 'invoice-number-test-2'});
+        await repo.save(invoice)
+        await db("configurations").insert({invoiceReferenceNumber: 9000})
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
+        expect(updatedInvoice.invoiceNumber).toEqual(9002)
+      })
+
+      it('should fail when reference number is set', async () => {
+        const invoice = makeInvoiceData({id: 'invoice-number-test-2', invoiceNumber: 9001});
+        await repo.save(invoice)
+
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
+        expect(updatedInvoice.invoiceNumber).toThrowError()
+      })
+    })
+
     describe('.exists()', () => {
       it('should return true for existing invoices', async () => {
         const invoice = makeInvoiceData({id: 'invoice-1'});

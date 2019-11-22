@@ -27,11 +27,12 @@ const PAYMENT_METHODS = {
 };
 
 interface Props {
-  payer: any;
+  invoice: any;
   error: string;
   invoiceCharge: number;
   invoiceIsPaid: boolean;
   loading: boolean;
+  status: "DRAFT" | "ACTIVE" | "FINAL";
   methods: Record<string, string>;
   payByCardSubmit: (data: any) => void;
   payByPayPalSubmit: (data: any) => void;
@@ -58,6 +59,13 @@ const validateFn = methods => values => {
   return errors;
 };
 
+const calculateTotalToBePaid = invoice => {
+  const netValue = invoice.invoiceItem.price;
+  const vatPercent = invoice.invoiceItem.vat;
+  const vat = (netValue * vatPercent) / 100;
+  return netValue + vat;
+};
+
 const InvoiceDownloadLink = ({ payer }) => {
   if (payer) {
     return (
@@ -71,11 +79,12 @@ const InvoiceDownloadLink = ({ payer }) => {
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
   error,
-  payer,
+  invoice,
   methods,
   loading,
   invoiceCharge,
   invoiceIsPaid,
+  status,
   payByCardSubmit,
   payByPayPalSubmit,
 }) => {
@@ -89,18 +98,21 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
   return (
-    <Expander title="2. Invoice &amp; Payment">
+    <Expander
+      title="2. Invoice &amp; Payment"
+      expanded={status === "ACTIVE" ? true : false}
+    >
       {invoiceIsPaid ? (
         <SuccessfulPayment
           onViewInvoice={() => {
-            console.info(`./api/invoice/${payer.id}`);
+            console.info(`./api/invoice/${invoice.payer.id}`);
           }}
         />
       ) : (
         [
           <Label my="4" ml="4">
             Your Invoice
-            <InvoiceDownloadLink payer={payer} />
+            <InvoiceDownloadLink payer={invoice.payer} />
           </Label>,
           <Formik
             validate={validateFn(methods)}

@@ -9,7 +9,7 @@ const filterCountry = (inputCountry: string) => (c: string) =>
   c.toLowerCase().startsWith(inputCountry.toLowerCase());
 
 const CountryField = ({ value, onChange, name, status }) => {
-  const countries = countryList.getNames();
+  const countries = (countryList.getNames() as []).sort();
   const [expanded, setExpanded] = useState(false);
   const [countryInput, setCountryInput] = useState(() =>
     !value ? "" : countryList.getName(value),

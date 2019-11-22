@@ -109,7 +109,7 @@ export class RecordPayPalPaymentUsecase
 
   private async getPayloadWithPaymentMethodId(payload: RecordPaymentDTO) {
     const usecase = new GetPaymentMethodByNameUsecase(this.paymentMethodRepo);
-    const either = await usecase.execute({ name: 'PayPal' });
+    const either = await usecase.execute({ name: 'Paypal' });
     return either.map(async paymentMethodResult => ({
       ...payload,
       paymentMethodId: paymentMethodResult.getValue().id.toString()

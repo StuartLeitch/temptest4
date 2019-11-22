@@ -9,6 +9,7 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   getInvoiceById(invoiceId: InvoiceId): Promise<Invoice>;
   getInvoiceByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Invoice>;
   getInvoicesByTransactionId(transactionId: TransactionId): Promise<Invoice[]>;
+  assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice>;
   delete(invoice: Invoice): Promise<unknown>;
   update(invoice: Invoice): Promise<Invoice>;
 }
