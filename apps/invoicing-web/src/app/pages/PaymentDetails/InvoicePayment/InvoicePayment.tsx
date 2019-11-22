@@ -78,8 +78,8 @@ const InvoiceDownloadLink = ({ payer }) => {
 };
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
-  error,
   invoice,
+  error,
   methods,
   loading,
   invoiceCharge,

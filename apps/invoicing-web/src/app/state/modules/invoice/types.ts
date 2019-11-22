@@ -51,7 +51,7 @@ export interface LoadingState {
 }
 
 export interface InvoiceState {
-  invoice: Invoice;
+  invoice: any;
   payerLoading: LoadingState;
   invoiceLoading: LoadingState;
 }

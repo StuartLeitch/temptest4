@@ -40,7 +40,7 @@ export type Article = {
 };
 
 export type CreditCardInput = {
-  amount?: Maybe<Scalars['Float']>,
+  amount: Scalars['Float'],
   cardNumber: Scalars['String'],
   expiration: Scalars['String'],
   cvv: Scalars['String'],
