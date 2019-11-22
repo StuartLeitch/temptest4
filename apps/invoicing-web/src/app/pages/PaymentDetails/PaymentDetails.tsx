@@ -25,7 +25,7 @@ import {
 interface Props {
   invoiceError: string;
   invoiceLoading: boolean;
-  invoice: invoiceTypes.Invoice | null;
+  invoice: any;
   payerError: string;
   payerLoading: boolean;
   paymentError: string;
@@ -109,7 +109,6 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               loading={payerLoading}
             />
             <InvoicePayment
-              invoice={invoice}
               methods={paymentMethods}
               status={invoice.status}
               error={paymentError}

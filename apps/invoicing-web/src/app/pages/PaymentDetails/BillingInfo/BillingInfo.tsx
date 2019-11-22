@@ -28,7 +28,7 @@ const BillingInfo: React.FC<Props> = ({
       title={status === "ACTIVE" ? "1. Invoice details" : "1. Payer details"}
     >
       <Root>
-        {status === "ACTIVE" ? (
+        {status === "ACTIVE" || status === "FINAL" ? (
           <InvoiceInfo {...payer} />
         ) : (
           <InvoiceForm

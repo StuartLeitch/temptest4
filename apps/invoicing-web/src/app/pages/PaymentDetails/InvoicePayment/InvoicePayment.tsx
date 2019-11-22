@@ -18,7 +18,7 @@ import ChoosePayment from "./ChoosePayment";
 import CreditCardForm from "./CreditCardForm";
 import SuccessfulPayment from "./SuccessfulPayment";
 
-import { invoiceSelectors } from "../../../state/modules/invoice";
+import { invoiceSelectors, invoiceTypes } from "../../../state/modules/invoice";
 
 const PAYMENT_METHODS = {
   paypal: "paypal",
@@ -75,6 +75,8 @@ const InvoiceDownloadLink = ({ payer }) => {
       </ActionLink>
     );
   }
+
+  return null;
 };
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
@@ -100,7 +102,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   return (
     <Expander
       title="2. Invoice &amp; Payment"
-      expanded={status === "ACTIVE" ? true : false}
+      expanded={status === "ACTIVE" || status === "FINAL" ? true : false}
     >
       {invoiceIsPaid ? (
         <SuccessfulPayment
@@ -110,11 +112,12 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
         />
       ) : (
         [
-          <Label my="4" ml="4">
+          <Label key={"invoice-download-link"} my="4" ml="4">
             Your Invoice
             <InvoiceDownloadLink payer={invoice.payer} />
           </Label>,
           <Formik
+            key={"invoice-payment-form"}
             validate={validateFn(methods)}
             initialValues={{ paymentMethodId: null, amount: invoiceCharge }}
             onSubmit={payByCardSubmit}
