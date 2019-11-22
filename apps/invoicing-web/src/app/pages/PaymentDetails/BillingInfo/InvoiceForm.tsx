@@ -24,7 +24,12 @@ interface Props {
 }
 
 const FormTextarea = field => (
-  <Textarea height={26} {...field} resize="vertical" />
+  <Textarea
+    height={26}
+    {...field}
+    resize="vertical"
+    style={{ resize: "none" }}
+  />
 );
 
 const parseErrors = (errors, prefix = "") => {
