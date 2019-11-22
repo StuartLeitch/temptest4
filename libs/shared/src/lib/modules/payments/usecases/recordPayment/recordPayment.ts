@@ -1,3 +1,4 @@
+import { BraintreeGateway } from '@hindawi/shared';
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -28,6 +29,12 @@ import { RecordPaymentDTO } from './recordPaymentDTO';
 import { PaymentDone } from '../../domain/events/paymentDone';
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
 
+import { CreditCard } from './../../domain/strategies/CreditCard';
+import { CreditCardPayment } from './../../domain/strategies/CreditCardPayment';
+import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
+import { PaymentModel } from './../../domain/contracts/PaymentModel';
+import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
+
 export type RecordPaymentContext = AuthorizationContext<Roles>;
 
 export class RecordPaymentUsecase
@@ -51,23 +58,44 @@ export class RecordPaymentUsecase
     payload: RecordPaymentDTO,
     context?: RecordPaymentContext
   ): Promise<RecordPaymentResponse> {
+    const creditCard = new CreditCard();
+    const paymentFactory = new PaymentFactory();
+    paymentFactory.registerPayment(creditCard);
+    const paymentStrategy: PaymentStrategy = new PaymentStrategy([
+      ['CreditCard', new CreditCardPayment(BraintreeGateway)]
+      //   ['PayPal', new PayPalPayment()]
+    ]);
+    const paymentModel: PaymentModel = paymentFactory.create(
+      'CreditCardPayment'
+    );
+
+    const payment: any = await paymentStrategy.makePayment(
+      paymentModel,
+      payload.amount
+    );
+
     const paymentPayload = {
       invoiceId: InvoiceId.create(
         new UniqueEntityID(payload.invoiceId)
       ).getValue(),
       amount: Amount.create(payload.amount).getValue(),
       payerId: PayerId.create(new UniqueEntityID(payload.payerId)),
-      foreignPaymentId: payload.foreignPaymentId,
+      foreignPaymentId: '',
       paymentMethodId: PaymentMethodId.create(
         new UniqueEntityID(payload.paymentMethodId)
       ),
-      datePaid: new Date(payload.datePaid)
+      datePaid: payload.datePaid ? new Date(payload.datePaid) : new Date()
     };
+
+    if (payment.success) {
+      console.log('BT Transaction ID: ' + payment.transaction.id);
+      paymentPayload.foreignPaymentId = payment.transaction.id;
+    } else {
+      throw new Error(payment.message);
+    }
 
     try {
       const payment = Payment.create(paymentPayload).getValue();
-
-      await this.paymentRepo.save(payment);
 
       const invoice = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(new UniqueEntityID(payload.invoiceId)).getValue()
@@ -81,9 +109,11 @@ export class RecordPaymentUsecase
       }
 
       invoice.markAsPaid();
+
+      await this.paymentRepo.save(payment);
       await this.invoiceRepo.update(invoice);
 
-      return right(Result.ok(invoice));
+      return right(Result.ok(payment));
     } catch (e) {
       return left(new AppError.UnexpectedError(e));
     }

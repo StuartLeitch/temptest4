@@ -1,4 +1,5 @@
 export interface CreditCardInput {
+  amount: number;
   cardNumber: string;
   expiration: string;
   cvv: string;

@@ -82,6 +82,7 @@ type Address {
 }
 
 input CreditCardInput {
+  amount: Float!
   cardNumber: String!
   expiration: String!
   cvv: String!

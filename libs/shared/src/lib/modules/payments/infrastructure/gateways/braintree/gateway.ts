@@ -1,5 +1,5 @@
 import * as braintree from 'braintree';
-import {environment} from '@env/environment';
+import { environment } from '@env/environment';
 
 let BraintreeGateway: braintree.BraintreeGateway = null;
 
@@ -20,9 +20,9 @@ const braintreeEnvironment =
 
 BraintreeGateway = new braintree.BraintreeGateway({
   environment: braintree.Environment[braintreeEnvironment],
-  merchantId: environment.BT_MERCHANT_ID,
-  publicKey: environment.BT_PUBLIC_KEY,
-  privateKey: environment.BT_PRIVATE_KEY
+  merchantId: process.env.BT_MERCHANT_ID || environment.BT_MERCHANT_ID,
+  publicKey: process.env.BT_PUBLIC_KEY || environment.BT_PUBLIC_KEY,
+  privateKey: process.env.BT_PRIVATE_KEY || environment.BT_PRIVATE_KEY
 });
 
-export {BraintreeGateway};
+export { BraintreeGateway };

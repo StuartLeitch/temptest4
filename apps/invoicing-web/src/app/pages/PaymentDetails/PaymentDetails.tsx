@@ -138,16 +138,13 @@ const mapStateToProps = (state: RootState) => ({
   paymentLoading: paymentSelectors.recordPaymentLoading(state),
 });
 
-export default connect(
-  mapStateToProps,
-  {
-    recordPayPalPayment: paymentActions.recordPayPalPayment.request,
-    getPaymentMethods: paymentActions.getPaymentMethods.request,
-    payWithCard: paymentActions.recordCardPayment.request,
-    updatePayer: invoiceActions.updatePayerAsync.request,
-    getInvoice: invoiceActions.getInvoice.request,
-  },
-)(PaymentDetails);
+export default connect(mapStateToProps, {
+  recordPayPalPayment: paymentActions.recordPayPalPayment.request,
+  getPaymentMethods: paymentActions.getPaymentMethods.request,
+  payWithCard: paymentActions.recordCardPayment.request,
+  updatePayer: invoiceActions.updatePayerAsync.request,
+  getInvoice: invoiceActions.getInvoice.request,
+})(PaymentDetails);
 
 // #region styles
 const Root = styled.div`

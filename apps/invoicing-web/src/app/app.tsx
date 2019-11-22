@@ -57,13 +57,10 @@ const mapStateToProps = (state: RootState) => ({
   // invoicesLoading: invoiceSelectors.invoiceLoading(state),
 });
 
-export default connect(
-  mapStateToProps,
-  {
-    // getInvoice: invoiceActions.getInvoice.request,
-    // updatePayer: invoiceActions.updatePayerAsync.request,
-  },
-)(App);
+export default connect(mapStateToProps, {
+  // getInvoice: invoiceActions.getInvoice.request,
+  // updatePayer: invoiceActions.updatePayerAsync.request,
+})(App);
 
 const InvoicesList = styled.ul`
   counter-reset: index;
@@ -132,11 +129,15 @@ const InvoiceSubtitle = styled.dl`
   }
 
   dd.draft {
-    color: #598296;
+    color: #a8a8a8;
   }
 
   dd.active {
-    color: #1fc06f;
+    color: #10aae2;
+  }
+
+  dd.final {
+    color: #088a3c;
   }
 
   dd:last-of-type {

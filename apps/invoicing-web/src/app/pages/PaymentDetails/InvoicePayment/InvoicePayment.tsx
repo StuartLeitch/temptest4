@@ -1,4 +1,6 @@
 import React, { useMemo } from "react";
+import { connect } from "react-redux";
+import { RootState } from "typesafe-actions";
 import { Formik } from "formik";
 import styled from "styled-components";
 import {
@@ -14,6 +16,9 @@ import Paypal from "./Paypal";
 import BankTransfer from "./BankTransfer";
 import ChoosePayment from "./ChoosePayment";
 import CreditCardForm from "./CreditCardForm";
+import SuccessfulPayment from "./SuccessfulPayment";
+
+import { invoiceSelectors } from "../../../state/modules/invoice";
 
 const PAYMENT_METHODS = {
   paypal: "paypal",
@@ -24,6 +29,8 @@ const PAYMENT_METHODS = {
 interface Props {
   payer: any;
   error: string;
+  invoiceCharge: number;
+  invoiceIsPaid: boolean;
   loading: boolean;
   methods: Record<string, string>;
   payByCardSubmit: (data: any) => void;
@@ -67,6 +74,8 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   payer,
   methods,
   loading,
+  invoiceCharge,
+  invoiceIsPaid,
   payByCardSubmit,
   payByPayPalSubmit,
 }) => {
@@ -80,43 +89,64 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
   return (
-    <Expander title="2. Invoice & Payment">
-      <Label my="4" ml="4">
-        Your Invoice
-        <InvoiceDownloadLink payer={payer} />
-      </Label>
-      <Formik
-        validate={validateFn(methods)}
-        initialValues={{ paymentMethodId: null }}
-        onSubmit={payByCardSubmit}
-      >
-        {({ handleSubmit, setFieldValue, values }) => {
-          return (
-            <Root>
-              <ChoosePayment
-                methods={parsedMethods}
-                setFieldValue={setFieldValue}
-                values={values}
-              />
-              {methods[values.paymentMethodId] === "Credit Card" && (
-                <CreditCardForm handleSubmit={handleSubmit} loading={loading} />
-              )}
-              {methods[values.paymentMethodId] === "Bank Transfer" && (
-                <BankTransfer />
-              )}
-              {methods[values.paymentMethodId] === "Paypal" && (
-                <Paypal onSuccess={payByPayPalSubmit} />
-              )}
-              {error && <Text type="warning">{error}</Text>}
-            </Root>
-          );
-        }}
-      </Formik>
+    <Expander title="2. Invoice &amp; Payment">
+      {invoiceIsPaid ? (
+        <SuccessfulPayment
+          onViewInvoice={() => {
+            console.info(`./api/invoice/${payer.id}`);
+          }}
+        />
+      ) : (
+        [
+          <Label my="4" ml="4">
+            Your Invoice
+            <InvoiceDownloadLink payer={payer} />
+          </Label>,
+          <Formik
+            validate={validateFn(methods)}
+            initialValues={{ paymentMethodId: null, amount: invoiceCharge }}
+            onSubmit={payByCardSubmit}
+          >
+            {({ handleSubmit, setFieldValue, values }) => {
+              return (
+                <Root>
+                  <ChoosePayment
+                    methods={parsedMethods}
+                    setFieldValue={setFieldValue}
+                    values={values}
+                  />
+                  {methods[values.paymentMethodId] === "Credit Card" && (
+                    <CreditCardForm
+                      handleSubmit={handleSubmit}
+                      loading={loading}
+                    />
+                  )}
+                  {methods[values.paymentMethodId] === "Bank Transfer" && (
+                    <BankTransfer />
+                  )}
+                  {methods[values.paymentMethodId] === "Paypal" && (
+                    <Paypal onSuccess={payByPayPalSubmit} />
+                  )}
+                  {error && <Text type="warning">{error}</Text>}
+                </Root>
+              );
+            }}
+          </Formik>,
+        ]
+      )}
     </Expander>
   );
 };
 
-export default InvoicePayment;
+const mapStateToProps = (state: RootState) => ({
+  invoice: invoiceSelectors.invoice(state),
+  invoiceError: invoiceSelectors.invoiceError(state),
+  invoiceLoading: invoiceSelectors.invoiceLoading(state),
+  invoiceCharge: invoiceSelectors.invoiceCharge(state),
+  invoiceIsPaid: invoiceSelectors.invoiceIsPaid(state),
+});
+
+export default connect(mapStateToProps, {})(InvoicePayment);
 
 // #region styles
 const Root = styled.div`
