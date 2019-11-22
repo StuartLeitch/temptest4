@@ -107,6 +107,7 @@ export type MutationDeleteInvoiceArgs = {
 
 export type MutationCreditCardPaymentArgs = {
   invoiceId: Scalars['String'],
+  payerId: Scalars['String'],
   paymentMethodId: Scalars['String'],
   creditCard: CreditCardInput
 };
@@ -340,7 +341,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
-  creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'paymentMethodId' | 'creditCard'>>,
+  creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'creditCard'>>,
 };
 
 export type PayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payer'] = ResolversParentTypes['Payer']> = {

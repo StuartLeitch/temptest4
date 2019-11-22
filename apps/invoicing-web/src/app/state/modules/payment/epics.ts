@@ -42,9 +42,15 @@ const creditCardPaymentEpic: RootEpic = (
   return action$.pipe(
     filter(isActionOf(recordCardPayment.request)),
     switchMap(action => {
-      const { invoiceId, paymentMethodId, ...creditCard } = action.payload;
+      const {
+        paymentMethodId,
+        invoiceId,
+        payerId,
+        ...creditCard
+      } = action.payload;
       return graphqlAdapter.send(mutations.creditCardPayment, {
         invoiceId,
+        payerId,
         paymentMethodId,
         creditCard,
       });

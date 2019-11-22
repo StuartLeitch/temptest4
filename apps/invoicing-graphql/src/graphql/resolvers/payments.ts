@@ -25,7 +25,7 @@ export const payments: Resolvers<Context> = {
         checkoutService,
         repos: { payment: paymentRepo, invoice: invoiceRepo }
       } = context;
-      const { invoiceId, paymentMethodId, creditCard } = args;
+      const { invoiceId, payerId, paymentMethodId, creditCard } = args;
 
       const recordPaymentUsecase = new RecordPaymentUsecase(
         paymentRepo,
@@ -38,7 +38,7 @@ export const payments: Resolvers<Context> = {
           paymentMethodId,
           invoiceId,
           amount: creditCard.amount,
-          payerId: 'todo'
+          payerId
         },
         usecaseContext
       );

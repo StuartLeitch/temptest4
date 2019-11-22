@@ -119,7 +119,11 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
           <Formik
             key={"invoice-payment-form"}
             validate={validateFn(methods)}
-            initialValues={{ paymentMethodId: null, amount: invoiceCharge }}
+            initialValues={{
+              paymentMethodId: null,
+              payerId: invoice && invoice.payer && invoice.payer.id,
+              amount: invoiceCharge,
+            }}
             onSubmit={payByCardSubmit}
           >
             {({ handleSubmit, setFieldValue, values }) => {

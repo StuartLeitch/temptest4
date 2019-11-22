@@ -6,6 +6,7 @@ export interface CreditCardInput {
   postalCode: string;
   paymentMethodId: string;
   invoiceId: string;
+  payerId: string;
 }
 
 export interface Payment {
