@@ -120,6 +120,7 @@ type Mutation {
   deleteInvoice(id: String!): Boolean
   creditCardPayment(
     invoiceId: String!
+    payerId: String!
     paymentMethodId: String!
     creditCard: CreditCardInput!
   ): Payment!
