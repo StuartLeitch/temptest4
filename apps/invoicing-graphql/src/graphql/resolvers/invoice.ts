@@ -70,7 +70,11 @@ export const invoice: Resolvers<Context> = {
           vat: invoiceDetails.vat,
           charge: invoiceDetails.charge,
           dateCreated: invoiceDetails.dateCreated.toISOString(),
-          invoiceNumber: invoiceDetails.invoiceNumber
+          referenceNumber: invoiceDetails.invoiceNumber
+            ? `${
+                invoiceDetails.invoiceNumber
+              }/${invoiceDetails.dateCreated.getFullYear()}`
+            : '---'
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
         };

@@ -37,6 +37,7 @@ type Invoice {
   charge: Float
   status: InvoiceStatus
   payer: Payer
+  referenceNumber: String
   invoiceItem: InvoiceItem
 }
 
