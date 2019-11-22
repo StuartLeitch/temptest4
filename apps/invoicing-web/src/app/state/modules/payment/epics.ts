@@ -1,14 +1,24 @@
-import { catchError, switchMap, filter, map } from "rxjs/operators";
+import {
+  catchError,
+  switchMap,
+  filter,
+  map,
+  mergeMap,
+  withLatestFrom,
+} from "rxjs/operators";
 import { isActionOf, RootEpic } from "typesafe-actions";
 import { ajax } from "rxjs/ajax";
-import { of } from "rxjs";
+import { of, from } from "rxjs";
 
 import { queries, mutations } from "./graphql";
+
 import {
   recordPayPalPayment,
   getPaymentMethods,
   recordCardPayment,
 } from "./actions";
+import { getInvoice } from "./../invoice/actions";
+import { invoice } from "./../invoice/selectors";
 
 const getPaymentsMethodsEpic: RootEpic = (
   action$,
@@ -39,8 +49,12 @@ const creditCardPaymentEpic: RootEpic = (
         creditCard,
       });
     }),
-    map(r => {
-      return recordCardPayment.success(r.data.creditCardPayment);
+    withLatestFrom(state$.pipe(map(invoice))),
+    mergeMap(([r, invoice]) => {
+      return from([
+        recordCardPayment.success(r.data.creditCardPayment),
+        getInvoice.request(invoice.invoiceId),
+      ]);
     }),
     catchError(err => of(recordCardPayment.failure(err.message))),
   );

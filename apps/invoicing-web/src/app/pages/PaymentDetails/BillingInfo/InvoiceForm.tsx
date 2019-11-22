@@ -98,6 +98,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
       type: null,
       address: {
         country: "",
+        city: "",
       },
     };
   }

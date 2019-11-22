@@ -16,6 +16,17 @@ export const invoice = createSelector(
   invoiceSlice => invoiceSlice.invoice,
 );
 
+export const invoiceCharge = createSelector(_getInvoice, invoiceSlice => {
+  const { price, vat } = invoiceSlice.invoice.invoiceItem;
+  const amount = price * ((100 + vat) / 100);
+  return amount;
+});
+
+export const invoiceIsPaid = createSelector(
+  _getInvoice,
+  invoiceSlice => invoiceSlice.invoice.status === "FINAL",
+);
+
 export const invoiceError = createSelector(
   _getInvoice,
   (invoiceSlice: InvoiceState) => invoiceSlice.invoiceLoading.error,

@@ -40,15 +40,15 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
       <Flex mt={2}>
         <Flex vertical flex={1}>
           <Label>City</Label>
-          <Text>{address.city}</Text>
+          <Text>{address && address.city}</Text>
         </Flex>
         <Flex vertical flex={1}>
           <Label>Country</Label>
-          <Text>{countryList.getName(address.country)}</Text>
+          <Text>{countryList.getName((address && address.country) || "")}</Text>
         </Flex>
         <Flex vertical flex={1}>
           <Label>Address</Label>
-          <Text>{address.addressLine1}</Text>
+          <Text>{address && address.addressLine1}</Text>
         </Flex>
       </Flex>
       {type === "INSTITUTION" && (
