@@ -49,6 +49,10 @@ export class ErpService implements ErpServiceContract {
   ) {}
 
   async registerInvoice(data: ErpData): Promise<object> {
+    if (process.env.ERP_DISABLED === 'true') {
+      return;
+    }
+
     const { payer, invoice, article, journal, items } = data;
 
     const accountId = await this.registerPayer(data);
@@ -61,7 +65,7 @@ export class ErpService implements ErpServiceContract {
     return {
       accountId,
       tradeDocumentId,
-      tradeItemIds,
+      tradeItemIds
     };
   }
 
@@ -77,9 +81,10 @@ export class ErpService implements ErpServiceContract {
         this.loginPromise ||
         this.connection.login(user, password + securityToken);
 
+      // tslint:disable-next-line: no-unused-expression
       this.connection.authorize;
       await this.loginPromise;
-      console.log('ERP login successfull');
+      console.log('ERP login successful');
     }
 
     return this.connection;
@@ -97,13 +102,13 @@ export class ErpService implements ErpServiceContract {
         : `${payer.organization.value} ${article.manuscriptId.id.toString()}`;
 
     const accountData = {
-      'Name': name.slice(0, 70),
-      'AccountNumber': article.manuscriptId.id.toString(),
+      Name: name.slice(0, 70),
+      AccountNumber: article.manuscriptId.id.toString(),
       // 'BillingAddress': payer.billingAddressId.id.toString(),
-      's2cor__Country_Code__c': payer.country,
-      's2cor__Registration_Number_Type__c': 'VAT Registration Number',
-      's2cor__VAT_Registration_Number__c': payer.VATId,
-    }
+      s2cor__Country_Code__c: payer.country,
+      s2cor__Registration_Number_Type__c: 'VAT Registration Number',
+      s2cor__VAT_Registration_Number__c: payer.VATId
+    };
 
     const account = await connection.sobject('Account').create(accountData);
 
@@ -115,7 +120,8 @@ export class ErpService implements ErpServiceContract {
 
     console.log('Account object registered: ', account.id);
 
-    const existingContact = await connection.sobject('Contact')
+    const existingContact = await connection
+      .sobject('Contact')
       .select({ Id: true })
       .where({ Email: payerEmail })
       .execute();
@@ -131,10 +137,10 @@ export class ErpService implements ErpServiceContract {
     const lastName = names.join(' ');
 
     const contact = await connection.sobject('Contact').create({
-      'AccountId': account.id,
-      'Email': payerEmail,
-      'FirstName': firstName,
-      'LastName': lastName,
+      AccountId: account.id,
+      Email: payerEmail,
+      FirstName: firstName,
+      LastName: lastName
     });
 
     if (!contact.success) {
@@ -201,15 +207,15 @@ export class ErpService implements ErpServiceContract {
     const tradeItem = await connection
       .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
       .create({
-        's2cor__Trade_Document__c': tradeDocumentId,
-        's2cor__Description__c': description,
-        's2cor__Discount_Type__c': 'Amount',
-        's2cor__Quantity__c': '1',
-        's2cor__Tax_Code__c': this.getTaxCode(payer),
-        's2cor__Tax_Treatment__c': this.getTaxTreatment(payer),
-        's2cor__Unit_Price__c': invoiceItem.price,
-        's2cor__Product__c': '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
-        's2cor__Discount_Amount__c': '0', // TODO fetch from applied coupons/waivers
+        s2cor__Trade_Document__c: tradeDocumentId,
+        s2cor__Description__c: description,
+        s2cor__Discount_Type__c: 'Amount',
+        s2cor__Quantity__c: '1',
+        s2cor__Tax_Code__c: this.getTaxCode(payer),
+        s2cor__Tax_Treatment__c: this.getTaxTreatment(payer),
+        s2cor__Unit_Price__c: invoiceItem.price,
+        s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
+        s2cor__Discount_Amount__c: '0' // TODO fetch from applied coupons/waivers
       });
 
     if (!tradeItem.success) {
@@ -222,17 +228,17 @@ export class ErpService implements ErpServiceContract {
   }
 
   private getTaxCode(payer: Payer): string {
-    // TODO datermine this based on payer country and VAT number
+    // TODO determine this based on payer country and VAT number
     return 'a680Y0000000CvBQAU';
   }
 
   private getTaxTreatment(payer: Payer): string {
-    // TODO datermine this based on payer country and VAT number
+    // TODO determine this based on payer country and VAT number
     return 'a6B0Y000000fyOyUAI';
   }
 
   private getVatNote(payer: Payer): string {
-    // TODO datermine this based on payer country and VAT number
+    // TODO determine this based on payer country and VAT number
     return 'vat note to be computed';
   }
 }
