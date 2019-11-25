@@ -65,7 +65,9 @@ class EmailService {
   }
 
   public sendEmail() {
-    return this.email.sendEmail();
+    if (process.env.MAILING_DISABLED === 'false') {
+      return this.email.sendEmail();
+    }
   }
 
   // TODO: move templates to a different place?
@@ -102,7 +104,7 @@ class EmailService {
           EmailService.createURL(
             `/payment-details/e23b6c52-eee8-4ca9-bfec-5c9a9d8b00c9`
           )
-        )} 
+        )}
         You do not need to login to your account to access the link. After entering your billing address information, you will be able to pay by direct credit card, PayPal or bank transfer.
         We are unable to accept payment by check.
         <br /><br />
