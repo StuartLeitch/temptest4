@@ -43,10 +43,7 @@ export class UpdateInvoiceDetailsUsecase
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract
-  ) {
-    this.invoiceRepo = invoiceRepo;
-    this.payerRepo = payerRepo;
-  }
+  ) {}
 
   private async getInvoice(
     request: UpdateInvoiceDetailsRequestDTO

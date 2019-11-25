@@ -30,6 +30,15 @@ export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
     return articleData ? ArticleMap.toDomain(articleData) : null;
   }
 
+  async findByCustomId(customId: string): Promise<Article> {
+    const articleData = await this.db(TABLES.ARTICLES)
+      .select()
+      .where('customId', customId)
+      .first();
+
+    return articleData ? ArticleMap.toDomain(articleData) : null;
+  }
+
   getAuthorOfArticle(articleId: ArticleId): Promise<unknown> {
     return Promise.resolve(articleId);
   }

@@ -45,6 +45,10 @@ type Invoice {
   type: String
 }
 
+type InvoiceId {
+  invoiceId: String
+}
+
 input AddressInput {
   city: String
   country: String
@@ -111,6 +115,7 @@ type Query {
   getPaymentMethods: [PaymentMethod]
   invoice(invoiceId: String): Invoice
   invoices: [Invoice]
+  invoiceIdByManuscriptCustomId(customId: String): InvoiceId
   echo(value: String): String
 }
 

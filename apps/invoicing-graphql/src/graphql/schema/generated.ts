@@ -65,6 +65,11 @@ export type Invoice = {
   type?: Maybe<Scalars['String']>,
 };
 
+export type InvoiceId = {
+   __typename?: 'InvoiceId',
+  invoiceId?: Maybe<Scalars['String']>,
+};
+
 export type InvoiceItem = {
    __typename?: 'InvoiceItem',
   id?: Maybe<Scalars['String']>,
@@ -162,12 +167,18 @@ export type Query = {
   getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>,
   invoice?: Maybe<Invoice>,
   invoices?: Maybe<Array<Maybe<Invoice>>>,
+  invoiceIdByManuscriptCustomId?: Maybe<InvoiceId>,
   echo?: Maybe<Scalars['String']>,
 };
 
 
 export type QueryInvoiceArgs = {
   invoiceId?: Maybe<Scalars['String']>
+};
+
+
+export type QueryInvoiceIdByManuscriptCustomIdArgs = {
+  customId?: Maybe<Scalars['String']>
 };
 
 
@@ -259,6 +270,7 @@ export type ResolversTypes = {
   InvoiceItem: ResolverTypeWrapper<InvoiceItem>,
   Article: ResolverTypeWrapper<Article>,
   Date: ResolverTypeWrapper<Scalars['Date']>,
+  InvoiceId: ResolverTypeWrapper<InvoiceId>,
   Mutation: ResolverTypeWrapper<{}>,
   PayerInput: PayerInput,
   AddressInput: AddressInput,
@@ -281,6 +293,7 @@ export type ResolversParentTypes = {
   InvoiceItem: InvoiceItem,
   Article: Article,
   Date: Scalars['Date'],
+  InvoiceId: InvoiceId,
   Mutation: {},
   PayerInput: PayerInput,
   AddressInput: AddressInput,
@@ -326,6 +339,10 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+};
+
+export type InvoiceIdResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceId'] = ResolversParentTypes['InvoiceId']> = {
+  invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
 
 export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {
@@ -374,6 +391,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getPaymentMethods?: Resolver<Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>, ParentType, ContextType>,
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
   invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+  invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, QueryInvoiceIdByManuscriptCustomIdArgs>,
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
 };
 
@@ -382,6 +400,7 @@ export type Resolvers<ContextType = any> = {
   Article?: ArticleResolvers<ContextType>,
   Date?: GraphQLScalarType,
   Invoice?: InvoiceResolvers<ContextType>,
+  InvoiceId?: InvoiceIdResolvers<ContextType>,
   InvoiceItem?: InvoiceItemResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Payer?: PayerResolvers<ContextType>,

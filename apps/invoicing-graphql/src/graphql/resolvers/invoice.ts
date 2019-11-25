@@ -14,6 +14,9 @@ import {
 import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
+
 import { Resolvers, Invoice } from '../schema';
 import { Context } from '../../context';
 
@@ -69,6 +72,37 @@ export const invoice: Resolvers<Context> = {
       }
 
       return result.value.getValue();
+    },
+
+    async invoiceIdByManuscriptCustomId(parent, args, context) {
+      const {
+        repos: { manuscript: articleRepo, invoiceItem: invoiceItemRepo }
+      } = context;
+      const usecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+        articleRepo,
+        invoiceItemRepo
+      );
+
+      const request: GetInvoiceIdByManuscriptCustomIdDTO = {
+        customId: args.customId
+      };
+
+      const usecaseContext = {
+        roles: [Roles.ADMIN]
+      };
+
+      const result = await usecase.execute(request, usecaseContext);
+
+      if (result.isLeft()) {
+        return undefined;
+      } else {
+        // There is a TSLint error for when try to use a shadowed variable!
+        const invoiceId = result.value.getValue();
+
+        return {
+          invoiceId: invoiceId.id.toString()
+        };
+      }
     }
   },
   Invoice: {
