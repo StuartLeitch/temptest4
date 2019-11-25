@@ -91,6 +91,7 @@ export type Mutation = {
   confirmInvoice: Payer,
   createInvoice?: Maybe<Invoice>,
   deleteInvoice?: Maybe<Scalars['Boolean']>,
+  setTransactionToActive?: Maybe<Transaction>,
   creditCardPayment: Payment,
 };
 
@@ -107,6 +108,11 @@ export type MutationCreateInvoiceArgs = {
 
 export type MutationDeleteInvoiceArgs = {
   id: Scalars['String']
+};
+
+
+export type MutationSetTransactionToActiveArgs = {
+  customId?: Maybe<Scalars['String']>
 };
 
 
@@ -184,6 +190,12 @@ export type QueryInvoiceIdByManuscriptCustomIdArgs = {
 
 export type QueryEchoArgs = {
   value?: Maybe<Scalars['String']>
+};
+
+export type Transaction = {
+   __typename?: 'Transaction',
+  id?: Maybe<Scalars['String']>,
+  status?: Maybe<Scalars['String']>,
 };
 
 
@@ -274,6 +286,7 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>,
   PayerInput: PayerInput,
   AddressInput: AddressInput,
+  Transaction: ResolverTypeWrapper<Transaction>,
   CreditCardInput: CreditCardInput,
   Payment: ResolverTypeWrapper<Payment>,
 };
@@ -297,6 +310,7 @@ export type ResolversParentTypes = {
   Mutation: {},
   PayerInput: PayerInput,
   AddressInput: AddressInput,
+  Transaction: Transaction,
   CreditCardInput: CreditCardInput,
   Payment: Payment,
 };
@@ -358,6 +372,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
+  setTransactionToActive?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, MutationSetTransactionToActiveArgs>,
   creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'creditCard'>>,
 };
 
@@ -395,6 +410,11 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
 };
 
+export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = {
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+};
+
 export type Resolvers<ContextType = any> = {
   Address?: AddressResolvers<ContextType>,
   Article?: ArticleResolvers<ContextType>,
@@ -407,6 +427,7 @@ export type Resolvers<ContextType = any> = {
   Payment?: PaymentResolvers<ContextType>,
   PaymentMethod?: PaymentMethodResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
+  Transaction?: TransactionResolvers<ContextType>,
 };
 
 

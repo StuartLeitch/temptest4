@@ -20,6 +20,11 @@ type Article {
   authorFirstName: String
 }
 
+type Transaction {
+  id: String
+  status: String
+}
+
 type InvoiceItem {
   id: String
   invoiceId: String
@@ -123,6 +128,7 @@ type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: String!): Boolean
+  setTransactionToActive(customId: String): Transaction
   creditCardPayment(
     invoiceId: String!
     payerId: String!

@@ -8,7 +8,7 @@ export class TransactionMap extends Mapper<Transaction> {
       {
         deleted: raw.deleted,
         status: raw.status,
-        dateCreated: new Date(raw.dateCreated),
+        dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : new Date(),
         dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : new Date()
       },
       new UniqueEntityID(raw.id)
