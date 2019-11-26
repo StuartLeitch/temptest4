@@ -150,6 +150,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     const now = new Date();
     this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.ACTIVE;
+    this.props.dateIssued = new Date();
     this.addDomainEvent(new InvoiceActivated(this, now));
   }
 

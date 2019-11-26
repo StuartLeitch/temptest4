@@ -48,6 +48,7 @@ export const invoice: Resolvers<Context> = {
           status: invoiceDetails.status,
           charge: invoiceDetails.charge,
           dateCreated: invoiceDetails.dateCreated.toISOString(),
+          dateIssued: invoiceDetails.dateIssued.toISOString(),
           referenceNumber: invoiceDetails.invoiceNumber
             ? `${
                 invoiceDetails.invoiceNumber

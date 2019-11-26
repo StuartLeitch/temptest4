@@ -25,7 +25,6 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
         invoiceId.id.toString()
       );
     }
-
     return InvoiceMap.toDomain(invoice);
   }
 

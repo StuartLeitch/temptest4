@@ -16,11 +16,17 @@ const InvoiceDetails: React.FC<Props> = ({ invoice }) => {
     return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   }, [invoice.dateCreated]);
 
+  const issuedDate = useMemo(() => {
+    const d = new Date(invoice.dateIssued || invoice.dateCreated);
+
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  }, [invoice.dateIssued || invoice.dateCreated]);
+
   return (
     <Expander title="Invoice Details" expanded>
       <Root>
-        <DetailItem label="Invoice Issue Date" text={parsedDate} />
-        <DetailItem label="Date of Supply" text={parsedDate} />
+        <DetailItem label="Invoice Issue Date" text={issuedDate} />
+        <DetailItem label="Date of Supply" text={issuedDate} />
         <DetailItem label="Reference Number" text={invoice.referenceNumber} />
         <DetailItem label="Terms" text="Payable upon Receipt" />
       </Root>

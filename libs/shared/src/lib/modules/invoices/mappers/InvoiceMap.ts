@@ -1,8 +1,8 @@
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Mapper} from '../../../infrastructure/Mapper';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Mapper } from '../../../infrastructure/Mapper';
 
-import {Invoice} from '../domain/Invoice';
-import {TransactionId} from '../../transactions/domain/TransactionId';
+import { Invoice } from '../domain/Invoice';
+import { TransactionId } from '../../transactions/domain/TransactionId';
 
 export class InvoiceMap extends Mapper<Invoice> {
   public static toDomain(raw: any): Invoice {
@@ -13,7 +13,8 @@ export class InvoiceMap extends Mapper<Invoice> {
         ),
         status: raw.status,
         invoiceNumber: raw.invoiceNumber,
-        dateCreated: new Date(raw.dateCreated)
+        dateCreated: new Date(raw.dateCreated),
+        dateIssued: new Date(raw.dateIssued)
       },
       new UniqueEntityID(raw.id)
     );
@@ -29,7 +30,8 @@ export class InvoiceMap extends Mapper<Invoice> {
       transactionId: invoice.transactionId.id.toString(),
       status: invoice.status,
       invoiceNumber: invoice.invoiceNumber,
-      dateCreated: invoice.dateCreated
+      dateCreated: invoice.dateCreated,
+      dateIssued: invoice.dateIssued
     };
   }
 }
