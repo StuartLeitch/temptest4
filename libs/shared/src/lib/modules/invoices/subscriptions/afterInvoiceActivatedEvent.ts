@@ -1,35 +1,61 @@
-import {HandleContract} from '../../../core/domain/events/contracts/Handle';
-import {DomainEvents} from '../../../core/domain/events/DomainEvents';
+import { HandleContract } from '../../../core/domain/events/contracts/Handle';
+import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
-import {InvoiceActivated} from '../domain/events/invoiceActivated';
-import {PublishInvoiceGenerated} from '../usecases/publishInvoiceGenerated';
+import { InvoiceActivated } from '../domain/events/invoiceActivated';
+import { PublishInvoiceConfirmed } from '../usecases/publishInvoiceConfirmed';
+
+import { InvoiceItemRepoContract } from '../repos';
+import { ArticleRepoContract } from '../../manuscripts/repos';
+import { PayerRepoContract } from '../../payers/repos/payerRepo';
 
 export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
-  constructor(private publishInvoiceGenerated: PublishInvoiceGenerated) {
+  constructor(
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private payerRepo: PayerRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private publishInvoiceActivated: PublishInvoiceConfirmed
+  ) {
     this.setupSubscriptions();
   }
 
   setupSubscriptions(): void {
     // Register to the domain event
     DomainEvents.register(
-      this.onPublishInvoiceGenerated.bind(this),
+      this.onPublishInvoiceActivated.bind(this),
       InvoiceActivated.name
     );
   }
 
-  private async onPublishInvoiceGenerated(
+  private async onPublishInvoiceActivated(
     event: InvoiceActivated
   ): Promise<void> {
-    const {invoice} = event;
-
     try {
-      await this.publishInvoiceGenerated.execute(invoice);
+      const { invoice } = event;
+      let invoiceItems = invoice.invoiceItems.currentItems;
+      if (invoiceItems.length === 0) {
+        invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(invoice.invoiceId);
+      }
+      if (invoiceItems.length === 0) {
+        throw new Error(`Invoice ${invoice.id} has no invoice items.`)
+      }
+
+      const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
+      if (!payer) {
+        throw new Error(`Invoice ${invoice.id} has no payers.`)
+      }
+
+      const manuscript = await this.manuscriptRepo.findById(invoiceItems[0].manuscriptId);
+      if (!manuscript) {
+        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`)
+      }
+
+      await this.publishInvoiceActivated.execute(invoice, invoiceItems, manuscript, payer);
       console.log(
-        `[AfterInvoiceActivated]: Successfully executed PublishInvoiceGenerated use case AfterInvoiceActivated`
+        `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`
       );
     } catch (err) {
       console.log(
-        `[AfterInvoiceActivated]: Failed to execute PublishInvoiceGenerated use case AfterInvoiceActivated.`
+        `[AfterInvoiceActivated]: Failed to execute onPublishInvoiceActivated use case AfterInvoiceActivated. Err: ${err}`
       );
     }
   }

@@ -77,7 +77,7 @@ export class ConfirmPaidInvoiceUsecase
       const invoice = invoiceOrError.getValue();
 
       // * This is where all the magic happens
-      invoice.markAsPaid();
+      // invoice.markAsPaid(payment.paymentId);
 
       return Result.ok<Invoice>(invoice);
     } catch (err) {
