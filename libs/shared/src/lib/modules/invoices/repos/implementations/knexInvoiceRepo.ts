@@ -94,7 +94,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const updated = await db(TABLES.INVOICES)
       .where({ id: invoiceId.id.toString() })
       .update({
-        invoiceNumber: db.raw(`ifnull((select max("invoiceNumber") + 1 as max from (
+        invoiceNumber: db.raw(`coalesce((select max("invoiceNumber") + 1 as max from (
           select max("invoiceNumber") as "invoiceNumber" from invoices
             union
             select "invoiceReferenceNumber" as "invoiceNumber" from configurations
