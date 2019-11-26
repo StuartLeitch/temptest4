@@ -1,14 +1,15 @@
 import {
+  withLatestFrom,
   catchError,
   switchMap,
+  mergeMap,
   filter,
   map,
-  mergeMap,
-  withLatestFrom,
 } from "rxjs/operators";
 import { isActionOf, RootEpic } from "typesafe-actions";
 import { ajax } from "rxjs/ajax";
 import { of, from } from "rxjs";
+import { config } from "../../../../config";
 
 import { queries, mutations } from "./graphql";
 
@@ -71,11 +72,15 @@ const recordPayPalPaymentEpic: RootEpic = (action$, state$) => {
     filter(isActionOf(recordPayPalPayment.request)),
     switchMap(action =>
       ajax.post(
-        `./api/paypal-payment/${action.payload.payerId}/${action.payload.invoiceId}/${action.payload.payPalOrderId}`,
+        `${config.apiRoot}/paypal-payment/${action.payload.payerId}/${action.payload.invoiceId}/${action.payload.payPalOrderId}`,
       ),
     ),
-    map(r => {
-      return recordPayPalPayment.success("");
+    withLatestFrom(state$.pipe(map(invoice))),
+    mergeMap(([r, invoice]) => {
+      return from([
+        recordPayPalPayment.success(""),
+        getInvoice.request(invoice.invoiceId),
+      ]);
     }),
     catchError(err => of(recordPayPalPayment.failure(err.message))),
   );

@@ -3,8 +3,8 @@ import { Roles, GetPaymentMethodsUseCase } from '@hindawi/shared';
 import { Resolvers } from '../schema';
 import { Context } from '../../context';
 
-import { RecordPaymentUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/recordPayment/recordPayment';
 import { MigratePaymentUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/migratePayment/migratePayment';
+import { RecordCreditCardPaymentUsecase } from '@hindawi/shared';
 
 export const payments: Resolvers<Context> = {
   Query: {
@@ -28,13 +28,13 @@ export const payments: Resolvers<Context> = {
       } = context;
       const { invoiceId, payerId, paymentMethodId, creditCard } = args;
 
-      const recordPaymentUsecase = new RecordPaymentUsecase(
+      const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
         paymentRepo,
         invoiceRepo
       );
       const usecaseContext = { roles: [Roles.PAYER] };
 
-      const result = await recordPaymentUsecase.execute(
+      const result = await recordCreditCardPaymentUsecase.execute(
         {
           paymentMethodId,
           invoiceId,

@@ -3,12 +3,10 @@ import { RootState } from "typesafe-actions";
 
 const _getPayments = (state: RootState) => state.payments;
 
-export const getPaymentMethods = createSelector(
-  _getPayments,
-  p =>
-    p.payment.methods
-      .filter(m => m.isActive)
-      .reduce((acc, el) => ({ ...acc, [el.id]: el.name }), {}),
+export const getPaymentMethods = createSelector(_getPayments, p =>
+  p.payment.methods
+    .filter(m => m.isActive)
+    .reduce((acc, el) => ({ ...acc, [el.id]: el.name }), {}),
 );
 
 export const paymentMethodsLoading = createSelector(
@@ -21,12 +19,22 @@ export const paymentMethodsError = createSelector(
   p => p.getMethodsLoading.error,
 );
 
-export const recordPaymentLoading = createSelector(
+export const recordCreditCardPaymentLoading = createSelector(
   _getPayments,
-  p => p.recordPaymentLoading.loading,
+  p => p.recordCreditCardPaymentLoading.loading,
 );
 
-export const recordPaymentError = createSelector(
+export const recordCreditCardPaymentError = createSelector(
   _getPayments,
-  p => p.recordPaymentLoading.error,
+  p => p.recordCreditCardPaymentLoading.error,
+);
+
+export const recordPayPalPaymentLoading = createSelector(
+  _getPayments,
+  p => p.recordPayPalPaymentLoading.loading,
+);
+
+export const recordPayPalPaymentError = createSelector(
+  _getPayments,
+  p => p.recordPayPalPaymentLoading.error,
 );

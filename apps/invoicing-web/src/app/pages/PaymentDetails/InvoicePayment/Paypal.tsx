@@ -57,7 +57,6 @@ const Paypal: React.FunctionComponent<Props> = ({
 
   const onAuthorize = (data, actions) =>
     actions.payment.execute().then(() => {
-      console.log(data);
       const payment = {
         paid: true,
         cancelled: false,

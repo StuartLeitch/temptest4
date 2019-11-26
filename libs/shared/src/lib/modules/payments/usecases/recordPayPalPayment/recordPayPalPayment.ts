@@ -1,7 +1,6 @@
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, left, right, Either } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
 import { chain } from '../../../../core/logic/EitherChain';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { map } from '../../../../core/logic/EitherMap';
@@ -16,12 +15,8 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
-import { PayerId } from '../../../payers/domain/PayerId';
-import { Amount } from '../../../../domain/Amount';
-import { Payment } from '../../domain/Payment';
 
 import { RecordPayPalPaymentResponse } from './recordPayPalPaymentResponse';
 import { RecordPayPalPaymentErrors } from './recordPayPalPaymentErrors';
@@ -68,11 +63,11 @@ export class RecordPayPalPaymentUsecase
       this.invoiceRepo
     );
 
-    const a: any = await chain(
+    const paymentEither: any = await chain(
       [payload => usecase.execute(payload)],
       payloadEither
     );
-    return a as RecordPayPalPaymentResponse;
+    return paymentEither as RecordPayPalPaymentResponse;
   }
 
   private async constructPayload(request: RecordPayPalPaymentDTO) {
@@ -122,6 +117,7 @@ export class RecordPayPalPaymentUsecase
         orderId
       );
       const order = await this.payPalService().execute(request);
+      console.log(`PayPal Order ID: ${orderId}`);
       return right(order.result);
     } catch (e) {
       console.log(e);

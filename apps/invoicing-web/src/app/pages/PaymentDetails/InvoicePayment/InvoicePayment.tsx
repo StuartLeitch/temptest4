@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { connect } from "react-redux";
 import { RootState } from "typesafe-actions";
 import { Formik } from "formik";
+import { config } from "../../../../config";
 import styled from "styled-components";
 import {
   Text,
@@ -63,13 +64,18 @@ const calculateTotalToBePaid = invoice => {
   const netValue = invoice.invoiceItem.price;
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
+  console.info("net", netValue, "vat", vat);
   return netValue + vat;
 };
 
 const InvoiceDownloadLink = ({ payer }) => {
   if (payer) {
     return (
-      <ActionLink type="action" ml="4" link={`./api/invoice/${payer.id}`}>
+      <ActionLink
+        type="action"
+        ml="4"
+        link={`${config.apiRoot}/invoice/${payer.id}`}
+      >
         <Icon name="download" color="colors.actionSecondary" mr="1" />
         Download
       </ActionLink>
@@ -169,10 +175,7 @@ const mapStateToProps = (state: RootState) => ({
   invoiceIsPaid: invoiceSelectors.invoiceIsPaid(state),
 });
 
-export default connect(
-  mapStateToProps,
-  {},
-)(InvoicePayment);
+export default connect(mapStateToProps, {})(InvoicePayment);
 
 // #region styles
 const Root = styled.div`
