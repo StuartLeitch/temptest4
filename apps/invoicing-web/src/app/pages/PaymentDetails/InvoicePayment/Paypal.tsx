@@ -48,7 +48,7 @@ const Paypal: React.FunctionComponent<Props> = ({
       transactions: [
         {
           amount: {
-            total,
+            total: total.toFixed(2),
             currency,
           },
         },
