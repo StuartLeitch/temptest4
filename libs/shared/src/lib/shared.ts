@@ -119,6 +119,8 @@ export * from './modules/payments/repos';
 export * from './modules/payments/usecases/getPaymentMethodByName/getPaymentMethodByName';
 export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPayment';
 export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPaymentDTO';
+export * from './modules/payments/usecases/recordCreditCardPayment/recordCreditCardPayment';
+export * from './modules/payments/usecases/recordCreditCardPayment/recordCreditCardPaymentDTO';
 
 export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
@@ -155,9 +157,7 @@ export * from './modules/users/mappers/UserMap';
 // ? Should we export this
 // * Infra
 // export * from './infra/http/app';
-export {
-  BraintreeGateway
-} from './modules/payments/infrastructure/gateways/braintree/gateway';
+export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
 export * from './infrastructure/database/knex';
 export { EmailService } from './infrastructure/communication-channels';
 

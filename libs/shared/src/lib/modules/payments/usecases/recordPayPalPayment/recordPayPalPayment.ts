@@ -68,11 +68,11 @@ export class RecordPayPalPaymentUsecase
       this.invoiceRepo
     );
 
-    const a: any = await chain(
+    const paymentEither: any = await chain(
       [payload => usecase.execute(payload)],
       payloadEither
     );
-    return a as RecordPayPalPaymentResponse;
+    return paymentEither as RecordPayPalPaymentResponse;
   }
 
   private async constructPayload(request: RecordPayPalPaymentDTO) {
@@ -122,6 +122,7 @@ export class RecordPayPalPaymentUsecase
         orderId
       );
       const order = await this.payPalService().execute(request);
+      console.log(order.result);
       return right(order.result);
     } catch (e) {
       console.log(e);

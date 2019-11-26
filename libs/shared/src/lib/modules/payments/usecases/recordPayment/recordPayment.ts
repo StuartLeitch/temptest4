@@ -26,14 +26,7 @@ import { RecordPaymentResponse } from './recordPaymentResponse';
 import { RecordPaymentErrors } from './recordPaymentErrors';
 import { RecordPaymentDTO } from './recordPaymentDTO';
 
-import { PaymentDone } from '../../domain/events/paymentDone';
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
-
-import { CreditCard } from './../../domain/strategies/CreditCard';
-import { CreditCardPayment } from './../../domain/strategies/CreditCardPayment';
-import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
-import { PaymentModel } from './../../domain/contracts/PaymentModel';
-import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
 
 export type RecordPaymentContext = AuthorizationContext<Roles>;
 
@@ -58,41 +51,18 @@ export class RecordPaymentUsecase
     payload: RecordPaymentDTO,
     context?: RecordPaymentContext
   ): Promise<RecordPaymentResponse> {
-    const creditCard = new CreditCard();
-    const paymentFactory = new PaymentFactory();
-    paymentFactory.registerPayment(creditCard);
-    const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['CreditCard', new CreditCardPayment(BraintreeGateway)]
-      //   ['PayPal', new PayPalPayment()]
-    ]);
-    const paymentModel: PaymentModel = paymentFactory.create(
-      'CreditCardPayment'
-    );
-
-    const payment: any = await paymentStrategy.makePayment(
-      paymentModel,
-      payload.amount
-    );
-
     const paymentPayload = {
       invoiceId: InvoiceId.create(
         new UniqueEntityID(payload.invoiceId)
       ).getValue(),
       amount: Amount.create(payload.amount).getValue(),
       payerId: PayerId.create(new UniqueEntityID(payload.payerId)),
-      foreignPaymentId: '',
+      foreignPaymentId: payload.foreignPaymentId,
       paymentMethodId: PaymentMethodId.create(
         new UniqueEntityID(payload.paymentMethodId)
       ),
       datePaid: payload.datePaid ? new Date(payload.datePaid) : new Date()
     };
-
-    if (payment.success) {
-      console.log('BT Transaction ID: ' + payment.transaction.id);
-      paymentPayload.foreignPaymentId = payment.transaction.id;
-    } else {
-      throw new Error(payment.message);
-    }
 
     try {
       const payment = Payment.create(paymentPayload).getValue();

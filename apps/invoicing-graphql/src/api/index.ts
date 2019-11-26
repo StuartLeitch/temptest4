@@ -14,10 +14,6 @@ export function makeExpressServer(context: Context) {
   const auth = new AuthMiddleware(context);
   app.use(express.json());
 
-  app.post('/api/paypal-payment-completed', async (req, res) => {
-    return res.status(200);
-  });
-
   app.post(
     '/api/paypal-payment/:payerId/:invoiceId/:orderId',
     async (req, res) => {
@@ -27,14 +23,17 @@ export function makeExpressServer(context: Context) {
         context.repos.invoice,
         context.payPalService
       );
-      const result = await usecase.execute({
+
+      const resultEither = await usecase.execute({
         invoiceId: req.params.invoiceId,
         orderId: req.params.orderId,
         payerId: req.params.payerId
       });
-      if (result.isLeft()) {
+
+      if (resultEither.isLeft()) {
+        console.log(resultEither.value.errorValue());
         res.status(404);
-        res.send(result.value.errorValue());
+        res.send(resultEither.value.errorValue());
       }
       res.status(200);
       res.send();
