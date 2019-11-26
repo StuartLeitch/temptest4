@@ -27,6 +27,7 @@ import { RecordPaymentErrors } from './recordPaymentErrors';
 import { RecordPaymentDTO } from './recordPaymentDTO';
 
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
+import { DomainEvents } from 'libs/shared/src/lib/core/domain/events/DomainEvents';
 
 export type RecordPaymentContext = AuthorizationContext<Roles>;
 
@@ -78,11 +79,13 @@ export class RecordPaymentUsecase
         );
       }
 
-      invoice.markAsPaid();
+      invoice.markAsPaid(payment.paymentId);
 
       await this.paymentRepo.save(payment);
       await this.invoiceRepo.update(invoice);
 
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
+      
       return right(Result.ok(payment));
     } catch (e) {
       return left(new AppError.UnexpectedError(e));

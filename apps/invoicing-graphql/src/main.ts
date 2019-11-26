@@ -6,6 +6,7 @@ import { makeContext } from './context';
 import { makeGraphqlServer } from './graphql';
 import { makeExpressServer } from './api';
 import { queueService } from './queue_service';
+import { registerDomainEvents } from './domain_events';
 
 async function main(): Promise<void> {
   const config = await makeConfig();
@@ -156,7 +157,7 @@ async function main(): Promise<void> {
   //     }
   //   ]
   // });
-
+  registerDomainEvents(context, queue);
   expressServer.listen(process.env.PORT || 4000);
 }
 

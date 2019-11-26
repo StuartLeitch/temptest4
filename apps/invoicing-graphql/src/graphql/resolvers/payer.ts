@@ -6,7 +6,9 @@ import {
   PayerMap,
   AddressMap,
   GetAddressUseCase,
-  UpdatePayerUsecase
+  UniqueEntityID,
+  InvoiceId,
+  InvoiceStatus
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
@@ -15,6 +17,7 @@ import { Context } from '../../context';
 import { CreateAddress } from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
 import { ChangeInvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
 import { CreatePayerUsecase } from './../../../../../libs/shared/src/lib/modules/payers/usecases/createPayer/createPayer';
+import { DomainEvents } from 'libs/shared/src/lib/core/domain/events/DomainEvents';
 
 export const payer: Resolvers<Context> = {
   Mutation: {
@@ -26,6 +29,10 @@ export const payer: Resolvers<Context> = {
       const { repos, vatService } = context;
       const usecaseContext = { roles: [Roles.PAYER] };
       const { payer } = args;
+      const invoiceId = InvoiceId.create(
+        new UniqueEntityID(payer.invoiceId)
+      ).getValue();
+      invoice = await repos.invoice.getInvoiceById(invoiceId);
 
       const createAddressUseCase = new CreateAddress(repos.address);
       const createPayerUseCase = new CreatePayerUsecase(repos.payer);
@@ -71,14 +78,15 @@ export const payer: Resolvers<Context> = {
         updatedPayer = payerResult.value.getValue();
       }
 
-      const invoiceResult = await changeInvoiceStatusUseCase.execute({
-        invoiceId: updatedPayer.invoiceId.id.toString(),
-        status: 'ACTIVE'
-      });
-
-      if (invoiceResult.isRight()) {
-        invoice = invoiceResult.value.getValue();
+      if (invoice.status != InvoiceStatus.ACTIVE) {
+        invoice.markAsActive();
+        await changeInvoiceStatusUseCase.execute({
+          invoiceId: updatedPayer.invoiceId.id.toString(),
+          status: 'ACTIVE'
+        });
       }
+
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       return PayerMap.toPersistence(updatedPayer);
     }

@@ -12,6 +12,7 @@ import { InvoicePaidEvent } from './events/invoicePaid';
 import { InvoiceActivated } from './events/invoiceActivated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
+import { PaymentId } from '../../payments/domain/PaymentId';
 // import {PayerType} from '../../payers/domain/PayerType';
 // import {Coupon} from '../../coupons/domain/Coupon';
 
@@ -153,11 +154,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.addDomainEvent(new InvoiceActivated(this, now));
   }
 
-  public markAsPaid(): void {
+  public markAsPaid(paymentId: PaymentId): void {
     const now = new Date();
     this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.FINAL;
-    this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
+    this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, paymentId, now));
   }
 
   public getInvoiceTotal(): number {
