@@ -1,10 +1,10 @@
 import {
+  withLatestFrom,
   catchError,
   switchMap,
+  mergeMap,
   filter,
   map,
-  mergeMap,
-  withLatestFrom,
 } from "rxjs/operators";
 import { isActionOf, RootEpic } from "typesafe-actions";
 import { ajax } from "rxjs/ajax";
@@ -74,8 +74,12 @@ const recordPayPalPaymentEpic: RootEpic = (action$, state$) => {
         `./api/paypal-payment/${action.payload.payerId}/${action.payload.invoiceId}/${action.payload.payPalOrderId}`,
       ),
     ),
-    map(r => {
-      return recordPayPalPayment.success("");
+    withLatestFrom(state$.pipe(map(invoice))),
+    mergeMap(([r, invoice]) => {
+      return from([
+        recordPayPalPayment.success(""),
+        getInvoice.request(invoice.invoiceId),
+      ]);
     }),
     catchError(err => of(recordPayPalPayment.failure(err.message))),
   );

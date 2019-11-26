@@ -3,7 +3,11 @@ import { combineReducers } from "redux";
 
 import { PaymentsSlice } from "./types";
 import { createLoadingReducer } from "../../redux/helpers";
-import { getPaymentMethods, recordCardPayment } from "./actions";
+import {
+  getPaymentMethods,
+  recordCardPayment,
+  recordPayPalPayment,
+} from "./actions";
 
 const initialState: PaymentsSlice = {
   methods: [],
@@ -19,10 +23,13 @@ const payment = createReducer(initialState).handleAction(
 
 const getMethodsLoading = createLoadingReducer(getPaymentMethods);
 
-const recordPaymentLoading = createLoadingReducer(recordCardPayment);
+const recordCreditCardPaymentLoading = createLoadingReducer(recordCardPayment);
+
+const recordPayPalPaymentLoading = createLoadingReducer(recordPayPalPayment);
 
 export default combineReducers({
-  recordPaymentLoading,
+  recordCreditCardPaymentLoading,
+  recordPayPalPaymentLoading,
   getMethodsLoading,
   payment,
 });

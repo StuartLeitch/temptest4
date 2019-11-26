@@ -29,8 +29,10 @@ interface Props {
   invoice: any;
   payerError: string;
   payerLoading: boolean;
-  paymentError: string;
-  paymentLoading: boolean;
+  creditCardPaymentError: string;
+  creditCardPaymentLoading: boolean;
+  payPalPaymentError: string;
+  payPalPaymentLoading: boolean;
   getMethodsError: string;
   getMethodsLoading: boolean;
   paymentMethods: Record<string, string>;
@@ -64,8 +66,10 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   recordPayPalPayment,
   getPaymentMethods,
   payWithCard,
-  paymentError,
-  paymentLoading,
+  creditCardPaymentError,
+  creditCardPaymentLoading,
+  payPalPaymentError,
+  payPalPaymentLoading,
   paymentMethods,
 }) => {
   const { invoiceId } = useParams();
@@ -112,10 +116,10 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
             <InvoicePayment
               methods={paymentMethods}
               status={invoice.status}
-              error={paymentError}
+              error={creditCardPaymentError || payPalPaymentError}
               payByCardSubmit={payByCard}
               payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
-              loading={paymentLoading}
+              loading={creditCardPaymentLoading || payPalPaymentLoading}
             />
           </FormsContainer>
 
@@ -136,8 +140,12 @@ const mapStateToProps = (state: RootState) => ({
   getMethodsError: paymentSelectors.paymentMethodsError(state),
   getMethodsLoading: paymentSelectors.paymentMethodsLoading(state),
   paymentMethods: paymentSelectors.getPaymentMethods(state),
-  paymentError: paymentSelectors.recordPaymentError(state),
-  paymentLoading: paymentSelectors.recordPaymentLoading(state),
+  creditCardPaymentError: paymentSelectors.recordCreditCardPaymentError(state),
+  creditCardPaymentLoading: paymentSelectors.recordCreditCardPaymentLoading(
+    state,
+  ),
+  payPalPaymentError: paymentSelectors.recordPayPalPaymentError(state),
+  payPalPaymentLoading: paymentSelectors.recordPayPalPaymentLoading(state),
 });
 
 export default connect(mapStateToProps, {
