@@ -135,7 +135,12 @@ export type MutationMigratePaymentArgs = {
 
 
 export type MutationMigrateInvoiceArgs = {
-  invoiceId?: Maybe<Scalars['String']>
+  invoiceId?: Maybe<Scalars['String']>,
+  vatValue?: Maybe<Scalars['Float']>,
+  invoiceReference?: Maybe<Scalars['String']>,
+  discount?: Maybe<Scalars['Float']>,
+  APC?: Maybe<Scalars['Float']>,
+  dateIssued?: Maybe<Scalars['String']>
 };
 
 export type Payer = {

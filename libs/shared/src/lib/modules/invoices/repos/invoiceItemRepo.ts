@@ -1,7 +1,7 @@
-import {Repo} from '../../../infrastructure/Repo';
-import {InvoiceItem} from '../domain/InvoiceItem';
-import {InvoiceItemId} from '../domain/InvoiceItemId';
-import {ManuscriptId} from '../domain/ManuscriptId';
+import { Repo } from '../../../infrastructure/Repo';
+import { InvoiceItem } from '../domain/InvoiceItem';
+import { InvoiceItemId } from '../domain/InvoiceItemId';
+import { ManuscriptId } from '../domain/ManuscriptId';
 import { InvoiceId } from '../../../shared';
 
 export interface InvoiceItemRepoContract extends Repo<InvoiceItem> {
@@ -13,5 +13,5 @@ export interface InvoiceItemRepoContract extends Repo<InvoiceItem> {
   delete(invoiceItem: InvoiceItem): Promise<void>;
 
   getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]>;
-  // update(invoice: Invoice): Promise<Invoice>;
+  update(invoiceItem: InvoiceItem): Promise<InvoiceItem>;
 }

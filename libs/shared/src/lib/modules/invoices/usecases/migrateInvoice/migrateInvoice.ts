@@ -15,13 +15,15 @@ import {
 
 // * Usecase specific
 import { Invoice } from './../../domain/Invoice';
+import { InvoiceItem } from './../../domain/InvoiceItem';
 import { InvoiceId } from './../../domain/InvoiceId';
-import { InvoiceMap } from './../../mappers/InvoiceMap';
+// import { InvoiceMap } from './../../mappers/InvoiceMap';
 
 import { MigrateInvoiceResponse } from './migrateInvoiceResponse';
 import { MigrateInvoiceErrors } from './migrateInvoiceErrors';
 import { MigrateInvoiceDTO } from './migrateInvoiceDTO';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
 
 export type MigrateInvoiceContext = AuthorizationContext<Roles>;
 
@@ -37,13 +39,17 @@ export class MigrateInvoiceUsecase
       MigrateInvoiceContext,
       AccessControlContext
     > {
-  constructor(private invoiceRepo: InvoiceRepoContract) {}
+  constructor(
+    private invoiceRepo: InvoiceRepoContract,
+    private invoiceItemRepo: InvoiceItemRepoContract
+  ) {}
 
   public async execute(
     request: MigrateInvoiceDTO,
     context?: MigrateInvoiceContext
   ): Promise<MigrateInvoiceResponse> {
     let invoice: Invoice;
+    let invoiceItem: InvoiceItem;
 
     // * get a proper InvoiceId
     const invoiceId = InvoiceId.create(
@@ -60,7 +66,25 @@ export class MigrateInvoiceUsecase
         );
       }
 
-      // await this.invoiceRepo.save(invoice);
+      try {
+        // * System identifies invoice item by invoice id
+        [invoiceItem] = await this.invoiceItemRepo.getItemsByInvoiceId(
+          invoiceId
+        );
+      } catch (err) {
+        return left(
+          new MigrateInvoiceErrors.InvoiceNotFound(invoiceId.id.toString())
+        );
+      }
+
+      invoice.invoiceNumber = request.invoiceReference;
+      invoice.dateIssued = new Date(request.dateIssued);
+
+      invoiceItem.vat = request.vatValue;
+      invoiceItem.price = request.APC - request.discount;
+
+      await this.invoiceRepo.update(invoice);
+      await this.invoiceItemRepo.update(invoiceItem);
 
       return right(Result.ok<Invoice>(invoice));
     } catch (err) {

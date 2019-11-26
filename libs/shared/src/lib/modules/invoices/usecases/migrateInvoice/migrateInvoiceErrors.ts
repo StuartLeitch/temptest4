@@ -9,4 +9,12 @@ export namespace MigrateInvoiceErrors {
       });
     }
   }
+
+  export class InvoiceItemNotFound extends Result<UseCaseError> {
+    constructor(invoiceId: string) {
+      super(false, {
+        message: `The Invoice Item associated with Invoice id {${invoiceId}} was not found.`
+      });
+    }
+  }
 }

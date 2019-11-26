@@ -14,6 +14,7 @@ export interface InvoiceItemProps {
   invoiceId: InvoiceId;
   manuscriptId: ManuscriptId;
   type?: InvoiceItemType;
+  vat?: number;
   price?: number;
   dateCreated: Date;
   name?: string;
@@ -52,12 +53,20 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this.props.name;
   }
 
-  private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
-    super(props, id);
+  set vat(vat: number) {
+    this.props.vat = vat;
+  }
+
+  get vat(): number {
+    return this.props.vat;
   }
 
   set price(priceValue: number) {
     this.props.price = priceValue;
+  }
+
+  private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
+    super(props, id);
   }
 
   public static create(

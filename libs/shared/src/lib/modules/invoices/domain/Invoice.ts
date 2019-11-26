@@ -29,8 +29,8 @@ interface InvoiceProps {
   invoiceItems?: InvoiceItems;
   dateCreated?: Date;
   dateUpdated?: Date;
+  dateIssued?: Date;
   charge?: number;
-  vat?: number;
   totalNumInvoiceItems?: number;
 }
 
@@ -69,12 +69,12 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.charge = charge;
   }
 
-  set vat(vat: number) {
-    this.props.vat = vat;
+  get dateIssued(): Date {
+    return this.props.dateIssued;
   }
 
-  get vat(): number {
-    return this.props.vat;
+  set dateIssued(dateIssued: Date) {
+    this.props.dateIssued = dateIssued;
   }
 
   get dateCreated(): Date {
@@ -87,6 +87,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get invoiceNumber(): string {
     return this.props.invoiceNumber;
+  }
+
+  set invoiceNumber(invoiceNumber: string) {
+    this.props.invoiceNumber = invoiceNumber;
   }
 
   set transactionId(transactionId: TransactionId) {

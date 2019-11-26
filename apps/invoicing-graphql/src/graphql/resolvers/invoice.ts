@@ -46,7 +46,6 @@ export const invoice: Resolvers<Context> = {
         return {
           invoiceId: invoiceDetails.id.toString(),
           status: invoiceDetails.status,
-          vat: invoiceDetails.vat,
           charge: invoiceDetails.charge,
           dateCreated: invoiceDetails.dateCreated.toISOString(),
           referenceNumber: invoiceDetails.invoiceNumber
@@ -174,16 +173,31 @@ export const invoice: Resolvers<Context> = {
   Mutation: {
     async migrateInvoice(parent, args, context) {
       const {
-        repos: { invoice: invoiceRepo }
+        repos: { invoice: invoiceRepo, invoiceItem: invoiceItemRepo }
       } = context;
-      const { invoiceId } = args;
+      const {
+        invoiceId,
+        vatValue,
+        invoiceReference,
+        discount,
+        APC,
+        dateIssued
+      } = args;
 
-      const migrateInvoiceUsecase = new MigrateInvoiceUsecase(invoiceRepo);
+      const migrateInvoiceUsecase = new MigrateInvoiceUsecase(
+        invoiceRepo,
+        invoiceItemRepo
+      );
       const usecaseContext = { roles: [Roles.PAYER] };
 
       const result = await migrateInvoiceUsecase.execute(
         {
-          invoiceId
+          invoiceId,
+          vatValue,
+          invoiceReference,
+          discount,
+          APC,
+          dateIssued
         },
         usecaseContext
       );
@@ -195,7 +209,9 @@ export const invoice: Resolvers<Context> = {
       const migratedInvoice = result.value.getValue();
 
       return {
-        invoiceId: migratedInvoice.invoiceId.id.toString()
+        invoiceId: migratedInvoice.invoiceId.id.toString(),
+        referenceNumber: migratedInvoice.invoiceNumber,
+        dateIssued: migratedInvoice.dateIssued.toISOString()
         // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
         // datePaid: migratedPayment.datePaid.toISOString(),
         // amount: migratedPayment.amount.value,

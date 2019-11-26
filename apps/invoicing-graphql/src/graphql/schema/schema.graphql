@@ -38,6 +38,7 @@ type Invoice {
   invoiceId: String
   dateCreated: String
   dateChanged: String
+  dateIssued: String
   vat: Float
   charge: Float
   status: InvoiceStatus
@@ -141,5 +142,12 @@ type Mutation {
     amount: Float
     datePaid: String
   ): Payment!
-  migrateInvoice(invoiceId: String): Invoice!
+  migrateInvoice(
+    invoiceId: String
+    vatValue: Float
+    invoiceReference: String
+    discount: Float
+    APC: Float
+    dateIssued: String
+  ): Invoice!
 }
