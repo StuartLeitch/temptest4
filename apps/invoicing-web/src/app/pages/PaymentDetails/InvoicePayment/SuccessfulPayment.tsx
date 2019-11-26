@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Flex, th, Separator, Title, Button } from "@hindawi/react-components";
+import { config } from "@hindawi/invoicing-web/config";
 
 interface Props {
   title?: string;
@@ -29,7 +30,7 @@ const SuccessfulPayment: React.FunctionComponent<Props> = ({
       </div>
 
       <Fragment>
-        <a href={`./api/invoice/${payerId}`}>
+        <a href={`${config.apiRoot}/invoice/${payerId}`}>
           <Button type="primary" onClick={null} mr={3}>
             VIEW INVOICE
           </Button>
