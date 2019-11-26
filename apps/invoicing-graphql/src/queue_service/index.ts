@@ -11,14 +11,14 @@ import * as eventHandlers from './handlers';
 const config = {
   accessKeyId: process.env.AWS_SNS_SQS_ACCESS_KEY,
   secretAccessKey: process.env.AWS_SNS_SQS_SECRET_KEY,
-  region: environment.AWS_SNS_SQS_REGION,
-  snsEndpoint: environment.AWS_SNS_ENDPOINT,
-  sqsEndpoint: environment.AWS_SQS_ENDPOINT,
-  topicName: environment.AWS_SNS_TOPIC,
-  queueName: environment.AWS_SQS_QUEUE_NAME,
-  eventNamespace: environment.EVENT_NAMESPACE,
-  publisherName: environment.PUBLISHER_NAME,
-  serviceName: environment.SERVICE_NAME
+  region: process.env.AWS_SNS_SQS_REGION || environment.AWS_SNS_SQS_REGION,
+  snsEndpoint: process.env.AWS_SNS_ENDPOINT || environment.AWS_SNS_ENDPOINT,
+  sqsEndpoint: process.env.AWS_SQS_ENDPOINT || environment.AWS_SQS_ENDPOINT,
+  topicName: process.env.AWS_SNS_TOPIC || environment.AWS_SNS_TOPIC,
+  queueName: process.env.AWS_SQS_QUEUE_NAME || environment.AWS_SQS_QUEUE_NAME,
+  eventNamespace: process.env.EVENT_NAMESPACE || environment.EVENT_NAMESPACE,
+  publisherName: process.env.PUBLISHER_NAME || environment.PUBLISHER_NAME,
+  serviceName: process.env.SERVICE_NAME || environment.SERVICE_NAME
 };
 
 export const queueService = createQueueService(config)

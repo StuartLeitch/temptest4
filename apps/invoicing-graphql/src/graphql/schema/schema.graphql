@@ -135,4 +135,11 @@ type Mutation {
     paymentMethodId: String!
     creditCard: CreditCardInput!
   ): Payment!
+  migratePayment(
+    invoiceId: String!
+    payerId: String!
+    amount: Float
+    datePaid: String
+  ): Payment!
+  migrateInvoice(invoiceId: String): Invoice!
 }

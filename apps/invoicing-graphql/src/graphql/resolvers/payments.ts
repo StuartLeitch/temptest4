@@ -4,6 +4,7 @@ import { Resolvers } from '../schema';
 import { Context } from '../../context';
 
 import { RecordPaymentUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/recordPayment/recordPayment';
+import { MigratePaymentUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/migratePayment/migratePayment';
 
 export const payments: Resolvers<Context> = {
   Query: {
@@ -67,6 +68,51 @@ export const payments: Resolvers<Context> = {
         foreignPaymentId: confirmedPayment.foreignPaymentId,
         amount: confirmedPayment.amount.value,
         datePaid: confirmedPayment.datePaid.toISOString()
+      };
+    },
+
+    async migratePayment(parent, args, context) {
+      const {
+        checkoutService,
+        repos: {
+          paymentMethod: paymentMethodRepo,
+          payment: paymentRepo,
+          invoice: invoiceRepo
+        }
+      } = context;
+      const { invoiceId, payerId, amount, datePaid } = args;
+
+      const migratePaymentUsecase = new MigratePaymentUsecase(
+        paymentMethodRepo,
+        paymentRepo,
+        invoiceRepo
+      );
+      const usecaseContext = { roles: [Roles.PAYER] };
+
+      const result = await migratePaymentUsecase.execute(
+        {
+          invoiceId,
+          payerId,
+          amount,
+          datePaid
+        },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        return null;
+      }
+
+      const migratedPayment = result.value.getValue();
+
+      return {
+        id: migratedPayment.paymentId.id.toString(),
+        payerId: migratedPayment.payerId.id.toString(),
+        paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
+        datePaid: migratedPayment.datePaid.toISOString(),
+        amount: migratedPayment.amount.value,
+        invoiceId: migratedPayment.invoiceId.id.toString(),
+        foreignPaymentId: migratedPayment.foreignPaymentId
       };
     }
   }

@@ -17,4 +17,12 @@ export namespace MigratePaymentErrors {
       });
     }
   }
+
+  export class PaymentMethodNotFound extends Result<UseCaseError> {
+    constructor(paymentMethodName: string) {
+      super(false, {
+        message: `The Payment Method with name {${paymentMethodName}} was not found.`
+      });
+    }
+  }
 }

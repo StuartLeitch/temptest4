@@ -1,3 +1,6 @@
 export interface MigratePaymentDTO {
-  paymentId: string;
+  invoiceId: string;
+  amount: number;
+  datePaid: string;
+  payerId: string;
 }

@@ -142,7 +142,7 @@ export class SetTransactionToActiveByCustomIdUsecase
       transaction.markAsActive();
 
       await this.transactionRepo.update(transaction);
-      // await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
+      await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
 
       return right(Result.ok<Transaction>(transaction));
     } catch (err) {

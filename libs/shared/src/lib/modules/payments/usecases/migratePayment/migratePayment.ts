@@ -23,14 +23,18 @@ import {
   // Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
+import { Payment } from './../../domain/Payment';
+import { PaymentMap } from './../../mapper/Payment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
 import { PaymentModel } from './../../domain/contracts/PaymentModel';
+import { PaymentMethod } from './../../domain/PaymentMethod';
+
 import { Migration } from './../../domain/strategies/Migration';
 import { MigrationPayment } from './../../domain/strategies/MigrationPayment';
 
 import { MigratePaymentResponse } from './migratePaymentResponse';
-// import { MigratePaymentErrors } from './migratePaymentErrors';
+import { MigratePaymentErrors } from './migratePaymentErrors';
 import { MigratePaymentDTO } from './migratePaymentDTO';
 import { PaymentMethodRepoContract } from '../../repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
@@ -59,6 +63,10 @@ export class MigratePaymentUsecase
     request: MigratePaymentDTO,
     context?: MigratePaymentContext
   ): Promise<MigratePaymentResponse> {
+    const { invoiceId, payerId, amount, datePaid } = request;
+
+    let paymentMethod: PaymentMethod;
+
     try {
       const migration = new Migration();
       const paymentFactory = new PaymentFactory();
@@ -70,15 +78,34 @@ export class MigratePaymentUsecase
         'MigrationPayment'
       );
 
-      // TODO: Create payment record and save it
-      // const payment: any = await paymentStrategy.makePayment(
-      //   paymentModel,
-      //   payload.amount
-      // );
+      try {
+        // * System identifies payment method by name
+        paymentMethod = await this.paymentMethodRepo.getPaymentMethodByName(
+          'Migration'
+        );
+      } catch (err) {
+        return left(
+          new MigratePaymentErrors.PaymentMethodNotFound('Migration')
+        );
+      }
 
-      // await this.paymentRepo.save(payment);
+      // Simulate payment processing
+      await paymentStrategy.makePayment(paymentModel, amount);
 
-      return right(Result.ok<void>());
+      const rawPayment = {
+        invoiceId,
+        amount,
+        datePaid,
+        payerId,
+        foreignPaymentId: '',
+        paymentMethodId: paymentMethod.paymentMethodId.id.toString()
+      };
+
+      const payment = PaymentMap.toDomain(rawPayment);
+
+      await this.paymentRepo.save(payment);
+
+      return right(Result.ok<Payment>(payment));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

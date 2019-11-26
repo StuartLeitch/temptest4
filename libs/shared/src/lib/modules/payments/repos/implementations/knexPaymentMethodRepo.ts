@@ -30,6 +30,26 @@ export class KnexPaymentMethodRepo
     return PaymentMethodMap.toDomain(paymentMethodRow);
   }
 
+  async getPaymentMethodByName(
+    paymentMethodName: string
+  ): Promise<PaymentMethod> {
+    const { db } = this;
+
+    const paymentMethodRow = await db(TABLES.PAYMENT_METHODS)
+      .select()
+      .where('name', paymentMethodName)
+      .first();
+
+    if (!paymentMethodRow) {
+      throw RepoError.createEntityNotFoundError(
+        'payment-method',
+        paymentMethodName
+      );
+    }
+
+    return PaymentMethodMap.toDomain(paymentMethodRow);
+  }
+
   async save(paymentMethod: PaymentMethod): Promise<PaymentMethod> {
     const { db } = this;
 

@@ -14,6 +14,7 @@ import {
 import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 
+import { MigrateInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/migrateInvoice/migrateInvoice';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 
@@ -168,6 +169,39 @@ export const invoice: Resolvers<Context> = {
       );
 
       return catalogItem.journalTitle;
+    }
+  },
+  Mutation: {
+    async migrateInvoice(parent, args, context) {
+      const {
+        repos: { invoice: invoiceRepo }
+      } = context;
+      const { invoiceId } = args;
+
+      const migrateInvoiceUsecase = new MigrateInvoiceUsecase(invoiceRepo);
+      const usecaseContext = { roles: [Roles.PAYER] };
+
+      const result = await migrateInvoiceUsecase.execute(
+        {
+          invoiceId
+        },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        return null;
+      }
+
+      const migratedInvoice = result.value.getValue();
+
+      return {
+        invoiceId: migratedInvoice.invoiceId.id.toString()
+        // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
+        // datePaid: migratedPayment.datePaid.toISOString(),
+        // amount: migratedPayment.amount.value,
+        // invoiceId: migratedPayment.invoiceId.id.toString(),
+        // foreignPaymentId: migratedPayment.foreignPaymentId
+      };
     }
   }
 };
