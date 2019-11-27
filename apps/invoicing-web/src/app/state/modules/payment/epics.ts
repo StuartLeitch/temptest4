@@ -67,14 +67,27 @@ const creditCardPaymentEpic: RootEpic = (
   );
 };
 
-const recordPayPalPaymentEpic: RootEpic = (action$, state$) => {
+const recordPayPalPaymentEpic: RootEpic = (
+  action$,
+  state$,
+  { graphqlAdapter },
+) => {
   return action$.pipe(
     filter(isActionOf(recordPayPalPayment.request)),
-    switchMap(action =>
-      ajax.post(
-        `${config.apiRoot}/paypal-payment/${action.payload.payerId}/${action.payload.invoiceId}/${action.payload.payPalOrderId}`,
-      ),
-    ),
+    switchMap(action => {
+      const {
+        invoiceId,
+        payerId,
+        payPalOrderId,
+        paymentMethodId,
+      } = action.payload;
+      return graphqlAdapter.send(mutations.recordPayPalPayment, {
+        orderId: payPalOrderId,
+        paymentMethodId,
+        invoiceId,
+        payerId,
+      });
+    }),
     withLatestFrom(state$.pipe(map(invoice))),
     mergeMap(([r, invoice]) => {
       return from([

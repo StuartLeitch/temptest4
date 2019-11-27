@@ -46,9 +46,10 @@ interface Props {
 const payByPayPal = (recordAction, invoice) => {
   return data => {
     return recordAction({
-      payerId: invoice.payer.id,
-      payPalOrderId: data.orderID,
+      paymentMethodId: data.paymentMethodId,
       invoiceId: invoice.invoiceId,
+      payPalOrderId: data.orderID,
+      payerId: invoice.payer.id,
     });
   };
 };

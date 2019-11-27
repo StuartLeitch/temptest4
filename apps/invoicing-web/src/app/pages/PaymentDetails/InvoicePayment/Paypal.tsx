@@ -9,6 +9,7 @@ interface Props {
   currency: string;
   isScriptLoaded: boolean;
   isScriptLoadSucceed: boolean;
+  paymentMethodId: string;
   onError?(data?: any): void;
   onCancel?(data?: any): void;
   onSuccess?(data?: any): void;
@@ -28,14 +29,15 @@ const Paypal: React.FunctionComponent<Props> = ({
   onCancel,
   onSuccess,
   isScriptLoaded,
+  paymentMethodId,
   isScriptLoadSucceed,
 }) => {
   const [showButton, setShowButton] = useState(false);
 
-  useEffect(() => {
-    window.React = React;
-    window.ReactDOM = ReactDOM;
-  }, []);
+  // useEffect(() => {
+  //   window.React = React;
+  //   window.ReactDOM = ReactDOM;
+  // }, []);
 
   useEffect(() => {
     if (!showButton && isScriptLoadSucceed && isScriptLoaded) {
@@ -65,11 +67,14 @@ const Paypal: React.FunctionComponent<Props> = ({
         paymentToken: data.paymentToken,
         returnUrl: data.returnUrl,
         orderID: data.orderID,
+        paymentMethodId,
       };
       onSuccess(payment);
     }, onError);
 
-  const PaypalBtn = showButton && (window as any).paypal.Button.react;
+  const PaypalBtn =
+    showButton &&
+    (window as any).paypal.Button.driver("react", { React, ReactDOM });
 
   return (
     showButton && (
