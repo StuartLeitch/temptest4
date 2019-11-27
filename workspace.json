@@ -131,7 +131,8 @@
               "apps/invoicing-web/src/favicon.ico",
               "apps/invoicing-web/src/assets",
               "apps/invoicing-web/src/env-template.js",
-              "apps/invoicing-web/src/Dockerfile"
+              "apps/invoicing-web/src/Dockerfile",
+              "apps/invoicing-web/src/nginx.conf"
             ],
             "styles": ["apps/invoicing-web/src/styles.scss"],
             "scripts": [],
