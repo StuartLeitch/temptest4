@@ -32,24 +32,36 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     try {
       const { invoice } = event;
       let invoiceItems = invoice.invoiceItems.currentItems;
+
       if (invoiceItems.length === 0) {
-        invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(invoice.invoiceId);
+        invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+          invoice.invoiceId
+        );
       }
+
       if (invoiceItems.length === 0) {
-        throw new Error(`Invoice ${invoice.id} has no invoice items.`)
+        throw new Error(`Invoice ${invoice.id} has no invoice items.`);
       }
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
       if (!payer) {
-        throw new Error(`Invoice ${invoice.id} has no payers.`)
+        throw new Error(`Invoice ${invoice.id} has no payers.`);
       }
 
-      const manuscript = await this.manuscriptRepo.findById(invoiceItems[0].manuscriptId);
+      const manuscript = await this.manuscriptRepo.findById(
+        invoiceItems[0].manuscriptId
+      );
+
       if (!manuscript) {
-        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`)
+        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
-      await this.publishInvoiceActivated.execute(invoice, invoiceItems, manuscript, payer);
+      await this.publishInvoiceActivated.execute(
+        invoice,
+        invoiceItems,
+        manuscript,
+        payer
+      );
       console.log(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`
       );
