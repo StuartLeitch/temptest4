@@ -20,20 +20,32 @@ export class PublishInvoicePaid {
       event: 'invoicePaid',
       data: {
         invoiceId: invoice.id.toString(),
-        invoiceItems: invoiceItems.map(InvoiceItemMap.toPersistence),
-        manuscriptCustomId: manuscript.customId,
+        invoiceItems: invoiceItems.map(ii => ({
+          id: ii.id.toString(),
+          manuscriptCustomId: manuscript.customId,
+          manuscriptId: ii.manuscriptId.id.toString(),
+          type: ii.type,
+          price: ii.price,
+          vatPercentage: ii.vat,
+        })),
         transactionId: paymentDetails.transactionId,
         invoiceStatus: paymentDetails.invoiceStatus,
         invoiceNumber: paymentDetails.invoiceNumber,
         invoiceIssueDate: paymentDetails.invoiceIssueDate,
+        payerName: paymentDetails.payerName,
         payerEmail: paymentDetails.payerEmail,
         payerType: paymentDetails.payerType,
+        vatRegistrationNumber: paymentDetails.vatRegistrationNumber,
         address: `${paymentDetails.address}, ${paymentDetails.city}, ${paymentDetails.country}`,
         foreignPaymentId: paymentDetails.foreignPaymentId,
-        amount: paymentDetails.amount,
         country: paymentDetails.country,
         paymentDate: paymentDetails.paymentDate,
-        paymentType: paymentDetails.paymentType
+        paymentType: paymentDetails.paymentType,
+        valueWithoutVAT: invoiceItems.reduce(
+          (acc, curr) => acc + curr.price,
+          0
+        ),
+        valueWithVAT: paymentDetails.amount,
         // VAT: "todo"
         // couponId: coupon.id,
         // dateApplied: coupon.applied

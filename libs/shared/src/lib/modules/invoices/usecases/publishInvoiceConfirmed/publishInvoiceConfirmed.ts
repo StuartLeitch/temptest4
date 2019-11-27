@@ -24,17 +24,30 @@ export class PublishInvoiceConfirmed {
         invoiceId: invoice.id.toString(),
         invoiceNumber: invoice.invoiceNumber,
         invoiceIssueDate: invoice.dateIssued,
-        invoiceItems: invoiceItems.map(InvoiceItemMap.toPersistence),
-        manuscriptCustomId: manuscript.customId,
+        invoiceItems: invoiceItems.map(ii => ({
+          id: ii.id.toString(),
+          manuscriptCustomId: manuscript.customId,
+          manuscriptId: ii.manuscriptId.id.toString(),
+          type: ii.type,
+          price: ii.price,
+          vatPercentage: ii.vat,
+        })),
         transactionId: invoice.transactionId.id.toString(),
         invoiceStatus: invoice.status,
+        payerName: payer.name.value.toString(),
         payerEmail: payer.email.value.toString(),
         payerType: payer.type,
+        vatRegistrationNumber: payer.VATId,
         address: `${address.addressLine1}, ${address.city}, ${address.country}`,
         country: address.country,
-        costWithoutVAT: invoiceItems
-          .map(ii => ii.price)
-          .reduce((a, c) => a + c, 0)
+        valueWithoutVAT: invoiceItems.reduce(
+          (acc, curr) => acc + curr.price,
+          0
+        ),
+        valueWithVAT: invoiceItems.reduce(
+          (acc, curr) => acc + curr.price * (1 + curr.vat / 100),
+          0
+        )
         // VAT: "todo"
         // couponId: coupon.id,
         // dateApplied: coupon.applied
