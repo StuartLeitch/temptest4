@@ -8,6 +8,7 @@ import pdf from 'html-pdf';
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 
 export interface InvoicePayload {
+  invoiceLink: string;
   address: Address;
   article: Article;
   invoice: Invoice;

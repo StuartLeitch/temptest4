@@ -71,6 +71,7 @@ export class GetInvoicePdfUsecase
     this.authorizationContext = context;
     const { payerId } = request;
     const emptyPayload: InvoicePayload = {
+      invoiceLink: request.invoiceLink,
       address: null,
       article: null,
       invoice: null,
