@@ -7,11 +7,13 @@ import { PublishInvoiceConfirmed } from '../usecases/publishInvoiceConfirmed';
 import { InvoiceItemRepoContract } from '../repos';
 import { ArticleRepoContract } from '../../manuscripts/repos';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
+import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 
 export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private payerRepo: PayerRepoContract,
+    private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceActivated: PublishInvoiceConfirmed
   ) {
@@ -44,12 +46,17 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
         throw new Error(`Invoice ${invoice.id} has no payers.`)
       }
 
+      const address = await this.addressRepo.findById(payer.billingAddressId);
+      if (!address) {
+        throw new Error(`Invoice ${invoice.id} has no address associated.`)
+      }
+
       const manuscript = await this.manuscriptRepo.findById(invoiceItems[0].manuscriptId);
       if (!manuscript) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`)
       }
 
-      await this.publishInvoiceActivated.execute(invoice, invoiceItems, manuscript, payer);
+      await this.publishInvoiceActivated.execute(invoice, invoiceItems, manuscript, payer, address);
       console.log(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`
       );

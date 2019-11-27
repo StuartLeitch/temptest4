@@ -11,7 +11,7 @@ export const registerDomainEvents = (
   queue: SQSPublishServiceContract
 ) => {
   const {
-    repos: { invoice, payer, invoiceItem, manuscript, payment, paymentMethod }
+    repos: { invoice, invoiceItem, manuscript, payer, address }
   } = context;
   const publishInvoiceActivated = new PublishInvoiceConfirmed(queue);
   const publishInvoicePaid = new PublishInvoicePaid(queue);
@@ -20,16 +20,14 @@ export const registerDomainEvents = (
   new AfterInvoiceActivated(
     invoiceItem,
     payer,
+    address,
     manuscript,
     publishInvoiceActivated
   );
   new AfterInvoicePaidEvent(
     invoice,
     invoiceItem,
-    payer,
     manuscript,
-    payment,
-    paymentMethod,
     publishInvoicePaid
   );
 
