@@ -64,7 +64,6 @@ const calculateTotalToBePaid = invoice => {
   const netValue = invoice.invoiceItem.price;
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
-  console.info("net", netValue, "vat", vat);
   return netValue + vat;
 };
 
@@ -152,6 +151,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                   )}
                   {methods[values.paymentMethodId] === "Paypal" && (
                     <Paypal
+                      paymentMethodId={values.paymentMethodId}
                       onSuccess={payByPayPalSubmit}
                       total={calculateTotalToBePaid(invoice)}
                     />

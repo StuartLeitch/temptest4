@@ -4,7 +4,10 @@ import { Resolvers } from '../schema';
 import { Context } from '../../context';
 
 import { MigratePaymentUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/migratePayment/migratePayment';
-import { RecordCreditCardPaymentUsecase } from '@hindawi/shared';
+import {
+  RecordCreditCardPaymentUsecase,
+  RecordPayPalPaymentUsecase
+} from '@hindawi/shared';
 
 export const payments: Resolvers<Context> = {
   Query: {
@@ -54,6 +57,46 @@ export const payments: Resolvers<Context> = {
       //   amount: 123.4,
       //   datePaid: new Date()
       // };
+
+      if (result.isLeft()) {
+        return null;
+      }
+
+      const confirmedPayment = result.value.getValue();
+
+      return {
+        id: confirmedPayment.paymentId.id.toString(),
+        invoiceId: confirmedPayment.invoiceId.id.toString(),
+        paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
+        foreignPaymentId: confirmedPayment.foreignPaymentId,
+        amount: confirmedPayment.amount.value,
+        datePaid: confirmedPayment.datePaid.toISOString()
+      };
+    },
+
+    async recordPayPalPayment(parent, args, context) {
+      const { invoiceId, payerId, orderId, paymentMethodId } = args;
+      const usecaseContext = { roles: [Roles.PAYER] };
+      const {
+        payPalService,
+        repos: { invoice: invoiceRepo, payment: paymentRepo }
+      } = context;
+
+      const usecase = new RecordPayPalPaymentUsecase(
+        paymentRepo,
+        invoiceRepo,
+        payPalService
+      );
+
+      const result = await usecase.execute(
+        {
+          invoiceId,
+          payerId,
+          orderId,
+          paymentMethodId
+        },
+        usecaseContext
+      );
 
       if (result.isLeft()) {
         return null;

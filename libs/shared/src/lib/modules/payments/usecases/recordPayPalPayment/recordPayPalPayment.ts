@@ -44,7 +44,6 @@ export class RecordPayPalPaymentUsecase
       AccessControlContext
     > {
   constructor(
-    private paymentMethodRepo: PaymentMethodRepoContract,
     private paymentRepo: PaymentRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private payPalService: any
@@ -72,11 +71,8 @@ export class RecordPayPalPaymentUsecase
 
   private async constructPayload(request: RecordPayPalPaymentDTO) {
     const partialPayloadEither = await chain(
-      [
-        this.getPayloadWithPaymentMethodId.bind(this),
-        this.getPayloadWithAmountAndDate.bind(this, request.orderId)
-      ],
-      this.getEmptyPayload()
+      [this.getPayloadWithAmountAndDate.bind(this, request.orderId)],
+      this.getEmptyPayload(request.paymentMethodId)
     );
 
     const payloadEither = map(
@@ -91,24 +87,15 @@ export class RecordPayPalPaymentUsecase
     return payloadEither;
   }
 
-  private getEmptyPayload() {
+  private getEmptyPayload(paymentMethodId: string) {
     return {
       foreignPaymentId: null,
-      paymentMethodId: null,
+      paymentMethodId,
       invoiceId: null,
       datePaid: null,
       payerId: null,
       amount: null
     };
-  }
-
-  private async getPayloadWithPaymentMethodId(payload: RecordPaymentDTO) {
-    const usecase = new GetPaymentMethodByNameUsecase(this.paymentMethodRepo);
-    const either = await usecase.execute({ name: 'Paypal' });
-    return either.map(async paymentMethodResult => ({
-      ...payload,
-      paymentMethodId: paymentMethodResult.getValue().id.toString()
-    }));
   }
 
   private async getPayPalOrderDetails(orderId: string) {
