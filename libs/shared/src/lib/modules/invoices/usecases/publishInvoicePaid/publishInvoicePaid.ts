@@ -41,11 +41,7 @@ export class PublishInvoicePaid {
         country: paymentDetails.country,
         paymentDate: paymentDetails.paymentDate,
         paymentType: paymentDetails.paymentType,
-        valueWithoutVAT: invoiceItems.reduce(
-          (acc, curr) => acc + curr.price,
-          0
-        ),
-        valueWithVAT: paymentDetails.amount,
+        paymentAmount: paymentDetails.amount,
         // VAT: "todo"
         // couponId: coupon.id,
         // dateApplied: coupon.applied
