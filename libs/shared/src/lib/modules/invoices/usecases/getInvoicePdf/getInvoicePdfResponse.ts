@@ -1,6 +1,6 @@
 import { Either, Result } from '../../../../core/logic/Result';
 
-import { GetInvoicePdfErrors } from './getInvoicePdfErrors';
+import { GetInvoicePdfAllErrors } from './getInvoicePdfErrors';
 
 export interface PdfResponse {
   fileName: string;
@@ -8,6 +8,6 @@ export interface PdfResponse {
 }
 
 export type GetInvoicePdfResponse = Either<
-  GetInvoicePdfErrors,
+  GetInvoicePdfAllErrors,
   Result<PdfResponse>
 >;
