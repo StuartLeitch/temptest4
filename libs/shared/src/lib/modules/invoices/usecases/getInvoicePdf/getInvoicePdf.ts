@@ -110,6 +110,7 @@ export class GetInvoicePdfUsecase
         const date = payload.invoice.dateCreated;
         const parsedDate = `${date.getUTCFullYear()}-${date.getUTCMonth() +
           1}-${date.getUTCDate()}`;
+
         return {
           fileName: `${payload.invoice.id}-${parsedDate}.pdf`,
           file: pdf
