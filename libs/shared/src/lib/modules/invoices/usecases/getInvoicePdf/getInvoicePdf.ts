@@ -24,6 +24,7 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { Invoice } from '../../domain/Invoice';
 
 import { GetInvoicePdfResponse, PdfResponse } from './getInvoicePdfResponse';
+import { GetInvoicePdfErrors } from './getInvoicePdfErrors';
 import { GetInvoicePdfDTO } from './getInvoicePdfDTO';
 
 import { GetArticleDetailsUsecase } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetails';
@@ -88,17 +89,28 @@ export class GetInvoicePdfUsecase
       emptyPayload
     );
 
-    const pdfEither: any = await map(
-      [
-        pdfGeneratorService.getInvoice.bind(pdfGeneratorService),
-        streamToPromise
-      ],
-      payloadEither
-    );
+    const pdfStreamEither = payloadEither.chain(this.generateThePdf.bind(this));
+
+    const pdfEither: any = await map([streamToPromise], pdfStreamEither);
 
     return this.addFileNameToResponse(payloadEither, pdfEither).map(pdf =>
       Result.ok(pdf)
     ) as GetInvoicePdfResponse;
+  }
+
+  private generateThePdf(payload: InvoicePayload) {
+    try {
+      const pdf = pdfGeneratorService.getInvoice(payload);
+      return right(pdf);
+    } catch (e) {
+      console.log(e);
+      return left(
+        new GetInvoicePdfErrors.PdfInvoiceError(
+          'empty pdf',
+          payload.invoice.id.toString()
+        )
+      );
+    }
   }
 
   private addFileNameToResponse(
@@ -230,16 +242,5 @@ export class GetInvoicePdfUsecase
       ...payload,
       author: authorResult.getValue()
     }));
-    // if (!article) {
-    //   return right(payload);
-    // } else {
-    //   try {
-    //     const authorName = payload.article.authorSurname;
-    //     const author = AuthorMap.toDomain({ name: authorName, id: '' });
-    //     return right({ ...payload, author });
-    //   } catch (e) {
-    //     return left(Result.fail(e.message));
-    //   }
-    // }
   }
 }

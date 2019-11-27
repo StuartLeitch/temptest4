@@ -29,9 +29,11 @@ export const payer: Resolvers<Context> = {
       const { repos, vatService } = context;
       const usecaseContext = { roles: [Roles.PAYER] };
       const { payer } = args;
+
       const invoiceId = InvoiceId.create(
         new UniqueEntityID(payer.invoiceId)
       ).getValue();
+
       invoice = await repos.invoice.getInvoiceById(invoiceId);
 
       const createAddressUseCase = new CreateAddress(repos.address);
@@ -78,12 +80,27 @@ export const payer: Resolvers<Context> = {
         updatedPayer = payerResult.value.getValue();
       }
 
-      if (invoice.status != InvoiceStatus.ACTIVE) {
+      if (invoice.status !== InvoiceStatus.ACTIVE) {
         invoice.markAsActive();
+
         await changeInvoiceStatusUseCase.execute({
           invoiceId: updatedPayer.invoiceId.id.toString(),
           status: 'ACTIVE'
         });
+
+        // * Apply and save VAT scheme
+        const vat = vatService.calculateVAT(
+          payer.address.country,
+          !!payer.organization
+        );
+
+        const [invoiceItem] = await repos.invoiceItem.getItemsByInvoiceId(
+          invoice.invoiceId
+        );
+
+        invoiceItem.vat = vat;
+
+        await repos.invoiceItem.update(invoiceItem);
       }
 
       DomainEvents.dispatchEventsForAggregate(invoice.id);

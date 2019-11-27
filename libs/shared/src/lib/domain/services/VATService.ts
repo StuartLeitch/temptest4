@@ -1,12 +1,12 @@
-import {createClient} from 'soap';
+import { createClient } from 'soap';
 import EuroVat from 'eu-vat';
 
-import {environment} from '@env/environment';
+import { environment } from '@env/environment';
 
-import {PoliciesRegister} from './../reductions/policies/PoliciesRegister';
-import {UKVATTreatmentArticleProcessingChargesPolicy} from './../../modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
+import { PoliciesRegister } from '../../modules/invoices/domain/policies/PoliciesRegister';
+import { UKVATTreatmentArticleProcessingChargesPolicy } from './../../modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 
-const {VAT_VALIDATION_SERVICE_ENDPOINT: endpoint} = environment;
+const { VAT_VALIDATION_SERVICE_ENDPOINT: endpoint } = environment;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
 const vat = new EuroVat();
 const policiesRegister = new PoliciesRegister();
@@ -54,9 +54,9 @@ export class VATService {
     }
 
     try {
-      result = await this.checkVat(client, {countryCode, vatNumber});
+      result = await this.checkVat(client, { countryCode, vatNumber });
     } catch (err) {
-      let error;
+      let error: Error;
       switch (err.message) {
         case INVALID_INPUT:
           error = new Error('Invalid Input');
@@ -79,6 +79,7 @@ export class VATService {
       !individualConfirmed,
       individualConfirmed ? false : true
     ]);
+
     const VAT = calculateVAT.getVAT();
     return VAT;
   }
