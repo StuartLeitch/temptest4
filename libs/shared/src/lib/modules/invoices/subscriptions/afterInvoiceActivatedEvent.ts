@@ -50,6 +50,8 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
         throw new Error(`Invoice ${invoice.id} has no payers.`);
       }
 
+      const address = await this.addressRepo.findById(payer.billingAddressId);
+
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
@@ -62,7 +64,8 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
         invoice,
         invoiceItems,
         manuscript,
-        payer
+        payer,
+        address
       );
       console.log(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`
