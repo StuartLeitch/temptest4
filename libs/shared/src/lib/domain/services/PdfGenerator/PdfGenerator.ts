@@ -8,6 +8,7 @@ import pdf from 'html-pdf';
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 
 export interface InvoicePayload {
+  invoiceLink: string;
   address: Address;
   article: Article;
   invoice: Invoice;
@@ -44,16 +45,22 @@ export class PdfGeneratorService {
         },
         header: {
           height: '2.5cm'
-        }
+        },
+        phantomPath: '/usr/local/bin/phantomjs',
+        phantomArgs: []
       };
+      try {
+        pdf.create(html, pdfOptions).toStream((err, stream) => {
+          if (err) {
+            return reject(err);
+          }
 
-      pdf.create(html, pdfOptions).toStream((err, stream) => {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve(stream);
-      });
+          resolve(stream);
+        });
+      } catch (e) {
+        console.log(e);
+        resolve(null);
+      }
     });
   }
 

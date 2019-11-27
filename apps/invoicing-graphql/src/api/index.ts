@@ -51,8 +51,10 @@ export function makeExpressServer(context: Context) {
       repos.invoice,
       repos.payer
     );
+
+    const invoiceLink = req.headers.referer;
     const pdfEither = await usecase.execute(
-      { payerId: req.params.payerId },
+      { payerId: req.params.payerId, invoiceLink },
       authContext
     );
 

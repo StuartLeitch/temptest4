@@ -1,15 +1,12 @@
 import { AppError } from '../../../../core/logic/AppError';
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 import { Invoice } from '../../domain/Invoice';
-import { InvoiceMap } from '../../mappers/InvoiceMap';
 import { InvoiceItem } from '../../domain/InvoiceItem';
-import { Payer } from '../../../payers/domain/Payer';
 import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
 import { PayerMap } from '../../../payers/mapper/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Payment } from '../../../payments/domain/Payment';
 import { PaymentMap } from '../../../payments/mapper/Payment';
-import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
+import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 
 export class PublishInvoicePaid {
   constructor(private publishService: SQSPublishServiceContract) {}
@@ -17,21 +14,34 @@ export class PublishInvoicePaid {
     invoice: Invoice,
     invoiceItems: InvoiceItem[],
     manuscript: Manuscript,
-    payment: Payment,
-    paymentMethod: PaymentMethod,
-    payer: Payer
+    paymentDetails: InvoicePaymentInfo
   ): Promise<any> {
     const message = {
       event: 'invoicePaid',
       data: {
         invoiceId: invoice.id.toString(),
-        invoiceReference: invoice.invoiceNumber,
-        invoiceIssueDate: invoice.dateCreated, // TODO change to accepted date
-        invoiceItems: invoiceItems.map(InvoiceItemMap.toPersistence),
-        payer: PayerMap.toPersistence(payer),
-        manuscriptCustomId: manuscript.customId,
-        paymentMethod: paymentMethod.name,
-        paymentInfo: PaymentMap.toPersistence(payment)
+        invoiceItems: invoiceItems.map(ii => ({
+          id: ii.id.toString(),
+          manuscriptCustomId: manuscript.customId,
+          manuscriptId: ii.manuscriptId.id.toString(),
+          type: ii.type,
+          price: ii.price,
+          vatPercentage: ii.vat,
+        })),
+        transactionId: paymentDetails.transactionId,
+        invoiceStatus: paymentDetails.invoiceStatus,
+        invoiceNumber: paymentDetails.invoiceNumber,
+        invoiceIssueDate: paymentDetails.invoiceIssueDate,
+        payerName: paymentDetails.payerName,
+        payerEmail: paymentDetails.payerEmail,
+        payerType: paymentDetails.payerType,
+        vatRegistrationNumber: paymentDetails.vatRegistrationNumber,
+        address: `${paymentDetails.address}, ${paymentDetails.city}, ${paymentDetails.country}`,
+        foreignPaymentId: paymentDetails.foreignPaymentId,
+        country: paymentDetails.country,
+        paymentDate: paymentDetails.paymentDate,
+        paymentType: paymentDetails.paymentType,
+        paymentAmount: paymentDetails.amount,
         // VAT: "todo"
         // couponId: coupon.id,
         // dateApplied: coupon.applied

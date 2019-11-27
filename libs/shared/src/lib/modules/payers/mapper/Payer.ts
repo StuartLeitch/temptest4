@@ -31,7 +31,7 @@ export class PayerMap extends Mapper<Payer> {
         billingAddressId: raw.addressId
           ? AddressId.create(new UniqueEntityID(raw.addressId))
           : AddressId.create(new UniqueEntityID(raw.billingAddressId)),
-        VATId: raw.VATId,
+        VATId: raw.vatId,
         dateAdded: raw.dateAdded ? new Date(raw.dateAdded) : new Date()
       },
       new UniqueEntityID(raw.id)

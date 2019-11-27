@@ -8,6 +8,7 @@ import { TransactionId } from './../../../transactions/domain/TransactionId';
 import { InvoiceRepoContract } from '../invoiceRepo';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
+import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
@@ -109,6 +110,48 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     }
 
     return this.getInvoiceById(invoiceId);
+  }
+
+  async getInvoicePaymentInfo(invoiceId: InvoiceId): Promise<InvoicePaymentInfo> {
+    const result = await this.db
+      .select(
+        'invoices.id as invoiceId',
+        'invoices.transactionId as transactionId',
+        'invoices.status as invoiceStatus',
+        'invoices.invoiceNumber as invoiceNumber',
+        'invoices.dateIssued as invoiceIssueDate',
+        'payers.email as payerEmail',
+        'payers.name as payerName',
+        'payers.type as payerType',
+        'payers.vatId as vatRegistrationNumber',
+        'addressLine1 as address',
+        'city',
+        'country',
+        'payments.foreignPaymentId as foreignPaymentId',
+        'payments.amount as amount',
+        'payments.datePaid as paymentDate',
+        'payment_methods.name as paymentType'
+      )
+      .from('invoices')
+      .join('payers', 'payers.invoiceId', '=', 'invoices.id')
+      .join('addresses', 'payers.billingAddressId', '=', 'addresses.id')
+      .join('payments', 'payments.invoiceId', '=', 'invoices.id')
+      .join(
+        'payment_methods',
+        'payment_methods.id',
+        '=',
+        'payments.paymentMethodId'
+        )
+        .where({ 'invoices.id': invoiceId.id.toString() })
+
+    if (result.length === 0) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice',
+        invoiceId.id.toString()
+      );
+    }
+
+    return result[0];
   }
 
   async delete(invoice: Invoice): Promise<unknown> {

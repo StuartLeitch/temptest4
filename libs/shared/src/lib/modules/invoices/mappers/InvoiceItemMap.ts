@@ -11,6 +11,7 @@ export interface InvoiceItemPersistenceDTO {
   type?: InvoiceItemType;
   name?: string;
   price?: number;
+  vat?: number;
   dateCreated?: Date;
 }
 
@@ -26,6 +27,7 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
         ).getValue(),
         type: raw.type,
         price: raw.price,
+        vat: raw.vat,
         dateCreated: new Date(raw.dateCreated)
       },
       new UniqueEntityID(raw.id)
