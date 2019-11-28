@@ -198,6 +198,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
           manuscript,
           catalogItem,
           invoiceItem,
+          invoice,
           request.paymentApplicationLink
         )
         .sendEmail();

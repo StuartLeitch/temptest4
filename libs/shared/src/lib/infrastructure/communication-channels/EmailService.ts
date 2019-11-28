@@ -3,6 +3,7 @@ import EmailTemplate from '@pubsweet/component-email-templating';
 import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../modules/journals/domain/CatalogItem';
 import { InvoiceItem } from '../../modules/invoices/domain/InvoiceItem';
+import { Invoice } from '../../modules/invoices/domain/Invoice';
 
 interface TemplateProps {
   type: string;
@@ -74,6 +75,7 @@ class EmailService {
     manuscript: Manuscript,
     catalogItem: CatalogItem,
     invoiceItem: InvoiceItem,
+    invoice: Invoice,
     paymentApplicationLink: string
   ) {
     return this.createTemplate({
@@ -90,12 +92,12 @@ class EmailService {
         As an open access journal, publication of articles in ${
           catalogItem.journalTitle
         } is associated with Article Processing Charges that amount to ${
-          catalogItem.currency
-        }${catalogItem.amount}. The total charges for your manuscript ${
+          catalogItem.amount
+        } ${catalogItem.currency}. The total charges for your manuscript ${
           manuscript.customId
-        }, before any taxes, are ${
-          invoiceItem.price
-        } USD. If you are required to pay Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges.
+        }, before any taxes, are ${invoiceItem.price} ${
+          catalogItem.currency
+        }. If you are required to pay Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges.
         <br/><h4>What to do next?</h4>
         This invoice is payable upon receipt. You can access the invoice for your article and make payment through the following URL:
         <br /><br />
@@ -110,7 +112,9 @@ class EmailService {
         <br /><br />
         If paying by credit card, we accept Visa, Mastercard, Discover and Maestro.
         <br /><br />
-        If paying by bank transfer, please use invoice number <strong><-INVOICE_REFERENCE_HERE/-></strong> in the payment reference and return a scanned copy of the payment authorisation by email to facilitate our tracking of your payment.
+        If paying by bank transfer, please use invoice number <strong>${
+          invoice.invoiceNumber
+        }/${invoice.dateIssued.getFullYear()}</strong> in the payment reference and return a scanned copy of the payment authorisation by email to facilitate our tracking of your payment.
         <br /><br />
         Please note that bank transfer payments can take up to a week to arrive and will be confirmed as soon as funds have cleared.
         <br /><br />
