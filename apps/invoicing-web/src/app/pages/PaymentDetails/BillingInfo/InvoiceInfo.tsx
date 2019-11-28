@@ -63,6 +63,7 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
             <Label>EC VAT Reg. No</Label>
             <Text>{vatId}</Text>
           </Flex>
+          <Flex flex={1}></Flex>
         </Flex>
       )}
     </Fragment>
