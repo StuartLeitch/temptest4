@@ -1,9 +1,8 @@
 import {
-  Payment,
   Invoice,
   Payer,
   InvoiceItem,
-  Journal,
+  Address,
   Article
 } from '@hindawi/shared';
 
@@ -12,9 +11,16 @@ export interface ErpData {
   items: InvoiceItem[];
   payer: Payer;
   article: Article;
-  journal: Journal;
+  billingAddress: Address;
+  journalName?: string;
+}
+
+export interface ErpResponse {
+  accountId: string;
+  tradeDocumentId: string;
+  tradeItemIds: string[];
 }
 
 export interface ErpServiceContract {
-  registerInvoice(data: ErpData): Promise<object>;
+  registerInvoice(data: ErpData): Promise<ErpResponse>;
 }

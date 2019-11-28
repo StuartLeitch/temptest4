@@ -14,7 +14,8 @@ export class InvoiceMap extends Mapper<Invoice> {
         status: raw.status,
         invoiceNumber: raw.invoiceNumber,
         dateCreated: new Date(raw.dateCreated),
-        dateIssued: new Date(raw.dateIssued)
+        dateIssued: new Date(raw.dateIssued),
+        erpReference: raw.erpReference
       },
       new UniqueEntityID(raw.id)
     );
@@ -31,7 +32,8 @@ export class InvoiceMap extends Mapper<Invoice> {
       status: invoice.status,
       invoiceNumber: invoice.invoiceNumber,
       dateCreated: invoice.dateCreated,
-      dateIssued: invoice.dateIssued
+      dateIssued: invoice.dateIssued,
+      erpReference: invoice.erpReference
     };
   }
 }

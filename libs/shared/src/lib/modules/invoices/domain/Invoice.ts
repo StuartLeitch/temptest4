@@ -24,7 +24,7 @@ export enum InvoiceStatus {
 
 interface InvoiceProps {
   status: InvoiceStatus;
-  invoiceNumber?: string; // TODO: Auto Increment!?...Smells bad!
+  invoiceNumber?: string;
   transactionId: TransactionId;
   payerId?: PayerId;
   invoiceItems?: InvoiceItems;
@@ -33,6 +33,7 @@ interface InvoiceProps {
   dateIssued?: Date;
   charge?: number;
   totalNumInvoiceItems?: number;
+  erpReference?: string;
 }
 
 export type InvoiceCollection = Invoice[];
@@ -96,6 +97,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set transactionId(transactionId: TransactionId) {
     this.props.transactionId = transactionId;
+  }
+
+  get erpReference(): string {
+    return this.props.erpReference;
+  }
+
+  set erpReference(erpReference: string) {
+    this.props.erpReference = erpReference;
   }
 
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
