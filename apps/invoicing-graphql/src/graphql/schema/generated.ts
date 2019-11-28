@@ -163,6 +163,7 @@ export type Payer = {
   email?: Maybe<Scalars['String']>,
   organization?: Maybe<Scalars['String']>,
   address?: Maybe<Address>,
+  vatId?: Maybe<Scalars['String']>
 };
 
 export type PayerInput = {
@@ -421,6 +422,7 @@ export type PayerResolvers<ContextType = any, ParentType extends ResolversParent
   email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   organization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   address?: Resolver<Maybe<ResolversTypes['Address']>, ParentType, ContextType>,
+  vatId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 };
 
 export type PaymentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {

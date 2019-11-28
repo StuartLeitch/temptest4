@@ -86,6 +86,7 @@ type Payer {
   email: String
   organization: String
   address: Address
+  vatId: String
 }
 
 type Address {

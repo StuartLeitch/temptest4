@@ -14,6 +14,7 @@ export const payerFragment = gql`
     type
     name
     email
+    vatId
     organization
     address {
       ...addressFragment
