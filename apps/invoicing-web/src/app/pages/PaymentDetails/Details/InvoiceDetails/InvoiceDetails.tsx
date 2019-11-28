@@ -16,7 +16,7 @@ const InvoiceDetails: React.FC<Props> = ({ invoice }) => {
     } else {
       const d = new Date(invoice.dateIssued);
       return d.toLocaleString("en-INT", {
-        day: "2-digit",
+        day: "numeric",
         month: "long",
         year: "numeric",
       });
