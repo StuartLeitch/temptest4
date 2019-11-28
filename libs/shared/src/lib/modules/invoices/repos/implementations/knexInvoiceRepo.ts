@@ -170,17 +170,24 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     return deletedRows;
   }
+  
 
   async update(invoice: Invoice): Promise<Invoice> {
     const { db } = this;
 
+    const updateObject:any = {
+      status: invoice.status,
+      dateCreated: invoice.dateCreated,
+      transactionId: invoice.transactionId.id.toString()
+    }
+
+    if (invoice.erpReference) {
+      updateObject.erpReference = invoice.erpReference;
+    }
+
     const updated = await db(TABLES.INVOICES)
       .where({ id: invoice.invoiceId.id.toString() })
-      .update({
-        status: invoice.status,
-        dateCreated: invoice.dateCreated,
-        transactionId: invoice.transactionId.id.toString()
-      });
+      .update(updateObject);
 
     if (!updated) {
       throw RepoError.createEntityNotFoundError(

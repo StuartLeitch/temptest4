@@ -18,6 +18,7 @@ import { Config } from './config';
 import { CheckoutService } from './services/checkout';
 import { AuthService } from './services/auth';
 import { ExchangeRateService } from './../../../libs/shared/src/lib/domain/services/ExchangeRateService';
+import { ErpService } from './services/erp';
 
 const checkoutNodeJsSDK = require('@paypal/checkout-server-sdk');
 
@@ -43,6 +44,7 @@ export interface Context {
   payPalService: any;
   emailService: EmailService;
   exchangeRateService: ExchangeRateService;
+  erpService: ErpService;
 }
 
 function makePayPalEnvironment(
@@ -87,6 +89,7 @@ export function makeContext(config: Config, db: Knex): Context {
     waiverService: new WaiverService(),
     payPalService: () => makePayPal(config),
     emailService: new EmailService(),
-    exchangeRateService: new ExchangeRateService()
+    exchangeRateService: new ExchangeRateService(),
+    erpService: new ErpService(config)
   };
 }

@@ -8,6 +8,7 @@ import { InvoiceItemRepoContract } from '../repos';
 import { ArticleRepoContract } from '../../manuscripts/repos';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
+import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 
 export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
   constructor(
@@ -15,7 +16,8 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceActivated: PublishInvoiceConfirmed
+    private publishInvoiceActivated: PublishInvoiceConfirmed,
+    private invoiceToErpUsecase: PublishInvoiceToErpUsecase
   ) {
     this.setupSubscriptions();
   }
@@ -31,8 +33,10 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
   private async onPublishInvoiceActivated(
     event: InvoiceActivated
   ): Promise<void> {
+    const { invoice } = event;
+    
     try {
-      const { invoice } = event;
+      // todo move this to usescase
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
@@ -67,12 +71,28 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
         payer,
         address
       );
+
       console.log(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`
       );
     } catch (err) {
       console.log(
         `[AfterInvoiceActivated]: Failed to execute onPublishInvoiceActivated use case AfterInvoiceActivated. Err: ${err}`
+      );
+    }
+
+    try {
+      let resp = await this.invoiceToErpUsecase.execute({invoiceId: invoice.id.toString()})
+      if (resp.isLeft()) {
+        throw resp.value;
+      } else {
+        console.log(
+          `[AfterInvoiceActivated]: Successfully executed invoiceToErpUsecase use case AfterInvoiceActivated`
+        );
+      }
+    } catch (error) {
+      console.log(
+        `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error}`
       );
     }
   }

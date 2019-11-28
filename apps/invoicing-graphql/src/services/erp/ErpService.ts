@@ -8,14 +8,10 @@ import {
 import {
   ErpData,
   ErpServiceContract,
-  InvoiceItemType,
   Payer,
-  Invoice,
   PayerType,
   InvoiceItem,
-  Address,
-  Article,
-  Journal
+  ErpResponse,
 } from '@hindawi/shared';
 import { Config } from '../../config';
 
@@ -48,12 +44,12 @@ export class ErpService implements ErpServiceContract {
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
-  async registerInvoice(data: ErpData): Promise<object> {
+  async registerInvoice(data: ErpData): Promise<ErpResponse> {
     if (process.env.ERP_DISABLED === 'true') {
       return;
     }
 
-    const { payer, invoice, article, journal, items } = data;
+    const { items } = data;
 
     const accountId = await this.registerPayer(data);
     const tradeDocumentId = await this.registerTradeDocument(accountId, data);
@@ -94,19 +90,19 @@ export class ErpService implements ErpServiceContract {
     console.log('Register payer');
     const connection = await this.getConnection();
 
-    const { article, payer } = data;
+    const { article, payer, billingAddress } = data;
 
     const name =
       payer.type === PayerType.INDIVIDUAL
-        ? `${payer.name.value} ${article.manuscriptId.id.toString()}`
-        : `${payer.organization.value} ${article.manuscriptId.id.toString()}`;
+        ? `${payer.name.value} ${article.customId}`
+        : `${payer.organization.value} ${article.customId}`;
 
     const accountData = {
       Name: name.slice(0, 70),
-      AccountNumber: article.manuscriptId.id.toString(),
-      // 'BillingAddress': payer.billingAddressId.id.toString(),
-      s2cor__Country_Code__c: payer.country,
-      s2cor__Registration_Number_Type__c: 'VAT Registration Number',
+      AccountNumber: article.customId,
+      // BillingAddress:{Street: billingAddress.addressLine1},
+      s2cor__Country_Code__c: billingAddress.country,
+      s2cor__Registration_Number_Type__c: 'VAT Registration Number', // TODO FM-21
       s2cor__VAT_Registration_Number__c: payer.VATId
     };
 
@@ -134,7 +130,7 @@ export class ErpService implements ErpServiceContract {
     const names = payer.name.value.split(' ');
     const firstName = names[0];
     names.shift();
-    const lastName = names.join(' ');
+    const lastName = names.join(' ') || "---";
 
     const contact = await connection.sobject('Contact').create({
       AccountId: account.id,
@@ -155,32 +151,33 @@ export class ErpService implements ErpServiceContract {
     data: Partial<ErpData>
   ): Promise<string> {
     const connection = await this.getConnection();
-    const { invoice, journal, article, payer } = data;
-    const invoiceDate = invoice.dateCreated;
+    const { invoice, article, payer, billingAddress, journalName } = data;
+    const invoiceDate = invoice.dateIssued;
     const fixedValues = this.fixedValues;
 
-    const description = `${journal.name} - Article Processing Charges for article ${article.manuscriptId}`;
-
+    const description = `${journalName} - Article Processing Charges for article ${article.customId}`;
+    const tradeDocumentObject = {
+      s2cor__Account__c: accountId,
+      s2cor__Approval_Status__c: 'Approved',
+      s2cor__Company__c: fixedValues.companyId,
+      s2cor__Currency__c: fixedValues.currencyId,
+      s2cor__Date__c: invoiceDate,
+      s2cor__Posting_Date__c: invoiceDate,
+      s2cor__Operation_Date__c: invoiceDate,
+      s2cor__Manual_Due_Date__c: invoiceDate,
+      s2cor__Reference__c: `${invoice.invoiceNumber}/${invoiceDate.getFullYear()}`,
+      s2cor__Status__c: 'Submitted',
+      s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
+      s2cor__Legal_Note__c: this.getVatNote(payer),
+      s2cor__BillingCountry__c: billingAddress.country,
+      s2cor__BillingCity__c: billingAddress.city,
+      s2cor__BillingStreet__c: billingAddress.addressLine1,
+      s2cor__Description__c: description
+    }
+    
     const tradeDocument = await connection
       .sobject('s2cor__Sage_INV_Trade_Document__c')
-      .create({
-        s2cor__Account__c: accountId,
-        s2cor__Approval_Status__c: 'Approved',
-        s2cor__Company__c: fixedValues.companyId,
-        s2cor__Currency__c: fixedValues.currencyId,
-        s2cor__Date__c: invoiceDate,
-        s2cor__Posting_Date__c: invoiceDate,
-        s2cor__Operation_Date__c: invoiceDate,
-        s2cor__Manual_Due_Date__c: invoiceDate,
-        s2cor__Reference__c: invoice.invoiceNumber,
-        s2cor__Status__c: 'Submitted',
-        s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
-        s2cor__Legal_Note__c: this.getVatNote(payer),
-        // s2cor__BillingCountry__c: '<payer.countryName>',
-        // s2cor__BillingCity__c: '<payer.city>',
-        // s2cor__BillingStreet__c: '<payer.address>',
-        s2cor__Description__c: description
-      });
+      .create(tradeDocumentObject);
 
     if (!tradeDocument.success) {
       throw tradeDocument;
@@ -197,12 +194,12 @@ export class ErpService implements ErpServiceContract {
     invoiceItem: InvoiceItem
   ): Promise<string> {
     const connection = await this.getConnection();
-    const { journal, article, payer } = data;
+    const { journalName, article, payer } = data;
 
     const description =
       invoiceItem.type === 'APC'
-        ? `${journal.name} - Article Processing Charges for article ${article.manuscriptId}`
-        : `${journal.name} - Article Reprint Charges for article ${article.manuscriptId}`;
+        ? `${journalName} - Article Processing Charges for article ${article.customId}`
+        : `${journalName} - Article Reprint Charges for article ${article.customId}`;
 
     const tradeItem = await connection
       .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
@@ -216,6 +213,7 @@ export class ErpService implements ErpServiceContract {
         s2cor__Unit_Price__c: invoiceItem.price,
         s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
         s2cor__Discount_Amount__c: '0' // TODO fetch from applied coupons/waivers
+        // S2cor__Sage_INV_Trade_Document_Item__c.s2cor__Tax_Amount__c: 'vat amount'
       });
 
     if (!tradeItem.success) {
