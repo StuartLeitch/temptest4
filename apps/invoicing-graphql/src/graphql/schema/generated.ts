@@ -77,6 +77,8 @@ export type InvoiceItem = {
   invoiceId?: Maybe<Scalars['String']>,
   manuscriptId?: Maybe<Scalars['String']>,
   price?: Maybe<Scalars['Float']>,
+  rate?: Maybe<Scalars['Float']>,
+  vat?: Maybe<Scalars['Float']>,
   article?: Maybe<Article>,
   dateCreated?: Maybe<Scalars['Date']>,
 };
@@ -96,7 +98,7 @@ export type Mutation = {
   creditCardPayment: Payment,
   recordPayPalPayment: Payment,
   migratePayment: Payment,
-  migrateInvoice: Invoice,
+  migrateInvoice?: Maybe<Invoice>,
 };
 
 
@@ -127,12 +129,13 @@ export type MutationCreditCardPaymentArgs = {
   creditCard: CreditCardInput
 };
 
+
 export type MutationRecordPayPalPaymentArgs = {
   paymentMethodId: Scalars['String'],
   invoiceId: Scalars['String'],
-  orderId: Scalars['String'],
-  payerId: Scalars['String']
-}
+  payerId: Scalars['String'],
+  orderId: Scalars['String']
+};
 
 
 export type MutationMigratePaymentArgs = {
@@ -144,7 +147,7 @@ export type MutationMigratePaymentArgs = {
 
 
 export type MutationMigrateInvoiceArgs = {
-  invoiceId?: Maybe<Scalars['String']>,
+  invoiceId: Scalars['String'],
   vatValue?: Maybe<Scalars['Float']>,
   invoiceReference?: Maybe<Scalars['String']>,
   discount?: Maybe<Scalars['Float']>,
@@ -394,6 +397,8 @@ export type InvoiceItemResolvers<ContextType = any, ParentType extends Resolvers
   invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   manuscriptId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   article?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType>,
   dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
 };
@@ -404,9 +409,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
   setTransactionToActive?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, MutationSetTransactionToActiveArgs>,
   creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'creditCard'>>,
-  recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'invoiceId' | 'payerId' | 'orderId' | 'paymentMethodId'>>,
+  recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'paymentMethodId' | 'invoiceId' | 'payerId' | 'orderId'>>,
   migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
-  migrateInvoice?: Resolver<ResolversTypes['Invoice'], ParentType, ContextType, MutationMigrateInvoiceArgs>,
+  migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
 };
 
 export type PayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payer'] = ResolversParentTypes['Payer']> = {

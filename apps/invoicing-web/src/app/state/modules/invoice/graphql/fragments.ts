@@ -50,6 +50,8 @@ export const invoiceFragment = gql`
     invoiceItem {
       id
       price
+      rate
+      vat
       dateCreated
       article {
         ...articleFragment

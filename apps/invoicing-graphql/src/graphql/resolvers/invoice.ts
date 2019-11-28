@@ -48,7 +48,9 @@ export const invoice: Resolvers<Context> = {
           status: invoiceDetails.status,
           charge: invoiceDetails.charge,
           dateCreated: invoiceDetails.dateCreated.toISOString(),
-          dateIssued: invoiceDetails.dateIssued.toISOString(),
+          dateIssued:
+            invoiceDetails.dateIssued &&
+            invoiceDetails.dateIssued.toISOString(),
           referenceNumber: invoiceDetails.invoiceNumber
             ? `${
                 invoiceDetails.invoiceNumber
@@ -124,7 +126,8 @@ export const invoice: Resolvers<Context> = {
     },
     async invoiceItem(parent: Invoice, args, context) {
       const {
-        repos: { invoiceItem: invoiceItemRepo, invoice: invoiceRepo }
+        repos: { invoiceItem: invoiceItemRepo, invoice: invoiceRepo },
+        exchangeRateService
       } = context;
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
@@ -141,8 +144,18 @@ export const invoice: Resolvers<Context> = {
       }
 
       const [item] = result.value.getValue();
+      const rawItem = InvoiceItemMap.toPersistence(item);
 
-      return InvoiceItemMap.toPersistence(item);
+      let rate = 1.42; // ! Average value for the last seven years
+      if (parent && parent.dateIssued) {
+        const exchangeRate = await exchangeRateService.getExchangeRate(
+          new Date(parent.dateIssued),
+          'USD'
+        );
+        rate = exchangeRate.exchangeRate;
+      }
+
+      return { ...rawItem, rate: Math.round(rate * 100) / 100 };
     }
   },
   InvoiceItem: {

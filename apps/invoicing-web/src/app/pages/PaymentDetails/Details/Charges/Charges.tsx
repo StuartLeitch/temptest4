@@ -3,12 +3,10 @@ import { LayoutProps, SpaceProps } from "styled-system";
 
 import { Separator, Title, Flex, Icon, Text } from "@hindawi/react-components";
 
-import { ChargeItemGroup } from "../ChargeItemGroup";
 import { Charges as Root } from "./Charges.styles";
 import { TotalCharges } from "../TotalCharges";
 import { ChargeItem } from "../ChargeItem";
 import { VatCharge } from "../VatCharge";
-import invoice from "@hindawi/invoicing-web/app/state/modules/invoice";
 
 interface Props extends LayoutProps, SpaceProps {
   invoiceItem: any;
@@ -40,7 +38,11 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }) => (
       <Separator direction="horizontal" fraction={20} />
     </Flex>
     <ChargeItem price={invoiceItem.price} name="Net Charges" mt="2" />
-    <VatCharge vat={invoiceItem.vat} price={invoiceItem.price} rate={1.3} />
+    <VatCharge
+      vat={invoiceItem.vat}
+      price={invoiceItem.price}
+      rate={invoiceItem.rate}
+    />
     <Separator direction="horizontal" fraction="auto" mx={-2} mt={2} />
     <TotalCharges price={invoiceItem.price} vat={invoiceItem.vat} mt="2" />
     <Flex mt={4} justifyContent="flex-end">

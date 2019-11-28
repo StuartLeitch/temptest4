@@ -7,7 +7,6 @@ const parser = require('xml2json');
 
 export class ExchangeRateService {
   public async getExchangeRate(date: Date, currency: string) {
-    // For 15th of Dec 2019 and USD it should return the value 1.2912
     let rates: any;
 
     try {

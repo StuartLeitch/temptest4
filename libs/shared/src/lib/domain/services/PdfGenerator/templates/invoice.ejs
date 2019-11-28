@@ -212,7 +212,7 @@
           <tr>
             <th class="summary">Total</th>
             <td class="summary">
-              <%= invoice.getInvoiceTotal() + (invoice.vat ? invoice.vat : 0)
+              <%= invoice.getInvoiceTotal() + (invoice.invoiceItem.vat ? invoice.invoiceItem.vat : 0)
                 %>
             </td>
           </tr>

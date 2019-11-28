@@ -14,7 +14,7 @@ export class InvoiceMap extends Mapper<Invoice> {
         status: raw.status,
         invoiceNumber: raw.invoiceNumber,
         dateCreated: new Date(raw.dateCreated),
-        dateIssued: new Date(raw.dateIssued)
+        dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null
       },
       new UniqueEntityID(raw.id)
     );

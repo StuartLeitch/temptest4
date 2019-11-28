@@ -28,7 +28,7 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
 
       return getInvoice.success({
         ...invoice,
-        invoiceItem: { ...invoiceItem, vat: 20 },
+        invoiceItem,
         article,
       });
     }),

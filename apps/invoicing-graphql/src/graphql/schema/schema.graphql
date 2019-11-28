@@ -30,6 +30,8 @@ type InvoiceItem {
   invoiceId: String
   manuscriptId: String
   price: Float
+  rate: Float
+  vat: Float
   article: Article
   dateCreated: Date
 }
@@ -149,11 +151,11 @@ type Mutation {
     datePaid: String
   ): Payment!
   migrateInvoice(
-    invoiceId: String
+    invoiceId: String!
     vatValue: Float
     invoiceReference: String
     discount: Float
     APC: Float
     dateIssued: String
-  ): Invoice!
+  ): Invoice
 }

@@ -49,6 +49,7 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
       manuscriptId: invoiceItem.manuscriptId.id.toString(),
       type: invoiceItem.type,
       price: invoiceItem.price,
+      vat: invoiceItem.vat,
       dateCreated: invoiceItem.dateCreated
     };
   }

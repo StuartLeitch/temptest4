@@ -26,7 +26,7 @@ const VatCharge: React.FC<Props> = ({ vat, price, rate, ...rest }) => {
         <Text type="secondary">
           {`(VAT amount in GBP is ${amountInPounds.toFixed(
             2,
-          )}GBP, 1 GBP = ${rate}USD)`}
+          )} GBP, 1 GBP = ${rate} USD)`}
         </Text>
       </Flex>
     </Fragment>
@@ -34,7 +34,7 @@ const VatCharge: React.FC<Props> = ({ vat, price, rate, ...rest }) => {
 };
 
 VatCharge.defaultProps = {
-  rate: 1.2,
+  rate: 0,
 };
 
 export default VatCharge;
