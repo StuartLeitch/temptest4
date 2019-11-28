@@ -3,6 +3,7 @@ import {
   Payer,
   Address,
   Invoice,
+  InvoiceItem,
   PayerMap,
   AddressMap,
   GetAddressUseCase,
@@ -25,6 +26,7 @@ export const payer: Resolvers<Context> = {
       let address: Address;
       let updatedPayer: Payer;
       let invoice: Invoice;
+      let invoiceItem: InvoiceItem;
 
       const { repos, vatService } = context;
       const usecaseContext = { roles: [Roles.PAYER] };
@@ -94,9 +96,13 @@ export const payer: Resolvers<Context> = {
           !!payer.organization
         );
 
-        const [invoiceItem] = await repos.invoiceItem.getItemsByInvoiceId(
-          invoice.invoiceId
-        );
+        try {
+          [invoiceItem] = await repos.invoiceItem.getItemsByInvoiceId(
+            invoice.invoiceId
+          );
+        } catch (err) {
+          // do nothing yet
+        }
 
         invoiceItem.vat = vat;
 

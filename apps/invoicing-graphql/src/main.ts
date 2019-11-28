@@ -9,7 +9,7 @@ import { queueService } from './queue_service';
 import { registerDomainEvents } from './domain_events';
 
 async function main(): Promise<void> {
-  const config = await makeConfig();
+  const config = makeConfig();
   const db = await makeDb(config);
   const context = makeContext(config, db);
 
