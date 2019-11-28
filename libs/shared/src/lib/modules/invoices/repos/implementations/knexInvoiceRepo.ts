@@ -175,14 +175,8 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   async update(invoice: Invoice): Promise<Invoice> {
     const { db } = this;
 
-    const updateObject:any = {
-      status: invoice.status,
-      dateCreated: invoice.dateCreated,
-      transactionId: invoice.transactionId.id.toString()
-    }
-
-    if (invoice.erpReference) {
-      updateObject.erpReference = invoice.erpReference;
+    const updateObject = {
+      ...InvoiceMap.toPersistence(invoice)
     }
 
     const updated = await db(TABLES.INVOICES)

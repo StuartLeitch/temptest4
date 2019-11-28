@@ -42,6 +42,9 @@ export class ChangeInvoiceStatus
 
       try {
         invoice.status = InvoiceStatus[request.status];
+        if (invoice.status === InvoiceStatus.ACTIVE) {
+          invoice.dateIssued = new Date();
+        }
         await this.invoiceRepo.update(invoice);
       } catch (err) {
         return left(
