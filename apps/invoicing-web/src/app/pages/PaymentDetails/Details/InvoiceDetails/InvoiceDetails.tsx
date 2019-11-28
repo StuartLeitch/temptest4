@@ -10,17 +10,18 @@ interface Props {
 }
 
 const InvoiceDetails: React.FC<Props> = ({ invoice }) => {
-  const parsedDate = useMemo(() => {
-    const d = new Date(invoice.dateCreated);
-
-    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-  }, [invoice.dateCreated]);
-
   const issuedDate = useMemo(() => {
-    const d = new Date(invoice.dateIssued || invoice.dateCreated);
-
-    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-  }, [invoice.dateIssued || invoice.dateCreated]);
+    if (!invoice.dateIssued) {
+      return "-";
+    } else {
+      const d = new Date(invoice.dateIssued);
+      return d.toLocaleString("en-INT", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+    }
+  }, [invoice.dateIssued]);
 
   return (
     <Expander title="Invoice Details" expanded>
