@@ -13,4 +13,6 @@ window._env_ = {
   FOOTER_PRIVACY: "https://www.hindawi.com/privacy/",
   FOOTER_TOS: "https://www.hindawi.com/terms/",
   FOOTER_EMAIL: "invoices@hindawi.com",
+
+  APP_NAME: "Hindawi Invoicing",
 };

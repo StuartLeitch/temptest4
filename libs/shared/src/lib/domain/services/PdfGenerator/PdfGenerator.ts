@@ -4,6 +4,7 @@ import { Readable } from 'stream';
 import { format } from 'date-fns';
 import ejs from 'ejs';
 import pdf from 'html-pdf';
+import countryList from 'country-list';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 
@@ -29,7 +30,8 @@ export class PdfGeneratorService {
       const template = this.getTemplate('invoice');
       const html = template({
         dateFormatFn: format,
-        ...payload
+        ...payload,
+        addressCountry: countryList.getName(payload.address.country)
       });
 
       const pdfOptions: pdf.CreateOptions = {

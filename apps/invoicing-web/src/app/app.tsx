@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, Route } from "react-router-dom";
 import { connect } from "react-redux";
 import { RootState } from "typesafe-actions";
 import styled from "styled-components";
+
+import { config } from "../config";
 
 import { Header } from "./components/Header";
 import { PaymentDetails } from "./pages/PaymentDetails";
 import { invoicesMap } from "./state/redux/root-reducer";
 
 export const App = ({ invoices }) => {
+  useEffect(() => {
+    document.title = config.appName;
+  });
+
   return (
     <div>
       <Header path="Payment Details" />

@@ -17,6 +17,8 @@ export class Config {
   tenantName: string;
   footerTOS: string;
 
+  appName: string;
+
   constructor() {
     this.env = globalConfig.NODE_ENV || "development";
     this.appUrl = globalConfig.APP_URL;
@@ -33,6 +35,8 @@ export class Config {
     this.footerEmail = globalConfig.FOOTER_EMAIL;
     this.tenantName = globalConfig.TENANT_NAME;
     this.footerTOS = globalConfig.FOOTER_TOS;
+
+    this.appName = globalConfig.APP_NAME;
   }
 }
 
