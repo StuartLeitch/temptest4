@@ -17,7 +17,6 @@ interface TemplateProps {
     signatureName?: string;
     subject: string;
     paragraph: string;
-    unsubscribeLink?: string;
     ctaLink?: string;
     footerText?: string;
   };
@@ -74,7 +73,8 @@ class EmailService {
   public createInvoicePaymentTemplate(
     manuscript: Manuscript,
     catalogItem: CatalogItem,
-    invoiceItem: InvoiceItem
+    invoiceItem: InvoiceItem,
+    paymentApplicationLink: string
   ) {
     return this.createTemplate({
       type: 'user',
@@ -84,7 +84,7 @@ class EmailService {
         name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`
       },
       content: {
-        subject: `${manuscript.customId}!!: Article Processing Charges`,
+        subject: `${manuscript.customId}: Article Processing Charges`,
         paragraph: `
         <h4>Thank you for choosing Hindawi to publish your manuscript</h4>
         As an open access journal, publication of articles in ${
@@ -95,14 +95,14 @@ class EmailService {
           manuscript.customId
         }, before any taxes, are ${
           invoiceItem.price
-        }. If you are required to pay Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges.
+        } USD. If you are required to pay Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges.
         <br/><h4>What to do next?</h4>
         This invoice is payable upon receipt. You can access the invoice for your article and make payment through the following URL:
         <br /><br />
         ${EmailService.createSingleButton(
           'INVOICE DETAILS',
           EmailService.createURL(
-            `/payment-details/e23b6c52-eee8-4ca9-bfec-5c9a9d8b00c9`
+            `${paymentApplicationLink}/payment-details/${invoiceItem.invoiceId}`
           )
         )}
         You do not need to login to your account to access the link. After entering your billing address information, you will be able to pay by direct credit card, PayPal or bank transfer.

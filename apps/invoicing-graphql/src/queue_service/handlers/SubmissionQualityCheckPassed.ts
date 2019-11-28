@@ -1,3 +1,5 @@
+import { config } from '../../config';
+
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 
@@ -75,7 +77,8 @@ ${JSON.stringify(data)}
         authorEmail: email,
         authorCountry: country,
         authorSurname: surname,
-        authorFirstName: givenNames
+        authorFirstName: givenNames,
+        paymentApplicationLink: config.feRoot
       },
       defaultContext
     );

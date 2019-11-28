@@ -194,7 +194,12 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
 
       this.emailService
-        .createInvoicePaymentTemplate(manuscript, catalogItem, invoiceItem)
+        .createInvoicePaymentTemplate(
+          manuscript,
+          catalogItem,
+          invoiceItem,
+          request.paymentApplicationLink
+        )
         .sendEmail();
 
       return right(Result.ok<void>());
