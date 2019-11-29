@@ -1,4 +1,4 @@
-import {TaxRuleContract} from '../contracts/TaxRuleContract';
+import { TaxRuleContract } from '../contracts/TaxRuleContract';
 
 /**
  * * Customer Categories:
@@ -36,61 +36,82 @@ export class UKVATTreatmentArticleProcessingChargesRule
    */
   private VATRules = {
     // Belgium
-    BE: {rate: 21},
+    BE: { rate: 21 },
     // Bulgaria
-    BG: {rate: 20},
+    BG: { rate: 20 },
     // Czech Republic
-    CZ: {rate: 21},
+    CZ: { rate: 21 },
     // Denmark
-    DK: {rate: 25},
+    DK: { rate: 25 },
     // Germany
-    DE: {rate: 19},
+    DE: { rate: 19 },
     // Estonia
-    EE: {rate: 20},
+    EE: { rate: 20 },
     // Ireland
-    IE: {rate: 23},
+    IE: { rate: 23 },
     // Greece
-    EL: {rate: 24},
+    EL: { rate: 24 },
     // Spain
-    ES: {rate: 21},
+    ES: { rate: 21 },
     // France
-    FR: {rate: 20},
+    FR: { rate: 20 },
     // Croatia
-    HR: {rate: 25},
+    HR: { rate: 25 },
     // Italy
-    IT: {rate: 22},
+    IT: { rate: 22 },
     // Cyprus
-    CY: {rate: 19},
+    CY: { rate: 19 },
     // Latvia
-    LV: {rate: 21},
+    LV: { rate: 21 },
     // Lithuania
-    LT: {rate: 21},
+    LT: { rate: 21 },
     // Luxembourg
-    LU: {rate: 14},
+    LU: { rate: 14 },
     // Hungary
-    HU: {rate: 27},
+    HU: { rate: 27 },
     // Malta
-    MT: {rate: 18},
+    MT: { rate: 18 },
     // Netherlands
-    NL: {rate: 21},
+    NL: { rate: 21 },
     // Austria
-    AT: {rate: 20},
+    AT: { rate: 20 },
     // Poland
-    PL: {rate: 23},
+    PL: { rate: 23 },
     // Portugal
-    PT: {rate: 23},
+    PT: { rate: 23 },
     // Romania
-    RO: {rate: 19},
+    RO: { rate: 19 },
     // Slovenia
-    SI: {rate: 22},
+    SI: { rate: 22 },
     // Slovakia
-    SK: {rate: 20},
+    SK: { rate: 20 },
     // Finland
-    FI: {rate: 24},
+    FI: { rate: 24 },
     // Sweden
-    SE: {rate: 25},
+    SE: { rate: 25 },
     // United Kingdom
-    UK: {rate: 20}
+    UK: { rate: 20 },
+    // United Kingdom
+    GB: { rate: 20 }
+  };
+
+  private VATNote = {
+    TAX_TREATMENT_EU_AND_UK_TEMPLATE:
+      'UK VAT applies to this invoice, based on the country of the payer. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)',
+    TAX_TREATMENT_REST_OF_THE_WORLD_TEMPLATE:
+      'Outside the scope of UK VAT as per Article 44 of 2006/112/EC',
+    TAX_EU_AND_UK_TREATMENT_VALUE: 'a6B0Y000000fyPVUAY',
+    TAX_EU_ONLY_TREATMENT_VALUE: 'a6B0Y000000fyOuUAI',
+    TAX_REST_OF_THE_WORLD_TREATMENT_VALUE: 'a6B0Y000000fyOyUAI',
+    TAX_EU_AND_UK_TREATMENT_TEXT: 'UK Sale Services',
+    TAX_EU_ONLY_TREATMENT_TEXT: 'EC Sale Services UK',
+    TAX_REST_OF_THE_WORLD_TREATMENT_TEXT: 'Worldwide Sale Services',
+    TAX_EU_AND_UK_TYPE_VALUE: 'a680Y0000000CvBQAU',
+    TAX_EU_ONLY_TYPE_VALUE: 'a680Y0000000CvCQAU',
+    TAX_REST_OF_THE_WORLD_TYPE_VALUE: 'a680Y0000000Cv8QAE',
+    TAX_EU_AND_UK_TYPE_TEXT: 'Standard Rate UK',
+    TAX_TYPE_ZERO_RATE_TEXT: 'Zero Rate UK',
+    TAX_TYPE_EXEMPT_UK_TEXT: 'Exempt UK'
   };
 
   public constructor(
@@ -116,5 +137,49 @@ export class UKVATTreatmentArticleProcessingChargesRule
     }
 
     return VATRate;
+  }
+
+  public getVATNote(): any {
+    const europeanCountriesCodes = Object.keys(this.VATRules);
+    const VATNote = {
+      template: '',
+      tax: {
+        treatment: {
+          value: '',
+          text: ''
+        },
+        type: {
+          value: '',
+          text: ''
+        }
+      }
+    };
+
+    if (!europeanCountriesCodes.includes(this.CountryCode)) {
+      VATNote.template = this.VATNote.TAX_TREATMENT_REST_OF_THE_WORLD_TEMPLATE;
+      VATNote.tax.treatment.value = this.VATNote.TAX_REST_OF_THE_WORLD_TREATMENT_VALUE;
+      VATNote.tax.treatment.text = this.VATNote.TAX_REST_OF_THE_WORLD_TREATMENT_TEXT;
+      VATNote.tax.type.value = this.VATNote.TAX_REST_OF_THE_WORLD_TYPE_VALUE;
+      VATNote.tax.type.text = this.VATNote.TAX_TYPE_EXEMPT_UK_TEXT;
+    } else if (
+      europeanCountriesCodes.includes(this.CountryCode) &&
+      this.CountryCode !== 'UK' &&
+      this.CountryCode !== 'GB' &&
+      this.VATRegistered
+    ) {
+      VATNote.template = this.VATNote.TAX_TREATMENT_REST_OF_THE_WORLD_TEMPLATE;
+      VATNote.tax.treatment.value = this.VATNote.TAX_EU_ONLY_TREATMENT_VALUE;
+      VATNote.tax.treatment.text = this.VATNote.TAX_EU_ONLY_TREATMENT_TEXT;
+      VATNote.tax.type.value = this.VATNote.TAX_EU_ONLY_TYPE_VALUE;
+      VATNote.tax.type.text = this.VATNote.TAX_TYPE_ZERO_RATE_TEXT;
+    } else {
+      VATNote.template = this.VATNote.TAX_TREATMENT_EU_AND_UK_TEMPLATE;
+      VATNote.tax.treatment.value = this.VATNote.TAX_EU_AND_UK_TREATMENT_VALUE;
+      VATNote.tax.treatment.text = this.VATNote.TAX_EU_AND_UK_TREATMENT_TEXT;
+      VATNote.tax.type.value = this.VATNote.TAX_EU_AND_UK_TYPE_VALUE;
+      VATNote.tax.type.text = this.VATNote.TAX_EU_AND_UK_TYPE_TEXT;
+    }
+
+    return VATNote;
   }
 }
