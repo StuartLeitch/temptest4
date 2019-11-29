@@ -45,6 +45,7 @@ export interface Context {
   emailService: EmailService;
   exchangeRateService: ExchangeRateService;
   erpService: ErpService;
+  qq?: any;
 }
 
 function makePayPalEnvironment(

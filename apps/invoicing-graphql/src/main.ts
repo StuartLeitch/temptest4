@@ -11,8 +11,11 @@ import { registerDomainEvents } from './domain_events';
 async function main(): Promise<void> {
   const config = makeConfig();
   const db = await makeDb(config);
-  const context = makeContext(config, db);
-
+  const context = makeContext(config, db) as any;
+  
+  const queue = await queueService;
+  queue.start();
+  context.qq = queue
   const graphqlServer = makeGraphqlServer(context);
   const expressServer = makeExpressServer(context);
 
@@ -21,8 +24,6 @@ async function main(): Promise<void> {
     path: '/graphql'
   });
 
-  const queue = await queueService;
-  queue.start();
 
   // queue.__LOCAL__.handler({
   //   submissionId: '42e12839-188b-4e60-9f09-5636f5e73ae4',

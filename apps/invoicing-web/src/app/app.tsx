@@ -9,6 +9,7 @@ import { config } from "../config";
 import { Header } from "./components/Header";
 import { PaymentDetails } from "./pages/PaymentDetails";
 import { invoicesMap } from "./state/redux/root-reducer";
+import Axios from 'axios';
 
 export const App = ({ invoices }) => {
   useEffect(() => {
@@ -43,6 +44,9 @@ export const App = ({ invoices }) => {
                       <dd>{invoice.type}</dd>
                       <dt>Amount:</dt>
                       <dd>{invoice.price} 💲</dd>
+                      {invoice.status === 'DRAFT'&&<dd><button onClick={()=>{
+                        Axios.post('/api/acceptManuscript', {invoiceId: invoice.id})
+                      }}>Accept manuscript</button></dd>}
                     </InvoiceSubtitle>
                   </div>
                 </InvoiceItem>
