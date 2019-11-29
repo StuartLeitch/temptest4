@@ -53,6 +53,7 @@ export const invoiceFragment = gql`
       price
       rate
       vat
+      vatnote
       dateCreated
       article {
         ...articleFragment

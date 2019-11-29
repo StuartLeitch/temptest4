@@ -12,7 +12,7 @@ import {
   InvoiceStatus
 } from '@hindawi/shared';
 
-import { Resolvers } from '../schema';
+import { Resolvers, PayerType } from '../schema';
 import { Context } from '../../context';
 
 import { CreateAddress } from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
@@ -42,7 +42,7 @@ export const payer: Resolvers<Context> = {
       const createPayerUseCase = new CreatePayerUsecase(repos.payer);
       const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(repos.invoice);
 
-      if (payer.type === 'INSTITUTION') {
+      if (payer.type === PayerType.INSTITUTION) {
         const vatResult = await vatService.checkVAT({
           countryCode: payer.address.country,
           vatNumber: payer.vatId
@@ -93,7 +93,7 @@ export const payer: Resolvers<Context> = {
         // * Apply and save VAT scheme
         const vat = vatService.calculateVAT(
           payer.address.country,
-          payer.type !== 'INDIVIDUAL'
+          payer.type !== PayerType.INDIVIDUAL
         );
 
         try {

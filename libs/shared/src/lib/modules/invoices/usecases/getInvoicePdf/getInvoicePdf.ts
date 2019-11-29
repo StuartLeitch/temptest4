@@ -38,6 +38,10 @@ import { InvoicePayload } from '../../../../domain/services/PdfGenerator/PdfGene
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { pdfGeneratorService } from '../../../../domain/services';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { VATService } from '../../../../domain/services/VATService';
+import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
+
+import { PayerType } from 'libs/shared/src/lib/modules/payers/domain/Payer';
 
 export type GetInvoicePdfContext = AuthorizationContext<Roles>;
 
@@ -90,7 +94,39 @@ export class GetInvoicePdfUsecase
       emptyPayload
     );
 
-    const pdfStreamEither = payloadEither.chain(this.generateThePdf.bind(this));
+    const vatService = new VATService();
+    const exchangeRateService = new ExchangeRateService();
+
+    let rate = 1.42; // ! Average value for the last seven years
+
+    const payloadWithVatNote = await map(
+      [
+        async payload => {
+          const { template } = vatService.getVATNote(
+            payload.address.country,
+            payload.payer.type !== PayerType.INDIVIDUAL
+          );
+
+          if (payload && payload.invoice && payload.invoice.dateIssued) {
+            const exchangeRate = await exchangeRateService.getExchangeRate(
+              new Date(payload.invoice.dateIssued),
+              'USD'
+            );
+            rate = exchangeRate.exchangeRate;
+          }
+
+          payload.invoice.props.rate = Math.round(rate * 100) / 100;
+          payload.invoice.props.vatnote = template;
+
+          return payload;
+        }
+      ],
+      payloadEither
+    );
+
+    const pdfStreamEither = payloadWithVatNote.chain(
+      this.generateThePdf.bind(this)
+    );
 
     const pdfEither: any = await map([streamToPromise], pdfStreamEither);
 

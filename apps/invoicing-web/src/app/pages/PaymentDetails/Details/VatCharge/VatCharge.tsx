@@ -22,13 +22,13 @@ const VatCharge: React.FC<Props> = ({ vat, price, rate, ...rest }) => {
         <Text>${vatAmount.toFixed(2)}</Text>
       </Flex>
 
-      <Flex justifyContent="flex-start">
+      {/* <Flex justifyContent="flex-start">
         <Text type="secondary">
           {`(VAT amount in GBP is ${amountInPounds.toFixed(
             2,
           )} GBP, 1 GBP = ${rate} USD)`}
         </Text>
-      </Flex>
+      </Flex> */}
     </Fragment>
   );
 };
