@@ -165,13 +165,17 @@ export const invoice: Resolvers<Context> = {
       ).getValue();
 
       const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
-      const address = await addressRepo.findById(payer.billingAddressId);
-
-      // * Get the VAT note for the invoice item
-      const { template: vatnote } = vatService.getVATNote(
-        address.country,
-        payer.type !== PayerType.INDIVIDUAL
-      );
+      let vatnote = ' '
+      
+      if (payer && payer.billingAddressId) {
+        const address = await addressRepo.findById(payer.billingAddressId);
+        // * Get the VAT note for the invoice item
+        const { template } = vatService.getVATNote(
+          address.country,
+          payer.type !== PayerType.INSTITUTION
+        );
+        vatnote = template;
+      }
 
       return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote };
     }
