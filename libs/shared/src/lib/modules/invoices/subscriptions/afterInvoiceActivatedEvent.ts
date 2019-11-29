@@ -9,6 +9,7 @@ import { ArticleRepoContract } from '../../manuscripts/repos';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
+import { VATService, PayerType } from '@hindawi/shared';
 
 export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
   constructor(
@@ -34,6 +35,7 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     event: InvoiceActivated
   ): Promise<void> {
     const { invoice } = event;
+    console.log('sending to erp')
     
     try {
       // todo move this to usescase

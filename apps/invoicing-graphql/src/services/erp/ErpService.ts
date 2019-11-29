@@ -11,7 +11,7 @@ import {
   Payer,
   PayerType,
   InvoiceItem,
-  ErpResponse,
+  ErpResponse
 } from '@hindawi/shared';
 import { Config } from '../../config';
 
@@ -130,7 +130,7 @@ export class ErpService implements ErpServiceContract {
     const names = payer.name.value.split(' ');
     const firstName = names[0];
     names.shift();
-    const lastName = names.join(' ') || "---";
+    const lastName = names.join(' ') || '---';
 
     const contact = await connection.sobject('Contact').create({
       AccountId: account.id,
@@ -151,7 +151,14 @@ export class ErpService implements ErpServiceContract {
     data: Partial<ErpData>
   ): Promise<string> {
     const connection = await this.getConnection();
-    const { invoice, article, payer, billingAddress, journalName } = data;
+    const {
+      invoice,
+      article,
+      payer,
+      billingAddress,
+      journalName,
+      vatNote
+    } = data;
     const invoiceDate = invoice.dateIssued;
     const fixedValues = this.fixedValues;
 
@@ -165,16 +172,18 @@ export class ErpService implements ErpServiceContract {
       s2cor__Posting_Date__c: invoiceDate,
       s2cor__Operation_Date__c: invoiceDate,
       s2cor__Manual_Due_Date__c: invoiceDate,
-      s2cor__Reference__c: `${invoice.invoiceNumber}/${invoiceDate.getFullYear()}`,
+      s2cor__Reference__c: `${
+        invoice.invoiceNumber
+      }/${invoiceDate.getFullYear()}`,
       s2cor__Status__c: 'Submitted',
       s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
-      s2cor__Legal_Note__c: this.getVatNote(payer),
+      s2cor__Legal_Note__c: this.getVatNote(vatNote),
       s2cor__BillingCountry__c: billingAddress.country,
       s2cor__BillingCity__c: billingAddress.city,
       s2cor__BillingStreet__c: billingAddress.addressLine1,
       s2cor__Description__c: description
-    }
-    
+    };
+
     const tradeDocument = await connection
       .sobject('s2cor__Sage_INV_Trade_Document__c')
       .create(tradeDocumentObject);
@@ -194,27 +203,29 @@ export class ErpService implements ErpServiceContract {
     invoiceItem: InvoiceItem
   ): Promise<string> {
     const connection = await this.getConnection();
-    const { journalName, article, payer } = data;
-
+    const { journalName, article, payer, vatNote } = data;
     const description =
       invoiceItem.type === 'APC'
         ? `${journalName} - Article Processing Charges for article ${article.customId}`
         : `${journalName} - Article Reprint Charges for article ${article.customId}`;
+    const tdObj = {
+      s2cor__Trade_Document__c: tradeDocumentId,
+      s2cor__Description__c: description,
+      s2cor__Discount_Type__c: 'Amount',
+      s2cor__Quantity__c: '1',
+      s2cor__Tax_Code__c: this.getTaxCode(vatNote),
+      s2cor__Tax_Treatment__c: this.getTaxTreatment(vatNote),
+      s2cor__Unit_Price__c: invoiceItem.price,
+      s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
+      s2cor__Discount_Amount__c: '0', // TODO fetch from applied coupons/waivers
+      s2cor__Tax_Amount__c:  invoiceItem.vat / 100 * invoiceItem.price,
+      s2cor__Tax_Rates__c: invoiceItem.vat.toString() + "%"
+    }
+    console.log({ tdObj });
 
     const tradeItem = await connection
       .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
-      .create({
-        s2cor__Trade_Document__c: tradeDocumentId,
-        s2cor__Description__c: description,
-        s2cor__Discount_Type__c: 'Amount',
-        s2cor__Quantity__c: '1',
-        s2cor__Tax_Code__c: this.getTaxCode(payer),
-        s2cor__Tax_Treatment__c: this.getTaxTreatment(payer),
-        s2cor__Unit_Price__c: invoiceItem.price,
-        s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
-        s2cor__Discount_Amount__c: '0' // TODO fetch from applied coupons/waivers
-        // S2cor__Sage_INV_Trade_Document_Item__c.s2cor__Tax_Amount__c: 'vat amount'
-      });
+      .create({...tdObj,s2cor__Total_Amount__c: tdObj.s2cor__Unit_Price__c + tdObj.s2cor__Tax_Amount__c});
 
     if (!tradeItem.success) {
       throw tradeItem;
@@ -225,18 +236,19 @@ export class ErpService implements ErpServiceContract {
     return tradeItem.id;
   }
 
-  private getTaxCode(payer: Payer): string {
+  private getTaxCode(vatNote: any): string {
     // TODO determine this based on payer country and VAT number
-    return 'a680Y0000000CvBQAU';
+    return vatNote.tax.type.value;
   }
 
-  private getTaxTreatment(payer: Payer): string {
+  private getTaxTreatment(vatNote: any): string {
     // TODO determine this based on payer country and VAT number
-    return 'a6B0Y000000fyOyUAI';
+    return vatNote.tax.treatment.value;
   }
 
-  private getVatNote(payer: Payer): string {
+  private getVatNote(vatNote: any): string {
     // TODO determine this based on payer country and VAT number
-    return 'vat note to be computed';
+
+    return vatNote.template;
   }
 }
