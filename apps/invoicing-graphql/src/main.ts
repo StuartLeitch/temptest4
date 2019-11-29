@@ -158,6 +158,7 @@ async function main(): Promise<void> {
   //     }
   //   ]
   // });
+
   registerDomainEvents(context, queue);
   expressServer.listen(process.env.PORT || 4000);
 }

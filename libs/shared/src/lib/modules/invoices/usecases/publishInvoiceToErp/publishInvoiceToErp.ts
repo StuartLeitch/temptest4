@@ -8,7 +8,9 @@ import {
   InvoiceItemRepoContract,
   PayerRepoContract,
   ArticleRepoContract,
-  InvoiceRepoContract
+  InvoiceRepoContract,
+  VATService,
+  PayerType
 } from '@hindawi/shared';
 import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
 import { right, Result, left } from 'libs/shared/src/lib/core/logic/Result';
@@ -98,13 +100,17 @@ export class PublishInvoiceToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
       }
 
+      const vatService = new VATService();
+      const vatNote = vatService.getVATNote(payer.country, payer.type !== PayerType.INDIVIDUAL)
+
       const erpResponse = await this.erpService.registerInvoice({
         invoice,
         items: invoiceItems,
         payer,
         article: manuscript,
         billingAddress: address,
-        journalName: catalog.journalTitle
+        journalName: catalog.journalTitle,
+        vatNote
       });
 
       console.log(

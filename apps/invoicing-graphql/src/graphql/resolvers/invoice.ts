@@ -12,13 +12,12 @@ import {
   Roles
 } from '@hindawi/shared';
 import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
-import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { MigrateInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/migrateInvoice/migrateInvoice';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 
-import { Resolvers, Invoice } from '../schema';
+import { Resolvers, Invoice, PayerType } from '../schema';
 import { Context } from '../../context';
 
 export const invoice: Resolvers<Context> = {
@@ -126,8 +125,14 @@ export const invoice: Resolvers<Context> = {
     },
     async invoiceItem(parent: Invoice, args, context) {
       const {
-        repos: { invoiceItem: invoiceItemRepo, invoice: invoiceRepo },
-        exchangeRateService
+        repos: {
+          invoiceItem: invoiceItemRepo,
+          invoice: invoiceRepo,
+          payer: payerRepo,
+          address: addressRepo
+        },
+        exchangeRateService,
+        vatService
       } = context;
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
@@ -155,7 +160,20 @@ export const invoice: Resolvers<Context> = {
         rate = exchangeRate.exchangeRate;
       }
 
-      return { ...rawItem, rate: Math.round(rate * 100) / 100 };
+      const invoiceId = InvoiceId.create(
+        new UniqueEntityID(parent.invoiceId)
+      ).getValue();
+
+      const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
+      const address = await addressRepo.findById(payer.billingAddressId);
+
+      // * Get the VAT note for the invoice item
+      const { template: vatnote } = vatService.getVATNote(
+        address.country,
+        payer.type !== PayerType.INDIVIDUAL
+      );
+
+      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote };
     }
   },
   InvoiceItem: {

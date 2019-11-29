@@ -34,6 +34,7 @@ interface InvoiceProps {
   charge?: number;
   totalNumInvoiceItems?: number;
   erpReference?: string;
+  vatnote?: string;
 }
 
 export type InvoiceCollection = Invoice[];

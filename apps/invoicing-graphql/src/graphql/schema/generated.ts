@@ -79,6 +79,7 @@ export type InvoiceItem = {
   price?: Maybe<Scalars['Float']>,
   rate?: Maybe<Scalars['Float']>,
   vat?: Maybe<Scalars['Float']>,
+  vatnote?: Maybe<Scalars['String']>,
   article?: Maybe<Article>,
   dateCreated?: Maybe<Scalars['Date']>,
 };
@@ -163,7 +164,7 @@ export type Payer = {
   email?: Maybe<Scalars['String']>,
   organization?: Maybe<Scalars['String']>,
   address?: Maybe<Address>,
-  vatId?: Maybe<Scalars['String']>
+  vatId?: Maybe<Scalars['String']>,
 };
 
 export type PayerInput = {
@@ -400,6 +401,7 @@ export type InvoiceItemResolvers<ContextType = any, ParentType extends Resolvers
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  vatnote?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   article?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType>,
   dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
 };
@@ -422,7 +424,7 @@ export type PayerResolvers<ContextType = any, ParentType extends ResolversParent
   email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   organization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   address?: Resolver<Maybe<ResolversTypes['Address']>, ParentType, ContextType>,
-  vatId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  vatId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
 
 export type PaymentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {

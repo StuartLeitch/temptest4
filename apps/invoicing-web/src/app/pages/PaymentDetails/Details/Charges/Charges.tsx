@@ -48,7 +48,12 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }) => (
     <Flex mt={4} justifyContent="flex-end">
       <Icon name="warningFilled" color="colors.info" mr={2} />
       <Text>
-        UK VAT applies to this invoice, based on the country of the payer.
+        {invoiceItem.vatnote
+          .replace(
+            "{Vat/Rate}",
+            `${(invoiceItem.vat / invoiceItem.rate).toFixed(2)}`,
+          )
+          .replace("{Rate}", invoiceItem.rate)}
       </Text>
     </Flex>
   </Root>

@@ -13,6 +13,7 @@ export interface ErpData {
   article: Article;
   billingAddress: Address;
   journalName?: string;
+  vatNote?: object
 }
 
 export interface ErpResponse {

@@ -83,4 +83,15 @@ export class VATService {
     const VAT = calculateVAT.getVAT();
     return VAT;
   }
+
+  public getVATNote(country?: string, individualConfirmed?: boolean) {
+    const calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
+      country,
+      !individualConfirmed,
+      individualConfirmed ? false : true
+    ]);
+
+    const VATNote = calculateVAT.getVATNote();
+    return VATNote;
+  }
 }

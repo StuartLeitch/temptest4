@@ -32,6 +32,7 @@ type InvoiceItem {
   price: Float
   rate: Float
   vat: Float
+  vatnote: String
   article: Article
   dateCreated: Date
 }
