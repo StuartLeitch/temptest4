@@ -7,5 +7,4 @@ export interface UpdateTransactionOnAcceptManuscriptDTO {
   authorCountry?: string;
   authorSurname?: string;
   authorFirstName?: string;
-  paymentApplicationLink?: string;
 }

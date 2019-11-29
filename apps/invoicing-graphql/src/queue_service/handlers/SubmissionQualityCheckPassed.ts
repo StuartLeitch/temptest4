@@ -77,8 +77,7 @@ ${JSON.stringify(data)}
         authorEmail: email,
         authorCountry: country,
         authorSurname: surname,
-        authorFirstName: givenNames,
-        paymentApplicationLink: config.feRoot
+        authorFirstName: givenNames
       },
       defaultContext
     );
