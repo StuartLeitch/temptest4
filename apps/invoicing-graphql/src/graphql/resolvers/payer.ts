@@ -93,7 +93,7 @@ export const payer: Resolvers<Context> = {
         // * Apply and save VAT scheme
         const vat = vatService.calculateVAT(
           payer.address.country,
-          payer.type !== PayerType.INDIVIDUAL
+          payer.type !== PayerType.INSTITUTION
         );
 
         try {

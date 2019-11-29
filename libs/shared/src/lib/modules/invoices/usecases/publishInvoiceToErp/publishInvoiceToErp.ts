@@ -101,7 +101,7 @@ export class PublishInvoiceToErpUsecase
       }
 
       const vatService = new VATService();
-      const vatNote = vatService.getVATNote(payer.country, payer.type !== PayerType.INDIVIDUAL)
+      const vatNote = vatService.getVATNote(address.country, payer.type !== PayerType.INSTITUTION)
 
       const erpResponse = await this.erpService.registerInvoice({
         invoice,

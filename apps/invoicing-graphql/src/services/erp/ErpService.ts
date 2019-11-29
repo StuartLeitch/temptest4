@@ -102,7 +102,7 @@ export class ErpService implements ErpServiceContract {
       AccountNumber: article.customId,
       // BillingAddress:{Street: billingAddress.addressLine1},
       s2cor__Country_Code__c: billingAddress.country,
-      s2cor__Registration_Number_Type__c: 'VAT Registration Number', // TODO FM-21
+      s2cor__Registration_Number_Type__c: 'VAT Registration Number',
       s2cor__VAT_Registration_Number__c: payer.VATId
     };
 
@@ -219,13 +219,13 @@ export class ErpService implements ErpServiceContract {
       s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
       s2cor__Discount_Amount__c: '0', // TODO fetch from applied coupons/waivers
       s2cor__Tax_Amount__c:  invoiceItem.vat / 100 * invoiceItem.price,
-      s2cor__Tax_Rates__c: invoiceItem.vat.toString() + "%"
+      s2cor__Tax_Rates__c: invoiceItem.vat.toString() 
     }
     console.log({ tdObj });
 
     const tradeItem = await connection
       .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
-      .create({...tdObj,s2cor__Total_Amount__c: tdObj.s2cor__Unit_Price__c + tdObj.s2cor__Tax_Amount__c});
+      .create(tdObj);
 
     if (!tradeItem.success) {
       throw tradeItem;

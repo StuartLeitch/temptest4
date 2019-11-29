@@ -104,7 +104,7 @@ export class GetInvoicePdfUsecase
         async payload => {
           const { template } = vatService.getVATNote(
             payload.address.country,
-            payload.payer.type !== PayerType.INDIVIDUAL
+            payload.payer.type !== PayerType.INSTITUTION
           );
 
           if (payload && payload.invoice && payload.invoice.dateIssued) {
