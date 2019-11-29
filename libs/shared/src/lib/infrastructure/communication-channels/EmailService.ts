@@ -32,7 +32,7 @@ class EmailService {
   private email: any;
 
   static createURL(path: string) {
-    return `${process.env.APP_URL}${path}`;
+    return `${process.env.FE_ROOT}${path}`;
   }
 
   static createSingleButton(label: string, link: string) {
@@ -75,8 +75,7 @@ class EmailService {
     manuscript: Manuscript,
     catalogItem: CatalogItem,
     invoiceItem: InvoiceItem,
-    invoice: Invoice,
-    paymentApplicationLink: string
+    invoice: Invoice
   ) {
     return this.createTemplate({
       type: 'user',
@@ -104,7 +103,7 @@ class EmailService {
         ${EmailService.createSingleButton(
           'INVOICE DETAILS',
           EmailService.createURL(
-            `${paymentApplicationLink}/payment-details/${invoiceItem.invoiceId}`
+            `/payment-details/${invoiceItem.invoiceId.id.toString()}`
           )
         )}
         You do not need to login to your account to access the link. After entering your billing address information, you will be able to pay by direct credit card, PayPal or bank transfer.
@@ -114,7 +113,9 @@ class EmailService {
         <br /><br />
         If paying by bank transfer, please use invoice number <strong>${
           invoice.invoiceNumber
-        }/${invoice.dateIssued.getFullYear()}</strong> in the payment reference and return a scanned copy of the payment authorisation by email to facilitate our tracking of your payment.
+        }/${(
+          invoice.dateIssued || invoice.dateCreated
+        ).getFullYear()}</strong> in the payment reference and return a scanned copy of the payment authorisation by email to facilitate our tracking of your payment.
         <br /><br />
         Please note that bank transfer payments can take up to a week to arrive and will be confirmed as soon as funds have cleared.
         <br /><br />

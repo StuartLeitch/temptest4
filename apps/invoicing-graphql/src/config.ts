@@ -54,8 +54,6 @@ export class Config {
       environment: process.env.PP_ENVIRONMENT,
       clientId: process.env.PP_CLIENT_ID
     };
-
-    this.feRoot = process.env.FE_ROOT;
   }
 }
 
