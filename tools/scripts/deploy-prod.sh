@@ -1,7 +1,7 @@
 #!/bin/sh
 
-export AWS_REGISTRY="496598730381.dkr.ecr.eu-west-1.amazonaws.com"
-export AWS_ENVIRONMENT="demo"
+export AWS_REGISTRY="918602980697.dkr.ecr.eu-west-1.amazonaws.com"
+export AWS_ENVIRONMENT="prod"
 export APP="invoicing-graphql"
 export TO="${AWS_ENVIRONMENT}-${APP}"
 export TIMESTAMP=$(date +'%d_%m_%Y_%R')
@@ -25,10 +25,10 @@ fi;
 
 CURR_DIR="$(dirname $0)"
 
-printf -- '\033[33m>\033[0m Deploy Back End App for "demo" environment\n'
+printf -- '\033[33m\033[1m > Deploy Back End App for "prod" environment\033[0m\n'
 ./$CURR_DIR/deploy-$AWS_ENVIRONMENT-backend.sh
 
-printf -- '\033[33m>\033[0m Deploy Front End App for "demo" environment\n'
+printf -- '\033[33m\033[1m > Deploy Front End App for "prod" environment\033[0m\n'
 ./$CURR_DIR/deploy-$AWS_ENVIRONMENT-frontend.sh
 
 printf -- '\n';
