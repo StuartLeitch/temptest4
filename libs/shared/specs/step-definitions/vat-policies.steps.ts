@@ -1,7 +1,5 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 
-// import {Result} from '../../lib/core/Result';
-// import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
 import {
   Invoice,
   InvoiceStatus
@@ -15,8 +13,6 @@ import { Roles } from '../../src/lib/modules/users/domain/enums/Roles';
 
 import { Payer, PayerType } from '../../src/lib/modules/payers/domain/Payer';
 import { PayerMap } from '../../src/lib/modules/payers/mapper/Payer';
-// import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
-// import {PayerType} from '../../src/lib/modules/payers/domain/PayerType';
 import { MockPayerRepo } from '../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { InvoiceMap } from './../../src/lib/modules/invoices/mappers/InvoiceMap';
 
@@ -402,110 +398,110 @@ defineFeature(feature, test => {
     );
   });
 
-  test('UK VAT treatment of publication not owned by Hindawi', ({
-    given,
-    when,
-    and,
-    then
-  }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
+  // test('UK VAT treatment of publication not owned by Hindawi', ({
+  //   given,
+  //   when,
+  //   and,
+  //   then
+  // }) => {
+  //   given(/^The Payer is in (\w+)$/, (country: string) => {
+  //     countryCode = country;
+  //   });
 
-    and(
-      'The payer wants to purchase a publication NOT owned by Hindawi',
-      () => {
-        PublicationNotOwnedPolicy = new VATTreatmentPublicationNotOwnedPolicy();
+  //   and(
+  //     'The payer wants to purchase a publication NOT owned by Hindawi',
+  //     () => {
+  //       PublicationNotOwnedPolicy = new VATTreatmentPublicationNotOwnedPolicy();
 
-        policiesRegister.registerPolicy(PublicationNotOwnedPolicy);
-      }
-    );
+  //       policiesRegister.registerPolicy(PublicationNotOwnedPolicy);
+  //     }
+  //   );
 
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const VATRegistered = false;
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
+  //   when(
+  //     /^The invoice net value is (\d+)$/,
+  //     async (invoiceNetValue: string) => {
+  //       const asBusiness = false;
+  //       const VATRegistered = false;
+  //       const invoiceResult = await getInvoiceDetailsUsecase.execute(
+  //         {
+  //           invoiceId
+  //         },
+  //         defaultContext
+  //       );
 
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
+  //       if (invoiceResult.isRight()) {
+  //         invoice = invoiceResult.value.getValue();
+  //       }
+  //       netValue = parseInt(invoiceNetValue, 10);
+  //       // invoice.netAmount = netValue;
 
-        calculateVAT = policiesRegister.applyPolicy(
-          PublicationNotOwnedPolicy.getType(),
-          [countryCode, asBusiness, VATRegistered]
-        );
+  //       calculateVAT = policiesRegister.applyPolicy(
+  //         PublicationNotOwnedPolicy.getType(),
+  //         [countryCode, asBusiness, VATRegistered]
+  //       );
 
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
+  //       const VAT = calculateVAT.getVAT();
+  //       // invoice.addTax(VAT);
+  //     }
+  //   );
 
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
-    );
-  });
+  //   then(
+  //     /^The invoice total amount is (\d+)$/,
+  //     async (expectedTotalAmount: string) => {
+  //       // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
+  //     }
+  //   );
+  // });
 
-  test('UK VAT treatment of the supply of hard copy publications', ({
-    given,
-    when,
-    and,
-    then
-  }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
+  // test('UK VAT treatment of the supply of hard copy publications', ({
+  //   given,
+  //   when,
+  //   and,
+  //   then
+  // }) => {
+  //   given(/^The Payer is in (\w+)$/, (country: string) => {
+  //     countryCode = country;
+  //   });
 
-    and('The payer wants to purchase a hard copy', () => {
-      HardCopyPolicy = new UKVATTreatmentOfHardCopyPublicationsPolicy();
+  //   and('The payer wants to purchase a hard copy', () => {
+  //     HardCopyPolicy = new UKVATTreatmentOfHardCopyPublicationsPolicy();
 
-      policiesRegister.registerPolicy(HardCopyPolicy);
-    });
+  //     policiesRegister.registerPolicy(HardCopyPolicy);
+  //   });
 
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
+  //   when(
+  //     /^The invoice net value is (\d+)$/,
+  //     async (invoiceNetValue: string) => {
+  //       const asBusiness = false;
+  //       const invoiceResult = await getInvoiceDetailsUsecase.execute(
+  //         {
+  //           invoiceId
+  //         },
+  //         defaultContext
+  //       );
 
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
+  //       if (invoiceResult.isRight()) {
+  //         invoice = invoiceResult.value.getValue();
+  //       }
 
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
+  //       netValue = parseInt(invoiceNetValue, 10);
+  //       // invoice.netAmount = netValue;
 
-        calculateVAT = policiesRegister.applyPolicy(HardCopyPolicy.getType(), [
-          countryCode,
-          asBusiness
-        ]);
+  //       calculateVAT = policiesRegister.applyPolicy(HardCopyPolicy.getType(), [
+  //         countryCode,
+  //         asBusiness
+  //       ]);
 
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
+  //       const VAT = calculateVAT.getVAT();
+  //       // invoice.addTax(VAT);
+  //     }
+  //   );
 
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
-    );
-  });
+  //   then(
+  //     /^The invoice total amount is (\d+)$/,
+  //     async (expectedTotalAmount: string) => {
+  //       // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
+  //     }
+  //   );
+  // });
 });

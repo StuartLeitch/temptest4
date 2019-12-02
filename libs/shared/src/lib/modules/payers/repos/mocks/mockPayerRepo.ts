@@ -1,8 +1,9 @@
-import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
+import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
-import {PayerRepoContract} from '../payerRepo';
-import {Payer} from '../../domain/Payer';
-import {PayerId} from '../../domain/PayerId';
+import { PayerRepoContract } from '../payerRepo';
+import { Payer } from '../../domain/Payer';
+import { PayerId } from '../../domain/PayerId';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 // import {TransactionId} from '../../../transactions/domain/TransactionId';
 
 export class MockPayerRepo extends BaseMockRepo<Payer>
@@ -13,6 +14,15 @@ export class MockPayerRepo extends BaseMockRepo<Payer>
 
   public async getPayerById(payerId: PayerId): Promise<Payer> {
     const matches = this._items.filter(p => p.payerId.equals(payerId));
+    if (matches.length !== 0) {
+      return matches[0];
+    } else {
+      return null;
+    }
+  }
+
+  public async getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Payer> {
+    const matches = this._items.filter(p => p.invoiceId.equals(invoiceId));
     if (matches.length !== 0) {
       return matches[0];
     } else {

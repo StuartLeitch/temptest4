@@ -1,10 +1,11 @@
-import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
+import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
-import {InvoiceRepoContract} from '../invoiceRepo';
-import {Invoice} from '../../domain/Invoice';
-import {InvoiceId} from '../../domain/InvoiceId';
-import {InvoiceItemId} from '../../domain/InvoiceItemId';
-import {TransactionId} from '../../../transactions/domain/TransactionId';
+import { InvoiceRepoContract } from '../invoiceRepo';
+import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
+import { Invoice } from '../../domain/Invoice';
+import { InvoiceId } from '../../domain/InvoiceId';
+import { InvoiceItemId } from '../../domain/InvoiceItemId';
+import { TransactionId } from '../../../transactions/domain/TransactionId';
 
 export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   implements InvoiceRepoContract {
@@ -44,8 +45,22 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     }
   }
 
+  async getRecentInvoices(): Promise<any[]> {
+    return this._items;
+  }
+
   public async getInvoiceCollection(): Promise<Invoice[]> {
     return this._items; // .filter(i => i.invoiceId.id.toString() === invoiceId);
+  }
+
+  public async getInvoicePaymentInfo(
+    invoiceId: InvoiceId
+  ): Promise<InvoicePaymentInfo> {
+    return null;
+  }
+
+  public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
+    return null;
   }
 
   public async save(invoice: Invoice): Promise<Invoice> {
