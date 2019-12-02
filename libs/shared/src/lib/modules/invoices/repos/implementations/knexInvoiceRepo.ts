@@ -88,7 +88,8 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     const invoice = await this.getInvoiceById(invoiceId);
     if (invoice.invoiceNumber) {
-      throw RepoError.fromDBError(new Error('Invoice number already set'));
+      console.log('Invoice number already set')
+      return invoice
     }
 
     const updated = await db(TABLES.INVOICES)
