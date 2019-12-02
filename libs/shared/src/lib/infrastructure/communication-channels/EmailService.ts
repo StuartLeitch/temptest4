@@ -79,7 +79,7 @@ class EmailService {
   ) {
     return this.createTemplate({
       type: 'user',
-      fromEmail: 'invoices@hindawi.com',
+      fromEmail: 'Hindawi Invoicing <invoices@hindawi.com>',
       toUser: {
         email: manuscript.authorEmail,
         name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`
