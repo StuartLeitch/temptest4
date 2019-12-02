@@ -165,8 +165,8 @@ export const invoice: Resolvers<Context> = {
       ).getValue();
 
       const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
-      let vatnote = ' '
-      
+
+      let vatnote = ' ';
       if (payer && payer.billingAddressId) {
         const address = await addressRepo.findById(payer.billingAddressId);
         // * Get the VAT note for the invoice item
@@ -177,7 +177,7 @@ export const invoice: Resolvers<Context> = {
         vatnote = template;
       }
 
-      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote };
+      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote: ' ' };
     }
   },
   InvoiceItem: {

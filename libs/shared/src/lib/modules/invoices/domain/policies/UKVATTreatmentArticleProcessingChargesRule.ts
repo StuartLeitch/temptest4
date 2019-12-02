@@ -128,10 +128,8 @@ export class UKVATTreatmentArticleProcessingChargesRule
     const europeanCountriesCodes = Object.keys(this.VATRules);
     let VATRate = 0;
 
-    console.info(this.CountryCode);
-
     if (europeanCountriesCodes.includes(this.CountryCode)) {
-      VATRate = this.VATRules[this.CountryCode].rate;
+      //  VATRate = this.VATRules[this.CountryCode].rate;
       // institutions should have 0 vat
       if (!this.AsBusiness && !this.VATRegistered) {
         VATRate = this.VATRules.UK.rate;
