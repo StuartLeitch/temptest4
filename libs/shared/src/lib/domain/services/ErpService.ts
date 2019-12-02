@@ -14,6 +14,7 @@ export interface ErpData {
   billingAddress: Address;
   journalName?: string;
   vatNote?: object
+  rate?: number
 }
 
 export interface ErpResponse {

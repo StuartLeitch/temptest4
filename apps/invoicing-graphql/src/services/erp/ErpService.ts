@@ -154,10 +154,11 @@ export class ErpService implements ErpServiceContract {
     const {
       invoice,
       article,
-      payer,
+      items,
       billingAddress,
       journalName,
-      vatNote
+      vatNote,
+      rate
     } = data;
     const invoiceDate = invoice.dateIssued;
     const fixedValues = this.fixedValues;
@@ -177,7 +178,7 @@ export class ErpService implements ErpServiceContract {
       }/${invoiceDate.getFullYear()}`,
       s2cor__Status__c: 'Submitted',
       s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
-      s2cor__Legal_Note__c: this.getVatNote(vatNote),
+      s2cor__Legal_Note__c: this.getVatNote(vatNote, items, rate),
       s2cor__BillingCountry__c: billingAddress.country,
       s2cor__BillingCity__c: billingAddress.city,
       s2cor__BillingStreet__c: billingAddress.addressLine1,
@@ -218,10 +219,9 @@ export class ErpService implements ErpServiceContract {
       s2cor__Unit_Price__c: invoiceItem.price,
       s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
       s2cor__Discount_Amount__c: '0', // TODO fetch from applied coupons/waivers
-      s2cor__Tax_Amount__c:  invoiceItem.vat / 100 * invoiceItem.price,
-      s2cor__Tax_Rates__c: invoiceItem.vat.toString() 
-    }
-    console.log({ tdObj });
+      s2cor__Tax_Amount__c: (invoiceItem.vat / 100) * invoiceItem.price,
+      s2cor__Tax_Rates__c: invoiceItem.vat.toString()
+    };
 
     const tradeItem = await connection
       .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
@@ -237,18 +237,26 @@ export class ErpService implements ErpServiceContract {
   }
 
   private getTaxCode(vatNote: any): string {
-    // TODO determine this based on payer country and VAT number
     return vatNote.tax.type.value;
   }
 
   private getTaxTreatment(vatNote: any): string {
-    // TODO determine this based on payer country and VAT number
     return vatNote.tax.treatment.value;
   }
 
-  private getVatNote(vatNote: any): string {
-    // TODO determine this based on payer country and VAT number
-
-    return vatNote.template;
+  private getVatNote(
+    vatNote: any,
+    invoiceItems: InvoiceItem[],
+    rate: number
+  ): string {
+    const { template } = vatNote;
+    return template
+      .replace(
+        '{Vat/Rate}',
+        `${(
+          invoiceItems.reduce((acc, curr) => acc + (curr.vat / 100) * curr.price, 0) / rate
+        ).toFixed(2)}`
+      )
+      .replace('{Rate}', rate);
   }
 }
