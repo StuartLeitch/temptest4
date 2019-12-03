@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import { ASTNode } from "graphql";
 
-import { invoiceFragment } from "./fragments";
+import { invoiceFragment, invoiceVatFragment } from "./fragments";
 
 export const getInvoice: ASTNode = gql`
   query invoice($id: String) {
@@ -24,4 +24,13 @@ export const getInvoices: ASTNode = gql`
       dateCreated
     }
   }
+`;
+
+export const getInvoiceVat: ASTNode = gql`
+  query invoiceWithVat($invoiceId: String, $country: String, $payerType: String) {
+    invoiceVat(invoiceId: $invoiceId, country: $country, payerType: $payerType) {
+      ...invoiceVatFragment
+    }
+  }
+  ${invoiceVatFragment}
 `;

@@ -15,12 +15,14 @@ import { PAYMENT_TYPES } from "./types";
 import CountryField from "./CountryField";
 import IconRadioButton from "./IconRadioButton";
 import ConfirmationModal from "./ConfirmationModal";
+import VatChargesObserver from './VATChargesObserver';
 
 interface Props {
   payer: any;
   error: string;
   loading: boolean;
   handleSubmit(payer: any): any;
+  onVatFieldChange(country: string, paymentType: string): any;
 }
 
 const FormTextarea = field => (
@@ -88,6 +90,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
   error,
   loading,
   handleSubmit,
+  onVatFieldChange
 }) => {
   const { invoiceId } = useParams();
   const { showModal, hideModal } = useModalActions();
@@ -119,6 +122,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
       }) => {
         return (
           <Fragment>
+            <VatChargesObserver country={values.address.country} paymentType={values.type} onChange={onVatFieldChange} />
             <Flex m={2} vertical>
               <Label required>Who is making the payment?</Label>
               <Flex mt={1} mb={4}>

@@ -18,6 +18,8 @@ export interface InvoiceItem {
   manuscriptId: string;
   price: number;
   vat: number;
+  rate: number;
+  vatnote: string;
 }
 
 export interface Invoice {
@@ -54,4 +56,16 @@ export interface InvoiceState {
   invoice: any;
   payerLoading: LoadingState;
   invoiceLoading: LoadingState;
+}
+
+export interface InvoiceVATDTO {
+  invoiceId: string;
+  country: string;
+  payerType: string;
+}
+
+export interface InvoiceVat {
+  rate: number;
+  vatNote: string;
+  vatPercentage: number;
 }

@@ -1,4 +1,4 @@
-import { RootEpic, isActionOf } from "typesafe-actions";
+import { RootEpic, isActionOf, action } from "typesafe-actions";
 import { of, from } from "rxjs";
 import {
   map,
@@ -7,13 +7,13 @@ import {
   mergeMap,
   switchMap,
   catchError,
-  withLatestFrom,
+  withLatestFrom
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
 import { invoice } from "./selectors";
 import { queries, mutations } from "./graphql";
-import { getInvoice, getInvoices, updatePayerAsync } from "./actions";
+import { getInvoice, getInvoices, updatePayerAsync, getInvoiceVat } from "./actions";
 
 const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
@@ -70,4 +70,14 @@ const fetchInvoicesEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   );
 };
 
-export default [fetchInvoiceEpic, updatePayerEpic, fetchInvoicesEpic];
+const getInvoiceVatEpic: RootEpic =(action$, _, { graphqlAdapter }) => {
+  return action$.pipe(
+    filter(isActionOf(getInvoiceVat.request)),
+    delay(500),
+    switchMap(action => graphqlAdapter.send(queries.getInvoiceVat, {...action.payload})),
+    map(r => getInvoiceVat.success(r.data.invoiceVat)),
+    catchError(err => of(getInvoiceVat.failure(err.message))),
+  )
+}
+
+export default [fetchInvoiceEpic, updatePayerEpic, fetchInvoicesEpic, getInvoiceVatEpic];

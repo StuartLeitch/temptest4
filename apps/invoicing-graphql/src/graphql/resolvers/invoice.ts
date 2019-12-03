@@ -105,6 +105,51 @@ export const invoice: Resolvers<Context> = {
           invoiceId: invoiceId.id.toString()
         };
       }
+    },
+
+    async invoiceVat(parent, args, context) {
+      const { repos, exchangeRateService, vatService } = context;
+      const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
+
+      const request: GetInvoiceDetailsDTO = {
+        invoiceId: args.invoiceId
+      };
+      const usecaseContext = {
+        roles: [Roles.PAYER]
+      };
+
+      const result = await usecase.execute(request, usecaseContext);
+      if (result.isLeft()) {
+        return undefined;
+      } else {
+        // There is a TSLint error for when try to use a shadowed variable!
+        const invoiceDetails = result.value.getValue();
+
+        let rate = 1.42; // ! Average value for the last seven years
+
+          try {
+            const exchangeRate = await exchangeRateService.getExchangeRate(
+              new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
+              'USD'
+            );
+            rate = exchangeRate.exchangeRate;
+          } catch (error) {}
+
+
+        let vatNote = vatService.getVATNote(
+          args.country,
+          args.payerType !== PayerType.INSTITUTION
+        );
+        let vatPercentage = vatService.calculateVAT(
+          args.country,
+          args.payerType !== PayerType.INSTITUTION
+        );
+        return {
+          rate,
+          vatNote: vatNote.template,
+          vatPercentage
+        };
+      }
     }
   },
   Invoice: {
@@ -177,7 +222,7 @@ export const invoice: Resolvers<Context> = {
         vatnote = template;
       }
 
-      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote: ' ' };
+      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote };
     }
   },
   InvoiceItem: {

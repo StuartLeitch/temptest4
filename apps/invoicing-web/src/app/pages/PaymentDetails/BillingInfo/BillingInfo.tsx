@@ -11,6 +11,7 @@ interface Props {
   loading: boolean;
   status: "DRAFT" | "ACTIVE" | "FINAL";
   handleSubmit(payer: any): any;
+  onVatFieldChange(country: string, paymentType: string): any;
 }
 
 const BillingInfo: React.FC<Props> = ({
@@ -19,6 +20,7 @@ const BillingInfo: React.FC<Props> = ({
   status,
   loading,
   handleSubmit,
+  onVatFieldChange
 }) => {
   return (
     <Expander mb={6} flex={2} expanded={true} title="1. Payer details">
@@ -31,6 +33,7 @@ const BillingInfo: React.FC<Props> = ({
             error={error}
             loading={loading}
             handleSubmit={handleSubmit}
+            onVatFieldChange={onVatFieldChange}
           />
         )}
       </Root>

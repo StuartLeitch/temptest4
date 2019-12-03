@@ -54,6 +54,12 @@ type Invoice {
   type: String
 }
 
+type InvoiceVat {
+  vatPercentage: Float
+  vatNote: String
+  rate: Float
+}
+
 type InvoiceId {
   invoiceId: String
 }
@@ -124,6 +130,7 @@ type PaymentMethod {
 type Query {
   getPaymentMethods: [PaymentMethod]
   invoice(invoiceId: String): Invoice
+  invoiceVat(invoiceId: String, country: String, payerType: String): InvoiceVat
   invoices: [Invoice]
   invoiceIdByManuscriptCustomId(customId: String): InvoiceId
   echo(value: String): String
