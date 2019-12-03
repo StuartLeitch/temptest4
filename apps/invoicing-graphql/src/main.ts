@@ -12,10 +12,10 @@ async function main(): Promise<void> {
   const config = makeConfig();
   const db = await makeDb(config);
   const context = makeContext(config, db) as any;
-  
+
   const queue = await queueService;
   queue.start();
-  context.qq = queue
+  context.qq = queue;
   const graphqlServer = makeGraphqlServer(context);
   const expressServer = makeExpressServer(context);
 
@@ -23,7 +23,6 @@ async function main(): Promise<void> {
     app: expressServer,
     path: '/graphql'
   });
-
 
   // queue.__LOCAL__.handler({
   //   submissionId: '42e12839-188b-4e60-9f09-5636f5e73ae4',
