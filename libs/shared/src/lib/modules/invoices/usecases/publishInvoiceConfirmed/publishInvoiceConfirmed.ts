@@ -23,6 +23,7 @@ export class PublishInvoiceConfirmed {
       data: {
         invoiceId: invoice.id.toString(),
         invoiceNumber: invoice.invoiceNumber,
+        referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
         invoiceIssueDate: invoice.dateIssued,
         invoiceItems: invoiceItems.map(ii => ({
           id: ii.id.toString(),

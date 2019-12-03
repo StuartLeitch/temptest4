@@ -30,6 +30,7 @@ interface InvoiceProps {
   invoiceItems?: InvoiceItems;
   dateCreated?: Date;
   dateUpdated?: Date;
+  dateAccepted?: Date;
   dateIssued?: Date;
   charge?: number;
   totalNumInvoiceItems?: number;
@@ -82,6 +83,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get dateCreated(): Date {
     return this.props.dateCreated;
+  }
+
+  get dateAccepted(): Date {
+    return this.props.dateAccepted;
+  }
+
+  set dateAccepted(dateAccepted: Date) {
+    this.props.dateAccepted = dateAccepted
   }
 
   get invoiceItems(): InvoiceItems {

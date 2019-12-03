@@ -42,6 +42,7 @@ type Invoice {
   dateCreated: String
   dateChanged: String
   dateIssued: String
+  dateAccepted: String
   vat: Float
   charge: Float
   status: InvoiceStatus

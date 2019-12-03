@@ -173,9 +173,10 @@ export class ErpService implements ErpServiceContract {
       s2cor__Posting_Date__c: invoiceDate,
       s2cor__Operation_Date__c: invoiceDate,
       s2cor__Manual_Due_Date__c: invoiceDate,
-      s2cor__Reference__c: `${
-        invoice.invoiceNumber
-      }/${invoiceDate.getFullYear()}`,
+      s2cor__Reference__c:
+        invoice.invoiceNumber &&
+        invoice.dateAccepted &&
+        `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
       s2cor__Status__c: 'Submitted',
       s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
       s2cor__Legal_Note__c: this.getVatNote(vatNote, items, rate),
@@ -254,7 +255,10 @@ export class ErpService implements ErpServiceContract {
       .replace(
         '{Vat/Rate}',
         `${(
-          invoiceItems.reduce((acc, curr) => acc + (curr.vat / 100) * curr.price, 0) / rate
+          invoiceItems.reduce(
+            (acc, curr) => acc + (curr.vat / 100) * curr.price,
+            0
+          ) / rate
         ).toFixed(2)}`
       )
       .replace('{Rate}', rate);

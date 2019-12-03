@@ -142,8 +142,11 @@ export class SetTransactionToActiveByCustomIdUsecase
       transaction.markAsActive();
 
       await this.transactionRepo.update(transaction);
-      await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
-
+      invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
+      
+      invoice.dateAccepted = new Date();
+      await this.invoiceRepo.update(invoice)
+      
       return right(Result.ok<Transaction>(transaction));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));

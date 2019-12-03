@@ -52,6 +52,7 @@ export const invoiceFragment = gql`
     status
     dateCreated
     dateIssued
+    dateAccepted
     referenceNumber
     payer {
       ...payerFragment

@@ -50,10 +50,10 @@ export const invoice: Resolvers<Context> = {
           dateIssued:
             invoiceDetails.dateIssued &&
             invoiceDetails.dateIssued.toISOString(),
-          referenceNumber: invoiceDetails.invoiceNumber
+          referenceNumber: invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
             ? `${
                 invoiceDetails.invoiceNumber
-              }/${invoiceDetails.dateCreated.getFullYear()}`
+              }/${invoiceDetails.dateAccepted.getFullYear()}`
             : '---'
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
@@ -292,7 +292,8 @@ export const invoice: Resolvers<Context> = {
       return {
         invoiceId: migratedInvoice.invoiceId.id.toString(),
         referenceNumber: migratedInvoice.invoiceNumber,
-        dateIssued: migratedInvoice.dateIssued.toISOString()
+        dateIssued: migratedInvoice.dateIssued.toISOString(),
+        dateAccepted: migratedInvoice.dateAccepted.toISOString()
         // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
         // datePaid: migratedPayment.datePaid.toISOString(),
         // amount: migratedPayment.amount.value,
