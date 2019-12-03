@@ -4,6 +4,8 @@ import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AppError } from '../../../../core/logic/AppError';
 
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
+
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
@@ -141,6 +143,8 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       // * Mark transaction as ACTIVE
       transaction.markAsActive();
+      invoice.generateCreatedEvent();
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       // * get author details
       let { authorCountry } = manuscript;

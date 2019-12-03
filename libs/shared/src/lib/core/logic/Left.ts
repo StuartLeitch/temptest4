@@ -1,4 +1,5 @@
-import {Right} from './Right';
+import { Either } from './Result';
+import { Right } from './Right';
 
 export class Left<L, A> {
   readonly value: L;
@@ -15,8 +16,8 @@ export class Left<L, A> {
     return false;
   }
 
-  map() {
-    return this;
+  map<B>(fn: (a: A) => B): Either<L, B> {
+    return (this as unknown) as Left<L, B>;
   }
 
   chain() {
