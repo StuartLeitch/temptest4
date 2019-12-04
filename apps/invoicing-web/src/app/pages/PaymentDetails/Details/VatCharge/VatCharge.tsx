@@ -31,7 +31,17 @@ const VatCharge: React.FC<Props> = ({ vat, price, rate, ...rest }) => {
         <Flex justifyContent="flex-start">
           <Label>VAT</Label>
           <Text>(+{vat}%)</Text>
-          <Tooltip placement="topLeft" title={vatInfoText}>
+          <Tooltip
+            placement="topLeft"
+            title={vatInfoText}
+            overlayStyle={{
+              fontFamily: "Nunito,sans-serif",
+              fontWeight: "normal",
+              fontStyle: "normal",
+              lineHeight: 1.3,
+              fontSize: "14px",
+            }}
+          >
             <Icon name="info" color="colors.textPrimary"></Icon>
           </Tooltip>
         </Flex>
