@@ -4,6 +4,8 @@ import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AppError } from '../../../../core/logic/AppError';
 
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
+
 // * Authorization Logic
 import {
   // Authorize,
@@ -143,10 +145,13 @@ export class SetTransactionToActiveByCustomIdUsecase
 
       await this.transactionRepo.update(transaction);
       invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
-      
+
       invoice.dateAccepted = new Date();
-      await this.invoiceRepo.update(invoice)
-      
+      await this.invoiceRepo.update(invoice);
+
+      invoice.generateCreatedEvent();
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
+
       return right(Result.ok<Transaction>(transaction));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
