@@ -35,8 +35,8 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     event: InvoiceActivated
   ): Promise<void> {
     const { invoice } = event;
-    console.log('sending to erp')
-    
+    console.log('sending to erp');
+
     try {
       // todo move this to usescase
       let invoiceItems = invoice.invoiceItems.currentItems;
@@ -48,12 +48,14 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
       }
 
       if (invoiceItems.length === 0) {
-        throw new Error(`Invoice ${invoice.id} has no invoice items.`);
+        throw new Error(
+          `Invoice ${invoice.id.toString()} has no invoice items.`
+        );
       }
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
       if (!payer) {
-        throw new Error(`Invoice ${invoice.id} has no payers.`);
+        throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
       }
 
       const address = await this.addressRepo.findById(payer.billingAddressId);
@@ -63,7 +65,9 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
       );
 
       if (!manuscript) {
-        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
+        throw new Error(
+          `Invoice ${invoice.id.toString()} has no manuscripts associated.`
+        );
       }
 
       await this.publishInvoiceActivated.execute(
@@ -84,7 +88,9 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     }
 
     try {
-      let resp = await this.invoiceToErpUsecase.execute({invoiceId: invoice.id.toString()})
+      let resp = await this.invoiceToErpUsecase.execute({
+        invoiceId: invoice.id.toString()
+      });
       if (resp.isLeft()) {
         throw resp.value;
       } else {

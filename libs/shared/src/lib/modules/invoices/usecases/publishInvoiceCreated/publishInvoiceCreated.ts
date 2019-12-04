@@ -3,7 +3,6 @@ import { Result, Either, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { chain } from '../../../../core/logic/EitherChain';
-import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
@@ -25,8 +24,6 @@ import { PayerType } from '../../../payers/domain/Payer';
 import { InvoiceItemType, InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus, Invoice } from '../../domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Payer } from '../../../payers/domain/Payer';
-import { Address } from '../../../addresses/domain/Address';
 
 export type PublishInvoiceCreatedContext = AuthorizationContext<Roles>;
 
@@ -52,7 +49,7 @@ export class PublishInvoiceCreatedUsecase
     context?: PublishInvoiceCreatedContext
   ): Promise<PublishInvoiceCreatedResponse> {
     const messageEither = this.verifyInput(request)
-      .map(({ invoiceItems, invoice, manuscript, address, payer }) => {
+      .map(({ invoiceItems, manuscript, invoice }) => {
         let payload = this.emptyMessagePayload;
         payload = this.payloadWithInvoiceItemsData(
           invoiceItems,
@@ -61,8 +58,6 @@ export class PublishInvoiceCreatedUsecase
         );
         payload = this.payloadWithTotalData(invoiceItems, payload);
         payload = this.payloadWithInvoiceData(invoice, payload);
-        payload = this.payloadWithAddressData(address, payload);
-        payload = this.payloadWithPayerData(payer, payload);
         return payload;
       })
       .map(this.constructMessageFromPayload);
@@ -90,7 +85,7 @@ export class PublishInvoiceCreatedUsecase
     payload: InvoiceCreatedMessagePayload
   ): InvoiceCreatedMessage {
     return {
-      event: 'invoiceConfirmed',
+      event: 'invoiceCreated',
       data: payload
     };
   }
@@ -101,9 +96,9 @@ export class PublishInvoiceCreatedUsecase
     PublishInvoiceCreatedErrors.InputNotProvided,
     PublishInvoiceCreatedDTO
   > {
-    const { invoiceItems, manuscript, address, invoice, payer } = request;
+    const { invoiceItems, manuscript, invoice } = request;
 
-    if (!invoiceItems || !manuscript || !address || !invoice || !payer) {
+    if (!invoiceItems || !manuscript || !invoice) {
       return left(new PublishInvoiceCreatedErrors.InputNotProvided());
     } else {
       return right(request);
@@ -120,7 +115,7 @@ export class PublishInvoiceCreatedUsecase
       invoiceItems: invoiceItems.map(invoiceItem => ({
         manuscriptId: invoiceItem.manuscriptId.id.toString(),
         manuscriptCustomId: manuscript.customId,
-        vatPercentage: invoiceItem.vat,
+        vatPercentage: null,
         id: invoiceItem.id.toString(),
         price: invoiceItem.price,
         type: invoiceItem.type
@@ -136,33 +131,11 @@ export class PublishInvoiceCreatedUsecase
       ...payload,
       transactionId: invoice.transactionId.id.toString(),
       invoiceIssueDate: invoice.dateIssued,
-      referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
+      referenceNumber: `${
+        invoice.invoiceNumber
+      }/${invoice.dateAccepted.getFullYear()}`,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status
-    };
-  }
-
-  private payloadWithPayerData(
-    payer: Payer,
-    payload: InvoiceCreatedMessagePayload
-  ): InvoiceCreatedMessagePayload {
-    return {
-      ...payload,
-      payerEmail: payer.email.value.toString(),
-      payerName: payer.name.value.toString(),
-      vatRegistrationNumber: payer.VATId,
-      payerType: payer.type
-    };
-  }
-
-  private payloadWithAddressData(
-    address: Address,
-    payload: InvoiceCreatedMessagePayload
-  ): InvoiceCreatedMessagePayload {
-    return {
-      ...payload,
-      address: `${address.addressLine1}, ${address.city}, ${address.country}`,
-      country: address.country
     };
   }
 
@@ -172,15 +145,7 @@ export class PublishInvoiceCreatedUsecase
   ): InvoiceCreatedMessagePayload {
     return {
       ...payload,
-      valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
-      valueWithVAT: invoiceItems.reduce(
-        (acc, curr) => acc + curr.price * (1 + curr.vat / 100),
-        0
-      ),
-      VAT: invoiceItems.reduce(
-        (acc, item) => acc + item.price * (item.vat / 100),
-        0
-      )
+      valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0)
     };
   }
 
@@ -189,7 +154,7 @@ export class PublishInvoiceCreatedUsecase
       invoiceId: null,
       invoiceIssueDate: null,
       referenceNumber: null,
-      invoiceItems: [],
+      invoiceItems: null,
       transactionId: null,
       invoiceStatus: null,
       payerName: null,
@@ -237,6 +202,6 @@ interface InvoiceCreatedMessagePayload {
 }
 
 interface InvoiceCreatedMessage {
-  event: 'invoiceConfirmed';
+  event: 'invoiceCreated';
   data: InvoiceCreatedMessagePayload;
 }

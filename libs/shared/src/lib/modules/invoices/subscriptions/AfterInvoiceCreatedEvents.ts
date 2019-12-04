@@ -33,20 +33,18 @@ export class AfterInvoiceCreatedEvent
     try {
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       if (!invoice) {
-        throw new Error(`Invoice ${event.invoiceId} does not exist.`);
+        throw new Error(
+          `Invoice ${event.invoiceId.id.toString()} does not exist.`
+        );
       }
       const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
         event.invoiceId
       );
       if (!invoiceItems || invoiceItems.length === 0) {
-        throw new Error(`Invoice ${event.invoiceId} has no invoice items.`);
+        throw new Error(
+          `Invoice ${event.invoiceId.id.toString()} has no invoice items.`
+        );
       }
-      const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      if (!payer) {
-        throw new Error(`Invoice ${event.invoiceId} has no payers.`);
-      }
-
-      const address = await this.addressRepo.findById(payer.billingAddressId);
 
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
@@ -54,16 +52,14 @@ export class AfterInvoiceCreatedEvent
 
       if (!manuscript) {
         throw new Error(
-          `Invoice ${event.invoiceId} has no manuscripts associated.`
+          `Invoice ${event.invoiceId.id.toString()} has no manuscripts associated.`
         );
       }
 
       const result = await this.publishInvoiceCreated.execute({
         invoice,
         invoiceItems,
-        payer,
-        manuscript,
-        address
+        manuscript
       });
 
       if (result.isLeft()) {
