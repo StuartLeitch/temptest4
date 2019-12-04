@@ -20,7 +20,7 @@ export class Left<L, A> {
     return (this as unknown) as Left<L, B>;
   }
 
-  chain() {
-    return this;
+  chain<B>(fn: (a: A) => Either<L, B>): Either<L, B> {
+    return (this as unknown) as Left<L, B>;
   }
 }
