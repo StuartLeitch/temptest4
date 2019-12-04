@@ -1,166 +1,70 @@
 import React, { useEffect } from "react";
-import { Link, Route } from "react-router-dom";
-import { connect } from "react-redux";
-import { RootState } from "typesafe-actions";
-import styled from "styled-components";
+import { Route, Switch } from "react-router-dom";
 
 import { config } from "../config";
 
+// import { useUser } from "./contexts/User";
+const loadInvoicesList = () => import("./pages/InvoicesList/InvoicesList");
+const InvoicesList = React.lazy(loadInvoicesList);
+
+import { useAuth } from "./contexts/Auth";
+import { AuthClient } from "./utils/auth-client";
+
 import { Header } from "./components/Header";
 import { PaymentDetails } from "./pages/PaymentDetails";
-import { invoicesMap } from "./state/redux/root-reducer";
-import Axios from "axios";
+import { NotFound } from "./pages/NotFound";
+import { PendingLogging } from "./pages/PendingLogging/PendingLogging";
 
-export const App = ({ invoices }) => {
+export const App = () => {
   useEffect(() => {
     document.title = config.appName;
   });
 
   return (
-    <div>
+    <>
       <Header path="Payment Details" />
-      <Route
-        path="/"
-        exact
-        component={() => {
-          return (
-            <InvoicesList>
-              {invoices.map(invoice => (
-                <InvoiceItem key={invoice.id}>
-                  <div style={{ width: "100%" }}>
-                    <InvoiceLink to={"/payment-details/" + invoice.id}>
-                      Invoice #{invoice.id}
-                    </InvoiceLink>
-                    <InvoiceSubtitle>
-                      <dt>STATUS:</dt>
-                      <dd className={invoice.status.toLowerCase()}>
-                        {invoice.status}
-                      </dd>
-                      <dt>Manuscript Custom ID:</dt>
-                      <dd>{invoice.customId}</dd>
-                      <dt>Manuscript Title:</dt>
-                      <dd>{invoice.manuscriptTitle}</dd>
-                      <dt>Type:</dt>
-                      <dd>{invoice.type}</dd>
-                      <dt>Amount:</dt>
-                      <dd>{invoice.price} 💲</dd>
-                      {invoice.status === "DRAFT" && (
-                        <dd>
-                          <button
-                            onClick={() => {
-                              Axios.post(`${config.apiRoot}/acceptManuscript`, {
-                                invoiceId: invoice.id,
-                              });
-                            }}
-                          >
-                            Accept manuscript
-                          </button>
-                        </dd>
-                      )}
-                    </InvoiceSubtitle>
-                  </div>
-                </InvoiceItem>
-              ))}
-            </InvoicesList>
-          );
-        }}
-      />
-
-      <Route path="/payment-details/:invoiceId" component={PaymentDetails} />
-    </div>
+      <AppRoutes />
+    </>
   );
 };
 
-const mapStateToProps = (state: RootState) => ({
-  invoices: invoicesMap(state), // invoicesSelectors.invoice(state),
-  // invoicesError: invoicesSelectors.invoiceError(state),
-  // invoicesLoading: invoiceSelectors.invoiceLoading(state),
-});
+function AppRoutes() {
+  return (
+    <Switch>
+      <PrivateRoute path="/" exact>
+        <InvoicesList />
+      </PrivateRoute>
+      <Route path="/payment-details/:invoiceId">
+        <PaymentDetails />
+      </Route>
+      <Route path="*">
+        <NotFound />
+      </Route>
+    </Switch>
+  );
+}
 
-export default connect(mapStateToProps, {
-  // getInvoice: invoiceActions.getInvoice.request,
-  // updatePayer: invoiceActions.updatePayerAsync.request,
-})(App);
+// A wrapper for <Route> that asks for authentication if you're not yet authenticated.
+function PrivateRoute({ children, ...rest }) {
+  const { data, login, foo } = useAuth();
 
-const InvoicesList = styled.ul`
-  counter-reset: index;
-  padding: 0;
-  max-width: 100%;
-`;
+  let toRender = null;
 
-const InvoiceItem = styled.li`
-  counter-increment: index;
-  display: flex;
-  align-items: center;
-  padding: 12px 0;
-  box-sizing: border-box;
-
-  &::before {
-    content: counters(index, ".", decimal-leading-zero);
-    font-size: 1.5rem;
-    text-align: right;
-    font-weight: bold;
-    min-width: 50px;
-    padding-right: 12px;
-    font-variant-numeric: tabular-nums;
-    align-self: flex-start;
-    background-image: linear-gradient(to bottom, #00718f, #6db33f);
-    background-attachment: fixed;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  if (!data) {
+    // * Ask user to login!
+    login();
   }
 
-  & + li {
-    border-top: 1px solid rgba(204, 204, 204, 0.55);
-  }
-`;
-
-const InvoiceLink = styled(Link)`
-  font-size: 1.4rem;
-  display: block;
-
-  &:hover {
-    color: #00718f;
-  }
-`;
-
-const InvoiceSubtitle = styled.dl`
-  display: flex;
-  flex-flow: row wrap;
-  font-size: 1.1rem;
-  max-height: 3em;
-
-  dt {
-    padding: 2px 7px;
-    max-width: 200px;
-    text-align: right;
+  if (data && "isAuthenticated" in data && data.isAuthenticated) {
+    // pre-load the authenticated side in the background while the user's
+    // filling out the login form.
+    React.useEffect(() => {
+      loadInvoicesList();
+    }, []);
+    toRender = (
+      <React.Suspense fallback={<PendingLogging />}>{children}</React.Suspense>
+    );
   }
 
-  dt:first-of-type {
-    padding-left: 0;
-  }
-
-  dd {
-    margin: 0;
-    padding: 2px 7px;
-    min-height: 1em;
-    font-weight: bold;
-    border-right: 1px solid rgba(120, 120, 120, 0.5);
-  }
-
-  dd.draft {
-    color: #a8a8a8;
-  }
-
-  dd.active {
-    color: #10aae2;
-  }
-
-  dd.final {
-    color: #088a3c;
-  }
-
-  dd:last-of-type {
-    border-right: none;
-  }
-`;
+  return <Route {...rest} render={() => toRender} />;
+}

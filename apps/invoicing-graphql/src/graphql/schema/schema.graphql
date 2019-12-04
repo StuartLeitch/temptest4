@@ -55,7 +55,7 @@ type Invoice {
 }
 
 type InvoiceId {
-  invoiceId: String
+  invoiceId: [String]
 }
 
 input AddressInput {

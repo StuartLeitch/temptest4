@@ -31,14 +31,13 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
 
   public async getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
-  ): Promise<InvoiceItem> {
+  ): Promise<InvoiceItem[]> {
     const { db } = this;
-    const invoice = await db(TABLES.INVOICE_ITEMS)
+    const invoiceItems = await db(TABLES.INVOICE_ITEMS)
       .select()
-      .where('manuscriptId', manuscriptId.id.toString())
-      .first();
+      .where('manuscriptId', manuscriptId.id.toString());
 
-    return InvoiceItemMap.toDomain(invoice);
+    return invoiceItems.map(InvoiceItemMap.toDomain);
   }
 
   async update(invoiceItem: InvoiceItem): Promise<InvoiceItem> {

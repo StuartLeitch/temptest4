@@ -68,7 +68,7 @@ export type Invoice = {
 
 export type InvoiceId = {
    __typename?: 'InvoiceId',
-  invoiceId?: Maybe<Scalars['String']>,
+  invoiceId?: Maybe<Array<Maybe<Scalars['String']>>>,
 };
 
 export type InvoiceItem = {
@@ -391,7 +391,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type InvoiceIdResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceId'] = ResolversParentTypes['InvoiceId']> = {
-  invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  invoiceId?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>,
 };
 
 export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {

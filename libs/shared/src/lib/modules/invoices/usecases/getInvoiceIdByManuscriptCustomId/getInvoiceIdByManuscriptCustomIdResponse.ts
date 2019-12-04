@@ -7,5 +7,5 @@ import { InvoiceId } from './../../domain/InvoiceId';
 export type GetInvoiceIdByManuscriptCustomIdResponse = Either<
   | GetInvoiceIdByManuscriptCustomIdErrors.ManuscriptNotFoundError
   | AppError.UnexpectedError,
-  Result<InvoiceId>
+  Result<InvoiceId[]>
 >;

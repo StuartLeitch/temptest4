@@ -56,7 +56,7 @@ export class GetInvoiceIdByManuscriptCustomIdUsecase
     const { customId } = request;
 
     let manuscript: Manuscript;
-    let invoiceItem: InvoiceItem;
+    let invoiceItems: InvoiceItem[];
     let invoiceId: InvoiceId;
 
     try {
@@ -73,7 +73,7 @@ export class GetInvoiceIdByManuscriptCustomIdUsecase
 
       try {
         // * System identifies Invoice Item by Manuscript Id
-        invoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        invoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
           manuscript.manuscriptId
         );
       } catch (e) {
@@ -84,9 +84,9 @@ export class GetInvoiceIdByManuscriptCustomIdUsecase
         );
       }
 
-      invoiceId = invoiceItem.invoiceId;
+      const invoiceIds = invoiceItems.map(ii => ii.invoiceId);
 
-      return right(Result.ok<InvoiceId>(invoiceId));
+      return right(Result.ok<InvoiceId[]>(invoiceIds));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

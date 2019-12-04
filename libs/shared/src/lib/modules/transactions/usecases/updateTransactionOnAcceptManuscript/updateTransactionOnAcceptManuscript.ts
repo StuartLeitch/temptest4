@@ -91,7 +91,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       try {
         // * System identifies invoice item by manuscript Id
-        invoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        [invoiceItem] = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
           manuscriptId
         );
       } catch (err) {

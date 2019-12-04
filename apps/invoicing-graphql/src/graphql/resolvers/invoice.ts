@@ -99,11 +99,9 @@ export const invoice: Resolvers<Context> = {
         return undefined;
       } else {
         // There is a TSLint error for when try to use a shadowed variable!
-        const invoiceId = result.value.getValue();
+        const invoiceIds = result.value.getValue();
 
-        return {
-          invoiceId: invoiceId.id.toString()
-        };
+        return { invoiceId: invoiceIds.map(ii => ii.id.toString()) };
       }
     }
   },

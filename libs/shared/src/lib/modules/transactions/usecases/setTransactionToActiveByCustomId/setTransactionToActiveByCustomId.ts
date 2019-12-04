@@ -1,3 +1,4 @@
+import { InvoiceItems } from './../../../invoices/domain/InvoiceItems';
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
@@ -90,7 +91,7 @@ export class SetTransactionToActiveByCustomIdUsecase
 
       try {
         // * System identifies invoice item by manuscript Id
-        invoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        [invoiceItem] = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
           manuscriptId
         );
       } catch (err) {
