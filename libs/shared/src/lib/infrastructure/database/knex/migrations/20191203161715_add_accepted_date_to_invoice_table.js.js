@@ -17,6 +17,7 @@ module.exports.up = function(knex) {
                 return knex('invoices')
                   .update({ dateAccepted: row.dateCreated })
                   .where({ id: row.invoiceId })
+                  .whereNotNull('invoiceNumber')
                   .transacting(trx);
               })
             )
