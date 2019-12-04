@@ -1,17 +1,16 @@
 import styled, { AnyStyledComponent, css } from 'styled-components';
-import { layout, space, flex } from 'styled-system';
 
 import { TooltipDirections } from './TooltipDirections';
 
 import { th } from '../Theme';
 
-const yDirection = css`
+const yPosition = css`
   &::before,
   &::after {
-    border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    left: 50%;
+    border-left: 10px solid transparent;
     margin-left: -10px;
+    left: 50%;
   }
 
   &::after {
@@ -19,13 +18,13 @@ const yDirection = css`
   }
 `;
 
-const xDirection = css`
+const xPosition = css`
   &::before,
   &::after {
-    border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
-    top: 50%;
+    border-top: 10px solid transparent;
     margin-top: -10px;
+    top: 50%;
   }
 
   &::after {
@@ -34,7 +33,7 @@ const xDirection = css`
 `;
 
 const right = css`
-  ${xDirection}
+  ${xPosition}
 
   &::before,
   &::after {
@@ -52,7 +51,7 @@ const right = css`
 `;
 
 const left = css`
-  ${xDirection}
+  ${xPosition}
 
   &::before,
   &::after {
@@ -70,7 +69,7 @@ const left = css`
 `;
 
 const bottom = css`
-  ${yDirection}
+  ${yPosition}
 
   &::before,
   &::after {
@@ -88,7 +87,7 @@ const bottom = css`
 `;
 
 const top = css`
-  ${yDirection}
+  ${yPosition}
 
   &::before,
   &::after {
@@ -105,22 +104,22 @@ const top = css`
   }
 `;
 
-const direction = ({ direction }: { direction: TooltipDirections }) => {
-  switch (direction) {
-    case 'top':
-      return top;
+const position = ({ position }: { position: TooltipDirections }) => {
+  switch (position) {
     case 'bottom':
       return bottom;
-    case 'left':
-      return left;
     case 'right':
       return right;
+    case 'left':
+      return left;
+    case 'top':
+      return top;
     default:
       return bottom;
   }
 };
 
-const positionXY = ({ left, top }: { left: string; top: string }) => {
+const moveWithScroll = ({ left, top }: { left: string; top: string }) => {
   return css`
     left: ${left + window.scrollX}px;
     top: ${top + window.scrollY}px;
@@ -128,11 +127,10 @@ const positionXY = ({ left, top }: { left: string; top: string }) => {
 };
 
 export const Tooltip: AnyStyledComponent = styled.div`
+  max-width: calc(${th('gridUnit')} * 65);
   padding: calc(${th('gridUnit')} * 2);
   position: absolute;
   left: 0%;
-  /* bottom: 100%; */
-  /* margin-bottom: 15px; */
 
   background-color: ${th('colors.background')};
   border: 1px solid ${th('colors.disabled')};
@@ -152,6 +150,6 @@ export const Tooltip: AnyStyledComponent = styled.div`
     position: absolute;
   }
 
-  ${positionXY};
-  ${direction};
+  ${moveWithScroll};
+  ${position};
 `;

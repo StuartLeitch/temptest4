@@ -1,22 +1,26 @@
-import React from 'react';
+import React, { ReactElement, Fragment, FC } from 'react';
 
 import { TooltipDirections } from './TooltipDirections';
 
 import { Tooltip as Root } from './Tooltip.styles';
 
 interface Props {
-  direction?: TooltipDirections;
+  position?: TooltipDirections;
+  children?: ReactElement;
   message: string;
   left?: string;
   top?: string;
 }
 
-const Tooltip: React.FC<Props> = ({ message, ...rest }) => (
-  <Root {...rest}>{message}</Root>
+const Tooltip: FC<Props> = ({ message, children, ...rest }) => (
+  <Fragment>
+    <Root {...rest}>{message}</Root>
+    {children}
+  </Fragment>
 );
 
 Tooltip.defaultProps = {
-  direction: 'bottom',
+  position: 'bottom',
   left: '0',
   top: '0'
 };
