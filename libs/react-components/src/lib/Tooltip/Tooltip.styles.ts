@@ -1,9 +1,126 @@
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { layout, space, flex } from 'styled-system';
 
+import { TooltipDirections } from './TooltipDirections';
+
 import { th } from '../Theme';
 
-const positionXY = ({ left, top }) => {
+const yDirection = css`
+  &::before,
+  &::after {
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    left: 50%;
+    margin-left: -10px;
+  }
+
+  &::after {
+    z-index: 1;
+  }
+`;
+
+const xDirection = css`
+  &::before,
+  &::after {
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    top: 50%;
+    margin-top: -10px;
+  }
+
+  &::after {
+    z-index: 1;
+  }
+`;
+
+const right = css`
+  ${xDirection}
+
+  &::before,
+  &::after {
+    left: -10px;
+  }
+
+  &::before {
+    border-right: 10px solid ${th('colors.disabled')};
+  }
+
+  &::after {
+    border-right: 10px solid ${th('colors.background')};
+    margin-left: 2px;
+  }
+`;
+
+const left = css`
+  ${xDirection}
+
+  &::before,
+  &::after {
+    left: 100%;
+  }
+
+  &::before {
+    border-left: 10px solid ${th('colors.disabled')};
+  }
+
+  &::after {
+    border-left: 10px solid ${th('colors.background')};
+    margin-left: -2px;
+  }
+`;
+
+const bottom = css`
+  ${yDirection}
+
+  &::before,
+  &::after {
+    top: -10px;
+  }
+
+  &::before {
+    border-bottom: 10px solid ${th('colors.disabled')};
+  }
+
+  &::after {
+    border-bottom: 10px solid ${th('colors.background')};
+    margin-top: 2px;
+  }
+`;
+
+const top = css`
+  ${yDirection}
+
+  &::before,
+  &::after {
+    top: 100%;
+  }
+
+  &::before {
+    border-top: 10px solid ${th('colors.disabled')};
+  }
+
+  &::after {
+    border-top: 10px solid ${th('colors.background')};
+    margin-top: -2px;
+  }
+`;
+
+const direction = ({ direction }: { direction: TooltipDirections }) => {
+  switch (direction) {
+    case 'top':
+      return top;
+    case 'bottom':
+      return bottom;
+    case 'left':
+      return left;
+    case 'right':
+      return right;
+    default:
+      return bottom;
+  }
+};
+
+const positionXY = ({ left, top }: { left: string; top: string }) => {
   return css`
     left: ${left + window.scrollX}px;
     top: ${top + window.scrollY}px;
@@ -33,23 +150,8 @@ export const Tooltip: AnyStyledComponent = styled.div`
   &::after {
     content: '';
     position: absolute;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    top: 100%;
-    left: 50%;
-    margin-left: -10px;
-  }
-
-  &::before {
-    border-top: 10px solid ${th('colors.disabled')};
-  }
-
-  /* The white fill of the triangle */
-  &::after {
-    border-top: 10px solid ${th('colors.background')};
-    margin-top: -2px;
-    z-index: 1;
   }
 
   ${positionXY};
+  ${direction};
 `;
