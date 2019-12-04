@@ -194,6 +194,8 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.transactionRepo.update(transaction);
       await this.articleRepo.update(manuscript);
       invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
+      invoice.dateAccepted = new Date();
+      await this.invoiceRepo.update(invoice);
 
       invoice.generateCreatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
