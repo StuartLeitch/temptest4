@@ -13,8 +13,6 @@ export class AfterInvoiceCreatedEvent
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private payerRepo: PayerRepoContract,
-    private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceCreated: PublishInvoiceCreatedUsecase
   ) {
@@ -30,6 +28,7 @@ export class AfterInvoiceCreatedEvent
 
   private async onInvoiceCreatedEvent(event: InvoiceCreated): Promise<any> {
     // Get invoice from repo
+    console.log('execute OnInvoiceCreatedEvent');
     try {
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       if (!invoice) {

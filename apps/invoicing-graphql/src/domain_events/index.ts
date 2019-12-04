@@ -36,8 +36,6 @@ export const registerDomainEvents = (
   new AfterInvoiceCreatedEvent(
     invoice,
     invoiceItem,
-    payer,
-    address,
     manuscript,
     publishInvoiceCreatedUsecase
   );

@@ -143,8 +143,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       // * Mark transaction as ACTIVE
       transaction.markAsActive();
-      invoice.generateCreatedEvent();
-      DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       // * get author details
       let { authorCountry } = manuscript;
@@ -196,6 +194,9 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.transactionRepo.update(transaction);
       await this.articleRepo.update(manuscript);
       invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
+
+      invoice.generateCreatedEvent();
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       this.emailService
         .createInvoicePaymentTemplate(
