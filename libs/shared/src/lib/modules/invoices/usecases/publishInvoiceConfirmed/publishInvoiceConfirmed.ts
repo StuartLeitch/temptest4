@@ -22,7 +22,7 @@ export class PublishInvoiceConfirmed {
       event: 'invoiceConfirmed',
       data: {
         invoiceId: invoice.id.toString(),
-        invoiceNumber: invoice.invoiceNumber,
+        referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
         invoiceIssueDate: invoice.dateIssued,
         invoiceItems: invoiceItems.map(ii => ({
           id: ii.id.toString(),
@@ -30,7 +30,7 @@ export class PublishInvoiceConfirmed {
           manuscriptId: ii.manuscriptId.id.toString(),
           type: ii.type,
           price: ii.price,
-          vatPercentage: ii.vat,
+          vatPercentage: ii.vat
         })),
         transactionId: invoice.transactionId.id.toString(),
         invoiceStatus: invoice.status,
@@ -47,8 +47,11 @@ export class PublishInvoiceConfirmed {
         valueWithVAT: invoiceItems.reduce(
           (acc, curr) => acc + curr.price * (1 + curr.vat / 100),
           0
+        ),
+        VAT: invoiceItems.reduce(
+          (acc, item) => acc + item.price * (item.vat / 100),
+          0
         )
-        // VAT: "todo"
         // couponId: coupon.id,
         // dateApplied: coupon.applied
       }

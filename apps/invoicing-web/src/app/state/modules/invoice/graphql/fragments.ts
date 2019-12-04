@@ -1,5 +1,13 @@
 import gql from "graphql-tag";
 
+export const invoiceVatFragment = gql`
+  fragment invoiceVatFragment on InvoiceVat {
+    vatPercentage
+    vatNote
+    rate
+  }
+`
+
 export const addressFragment = gql`
   fragment addressFragment on Address {
     city
@@ -44,6 +52,7 @@ export const invoiceFragment = gql`
     status
     dateCreated
     dateIssued
+    dateAccepted
     referenceNumber
     payer {
       ...payerFragment

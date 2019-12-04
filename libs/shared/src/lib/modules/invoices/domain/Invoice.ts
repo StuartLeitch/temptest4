@@ -9,6 +9,7 @@ import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoiceSentEvent } from './events/invoiceSent';
 import { InvoicePaidEvent } from './events/invoicePaid';
+import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceActivated } from './events/invoiceActivated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
@@ -30,6 +31,7 @@ interface InvoiceProps {
   invoiceItems?: InvoiceItems;
   dateCreated?: Date;
   dateUpdated?: Date;
+  dateAccepted?: Date;
   dateIssued?: Date;
   charge?: number;
   totalNumInvoiceItems?: number;
@@ -82,6 +84,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get dateCreated(): Date {
     return this.props.dateCreated;
+  }
+
+  get dateAccepted(): Date {
+    return this.props.dateAccepted;
+  }
+
+  set dateAccepted(dateAccepted: Date) {
+    this.props.dateAccepted = dateAccepted
   }
 
   get invoiceItems(): InvoiceItems {
@@ -151,6 +161,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     }
 
     return Result.ok<Invoice>(invoice);
+  }
+
+  public generateCreatedEvent() {
+    const now = new Date();
+    this.addDomainEvent(new InvoiceCreated(this, now));
   }
 
   public send(): void {

@@ -114,7 +114,7 @@ class EmailService {
         If paying by bank transfer, please use invoice number <strong>${
           invoice.invoiceNumber
         }/${(
-          invoice.dateIssued || invoice.dateCreated
+          invoice.dateAccepted || invoice.dateCreated
         ).getFullYear()}</strong> in the payment reference and return a scanned copy of the payment authorisation by email to facilitate our tracking of your payment.
         <br /><br />
         Please note that bank transfer payments can take up to a week to arrive and will be confirmed as soon as funds have cleared.

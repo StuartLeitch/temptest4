@@ -4,6 +4,8 @@ import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AppError } from '../../../../core/logic/AppError';
 
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
+
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
@@ -192,6 +194,11 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.transactionRepo.update(transaction);
       await this.articleRepo.update(manuscript);
       invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
+      invoice.dateAccepted = new Date();
+      await this.invoiceRepo.update(invoice);
+
+      invoice.generateCreatedEvent();
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       this.emailService
         .createInvoicePaymentTemplate(

@@ -50,10 +50,10 @@ export const invoice: Resolvers<Context> = {
           dateIssued:
             invoiceDetails.dateIssued &&
             invoiceDetails.dateIssued.toISOString(),
-          referenceNumber: invoiceDetails.invoiceNumber
+          referenceNumber: invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
             ? `${
                 invoiceDetails.invoiceNumber
-              }/${invoiceDetails.dateCreated.getFullYear()}`
+              }/${invoiceDetails.dateAccepted.getFullYear()}`
             : '---'
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
@@ -102,6 +102,51 @@ export const invoice: Resolvers<Context> = {
         const invoiceIds = result.value.getValue();
 
         return { invoiceId: invoiceIds.map(ii => ii.id.toString()) };
+      }
+    },
+
+    async invoiceVat(parent, args, context) {
+      const { repos, exchangeRateService, vatService } = context;
+      const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
+
+      const request: GetInvoiceDetailsDTO = {
+        invoiceId: args.invoiceId
+      };
+      const usecaseContext = {
+        roles: [Roles.PAYER]
+      };
+
+      const result = await usecase.execute(request, usecaseContext);
+      if (result.isLeft()) {
+        return undefined;
+      } else {
+        // There is a TSLint error for when try to use a shadowed variable!
+        const invoiceDetails = result.value.getValue();
+
+        let rate = 1.42; // ! Average value for the last seven years
+
+          try {
+            const exchangeRate = await exchangeRateService.getExchangeRate(
+              new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
+              'USD'
+            );
+            rate = exchangeRate.exchangeRate;
+          } catch (error) {}
+
+
+        let vatNote = vatService.getVATNote(
+          args.country,
+          args.payerType !== PayerType.INSTITUTION
+        );
+        let vatPercentage = vatService.calculateVAT(
+          args.country,
+          args.payerType !== PayerType.INSTITUTION
+        );
+        return {
+          rate,
+          vatNote: vatNote.template,
+          vatPercentage
+        };
       }
     }
   },
@@ -175,7 +220,7 @@ export const invoice: Resolvers<Context> = {
         vatnote = template;
       }
 
-      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote: ' ' };
+      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote };
     }
   },
   InvoiceItem: {
@@ -245,7 +290,8 @@ export const invoice: Resolvers<Context> = {
       return {
         invoiceId: migratedInvoice.invoiceId.id.toString(),
         referenceNumber: migratedInvoice.invoiceNumber,
-        dateIssued: migratedInvoice.dateIssued.toISOString()
+        dateIssued: migratedInvoice.dateIssued.toISOString(),
+        dateAccepted: migratedInvoice.dateAccepted.toISOString()
         // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
         // datePaid: migratedPayment.datePaid.toISOString(),
         // amount: migratedPayment.amount.value,

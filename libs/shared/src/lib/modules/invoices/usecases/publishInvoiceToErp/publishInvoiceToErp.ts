@@ -1,4 +1,5 @@
 import { ErpServiceContract } from 'libs/shared/src/lib/domain/services/ErpService';
+import { ExchangeRateService } from 'libs/shared/src/lib/domain/services/ExchangeRateService';
 import {
   AuthorizationContext,
   Roles,
@@ -102,7 +103,15 @@ export class PublishInvoiceToErpUsecase
 
       const vatService = new VATService();
       const vatNote = vatService.getVATNote(address.country, payer.type !== PayerType.INSTITUTION)
-
+      const exchangeRateService = new ExchangeRateService();
+      let rate = 1.42; // ! Average value for the last seven years
+      if (invoice && invoice.dateIssued) {
+        const exchangeRate = await exchangeRateService.getExchangeRate(
+          new Date(invoice.dateIssued),
+          'USD'
+        );
+        rate = exchangeRate.exchangeRate;
+      }
       const erpResponse = await this.erpService.registerInvoice({
         invoice,
         items: invoiceItems,
@@ -110,7 +119,8 @@ export class PublishInvoiceToErpUsecase
         article: manuscript,
         billingAddress: address,
         journalName: catalog.journalTitle,
-        vatNote
+        vatNote,
+        rate
       });
 
       console.log(

@@ -22,6 +22,7 @@ import {
   paymentActions,
   paymentTypes,
 } from "../../state/modules/payment";
+import { InvoiceVATDTO } from '../../state/modules/invoice/types';
 
 interface Props {
   invoiceError: string;
@@ -37,6 +38,7 @@ interface Props {
   getMethodsLoading: boolean;
   paymentMethods: Record<string, string>;
   getInvoice(id: string): any;
+  getInvoiceVAT(invoiceVATRequest: InvoiceVATDTO): any;
   updatePayer(payer: any): any;
   recordPayPalPayment(payment: paymentTypes.PayPalPayment): any;
   payWithCard(payload: any): any;
@@ -55,6 +57,7 @@ const payByPayPal = (recordAction, invoice) => {
 };
 
 const PaymentDetails: React.FunctionComponent<Props> = ({
+  getInvoiceVAT,
   getInvoice,
   invoice,
   invoiceError,
@@ -113,6 +116,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               error={payerError}
               handleSubmit={updatePayer}
               loading={payerLoading}
+              onVatFieldChange={(country, payerType) => getInvoiceVAT({invoiceId, country, payerType})}
             />
             <InvoicePayment
               methods={paymentMethods}
@@ -150,6 +154,7 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 export default connect(mapStateToProps, {
+  getInvoiceVAT: invoiceActions.getInvoiceVat.request,
   recordPayPalPayment: paymentActions.recordPayPalPayment.request,
   getPaymentMethods: paymentActions.getPaymentMethods.request,
   payWithCard: paymentActions.recordCardPayment.request,
