@@ -22,7 +22,6 @@ export class PublishInvoiceConfirmed {
       event: 'invoiceConfirmed',
       data: {
         invoiceId: invoice.id.toString(),
-        invoiceNumber: invoice.invoiceNumber,
         referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
         invoiceIssueDate: invoice.dateIssued,
         invoiceItems: invoiceItems.map(ii => ({

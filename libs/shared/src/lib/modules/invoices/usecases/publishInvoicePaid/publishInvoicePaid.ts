@@ -30,7 +30,6 @@ export class PublishInvoicePaid {
         })),
         transactionId: paymentDetails.transactionId,
         invoiceStatus: paymentDetails.invoiceStatus,
-        invoiceNumber: paymentDetails.invoiceNumber,
         referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
         invoiceIssueDate: paymentDetails.invoiceIssueDate,
         payerName: paymentDetails.payerName,

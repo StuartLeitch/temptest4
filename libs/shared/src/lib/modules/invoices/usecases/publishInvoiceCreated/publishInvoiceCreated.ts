@@ -136,7 +136,7 @@ export class PublishInvoiceCreatedUsecase
       ...payload,
       transactionId: invoice.transactionId.id.toString(),
       invoiceIssueDate: invoice.dateIssued,
-      invoiceNumber: invoice.invoiceNumber,
+      referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status
     };
@@ -187,8 +187,8 @@ export class PublishInvoiceCreatedUsecase
   private get emptyMessagePayload(): InvoiceCreatedMessagePayload {
     const payload: InvoiceCreatedMessagePayload = {
       invoiceId: null,
-      invoiceNumber: null,
       invoiceIssueDate: null,
+      referenceNumber: null,
       invoiceItems: [],
       transactionId: null,
       invoiceStatus: null,
@@ -211,7 +211,7 @@ export class PublishInvoiceCreatedUsecase
 
 interface InvoiceCreatedMessagePayload {
   invoiceId: string;
-  invoiceNumber: string;
+  referenceNumber: string;
   invoiceIssueDate: Date;
   invoiceItems: {
     id: string;
