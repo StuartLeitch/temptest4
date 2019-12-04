@@ -154,7 +154,7 @@ export class GetInvoicePdfUsecase
     payloadEither: Either<any, InvoicePayload>,
     pdfEither: Either<any, Buffer>
   ) {
-    return payloadEither.chain(payload => {
+    return payloadEither.chain<Buffer | PdfResponse>(payload => {
       return pdfEither.map<PdfResponse>(pdf => {
         const date = payload.invoice.dateCreated;
         const parsedDate = `${date.getUTCFullYear()}-${date.getUTCMonth() +
@@ -243,19 +243,14 @@ export class GetInvoicePdfUsecase
     if (apcItems.length > 0) {
       return right(apcItems[0].manuscriptId.id.toString());
     } else {
-      return left(null);
+      return left('');
     }
   }
 
   private async getPayloadWithArticle(payload: InvoicePayload) {
     const articleIdEither = this.getArticleId(payload.invoice);
-    if (articleIdEither.isLeft()) {
-      return left<AppError.UnexpectedError, InvoicePayload>(
-        Result.fail({
-          message: `no APC found for the invoice with id ${payload.invoice.id.toString()}`
-        })
-      );
-    } else {
+
+    if (articleIdEither.isRight()) {
       const usecase = new GetArticleDetailsUsecase(this.articleRepo);
       const articleEither = await usecase.execute(
         { articleId: articleIdEither.value },
@@ -265,6 +260,12 @@ export class GetInvoicePdfUsecase
         ...payload,
         article: articleResult.getValue()
       }));
+    } else {
+      return left<AppError.UnexpectedError, InvoicePayload>(
+        Result.fail({
+          message: `no APC found for the invoice with id ${payload.invoice.id.toString()}`
+        })
+      );
     }
   }
 
