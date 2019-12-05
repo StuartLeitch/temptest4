@@ -177,7 +177,7 @@ export class ErpService implements ErpServiceContract {
         invoice.invoiceNumber &&
         invoice.dateAccepted &&
         `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
-      s2cor__Status__c: 'Submitted',
+      s2cor__Status__c: 'Unsubmitted',
       s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
       s2cor__Legal_Note__c: this.getVatNote(vatNote, items, rate),
       s2cor__BillingCountry__c: billingAddress.country,
