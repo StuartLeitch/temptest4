@@ -50,11 +50,12 @@ export const invoice: Resolvers<Context> = {
           dateIssued:
             invoiceDetails.dateIssued &&
             invoiceDetails.dateIssued.toISOString(),
-          referenceNumber: invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
-            ? `${
-                invoiceDetails.invoiceNumber
-              }/${invoiceDetails.dateAccepted.getFullYear()}`
-            : '---'
+          referenceNumber:
+            invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
+              ? `${
+                  invoiceDetails.invoiceNumber
+                }/${invoiceDetails.dateAccepted.getFullYear()}`
+              : '---'
           // totalAmount: entity.totalAmount,
           // netAmount: entity.netAmount
         };
@@ -125,20 +126,19 @@ export const invoice: Resolvers<Context> = {
 
         let rate = 1.42; // ! Average value for the last seven years
 
-          try {
-            const exchangeRate = await exchangeRateService.getExchangeRate(
-              new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
-              'USD'
-            );
-            rate = exchangeRate.exchangeRate;
-          } catch (error) {}
+        try {
+          const exchangeRate = await exchangeRateService.getExchangeRate(
+            new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
+            'USD'
+          );
+          rate = exchangeRate.exchangeRate;
+        } catch (error) {}
 
-
-        let vatNote = vatService.getVATNote(
+        const vatNote = vatService.getVATNote(
           args.country,
           args.payerType !== PayerType.INSTITUTION
         );
-        let vatPercentage = vatService.calculateVAT(
+        const vatPercentage = vatService.calculateVAT(
           args.country,
           args.payerType !== PayerType.INSTITUTION
         );
@@ -260,7 +260,8 @@ export const invoice: Resolvers<Context> = {
         invoiceReference,
         discount,
         APC,
-        dateIssued
+        dateIssued,
+        dateAccepted
       } = args;
 
       const migrateInvoiceUsecase = new MigrateInvoiceUsecase(
@@ -276,7 +277,8 @@ export const invoice: Resolvers<Context> = {
           invoiceReference,
           discount,
           APC,
-          dateIssued
+          dateIssued,
+          dateAccepted
         },
         usecaseContext
       );

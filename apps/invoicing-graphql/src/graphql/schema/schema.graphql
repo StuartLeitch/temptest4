@@ -163,9 +163,10 @@ type Mutation {
   migrateInvoice(
     invoiceId: String!
     vatValue: Float
-    invoiceReference: String
+    invoiceReference: Float
     discount: Float
     APC: Float
     dateIssued: String
+    dateAccepted: String
   ): Invoice
 }

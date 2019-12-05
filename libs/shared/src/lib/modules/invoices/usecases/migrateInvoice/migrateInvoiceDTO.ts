@@ -5,4 +5,5 @@ export interface MigrateInvoiceDTO {
   discount: number;
   APC: number;
   dateIssued: string;
+  dateAccepted: string;
 }

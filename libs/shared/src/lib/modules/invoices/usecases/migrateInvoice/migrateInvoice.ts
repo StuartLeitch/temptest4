@@ -79,7 +79,9 @@ export class MigrateInvoiceUsecase
 
       invoice.invoiceNumber = request.invoiceReference;
       invoice.dateIssued = new Date(request.dateIssued);
-      invoice.dateAccepted = new Date(request.dateIssued);
+      invoice.dateAccepted = new Date(
+        request.dateAccepted || request.dateIssued
+      );
 
       invoiceItem.vat = request.vatValue;
       invoiceItem.price = request.APC - request.discount;
