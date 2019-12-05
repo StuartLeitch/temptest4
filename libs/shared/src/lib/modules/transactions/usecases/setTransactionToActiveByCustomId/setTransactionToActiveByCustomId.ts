@@ -147,7 +147,7 @@ export class SetTransactionToActiveByCustomIdUsecase
       await this.transactionRepo.update(transaction);
       invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
 
-      invoice.dateAccepted = new Date();
+      // invoice.dateAccepted = new Date();
       await this.invoiceRepo.update(invoice);
 
       invoice.generateCreatedEvent();
