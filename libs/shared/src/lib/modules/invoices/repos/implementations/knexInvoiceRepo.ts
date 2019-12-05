@@ -88,8 +88,8 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     const invoice = await this.getInvoiceById(invoiceId);
     if (invoice.invoiceNumber) {
-      console.log('Invoice number already set')
-      return invoice
+      console.log('Invoice number already set');
+      return invoice;
     }
 
     const updated = await db(TABLES.INVOICES)
@@ -113,7 +113,9 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return this.getInvoiceById(invoiceId);
   }
 
-  async getInvoicePaymentInfo(invoiceId: InvoiceId): Promise<InvoicePaymentInfo> {
+  async getInvoicePaymentInfo(
+    invoiceId: InvoiceId
+  ): Promise<InvoicePaymentInfo> {
     const result = await this.db
       .select(
         'invoices.id as invoiceId',
@@ -142,8 +144,8 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
         'payment_methods.id',
         '=',
         'payments.paymentMethodId'
-        )
-        .where({ 'invoices.id': invoiceId.id.toString() })
+      )
+      .where({ 'invoices.id': invoiceId.id.toString() });
 
     if (result.length === 0) {
       throw RepoError.createEntityNotFoundError(
@@ -171,14 +173,13 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     return deletedRows;
   }
-  
 
   async update(invoice: Invoice): Promise<Invoice> {
     const { db } = this;
 
     const updateObject = {
       ...InvoiceMap.toPersistence(invoice)
-    }
+    };
 
     const updated = await db(TABLES.INVOICES)
       .where({ id: invoice.invoiceId.id.toString() })

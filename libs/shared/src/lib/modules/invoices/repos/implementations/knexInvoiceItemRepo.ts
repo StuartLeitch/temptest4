@@ -48,7 +48,8 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
       .update({
         dateCreated: invoiceItem.dateCreated,
         invoiceId: invoiceItem.invoiceId.id.toString(),
-        vat: invoiceItem.vat
+        vat: invoiceItem.vat,
+        price: invoiceItem.price
       });
 
     if (!updated) {

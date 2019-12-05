@@ -14,7 +14,9 @@ export class InvoiceMap extends Mapper<Invoice> {
         status: raw.status,
         invoiceNumber: raw.invoiceNumber,
         dateCreated: new Date(raw.dateCreated),
-        dateAccepted: raw.dateAccepted ? new Date(raw.dateCreated) : null,
+        dateAccepted: raw.dateAccepted
+          ? new Date(raw.dateAccepted)
+          : new Date(raw.dateCreated),
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
         erpReference: raw.erpReference
       },
