@@ -99,6 +99,10 @@
       vertical-align: top;
     }
 
+    table.data.billing th em {
+      font-weight: normal;
+    }
+
     th.summary,
     td.summary {
       border-top: 0.1rem solid;
@@ -129,8 +133,8 @@
 
     .separator {
       border-top: 0.125rem solid;
-      padding: 0.75rem 0;
-      margin: 2rem 0;
+      padding: 0.5rem 0;
+      margin: 1.5rem 0;
     }
 
     .isCentered {
@@ -213,10 +217,10 @@
             <td><%= invoice.getInvoiceTotal().toFixed(2) %> USD</td>
           </tr>
           <tr>
-            <th class="summary">VAT
-              (<%= invoice.invoiceItems.currentItems.length > 0 ? invoice.invoiceItems.currentItems[0].vat : 0 %>%)
+            <th>VAT
+              <em>(<%= invoice.invoiceItems.currentItems.length > 0 ? invoice.invoiceItems.currentItems[0].vat : 0 %>%)</em>
             </th>
-            <td class="summary">
+            <td>
               <%= invoice.invoiceItems.currentItems.filter(item => item.type === 'APC').reduce((acc, item) => acc + (item.price * item.vat / 100), 0) %>
               USD
             </td>
