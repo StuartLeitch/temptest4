@@ -5,6 +5,7 @@ import { config } from "../../config";
 class _AuthClient {
   private kc: Keycloak.KeycloakInstance<"native">;
   public authState: any = {
+    isAuthenticated: false,
     user: null,
   };
 
@@ -49,8 +50,8 @@ class _AuthClient {
 
   public async init() {
     const kcOptions = {
-      // onLoad: "check-sso",
-      onLoad: "login-required",
+      onLoad: "check-sso",
+      // onLoad: "login-required",
       promiseType: "native",
       // silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
       // pkceMethod: "S256",

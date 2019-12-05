@@ -47,10 +47,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props: any) => {
     const boundLogout = AuthClient.logout.bind(AuthClient);
     return boundLogout().then(reload);
   };
-  const foo = () => console.log("bar");
 
   return (
-    <AuthContext.Provider value={{ data, login, logout, foo }} {...props} />
+    <AuthContext.Provider value={{ data, login, logout }} {...props} />
   );
 };
 

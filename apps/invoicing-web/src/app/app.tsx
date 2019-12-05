@@ -8,7 +8,7 @@ const loadInvoicesList = () => import("./pages/InvoicesList/InvoicesList");
 const InvoicesList = React.lazy(loadInvoicesList);
 
 import { useAuth } from "./contexts/Auth";
-import { AuthClient } from "./utils/auth-client";
+// import { AuthClient } from "./utils/auth-client";
 
 import { Header } from "./components/Header";
 import { PaymentDetails } from "./pages/PaymentDetails";
@@ -46,11 +46,11 @@ function AppRoutes() {
 
 // A wrapper for <Route> that asks for authentication if you're not yet authenticated.
 function PrivateRoute({ children, ...rest }) {
-  const { data, login, foo } = useAuth();
+  const { data, login } = useAuth();
 
   let toRender = null;
 
-  if (!data) {
+  if (!data || !data.isAuthenticated) {
     // * Ask user to login!
     login();
   }
