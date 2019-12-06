@@ -15,14 +15,25 @@ if (
 }
 
 const braintreeEnvironment =
-  environment.BT_ENVIRONMENT.charAt(0).toUpperCase() +
-  environment.BT_ENVIRONMENT.slice(1);
+  process.env.BT_ENVIRONMENT.charAt(0).toUpperCase() +
+  process.env.BT_ENVIRONMENT.slice(1);
 
-BraintreeGateway = new braintree.BraintreeGateway({
+const BraintreeGatewayConfig = {
   environment: braintree.Environment[braintreeEnvironment],
   merchantId: process.env.BT_MERCHANT_ID || environment.BT_MERCHANT_ID,
   publicKey: process.env.BT_PUBLIC_KEY || environment.BT_PUBLIC_KEY,
   privateKey: process.env.BT_PRIVATE_KEY || environment.BT_PRIVATE_KEY
-});
+};
+
+console.log('=======================================================');
+console.info(environment);
+console.info(process.env);
+console.info(braintreeEnvironment);
+console.info(braintree.Environment);
+console.info(braintree.Environment[braintreeEnvironment]);
+console.info(BraintreeGatewayConfig);
+console.log('=======================================================');
+
+BraintreeGateway = new braintree.BraintreeGateway(BraintreeGatewayConfig);
 
 export { BraintreeGateway };
