@@ -100,9 +100,7 @@ export class RecordPayPalPaymentUsecase
 
   private async getPayPalOrderDetails(orderId: string) {
     try {
-      const request = new checkoutNodeJsSDK.orders.OrdersCaptureRequest(
-        orderId
-      );
+      const request = new checkoutNodeJsSDK.orders.OrdersGetRequest(orderId);
       const order = await this.payPalService().execute(request);
       console.log(`PayPal Order ID: ${orderId}`);
       return right(order.result);
