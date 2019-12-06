@@ -1,5 +1,5 @@
-import { JournalEditorAssigned } from 'phenom-types/libs/events/src';
-import { Editor } from 'phenom-types/libs/events/src/lib/editor';
+import { JournalEditorAssigned } from 'phenom-events';
+import { Editor } from 'phenom-events/src/lib/editor';
 import { CreateEditorDTO } from '../usecases/editorialBoards/createEditor/createEditorDTO';
 import { EditorMap } from './EditorMap';
 

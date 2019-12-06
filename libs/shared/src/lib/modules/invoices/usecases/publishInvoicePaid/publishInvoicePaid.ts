@@ -17,7 +17,7 @@ export class PublishInvoicePaid {
     paymentDetails: InvoicePaymentInfo
   ): Promise<any> {
     const message = {
-      event: 'invoicePaid',
+      event: 'InvoicePaid',
       data: {
         invoiceId: invoice.id.toString(),
         invoiceItems: invoiceItems.map(ii => ({

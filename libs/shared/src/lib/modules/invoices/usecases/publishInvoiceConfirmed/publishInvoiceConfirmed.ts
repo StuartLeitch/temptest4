@@ -19,7 +19,7 @@ export class PublishInvoiceConfirmed {
     address: Address
   ): Promise<any> {
     const message = {
-      event: 'invoiceConfirmed',
+      event: 'InvoiceConfirmed',
       data: {
         invoiceId: invoice.id.toString(),
         referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,

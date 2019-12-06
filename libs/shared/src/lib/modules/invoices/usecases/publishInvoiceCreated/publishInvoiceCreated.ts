@@ -85,7 +85,7 @@ export class PublishInvoiceCreatedUsecase
     payload: InvoiceCreatedMessagePayload
   ): InvoiceCreatedMessage {
     return {
-      event: 'invoiceCreated',
+      event: 'InvoiceCreated',
       data: payload
     };
   }
@@ -202,6 +202,6 @@ interface InvoiceCreatedMessagePayload {
 }
 
 interface InvoiceCreatedMessage {
-  event: 'invoiceCreated';
+  event: 'InvoiceCreated';
   data: InvoiceCreatedMessagePayload;
 }
