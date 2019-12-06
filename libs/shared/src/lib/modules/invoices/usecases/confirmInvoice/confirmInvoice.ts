@@ -36,12 +36,24 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
-import { CreatePayerUsecase } from '../../../payers/usecases/createPayer/createPayer';
+import { CreateAddressRequestDTO } from '../../../addresses/usecases/createAddress/createAddressDTO';
+import {
+  CreatePayerUsecase,
+  CreatePayerRequestDTO
+} from '../../../payers/usecases/createPayer/createPayer';
 import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 
 import { VATService } from '../../../../domain/services/VATService';
+import { AddressId } from '../../../addresses/domain/AddressId';
 
 export type ConfirmInvoiceContext = AuthorizationContext<Roles>;
+
+interface PayerDataDomain {
+  address: Address;
+  invoice: Invoice;
+  payer: Payer;
+}
 
 export class ConfirmInvoiceUsecase
   implements
@@ -63,102 +75,119 @@ export class ConfirmInvoiceUsecase
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
     private vatService: VATService
-  ) {}
+  ) {
+    this.authorizationContext = { roles: [Roles.PAYER] };
+  }
 
   // @Authorize('payer:read')
   public async execute(
     request: ConfirmInvoiceDTO,
     context?: ConfirmInvoiceContext
   ): Promise<ConfirmInvoiceResponse> {
-    let address: Address;
-    let updatedPayer: Payer;
     let invoice: Invoice;
-    let invoiceItem: InvoiceItem;
-
-    const usecaseContext = { roles: [Roles.PAYER] };
-    const { payer } = request;
+    const { payer: payerInput } = request;
 
     const invoiceId = InvoiceId.create(
-      new UniqueEntityID(payer.invoiceId)
+      new UniqueEntityID(payerInput.invoiceId)
     ).getValue();
 
     invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
 
-    const createAddressUseCase = new CreateAddress(this.addressRepo);
-    const createPayerUseCase = new CreatePayerUsecase(this.payerRepo);
+    await this.checkVatId(payerInput);
 
-    // if (payer.type === PayerType.INSTITUTION) {
-    //   const vatResult = await this.vatService.checkVAT({
-    //     countryCode: payer.address.country,
-    //     vatNumber: payer.vatId
-    //   });
+    const maybePayerData = await this.savePayerData(payerInput);
 
-    //   if (!vatResult.valid) {
-    //     console.log(`VAT ${payer.vatId} is not valid.`);
-    //   }
-    // }
-    await this.checkVatId(payer);
-
-    const addressResult = await createAddressUseCase.execute({
-      city: payer.address.city,
-      country: payer.address.country,
-      addressLine1: payer.address.addressLine1
-    });
-
-    if (addressResult.isRight()) {
-      address = addressResult.value.getValue();
-    }
-
-    const createPayerRequest = {
-      invoiceId: payer.invoiceId,
-      type: payer.type,
-      name: payer.name,
-      email: payer.email,
-      vatId: payer.vatId,
-      organization: payer.organization || ' ',
-      addressId: address.addressId.id.toString()
-    };
-
-    const payerResult = await createPayerUseCase.execute(
-      createPayerRequest,
-      usecaseContext
-    );
-
-    if (payerResult.isRight()) {
-      updatedPayer = payerResult.value.getValue();
-    }
-
-    if (invoice.status !== InvoiceStatus.ACTIVE) {
-      // invoice.markAsActive();
-
-      // await changeInvoiceStatusUseCase.execute({
-      //   invoiceId: updatedPayer.invoiceId.id.toString(),
-      //   status: 'ACTIVE'
-      // });
-
-      // // * Apply and save VAT scheme
-      // const vat = this.vatService.calculateVAT(
-      //   payer.address.country,
-      //   payer.type !== PayerType.INSTITUTION
-      // );
-
-      // try {
-      //   [invoiceItem] = await this.invoiceItemRepo.getItemsByInvoiceId(
-      //     invoice.invoiceId
-      //   );
-      // } catch (err) {
-      //   // do nothing yet
-      // }
-
-      // invoiceItem.vat = vat;
-
-      // await this.invoiceItemRepo.update(invoiceItem);
-      await this.markInvoiceActive(invoice, updatedPayer, invoiceItem, address);
-    }
+    await map([this.choseAction], maybePayerData);
 
     DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-    return right(Result.ok(PayerMap.toPersistence(updatedPayer)));
+    return maybePayerData.map(({ payer }) => Result.ok(payer));
+  }
+
+  private async choseAction({ invoice, address, payer }: PayerDataDomain) {
+    if (invoice.status !== InvoiceStatus.ACTIVE) {
+      await this.markInvoiceAsActive(invoice, address, payer);
+    }
+
+    if (this.isPayerFromSanctionedCountry(address)) {
+      await this.markInvoiceAsPending(invoice, address, payer);
+    }
+  }
+
+  private isPayerFromSanctionedCountry(address: Address): boolean {
+    return false;
+  }
+
+  private async savePayerData(payerInput: PayerInput) {
+    const emptyPayload: PayerDataDomain = {
+      address: null,
+      invoice: null,
+      payer: null
+    };
+    return await map(
+      [
+        this.getInvoiceDetails.bind(this, payerInput),
+        this.createAddress.bind(this, payerInput),
+        this.createPayer.bind(this, payerInput)
+      ],
+      emptyPayload
+    );
+  }
+
+  private async getInvoiceDetails(
+    { invoiceId }: PayerInput,
+    payerData: PayerDataDomain
+  ) {
+    const getInvoiceDetailsUseCase = new GetInvoiceDetailsUsecase(
+      this.invoiceRepo
+    );
+    const maybeDetails = await getInvoiceDetailsUseCase.execute(
+      { invoiceId },
+      this.authorizationContext
+    );
+    return maybeDetails.map(invoiceResult => ({
+      ...payerData,
+      invoice: invoiceResult.getValue()
+    }));
+  }
+
+  private async createPayer(
+    payerInput: PayerInput,
+    payerData: PayerDataDomain
+  ) {
+    const createPayerUseCase = new CreatePayerUsecase(this.payerRepo);
+    const payerDTO: CreatePayerRequestDTO = {
+      invoiceId: payerInput.invoiceId,
+      type: payerInput.type,
+      name: payerInput.name,
+      email: payerInput.email,
+      vatId: payerInput.vatId,
+      organization: payerInput.organization || ' ',
+      addressId: payerData.address.addressId.id.toString()
+    };
+
+    return (
+      await createPayerUseCase.execute(payerDTO, this.authorizationContext)
+    ).map(payerResult => ({ ...payerData, payer: payerResult.getValue() }));
+  }
+
+  private async createAddress(
+    { address }: PayerInput,
+    payerData: PayerDataDomain
+  ) {
+    const createAddressUseCase = new CreateAddress(this.addressRepo);
+    const addressDTO = {
+      city: address.city,
+      country: address.country,
+      addressLine1: address.addressLine1
+    };
+
+    return (await createAddressUseCase.execute(addressDTO)).map(
+      addressResult => ({
+        ...payerData,
+        address: addressResult.getValue()
+      })
+    );
   }
 
   private async checkVatId(payer: PayerInput) {
@@ -174,12 +203,18 @@ export class ConfirmInvoiceUsecase
     }
   }
 
-  private async markInvoiceActive(
+  private async markInvoiceAsPending(
     invoice: Invoice,
-    payer: Payer,
-    invoiceItem: InvoiceItem,
-    address: Address
+    address: Address,
+    payer: Payer
+  ) {}
+
+  private async markInvoiceAsActive(
+    invoice: Invoice,
+    address: Address,
+    payer: Payer
   ) {
+    let invoiceItem: InvoiceItem;
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );
