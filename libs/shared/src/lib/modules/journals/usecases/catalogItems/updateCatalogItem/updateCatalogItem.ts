@@ -8,7 +8,7 @@ import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
 import { CatalogMap } from '../../../mappers/CatalogMap';
 
-export interface AddCatalogItemToCatalogUseCaseRequestDTO {
+export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
   type: string;
   amount: number;
   currency?: string;
@@ -19,16 +19,16 @@ export interface AddCatalogItemToCatalogUseCaseRequestDTO {
   updated?: string;
   isActive?: boolean;
 }
-export type AddCatalogItemToCatalogUseCaseResponse = Either<
+export type UpdateCatalogItemToCatalogUseCaseResponse = Either<
   // | UpdateTransactionErrors.SomeBlahBlahError
   AppError.UnexpectedError,
   Result<CatalogItem>
 >;
-export class AddCatalogItemToCatalogUseCase
+export class UpdateCatalogItemToCatalogUseCase
   implements
     UseCase<
-      AddCatalogItemToCatalogUseCaseRequestDTO,
-      AddCatalogItemToCatalogUseCaseResponse
+      UpdateCatalogItemToCatalogUseCaseRequestDTO,
+      UpdateCatalogItemToCatalogUseCaseResponse
     > {
   private catalogRepo: CatalogRepoContract;
 
@@ -37,8 +37,8 @@ export class AddCatalogItemToCatalogUseCase
   }
 
   public async execute(
-    request: AddCatalogItemToCatalogUseCaseRequestDTO
-  ): Promise<AddCatalogItemToCatalogUseCaseResponse> {
+    request: UpdateCatalogItemToCatalogUseCaseRequestDTO
+  ): Promise<UpdateCatalogItemToCatalogUseCaseResponse> {
     const {
       type,
       amount,
@@ -52,27 +52,48 @@ export class AddCatalogItemToCatalogUseCase
     } = request;
 
     try {
-      const catalogItemOrError = CatalogItem.create({
-        type,
-        amount,
-        created: created ? new Date(created) : null,
-        updated: updated ? new Date(updated) : null,
-        currency,
-        isActive,
-        issn,
-        journalId: JournalId.create(new UniqueEntityID(journalId)).getValue(),
-        journalTitle
-      }, new UniqueEntityID());
+      const journalIdValueObject = JournalId.create(
+        new UniqueEntityID(journalId)
+      ).getValue();
 
-      if (catalogItemOrError.isFailure) {
-        return left(new AppError.UnexpectedError(catalogItemOrError.error))
+      // getting catalog item id
+      let catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+        journalIdValueObject
+      );
+
+      if (!catalogItem) {
+        return left(
+          new AppError.UnexpectedError(
+            `Journal with id ${journalIdValueObject.id.toString()} does not exist.`
+          )
+        );
       }
 
-      const catalogItem = catalogItemOrError.getValue();
+      const catalogItemOrError = CatalogItem.create(
+        {
+          type,
+          amount,
+          created: created ? new Date(created) : null,
+          updated: updated ? new Date(updated) : null,
+          currency,
+          isActive,
+          issn,
+          journalId: journalIdValueObject,
+          journalTitle
+        },
+        catalogItem.id
+      );
+
+      if (catalogItemOrError.isFailure) {
+        return left(new AppError.UnexpectedError(catalogItemOrError.error));
+      }
+
+      catalogItem = catalogItemOrError.getValue();
 
       // This is where all the magic happens
-      await this.catalogRepo.save(catalogItem);
+      await this.catalogRepo.updateCatalogItem(catalogItem);
 
+      // todo will editors change here?
       return right(Result.ok<CatalogItem>(catalogItem));
     } catch (err) {
       console.log(err);

@@ -1,0 +1,61 @@
+import { Mapper } from '../../../infrastructure/Mapper';
+import { Editor } from '../domain/Editor';
+import { UniqueEntityID } from '@hindawi/shared';
+import { Email } from '../../../domain/Email';
+import { Name } from '../../../domain/Name';
+import { JournalId } from '../domain/JournalId';
+import { EditorRole } from '../../../domain/EditorRole';
+import { UserId } from '../../users/domain/UserId';
+import { CreateEditorDTO } from '../usecases/editorialBoards/createEditor/createEditorDTO';
+
+export class EditorMap extends Mapper<Editor> {
+  public static toDomain(raw: any): Editor {
+    const editorOrError = Editor.create(
+      {
+        journalId: JournalId.create(
+          new UniqueEntityID(raw.journalId)
+        ).getValue(),
+        userId: UserId.create(new UniqueEntityID(raw.userId)),
+        email: Email.create({ value: raw.email }).getValue(),
+        name: Name.create({ value: raw.name }).getValue(),
+        createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
+        updatedAt: raw.updatedAt ? new Date(raw.creatupdatedAtedAt) : null,
+        role: EditorRole.create({
+          label: raw.roleLabel,
+          type: raw.roleType
+        }).getValue()
+      },
+      new UniqueEntityID(raw.id)
+    );
+
+    return editorOrError.isSuccess ? editorOrError.getValue() : null;
+  }
+
+  public static toPersistence(editor: Editor): any {
+    return {
+      id: editor.editorId.id.toString(),
+      journalId: editor.journalId.id.toString(),
+      userId: editor.userId.id.toString(),
+      email: editor.email.value,
+      name: editor.name.value,
+      roleLabel: editor.role.label,
+      roleType: editor.role.type,
+      createdAt: editor.createdAt,
+      updatedAt: editor.updatedAt
+    };
+  }
+
+  public static fromEventToDTO(raw: any): CreateEditorDTO {
+    return {
+      editorId: raw.id,
+      journalId: raw.journalId,
+      userId: raw.userId,
+      email: raw.email,
+      name: raw.givenNames,
+      createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
+      updatedAt: raw.updatedAt ? new Date(raw.creatupdatedAtedAt) : null,
+      roleLabel: raw.role && raw.role.label,
+      roleType: raw.role && raw.role.type
+    };
+  }
+}

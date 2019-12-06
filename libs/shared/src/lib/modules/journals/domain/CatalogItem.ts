@@ -10,6 +10,10 @@ export interface CatalogItemProps {
   currency?: string;
   journalId: JournalId;
   journalTitle?: string;
+  issn?: string;
+  created?: Date;
+  updated?: Date;
+  isActive?: boolean;
 }
 
 export class CatalogItem extends AggregateRoot<CatalogItemProps> {
@@ -52,5 +56,21 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   public get currency(): string {
     return this.props.currency;
+  }
+
+  public get issn(): string {
+    return this.props.issn;
+  }
+
+  public get created(): Date {
+    return this.props.created;
+  }
+
+  public get updated(): Date {
+    return this.props.updated;
+  }
+
+  public get isActive(): boolean {
+    return this.props.isActive;
   }
 }

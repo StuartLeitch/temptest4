@@ -1,4 +1,11 @@
-import {CatalogRepoContract} from './catalogRepo';
-import {KnexCatalogRepo} from './implementations/knexCatalogRepo';
+import { CatalogRepoContract } from './catalogRepo';
+import { EditorRepoContract } from './editorRepo';
+import { KnexCatalogRepo } from './implementations/knexCatalogRepo';
+import { KnexEditorRepo } from './implementations/knexEditorRepo';
 
-export {CatalogRepoContract, KnexCatalogRepo};
+export {
+  CatalogRepoContract,
+  KnexCatalogRepo,
+  KnexEditorRepo,
+  EditorRepoContract
+};

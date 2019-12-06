@@ -14,7 +14,12 @@ export class CatalogMap extends Mapper<CatalogItem> {
           new UniqueEntityID(raw.journalId)
         ).getValue(),
         type: raw.type,
-        amount: raw.amount
+        amount: raw.amount,
+        created: raw.created ? new Date(raw.created) : null,
+        updated: raw.updated ? new Date(raw.updated) : null,
+        currency: raw.currency,
+        isActive: !!raw.isActive,
+        journalTitle: raw.journalTitle
         // price: Money.fromInteger({amount: raw.amount, currency: Currencies.USD})
         // dateUpdated: new Date(raw.dateUpdated)
       },
@@ -29,7 +34,12 @@ export class CatalogMap extends Mapper<CatalogItem> {
       id: catalogItem.id.toString(),
       type: catalogItem.type,
       amount: catalogItem.amount,
-      journalId: catalogItem.journalId.toString()
+      journalId: catalogItem.journalId.id.toString(),
+      created: catalogItem.created,
+      updated: catalogItem.updated,
+      isActive: catalogItem.isActive ? 1 : 0,
+      currency: catalogItem.currency,
+      journalTitle: catalogItem.journalTitle
       // status: catalog.status,
       // amount: catalog.amount.value,
       // dateAdded: catalog.dateAdded,

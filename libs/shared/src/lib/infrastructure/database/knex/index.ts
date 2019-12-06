@@ -15,7 +15,8 @@ export enum TABLES {
   PAYMENTS = 'payments',
   PAYMENT_METHODS = 'payment_methods',
   TRANSACTIONS = 'transactions',
-  WAIVERS = 'waivers'
+  WAIVERS = 'waivers',
+  EDITORS = 'editors'
 }
 
 interface DbOptions {

@@ -12,11 +12,21 @@ import {EditorRole} from './../../../domain/EditorRole';
 // import {MemberCreated} from './events/memberCreated';
 
 import {EditorId} from './EditorId';
+import { UserId } from '../../users/domain/UserId';
+import { JournalId } from './JournalId';
+
+// So far it's the only role that is assigned to chief editor
+// should have a discound of 100%, rest of the roles being 50%
+const CHIEF_EDITOR_ROLE = 'triageEditor'
 
 export interface EditorProps {
   name: Name;
   email: Email;
+  userId: UserId;
+  journalId: JournalId;
   role: EditorRole;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type EditorCollection = Editor[];
@@ -36,6 +46,26 @@ export class Editor extends AggregateRoot<EditorProps> {
 
   get role(): EditorRole {
     return this.props.role;
+  }
+
+  get journalId(): JournalId {
+    return this.props.journalId;
+  }
+
+  get createdAt(): Date {
+    return this.props.createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this.props.updatedAt;
+  }
+
+  get userId(): UserId {
+    return this.props.userId;
+  }
+
+  isChiefEditor(): boolean {
+    return this.props.role.type === CHIEF_EDITOR_ROLE;
   }
 
   private constructor(props: EditorProps, id?: UniqueEntityID) {
