@@ -4,6 +4,14 @@ import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
 import { SubmissionQualityCheckRTCd } from './SubmissionQualityCheckRTCd';
 import { SubmissionRejected } from './SubmissionRejected';
 import { SubmissionWithdrawn } from './SubmissionWithdrawn';
+import { JournalAddedHandler } from './JournalAdded';
+import { JournalUpdatedHandler } from './JournalUpdated';
+import {
+  JournalEditorAssignedHandler,
+  JournalSectionEditorAssignedHandler,
+  JournalSectionSpecialIssueEditorAssignedHandler,
+  JournalSpecialIssueEditorAssignedHandler
+} from './JournalEditorAssigned';
 
 export {
   SubmissionSubmittedHandler,
@@ -11,5 +19,11 @@ export {
   SubmissionWithdrawn,
   SubmissionScreeningRTCd,
   SubmissionQualityCheckRTCd,
-  SubmissionRejected
+  SubmissionRejected,
+  JournalAddedHandler,
+  JournalUpdatedHandler,
+  JournalEditorAssignedHandler,
+  JournalSectionEditorAssignedHandler,
+  JournalSectionSpecialIssueEditorAssignedHandler,
+  JournalSpecialIssueEditorAssignedHandler
 };
