@@ -14,6 +14,7 @@ import {
   ErpResponse
 } from '@hindawi/shared';
 import { Config } from '../../config';
+import countryList from 'country-list';
 
 function ensureSuccess(result: RecordResult): SuccessResult {
   if (!result.success) {
@@ -180,7 +181,7 @@ export class ErpService implements ErpServiceContract {
       s2cor__Status__c: 'Unsubmitted',
       s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
       s2cor__Legal_Note__c: this.getVatNote(vatNote, items, rate),
-      s2cor__BillingCountry__c: billingAddress.country,
+      s2cor__BillingCountry__c: countryList.getName(billingAddress.country),
       s2cor__BillingCity__c: billingAddress.city,
       s2cor__BillingStreet__c: billingAddress.addressLine1,
       s2cor__Description__c: description
