@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import React, { useState, useEffect, useRef } from "react";
 import scriptLoader from "react-async-script-loader";
 
 import { config } from "../../../../config";
 
 interface Props {
   total: number;
-  currency: string;
+  currency?: string;
   isScriptLoaded: boolean;
   isScriptLoadSucceed: boolean;
   paymentMethodId: string;
@@ -15,12 +14,12 @@ interface Props {
   onSuccess?(data?: any): void;
 }
 
-const CLIENT = {
-  sandbox: config.paypallClientId,
-  production: config.paypallClientId,
-};
-
 const ENV = config.env === "production" ? "production" : "sandbox";
+
+const CLIENT = {
+  production: config.paypallClientId,
+  sandbox: config.paypallClientId,
+};
 
 const Paypal: React.FunctionComponent<Props> = ({
   total,
@@ -32,70 +31,49 @@ const Paypal: React.FunctionComponent<Props> = ({
   paymentMethodId,
   isScriptLoadSucceed,
 }) => {
-  const [showButton, setShowButton] = useState(false);
-
-  // useEffect(() => {
-  //   window.React = React;
-  //   window.ReactDOM = ReactDOM;
-  // }, []);
+  let paypalRef = useRef();
 
   useEffect(() => {
-    if (!showButton && isScriptLoadSucceed && isScriptLoaded) {
-      setShowButton(true);
-    }
-  }, [showButton, isScriptLoadSucceed, isScriptLoaded]);
-
-  const payment = () =>
-    (window as any).paypal.rest.payment.create(ENV, CLIENT, {
-      transactions: [
-        {
-          amount: {
-            total,
-            currency,
+    isScriptLoadSucceed &&
+      isScriptLoaded &&
+      (window as any).paypal
+        .Buttons({
+          createOrder: (data, actions) => {
+            return actions.order.create({
+              purchase_units: [
+                {
+                  amount: {
+                    currency_code: currency,
+                    value: total,
+                  },
+                },
+              ],
+            });
           },
-        },
-      ],
-    });
+          onApprove: async (data, actions) => {
+            const order = await actions.order.capture();
+            const payment = {
+              paid: true,
+              cancelled: false,
+              payerID: data.payerID,
+              orderID: data.orderID,
+              paymentMethodId,
+            };
+            onSuccess(payment);
+          },
+          onError,
+          onCancel,
+        })
+        .render(paypalRef.current);
+  }, [total, isScriptLoadSucceed, isScriptLoaded]);
 
-  const onAuthorize = (data, actions) =>
-    actions.payment.execute().then(() => {
-      const payment = {
-        paid: true,
-        cancelled: false,
-        payerID: data.payerID,
-        paymentID: data.paymentID,
-        paymentToken: data.paymentToken,
-        returnUrl: data.returnUrl,
-        orderID: data.orderID,
-        paymentMethodId,
-      };
-      onSuccess(payment);
-    }, onError);
-
-  const PaypalBtn =
-    showButton &&
-    (window as any).paypal.Button.driver("react", { React, ReactDOM });
-
-  return (
-    showButton && (
-      <PaypalBtn
-        env={ENV}
-        commit={true}
-        client={CLIENT}
-        payment={payment}
-        currency={currency}
-        onError={onError}
-        onCancel={onCancel}
-        onAuthorize={onAuthorize}
-      />
-    )
-  );
+  return isScriptLoadSucceed && isScriptLoaded && <div ref={paypalRef} />;
 };
 
 Paypal.defaultProps = {
   currency: "USD",
 };
 
-export default scriptLoader("https://www.paypalobjects.com/api/checkout.js")(
-  Paypal,
-);
+export default scriptLoader(
+  `https://www.paypal.com/sdk/js?client-id=${CLIENT[ENV]}`,
+)(Paypal);
