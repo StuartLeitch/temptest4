@@ -7,6 +7,7 @@ export class Config {
   gqlRoot: string;
   paypallClientId: string;
 
+  authEnabled: boolean;
   authServerUrl: string;
   authServerRealm: string;
   authServerClientId: string;
@@ -26,6 +27,7 @@ export class Config {
     this.gqlRoot = globalConfig.GQL_ROOT;
     this.paypallClientId = globalConfig.PP_CLIENT_ID;
 
+    this.authEnabled = globalConfig.AUTH_ENABLED === "true";
     this.authServerUrl = globalConfig.AUTH_SERVER_URL;
     this.authServerRealm = globalConfig.AUTH_SERVER_REALM;
     this.authServerClientId = globalConfig.AUTH_SERVER_CLIENT_ID;

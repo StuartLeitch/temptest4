@@ -46,10 +46,16 @@ function AppRoutes() {
 
 // A wrapper for <Route> that asks for authentication if you're not yet authenticated.
 function PrivateRoute({ children, ...rest }) {
-  const { data, login } = useAuth();
+  const auth = useAuth();
+
+  // * If auth is not enabled
+  if (typeof auth === "object" && !auth) {
+    return <React.Suspense fallback={null}>{children}</React.Suspense>;
+  }
 
   let toRender = null;
 
+  const { data, login } = auth;
   if (!data || !data.isAuthenticated) {
     // * Ask user to login!
     login();
