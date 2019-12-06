@@ -10,6 +10,7 @@ import { InvoiceItems } from './InvoiceItems';
 import { InvoiceSentEvent } from './events/invoiceSent';
 import { InvoicePaidEvent } from './events/invoicePaid';
 import { InvoiceCreated } from './events/invoiceCreated';
+import { InvoicePending } from './events/invoicePending';
 import { InvoiceActivated } from './events/invoiceActivated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
@@ -19,6 +20,7 @@ import { PaymentId } from '../../payments/domain/PaymentId';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
+  PENDING = 'PENDING', // when a user confirms the invoice from a sanctioned country
   ACTIVE = 'ACTIVE', // when the customer is being notified
   FINAL = 'FINAL' // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
 }
@@ -91,7 +93,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   set dateAccepted(dateAccepted: Date) {
-    this.props.dateAccepted = dateAccepted
+    this.props.dateAccepted = dateAccepted;
   }
 
   get invoiceItems(): InvoiceItems {
@@ -170,6 +172,13 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   public send(): void {
     this.addDomainEvent(new InvoiceSentEvent(this.invoiceId, new Date()));
+  }
+
+  public markAsPending(): void {
+    const now = new Date();
+    this.props.dateUpdated = now;
+    this.props.status = InvoiceStatus.PENDING;
+    this.addDomainEvent(new InvoicePending(this, now));
   }
 
   public markAsActive(): void {
