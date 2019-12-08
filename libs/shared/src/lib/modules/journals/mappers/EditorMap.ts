@@ -19,7 +19,9 @@ export class EditorMap extends Mapper<Editor> {
         email: Email.create({ value: raw.email }).getValue(),
         name: Name.create({ value: raw.name }).getValue(),
         createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
-        updatedAt: raw.updatedAt ? new Date(raw.creatupdatedAtedAt) : null,
+        updatedAt: raw.updatedAt
+          ? new Date(raw.updatedAt)
+          : new Date(raw.createdAt),
         role: EditorRole.create({
           label: raw.roleLabel,
           type: raw.roleType

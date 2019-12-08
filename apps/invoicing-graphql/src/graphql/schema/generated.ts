@@ -39,6 +39,11 @@ export type Article = {
   authorFirstName?: Maybe<Scalars['String']>,
 };
 
+export type ClientToken = {
+   __typename?: 'ClientToken',
+  token: Scalars['String'],
+};
+
 export type CreditCardInput = {
   amount: Scalars['Float'],
   cardNumber: Scalars['String'],
@@ -135,7 +140,8 @@ export type MutationCreditCardPaymentArgs = {
   invoiceId: Scalars['String'],
   payerId: Scalars['String'],
   paymentMethodId: Scalars['String'],
-  creditCard: CreditCardInput
+  paymentMethodNonce: Scalars['String'],
+  amount: Scalars['Float']
 };
 
 
@@ -158,7 +164,7 @@ export type MutationMigratePaymentArgs = {
 export type MutationMigrateInvoiceArgs = {
   invoiceId: Scalars['String'],
   vatValue?: Maybe<Scalars['Float']>,
-  invoiceReference?: Maybe<Scalars['String']>,
+  invoiceReference?: Maybe<Scalars['Float']>,
   discount?: Maybe<Scalars['Float']>,
   APC?: Maybe<Scalars['Float']>,
   dateIssued?: Maybe<Scalars['String']>,
@@ -214,6 +220,7 @@ export type PaymentMethod = {
 export type Query = {
    __typename?: 'Query',
   getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>,
+  getClientToken?: Maybe<ClientToken>,
   invoice?: Maybe<Invoice>,
   invoiceVat?: Maybe<InvoiceVat>,
   invoices?: Maybe<Array<Maybe<Invoice>>>,
@@ -324,6 +331,7 @@ export type ResolversTypes = {
   PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
   String: ResolverTypeWrapper<Scalars['String']>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
+  ClientToken: ResolverTypeWrapper<ClientToken>,
   Invoice: ResolverTypeWrapper<Invoice>,
   Float: ResolverTypeWrapper<Scalars['Float']>,
   InvoiceStatus: InvoiceStatus,
@@ -339,8 +347,8 @@ export type ResolversTypes = {
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Transaction: ResolverTypeWrapper<Transaction>,
-  CreditCardInput: CreditCardInput,
   Payment: ResolverTypeWrapper<Payment>,
+  CreditCardInput: CreditCardInput,
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -349,6 +357,7 @@ export type ResolversParentTypes = {
   PaymentMethod: PaymentMethod,
   String: Scalars['String'],
   Boolean: Scalars['Boolean'],
+  ClientToken: ClientToken,
   Invoice: Invoice,
   Float: Scalars['Float'],
   InvoiceStatus: InvoiceStatus,
@@ -364,8 +373,8 @@ export type ResolversParentTypes = {
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Transaction: Transaction,
-  CreditCardInput: CreditCardInput,
   Payment: Payment,
+  CreditCardInput: CreditCardInput,
 };
 
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
@@ -386,6 +395,10 @@ export type ArticleResolvers<ContextType = any, ParentType extends ResolversPare
   authorCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   authorSurname?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   authorFirstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+};
+
+export type ClientTokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['ClientToken'] = ResolversParentTypes['ClientToken']> = {
+  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 };
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
@@ -437,7 +450,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
   setTransactionToActive?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, MutationSetTransactionToActiveArgs>,
-  creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'creditCard'>>,
+  creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentMethodNonce' | 'amount'>>,
   recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'paymentMethodId' | 'invoiceId' | 'payerId' | 'orderId'>>,
   migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
@@ -472,6 +485,7 @@ export type PaymentMethodResolvers<ContextType = any, ParentType extends Resolve
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getPaymentMethods?: Resolver<Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>, ParentType, ContextType>,
+  getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>,
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, QueryInvoiceVatArgs>,
   invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
@@ -487,6 +501,7 @@ export type TransactionResolvers<ContextType = any, ParentType extends Resolvers
 export type Resolvers<ContextType = any> = {
   Address?: AddressResolvers<ContextType>,
   Article?: ArticleResolvers<ContextType>,
+  ClientToken?: ClientTokenResolvers<ContextType>,
   Date?: GraphQLScalarType,
   Invoice?: InvoiceResolvers<ContextType>,
   InvoiceId?: InvoiceIdResolvers<ContextType>,

@@ -128,8 +128,13 @@ type PaymentMethod {
   isActive: Boolean
 }
 
+type ClientToken {
+  token: String!
+}
+
 type Query {
   getPaymentMethods: [PaymentMethod]
+  getClientToken: ClientToken
   invoice(invoiceId: String): Invoice
   invoiceVat(invoiceId: String, country: String, payerType: String): InvoiceVat
   invoices: [Invoice]
@@ -146,7 +151,8 @@ type Mutation {
     invoiceId: String!
     payerId: String!
     paymentMethodId: String!
-    creditCard: CreditCardInput!
+    paymentMethodNonce: String!
+    amount: Float!
   ): Payment!
   recordPayPalPayment(
     paymentMethodId: String!

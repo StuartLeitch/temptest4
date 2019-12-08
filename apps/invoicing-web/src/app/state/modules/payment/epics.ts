@@ -16,6 +16,7 @@ import { queries, mutations } from "./graphql";
 import {
   recordPayPalPayment,
   getPaymentMethods,
+  getClientToken,
   recordCardPayment,
 } from "./actions";
 import { getInvoice } from "./../invoice/actions";
@@ -35,6 +36,16 @@ const getPaymentsMethodsEpic: RootEpic = (
   );
 };
 
+const getClientTokenEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
+  return action$.pipe(
+    filter(isActionOf(getClientToken.request)),
+    switchMap(() => graphqlAdapter.send(queries.getClientToken)),
+    map(r => {
+      return getClientToken.success(r.data.getClientToken);
+    }),
+  );
+};
+
 const creditCardPaymentEpic: RootEpic = (
   action$,
   state$,
@@ -47,13 +58,16 @@ const creditCardPaymentEpic: RootEpic = (
         paymentMethodId,
         invoiceId,
         payerId,
-        ...creditCard
+        paymentMethodNonce,
+        amount,
       } = action.payload;
+
       return graphqlAdapter.send(mutations.creditCardPayment, {
         invoiceId,
         payerId,
         paymentMethodId,
-        creditCard,
+        paymentMethodNonce,
+        amount,
       });
     }),
     withLatestFrom(state$.pipe(map(invoice))),
@@ -102,5 +116,6 @@ const recordPayPalPaymentEpic: RootEpic = (
 export default [
   recordPayPalPaymentEpic,
   getPaymentsMethodsEpic,
+  getClientTokenEpic,
   creditCardPaymentEpic,
 ];

@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { connect } from "react-redux";
 import { RootState } from "typesafe-actions";
 import { Formik } from "formik";
-import { config } from "../../../../config";
 import styled from "styled-components";
 import {
   Text,
@@ -13,6 +12,7 @@ import {
   th,
 } from "@hindawi/react-components";
 
+import { config } from "../../../../config";
 import Paypal from "./Paypal";
 import BankTransfer from "./BankTransfer";
 import ChoosePayment from "./ChoosePayment";
@@ -28,6 +28,7 @@ const PAYMENT_METHODS = {
 };
 
 interface Props {
+  ccToken: string;
   invoice: any;
   error: string;
   invoiceCharge: number;
@@ -60,7 +61,7 @@ const validateFn = methods => values => {
   return errors;
 };
 
-const calculateTotalToBePaid = invoice => {
+const calculateTotalToBePaid = (invoice: any) => {
   const netValue = invoice.invoiceItem.price;
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
@@ -94,6 +95,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   status,
   payByCardSubmit,
   payByPayPalSubmit,
+  ccToken,
 }) => {
   const parsedMethods = useMemo(
     () =>
@@ -104,6 +106,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       })),
     [methods],
   );
+
   return (
     <Expander
       title="2. Invoice &amp; Payment"
@@ -132,7 +135,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
             }}
             onSubmit={payByCardSubmit}
           >
-            {({ handleSubmit, setFieldValue, values }) => {
+            {({ setFieldValue, values }) => {
               return (
                 <Root>
                   <ChoosePayment
@@ -142,7 +145,11 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                   />
                   {methods[values.paymentMethodId] === "Credit Card" && (
                     <CreditCardForm
-                      handleSubmit={handleSubmit}
+                      ccToken={ccToken}
+                      payerId={invoice && invoice.payer && invoice.payer.id}
+                      paymentMethodId={values.paymentMethodId}
+                      handleSubmit={payByCardSubmit}
+                      total={calculateTotalToBePaid(invoice)}
                       loading={loading}
                     />
                   )}

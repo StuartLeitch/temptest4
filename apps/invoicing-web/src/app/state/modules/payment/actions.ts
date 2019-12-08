@@ -2,6 +2,8 @@ import { createAsyncAction } from "typesafe-actions";
 
 import {
   CreditCardInput,
+  ClientTokenInput,
+  ClientToken,
   PaymentMethod,
   PayPalPayment,
   Payment,
@@ -12,6 +14,12 @@ export const getPaymentMethods = createAsyncAction(
   "payments/GET_PAYMENT_METHODS_SUCCESS",
   "payments/GET_PAYMENT_METHODS_ERROR",
 )<CreditCardInput, PaymentMethod[], string>();
+
+export const getClientToken = createAsyncAction(
+  "payments/GET_CLIENT_TOKEN_REQUEST",
+  "payments/GET_CLIENT_TOKEN_SUCCESS",
+  "payments/GET_CLIENT_TOKEN_ERROR",
+)<ClientTokenInput, ClientToken, string>();
 
 export const recordCardPayment = createAsyncAction(
   "payments/RECORD_CARD_REQUEST",

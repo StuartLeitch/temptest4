@@ -7,3 +7,9 @@ export const paymentMethodFragment = gql`
     isActive
   }
 `;
+
+export const clientTokenFragment = gql`
+  fragment clientTokenFragment on ClientToken {
+    token
+  }
+`;

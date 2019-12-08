@@ -9,6 +9,8 @@ export const getPaymentMethods = createSelector(_getPayments, p =>
     .reduce((acc, el) => ({ ...acc, [el.id]: el.name }), {}),
 );
 
+export const getToken = createSelector(_getPayments, p => p.payment.token);
+
 export const paymentMethodsLoading = createSelector(
   _getPayments,
   p => p.getMethodsLoading.loading,

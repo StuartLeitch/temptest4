@@ -1,12 +1,18 @@
 export interface CreditCardInput {
   amount: number;
-  cardNumber: string;
-  expiration: string;
-  cvv: string;
-  postalCode: string;
   paymentMethodId: string;
   invoiceId: string;
   payerId: string;
+  paymentMethodNonce: string;
+  // cardNumber: string;
+  // expiration: string;
+  // cvv: string;
+  // postalCode: string;
+}
+
+export interface ClientTokenInput {}
+export interface ClientToken {
+  token: string;
 }
 
 export interface Payment {
@@ -25,6 +31,7 @@ export interface PaymentMethod {
 
 export interface PaymentsSlice {
   methods: PaymentMethod[];
+  token: string;
 }
 
 export interface PayPalPayment {

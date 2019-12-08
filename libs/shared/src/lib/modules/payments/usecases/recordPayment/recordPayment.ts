@@ -85,7 +85,7 @@ export class RecordPaymentUsecase
       await this.invoiceRepo.update(invoice);
 
       DomainEvents.dispatchEventsForAggregate(invoice.id);
-      
+
       return right(Result.ok(payment));
     } catch (e) {
       return left(new AppError.UnexpectedError(e));

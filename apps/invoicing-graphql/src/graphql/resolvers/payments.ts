@@ -8,6 +8,7 @@ import {
   RecordCreditCardPaymentUsecase,
   RecordPayPalPaymentUsecase
 } from '@hindawi/shared';
+import { GenerateClientTokenUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/generateClientToken/generateClientToken';
 
 export const payments: Resolvers<Context> = {
   Query: {
@@ -21,6 +22,18 @@ export const payments: Resolvers<Context> = {
       } else {
         throw new Error(`Can't get payments methods.`);
       }
+    },
+    async getClientToken(parent, args, context) {
+      const usecase = new GenerateClientTokenUsecase();
+
+      const result = await usecase.execute({});
+
+      if (result.isRight()) {
+        const paymentClientToken = result.value.getValue();
+        return paymentClientToken;
+      } else {
+        throw new Error(`Can't get client token.`);
+      }
     }
   },
   Mutation: {
@@ -29,7 +42,13 @@ export const payments: Resolvers<Context> = {
         checkoutService,
         repos: { payment: paymentRepo, invoice: invoiceRepo }
       } = context;
-      const { invoiceId, payerId, paymentMethodId, creditCard } = args;
+      const {
+        invoiceId,
+        payerId,
+        paymentMethodId,
+        paymentMethodNonce,
+        amount
+      } = args;
 
       const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
         paymentRepo,
@@ -40,23 +59,13 @@ export const payments: Resolvers<Context> = {
       const result = await recordCreditCardPaymentUsecase.execute(
         {
           paymentMethodId,
+          paymentMethodNonce,
           invoiceId,
-          amount: creditCard.amount,
+          amount,
           payerId
         },
         usecaseContext
       );
-
-      // return {
-      //   id: '123',
-      //   invoiceId: '345',
-      //   payerId: '1231',
-      //   paymentMethodId: '12312312',
-      //   foreignPaymentId: '132131',
-      //   paymentProof: '1231312',
-      //   amount: 123.4,
-      //   datePaid: new Date()
-      // };
 
       if (result.isLeft()) {
         return null;

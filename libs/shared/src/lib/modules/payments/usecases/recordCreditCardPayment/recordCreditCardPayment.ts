@@ -20,8 +20,8 @@ import { RecordCreditCardPaymentResponse } from './recordCreditCardPaymentRespon
 import { RecordCreditCardPaymentErrors } from './recordCreditCardPaymentErrors';
 import { RecordCreditCardPaymentDTO } from './recordCreditCardPaymentDTO';
 
-import { CreditCard } from './../../domain/strategies/CreditCard';
-import { CreditCardPayment } from './../../domain/strategies/CreditCardPayment';
+import { Braintree } from './../../domain/strategies/Braintree';
+import { BraintreePayment } from './../../domain/strategies/BraintreePayment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 import { PaymentModel } from './../../domain/contracts/PaymentModel';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
@@ -50,14 +50,15 @@ export class RecordCreditCardPaymentUsecase
     request: RecordCreditCardPaymentDTO,
     context?: RecordCreditCardPaymentContext
   ): Promise<RecordCreditCardPaymentResponse> {
-    const creditCard = new CreditCard();
+    const braintree = new Braintree();
+    braintree.paymentMethodNonce = request.paymentMethodNonce;
     const paymentFactory = new PaymentFactory();
-    paymentFactory.registerPayment(creditCard);
+    paymentFactory.registerPayment(braintree);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['CreditCard', new CreditCardPayment(BraintreeGateway)]
+      ['Braintree', new BraintreePayment(BraintreeGateway)]
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
-      'CreditCardPayment'
+      'BraintreePayment'
     );
 
     const payment: any = await paymentStrategy.makePayment(

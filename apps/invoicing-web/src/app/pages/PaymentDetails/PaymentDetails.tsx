@@ -12,7 +12,7 @@ import { PaymentHeader } from "./PaymentHeader";
 import { PaymentFooter } from "./PaymentFooter";
 
 import {
-  invoiceTypes,
+  // invoiceTypes,
   invoiceActions,
   invoiceSelectors,
 } from "../../state/modules/invoice";
@@ -22,7 +22,8 @@ import {
   paymentActions,
   paymentTypes,
 } from "../../state/modules/payment";
-import { InvoiceVATDTO } from '../../state/modules/invoice/types';
+import { InvoiceVATDTO } from "../../state/modules/invoice/types";
+// import { getClientToken } from "@hindawi/invoicing-web/app/state/modules/payment/actions";
 
 interface Props {
   invoiceError: string;
@@ -37,12 +38,14 @@ interface Props {
   getMethodsError: string;
   getMethodsLoading: boolean;
   paymentMethods: Record<string, string>;
+  token: string;
   getInvoice(id: string): any;
   getInvoiceVAT(invoiceVATRequest: InvoiceVATDTO): any;
   updatePayer(payer: any): any;
   recordPayPalPayment(payment: paymentTypes.PayPalPayment): any;
   payWithCard(payload: any): any;
   getPaymentMethods(): any;
+  getClientToken(): any;
 }
 
 const payByPayPal = (recordAction, invoice) => {
@@ -59,6 +62,7 @@ const payByPayPal = (recordAction, invoice) => {
 const PaymentDetails: React.FunctionComponent<Props> = ({
   getInvoiceVAT,
   getInvoice,
+  getClientToken,
   invoice,
   invoiceError,
   invoiceLoading,
@@ -75,11 +79,13 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   payPalPaymentError,
   payPalPaymentLoading,
   paymentMethods,
+  token,
 }) => {
   const { invoiceId } = useParams();
   useEffect(() => {
     getInvoice(invoiceId);
     getPaymentMethods();
+    getClientToken();
   }, []);
 
   const payByCard = useCallback(
@@ -116,9 +122,12 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               error={payerError}
               handleSubmit={updatePayer}
               loading={payerLoading}
-              onVatFieldChange={(country, payerType) => getInvoiceVAT({invoiceId, country, payerType})}
+              onVatFieldChange={(country, payerType) =>
+                getInvoiceVAT({ invoiceId, country, payerType })
+              }
             />
             <InvoicePayment
+              ccToken={token}
               methods={paymentMethods}
               status={invoice.status}
               error={creditCardPaymentError || payPalPaymentError}
@@ -130,7 +139,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 
           <Details invoice={invoice} mt={-44} />
         </Root>
-        <PaymentFooter></PaymentFooter>
+        <PaymentFooter />
       </Fragment>
     );
   })();
@@ -145,6 +154,7 @@ const mapStateToProps = (state: RootState) => ({
   getMethodsError: paymentSelectors.paymentMethodsError(state),
   getMethodsLoading: paymentSelectors.paymentMethodsLoading(state),
   paymentMethods: paymentSelectors.getPaymentMethods(state),
+  token: paymentSelectors.getToken(state),
   creditCardPaymentError: paymentSelectors.recordCreditCardPaymentError(state),
   creditCardPaymentLoading: paymentSelectors.recordCreditCardPaymentLoading(
     state,
@@ -157,12 +167,12 @@ export default connect(mapStateToProps, {
   getInvoiceVAT: invoiceActions.getInvoiceVat.request,
   recordPayPalPayment: paymentActions.recordPayPalPayment.request,
   getPaymentMethods: paymentActions.getPaymentMethods.request,
+  getClientToken: paymentActions.getClientToken.request,
   payWithCard: paymentActions.recordCardPayment.request,
   updatePayer: invoiceActions.updatePayerAsync.request,
   getInvoice: invoiceActions.getInvoice.request,
 })(PaymentDetails);
 
-// #region styles
 const Root = styled.div`
   align-items: flex-start;
   display: flex;
@@ -175,4 +185,3 @@ const FormsContainer = styled.div`
   flex-direction: column;
   margin-right: calc(${th("gridUnit")} * 4);
 `;
-// #endregion

@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-import { paymentMethodFragment } from "./fragments";
+import { paymentMethodFragment, clientTokenFragment } from "./fragments";
 
 export const getPaymentMethods = gql`
   query {
@@ -9,4 +9,13 @@ export const getPaymentMethods = gql`
     }
   }
   ${paymentMethodFragment}
+`;
+
+export const getClientToken = gql`
+  query {
+    getClientToken {
+      ...clientTokenFragment
+    }
+  }
+  ${clientTokenFragment}
 `;

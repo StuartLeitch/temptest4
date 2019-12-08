@@ -274,7 +274,7 @@ export const invoice: Resolvers<Context> = {
         {
           invoiceId,
           vatValue,
-          invoiceReference,
+          invoiceReference: String(invoiceReference),
           discount,
           APC,
           dateIssued,

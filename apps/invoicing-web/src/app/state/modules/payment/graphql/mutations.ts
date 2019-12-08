@@ -6,13 +6,15 @@ export const creditCardPayment: ASTNode = gql`
     $invoiceId: String!
     $payerId: String!
     $paymentMethodId: String!
-    $creditCard: CreditCardInput!
+    $paymentMethodNonce: String!
+    $amount: Float!
   ) {
     creditCardPayment(
       invoiceId: $invoiceId
       payerId: $payerId
       paymentMethodId: $paymentMethodId
-      creditCard: $creditCard
+      paymentMethodNonce: $paymentMethodNonce
+      amount: $amount
     ) {
       id
     }
