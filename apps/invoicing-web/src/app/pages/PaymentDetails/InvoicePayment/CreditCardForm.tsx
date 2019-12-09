@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Flex, Label, Button, FormField, th } from "@hindawi/react-components";
 import { Braintree, HostedField } from "react-braintree-fields";
 
-import { Visa, MasterCard, Amex, Discover, JCB } from "./ValidCreditCards";
+import { Visa, MasterCard, Discover } from "./ValidCreditCards";
 
 interface Props {
   handleSubmit: any;
@@ -74,7 +74,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
   onAuthorizationSuccess() {
     this.setState({ isBraintreeReady: true });
-    (this.numberField.current as any).focus();
+    // (this.numberField.current as any).focus();
   }
 
   render() {
@@ -84,8 +84,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           <Label>Credit Card Details</Label>
           <Visa ml={1} />
           <MasterCard ml={1} />
-          <Amex ml={1} />
-          <JCB ml={1} />
           <Discover ml={1} />
         </Flex>
 
@@ -117,19 +115,23 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
               <Label required htmlFor="cardNumber">
                 Card Number
               </Label>
-              <HostedField type="number" ref={this.numberField} />
+              <HostedField
+                placeholder={"**** **** **** ****"}
+                type="number"
+                ref={this.numberField}
+              />
             </Flex>
             <Flex vertical mr={4}>
               <Label required htmlFor="expirationDate">
                 Expiration Date
               </Label>
-              <HostedField type="expirationDate" />
+              <HostedField placeholder={"MM/YYYY"} type="expirationDate" />
             </Flex>
             <Flex vertical mr={4}>
               <Label required htmlFor="cvv">
                 CVV
               </Label>
-              <HostedField type="cvv" />
+              <HostedField placeholder={"***"} type="cvv" />
             </Flex>
             <Flex vertical mr={4}>
               <Label required htmlFor="postalCode">
