@@ -10,6 +10,9 @@ import {
 } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/createTransaction/createTransaction';
 import { CreateManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscript';
 import { CreateManuscriptDTO } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
+import { GetManuscriptByManuscriptIdUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
+import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+import { EditManuscriptUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/editManuscript/editManuscript';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
@@ -40,10 +43,6 @@ ${JSON.stringify(data)}
       (a: any) => a.isCorresponding
     );
 
-    if (name in ManuscriptTypeNotInvoiceable) {
-      return;
-    }
-
     const {
       repos: {
         transaction: transactionRepo,
@@ -54,62 +53,110 @@ ${JSON.stringify(data)}
       }
     } = this;
 
-    const createTransactionUsecase: CreateTransactionUsecase = new CreateTransactionUsecase(
+    const getManuscriptBySubmissionId: GetManuscriptByManuscriptIdUsecase = new GetManuscriptByManuscriptIdUsecase(
+      manuscriptRepo
+    );
+    const editManuscript: EditManuscriptUsecase = new EditManuscriptUsecase(
+      manuscriptRepo
+    );
+    const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
       transactionRepo,
-      invoiceRepo,
       invoiceItemRepo,
-      catalogRepo
+      invoiceRepo,
+      manuscriptRepo
     );
 
-    const result = await createTransactionUsecase.execute(
+    const alreadyExistingManuscript = await getManuscriptBySubmissionId.execute(
       {
-        manuscriptId: submissionId,
-        journalId
+        manuscriptId: submissionId
       },
       defaultContext
     );
 
-    if (result.isLeft()) {
-      console.error(result.value.error);
-    } else {
-      const newTransaction = result.value.getValue();
+    if (alreadyExistingManuscript.isRight()) {
+      if (name in ManuscriptTypeNotInvoiceable) {
+        await softDeleteDraftTransactionUsecase.execute(
+          {
+            manuscriptId: submissionId
+          },
+          defaultContext
+        );
+      }
 
-      console.log(`
+      const updateManuscript = await editManuscript.execute(
+        {
+          manuscriptId: submissionId,
+          title,
+          articleType: name,
+          authorEmail: email,
+          authorCountry: country,
+          authorSurname: surname,
+          authorFirstName: givenNames
+        },
+        defaultContext
+      );
+    } else {
+      if (name in ManuscriptTypeNotInvoiceable) {
+        return;
+      }
+
+      const createTransactionUsecase: CreateTransactionUsecase = new CreateTransactionUsecase(
+        transactionRepo,
+        invoiceRepo,
+        invoiceItemRepo,
+        catalogRepo
+      );
+
+      const result = await createTransactionUsecase.execute(
+        {
+          manuscriptId: submissionId,
+          journalId
+        },
+        defaultContext
+      );
+
+      if (result.isLeft()) {
+        console.error(result.value.error);
+      } else {
+        const newTransaction = result.value.getValue();
+
+        console.log(`
 [SubmissionSubmittedHandler Transaction Data]:
 ${JSON.stringify(newTransaction)}
         `);
 
-      const manuscriptProps: CreateManuscriptDTO = {
-        id: submissionId,
-        customId,
-        journalId,
-        title,
-        articleType: name,
-        authorEmail: email,
-        authorCountry: country,
-        authorSurname: surname,
-        authorFirstName: givenNames,
-        created
-      };
+        const manuscriptProps: CreateManuscriptDTO = {
+          id: submissionId,
+          customId,
+          journalId,
+          title,
+          articleType: name,
+          authorEmail: email,
+          authorCountry: country,
+          authorSurname: surname,
+          authorFirstName: givenNames,
+          created
+        };
 
-      const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(
-        manuscriptRepo
-      );
+        const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(
+          manuscriptRepo
+        );
 
-      const createManuscriptResult = await createManuscript.execute(
-        manuscriptProps,
-        defaultContext
-      );
+        const createManuscriptResult = await createManuscript.execute(
+          manuscriptProps,
+          defaultContext
+        );
 
-      if (createManuscriptResult.isLeft()) {
-        throw createManuscriptResult.value.error;
-      } else {
-        const newManuscript = createManuscriptResult.value.getValue();
+        if (createManuscriptResult.isLeft()) {
+          throw createManuscriptResult.value.error;
+        } else {
+          const newManuscript = createManuscriptResult.value.getValue();
 
-        console.log(`
+          console.log(`
 [SubmissionSubmittedHandler Manuscript Data]:
 ${JSON.stringify(newManuscript)}
           `);
+        }
       }
     }
   }

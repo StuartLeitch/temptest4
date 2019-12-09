@@ -30,7 +30,7 @@ export const queueService = createQueueService(config)
     Object.keys(eventHandlers).forEach((eventHandler: string) => {
       const { handler, event } = eventHandlers[eventHandler];
 
-      // if (event === 'SubmissionQualityCheckPassed') {
+      // if (event === 'SubmissionSubmitted') {
       //   messageQueue.__LOCAL__ = {
       //     event,
       //     handler: handler.bind(context)

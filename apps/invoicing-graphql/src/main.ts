@@ -25,7 +25,7 @@ async function main(): Promise<void> {
   });
 
   // queue.__LOCAL__.handler({
-  //   submissionId: '42e12839-188b-4e60-9f09-5636f5e73ae4',
+  //   submissionId: '8d870cfe-18a0-4e86-aba0-e56ea9eb8a21',
   //   manuscripts: [
   //     {
   //       id: '439303d8-bdb4-43f2-a7e0-7a4a341a04a1',
@@ -60,7 +60,7 @@ async function main(): Promise<void> {
   //         }
   //       ],
   //       articleType: {
-  //         name: 'Research Article'
+  //         name: 'Corrigendum'
   //       },
   //       reviews: [
   //         {
