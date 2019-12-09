@@ -9,8 +9,7 @@ import { AccessControlContext } from '../../../../domain/authorization/AccessCon
 import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
+  AuthorizationContext
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
@@ -20,10 +19,11 @@ import { PublishInvoiceCreatedResponse } from './publishInvoiceCreatedResponse';
 import { PublishInvoiceCreatedErrors } from './publishInvoiceCreatedErrors';
 import { PublishInvoiceCreatedDTO } from './publishInvoiceCreatedDTO';
 
-import { PayerType } from '../../../payers/domain/Payer';
-import { InvoiceItemType, InvoiceItem } from '../../domain/InvoiceItem';
-import { InvoiceStatus, Invoice } from '../../domain/Invoice';
+import { InvoiceCreated as InvoiceCreatedMessagePayload } from '@hindawi/phenom-events';
+import { InvoiceItem } from '../../domain/InvoiceItem';
+import { Invoice } from '../../domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { EventUtils } from 'libs/shared/src/lib/utils/EventUtils';
 
 export type PublishInvoiceCreatedContext = AuthorizationContext<Roles>;
 
@@ -118,7 +118,7 @@ export class PublishInvoiceCreatedUsecase
         vatPercentage: null,
         id: invoiceItem.id.toString(),
         price: invoiceItem.price,
-        type: invoiceItem.type
+        type: invoiceItem.type as any
       }))
     };
   }
@@ -129,13 +129,12 @@ export class PublishInvoiceCreatedUsecase
   ): InvoiceCreatedMessagePayload {
     return {
       ...payload,
-      transactionId: invoice.transactionId.id.toString(),
-      invoiceIssueDate: invoice.dateIssued,
       referenceNumber: `${
         invoice.invoiceNumber
       }/${invoice.dateAccepted.getFullYear()}`,
       invoiceId: invoice.id.toString(),
-      invoiceStatus: invoice.status
+      invoiceStatus: invoice.status,
+      invoiceCreatedDate: invoice.dateCreated
     };
   }
 
@@ -151,54 +150,17 @@ export class PublishInvoiceCreatedUsecase
 
   private get emptyMessagePayload(): InvoiceCreatedMessagePayload {
     const payload: InvoiceCreatedMessagePayload = {
+      ...EventUtils.createEventObject(),
       invoiceId: null,
-      invoiceIssueDate: null,
       referenceNumber: null,
       invoiceItems: null,
-      transactionId: null,
       invoiceStatus: null,
-      payerName: null,
-      payerEmail: null,
-      payerType: null,
-      vatRegistrationNumber: null,
-      address: null,
-      country: null,
       valueWithoutVAT: null,
-      valueWithVAT: null,
-      VAT: null,
-      couponId: null,
-      dateApplied: null
+      invoiceCreatedDate: null
     };
 
     return payload;
   }
-}
-
-interface InvoiceCreatedMessagePayload {
-  invoiceId: string;
-  referenceNumber: string;
-  invoiceIssueDate: Date;
-  invoiceItems: {
-    id: string;
-    manuscriptCustomId: string;
-    manuscriptId: string;
-    type: InvoiceItemType;
-    price: number;
-    vatPercentage: number;
-  }[];
-  transactionId: string;
-  invoiceStatus: InvoiceStatus;
-  payerName: string;
-  payerEmail: string;
-  payerType: PayerType;
-  vatRegistrationNumber: string;
-  address: string;
-  country: string;
-  valueWithoutVAT: number;
-  valueWithVAT: number;
-  VAT: number;
-  couponId: string;
-  dateApplied: Date;
 }
 
 interface InvoiceCreatedMessage {

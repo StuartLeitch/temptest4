@@ -33,7 +33,7 @@
   },
   "private": true,
   "dependencies": {
-    "@hindawi/phenom-events": "^0.1.0",
+    "@hindawi/phenom-events": "^1.0.0",
     "@hindawi/queue-service": "^1.0.3",
     "@paypal/checkout-server-sdk": "^1.0.2",
     "@pubsweet/component-email-templating": "^0.2.7",

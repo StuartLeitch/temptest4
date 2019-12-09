@@ -2,11 +2,13 @@ import { AppError } from '../../../../core/logic/AppError';
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 import { Invoice } from '../../domain/Invoice';
 import { InvoiceItem } from '../../domain/InvoiceItem';
-import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
-import { PayerMap } from '../../../payers/mapper/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { PaymentMap } from '../../../payments/mapper/Payment';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
+import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
+import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoiceItem';
+import { EventUtils } from '../../../../utils/EventUtils';
+
+const INVOICE_PAID_EVENT = 'InvoicePaid';
 
 export class PublishInvoicePaid {
   constructor(private publishService: SQSPublishServiceContract) {}
@@ -16,40 +18,49 @@ export class PublishInvoicePaid {
     manuscript: Manuscript,
     paymentDetails: InvoicePaymentInfo
   ): Promise<any> {
-    const message = {
-      event: 'InvoicePaid',
-      data: {
-        invoiceId: invoice.id.toString(),
-        invoiceItems: invoiceItems.map(ii => ({
-          id: ii.id.toString(),
-          manuscriptCustomId: manuscript.customId,
-          manuscriptId: ii.manuscriptId.id.toString(),
-          type: ii.type,
-          price: ii.price,
-          vatPercentage: ii.vat,
-        })),
-        transactionId: paymentDetails.transactionId,
-        invoiceStatus: paymentDetails.invoiceStatus,
-        referenceNumber: `${invoice.invoiceNumber}/${invoice.dateAccepted.getFullYear()}`,
-        invoiceIssueDate: paymentDetails.invoiceIssueDate,
-        payerName: paymentDetails.payerName,
-        payerEmail: paymentDetails.payerEmail,
-        payerType: paymentDetails.payerType,
-        vatRegistrationNumber: paymentDetails.vatRegistrationNumber,
-        address: `${paymentDetails.address}, ${paymentDetails.city}, ${paymentDetails.country}`,
-        foreignPaymentId: paymentDetails.foreignPaymentId,
-        country: paymentDetails.country,
-        paymentDate: paymentDetails.paymentDate,
-        paymentType: paymentDetails.paymentType,
-        paymentAmount: paymentDetails.amount,
-        // VAT: "todo"
-        // couponId: coupon.id,
-        // dateApplied: coupon.applied
-      }
+    const data: InvoicePaidEvent = {
+      ...EventUtils.createEventObject(),
+      invoiceId: invoice.id.toString(),
+      invoiceCreatedDate: invoice.dateCreated,
+      valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
+      invoiceItems: invoiceItems.map(ii => ({
+        id: ii.id.toString(),
+        manuscriptCustomId: manuscript.customId,
+        manuscriptId: ii.manuscriptId.id.toString(),
+        type: ii.type as InvoiceItemType,
+        price: ii.price,
+        vatPercentage: ii.vat
+      })),
+      transactionId: paymentDetails.transactionId,
+      invoiceStatus: paymentDetails.invoiceStatus as any,
+      referenceNumber: `${
+        invoice.invoiceNumber
+      }/${invoice.dateAccepted.getFullYear()}`,
+      invoiceIssueDate: paymentDetails.invoiceIssueDate
+        ? new Date(paymentDetails.invoiceIssueDate)
+        : null,
+      payerName: paymentDetails.payerName,
+      payerEmail: paymentDetails.payerEmail,
+      payerType: paymentDetails.payerType as any,
+      vatRegistrationNumber: paymentDetails.vatRegistrationNumber,
+      address: `${paymentDetails.address}, ${paymentDetails.city}, ${paymentDetails.country}`,
+      country: paymentDetails.country,
+      foreignPaymentId: paymentDetails.foreignPaymentId,
+      paymentDate: paymentDetails.paymentDate
+        ? new Date(paymentDetails.paymentDate)
+        : null,
+      paymentType: paymentDetails.paymentType,
+      paymentAmount: paymentDetails.amount
+      // VAT: "todo"
+      // couponId: coupon.id,
+      // dateApplied: coupon.applied
     };
 
     try {
-      await this.publishService.publishMessage(message);
+      await this.publishService.publishMessage({
+        event: INVOICE_PAID_EVENT,
+        data
+      });
     } catch (err) {
       throw new AppError.UnexpectedError(err.toString());
     }
