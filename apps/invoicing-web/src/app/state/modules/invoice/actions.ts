@@ -1,6 +1,12 @@
 import { createAsyncAction } from "typesafe-actions";
 
-import { Invoice, Payer, InvoiceVATDTO, InvoiceVat } from "./types";
+import {
+  Invoice,
+  Payer,
+  InvoiceVATDTO,
+  InvoiceVat,
+  InvoicesPagination,
+} from "./types";
 
 export const getInvoice = createAsyncAction(
   "invoice/GET_REQUEST",
@@ -18,7 +24,7 @@ export const getInvoices = createAsyncAction(
   "invoice/FETCH_INVOICES_REQUEST",
   "invoice/FETCH_INVOICES_SUCCESS",
   "invoice/FETCH_INVOICES_ERROR",
-)<string, Invoice[], string>();
+)<InvoicesPagination, { totalCount: number; invoices: Invoice[] }, string>();
 
 export const getInvoiceVat = createAsyncAction(
   "invoice/GET_VAT_REQUEST",

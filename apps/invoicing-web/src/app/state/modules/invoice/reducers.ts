@@ -3,7 +3,12 @@ import { createReducer } from "typesafe-actions";
 
 import { Invoice, InvoiceItem } from "./types";
 import { createLoadingReducer } from "../../redux/helpers";
-import { getInvoice, updatePayerAsync, getInvoiceVat } from "./actions";
+import {
+  getInvoice,
+  updatePayerAsync,
+  getInvoiceVat,
+  getInvoices,
+} from "./actions";
 
 const initialState: Invoice = {
   id: null,
@@ -22,25 +27,26 @@ const invoice = createReducer(initialState)
     payer: action.payload,
   }))
   .handleAction(getInvoiceVat.success, (state, action) => {
-    let invoiceItem = state.invoiceItem || {} as InvoiceItem;
-    let {payload} = action;
+    let invoiceItem = state.invoiceItem || ({} as InvoiceItem);
+    let { payload } = action;
     return {
       ...state,
       invoiceItem: {
         ...invoiceItem,
         rate: payload.rate,
         vat: payload.vatPercentage,
-        vatnote: payload.vatNote
-      }
-    }
+        vatnote: payload.vatNote,
+      },
+    };
   });
 
 const payerLoading = createLoadingReducer(updatePayerAsync);
-
 const invoiceLoading = createLoadingReducer(getInvoice, true);
+const invoicesLoading = createLoadingReducer(getInvoices, true);
 
 export default combineReducers({
   invoice,
   payerLoading,
   invoiceLoading,
+  invoicesLoading,
 });

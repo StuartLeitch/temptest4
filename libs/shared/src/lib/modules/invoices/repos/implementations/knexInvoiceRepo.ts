@@ -49,27 +49,37 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return InvoiceMap.toDomain(invoice);
   }
 
-  async getRecentInvoices(): Promise<any[]> {
+  async getRecentInvoices({ limit, offset }): Promise<any> {
     const { db } = this;
 
-    const invoices = await db(TABLES.INVOICES)
-      .select()
-      .whereNot(`${TABLES.INVOICES}.deleted`, 1)
-      .join(
-        TABLES.INVOICE_ITEMS,
-        `${TABLES.INVOICES}.id`,
-        '=',
-        `${TABLES.INVOICE_ITEMS}.invoiceId`
-      )
-      .join(
-        TABLES.ARTICLES,
-        `${TABLES.INVOICE_ITEMS}.manuscriptId`,
-        '=',
-        `${TABLES.ARTICLES}.id`
-      )
-      .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc');
+    const getModel = () =>
+      db(TABLES.INVOICES)
+        .whereNot(`${TABLES.INVOICES}.deleted`, 1)
+        .join(
+          TABLES.INVOICE_ITEMS,
+          `${TABLES.INVOICES}.id`,
+          '=',
+          `${TABLES.INVOICE_ITEMS}.invoiceId`
+        )
+        .join(
+          TABLES.ARTICLES,
+          `${TABLES.INVOICE_ITEMS}.manuscriptId`,
+          '=',
+          `${TABLES.ARTICLES}.id`
+        );
 
-    return invoices; // .map(i => InvoiceMap.toDomain(i));
+    const totalCount = await getModel().count(`${TABLES.INVOICES}.id`);
+
+    const invoices = await getModel()
+      .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
+      .offset(offset)
+      .limit(limit)
+      .select();
+
+    return {
+      totalCount: totalCount[0]['count'],
+      invoices // .map(i => InvoiceMap.toDomain(i));
+    };
   }
 
   async getInvoicesByTransactionId(

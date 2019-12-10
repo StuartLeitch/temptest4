@@ -5,8 +5,13 @@ import { InvoiceItemId } from '../domain/InvoiceItemId';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../domain/InvoicePaymentInfo';
 
+interface Paginated {
+  offset?: number;
+  limit?: number;
+}
+
 export interface InvoiceRepoContract extends Repo<Invoice> {
-  getRecentInvoices(): Promise<any[]>;
+  getRecentInvoices(paginated: Paginated): Promise<any>;
   getInvoiceById(invoiceId: InvoiceId): Promise<Invoice>;
   getInvoiceByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Invoice>;
   getInvoicesByTransactionId(transactionId: TransactionId): Promise<Invoice[]>;

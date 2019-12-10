@@ -68,7 +68,7 @@ export const invoice: Resolvers<Context> = {
       const usecaseContext = {
         roles: [Roles.ADMIN]
       };
-      const result = await usecase.execute({}, usecaseContext);
+      const result = await usecase.execute(args, usecaseContext);
 
       if (result.isLeft()) {
         return undefined;

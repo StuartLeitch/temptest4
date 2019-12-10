@@ -5,5 +5,5 @@ import { AppError } from '../../../.././core/logic/AppError';
 
 export type GetRecentInvoicesResponse = Either<
   AppError.UnexpectedError,
-  Result<any[]>
+  Result<any>
 >;

@@ -13,9 +13,9 @@ async function main(): Promise<void> {
   const db = await makeDb(config);
   const context = makeContext(config, db) as any;
 
-  const queue = await queueService;
-  queue.start();
-  context.qq = queue;
+  // const queue = await queueService;
+  // queue.start();
+  // context.qq = queue;
   const graphqlServer = makeGraphqlServer(context);
   const expressServer = makeExpressServer(context);
 
@@ -158,7 +158,7 @@ async function main(): Promise<void> {
   //   ]
   // });
 
-  registerDomainEvents(context, queue);
+  // registerDomainEvents(context, queue);
   expressServer.listen(process.env.PORT || 4000);
 }
 

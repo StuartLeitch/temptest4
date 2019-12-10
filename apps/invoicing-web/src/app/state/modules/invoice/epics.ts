@@ -7,18 +7,23 @@ import {
   mergeMap,
   switchMap,
   catchError,
-  withLatestFrom
+  withLatestFrom,
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
 import { invoice } from "./selectors";
 import { queries, mutations } from "./graphql";
-import { getInvoice, getInvoices, updatePayerAsync, getInvoiceVat } from "./actions";
+import {
+  getInvoice,
+  getInvoices,
+  updatePayerAsync,
+  getInvoiceVat,
+} from "./actions";
 
 const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(getInvoice.request)),
-    delay(1000),
+    delay(250),
     switchMap(action =>
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
@@ -61,23 +66,30 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
 const fetchInvoicesEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(getInvoices.request)),
-    delay(500),
-    switchMap(action => graphqlAdapter.send(queries.getInvoices)),
-    map(r => {
-      return getInvoices.success(r.data.invoices);
-    }),
+    delay(250),
+    switchMap(action =>
+      graphqlAdapter.send(queries.getInvoices, action.payload),
+    ),
+    map(r => getInvoices.success(r.data.invoices)),
     catchError(err => of(getInvoices.failure(err.message))),
   );
 };
 
-const getInvoiceVatEpic: RootEpic =(action$, _, { graphqlAdapter }) => {
+const getInvoiceVatEpic: RootEpic = (action$, _, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(getInvoiceVat.request)),
     delay(500),
-    switchMap(action => graphqlAdapter.send(queries.getInvoiceVat, {...action.payload})),
+    switchMap(action =>
+      graphqlAdapter.send(queries.getInvoiceVat, { ...action.payload }),
+    ),
     map(r => getInvoiceVat.success(r.data.invoiceVat)),
     catchError(err => of(getInvoiceVat.failure(err.message))),
-  )
-}
+  );
+};
 
-export default [fetchInvoiceEpic, updatePayerEpic, fetchInvoicesEpic, getInvoiceVatEpic];
+export default [
+  fetchInvoiceEpic,
+  updatePayerEpic,
+  fetchInvoicesEpic,
+  getInvoiceVatEpic,
+];

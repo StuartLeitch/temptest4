@@ -32,6 +32,11 @@ export interface Invoice {
   article: Article | null;
 }
 
+export interface InvoicesPagination {
+  offset: number;
+  limit: number;
+}
+
 export interface Address {
   city: string;
   country: string;
@@ -56,6 +61,7 @@ export interface InvoiceState {
   invoice: any;
   payerLoading: LoadingState;
   invoiceLoading: LoadingState;
+  invoicesLoading: LoadingState;
 }
 
 export interface InvoiceVATDTO {

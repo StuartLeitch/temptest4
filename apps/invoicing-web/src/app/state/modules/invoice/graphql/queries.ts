@@ -13,22 +13,33 @@ export const getInvoice: ASTNode = gql`
 `;
 
 export const getInvoices: ASTNode = gql`
-  query fetchInvoices {
-    invoices {
-      id: invoiceId
-      status
-      manuscriptTitle: title
-      type
-      price
-      customId
-      dateCreated
+  query fetchInvoices($offset: Int, $limit: Int) {
+    invoices(offset: $offset, limit: $limit) {
+      totalCount
+      invoices {
+        id: invoiceId
+        status
+        manuscriptTitle: title
+        type
+        price
+        customId
+        dateCreated
+      }
     }
   }
 `;
 
 export const getInvoiceVat: ASTNode = gql`
-  query invoiceWithVat($invoiceId: String, $country: String, $payerType: String) {
-    invoiceVat(invoiceId: $invoiceId, country: $country, payerType: $payerType) {
+  query invoiceWithVat(
+    $invoiceId: String
+    $country: String
+    $payerType: String
+  ) {
+    invoiceVat(
+      invoiceId: $invoiceId
+      country: $country
+      payerType: $payerType
+    ) {
       ...invoiceVatFragment
     }
   }

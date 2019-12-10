@@ -19,6 +19,7 @@ export class Config {
   footerTOS: string;
 
   appName: string;
+  invoicesPerPage: number;
 
   constructor() {
     this.env = globalConfig.NODE_ENV || "development";
@@ -39,6 +40,8 @@ export class Config {
     this.footerTOS = globalConfig.FOOTER_TOS;
 
     this.appName = globalConfig.APP_NAME;
+
+    this.invoicesPerPage = globalConfig.INVOICES_PER_PAGE;
   }
 }
 

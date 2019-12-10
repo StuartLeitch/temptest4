@@ -171,6 +171,12 @@ export type MutationMigrateInvoiceArgs = {
   dateAccepted?: Maybe<Scalars['String']>
 };
 
+export type PaginatedInvoices = {
+   __typename?: 'PaginatedInvoices',
+  totalCount?: Maybe<Scalars['Int']>,
+  invoices?: Maybe<Array<Maybe<Invoice>>>,
+};
+
 export type Payer = {
    __typename?: 'Payer',
   id?: Maybe<Scalars['String']>,
@@ -223,7 +229,7 @@ export type Query = {
   getClientToken?: Maybe<ClientToken>,
   invoice?: Maybe<Invoice>,
   invoiceVat?: Maybe<InvoiceVat>,
-  invoices?: Maybe<Array<Maybe<Invoice>>>,
+  invoices?: Maybe<PaginatedInvoices>,
   invoiceIdByManuscriptCustomId?: Maybe<InvoiceId>,
   echo?: Maybe<Scalars['String']>,
 };
@@ -238,6 +244,12 @@ export type QueryInvoiceVatArgs = {
   invoiceId?: Maybe<Scalars['String']>,
   country?: Maybe<Scalars['String']>,
   payerType?: Maybe<Scalars['String']>
+};
+
+
+export type QueryInvoicesArgs = {
+  offset?: Maybe<Scalars['Int']>,
+  limit?: Maybe<Scalars['Int']>
 };
 
 
@@ -342,6 +354,8 @@ export type ResolversTypes = {
   Article: ResolverTypeWrapper<Article>,
   Date: ResolverTypeWrapper<Scalars['Date']>,
   InvoiceVat: ResolverTypeWrapper<InvoiceVat>,
+  Int: ResolverTypeWrapper<Scalars['Int']>,
+  PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>,
   InvoiceId: ResolverTypeWrapper<InvoiceId>,
   Mutation: ResolverTypeWrapper<{}>,
   PayerInput: PayerInput,
@@ -368,6 +382,8 @@ export type ResolversParentTypes = {
   Article: Article,
   Date: Scalars['Date'],
   InvoiceVat: InvoiceVat,
+  Int: Scalars['Int'],
+  PaginatedInvoices: PaginatedInvoices,
   InvoiceId: InvoiceId,
   Mutation: {},
   PayerInput: PayerInput,
@@ -456,6 +472,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
 };
 
+export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {
+  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+};
+
 export type PayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payer'] = ResolversParentTypes['Payer']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['PayerType']>, ParentType, ContextType>,
@@ -488,7 +509,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>,
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, QueryInvoiceVatArgs>,
-  invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+  invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, QueryInvoicesArgs>,
   invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, QueryInvoiceIdByManuscriptCustomIdArgs>,
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
 };
@@ -508,6 +529,7 @@ export type Resolvers<ContextType = any> = {
   InvoiceItem?: InvoiceItemResolvers<ContextType>,
   InvoiceVat?: InvoiceVatResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
+  PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>,
   Payer?: PayerResolvers<ContextType>,
   Payment?: PaymentResolvers<ContextType>,
   PaymentMethod?: PaymentMethodResolvers<ContextType>,

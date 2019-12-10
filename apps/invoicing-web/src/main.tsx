@@ -18,6 +18,8 @@ ReactDOM.render(
   </AppProviders>,
   document.getElementById("root"),
   () => {
-    store.dispatch(getInvoices.request(null));
+    store.dispatch(
+      getInvoices.request({ offset: 0, limit: config.invoicesPerPage }),
+    );
   },
 );

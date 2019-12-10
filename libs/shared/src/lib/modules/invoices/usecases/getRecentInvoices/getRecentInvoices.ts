@@ -42,15 +42,20 @@ export class GetRecentInvoicesUsecase
     request: GetRecentInvoicesDTO,
     context?: GetRecentInvoicesAuthenticationContext
   ): Promise<GetRecentInvoicesResponse> {
-    let invoices: InvoiceCollection;
+    // TODO: add proper DDD types to the paginated result
+    let paginatedResult: any;
 
     try {
       try {
-        invoices = await this.invoiceRepo.getRecentInvoices();
+        paginatedResult = await this.invoiceRepo.getRecentInvoices(request);
       } catch (err) {
-        return left(new AppError.UnexpectedError(new Error('boom')));
+        return left(
+          new AppError.UnexpectedError(
+            new Error('Getting recent invoices failed.')
+          )
+        );
       }
-      return right(Result.ok<any[]>(invoices));
+      return right(Result.ok<any>(paginatedResult));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

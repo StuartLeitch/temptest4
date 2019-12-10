@@ -17,4 +17,5 @@ window._env_ = {
   FOOTER_EMAIL: "${FOOTER_EMAIL}",
 
   APP_NAME: "${APP_NAME}",
+  INVOICES_PER_PAGE: "${INVOICES_PER_PAGE}",
 };

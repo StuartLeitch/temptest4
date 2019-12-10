@@ -132,12 +132,17 @@ type ClientToken {
   token: String!
 }
 
+type PaginatedInvoices {
+  totalCount: Int
+  invoices: [Invoice]
+}
+
 type Query {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
   invoice(invoiceId: String): Invoice
   invoiceVat(invoiceId: String, country: String, payerType: String): InvoiceVat
-  invoices: [Invoice]
+  invoices(offset: Int, limit: Int): PaginatedInvoices
   invoiceIdByManuscriptCustomId(customId: String): InvoiceId
   echo(value: String): String
 }

@@ -1,14 +1,40 @@
-import React from "react";
-import styled from "styled-components";
 import Axios from "axios";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import ReactPaginate from "react-paginate";
+import styled, { StyledFunction } from "styled-components";
+import { Loader } from "@hindawi/react-components";
 
 import { config } from "../../../../config";
 
-export const InvoicesList = ({ invoices }) => {
-  return (
-    <StyledInvoicesList>
-      {invoices.map(invoice => (
+interface OffsetProps {
+  offset: number;
+}
+
+export const InvoicesList = ({
+  invoices,
+  invoicesLoading,
+  totalCount,
+  getInvoices,
+}) => {
+  const [offset, setOffset] = useState(0);
+
+  let pageCount = Math.ceil(totalCount / config.invoicesPerPage);
+
+  const handlePageClick = (data: any) => {
+    let selected = data.selected;
+
+    setOffset(Math.ceil(selected * config.invoicesPerPage));
+  };
+
+  useEffect(() => {
+    let limit = config.invoicesPerPage;
+    getInvoices({ offset, limit });
+  }, [offset]);
+
+  let maybeRenderContent = (
+    <StyledInvoicesList offset={offset}>
+      {invoices.map((invoice: any) => (
         <StyledInvoiceItem key={invoice.id}>
           <div style={{ width: "100%" }}>
             <StyledInvoiceLink to={"/payment-details/" + invoice.id}>
@@ -44,10 +70,37 @@ export const InvoicesList = ({ invoices }) => {
       ))}
     </StyledInvoicesList>
   );
+
+  if (invoicesLoading) {
+    maybeRenderContent = (
+      <Centered>
+        <Loader size={40} />
+      </Centered>
+    );
+  }
+
+  return (
+    <>
+      {maybeRenderContent}
+      <ReactPaginate
+        previousLabel={"<"}
+        nextLabel={">"}
+        breakLabel={"..."}
+        breakClassName={"break-me"}
+        pageCount={pageCount}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageClick}
+        containerClassName={"pagination"}
+        subContainerClassName={"pages pagination"}
+        activeClassName={"active"}
+      />
+    </>
+  );
 };
 
-const StyledInvoicesList = styled.ul`
-  counter-reset: index;
+const StyledInvoicesList = styled.ul<{ offset: number }>`
+  counter-reset: ${(props: any) => `index ${props.offset}`};
   padding: 0;
   max-width: 100%;
 `;
@@ -127,4 +180,11 @@ const StyledInvoiceSubtitle = styled.dl`
   dd:last-of-type {
     border-right: none;
   }
+`;
+
+const Centered = styled.div`
+  height: 100%;
+  display: grid;
+  align-items: center;
+  justify-content: center;
 `;
