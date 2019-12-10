@@ -95,7 +95,7 @@ export class ConfirmInvoiceUsecase
 
     await this.checkVatId(payerInput);
     const maybePayerData = await this.savePayerData(payerInput);
-    await map(
+    await chain(
       [
         this.updateInvoiceStatus.bind(this),
         this.applyVatToInvoice.bind(this),
@@ -124,14 +124,16 @@ export class ConfirmInvoiceUsecase
   ): Promise<Either<unknown, PayerDataDomain>> {
     const { invoice, address } = payerData;
     if (this.isPayerFromSanctionedCountry(address)) {
-      return (await this.markInvoiceAsPending(invoice)).map(pendingInvoice => {
-        return { ...payerData, invoice: pendingInvoice };
-      });
+      return (await this.markInvoiceAsPending(invoice)).map(pendingInvoice => ({
+        ...payerData,
+        invoice: pendingInvoice
+      }));
     } else {
       if (invoice.status !== InvoiceStatus.ACTIVE) {
-        return (await this.markInvoiceAsActive(invoice)).map(activeInvoice => {
-          return { ...payerData, invoice: activeInvoice };
-        });
+        return (await this.markInvoiceAsActive(invoice)).map(activeInvoice => ({
+          ...payerData,
+          invoice: activeInvoice
+        }));
       }
     }
     return right(payerData);
@@ -139,6 +141,7 @@ export class ConfirmInvoiceUsecase
 
   private async dispatchEvents({ invoice }: PayerDataDomain) {
     DomainEvents.dispatchEventsForAggregate(invoice.id);
+    return right<undefined, void>(null);
   }
 
   private async savePayerData(payerInput: PayerInput) {
@@ -147,7 +150,7 @@ export class ConfirmInvoiceUsecase
       invoice: null,
       payer: null
     };
-    return await map(
+    return await chain(
       [
         this.getInvoiceDetails.bind(this, payerInput),
         this.createAddress.bind(this, payerInput),
@@ -206,10 +209,12 @@ export class ConfirmInvoiceUsecase
     };
 
     return (await createAddressUseCase.execute(addressDTO)).map(
-      addressResult => ({
-        ...payerData,
-        address: addressResult.getValue()
-      })
+      addressResult => {
+        return {
+          ...payerData,
+          address: addressResult.getValue()
+        };
+      }
     );
   }
 
@@ -264,11 +269,11 @@ export class ConfirmInvoiceUsecase
       this.invoiceRepo,
       this.vatService
     );
-    const maybeApplied = await applyVatToInvoice.execute({
+    const maybeAppliedVat = await applyVatToInvoice.execute({
       invoiceId: invoice.id.toString(),
       country: address.country,
       payerType: payer.type
     });
-    return maybeApplied.map(() => ({ invoice, address, payer }));
+    return maybeAppliedVat.map(() => ({ invoice, address, payer }));
   }
 }
