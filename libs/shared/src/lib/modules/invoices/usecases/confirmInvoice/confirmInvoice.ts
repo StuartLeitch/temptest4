@@ -119,16 +119,18 @@ export class ConfirmInvoiceUsecase
     }
   }
 
-  private async updateInvoiceStatus(payerData: PayerDataDomain) {
+  private async updateInvoiceStatus(
+    payerData: PayerDataDomain
+  ): Promise<Either<unknown, PayerDataDomain>> {
     const { invoice, address } = payerData;
     if (this.isPayerFromSanctionedCountry(address)) {
-      return (await this.markInvoiceAsPending(invoice)).map(() => {
-        return payerData;
+      return (await this.markInvoiceAsPending(invoice)).map(pendingInvoice => {
+        return { ...payerData, invoice: pendingInvoice };
       });
     } else {
       if (invoice.status !== InvoiceStatus.ACTIVE) {
-        return (await this.markInvoiceAsActive(invoice)).map(() => {
-          return payerData;
+        return (await this.markInvoiceAsActive(invoice)).map(activeInvoice => {
+          return { ...payerData, invoice: activeInvoice };
         });
       }
     }
@@ -225,13 +227,17 @@ export class ConfirmInvoiceUsecase
   }
 
   private async markInvoiceAsPending(invoice: Invoice) {
-    invoice.markAsPending();
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );
-    return await changeInvoiceStatusUseCase.execute({
+    const maybePendingInvoice = await changeInvoiceStatusUseCase.execute({
       invoiceId: invoice.id.toString(),
       status: InvoiceStatus.PENDING
+    });
+    return maybePendingInvoice.map(pendingInvoiceResult => {
+      const pendingInvoice = pendingInvoiceResult.getValue();
+      pendingInvoice.triggerStatusPendingEvent();
+      return pendingInvoice;
     });
   }
 
@@ -240,10 +246,12 @@ export class ConfirmInvoiceUsecase
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );
-    return await changeInvoiceStatusUseCase.execute({
-      invoiceId: invoice.id.toString(),
-      status: InvoiceStatus.ACTIVE
-    });
+    return (
+      await changeInvoiceStatusUseCase.execute({
+        invoiceId: invoice.id.toString(),
+        status: InvoiceStatus.ACTIVE
+      })
+    ).map(resultInvoice => resultInvoice.getValue());
   }
 
   private async applyVatToInvoice({

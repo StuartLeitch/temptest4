@@ -1,6 +1,7 @@
 import { Context } from '../context';
 
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
+import { AfterInvoicePendingEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePendingEvents';
 import { AfterInvoiceActivated } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceActivatedEvent';
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
 import { PublishInvoiceConfirmed } from 'libs/shared/src/lib/modules/invoices/usecases/publishInvoiceConfirmed';
@@ -33,13 +34,14 @@ export const registerDomainEvents = (
   const publishInvoicePaid = new PublishInvoicePaid(queue);
 
   // Registering Invoice Events
-  new AfterInvoiceCreatedEvent(
+  const pendingEventListener = new AfterInvoicePendingEvent();
+  const createdEventListener = new AfterInvoiceCreatedEvent(
     invoice,
     invoiceItem,
     manuscript,
     publishInvoiceCreatedUsecase
   );
-  new AfterInvoiceActivated(
+  const activatedEventListener = new AfterInvoiceActivated(
     invoiceItem,
     payer,
     address,
@@ -47,7 +49,7 @@ export const registerDomainEvents = (
     publishInvoiceActivated,
     publishInvoiceToErpUsecase
   );
-  new AfterInvoicePaidEvent(
+  const paidEventListener = new AfterInvoicePaidEvent(
     invoice,
     invoiceItem,
     manuscript,

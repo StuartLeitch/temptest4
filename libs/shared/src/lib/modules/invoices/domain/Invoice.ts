@@ -174,10 +174,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.addDomainEvent(new InvoiceSentEvent(this.invoiceId, new Date()));
   }
 
-  public markAsPending(): void {
+  public triggerStatusPendingEvent(): void {
     const now = new Date();
-    this.props.dateUpdated = now;
-    this.props.status = InvoiceStatus.PENDING;
     this.addDomainEvent(new InvoicePending(this, now));
   }
 

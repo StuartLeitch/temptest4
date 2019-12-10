@@ -64,6 +64,8 @@ export * from './modules/invoices/usecases/updateInvoiceItems/updateInvoiceItems
 export * from './modules/invoices/usecases/updateInvoiceItems/updateInvoiceItemsDTO';
 export * from './modules/invoices/usecases/applyVatToInvoice/applyVatToInvoice';
 export * from './modules/invoices/usecases/applyVatToInvoice/applyVatToInvoiceDTO';
+export * from './modules/invoices/usecases/confirmInvoice/confirmInvoice';
+export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
