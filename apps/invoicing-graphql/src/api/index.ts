@@ -65,7 +65,7 @@ export function makeExpressServer(context: Context) {
         submissionId: manuscript.id.toString(),
         manuscripts: [
           {
-            id: '8250aba9-4f34-491b-be13-1edcae7ff4ba',
+            id: new UniqueEntityID().toString(),
             created: '2019-11-29T08:55:50.555Z',
             updated: '2019-11-29T08:56:19.743Z',
             customId: '4217444',
@@ -82,7 +82,7 @@ export function makeExpressServer(context: Context) {
             },
             authors: [
               {
-                id: 'b73521ed-e4b9-4406-876f-ede62462362e',
+                id: new UniqueEntityID().toString(),
                 created: '2019-11-27T08:55:50.560Z',
                 updated: '2019-11-27T08:56:08.640Z',
                 surname: 'GENERATED',
