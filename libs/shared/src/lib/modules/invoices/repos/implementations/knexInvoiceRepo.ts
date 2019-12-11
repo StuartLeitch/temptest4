@@ -173,6 +173,20 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return result[0];
   }
 
+  async getFailedErpInvoices(): Promise<Invoice[]> {
+    const { db } = this;
+
+    const invoices = await db(TABLES.INVOICES)
+      .select()
+      .whereNot(`deleted`, 1)
+      .where({
+        status: 'ACTIVE'
+      })
+      .whereNull('erpReference');
+
+    return invoices.map(i => InvoiceMap.toDomain(i));
+  }
+
   async delete(invoice: Invoice): Promise<unknown> {
     const { db } = this;
 

@@ -7,6 +7,7 @@ import { makeGraphqlServer } from './graphql';
 import { makeExpressServer } from './api';
 import { queueService } from './queue_service';
 import { registerDomainEvents } from './domain_events';
+import { scheduleCronJobs } from './cron_jobs'
 
 async function main(): Promise<void> {
   const config = makeConfig();
@@ -160,6 +161,7 @@ async function main(): Promise<void> {
 
   registerDomainEvents(context, queue);
   expressServer.listen(process.env.PORT || 4000);
+  scheduleCronJobs(context)
 }
 
 main().catch(err => {
