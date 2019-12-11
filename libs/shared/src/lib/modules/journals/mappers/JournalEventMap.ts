@@ -16,33 +16,7 @@ export class JournalEventMap {
       editorsToParse.push(...event.editors);
     }
 
-    // parsing Journal Special Issue Editors
-    if (Array.isArray(event.specialIssues)) {
-      for (const specialIssue of event.specialIssues) {
-        if (Array.isArray(specialIssue.editors)) {
-          editorsToParse.push(...specialIssue.editors);
-        }
-      }
-    }
-
-    // parsing Journal Section Editors
-    if (Array.isArray(event.sections)) {
-      for (const section of event.sections) {
-        // section.editors
-        if (Array.isArray(section.editors)) {
-          editorsToParse.push(...section.editors);
-        }
-
-        // section.specialIssues.editors
-        if (Array.isArray(section.specialIssues)) {
-          for (const sectionSpecialIssue of section.specialIssues) {
-            if (Array.isArray(sectionSpecialIssue.editors)) {
-              editorsToParse.push(...sectionSpecialIssue.editors);
-            }
-          }
-        }
-      }
-    }
+    // Removed section editors/special issue editors
 
     for (const editor of editorsToParse) {
       const editorId = editor.id;

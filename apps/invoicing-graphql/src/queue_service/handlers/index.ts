@@ -6,12 +6,7 @@ import { SubmissionRejected } from './SubmissionRejected';
 import { SubmissionWithdrawn } from './SubmissionWithdrawn';
 import { JournalAddedHandler } from './JournalAdded';
 import { JournalUpdatedHandler } from './JournalUpdated';
-import {
-  JournalEditorAssignedHandler,
-  JournalSectionEditorAssignedHandler,
-  JournalSectionSpecialIssueEditorAssignedHandler,
-  JournalSpecialIssueEditorAssignedHandler
-} from './JournalEditorAssigned';
+import { JournalEditorAssignedHandler } from './JournalEditorAssigned';
 
 export {
   SubmissionSubmittedHandler,
@@ -22,8 +17,5 @@ export {
   SubmissionRejected,
   JournalAddedHandler,
   JournalUpdatedHandler,
-  JournalEditorAssignedHandler,
-  JournalSectionEditorAssignedHandler,
-  JournalSectionSpecialIssueEditorAssignedHandler,
-  JournalSpecialIssueEditorAssignedHandler
+  JournalEditorAssignedHandler
 };

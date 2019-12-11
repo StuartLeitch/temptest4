@@ -97,6 +97,7 @@ export class AssignEditorsToJournalUsecase
       console.log(`Expected editor number: ${allEditors.length}`);
 
       const editorsToCreate = allEditors.filter(e => {
+        // TODO filter assistants 
         const isCreated = currentEditorsIds.includes(e.editorId);
         return !isCreated;
       });
