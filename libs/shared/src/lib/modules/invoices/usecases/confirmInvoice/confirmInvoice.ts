@@ -99,7 +99,7 @@ export class ConfirmInvoiceUsecase
       [
         this.updateInvoiceStatus.bind(this),
         this.applyVatToInvoice.bind(this),
-        this.dispatchEvents
+        this.dispatchEvents.bind(this)
       ],
       maybePayerData
     );
@@ -112,7 +112,7 @@ export class ConfirmInvoiceUsecase
       this.sanctionedCountryPolicy.getType(),
       [country]
     );
-    if (reductions.getReduction() < 0) {
+    if (reductions.getReduction().props.reduction < 0) {
       return true;
     } else {
       return false;
