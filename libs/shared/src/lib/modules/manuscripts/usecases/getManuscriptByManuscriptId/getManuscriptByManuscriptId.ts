@@ -61,10 +61,6 @@ export class GetManuscriptByManuscriptIdUsecase
         );
       }
 
-      return manuscript
-        ? right(Result.ok<Manuscript>(manuscript))
-        : left(Result.fail(null));
-
       return right(Result.ok<Manuscript>(manuscript));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));

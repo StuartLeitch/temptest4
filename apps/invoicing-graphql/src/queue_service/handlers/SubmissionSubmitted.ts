@@ -66,14 +66,16 @@ ${JSON.stringify(data)}
       manuscriptRepo
     );
 
-    const alreadyExistingManuscript = await getManuscriptBySubmissionId.execute(
+    const alreadyExistingManuscriptResult = await getManuscriptBySubmissionId.execute(
       {
         manuscriptId: submissionId
       },
       defaultContext
     );
 
-    if (alreadyExistingManuscript.isRight()) {
+    const alreadyExistingManuscript = alreadyExistingManuscriptResult.value.getValue();
+
+    if (alreadyExistingManuscript) {
       if (name in ManuscriptTypeNotInvoiceable) {
         await softDeleteDraftTransactionUsecase.execute(
           {
@@ -83,7 +85,7 @@ ${JSON.stringify(data)}
         );
       }
 
-      const updateManuscript = await editManuscript.execute(
+      await editManuscript.execute(
         {
           manuscriptId: submissionId,
           title,

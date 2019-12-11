@@ -13,9 +13,9 @@ async function main(): Promise<void> {
   const db = await makeDb(config);
   const context = makeContext(config, db) as any;
 
-  // const queue = await queueService;
-  // queue.start();
-  // context.qq = queue;
+  const queue = await queueService;
+  queue.start();
+  context.qq = queue;
   const graphqlServer = makeGraphqlServer(context);
   const expressServer = makeExpressServer(context);
 
@@ -25,11 +25,11 @@ async function main(): Promise<void> {
   });
 
   // queue.__LOCAL__.handler({
-  //   submissionId: '8d870cfe-18a0-4e86-aba0-e56ea9eb8a21',
+  //   submissionId: 'georgiana-e-ofticata',
   //   manuscripts: [
   //     {
   //       id: '439303d8-bdb4-43f2-a7e0-7a4a341a04a1',
-  //       journalId: '03c177e1-f55e-4008-9299-25e9f3421e10',
+  //       journalId: '46a25365-57d4-44af-b041-3935ad3796dd',
   //       created: '2019-11-06T09:53:00.361Z',
   //       updated: '2019-11-06T09:58:27.365Z',
   //       title: 'Renal Replacement Therapy in the Critical Care Setting',
@@ -60,7 +60,7 @@ async function main(): Promise<void> {
   //         }
   //       ],
   //       articleType: {
-  //         name: 'Corrigendum'
+  //         name: 'Research Article'
   //       },
   //       reviews: [
   //         {
@@ -158,7 +158,7 @@ async function main(): Promise<void> {
   //   ]
   // });
 
-  // registerDomainEvents(context, queue);
+  registerDomainEvents(context, queue);
   expressServer.listen(process.env.PORT || 4000);
 }
 
