@@ -102,15 +102,21 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       return invoice;
     }
 
+    const currentYear = new Date().getFullYear();
+
     const updated = await db(TABLES.INVOICES)
       .where({ id: invoiceId.id.toString() })
+      .update({ dateAccepted: new Date() })
       .update({
-        invoiceNumber: db.raw(`coalesce((select max("invoiceNumber") + 1 as max from (
-          select max("invoiceNumber") as "invoiceNumber" from invoices
+        invoiceNumber: db.raw(
+          `coalesce((select max("invoiceNumber") + 1 as max from (
+          select max("invoiceNumber") as "invoiceNumber" from invoices where "dateAccepted" BETWEEN ? AND ?
             union
             select "invoiceReferenceNumber" as "invoiceNumber" from configurations
           ) referenceNumbers), 1)
-        `)
+        `,
+          [`${currentYear}-01-01`, `${currentYear}-12-31`]
+        )
       });
 
     if (!updated) {
