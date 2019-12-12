@@ -3,19 +3,18 @@ import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain
 
 import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import { SoftDeleteDraftTransactionAuthorizationContext } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionAuthorizationContext';
+import { Logger } from '../../lib/logger';
 
 const SUBMISSION_WITHDRAWN = 'SubmissionWithdrawn';
 const defaultContext: SoftDeleteDraftTransactionAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN]
 };
+const logger = new Logger(`events:${SUBMISSION_WITHDRAWN}`);
 
 export const SubmissionWithdrawn = {
   event: SUBMISSION_WITHDRAWN,
   handler: async function submissionWithdrawnHandler(data: any) {
-    console.log(`
-[SubmissionWithdrawnHandler Incoming Event Data]:
-${JSON.stringify(data)}
-    `);
+    logger.info('Incoming Event Data', data);
 
     const { submissionId } = data;
 
@@ -43,7 +42,7 @@ ${JSON.stringify(data)}
     );
 
     if (result.isLeft()) {
-      console.error(result.value.error);
+      logger.error(result.value.error.toString());
     }
   }
 };

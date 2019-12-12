@@ -17,7 +17,7 @@ import { Logger } from '../../lib/logger';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
-const logger = new Logger('events:submission-submitted');
+const logger = new Logger(`events:${SUBMISSION_SUBMITTED}`);
 
 export const SubmissionSubmittedHandler = {
   event: SUBMISSION_SUBMITTED,
