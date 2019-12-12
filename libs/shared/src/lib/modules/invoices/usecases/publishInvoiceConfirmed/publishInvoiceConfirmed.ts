@@ -1,3 +1,6 @@
+import { InvoiceStatus as PhenomInvoiceStatus } from '@hindawi/phenom-events/src/lib/invoice';
+import { InvoiceConfirmed as InvoiceConfirmedEvent } from '@hindawi/phenom-events';
+
 import { AppError } from '../../../../core/logic/AppError';
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 import { Invoice } from '../../domain/Invoice';
@@ -5,7 +8,6 @@ import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Payer } from '../../../payers/domain/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
-import { InvoiceConfirmed as InvoiceConfirmedEvent } from '@hindawi/phenom-events';
 import { EventUtils } from 'libs/shared/src/lib/utils/EventUtils';
 
 const INVOICE_CONFIRMED = 'InvoiceConfirmed';
@@ -36,7 +38,7 @@ export class PublishInvoiceConfirmed {
         vatPercentage: ii.vat
       })),
       organization: payer.organization.value.toString(),
-      invoiceStatus: invoice.status,
+      invoiceStatus: invoice.status as PhenomInvoiceStatus,
       payerName: payer.name.value.toString(),
       payerEmail: payer.email.value.toString(),
       payerType: payer.type,
