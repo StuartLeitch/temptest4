@@ -7,4 +7,9 @@ export interface UpdateTransactionOnAcceptManuscriptDTO {
   authorCountry?: string;
   authorSurname?: string;
   authorFirstName?: string;
+  emailSenderInfo?: {
+    address?: string;
+    name?: string;
+  };
+  bankTransferCopyReceiver?: string;
 }

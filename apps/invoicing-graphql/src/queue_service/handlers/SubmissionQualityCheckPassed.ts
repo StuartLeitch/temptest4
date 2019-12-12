@@ -77,7 +77,13 @@ ${JSON.stringify(data)}
         authorEmail: email,
         authorCountry: country,
         authorSurname: surname,
-        authorFirstName: givenNames
+        authorFirstName: givenNames,
+        bankTransferCopyReceiver:
+          config.invoicePaymentBankTransferCopyReceiverAddress,
+        emailSenderInfo: {
+          address: config.invoicePaymentEmailSenderAddress,
+          name: config.invoicePaymentEmailSenderName
+        }
       },
       defaultContext
     );

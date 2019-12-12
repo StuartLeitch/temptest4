@@ -42,6 +42,10 @@ export class Config {
   sanctionedCountryNotificationReceiver: string;
   sanctionedCountryNotificationSender: string;
 
+  invoicePaymentBankTransferCopyReceiverAddress: string;
+  invoicePaymentEmailSenderAddress: string;
+  invoicePaymentEmailSenderName: string;
+
   constructor() {
     Object.assign(this, dbConfig);
 
@@ -62,6 +66,13 @@ export class Config {
       process.env.SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER;
     this.sanctionedCountryNotificationSender =
       process.env.SANCTIONED_COUNTRY_NOTIFICATION_SENDER;
+
+    this.invoicePaymentBankTransferCopyReceiverAddress =
+      process.env.INVOICE_PAYMENT_EMAIL_BANK_TRANSFER_COPY_RECEIVER;
+    this.invoicePaymentEmailSenderAddress =
+      process.env.INVOICE_PAYMENT_EMAIL_SENDER_ADDRESS;
+    this.invoicePaymentEmailSenderName =
+      process.env.INVOICE_PAYMENT_EMAIL_SENDER_NAME;
   }
 }
 

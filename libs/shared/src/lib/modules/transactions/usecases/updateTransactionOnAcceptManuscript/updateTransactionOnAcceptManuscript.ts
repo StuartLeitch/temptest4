@@ -205,7 +205,10 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
           manuscript,
           catalogItem,
           invoiceItem,
-          invoice
+          invoice,
+          request.bankTransferCopyReceiver,
+          request.emailSenderInfo.address,
+          request.emailSenderInfo.name
         )
         .sendEmail();
 

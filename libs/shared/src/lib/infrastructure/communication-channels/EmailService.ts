@@ -102,11 +102,14 @@ class EmailService {
     manuscript: Manuscript,
     catalogItem: CatalogItem,
     invoiceItem: InvoiceItem,
-    invoice: Invoice
+    invoice: Invoice,
+    bankTransferCopyReceiverAddress: string,
+    senderAddress: string,
+    senderName: string
   ) {
     return this.createTemplate({
       type: 'user',
-      fromEmail: 'Hindawi Invoicing <invoices@hindawi.com>',
+      fromEmail: `${senderName} <${senderAddress}>`,
       toUser: {
         email: manuscript.authorEmail,
         name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`
@@ -123,9 +126,9 @@ class EmailService {
           manuscript.customId
         }, before any taxes, are ${invoiceItem.price} ${
           catalogItem.currency
-        }. If you are required to pay Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges.
+        }. If you are required to pay United Kingdom Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges by the prevailing rate of UK VAT at the date of the invoice.
         <br/><h4>What to do next?</h4>
-        This invoice is payable upon receipt. You can access the invoice for your article and make payment through the following URL:
+        In order to finalise the invoice with the correct billing details, you now access the invoice to confirm the details. Invoices can be charged to an individual or an institution depending on who is paying. This invoice is payable upon receipt. You can access the invoice for your article and make payment through the following URL:
         <br /><br />
         ${EmailService.createSingleButton(
           'INVOICE DETAILS',
@@ -133,16 +136,16 @@ class EmailService {
             `/payment-details/${invoiceItem.invoiceId.id.toString()}`
           )
         )}
-        You do not need to login to your account to access the link. After entering your billing address information, you will be able to pay by direct credit card, PayPal or bank transfer.
-        We are unable to accept payment by check.
+        You do not need to login to your account to access the link. After entering your billing address information, you will be able to pay directly by debit or credit, PayPal or bank transfer.
+        We are unable to accept payment by cheque.
         <br /><br />
-        If paying by credit card, we accept Visa, Mastercard, Discover and Maestro.
+        If paying by debit or credit card, we accept Visa, Mastercard, Discover and Maestro. You may find there are other card options if using your card against payment through PayPal.
         <br /><br />
         If paying by bank transfer, please use invoice number <strong>${
           invoice.invoiceNumber
         }/${(
           invoice.dateAccepted || invoice.dateCreated
-        ).getFullYear()}</strong> in the payment reference and return a scanned copy of the payment authorisation by email to facilitate our tracking of your payment.
+        ).getFullYear()}</strong> in the payment reference and return a scanned copy of the payment authorisation by email to <a href="mailto:${bankTransferCopyReceiverAddress}">${bankTransferCopyReceiverAddress}</a> to facilitate our tracking of your payment and to avoid us unnecessarily chasing payment.
         <br /><br />
         Please note that bank transfer payments can take up to a week to arrive and will be confirmed as soon as funds have cleared.
         <br /><br />
