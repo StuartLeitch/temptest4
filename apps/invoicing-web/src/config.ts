@@ -41,7 +41,7 @@ export class Config {
 
     this.appName = globalConfig.APP_NAME;
 
-    this.invoicesPerPage = globalConfig.INVOICES_PER_PAGE;
+    this.invoicesPerPage = Number(globalConfig.INVOICES_PER_PAGE);
   }
 }
 
