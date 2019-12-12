@@ -1,5 +1,4 @@
 // * Domain imports
-
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';

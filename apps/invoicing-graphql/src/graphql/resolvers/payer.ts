@@ -13,14 +13,13 @@ import {
 } from '@hindawi/shared';
 
 import { Resolvers, PayerType } from '../schema';
-import { Context } from '../../context';
 
 import { CreateAddress } from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
 import { ChangeInvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
 import { CreatePayerUsecase } from './../../../../../libs/shared/src/lib/modules/payers/usecases/createPayer/createPayer';
 import { DomainEvents } from 'libs/shared/src/lib/core/domain/events/DomainEvents';
 
-export const payer: Resolvers<Context> = {
+export const payer: Resolvers<any> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
       let address: Address;

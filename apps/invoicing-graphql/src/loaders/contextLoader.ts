@@ -23,7 +23,9 @@ import {
 import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
 import { CheckoutService } from '../services/checkout';
 import { AuthService } from '../services/auth';
-// import { ErpService } from '../services/erp';
+import { PayPalService } from '../services/paypal';
+import { ErpService } from '../services/erp';
+import { env } from '../env';
 
 export const contextLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -50,10 +52,10 @@ export const contextLoader: MicroframeworkLoader = (
       authService: new AuthService({}),
       vatService: new VATService(),
       waiverService: new WaiverService(),
-      // payPalService: () => makePayPal(config),
       emailService: new EmailService(),
-      exchangeRateService: new ExchangeRateService()
-      // erpService: new ErpService(config)
+      exchangeRateService: new ExchangeRateService(),
+      payPalService: new PayPalService(env.paypal),
+      erpService: new ErpService(env.salesForce)
     };
 
     const context = {

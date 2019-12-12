@@ -3,6 +3,7 @@ import {
   MicroframeworkSettings
 } from 'microframework-w3tec';
 import { configure, format, transports } from 'winston';
+// import WinstonCloudWatch from 'winston-cloudwatch';
 
 import { env } from '../env';
 

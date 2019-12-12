@@ -1,13 +1,11 @@
 import express from 'express';
-import { Context } from '@hindawi/invoicing-graphql/context';
 import { AuthContext } from '@hindawi/invoicing-graphql/services';
 import { Request, Response } from 'express';
 
 export class AuthMiddleware {
-  constructor(private context: Context) {
-  }
+  constructor(private context: any) {}
 
-  public parse(): express.Handler  {
+  public parse(): express.Handler {
     return async (req, res, next) => {
       const token = this.extractToken(req);
       let auth: AuthContext;

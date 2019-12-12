@@ -1,11 +1,10 @@
 import { Roles, GetPaymentMethodsUseCase } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
-import { Context } from '../../context';
 
 import { SetTransactionToActiveByCustomIdUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
 
-export const transactions: Resolvers<Context> = {
+export const transactions: Resolvers<any> = {
   Mutation: {
     async setTransactionToActive(parent, args, context) {
       const {

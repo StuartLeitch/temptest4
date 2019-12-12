@@ -1,5 +1,3 @@
-import { config } from '../../config';
-
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 
@@ -8,7 +6,6 @@ import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/e
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
-import { Context } from '../../context';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
@@ -53,7 +50,7 @@ ${JSON.stringify(data)}
       },
       waiverService,
       emailService
-    } = this as Context;
+    } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
 

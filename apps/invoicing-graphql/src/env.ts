@@ -50,13 +50,6 @@ export const env = {
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR')
-      // entities: getOsPaths('TYPEORM_ENTITIES'),
-      // entitiesDir: getOsPath('TYPEORM_ENTITIES_DIR'),
-      // controllers: getOsPaths('CONTROLLERS'),
-      // middlewares: getOsPaths('MIDDLEWARES'),
-      // interceptors: getOsPaths('INTERCEPTORS'),
-      // subscribers: getOsPaths('SUBSCRIBERS'),
-      // resolvers: getOsPaths('RESOLVERS')
     }
   },
   log: {
@@ -65,13 +58,10 @@ export const env = {
     output: getOsEnv('LOG_OUTPUT')
   },
   db: {
-    // type: getOsEnv('TYPEORM_CONNECTION'),
     host: getOsEnvOptional('DB_HOST'),
-    // port: toNumber(getOsEnvOptional('TYPEORM_PORT')),
     username: getOsEnvOptional('DB_USERNAME'),
     password: getOsEnvOptional('DB_PASSWORD'),
     database: getOsEnv('DB_DATABASE'),
-    // synchronize: toBool(getOsEnvOptional('TYPEORM_SYNCHRONIZE')),
     logging: getOsEnv('DB_LOGGING')
   },
   graphql: {
@@ -79,12 +69,6 @@ export const env = {
     route: getOsEnv('GRAPHQL_ROUTE'),
     editor: toBool(getOsEnv('GRAPHQL_EDITOR'))
   },
-  // swagger: {
-  //   enabled: toBool(getOsEnv('SWAGGER_ENABLED')),
-  //   route: getOsEnv('SWAGGER_ROUTE'),
-  //   username: getOsEnv('SWAGGER_USERNAME'),
-  //   password: getOsEnv('SWAGGER_PASSWORD')
-  // },
   monitor: {
     enabled: toBool(getOsEnv('MONITOR_ENABLED')),
     route: getOsEnv('MONITOR_ROUTE'),
@@ -121,7 +105,7 @@ export const env = {
     clientId: getOsEnv('PP_CLIENT_ID'),
     clientSecret: getOsEnv('PP_CLIENT_SECRET')
   },
-  sage: {
+  salesForce: {
     loginUrl: getOsEnv('SAGE_LOGIN_URL'),
     user: getOsEnv('SAGE_USER'),
     password: getOsEnv('SAGE_PASSWORD'),

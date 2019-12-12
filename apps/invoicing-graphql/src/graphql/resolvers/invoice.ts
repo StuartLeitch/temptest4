@@ -18,9 +18,8 @@ import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/s
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
-import { Context } from '../../context';
 
-export const invoice: Resolvers<Context> = {
+export const invoice: Resolvers<any> = {
   Query: {
     async invoice(parent, args, context) {
       const { repos } = context;
