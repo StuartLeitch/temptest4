@@ -220,7 +220,7 @@ export const invoice: Resolvers<Context> = {
         vatnote = template;
       }
 
-      return { ...rawItem, rate: Math.round(rate * 100) / 100, vatnote };
+      return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
     }
   },
   InvoiceItem: {
