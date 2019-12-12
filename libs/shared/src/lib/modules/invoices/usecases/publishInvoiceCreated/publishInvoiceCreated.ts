@@ -20,6 +20,8 @@ import { PublishInvoiceCreatedErrors } from './publishInvoiceCreatedErrors';
 import { PublishInvoiceCreatedDTO } from './publishInvoiceCreatedDTO';
 
 import { InvoiceCreated as InvoiceCreatedMessagePayload } from '@hindawi/phenom-events';
+import { InvoiceStatus as PhenomInvoiceStatus } from '@hindawi/phenom-events/src/lib/invoice';
+
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Invoice } from '../../domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
@@ -133,7 +135,7 @@ export class PublishInvoiceCreatedUsecase
         invoice.invoiceNumber
       }/${invoice.dateAccepted.getFullYear()}`,
       invoiceId: invoice.id.toString(),
-      invoiceStatus: invoice.status,
+      invoiceStatus: invoice.status as PhenomInvoiceStatus,
       invoiceCreatedDate: invoice.dateCreated
     };
   }
