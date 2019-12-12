@@ -34,7 +34,7 @@ interface Props {
   invoiceCharge: number;
   invoiceIsPaid: boolean;
   loading: boolean;
-  status: "DRAFT" | "ACTIVE" | "FINAL";
+  status: "DRAFT" | "ACTIVE" | "FINAL" | "PENDING";
   methods: Record<string, string>;
   payByCardSubmit: (data: any) => void;
   payByPayPalSubmit: (data: any) => void;
@@ -110,7 +110,9 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   return (
     <Expander
       title="2. Invoice &amp; Payment"
-      expanded={status === "ACTIVE" || status === "FINAL" ? true : false}
+      expanded={
+        status === "ACTIVE" || status === "FINAL" || "PENDING" ? true : false
+      }
     >
       {invoiceIsPaid ? (
         <SuccessfulPayment
@@ -119,6 +121,11 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
           }}
           payerId={invoice.payer.id}
         />
+      ) : status === "PENDING" ? (
+        <Text my="4" ml="4">
+          Your invoice is currently pending. You will be contacted soon by our
+          invoicing team. Thank you for your understanding
+        </Text>
       ) : (
         [
           <Label key={"invoice-download-link"} my="4" ml="4">

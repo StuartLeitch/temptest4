@@ -238,6 +238,9 @@ export class ConfirmInvoiceUsecase
   }
 
   private async markInvoiceAsPending(invoice: Invoice) {
+    console.log(
+      `Invoice with id {${invoice.id.toString()}} is confirmed with a sanctioned country.`
+    );
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );

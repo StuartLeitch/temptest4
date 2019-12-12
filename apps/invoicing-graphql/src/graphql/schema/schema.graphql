@@ -2,6 +2,7 @@ scalar Date
 
 enum InvoiceStatus {
   DRAFT
+  PENDING
   ACTIVE
   FINAL
 }
