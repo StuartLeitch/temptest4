@@ -20,6 +20,11 @@ import {
   KnexEditorRepo
 } from '@hindawi/shared';
 
+import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
+import { CheckoutService } from '../services/checkout';
+import { AuthService } from '../services/auth';
+// import { ErpService } from '../services/erp';
+
 export const contextLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
@@ -41,13 +46,13 @@ export const contextLoader: MicroframeworkLoader = (
     };
 
     const services = {
-      // checkoutService: new CheckoutService(),
-      // authService: new AuthService(config),
+      checkoutService: new CheckoutService(),
+      authService: new AuthService({}),
       vatService: new VATService(),
       waiverService: new WaiverService(),
       // payPalService: () => makePayPal(config),
-      emailService: new EmailService()
-      // exchangeRateService: new ExchangeRateService(),
+      emailService: new EmailService(),
+      exchangeRateService: new ExchangeRateService()
       // erpService: new ErpService(config)
     };
 

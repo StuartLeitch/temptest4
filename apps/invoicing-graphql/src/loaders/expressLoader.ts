@@ -1,11 +1,25 @@
-import express from 'express';
 import {
   MicroframeworkLoader,
   MicroframeworkSettings
 } from 'microframework-w3tec';
+import express from 'express';
+import corsMiddleware from 'cors';
+
+import {
+  // ErpData,
+  RecordPaymentUsecase,
+  GetInvoicePdfUsecase,
+  Roles,
+  UniqueEntityID,
+  InvoiceId
+  // ManuscriptId,
+  // Journal,
+  // Name
+} from '@hindawi/shared';
 
 // import { authorizationChecker } from '../auth/authorizationChecker';
 // import { currentUserChecker } from '../auth/currentUserChecker';
+import { AuthMiddleware } from '../api/middleware/auth';
 
 import { env } from '../env';
 
@@ -14,6 +28,7 @@ export const expressLoader: MicroframeworkLoader = (
 ) => {
   if (settings) {
     const connection = settings.getData('connection');
+    const context = settings.getData('context');
 
     const app = express();
     const auth = new AuthMiddleware(context);
@@ -196,11 +211,11 @@ export const expressLoader: MicroframeworkLoader = (
 
     // Run application to listen on given port
     if (!env.isTest) {
-      const server = expressApp.listen(env.app.port);
+      const server = app.listen(env.app.port);
       settings.setData('express_server', server);
     }
 
     // Here we can set the data for other loaders
-    settings.setData('express_app', expressApp);
+    settings.setData('express_app', app);
   }
 };

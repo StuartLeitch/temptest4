@@ -11,6 +11,8 @@ import { Logger } from './lib/logger';
 import { winstonLoader } from './loaders/winstonLoader';
 // import { graphqlLoader } from './loaders/graphqlLoader';
 import { knexLoader } from './loaders/knexLoader';
+import { contextLoader } from './loaders/contextLoader';
+import { expressLoader } from './loaders/expressLoader';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -31,8 +33,9 @@ bootstrapMicroframework({
     winstonLoader,
     // iocLoader,
     // eventDispatchLoader,
-    knexLoader
-    // expressLoader,
+    knexLoader,
+    contextLoader,
+    expressLoader
     // swaggerLoader,
     // monitorLoader,
     // homeLoader,
