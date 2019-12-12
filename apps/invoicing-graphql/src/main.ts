@@ -9,10 +9,10 @@ import { Logger } from './lib/logger';
  * Loaders
  */
 import { winstonLoader } from './loaders/winstonLoader';
-// import { graphqlLoader } from './loaders/graphqlLoader';
 import { knexLoader } from './loaders/knexLoader';
 import { contextLoader } from './loaders/contextLoader';
 import { expressLoader } from './loaders/expressLoader';
+import { graphqlLoader } from './loaders/graphqlLoader';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -35,12 +35,12 @@ bootstrapMicroframework({
     // eventDispatchLoader,
     knexLoader,
     contextLoader,
-    expressLoader
+    expressLoader,
     // swaggerLoader,
     // monitorLoader,
     // homeLoader,
     // publicLoader,
-    // graphqlLoader
+    graphqlLoader
   ]
 })
   .then(() => banner(log))

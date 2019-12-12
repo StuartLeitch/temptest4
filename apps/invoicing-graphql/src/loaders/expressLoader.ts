@@ -27,7 +27,6 @@ export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
-    const connection = settings.getData('connection');
     const context = settings.getData('context');
 
     const app = express();
