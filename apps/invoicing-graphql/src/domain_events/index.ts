@@ -1,7 +1,7 @@
 import { Context } from '../context';
+import { config } from '../config';
 
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
-import { AfterInvoicePendingEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePendingEvents';
 import { AfterInvoiceActivated } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceActivatedEvent';
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
 import { PublishInvoiceConfirmed } from 'libs/shared/src/lib/modules/invoices/usecases/publishInvoiceConfirmed';
@@ -16,6 +16,7 @@ export const registerDomainEvents = (
 ) => {
   const {
     repos: { invoice, invoiceItem, manuscript, payer, address, catalog },
+    emailService,
     erpService
   } = context;
 
@@ -34,7 +35,6 @@ export const registerDomainEvents = (
   const publishInvoicePaid = new PublishInvoicePaid(queue);
 
   // Registering Invoice Events
-  const pendingEventListener = new AfterInvoicePendingEvent();
   const createdEventListener = new AfterInvoiceCreatedEvent(
     invoice,
     invoiceItem,

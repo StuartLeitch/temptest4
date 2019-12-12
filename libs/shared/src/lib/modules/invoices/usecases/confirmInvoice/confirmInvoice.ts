@@ -44,6 +44,7 @@ import {
 import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
 import { PoliciesRegister } from '../../../../domain/reductions/policies/PoliciesRegister';
 
+import { EmailService } from '../../../../infrastructure/communication-channels';
 import { VATService } from '../../../../domain/services/VATService';
 
 export type ConfirmInvoiceContext = AuthorizationContext<Roles>;
@@ -75,7 +76,10 @@ export class ConfirmInvoiceUsecase
     private addressRepo: AddressRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
-    private vatService: VATService
+    private emailService: EmailService,
+    private vatService: VATService,
+    private receiverEmail: string,
+    private senderEmail: string
   ) {
     this.authorizationContext = { roles: [Roles.PAYER] };
 
@@ -124,10 +128,12 @@ export class ConfirmInvoiceUsecase
   ): Promise<Either<unknown, PayerDataDomain>> {
     const { invoice, address } = payerData;
     if (this.isPayerFromSanctionedCountry(address)) {
-      return (await this.markInvoiceAsPending(invoice)).map(pendingInvoice => ({
-        ...payerData,
-        invoice: pendingInvoice
-      }));
+      return (await this.markInvoiceAsPending(invoice))
+        .map(pendingInvoice => this.sendEmail(pendingInvoice))
+        .map(pendingInvoice => ({
+          ...payerData,
+          invoice: pendingInvoice
+        }));
     } else {
       if (invoice.status !== InvoiceStatus.ACTIVE) {
         return (await this.markInvoiceAsActive(invoice)).map(activeInvoice => ({
@@ -241,7 +247,6 @@ export class ConfirmInvoiceUsecase
     });
     return maybePendingInvoice.map(pendingInvoiceResult => {
       const pendingInvoice = pendingInvoiceResult.getValue();
-      pendingInvoice.triggerStatusPendingEvent();
       return pendingInvoice;
     });
   }
@@ -275,5 +280,16 @@ export class ConfirmInvoiceUsecase
       payerType: payer.type
     });
     return maybeAppliedVat.map(() => ({ invoice, address, payer }));
+  }
+
+  private sendEmail(invoice: Invoice) {
+    this.emailService
+      .createInvoicePendingNotification(
+        invoice,
+        this.receiverEmail,
+        this.senderEmail
+      )
+      .sendEmail();
+    return invoice;
   }
 }

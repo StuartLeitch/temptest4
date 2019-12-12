@@ -70,6 +70,33 @@ class EmailService {
     }
   }
 
+  public createInvoicePendingNotification(
+    invoice: Invoice,
+    receiverEmail: string,
+    senderEmail: string
+  ) {
+    return this.createTemplate({
+      type: 'user',
+      fromEmail: senderEmail,
+      toUser: {
+        email: receiverEmail
+      },
+      content: {
+        subject: `[Sanctioned Country] An Invoice was confirmed from a Sanctioned Country`,
+        paragraph: `
+          The invoice with id {${invoice.id.toString()}} and reference number {${
+          invoice.invoiceNumber
+        }/${invoice.dateAccepted.getFullYear()}} has been confirmed from a Sanctioned Country.
+        `
+      },
+      bodyProps: {
+        hasLink: false,
+        hasIntro: true,
+        hasSignature: false
+      }
+    });
+  }
+
   // TODO: move templates to a different place?
   public createInvoicePaymentTemplate(
     manuscript: Manuscript,

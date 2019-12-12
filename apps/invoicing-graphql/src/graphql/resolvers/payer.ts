@@ -7,11 +7,12 @@ import {
 
 import { Resolvers } from '../schema';
 import { Context } from '../../context';
+import { config } from '../../config';
 
 export const payer: Resolvers<Context> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
-      const { repos, vatService } = context;
+      const { repos, vatService, emailService } = context;
       const { payer: inputPayer } = args;
 
       const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
@@ -19,7 +20,10 @@ export const payer: Resolvers<Context> = {
         repos.address,
         repos.invoice,
         repos.payer,
-        vatService
+        emailService,
+        vatService,
+        config.sanctionedCountryNotificationReceiver,
+        config.sanctionedCountryNotificationSender
       );
       const maybeUpdatedPayer = await confirmInvoiceUsecase.execute({
         payer: inputPayer

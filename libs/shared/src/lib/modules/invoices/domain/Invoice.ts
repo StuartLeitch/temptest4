@@ -10,7 +10,6 @@ import { InvoiceItems } from './InvoiceItems';
 import { InvoiceSentEvent } from './events/invoiceSent';
 import { InvoicePaidEvent } from './events/invoicePaid';
 import { InvoiceCreated } from './events/invoiceCreated';
-import { InvoicePending } from './events/invoicePending';
 import { InvoiceActivated } from './events/invoiceActivated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
@@ -172,11 +171,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   public send(): void {
     this.addDomainEvent(new InvoiceSentEvent(this.invoiceId, new Date()));
-  }
-
-  public triggerStatusPendingEvent(): void {
-    const now = new Date();
-    this.addDomainEvent(new InvoicePending(this, now));
   }
 
   public markAsActive(): void {

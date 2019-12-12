@@ -39,6 +39,9 @@ export class Config {
 
   feRoot: string;
 
+  sanctionedCountryNotificationReceiver: string;
+  sanctionedCountryNotificationSender: string;
+
   constructor() {
     Object.assign(this, dbConfig);
 
@@ -54,6 +57,11 @@ export class Config {
       environment: process.env.PP_ENVIRONMENT,
       clientId: process.env.PP_CLIENT_ID
     };
+
+    this.sanctionedCountryNotificationReceiver =
+      process.env.SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER;
+    this.sanctionedCountryNotificationSender =
+      process.env.SANCTIONED_COUNTRY_NOTIFICATION_SENDER;
   }
 }
 
