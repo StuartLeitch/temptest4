@@ -9,7 +9,7 @@ interface Props {
   payer: any;
   error: string;
   loading: boolean;
-  status: "DRAFT" | "ACTIVE" | "FINAL";
+  status: "DRAFT" | "ACTIVE" | "FINAL" | "PENDING";
   handleSubmit(payer: any): any;
   onVatFieldChange(country: string, paymentType: string): any;
 }
@@ -20,12 +20,12 @@ const BillingInfo: React.FC<Props> = ({
   status,
   loading,
   handleSubmit,
-  onVatFieldChange
+  onVatFieldChange,
 }) => {
   return (
     <Expander mb={6} flex={2} expanded={true} title="1. Payer details">
       <Root>
-        {status === "ACTIVE" || status === "FINAL" ? (
+        {status === "ACTIVE" || status === "FINAL" || status === "PENDING" ? (
           <InvoiceInfo {...payer} />
         ) : (
           <InvoiceForm

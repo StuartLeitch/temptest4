@@ -19,6 +19,7 @@ import { PaymentId } from '../../payments/domain/PaymentId';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
+  PENDING = 'PENDING', // when a user confirms the invoice from a sanctioned country
   ACTIVE = 'ACTIVE', // when the customer is being notified
   FINAL = 'FINAL' // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
 }
@@ -91,7 +92,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   set dateAccepted(dateAccepted: Date) {
-    this.props.dateAccepted = dateAccepted
+    this.props.dateAccepted = dateAccepted;
   }
 
   get invoiceItems(): InvoiceItems {

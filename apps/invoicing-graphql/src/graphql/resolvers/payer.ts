@@ -1,18 +1,12 @@
 import {
-  Roles,
-  Payer,
-  Address,
-  Invoice,
-  InvoiceItem,
   PayerMap,
   AddressMap,
   GetAddressUseCase,
-  UniqueEntityID,
-  InvoiceId,
-  InvoiceStatus
+  ConfirmInvoiceUsecase
 } from '@hindawi/shared';
 
 import { Resolvers, PayerType } from '../schema';
+import { env } from '../../env';
 
 import { CreateAddress } from '../../../../../libs/shared/src/lib/modules/addresses/usecases/createAddress/createAddress';
 import { ChangeInvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
@@ -22,95 +16,28 @@ import { DomainEvents } from 'libs/shared/src/lib/core/domain/events/DomainEvent
 export const payer: Resolvers<any> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
-      let address: Address;
-      let updatedPayer: Payer;
-      let invoice: Invoice;
-      let invoiceItem: InvoiceItem;
+      const { repos, vatService, emailService } = context;
+      const { payer: inputPayer } = args;
 
-      const { repos, vatService } = context;
-      const usecaseContext = { roles: [Roles.PAYER] };
-      const { payer } = args;
-
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(payer.invoiceId)
-      ).getValue();
-
-      invoice = await repos.invoice.getInvoiceById(invoiceId);
-
-      const createAddressUseCase = new CreateAddress(repos.address);
-      const createPayerUseCase = new CreatePayerUsecase(repos.payer);
-      const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(repos.invoice);
-
-      if (payer.type === PayerType.INSTITUTION) {
-        const vatResult = await vatService.checkVAT({
-          countryCode: payer.address.country,
-          vatNumber: payer.vatId
-        });
-
-        if (!vatResult.valid) {
-          console.log(`VAT ${payer.vatId} is not valid.`);
-        }
-      }
-
-      const addressResult = await createAddressUseCase.execute({
-        city: payer.address.city,
-        country: payer.address.country,
-        addressLine1: payer.address.addressLine1
-      });
-
-      if (addressResult.isRight()) {
-        address = addressResult.value.getValue();
-      }
-
-      const createPayerRequest = {
-        invoiceId: payer.invoiceId,
-        type: payer.type,
-        name: payer.name,
-        email: payer.email,
-        vatId: payer.vatId,
-        organization: payer.organization || ' ',
-        addressId: address.addressId.id.toString()
-      };
-
-      const payerResult = await createPayerUseCase.execute(
-        createPayerRequest,
-        usecaseContext
+      const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
+        repos.invoiceItem,
+        repos.address,
+        repos.invoice,
+        repos.payer,
+        emailService,
+        vatService,
+        env.app.sanctionedCountryNotificationReceiver,
+        env.app.sanctionedCountryNotificationSender
       );
-
-      if (payerResult.isRight()) {
-        updatedPayer = payerResult.value.getValue();
-      }
-
-      if (invoice.status !== InvoiceStatus.ACTIVE) {
-        invoice.markAsActive();
-
-        await changeInvoiceStatusUseCase.execute({
-          invoiceId: updatedPayer.invoiceId.id.toString(),
-          status: 'ACTIVE'
-        });
-
-        // * Apply and save VAT scheme
-        const vat = vatService.calculateVAT(
-          payer.address.country,
-          payer.type !== PayerType.INSTITUTION
+      const maybeUpdatedPayer = await confirmInvoiceUsecase.execute({
+        payer: inputPayer
+      });
+      if (maybeUpdatedPayer.isLeft()) {
+        throw new Error(
+          `Error: ${maybeUpdatedPayer.value.errorValue().message}`
         );
-
-        try {
-          [invoiceItem] = await repos.invoiceItem.getItemsByInvoiceId(
-            invoice.invoiceId
-          );
-        } catch (err) {
-          // do nothing yet
-        }
-
-        invoiceItem.vat = vat;
-
-        await repos.invoiceItem.update(invoiceItem);
       }
-
-      DomainEvents.dispatchEventsForAggregate(invoice.id);
-
-      return PayerMap.toPersistence(updatedPayer);
+      return PayerMap.toPersistence(maybeUpdatedPayer.value.getValue());
     }
   },
   Payer: {

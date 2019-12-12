@@ -221,16 +221,16 @@
               <em>(<%= invoice.invoiceItems.currentItems.length > 0 ? invoice.invoiceItems.currentItems[0].vat : 0 %>%)</em>
             </th>
             <td>
-              <%= invoice.invoiceItems.currentItems.filter(item => item.type === 'APC').reduce((acc, item) => acc + (item.price * item.vat / 100), 0) %>
+              <%= (invoice.invoiceItems.currentItems.filter(item => item.type === 'APC').reduce((acc, item) => acc + (item.price * item.vat / 100), 0)).toFixed(2) %>
               USD
             </td>
           </tr>
           <tr>
             <th class="summary">Total</th>
             <td class="summary">
-              <%= invoice.getInvoiceTotal() +
+              <%= (invoice.getInvoiceTotal() +
                 (invoice.invoiceItems.currentItems[0].vat ?
-                invoice.invoiceItems.currentItems[0].vat *  invoice.invoiceItems.currentItems[0].price / 100 : 0) %>
+                invoice.invoiceItems.currentItems[0].vat *  invoice.invoiceItems.currentItems[0].price / 100 : 0)).toFixed(2) %>
               USD
             </td>
           </tr>

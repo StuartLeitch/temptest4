@@ -50,7 +50,20 @@ export const env = {
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR')
-    }
+    },
+    sanctionedCountryNotificationReceiver: getOsEnv(
+      'SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER'
+    ),
+    sanctionedCountryNotificationSender: getOsEnv(
+      'SANCTIONED_COUNTRY_NOTIFICATION_SENDER'
+    ),
+    invoicePaymentEmailBankTransferCopyReceiver: getOsEnv(
+      'INVOICE_PAYMENT_EMAIL_BANK_TRANSFER_COPY_RECEIVER'
+    ),
+    invoicePaymentEmailSenderAddress: getOsEnv(
+      'INVOICE_PAYMENT_EMAIL_SENDER_ADDRESS'
+    ),
+    invoicePaymentEmailSenderName: getOsEnv('INVOICE_PAYMENT_EMAIL_SENDER_NAME')
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),
