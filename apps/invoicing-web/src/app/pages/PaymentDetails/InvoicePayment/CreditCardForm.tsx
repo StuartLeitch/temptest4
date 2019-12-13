@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Flex, Label, Button, FormField, th } from "@hindawi/react-components";
 import { Braintree, HostedField } from "react-braintree-fields";
 
-import { Visa, MasterCard, Discover } from "./ValidCreditCards";
+import { Visa, Maestro, MasterCard, Discover } from "./ValidCreditCards";
 
 interface Props {
   handleSubmit: any;
@@ -82,9 +82,10 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       <Flex vertical>
         <Flex justifyContent="flex-start">
           <Label>Credit Card Details</Label>
-          <Visa ml={1} />
-          <MasterCard ml={1} />
-          <Discover ml={1} />
+          <Visa height={24} width={74} ml={1} />
+          <Maestro height={24} width={30} ml={1} />
+          <MasterCard height={24} width={24} ml={1} />
+          <Discover height={24} width={24} ml={1} />
         </Flex>
 
         <Braintree
