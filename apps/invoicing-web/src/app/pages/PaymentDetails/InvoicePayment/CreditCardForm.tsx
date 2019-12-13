@@ -1,9 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import { Flex, Label, Button, FormField, th } from "@hindawi/react-components";
+import PaymentIcon from "react-payment-icons";
+import { Flex, Label, Button, th } from "@hindawi/react-components";
 import { Braintree, HostedField } from "react-braintree-fields";
-
-import { Visa, Maestro, MasterCard, Discover } from "./ValidCreditCards";
 
 interface Props {
   handleSubmit: any;
@@ -82,10 +81,10 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       <Flex vertical>
         <Flex justifyContent="flex-start">
           <Label>Credit Card Details</Label>
-          <Visa height={24} width={74} ml={1} />
-          <Maestro height={24} width={30} ml={1} />
-          <MasterCard height={24} width={24} ml={1} />
-          <Discover height={24} width={24} ml={1} />
+          <PaymentIcon id="visa" style={{ margin: 3, width: 36 }} />
+          <PaymentIcon id="maestro" style={{ margin: 3, width: 36 }} />
+          <PaymentIcon id="mastercard" style={{ margin: 3, width: 36 }} />
+          <PaymentIcon id="discover" style={{ margin: 3, width: 36 }} />
         </Flex>
 
         <Braintree
@@ -98,9 +97,15 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           styles={{
             input: {
               "font-size": "14px",
-              "font-family": "helvetica, tahoma, calibri, sans-serif",
+              "font-family": "courier, monospace",
+              "letter-spacing": "2px",
+              "word-spacing": "4px",
               width: "100%",
-              color: "rgb(201, 201, 201)",
+              color: "rgb(161, 161, 161)",
+            },
+            "#credit-card-number": {
+              "text-align": "left",
+              "margin-bottom": "10px",
             },
             ":focus": {
               color: "rgb(51, 51, 51)",
@@ -117,7 +122,9 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
                 Card Number
               </Label>
               <HostedField
-                placeholder={"**** **** **** ****"}
+                placeholder={
+                  "\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022"
+                }
                 type="number"
                 ref={this.numberField}
               />
@@ -132,7 +139,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
               <Label required htmlFor="cvv">
                 CVV
               </Label>
-              <HostedField placeholder={"***"} type="cvv" />
+              <HostedField placeholder={"\u2022\u2022\u2022"} type="cvv" />
             </Flex>
             <Flex vertical mr={4}>
               <Label required htmlFor="postalCode">

@@ -115,7 +115,7 @@ export class GetInvoicePdfUsecase
             rate = exchangeRate.exchangeRate;
           }
 
-          payload.invoice.props.rate = Math.round(rate * 100) / 100;
+          payload.invoice.props.rate = Math.round(rate * 10000) / 10000;
           payload.invoice.props.vatnote = template;
 
           return payload;
