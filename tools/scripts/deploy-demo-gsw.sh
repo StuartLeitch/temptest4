@@ -1,0 +1,36 @@
+#!/bin/sh
+
+export AWS_REGISTRY="496598730381.dkr.ecr.eu-west-1.amazonaws.com"
+export AWS_ENVIRONMENT="demo"
+export APP="invoicing-graphql"
+export TO="${AWS_ENVIRONMENT}-${APP}"
+export TIMESTAMP=$(date +'%d_%m_%Y_%R')
+export CI_COMMIT_SHA="${USER}_${TIMESTAMP/:/_}"
+
+_=$(command -v npm);
+if [ "$?" != "0" ]; then
+  printf -- "You don\'t seem to have NPM installed.\n";
+  # printf -- 'Get it: https://www.docker.com/community-edition\n';
+  printf -- "Exiting with code 127...\n";
+  exit 127;
+fi;
+
+_=$(command -v aws);
+if [ "$?" != "0" ]; then
+  printf -- "You don\'t seem to have AWS installed.\n";
+  printf -- "Get it: https://aws.amazon.com/cli/\n";
+  printf -- "Exiting with code 127...\n";
+  exit 127;
+fi;
+
+CURR_DIR="$(dirname $0)"
+
+printf -- '\033[33m>\033[0m Deploy Back End App for "GWS demo" environment\n'
+./$CURR_DIR/deploy-$AWS_ENVIRONMENT-backend.sh
+
+printf -- '\033[33m>\033[0m Deploy Front End App for "GWS demo" environment\n'
+./$CURR_DIR/deploy-$AWS_ENVIRONMENT-frontend.sh
+
+printf -- '\n';
+
+exit 0;
