@@ -34,6 +34,8 @@
     "src/lib/infrastructure/database/knex/migrations/20191205083540_add_dateAccepted_to_invoices.js",
     "src/lib/infrastructure/database/knex/migrations/20191204132306_add_is_active_to_catalog_table.js",
     "src/lib/infrastructure/database/knex/migrations/20191205144644_add_userId_to_editor_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20191210165617_remove_invoiceNumber_unique.js"
+    "src/lib/infrastructure/database/knex/migrations/20191210165617_remove_invoiceNumber_unique.js",
+    "src/lib/infrastructure/database/knex/migrations/20191216144735_replace_coupons_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20191216172738_create_invoice_items_to_coupons_table.js"
   ]
 }
