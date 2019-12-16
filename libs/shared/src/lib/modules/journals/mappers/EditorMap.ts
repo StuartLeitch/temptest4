@@ -1,11 +1,11 @@
-import { Mapper } from '../../../infrastructure/Mapper';
-import { Editor } from '../domain/Editor';
-import { UniqueEntityID } from '@hindawi/shared';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { EditorRole } from '../../../domain/EditorRole';
 import { Email } from '../../../domain/Email';
 import { Name } from '../../../domain/Name';
-import { JournalId } from '../domain/JournalId';
-import { EditorRole } from '../../../domain/EditorRole';
+import { Mapper } from '../../../infrastructure/Mapper';
 import { UserId } from '../../users/domain/UserId';
+import { JournalId } from '../domain/JournalId';
+import { Editor } from '../domain/Editor';
 import { CreateEditorDTO } from '../usecases/editorialBoards/createEditor/createEditorDTO';
 
 export class EditorMap extends Mapper<Editor> {

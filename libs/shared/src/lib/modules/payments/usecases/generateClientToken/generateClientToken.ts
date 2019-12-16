@@ -14,7 +14,7 @@ import {
 // * Usecase specific
 import { BraintreeGateway } from '@hindawi/shared';
 import { Braintree } from './../../domain/strategies/Braintree';
-import { BraintreePayment } from './../../domain/strategies/BrainTreePayment';
+import { BraintreePayment } from '../../domain/strategies/BraintreePayment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 // import { PaymentModel } from './../../domain/contracts/PaymentModel';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';

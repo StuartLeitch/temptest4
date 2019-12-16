@@ -22,7 +22,7 @@ import {
 
 import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
 import { CheckoutService } from '../services/checkout';
-import { AuthService } from '../services/auth';
+// import { AuthService } from '../services/auth';
 import { PayPalService } from '../services/paypal';
 import { ErpService } from '../services/erp';
 import { env } from '../env';
@@ -49,7 +49,7 @@ export const contextLoader: MicroframeworkLoader = (
 
     const services = {
       checkoutService: new CheckoutService(),
-      authService: new AuthService({}),
+      // authService: new AuthService({}),
       vatService: new VATService(),
       waiverService: new WaiverService(),
       emailService: new EmailService(),

@@ -19,7 +19,7 @@ import {
 
 // import { authorizationChecker } from '../auth/authorizationChecker';
 // import { currentUserChecker } from '../auth/currentUserChecker';
-import { AuthMiddleware } from '../api/middleware/auth';
+// import { AuthMiddleware } from '../api/middleware/auth';
 
 import { env } from '../env';
 
@@ -30,7 +30,7 @@ export const expressLoader: MicroframeworkLoader = (
     const context = settings.getData('context');
 
     const app = express();
-    const auth = new AuthMiddleware(context);
+    // const auth = new AuthMiddleware(context);
     app.use(express.json());
     app.use(corsMiddleware());
 
@@ -56,9 +56,9 @@ export const expressLoader: MicroframeworkLoader = (
       }
     });
 
-    app.get('/api/jwt-test', auth.enforce(), (req, res) => {
-      res.status(200).json(req.auth);
-    });
+    // app.get('/api/jwt-test', auth.enforce(), (req, res) => {
+    //   res.status(200).json(req.auth);
+    // });
 
     // TODO REMOVE THIS !!!
     app.post('/api/acceptManuscript', async (req, res) => {
