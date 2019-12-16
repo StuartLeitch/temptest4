@@ -6,7 +6,8 @@ const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
 const JOURNAL_SECTION_SPECIAL_ISSUE_EDITOR_ASSIGNED =
   'JournalSectionSpecialIssueEditorAssigned';
 const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
-const JOURNAL_SPECIAL_ISSUE_EDITOR_ASSIGNED = 'JournalSpecialIssueEditorAssigned';
+const JOURNAL_SPECIAL_ISSUE_EDITOR_ASSIGNED =
+  'JournalSpecialIssueEditorAssigned';
 
 export const JournalEditorAssignedHandler = {
   event: JOURNAL_EDITOR_ASSIGNED,
@@ -29,7 +30,7 @@ export const JournalEditorAssignedHandler = {
 //   handler: addEditorEventHandlerFactory(JOURNAL_SPECIAL_ISSUE_EDITOR_ASSIGNED)
 // };
 
-function addEditorEventHandlerFactory(eventName: string):any {
+function addEditorEventHandlerFactory(eventName: string): any {
   return async function(data: any) {
     console.log(`
 [${eventName} Incoming Event Data]:
@@ -44,8 +45,8 @@ ${JSON.stringify(data)}`);
     );
 
     try {
-      let journalId = data.id;
-      let editors = JournalEventMap.extractEditors(data);
+      const journalId = data.id;
+      const editors = JournalEventMap.extractEditors(data);
       const assignEditorResponse = await assignEditorToJournal.execute({
         journalId,
         allEditors: editors
@@ -53,10 +54,9 @@ ${JSON.stringify(data)}`);
       if (assignEditorResponse.isLeft()) {
         console.error(assignEditorResponse.value.error);
       }
-      console.log(`Successfully exectued event ${eventName}`)
+      console.log(`Successfully exectued event ${eventName}`);
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 }
-

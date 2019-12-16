@@ -21,7 +21,7 @@ export class JournalEventMap {
     for (const editor of editorsToParse) {
       const editorId = editor.id;
       const isScheduled = scheduledEditorMap[editorId];
-      if (!isScheduled) {
+      if (!isScheduled && editor.role.type !== 'editorialAssistant') {
         scheduledEditors.push(EditorMap.fromEventToDTO(editor));
         scheduledEditorMap[editorId] = true;
       }
