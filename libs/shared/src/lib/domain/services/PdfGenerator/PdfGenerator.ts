@@ -49,6 +49,7 @@ export class PdfGeneratorService {
           height: '2.5cm'
         },
         phantomPath: '/usr/local/bin/phantomjs',
+        // phantomPath: 'node_modules/.bin/phantomjs',
         phantomArgs: []
       };
       try {

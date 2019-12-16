@@ -116,7 +116,11 @@ export class ConfirmInvoiceUsecase
       this.sanctionedCountryPolicy.getType(),
       [country]
     );
-    if (reductions.getReduction().props.reduction < 0) {
+    if (
+      reductions &&
+      reductions.getReduction() &&
+      reductions.getReduction().props.reduction < 0
+    ) {
       return true;
     } else {
       return false;
