@@ -2,40 +2,22 @@
 import {AggregateRoot} from '../../core/domain/AggregateRoot';
 import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
 
-import {InvoiceId} from './../../modules/invoices/domain/InvoiceId';
-import {ReductionId} from './ReductionId';
-
+export enum ReductionType {
+  WAIVER = 'WAIVER',
+  COUPON = 'COUPON'
+}
 export interface ReductionProps {
-  reductionId?: ReductionId;
-  invoiceId?: InvoiceId;
-  name: string;
   reduction: number;
-  readonly type?: string;
-  isAutomatic?: boolean;
-  isValid?: boolean;
-  created?: Date;
 }
 
-export abstract class Reduction extends AggregateRoot<ReductionProps> {
+export abstract class Reduction<T> extends AggregateRoot<ReductionProps&T> {
   protected readonly reductionPercentage: number = 0;
 
   public get id(): UniqueEntityID {
     return this._id;
   }
 
-  get reductionId(): ReductionId {
-    return ReductionId.create(this.id);
-  }
+  public abstract get reduction(): number;
 
-  public get type(): string {
-    return this.props.type;
-  }
-
-  public get isAutomatic(): boolean {
-    return this.props.isAutomatic;
-  }
-
-  public get isValid(): boolean {
-    return this.props.isValid;
-  }
+  public abstract get reductionType(): ReductionType;
 }

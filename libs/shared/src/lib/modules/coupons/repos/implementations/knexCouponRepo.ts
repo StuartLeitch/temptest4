@@ -1,16 +1,15 @@
-import {Knex, TABLES} from '@hindawi/shared';
+import { Knex, TABLES } from '@hindawi/shared';
+import { Coupon } from '../../../../domain/reductions/Coupon';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { CouponMap } from '../../mappers/CouponMap';
+import { CouponRepoContract } from '../couponRepo';
+import { CouponId } from 'libs/shared/src/lib/domain/reductions/CouponId';
 
-import {Coupon} from '../../../../domain/reductions/Coupon';
-import {CouponMap} from '../../mappers/CouponMap';
-import {ReductionId} from '../../../../domain/reductions/ReductionId';
 
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoError} from '../../../../infrastructure/RepoError';
-import {CouponRepoContract} from '../couponRepo';
 
 export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   implements CouponRepoContract {
-  async getCouponById(couponId: ReductionId): Promise<Coupon> {
+  async getCouponById(couponId: CouponId): Promise<Coupon> {
     const {db} = this;
 
     const couponRow = await db(TABLES.COUPONS)
@@ -72,7 +71,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   // }
 
   async exists(coupon: Coupon): Promise<boolean> {
-    const result = await this.getCouponById(coupon.reductionId);
+    const result = await this.getCouponById(coupon.couponId);
 
     return !!result;
   }
@@ -84,6 +83,6 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
     await db(TABLES.COUPONS).insert(data);
 
-    return this.getCouponById(coupon.reductionId);
+    return this.getCouponById(coupon.couponId);
   }
 }
