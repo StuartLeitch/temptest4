@@ -1,41 +1,49 @@
 // * Core Domain
-import {Result} from '../../core/logic/Result';
-import {UniqueEntityID} from '../../core/domain/UniqueEntityID';
+import { Result } from '../../core/logic/Result';
+import { UniqueEntityID } from '../../core/domain/UniqueEntityID';
 
-import {ReductionProps} from './Reduction';
-import {Discount} from './Discount';
+import { ReductionProps, Reduction, ReductionType } from './Reduction';
 
 // * Coupon Domain Events
-import {CouponCreated} from './../../modules/coupons/domain/events/couponCreated';
-import {CouponUpdated} from './../../modules/coupons/domain/events/couponUpdated';
-import {CouponApplied} from './../../modules/coupons/domain/events/couponApplied';
+import { CouponCreated } from './../../modules/coupons/domain/events/couponCreated';
+import { CouponId } from './CouponId';
 
-export class Coupon extends Discount {
-  private constructor(props: ReductionProps, id?: UniqueEntityID) {
+export enum CouponType {
+  SINGLE_USE = 'SINGLE_USE',
+  MULTIPLE_USE = 'MULTIPLE_USE'
+}
+
+export interface CouponProps extends ReductionProps {
+  couponType: CouponType;
+}
+
+export class Coupon extends Reduction<CouponProps> {
+  private constructor(props: CouponProps, id?: UniqueEntityID) {
     super(props, id);
   }
 
-  get name(): string {
-    return this.props.name;
+  public get couponId(): CouponId {
+    return CouponId.create(this._id).getValue()
   }
 
-  get reduction(): number {
+  public get reductionType(): ReductionType {
+    return ReductionType.COUPON;
+  }
+
+  public get reduction(): number {
     return this.props.reduction;
   }
 
-  get created(): Date {
-    return this.props.created;
+  public get couponType(): CouponType {
+    return this.props.couponType;
   }
 
   public static create(
-    props: ReductionProps,
+    props: CouponProps,
     id?: UniqueEntityID
   ): Result<Coupon> {
     const coupon = new Coupon(
-      {
-        ...props,
-        type: 'COUPON'
-      },
+      props,
       id
     );
 

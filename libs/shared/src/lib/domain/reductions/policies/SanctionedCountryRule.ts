@@ -1,6 +1,5 @@
 import {ReductionRuleContract} from '../contracts/ReductionRule';
-import {ReductionFactory} from '../ReductionFactory';
-import {Reduction, ReductionProps} from '../Reduction';
+import { Waiver, WaiverType } from '../Waiver';
 
 const SANCTIONED_COUNTRIES = {
   AF: {country: 'Afghanistan'},
@@ -13,18 +12,16 @@ const SANCTIONED_COUNTRIES = {
   UA: {country: 'Ukraine'}
 };
 
-export class SanctionedCountryRule implements ReductionRuleContract<Reduction> {
+export class SanctionedCountryRule implements ReductionRuleContract<Waiver> {
   public constructor(
     public correspondingAuthorInstitutionCountryCode: string
   ) {}
 
-  public getReduction(): Reduction {
+  public getReduction(): Waiver {
     if (
       this.correspondingAuthorInstitutionCountryCode in SANCTIONED_COUNTRIES
     ) {
-      return ReductionFactory.createReduction('WAIVER', {
-        reduction: -1
-      } as ReductionProps);
+      return Waiver.create({reduction: -1, waiverType: WaiverType.SANCTIONED_COUNTRY}).getValue();
     }
   }
 }

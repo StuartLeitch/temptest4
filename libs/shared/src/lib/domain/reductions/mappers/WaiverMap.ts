@@ -7,8 +7,8 @@ export class WaiverMap extends Mapper<Waiver> {
   public static toDomain(raw: any): Waiver {
     const waiverOrError = Waiver.create(
       {
-        name: raw.name,
         invoiceId: InvoiceId.create(new UniqueEntityID(raw.invoiceId)).getValue(),
+        waiverType: raw.type,
         reduction: raw.reduction
       },
       new UniqueEntityID(raw.id)
@@ -22,7 +22,7 @@ export class WaiverMap extends Mapper<Waiver> {
   public static toPersistence(waiver: Waiver): any {
     return {
       id: waiver.id.toString(),
-      type: waiver.type,
+      type: waiver.waiverType,
       percentage: waiver.percentage
     };
   }
