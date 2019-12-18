@@ -15,14 +15,16 @@ import { PAYMENT_TYPES } from "./types";
 import CountryField from "./CountryField";
 import IconRadioButton from "./IconRadioButton";
 import ConfirmationModal from "./ConfirmationModal";
-import VatChargesObserver from './VATChargesObserver';
+import VatChargesObserver from "./VATChargesObserver";
 
 interface Props {
   payer: any;
   error: string;
   loading: boolean;
+  couponError: string;
   handleSubmit(payer: any): any;
   onVatFieldChange(country: string, paymentType: string): any;
+  applyCoupon(invoiceId: string, couponCode: string): any;
 }
 
 const FormTextarea = field => (
@@ -88,9 +90,11 @@ const validateFn = values => {
 const InvoiceForm: React.FunctionComponent<Props> = ({
   payer,
   error,
+  couponError,
   loading,
   handleSubmit,
-  onVatFieldChange
+  onVatFieldChange,
+  applyCoupon,
 }) => {
   const { invoiceId } = useParams();
   const { showModal, hideModal } = useModalActions();
@@ -103,6 +107,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
         country: "",
         city: "",
       },
+      coupon: "",
     };
   }
 
@@ -122,7 +127,11 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
       }) => {
         return (
           <Fragment>
-            <VatChargesObserver country={values.address.country} paymentType={values.type} onChange={onVatFieldChange} />
+            <VatChargesObserver
+              country={values.address.country}
+              paymentType={values.type}
+              onChange={onVatFieldChange}
+            />
             <Flex m={2} vertical>
               <Label required>Who is making the payment?</Label>
               <Flex mt={1} mb={4}>
@@ -202,19 +211,44 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                     </Flex>
                   </Flex>
 
-                  <Button
-                    onClick={imperativeValidation(
-                      {
-                        setTouched,
-                        validateForm,
-                      },
-                      showModal,
-                    )}
-                    size="medium"
-                    alignSelf="flex-end"
-                  >
-                    Confirm Invoice
-                  </Button>
+                  <Flex justifyContent="space-between">
+                    <Flex>
+                      <FormField
+                        error={couponError}
+                        required
+                        placeholder="Insert coupon code here"
+                        label="Coupon"
+                        name="coupon"
+                      />
+                      <Button
+                        type="secondary"
+                        disabled={!values.coupon}
+                        size="medium"
+                        mb="1"
+                        ml="2"
+                        onClick={() => {
+                          applyCoupon(invoiceId, values.coupon);
+                        }}
+                      >
+                        Apply
+                      </Button>
+                    </Flex>
+                    <Flex justifyContent="flex-end">
+                      <Button
+                        onClick={imperativeValidation(
+                          {
+                            setTouched,
+                            validateForm,
+                          },
+                          showModal,
+                        )}
+                        size="medium"
+                        alignSelf="flex-end"
+                      >
+                        Confirm Invoice
+                      </Button>
+                    </Flex>
+                  </Flex>
                 </Fragment>
               )}
             </Flex>

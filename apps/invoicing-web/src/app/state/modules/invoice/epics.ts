@@ -8,6 +8,7 @@ import {
   switchMap,
   catchError,
   withLatestFrom,
+  tap,
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
@@ -18,6 +19,7 @@ import {
   getInvoices,
   updatePayerAsync,
   getInvoiceVat,
+  applyCouponAction,
 } from "./actions";
 
 const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
@@ -87,9 +89,29 @@ const getInvoiceVatEpic: RootEpic = (action$, _, { graphqlAdapter }) => {
   );
 };
 
+const applyCouponEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
+  return action$.pipe(
+    filter(isActionOf(applyCouponAction.request)),
+    switchMap(action => {
+      return from(
+        graphqlAdapter.send(mutations.applyCoupon, {
+          invoiceId: action.payload.invoiceId,
+          couponCode: action.payload.couponCode,
+        }),
+      ).pipe(
+        mergeMap(r => {
+          return from([applyCouponAction.success(r.data.applyCoupon)]);
+        }),
+        catchError(error => of(applyCouponAction.failure(error.message))),
+      );
+    }),
+  );
+};
+
 export default [
   fetchInvoiceEpic,
   updatePayerEpic,
   fetchInvoicesEpic,
   getInvoiceVatEpic,
+  applyCouponEpic,
 ];

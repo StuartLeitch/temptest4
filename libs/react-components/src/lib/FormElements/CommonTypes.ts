@@ -1,4 +1,4 @@
-import {KeyboardEvent, MouseEvent, FormEvent} from 'react';
+import { KeyboardEvent, MouseEvent, FormEvent } from 'react';
 
 export type FormFieldStatus = 'none' | 'success' | 'info' | 'warning';
 
@@ -17,6 +17,7 @@ export interface FormFieldProps extends FormField {
   value?: any;
   name?: string;
   error?: string;
+  placeholder?: string;
   validationStatus?: ValidationStatuses;
   onBlur?(e: InputEvent): void;
   onChange?(e: InputEvent): void;

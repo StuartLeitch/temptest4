@@ -8,6 +8,7 @@ import {
   updatePayerAsync,
   getInvoiceVat,
   getInvoices,
+  applyCouponAction,
 } from "./actions";
 
 const initialState: Invoice = {
@@ -26,6 +27,19 @@ const invoice = createReducer(initialState)
     ...state,
     payer: action.payload,
   }))
+  .handleAction(applyCouponAction.success, (state, action) => {
+    const newState = { ...state, invoiceItem: { ...state.invoiceItem } };
+    if (!newState.invoiceItem.coupons) {
+      newState.invoiceItem.coupons = [];
+    }
+
+    newState.invoiceItem.coupons = [
+      ...newState.invoiceItem.coupons,
+      action.payload,
+    ];
+
+    return newState;
+  })
   .handleAction(getInvoiceVat.success, (state, action) => {
     let invoiceItem = state.invoiceItem || ({} as InvoiceItem);
     let { payload } = action;
@@ -40,12 +54,20 @@ const invoice = createReducer(initialState)
     };
   });
 
+const invoiceCouponInitialState = { error: null };
+const invoiceCoupon = createReducer(invoiceCouponInitialState)
+  .handleAction(getInvoice.success, () => invoiceCouponInitialState)
+  .handleAction(applyCouponAction.success, () => invoiceCouponInitialState)
+  .handleAction(applyCouponAction.failure, (state, action) => {
+    return { ...state, error: action.payload };
+  });
 const payerLoading = createLoadingReducer(updatePayerAsync);
 const invoiceLoading = createLoadingReducer(getInvoice, true);
 const invoicesLoading = createLoadingReducer(getInvoices, true);
 
 export default combineReducers({
   invoice,
+  invoiceCoupon,
   payerLoading,
   invoiceLoading,
   invoicesLoading,

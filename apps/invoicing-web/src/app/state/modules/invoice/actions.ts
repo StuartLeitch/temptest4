@@ -6,6 +6,8 @@ import {
   InvoiceVATDTO,
   InvoiceVat,
   InvoicesPagination,
+  ApplyCouponDTO,
+  Coupon,
 } from "./types";
 
 export const getInvoice = createAsyncAction(
@@ -31,3 +33,9 @@ export const getInvoiceVat = createAsyncAction(
   "invoice/GET_VAT_SUCCESS",
   "invoice/GET_VAT_ERROR",
 )<InvoiceVATDTO, InvoiceVat, string>();
+
+export const applyCouponAction = createAsyncAction(
+  "invoice/APPLY_COUPON_REQUEST",
+  "invoice/APPLY_COUPON_SUCCESS",
+  "invoice/APPLY_COUPON_ERROR",
+)<ApplyCouponDTO, Coupon, string>();

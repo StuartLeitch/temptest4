@@ -8,11 +8,15 @@ import { ChargeItem as Root } from "./ChargeItem.styles";
 interface Props extends FlexboxProps, LayoutProps, SpaceProps {
   price: number;
   name: string;
+  description?: string;
 }
 
-const ChargeItem: React.FC<Props> = ({ price, name, ...rest }) => (
+const ChargeItem: React.FC<Props> = ({ price, name, description, ...rest }) => (
   <Root {...rest}>
-    <Label>{name}</Label>
+    <Label>
+      {name}
+      {description && <Text>({description})</Text>}
+    </Label>
     <Text>${price.toFixed(2)}</Text>
   </Root>
 );

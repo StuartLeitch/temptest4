@@ -7,6 +7,7 @@ import { Result } from '../../../core/logic/Result';
 import { InvoiceId } from './InvoiceId';
 import { InvoiceItemId } from './InvoiceItemId';
 import { ManuscriptId } from './ManuscriptId';
+import { Coupon } from '../../../domain/reductions/Coupon';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
@@ -18,6 +19,7 @@ export interface InvoiceItemProps {
   price?: number;
   dateCreated: Date;
   name?: string;
+  coupons?: Coupon[];
 }
 
 export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
@@ -59,6 +61,10 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
   get vat(): number {
     return this.props.vat;
+  }
+
+  get coupons(): Coupon[] {
+    return this.props.coupons;
   }
 
   set price(priceValue: number) {

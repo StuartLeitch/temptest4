@@ -9,16 +9,19 @@ import {
   GetInvoiceDetailsUsecase,
   GetArticleDetailsUsecase,
   GetItemsForInvoiceUsecase,
-  Roles
+  Roles,
+  InvoiceItemId
 } from '@hindawi/shared';
 import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 
 import { MigrateInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/migrateInvoice/migrateInvoice';
+import { ApplyCouponToInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
 import { Context } from '../../context';
+import { CouponMap } from 'libs/shared/src/lib/modules/coupons/mappers/CouponMap';
 
 export const invoice: Resolvers<Context> = {
   Query: {
@@ -238,6 +241,12 @@ export const invoice: Resolvers<Context> = {
       }
 
       return ArticleMap.toPersistence(article.value.getValue());
+    },
+    async coupons(parent, args, context) {
+      const coupons = await context.repos.coupon.getCouponsByInvoiceItemId(
+        InvoiceItemId.create(new UniqueEntityID(parent.id))
+      );
+      return coupons.map(CouponMap.toPersistence);
     }
   },
   Article: {
@@ -249,7 +258,31 @@ export const invoice: Resolvers<Context> = {
       return catalogItem.journalTitle;
     }
   },
+
   Mutation: {
+    async applyCoupon(parent, args, context) {
+      const {
+        repos: {
+          invoice: invoiceRepo,
+          invoiceItem: invoiceItemRepo,
+          coupon: couponRepo
+        }
+      } = context;
+      const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
+        invoiceRepo,
+        invoiceItemRepo,
+        couponRepo
+      );
+      const result = await applyCouponUsecase.execute({
+        couponCode: args.couponCode,
+        invoiceId: args.invoiceId
+      });
+      if (result.isLeft()) {
+        console.log(result);
+        throw new Error(result.value.errorValue().message);
+      }
+      return CouponMap.toPersistence(result.value.getValue());
+    },
     async migrateInvoice(parent, args, context) {
       const {
         repos: { invoice: invoiceRepo, invoiceItem: invoiceItemRepo }

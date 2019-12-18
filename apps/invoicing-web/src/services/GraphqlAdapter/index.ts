@@ -21,7 +21,7 @@ export class GraphqlAdapter {
 
   static parseGQLErrors({ data, errors }) {
     // TODO?: implement a more robust error handling interceptor? KRONOS
-    if (!data && errors) {
+    if (errors) {
       throw errors[0];
     }
     return data;

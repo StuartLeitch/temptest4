@@ -22,7 +22,10 @@ import {
   paymentActions,
   paymentTypes,
 } from "../../state/modules/payment";
-import { InvoiceVATDTO } from "../../state/modules/invoice/types";
+import {
+  InvoiceVATDTO,
+  ApplyCouponDTO,
+} from "../../state/modules/invoice/types";
 // import { getClientToken } from "@hindawi/invoicing-web/app/state/modules/payment/actions";
 
 interface Props {
@@ -37,10 +40,12 @@ interface Props {
   payPalPaymentLoading: boolean;
   getMethodsError: string;
   getMethodsLoading: boolean;
+  couponError: string;
   paymentMethods: Record<string, string>;
   token: string;
   getInvoice(id: string): any;
   getInvoiceVAT(invoiceVATRequest: InvoiceVATDTO): any;
+  applyCoupon(applyCouponDTO: ApplyCouponDTO): any;
   updatePayer(payer: any): any;
   recordPayPalPayment(payment: paymentTypes.PayPalPayment): any;
   payWithCard(payload: any): any;
@@ -62,6 +67,8 @@ const payByPayPal = (recordAction, invoice) => {
 const PaymentDetails: React.FunctionComponent<Props> = ({
   getInvoiceVAT,
   getInvoice,
+  applyCoupon,
+  couponError,
   getClientToken,
   invoice,
   invoiceError,
@@ -122,6 +129,10 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
               error={payerError}
               handleSubmit={updatePayer}
               loading={payerLoading}
+              applyCoupon={(invoiceId, couponCode) => {
+                applyCoupon({ invoiceId, couponCode });
+              }}
+              couponError={couponError}
               onVatFieldChange={(country, payerType) =>
                 getInvoiceVAT({ invoiceId, country, payerType })
               }
@@ -148,6 +159,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 const mapStateToProps = (state: RootState) => ({
   invoice: invoiceSelectors.invoice(state),
   invoiceError: invoiceSelectors.invoiceError(state),
+  couponError: invoiceSelectors.couponError(state),
   invoiceLoading: invoiceSelectors.invoiceLoading(state),
   payerError: invoiceSelectors.payerError(state),
   payerLoading: invoiceSelectors.payerLoading(state),
@@ -171,6 +183,7 @@ export default connect(mapStateToProps, {
   payWithCard: paymentActions.recordCardPayment.request,
   updatePayer: invoiceActions.updatePayerAsync.request,
   getInvoice: invoiceActions.getInvoice.request,
+  applyCoupon: invoiceActions.applyCouponAction.request,
 })(PaymentDetails);
 
 const Root = styled.div`

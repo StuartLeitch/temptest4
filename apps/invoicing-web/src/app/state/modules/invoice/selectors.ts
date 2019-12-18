@@ -27,6 +27,13 @@ export const invoiceCharge = createSelector(_getInvoice, invoiceSlice => {
   return amount;
 });
 
+export const couponError = createSelector(
+  (state: RootState) => {
+    return state.invoice.invoiceCoupon;
+  },
+  ic => ic.error,
+);
+
 export const invoiceIsPaid = createSelector(
   _getInvoice,
   invoiceSlice => invoiceSlice.invoice.status === "FINAL",

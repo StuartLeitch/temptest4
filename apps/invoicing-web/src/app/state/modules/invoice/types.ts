@@ -19,6 +19,7 @@ export interface InvoiceItem {
   price: number;
   vat: number;
   rate: number;
+  coupons: Coupon[];
   vatnote: string;
 }
 
@@ -68,6 +69,16 @@ export interface InvoiceVATDTO {
   invoiceId: string;
   country: string;
   payerType: string;
+}
+
+export interface ApplyCouponDTO {
+  invoiceId: string;
+  couponCode: string;
+}
+
+export interface Coupon {
+  reduction: number;
+  code: string;
 }
 
 export interface InvoiceVat {

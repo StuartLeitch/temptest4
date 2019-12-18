@@ -91,8 +91,6 @@ export class Coupon extends Reduction<CouponProps> {
   ): Result<Coupon> {
     const coupon = new Coupon(props, id);
 
-    coupon.addDomainEvent(new CouponCreated(coupon));
-
     return Result.ok<Coupon>(coupon);
   }
 }

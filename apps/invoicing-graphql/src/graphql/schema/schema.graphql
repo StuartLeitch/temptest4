@@ -36,6 +36,7 @@ type InvoiceItem {
   vatnote: String
   article: Article
   dateCreated: Date
+  coupons: [Coupon]
 }
 
 type Invoice {
@@ -129,6 +130,11 @@ type PaymentMethod {
   isActive: Boolean
 }
 
+type Coupon {
+  reduction: Float
+  code: String
+}
+
 type ClientToken {
   token: String!
 }
@@ -150,6 +156,7 @@ type Query {
 
 type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
+  applyCoupon(invoiceId: String, couponCode: String): Coupon
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: String!): Boolean
   setTransactionToActive(customId: String): Transaction

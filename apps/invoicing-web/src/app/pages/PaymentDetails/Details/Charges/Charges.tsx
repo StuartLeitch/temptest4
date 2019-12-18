@@ -24,9 +24,16 @@ const showInfo = (info: string) => {
 };
 
 const Charges: React.FC<Props> = ({ invoiceItem, ...rest }) => {
-  const { vat, rate, vatnote, price } = invoiceItem;
+  const { vat, rate, vatnote, price, coupons } = invoiceItem;
+  let totalDiscountFromCoupons = coupons.reduce(
+    (acc, curr) => acc + curr.reduction,
+    0,
+  );
+  totalDiscountFromCoupons =
+    totalDiscountFromCoupons > 100 ? 100 : totalDiscountFromCoupons;
+  const finalPrice = price - (price * totalDiscountFromCoupons) / 100;
   const vatNote = vatnote
-    .replace("{Vat/Rate}", `${(((vat / 100) * price) / rate).toFixed(2)}`)
+    .replace("{Vat/Rate}", `${(((vat / 100) * finalPrice) / rate).toFixed(2)}`)
     .replace("{Rate}", rate);
 
   return (
@@ -40,17 +47,26 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }) => {
         price={invoiceItem.price}
         name="Article Processing Charges"
       />
+      {invoiceItem.coupons &&
+        invoiceItem.coupons.map(coupon => (
+          <ChargeItem
+            price={-(coupon.reduction * invoiceItem.price) / 100}
+            name="Coupon"
+            description={`${-coupon.reduction}%`}
+            mt="2"
+          />
+        ))}
       <Flex justifyContent="flex-end" mt="2">
         <Separator direction="horizontal" fraction={20} />
       </Flex>
-      <ChargeItem price={invoiceItem.price} name="Net Charges" mt="2" />
+      <ChargeItem price={finalPrice} name="Net Charges" mt="2" />
       <VatCharge
         vat={invoiceItem.vat}
-        price={invoiceItem.price}
+        price={finalPrice}
         rate={invoiceItem.rate}
       />
       <Separator direction="horizontal" fraction="auto" mx={-2} mt={2} />
-      <TotalCharges price={invoiceItem.price} vat={invoiceItem.vat} mt="2" />
+      <TotalCharges price={finalPrice} vat={invoiceItem.vat} mt="2" />
       {vatNote !== " " ? showInfo(vatNote) : null}
     </Root>
   );

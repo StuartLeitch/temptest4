@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import { ASTNode } from "graphql";
 
-import { payerFragment } from "./fragments";
+import { payerFragment, couponFragment } from "./fragments";
 
 export const createPayer: ASTNode = gql`
   mutation createPayer($input: string) {
@@ -19,4 +19,13 @@ export const confirmInvoice: ASTNode = gql`
     }
   }
   ${payerFragment}
+`;
+
+export const applyCoupon: ASTNode = gql`
+  mutation applyCoupon($invoiceId: String, $couponCode: String) {
+    applyCoupon(invoiceId: $invoiceId, couponCode: $couponCode) {
+      ...couponFragment
+    }
+  }
+  ${couponFragment}
 `;

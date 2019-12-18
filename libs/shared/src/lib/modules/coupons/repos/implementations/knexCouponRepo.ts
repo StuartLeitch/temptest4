@@ -9,11 +9,32 @@ import { RepoError } from 'libs/shared/src/lib/infrastructure/RepoError';
 
 export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   implements CouponRepoContract {
+  async getCouponsByInvoiceItemId(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Coupon[]> {
+    const { db } = this;
+
+    const coupons = await db
+      .select()
+      .from(TABLES.INVOICE_ITEMS_TO_COUPONS)
+      .where('invoiceItemId', invoiceItemId.id.toString())
+      .join(
+        TABLES.COUPONS,
+        `${TABLES.INVOICE_ITEMS_TO_COUPONS}.couponId`,
+        '=',
+        `${TABLES.COUPONS}.id`
+      );
+
+    return coupons.map(CouponMap.toDomain);
+  }
+
   async getCouponByCode(code: CouponCode): Promise<Coupon> {
     const { db } = this;
-    const coupon = await db(TABLES.COUPONS)
+    console.log(TABLES.COUPONS);
+    const coupon = await db
       .select()
-      .where('code', code.id.toString)
+      .from(TABLES.COUPONS)
+      .where('code', code.id.toString())
       .first();
     return coupon ? CouponMap.toDomain(coupon) : null;
   }
@@ -35,8 +56,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     const { db } = this;
     let updatedCoupon = await db(TABLES.COUPONS)
       .increment('redeemCount')
-      .where('id', coupon.id.toString())
-      .first();
+      .where('id', coupon.id.toString());
     if (!updatedCoupon) {
       RepoError.createEntityNotFoundError('coupon', coupon.id.toString());
     }
@@ -64,8 +84,9 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   async getCouponById(couponId: CouponId): Promise<Coupon> {
     const { db } = this;
 
-    const couponRow = await db(TABLES.COUPONS)
+    const couponRow = await db()
       .select()
+      .from(TABLES.COUPONS)
       .where('id', couponId.id.toString())
       .first();
 

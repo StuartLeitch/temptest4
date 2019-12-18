@@ -146,7 +146,7 @@ export { WaiverService } from './domain/services/WaiverService';
 export * from './domain/services/ErpService';
 
 // export * from './modules/coupons/mappers/CouponMap';
-// export * from './modules/coupons/repos';
+export * from './modules/coupons/repos';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';

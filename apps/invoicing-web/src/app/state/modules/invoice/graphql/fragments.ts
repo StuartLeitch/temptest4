@@ -6,7 +6,7 @@ export const invoiceVatFragment = gql`
     vatNote
     rate
   }
-`
+`;
 
 export const addressFragment = gql`
   fragment addressFragment on Address {
@@ -46,6 +46,13 @@ export const articleFragment = gql`
   }
 `;
 
+export const couponFragment = gql`
+  fragment couponFragment on Coupon {
+    code
+    reduction
+  }
+`;
+
 export const invoiceFragment = gql`
   fragment invoiceFragment on Invoice {
     invoiceId
@@ -64,11 +71,15 @@ export const invoiceFragment = gql`
       vat
       vatnote
       dateCreated
+      coupons {
+        ...couponFragment
+      }
       article {
         ...articleFragment
       }
     }
   }
   ${payerFragment}
+  ${couponFragment}
   ${articleFragment}
 `;
