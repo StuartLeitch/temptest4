@@ -115,7 +115,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
     <Formik
       initialValues={payer}
       validate={validateFn}
-      onSubmit={payer => handleSubmit({ invoiceId, ...payer })}
+      onSubmit={({ coupon, ...payer }) => handleSubmit({ invoiceId, ...payer })}
     >
       {({
         values,
