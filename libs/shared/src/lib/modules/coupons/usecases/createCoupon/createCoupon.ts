@@ -1,7 +1,9 @@
+import { createHash, randomBytes } from 'crypto';
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { Result, left, right, Either } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
@@ -20,11 +22,14 @@ import { CreateCouponResponse } from './createCouponResponse';
 import { CreateCouponErrors } from './createCouponErrors';
 import { CreateCouponDTO } from './createCouponDTO';
 
+import { CouponId } from '../../../../domain/reductions/CouponId';
 import {
   CouponStatus,
   CouponType,
   Coupon
 } from '../../../../domain/reductions/Coupon';
+
+const MAX_COUPON_CODE_LENGTH = 10;
 
 export type CreateCouponContext = AuthorizationContext<Roles>;
 
@@ -51,10 +56,51 @@ export class CreateCouponUsecase
     request: CreateCouponDTO,
     context?: CreateCouponContext
   ): Promise<CreateCouponResponse> {
-    const maybeSaneRequest = this.requestSanityChecks(request);
-    // TODO: Add check for duplicate coupon codes.
+    const maybeExistingCodes = await this.getAllExistingCouponCodes();
+    const maybeSaneRequest = maybeExistingCodes.chain(codes => {
+      return this.requestSanityChecks(request, codes);
+    });
 
     return null;
+  }
+
+  private async getAllExistingCouponCodes(): Promise<
+    Either<AppError.UnexpectedError, string[]>
+  > {
+    try {
+      const codes = await this.couponRepo.getAllUsedCodes();
+      return right(codes);
+    } catch (err) {
+      return left(new AppError.UnexpectedError(err));
+    }
+  }
+
+  private generateUniqueCouponCode(
+    couponId: CouponId,
+    existingCodes: string[]
+  ) {
+    if (existingCodes.length === 36 * 10) {
+      return left(new CreateCouponErrors.NoAvailableCouponCodes());
+    }
+    while (true) {
+      const code = this.generateCouponCode(couponId);
+      if (!existingCodes.includes(code)) {
+        return right(code);
+      }
+    }
+  }
+
+  private generateCouponCode(couponId: CouponId) {
+    const hash = createHash('sha-256');
+    const salt = randomBytes(256);
+    hash.update(salt);
+    hash.update(couponId.id.toString());
+    return hash
+      .digest('base64')
+      .toUpperCase()
+      .replace('/', '')
+      .replace('+', '')
+      .slice(0, MAX_COUPON_CODE_LENGTH);
   }
 
   private isCouponCodeValid(code: string): boolean {
@@ -93,7 +139,10 @@ export class CreateCouponUsecase
     }
   }
 
-  private requestSanityChecks(request: CreateCouponDTO) {
+  private requestSanityChecks(
+    request: CreateCouponDTO,
+    usedCoupons: string[]
+  ): SanityCheckResult {
     const { type, status, redeemCount, code, expirationDate } = request;
     if (!(type in CouponType)) {
       return left(new CreateCouponErrors.InvalidCouponType(request.type));
@@ -112,7 +161,22 @@ export class CreateCouponUsecase
     ) {
       return left(new CreateCouponErrors.InvalidExpirationDate(expirationDate));
     }
+    if (usedCoupons.includes(code)) {
+      return left(new CreateCouponErrors.DuplicateCouponCode(code));
+    }
 
     return right(request);
   }
 }
+
+type SanityCheckResult = Either<
+  | CreateCouponErrors.NoAvailableCouponCodes
+  | CreateCouponErrors.InvalidExpirationDate
+  | CreateCouponErrors.DuplicateCouponCode
+  | CreateCouponErrors.InvalidCouponStatus
+  | CreateCouponErrors.InvalidRedeemCount
+  | CreateCouponErrors.InvalidCouponCode
+  | CreateCouponErrors.InvalidCouponType
+  | AppError.UnexpectedError,
+  CreateCouponDTO
+>;

@@ -49,4 +49,12 @@ export namespace CreateCouponErrors {
       });
     }
   }
+
+  export class NoAvailableCouponCodes extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `There are no more Coupon Codes available, please reuse or delete existing ones.`
+      });
+    }
+  }
 }

@@ -39,6 +39,12 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     return coupon ? CouponMap.toDomain(coupon) : null;
   }
 
+  async getAllUsedCodes(): Promise<string[]> {
+    const { db } = this;
+    const codes = await db(TABLES.COUPONS).select('code');
+    return codes as string[];
+  }
+
   async assignCouponToInvoiceItem(
     coupon: Coupon,
     invoiceItemId: InvoiceItemId
@@ -54,7 +60,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
   async incrementRedeemedCount(coupon: Coupon): Promise<Coupon> {
     const { db } = this;
-    let updatedCoupon = await db(TABLES.COUPONS)
+    const updatedCoupon = await db(TABLES.COUPONS)
       .increment('redeemCount')
       .where('id', coupon.id.toString());
     if (!updatedCoupon) {

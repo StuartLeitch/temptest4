@@ -7,6 +7,7 @@ import { InvoiceItemId } from '@hindawi/shared';
 export interface CouponRepoContract extends Repo<Coupon> {
   getCouponCollection(): Promise<Coupon[]>;
   getCouponsByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Coupon[]>;
+  getAllUsedCodes(): Promise<string[]>;
   getCouponById(couponId: CouponId): Promise<Coupon>;
   getCouponByCode(code: CouponCode): Promise<Coupon>;
   incrementRedeemedCount(coupon: Coupon): Promise<Coupon>;
