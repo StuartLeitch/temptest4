@@ -175,7 +175,8 @@ export function makeExpressServer(context: Context) {
       repos.address,
       repos.manuscript,
       repos.invoice,
-      repos.payer
+      repos.payer,
+      repos.coupon
     );
 
     const invoiceLink = req.headers.referer;

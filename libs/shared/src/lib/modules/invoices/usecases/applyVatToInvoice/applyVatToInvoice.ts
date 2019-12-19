@@ -26,9 +26,9 @@ import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { UpdateInvoiceItemsUsecase } from '../updateInvoiceItems';
-import { InvoiceRepoContract } from '../../repos';
 
 import { VATService } from '../../../../domain/services/VATService';
+import { CouponRepoContract } from '../../../coupons/repos';
 
 export type ApplyVatToInvoiceContext = AuthorizationContext<Roles>;
 
@@ -46,7 +46,7 @@ export class ApplyVatToInvoiceUsecase
     > {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private invoiceRepo: InvoiceRepoContract,
+    private couponRepo: CouponRepoContract,
     private vatService: VATService
   ) {}
 
@@ -73,7 +73,7 @@ export class ApplyVatToInvoiceUsecase
   private async getInvoiceItems(invoiceId: string) {
     const getItemsForInvoiceUsecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
-      this.invoiceRepo
+      this.couponRepo
     );
     return await getItemsForInvoiceUsecase.execute({
       invoiceId

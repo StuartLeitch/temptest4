@@ -45,13 +45,16 @@ export class PublishInvoiceConfirmed {
       vatRegistrationNumber: payer.VATId,
       address: `${address.addressLine1}, ${address.city}, ${address.country}`,
       country: address.country,
-      valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
+      valueWithoutVAT: invoiceItems.reduce(
+        (acc, curr) => acc + curr.calculatePrice(),
+        0
+      ),
       valueWithVAT: invoiceItems.reduce(
-        (acc, curr) => acc + curr.price * (1 + curr.vat / 100),
+        (acc, curr) => acc + curr.calculatePrice() * (1 + curr.vat / 100),
         0
       ),
       VAT: invoiceItems.reduce(
-        (acc, item) => acc + item.price * (item.vat / 100),
+        (acc, item) => acc + item.calculatePrice() * (item.vat / 100),
         0
       )
       // couponId: coupon.id,

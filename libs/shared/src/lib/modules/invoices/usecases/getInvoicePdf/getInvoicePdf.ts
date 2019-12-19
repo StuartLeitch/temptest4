@@ -10,8 +10,7 @@ import { AccessControlContext } from '../../../../domain/authorization/AccessCon
 import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
+  AuthorizationContext
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
@@ -42,6 +41,7 @@ import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
 import { PayerType } from 'libs/shared/src/lib/modules/payers/domain/Payer';
+import { CouponRepoContract } from '../../../coupons/repos';
 
 export type GetInvoicePdfContext = AuthorizationContext<Roles>;
 
@@ -64,7 +64,8 @@ export class GetInvoicePdfUsecase
     private addressRepo: AddressRepoContract,
     private articleRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
-    private payerRepo: PayerRepoContract
+    private payerRepo: PayerRepoContract,
+    private couponRepo: CouponRepoContract
   ) {}
 
   // @Authorize('payer:read')
@@ -198,7 +199,7 @@ export class GetInvoicePdfUsecase
   private async getInvoiceItems(invoiceId: string) {
     const usecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
-      this.invoiceRepo
+      this.couponRepo
     );
     const itemsEither = await usecase.execute({ invoiceId });
     return itemsEither;

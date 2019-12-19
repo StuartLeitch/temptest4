@@ -46,6 +46,7 @@ import { PoliciesRegister } from '../../../../domain/reductions/policies/Policie
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { VATService } from '../../../../domain/services/VATService';
+import { CouponRepoContract } from '../../../coupons/repos';
 
 export type ConfirmInvoiceContext = AuthorizationContext<Roles>;
 
@@ -76,6 +77,7 @@ export class ConfirmInvoiceUsecase
     private addressRepo: AddressRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
+    private couponRepo: CouponRepoContract,
     private emailService: EmailService,
     private vatService: VATService,
     private receiverEmail: string,
@@ -278,7 +280,7 @@ export class ConfirmInvoiceUsecase
   }: PayerDataDomain) {
     const applyVatToInvoice = new ApplyVatToInvoiceUsecase(
       this.invoiceItemRepo,
-      this.invoiceRepo,
+      this.couponRepo,
       this.vatService
     );
     const maybeAppliedVat = await applyVatToInvoice.execute({

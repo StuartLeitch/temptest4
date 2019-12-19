@@ -8,6 +8,7 @@ import { InvoiceId } from './InvoiceId';
 import { InvoiceItemId } from './InvoiceItemId';
 import { ManuscriptId } from './ManuscriptId';
 import { Coupon } from '../../../domain/reductions/Coupon';
+import { Reduction } from '../../../domain/reductions/Reduction';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
@@ -47,6 +48,10 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this.props.price;
   }
 
+  set price(priceValue: number) {
+    this.props.price = priceValue;
+  }
+
   get dateCreated(): Date {
     return this.props.dateCreated;
   }
@@ -67,8 +72,8 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this.props.coupons;
   }
 
-  set price(priceValue: number) {
-    this.props.price = priceValue;
+  set coupons(coupons: Coupon[]) {
+    this.props.coupons = coupons;
   }
 
   private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
@@ -98,5 +103,25 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
     const invoiceItem = new InvoiceItem(defaultValues, id);
     return Result.ok<InvoiceItem>(invoiceItem);
+  }
+
+  public calculatePrice(withReductions?: Reduction<any>[]) {
+    const reductions: Reduction<any>[] = [];
+    if (this.coupons) {
+      reductions.push(...this.coupons);
+    }
+    if (withReductions) {
+      reductions.push(...withReductions);
+    }
+
+    let totalDiscount = reductions.reduce(
+      (acc, curr) => acc + curr.reduction,
+      0
+    );
+    if (totalDiscount >= 100) {
+      return 0;
+    }
+
+    return this.price - (totalDiscount * this.price) / 100;
   }
 }

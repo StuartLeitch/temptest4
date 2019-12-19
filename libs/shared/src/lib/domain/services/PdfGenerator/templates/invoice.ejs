@@ -10,7 +10,7 @@
       #pageFooter {
         font-size: 0.9rem;
         border-top: 0.2rem solid #d3d6d6;
-        padding-top: 1rem;
+        padding-top: 0.5rem;
         text-align: center;
       }
 
@@ -34,7 +34,7 @@
         font-size: 1.5rem;
         text-transform: uppercase;
         text-align: center;
-        padding-top: 4.5rem;
+        padding-top: 3rem;
       }
 
       #pageHeader img {
@@ -57,7 +57,7 @@
         color: #006f92;
         font-size: 1.1rem;
         padding: 0.2rem 0;
-        margin-bottom: 2rem;
+        margin-bottom: 1.8rem;
       }
 
       h3 {
@@ -133,7 +133,7 @@
       .separator {
         border-top: 0.125rem solid;
         padding: 0.5rem 0;
-        margin: 1.5rem 0;
+        margin: 1rem 0;
       }
 
       .isCentered {
@@ -215,33 +215,37 @@
                 <%= invoice.invoiceItems.currentItems[i].price.toFixed(2) %> USD
               </td>
             </tr>
-            <% } %> <% } %>
+            <% } %> <% } %> <% let price = invoice.getInvoiceTotal() %> <% let
+            vat = invoice.invoiceItems.currentItems.length > 0 ?
+            invoice.invoiceItems.currentItems[0].vat : 0 %> <% let vatAmount =
+            invoice.getInvoiceTotal() * vat / 100 %> <% let item =
+            invoice.invoiceItems.currentItems[0] %> <% if (item.coupons &&
+            item.coupons.length) { %> <% let discount =
+            item.coupons.reduce((acc, curr) => acc + curr.reduction, 0) %>
+            <tr>
+              <th>Discounts (-<%= discount %>%)</th>
+              <td>
+                -<%= (item.price * discount / 100).toFixed(2) %> USD
+              </td>
+            </tr>
+            <% } %>
             <tr>
               <th>Net Charges</th>
-              <td><%= invoice.getInvoiceTotal().toFixed(2) %> USD</td>
+              <td><%= price.toFixed(2) %> USD</td>
             </tr>
             <tr>
               <th>
                 VAT
-                <em
-                  >(<%= invoice.invoiceItems.currentItems.length > 0 ?
-                  invoice.invoiceItems.currentItems[0].vat : 0 %>%)</em
-                >
+                <em>(<%= vat %>%)</em>
               </th>
               <td>
-                <%= (invoice.invoiceItems.currentItems.filter(item => item.type
-                === 'APC').reduce((acc, item) => acc + (item.price * item.vat /
-                100), 0)).toFixed(2) %> USD
+                <%= vatAmount.toFixed(2) %> USD
               </td>
             </tr>
             <tr>
               <th class="summary">Total</th>
               <td class="summary">
-                <%= (invoice.getInvoiceTotal() +
-                (invoice.invoiceItems.currentItems[0].vat ?
-                invoice.invoiceItems.currentItems[0].vat *
-                invoice.invoiceItems.currentItems[0].price / 100 :
-                0)).toFixed(2) %> USD
+                <%= (price + vatAmount).toFixed(2) %> USD
               </td>
             </tr>
           </table>
@@ -269,9 +273,7 @@
     </table>
 
     <div class="separator isCentered">
-      <%= invoice.props.vatnote.replace( "{Vat/Rate}",
-      `${(((invoice.invoiceItems.currentItems[0].vat / 100) *
-      invoice.invoiceItems.currentItems[0].price) /
+      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${( vatAmount /
       invoice.props.rate).toFixed(2)}`, ).replace("{Rate}", invoice.props.rate)
       %>
     </div>
