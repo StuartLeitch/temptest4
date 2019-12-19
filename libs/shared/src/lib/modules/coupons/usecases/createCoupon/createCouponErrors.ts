@@ -57,4 +57,12 @@ export namespace CreateCouponErrors {
       });
     }
   }
+
+  export class InvalidInvoiceItemType extends Result<UseCaseError> {
+    constructor(invoiceItemType: string) {
+      super(false, {
+        message: `The provided invoice item type {${invoiceItemType}} is invalid, expected types are: 'APC' or 'PRINT ORDER'`
+      });
+    }
+  }
 }

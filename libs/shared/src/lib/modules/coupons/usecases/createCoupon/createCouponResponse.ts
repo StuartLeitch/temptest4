@@ -6,6 +6,7 @@ import { Coupon } from '../../../../domain/reductions/Coupon';
 import { CreateCouponErrors } from './createCouponErrors';
 
 export type CreateCouponResponse = Either<
+  | CreateCouponErrors.InvalidInvoiceItemType
   | CreateCouponErrors.NoAvailableCouponCodes
   | CreateCouponErrors.InvalidExpirationDate
   | CreateCouponErrors.DuplicateCouponCode

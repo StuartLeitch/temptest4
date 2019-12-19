@@ -57,6 +57,10 @@ export class Coupon extends Reduction<CouponProps> {
     return this.props.code;
   }
 
+  public set code(newCode: CouponCode) {
+    this.props.code = newCode;
+  }
+
   public get expirationDate(): Date {
     return this.props.expirationDate;
   }
