@@ -7,11 +7,9 @@ import { CreateCouponErrors } from './createCouponErrors';
 
 export type CreateCouponResponse = Either<
   | CreateCouponErrors.InvalidInvoiceItemType
-  | CreateCouponErrors.NoAvailableCouponCodes
   | CreateCouponErrors.InvalidExpirationDate
   | CreateCouponErrors.DuplicateCouponCode
   | CreateCouponErrors.InvalidCouponStatus
-  | CreateCouponErrors.InvalidRedeemCount
   | CreateCouponErrors.InvalidCouponCode
   | CreateCouponErrors.InvalidCouponType
   | AppError.UnexpectedError,

@@ -5,7 +5,7 @@ import { UniqueEntityID } from '../../core/domain/UniqueEntityID';
 import { ReductionProps, Reduction, ReductionType } from './Reduction';
 import { CouponId } from './CouponId';
 import { CouponCode } from './CouponCode';
-import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoiceItem';
+import { InvoiceItemType } from '../../modules/invoices/domain/InvoiceItem';
 
 // * Coupon Domain Events
 import { CouponCreated } from './../../modules/coupons/domain/events/couponCreated';

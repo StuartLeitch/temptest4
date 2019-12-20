@@ -1,10 +1,9 @@
 export interface CreateCouponDTO {
   invoiceItemType: string;
-  expirationDate: string;
-  redeemCount: number;
+  expirationDate?: string;
   couponType: string;
   reduction: number;
   status: string;
-  code: string;
+  code?: string;
   name: string;
 }

@@ -34,15 +34,9 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     const coupon = await db
       .select()
       .from(TABLES.COUPONS)
-      .where('code', code.id.toString())
+      .where('code', code.value)
       .first();
     return coupon ? CouponMap.toDomain(coupon) : null;
-  }
-
-  async getAllUsedCodes(): Promise<string[]> {
-    const { db } = this;
-    const codes = await db(TABLES.COUPONS).select('code');
-    return codes as string[];
   }
 
   async assignCouponToInvoiceItem(
@@ -90,9 +84,8 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   async getCouponById(couponId: CouponId): Promise<Coupon> {
     const { db } = this;
 
-    const couponRow = await db()
+    const couponRow = await db(TABLES.COUPONS)
       .select()
-      .from(TABLES.COUPONS)
       .where('id', couponId.id.toString())
       .first();
 
@@ -118,11 +111,20 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
   async save(coupon: Coupon): Promise<Coupon> {
     const { db } = this;
-
     const data = CouponMap.toPersistence(coupon);
 
     await db(TABLES.COUPONS).insert(data);
 
     return this.getCouponById(coupon.couponId);
+  }
+
+  async isCodeUsed(code: CouponCode | string): Promise<boolean> {
+    const rawValue = code instanceof CouponCode ? code.value : code;
+    const { db } = this;
+    const result = await db(TABLES.COUPONS)
+      .select('code')
+      .where('code', rawValue);
+
+    return !!result.length;
   }
 }

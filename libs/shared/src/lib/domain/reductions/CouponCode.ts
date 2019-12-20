@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'crypto';
-import { uuid } from 'uuid/v4';
+import uuid from 'uuid/v4';
 
 import { ValueObject } from '../../core/domain/ValueObject';
 import { Result } from '../../core/logic/Result';
@@ -64,7 +64,7 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
 
   static generateCouponCode(): CouponCode {
     const salt = randomBytes(CouponCode.SALT_SIZE);
-    const hash = createHash('sha-256');
+    const hash = createHash('sha256');
 
     hash.update(salt);
     hash.update(uuid());

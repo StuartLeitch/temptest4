@@ -1,27 +1,28 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
+import { Result, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
-import { Result, left, right, Either } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import {
-  Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
+import {
+  AccessControlledUsecase,
+  AuthorizationContext,
+  Authorize
+} from '../../../../domain/authorization/decorators/Authorize';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
 // * Usecase specific
+import { InvoiceItemType } from '../../../invoices/domain/InvoiceItem';
+
 import { CreateCouponResponse } from './createCouponResponse';
 import { CreateCouponErrors } from './createCouponErrors';
 import { CreateCouponDTO } from './createCouponDTO';
 
 import { CouponCode } from '../../../../domain/reductions/CouponCode';
-import { CouponId } from '../../../../domain/reductions/CouponId';
 import {
   CouponStatus,
   CouponProps,
@@ -29,57 +30,7 @@ import {
   Coupon
 } from '../../../../domain/reductions/Coupon';
 
-import {
-  sanityChecksRequestParameters,
-  generateUniqueCouponCode,
-  isExpirationDateValid,
-  isCouponCodeValid
-} from './utils';
-import { chain } from 'libs/shared/src/lib/core/logic/EitherChain';
-
-interface CouponAndCodes {
-  existingCodes: string[];
-  coupon: Coupon;
-}
-
-function createCoupon(request: CreateCouponDTO): Coupon {
-  const now = new Date();
-  const props: CouponProps = {
-    ...request,
-    code: request.code ? CouponCode.create(request.code).getValue() : null,
-    couponType: request.couponType as CouponType,
-    dateCreated: now,
-    dateUpdated: now
-  };
-
-  const coupon = Coupon.create(props);
-  return coupon.getValue();
-}
-
-function addGeneratedCouponCodeIfNoneProvided({
-  coupon,
-  existingCodes
-}: CouponAndCodes): Either<CreateCouponErrors.NoAvailableCouponCodes, Coupon> {
-  if (!coupon.code) {
-    return generateUniqueCouponCode(coupon.couponId, existingCodes).map(
-      code => {
-        coupon.code = code;
-        return coupon;
-      }
-    );
-  }
-
-  return right(coupon);
-}
-
-function attachExistingCodes(maybeExistingCodes: Either<unknown, string[]>) {
-  return (coupon: Coupon) => {
-    return maybeExistingCodes.map(existingCodes => ({
-      coupon,
-      existingCodes
-    }));
-  };
-}
+import { sanityChecksRequestParameters } from './utils';
 
 export type CreateCouponContext = AuthorizationContext<Roles>;
 
@@ -97,40 +48,65 @@ export class CreateCouponUsecase
     > {
   constructor(private couponRepo: CouponRepoContract) {}
 
-  @Authorize('coupon:create')
+  // @Authorize('coupon:create')
   public async execute(
     request: CreateCouponDTO,
     context?: CreateCouponContext
   ): Promise<CreateCouponResponse> {
-    const maybeExistingCodes = await this.getAllExistingCouponCodes();
-    const maybeCoupon = maybeExistingCodes
-      .chain(existingCodes =>
-        sanityChecksRequestParameters(request, existingCodes)
-      )
-      .map(createCoupon)
-      .chain(attachExistingCodes(maybeExistingCodes))
-      .chain(addGeneratedCouponCodeIfNoneProvided);
-    const maybeSavedCoupon = await chain([this.saveCoupon], maybeCoupon);
+    try {
+      const maybeSaneRequest = await sanityChecksRequestParameters(
+        request,
+        this.couponRepo
+      );
+      const maybeSavedCoupon = await map(
+        [this.createCoupon.bind(this), this.saveCoupon.bind(this)],
+        maybeSaneRequest
+      );
+      const finalResult = maybeSavedCoupon.map(coupon => Result.ok(coupon));
 
-    return maybeSavedCoupon.map(coupon => Result.ok(coupon));
+      return (finalResult as unknown) as CreateCouponResponse;
+    } catch (err) {
+      return left(new AppError.UnexpectedError(err));
+    }
   }
 
   private async getAccessControlContext(request, context?) {
     return {};
   }
 
-  private async getAllExistingCouponCodes(): Promise<
-    Either<AppError.UnexpectedError, string[]>
-  > {
-    try {
-      const codes = await this.couponRepo.getAllUsedCodes();
-      return right(codes);
-    } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+  private async createCoupon(request: CreateCouponDTO): Promise<Coupon> {
+    const code = request.code
+      ? CouponCode.create(request.code).getValue()
+      : await this.generateUniqueCouponCode();
+    const now = new Date();
+    const props: CouponProps = {
+      ...request,
+      invoiceItemType: request.invoiceItemType as InvoiceItemType,
+      expirationDate: new Date(request.expirationDate),
+      couponType: CouponType[request.couponType],
+      status: CouponStatus[request.status],
+      dateCreated: now,
+      dateUpdated: now,
+      redeemCount: 0,
+      code
+    };
+
+    const coupon = Coupon.create(props);
+    return coupon.getValue();
+  }
+
+  private async generateUniqueCouponCode(): Promise<CouponCode> {
+    const found = false;
+    while (!found) {
+      const code = CouponCode.generateCouponCode();
+      const isCodeDuplicate = await this.couponRepo.isCodeUsed(code);
+      if (!isCodeDuplicate) {
+        return code;
+      }
     }
   }
 
-  private async saveCoupon(coupon: Coupon) {
+  private async saveCoupon(coupon: Coupon): Promise<Coupon> {
     return this.couponRepo.save(coupon);
   }
 }

@@ -155,7 +155,7 @@ export class GetInvoicePdfUsecase
     payloadEither: Either<any, InvoicePayload>,
     pdfEither: Either<any, Buffer>
   ) {
-    return payloadEither.chain<Buffer | PdfResponse>(payload => {
+    return payloadEither.chain<any, Buffer | PdfResponse>(payload => {
       return pdfEither.map<PdfResponse>(pdf => {
         const date = payload.invoice.dateCreated;
         const parsedDate = `${date.getUTCFullYear()}-${date.getUTCMonth() +
