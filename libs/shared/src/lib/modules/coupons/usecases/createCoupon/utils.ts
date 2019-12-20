@@ -1,11 +1,13 @@
 import { left, right, Either } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { CouponType, CouponStatus } from '../../../../domain/reductions/Coupon';
-import { CouponCode } from '../../../../domain/reductions/CouponCode';
+import { CouponType, CouponStatus } from '../../domain/Coupon';
+import { CouponCode } from '../../domain/CouponCode';
+
+import { CouponRepoContract } from '../../repos';
+
 import { CreateCouponErrors } from './createCouponErrors';
 import { CreateCouponDTO } from './createCouponDTO';
-import { CouponRepoContract } from '../../repos';
 
 type SanityCheckResult = Either<
   | CreateCouponErrors.InvalidInvoiceItemType

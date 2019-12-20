@@ -1,8 +1,8 @@
 import { createHash, randomBytes } from 'crypto';
 import uuid from 'uuid/v4';
 
-import { ValueObject } from '../../core/domain/ValueObject';
-import { Result } from '../../core/logic/Result';
+import { ValueObject } from '../../../core/domain/ValueObject';
+import { Result } from '../../../core/logic/Result';
 
 interface CouponCodeProps {
   value: string;

@@ -22,13 +22,13 @@ import { CreateCouponResponse } from './createCouponResponse';
 import { CreateCouponErrors } from './createCouponErrors';
 import { CreateCouponDTO } from './createCouponDTO';
 
-import { CouponCode } from '../../../../domain/reductions/CouponCode';
+import { CouponCode } from '../../domain/CouponCode';
 import {
   CouponStatus,
   CouponProps,
   CouponType,
   Coupon
-} from '../../../../domain/reductions/Coupon';
+} from '../../domain/Coupon';
 
 import { sanityChecksRequestParameters } from './utils';
 

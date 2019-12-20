@@ -1,6 +1,6 @@
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
-import { CouponType } from 'libs/shared/src/lib/domain/reductions/Coupon';
-import { CouponCode } from 'libs/shared/src/lib/domain/reductions/CouponCode';
+import { UniqueEntityID } from '../../../../../lib/core/domain/UniqueEntityID';
+import { CouponType } from '../../domain/Coupon';
+import { CouponCode } from '../..//domain/CouponCode';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { left, right, Result } from '../../../../core/logic/Result';
@@ -50,9 +50,7 @@ export class ApplyCouponToInvoiceUsecase
       const invoiceId = InvoiceId.create(
         new UniqueEntityID(request.invoiceId)
       ).getValue();
-      const couponCode = CouponCode.create(
-        new UniqueEntityID(request.couponCode)
-      ).getValue();
+      const couponCode = CouponCode.create(request.couponCode).getValue();
 
       const invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
       if (!invoice) {

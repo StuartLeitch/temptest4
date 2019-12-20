@@ -7,7 +7,7 @@ import { Result } from '../../../core/logic/Result';
 import { InvoiceId } from './InvoiceId';
 import { InvoiceItemId } from './InvoiceItemId';
 import { ManuscriptId } from './ManuscriptId';
-import { Coupon } from '../../../domain/reductions/Coupon';
+import { Coupon } from '../../coupons/domain/Coupon';
 import { Reduction } from '../../../domain/reductions/Reduction';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';

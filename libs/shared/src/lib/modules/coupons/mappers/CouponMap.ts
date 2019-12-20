@@ -1,8 +1,7 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
-import { Coupon, CouponType } from '../../../domain/reductions/Coupon';
-import { CouponCode } from '../../../domain/reductions/CouponCode';
-import { InvoiceItemType } from '@hindawi/shared';
+import { Coupon, CouponType } from '../domain/Coupon';
+import { CouponCode } from '../domain/CouponCode';
 
 export class CouponPersistenceDTO {
   id: string;

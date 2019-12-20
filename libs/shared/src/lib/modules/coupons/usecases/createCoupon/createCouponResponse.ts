@@ -1,7 +1,7 @@
 import { Result, Either } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { Coupon } from '../../../../domain/reductions/Coupon';
+import { Coupon } from '../../domain/Coupon';
 
 import { CreateCouponErrors } from './createCouponErrors';
 
