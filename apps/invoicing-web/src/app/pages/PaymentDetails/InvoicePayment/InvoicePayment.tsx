@@ -62,7 +62,16 @@ const validateFn = methods => values => {
 };
 
 const calculateTotalToBePaid = (invoice: any) => {
-  const netValue = invoice.invoiceItem.price;
+  let netValue = invoice.invoiceItem.price;
+  let { coupons } = invoice.invoiceItem;
+  if (coupons && coupons.length) {
+    let discount = invoice.invoiceItem.coupons.reduce(
+      (acc, curr) => acc + curr.reduction,
+      0,
+    );
+    discount = discount > 100 ? 100 : discount;
+    netValue = netValue - (discount * netValue) / 100;
+  }
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
   return netValue + vat;

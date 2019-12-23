@@ -20,6 +20,7 @@ export const payer: Resolvers<Context> = {
         repos.address,
         repos.invoice,
         repos.payer,
+        repos.coupon,
         emailService,
         vatService,
         config.sanctionedCountryNotificationReceiver,

@@ -1,14 +1,18 @@
 // * Core Domain
-import { Result } from '../../core/logic/Result';
-import { UniqueEntityID } from '../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 
-import { ReductionProps, Reduction, ReductionType } from './Reduction';
-import { CouponId } from './CouponId';
+import { InvoiceItemType } from '../../invoices/domain/InvoiceItem';
 import { CouponCode } from './CouponCode';
-import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoiceItem';
+import { CouponId } from './CouponId';
+import {
+  ReductionProps,
+  ReductionType,
+  Reduction
+} from '../../../domain/reductions/Reduction';
 
 // * Coupon Domain Events
-import { CouponCreated } from './../../modules/coupons/domain/events/couponCreated';
+import { CouponCreated } from './events/couponCreated';
 
 export enum CouponType {
   SINGLE_USE = 'SINGLE_USE',
@@ -55,6 +59,10 @@ export class Coupon extends Reduction<CouponProps> {
 
   public get code(): CouponCode {
     return this.props.code;
+  }
+
+  public set code(newCode: CouponCode) {
+    this.props.code = newCode;
   }
 
   public get expirationDate(): Date {

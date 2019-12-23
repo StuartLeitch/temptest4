@@ -51,6 +51,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
       {invoiceItem.coupons &&
         invoiceItem.coupons.map(coupon => (
           <ChargeItem
+            key={coupon.code}
             price={-(coupon.reduction * invoiceItem.price) / 100}
             name="Coupon"
             description={`${-coupon.reduction}%`}

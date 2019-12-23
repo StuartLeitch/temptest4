@@ -1,8 +1,7 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
-import { Coupon, CouponType } from '../../../domain/reductions/Coupon';
-import { CouponCode } from '../../../domain/reductions/CouponCode';
-import { InvoiceItemType } from '@hindawi/shared';
+import { Coupon, CouponType } from '../domain/Coupon';
+import { CouponCode } from '../domain/CouponCode';
 
 export class CouponPersistenceDTO {
   id: string;
@@ -24,7 +23,7 @@ export class CouponMap extends Mapper<Coupon> {
       {
         couponType: raw.type as CouponType,
         reduction: raw.reduction,
-        code: CouponCode.create(new UniqueEntityID(raw.code)).getValue(),
+        code: CouponCode.create(raw.code).getValue(),
         dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
         dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
         expirationDate: raw.expirationDate
@@ -46,7 +45,7 @@ export class CouponMap extends Mapper<Coupon> {
       id: coupon.id.toString(),
       reduction: coupon.reduction,
       type: coupon.couponType,
-      code: coupon.code.id.toString(),
+      code: coupon.code.value,
       dateCreated: coupon.dateCreated,
       dateUpdated: coupon.dateUpdated,
       expirationDate: coupon.expirationDate,

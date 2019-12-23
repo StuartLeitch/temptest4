@@ -9,12 +9,10 @@ import { AccessControlContext } from '../../../../domain/authorization/AccessCon
 import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
+  AuthorizationContext
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
-import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 
 import { GetItemsForInvoiceResponse } from './getItemsForInvoiceResponse';
@@ -22,6 +20,7 @@ import { GetItemsForInvoiceErrors } from './getItemsForInvoiceErrors';
 import { GetItemsForInvoiceDTO } from './getItemsForInvoiceDTO';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceId } from '../../domain/InvoiceId';
+import { CouponRepoContract } from '../../../coupons/repos';
 
 export type GetItemsForInvoiceContext = AuthorizationContext<Roles>;
 
@@ -39,7 +38,7 @@ export class GetItemsForInvoiceUsecase
     > {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private invoiceRepo: InvoiceRepoContract
+    private couponRepo: CouponRepoContract
   ) {}
 
   // @Authorize('invoice:read')
@@ -56,6 +55,11 @@ export class GetItemsForInvoiceUsecase
     try {
       try {
         items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
+        for (const item of items) {
+          item.coupons = await this.couponRepo.getCouponsByInvoiceItemId(
+            item.invoiceItemId
+          );
+        }
       } catch (err) {
         return left(
           new GetItemsForInvoiceErrors.InvoiceNotFoundError(

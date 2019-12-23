@@ -20,7 +20,7 @@ export class Right<L, A> {
     return new Right<L, B>(fn(this.value));
   }
 
-  chain<B>(fn: (a: A) => Either<L, B>): Either<L, B> {
+  chain<L2, B>(fn: (a: A) => Either<L2, B>): Either<L | L2, B> {
     return fn(this.value);
   }
 }

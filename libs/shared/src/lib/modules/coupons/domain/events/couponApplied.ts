@@ -1,7 +1,7 @@
-import {DomainEventContract} from '../../../../core/domain/events/contracts/DomainEvent';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { DomainEventContract } from '../../../../core/domain/events/contracts/DomainEvent';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import {Coupon} from '../../../../domain/reductions/Coupon';
+import { Coupon } from '../Coupon';
 
 export class CouponApplied implements DomainEventContract {
   constructor(

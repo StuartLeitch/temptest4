@@ -191,7 +191,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public getInvoiceTotal(): number {
     return this.invoiceItems
       .getItems()
-      .reduce((acc, item) => acc + item.price, 0);
+      .reduce((acc, item) => acc + item.calculatePrice(), 0);
   }
 
   // public getValue(): number {

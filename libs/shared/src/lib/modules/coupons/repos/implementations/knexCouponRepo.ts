@@ -1,11 +1,11 @@
 import { Knex, TABLES, InvoiceItemId } from '@hindawi/shared';
-import { Coupon } from '../../../../domain/reductions/Coupon';
+import { Coupon } from '../../domain/Coupon';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { CouponMap } from '../../mappers/CouponMap';
 import { CouponRepoContract } from '../couponRepo';
-import { CouponId } from 'libs/shared/src/lib/domain/reductions/CouponId';
-import { CouponCode } from 'libs/shared/src/lib/domain/reductions/CouponCode';
-import { RepoError } from 'libs/shared/src/lib/infrastructure/RepoError';
+import { CouponId } from '../../domain/CouponId';
+import { CouponCode } from '../../domain/CouponCode';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   implements CouponRepoContract {
@@ -34,7 +34,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     const coupon = await db
       .select()
       .from(TABLES.COUPONS)
-      .where('code', code.id.toString())
+      .where('code', code.value)
       .first();
     return coupon ? CouponMap.toDomain(coupon) : null;
   }
@@ -54,7 +54,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
   async incrementRedeemedCount(coupon: Coupon): Promise<Coupon> {
     const { db } = this;
-    let updatedCoupon = await db(TABLES.COUPONS)
+    const updatedCoupon = await db(TABLES.COUPONS)
       .increment('redeemCount')
       .where('id', coupon.id.toString());
     if (!updatedCoupon) {
@@ -84,9 +84,8 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   async getCouponById(couponId: CouponId): Promise<Coupon> {
     const { db } = this;
 
-    const couponRow = await db()
+    const couponRow = await db(TABLES.COUPONS)
       .select()
-      .from(TABLES.COUPONS)
       .where('id', couponId.id.toString())
       .first();
 
@@ -112,11 +111,20 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
   async save(coupon: Coupon): Promise<Coupon> {
     const { db } = this;
-
     const data = CouponMap.toPersistence(coupon);
 
     await db(TABLES.COUPONS).insert(data);
 
     return this.getCouponById(coupon.couponId);
+  }
+
+  async isCodeUsed(code: CouponCode | string): Promise<boolean> {
+    const rawValue = code instanceof CouponCode ? code.value : code;
+    const { db } = this;
+    const result = await db(TABLES.COUPONS)
+      .select('code')
+      .where('code', rawValue);
+
+    return !!result.length;
   }
 }

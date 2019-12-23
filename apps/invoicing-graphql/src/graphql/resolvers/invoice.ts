@@ -173,7 +173,7 @@ export const invoice: Resolvers<Context> = {
       const {
         repos: {
           invoiceItem: invoiceItemRepo,
-          invoice: invoiceRepo,
+          coupon: couponRepo,
           payer: payerRepo,
           address: addressRepo
         },
@@ -183,7 +183,7 @@ export const invoice: Resolvers<Context> = {
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
         invoiceItemRepo,
-        invoiceRepo
+        couponRepo
       );
 
       const result = await getItemsUseCase.execute({
