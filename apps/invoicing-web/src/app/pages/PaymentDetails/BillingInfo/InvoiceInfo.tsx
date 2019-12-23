@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import countryList from "country-list";
+import stateList from "state-list";
 import { Flex, Text, Label } from "@hindawi/react-components";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
   type: "INSTITUTION" | "INDIVIDUAL";
   address: {
     city: string;
+    state: string;
     country: string;
     addressLine1: string;
   };
@@ -22,7 +24,7 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
   vatId,
   address,
   organization,
-}) => {
+}: any) => {
   return (
     <Fragment>
       <Flex>
@@ -46,7 +48,13 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
         </Flex>
         <Flex vertical flex={1}>
           <Label>Country</Label>
-          <Text>{countryList.getName((address && address.country) || "")}</Text>
+          <Text>
+            {`${countryList.getName(
+              (address && address.country) || "",
+            )}${address &&
+              address.state &&
+              `, ${stateList.name[address.state]}`}`}
+          </Text>
         </Flex>
         <Flex vertical flex={1}>
           <Label>Address</Label>

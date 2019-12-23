@@ -7,7 +7,7 @@ import { makeGraphqlServer } from './graphql';
 import { makeExpressServer } from './api';
 import { queueService } from './queue_service';
 import { registerDomainEvents } from './domain_events';
-import { scheduleCronJobs } from './cron_jobs'
+import { scheduleCronJobs } from './cron_jobs';
 
 async function main(): Promise<void> {
   const config = makeConfig();
@@ -30,7 +30,7 @@ async function main(): Promise<void> {
   //   manuscripts: [
   //     {
   //       id: '439303d8-bdb4-43f2-a7e0-7a4a341a04a1',
-  //       journalId: '46a25365-57d4-44af-b041-3935ad3796dd',
+  //       journalId: '3d5d7135-5ac1-481a-99df-29fe361e1c7a',
   //       created: '2019-11-06T09:53:00.361Z',
   //       updated: '2019-11-06T09:58:27.365Z',
   //       title: 'Renal Replacement Therapy in the Critical Care Setting',
@@ -161,7 +161,7 @@ async function main(): Promise<void> {
 
   registerDomainEvents(context, queue);
   expressServer.listen(process.env.PORT || 4000);
-  scheduleCronJobs(context)
+  scheduleCronJobs(context);
 }
 
 main().catch(err => {

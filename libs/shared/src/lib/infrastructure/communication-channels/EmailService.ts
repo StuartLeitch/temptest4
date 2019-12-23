@@ -65,7 +65,9 @@ class EmailService {
   }
 
   public sendEmail() {
+    console.info(process.env);
     if (process.env.MAILING_DISABLED === 'false') {
+      console.info(this.email);
       return this.email.sendEmail();
     }
   }
@@ -117,16 +119,21 @@ class EmailService {
       content: {
         subject: `${manuscript.customId}: Article Processing Charges`,
         paragraph: `
-        <h4>Thank you for choosing Hindawi to publish your manuscript</h4>
+        <h4>Thank you for choosing ${
+          process.env.TENANT_NAME
+        } to publish your manuscript</h4>
         As an open access journal, publication of articles in ${
           catalogItem.journalTitle
         } is associated with Article Processing Charges that amount to ${
           catalogItem.amount
         } ${catalogItem.currency}. The total charges for your manuscript ${
           manuscript.customId
-        }, before any taxes, are ${invoiceItem.price} ${
-          catalogItem.currency
-        }. If you are required to pay United Kingdom Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges by the prevailing rate of UK VAT at the date of the invoice.
+        }, before any taxes, are ${invoiceItem.price} ${catalogItem.currency}.
+        ${
+          process.env.TENANT_NAME === 'Hindawi'
+            ? `If you are required to pay United Kingdom Value Added Tax (VAT) as an individual or institution this will increase the overall cost of the charges by the prevailing rate of UK VAT at the date of the invoice.`
+            : ''
+        }
         <br/><h4>What to do next?</h4>
         In order to finalise the invoice with the correct billing details, you now access the invoice to confirm the details. Invoices can be charged to an individual or an institution depending on who is paying. This invoice is payable upon receipt. You can access the invoice for your article and make payment through the following URL:
         <br /><br />

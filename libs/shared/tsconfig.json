@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    // "allowJs": true,
+    "allowJs": true,
     "module": "commonjs",
     "moduleResolution": "node",
 
@@ -15,7 +15,8 @@
     "types": ["node", "jest"]
   },
   "include": [
-    "**/*.ts",
+    "**/src/**/*.ts",
+    "lib/shared/src/lib/**/*.ts",
     "src/lib/infrastructure/database/knex/migrations/20191105154102_create_journals_table.js",
     "src/lib/infrastructure/database/knex/migrations/20191105154722_create_editors_table.js",
     "src/lib/infrastructure/database/knex/seeds/payment_methods.js",
@@ -36,6 +37,7 @@
     "src/lib/infrastructure/database/knex/migrations/20191205144644_add_userId_to_editor_table.js",
     "src/lib/infrastructure/database/knex/migrations/20191210165617_remove_invoiceNumber_unique.js",
     "src/lib/infrastructure/database/knex/migrations/20191216144735_replace_coupons_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20191216172738_create_invoice_items_to_coupons_table.js"
+    "src/lib/infrastructure/database/knex/migrations/20191216172738_create_invoice_items_to_coupons_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20191218133638_add_state_to_addresses.js"
   ]
 }

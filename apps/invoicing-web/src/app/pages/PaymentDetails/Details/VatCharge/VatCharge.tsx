@@ -9,9 +9,11 @@ interface Props extends LayoutProps, SpaceProps, FlexProps {
   vat: any;
   price: number;
   rate?: number;
+  tenant?: string;
 }
 
-const vatInfoText = `
+const vatInfoText = {
+  Hindawi: `
 Hindawi Limited is based in the United Kingdom and must charge a 20% Value Added Tax (VAT) on qualifying transactions.
 
 UK VAT applies when we supply services to any individual or organization based in the UK.
@@ -21,9 +23,18 @@ When our customer is a non-VAT registered individual or organization based outsi
 When our customer is a VAT-registered individual or organization based outside the UK but within the EU, Article 44 of the 2006/112/EC applies. The place of supply is where the customer is established, which puts the invoice outside the scope of UK VAT.
 
 When our customer is an individual or organization based outside of the EU, all transactions are outside the scope of UK VAT.
-`;
+`,
+  GeoScienceWorld: `
+The service recipient is liable to pay the entire amount of any Sales, VAT or GST tax.
 
-const VatCharge: React.FC<Props> = ({ vat, price, rate, ...rest }) => {
+This invoice amount is net of any service tax.
+
+Any such taxes has to be borne by the customer and paid directly to the appropriate tax authorities.
+
+GeoScienceWorld is a not for profit organization and does not allow deductions of any taxes from its invoice amount.`,
+};
+
+const VatCharge: React.FC<Props> = ({ tenant, vat, price, rate, ...rest }) => {
   const vatAmount = (price * vat) / 100;
   const amountInPounds = vatAmount / rate;
   return (
@@ -34,7 +45,7 @@ const VatCharge: React.FC<Props> = ({ vat, price, rate, ...rest }) => {
           <Text>(+{vat}%)</Text>
           <Tooltip
             placement="top"
-            title={vatInfoText}
+            title={vatInfoText[tenant]}
             overlayStyle={{
               fontFamily: "Nunito,sans-serif",
               fontWeight: "normal",
@@ -57,6 +68,7 @@ const VatCharge: React.FC<Props> = ({ vat, price, rate, ...rest }) => {
 
 VatCharge.defaultProps = {
   rate: 0,
+  tenant: "Hindawi",
 };
 
 export default VatCharge;

@@ -2,6 +2,7 @@ import React from "react";
 
 import { Separator, Title } from "@hindawi/react-components";
 
+import { config } from "../../../config";
 import { Header as Root } from "./Header.styles";
 
 interface Props {
@@ -10,7 +11,11 @@ interface Props {
 
 const Header: React.FC<Props> = ({ path }) => (
   <Root>
-    <img src="../../assets/images/hindawi-horizontal.svg" alt="Hindawi" />
+    <img
+      src={config.logoUrl}
+      alt={config.tenantName}
+      style={{ width: "150px" }}
+    />
     <div style={{ height: "30px" }}>
       <Separator direction="vertical"></Separator>
     </div>

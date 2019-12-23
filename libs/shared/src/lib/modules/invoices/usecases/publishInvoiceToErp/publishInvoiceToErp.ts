@@ -60,6 +60,10 @@ export class PublishInvoiceToErpUsecase
     request: PublishInvoiceToErpRequestDTO,
     context?: PublishInvoiceToErpContext
   ): Promise<PublishInvoiceToErpResponse> {
+    if (process.env.ERP_DISABLED === 'true') {
+      return right(Result.ok<any>(null));
+    }
+
     try {
       let invoice = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
@@ -102,7 +106,10 @@ export class PublishInvoiceToErpUsecase
       }
 
       const vatService = new VATService();
-      const vatNote = vatService.getVATNote(address.country, payer.type !== PayerType.INSTITUTION)
+      const vatNote = vatService.getVATNote(
+        address.country,
+        payer.type !== PayerType.INSTITUTION
+      );
       const exchangeRateService = new ExchangeRateService();
       let rate = 1.42; // ! Average value for the last seven years
       if (invoice && invoice.dateIssued) {

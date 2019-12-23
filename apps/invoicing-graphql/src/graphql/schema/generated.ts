@@ -15,12 +15,14 @@ export type Address = {
    __typename?: 'Address',
   city?: Maybe<Scalars['String']>,
   country?: Maybe<Scalars['String']>,
+  state?: Maybe<Scalars['String']>,
   addressLine1?: Maybe<Scalars['String']>,
 };
 
 export type AddressInput = {
   city?: Maybe<Scalars['String']>,
   country?: Maybe<Scalars['String']>,
+  state?: Maybe<Scalars['String']>,
   addressLine1?: Maybe<Scalars['String']>,
 };
 
@@ -413,6 +415,7 @@ export type ResolversParentTypes = {
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
   city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  state?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
 

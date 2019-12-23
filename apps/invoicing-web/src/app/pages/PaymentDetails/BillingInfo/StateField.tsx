@@ -1,41 +1,41 @@
-import React, { Fragment, useState } from "react";
-import countryList from "country-list";
+import React, { useState } from "react";
+import stateList from "state-list";
 import { space, layout } from "styled-system";
 import styled, { css } from "styled-components";
 
 import { Icon, Text, th, lighten } from "@hindawi/react-components";
 
-const filterCountry = (inputCountry: string) => (c: string) =>
-  c.toLowerCase().startsWith(inputCountry.toLowerCase());
+const filterState = (inputState: string) => (c: string) =>
+  c.toLowerCase().startsWith(inputState.toLowerCase());
 
-const CountryField = ({ value, onChange, name, status }) => {
-  const countries = (countryList.getNames() as []).sort();
+const StateField = ({ value, onChange, name, status }) => {
+  const states = stateList.name;
   const [expanded, setExpanded] = useState(false);
-  const [countryInput, setCountryInput] = useState(() =>
-    !value ? "" : countryList.getName(value),
+  const [stateInput, setStateInput] = useState(() =>
+    !value ? "" : stateList.name[value],
   );
 
   const toggleMenu = () => {
     setExpanded(s => !s);
   };
 
-  const selectCountry = (country: string) => () => {
-    onChange(name)(countryList.getCode(country));
-    setCountryInput(country);
+  const selectState = (state: string) => () => {
+    onChange(name)(state);
+    setStateInput(stateList.name[state]);
   };
 
-  const setCountry = e => {
-    setCountryInput(e.target.value);
+  const setState = e => {
+    setStateInput(e.target.value);
   };
 
   return (
     <Relative>
       <Root status={status}>
-        <CountryInput
-          value={countryInput}
+        <StateInput
+          value={stateInput}
           onBlur={toggleMenu}
           onFocus={toggleMenu}
-          onChange={setCountry}
+          onChange={setState}
         />
         <Icon
           name={expanded ? "caretUp" : "caretDown"}
@@ -44,22 +44,19 @@ const CountryField = ({ value, onChange, name, status }) => {
       </Root>
       {expanded && (
         <DropdownList>
-          {countries
-            .filter(filterCountry(countryInput))
-            .map((country: string) => (
-              <DropdownItem key={country} onMouseDown={selectCountry(country)}>
-                <Text>{country}</Text>
-              </DropdownItem>
-            ))}
+          {Object.keys(states).map((state: string) => (
+            <DropdownItem key={state} onMouseDown={selectState(state)}>
+              <Text>{states[state]}</Text>
+            </DropdownItem>
+          ))}
         </DropdownList>
       )}
     </Relative>
   );
 };
 
-export default CountryField;
+export default StateField;
 
-// #region styles
 const statusColor = ({ status }: { status: any }) => {
   switch (status) {
     case "warning":
@@ -119,7 +116,7 @@ const statusColor = ({ status }: { status: any }) => {
   }
 };
 
-const CountryInput = styled.input`
+const StateInput = styled.input`
   border: none;
   outline: none;
   width: 100%;

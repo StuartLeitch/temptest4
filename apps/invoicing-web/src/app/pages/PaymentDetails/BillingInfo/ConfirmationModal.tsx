@@ -21,7 +21,7 @@ const ConfirmationModal: React.FunctionComponent<Props> = ({
   error,
   onAccept,
   onCancel,
-}) => {
+}: any) => {
   return (
     <Root>
       <Title mt={10}>Confirm Invoice?</Title>

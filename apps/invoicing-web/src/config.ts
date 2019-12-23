@@ -2,6 +2,8 @@ const globalConfig: any = (window as any)._env_;
 
 export class Config {
   env: "development" | "production";
+  tenantName: string;
+  tenantCountry: string;
   appUrl: string;
   apiRoot: string;
   gqlRoot: string;
@@ -15,11 +17,24 @@ export class Config {
   footerHomeLink: string;
   footerPrivacy: string;
   footerEmail: string;
-  tenantName: string;
   footerTOS: string;
 
   appName: string;
   invoicesPerPage: number;
+
+  faviconUrl: string;
+  logoUrl: string;
+
+  bankDetails: {
+    accountName: string;
+    accountType: string;
+    accountNumber: string;
+    sortCode: string;
+    swift: string;
+    iban: string;
+    bankAddress: string;
+    beneficiaryAddress: string;
+  };
 
   constructor() {
     this.env = globalConfig.NODE_ENV || "development";
@@ -37,11 +52,26 @@ export class Config {
     this.footerPrivacy = globalConfig.FOOTER_PRIVACY;
     this.footerEmail = globalConfig.FOOTER_EMAIL;
     this.tenantName = globalConfig.TENANT_NAME;
+    this.tenantCountry = globalConfig.TENANT_COUNTRY;
     this.footerTOS = globalConfig.FOOTER_TOS;
 
     this.appName = globalConfig.APP_NAME;
 
     this.invoicesPerPage = Number(globalConfig.INVOICES_PER_PAGE);
+
+    this.faviconUrl = globalConfig.FAVICON_URL;
+    this.logoUrl = globalConfig.LOGO_URL;
+
+    this.bankDetails = {
+      accountName: globalConfig.BANK_ACCOUNT_NAME,
+      accountType: globalConfig.BANK_ACCOUNT_TYPE,
+      accountNumber: globalConfig.BANK_ACCOUNT_NUMBER,
+      sortCode: globalConfig.BANK_SORT_CODE,
+      swift: globalConfig.BANK_SWIFT,
+      iban: globalConfig.BANK_IBAN,
+      bankAddress: globalConfig.BANK_ADDRESS,
+      beneficiaryAddress: globalConfig.BANK_BENEFICIARY_ADDRESS,
+    };
   }
 }
 

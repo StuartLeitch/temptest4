@@ -1,4 +1,5 @@
 // * Core Domain
+import { UniqueEntityID } from './../../../../core/domain/UniqueEntityID';
 import { Result, Either, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -22,6 +23,7 @@ import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 import { Invoice } from '../../domain/Invoice';
+import { JournalId } from './../../../journals/domain/JournalId';
 
 import { GetInvoicePdfResponse, PdfResponse } from './getInvoicePdfResponse';
 import { GetInvoicePdfErrors } from './getInvoicePdfErrors';
@@ -38,6 +40,7 @@ import { InvoicePayload } from '../../../../domain/services/PdfGenerator/PdfGene
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { pdfGeneratorService } from '../../../../domain/services';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
@@ -64,7 +67,8 @@ export class GetInvoicePdfUsecase
     private addressRepo: AddressRepoContract,
     private articleRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
-    private payerRepo: PayerRepoContract
+    private payerRepo: PayerRepoContract,
+    private catalogRepo: CatalogRepoContract
   ) {}
 
   // @Authorize('payer:read')
@@ -94,6 +98,26 @@ export class GetInvoicePdfUsecase
       emptyPayload
     );
 
+    const payloadWithJournal = await map(
+      [
+        async payload => {
+          const catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+            JournalId.create(
+              new UniqueEntityID(payload.article.props.journalId)
+            ).getValue()
+          );
+
+          if (payload.article) {
+            // eslint-disable-next-line require-atomic-updates
+            payload.article.props.journalTitle = catalogItem.journalTitle;
+          }
+
+          return payload;
+        }
+      ],
+      payloadEither
+    );
+
     const vatService = new VATService();
     const exchangeRateService = new ExchangeRateService();
 
@@ -121,7 +145,7 @@ export class GetInvoicePdfUsecase
           return payload;
         }
       ],
-      payloadEither
+      payloadWithJournal
     );
 
     const pdfStreamEither = payloadWithVatNote.chain(

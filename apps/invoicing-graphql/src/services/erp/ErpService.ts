@@ -46,10 +46,6 @@ export class ErpService implements ErpServiceContract {
   ) {}
 
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
-    if (process.env.ERP_DISABLED === 'true') {
-      return;
-    }
-
     const { items } = data;
 
     const accountId = await this.registerPayer(data);
@@ -276,7 +272,7 @@ export class ErpService implements ErpServiceContract {
       const deleteResponses = await connection
         .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
         .delete(invoiceItemsToDelete);
-  
+
       for (const deleteResponse of deleteResponses) {
         if (!deleteResponse.success) {
           throw deleteResponse;

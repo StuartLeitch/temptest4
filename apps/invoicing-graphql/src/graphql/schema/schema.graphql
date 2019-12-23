@@ -70,6 +70,7 @@ type InvoiceId {
 input AddressInput {
   city: String
   country: String
+  state: String
   addressLine1: String
 }
 
@@ -102,6 +103,7 @@ type Payer {
 type Address {
   city: String
   country: String
+  state: String
   addressLine1: String
 }
 

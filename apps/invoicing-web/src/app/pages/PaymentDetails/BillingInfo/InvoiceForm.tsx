@@ -13,6 +13,7 @@ import {
 import { Modal, useModalActions } from "../../../providers/modal";
 import { PAYMENT_TYPES } from "./types";
 import CountryField from "./CountryField";
+import StateField from "./StateField";
 import IconRadioButton from "./IconRadioButton";
 import ConfirmationModal from "./ConfirmationModal";
 import VatChargesObserver from "./VATChargesObserver";
@@ -27,7 +28,7 @@ interface Props {
   applyCoupon(invoiceId: string, couponCode: string): any;
 }
 
-const FormTextarea = field => (
+const FormTextarea = (field: any) => (
   <Textarea
     height={26}
     {...field}
@@ -60,7 +61,7 @@ const imperativeValidation = (formFns, showModal) => () => {
   });
 };
 
-const validateFn = values => {
+const validateFn = (values: any) => {
   const errors: any = {};
 
   if (!values.name) {
@@ -73,6 +74,13 @@ const validateFn = values => {
   if (!values.address.country) {
     set(errors, "address.country", "Required");
   }
+
+  if (values.address.country === "US") {
+    if (!values.address.state) {
+      set(errors, "address.state", "Required");
+    }
+  }
+
   if (!values.address.city) {
     set(errors, "address.city", "Required");
   }
@@ -95,7 +103,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
   handleSubmit,
   onVatFieldChange,
   applyCoupon,
-}) => {
+}: any) => {
   const { invoiceId } = useParams();
   const { showModal, hideModal } = useModalActions();
 
@@ -105,6 +113,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
       type: null,
       address: {
         country: "",
+        state: "",
         city: "",
       },
       coupon: "",
@@ -207,6 +216,14 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                         name="address.country"
                         component={CountryField}
                       />
+                      {values.address.country === "US" && (
+                        <FormField
+                          required
+                          label="State"
+                          name="address.state"
+                          component={StateField}
+                        />
+                      )}
                       <FormField required label="City" name="address.city" />
                     </Flex>
                   </Flex>

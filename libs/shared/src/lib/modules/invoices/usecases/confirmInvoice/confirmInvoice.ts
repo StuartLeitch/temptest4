@@ -215,6 +215,7 @@ export class ConfirmInvoiceUsecase
     const addressDTO = {
       city: address.city,
       country: address.country,
+      state: address.state,
       addressLine1: address.addressLine1
     };
 

@@ -1,18 +1,20 @@
 import React, { Fragment } from "react";
 import { Flex, Label, Title, Text } from "@hindawi/react-components";
 
+import { config } from "../../../../config";
+
 interface Props {
   accountName?: string;
   accountType?: string;
   accountNumber?: string;
   sortCode?: string;
-  switft?: string;
+  swift?: string;
   iban?: string;
   bankAddress?: string;
   beneficiaryAddress?: string;
 }
 
-const BankTransferRow = ({ label, value }) => (
+const BankTransferRow = ({ label, value }: any) => (
   <Flex justifyContent="flex-start" mt={2}>
     <Flex flex={1} justifyContent="flex-start">
       <Label>{label}</Label>
@@ -28,11 +30,11 @@ const BankTransfer: React.FunctionComponent<Props> = ({
   accountType,
   accountNumber,
   sortCode,
-  switft,
+  swift,
   iban,
   bankAddress,
   beneficiaryAddress,
-}) => {
+}: any) => {
   return (
     <Fragment>
       <Title type="small">Bank Transfer Details</Title>
@@ -41,7 +43,7 @@ const BankTransfer: React.FunctionComponent<Props> = ({
       <BankTransferRow label="Account Type" value={accountType} />
       <BankTransferRow label="Account Number" value={accountNumber} />
       <BankTransferRow label="Sort Code" value={sortCode} />
-      <BankTransferRow label="SWIFT/BIC Code" value={switft} />
+      <BankTransferRow label="SWIFT/BIC Code" value={swift} />
       <BankTransferRow label="IBAN" value={iban} />
       <BankTransferRow label="Bank Address" value={bankAddress} />
       <BankTransferRow label="Beneficiary Address" value={beneficiaryAddress} />
@@ -49,17 +51,6 @@ const BankTransfer: React.FunctionComponent<Props> = ({
   );
 };
 
-BankTransfer.defaultProps = {
-  accountName: "Hindawi Limited",
-  accountType: "FGN Current",
-  accountNumber: "00113905",
-  sortCode: "090715",
-  switft: "ABBYGB2LXXX",
-  iban: "GB60ABBY09071500113905",
-  bankAddress:
-    "Santander UK PLC, Corporate Banking, Bridle Road, Bootle, Merseyside, L30 4GB",
-  beneficiaryAddress:
-    "Hindawi Ltd., Adam House, Third Floor, 1 Fitzroy Square, London W1T 5HF, UK",
-};
+BankTransfer.defaultProps = { ...config.bankDetails };
 
 export default BankTransfer;

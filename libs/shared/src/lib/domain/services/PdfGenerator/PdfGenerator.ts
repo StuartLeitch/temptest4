@@ -5,6 +5,8 @@ import { format } from 'date-fns';
 import ejs from 'ejs';
 import pdf from 'html-pdf';
 import countryList from 'country-list';
+import stateList from 'state-list';
+import base64Img from 'base64-img';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 
@@ -25,14 +27,60 @@ export class PdfGeneratorService {
     };
   } = {};
 
-  public getInvoice(payload: InvoicePayload): Promise<Readable> {
+  static async convertLogo(url: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      base64Img.requestBase64(url, (err, res, body) => {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(body);
+      });
+    });
+  }
+
+  public async getInvoice(payload: InvoicePayload): Promise<Readable> {
+    const logoUrl = process.env.LOGO_URL;
+    const logoData = await PdfGeneratorService.convertLogo(logoUrl);
+
     return new Promise((resolve, reject) => {
       const template = this.getTemplate('invoice');
-      const html = template({
+      const data = {
         dateFormatFn: format,
         ...payload,
-        addressCountry: countryList.getName(payload.address.country)
-      });
+        addressCountry: countryList.getName(payload.address.country),
+        addressState: stateList.name[payload.address.state],
+        companyNumber: process.env.COMPANY_REGISTRATION_NUMBER,
+        vatNumber: process.env.COMPANY_VAT_NUMBER,
+        assistanceEmail: process.env.ASSISTANCE_EMAIL,
+        tenantName: process.env.TENANT_NAME,
+        tenantAddress: process.env.TENANT_ADDRESS,
+        logo: logoData,
+        bankDetails: {
+          accountName: process.env.BANK_ACCOUNT_NAME,
+          accountType: process.env.BANK_ACCOUNT_TYPE,
+          accountNumber: process.env.BANK_ACCOUNT_NUMBER,
+          sortCode: process.env.BANK_SORT_CODE,
+          swift: process.env.BANK_SWIFT,
+          iban: process.env.BANK_IBAN,
+          bankAddress: [
+            process.env.BANK_ADDRESS_LINE_1,
+            process.env.BANK_ADDRESS_LINE_2,
+            process.env.BANK_ADDRESS_LINE_3,
+            process.env.BANK_ADDRESS_CITY,
+            process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY,
+            process.env.BANK_ADDRESS_POSTCODE
+          ].join(', '),
+          beneficiaryAddress: [
+            process.env.BANK_BENEFICIARY_ADDRESS_LINE_1,
+            process.env.BANK_BENEFICIARY_ADDRESS_LINE_2,
+            process.env.BANK_BENEFICIARY_ADDRESS_CITY,
+            process.env.BANK_BENEFICIARY_ADDRESS_POSTCODE,
+            process.env.BANK_BENEFICIARY_ADDRESS_STATE
+          ].join(', ')
+        }
+      };
+      const html = template(data);
 
       const pdfOptions: pdf.CreateOptions = {
         border: {

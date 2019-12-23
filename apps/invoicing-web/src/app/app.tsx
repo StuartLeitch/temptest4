@@ -3,10 +3,6 @@ import { Route, Switch } from "react-router-dom";
 
 import { config } from "../config";
 
-// import { useUser } from "./contexts/User";
-const loadInvoicesList = () => import("./pages/InvoicesList/InvoicesList");
-const InvoicesList = React.lazy(loadInvoicesList);
-
 import { useAuth } from "./contexts/Auth";
 // import { AuthClient } from "./utils/auth-client";
 
@@ -15,9 +11,16 @@ import { PaymentDetails } from "./pages/PaymentDetails";
 import { NotFound } from "./pages/NotFound";
 import { PendingLogging } from "./pages/PendingLogging/PendingLogging";
 
+// import { useUser } from "./contexts/User";
+const loadInvoicesList = () => import("./pages/InvoicesList/InvoicesList");
+const InvoicesList = React.lazy(loadInvoicesList);
+
 export const App = () => {
   useEffect(() => {
     document.title = config.appName;
+
+    const favicon: any = document.getElementById("favicon");
+    favicon.href = config.faviconUrl;
   });
 
   return (

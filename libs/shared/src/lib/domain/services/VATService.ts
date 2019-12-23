@@ -5,13 +5,24 @@ import { environment } from '@env/environment';
 
 import { PoliciesRegister } from '../../modules/invoices/domain/policies/PoliciesRegister';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from './../../modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
+import { USVATPolicy } from './../../modules/invoices/domain/policies/USVATPolicy';
 
 const { VAT_VALIDATION_SERVICE_ENDPOINT: endpoint } = environment;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
+
 const vat = new EuroVat();
 const policiesRegister = new PoliciesRegister();
-const APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-policiesRegister.registerPolicy(APCPolicy);
+
+let VATPolicy: USVATPolicy | UKVATTreatmentArticleProcessingChargesPolicy;
+
+// !!! Ugly as fuck!
+// TODO: Please reconsider this solution
+if (process.env.TENANT_COUNTRY === 'US') {
+  VATPolicy = new USVATPolicy();
+} else {
+  VATPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
+}
+policiesRegister.registerPolicy(VATPolicy);
 
 export class VATService {
   private async createClient() {
@@ -74,7 +85,7 @@ export class VATService {
   }
 
   public calculateVAT(country?: string, individualConfirmed?: boolean) {
-    const calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
+    const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
       country,
       !individualConfirmed,
       individualConfirmed ? false : true
@@ -85,7 +96,7 @@ export class VATService {
   }
 
   public getVATNote(country?: string, individualConfirmed?: boolean) {
-    const calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
+    const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
       country,
       !individualConfirmed,
       individualConfirmed ? false : true

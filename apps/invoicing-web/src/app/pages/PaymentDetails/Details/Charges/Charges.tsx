@@ -8,6 +8,7 @@ import { TotalCharges } from "../TotalCharges";
 import { ChargeItem } from "../ChargeItem";
 import { VatCharge } from "../VatCharge";
 
+import { config } from "../../../../../config";
 interface Props extends LayoutProps, SpaceProps {
   invoiceItem: any;
 }
@@ -23,7 +24,7 @@ const showInfo = (info: string) => {
   }
 };
 
-const Charges: React.FC<Props> = ({ invoiceItem, ...rest }) => {
+const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
   const { vat, rate, vatnote, price, coupons } = invoiceItem;
   let totalDiscountFromCoupons = coupons.reduce(
     (acc, curr) => acc + curr.reduction,
@@ -61,6 +62,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }) => {
       </Flex>
       <ChargeItem price={finalPrice} name="Net Charges" mt="2" />
       <VatCharge
+        tenant={config.tenantName}
         vat={invoiceItem.vat}
         price={finalPrice}
         rate={invoiceItem.rate}

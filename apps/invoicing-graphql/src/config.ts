@@ -27,6 +27,8 @@ export interface PayPalConfig {
 }
 
 export class Config {
+  tenantName: string;
+  tenantCountry: string;
   dbUser: string;
   dbHost: string;
   dbDatabase: string;
@@ -48,6 +50,9 @@ export class Config {
 
   constructor() {
     Object.assign(this, dbConfig);
+
+    this.tenantName = process.env.TENANT_NAME;
+    this.tenantCountry = process.env.TENANT_COUNTRY;
 
     this.salesForce = {
       user: process.env.SAGE_USER,

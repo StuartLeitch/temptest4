@@ -12,6 +12,7 @@ export const addressFragment = gql`
   fragment addressFragment on Address {
     city
     country
+    state
     addressLine1
   }
 `;

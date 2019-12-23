@@ -1,10 +1,10 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
 
 // * Subdomain
-import {AddressId} from './AddressId';
+import { AddressId } from './AddressId';
 
 export interface AddressProps {
   companyName?: string;
@@ -12,6 +12,7 @@ export interface AddressProps {
   addressLine2?: string;
   city: string;
   country: string;
+  state?: string;
   postalCode?: string;
   dateCreated?: Date;
   dateUpdated?: Date;
@@ -36,6 +37,10 @@ export class Address extends AggregateRoot<AddressProps> {
 
   get country(): string {
     return this.props.country;
+  }
+
+  get state(): string {
+    return this.props.state;
   }
 
   get addressLine1(): string {

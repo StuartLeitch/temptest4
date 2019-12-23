@@ -10,7 +10,7 @@ interface Props extends LayoutProps, SpaceProps {
   invoice: any;
 }
 
-const Details: React.FC<Props> = ({ invoice, ...rest }) => (
+const Details: React.FC<Props> = ({ invoice, ...rest }: any) => (
   <Root {...rest}>
     <ArticleDetails article={invoice.article} />
     <InvoiceDetails invoice={invoice} />

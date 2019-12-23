@@ -9,7 +9,7 @@ interface Props {
   article: any;
 }
 
-const ArticleDetails: React.FunctionComponent<Props> = ({ article }) => {
+const ArticleDetails: React.FunctionComponent<Props> = ({ article }: any) => {
   return (
     <Expander title="Article details" expanded>
       <Root>
