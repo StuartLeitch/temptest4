@@ -22,6 +22,12 @@
     },
     "invoicing-web-e2e": {
       "tags": []
+    },
+    "invoicing-admin": {
+      "tags": []
+    },
+    "invoicing-admin-e2e": {
+      "tags": []
     }
   }
 }
