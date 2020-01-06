@@ -1,0 +1,1 @@
+export { UpdateCouponUsecase } from './updateCoupon';

@@ -9,6 +9,8 @@ import { CouponRepoContract } from '../../repos';
 import { CreateCouponErrors } from './createCouponErrors';
 import { CreateCouponDTO } from './createCouponDTO';
 
+import { isExpirationDateValid } from '../utils';
+
 type SanityCheckResult = Either<
   | CreateCouponErrors.InvalidInvoiceItemType
   | CreateCouponErrors.InvalidExpirationDate
@@ -19,40 +21,6 @@ type SanityCheckResult = Either<
   | AppError.UnexpectedError,
   CreateCouponDTO
 >;
-
-function isExpirationAfterNow(expiration: Date): boolean {
-  const now = new Date();
-  if (expiration.getUTCFullYear() < now.getUTCFullYear()) {
-    return false;
-  }
-  if (
-    expiration.getUTCFullYear() === now.getUTCFullYear() &&
-    expiration.getUTCMonth() < now.getUTCMonth()
-  ) {
-    return false;
-  }
-  if (
-    expiration.getUTCFullYear() === now.getUTCFullYear() &&
-    expiration.getUTCMonth() === now.getUTCMonth() &&
-    expiration.getUTCDate() < now.getUTCDate()
-  ) {
-    return false;
-  }
-  return true;
-}
-
-export function isExpirationDateValid(
-  expirationDate: Date,
-  couponType: CouponType
-): boolean {
-  if (
-    couponType === CouponType.MULTIPLE_USE &&
-    !isExpirationAfterNow(expirationDate)
-  ) {
-    return false;
-  }
-  return true;
-}
 
 export async function sanityChecksRequestParameters(
   request: CreateCouponDTO,

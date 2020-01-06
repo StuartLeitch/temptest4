@@ -57,6 +57,10 @@ export class Coupon extends Reduction<CouponProps> {
     return this.props.couponType;
   }
 
+  public set couponType(newType: CouponType) {
+    this.props.couponType = newType;
+  }
+
   public get code(): CouponCode {
     return this.props.code;
   }
@@ -69,8 +73,16 @@ export class Coupon extends Reduction<CouponProps> {
     return this.props.expirationDate;
   }
 
+  public set expirationDate(newDate: Date) {
+    this.props.expirationDate = newDate;
+  }
+
   public get status(): CouponStatus {
     return this.props.status;
+  }
+
+  public set status(newStatus: CouponStatus) {
+    this.props.status = newStatus;
   }
 
   public get redeemCount(): number {
