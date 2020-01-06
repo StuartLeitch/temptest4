@@ -1,10 +1,6 @@
-import {
-  Connection,
-  RecordResult,
-  SuccessResult,
-  UserInfo,
-  ErrorResult
-} from 'jsforce';
+/* eslint-disable @typescript-eslint/camelcase */
+
+import { Connection } from 'jsforce';
 import {
   ErpData,
   ErpServiceContract,
@@ -28,7 +24,7 @@ export const defaultErpFixedValues: ErpFixedValues = {
 
 export class ErpService implements ErpServiceContract {
   private connection: Connection;
-  private loginPromise: Promise<SuccessResult | ErrorResult | UserInfo>;
+  private loginPromise: Promise<any>;
 
   constructor(
     private config: any,
@@ -42,7 +38,9 @@ export class ErpService implements ErpServiceContract {
     const tradeDocumentId = await this.registerTradeDocument(accountId, data);
 
     const tradeItemIds = await Promise.all(
-      items.map(item => this.registerInvoiceItem(tradeDocumentId, data, item))
+      items.map(async item =>
+        this.registerInvoiceItem(tradeDocumentId, data, item)
+      )
     );
 
     return {
@@ -60,9 +58,7 @@ export class ErpService implements ErpServiceContract {
         loginUrl
       });
 
-      this.loginPromise =
-        this.loginPromise ||
-        this.connection.login(user, password + securityToken);
+      this.loginPromise = this.connection.login(user, password + securityToken);
 
       // tslint:disable-next-line: no-unused-expression
       this.connection.authorize;

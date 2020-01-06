@@ -51,9 +51,9 @@ export const expressLoader: MicroframeworkLoader = (
       if (resultEither.isLeft()) {
         console.log(resultEither.value.errorValue());
         return res.status(500);
-      } else {
-        return resultEither.value.getValue();
       }
+
+      return resultEither.value.getValue();
     });
 
     // app.get('/api/jwt-test', auth.enforce(), (req, res) => {
@@ -62,7 +62,7 @@ export const expressLoader: MicroframeworkLoader = (
 
     // TODO REMOVE THIS !!!
     app.post('/api/acceptManuscript', async (req, res) => {
-      const invoiceId = req.body.invoiceId;
+      const { invoiceId } = req.body;
       const invoiceItems = await context.repos.invoiceItem.getItemsByInvoiceId(
         InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
       );
@@ -186,7 +186,9 @@ export const expressLoader: MicroframeworkLoader = (
         repos.address,
         repos.manuscript,
         repos.invoice,
-        repos.payer
+        repos.payer,
+        repos.catalog,
+        repos.coupon
       );
 
       const invoiceLink = req.headers.referer;
@@ -197,15 +199,15 @@ export const expressLoader: MicroframeworkLoader = (
 
       if (pdfEither.isLeft()) {
         return res.status(400).send(pdfEither.value.errorValue());
-      } else {
-        const { fileName, file } = pdfEither.value.getValue();
-        res.writeHead(200, {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename=${fileName}`,
-          'Content-Length': file.length
-        });
-        res.end(file);
       }
+
+      const { fileName, file } = pdfEither.value.getValue();
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=${fileName}`,
+        'Content-Length': file.length
+      });
+      res.end(file);
     });
 
     // Run application to listen on given port

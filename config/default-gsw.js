@@ -14,5 +14,5 @@ const gswConfig = {
     footerText: ''
   }
 };
-console.info(gswConfig);
+// console.info(gswConfig);
 module.exports = gswConfig;

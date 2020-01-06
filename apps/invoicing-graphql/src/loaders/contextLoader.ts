@@ -17,7 +17,8 @@ import {
   VATService,
   WaiverService,
   EmailService,
-  KnexEditorRepo
+  KnexEditorRepo,
+  KnexCouponRepo
 } from '@hindawi/shared';
 
 import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
@@ -44,7 +45,8 @@ export const contextLoader: MicroframeworkLoader = (
       paymentMethod: new KnexPaymentMethodRepo(db),
       waiver: new KnexWaiverRepo(db),
       manuscript: new KnexArticleRepo(db),
-      editor: new KnexEditorRepo(db)
+      editor: new KnexEditorRepo(db),
+      coupon: new KnexCouponRepo(db)
     };
 
     const services = {
