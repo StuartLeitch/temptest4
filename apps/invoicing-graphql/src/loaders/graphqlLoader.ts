@@ -14,7 +14,7 @@ import { getErrorCode, getErrorMessage, handlingErrors } from '../lib/graphql';
 import { typeDefs } from '../graphql/schema';
 import { resolvers } from '../graphql/resolvers';
 
-export const graphqlLoader: MicroframeworkLoader = async (
+export const graphqlLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings && env.graphql.enabled) {

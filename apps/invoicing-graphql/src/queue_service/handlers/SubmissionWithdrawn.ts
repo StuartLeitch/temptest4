@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 // * Domain imports
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 

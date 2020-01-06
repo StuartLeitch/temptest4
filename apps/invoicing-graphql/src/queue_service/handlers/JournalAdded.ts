@@ -1,16 +1,16 @@
 import {
   AddCatalogItemToCatalogUseCase,
   AddCatalogItemToCatalogUseCaseRequestDTO
-} from 'libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+} from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+import { Logger } from '../../lib/logger';
 
 const JOURNAL_ADDED = 'JournalAdded';
+const logger = new Logger(`events:${JOURNAL_ADDED}`);
 
 export const JournalAddedHandler = {
   event: JOURNAL_ADDED,
-  handler: async function(data: any) {
-    console.log(`
-[JournalAddedHandler Incoming Event Data]:
-${JSON.stringify(data)}`);
+  async handler(data: any) {
+    logger.info(`Incoming Event Data`, data);
     const {
       repos: { catalog: catalogRepo }
     } = this;

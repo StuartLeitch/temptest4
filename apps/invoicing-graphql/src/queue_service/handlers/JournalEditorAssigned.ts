@@ -1,7 +1,11 @@
-import { AssignEditorsToJournalUsecase } from 'libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
-import { JournalEventMap } from 'libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
+/* eslint-disable max-len */
+
+import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
+import { JournalEventMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
+import { Logger } from '../../lib/logger';
 
 const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
+const logger = new Logger(`events:${JOURNAL_EDITOR_ASSIGNED}`);
 // const JOURNAL_SECTION_SPECIAL_ISSUE_EDITOR_ASSIGNED =
 //   'JournalSectionSpecialIssueEditorAssigned';
 // const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
@@ -10,9 +14,7 @@ const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
 
 function addEditorEventHandlerFactory(eventName: string): any {
   return async function(data: any) {
-    console.log(`
-[${eventName} Incoming Event Data]:
-${JSON.stringify(data)}`);
+    logger.info(`Incoming Event Data`, data);
     const {
       repos: { catalog: catalogRepo, editor: editorRepo }
     } = this;

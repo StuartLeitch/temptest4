@@ -89,6 +89,7 @@ export const env = {
     password: getOsEnv('MONITOR_PASSWORD')
   },
   aws: {
+    enabled: toBool(getOsEnv('AWS_ENABLED')),
     ses: {
       region: getOsEnv('AWS_SES_REGION'),
       accessKey: getOsEnv('AWS_SES_ACCESS_KEY'),

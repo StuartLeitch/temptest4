@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 

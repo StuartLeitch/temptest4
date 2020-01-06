@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import {
   MicroframeworkLoader,
   MicroframeworkSettings
@@ -6,12 +8,12 @@ import {
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceActivated } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceActivatedEvent';
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
-import { PublishInvoiceConfirmed } from 'libs/shared/src/lib/modules/invoices/usecases/publishInvoiceConfirmed';
-import { PublishInvoicePaid } from 'libs/shared/src/lib/modules/invoices/usecases/PublishInvoicePaid/publishInvoicePaid';
-import { PublishInvoiceToErpUsecase } from 'libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-import { PublishInvoiceCreatedUsecase } from 'libs/shared/src/lib/modules/invoices/usecases/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceConfirmed';
+import { PublishInvoicePaid } from '../../../../libs/shared/src/lib/modules/invoices/usecases/PublishInvoicePaid/publishInvoicePaid';
+import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
+import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceCreated/publishInvoiceCreated';
 
-import { env } from '../env';
+// import { env } from '../env';
 
 export const domainEventsRegisterLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -41,12 +43,14 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const publishInvoicePaid = new PublishInvoicePaid(queue);
 
     // Registering Invoice Events
+    // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceCreatedEvent(
       invoice,
       invoiceItem,
       manuscript,
       publishInvoiceCreatedUsecase
     );
+    // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceActivated(
       invoiceItem,
       payer,
@@ -55,6 +59,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       publishInvoiceActivated,
       publishInvoiceToErpUsecase
     );
+    // tslint:disable-next-line: no-unused-expression
     new AfterInvoicePaidEvent(
       invoice,
       invoiceItem,
