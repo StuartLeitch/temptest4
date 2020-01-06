@@ -9,6 +9,7 @@ import stateList from 'state-list';
 import base64Img from 'base64-img';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
+import { FormatUtils } from '../../../utils/FormatUtils';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -32,6 +33,7 @@ export class PdfGeneratorService {
       base64Img.requestBase64(url, (err, res, body) => {
         if (err) {
           reject(err);
+          return;
         }
 
         resolve(body);
@@ -46,6 +48,7 @@ export class PdfGeneratorService {
     return new Promise((resolve, reject) => {
       const template = this.getTemplate('invoice');
       const data = {
+        formatPriceFn: FormatUtils.formatPrice,
         dateFormatFn: format,
         ...payload,
         addressCountry: countryList.getName(payload.address.country),

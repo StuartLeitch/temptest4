@@ -174,3 +174,6 @@ export { EmailService } from './infrastructure/communication-channels';
 export * from './domain/reductions/repos/implementations/knexWaiverRepo';
 export * from './domain/services/VATService';
 export * from './domain/services/WaiverService';
+
+// * Export Utils
+export * from './utils/FormatUtils';

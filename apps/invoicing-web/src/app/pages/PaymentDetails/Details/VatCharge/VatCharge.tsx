@@ -4,6 +4,7 @@ import Tooltip from "antd/lib/tooltip";
 import Icon from "antd/lib/icon";
 
 import { Flex, Label, Text } from "@hindawi/react-components";
+import { FormatUtils } from "@hindawi/invoicing-web/app/utils/format";
 
 interface Props extends LayoutProps, SpaceProps, FlexProps {
   vat: any;
@@ -60,7 +61,7 @@ const VatCharge: React.FC<Props> = ({ tenant, vat, price, rate, ...rest }) => {
             />
           </Tooltip>
         </Flex>
-        <Text>${vatAmount.toFixed(2)}</Text>
+        <Text>${FormatUtils.formatPrice(vatAmount)}</Text>
       </Flex>
     </Fragment>
   );

@@ -9,6 +9,8 @@ import { ChargeItem } from "../ChargeItem";
 import { VatCharge } from "../VatCharge";
 
 import { config } from "../../../../../config";
+import { FormatUtils } from "../../../../utils/format";
+
 interface Props extends LayoutProps, SpaceProps {
   invoiceItem: any;
 }
@@ -34,7 +36,10 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
     totalDiscountFromCoupons > 100 ? 100 : totalDiscountFromCoupons;
   const finalPrice = price - (price * totalDiscountFromCoupons) / 100;
   const vatNote = vatnote
-    .replace("{Vat/Rate}", `${(((vat / 100) * finalPrice) / rate).toFixed(2)}`)
+    .replace(
+      "{Vat/Rate}",
+      `${FormatUtils.formatPrice(((vat / 100) * finalPrice) / rate)}`,
+    )
     .replace("{Rate}", rate);
 
   return (

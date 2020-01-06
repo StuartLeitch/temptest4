@@ -4,6 +4,7 @@ import { Expander } from "@hindawi/react-components";
 import { DetailItem } from "../DetailItem";
 
 import { ArticleDetails as Root } from "./ArticleDetails.styles";
+import { config } from "../../../../../config";
 
 interface Props {
   article: any;
@@ -18,7 +19,7 @@ const ArticleDetails: React.FunctionComponent<Props> = ({ article }: any) => {
         <DetailItem
           link
           label="DOI Number"
-          text={`https://doi.org/10.1155/${new Date(
+          text={`https://doi.org/${config.doiNumber}/${new Date(
             article.created,
           ).getFullYear()}/${article.customId}`}
         />

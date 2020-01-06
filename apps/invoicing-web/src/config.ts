@@ -8,6 +8,7 @@ export class Config {
   apiRoot: string;
   gqlRoot: string;
   paypallClientId: string;
+  doiNumber: string;
 
   authEnabled: boolean;
   authServerUrl: string;
@@ -42,6 +43,7 @@ export class Config {
     this.apiRoot = globalConfig.API_ROOT;
     this.gqlRoot = globalConfig.GQL_ROOT;
     this.paypallClientId = globalConfig.PP_CLIENT_ID;
+    this.doiNumber = globalConfig.DOI_NUMBER;
 
     this.authEnabled = globalConfig.AUTH_ENABLED === "true";
     this.authServerUrl = globalConfig.AUTH_SERVER_URL;

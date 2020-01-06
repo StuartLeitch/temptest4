@@ -8,6 +8,7 @@ window._env_ = {
   AUTH_SERVER_URL: "http://52.17.30.165:8080/auth",
   AUTH_SERVER_REALM: "Phenom",
   AUTH_SERVER_CLIENT_ID: "invoicing",
+  DOI_NUMBER: "10.1155",
 
   TENANT_NAME: "Hindawi",
   FOOTER_HOME_LINK: "https://www.hindawi.com/",
