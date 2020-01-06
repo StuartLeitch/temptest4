@@ -4,6 +4,24 @@ import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../modules/journals/domain/CatalogItem';
 import { InvoiceItem } from '../../modules/invoices/domain/InvoiceItem';
 import { Invoice } from '../../modules/invoices/domain/Invoice';
+import gswConfig from '../../../../../../config/default-gsw';
+
+interface JournalConfig {
+  logo?: string;
+  address?: string;
+  privacy?: string;
+  ctaColor?: string;
+  logoLink?: string;
+  publisher?: string;
+  footerText?: string;
+}
+
+let journalConfig: JournalConfig = {};
+
+if (process.env.TENANT_NAME) {
+  journalConfig = { ...gswConfig.journal };
+  journalConfig.address = ''; // address is in privacy text
+}
 
 interface TemplateProps {
   type: string;
@@ -67,6 +85,7 @@ class EmailService {
   public sendEmail() {
     console.info(process.env);
     if (process.env.MAILING_DISABLED === 'false') {
+      console.log('sending to', this.email);
       console.info(this.email);
       return this.email.sendEmail();
     }
@@ -109,7 +128,7 @@ class EmailService {
     senderAddress: string,
     senderName: string
   ) {
-    return this.createTemplate({
+    const templateProps = {
       type: 'user',
       fromEmail: `${senderName} <${senderAddress}>`,
       toUser: {
@@ -159,14 +178,22 @@ class EmailService {
         If the payment will be made by an alternative source such as your institution, you can provide them with the invoice link.
         <h4>Got a question?</h4>
         If you have any questions related to the invoice, just reply to this email and our Customer Service team will be happy to help.
-        `
+        `,
+        ...journalConfig
       },
       bodyProps: {
         hasLink: false,
         hasIntro: true,
         hasSignature: false
       }
-    });
+    };
+    if (templateProps.content.privacy) {
+      templateProps.content.privacy = templateProps.content.privacy.replace(
+        '[TO EMAIL]',
+        manuscript.authorEmail
+      );
+    }
+    return this.createTemplate(templateProps);
   }
 }
 

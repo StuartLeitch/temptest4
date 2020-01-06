@@ -43,6 +43,7 @@ export class ExchangeRateService {
       fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
           reject(err);
+          return;
         }
 
         resolve(parser.toJson(data, { object: true, sanitize: true }));

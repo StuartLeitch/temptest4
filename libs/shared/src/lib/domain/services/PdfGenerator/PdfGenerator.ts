@@ -9,6 +9,7 @@ import stateList from 'state-list';
 import base64Img from 'base64-img';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
+import { FormatUtils } from '../../../utils/FormatUtils';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -32,6 +33,7 @@ export class PdfGeneratorService {
       base64Img.requestBase64(url, (err, res, body) => {
         if (err) {
           reject(err);
+          return;
         }
 
         resolve(body);
@@ -40,12 +42,14 @@ export class PdfGeneratorService {
   }
 
   public async getInvoice(payload: InvoicePayload): Promise<Readable> {
-    const logoUrl = process.env.LOGO_URL;
+    const logoUrl =
+      'http://demo-gsw-invoicing-web.eu-west-1.elasticbeanstalk.com/assets/gsw/images/Lithosphere_logo_web.png';
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
     return new Promise((resolve, reject) => {
       const template = this.getTemplate('invoice');
       const data = {
+        formatPriceFn: FormatUtils.formatPrice,
         dateFormatFn: format,
         ...payload,
         addressCountry: countryList.getName(payload.address.country),

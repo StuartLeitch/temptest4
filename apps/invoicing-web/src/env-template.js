@@ -4,6 +4,7 @@ window._env_ = {
   GQL_ROOT: "${APP_URL}/graphql",
   API_ROOT: "${APP_URL}/api",
   PP_CLIENT_ID: "${PP_CLIENT_ID}",
+  DOI_NUMBER: "${DOI_NUMBER}",
 
   AUTH_ENABLED: "${AUTH_ENABLED}",
   AUTH_SERVER_URL: "${AUTH_SERVER_URL}",

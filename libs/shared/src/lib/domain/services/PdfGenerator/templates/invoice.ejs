@@ -41,7 +41,9 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 7.5rem;
+        max-width: 20rem;
+        min-height: 30px;
+        max-height: 50px;
       }
 
       p {
@@ -209,7 +211,8 @@
             <tr>
               <th>Article Processing Charges</th>
               <td>
-                <%= invoice.invoiceItems.currentItems[i].price.toFixed(2) %> USD
+                <%= formatPriceFn(invoice.invoiceItems.currentItems[i].price) %>
+                USD
               </td>
             </tr>
             <% } %> <% } %> <% let price = invoice.getInvoiceTotal() %> <% let
@@ -222,13 +225,13 @@
             <tr>
               <th>Discounts (-<%= discount %>%)</th>
               <td>
-                -<%= (item.price * discount / 100).toFixed(2) %> USD
+                -<%= formatPriceFn((item.price * discount / 100)) %> USD
               </td>
             </tr>
             <% } %>
             <tr>
               <th>Net Charges</th>
-              <td><%= price.toFixed(2) %> USD</td>
+              <td><%= formatPriceFn(price) %> USD</td>
             </tr>
             <tr>
               <th>
@@ -236,13 +239,13 @@
                 <em>(<%= vat %>%)</em>
               </th>
               <td>
-                <%= vatAmount.toFixed(2) %> USD
+                <%= formatPriceFn(vatAmount) %> USD
               </td>
             </tr>
             <tr>
               <th class="summary">Total</th>
               <td class="summary">
-                <%= (price + vatAmount).toFixed(2) %> USD
+                <%= formatPriceFn(price + vatAmount) %> USD
               </td>
             </tr>
           </table>
@@ -270,8 +273,8 @@
     </table>
 
     <div class="separator isCentered">
-      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${( vatAmount /
-      invoice.props.rate).toFixed(2)}`, ).replace("{Rate}", invoice.props.rate)
+      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn(
+      vatAmount / invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate)
       %>
     </div>
 
