@@ -41,7 +41,9 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 7.5rem;
+        max-width: 20rem;
+        min-height: 30px;
+        max-height: 50px;
       }
 
       p {
@@ -271,9 +273,9 @@
     </table>
 
     <div class="separator isCentered">
-      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn( vatAmount /
-      invoice.props.rate)}`, ).replace("{Rate}",
-      invoice.props.rate) %>
+      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn(
+      vatAmount / invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate)
+      %>
     </div>
 
     <h1>Bill to</h1>

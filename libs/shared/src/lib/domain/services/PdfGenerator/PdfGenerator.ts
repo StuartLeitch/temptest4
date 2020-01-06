@@ -42,7 +42,8 @@ export class PdfGeneratorService {
   }
 
   public async getInvoice(payload: InvoicePayload): Promise<Readable> {
-    const logoUrl = process.env.LOGO_URL;
+    const logoUrl =
+      'http://demo-gsw-invoicing-web.eu-west-1.elasticbeanstalk.com/assets/gsw/images/Lithosphere_logo_web.png';
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
     return new Promise((resolve, reject) => {
