@@ -233,6 +233,7 @@
         "build": {
           "builder": "@nrwl/web:build",
           "options": {
+            "webpackConfig": "@nrwl/react/plugins/babel",
             "outputPath": "dist/apps/invoicing-admin",
             "index": "apps/invoicing-admin/src/index.html",
             "main": "apps/invoicing-admin/src/main.tsx",
@@ -243,8 +244,7 @@
               "apps/invoicing-admin/src/assets"
             ],
             "styles": ["apps/invoicing-admin/src/styles.scss"],
-            "scripts": [],
-            "webpackConfig": "@nrwl/react/plugins/babel"
+            "scripts": []
           },
           "configurations": {
             "production": {

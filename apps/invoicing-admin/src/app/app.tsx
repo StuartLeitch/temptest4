@@ -1,8 +1,10 @@
 import React from 'react';
+import { Route, Link } from 'react-router-dom';
+
+// import Layout from './../components/Layout';
+// ThemeProvider, ThemeSelector, PageConfigConsumer
 
 import './app.scss';
-
-import { Route, Link } from 'react-router-dom';
 
 export const App = () => {
   /*
