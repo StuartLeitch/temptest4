@@ -2,7 +2,6 @@ import {
   AddCatalogItemToCatalogUseCase,
   AddCatalogItemToCatalogUseCaseRequestDTO
 } from 'libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
-import { Context } from '@hindawi/invoicing-graphql/context';
 
 const JOURNAL_ADDED = 'JournalAdded';
 
@@ -14,7 +13,7 @@ export const JournalAddedHandler = {
 ${JSON.stringify(data)}`);
     const {
       repos: { catalog: catalogRepo }
-    } = this as Context;
+    } = this;
 
     const addJournalUsecase = new AddCatalogItemToCatalogUseCase(catalogRepo);
     try {

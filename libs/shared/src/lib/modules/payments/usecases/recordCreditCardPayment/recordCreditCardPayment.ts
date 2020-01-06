@@ -1,4 +1,3 @@
-import { BraintreeGateway } from '@hindawi/shared';
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
@@ -13,6 +12,7 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
+import { BraintreeGateway } from '../../../payments/infrastructure/gateways/braintree/gateway';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
@@ -21,7 +21,7 @@ import { RecordCreditCardPaymentErrors } from './recordCreditCardPaymentErrors';
 import { RecordCreditCardPaymentDTO } from './recordCreditCardPaymentDTO';
 
 import { Braintree } from './../../domain/strategies/Braintree';
-import { BraintreePayment } from './../../domain/strategies/BraintreePayment';
+import { BraintreePayment } from '../../domain/strategies/BraintreePayment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 import { PaymentModel } from './../../domain/contracts/PaymentModel';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';

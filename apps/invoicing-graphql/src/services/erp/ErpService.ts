@@ -8,23 +8,13 @@ import {
 import {
   ErpData,
   ErpServiceContract,
-  Payer,
   PayerType,
   InvoiceItem,
   ErpResponse
 } from '@hindawi/shared';
-import { Config } from '../../config';
 import countryList from 'country-list';
 
-function ensureSuccess(result: RecordResult): SuccessResult {
-  if (!result.success) {
-    throw result;
-  }
-
-  return result;
-}
-
-export interface ErpFixedValues {
+interface ErpFixedValues {
   tradeDocumentType: string;
   currencyId: string;
   companyId: string;
@@ -41,7 +31,7 @@ export class ErpService implements ErpServiceContract {
   private loginPromise: Promise<SuccessResult | ErrorResult | UserInfo>;
 
   constructor(
-    private config: Config,
+    private config: any,
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
@@ -63,7 +53,7 @@ export class ErpService implements ErpServiceContract {
   }
 
   private async getConnection(): Promise<Connection> {
-    const { user, password, securityToken, loginUrl } = this.config.salesForce;
+    const { user, password, securityToken, loginUrl } = this.config;
 
     if (!this.connection) {
       this.connection = new Connection({
@@ -77,6 +67,7 @@ export class ErpService implements ErpServiceContract {
       // tslint:disable-next-line: no-unused-expression
       this.connection.authorize;
       await this.loginPromise;
+      // TODO: Log this message in the banner
       console.log('ERP login successful');
     }
 

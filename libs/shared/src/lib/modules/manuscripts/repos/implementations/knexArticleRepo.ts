@@ -1,16 +1,15 @@
-import {
-  Article,
-  ArticleId,
-  ArticleMap,
-  UniqueEntityID
-} from '../../../../shared';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { Manuscript } from './../../domain/Manuscript';
-import { ManuscriptMap } from './../../mappers/ManuscriptMap';
+import { Article } from '../../domain/Article';
+import { ArticleId } from '../../domain/ArticleId';
+import { Manuscript } from '../../domain/Manuscript';
+import { ArticleMap } from '../../mappers/ArticleMap';
+import { ManuscriptMap } from '../../mappers/ManuscriptMap';
 
 import { ArticleRepoContract } from '../articleRepo';
 

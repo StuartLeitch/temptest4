@@ -1,13 +1,14 @@
-import { AbstractBaseDBRepo } from 'libs/shared/src/lib/infrastructure/AbstractBaseDBRepo';
-import { JournalId, Knex, TABLES } from '@hindawi/shared';
+import Knex from 'knex';
+
+import { TABLES } from '../../../../infrastructure/database/knex/index';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
+
+import { JournalId } from '../../domain/JournalId';
 import { Editor } from '../../domain/Editor';
-import { EditorRepoContract } from '../editorRepo';
-import {
-  RepoErrorCode,
-  RepoError
-} from 'libs/shared/src/lib/infrastructure/RepoError';
-import { EditorMap } from '../../mappers/EditorMap';
 import { EditorId } from '../../domain/EditorId';
+import { EditorMap } from '../../mappers/EditorMap';
+import { EditorRepoContract } from '../editorRepo';
 
 export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
   implements EditorRepoContract {
@@ -61,7 +62,7 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
 
     const editors = await db(TABLES.EDITORS)
       .select()
-      .where('journalId', journalId.id.toString())
+      .where('journalId', journalId.id.toString());
 
     return editors.map(EditorMap.toDomain);
   }

@@ -12,18 +12,17 @@ import {
   Roles,
   InvoiceItemId
 } from '@hindawi/shared';
-import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
+import { CouponMap } from './../../../../../libs/shared/src/lib/modules/coupons/mappers/CouponMap';
 
+import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 import { MigrateInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/migrateInvoice/migrateInvoice';
 import { ApplyCouponToInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
-import { Context } from '../../context';
-import { CouponMap } from 'libs/shared/src/lib/modules/coupons/mappers/CouponMap';
 
-export const invoice: Resolvers<Context> = {
+export const invoice: Resolvers<any> = {
   Query: {
     async invoice(parent, args, context) {
       const { repos } = context;
@@ -101,12 +100,12 @@ export const invoice: Resolvers<Context> = {
 
       if (result.isLeft()) {
         return undefined;
-      } else {
-        // There is a TSLint error for when try to use a shadowed variable!
-        const invoiceIds = result.value.getValue();
-
-        return { invoiceId: invoiceIds.map(ii => ii.id.toString()) };
       }
+
+      // There is a TSLint error for when try to use a shadowed variable!
+      const invoiceIds = result.value.getValue();
+
+      return { invoiceId: invoiceIds.map(ii => ii.id.toString()) };
     },
 
     async invoiceVat(parent, args, context) {
@@ -123,34 +122,36 @@ export const invoice: Resolvers<Context> = {
       const result = await usecase.execute(request, usecaseContext);
       if (result.isLeft()) {
         return undefined;
-      } else {
-        // There is a TSLint error for when try to use a shadowed variable!
-        const invoiceDetails = result.value.getValue();
-
-        let rate = 1.42; // ! Average value for the last seven years
-
-        try {
-          const exchangeRate = await exchangeRateService.getExchangeRate(
-            new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
-            'USD'
-          );
-          rate = exchangeRate.exchangeRate;
-        } catch (error) {}
-
-        const vatNote = vatService.getVATNote(
-          args.country,
-          args.payerType !== PayerType.INSTITUTION
-        );
-        const vatPercentage = vatService.calculateVAT(
-          args.country,
-          args.payerType !== PayerType.INSTITUTION
-        );
-        return {
-          rate,
-          vatNote: vatNote.template,
-          vatPercentage
-        };
       }
+
+      // There is a TSLint error for when try to use a shadowed variable!
+      const invoiceDetails = result.value.getValue();
+
+      let rate = 1.42; // ! Average value for the last seven years
+
+      try {
+        const exchangeRate = await exchangeRateService.getExchangeRate(
+          new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
+          'USD'
+        );
+        rate = exchangeRate.exchangeRate;
+      } catch (error) {
+        // do nothing yet
+      }
+
+      const vatNote = vatService.getVATNote(
+        args.country,
+        args.payerType !== PayerType.INSTITUTION
+      );
+      const vatPercentage = vatService.calculateVAT(
+        args.country,
+        args.payerType !== PayerType.INSTITUTION
+      );
+      return {
+        rate,
+        vatNote: vatNote.template,
+        vatPercentage
+      };
     }
   },
   Invoice: {

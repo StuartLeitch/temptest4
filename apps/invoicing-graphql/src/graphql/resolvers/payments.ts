@@ -1,7 +1,6 @@
 import { Roles, GetPaymentMethodsUseCase } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
-import { Context } from '../../context';
 
 import { MigratePaymentUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/migratePayment/migratePayment';
 import {
@@ -10,7 +9,7 @@ import {
 } from '@hindawi/shared';
 import { GenerateClientTokenUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/generateClientToken/generateClientToken';
 
-export const payments: Resolvers<Context> = {
+export const payments: Resolvers<any> = {
   Query: {
     async getPaymentMethods(parent, args, context) {
       const usecase = new GetPaymentMethodsUseCase(context.repos.paymentMethod);
