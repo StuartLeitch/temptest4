@@ -16,6 +16,16 @@ export class JournalEventMap {
       editorsToParse.push(...event.editors);
     }
 
+    // parsing Journal Section Editors
+    if (Array.isArray(event.sections)) {
+      for (const section of event.sections) {
+        // section.editors
+        if (Array.isArray(section.editors)) {
+          editorsToParse.push(...section.editors);
+        }
+      }
+    }
+
     // Removed section editors/special issue editors
 
     for (const editor of editorsToParse) {
