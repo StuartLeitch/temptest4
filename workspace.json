@@ -142,7 +142,7 @@
             ],
             "styles": ["apps/invoicing-web/src/styles.scss"],
             "scripts": [],
-            "webpackConfig": "@nrwl/react/plugins/babel"
+            "webpackConfig": "@nrwl/react/plugins/webpack"
           },
           "configurations": {
             "production": {

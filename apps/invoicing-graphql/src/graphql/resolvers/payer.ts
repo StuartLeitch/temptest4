@@ -16,7 +16,10 @@ import { DomainEvents } from 'libs/shared/src/lib/core/domain/events/DomainEvent
 export const payer: Resolvers<any> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
-      const { repos, vatService, emailService } = context;
+      const {
+        repos,
+        services: { vatService, emailService }
+      } = context;
       const { payer: inputPayer } = args;
 
       const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(

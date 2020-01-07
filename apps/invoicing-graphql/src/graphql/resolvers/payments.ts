@@ -38,7 +38,6 @@ export const payments: Resolvers<any> = {
   Mutation: {
     async creditCardPayment(parent, args, context) {
       const {
-        checkoutService,
         repos: { payment: paymentRepo, invoice: invoiceRepo }
       } = context;
       const {
@@ -86,7 +85,7 @@ export const payments: Resolvers<any> = {
       const { invoiceId, payerId, orderId, paymentMethodId } = args;
       const usecaseContext = { roles: [Roles.PAYER] };
       const {
-        payPalService,
+        services: { payPalService },
         repos: { invoice: invoiceRepo, payment: paymentRepo }
       } = context;
 
@@ -124,7 +123,6 @@ export const payments: Resolvers<any> = {
 
     async migratePayment(parent, args, context) {
       const {
-        checkoutService,
         repos: {
           paymentMethod: paymentMethodRepo,
           payment: paymentRepo,

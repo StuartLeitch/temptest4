@@ -50,8 +50,7 @@ export const SubmissionQualityCheckPassedHandler = {
         waiver: waiverRepo,
         catalog: catalogRepo
       },
-      waiverService,
-      emailService
+      services: { waiverService, emailService }
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
