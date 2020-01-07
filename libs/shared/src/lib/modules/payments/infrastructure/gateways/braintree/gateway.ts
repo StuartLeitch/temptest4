@@ -25,9 +25,9 @@ const BraintreeGatewayConfig = {
   privateKey: process.env.BT_PRIVATE_KEY || environment.BT_PRIVATE_KEY
 };
 
-console.log('-------------+  Braintree Gateway Configuration +------------');
-console.info(BraintreeGatewayConfig);
-console.log('-------------------------------------------------------------');
+// console.log('-------------+  Braintree Gateway Configuration +------------');
+// console.info(BraintreeGatewayConfig);
+// console.log('-------------------------------------------------------------');
 
 BraintreeGateway = new braintree.BraintreeGateway(BraintreeGatewayConfig);
 

@@ -1,17 +1,19 @@
-import {Knex, TABLES} from '@hindawi/shared';
-import {Transaction} from '../../domain/Transaction';
-import {TransactionId} from '../../domain/TransactionId';
-import {TransactionMap} from '../../mappers/TransactionMap';
-import {InvoiceId} from './../../../invoices/domain/InvoiceId';
+import Knex from 'knex';
+import { TABLES } from './../../../../infrastructure/database/knex/index';
 
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoError} from '../../../../infrastructure/RepoError';
-import {TransactionRepoContract} from '../transactionRepo';
+import { Transaction } from '../../domain/Transaction';
+import { TransactionId } from '../../domain/TransactionId';
+import { TransactionMap } from '../../mappers/TransactionMap';
+import { InvoiceId } from './../../../invoices/domain/InvoiceId';
+
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoError } from '../../../../infrastructure/RepoError';
+import { TransactionRepoContract } from '../transactionRepo';
 
 export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   implements TransactionRepoContract {
   async getTransactionById(transactionId: TransactionId): Promise<Transaction> {
-    const {db} = this;
+    const { db } = this;
 
     const transactionRow = await db(TABLES.TRANSACTIONS)
       .select()
@@ -22,7 +24,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   }
 
   async getTransactionByInvoiceId(invoiceId: InvoiceId): Promise<Transaction> {
-    const {db} = this;
+    const { db } = this;
 
     const transactionRow = await db(TABLES.TRANSACTIONS)
       .select()
@@ -33,7 +35,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   }
 
   async getTransactionCollection(): Promise<Transaction[]> {
-    const {db} = this;
+    const { db } = this;
 
     const transactionsRows = await db(TABLES.TRANSACTIONS);
 
@@ -44,11 +46,11 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   }
 
   async delete(transaction: Transaction): Promise<unknown> {
-    const {db} = this;
+    const { db } = this;
 
     const deletedRows = await db(TABLES.TRANSACTIONS)
       .where('id', transaction.id.toString())
-      .update({...TransactionMap.toPersistence(transaction), deleted: 1});
+      .update({ ...TransactionMap.toPersistence(transaction), deleted: 1 });
 
     return deletedRows
       ? deletedRows
@@ -61,10 +63,10 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   }
 
   async update(transaction: Transaction): Promise<Transaction> {
-    const {db} = this;
+    const { db } = this;
 
     const updated = await db(TABLES.TRANSACTIONS)
-      .where({id: transaction.id.toString()})
+      .where({ id: transaction.id.toString() })
       .update(TransactionMap.toPersistence(transaction));
 
     if (!updated) {
@@ -84,7 +86,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   }
 
   async save(transaction: Transaction): Promise<Transaction> {
-    const {db} = this;
+    const { db } = this;
 
     const data = TransactionMap.toPersistence(transaction);
 

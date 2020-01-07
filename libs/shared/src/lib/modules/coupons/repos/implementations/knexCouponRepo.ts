@@ -1,10 +1,11 @@
-import { Knex, TABLES, InvoiceItemId } from '@hindawi/shared';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { Coupon } from '../../domain/Coupon';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { CouponMap } from '../../mappers/CouponMap';
 import { CouponRepoContract } from '../couponRepo';
 import { CouponId } from '../../domain/CouponId';
 import { CouponCode } from '../../domain/CouponCode';
+import { InvoiceItemId } from './../../../invoices/domain/InvoiceItemId';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>

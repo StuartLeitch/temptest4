@@ -1,30 +1,16 @@
-import {
-  Connection,
-  RecordResult,
-  SuccessResult,
-  UserInfo,
-  ErrorResult
-} from 'jsforce';
+/* eslint-disable @typescript-eslint/camelcase */
+
+import { Connection } from 'jsforce';
 import {
   ErpData,
   ErpServiceContract,
-  Payer,
   PayerType,
   InvoiceItem,
   ErpResponse
 } from '@hindawi/shared';
-import { Config } from '../../config';
 import countryList from 'country-list';
 
-function ensureSuccess(result: RecordResult): SuccessResult {
-  if (!result.success) {
-    throw result;
-  }
-
-  return result;
-}
-
-export interface ErpFixedValues {
+interface ErpFixedValues {
   tradeDocumentType: string;
   currencyId: string;
   companyId: string;
@@ -38,10 +24,10 @@ export const defaultErpFixedValues: ErpFixedValues = {
 
 export class ErpService implements ErpServiceContract {
   private connection: Connection;
-  private loginPromise: Promise<SuccessResult | ErrorResult | UserInfo>;
+  private loginPromise: Promise<any>;
 
   constructor(
-    private config: Config,
+    private config: any,
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
@@ -52,7 +38,9 @@ export class ErpService implements ErpServiceContract {
     const tradeDocumentId = await this.registerTradeDocument(accountId, data);
 
     const tradeItemIds = await Promise.all(
-      items.map(item => this.registerInvoiceItem(tradeDocumentId, data, item))
+      items.map(async item =>
+        this.registerInvoiceItem(tradeDocumentId, data, item)
+      )
     );
 
     return {
@@ -63,20 +51,19 @@ export class ErpService implements ErpServiceContract {
   }
 
   private async getConnection(): Promise<Connection> {
-    const { user, password, securityToken, loginUrl } = this.config.salesForce;
+    const { user, password, securityToken, loginUrl } = this.config;
 
     if (!this.connection) {
       this.connection = new Connection({
         loginUrl
       });
 
-      this.loginPromise =
-        this.loginPromise ||
-        this.connection.login(user, password + securityToken);
+      this.loginPromise = this.connection.login(user, password + securityToken);
 
       // tslint:disable-next-line: no-unused-expression
       this.connection.authorize;
       await this.loginPromise;
+      // TODO: Log this message in the banner
       console.log('ERP login successful');
     }
 

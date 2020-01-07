@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 const gswConfig = {
   mailer: {
     path: `${__dirname}/mailer`
@@ -14,5 +16,7 @@ const gswConfig = {
     footerText: ''
   }
 };
+
+// console.info(gswConfig);
 
 module.exports = gswConfig;

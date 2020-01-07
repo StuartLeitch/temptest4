@@ -1,5 +1,4 @@
-import { config } from '../../config';
-
+/* eslint-disable max-len */
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 
@@ -8,19 +7,19 @@ import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/e
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
-import { Context } from '../../context';
+
+import { Logger } from '../../lib/logger';
+import { env } from '../../env';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
+const logger = new Logger(`events:${SUBMISSION_QUALITY_CHECK_PASSED}`);
 
 export const SubmissionQualityCheckPassedHandler = {
   event: SUBMISSION_QUALITY_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(data: any) {
-    console.log(`
-[submissionQualityCheckPassedHandler Incoming Event Data]:
-${JSON.stringify(data)}
-    `);
+    logger.info('Incoming Event Data', data);
 
     const { submissionId, manuscripts } = data;
 
@@ -53,7 +52,7 @@ ${JSON.stringify(data)}
       },
       waiverService,
       emailService
-    } = this as Context;
+    } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
 
@@ -79,17 +78,17 @@ ${JSON.stringify(data)}
         authorSurname: surname,
         authorFirstName: givenNames,
         bankTransferCopyReceiver:
-          config.invoicePaymentBankTransferCopyReceiverAddress,
+          env.app.invoicePaymentEmailBankTransferCopyReceiver,
         emailSenderInfo: {
-          address: config.invoicePaymentEmailSenderAddress,
-          name: config.invoicePaymentEmailSenderName
+          address: env.app.invoicePaymentEmailSenderAddress,
+          name: env.app.invoicePaymentEmailSenderName
         }
       },
       defaultContext
     );
 
     if (result.isLeft()) {
-      console.error(result.value.error);
+      logger.error(result.value.error.toString());
     }
   }
 };

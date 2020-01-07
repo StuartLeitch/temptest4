@@ -1,14 +1,12 @@
-import {
-  Payer,
-  PayerId,
-  PayerMap,
-  InvoiceId,
-  PayerRepoContract
-} from '../../../../shared';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
-import { PayerType } from '../../../payers/domain/Payer';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { Payer } from '../../domain/Payer';
+import { PayerId } from '../../domain/PayerId';
+import { PayerMap } from '../../mapper/Payer';
+import { PayerRepoContract } from '../payerRepo';
 
 export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
   implements PayerRepoContract {

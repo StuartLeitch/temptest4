@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 
@@ -13,17 +15,16 @@ import { CreateManuscriptDTO } from './../../../../../libs/shared/src/lib/module
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import { EditManuscriptUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/editManuscript/editManuscript';
+import { Logger } from '../../lib/logger';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const logger = new Logger(`events:${SUBMISSION_SUBMITTED}`);
 
 export const SubmissionSubmittedHandler = {
   event: SUBMISSION_SUBMITTED,
   handler: async function submissionSubmittedHandler(data: any) {
-    console.log(`
-[SubmissionSubmittedHandler Incoming Event Data]:
-${JSON.stringify(data)}
-    `);
+    logger.info(`Incoming Event Data`, data);
 
     const {
       submissionId,
@@ -121,11 +122,7 @@ ${JSON.stringify(data)}
         console.error(result.value.error);
       } else {
         const newTransaction = result.value.getValue();
-
-        console.log(`
-[SubmissionSubmittedHandler Transaction Data]:
-${JSON.stringify(newTransaction)}
-        `);
+        logger.info(`Transaction Data`, newTransaction);
 
         const manuscriptProps: CreateManuscriptDTO = {
           id: submissionId,
@@ -154,10 +151,7 @@ ${JSON.stringify(newTransaction)}
         } else {
           const newManuscript = createManuscriptResult.value.getValue();
 
-          console.log(`
-[SubmissionSubmittedHandler Manuscript Data]:
-${JSON.stringify(newManuscript)}
-          `);
+          logger.info('Manuscript Data', newManuscript);
         }
       }
     }

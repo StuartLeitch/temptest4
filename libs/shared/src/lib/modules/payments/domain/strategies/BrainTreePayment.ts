@@ -1,7 +1,7 @@
-import { PaymentClientToken } from './../../../../domain/PaymentClientToken';
-import { Braintree } from './Braintree';
+import { PaymentClientToken } from '../../../../domain/PaymentClientToken';
 import { PaymentService } from '../contracts/PaymentService';
 import { PaymentGateway } from '../contracts/PaymentGateway';
+import { Braintree } from './Braintree';
 
 export class BraintreePayment extends PaymentService<
   Braintree,
