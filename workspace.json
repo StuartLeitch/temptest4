@@ -142,7 +142,7 @@
             ],
             "styles": ["apps/invoicing-web/src/styles.scss"],
             "scripts": [],
-            "webpackConfig": "@nrwl/react/plugins/babel"
+            "webpackConfig": "@nrwl/react/plugins/webpack"
           },
           "configurations": {
             "production": {
@@ -220,6 +220,114 @@
             "config": "apps/invoicing-web-e2e/.eslintrc",
             "tsConfig": ["apps/invoicing-web-e2e/tsconfig.e2e.json"],
             "exclude": ["**/node_modules/**", "!apps/invoicing-web-e2e/**"]
+          }
+        }
+      }
+    },
+    "invoicing-dump": {
+      "root": "apps/invoicing-dump",
+      "sourceRoot": "apps/invoicing-dump/src",
+      "projectType": "application",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/web:build",
+          "options": {
+            "outputPath": "dist/apps/invoicing-dump",
+            "index": "apps/invoicing-dump/src/index.html",
+            "main": "apps/invoicing-dump/src/main.tsx",
+            "polyfills": "apps/invoicing-dump/src/polyfills.ts",
+            "tsConfig": "apps/invoicing-dump/tsconfig.app.json",
+            "assets": [
+              "apps/invoicing-dump/src/favicon.ico",
+              "apps/invoicing-dump/src/assets"
+            ],
+            "styles": ["apps/invoicing-dump/src/styles.scss"],
+            "scripts": [],
+            "webpackConfig": "@nrwl/react/plugins/webpack"
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/invoicing-dump/src/environments/environment.ts",
+                  "with": "apps/invoicing-dump/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/web:dev-server",
+          "options": {
+            "buildTarget": "invoicing-dump:build"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "invoicing-dump:build:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/invoicing-dump/.eslintrc",
+            "tsConfig": [
+              "apps/invoicing-dump/tsconfig.app.json",
+              "apps/invoicing-dump/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-dump/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/invoicing-dump/jest.config.js",
+            "tsConfig": "apps/invoicing-dump/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "invoicing-dump-e2e": {
+      "root": "apps/invoicing-dump-e2e",
+      "sourceRoot": "apps/invoicing-dump-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/invoicing-dump-e2e/cypress.json",
+            "tsConfig": "apps/invoicing-dump-e2e/tsconfig.e2e.json",
+            "devServerTarget": "invoicing-dump:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "invoicing-dump:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/invoicing-dump-e2e/.eslintrc",
+            "tsConfig": ["apps/invoicing-dump-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-dump-e2e/**"]
           }
         }
       }

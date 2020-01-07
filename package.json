@@ -34,7 +34,7 @@
   "private": true,
   "dependencies": {
     "@hindawi/phenom-events": "^1.0.2",
-    "@hindawi/queue-service": "^1.0.12",
+    "@hindawi/queue-service": "^1.1.0",
     "@paypal/checkout-server-sdk": "^1.0.2",
     "@pubsweet/component-email-templating": "0.2.8",
     "@pubsweet/logger": "^0.2.36",
@@ -192,7 +192,11 @@
     "typesafe-actions": "5.1.0",
     "typescript": "~3.7.4",
     "webpack": "^4.41.5",
-    "webpack-graphql-loader": "^1.0.2"
+    "webpack-graphql-loader": "^1.0.2",
+    "eslint-plugin-import": "2.19.1",
+    "eslint-plugin-jsx-a11y": "6.2.3",
+    "eslint-plugin-react": "7.17.0",
+    "eslint-plugin-react-hooks": "2.3.0"
   },
   "bolt": {
     "workspaces": [
