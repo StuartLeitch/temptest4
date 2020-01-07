@@ -109,7 +109,10 @@ export const invoice: Resolvers<any> = {
     },
 
     async invoiceVat(parent, args, context) {
-      const { repos, exchangeRateService, vatService } = context;
+      const {
+        repos,
+        services: { exchangeRateService, vatService }
+      } = context;
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
@@ -178,8 +181,7 @@ export const invoice: Resolvers<any> = {
           payer: payerRepo,
           address: addressRepo
         },
-        exchangeRateService,
-        vatService
+        services: { exchangeRateService, vatService }
       } = context;
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
