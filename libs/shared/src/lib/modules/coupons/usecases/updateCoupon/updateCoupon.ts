@@ -1,6 +1,6 @@
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { Result, left, right, Either } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { map } from '../../../../core/logic/EitherMap';
@@ -17,22 +17,18 @@ import {
 import { CouponRepoContract } from '../../repos/couponRepo';
 
 // * Usecase specific
-import { InvoiceItemType } from '../../../invoices/domain/InvoiceItem';
-
 import { UpdateCouponResponse } from './updateCouponResponse';
 import { UpdateCouponErrors } from './updateCouponErrors';
 import { UpdateCouponDTO } from './updateCouponDTO';
 
-import { CouponCode } from '../../domain/CouponCode';
 import { CouponId } from '../../domain/CouponId';
-import {
-  CouponStatus,
-  CouponProps,
-  CouponType,
-  Coupon
-} from '../../domain/Coupon';
+import { Coupon } from '../../domain/Coupon';
 
-import { isExpirationDateValid } from '../utils';
+import {
+  sanityChecksRequestParameters,
+  UpdateCouponData,
+  updateCoupon
+} from './utils';
 
 export type UpdateCouponContext = AuthorizationContext<Roles>;
 
@@ -55,14 +51,12 @@ export class UpdateCouponUsecase
     request: UpdateCouponDTO,
     context?: UpdateCouponContext
   ): Promise<UpdateCouponResponse> {
-    const maybeValidInput = this.sanityChecksRequestParameters(request);
-    const maybeCouponWithInput = await map(
+    const maybeValidInput = sanityChecksRequestParameters(request);
+    const maybeCouponWithInput = ((await map(
       [this.getCouponWithInput.bind(this)],
       maybeValidInput
-    );
-    const maybeUpdatedCoupon = maybeCouponWithInput.map(
-      this.updateCoupon.bind(this)
-    );
+    )) as unknown) as Either<UpdateCouponErrors.InvalidId, UpdateCouponData>;
+    const maybeUpdatedCoupon = maybeCouponWithInput.map(updateCoupon);
     const response = await map(
       [this.saveCoupon.bind(this)],
       maybeUpdatedCoupon
@@ -70,28 +64,13 @@ export class UpdateCouponUsecase
     return (response as unknown) as UpdateCouponResponse;
   }
 
-  private sanityChecksRequestParameters(request: UpdateCouponDTO) {
-    const { couponType, status, expirationDate, id } = request;
-    if (!id) {
-      return left(new UpdateCouponErrors.IdRequired());
-    }
-    if (!!couponType && !(couponType in CouponType)) {
-      return left(new UpdateCouponErrors.InvalidCouponType(couponType));
-    }
-    if (!!status && !(status in CouponStatus)) {
-      return left(new UpdateCouponErrors.InvalidCouponStatus(status));
-    }
-    if (
-      !!couponType &&
-      couponType === CouponType.MULTIPLE_USE &&
-      !isExpirationDateValid(new Date(expirationDate), CouponType[couponType])
-    ) {
-      return left(new UpdateCouponErrors.InvalidExpirationDate(expirationDate));
-    }
-    return right(request);
+  private async getAccessControlContext(request, context?) {
+    return {};
   }
 
-  private async getCouponWithInput(request: UpdateCouponDTO) {
+  private async getCouponWithInput(
+    request: UpdateCouponDTO
+  ): Promise<Either<UpdateCouponErrors.InvalidId, UpdateCouponData>> {
     const couponId = CouponId.create(new UniqueEntityID(request.id));
     const coupon = await this.couponRepo.getCouponById(couponId.getValue());
 
@@ -102,30 +81,8 @@ export class UpdateCouponUsecase
     return right({ coupon, request });
   }
 
-  private updateCoupon({
-    coupon,
-    request
-  }: {
-    coupon: Coupon;
-    request: UpdateCouponDTO;
-  }) {
-    const { couponType, expirationDate, status } = request;
-    if (!!couponType) {
-      coupon.couponType = CouponType[couponType];
-      if (couponType === CouponType.SINGLE_USE) {
-        coupon.expirationDate = null;
-      }
-    }
-    if (!!expirationDate) {
-      coupon.expirationDate = new Date(expirationDate);
-    }
-    if (!!status) {
-      coupon.status = CouponStatus[status];
-    }
-    return coupon;
-  }
-
-  private async saveCoupon(coupon: Coupon) {
-    return await this.couponRepo.update(coupon);
+  private async saveCoupon(coupon: Coupon): Promise<Result<Coupon>> {
+    const savedCoupon = await this.couponRepo.update(coupon);
+    return Result.ok(savedCoupon);
   }
 }
