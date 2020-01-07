@@ -25,6 +25,9 @@ export function isExpirationDateValid(
   expirationDate: Date,
   couponType: CouponType
 ): boolean {
+  if (Number.isNaN(expirationDate.getTime())) {
+    return false;
+  }
   if (
     couponType === CouponType.MULTIPLE_USE &&
     (!expirationDate || !isExpirationAfterNow(expirationDate))

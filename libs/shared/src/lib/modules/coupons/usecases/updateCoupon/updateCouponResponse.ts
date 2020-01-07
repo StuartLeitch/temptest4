@@ -6,6 +6,7 @@ import { Coupon } from '../../domain/Coupon';
 import { UpdateCouponErrors } from './updateCouponErrors';
 
 export type UpdateCouponResponse = Either<
+  | UpdateCouponErrors.ExpirationDateRequired
   | UpdateCouponErrors.InvalidExpirationDate
   | UpdateCouponErrors.InvalidCouponStatus
   | UpdateCouponErrors.InvalidCouponType

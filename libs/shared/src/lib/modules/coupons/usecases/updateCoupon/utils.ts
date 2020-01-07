@@ -13,6 +13,7 @@ export interface UpdateCouponData {
 }
 
 type SanityCheckResponse = Either<
+  | UpdateCouponErrors.ExpirationDateRequired
   | UpdateCouponErrors.InvalidExpirationDate
   | UpdateCouponErrors.InvalidCouponStatus
   | UpdateCouponErrors.InvalidCouponType
@@ -44,14 +45,17 @@ export function sanityChecksRequestParameters(
   if (!id) {
     return left(new UpdateCouponErrors.IdRequired());
   }
-  if (!!couponType && !(couponType in CouponType)) {
+  if (couponType && !(couponType in CouponType)) {
     return left(new UpdateCouponErrors.InvalidCouponType(couponType));
   }
-  if (!!status && !(status in CouponStatus)) {
+  if (status && !(status in CouponStatus)) {
     return left(new UpdateCouponErrors.InvalidCouponStatus(status));
   }
+  if (couponType && couponType === CouponType.MULTIPLE_USE && !expirationDate) {
+    return left(new UpdateCouponErrors.ExpirationDateRequired());
+  }
   if (
-    !!couponType &&
+    couponType &&
     couponType === CouponType.MULTIPLE_USE &&
     !isExpirationDateValid(new Date(expirationDate), CouponType[couponType])
   ) {

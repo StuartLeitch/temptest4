@@ -12,6 +12,7 @@ import { CreateCouponDTO } from './createCouponDTO';
 import { isExpirationDateValid } from '../utils';
 
 type SanityCheckResult = Either<
+  | CreateCouponErrors.ExpirationDateRequired
   | CreateCouponErrors.InvalidInvoiceItemType
   | CreateCouponErrors.InvalidExpirationDate
   | CreateCouponErrors.DuplicateCouponCode
@@ -38,6 +39,9 @@ export async function sanityChecksRequestParameters(
   }
   if (code && !CouponCode.isValid(code)) {
     return left(new CreateCouponErrors.InvalidCouponCode(code));
+  }
+  if (couponType && couponType === CouponType.MULTIPLE_USE && !expirationDate) {
+    return left(new CreateCouponErrors.ExpirationDateRequired());
   }
   if (
     couponType === CouponType.MULTIPLE_USE &&

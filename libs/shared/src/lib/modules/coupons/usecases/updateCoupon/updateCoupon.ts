@@ -4,6 +4,7 @@ import { Result, left, right, Either } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { map } from '../../../../core/logic/EitherMap';
+import { chain } from '../../../../core/logic/EitherChain';
 
 // * Authorization Logic
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
@@ -52,7 +53,7 @@ export class UpdateCouponUsecase
     context?: UpdateCouponContext
   ): Promise<UpdateCouponResponse> {
     const maybeValidInput = sanityChecksRequestParameters(request);
-    const maybeCouponWithInput = ((await map(
+    const maybeCouponWithInput = ((await chain(
       [this.getCouponWithInput.bind(this)],
       maybeValidInput
     )) as unknown) as Either<UpdateCouponErrors.InvalidId, UpdateCouponData>;

@@ -42,6 +42,14 @@ export namespace CreateCouponErrors {
     }
   }
 
+  export class ExpirationDateRequired extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Expiration date is required with MULTIPLE_USE Coupons.`
+      });
+    }
+  }
+
   export class InvalidInvoiceItemType extends Result<UseCaseError> {
     constructor(invoiceItemType: string) {
       super(false, {
