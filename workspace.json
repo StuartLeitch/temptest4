@@ -224,34 +224,34 @@
         }
       }
     },
-    "invoicing-dump": {
-      "root": "apps/invoicing-dump",
-      "sourceRoot": "apps/invoicing-dump/src",
+    "invoicing-admin": {
+      "root": "apps/invoicing-admin",
+      "sourceRoot": "apps/invoicing-admin/src",
       "projectType": "application",
       "schematics": {},
       "architect": {
         "build": {
           "builder": "@nrwl/web:build",
           "options": {
-            "outputPath": "dist/apps/invoicing-dump",
-            "index": "apps/invoicing-dump/src/index.html",
-            "main": "apps/invoicing-dump/src/main.tsx",
-            "polyfills": "apps/invoicing-dump/src/polyfills.ts",
-            "tsConfig": "apps/invoicing-dump/tsconfig.app.json",
+            "webpackConfig": "@nrwl/react/plugins/babel",
+            "outputPath": "dist/apps/invoicing-admin",
+            "index": "apps/invoicing-admin/src/index.html",
+            "main": "apps/invoicing-admin/src/main.tsx",
+            "polyfills": "apps/invoicing-admin/src/polyfills.ts",
+            "tsConfig": "apps/invoicing-admin/tsconfig.app.json",
             "assets": [
-              "apps/invoicing-dump/src/favicon.ico",
-              "apps/invoicing-dump/src/assets"
+              "apps/invoicing-admin/src/favicon.ico",
+              "apps/invoicing-admin/src/assets"
             ],
-            "styles": ["apps/invoicing-dump/src/styles.scss"],
-            "scripts": [],
-            "webpackConfig": "@nrwl/react/plugins/webpack"
+            "styles": ["apps/invoicing-admin/src/styles.scss"],
+            "scripts": []
           },
           "configurations": {
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "apps/invoicing-dump/src/environments/environment.ts",
-                  "with": "apps/invoicing-dump/src/environments/environment.prod.ts"
+                  "replace": "apps/invoicing-admin/src/environments/environment.ts",
+                  "with": "apps/invoicing-admin/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -274,11 +274,11 @@
         "serve": {
           "builder": "@nrwl/web:dev-server",
           "options": {
-            "buildTarget": "invoicing-dump:build"
+            "buildTarget": "invoicing-admin:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "invoicing-dump:build:production"
+              "buildTarget": "invoicing-admin:build:production"
             }
           }
         },
@@ -286,38 +286,38 @@
           "builder": "@nrwl/linter:lint",
           "options": {
             "linter": "eslint",
-            "config": "apps/invoicing-dump/.eslintrc",
+            "config": "apps/invoicing-admin/.eslintrc",
             "tsConfig": [
-              "apps/invoicing-dump/tsconfig.app.json",
-              "apps/invoicing-dump/tsconfig.spec.json"
+              "apps/invoicing-admin/tsconfig.app.json",
+              "apps/invoicing-admin/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/invoicing-dump/**"]
+            "exclude": ["**/node_modules/**", "!apps/invoicing-admin/**"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
-            "jestConfig": "apps/invoicing-dump/jest.config.js",
-            "tsConfig": "apps/invoicing-dump/tsconfig.spec.json"
+            "jestConfig": "apps/invoicing-admin/jest.config.js",
+            "tsConfig": "apps/invoicing-admin/tsconfig.spec.json"
           }
         }
       }
     },
-    "invoicing-dump-e2e": {
-      "root": "apps/invoicing-dump-e2e",
-      "sourceRoot": "apps/invoicing-dump-e2e/src",
+    "invoicing-admin-e2e": {
+      "root": "apps/invoicing-admin-e2e",
+      "sourceRoot": "apps/invoicing-admin-e2e/src",
       "projectType": "application",
       "architect": {
         "e2e": {
           "builder": "@nrwl/cypress:cypress",
           "options": {
-            "cypressConfig": "apps/invoicing-dump-e2e/cypress.json",
-            "tsConfig": "apps/invoicing-dump-e2e/tsconfig.e2e.json",
-            "devServerTarget": "invoicing-dump:serve"
+            "cypressConfig": "apps/invoicing-admin-e2e/cypress.json",
+            "tsConfig": "apps/invoicing-admin-e2e/tsconfig.e2e.json",
+            "devServerTarget": "invoicing-admin:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "invoicing-dump:serve:production"
+              "devServerTarget": "invoicing-admin:serve:production"
             }
           }
         },
@@ -325,9 +325,9 @@
           "builder": "@nrwl/linter:lint",
           "options": {
             "linter": "eslint",
-            "config": "apps/invoicing-dump-e2e/.eslintrc",
-            "tsConfig": ["apps/invoicing-dump-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/invoicing-dump-e2e/**"]
+            "config": "apps/invoicing-admin-e2e/.eslintrc",
+            "tsConfig": ["apps/invoicing-admin-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-admin-e2e/**"]
           }
         }
       }
