@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import {
   PayerMap,
   InvoiceId,
@@ -40,28 +42,27 @@ export const invoice: Resolvers<any> = {
 
       if (result.isLeft()) {
         return undefined;
-      } else {
-        // There is a TSLint error for when try to use a shadowed variable!
-        const invoiceDetails = result.value.getValue();
-
-        return {
-          invoiceId: invoiceDetails.id.toString(),
-          status: invoiceDetails.status,
-          charge: invoiceDetails.charge,
-          dateCreated: invoiceDetails.dateCreated.toISOString(),
-          dateIssued:
-            invoiceDetails.dateIssued &&
-            invoiceDetails.dateIssued.toISOString(),
-          referenceNumber:
-            invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
-              ? `${
-                  invoiceDetails.invoiceNumber
-                }/${invoiceDetails.dateAccepted.getFullYear()}`
-              : '---'
-          // totalAmount: entity.totalAmount,
-          // netAmount: entity.netAmount
-        };
       }
+
+      // There is a TSLint error for when try to use a shadowed variable!
+      const invoiceDetails = result.value.getValue();
+
+      return {
+        invoiceId: invoiceDetails.id.toString(),
+        status: invoiceDetails.status,
+        charge: invoiceDetails.charge,
+        dateCreated: invoiceDetails.dateCreated.toISOString(),
+        dateIssued:
+          invoiceDetails.dateIssued && invoiceDetails.dateIssued.toISOString(),
+        referenceNumber:
+          invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
+            ? `${
+                invoiceDetails.invoiceNumber
+              }/${invoiceDetails.dateAccepted.getFullYear()}`
+            : '---'
+        // totalAmount: entity.totalAmount,
+        // netAmount: entity.netAmount
+      };
     },
 
     async invoices(parent, args, context) {
