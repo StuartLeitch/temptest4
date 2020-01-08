@@ -1,9 +1,5 @@
 # Use an official Node runtime as a parent image
-FROM node:12.7.0-alpine
-
-# Copy package.json to the working directory
-COPY package.json .
-COPY package-lock.json .
+FROM node:12.14.0-alpine
 
 ENV PHANTOMJS_VERSION 2.1.1
 
@@ -14,6 +10,11 @@ RUN curl -Ls "https://github.com/dustinblackman/phantomized/releases/download/${
 RUN cp phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
 RUN rm -fR phantomjs-${PHANTOMJS_VERSION}-linux-x86_64
 
+RUN apk add --no-cache git
+
+# Copy package.json to the working directory
+COPY package.json .
+COPY package-lock.json .
 
 # Install any needed packages specified in package.json
 RUN npm ci --only=production
