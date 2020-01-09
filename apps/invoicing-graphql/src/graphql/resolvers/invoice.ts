@@ -110,6 +110,16 @@ export const invoice: Resolvers<any> = {
     },
 
     async invoiceVat(parent, args, context) {
+      if (
+        args.postalCode &&
+        (args.postalCode.length !== 5 ||
+          Number.isNaN(Number.parseInt(args.postalCode, 10)) ||
+          (Number.parseInt(args.postalCode, 10) + '').length !== 5)
+      ) {
+        throw new Error(
+          `The postalCode {${args.postalCode}} is invalid, it needs to have 5 numbers.`
+        );
+      }
       const {
         repos,
         services: { exchangeRateService, vatService }

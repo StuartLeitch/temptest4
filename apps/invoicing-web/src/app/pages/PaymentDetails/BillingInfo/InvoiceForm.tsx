@@ -84,6 +84,22 @@ const validateFn = (values: any) => {
     if (!values.address.state) {
       set(errors, "address.state", "Required");
     }
+
+    if (!values.address.postalCode) {
+      set(errors, "address.postalCode", "Required");
+    }
+
+    if (
+      values.address.postalCode.length !== 5 ||
+      Number.isNaN(Number.parseInt(values.address.postalCode, 10)) ||
+      (Number.parseInt(values.address.postalCode, 10) + "").length !== 5
+    ) {
+      set(
+        errors,
+        "address.postalCode",
+        "Invalid postal code format, use 5 numbers",
+      );
+    }
   }
 
   if (!values.address.city) {

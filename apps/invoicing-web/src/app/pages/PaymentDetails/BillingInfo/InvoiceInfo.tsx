@@ -54,7 +54,9 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
             )}${address &&
               address.country === "US" &&
               address.state &&
-              `, ${stateList.name[address.state]}`}`}
+              `, ${stateList.name[address.state]}`}
+              , ${address && address.country === "US" ? address.postalCode : ""}
+              `}
           </Text>
         </Flex>
         <Flex vertical flex={1}>
