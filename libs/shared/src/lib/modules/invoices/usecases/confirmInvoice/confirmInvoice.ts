@@ -215,10 +215,11 @@ export class ConfirmInvoiceUsecase
   ) {
     const createAddressUseCase = new CreateAddress(this.addressRepo);
     const addressDTO = {
-      city: address.city,
+      addressLine1: address.addressLine1,
       country: address.country,
+      postalCode: address.postalCode,
       state: address.state,
-      addressLine1: address.addressLine1
+      city: address.city
     };
 
     return (await createAddressUseCase.execute(addressDTO)).map(

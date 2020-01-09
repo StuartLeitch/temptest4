@@ -202,13 +202,23 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                   </Flex>
 
                   <Flex alignItems="flex-start" justifyContent="space-between">
-                    <FormField
-                      flex={2}
-                      required
-                      name="address.addressLine1"
-                      label="Address"
-                      component={FormTextarea}
-                    />
+                    <Flex vertical flex={2}>
+                      <FormField
+                        flex={2}
+                        required
+                        name="address.addressLine1"
+                        label="Address"
+                        component={FormTextarea}
+                      />
+                      {values.address.country === "US" && (
+                        <FormField
+                          required
+                          label="State"
+                          name="address.state"
+                          component={StateField}
+                        />
+                      )}
+                    </Flex>
                     <Flex vertical flex={1} ml={4}>
                       <FormField
                         required
@@ -218,10 +228,10 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                       />
                       {values.address.country === "US" && (
                         <FormField
+                          flex={1}
                           required
-                          label="State"
-                          name="address.state"
-                          component={StateField}
+                          name="address.postalCode"
+                          label="Postal code"
                         />
                       )}
                       <FormField required label="City" name="address.city" />

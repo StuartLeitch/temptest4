@@ -8,6 +8,7 @@ export class AddressMap extends Mapper<Address> {
       {
         city: raw.city,
         state: raw.state,
+        postalCode: raw.postalCode,
         country: raw.country,
         addressLine1: raw.addressLine1,
         dateCreated: new Date()
@@ -24,8 +25,9 @@ export class AddressMap extends Mapper<Address> {
       city: address.city,
       state: address.state,
       country: address.country,
-      addressLine1: address.addressLine1,
-      dateCreated: address.dateCreated
+      postalCode: address.postalCode,
+      dateCreated: address.dateCreated,
+      addressLine1: address.addressLine1
     };
   }
 }

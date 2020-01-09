@@ -12,6 +12,7 @@ export interface PayerInput {
     city?: string;
     country?: string;
     state?: string;
+    zipcode?: string;
     addressLine1?: string;
   };
 }

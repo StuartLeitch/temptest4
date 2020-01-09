@@ -23,6 +23,7 @@ export type AddressInput = {
   city?: Maybe<Scalars['String']>,
   country?: Maybe<Scalars['String']>,
   state?: Maybe<Scalars['String']>,
+  postalCode?: Maybe<Scalars['String']>,
   addressLine1?: Maybe<Scalars['String']>,
 };
 

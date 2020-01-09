@@ -71,6 +71,7 @@ input AddressInput {
   city: String
   country: String
   state: String
+  postalCode: String
   addressLine1: String
 }
 

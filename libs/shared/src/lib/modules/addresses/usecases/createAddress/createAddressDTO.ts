@@ -1,5 +1,7 @@
 export interface CreateAddressRequestDTO {
-  city: string;
-  country: string;
   addressLine1: string;
+  postalCode: string;
+  country: string;
+  state: string;
+  city: string;
 }
