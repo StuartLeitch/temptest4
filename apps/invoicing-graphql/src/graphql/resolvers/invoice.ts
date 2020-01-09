@@ -144,11 +144,19 @@ export const invoice: Resolvers<any> = {
       }
 
       const vatNote = vatService.getVATNote(
-        args.country,
+        {
+          postalCode: args.postalCode,
+          countryCode: args.country,
+          stateCode: args.state
+        },
         args.payerType !== PayerType.INSTITUTION
       );
       const vatPercentage = vatService.calculateVAT(
-        args.country,
+        {
+          postalCode: args.postalCode,
+          countryCode: args.country,
+          stateCode: args.state
+        },
         args.payerType !== PayerType.INSTITUTION
       );
       return {

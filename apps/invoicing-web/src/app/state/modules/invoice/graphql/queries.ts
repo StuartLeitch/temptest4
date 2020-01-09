@@ -34,11 +34,15 @@ export const getInvoiceVat: ASTNode = gql`
     $invoiceId: String
     $country: String
     $payerType: String
+    $state: String
+    $postalCode: String
   ) {
     invoiceVat(
       invoiceId: $invoiceId
       country: $country
       payerType: $payerType
+      state: $state
+      postalCode: $postalCode
     ) {
       ...invoiceVatFragment
     }

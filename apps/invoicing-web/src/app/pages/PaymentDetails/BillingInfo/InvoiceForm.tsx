@@ -142,7 +142,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
         return (
           <Fragment>
             <VatChargesObserver
-              postalCode={values.address.state}
+              postalCode={values.address.postalCode}
               country={values.address.country}
               state={values.address.state}
               paymentType={values.type}

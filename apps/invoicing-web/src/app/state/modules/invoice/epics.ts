@@ -82,7 +82,7 @@ const getInvoiceVatEpic: RootEpic = (action$, _, { graphqlAdapter }) => {
     filter(isActionOf(getInvoiceVat.request)),
     delay(500),
     switchMap(action =>
-      graphqlAdapter.send(queries.getInvoiceVat, { ...action.payload }),
+      graphqlAdapter.send(queries.getInvoiceVat, action.payload),
     ),
     map(r => getInvoiceVat.success(r.data.invoiceVat)),
     catchError(err => of(getInvoiceVat.failure(err.message))),

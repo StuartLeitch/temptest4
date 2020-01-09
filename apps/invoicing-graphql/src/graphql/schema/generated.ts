@@ -16,6 +16,7 @@ export type Address = {
   city?: Maybe<Scalars['String']>,
   country?: Maybe<Scalars['String']>,
   state?: Maybe<Scalars['String']>,
+  postalCode?: Maybe<Scalars['String']>,
   addressLine1?: Maybe<Scalars['String']>,
 };
 
@@ -261,6 +262,8 @@ export type QueryInvoiceArgs = {
 export type QueryInvoiceVatArgs = {
   invoiceId?: Maybe<Scalars['String']>,
   country?: Maybe<Scalars['String']>,
+  state?: Maybe<Scalars['String']>,
+  postalCode?: Maybe<Scalars['String']>,
   payerType?: Maybe<Scalars['String']>
 };
 
