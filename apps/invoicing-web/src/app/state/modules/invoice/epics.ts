@@ -1,5 +1,5 @@
 import { RootEpic, isActionOf, action } from "typesafe-actions";
-import { of, from } from "rxjs";
+import { of, from, interval } from "rxjs";
 import {
   map,
   delay,
@@ -9,6 +9,7 @@ import {
   catchError,
   withLatestFrom,
   tap,
+  debounce,
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
@@ -81,11 +82,15 @@ const getInvoiceVatEpic: RootEpic = (action$, _, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(getInvoiceVat.request)),
     delay(500),
-    switchMap(action =>
-      graphqlAdapter.send(queries.getInvoiceVat, action.payload),
-    ),
-    map(r => getInvoiceVat.success(r.data.invoiceVat)),
-    catchError(err => of(getInvoiceVat.failure(err.message))),
+    debounce(() => interval(300)),
+    switchMap(action => {
+      return from(
+        graphqlAdapter.send(queries.getInvoiceVat, action.payload),
+      ).pipe(
+        mergeMap(r => from([getInvoiceVat.success(r.data.invoiceVat)])),
+        catchError(err => of(getInvoiceVat.failure(err.message))),
+      );
+    }),
   );
 };
 

@@ -29,7 +29,7 @@ printf -- '\033[33m\033[1m > Deploy Back End App for "dev" environment\033[0m\n'
 ./$CURR_DIR/deploy-$AWS_ENVIRONMENT-backend.sh
 
 printf -- '\033[33m\033[1m > Deploy Front End App for "dev" environment\033[0m\n'
-# ./$CURR_DIR/deploy-$AWS_ENVIRONMENT-frontend.sh
+./$CURR_DIR/deploy-$AWS_ENVIRONMENT-frontend.sh
 
 printf -- '\n';
 

@@ -265,7 +265,6 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                     <Flex>
                       <FormField
                         error={couponError}
-                        required
                         placeholder="Insert coupon code here"
                         label="Coupon"
                         name="coupon"
