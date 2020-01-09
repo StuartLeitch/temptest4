@@ -66,9 +66,11 @@ export interface InvoiceState {
 }
 
 export interface InvoiceVATDTO {
+  postalCode: string;
   invoiceId: string;
-  country: string;
   payerType: string;
+  country: string;
+  state: string;
 }
 
 export interface ApplyCouponDTO {

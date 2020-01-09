@@ -287,8 +287,10 @@ export class ConfirmInvoiceUsecase
     );
     const maybeAppliedVat = await applyVatToInvoice.execute({
       invoiceId: invoice.id.toString(),
+      postalCode: address.postalCode,
       country: address.country,
-      payerType: payer.type
+      payerType: payer.type,
+      state: address.state
     });
     return maybeAppliedVat.map(() => ({ invoice, address, payer }));
   }

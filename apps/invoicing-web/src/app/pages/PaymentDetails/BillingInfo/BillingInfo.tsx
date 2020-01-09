@@ -12,7 +12,12 @@ interface Props {
   loading: boolean;
   status: "DRAFT" | "ACTIVE" | "FINAL" | "PENDING";
   handleSubmit(payer: any): any;
-  onVatFieldChange(country: string, paymentType: string): any;
+  onVatFieldChange(
+    country: string,
+    state: string,
+    postalCode: string,
+    paymentType: string,
+  ): any;
   applyCoupon(invoiceId: string, couponCode: string): any;
 }
 

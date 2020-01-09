@@ -24,7 +24,12 @@ interface Props {
   loading: boolean;
   couponError: string;
   handleSubmit(payer: any): any;
-  onVatFieldChange(country: string, paymentType: string): any;
+  onVatFieldChange(
+    country: string,
+    state: string,
+    postalCode: string,
+    paymentType: string,
+  ): any;
   applyCoupon(invoiceId: string, couponCode: string): any;
 }
 
@@ -137,7 +142,9 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
         return (
           <Fragment>
             <VatChargesObserver
+              postalCode={values.address.state}
               country={values.address.country}
+              state={values.address.state}
               paymentType={values.type}
               onChange={onVatFieldChange}
             />

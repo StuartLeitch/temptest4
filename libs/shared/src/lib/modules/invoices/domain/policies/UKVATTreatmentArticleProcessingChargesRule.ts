@@ -1,4 +1,5 @@
 import { TaxRuleContract } from '../contracts/TaxRuleContract';
+import { Address } from './Address';
 
 /**
  * * Customer Categories:
@@ -115,11 +116,11 @@ export class UKVATTreatmentArticleProcessingChargesRule
   };
 
   public constructor(
-    countryCode: string,
+    address: Address,
     asBusiness = false,
     VATRegistered = true
   ) {
-    this.CountryCode = countryCode;
+    this.CountryCode = address.countryCode;
     this.AsBusiness = asBusiness;
     this.VATRegistered = VATRegistered;
   }

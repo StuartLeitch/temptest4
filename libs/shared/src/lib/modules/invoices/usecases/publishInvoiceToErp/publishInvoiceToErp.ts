@@ -107,7 +107,11 @@ export class PublishInvoiceToErpUsecase
 
       const vatService = new VATService();
       const vatNote = vatService.getVATNote(
-        address.country,
+        {
+          postalCode: address.postalCode,
+          countryCode: address.country,
+          stateCode: address.state
+        },
         payer.type !== PayerType.INSTITUTION
       );
       const exchangeRateService = new ExchangeRateService();

@@ -133,8 +133,14 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 applyCoupon({ invoiceId, couponCode });
               }}
               couponError={couponError}
-              onVatFieldChange={(country, payerType) =>
-                getInvoiceVAT({ invoiceId, country, payerType })
+              onVatFieldChange={(country, state, postalCode, payerType) =>
+                getInvoiceVAT({
+                  postalCode,
+                  invoiceId,
+                  payerType,
+                  country,
+                  state,
+                })
               }
             />
             <InvoicePayment

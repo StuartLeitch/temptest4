@@ -55,9 +55,13 @@ export class ApplyVatToInvoiceUsecase
     request: ApplyVatToInvoiceDTO,
     context?: ApplyVatToInvoiceContext
   ): Promise<ApplyVatToInvoiceResponse> {
-    const { payerType, invoiceId, country } = request;
+    const { postalCode, payerType, invoiceId, country, state } = request;
     const vat = this.vatService.calculateVAT(
-      country,
+      {
+        countryCode: country,
+        stateCode: state,
+        postalCode
+      },
       payerType !== PayerType.INSTITUTION
     );
 

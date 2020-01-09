@@ -52,6 +52,7 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
             {`${countryList.getName(
               (address && address.country) || "",
             )}${address &&
+              address.country === "US" &&
               address.state &&
               `, ${stateList.name[address.state]}`}`}
           </Text>
