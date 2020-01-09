@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import PaymentIcon from "react-payment-icons";
+import PaymentIcon from "./PaymentIcon";
 import { Flex, Label, Button, th } from "@hindawi/react-components";
 import { Braintree, HostedField } from "react-braintree-fields";
 
