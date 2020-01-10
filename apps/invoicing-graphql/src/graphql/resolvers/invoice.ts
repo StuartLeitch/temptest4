@@ -56,9 +56,9 @@ export const invoice: Resolvers<any> = {
           invoiceDetails.dateIssued && invoiceDetails.dateIssued.toISOString(),
         referenceNumber:
           invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
-            ? `${
-                invoiceDetails.invoiceNumber
-              }/${invoiceDetails.dateAccepted.getFullYear()}`
+            ? `${invoiceDetails.invoiceNumber
+                .toString()
+                .padStart(5, '0')}/${invoiceDetails.dateAccepted.getFullYear()}`
             : '---'
         // totalAmount: entity.totalAmount,
         // netAmount: entity.netAmount

@@ -131,9 +131,9 @@ export class PublishInvoiceCreatedUsecase
   ): InvoiceCreatedMessagePayload {
     return {
       ...payload,
-      referenceNumber: `${
-        invoice.invoiceNumber
-      }/${invoice.dateAccepted.getFullYear()}`,
+      referenceNumber: `${invoice.invoiceNumber
+        .toString()
+        .padStart(5, '0')}/${invoice.dateAccepted.getFullYear()}`,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status as PhenomInvoiceStatus,
       invoiceCreatedDate: invoice.dateCreated

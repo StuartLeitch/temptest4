@@ -33,9 +33,9 @@ export class PublishInvoicePaid {
       })),
       transactionId: paymentDetails.transactionId,
       invoiceStatus: paymentDetails.invoiceStatus as any,
-      referenceNumber: `${
-        invoice.invoiceNumber
-      }/${invoice.dateAccepted.getFullYear()}`,
+      referenceNumber: `${invoice.invoiceNumber
+        .toString()
+        .padStart(5, '0')}/${invoice.dateAccepted.getFullYear()}`,
       invoiceIssueDate: paymentDetails.invoiceIssueDate
         ? new Date(paymentDetails.invoiceIssueDate)
         : null,
