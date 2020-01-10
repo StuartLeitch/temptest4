@@ -49,13 +49,16 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
         <Flex vertical flex={1}>
           <Label>Country</Label>
           <Text>
-            {`${countryList.getName(
-              (address && address.country) || "",
-            )}${address &&
-              address.country === "US" &&
-              address.state &&
-              `, ${stateList.name[address.state]}`}
-              , ${address && address.country === "US" ? address.postalCode : ""}
+            {`${countryList.getName((address && address.country) || "")}${
+              address && address.country === "US" && address.state
+                ? `, ${stateList.name[address.state]}`
+                : ""
+            }
+              ${
+                address && address.country === "US" && address.postalCode
+                  ? `, ${address.postalCode}`
+                  : ""
+              }
               `}
           </Text>
         </Flex>
