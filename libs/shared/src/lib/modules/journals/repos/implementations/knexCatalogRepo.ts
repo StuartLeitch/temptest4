@@ -65,9 +65,18 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
     const { db } = this;
 
-    return await db(TABLES.CATALOG)
+    const journal = await db(TABLES.CATALOG)
       .where({ journalId: journalId.id.toString() })
       .first();
+
+    if (!journal) {
+      throw RepoError.createEntityNotFoundError(
+        'catalogItem',
+        journal.id.toString()
+      );
+    }
+
+    return CatalogMap.toDomain(journal);
   }
 
   async updateCatalogItem(catalogItem: CatalogItem): Promise<CatalogItem> {

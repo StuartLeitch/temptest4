@@ -1,4 +1,5 @@
 export interface EditManuscriptDTO {
+  journalId?: string;
   manuscriptId: string;
   customId?: string;
   title?: string;

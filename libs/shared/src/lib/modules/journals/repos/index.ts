@@ -5,7 +5,7 @@ import { KnexEditorRepo } from './implementations/knexEditorRepo';
 
 export {
   CatalogRepoContract,
+  EditorRepoContract,
   KnexCatalogRepo,
-  KnexEditorRepo,
-  EditorRepoContract
+  KnexEditorRepo
 };

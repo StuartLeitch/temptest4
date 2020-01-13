@@ -57,7 +57,7 @@ export class GetInvoiceIdByManuscriptCustomIdUsecase
 
     let manuscript: Manuscript;
     let invoiceItems: InvoiceItem[];
-    let invoiceId: InvoiceId;
+    // const invoiceId: InvoiceId;
 
     try {
       try {

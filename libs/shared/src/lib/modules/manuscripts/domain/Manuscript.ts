@@ -69,6 +69,10 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.journalId;
   }
 
+  set journalId(journalId: string) {
+    this.props.journalId = journalId;
+  }
+
   get customId(): string {
     return this.props.customId;
   }

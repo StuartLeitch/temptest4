@@ -61,6 +61,10 @@ export class EditManuscriptUsecase
         );
       }
 
+      if (request.journalId) {
+        manuscript.journalId = request.journalId;
+      }
+
       // * get author details
       let { authorCountry } = manuscript;
       if (request.authorCountry) {
