@@ -265,8 +265,7 @@
           <tr>
             <th>Invoice Ref. No.</th>
             <td>
-              <%= invoice.invoiceNumber.toString().padStart(5, '0') %>/<%=
-                invoice.dateAccepted.getFullYear() %>
+              <%= invoice.referenceNumber %>
             </td>
           </tr>
         </table>
@@ -372,8 +371,7 @@
           <tr>
             <th>Invoice Ref. No.</th>
             <td>
-              <%= invoice.invoiceNumber %>/<%=
-                invoice.dateAccepted.getFullYear() %>
+              <%= invoice.referenceNumber %>
             </td>
           </tr>
         </table>
