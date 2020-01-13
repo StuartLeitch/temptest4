@@ -1,5 +1,5 @@
-import format from 'date-fns/format'
-import { enGB } from 'date-fns/locale'
+import format from "date-fns/format";
+import { enGB } from "date-fns/locale";
 import React, { useMemo } from "react";
 
 import { Expander } from "@hindawi/react-components";
@@ -16,7 +16,9 @@ const InvoiceDetails: React.FC<Props> = ({ invoice }) => {
     if (!invoice.dateIssued) {
       return "-";
     } else {
-      return format(new Date(invoice.dateIssued), 'eo MMMM yyyy', { locale: enGB })
+      return format(new Date(invoice.dateIssued), "do MMMM yyyy", {
+        locale: enGB,
+      });
     }
   }, [invoice.dateIssued]);
 
