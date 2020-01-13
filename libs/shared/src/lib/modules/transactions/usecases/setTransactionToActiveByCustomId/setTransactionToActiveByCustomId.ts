@@ -26,12 +26,12 @@ import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { WaiverService } from '../../../../domain/services/WaiverService';
 import { EmailService } from '../../../../infrastructure/communication-channels';
-import { Waiver } from '../../../../domain/reductions/Waiver';
+import { Waiver } from '../../../waivers/domain/Waiver';
 import { Transaction } from '../../domain/Transaction';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
-import { WaiverRepoContract } from '../../../../domain/reductions/repos/waiverRepo';
+import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 
 // * Usecase specifics
 import { SetTransactionToActiveByCustomIdResponse } from './setTransactionToActiveByCustomIdResponse';

@@ -38,6 +38,7 @@
     "src/lib/infrastructure/database/knex/migrations/20191210165617_remove_invoiceNumber_unique.js",
     "src/lib/infrastructure/database/knex/migrations/20191216144735_replace_coupons_table.js",
     "src/lib/infrastructure/database/knex/migrations/20191216172738_create_invoice_items_to_coupons_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20191218133638_add_state_to_addresses.js"
+    "src/lib/infrastructure/database/knex/migrations/20191218133638_add_state_to_addresses.js",
+    "src/lib/infrastructure/database/knex/migrations/20200109094913_update_waiver_table.js"
   ]
 }

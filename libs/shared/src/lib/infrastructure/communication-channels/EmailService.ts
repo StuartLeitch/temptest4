@@ -83,10 +83,7 @@ class EmailService {
   }
 
   public sendEmail() {
-    console.info(process.env);
     if (process.env.MAILING_DISABLED === 'false') {
-      console.log('sending to', this.email);
-      console.info(this.email);
       return this.email.sendEmail();
     }
   }

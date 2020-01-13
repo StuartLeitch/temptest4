@@ -20,10 +20,10 @@ import { AccessControlContext } from '../../../../domain/authorization/AccessCon
 import { Roles } from '../../../users/domain/enums/Roles';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 // import {PayerId} from '../../../payers/domain/PayerId';
-import { WaiverRepoContract } from '../../../../domain/reductions/repos/waiverRepo';
+import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { WaiverService } from '../../../../domain/services/WaiverService';
 import { VATService } from './../../../../domain/services/VATService';
-import { WaiverCollection } from '../../../../domain/reductions/Waiver';
+import { WaiverCollection } from '../../../waivers/domain/Waiver';
 import { PayerRepoContract } from './../../../payers/repos/payerRepo';
 import { Payer } from './../../../payers/domain/Payer';
 import { PayerMap } from './../../../payers/mapper/Payer';
