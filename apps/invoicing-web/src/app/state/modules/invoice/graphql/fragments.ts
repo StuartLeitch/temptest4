@@ -13,6 +13,7 @@ export const addressFragment = gql`
     city
     country
     state
+    postalCode
     addressLine1
   }
 `;

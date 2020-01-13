@@ -5,8 +5,12 @@ import styled, { css } from "styled-components";
 
 import { Icon, Text, th, lighten } from "@hindawi/react-components";
 
-const filterState = (inputState: string) => (c: string) =>
-  c.toLowerCase().startsWith(inputState.toLowerCase());
+const filterState = (inputState: string) => ([stateCode, stateName]: [
+  string,
+  string,
+]) => {
+  return stateName.toLowerCase().startsWith(inputState.toLowerCase());
+};
 
 const StateField = ({ value, onChange, name, status }) => {
   const states = stateList.name;
@@ -44,11 +48,16 @@ const StateField = ({ value, onChange, name, status }) => {
       </Root>
       {expanded && (
         <DropdownList>
-          {Object.keys(states).map((state: string) => (
-            <DropdownItem key={state} onMouseDown={selectState(state)}>
-              <Text>{states[state]}</Text>
-            </DropdownItem>
-          ))}
+          {Object.entries(states)
+            .filter(filterState(stateInput))
+            .map(([stateCode, stateName]) => (
+              <DropdownItem
+                key={stateCode}
+                onMouseDown={selectState(stateCode)}
+              >
+                <Text>{stateName}</Text>
+              </DropdownItem>
+            ))}
         </DropdownList>
       )}
     </Relative>

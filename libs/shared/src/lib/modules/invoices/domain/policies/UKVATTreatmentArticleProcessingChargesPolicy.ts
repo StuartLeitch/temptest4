@@ -1,5 +1,6 @@
-import {PolicyContract} from '../contracts/PolicyContract';
-import {UKVATTreatmentArticleProcessingChargesRule} from './UKVATTreatmentArticleProcessingChargesRule';
+import { PolicyContract } from '../contracts/PolicyContract';
+import { UKVATTreatmentArticleProcessingChargesRule } from './UKVATTreatmentArticleProcessingChargesRule';
+import { Address } from './Address';
 
 export class UKVATTreatmentArticleProcessingChargesPolicy
   implements PolicyContract<UKVATTreatmentArticleProcessingChargesRule> {
@@ -14,12 +15,12 @@ export class UKVATTreatmentArticleProcessingChargesPolicy
    * @param invoice
    */
   public getVAT(
-    countryCode: string,
+    address: Address,
     asBusiness = false,
     VATRegistered = true
   ): UKVATTreatmentArticleProcessingChargesRule {
     return new UKVATTreatmentArticleProcessingChargesRule(
-      countryCode,
+      address,
       asBusiness,
       VATRegistered
     );

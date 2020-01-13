@@ -24,7 +24,12 @@ interface Props {
   loading: boolean;
   couponError: string;
   handleSubmit(payer: any): any;
-  onVatFieldChange(country: string, paymentType: string): any;
+  onVatFieldChange(
+    country: string,
+    state: string,
+    postalCode: string,
+    paymentType: string,
+  ): any;
   applyCoupon(invoiceId: string, couponCode: string): any;
 }
 
@@ -78,6 +83,22 @@ const validateFn = (values: any) => {
   if (values.address.country === "US") {
     if (!values.address.state) {
       set(errors, "address.state", "Required");
+    }
+
+    if (!values.address.postalCode) {
+      set(errors, "address.postalCode", "Required");
+    }
+
+    if (
+      values.address.postalCode.length !== 5 ||
+      Number.isNaN(Number.parseInt(values.address.postalCode, 10)) ||
+      (Number.parseInt(values.address.postalCode, 10) + "").length !== 5
+    ) {
+      set(
+        errors,
+        "address.postalCode",
+        "Invalid postal code format, use 5 numbers",
+      );
     }
   }
 
@@ -137,7 +158,9 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
         return (
           <Fragment>
             <VatChargesObserver
+              postalCode={values.address.postalCode}
               country={values.address.country}
+              state={values.address.state}
               paymentType={values.type}
               onChange={onVatFieldChange}
             />
@@ -202,13 +225,23 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                   </Flex>
 
                   <Flex alignItems="flex-start" justifyContent="space-between">
-                    <FormField
-                      flex={2}
-                      required
-                      name="address.addressLine1"
-                      label="Address"
-                      component={FormTextarea}
-                    />
+                    <Flex vertical flex={2}>
+                      <FormField
+                        flex={2}
+                        required
+                        name="address.addressLine1"
+                        label="Address"
+                        component={FormTextarea}
+                      />
+                      {values.address.country === "US" && (
+                        <FormField
+                          required
+                          label="State"
+                          name="address.state"
+                          component={StateField}
+                        />
+                      )}
+                    </Flex>
                     <Flex vertical flex={1} ml={4}>
                       <FormField
                         required
@@ -218,10 +251,10 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                       />
                       {values.address.country === "US" && (
                         <FormField
+                          flex={1}
                           required
-                          label="State"
-                          name="address.state"
-                          component={StateField}
+                          name="address.postalCode"
+                          label="Postal code"
                         />
                       )}
                       <FormField required label="City" name="address.city" />
@@ -232,7 +265,6 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                     <Flex>
                       <FormField
                         error={couponError}
-                        required
                         placeholder="Insert coupon code here"
                         label="Coupon"
                         name="coupon"

@@ -1,5 +1,5 @@
 import { ReductionRuleContract } from '../contracts/ReductionRule';
-import { Waiver, WaiverType } from '../Waiver';
+import { Waiver, WaiverType } from '../../../modules/waivers/domain/Waiver';
 
 const WAIVER_POLICY_COUNTRIES = {
   AF: { country: 'Afghanistan' },
@@ -83,7 +83,10 @@ export class WaivedCountryRule implements ReductionRuleContract<Waiver> {
     if (
       this.correspondingAuthorInstitutionCountryCode in WAIVER_POLICY_COUNTRIES
     ) {
-      return Waiver.create({reduction: -1, waiverType: WaiverType.WAIVED_COUNTRY}).getValue();
+      return Waiver.create({
+        reduction: -1,
+        waiverType: WaiverType.WAIVED_COUNTRY
+      }).getValue();
     }
   }
 }

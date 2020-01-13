@@ -1,11 +1,11 @@
-import {Roles} from '../../../users/domain/enums/Roles';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {WaiverService} from './../../../../domain/services/WaiverService';
-import {VATService} from './../../../../domain/services/VATService';
-import {MockWaiverRepo} from './../../../../domain/reductions/repos/mocks/mockWaiverRepo';
-import {MockInvoiceRepo} from '../../repos/mocks/mockInvoiceRepo';
-import {InvoiceCollection, InvoiceStatus} from '../../domain/Invoice';
-import {InvoiceMap} from './../../mappers/InvoiceMap';
+import { WaiverService } from './../../../../domain/services/WaiverService';
+import { VATService } from './../../../../domain/services/VATService';
+import { MockWaiverRepo } from '../../../waivers/repos/mocks/mockWaiverRepo';
+import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
+import { InvoiceCollection, InvoiceStatus } from '../../domain/Invoice';
+import { InvoiceMap } from './../../mappers/InvoiceMap';
 
 import {
   GetInvoiceDetailsUsecase,
@@ -22,7 +22,7 @@ let result: any;
 let invoiceCollection: InvoiceCollection;
 let invoiceId: string;
 
-const defaultContext: GetInvoiceDetailsContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: GetInvoiceDetailsContext = { roles: [Roles.SUPER_ADMIN] };
 
 describe('GetInvoiceDetailsUsecase', () => {
   describe('When Invoice ID is provided', () => {

@@ -12,7 +12,7 @@ export class InvoiceMap extends Mapper<Invoice> {
           new UniqueEntityID(raw.transactionId)
         ),
         status: raw.status,
-        invoiceNumber: raw.invoiceNumber,
+        invoiceNumber: raw.invoiceNumber?.toString(),
         dateCreated: new Date(raw.dateCreated),
         dateAccepted: raw.dateAccepted
           ? new Date(raw.dateAccepted)
@@ -33,7 +33,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       id: invoice.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
       status: invoice.status,
-      invoiceNumber: invoice.invoiceNumber,
+      invoiceNumber: Number.parseInt(invoice.invoiceNumber, 10) || null,
       dateCreated: invoice.dateCreated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,

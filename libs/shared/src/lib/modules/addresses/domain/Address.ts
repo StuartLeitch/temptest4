@@ -47,6 +47,10 @@ export class Address extends AggregateRoot<AddressProps> {
     return this.props.addressLine1;
   }
 
+  get postalCode(): string {
+    return this.props.postalCode;
+  }
+
   get dateCreated(): Date {
     return this.props.dateCreated;
   }

@@ -12,6 +12,15 @@ import { EditorRepoContract } from '../editorRepo';
 
 export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
   implements EditorRepoContract {
+  async getEditorRolesByEmail(editorEmail: string): Promise<Editor[]> {
+    const { db } = this;
+
+    const editors = await db(TABLES.EDITORS)
+      .select()
+      .where('email', editorEmail);
+
+    return editors.map(editor => EditorMap.toDomain(editor));
+  }
   async getEditorById(editorId: EditorId): Promise<Editor> {
     const { db } = this;
 

@@ -1,9 +1,9 @@
-import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
+import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
-import {WaiverRepoContract} from '../waiverRepo';
-import {Waiver} from '../../Waiver';
-import {WaiverId} from '../../WaiverId';
-import {InvoiceId} from '../../../../modules/invoices/domain/InvoiceId';
+import { WaiverRepoContract } from '../waiverRepo';
+import { Waiver } from '../../domain/Waiver';
+import { WaiverId } from '../../domain/WaiverId';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 // import {TransactionId} from '../../../transactions/domain/TransactionId';
 
 export class MockWaiverRepo extends BaseMockRepo<Waiver>

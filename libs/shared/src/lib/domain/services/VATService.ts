@@ -6,6 +6,7 @@ import { environment } from '@env/environment';
 import { PoliciesRegister } from '../../modules/invoices/domain/policies/PoliciesRegister';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from './../../modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 import { USVATPolicy } from './../../modules/invoices/domain/policies/USVATPolicy';
+import { Address as VATAddress } from '../../modules/invoices/domain/policies/Address';
 
 const { VAT_VALIDATION_SERVICE_ENDPOINT: endpoint } = environment;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
@@ -84,9 +85,9 @@ export class VATService {
     return rates;
   }
 
-  public calculateVAT(country?: string, individualConfirmed?: boolean) {
+  public calculateVAT(address?: VATAddress, individualConfirmed?: boolean) {
     const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
-      country,
+      address,
       !individualConfirmed,
       individualConfirmed ? false : true
     ]);
@@ -95,9 +96,9 @@ export class VATService {
     return VAT;
   }
 
-  public getVATNote(country?: string, individualConfirmed?: boolean) {
+  public getVATNote(address?: VATAddress, individualConfirmed?: boolean) {
     const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
-      country,
+      address,
       !individualConfirmed,
       individualConfirmed ? false : true
     ]);

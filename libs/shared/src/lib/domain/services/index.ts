@@ -1,13 +1,11 @@
-import {WaiverService} from './WaiverService';
-import {VATService} from './VATService';
+import { VATService } from './VATService';
 
-import {sqsConnection} from './sqs/connection';
-import {SQSPublishService} from './sqs/PublishService';
+import { sqsConnection } from './sqs/connection';
+import { SQSPublishService } from './sqs/PublishService';
 
-import {pdfGeneratorService} from './PdfGenerator';
+import { pdfGeneratorService } from './PdfGenerator';
 
 const vatService = new VATService();
-const waiverService = new WaiverService();
 const publishService = new SQSPublishService(sqsConnection);
 
-export {waiverService, vatService, publishService, pdfGeneratorService};
+export { vatService, publishService, pdfGeneratorService };

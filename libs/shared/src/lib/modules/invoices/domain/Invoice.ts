@@ -107,6 +107,15 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.invoiceNumber = invoiceNumber;
   }
 
+  get referenceNumber(): string {
+    if (!this.props.invoiceNumber || !this.props.dateAccepted) {
+      return null;
+    }
+    const paddedNumber = this.props.invoiceNumber.toString().padStart(5, '0');
+    const creationYear = this.props.dateAccepted.getFullYear();
+    return `${paddedNumber}/${creationYear}`;
+  }
+
   set transactionId(transactionId: TransactionId) {
     this.props.transactionId = transactionId;
   }

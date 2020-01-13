@@ -29,7 +29,7 @@ printf -- '\033[33m>\033[0m Deploy Back End App for "GSW demo" environment\n'
 ./$CURR_DIR/deploy-$AWS_ENVIRONMENT-gsw-backend.sh
 
 printf -- '\033[33m>\033[0m Deploy Front End App for "GSW demo" environment\n'
-# ./$CURR_DIR/deploy-$AWS_ENVIRONMENT-gsw-frontend.sh
+./$CURR_DIR/deploy-$AWS_ENVIRONMENT-gsw-frontend.sh
 
 printf -- '\n';
 

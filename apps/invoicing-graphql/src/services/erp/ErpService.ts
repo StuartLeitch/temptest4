@@ -163,9 +163,7 @@ export class ErpService implements ErpServiceContract {
     let referenceNumber;
 
     if (invoice.invoiceNumber && invoice.dateAccepted) {
-      referenceNumber = `${
-        invoice.invoiceNumber
-      }/${invoice.dateAccepted.getFullYear()}`;
+      referenceNumber = invoice.referenceNumber;
     }
 
     const description = `${journalName} - Article Processing Charges for article ${article.customId}`;

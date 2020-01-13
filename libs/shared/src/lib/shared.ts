@@ -144,7 +144,7 @@ export * from './modules/coupons/usecases/createCoupon/createCoupon';
 export * from './modules/coupons/usecases/createCoupon/createCouponDTO';
 export * from './modules/coupons/usecases/updateCoupon/updateCoupon';
 export * from './modules/coupons/usecases/updateCoupon/updateCouponDTO';
-export * from './domain/reductions/repos/implementations/knexWaiverRepo';
+export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 export { VATService } from './domain/services/VATService';
 export { WaiverService } from './domain/services/WaiverService';
 export * from './domain/services/ErpService';
@@ -175,7 +175,7 @@ export { EmailService } from './infrastructure/communication-channels';
 // * Redux Stuff
 // export * from './infrastructure/frameworks/redux';
 // export * from './infrastructure/state-management/redux';
-export * from './domain/reductions/repos/implementations/knexWaiverRepo';
+export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 export * from './domain/services/VATService';
 export * from './domain/services/WaiverService';
 
