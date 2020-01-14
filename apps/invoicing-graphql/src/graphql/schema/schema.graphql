@@ -37,6 +37,7 @@ type InvoiceItem {
   article: Article
   dateCreated: Date
   coupons: [Coupon]
+  waivers: [Waiver]
 }
 
 type Invoice {
@@ -137,6 +138,11 @@ type PaymentMethod {
 type Coupon {
   reduction: Float
   code: String
+}
+
+type Waiver {
+  reduction: Float
+  type_id: String
 }
 
 type ClientToken {

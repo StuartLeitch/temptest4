@@ -10,10 +10,15 @@ import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { VATService, PayerType } from '@hindawi/shared';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { CouponRepoContract } from '../../coupons/repos';
+import { WaiverRepoContract } from '../../waivers/repos';
 
 export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
@@ -42,15 +47,22 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
-        invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
-          invoice.invoiceId
+        let getItemsUsecase = new GetItemsForInvoiceUsecase(
+          this.invoiceItemRepo,
+          this.couponRepo,
+          this.waiverRepo
         );
-      }
 
-      if (invoiceItems.length === 0) {
-        throw new Error(
-          `Invoice ${invoice.id.toString()} has no invoice items.`
-        );
+        const resp = await getItemsUsecase.execute({
+          invoiceId: invoice.invoiceId.id.toString()
+        });
+        if (resp.isLeft()) {
+          throw new Error(
+            `Invoice ${invoice.id.toString()} has no invoice items.`
+          );
+        }
+
+        invoiceItems = resp.value.getValue();
       }
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);

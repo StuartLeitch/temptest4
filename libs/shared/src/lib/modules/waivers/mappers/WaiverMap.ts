@@ -23,8 +23,15 @@ export class WaiverMap extends Mapper<Waiver> {
   public static toPersistence(waiver: Waiver): any {
     return {
       type_id: waiver.waiverType,
-      percentage: waiver.percentage,
+      reduction: waiver.reduction,
       isActive: waiver.isActive
+    };
+  }
+
+  public static toEvent(waiver: Waiver): any {
+    return {
+      type_id: waiver.waiverType,
+      reduction: waiver.reduction
     };
   }
 }

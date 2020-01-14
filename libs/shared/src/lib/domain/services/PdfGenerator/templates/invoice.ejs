@@ -220,10 +220,13 @@
           <% } %> <% } %> <% let price = invoice.getInvoiceTotal() %> <% let
             vat = invoice.invoiceItems.currentItems.length > 0 ?
             invoice.invoiceItems.currentItems[0].vat : 0 %> <% let vatAmount =
-            invoice.getInvoiceTotal() * vat / 100 %> <% let item =
-            invoice.invoiceItems.currentItems[0] %> <% if (item.coupons &&
-            item.coupons.length) { %> <% let discount =
-            item.coupons.reduce((acc, curr) => acc + curr.reduction, 0) %>
+            invoice.getInvoiceTotal() * vat / 100 %> 
+            <% let item = invoice.invoiceItems.currentItems[0] %>
+            <% 
+              let reductions = [...item.coupons, ...item.waivers]
+            %>
+            <% if (reductions.length) { %> <% let discount =
+              reductions.reduce((acc, curr) => acc + curr.reduction, 0) %>
           <tr>
             <th>Discounts (-<%= discount %>%)</th>
             <td>

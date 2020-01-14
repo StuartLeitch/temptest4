@@ -23,6 +23,7 @@ import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/s
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
+import { WaiverMap } from 'libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
 
 export const invoice: Resolvers<any> = {
   Query: {
@@ -196,14 +197,16 @@ export const invoice: Resolvers<any> = {
           invoiceItem: invoiceItemRepo,
           coupon: couponRepo,
           payer: payerRepo,
-          address: addressRepo
+          address: addressRepo,
+          waiver: waiverRepo
         },
         services: { exchangeRateService, vatService }
       } = context;
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
         invoiceItemRepo,
-        couponRepo
+        couponRepo,
+        waiverRepo
       );
 
       const result = await getItemsUseCase.execute({
@@ -267,6 +270,12 @@ export const invoice: Resolvers<any> = {
         InvoiceItemId.create(new UniqueEntityID(parent.id))
       );
       return coupons.map(CouponMap.toPersistence);
+    },
+    async waivers(parent, args, context) {
+      const waivers = await context.repos.waiver.getWaiversByInvoiceItemId(
+        InvoiceItemId.create(new UniqueEntityID(parent.id))
+      );
+      return waivers.map(WaiverMap.toPersistence);
     }
   },
   Article: {

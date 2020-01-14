@@ -33,6 +33,7 @@ import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
 import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
 import { ConfirmInvoiceDTO, PayerInput } from './confirmInvoiceDTO';
 import { ConfirmInvoiceResponse } from './confirmInvoiceResponse';
+import { WaiverRepoContract } from '../../../waivers/repos';
 
 export type ConfirmInvoiceContext = AuthorizationContext<Roles>;
 
@@ -64,6 +65,7 @@ export class ConfirmInvoiceUsecase
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
     private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
     private emailService: EmailService,
     private vatService: VATService,
     private receiverEmail: string,
@@ -269,6 +271,7 @@ export class ConfirmInvoiceUsecase
     const applyVatToInvoice = new ApplyVatToInvoiceUsecase(
       this.invoiceItemRepo,
       this.couponRepo,
+      this.waiverRepo,
       this.vatService
     );
     const maybeAppliedVat = await applyVatToInvoice.execute({

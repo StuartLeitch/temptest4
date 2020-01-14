@@ -45,6 +45,7 @@ import { ExchangeRateService } from '../../../../domain/services/ExchangeRateSer
 
 import { PayerType } from 'libs/shared/src/lib/modules/payers/domain/Payer';
 import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
 
 export type GetInvoicePdfContext = AuthorizationContext<Roles>;
 
@@ -69,7 +70,8 @@ export class GetInvoicePdfUsecase
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private couponRepo: CouponRepoContract
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract
   ) {}
 
   // @Authorize('payer:read')
@@ -227,7 +229,8 @@ export class GetInvoicePdfUsecase
   private async getInvoiceItems(invoiceId: string) {
     const usecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
-      this.couponRepo
+      this.couponRepo,
+      this.waiverRepo
     );
     const itemsEither = await usecase.execute({ invoiceId });
     return itemsEither;

@@ -21,7 +21,16 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
   if (settings) {
     const context = settings.getData('context');
     const {
-      repos: { invoice, invoiceItem, manuscript, payer, address, catalog },
+      repos: {
+        invoice,
+        invoiceItem,
+        manuscript,
+        payer,
+        address,
+        catalog,
+        coupon,
+        waiver
+      },
       services: { erpService },
       qq: queue
     } = context;
@@ -53,6 +62,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceActivated(
       invoiceItem,
+      coupon,
+      waiver,
       payer,
       address,
       manuscript,
@@ -63,6 +74,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     new AfterInvoicePaidEvent(
       invoice,
       invoiceItem,
+      coupon,
+      waiver,
       manuscript,
       publishInvoicePaid
     );

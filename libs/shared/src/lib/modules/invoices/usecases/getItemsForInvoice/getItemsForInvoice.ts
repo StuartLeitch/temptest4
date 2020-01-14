@@ -21,6 +21,7 @@ import { GetItemsForInvoiceDTO } from './getItemsForInvoiceDTO';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
 
 export type GetItemsForInvoiceContext = AuthorizationContext<Roles>;
 
@@ -38,7 +39,8 @@ export class GetItemsForInvoiceUsecase
     > {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private couponRepo: CouponRepoContract
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract
   ) {}
 
   // @Authorize('invoice:read')
@@ -56,9 +58,12 @@ export class GetItemsForInvoiceUsecase
       try {
         items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
         for (const item of items) {
-          item.coupons = await this.couponRepo.getCouponsByInvoiceItemId(
-            item.invoiceItemId
-          );
+          const [coupons, waivers] = await Promise.all([
+            this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
+            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId)
+          ]);
+          item.coupons = coupons;
+          item.waivers = waivers;
         }
       } catch (err) {
         return left(

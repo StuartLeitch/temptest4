@@ -7,6 +7,8 @@ import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
 import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoiceItem';
 import { EventUtils } from '../../../../utils/EventUtils';
+import { CouponMap } from '../../../coupons/mappers/CouponMap';
+import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
 
 const INVOICE_PAID_EVENT = 'InvoicePaid';
 
@@ -29,7 +31,13 @@ export class PublishInvoicePaid {
         manuscriptId: ii.manuscriptId.id.toString(),
         type: ii.type as InvoiceItemType,
         price: ii.price,
-        vatPercentage: ii.vat
+        vatPercentage: ii.vat,
+        coupons: ii.coupons
+          ? ii.coupons.map(c => CouponMap.toEvent(c))
+          : undefined,
+        waivers: ii.waivers
+          ? ii.waivers.map(w => WaiverMap.toEvent(w))
+          : undefined
       })),
       transactionId: paymentDetails.transactionId,
       invoiceStatus: paymentDetails.invoiceStatus as any,

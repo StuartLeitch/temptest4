@@ -99,6 +99,7 @@ export type InvoiceItem = {
   article?: Maybe<Article>,
   dateCreated?: Maybe<Scalars['Date']>,
   coupons?: Maybe<Array<Maybe<Coupon>>>,
+  waivers?: Maybe<Array<Maybe<Waiver>>>,
 };
 
 export enum InvoiceStatus {
@@ -289,6 +290,12 @@ export type Transaction = {
   status?: Maybe<Scalars['String']>,
 };
 
+export type Waiver = {
+   __typename?: 'Waiver',
+  reduction?: Maybe<Scalars['Float']>,
+  type_id?: Maybe<Scalars['String']>,
+};
+
 
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -375,6 +382,7 @@ export type ResolversTypes = {
   Article: ResolverTypeWrapper<Article>,
   Date: ResolverTypeWrapper<Scalars['Date']>,
   Coupon: ResolverTypeWrapper<Coupon>,
+  Waiver: ResolverTypeWrapper<Waiver>,
   InvoiceVat: ResolverTypeWrapper<InvoiceVat>,
   Int: ResolverTypeWrapper<Scalars['Int']>,
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>,
@@ -404,6 +412,7 @@ export type ResolversParentTypes = {
   Article: Article,
   Date: Scalars['Date'],
   Coupon: Coupon,
+  Waiver: Waiver,
   InvoiceVat: InvoiceVat,
   Int: Scalars['Int'],
   PaginatedInvoices: PaginatedInvoices,
@@ -420,6 +429,7 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   state?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  postalCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
 
@@ -483,6 +493,7 @@ export type InvoiceItemResolvers<ContextType = any, ParentType extends Resolvers
   article?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType>,
   dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
   coupons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Coupon']>>>, ParentType, ContextType>,
+  waivers?: Resolver<Maybe<Array<Maybe<ResolversTypes['Waiver']>>>, ParentType, ContextType>,
 };
 
 export type InvoiceVatResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceVat'] = ResolversParentTypes['InvoiceVat']> = {
@@ -550,6 +561,11 @@ export type TransactionResolvers<ContextType = any, ParentType extends Resolvers
   status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 };
 
+export type WaiverResolvers<ContextType = any, ParentType extends ResolversParentTypes['Waiver'] = ResolversParentTypes['Waiver']> = {
+  reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  type_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+};
+
 export type Resolvers<ContextType = any> = {
   Address?: AddressResolvers<ContextType>,
   Article?: ArticleResolvers<ContextType>,
@@ -567,6 +583,7 @@ export type Resolvers<ContextType = any> = {
   PaymentMethod?: PaymentMethodResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
   Transaction?: TransactionResolvers<ContextType>,
+  Waiver?: WaiverResolvers<ContextType>,
 };
 
 

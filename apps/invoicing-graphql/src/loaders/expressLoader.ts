@@ -188,7 +188,8 @@ export const expressLoader: MicroframeworkLoader = (
         repos.invoice,
         repos.payer,
         repos.catalog,
-        repos.coupon
+        repos.coupon,
+        repos.waiver
       );
 
       const invoiceLink = req.headers.referer;

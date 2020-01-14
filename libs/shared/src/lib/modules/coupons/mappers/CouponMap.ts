@@ -55,4 +55,18 @@ export class CouponMap extends Mapper<Coupon> {
       name: coupon.name
     };
   }
+
+  public static toEvent(coupon: Coupon): any {
+    return {
+      id: coupon.id.toString(),
+      reduction: coupon.reduction,
+      type: coupon.couponType,
+      code: coupon.code.value,
+      dateCreated: coupon.dateCreated,
+      dateUpdated: coupon.dateUpdated,
+      expirationDate: coupon.expirationDate,
+      invoiceItemType: coupon.invoiceItemType,
+      name: coupon.name
+    };
+  }
 }

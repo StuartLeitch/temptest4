@@ -7,9 +7,33 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { WaiverRepoContract } from '../waiverRepo';
+import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
 
 export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
   implements WaiverRepoContract {
+  async getWaiversByInvoiceItemId(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Waiver[]> {
+    const waivers = await this.db
+      .select()
+      .from(TABLES.INVOICE_ITEMS)
+      .join(
+        TABLES.INVOICE_ITEMS_TO_WAIVERS,
+        `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.invoiceItemId`,
+        '=',
+        `${TABLES.INVOICE_ITEMS}.id`
+      )
+      .join(
+        TABLES.WAIVERS,
+        `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.waiverId`,
+        '=',
+        `${TABLES.WAIVERS}.type_id`
+      )
+      .where({ [`${TABLES.INVOICE_ITEMS}.id`]: invoiceItemId.id.toString() });
+
+    return waivers.map(w => WaiverMap.toDomain(w));
+  }
+
   async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
     const waivers = await this.db
       .select()

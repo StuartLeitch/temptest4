@@ -5,13 +5,18 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos';
 import {
   ArticleRepoContract,
+  GetItemsForInvoiceUsecase
 } from '@hindawi/shared';
 import { PublishInvoicePaid } from '../usecases/PublishInvoicePaid';
+import { CouponRepoContract } from '../../coupons/repos';
+import { WaiverRepoContract } from '../../waivers/repos';
 
 export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoicePaid: PublishInvoicePaid
   ) {
@@ -30,14 +35,23 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       let invoiceItems = invoice.invoiceItems.currentItems;
       if (invoiceItems.length === 0) {
-        invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
-          invoice.invoiceId
+        let getItemsUsecase = new GetItemsForInvoiceUsecase(
+          this.invoiceItemRepo,
+          this.couponRepo,
+          this.waiverRepo
         );
-      }
-      if (invoiceItems.length === 0) {
-        throw new Error(`Invoice ${invoice.id} has no invoice items.`);
-      }
 
+        const resp = await getItemsUsecase.execute({
+          invoiceId: invoice.invoiceId.id.toString()
+        });
+        if (resp.isLeft()) {
+          throw new Error(
+            `Invoice ${invoice.id.toString()} has no invoice items.`
+          );
+        }
+
+        invoiceItems = resp.value.getValue();
+      }
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
@@ -45,7 +59,9 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
-      const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(invoice.invoiceId);
+      const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(
+        invoice.invoiceId
+      );
 
       this.publishInvoicePaid.execute(
         invoice,

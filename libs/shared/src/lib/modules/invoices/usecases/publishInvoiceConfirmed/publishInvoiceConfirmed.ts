@@ -9,6 +9,8 @@ import { Payer } from '../../../payers/domain/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
 import { EventUtils } from 'libs/shared/src/lib/utils/EventUtils';
+import { CouponMap } from '../../../coupons/mappers/CouponMap';
+import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
 
 const INVOICE_CONFIRMED = 'InvoiceConfirmed';
 
@@ -33,7 +35,13 @@ export class PublishInvoiceConfirmed {
         manuscriptId: ii.manuscriptId.id.toString(),
         type: ii.type as any,
         price: ii.price,
-        vatPercentage: ii.vat
+        vatPercentage: ii.vat,
+        coupons: ii.coupons
+          ? ii.coupons.map(c => CouponMap.toEvent(c))
+          : undefined,
+        waivers: ii.waivers
+          ? ii.waivers.map(w => WaiverMap.toEvent(w))
+          : undefined
       })),
       organization: payer.organization.value.toString(),
       invoiceStatus: invoice.status as PhenomInvoiceStatus,

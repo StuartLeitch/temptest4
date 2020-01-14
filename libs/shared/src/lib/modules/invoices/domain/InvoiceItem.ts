@@ -9,6 +9,7 @@ import { InvoiceItemId } from './InvoiceItemId';
 import { ManuscriptId } from './ManuscriptId';
 import { Coupon } from '../../coupons/domain/Coupon';
 import { Reduction } from '../../../domain/reductions/Reduction';
+import { Waiver } from '../../waivers/domain/Waiver';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
@@ -21,6 +22,7 @@ export interface InvoiceItemProps {
   dateCreated: Date;
   name?: string;
   coupons?: Coupon[];
+  waivers?: Waiver[];
 }
 
 export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
@@ -76,6 +78,14 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     this.props.coupons = coupons;
   }
 
+  get waivers(): Waiver[] {
+    return this.props.waivers;
+  }
+
+  set waivers(waivers: Waiver[]) {
+    this.props.waivers = waivers;
+  }
+
   private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -109,6 +119,9 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     const reductions: Reduction<any>[] = [];
     if (this.coupons) {
       reductions.push(...this.coupons);
+    }
+    if (this.waivers) {
+      reductions.push(...this.waivers);
     }
     if (withReductions) {
       reductions.push(...withReductions);

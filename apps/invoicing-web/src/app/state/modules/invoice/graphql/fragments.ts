@@ -55,6 +55,13 @@ export const couponFragment = gql`
   }
 `;
 
+export const waiverFragment = gql`
+  fragment waiverFragment on Waiver {
+    reduction
+    type_id
+  }
+`;
+
 export const invoiceFragment = gql`
   fragment invoiceFragment on Invoice {
     invoiceId
@@ -76,6 +83,9 @@ export const invoiceFragment = gql`
       coupons {
         ...couponFragment
       }
+      waivers {
+        ...waiverFragment
+      }
       article {
         ...articleFragment
       }
@@ -83,5 +93,6 @@ export const invoiceFragment = gql`
   }
   ${payerFragment}
   ${couponFragment}
+  ${waiverFragment}
   ${articleFragment}
 `;
