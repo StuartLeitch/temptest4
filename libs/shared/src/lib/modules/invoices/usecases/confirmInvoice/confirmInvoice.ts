@@ -129,7 +129,12 @@ export class ConfirmInvoiceUsecase
           invoice: pendingInvoice
         }));
     } else {
-      if (invoice.status !== InvoiceStatus.ACTIVE) {
+      if (invoice.getInvoiceTotal() === 0) {
+        return (await this.markInvoiceAsFinal(invoice)).map(activeInvoice => ({
+          ...payerData,
+          invoice: activeInvoice
+        }));
+      } else if (invoice.status !== InvoiceStatus.ACTIVE) {
         return (await this.markInvoiceAsActive(invoice)).map(activeInvoice => ({
           ...payerData,
           invoice: activeInvoice
@@ -259,6 +264,18 @@ export class ConfirmInvoiceUsecase
       await changeInvoiceStatusUseCase.execute({
         invoiceId: invoice.id.toString(),
         status: InvoiceStatus.ACTIVE
+      })
+    ).map(resultInvoice => resultInvoice.getValue());
+  }
+
+  private async markInvoiceAsFinal(invoice: Invoice) {
+    const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
+      this.invoiceRepo
+    );
+    return (
+      await changeInvoiceStatusUseCase.execute({
+        invoiceId: invoice.id.toString(),
+        status: InvoiceStatus.FINAL
       })
     ).map(resultInvoice => resultInvoice.getValue());
   }
