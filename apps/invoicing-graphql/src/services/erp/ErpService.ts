@@ -241,8 +241,8 @@ export class ErpService implements ErpServiceContract {
       s2cor__Unit_Price__c: invoiceItem.price,
       s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
       s2cor__Discount_Type__c: 'Amount',
-      s2cor__Discount_Amount__c: discountAmount, // TODO fetch from applied coupons/waivers
-      s2cor__Discount_Value__c: discountAmount, // TODO fetch from applied coupons/waivers
+      s2cor__Discount_Amount__c: discountAmount,
+      s2cor__Discount_Value__c: discountAmount,
       s2cor__Tax_Amount__c:
         (invoiceItem.vat / 100) * invoiceItem.calculatePrice(),
       s2cor__Tax_Rates__c: invoiceItem.vat.toString()
