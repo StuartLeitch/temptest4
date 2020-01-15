@@ -37,7 +37,16 @@ export const schedulerLoader: MicroframeworkLoader = async (
   if (settings) {
     const context = settings.getData('context');
     const {
-      repos: { invoice, invoiceItem, manuscript, payer, address, catalog },
+      repos: {
+        invoice,
+        invoiceItem,
+        manuscript,
+        payer,
+        address,
+        catalog,
+        coupon,
+        waiver
+      },
       services: { erpService }
     } = context;
     const erpRetryJobName = 'InvoiceToErpCronJob';
@@ -45,6 +54,8 @@ export const schedulerLoader: MicroframeworkLoader = async (
     const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
       invoice,
       invoiceItem,
+      coupon,
+      waiver,
       payer,
       address,
       manuscript,

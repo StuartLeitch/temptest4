@@ -38,6 +38,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
       invoice,
       invoiceItem,
+      coupon,
+      waiver,
       payer,
       address,
       manuscript,

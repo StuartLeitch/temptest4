@@ -11,13 +11,16 @@ import {
   ArticleRepoContract,
   InvoiceRepoContract,
   VATService,
-  PayerType
+  PayerType,
+  GetItemsForInvoiceUsecase
 } from '@hindawi/shared';
 import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
 import { right, Result, left } from 'libs/shared/src/lib/core/logic/Result';
 import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
@@ -44,6 +47,8 @@ export class PublishInvoiceToErpUsecase
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
@@ -72,9 +77,22 @@ export class PublishInvoiceToErpUsecase
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
-        invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
-          invoice.invoiceId
+        let getItemsUsecase = new GetItemsForInvoiceUsecase(
+          this.invoiceItemRepo,
+          this.couponRepo,
+          this.waiverRepo
         );
+
+        const resp = await getItemsUsecase.execute({
+          invoiceId: request.invoiceId
+        });
+        if (resp.isLeft()) {
+          throw new Error(
+            `Invoice ${invoice.id.toString()} has no invoice items.`
+          );
+        }
+
+        invoiceItems = resp.value.getValue();
       }
 
       if (invoiceItems.length === 0) {

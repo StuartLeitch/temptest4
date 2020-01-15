@@ -112,21 +112,23 @@ export class ErpService implements ErpServiceContract {
 
     const payerEmail = payer.email.value;
 
+    const names = payer.name.value.split(' ');
+    const firstName = names[0];
+    names.shift();
+    const lastName = names.join(' ') || '---';
+
     const existingContact = await connection
       .sobject('Contact')
       .select({ Id: true })
-      .where({ Email: payerEmail, AccountId: account.id })
+      .where({
+        Email: payerEmail
+      })
       .execute();
 
     if (existingContact.length) {
       console.log('Contact object reused: ', (existingContact[0] as any).Id);
       return account.id;
     }
-
-    const names = payer.name.value.split(' ');
-    const firstName = names[0];
-    names.shift();
-    const lastName = names.join(' ') || '---';
 
     const contact = await connection.sobject('Contact').create({
       AccountId: account.id,
@@ -188,8 +190,7 @@ export class ErpService implements ErpServiceContract {
 
     const existingTradeDocument = await connection
       .sobject('s2cor__Sage_INV_Trade_Document__c')
-      .select({ Id: true })
-      .where({
+      .find({
         s2cor__Reference__c: referenceNumber,
         s2cor__Account__c: accountId
       })
@@ -226,6 +227,7 @@ export class ErpService implements ErpServiceContract {
   ): Promise<string> {
     const connection = await this.getConnection();
     const { journalName, article, payer, vatNote } = data;
+    const discountAmount = invoiceItem.price - invoiceItem.calculatePrice();
     const description =
       invoiceItem.type === 'APC'
         ? `${journalName} - Article Processing Charges for article ${article.customId}`
@@ -233,21 +235,22 @@ export class ErpService implements ErpServiceContract {
     const tdObj = {
       s2cor__Trade_Document__c: tradeDocumentId,
       s2cor__Description__c: description,
-      s2cor__Discount_Type__c: 'Amount',
       s2cor__Quantity__c: '1',
       s2cor__Tax_Code__c: this.getTaxCode(vatNote),
       s2cor__Tax_Treatment__c: this.getTaxTreatment(vatNote),
       s2cor__Unit_Price__c: invoiceItem.price,
       s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
-      s2cor__Discount_Amount__c: '0', // TODO fetch from applied coupons/waivers
-      s2cor__Tax_Amount__c: (invoiceItem.vat / 100) * invoiceItem.price,
+      s2cor__Discount_Type__c: 'Amount',
+      s2cor__Discount_Amount__c: discountAmount, // TODO fetch from applied coupons/waivers
+      s2cor__Discount_Value__c: discountAmount, // TODO fetch from applied coupons/waivers
+      s2cor__Tax_Amount__c:
+        (invoiceItem.vat / 100) * invoiceItem.calculatePrice(),
       s2cor__Tax_Rates__c: invoiceItem.vat.toString()
     };
 
     const existingTradeItems = await connection
       .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
-      .select({ Id: true })
-      .where({ s2cor__Trade_Document__c: tradeDocumentId });
+      .find({ s2cor__Trade_Document__c: tradeDocumentId });
 
     if (existingTradeItems.length) {
       const invoiceItemsToDelete = existingTradeItems.map(ii => (ii as any).Id);
@@ -297,7 +300,7 @@ export class ErpService implements ErpServiceContract {
         '{Vat/Rate}',
         `${(
           invoiceItems.reduce(
-            (acc, curr) => acc + (curr.vat / 100) * curr.price,
+            (acc, curr) => acc + (curr.vat / 100) * curr.calculatePrice(),
             0
           ) / rate
         ).toFixed(2)}`

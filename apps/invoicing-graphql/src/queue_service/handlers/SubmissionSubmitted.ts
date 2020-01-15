@@ -56,7 +56,8 @@ export const SubmissionSubmittedHandler = {
         invoiceItem: invoiceItemRepo,
         catalog: catalogRepo,
         manuscript: manuscriptRepo,
-        coupon: couponRepo
+        coupon: couponRepo,
+        waiver: waiverRepo
       }
     } = this;
 
@@ -78,7 +79,8 @@ export const SubmissionSubmittedHandler = {
     );
     const getItemsForInvoiceUsecase: GetItemsForInvoiceUsecase = new GetItemsForInvoiceUsecase(
       invoiceItemRepo,
-      couponRepo
+      couponRepo,
+      waiverRepo
     );
     const getJournalUsecase: GetJournal = new GetJournal(catalogRepo);
     const updateInvoiceItemsUsecase: UpdateInvoiceItemsUsecase = new UpdateInvoiceItemsUsecase(
