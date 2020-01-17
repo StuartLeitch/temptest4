@@ -18,6 +18,7 @@ import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { Payer, PayerType } from '../../../payers/domain/Payer';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import {
@@ -158,6 +159,7 @@ export class ConfirmInvoiceUsecase
     return await chain(
       [
         this.getInvoiceDetails.bind(this, payerInput),
+        this.getInvoiceItems.bind(this, payerInput),
         this.createAddress.bind(this, payerInput),
         this.createPayer.bind(this, payerInput)
       ],
@@ -180,6 +182,26 @@ export class ConfirmInvoiceUsecase
       ...payerData,
       invoice: invoiceResult.getValue()
     }));
+  }
+
+  private async getInvoiceItems(
+    { invoiceId }: PayerInput,
+    payerData: PayerDataDomain
+  ) {
+    const getInvoiceItemsUsecase = new GetItemsForInvoiceUsecase(
+      this.invoiceItemRepo,
+      this.couponRepo,
+      this.waiverRepo
+    );
+    const maybeDetails = await getInvoiceItemsUsecase.execute(
+      { invoiceId },
+      this.authorizationContext
+    );
+    return maybeDetails.map(invoiceItemsResult => {
+      let items = invoiceItemsResult.getValue();
+      items.forEach(ii => payerData.invoice.addInvoiceItem(ii));
+      return payerData;
+    });
   }
 
   private async createPayer(

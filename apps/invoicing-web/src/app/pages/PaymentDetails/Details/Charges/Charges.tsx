@@ -44,23 +44,26 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
     .replace("{Rate}", rate);
 
   let waiverItems;
-
+  let totalDiscountFromWaivers = waivers.reduce(
+    (acc, curr) => acc + curr.reduction,
+    0,
+  );
   if (waivers && waivers.length > 0) {
     waiverItems = invoiceItem.waivers.map(waiver => (
       <ChargeItem
         key={waiver.type_id}
         price={-(waiver.reduction * invoiceItem.price) / 100}
-        name="Waiver"
+        name={"Waiver " + waiver.type_id}
         description={`${-waiver.reduction}%`}
         mt="2"
       />
     ));
-    if (totalDiscountFromReductions >= 100) {
+    if (totalDiscountFromWaivers > 100) {
       waiverItems = [
         <ChargeItem
           key={"100%"}
           price={-invoiceItem.price}
-          name="Waiver"
+          name={"Waivers: " + waivers.map(w => w.type_id).join(", ")}
           description={`-100%`}
           mt="2"
         />,
