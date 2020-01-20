@@ -1,64 +1,89 @@
-import { S3 } from 'aws-sdk';
+import { S3, AWSError } from 'aws-sdk';
+
+export interface S3Credentials {
+  secretAccessKey: string;
+  accessKeyId: string;
+}
+
+export interface S3BucketParameters {
+  credentials: S3Credentials;
+  apiVersion: string;
+  endpoint: string;
+  name: string;
+}
+
+export interface Event {
+  attributes: {
+    ApproximateFirstReceiveTimestamp: string;
+    ApproximateReceiveCount: string;
+    SentTimestamp: string;
+    SenderId: string;
+  };
+  eventSourceARN: string;
+  receiptHandle: string;
+  eventSource: string;
+  awsRegion: string;
+  md5OfBody: string;
+  messageId: string;
+  body: string;
+}
+
+export type ObjectCallback = (data: Event) => void;
 
 export class S3Bucket {
-  private _logger;
-  private _api;
-  private _credentials;
-  private _endpoint;
-  private _apiVersion;
-  private _name;
+  private credentials: S3Credentials;
+  private callback: ObjectCallback;
+  private logger = console;
+  private name: string;
+  private api: S3;
 
-  constructor(params) {
-    this.configure(params);
+  constructor(params: S3BucketParameters, callback: ObjectCallback) {
+    this.credentials = params.credentials;
+    this.name = params.name;
+    this.api = new S3({
+      ...this.credentials,
+      endpoint: params.endpoint,
+      apiVersion: params.apiVersion
+    });
+    this.callback = callback;
   }
 
-  getObjects(params, callback) {
-    const withCallback = callback != null;
-
-    const _params = withCallback
-      ? this._makeParams(params)
-      : this._makeParams();
-    const cb = withCallback ? callback : params;
-
-    this._listObjects(_params, (err, list) => {
+  getObjects() {
+    this.api.listObjectsV2({ Bucket: this.name }, (err, objects) => {
       if (err != null) {
-        this.logger.error(err); // TODO: use tags (for debugging)
+        this.logger.error(err);
         return;
       }
 
-      for (const { Key } of list.Contents) {
-        this._getObject({ ..._params, Key }, (err, object) => {
-          if (err != null) {
-            this.logger.error(err); // TODO: use tags (for debugging)
-            return;
-          }
-
-          let data;
-          try {
-            data = object.Body.toString();
-          } catch {
-            this.logger.error('[AWS] Object data cannot be decoded:', object);
-          }
-
-          this._processData(data, cb);
-        });
-      }
+      objects.Contents.forEach(this.processObject());
     });
   }
 
-  _listObjects(params, cb) {
-    return this.backend.listObjectsV2(params, cb);
+  private processObject() {
+    return ({ Key }: S3.Object) => {
+      this.api.getObject({ Bucket: this.name, Key }, (err, object) => {
+        if (err != null) {
+          this.logger.error(err);
+          return;
+        }
+
+        let data: string;
+        try {
+          data = object.Body.toString();
+        } catch {
+          this.logger.error('[AWS] Object data cannot be decoded:', object);
+        }
+
+        this.processData(data);
+      });
+    };
   }
 
-  _getObject(params, cb) {
-    return this.backend.getObject(params, cb);
-  }
-
-  _processData(data, cb) {
+  private processData(data: string) {
     if (data == null) return;
 
     for (const entry of data.trim().split(/\s*[\r\n]+\s*/g)) {
-      let json;
+      let json: Event;
       try {
         json = JSON.parse(entry.trim());
       } catch {
@@ -69,78 +94,8 @@ export class S3Bucket {
       }
 
       if (json != null) {
-        cb(json);
+        this.callback(json);
       }
     }
-  }
-
-  get logger() {
-    if (this._logger == null) {
-      this._logger = console;
-    }
-
-    return this._logger;
-  }
-
-  get backend() {
-    if (this._api == null) {
-      this._api = new S3({
-        ...this._credentials,
-        endpoint: this._endpoint,
-        apiVersion: this._apiVersion
-      });
-    }
-
-    return this._api;
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  get credentials() {
-    return this._credentials;
-  }
-
-  get apiVersion() {
-    return this._apiVersion;
-  }
-
-  get endpoint() {
-    return this._endpoint;
-  }
-
-  _makeParams(params: any = {}) {
-    if (typeof params === 'string') return { Bucket: params };
-
-    if (params.Bucket == null) return { ...params, Bucket: this._name };
-
-    return params;
-  }
-
-  configure(params) {
-    if (params == null) return false;
-
-    if (params.endpoint != null) {
-      this._endpoint = params.endpoint;
-    }
-
-    if (params.name != null) {
-      this._name = params.name;
-    }
-
-    if (params.apiVersion != null) {
-      this._apiVersion = params.apiVersion;
-    }
-
-    if (params.credentials != null) {
-      this._credentials = params.credentials;
-    }
-
-    if (params.logger != null) {
-      this._logger = params.logger;
-    }
-
-    return true;
   }
 }

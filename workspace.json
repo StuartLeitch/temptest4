@@ -332,6 +332,62 @@
           }
         }
       }
+    },
+    "reporting-backend": {
+      "root": "apps/reporting-backend",
+      "sourceRoot": "apps/reporting-backend/src",
+      "projectType": "application",
+      "prefix": "reporting-backend",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/reporting-backend",
+            "main": "apps/reporting-backend/src/main.ts",
+            "tsConfig": "apps/reporting-backend/tsconfig.app.json",
+            "assets": []
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/reporting-backend/src/environments/environment.ts",
+                  "with": "apps/reporting-backend/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "reporting-backend:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/reporting-backend/.eslintrc",
+            "tsConfig": [
+              "apps/reporting-backend/tsconfig.app.json",
+              "apps/reporting-backend/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/reporting-backend/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/reporting-backend/jest.config.js",
+            "tsConfig": "apps/reporting-backend/tsconfig.spec.json"
+          }
+        }
+      }
     }
   },
   "cli": {

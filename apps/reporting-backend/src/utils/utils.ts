@@ -1,4 +1,4 @@
-export function makeCallback(callback) {
+export function makeCallback(callback): Function {
   let cb = callback;
   if (typeof cb === 'function') return cb;
 
@@ -9,9 +9,7 @@ export function makeCallback(callback) {
     result = [];
     cb._result = result;
   }
-  cb = entry => {
+  return entry => {
     result.push(entry);
   };
-
-  return cb;
 }
