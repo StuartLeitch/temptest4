@@ -346,7 +346,7 @@
             "outputPath": "dist/apps/reporting-backend",
             "main": "apps/reporting-backend/src/main.ts",
             "tsConfig": "apps/reporting-backend/tsconfig.app.json",
-            "assets": []
+            "assets": ["apps/reporting-backend/src/Dockerfile"]
           },
           "configurations": {
             "production": {
