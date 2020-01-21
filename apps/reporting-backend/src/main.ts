@@ -1,12 +1,16 @@
-import { S3Bucket } from './s3/s3-bucket';
+import { eventsFromBucket } from './events-store/get-events';
 import { environment } from './environments/environment';
 
 const s3Details = environment.s3BucketDetails;
-const bucket = new S3Bucket(
-  {
+async function main() {
+  const awsConfig = {
     ...s3Details,
     credentials: environment.credentials
-  },
-  console.log
-);
-bucket.getObjects();
+  };
+  const bucketName = s3Details.name;
+  for await (const event of eventsFromBucket(bucketName, awsConfig)) {
+    console.log(event);
+  }
+}
+
+main();
