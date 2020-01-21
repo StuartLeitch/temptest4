@@ -28,6 +28,12 @@
     },
     "invoicing-admin-e2e": {
       "tags": []
+    },
+    "reporting-backend": {
+      "tags": []
+    },
+    "eve": {
+      "tags": []
     }
   }
 }
