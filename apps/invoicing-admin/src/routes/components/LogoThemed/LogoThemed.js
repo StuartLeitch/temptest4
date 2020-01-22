@@ -6,7 +6,7 @@ import { ThemeConsumer } from '../../../components/Theme';
 
 const logos = {
   white: require('./../../../assets/images/logos/logo-white.svg'),
-  primary: require('./../../../assets/images/logos/logo-primary.svg'),
+  primary: require('./../../../assets/images/logos/hindawi.svg'),
   success: require('./../../../assets/images/logos/logo-success.svg'),
   warning: require('./../../../assets/images/logos/logo-warning.svg'),
   danger: require('./../../../assets/images/logos/logo-danger.svg'),
@@ -40,7 +40,7 @@ const LogoThemed = ({ checkBackground, className, ...otherProps }) => (
             : getLogoUrl(style, color)
         }
         className={classNames('d-block', className)}
-        alt='Airframe Logo'
+        alt='Hindawi Logo'
         {...otherProps}
       />
     )}

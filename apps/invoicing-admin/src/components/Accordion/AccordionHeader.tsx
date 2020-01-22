@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import CardHeader from '../CardHeader';
 
 import { Consumer } from './context';
-import classes from './AccordionHeader.scss';
+const classes = require('./AccordionHeader.scss');
 
 export const AccordionHeader = props => (
   <Consumer>

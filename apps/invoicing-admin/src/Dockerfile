@@ -8,7 +8,7 @@ COPY ../../../airframe-react/dist /usr/share/nginx/html
 # RUN rm /etc/nginx/conf.d/default.conf
 # COPY dist/apps/invoicing-web/nginx.conf /etc/nginx/conf.d
 
-# EXPOSE 80 443 3000
+EXPOSE 80 443 3000
 
 # CMD [ "/bin/bash", "-c", \
 #   "envsubst < /usr/share/nginx/html/env-template.js > /usr/share/nginx/html/assets/env-config.js && nginx -g 'daemon off;'" ]

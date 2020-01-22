@@ -8,12 +8,12 @@ import {
   PageConfigConsumer
 } from '../components';
 
-import './../styles/bootstrap.scss';
-import './../styles/main.scss';
-import './../styles/plugins/plugins.scss';
+import '../styles/bootstrap.scss';
+import '../styles/main.scss';
+import '../styles/plugins/plugins.scss';
 import './../styles/plugins/plugins.css';
 
-// import { RoutedNavbars, RoutedSidebars } from './../routes';
+import { RoutedNavbars, RoutedSidebars } from './../routes';
 
 const favIcons = [
   {
@@ -50,21 +50,19 @@ class AppLayout extends React.Component {
   render() {
     const { children } = this.props;
 
-    // console.info(Layout.Navbar);
-
     return (
       <ThemeProvider initialStyle='light' initialColor='primary'>
         <Layout sidebarSlim favIcons={favIcons}>
-          {/* --------- Navbar ----------- *}
+          {/* --------- Navbar ----------- */}
           <Layout.Navbar>
             <RoutedNavbars />
           </Layout.Navbar>
-          {/* -------- Sidebar ------------*}
+          {/* -------- Sidebar ------------*/}
           <Layout.Sidebar>
             <RoutedSidebars />
           </Layout.Sidebar>
 
-          {/* -------- Content ------------*}
+          {/* -------- Content ------------*/}
           <Layout.Content>{children}</Layout.Content>
 
           {/* -- Theme Selector (DEMO) ----*/}
