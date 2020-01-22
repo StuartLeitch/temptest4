@@ -45,7 +45,7 @@ const Reports = () => (
     <Container>
         <Row className="mb-2">
             <Col lg={ 12 }>
-                <HeaderMain 
+                <HeaderMain
                     title="Reports"
                     className="mb-3 mb-lg-5"
                 />
@@ -59,9 +59,9 @@ const Reports = () => (
                             </CardTitle>
                             <span className="ml-auto justify-content-start">
                                 <a href="javascript:;" className="ml-auto justify-content-start pr-2 text-decoration-none" id="TemperaturesTooltipSettings">
-                                    <i className="fa fa-fw fa-sliders"></i>
+                                    <i className="fas fa-fw fa-sliders"></i>
                                 </a> <a href="javascript:;" id="TemperaturesTooltipAdd" className="text-decoration-none">
-                                    <i className="fa fa-fw fa-plus"></i>
+                                    <i className="fas fa-fw fa-plus"></i>
                                 </a>
                             </span>
                             <UncontrolledTooltip placement="top" target="TemperaturesTooltipSettings">
@@ -75,7 +75,7 @@ const Reports = () => (
                     <ListGroup flush>
                         <ListGroupItem tag="a" href="#" id="TemperaturesProcessorToggler" className="by-0 d-flex text-decoration-none">
                             Processor
-                            <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="TemperaturesProcessorTooltip"></i>
+                            <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="TemperaturesProcessorTooltip"></i>
                         </ListGroupItem>
                         <UncontrolledTooltip placement="top" target="TemperaturesProcessorTooltip">
                             Show/Hide Section
@@ -87,7 +87,7 @@ const Reports = () => (
                                 <h1>39º</h1>
                                 <span className="ml-auto text-right">
                                     102º F <br />
-                                    <i className="fa fa-arrow-down fa-fw text-primary"></i>
+                                    <i className="fas fa-arrow-down fa-fw text-primary"></i>
                                 </span>
                             </span>
                             <div className="d-flex justify-content-between mb-2">
@@ -115,7 +115,7 @@ const Reports = () => (
                     <ListGroup flush>
                         <ListGroupItem tag="a" href="#" id="TemperaturesGraphicsToggler" className="by-0 d-flex text-decoration-none">
                             Graphics
-                            <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="TemperaturesGraphicsTooltip"></i>
+                            <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="TemperaturesGraphicsTooltip"></i>
                         </ListGroupItem>
                         <UncontrolledTooltip placement="top" target="TemperaturesGraphicsTooltip">
                             Show/Hide Section
@@ -127,7 +127,7 @@ const Reports = () => (
                                 <h1>68º</h1>
                                 <span className="ml-auto text-right">
                                     102º F <br />
-                                    <i className="fa fa-arrow-up fa-fw text-danger"></i>
+                                    <i className="fas fa-arrow-up fa-fw text-danger"></i>
                                 </span>
                             </span>
                             <div className="d-flex justify-content-between mb-2">
@@ -140,7 +140,7 @@ const Reports = () => (
                     <ListGroup flush>
                         <ListGroupItem tag="a" href="#" id="TemperaturesStorageToggler" className="by-0 d-flex text-decoration-none">
                             Storage
-                            <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="TemperaturesStorageTooltip"></i>
+                            <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="TemperaturesStorageTooltip"></i>
                         </ListGroupItem>
                         <UncontrolledTooltip placement="top" target="TemperaturesStorageTooltip">
                             Show/Hide Section
@@ -209,9 +209,9 @@ const Reports = () => (
                             </CardTitle>
                             <span className="ml-auto justify-content-start">
                                 <a href="javascript:;" className="ml-auto justify-content-start pr-2 text-decoration-none" id="UsageTooltipSettings">
-                                    <i className="fa fa-fw fa-sliders"></i>
+                                    <i className="fas fa-fw fa-sliders"></i>
                                 </a> <a href="javascript:;" id="UsageTooltipAdd" className="text-decoration-none">
-                                    <i className="fa fa-fw fa-plus"></i>
+                                    <i className="fas fa-fw fa-plus"></i>
                                 </a>
                             </span>
                             <UncontrolledTooltip placement="top" target="UsageTooltipSettings">
@@ -225,7 +225,7 @@ const Reports = () => (
                     <ListGroup flush>
                         <ListGroupItem tag="a" href="#" id="ProcessorToggler" className="by-0 d-flex text-decoration-none">
                             Processor
-                            <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="ProcessorTooltip"></i>
+                            <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="ProcessorTooltip"></i>
                         </ListGroupItem>
                         <UncontrolledTooltip placement="top" target="ProcessorTooltip">
                             Show/Hide Section
@@ -250,7 +250,7 @@ const Reports = () => (
                     <ListGroup flush>
                         <ListGroupItem tag="a" href="#" id="UsageLoadToggler" className="by-0 d-flex text-decoration-none">
                             Usage (Load)
-                            <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="UsageLoadTooltip"></i>
+                            <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="UsageLoadTooltip"></i>
                         </ListGroupItem>
                         <UncontrolledTooltip placement="top" target="UsageLoadTooltip">
                             Show/Hide Section
@@ -265,29 +265,29 @@ const Reports = () => (
                                             </th>
                                             <th scope="col" className="text-center bt-0 bb-0 align-bottom" width="5">
                                                 <p style={{ textOrientation: 'unset', lineHeight: '0' }} className="mb-0">
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-primary"></i>
-                                                    <i className="fa fa-fw fa-stop text-primary"></i>
-                                                    <i className="fa fa-fw fa-stop text-primary"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-primary"></i>
+                                                    <i className="fas fa-fw fa-stop text-primary"></i>
+                                                    <i className="fas fa-fw fa-stop text-primary"></i>
                                                 </p>
                                             </th>
                                             <th scope="col" className="text-center bt-0 bb-0 align-bottom" width="5">
                                                 <p style={{ textOrientation: 'unset', lineHeight: '0' }} className="mb-0">
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-primary"></i>
-                                                    <i className="fa fa-fw fa-stop text-primary"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-primary"></i>
+                                                    <i className="fas fa-fw fa-stop text-primary"></i>
                                                 </p>
                                             </th>
                                             <th scope="col" className="text-center bt-0 bb-0 align-bottom"  width="5">
                                                 <p style={{ textOrientation: 'unset', lineHeight: '0' }} className="mb-0">
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-gray-300"></i>
-                                                    <i className="fa fa-fw fa-stop text-primary"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-gray-300"></i>
+                                                    <i className="fas fa-fw fa-stop text-primary"></i>
                                                 </p>
                                             </th>
                                         </tr>
@@ -308,13 +308,13 @@ const Reports = () => (
                                         <tr>
                                             <td>Tendency</td>
                                             <td className="text-center">
-                                                <i className="fa fa-arrow-down fa-fw text-danger"></i>
+                                                <i className="fas fa-arrow-down fa-fw text-danger"></i>
                                             </td>
                                             <td className="text-center">
-                                                <i className="fa fa-arrow-down fa-fw text-danger"></i>
+                                                <i className="fas fa-arrow-down fa-fw text-danger"></i>
                                             </td>
                                             <td className="text-center">
-                                                <i className="fa fa-arrow-down fa-fw text-danger"></i>
+                                                <i className="fas fa-arrow-down fa-fw text-danger"></i>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -325,7 +325,7 @@ const Reports = () => (
                     <ListGroup flush>
                         <ListGroupItem tag="a" href="#" id="GraphicsToggler" className="by-0 d-flex text-decoration-none">
                             Graphics
-                            <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="GraphicsTooltip"></i>
+                            <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="GraphicsTooltip"></i>
                         </ListGroupItem>
                         <UncontrolledTooltip placement="top" target="GraphicsTooltip">
                             Show/Hide Section
@@ -346,7 +346,7 @@ const Reports = () => (
                     <ListGroup flush>
                         <ListGroupItem tag="a" href="#" id="UsageLoadToggler2" className="by-0 d-flex text-decoration-none">
                             Usage (Load)
-                            <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="UsageLoadTooltip2"></i>
+                            <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="UsageLoadTooltip2"></i>
                         </ListGroupItem>
                         <UncontrolledTooltip placement="top" target="UsageLoadTooltip2">
                             Show/Hide Section
@@ -380,7 +380,7 @@ const Reports = () => (
                                         <tr>
                                             <td>Tendency</td>
                                             <td className="text-right">
-                                                <i className="fa fa-arrow-down fa-fw text-danger"></i>
+                                                <i className="fas fa-arrow-down fa-fw text-danger"></i>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -401,9 +401,9 @@ const Reports = () => (
                                     </CardTitle>
                                     <span className="ml-auto justify-content-start">
                                         <a href="javascript:;" className="ml-auto justify-content-start pr-2 text-decoration-none" id="AllocationTooltipSettings">
-                                            <i className="fa fa-fw fa-sliders"></i>
+                                            <i className="fas fa-fw fa-sliders"></i>
                                         </a> <a href="javascript:;" id="AllocationTooltipAdd" className="text-decoration-none">
-                                            <i className="fa fa-fw fa-plus"></i>
+                                            <i className="fas fa-fw fa-plus"></i>
                                         </a>
                                     </span>
                                     <UncontrolledTooltip placement="top" target="AllocationTooltipSettings">
@@ -417,7 +417,7 @@ const Reports = () => (
                             <ListGroup flush>
                                 <ListGroupItem tag="a" href="#" id="RamToggler" className="by-0 d-flex text-decoration-none">
                                     RAM
-                                    <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="RamTooltip"></i>
+                                    <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="RamTooltip"></i>
                                 </ListGroupItem>
                                 <UncontrolledTooltip placement="top" target="RamTooltip">
                                     Show/Hide Section
@@ -441,29 +441,29 @@ const Reports = () => (
                                         <tbody>
                                             <tr>
                                                 <td className="bt-0">
-                                                    <i className="fa fa fa-circle-o text-primary mr-1"></i>
+                                                    <i className="fas fas fa-circle-o text-primary mr-1"></i>
                                                     In Use
                                                 </td>
                                                 <td className="text-right text-inverse bt-0">
-                                                    796MB <i className="fa fa-arrow-up fa-fw text-gray-300"></i>
+                                                    796MB <i className="fas fa-arrow-up fa-fw text-gray-300"></i>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <i className="fa fa fa-circle-o text-danger mr-1"></i>
+                                                    <i className="fas fas fa-circle-o text-danger mr-1"></i>
                                                     In Cache
                                                 </td>
                                                 <td className="text-right text-inverse">
-                                                    180MB <i className="fa fa-arrow-down fa-fw text-gray-300"></i>
+                                                    180MB <i className="fas fa-arrow-down fa-fw text-gray-300"></i>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <i className="fa fa fa-circle-o text-gray-300 mr-1"></i>
+                                                    <i className="fas fas fa-circle-o text-gray-300 mr-1"></i>
                                                     Available
                                                 </td>
                                                 <td className="text-right text-inverse">
-                                                    1672MB <i className="fa fa-arrow-down fa-fw text-gray-300"></i>
+                                                    1672MB <i className="fas fa-arrow-down fa-fw text-gray-300"></i>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -484,9 +484,9 @@ const Reports = () => (
                                     </CardTitle>
                                     <span className="ml-auto justify-content-start">
                                         <a href="javascript:;" className="ml-auto justify-content-start pr-2 text-decoration-none" id="CoolingTooltipSettings">
-                                            <i className="fa fa-fw fa-sliders"></i>
+                                            <i className="fas fa-fw fa-sliders"></i>
                                         </a> <a href="javascript:;" id="CoolingTooltipAdd" className="text-decoration-none">
-                                            <i className="fa fa-fw fa-plus"></i>
+                                            <i className="fas fa-fw fa-plus"></i>
                                         </a>
                                     </span>
                                     <UncontrolledTooltip placement="top" target="CoolingTooltipSettings">
@@ -500,7 +500,7 @@ const Reports = () => (
                             <ListGroup flush>
                                 <ListGroupItem tag="a" href="#" id="FansToggler" className="by-0 d-flex text-decoration-none">
                                     Fans
-                                    <i className="fa fa-fw fa-angle-down ml-auto justify-content-end" id="FansTooltip"></i>
+                                    <i className="fas fa-fw fa-angle-down ml-auto justify-content-end" id="FansTooltip"></i>
                                 </ListGroupItem>
                                 <UncontrolledTooltip placement="top" target="FansTooltip">
                                     Show/Hide Section
@@ -520,7 +520,7 @@ const Reports = () => (
                                         <input type="range" className="custom-range pb-0" id="leftFontalFan" />
                                         <span className="d-flex">
                                             <span>
-                                                <i className="fa fa-fw fa-leaf"></i>
+                                                <i className="fas fa-fw fa-leaf"></i>
                                             </span>
                                             <span className="ml-auto">
                                                 250RPM
@@ -539,7 +539,7 @@ const Reports = () => (
                                         <input type="range" max="3" step="1" className="custom-range pb-0" id="leftFontalFan" />
                                         <span className="d-flex">
                                             <span>
-                                                <i className="fa fa-fw fa-leaf"></i>
+                                                <i className="fas fa-fw fa-leaf"></i>
                                             </span>
                                             <span className="ml-auto">
                                                 250RPM
@@ -549,17 +549,17 @@ const Reports = () => (
                                     <Nav pills className="nav-fill">
                                         <NavItem>
                                             <NavLink href="#" active>
-                                                <i className="fa fa-sliders"></i>
+                                                <i className="fas fa-sliders"></i>
                                             </NavLink>
                                         </NavItem>
                                         <NavItem>
                                             <NavLink href="#">
-                                                <i className="fa fa-leaf"></i>
+                                                <i className="fas fa-leaf"></i>
                                             </NavLink>
                                         </NavItem>
                                         <NavItem>
                                             <NavLink href="#">
-                                                <i className="fa fa-dashboard"></i>
+                                                <i className="fas fa-dashboard"></i>
                                             </NavLink>
                                         </NavItem>
                                     </Nav>
@@ -576,9 +576,9 @@ const Reports = () => (
                                     </CardTitle>
                                     <span className="ml-auto justify-content-start">
                                         <a href="javascript:;" className="ml-auto justify-content-start pr-2" id="ActivityTooltipSettings">
-                                            <i className="fa fa-fw fa-sliders"></i>
+                                            <i className="fas fa-fw fa-sliders"></i>
                                         </a> <a href="javascript:;" id="ActivityTooltipAdd">
-                                            <i className="fa fa-fw fa-plus"></i>
+                                            <i className="fas fa-fw fa-plus"></i>
                                         </a>
                                     </span>
                                     <UncontrolledTooltip placement="top" target="ActivityTooltipSettings">
@@ -676,7 +676,7 @@ const Reports = () => (
                                     <tbody>
                                         <tr>
                                             <td className="align-middle text-nowrap">
-                                                <i className="fa fa fa-window-maximize mr-1"></i>
+                                                <i className="fas fas fa-window-maximize mr-1"></i>
                                                 <span className="text-inverse">
                                                     Chrome
                                                 </span>
@@ -694,19 +694,19 @@ const Reports = () => (
                                                 56%
                                             </td>
                                             <td className="align-middle text-right">
-                                                7.9GB 
+                                                7.9GB
                                             </td>
                                             <td className="align-middle text-right">
-                                                    <i className="fa fa-arrow-down fa-fw text-danger"></i>
+                                                    <i className="fas fa-arrow-down fa-fw text-danger"></i>
                                             </td>
                                             <td className="align-middle text-right">
                                                 <a href="#" id="tr1">
-                                                    <i className="fa fa-fw fa-angle-down"></i>
+                                                    <i className="fas fa-fw fa-angle-down"></i>
                                                 </a>
                                                 <UncontrolledTooltip placement="top" target="tr1">
                                                     Show Details
                                                 </UncontrolledTooltip>
-                                            </td>   
+                                            </td>
                                         </tr>
                                         <UncontrolledCollapse toggler="#tr1">
                                             <tr>
@@ -717,7 +717,7 @@ const Reports = () => (
                                         </UncontrolledCollapse>
                                         <tr>
                                             <td className="align-middle text-nowrap">
-                                                <i className="fa fa fa-window-maximize mr-1"></i>
+                                                <i className="fas fas fa-window-maximize mr-1"></i>
                                                 <span className="text-inverse">
                                                     Photoshop
                                                 </span>
@@ -735,19 +735,19 @@ const Reports = () => (
                                                 10%
                                             </td>
                                             <td className="align-middle text-right">
-                                                1.1GB 
+                                                1.1GB
                                             </td>
                                             <td className="align-middle text-right">
-                                                <i className="fa fa-arrow-up fa-fw text-success"></i>
+                                                <i className="fas fa-arrow-up fa-fw text-success"></i>
                                             </td>
                                             <td className="align-middle text-right">
                                                 <a href="#" id="tr2">
-                                                    <i className="fa fa-fw fa-angle-down"></i>
+                                                    <i className="fas fa-fw fa-angle-down"></i>
                                                 </a>
                                                 <UncontrolledTooltip placement="top" target="tr2">
                                                     Show Details
                                                 </UncontrolledTooltip>
-                                            </td>    
+                                            </td>
                                         </tr>
                                         <UncontrolledCollapse toggler="#tr2">
                                             <tr>
@@ -758,7 +758,7 @@ const Reports = () => (
                                         </UncontrolledCollapse>
                                         <tr>
                                             <td className="align-middle text-nowrap">
-                                                <i className="fa fa fa-window-maximize mr-1"></i>
+                                                <i className="fas fas fa-window-maximize mr-1"></i>
                                                 <span className="text-inverse">
                                                     Chrome
                                                 </span>
@@ -776,19 +776,19 @@ const Reports = () => (
                                                 56%
                                             </td>
                                             <td className="align-middle text-right">
-                                                2.4GB 
+                                                2.4GB
                                             </td>
                                             <td className="align-middle text-right">
-                                                <i className="fa fa-arrow-down fa-fw text-danger"></i>
+                                                <i className="fas fa-arrow-down fa-fw text-danger"></i>
                                             </td>
                                             <td className="align-middle text-right">
                                                 <a href="#" id="tr3">
-                                                    <i className="fa fa-fw fa-angle-down"></i>
+                                                    <i className="fas fa-fw fa-angle-down"></i>
                                                 </a>
                                                 <UncontrolledTooltip placement="top" target="tr3">
                                                     Show Details
                                                 </UncontrolledTooltip>
-                                            </td>    
+                                            </td>
                                         </tr>
                                         <UncontrolledCollapse toggler="#tr3">
                                             <tr>
@@ -799,7 +799,7 @@ const Reports = () => (
                                         </UncontrolledCollapse>
                                         <tr>
                                             <td className="align-middle text-nowrap">
-                                                <i className="fa fa fa-window-maximize mr-1"></i>
+                                                <i className="fas fas fa-window-maximize mr-1"></i>
                                                 <span className="text-inverse">
                                                     Safari
                                                 </span>
@@ -817,19 +817,19 @@ const Reports = () => (
                                                 56%
                                             </td>
                                             <td className="align-middle text-right">
-                                                1.1GB 
+                                                1.1GB
                                             </td>
                                             <td className="align-middle text-right">
-                                                <i className="fa fa-arrow-up fa-fw text-success"></i>
+                                                <i className="fas fa-arrow-up fa-fw text-success"></i>
                                             </td>
                                             <td className="align-middle text-right">
                                                 <a href="#" id="tr4">
-                                                    <i className="fa fa-fw fa-angle-down"></i>
+                                                    <i className="fas fa-fw fa-angle-down"></i>
                                                 </a>
                                                 <UncontrolledTooltip placement="top" target="tr4">
                                                     Show Details
                                                 </UncontrolledTooltip>
-                                            </td>    
+                                            </td>
                                         </tr>
                                         <UncontrolledCollapse toggler="#tr4">
                                             <tr>
@@ -840,7 +840,7 @@ const Reports = () => (
                                         </UncontrolledCollapse>
                                         <tr>
                                             <td className="align-middle text-nowrap">
-                                                <i className="fa fa fa-window-maximize mr-1"></i>
+                                                <i className="fas fas fa-window-maximize mr-1"></i>
                                                 <span className="text-inverse">
                                                     Chrome
                                                 </span>
@@ -858,19 +858,19 @@ const Reports = () => (
                                                 27%
                                             </td>
                                             <td className="align-middle text-right">
-                                                9.1GB 
+                                                9.1GB
                                             </td>
                                             <td className="align-middle text-right">
-                                                <i className="fa fa-arrow-down fa-fw text-danger"></i>
+                                                <i className="fas fa-arrow-down fa-fw text-danger"></i>
                                             </td>
                                             <td className="align-middle text-right">
                                                 <a href="#" id="tr5">
-                                                    <i className="fa fa-fw fa-angle-down"></i>
+                                                    <i className="fas fa-fw fa-angle-down"></i>
                                                 </a>
                                                 <UncontrolledTooltip placement="top" target="tr5">
                                                     Show Details
                                                 </UncontrolledTooltip>
-                                            </td>    
+                                            </td>
                                         </tr>
                                         <UncontrolledCollapse toggler="#tr5">
                                             <tr>
@@ -881,7 +881,7 @@ const Reports = () => (
                                         </UncontrolledCollapse>
                                         <tr>
                                             <td className="align-middle text-nowrap">
-                                                <i className="fa fa fa-window-maximize mr-1"></i>
+                                                <i className="fas fas fa-window-maximize mr-1"></i>
                                                 <span className="text-inverse">
                                                     System
                                                 </span>
@@ -899,19 +899,19 @@ const Reports = () => (
                                                 19%
                                             </td>
                                             <td className="align-middle text-right">
-                                                8.8GB 
+                                                8.8GB
                                             </td>
                                             <td className="align-middle text-right">
-                                                <i className="fa fa-arrow-up fa-fw text-success"></i>
+                                                <i className="fas fa-arrow-up fa-fw text-success"></i>
                                             </td>
                                             <td className="align-middle text-right">
                                                 <a href="#" id="tr6">
-                                                    <i className="fa fa-fw fa-angle-down"></i>
+                                                    <i className="fas fa-fw fa-angle-down"></i>
                                                 </a>
                                                 <UncontrolledTooltip placement="top" target="tr6">
                                                     Show Details
                                                 </UncontrolledTooltip>
-                                            </td>    
+                                            </td>
                                         </tr>
                                         <UncontrolledCollapse toggler="#tr6">
                                             <tr>

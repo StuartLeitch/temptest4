@@ -18,20 +18,20 @@ import {
 /*eslint-disable */
 const activityFeedIcons = [
     <span className="fa-stack fa-lg fa-fw d-flex mr-3">
-        <i className="fa fa-circle fa-fw fa-stack-2x text-success"></i>
-        <i className="fa fa-check fa-stack-1x fa-fw text-white"></i>
+        <i className="fas fa-circle fa-fw fa-stack-2x text-success"></i>
+        <i className="fas fa-check fa-stack-1x fa-fw text-white"></i>
     </span>,
     <span className="fa-stack fa-lg fa-fw d-flex mr-3">
-        <i className="fa fa-circle fa-fw fa-stack-2x text-danger"></i>
-        <i className="fa fa-close fa-stack-1x fa-fw text-white"></i>
+        <i className="fas fa-circle fa-fw fa-stack-2x text-danger"></i>
+        <i className="fas fa-close fa-stack-1x fa-fw text-white"></i>
     </span>,
     <span className="fa-stack fa-lg fa-fw d-flex mr-3">
-        <i className="fa fa-circle fa-fw fa-stack-2x text-warning"></i>
-        <i className="fa fa-exclamation fa-stack-1x fa-fw text-white"></i>
+        <i className="fas fa-circle fa-fw fa-stack-2x text-warning"></i>
+        <i className="fas fa-exclamation fa-stack-1x fa-fw text-white"></i>
     </span>,
     <span className="fa-stack fa-lg fa-fw d-flex mr-3">
-        <i className="fa fa-circle fa-fw fa-stack-2x text-primary"></i>
-        <i className="fa fa-info fa-stack-1x fa-fw text-white"></i>
+        <i className="fas fa-circle fa-fw fa-stack-2x text-primary"></i>
+        <i className="fas fa-info fa-stack-1x fa-fw text-white"></i>
     </span>
 ];
 /*eslint-enable */
@@ -42,7 +42,7 @@ const NavbarActivityFeed = (props) => (
             <IconWithBadge
                 badge={ <Badge pill color="primary">6</Badge> }
             >
-                <i className="fa fa-bell-o fa-fw" />
+                <i className="fas fa-bell-o fa-fw" />
             </IconWithBadge>
         </DropdownToggle>
         <ExtendedDropdown right>
@@ -80,7 +80,7 @@ const NavbarActivityFeed = (props) => (
 
             <ExtendedDropdown.Section className="text-center" tag={ Link} to="/apps/widgets">
                 See All Notifications
-                <i className="fa fa-angle-right fa-fw ml-2" />
+                <i className="fas fa-angle-right fa-fw ml-2" />
             </ExtendedDropdown.Section>
         </ExtendedDropdown>
     </UncontrolledDropdown>

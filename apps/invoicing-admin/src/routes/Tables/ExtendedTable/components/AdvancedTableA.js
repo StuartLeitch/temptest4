@@ -36,9 +36,9 @@ const ProductQuality = {
 
 const sortCaret = (order) => {
     if (!order)
-        return <i className="fa fa-fw fa-sort text-muted"></i>;
+        return <i className="fas fa-fw fa-sort text-muted"></i>;
     if (order)
-        return <i className={`fa fa-fw text-muted fa-sort-${order}`}></i>
+        return <i className={`fas fa-fw text-muted fa-sort-${order}`}></i>
 }
 
 const generateRow = (index) => ({
@@ -57,7 +57,7 @@ const generateRow = (index) => ({
 export class AdvancedTableA extends React.Component {
     constructor() {
         super();
-        
+
         this.state = {
             products: _.times(INITIAL_PRODUCTS_COUNT, generateRow),
             selected: []
@@ -121,7 +121,7 @@ export class AdvancedTableA extends React.Component {
                         className="d-block small text-decoration-none text-nowrap"
                         onClick={ this.handleResetFilters.bind(this) }
                     >
-                        Reset Filters <i className="fa fa-times fa-fw text-danger"></i>
+                        Reset Filters <i className="fas fa-times fa-fw text-danger"></i>
                     </a>
                 </React.Fragment>
             )
@@ -217,7 +217,7 @@ export class AdvancedTableA extends React.Component {
             }),
             sort: true,
             sortCaret
-        }]; 
+        }];
     }
 
     render() {
@@ -286,7 +286,7 @@ export class AdvancedTableA extends React.Component {
                                         outline
                                         onClick={ this.handleAddRow.bind(this) }
                                     >
-                                        <i className="fa fa-fw fa-plus"></i>
+                                        <i className="fas fa-fw fa-plus"></i>
                                     </Button>
                                 </ButtonGroup>
                             </div>

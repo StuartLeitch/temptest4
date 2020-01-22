@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     InputGroup,
     InputGroupAddon,
     Input,
@@ -13,7 +13,7 @@ const SearchResultsHeader = () => (
             <h4 className="mt-2 mb-3">
                 <small className="mr-1">
                     Search Results for
-                </small> "Content Designer" 
+                </small> "Content Designer"
                 <small className="mr-2">
                     <small className="ml-3">
                         About 1,370 result (0.13 seconds)
@@ -24,7 +24,7 @@ const SearchResultsHeader = () => (
                 <Input placeholder="Search for..." className="bg-white" />
                 <InputGroupAddon addonType="append">
                     <Button color="primary">
-                        <i className="fa fa-search"></i>
+                        <i className="fas fa-search"></i>
                     </Button>
                 </InputGroupAddon>
             </InputGroup>

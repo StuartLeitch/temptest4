@@ -16,7 +16,7 @@ export const CustomSizePerPageButton = ({
 }) => (
     <UncontrolledButtonDropdown { ...ddProps }>
         <DropdownToggle size="sm" color="link" className="text-decoration-none">
-            { currSizePerPage }<i className="fa fa-angle-down ml-2" />
+            { currSizePerPage }<i className="fas fa-angle-down ml-2" />
         </DropdownToggle>
         <DropdownMenu>
             <DropdownItem header>Page Size</DropdownItem>

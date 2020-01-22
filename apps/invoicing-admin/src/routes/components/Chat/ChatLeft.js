@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Card,
     Media,
     Avatar,
@@ -28,13 +28,13 @@ const ChatLeft = (props) => (
                     src={ randomAvatar() }
                     className="mr-2"
                     addOns={[
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="white"
                             key="avatar-icon-bg"
                         />,
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color={ randomArray(status) }
                             key="avatar-icon-fg"
                         />
@@ -45,7 +45,7 @@ const ChatLeft = (props) => (
                 <Card body className={ `mb-2 ${ props.cardClassName }` }>
                     <p className="mb-0">
                         { faker.lorem.paragraph() }
-                    </p>                                                   
+                    </p>
                 </Card>
                 <div className="mb-2">
                     <span className="text-inverse mr-2">

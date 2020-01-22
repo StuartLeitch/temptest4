@@ -5,10 +5,10 @@ import _ from 'lodash';
 /*eslint-disable */
 const lastMonth = [
     <td className="align-middle text-right text-danger">
-        <i className="fa fa-fw fa-caret-down mr-1"></i>92.02%
+        <i className="fas fa-fw fa-caret-down mr-1"></i>92.02%
     </td>,
     <td className="align-middle text-right text-success">
-        <i className="fa fa-fw fa-caret-up mr-1"></i>23.02%
+        <i className="fas fa-fw fa-caret-up mr-1"></i>23.02%
     </td>
 ];
 /*eslint-enable */

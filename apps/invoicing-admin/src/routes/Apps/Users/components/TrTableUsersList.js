@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 
-import { 
+import {
     Media,
     Avatar,
     AvatarAddOn,
@@ -19,65 +19,65 @@ const TrTableUsersList = (props) => {
 
     const avatar = [
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="facebook"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-facebook"
+            <AvatarAddOn.Icon
+                className="fas fa-facebook"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="twitter"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-twitter"
+            <AvatarAddOn.Icon
+                className="fas fa-twitter"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="linkedin"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-linkedin"
+            <AvatarAddOn.Icon
+                className="fas fa-linkedin"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="foursquare"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-foursquare"
+            <AvatarAddOn.Icon
+                className="fas fa-foursquare"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="paypal"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-paypal"
+            <AvatarAddOn.Icon
+                className="fas fa-paypal"
                 color="white"
                 key="avatar-icon-fg"
                 small
@@ -92,7 +92,7 @@ const TrTableUsersList = (props) => {
              </td>
              <td className="align-middle">
                 <a href="#">
-                    <i className="fa fa-fw fa-star-o"></i>
+                    <i className="fas fa-fw fa-star-o"></i>
                 </a>
              </td>
                 <td>
@@ -103,14 +103,14 @@ const TrTableUsersList = (props) => {
                                 src={ randomAvatar() }
                                 className="align-self-center"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
                                     ...randomArray(avatar)
                                 ]}
-                            /> 
+                            />
                         </Media>
                         <Media body>
                             <a className="mt-0 d-flex text-decoration-none" href="#">
@@ -123,40 +123,40 @@ const TrTableUsersList = (props) => {
                     </Media>
                 </td>
                 <td className="align-middle">
-                     { faker.internet.email() }   
+                     { faker.internet.email() }
                 </td>
                 <td className="align-middle">
-                     { faker.phone.phoneNumberFormat() }   
+                     { faker.phone.phoneNumberFormat() }
                 </td>
                 <td className="align-middle text-right">
                     <UncontrolledButtonDropdown>
                         <DropdownToggle color="link" className="pr-0">
-                            <i className="fa fa-bars"></i><i className="fa fa-angle-down ml-2" />
+                            <i className="fas fa-bars"></i><i className="fas fa-angle-down ml-2" />
                         </DropdownToggle>
                         <DropdownMenu right>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-phone mr-2"></i>
+                                <i className="fas fa-fw fa-phone mr-2"></i>
                                 Call
                             </DropdownItem>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-comment mr-2"></i>
+                                <i className="fas fa-fw fa-comment mr-2"></i>
                                 Chat
                             </DropdownItem>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-video-camera mr-2"></i>
+                                <i className="fas fa-fw fa-video-camera mr-2"></i>
                                 Video
                             </DropdownItem>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-user mr-2"></i>
+                                <i className="fas fa-fw fa-user mr-2"></i>
                                 Profile
                             </DropdownItem>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-pencil mr-2"></i>
+                                <i className="fas fa-fw fa-pencil mr-2"></i>
                                 Edit
                             </DropdownItem>
                             <DropdownItem divider />
                             <DropdownItem>
-                                <i className="fa fa-fw fa-trash mr-2"></i>
+                                <i className="fas fa-fw fa-trash mr-2"></i>
                                 Delete
                             </DropdownItem>
                         </DropdownMenu>

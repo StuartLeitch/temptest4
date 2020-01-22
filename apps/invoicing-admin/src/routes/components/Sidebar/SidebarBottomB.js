@@ -32,22 +32,22 @@ const SidebarBottomB = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1 text-truncate">
-                                        { faker.name.firstName() } { faker.name.lastName() } <i className="fa fa-fw fa-angle-up ml-1"></i>
+                                        { faker.name.firstName() } { faker.name.lastName() } <i className="fas fa-fw fa-angle-up ml-1"></i>
                                     </span>
                                     <p className="small text-truncate">
                                         { faker.name.jobTitle() }
@@ -68,18 +68,18 @@ const SidebarBottomB = () => (
                                 size="sm"
                                 src={ randomAvatar() }
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-fg"
                                     />
                                 ]}
-                            /> 
+                            />
                         </DropdownToggle>
                         <DropdownProfile />
                     </UncontrolledButtonDropdown>
@@ -99,7 +99,7 @@ const SidebarBottomB = () => (
                         id="UncontrolledSidebarPopoverFooter"
                         className="sidebar__link p-0"
                     >
-                        <i className="fa fa-fw fa-question-circle-o" />
+                        <i className="fas fa-fw fa-question-circle-o" />
                     </Button>
                     <UncontrolledPopover placement="left-end" target="UncontrolledSidebarPopoverFooter">
                         <PopoverBody>

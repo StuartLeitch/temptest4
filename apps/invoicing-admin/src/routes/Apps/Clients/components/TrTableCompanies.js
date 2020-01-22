@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 
-import { 
+import {
     Avatar,
     CustomInput,
     UncontrolledTooltip,
@@ -22,8 +22,8 @@ const brand = [
     <Media key="facebook">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-facebook"></i>
-                <i className="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-facebook"></i>
+                <i className="fas fa-facebook fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -38,8 +38,8 @@ const brand = [
     <Media key="twitter">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-twitter"></i>
-                <i className="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-twitter"></i>
+                <i className="fas fa-twitter fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -54,8 +54,8 @@ const brand = [
     <Media key="linkedin">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-linkedin"></i>
-                <i className="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-linkedin"></i>
+                <i className="fas fa-linkedin fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -70,8 +70,8 @@ const brand = [
     <Media key="foursquare">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-foursquare"></i>
-                <i className="fa fa-foursquare fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-foursquare"></i>
+                <i className="fas fa-foursquare fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -86,8 +86,8 @@ const brand = [
     <Media key="lastfm">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-lastfm"></i>
-                <i className="fa fa-lastfm fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-lastfm"></i>
+                <i className="fas fa-lastfm fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -102,8 +102,8 @@ const brand = [
     <Media key="paypal">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-paypal"></i>
-                <i className="fa fa-paypal fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-paypal"></i>
+                <i className="fas fa-paypal fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -118,8 +118,8 @@ const brand = [
     <Media key="amazon">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-amazon"></i>
-                <i className="fa fa-amazon fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-amazon"></i>
+                <i className="fas fa-amazon fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -134,8 +134,8 @@ const brand = [
     <Media key="skype">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-skype"></i>
-                <i className="fa fa-skype fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-skype"></i>
+                <i className="fas fa-skype fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -150,8 +150,8 @@ const brand = [
     <Media key="spotify">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-spotify"></i>
-                <i className="fa fa-spotify fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-spotify"></i>
+                <i className="fas fa-spotify fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -166,8 +166,8 @@ const brand = [
     <Media key="pinterest">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-pinterest"></i>
-                <i className="fa fa-pinterest fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-pinterest"></i>
+                <i className="fas fa-pinterest fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -182,8 +182,8 @@ const brand = [
     <Media key="windows">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-windows"></i>
-                <i className="fa fa-windows fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-windows"></i>
+                <i className="fas fa-windows fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -198,8 +198,8 @@ const brand = [
     <Media key="android">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-android"></i>
-                <i className="fa fa-android fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-android"></i>
+                <i className="fas fa-android fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -214,8 +214,8 @@ const brand = [
     <Media key="medium">
         <Media left className="align-self-center mr-3">
             <span className="fa-stack fa-lg">
-                <i className="fa fa-stop fa-stack-2x text-medium"></i>
-                <i className="fa fa-medium fa-stack-1x fa-inverse"></i>
+                <i className="fas fa-stop fa-stack-2x text-medium"></i>
+                <i className="fas fa-medium fa-stack-1x fa-inverse"></i>
             </span>
         </Media>
         <Media body>
@@ -237,7 +237,7 @@ const TrTableCompanies = (props) => (
             </td>
             <td className="align-middle">
                 <a href="#" id={`trTableCompaniesTooltip-${ props.id }` }>
-                    <i className="fa fa-fw fa-star-o"></i>
+                    <i className="fas fa-fw fa-star-o"></i>
                 </a>
                 <UncontrolledTooltip placement="top" target={`trTableCompaniesTooltip-${ props.id }` }>
                     Add To Favorites
@@ -252,13 +252,13 @@ const TrTableCompanies = (props) => (
                     src="http://bs4.webkom.co/img/avatars/2.jpg"
                     className="mr-2"
                     addOns={[
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="white"
                             key="avatar-icon-bg"
                         />,
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color={ randomArray(status) }
                             key="avatar-icon-fg"
                         />
@@ -267,11 +267,11 @@ const TrTableCompanies = (props) => (
             </td>
             <td className="align-middle text-right">
                 { faker.phone.phoneNumberFormat() }<br />
-                { faker.internet.email() } 
+                { faker.internet.email() }
             </td>
             <td className="align-middle text-right">
                 { faker.address.streetAddress() }<br />
-                { faker.address.city() } 
+                { faker.address.city() }
             </td>
         </tr>
     </React.Fragment>

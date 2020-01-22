@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Pagination,
     PaginationItem,
     PaginationLink,
@@ -30,31 +30,31 @@ const TasksList = () => (
                     </thead>
                     <tbody>
                         <TrTableTasksList />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="2"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="3"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="4"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="5"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="6"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="7"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="8"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="9"
                         />
-                        <TrTableTasksList 
+                        <TrTableTasksList
                             id="10"
                         />
                     </tbody>
@@ -65,7 +65,7 @@ const TasksList = () => (
                 <Pagination aria-label="Page navigation example">
                     <PaginationItem>
                         <PaginationLink previous href="#">
-                            <i className="fa fa-fw fa-angle-left"></i>
+                            <i className="fas fa-fw fa-angle-left"></i>
                         </PaginationLink>
                     </PaginationItem>
                     <PaginationItem active>
@@ -85,7 +85,7 @@ const TasksList = () => (
                     </PaginationItem>
                     <PaginationItem>
                         <PaginationLink next href="#">
-                            <i className="fa fa-fw fa-angle-right"></i>
+                            <i className="fas fa-fw fa-angle-right"></i>
                         </PaginationLink>
                     </PaginationItem>
                 </Pagination>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -21,7 +21,7 @@ import { TrTableBorderless } from "./../../Tables/Tables/components/TrTableBorde
 const BillingEdit = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Billing Edit"
                 className="mb-5 mt-4"
             />
@@ -64,17 +64,17 @@ const BillingEdit = () => (
                                         <dd className="col-sm-8 text-inverse">214,8 GB / 1,03 TB</dd>
                                         <dt className="col-sm-4 text-right">Regular Files</dt>
                                         <dd className="col-sm-8">
-                                            <i className="fa fa-circle text-primary mr-2"></i>
+                                            <i className="fas fa-circle text-primary mr-2"></i>
                                             <span className="text-inverse">177,8 GB</span>
                                         </dd>
                                         <dt className="col-sm-4 text-right">Shared Files</dt>
                                         <dd className="col-sm-8">
-                                            <i className="fa fa-circle text-purple mr-2"></i>
+                                            <i className="fas fa-circle text-purple mr-2"></i>
                                             <span className="text-inverse">37 GB</span>
                                         </dd>
                                         <dt className="col-sm-4 text-right">Available Files</dt>
                                         <dd className="col-sm-8">
-                                            <i className="fa fa-circle text-yellow mr-2"></i>
+                                            <i className="fas fa-circle text-yellow mr-2"></i>
                                             <span className="text-inverse">177,8 GB</span>
                                         </dd>
                                         <dt className="col-sm-4 text-right">Action</dt>
@@ -95,7 +95,7 @@ const BillingEdit = () => (
                                 </Col>
                                 <Col sm={9}>
                                     <div className="mb-2">
-                                        <i className="fa fa-fw fa-paypal text-primary mr-2"></i>
+                                        <i className="fas fa-fw fa-paypal text-primary mr-2"></i>
                                         <span className="text-inverse">
                                             PayPal
                                         </span> - Account: <samp>Tyshawn_Lakin56@gmail.com</samp>
@@ -116,7 +116,7 @@ const BillingEdit = () => (
                             </Row>
                         </CardBody>
                         <CardFooter className="small">
-                            <i className="fa fa-fw fa-support text-muted mr-2"></i>
+                            <i className="fas fa-fw fa-support text-muted mr-2"></i>
                              If you want to personalize the notification settings, go <a href="#">here</a>
                         </CardFooter>
                     </Card>

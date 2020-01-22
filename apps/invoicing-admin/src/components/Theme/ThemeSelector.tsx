@@ -66,7 +66,7 @@ class ThemeSelector extends React.Component {
             this.setState({ isActive: !this.state.isActive });
           }}
         >
-          <i className='fa fa-paint-brush fa-fw'></i>
+          <i className='fas fa-paint-brush fa-fw'></i>
         </Button>
         <Card className='theme-config__body'>
           <CardBody>

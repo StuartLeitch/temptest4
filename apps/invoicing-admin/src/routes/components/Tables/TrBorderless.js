@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Badge,
     UncontrolledTooltip
 } from './../../../components';
@@ -11,7 +11,7 @@ const TrBorderless = () => (
         { /* START TR */}
         <tr>
             <td className="align-middle">
-                <i className="fa fa-fw fa-check text-success"></i>
+                <i className="fas fa-fw fa-check text-success"></i>
             </td>
             <td className="align-middle">
                 <samp>{ faker.random.number() }</samp>
@@ -28,12 +28,12 @@ const TrBorderless = () => (
                 </Badge>
             </td>
             <td className="align-middle">
-                <i className="fa fa-fw fa-paypal text-primary mr-2"></i>
+                <i className="fas fa-fw fa-paypal text-primary mr-2"></i>
                 { faker.internet.email() }
             </td>
             <td className="align-middle text-right">
                 <a href="#" id="UncontrolledTooltipDownload">
-                    <i className="fa fa-fw fa-download text-primary"></i>
+                    <i className="fas fa-fw fa-download text-primary"></i>
                 </a>
                 <UncontrolledTooltip placement="left" target="UncontrolledTooltipDownload">
                     Download

@@ -2,8 +2,8 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import { NavLink as RouterNavLink } from 'react-router-dom';
 
-import { 
-    Nav, 
+import {
+    Nav,
     NavLink,
     NavItem,
     InputGroup,
@@ -23,7 +23,7 @@ const SearchResultsLeftNav = () => (
                     <span>
                         Navigation
                     </span>
-                    <i className="fa fa-angle-down align-self-center ml-auto"></i>
+                    <i className="fas fa-angle-down align-self-center ml-auto"></i>
                 </NavLink>
             </NavItem>
             <NavItem>
@@ -67,7 +67,7 @@ const SearchResultsLeftNav = () => (
                     <span>
                         Category
                     </span>
-                    <i className="fa fa-angle-down align-self-center ml-auto"></i>
+                    <i className="fas fa-angle-down align-self-center ml-auto"></i>
                 </NavLink>
             </NavItem>
             <NavItem>
@@ -109,7 +109,7 @@ const SearchResultsLeftNav = () => (
                     <span>
                         Rating
                     </span>
-                    <i className="fa fa-angle-down align-self-center ml-auto"></i>
+                    <i className="fas fa-angle-down align-self-center ml-auto"></i>
                 </NavLink>
             </NavItem>
             <NavItem className="d-flex px-2 mb-2">
@@ -145,7 +145,7 @@ const SearchResultsLeftNav = () => (
                     <span>
                         Tags
                     </span>
-                    <i className="fa fa-angle-down align-self-center ml-auto"></i>
+                    <i className="fas fa-angle-down align-self-center ml-auto"></i>
                 </NavLink>
             </NavItem>
             <NavItem className="d-flex px-2 mb-2">
@@ -181,7 +181,7 @@ const SearchResultsLeftNav = () => (
                     <span>
                         Price
                     </span>
-                    <i className="fa fa-angle-down align-self-center ml-auto"></i>
+                    <i className="fas fa-angle-down align-self-center ml-auto"></i>
                 </NavLink>
             </NavItem>
             <NavItem className="d-flex p-0">
@@ -193,9 +193,9 @@ const SearchResultsLeftNav = () => (
                     <Input placeholder="Max: 87" className="bg-white" />
                     <InputGroupAddon addonType="append">
                         <Button color="secondary" outline>
-                            <i className="fa fa-check"></i>
+                            <i className="fas fa-check"></i>
                         </Button>
-                    </InputGroupAddon> 
+                    </InputGroupAddon>
                 </InputGroup>
             </NavItem>
         </Nav>
@@ -207,7 +207,7 @@ const SearchResultsLeftNav = () => (
                     <span>
                         Shipping
                     </span>
-                    <i className="fa fa-angle-down align-self-center ml-auto"></i>
+                    <i className="fas fa-angle-down align-self-center ml-auto"></i>
                 </NavLink>
             </NavItem>
             <NavItem className="d-flex p-0">
@@ -228,7 +228,7 @@ const SearchResultsLeftNav = () => (
                     <span>
                         Sales
                     </span>
-                    <i className="fa fa-angle-down align-self-center ml-auto"></i>
+                    <i className="fas fa-angle-down align-self-center ml-auto"></i>
                 </NavLink>
             </NavItem>
             <NavItem className="d-flex p-0">

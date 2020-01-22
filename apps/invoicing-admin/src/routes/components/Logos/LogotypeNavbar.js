@@ -5,12 +5,12 @@ const LogotypeNavbar = (props) => (
 <React.Fragment>
     { /* START Logotype: Visible on: md, lg, xl */}
     <div className={` fw-600 sidebar-logo mb-1 text-left d-none d-lg-block ${ props.logoH }`}>
-        { props.logotype } <i className="fa fa-angle-down"></i>
+        { props.logotype } <i className="fas fa-angle-down"></i>
     </div>
     { /* END Logotype: Visible on: md, lg, xl */}
     { /* START Logotype: Visible on: xs, sm */}
     <div className="h6 fw-600 sidebar-logo mb-0 text-left d-lg-none">
-        { props.logotype } <i className="fa fa-angle-down"></i>
+        { props.logotype } <i className="fas fa-angle-down"></i>
     </div>
     { /* END Logotype: Visible on: xs, sm */}
     <div className="job-title small text-left d-flex">

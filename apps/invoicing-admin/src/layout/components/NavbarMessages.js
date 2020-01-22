@@ -31,14 +31,14 @@ const NavbarMessages = (props) => (
             <IconWithBadge
                 badge={ <Badge pill color="secondary">6</Badge> }
             >
-                <i className="fa fa-envelope-o fa-fw" />
+                <i className="fas fa-envelope-o fa-fw" />
             </IconWithBadge>
         </DropdownToggle>
         <ExtendedDropdown right>
             <ExtendedDropdown.Section className="d-flex justify-content-between align-items-center">
                 <h6 className="mb-0">Messages</h6>
                 <ExtendedDropdown.Link to="/apps/new-email">
-                    <i className="fa fa-pencil" />
+                    <i className="fas fa-pencil" />
                 </ExtendedDropdown.Link>
             </ExtendedDropdown.Section>
             <ExtendedDropdown.Section>
@@ -46,7 +46,7 @@ const NavbarMessages = (props) => (
                     <Input placeholder="Search Messages..." />
                     <InputGroupAddon addonType="append">
                         <Button color="secondary" outline>
-                            <i className="fa fa-search" />
+                            <i className="fas fa-search" />
                         </Button>
                     </InputGroupAddon>
                 </InputGroup>
@@ -67,12 +67,12 @@ const NavbarMessages = (props) => (
                                 <Media body>
                                     <span className="d-flex justify-content-start">
                                         <i
-                                            className={`fa fa-circle small ${messagesColors[index]} mr-2 d-flex align-items-center`}
+                                            className={`fas fa-circle small ${messagesColors[index]} mr-2 d-flex align-items-center`}
                                         />
                                         <span className="h6 pb-0 mb-0 d-flex align-items-center">
                                             { faker.name.firstName() } { faker.name.lastName() }
                                         </span>
-                                        
+
                                         <span className="ml-1 small">(23)</span>
                                         <span className="ml-auto small">Now</span>
                                     </span>
@@ -89,7 +89,7 @@ const NavbarMessages = (props) => (
 
             <ExtendedDropdown.Section className="text-center" tag={ ExtendedDropdown.Link } to="/apps/inbox">
                 View All
-                <i className="fa fa-angle-right fa-fw ml-2" />
+                <i className="fas fa-angle-right fa-fw ml-2" />
             </ExtendedDropdown.Section>
         </ExtendedDropdown>
     </UncontrolledDropdown>

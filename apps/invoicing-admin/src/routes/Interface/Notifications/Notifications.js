@@ -46,7 +46,7 @@ const initialState = {
 const contentSuccess = ({ closeToast }) => (
     <Media>
         <Media middle left className="mr-3">
-            <i className="fa fa-fw fa-2x fa-check"></i>
+            <i className="fas fa-fw fa-2x fa-check"></i>
         </Media>
         <Media body>
             <Media heading tag="h6">
@@ -70,7 +70,7 @@ const contentSuccess = ({ closeToast }) => (
 const contentError = ({ closeToast }) => (
     <Media>
         <Media middle left className="mr-3">
-            <i className="fa fa-fw fa-2x fa-close"></i>
+            <i className="fas fa-fw fa-2x fa-close"></i>
         </Media>
         <Media body>
             <Media heading tag="h6">
@@ -94,7 +94,7 @@ const contentError = ({ closeToast }) => (
 const contentInfo = ({ closeToast }) => (
     <Media>
         <Media middle left className="mr-3">
-            <i className="fa fa-fw fa-2x fa-info"></i>
+            <i className="fas fa-fw fa-2x fa-info"></i>
         </Media>
         <Media body>
             <Media heading tag="h6">
@@ -118,7 +118,7 @@ const contentInfo = ({ closeToast }) => (
 const contentWarning = ({ closeToast }) => (
     <Media>
         <Media middle left className="mr-3">
-            <i className="fa fa-fw fa-2x fa-exclamation"></i>
+            <i className="fas fa-fw fa-2x fa-exclamation"></i>
         </Media>
         <Media body>
             <Media heading tag="h6">
@@ -142,7 +142,7 @@ const contentWarning = ({ closeToast }) => (
 const contentDefault = ({ closeToast }) => (
     <Media>
         <Media middle left className="mr-3">
-            <i className="fa fa-fw fa-2x fa-question"></i>
+            <i className="fas fa-fw fa-2x fa-question"></i>
         </Media>
         <Media body>
             <Media heading tag="h6">
@@ -170,7 +170,7 @@ export class Notifications extends React.Component {
     render() {
         return (
             <Container>
-                <HeaderMain 
+                <HeaderMain
                     title="Notifications"
                     className="mb-4 mt-4"
                 />
@@ -226,7 +226,7 @@ export class Notifications extends React.Component {
                     </CardBody>
                 </Card>
 
-                <ToastContainer 
+                <ToastContainer
                     position={this.state.position}
                     autoClose={50000}
                     draggable={false}

@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -33,7 +33,7 @@ import { TrTableCompanies } from "./components/TrTableCompanies";
 const Clients = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Clients"
                 className="mb-5 mt-4"
             />
@@ -59,12 +59,12 @@ const Clients = () => (
                                     <ButtonToolbar className="ml-auto">
                                         <ButtonGroup>
                                             <Button color="link" className="align-self-center mr-2 text-decoration-none" id="tooltipSettings">
-                                                <i className="fa fa-fw fa-gear"></i>
+                                                <i className="fas fa-fw fa-gear"></i>
                                             </Button>
                                         </ButtonGroup>
                                         <ButtonGroup>
                                             <Button color="primary" className="align-self-center" id="tooltipAddNew">
-                                                <i className="fa fa-fw fa-plus"></i>
+                                                <i className="fas fa-fw fa-plus"></i>
                                             </Button>
                                         </ButtonGroup>
                                     </ButtonToolbar>
@@ -93,28 +93,28 @@ const Clients = () => (
                                         </thead>
                                         <tbody>
                                             <TrTableClients />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="2"
                                             />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="3"
                                             />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="4"
                                             />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="5"
                                             />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="6"
                                             />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="7"
                                             />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="8"
                                             />
-                                            <TrTableClients 
+                                            <TrTableClients
                                                 id="9"
                                             />
                                         </tbody>
@@ -136,37 +136,37 @@ const Clients = () => (
                                         </thead>
                                         <tbody>
                                             <TrTableCompanies />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="2"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="3"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="4"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="5"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="6"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="7"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="8"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="9"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="10"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="11"
                                             />
-                                            <TrTableCompanies 
+                                            <TrTableCompanies
                                                 id="12"
                                             />
                                         </tbody>
@@ -183,7 +183,7 @@ const Clients = () => (
                             <Pagination aria-label="Page navigation example" className="ml-auto">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-angle-left"></i>
+                                        <i className="fas fa-fw fa-angle-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem active>
@@ -203,7 +203,7 @@ const Clients = () => (
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-angle-right"></i>
+                                        <i className="fas fa-fw fa-angle-right"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                             </Pagination>
@@ -229,17 +229,17 @@ const Clients = () => (
                                         <span>Relases</span>
                                     </li>
                                 </ul>
-                            </div>                                
+                            </div>
                             <Row className="mt-3">
                                 <Col sm={ 6 }>
                                     <Button color="primary" block>
                                         Message
-                                    </Button> 
+                                    </Button>
                                 </Col>
                                 <Col sm={ 6 }>
                                     <Button color="secondary" outline block>
                                         Edit
-                                    </Button> 
+                                    </Button>
                                 </Col>
                             </Row>
                             <div className="mt-4 mb-2">
@@ -248,8 +248,8 @@ const Clients = () => (
                                 </span>
                             </div>
                             <p className="text-left">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
-                                Dicta sapiente earum, necessitatibus commodi eius pariatur 
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                Dicta sapiente earum, necessitatibus commodi eius pariatur
                                 repudiandae cum sunt officiis ex!
                             </p>
                             <div className="mt-4 mb-2">
@@ -271,14 +271,14 @@ const Clients = () => (
                             <div className="mt-4 mb-2">
                                 <span className="small">Contact</span>
                             </div>
-                            <DlRowContacts 
+                            <DlRowContacts
                                 leftSideClassName="text-left"
                                 rightSideClassName="text-right text-inverse"
                             />
                             <div className="mt-4 mb-2">
                                 <span className="small">Address</span>
                             </div>
-                            <DlRowAddress 
+                            <DlRowAddress
                                 leftSideClassName="text-left"
                                 rightSideClassName="text-right text-inverse"
                             />

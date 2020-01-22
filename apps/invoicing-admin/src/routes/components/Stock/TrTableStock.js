@@ -50,12 +50,12 @@ const g = [
 const price = [
     <React.Fragment key="price1">
         <span className="text-success">
-            <i className="fa fa-caret-up mr-1"></i> { randomArray(percentForPrice) }%
+            <i className="fas fa-caret-up mr-1"></i> { randomArray(percentForPrice) }%
         </span>
     </React.Fragment>,
     <React.Fragment key="price2">
         <span className="text-danger">
-            <i className="fa fa-caret-down mr-1"></i> { randomArray(percentForPrice) }%
+            <i className="fas fa-caret-down mr-1"></i> { randomArray(percentForPrice) }%
         </span>
     </React.Fragment>
 ];
