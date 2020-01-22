@@ -9,7 +9,7 @@ describe('BatchUtils', function() {
       const debouncedCb = BatchUtils.withTimeout<Object>(mockFn, 10, timeout);
       debouncedCb([{}, {}]);
       expect(mockFn.mock.calls.length).toBe(0);
-      await wait(100);
+      await wait(timeout);
       expect(mockFn.mock.calls.length).toBe(1);
     });
 
@@ -19,7 +19,7 @@ describe('BatchUtils', function() {
       const debouncedCb = BatchUtils.withTimeout<number>(mockFn, 10, timeout);
       debouncedCb(new Array(11).fill(0));
       expect(mockFn.mock.calls.length).toBe(2);
-      await wait(100);
+      await wait(timeout);
       expect(mockFn.mock.calls.length).toBe(2);
     });
 
@@ -31,7 +31,7 @@ describe('BatchUtils', function() {
         debouncedCb([i]);
       }
       expect(mockFn.mock.calls.length).toBe(1);
-      await wait(100);
+      await wait(timeout);
       expect(mockFn.mock.calls.length).toBe(1);
     });
 
@@ -43,7 +43,7 @@ describe('BatchUtils', function() {
         debouncedCb([i]);
       }
       expect(mockFn.mock.calls.length).toBe(0);
-      await wait(100);
+      await wait(timeout);
       expect(mockFn.mock.calls.length).toBe(1);
     });
   });
