@@ -3,7 +3,7 @@ import faker from 'faker/locale/en_US';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -32,7 +32,7 @@ import { TrTableInbox } from "./components/TrTableInbox";
 const Inbox = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Inbox"
                 className="mb-5 mt-4"
             />
@@ -50,7 +50,7 @@ const Inbox = () => (
                                         <Input placeholder="Search for..." />
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary" outline>
-                                                <i className="fa fa-search"></i>
+                                                <i className="fas fa-search"></i>
                                             </Button>
                                         </InputGroupAddon>
                                     </InputGroup>
@@ -58,31 +58,31 @@ const Inbox = () => (
                                 <ButtonToolbar>
                                     <ButtonGroup className="mr-2">
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipRefresh">
-                                            <i className="fa fa-fw fa-refresh"></i>
+                                            <i className="fas fa-fw fa-refresh"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipRefresh">
                                             Refresh
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipFav">
-                                            <i className="fa fa-fw fa-star"></i>
+                                            <i className="fas fa-fw fa-star"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipFav">
                                             Add to Favorites
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipTag">
-                                            <i className="fa fa-fw fa-tag"></i>
+                                            <i className="fas fa-fw fa-tag"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipTag">
                                             Tag
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipBan">
-                                            <i className="fa fa-fw fa-ban"></i>
+                                            <i className="fas fa-fw fa-ban"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipBan">
                                             Ban this User
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipDelete">
-                                            <i className="fa fa-fw fa-trash"></i>
+                                            <i className="fas fa-fw fa-trash"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipDelete">
                                             Delete
@@ -90,7 +90,7 @@ const Inbox = () => (
                                     </ButtonGroup>
                                     <ButtonGroup className="ml-auto ml-lg-0">
                                         <Button color="primary" className="align-self-center" tag={ Link } to="/apps/new-email" id="tooltipAddNew">
-                                            <i className="fa fa-fw fa-pencil"></i>
+                                            <i className="fas fa-fw fa-pencil"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipAddNew">
                                             Add New
@@ -115,10 +115,10 @@ const Inbox = () => (
                             <tbody>
                             {
                                 _.times(11, (index) => (
-                                    <TrTableInbox 
+                                    <TrTableInbox
                                         id={index.toString()}
                                         key={index}
-                                    />            
+                                    />
                                 ))
                             }
                             </tbody>

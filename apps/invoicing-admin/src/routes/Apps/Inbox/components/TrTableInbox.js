@@ -3,7 +3,7 @@ import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Badge,
     Avatar,
     UncontrolledTooltip,
@@ -36,7 +36,7 @@ const TrTableInbox = (props) => (
                 {
                     (Math.round(Math.random())) ? (
                         <span>
-                            <i className="fa fa-circle fa-fw text-primary" id={`newMessage-${ props.id }` }></i>
+                            <i className="fas fa-circle fa-fw text-primary" id={`newMessage-${ props.id }` }></i>
                             <UncontrolledTooltip placement="bottom" target={`#newMessage-${ props.id }` }>
                                 New Message
                             </UncontrolledTooltip>
@@ -54,7 +54,7 @@ const TrTableInbox = (props) => (
                     <Media left className="d-flex align-self-center mr-3">
                         <div className="mr-2">
                             <a href="#" id="tooltipAddToFavorites">
-                                <i className="fa fa-fw fa-star-o"></i>
+                                <i className="fas fa-fw fa-star-o"></i>
                             </a>
                             <UncontrolledTooltip placement="top" target="tooltipAddToFavorites">
                                 Add To Favorites
@@ -64,18 +64,18 @@ const TrTableInbox = (props) => (
                             size="md"
                             src={ randomAvatar() }
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(status) }
                                     key="avatar-icon-fg"
                                 />
                             ]}
-                        /> 
+                        />
                     </Media>
                     <Media body>
                         <a className="mt-0 text-decoration-none d-flex" href="#">
@@ -96,7 +96,7 @@ const TrTableInbox = (props) => (
                 <br />
                 <Badge pill color={ randomArray(tag) }>
                     { faker.commerce.department() }
-                </Badge> <i className="fa fa-paperclip ml-2"></i>
+                </Badge> <i className="fas fa-paperclip ml-2"></i>
             </td>
             <td className="align-middle text-right">
                 30-Jun-2014<br />

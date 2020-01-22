@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 
-import { 
+import {
     Badge
 } from './../../../components';
 
@@ -25,9 +25,9 @@ const TimelineMini = (props) => (
             }
             { /* START POST Timeline */}
             <div className="timeline-item">
-                { /* Icon */}    
+                { /* Icon */}
                 <div className="timeline-icon">
-                    <i className={` fa fa-fw fa-${ props.icon } ${ props.iconClassName }`}></i>
+                    <i className={` fas fa-fw fa-${ props.icon } ${ props.iconClassName }`}></i>
                 </div>
                 <div className="timeline-item-head clearfix mb-0 pl-3">
                     { /* Badge */}

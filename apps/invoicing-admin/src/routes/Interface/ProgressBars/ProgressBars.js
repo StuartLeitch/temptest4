@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -15,16 +15,16 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const ProgressBars = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Progress Bars"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Progress Bars Colors" 
+                    <HeaderDemo
+                        no={1}
+                        title="Progress Bars Colors"
                         subTitle={(
                             <React.Fragment>
                                 Basic button layout options.
@@ -47,7 +47,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Default progress styling. Use 
+                                Default progress styling. Use
                                 <code> &lt;Progress value={'{'}2 * 5{'}'}/&gt;</code>
                             </p>
                             <Progress value={2 * 5} />
@@ -62,7 +62,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="success" value={'{'}50{'}'}/&gt;</code>
                             </p>
                             <Progress color="success" value={50} />
@@ -77,7 +77,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="info" value={'{'}60{'}'}/&gt;</code>
                             </p>
                             <Progress color="info" value={60} />
@@ -96,7 +96,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="warning" value={'{'}70{'}'}/&gt;</code>
                             </p>
                             <Progress color="warning" value={70} />
@@ -111,7 +111,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="danger" value={'{'}80{'}'}/&gt;</code>
                             </p>
                             <Progress color="danger" value={80} />
@@ -126,7 +126,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="dark" value={'{'}20{'}'}/&gt;</code>
                             </p>
                             <Progress color="dark" value={20} />
@@ -145,7 +145,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="secondary" value={'{'}30{'}'}/&gt;</code>
                             </p>
                             <Progress color="secondary" value={30} />
@@ -160,7 +160,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="purple" value={'{'}40{'}'}/&gt;</code>
                             </p>
                             <Progress color="purple" value={40} />
@@ -175,7 +175,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress color="facebook" value={'{'}60{'}'}/&gt;</code>
                             </p>
                             <Progress color="facebook" value={60} />
@@ -187,12 +187,12 @@ const ProgressBars = () => (
             { /* END Section 1 */}
 
             { /* START Header 2 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
+                    <HeaderDemo
+                        no={2}
                         title="Progress Bars Heights"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Basic button layout options.
@@ -215,7 +215,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Default progress styling. Use 
+                                Default progress styling. Use
                                 <code> &lt;Progress value={'{'}3 * 5{'}'}/&gt;</code>
                             </p>
                             <Progress value={3 * 5} />
@@ -230,7 +230,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress value={'{'}50{'}'} style={'{'}{'{'}height: "5px"{'}'}{'}'}/&gt;</code>
                             </p>
                             <Progress value={2 * 5} style={{height: "5px"}} />
@@ -249,7 +249,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress value={'{'}60{'}'} style={'{'}{'{'}height: "3px"{'}'}{'}'}/&gt;</code>
                             </p>
                             <Progress value={60} style={{height: "3px"}} />
@@ -264,13 +264,13 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress value={'{'}30{'}'} style={'{'}{'{'}height: "1px"{'}'}{'}'}/&gt;</code>
                             </p>
                             <Progress value={30} style={{height: "1px"}} />
                         </CardBody>
                     </Card>
-                    
+
                 </Col>
                 { /* END Col4 2 */}
                 { /* START Col4 3 */}
@@ -284,7 +284,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress value={'{'}70{'}'} style={'{'}{'{'}height: "4px"{'}'}{'}'}/&gt;</code>
                             </p>
                             <Progress value={70} style={{height: "4px"}} />
@@ -299,7 +299,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Color progress styling. Use 
+                                Color progress styling. Use
                                 <code> &lt;Progress value={'{'}40{'}'} style={'{'}{'{'}height: "2px"{'}'}{'}'}/&gt;</code>
                             </p>
                             <Progress value={40} style={{height: "2px"}} />
@@ -311,12 +311,12 @@ const ProgressBars = () => (
             { /* END Section 2 */}
 
             { /* START Header 3 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
+                    <HeaderDemo
+                        no={3}
                         title="Progress Bars Options"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Basic button layout options.
@@ -339,7 +339,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Custom progress styling. Use 
+                                Custom progress styling. Use
                                 <code> &lt;Progress value={'{'}25{'}'}&gt;25%&lt;Progress&gt;</code>
                             </p>
                             <Progress value="25">25%</Progress>
@@ -354,11 +354,11 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Custom progress styling. Use 
+                                Custom progress styling. Use
                                 <code> &lt;Progress value={'{'}25{'}'}&gt;&lt;i className="fa fa-twitter"&gt;&lt;/i&gt;&lt;Progress&gt;</code>
                             </p>
                             <Progress value="55" color="twitter">
-                                    <i className="fa fa-twitter"></i>
+                                    <i className="fas fa-twitter"></i>
                             </Progress>
                         </CardBody>
                     </Card>
@@ -371,7 +371,7 @@ const ProgressBars = () => (
                                 </span>
                             </CardTitle>
                             <p className="card-text">
-                                Custom progress styling. Use 
+                                Custom progress styling. Use
                                 <code> &lt;Progress multi &gt;&lt;Progress bar value="15" /&gt;&lt;/Progress&gt;
                                 </code>
                             </p>
@@ -452,12 +452,12 @@ const ProgressBars = () => (
             { /* END Section 3 */}
 
             { /* START Header 4 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
+                    <HeaderDemo
+                        no={3}
                         title="Progress Bars Layouts"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Below are often used UI cases in applications.

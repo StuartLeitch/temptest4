@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Card,
     CardImg,
     HolderProvider,
@@ -23,39 +23,39 @@ const status = [
 ];
 const stars = [
     <span key="stars5">
-        <i className="fa fa-fw fa-star text-warning" />
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star text-warning" />
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star text-warning"></i>
     </span>,
     <span key="stars4">
-        <i className="fa fa-fw fa-star text-warning" />
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star text-warning" />
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star-o"></i>
     </span>,
     <span key="stars4">
-        <i className="fa fa-fw fa-star text-warning" />
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star-o"></i>
-        <i className="fa fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star text-warning" />
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star-o"></i>
     </span>,
     <span key="stars2">
-        <i className="fa fa-fw fa-star text-warning" />
-        <i className="fa fa-fw fa-star text-warning"></i>
-        <i className="fa fa-fw fa-star-o"></i>
-        <i className="fa fa-fw fa-star-o"></i>
-        <i className="fa fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star text-warning" />
+        <i className="fas fa-fw fa-star text-warning"></i>
+        <i className="fas fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star-o"></i>
     </span>,
     <span key="stars1">
-        <i className="fa fa-fw fa-star text-warning" />
-        <i className="fa fa-fw fa-star-o"></i>
-        <i className="fa fa-fw fa-star-o"></i>
-        <i className="fa fa-fw fa-star-o"></i>
-        <i className="fa fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star text-warning" />
+        <i className="fas fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star-o"></i>
+        <i className="fas fa-fw fa-star-o"></i>
     </span>,
 ];
 
@@ -98,7 +98,7 @@ const VideosResultsCard = () => (
                             </Badge>
                             <Badge color="secondary" pill className="mr-1">
                                 { faker.internet.domainName() }
-                            </Badge>                       
+                            </Badge>
                         </div>
                         <div>
                             <Media>
@@ -107,26 +107,26 @@ const VideosResultsCard = () => (
                                         size="sm"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color={ randomArray(status) }
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <div className="mt-0">
                                         { faker.name.firstName() } { faker.name.lastName() }
                                     </div>
                                 </Media>
-                            </Media>  
-                        </div>  
+                            </Media>
+                        </div>
                     </CardBody>
                 </div>
             </div>

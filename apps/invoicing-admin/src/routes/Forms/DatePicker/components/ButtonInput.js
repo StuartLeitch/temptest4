@@ -11,7 +11,7 @@ const ButtonInputFR = React.forwardRef((props, ref) => (
         onClick={props.onClick}
         ref={ref}
     >
-        <i className="fa fa-fw fa-calendar-o mr-1" />
+        <i className="fas fa-fw fa-calendar-o mr-1" />
         { props.value }
     </Button>
 ));

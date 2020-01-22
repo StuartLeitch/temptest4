@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -10,10 +10,10 @@ import {
     FormFeedback,
     Badge,
     CustomInput,
-    Form, 
-    FormGroup, 
-    Label, 
-    Input, 
+    Form,
+    FormGroup,
+    Label,
+    Input,
     FormText
 } from './../../../components';
 
@@ -23,16 +23,16 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const Forms = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Forms"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Basic Inputs" 
+                    <HeaderDemo
+                        no={1}
+                        title="Basic Inputs"
                         subTitle={(
                             <React.Fragment>
                                 Indicate the current page’s location within a navigational hierarchy that automatically adds separators via CSS.
@@ -61,11 +61,11 @@ const Forms = () => (
                                         Input
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="" 
-                                            name="" 
-                                            id="input" 
-                                            placeholder="" 
+                                        <Input
+                                            type=""
+                                            name=""
+                                            id="input"
+                                            placeholder=""
                                         />
                                     </Col>
                                 </FormGroup>
@@ -76,11 +76,11 @@ const Forms = () => (
                                         Password
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="password" 
-                                            name="password" 
-                                            id="inputPassword" 
-                                            placeholder="" 
+                                        <Input
+                                            type="password"
+                                            name="password"
+                                            id="inputPassword"
+                                            placeholder=""
                                         />
                                     </Col>
                                 </FormGroup>
@@ -91,11 +91,11 @@ const Forms = () => (
                                         Input Placeholder
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="email" 
-                                            name="email" 
-                                            id="inputPasswordPlaceholder" 
-                                            placeholder="Placeholder..." 
+                                        <Input
+                                            type="email"
+                                            name="email"
+                                            id="inputPasswordPlaceholder"
+                                            placeholder="Placeholder..."
                                         />
                                     </Col>
                                 </FormGroup>
@@ -106,11 +106,11 @@ const Forms = () => (
                                         Input Readonly
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="" 
-                                            name="email" 
-                                            id="inputPasswordReadonly" 
-                                            placeholder="Readonly Input..." 
+                                        <Input
+                                            type=""
+                                            name="email"
+                                            id="inputPasswordReadonly"
+                                            placeholder="Readonly Input..."
                                             readOnly
                                         />
                                     </Col>
@@ -122,11 +122,11 @@ const Forms = () => (
                                         Input Disabled
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="" 
-                                            name="" 
-                                            id="inputPasswordDisabled" 
-                                            placeholder="Disabled" 
+                                        <Input
+                                            type=""
+                                            name=""
+                                            id="inputPasswordDisabled"
+                                            placeholder="Disabled"
                                             disabled
                                         />
                                     </Col>
@@ -138,10 +138,10 @@ const Forms = () => (
                                         Default Select
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="select" 
-                                            name="select" 
-                                            id="defaultSelect" 
+                                        <Input
+                                            type="select"
+                                            name="select"
+                                            id="defaultSelect"
                                         >
                                             <option defaultValue="">Open this Select Menu</option>
                                             <option>One</option>
@@ -157,10 +157,10 @@ const Forms = () => (
                                         Custom Select
                                     </Label>
                                     <Col sm={9}>
-                                        <CustomInput 
-                                            type="select" 
-                                            name="customSelect" 
-                                            id="customSelect"  
+                                        <CustomInput
+                                            type="select"
+                                            name="customSelect"
+                                            id="customSelect"
                                         >
                                             <option defaultValue="">Open this Select Menu</option>
                                             <option>One</option>
@@ -186,11 +186,11 @@ const Forms = () => (
                                         Textarea
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="textarea" 
-                                            name="text" 
-                                            id="textArea" 
-                                            placeholder="Enter text..." 
+                                        <Input
+                                            type="textarea"
+                                            name="text"
+                                            id="textArea"
+                                            placeholder="Enter text..."
                                         />
                                     </Col>
                                 </FormGroup>
@@ -212,9 +212,9 @@ const Forms = () => (
                                         Multiple Select
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="select" 
-                                            name="select" 
+                                        <Input
+                                            type="select"
+                                            name="select"
                                             id="multipleSelect"
                                             multiple
                                         >
@@ -232,9 +232,9 @@ const Forms = () => (
                                         Multiple Select Disabled
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="select" 
-                                            name="select" 
+                                        <Input
+                                            type="select"
+                                            name="select"
                                             id="multipleSelectDisabled"
                                             multiple
                                             disabled
@@ -325,33 +325,33 @@ const Forms = () => (
                                     <Col sm={9}>
                                         <Row>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputHelper-1" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputHelper-1"
+                                                    placeholder=""
                                                 />
                                                 <FormText color="muted">
                                                     Left Text Helper
                                                 </FormText>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputHelper-2" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputHelper-2"
+                                                    placeholder=""
                                                 />
                                                 <FormText color="muted text-center">
                                                     Center Text Helper
                                                 </FormText>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 }>
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputHelper-3" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputHelper-3"
+                                                    placeholder=""
                                                 />
                                                 <FormText color="muted text-right">
                                                     Right Text Helper
@@ -369,38 +369,38 @@ const Forms = () => (
                                     <Col sm={9}>
                                         <Row>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputIcon-1" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputIcon-1"
+                                                    placeholder=""
                                                 />
                                                 <FormText color="muted">
-                                                    <i className="fa fa-info-circle mr-2"></i>
+                                                    <i className="fas fa-info-circle mr-2"></i>
                                                     We&apos;ll never share your email.
                                                 </FormText>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputIcon-2" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputIcon-2"
+                                                    placeholder=""
                                                 />
                                                 <FormText color="muted text-center">
-                                                    <i className="fa fa-info-circle mr-2"></i>
+                                                    <i className="fas fa-info-circle mr-2"></i>
                                                     We&apos;ll never share your email.
                                                 </FormText>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 }>
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputIcon-3" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputIcon-3"
+                                                    placeholder=""
                                                 />
                                                 <FormText color="muted text-right">
-                                                    <i className="fa fa-info-circle mr-2"></i>
+                                                    <i className="fas fa-info-circle mr-2"></i>
                                                     We&apos;ll never share your email.
                                                 </FormText>
                                             </Col>
@@ -416,11 +416,11 @@ const Forms = () => (
                                     <Col sm={9}>
                                         <Row>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputBadge-1" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputBadge-1"
+                                                    placeholder=""
                                                 />
                                                 <FormText>
                                                     <Badge color="primary">
@@ -429,11 +429,11 @@ const Forms = () => (
                                                 </FormText>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputBadge-2" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputBadge-2"
+                                                    placeholder=""
                                                 />
                                                 <FormText className="text-center">
                                                     <Badge color="success">
@@ -442,11 +442,11 @@ const Forms = () => (
                                                 </FormText>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 }>
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="inputBadge-3" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="inputBadge-3"
+                                                    placeholder=""
                                                 />
                                                 <FormText className="text-right">
                                                     <Badge color="warning">
@@ -465,11 +465,11 @@ const Forms = () => (
                                     </Label>
                                     <Col sm={9} className="d-flex align-items-center">
                                         <FormGroup check inline>
-                                            <Input 
-                                                type="text" 
-                                                name="" 
-                                                id="inputInline" 
-                                                placeholder="" 
+                                            <Input
+                                                type="text"
+                                                name=""
+                                                id="inputInline"
+                                                placeholder=""
                                             />
                                         </FormGroup>
                                         <FormGroup check inline>
@@ -487,11 +487,11 @@ const Forms = () => (
                                     </Label>
                                     <Col sm={9} className="d-flex align-items-center">
                                         <FormGroup check inline>
-                                            <Input 
-                                                type="text" 
-                                                name="" 
-                                                id="inputInlineBadge" 
-                                                placeholder="" 
+                                            <Input
+                                                type="text"
+                                                name=""
+                                                id="inputInlineBadge"
+                                                placeholder=""
                                             />
                                         </FormGroup>
                                         <FormGroup check inline>
@@ -519,11 +519,11 @@ const Forms = () => (
                                         Input Without Validation
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="text" 
-                                            name="" 
-                                            id="inputWithoutValidation" 
-                                            placeholder="" 
+                                        <Input
+                                            type="text"
+                                            name=""
+                                            id="inputWithoutValidation"
+                                            placeholder=""
                                         />
                                         <FormFeedback>You will not be able to see this</FormFeedback>
                                         <FormText>Example help text that remains unchanged.</FormText>
@@ -536,11 +536,11 @@ const Forms = () => (
                                         Input Validation
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="text" 
-                                            name="" 
-                                            id="inputValidation-1" 
-                                            placeholder="" 
+                                        <Input
+                                            type="text"
+                                            name=""
+                                            id="inputValidation-1"
+                                            placeholder=""
                                             valid
                                             defaultValue="Mark"
                                         />
@@ -555,11 +555,11 @@ const Forms = () => (
                                         Input Validation
                                     </Label>
                                     <Col sm={9}>
-                                        <Input 
-                                            type="text" 
-                                            name="" 
-                                            id="inputValidation-2" 
-                                            placeholder="Username..." 
+                                        <Input
+                                            type="text"
+                                            name=""
+                                            id="inputValidation-2"
+                                            placeholder="Username..."
                                             invalid
                                         />
                                         <FormFeedback>Oh noes! that name is already taken</FormFeedback>
@@ -573,11 +573,11 @@ const Forms = () => (
                                         Select Custom Validation
                                     </Label>
                                     <Col sm={9}>
-                                        <CustomInput 
-                                            type="select" 
-                                            name="customSelect" 
-                                            id="selectCustomValidation" 
-                                            invalid 
+                                        <CustomInput
+                                            type="select"
+                                            name="customSelect"
+                                            id="selectCustomValidation"
+                                            invalid
                                         >
                                             <option defaultValue="">Open this Select Menu</option>
                                             <option>One</option>
@@ -595,10 +595,10 @@ const Forms = () => (
                                         File Browser Validation
                                     </Label>
                                     <Col sm={9}>
-                                        <CustomInput 
-                                            type="file" 
-                                            id="fileInputStyleValidation" 
-                                            name="customFile" 
+                                        <CustomInput
+                                            type="file"
+                                            id="fileInputStyleValidation"
+                                            name="customFile"
                                             invalid
                                         />
                                         <FormFeedback>Example invalid custom file feedback</FormFeedback>
@@ -614,11 +614,11 @@ const Forms = () => (
                                     <Col sm={9}>
                                         <Row>
                                             <Col sm={ 12 } lg={ 4 } className="mb-5 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="validationTooltips-1" 
-                                                    placeholder="" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="validationTooltips-1"
+                                                    placeholder=""
                                                     defaultValue="Mark"
                                                     valid
                                                 />
@@ -630,10 +630,10 @@ const Forms = () => (
                                                 </FormText>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="validationTooltips-2" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="validationTooltips-2"
                                                     placeholder=""
                                                     invalid
                                                 />
@@ -667,20 +667,20 @@ const Forms = () => (
                                     <Col sm={9}>
                                         <Row>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="largeSize-1" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="largeSize-1"
                                                     placeholder="Large (lg) Input"
-                                                    bsSize="lg" 
+                                                    bsSize="lg"
                                                 />
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="select" 
-                                                    name="select" 
+                                                <Input
+                                                    type="select"
+                                                    name="select"
                                                     id="largeSize-2"
-                                                    bsSize="lg" 
+                                                    bsSize="lg"
                                                 >
                                                     <option defaultValue="">Large (lg) Select</option>
                                                     <option>One</option>
@@ -689,11 +689,11 @@ const Forms = () => (
                                                 </Input>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <CustomInput 
-                                                    type="select" 
-                                                    name="customSelect" 
+                                                <CustomInput
+                                                    type="select"
+                                                    name="customSelect"
                                                     id="largeSize-3"
-                                                    bsSize="lg" 
+                                                    bsSize="lg"
                                                 >
                                                     <option defaultValue="">Large (lg) Custom</option>
                                                     <option>One</option>
@@ -713,17 +713,17 @@ const Forms = () => (
                                     <Col sm={9}>
                                         <Row>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="defaultSize-1" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="defaultSize-1"
                                                     placeholder="Default Input"
                                                 />
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="select" 
-                                                    name="select" 
+                                                <Input
+                                                    type="select"
+                                                    name="select"
                                                     id="defaultSize-2"
                                                 >
                                                     <option defaultValue="">Default Select</option>
@@ -733,9 +733,9 @@ const Forms = () => (
                                                 </Input>
                                             </Col>
                                             <Col>
-                                                <CustomInput 
-                                                    type="select" 
-                                                    name="customSelect" 
+                                                <CustomInput
+                                                    type="select"
+                                                    name="customSelect"
                                                     id="defaultSize-3"
                                                 >
                                                     <option defaultValue="">Default Custom</option>
@@ -756,20 +756,20 @@ const Forms = () => (
                                     <Col sm={9}>
                                         <Row>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="text" 
-                                                    name="" 
-                                                    id="smSize-1" 
+                                                <Input
+                                                    type="text"
+                                                    name=""
+                                                    id="smSize-1"
                                                     placeholder="Small (sm) Input"
-                                                    bsSize="sm" 
+                                                    bsSize="sm"
                                                 />
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 } className="mb-3 mb-md-0">
-                                                <Input 
-                                                    type="select" 
-                                                    name="select" 
+                                                <Input
+                                                    type="select"
+                                                    name="select"
                                                     id="smSize-2"
-                                                    bsSize="sm" 
+                                                    bsSize="sm"
                                                 >
                                                     <option defaultValue="">Small (sm) Select</option>
                                                     <option>One</option>
@@ -778,11 +778,11 @@ const Forms = () => (
                                                 </Input>
                                             </Col>
                                             <Col sm={ 12 } lg={ 4 }>
-                                                <CustomInput 
-                                                    type="select" 
-                                                    name="customSelect" 
+                                                <CustomInput
+                                                    type="select"
+                                                    name="customSelect"
                                                     id="smSize-3"
-                                                    bsSize="sm" 
+                                                    bsSize="sm"
                                                 >
                                                     <option defaultValue="">Small (sm) Custom</option>
                                                     <option>One</option>
@@ -803,11 +803,11 @@ const Forms = () => (
             { /* END Section 1 */}
 
             { /* START Header 2 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Checkboxes" 
+                    <HeaderDemo
+                        no={2}
+                        title="Checkboxes"
                         className="mt-5"
                         subTitle={(
                             <React.Fragment>
@@ -901,21 +901,21 @@ const Forms = () => (
                                         </CardTitle>
                                         <Form>
                                             <FormGroup>
-                                                <CustomInput 
-                                                    type="checkbox" 
-                                                    id="checkboxesStackedCustom1" 
+                                                <CustomInput
+                                                    type="checkbox"
+                                                    id="checkboxesStackedCustom1"
                                                     label="Checked Checkbox Custom"
-                                                    defaultChecked 
+                                                    defaultChecked
                                                 />
-                                                <CustomInput 
-                                                    type="checkbox" 
-                                                    id="checkboxesStackedCustom2" 
-                                                    label="Unchecked Checkbox Custom" 
+                                                <CustomInput
+                                                    type="checkbox"
+                                                    id="checkboxesStackedCustom2"
+                                                    label="Unchecked Checkbox Custom"
                                                 />
-                                                <CustomInput 
-                                                    type="checkbox" 
-                                                    id="checkboxesStackedCustom3" 
-                                                    label="Disabled Checkbox Custom" 
+                                                <CustomInput
+                                                    type="checkbox"
+                                                    id="checkboxesStackedCustom3"
+                                                    label="Disabled Checkbox Custom"
                                                 />
                                             </FormGroup>
                                         </Form>
@@ -931,23 +931,23 @@ const Forms = () => (
                                         </CardTitle>
                                         <Form>
                                             <FormGroup>
-                                                <CustomInput 
-                                                    type="checkbox" 
-                                                    id="checkboxesInlineCustom1" 
-                                                    label="Checked Custom" 
+                                                <CustomInput
+                                                    type="checkbox"
+                                                    id="checkboxesInlineCustom1"
+                                                    label="Checked Custom"
                                                     inline
                                                     defaultChecked
                                                 />
-                                                <CustomInput 
-                                                    type="checkbox" 
-                                                    id="checkboxesInlineCustom2" 
-                                                    label="Unchecked Custom" 
+                                                <CustomInput
+                                                    type="checkbox"
+                                                    id="checkboxesInlineCustom2"
+                                                    label="Unchecked Custom"
                                                     inline
                                                 />
-                                                <CustomInput 
-                                                    type="checkbox" 
-                                                    id="checkboxesInlineCustom3" 
-                                                    label="Disabled Custom" 
+                                                <CustomInput
+                                                    type="checkbox"
+                                                    id="checkboxesInlineCustom3"
+                                                    label="Disabled Custom"
                                                     inline
                                                     disabled
                                                 />
@@ -964,11 +964,11 @@ const Forms = () => (
             { /* END Section 2 */}
 
             { /* START Header 3 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
-                        title="Radios" 
+                    <HeaderDemo
+                        no={3}
+                        title="Radios"
                         className="mt-5"
                         subTitle={(
                             <React.Fragment>
@@ -1062,24 +1062,24 @@ const Forms = () => (
                                         </CardTitle>
                                         <Form>
                                             <FormGroup>
-                                                <CustomInput 
-                                                    type="radio" 
-                                                    id="radiosStackedCustom1" 
+                                                <CustomInput
+                                                    type="radio"
+                                                    id="radiosStackedCustom1"
                                                     name="radiosStackedCustom"
                                                     label="Checked Radio Custom"
-                                                    defaultChecked 
+                                                    defaultChecked
                                                 />
-                                                <CustomInput 
-                                                    type="radio" 
-                                                    id="radiosStackedCustom2" 
+                                                <CustomInput
+                                                    type="radio"
+                                                    id="radiosStackedCustom2"
                                                     name="radiosStackedCustom"
-                                                    label="Unchecked Radio Custom" 
+                                                    label="Unchecked Radio Custom"
                                                 />
-                                                <CustomInput 
-                                                    type="radio" 
-                                                    id="radiosStackedCustom3" 
+                                                <CustomInput
+                                                    type="radio"
+                                                    id="radiosStackedCustom3"
                                                     name="radiosStackedCustom"
-                                                    label="Disabled Radio Custom" 
+                                                    label="Disabled Radio Custom"
                                                     disabled
                                                 />
                                             </FormGroup>
@@ -1096,26 +1096,26 @@ const Forms = () => (
                                         </CardTitle>
                                         <Form>
                                             <FormGroup>
-                                                <CustomInput 
-                                                    type="radio" 
+                                                <CustomInput
+                                                    type="radio"
                                                     id="radioInlineCustom1"
                                                     name="radioInlineCustom"
-                                                    label="Checked Custom" 
+                                                    label="Checked Custom"
                                                     inline
                                                     defaultChecked
                                                 />
-                                                <CustomInput 
-                                                    type="radio" 
-                                                    id="radioInlineCustom2" 
+                                                <CustomInput
+                                                    type="radio"
+                                                    id="radioInlineCustom2"
                                                     name="radioInlineCustom"
-                                                    label="Unchecked Custom" 
+                                                    label="Unchecked Custom"
                                                     inline
                                                 />
-                                                <CustomInput 
-                                                    type="radio" 
-                                                    id="radioInlineCustom3" 
+                                                <CustomInput
+                                                    type="radio"
+                                                    id="radioInlineCustom3"
                                                     name="radioInlineCustom"
-                                                    label="Disabled Custom" 
+                                                    label="Disabled Custom"
                                                     inline
                                                     disabled
                                                 />

@@ -67,13 +67,13 @@ const RowList = (props) => (
                                         className="d-block"
                                         src={ item.avatarUrl }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color={ item.status }
                                                 key="avatar-icon-fg"
                                             />

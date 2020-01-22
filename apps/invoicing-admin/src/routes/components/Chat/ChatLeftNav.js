@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Nav,
     NavItem,
     Media,
@@ -26,7 +26,7 @@ const ChatLeftNav = () => (
                 <Input placeholder="Search for..." />
                 <InputGroupAddon addonType="append">
                     <Button outline color="secondary">
-                        <i className="fa fa-search"></i>
+                        <i className="fas fa-search"></i>
                     </Button>
                 </InputGroupAddon>
             </InputGroup>
@@ -48,18 +48,18 @@ const ChatLeftNav = () => (
                                     size="sm"
                                     src={ randomAvatar() }
                                     addOns={[
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="primary"
                                             key="avatar-icon-bg"
                                         />,
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="danger"
                                             key="avatar-icon-fg"
                                         />
                                     ]}
-                                /> 
+                                />
                             </Media>
                             <Media body>
                                 <div className="mt-0 d-flex">
@@ -80,18 +80,18 @@ const ChatLeftNav = () => (
                                     size="sm"
                                     src={ randomAvatar() }
                                     addOns={[
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="white"
                                             key="avatar-icon-bg"
                                         />,
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="success"
                                             key="avatar-icon-fg"
                                         />
                                     ]}
-                                /> 
+                                />
                             </Media>
                             <Media body>
                                 <div className="mt-0 d-flex">
@@ -112,18 +112,18 @@ const ChatLeftNav = () => (
                                     size="sm"
                                     src={ randomAvatar() }
                                     addOns={[
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="white"
                                             key="avatar-icon-bg"
                                         />,
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="secondary"
                                             key="avatar-icon-fg"
                                         />
                                     ]}
-                                /> 
+                                />
                             </Media>
                             <Media body>
                                 <div className="mt-0 d-flex">
@@ -139,7 +139,7 @@ const ChatLeftNav = () => (
                 <NavItem>
                     <NavLink href="/chat">
                         Show All <span className="small mr-2">(345)</span>
-                        <i className="fa fa-angle-down"></i>
+                        <i className="fas fa-angle-down"></i>
                     </NavLink>
                 </NavItem>
             </Nav>
@@ -158,9 +158,9 @@ const ChatLeftNav = () => (
                         <Media>
                             <Media left className="align-self-start mr-1">
                                 <span className="fa-stack fa-lg fa-fw d-flex align-self-center mr-3">
-                                    <i className="fa fa-circle fa-fw fa-stack-2x text-warning"></i>
-                                    <i className="fa fa-exclamation fa-stack-1x fa-fw text-white"></i>
-                                </span> 
+                                    <i className="fas fa-circle fa-fw fa-stack-2x text-warning"></i>
+                                    <i className="fas fa-exclamation fa-stack-1x fa-fw text-white"></i>
+                                </span>
                             </Media>
                             <Media body>
                                 <div className="mt-0">
@@ -178,9 +178,9 @@ const ChatLeftNav = () => (
                         <Media>
                             <Media left className="align-self-start mr-1">
                                 <span className="fa-stack fa-lg fa-fw d-flex align-self-center mr-3">
-                                    <i className="fa fa-circle fa-fw fa-stack-2x text-danger"></i>
-                                    <i className="fa fa-close fa-stack-1x fa-fw text-white"></i>
-                                </span> 
+                                    <i className="fas fa-circle fa-fw fa-stack-2x text-danger"></i>
+                                    <i className="fas fa-close fa-stack-1x fa-fw text-white"></i>
+                                </span>
                             </Media>
                             <Media body>
                                 <div className="mt-0">
@@ -198,9 +198,9 @@ const ChatLeftNav = () => (
                         <Media>
                             <Media left className="align-self-start mr-1">
                                 <span className="fa-stack fa-lg fa-fw d-flex align-self-center mr-3">
-                                    <i className="fa fa-circle fa-fw fa-stack-2x text-success"></i>
-                                    <i className="fa fa-check fa-stack-1x fa-fw text-white"></i>
-                                </span> 
+                                    <i className="fas fa-circle fa-fw fa-stack-2x text-success"></i>
+                                    <i className="fas fa-check fa-stack-1x fa-fw text-white"></i>
+                                </span>
                             </Media>
                             <Media body>
                                 <div className="mt-0">
@@ -218,9 +218,9 @@ const ChatLeftNav = () => (
                         <Media>
                             <Media left className="align-self-start mr-1">
                                 <span className="fa-stack fa-lg fa-fw d-flex align-self-center mr-3">
-                                    <i className="fa fa-circle fa-fw fa-stack-2x text-primary"></i>
-                                    <i className="fa fa-info fa-stack-1x fa-fw text-white"></i>
-                                </span> 
+                                    <i className="fas fa-circle fa-fw fa-stack-2x text-primary"></i>
+                                    <i className="fas fa-info fa-stack-1x fa-fw text-white"></i>
+                                </span>
                             </Media>
                             <Media body>
                                 <div className="mt-0">
@@ -236,7 +236,7 @@ const ChatLeftNav = () => (
                 <NavItem>
                     <NavLink href="/chat">
                         Show All <span className="small mr-2">(12)</span>
-                        <i className="fa fa-angle-down"></i>
+                        <i className="fas fa-angle-down"></i>
                     </NavLink>
                 </NavItem>
             </Nav>

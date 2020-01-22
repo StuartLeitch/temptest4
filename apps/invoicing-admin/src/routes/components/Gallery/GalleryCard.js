@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 
-import { 
+import {
     Card,
     CardImg,
     HolderProvider,
@@ -55,7 +55,7 @@ const GalleryCard = (props) => (
                     </Media>
                     <Media right>
                         <a href="#" className="ml-auto" id={`galleryCardTooltip-${ props.id }` }>
-                            <i className="fa fa-download"></i>
+                            <i className="fas fa-download"></i>
                         </a>
                         <UncontrolledTooltip placement="top" target={`galleryCardTooltip-${ props.id }` }>
                             Download
@@ -68,18 +68,18 @@ const GalleryCard = (props) => (
                             size="md"
                             src={ randomAvatar() }
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(status) }
                                     key="avatar-icon-fg"
                                 />
                             ]}
-                        /> 
+                        />
                     </Media>
                     <Media body>
                         <a className="mt-0 d-flex text-decoration-none" href="#">

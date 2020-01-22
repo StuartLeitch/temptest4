@@ -27,7 +27,7 @@ export const StarRating = (props) => {
                     for(let i = 1; i <= maxStars; i++) {
                         const starProps = {
                             key: i,
-                            className: classNames('fa fa-fw', {
+                            className: classNames('fas fa-fw', {
                                 'fa-star': i <= currentStars,
                                 'fa-star-o': i > currentStars,
                                 [`text-${starColor}`]: i <= currentStars

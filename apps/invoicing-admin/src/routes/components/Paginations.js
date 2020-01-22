@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Pagination,
     PaginationItem,
     PaginationLink
@@ -11,7 +11,7 @@ const Paginations = () => (
     <Pagination aria-label="Page navigation example">
         <PaginationItem>
             <PaginationLink previous href="#">
-                <i className="fa fa-fw fa-angle-left"></i>
+                <i className="fas fa-fw fa-angle-left"></i>
             </PaginationLink>
         </PaginationItem>
         <PaginationItem active>
@@ -31,7 +31,7 @@ const Paginations = () => (
         </PaginationItem>
         <PaginationItem>
             <PaginationLink next href="#">
-                <i className="fa fa-fw fa-angle-right"></i>
+                <i className="fas fa-fw fa-angle-right"></i>
             </PaginationLink>
         </PaginationItem>
     </Pagination>

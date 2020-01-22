@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import faker from 'faker/locale/en_US';
-import { 
+import {
     Avatar,
     Media,
     AvatarAddOn,
-    UncontrolledTooltip 
+    UncontrolledTooltip
 } from './../../components';
 import { randomArray, randomAvatar } from './../../utilities';
 
@@ -25,13 +25,13 @@ const Comment = (props) => (
                 src={ randomAvatar() }
                 className="mr-2"
                 addOns={[
-                    <AvatarAddOn.Icon 
-                        className="fa fa-circle"
+                    <AvatarAddOn.Icon
+                        className="fas fa-circle"
                         color="white"
                         key="avatar-icon-bg"
                     />,
-                    <AvatarAddOn.Icon 
-                        className="fa fa-circle"
+                    <AvatarAddOn.Icon
+                        className="fas fa-circle"
                         color={ randomArray(status) }
                         key="avatar-icon-fg"
                     />
@@ -55,13 +55,13 @@ const Comment = (props) => (
                     +92
                 </span>
                 <a href="#" id="tooltipVoteUp1" className="mr-2">
-                    <i className="fa fa-angle-up text-success"></i>
+                    <i className="fas fa-angle-up text-success"></i>
                 </a>
                 <UncontrolledTooltip placement="top" target="tooltipVoteUp1">
                     Vote Up
                 </UncontrolledTooltip>
                 <a href="#" id="tooltipVoteDown2" className="mr-2">
-                    <i className="fa fa-angle-down text-danger"></i>
+                    <i className="fas fa-angle-down text-danger"></i>
                 </a>
                 <UncontrolledTooltip placement="bottom" target="tooltipVoteDown2">
                     Vote Down

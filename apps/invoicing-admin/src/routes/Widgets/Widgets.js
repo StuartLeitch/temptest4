@@ -10,7 +10,7 @@ import {
     CardBody,
     ListGroup,
     ListGroupItem,
-    CardDeck, 
+    CardDeck,
     Progress,
     CardFooter,
     CardColumns,
@@ -91,16 +91,16 @@ import {
 
 export const Widgets = () => (
     <Container>
-        <HeaderMain 
+        <HeaderMain
             title="Widgets"
             className="mb-5 mt-4"
         />
         { /* START Header 1 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={1} 
-                    title="Widgets Metrics" 
+                <HeaderDemo
+                    no={1}
+                    title="Widgets Metrics"
                     subTitle={(
                         <React.Fragment>
                             Last Update: <strong>12-23-2018, 4:32:12 PM</strong>, Amount: <strong>4</strong>
@@ -115,7 +115,7 @@ export const Widgets = () => (
             { /* START Card Widget */}
             <Card className="mb-3">
                 <CardBody>
-                    <ProfileOverviewCard 
+                    <ProfileOverviewCard
                         title="Total Views"
                         badgeTitle="Monthly"
                         badgeColor="primary"
@@ -132,7 +132,7 @@ export const Widgets = () => (
             { /* START Card Widget */}
             <Card className="mb-3">
                 <CardBody>
-                    <ProfileOverviewCard 
+                    <ProfileOverviewCard
                         title="Total Orders"
                         badgeTitle="Annual"
                         badgeColor="info"
@@ -149,7 +149,7 @@ export const Widgets = () => (
             { /* START Card Widget */}
             <Card className="mb-3">
                 <CardBody>
-                    <ProfileOverviewCard 
+                    <ProfileOverviewCard
                         title="Total Visits"
                         badgeTitle="Daily"
                         badgeColor="secondary"
@@ -166,7 +166,7 @@ export const Widgets = () => (
             { /* START Card Widget */}
             <Card className="mb-3">
                 <CardBody>
-                    <ProfileOverviewCard 
+                    <ProfileOverviewCard
                         title="Total Bounces"
                         badgeTitle="Reatime"
                         badgeColor="warning"
@@ -186,8 +186,8 @@ export const Widgets = () => (
         { /* START Header 2 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={2} 
+                <HeaderDemo
+                    no={2}
                     title="Widgets Grids"
                     className="mt-5"
                     subTitle={(
@@ -211,8 +211,8 @@ export const Widgets = () => (
         { /* START Header 3 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={3} 
+                <HeaderDemo
+                    no={3}
                     title="Widgets Texts"
                     className="mt-5"
                     subTitle={(
@@ -239,19 +239,19 @@ export const Widgets = () => (
                     </CardBody>
                     <ListGroup flush>
                         <ListGroupItem tag={ Link } to="apps/email-details" action className="by-0">
-                            <Attachment 
+                            <Attachment
                                 BgIconClassName="text-primary"
                                 icon="file-word-o"
                             />
                         </ListGroupItem>
                         <ListGroupItem tag={ Link } to="apps/email-details" action className="by-0">
-                            <Attachment 
+                            <Attachment
                                 BgIconClassName="text-success"
                                 icon="file-excel-o"
                             />
                         </ListGroupItem>
                         <ListGroupItem tag={ Link } to="apps/email-details" action className="by-0 mb-3">
-                            <Attachment 
+                            <Attachment
                                 BgIconClassName="text-warning"
                                 icon="file-powerpoint-o"
                             />
@@ -313,14 +313,14 @@ export const Widgets = () => (
                             <Input placeholder="Search Projects..." />
                             <InputGroupAddon addonType="append">
                                 <Button color="secondary" outline tag={ Link } to="/apps/projects/list">
-                                    <i className="fa fa-search"></i>
+                                    <i className="fas fa-search"></i>
                                 </Button>
                             </InputGroupAddon>
                         </InputGroup>
                     </CardBody>
                     <ListGroup flush>
                         <ListGroupItem action tag={ Link } to="/apps/projects/list">
-                            <ProjectsList 
+                            <ProjectsList
                                 badgeColor="success"
                                 badgeTitle="Active"
                                 progressValue="76"
@@ -330,7 +330,7 @@ export const Widgets = () => (
                             />
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/projects/list">
-                            <ProjectsList 
+                            <ProjectsList
                                 badgeColor="danger"
                                 badgeTitle="Suspended"
                                 progressValue="23"
@@ -340,7 +340,7 @@ export const Widgets = () => (
                             />
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/projects/list">
-                            <ProjectsList 
+                            <ProjectsList
                                 badgeColor="secondary"
                                 badgeTitle="Archived"
                                 progressValue="4"
@@ -350,7 +350,7 @@ export const Widgets = () => (
                             />
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/projects/list">
-                            <ProjectsList 
+                            <ProjectsList
                                 badgeColor="warning"
                                 badgeTitle="Paused"
                                 progressValue="63"
@@ -361,7 +361,7 @@ export const Widgets = () => (
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/projects/list" className="text-center">
                             View All Projects
-                            <i className="fa fa-angle-right ml-2"></i>
+                            <i className="fas fa-angle-right ml-2"></i>
                         </ListGroupItem>
                     </ListGroup>
                 </Card>
@@ -398,25 +398,25 @@ export const Widgets = () => (
                     </CardBody>
                     <ListGroup flush className="mb-4">
                         <ListGroupItem action tag={ Link } to="/apps/profile-details" className="bt-0">
-                            <Activity 
+                            <Activity
                                 iconColorBelow="success"
                                 icon="check"
                             />
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/profile-details" className="bt-0">
-                            <Activity 
+                            <Activity
                                 iconColorBelow="danger"
                                 icon="close"
                             />
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/profile-details" className="bt-0">
-                            <Activity 
+                            <Activity
                                 iconColorBelow="warning"
                                 icon="exclamation"
                             />
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/profile-details" className="bt-0">
-                            <Activity 
+                            <Activity
                                 iconColorBelow="primary"
                                 icon="info"
                             />
@@ -437,38 +437,38 @@ export const Widgets = () => (
                             <Input placeholder="Search Tasks..." />
                             <InputGroupAddon addonType="append">
                                 <Button color="secondary" outline tag={ Link } to="/apps/tasks/list">
-                                    <i className="fa fa-search"></i>
+                                    <i className="fas fa-search"></i>
                                 </Button>
                             </InputGroupAddon>
                         </InputGroup>
                     </CardBody>
                     <ListGroup flush>
                         <ListGroupItem action>
-                            <TasksMedia 
+                            <TasksMedia
                                 iconColor="success"
                                 id="1"
                             />
                         </ListGroupItem>
                         <ListGroupItem action>
-                            <TasksMedia 
+                            <TasksMedia
                                 iconColor="danger"
                                 id="2"
                             />
                         </ListGroupItem>
                         <ListGroupItem action>
-                            <TasksMedia 
+                            <TasksMedia
                                 iconColor="warning"
                                 id="3"
                             />
                         </ListGroupItem>
                         <ListGroupItem action>
-                            <TasksMedia 
+                            <TasksMedia
                                 id="4"
                             />
                         </ListGroupItem>
                         <ListGroupItem action tag={ Link } to="/apps/tasks/list" className="text-center">
                             View All Tasks
-                            <i className="fa fa-angle-right ml-2"></i>
+                            <i className="fas fa-angle-right ml-2"></i>
                         </ListGroupItem>
                     </ListGroup>
                 </Card>
@@ -479,7 +479,7 @@ export const Widgets = () => (
                         <CardTitle tag="h6">
                             Timeline Mini
                         </CardTitle>
-                        <TimelineMini 
+                        <TimelineMini
                             showPillDate
                                 pillDate="2 Days ago"
                             icon="times-circle"
@@ -487,19 +487,19 @@ export const Widgets = () => (
                             badgeTitle="Alert"
                                 badgeColor="danger"
                         />
-                        <TimelineMini 
+                        <TimelineMini
                             icon="question-circle"
                                 iconClassName="text-warning"
                             badgeTitle="Warning"
                                 badgeColor="warning"
                         />
-                        <TimelineMini 
+                        <TimelineMini
                             icon="info-circle"
                                 iconClassName="text-info"
                             badgeTitle="Info"
                                 badgeColor="info"
                         />
-                        <TimelineMini 
+                        <TimelineMini
                             showPillDate
                                 pillDate="Yesterday"
                             icon="plus-circle"
@@ -507,13 +507,13 @@ export const Widgets = () => (
                             badgeTitle="Message"
                                 badgeColor="primary"
                         />
-                        <TimelineMini 
+                        <TimelineMini
                             icon="check-circle"
                                 iconClassName="text-success"
                             badgeTitle="Success"
                                 badgeColor="success"
                         />
-                        <TimelineMini 
+                        <TimelineMini
                             icon="circle"
                             badgeTitle="Obsolete"
                         />
@@ -521,7 +521,7 @@ export const Widgets = () => (
                     <ListGroup flush>
                         <ListGroupItem action tag={ Link } to="/pages/timeline" className="text-center">
                             Timeline Details
-                            <i className="fa fa-angle-right ml-2"></i>
+                            <i className="fas fa-angle-right ml-2"></i>
                         </ListGroupItem>
                     </ListGroup>
                 </Card>
@@ -533,8 +533,8 @@ export const Widgets = () => (
         { /* START Header 4 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={4} 
+                <HeaderDemo
+                    no={4}
                     title="Widgets Graphs"
                     className="mt-5"
                     subTitle={(
@@ -560,7 +560,7 @@ export const Widgets = () => (
                         </CardTitle>
                         <Row>
                             <Col sm={ 4 }>
-                                <SessionsByDevice 
+                                <SessionsByDevice
                                     title="Desktop"
                                     valuePercent="51,5"
                                     valuePercentColor="text-primary"
@@ -569,7 +569,7 @@ export const Widgets = () => (
                                 />
                             </Col>
                             <Col sm={ 4 }>
-                                <SessionsByDevice 
+                                <SessionsByDevice
                                     title="Mobile"
                                     valuePercent="34,4"
                                     valuePercentColor="text-info"
@@ -578,7 +578,7 @@ export const Widgets = () => (
                                 />
                             </Col>
                             <Col sm={ 4 }>
-                                <SessionsByDevice 
+                                <SessionsByDevice
                                     title="Tablet"
                                     valuePercent="20,8"
                                     value="81,525"
@@ -592,8 +592,8 @@ export const Widgets = () => (
                         </Progress>
                     </CardBody>
                     <CardFooter className="small">
-                        <i className="fa fa-fw fa-info-circle mr-2"></i>
-                        How do your users (visitors), sessions (visits) and pageviews 
+                        <i className="fas fa-fw fa-info-circle mr-2"></i>
+                        How do your users (visitors), sessions (visits) and pageviews
                         metrics for <abbr title="attribute">www.webkom.com</abbr> compare to your targets over the last 30 days?
                     </CardFooter>
                 </Card>
@@ -610,7 +610,7 @@ export const Widgets = () => (
                     </CardBody>
                     <ListGroup flush>
                         <ListGroupItem className="by-0">
-                            <WebsitePerformance 
+                            <WebsitePerformance
                                 title="Bounce Rate (Avg)"
                                 value="46,893"
                                 valuePercentIcon="caret-up"
@@ -619,7 +619,7 @@ export const Widgets = () => (
                             />
                         </ListGroupItem>
                         <ListGroupItem className="by-0">
-                            <WebsitePerformance 
+                            <WebsitePerformance
                                 title="Pageviews (Avg)"
                                 value="2.15"
                                 valuePercentColor="text-danger"
@@ -627,7 +627,7 @@ export const Widgets = () => (
                             />
                         </ListGroupItem>
                         <ListGroupItem className="by-0">
-                            <WebsitePerformance 
+                            <WebsitePerformance
                                 title="New Sessions"
                                 value="76,40"
                                 valuePercentIcon="caret-up"
@@ -636,7 +636,7 @@ export const Widgets = () => (
                             />
                         </ListGroupItem>
                         <ListGroupItem className="by-0 pb-4">
-                            <WebsitePerformance 
+                            <WebsitePerformance
                                 title="Time on Site (Avg)"
                                 value="2m:16s"
                                 valuePercentColor="text-danger"
@@ -645,8 +645,8 @@ export const Widgets = () => (
                         </ListGroupItem>
                     </ListGroup>
                     <CardFooter className="small">
-                        <i className="fa fa-fw fa-info-circle mr-2"></i>
-                        How do your users (visitors), sessions (visits) and pageviews 
+                        <i className="fas fa-fw fa-info-circle mr-2"></i>
+                        How do your users (visitors), sessions (visits) and pageviews
                         metrics for <abbr title="attribute">www.webkom.com</abbr> compare to your targets over the last 30 days?
                     </CardFooter>
                 </Card>
@@ -671,7 +671,7 @@ export const Widgets = () => (
                                $2,890.12
                             </h2>
                             <div className="mb-1 text-success">
-                                <i className="fa mr-1 fa-caret-up"></i>
+                                <i className="fas mr-1 fa-caret-up"></i>
                                 23.34%
                             </div>
                             <div>
@@ -695,7 +695,7 @@ export const Widgets = () => (
                                 #4.02
                             </span>
                         </CardTitle>
-                        <MetricVsTarget 
+                        <MetricVsTarget
                             title="Users"
                             value="168,793"
                             progressbarColor="danger"
@@ -703,8 +703,8 @@ export const Widgets = () => (
                         />
                     </CardBody>
                     <CardFooter className="small">
-                        <i className="fa fa-fw fa-info-circle mr-2"></i>
-                        How do your users (visitors), sessions (visits) and pageviews 
+                        <i className="fas fa-fw fa-info-circle mr-2"></i>
+                        How do your users (visitors), sessions (visits) and pageviews
                         metrics for <abbr title="attribute">www.webkom.com</abbr> compare to your targets over the last 30 days?
                     </CardFooter>
                 </Card>
@@ -728,7 +728,7 @@ export const Widgets = () => (
                                 Goal:
                                 <UncontrolledButtonDropdown className="ml-2">
                                     <DropdownToggle color="link" className="text-decoration-none">
-                                        All<i className="fa fa-angle-down ml-2" />
+                                        All<i className="fas fa-angle-down ml-2" />
                                     </DropdownToggle>
                                     <DropdownMenu right>
                                         <DropdownItem header>Select Goal:</DropdownItem>
@@ -746,7 +746,7 @@ export const Widgets = () => (
                                46,982
                             </h2>
                             <div className="mb-1 text-success">
-                                <i className="fa mr-1 fa-caret-up"></i>
+                                <i className="fas mr-1 fa-caret-up"></i>
                                 23.34% <span> vs { faker.finance .amount() } (prev.)
                                 </span>
                             </div>
@@ -754,8 +754,8 @@ export const Widgets = () => (
                         <SimpleLineChart />
                     </CardBody>
                     <CardFooter className="small">
-                        <i className="fa fa-fw fa-info-circle mr-2"></i>
-                        How do your users (visitors), sessions (visits) and pageviews 
+                        <i className="fas fa-fw fa-info-circle mr-2"></i>
+                        How do your users (visitors), sessions (visits) and pageviews
                         metrics for <abbr title="attribute">www.webkom.com</abbr> compare to your targets over the last 30 days?
                     </CardFooter>
                 </Card>

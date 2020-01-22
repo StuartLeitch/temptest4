@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { NavLink, Link } from 'react-router-dom';
 
-import { 
+import {
     Button,
     Breadcrumb,
     ButtonToolbar,
@@ -19,13 +19,13 @@ const ProjectsSmHeader = (props ) => (
                 { /* START 1st */}
                 <BreadcrumbItem active>
                     <Link to="/">
-                        <i className="fa fa-home"></i>
+                        <i className="fas fa-home"></i>
                     </Link>
                 </BreadcrumbItem>
                 { /* END 1st */}
 
                 { /* START 2nd */}
-                { 
+                {
                     props.title ? (
                         <BreadcrumbItem>
                             <Link to={ props.subTitleLink }>
@@ -45,7 +45,7 @@ const ProjectsSmHeader = (props ) => (
                     props.title && (
                         <BreadcrumbItem active>
                             {props.title}
-                        </BreadcrumbItem>  
+                        </BreadcrumbItem>
                     )
                 }
                 { /* END 3rd */}
@@ -53,13 +53,13 @@ const ProjectsSmHeader = (props ) => (
             <ButtonToolbar>
                 <ButtonGroup className="mr-auto mr-md-2">
                     <Button tag={ NavLink } to={ `${ props.linkList }` } color="secondary" outline className="align-self-center" id="tooltipShowList">
-                        <i className="fa-fw fa fa-bars"></i>
+                        <i className="fa-fw fas fa-bars"></i>
                     </Button>
                     <UncontrolledTooltip placement="bottom" target="tooltipShowList">
                         Show List
                     </UncontrolledTooltip>
                     <Button tag={ NavLink } to={ `${ props.linkGrid }` } color="secondary" outline className="align-self-center" id="tooltipShowGrid">
-                        <i className="fa-fw fa fa-th-large"></i>
+                        <i className="fa-fw fas fa-th-large"></i>
                     </Button>
                     <UncontrolledTooltip placement="bottom" target="tooltipShowGrid">
                         Show Grid
@@ -68,7 +68,7 @@ const ProjectsSmHeader = (props ) => (
                             props.btnShowKanban && (
                                 <React.Fragment>
                                     <Button tag={ NavLink } to={ `${ props.linkKanban }` } color="secondary" outline className="align-self-center" id="tooltipShowKanban">
-                                        <i className="fa-fw fa fa-trello"></i>
+                                        <i className="fa-fw fas fa-trello"></i>
                                     </Button>
                                     <UncontrolledTooltip placement="bottom" target="tooltipShowKanban">
                                         Show Kanban
@@ -79,7 +79,7 @@ const ProjectsSmHeader = (props ) => (
                 </ButtonGroup>
                 <ButtonGroup>
                     <Button color="primary" className="align-self-center" id="tooltipAddNew">
-                        <i className="fa-fw fa fa-plus"></i>
+                        <i className="fa-fw fas fa-plus"></i>
                     </Button>
                     <UncontrolledTooltip placement="bottom" target="tooltipAddNew">
                         Add New

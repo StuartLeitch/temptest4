@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -11,10 +11,10 @@ import {
     InputGroup,
     InputGroupAddon,
     CustomInput,
-    Form, 
-    FormGroup, 
-    Label, 
-    Input, 
+    Form,
+    FormGroup,
+    Label,
+    Input,
     FormText
 } from './../../../components';
 import { HeaderMain } from "../../components/HeaderMain";
@@ -23,20 +23,20 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const FormsLayouts = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Forms Layouts"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Forms Horizontal & Vertical" 
+                    <HeaderDemo
+                        no={1}
+                        title="Forms Horizontal & Vertical"
                         subTitle={(
                             <React.Fragment>
-                                Create horizontal forms with the grid by adding the 
-                                .row class to form groups and using the .col-*-* classes 
+                                Create horizontal forms with the grid by adding the
+                                .row class to form groups and using the .col-*-* classes
                                 to specify the width of your labels and controls.
                             </React.Fragment>
                         )}
@@ -63,11 +63,11 @@ const FormsLayouts = () => (
                                         Input
                                     </Label>
                                     <Col sm={8}>
-                                        <Input 
-                                            type="text" 
-                                            name="" 
-                                            id="input-1" 
-                                            placeholder="Enter Name..." 
+                                        <Input
+                                            type="text"
+                                            name=""
+                                            id="input-1"
+                                            placeholder="Enter Name..."
                                         />
                                     </Col>
                                 </FormGroup>
@@ -78,11 +78,11 @@ const FormsLayouts = () => (
                                         Password
                                     </Label>
                                     <Col sm={8}>
-                                        <Input 
-                                            type="password" 
-                                            name="password" 
-                                            id="inputPassword-1" 
-                                            placeholder="Password..." 
+                                        <Input
+                                            type="password"
+                                            name="password"
+                                            id="inputPassword-1"
+                                            placeholder="Password..."
                                         />
                                     </Col>
                                 </FormGroup>
@@ -93,26 +93,26 @@ const FormsLayouts = () => (
                                         Operating System
                                     </Label>
                                     <Col sm={8}>
-                                        <CustomInput 
-                                            type="radio" 
+                                        <CustomInput
+                                            type="radio"
                                             id="operatingSystem11"
                                             name="operatingSystem"
-                                            label="OSX" 
+                                            label="OSX"
                                             inline
                                             defaultChecked
                                         />
-                                        <CustomInput 
-                                            type="radio" 
+                                        <CustomInput
+                                            type="radio"
                                             id="operatingSystem12"
                                             name="operatingSystem"
-                                            label="Windows" 
+                                            label="Windows"
                                             inline
                                         />
-                                        <CustomInput 
-                                            type="radio" 
-                                            id="operatingSystem13" 
+                                        <CustomInput
+                                            type="radio"
+                                            id="operatingSystem13"
                                             name="operatingSystem"
-                                            label="Linux" 
+                                            label="Linux"
                                             inline
                                             disabled
                                         />
@@ -125,10 +125,10 @@ const FormsLayouts = () => (
                                         Country
                                     </Label>
                                     <Col sm={8}>
-                                        <CustomInput 
-                                            type="select" 
-                                            name="customSelect" 
-                                            id="country-selector-1"  
+                                        <CustomInput
+                                            type="select"
+                                            name="customSelect"
+                                            id="country-selector-1"
                                         >
                                             <option value="">Select Country...</option>
                                             <option>United States of America (US)</option>
@@ -159,17 +159,17 @@ const FormsLayouts = () => (
                                         Message
                                     </Label>
                                     <Col sm={8}>
-                                        <Input 
-                                            type="textarea" 
-                                            name="text" 
-                                            id="message-1" 
-                                            placeholder="Enter Your Message..." 
+                                        <Input
+                                            type="textarea"
+                                            name="text"
+                                            id="message-1"
+                                            placeholder="Enter Your Message..."
                                             className="mb-2"
                                         />
-                                        <CustomInput 
-                                            type="checkbox" 
-                                            id="iConfirm2" 
-                                            label="I confirm that I have read the Terms." 
+                                        <CustomInput
+                                            type="checkbox"
+                                            id="iConfirm2"
+                                            label="I confirm that I have read the Terms."
                                             className="mb-3"
                                         />
                                         <Button color="primary">Save</Button>
@@ -192,44 +192,44 @@ const FormsLayouts = () => (
                             <Form>
                                 { /* START Input */}
                                 <FormGroup>
-                                    <Input 
-                                        type="text" 
-                                        name="" 
-                                        placeholder="Enter Name..." 
+                                    <Input
+                                        type="text"
+                                        name=""
+                                        placeholder="Enter Name..."
                                     />
                                 </FormGroup>
                                 { /* END Input */}
                                 { /* START Input */}
                                 <FormGroup>
-                                    <Input 
-                                        type="password" 
-                                        name="password" 
-                                        placeholder="Password..." 
+                                    <Input
+                                        type="password"
+                                        name="password"
+                                        placeholder="Password..."
                                     />
                                 </FormGroup>
                                 { /* END Input */}
                                 { /* START Radios */}
                                 <FormGroup>
-                                    <CustomInput 
-                                        type="radio" 
+                                    <CustomInput
+                                        type="radio"
                                         name="operatingSystem"
                                         id="operatingSystem21"
-                                        label="OSX" 
+                                        label="OSX"
                                         inline
                                         defaultChecked
                                     />
-                                    <CustomInput 
-                                        type="radio" 
+                                    <CustomInput
+                                        type="radio"
                                         name="operatingSystem"
                                         id="operatingSystem22"
-                                        label="Windows" 
+                                        label="Windows"
                                         inline
                                     />
-                                    <CustomInput 
-                                        type="radio"  
+                                    <CustomInput
+                                        type="radio"
                                         name="operatingSystem"
                                         id="operatingSystem23"
-                                        label="Linux" 
+                                        label="Linux"
                                         inline
                                         disabled
                                     />
@@ -237,8 +237,8 @@ const FormsLayouts = () => (
                                 { /* END Radios */}
                                 { /* START Select */}
                                 <FormGroup>
-                                    <CustomInput 
-                                        type="select" 
+                                    <CustomInput
+                                        type="select"
                                         name="customSelect"
                                         id="country-selector"
                                     >
@@ -261,16 +261,16 @@ const FormsLayouts = () => (
                                 { /* END File Select */}
                                 { /* START Textarea */}
                                 <FormGroup>
-                                        <Input 
-                                            type="textarea" 
-                                            name="text"  
-                                            placeholder="Enter Your Message..." 
+                                        <Input
+                                            type="textarea"
+                                            name="text"
+                                            placeholder="Enter Your Message..."
                                             className="mb-2"
                                         />
-                                        <CustomInput 
-                                            type="checkbox" 
-                                            id="iConfirm3" 
-                                            label="I confirm that I have read the Terms." 
+                                        <CustomInput
+                                            type="checkbox"
+                                            id="iConfirm3"
+                                            label="I confirm that I have read the Terms."
                                             className="mb-3"
                                         />
                                         <Button color="primary">Save</Button>
@@ -297,11 +297,11 @@ const FormsLayouts = () => (
                                     <Label for="input-2">
                                         Input
                                     </Label>
-                                    <Input 
-                                        type="text" 
-                                        name="" 
-                                        id="input-2" 
-                                        placeholder="Enter Name..." 
+                                    <Input
+                                        type="text"
+                                        name=""
+                                        id="input-2"
+                                        placeholder="Enter Name..."
                                     />
                                 </FormGroup>
                                 { /* END Input */}
@@ -310,11 +310,11 @@ const FormsLayouts = () => (
                                     <Label for="inputPassword-2">
                                         Password
                                     </Label>
-                                    <Input 
-                                        type="password" 
-                                        name="password" 
-                                        id="inputPassword-2" 
-                                        placeholder="Password..." 
+                                    <Input
+                                        type="password"
+                                        name="password"
+                                        id="inputPassword-2"
+                                        placeholder="Password..."
                                     />
                                 </FormGroup>
                                 { /* END Input */}
@@ -324,26 +324,26 @@ const FormsLayouts = () => (
                                         Operating System
                                     </Label>
                                     <div>
-                                        <CustomInput 
-                                            type="radio" 
+                                        <CustomInput
+                                            type="radio"
                                             id="operatingSystem1"
                                             name="operatingSystem"
-                                            label="OSX" 
+                                            label="OSX"
                                             inline
                                             defaultChecked
                                         />
-                                        <CustomInput 
-                                            type="radio" 
-                                            id="operatingSystem2" 
+                                        <CustomInput
+                                            type="radio"
+                                            id="operatingSystem2"
                                             name="operatingSystem"
-                                            label="Windows" 
+                                            label="Windows"
                                             inline
                                         />
-                                        <CustomInput 
-                                            type="radio" 
-                                            id="operatingSystem3" 
+                                        <CustomInput
+                                            type="radio"
+                                            id="operatingSystem3"
                                             name="operatingSystem"
-                                            label="Linux" 
+                                            label="Linux"
                                             inline
                                             disabled
                                         />
@@ -355,10 +355,10 @@ const FormsLayouts = () => (
                                     <Label for="country-selector-2">
                                         Country
                                     </Label>
-                                    <CustomInput 
-                                        type="select" 
-                                        name="customSelect" 
-                                        id="country-selector-2"  
+                                    <CustomInput
+                                        type="select"
+                                        name="customSelect"
+                                        id="country-selector-2"
                                     >
                                         <option value="">Select Country...</option>
                                         <option>United States of America (US)</option>
@@ -385,17 +385,17 @@ const FormsLayouts = () => (
                                     <Label for="message-2">
                                         Message
                                     </Label>
-                                        <Input 
-                                            type="textarea" 
-                                            name="text" 
-                                            id="message-2" 
-                                            placeholder="Enter Your Message..." 
+                                        <Input
+                                            type="textarea"
+                                            name="text"
+                                            id="message-2"
+                                            placeholder="Enter Your Message..."
                                             className="mb-2"
                                         />
-                                        <CustomInput 
-                                            type="checkbox" 
-                                            id="iConfirm" 
-                                            label="I confirm that I have read the Terms." 
+                                        <CustomInput
+                                            type="checkbox"
+                                            id="iConfirm"
+                                            label="I confirm that I have read the Terms."
                                             className="mb-3"
                                         />
                                         <Button color="primary">Save</Button>
@@ -410,11 +410,11 @@ const FormsLayouts = () => (
             { /* END Section 1 */}
 
             { /* START Header 2 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Forms Inline" 
+                    <HeaderDemo
+                        no={2}
+                        title="Forms Inline"
                         className="mt-5"
                         subTitle={(
                             <React.Fragment>
@@ -444,7 +444,7 @@ const FormsLayouts = () => (
                                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
                                     <InputGroup>
                                         <InputGroupAddon addonType="prepend">
-                                            <i className="fa fa-key fa-fw" />
+                                            <i className="fas fa-key fa-fw" />
                                         </InputGroupAddon>
                                         <Input type="password" name="password" placeholder="Password..." />
                                     </InputGroup>

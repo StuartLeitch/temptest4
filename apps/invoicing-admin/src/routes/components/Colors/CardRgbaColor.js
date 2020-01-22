@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { 
-    Card, 
-    CardBody, 
+import {
+    Card,
+    CardBody,
     CardFooter,
     Button,
     CardHeader
@@ -22,8 +22,8 @@ const CardRgbaColor = (props) => (
             return (
                 <Tag className={ `d-flex justify-content-center b-0 bg-${ colorId }` } key={ index }>
                     <InfoPopover className="h6 text-inverse p-1 mb-0" colorId={ colorId } tag={ Button } color="link">
-                        { colorId } 
-                        <i className="fa fa-angle-up ml-1"></i>
+                        { colorId }
+                        <i className="fas fa-angle-up ml-1"></i>
                     </InfoPopover>
                 </Tag>
             );

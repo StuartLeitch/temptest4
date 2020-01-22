@@ -14,16 +14,16 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const Accordions = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Accordions"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Accordions Default" 
+                    <HeaderDemo
+                        no={1}
+                        title="Accordions Default"
                         subTitle="Basic button layout options"
                     />
                 </Col>
@@ -82,7 +82,7 @@ const Accordions = () => (
                     { /* START Example */}
                     <div className="mb-5">
                         <h6>
-                            Accordion: Normal Text 
+                            Accordion: Normal Text
                             <span className="small ml-1 text-muted">
                                 #1.04
                             </span>
@@ -243,7 +243,7 @@ const Accordions = () => (
                         <Accordion className="mb-2" initialOpen>
                             <Accordion.Header className="d-flex align-items-center h6">
                                 <span>
-                                    <i className="fa fa-fw fa-bookmark-o mr-2"></i>
+                                    <i className="fas fa-fw fa-bookmark-o mr-2"></i>
                                     Accordion Card #1
                                 </span>
                                 <Accordion.Indicator className="ml-auto"/>
@@ -258,7 +258,7 @@ const Accordions = () => (
                         <Accordion className="mb-2">
                             <Accordion.Header className="d-flex align-items-center h6">
                                 <span>
-                                    <i className="fa fa-fw fa-clone mr-2"></i>
+                                    <i className="fas fa-fw fa-clone mr-2"></i>
                                     Accordion Card #2
                                 </span>
                                 <Accordion.Indicator className="ml-auto"/>
@@ -273,7 +273,7 @@ const Accordions = () => (
                         <Accordion className="mb-2">
                             <Accordion.Header className="d-flex align-items-center h6">
                                 <span>
-                                    <i className="fa fa-fw fa-copy mr-2"></i>
+                                    <i className="fas fa-fw fa-copy mr-2"></i>
                                     Accordion Card #3
                                 </span>
                                 <Accordion.Indicator className="ml-auto"/>
@@ -294,8 +294,8 @@ const Accordions = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
+                    <HeaderDemo
+                        no={2}
                         title="Accordions Styling"
                         className="mt-5"
                         subTitle="Basic button layout options"

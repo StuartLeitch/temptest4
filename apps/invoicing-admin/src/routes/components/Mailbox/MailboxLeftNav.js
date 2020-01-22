@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Nav,
     NavItem,
     NavLink,
@@ -55,37 +55,37 @@ const MailboxLeftNav = () => (
             <Nav pills vertical>
                 <NavItem>
                     <NavLink href="#">
-                        <i className="fa fa-fw fa-circle text-primary mr-2"></i>
+                        <i className="fas fa-fw fa-circle text-primary mr-2"></i>
                         Family
                     </NavLink>
                 </NavItem>
                 <NavItem>
                     <NavLink href="#">
-                        <i className="fa fa-fw fa-circle text-info mr-2"></i>
+                        <i className="fas fa-fw fa-circle text-info mr-2"></i>
                         Friends
                     </NavLink>
                 </NavItem>
                 <NavItem>
                     <NavLink href="#">
-                        <i className="fa fa-fw fa-circle text-success mr-2"></i>
+                        <i className="fas fa-fw fa-circle text-success mr-2"></i>
                         Work
                     </NavLink>
                 </NavItem>
                 <NavItem>
                     <NavLink href="#">
-                        <i className="fa fa-fw fa-circle text-warning mr-2"></i>
+                        <i className="fas fa-fw fa-circle text-warning mr-2"></i>
                         Trips
                     </NavLink>
                 </NavItem>
                 <NavItem>
                     <NavLink href="#">
-                        <i className="fa fa-fw fa-circle text-danger mr-2"></i>
+                        <i className="fas fa-fw fa-circle text-danger mr-2"></i>
                         Other
                     </NavLink>
                 </NavItem>
                 <NavItem>
                     <NavLink href="#">
-                        <i className="fa fa-fw fa-plus mr-2"></i>
+                        <i className="fas fa-fw fa-plus mr-2"></i>
                         Add New Label
                     </NavLink>
                 </NavItem>

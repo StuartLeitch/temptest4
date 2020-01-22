@@ -3,7 +3,7 @@ import faker from 'faker/locale/en_US';
 
 import PropTypes from 'prop-types';
 
-import { 
+import {
     Row,
     Col
 } from './../../../components';
@@ -26,7 +26,7 @@ const WebsitePerformance = (props) => (
                     { props.value }
                 </h2>
                 <div className={ `mb-1 ${ props.valuePercentColor }` }>
-                    <i className={ `fa mr-1 fa-${ props.valuePercentIcon }` }></i>
+                    <i className={ `fas mr-1 fa-${ props.valuePercentIcon }` }></i>
                     { props.valuePercent }%
                 </div>
                 <div>

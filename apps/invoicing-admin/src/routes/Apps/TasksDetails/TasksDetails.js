@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -34,7 +34,7 @@ import { Comment } from "../../components/Comment";
 const TasksDetails = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Tasks Details"
                 className="mb-5 mt-4"
             />
@@ -79,26 +79,26 @@ const TasksDetails = () => (
                                     <td className="text-right">
                                         <UncontrolledButtonDropdown>
                                             <DropdownToggle color="link" className="p-0 text-decoration-none">
-                                                <i className="fa fa-circle text-success mr-2"></i>
-                                                Small<i className="fa fa-angle-down ml-2" />
+                                                <i className="fas fa-circle text-success mr-2"></i>
+                                                Small<i className="fas fa-angle-down ml-2" />
                                             </DropdownToggle>
                                             <DropdownMenu right>
                                                 <DropdownItem header>Select Priority</DropdownItem>
                                                 <DropdownItem>
-                                                    <i className="fa fa-circle text-danger mr-2"></i>
-                                                    Big 
+                                                    <i className="fas fa-circle text-danger mr-2"></i>
+                                                    Big
                                                 </DropdownItem>
                                                 <DropdownItem>
-                                                    <i className="fa fa-circle text-warning mr-2"></i>
-                                                    High 
+                                                    <i className="fas fa-circle text-warning mr-2"></i>
+                                                    High
                                                 </DropdownItem>
                                                 <DropdownItem>
-                                                    <i className="fa fa-circle text-primary mr-2"></i>
-                                                    Normal 
+                                                    <i className="fas fa-circle text-primary mr-2"></i>
+                                                    Normal
                                                 </DropdownItem>
                                                 <DropdownItem active>
-                                                    <i className="fa fa-circle text-success mr-2"></i>
-                                                    Small 
+                                                    <i className="fas fa-circle text-success mr-2"></i>
+                                                    Small
                                                 </DropdownItem>
                                             </DropdownMenu>
                                         </UncontrolledButtonDropdown>
@@ -150,7 +150,7 @@ const TasksDetails = () => (
                                             </span>
                                         </Media>
                                     </Media>
-                                    <i className="fa fa-fw fa-circle text-success ml-auto align-self-center ml-2"></i>
+                                    <i className="fas fa-fw fa-circle text-success ml-auto align-self-center ml-2"></i>
                                 </NavLink>
                             </NavItem>
                             <NavItem>
@@ -171,7 +171,7 @@ const TasksDetails = () => (
                                             </span>
                                         </Media>
                                     </Media>
-                                    <i className="fa fa-fw fa-circle text-warning ml-auto align-self-center ml-2"></i>
+                                    <i className="fas fa-fw fa-circle text-warning ml-auto align-self-center ml-2"></i>
                                 </NavLink>
                             </NavItem>
                             <NavItem>
@@ -192,21 +192,21 @@ const TasksDetails = () => (
                                             </span>
                                         </Media>
                                     </Media>
-                                    <i className="fa fa-fw fa-circle text-danger ml-auto align-self-center ml-2"></i>
+                                    <i className="fas fa-fw fa-circle text-danger ml-auto align-self-center ml-2"></i>
                                 </NavLink>
                             </NavItem>
                             <NavItem>
                                 <NavLink href="#">
-                                    <i className="fa fa-fw fa-plus mr-2"></i>
+                                    <i className="fas fa-fw fa-plus mr-2"></i>
                                     Add New People
                                 </NavLink>
                             </NavItem>
                         </Nav>
                     </div>
-                    { /* END Left Nav  */}                   
+                    { /* END Left Nav  */}
                 </Col>
                 <Col lg={ 9 }>
-                    <ProjectsSmHeader 
+                    <ProjectsSmHeader
                         subTitle="Tasks"
                             subTitleLink="/apps/tasks/grid"
                         title="Task Details"
@@ -255,21 +255,21 @@ const TasksDetails = () => (
                                     </Badge>
                                 </div>
                                 <div className="mb-3">
-                                    <Attachment 
+                                    <Attachment
                                         icon="file-word-o"
                                         iconClassName="text-white"
                                         BgIconClassName="text-primary"
                                     />
                                 </div>
                                 <div className="mb-3">
-                                    <Attachment 
+                                    <Attachment
                                         icon="file-excel-o"
                                         iconClassName="text-white"
                                         BgIconClassName="text-success"
                                     />
                                 </div>
                                 <div className="mb-3">
-                                    <Attachment 
+                                    <Attachment
                                         icon="file-powerpoint-o"
                                         iconClassName="text-white"
                                         BgIconClassName="text-warning"
@@ -277,7 +277,7 @@ const TasksDetails = () => (
                                 </div>
                                 <div className="mb-5">
                                     <a href="#">
-                                        <i className="fa fa-plus mr-2"></i>
+                                        <i className="fas fa-plus mr-2"></i>
                                         Add More Files to this Task
                                     </a>
                                 </div>
@@ -290,7 +290,7 @@ const TasksDetails = () => (
                                 <Badge pill color="secondary">
                                     3
                                 </Badge>
-                            </div> 
+                            </div>
                             <Comment />
                             <Comment />
                             { /* END Comment Media */}
@@ -299,13 +299,13 @@ const TasksDetails = () => (
                             <InputGroup>
                                 <InputGroupAddon addonType="prepend">
                                     <Button color="secondary" outline>
-                                        <i className="fa fa fa-paperclip"></i>
+                                        <i className="fas fas fa-paperclip"></i>
                                     </Button>
                                 </InputGroupAddon>
                                 <Input placeholder="Your message..." />
                                 <InputGroupAddon addonType="append">
                                     <Button color="primary">
-                                        <i className="fa fa fa-send"></i>
+                                        <i className="fas fas fa-send"></i>
                                     </Button>
                                 </InputGroupAddon>
                             </InputGroup>

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import faker from 'faker/locale/en_US';
-import { 
-    Media, 
+import {
+    Media,
 } from './../../../components';
 
 const Activity = (props) => (
@@ -10,8 +10,8 @@ const Activity = (props) => (
         <Media>
             <Media left>
                 <span className="fa-stack fa-lg fa-fw d-flex mr-3">
-                    <i className={ `fa fa-fw fa-stack-2x fa-stack-2x text-${ props.iconColorBelow } fa-${ props.iconBelow }` }></i>
-                    <i className={ `fa fa-stack-1x fa-fw text-${ props.iconColor } fa-${ props.icon }` }></i>
+                    <i className={ `fas fa-fw fa-stack-2x fa-stack-2x text-${ props.iconColorBelow } fa-${ props.iconBelow }` }></i>
+                    <i className={ `fas fa-stack-1x fa-fw text-${ props.iconColor } fa-${ props.icon }` }></i>
                 </span>
             </Media>
             <Media body>

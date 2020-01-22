@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Avatar,
     AvatarAddOn,
     Row,
@@ -17,20 +17,20 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const Home = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Avatars"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Avatars Sizes" 
+                    <HeaderDemo
+                        no={1}
+                        title="Avatars Sizes"
                         subTitle={(
                             <React.Fragment>
-                                There are versions available default, 
-                                that is avatar: large: avatar <code>avatar-lg</code> & small: 
+                                There are versions available default,
+                                that is avatar: large: avatar <code>avatar-lg</code> & small:
                                 avatar <code>avatar-sm</code>.
                             </React.Fragment>
                         )}
@@ -135,13 +135,13 @@ const Home = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Avatars Types" 
+                    <HeaderDemo
+                        no={2}
+                        title="Avatars Types"
                         subTitle={(
                             <React.Fragment>
-                                There are versions available default, 
-                                that is avatar: large: avatar <code>avatar-lg</code> & small: 
+                                There are versions available default,
+                                that is avatar: large: avatar <code>avatar-lg</code> & small:
                                 avatar <code>avatar-sm</code>.
                             </React.Fragment>
                         )}
@@ -235,21 +235,21 @@ const Home = () => (
                                 bgColor="200"
                                 className="mr-2"
                                 >
-                                <i className="fa fa-user" />
+                                <i className="fas fa-user" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 size="md"
                                 bgColor="200"
                                 className="mr-2"
                                 >
-                                <i className="fa fa-plus" />
+                                <i className="fas fa-plus" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 size="sm"
                                 bgColor="200"
                                 className="mr-2"
                                 >
-                                <i className="fa fa-bars" />
+                                <i className="fas fa-bars" />
                             </Avatar.Font>
                         </CardBody>
                     </Card>
@@ -260,13 +260,13 @@ const Home = () => (
             { /* START Header 3 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
-                        title="Avatars Status" 
+                    <HeaderDemo
+                        no={3}
+                        title="Avatars Status"
                         subTitle={(
                             <React.Fragment>
-                                There are versions available default, 
-                                that is avatar: large: avatar <code>avatar-lg</code> & small: 
+                                There are versions available default,
+                                that is avatar: large: avatar <code>avatar-lg</code> & small:
                                 avatar <code>avatar-sm</code>.
                             </React.Fragment>
                         )}
@@ -294,13 +294,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-fg"
                                     />
@@ -311,13 +311,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="danger"
                                         key="avatar-icon-fg"
                                     />
@@ -328,13 +328,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="warning"
                                         key="avatar-icon-fg"
                                     />
@@ -345,13 +345,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="secondary"
                                         key="avatar-icon-fg"
                                     />
@@ -377,13 +377,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-fg"
                                     />
@@ -394,13 +394,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="danger"
                                         key="avatar-icon-fg"
                                     />
@@ -411,13 +411,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="warning"
                                         key="avatar-icon-fg"
                                     />
@@ -428,13 +428,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="secondary"
                                         key="avatar-icon-fg"
                                     />
@@ -460,13 +460,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-fg"
                                     />
@@ -477,13 +477,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="danger"
                                         key="avatar-icon-fg"
                                     />
@@ -494,13 +494,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="warning"
                                         key="avatar-icon-fg"
                                     />
@@ -511,13 +511,13 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="secondary"
                                         key="avatar-icon-fg"
                                     />
@@ -532,13 +532,13 @@ const Home = () => (
             { /* START Header 4 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={4} 
-                        title="Avatars Badges Pills" 
+                    <HeaderDemo
+                        no={4}
+                        title="Avatars Badges Pills"
                         subTitle={(
                             <React.Fragment>
-                                There are versions available default, 
-                                that is avatar: large: avatar <code>avatar-lg</code> & small: 
+                                There are versions available default,
+                                that is avatar: large: avatar <code>avatar-lg</code> & small:
                                 avatar <code>avatar-sm</code>.
                             </React.Fragment>
                         )}
@@ -720,13 +720,13 @@ const Home = () => (
             { /* START Header 5 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={5} 
-                        title="Avatars Badges" 
+                    <HeaderDemo
+                        no={5}
+                        title="Avatars Badges"
                         subTitle={(
                             <React.Fragment>
-                                There are versions available default, 
-                                that is avatar: large: avatar <code>avatar-lg</code> & small: 
+                                There are versions available default,
+                                that is avatar: large: avatar <code>avatar-lg</code> & small:
                                 avatar <code>avatar-sm</code>.
                             </React.Fragment>
                         )}
@@ -908,13 +908,13 @@ const Home = () => (
             { /* START Header 6 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={6} 
-                        title="Avatars Icons" 
+                    <HeaderDemo
+                        no={6}
+                        title="Avatars Icons"
                         subTitle={(
                             <React.Fragment>
-                                There are versions available default, 
-                                that is avatar: large: avatar <code>avatar-lg</code> & small: 
+                                There are versions available default,
+                                that is avatar: large: avatar <code>avatar-lg</code> & small:
                                 avatar <code>avatar-sm</code>.
                             </React.Fragment>
                         )}
@@ -942,18 +942,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="facebook"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-facebook"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-facebook"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -965,18 +965,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="twitter"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-twitter"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-twitter"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -988,18 +988,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="linkedin"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-linkedin"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-linkedin"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1011,18 +1011,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-plus"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-plus"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1034,18 +1034,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="danger"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-minus"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-minus"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1072,18 +1072,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="facebook"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-facebook"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-facebook"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1095,18 +1095,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="twitter"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-twitter"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-twitter"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1118,18 +1118,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="linkedin"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-linkedin"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-linkedin"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1141,18 +1141,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-plus"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-plus"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1164,18 +1164,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="danger"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-minus"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-minus"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1202,18 +1202,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="facebook"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-facebook"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-facebook"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1225,18 +1225,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="twitter"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-twitter"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-twitter"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1248,18 +1248,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="linkedin"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-linkedin"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-linkedin"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1271,18 +1271,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-plus"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-plus"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1294,18 +1294,18 @@ const Home = () => (
                                 src={ randomAvatar() }
                                 className="mr-3"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-white-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="danger"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-minus"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-minus"
                                         color="white"
                                         key="avatar-icon-fg"
                                         small
@@ -1321,13 +1321,13 @@ const Home = () => (
             { /* START Header 7 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={7} 
-                        title="Avatars Colors" 
+                    <HeaderDemo
+                        no={7}
+                        title="Avatars Colors"
                         subTitle={(
                             <React.Fragment>
-                                There are versions available default, 
-                                that is avatar: large: avatar <code>avatar-lg</code> & small: 
+                                There are versions available default,
+                                that is avatar: large: avatar <code>avatar-lg</code> & small:
                                 avatar <code>avatar-sm</code>.
                             </React.Fragment>
                         )}
@@ -1406,7 +1406,7 @@ const Home = () => (
                             >
                                 WH
                             </Avatar.Font>
-                            
+
                         </CardBody>
                     </Card>
                 </Col>
@@ -1492,7 +1492,7 @@ const Home = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6">
-                                Avatars: Other Colors 
+                                Avatars: Other Colors
                                 <span className="small ml-1 text-muted">
                                     #7.03
                                 </span>
@@ -1545,110 +1545,110 @@ const Home = () => (
                             <p className="card-text">
                                 Large size avatar example
                             </p>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="facebook"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-facebook" />
+                                <i className="fas fa-facebook" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="twitter"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-twitter" />
+                                <i className="fas fa-twitter" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="lastfm"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-lastfm" />
+                                <i className="fas fa-lastfm" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="pinterest"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-pinterest" />
+                                <i className="fas fa-pinterest" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="linkedin"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-linkedin" />
+                                <i className="fas fa-linkedin" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="medium"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-medium" />
+                                <i className="fas fa-medium" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="skype"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-skype" />
+                                <i className="fas fa-skype" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="foursquare"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-foursquare" />
+                                <i className="fas fa-foursquare" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="android"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-android" />
+                                <i className="fas fa-android" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="spotify"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-spotify" />
+                                <i className="fas fa-spotify" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="paypal"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-paypal" />
+                                <i className="fas fa-paypal" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="dribbble"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-dribbble" />
+                                <i className="fas fa-dribbble" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="youtube"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-youtube" />
+                                <i className="fas fa-youtube" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="windows"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-windows" />
+                                <i className="fas fa-windows" />
                             </Avatar.Font>
-                            <Avatar.Font 
+                            <Avatar.Font
                                 bgColor="amazon"
                                 fgColor="white"
                                 className="mr-1"
                                 >
-                                <i className="fa fa-amazon" />
+                                <i className="fas fa-amazon" />
                             </Avatar.Font>
                         </CardBody>
                     </Card>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -17,19 +17,19 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const Paginations = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Paginations"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Paginations" 
+                    <HeaderDemo
+                        no={1}
+                        title="Paginations"
                         subTitle={(
                             <React.Fragment>
-                                Documentation and examples for showing pagination to 
+                                Documentation and examples for showing pagination to
                                 indicate a series of related content exists across m
                                 ultiple pages.
                             </React.Fragment>
@@ -159,14 +159,14 @@ const Paginations = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Paginations with Icons" 
+                    <HeaderDemo
+                        no={2}
+                        title="Paginations with Icons"
                         className="mt-5"
                         subTitle={(
                             <React.Fragment>
-                                Looking to use an icon or symbol in place of text for some pagination links? 
-                                Be sure to provide proper screen reader support with <code>aria</code> attributes and 
+                                Looking to use an icon or symbol in place of text for some pagination links?
+                                Be sure to provide proper screen reader support with <code>aria</code> attributes and
                                 the <code>.sr-only</code> utility.
                             </React.Fragment>
                         )}
@@ -227,7 +227,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-chevron-left"></i>
+                                        <i className="fas fa-fw fa-chevron-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem active>
@@ -246,7 +246,7 @@ const Paginations = () => (
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-chevron-right"></i>
+                                        <i className="fas fa-fw fa-chevron-right"></i>
                                     </PaginationLink>
                             </Pagination>
                         </CardBody>
@@ -267,7 +267,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-long-arrow-left"></i>
+                                        <i className="fas fa-fw fa-long-arrow-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem active>
@@ -287,7 +287,7 @@ const Paginations = () => (
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-long-arrow-right"></i>
+                                        <i className="fas fa-fw fa-long-arrow-right"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                             </Pagination>
@@ -307,7 +307,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-angle-left"></i>
+                                        <i className="fas fa-fw fa-angle-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem active>
@@ -327,7 +327,7 @@ const Paginations = () => (
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-angle-right"></i>
+                                        <i className="fas fa-fw fa-angle-right"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                             </Pagination>
@@ -349,7 +349,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-arrow-left"></i>
+                                        <i className="fas fa-fw fa-arrow-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem active>
@@ -369,7 +369,7 @@ const Paginations = () => (
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-arrow-right"></i>
+                                        <i className="fas fa-fw fa-arrow-right"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                             </Pagination>
@@ -389,7 +389,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-caret-left"></i>
+                                        <i className="fas fa-fw fa-caret-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem active>
@@ -408,7 +408,7 @@ const Paginations = () => (
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-caret-right"></i>
+                                        <i className="fas fa-fw fa-caret-right"></i>
                                     </PaginationLink>
                             </Pagination>
                         </CardBody>
@@ -420,14 +420,14 @@ const Paginations = () => (
             { /* START Header 3 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={4} 
-                        title="Paginations Sizes" 
+                    <HeaderDemo
+                        no={4}
+                        title="Paginations Sizes"
                         className="mt-5"
                          subTitle={(
                             <React.Fragment>
-                                Fancy larger or smaller pagination? 
-                                Add <code>.pagination-lg</code> or <code>.pagination-sm</code> 
+                                Fancy larger or smaller pagination?
+                                Add <code>.pagination-lg</code> or <code>.pagination-sm</code>
                                 for additional sizes.
                             </React.Fragment>
                         )}
@@ -452,7 +452,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example" size="lg">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-angle-left"></i>
+                                        <i className="fas fa-fw fa-angle-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem>
@@ -472,7 +472,7 @@ const Paginations = () => (
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-angle-right"></i>
+                                        <i className="fas fa-fw fa-angle-right"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                             </Pagination>
@@ -494,7 +494,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-angle-left"></i>
+                                        <i className="fas fa-fw fa-angle-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem>
@@ -514,7 +514,7 @@ const Paginations = () => (
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-angle-right"></i>
+                                        <i className="fas fa-fw fa-angle-right"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                             </Pagination>
@@ -536,7 +536,7 @@ const Paginations = () => (
                             <Pagination aria-label="Page navigation example" size="sm">
                                 <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-fw fa-angle-left"></i>
+                                        <i className="fas fa-fw fa-angle-left"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                                 <PaginationItem>
@@ -556,7 +556,7 @@ const Paginations = () => (
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationLink next href="#">
-                                        <i className="fa fa-fw fa-angle-right"></i>
+                                        <i className="fas fa-fw fa-angle-right"></i>
                                     </PaginationLink>
                                 </PaginationItem>
                             </Pagination>

@@ -32,8 +32,8 @@ const generateRow = (id) => ({
     region: randomArray(['North', 'South', 'East', 'West']),
     earnings: 500 + Math.random() * 1000,
     earningsCurrencyIcon: randomArray([
-        <i className="fa fa-fw fa-euro text-muted" key="cur_eur"></i>,
-        <i className="fa fa-fw fa-dollar text-muted" key="cur_usd"></i>
+        <i className="fas fa-fw fa-euro text-muted" key="cur_eur"></i>,
+        <i className="fas fa-fw fa-dollar text-muted" key="cur_usd"></i>
     ]),
     lastLoginDate: faker.date.recent(),
     ipAddress: faker.internet.ip(),
@@ -45,9 +45,9 @@ const generateRow = (id) => ({
 
 const sortCaret = (order) => {
     if (!order)
-        return <i className="fa fa-fw fa-sort text-muted"></i>;
+        return <i className="fas fa-fw fa-sort text-muted"></i>;
     if (order)
-        return <i className={`fa fa-fw text-muted fa-sort-${order}`}></i>
+        return <i className={`fas fa-fw text-muted fa-sort-${order}`}></i>
 };
 
 export class AdvancedTableB extends React.Component {
@@ -132,7 +132,7 @@ export class AdvancedTableB extends React.Component {
                     </span>
                 )
             }
-        ]; 
+        ];
     }
 
     render() {
@@ -169,15 +169,15 @@ export class AdvancedTableB extends React.Component {
             ),
             showExpandColumn: true,
             expandHeaderColumnRenderer: ({ isAnyExpands }) => isAnyExpands ? (
-                    <i className="fa fa-angle-down fa-fw fa-lg text-muted"></i>
+                    <i className="fas fa-angle-down fa-fw fa-lg text-muted"></i>
                 ) : (
-                    <i className="fa fa-angle-right fa-fw fa-lg text-muted"></i>
+                    <i className="fas fa-angle-right fa-fw fa-lg text-muted"></i>
                 ),
             expandColumnRenderer: ({ expanded }) =>
                 expanded ? (
-                    <i className="fa fa-angle-down fa-fw fa-lg text-muted"></i>
+                    <i className="fas fa-angle-down fa-fw fa-lg text-muted"></i>
                 ) : (
-                    <i className="fa fa-angle-right fa-fw fa-lg text-muted"></i>
+                    <i className="fas fa-angle-right fa-fw fa-lg text-muted"></i>
                 )
         }
 
@@ -212,7 +212,7 @@ export class AdvancedTableB extends React.Component {
                                         outline
                                         onClick={ this.handleAddRow.bind(this) }
                                     >
-                                        Add <i className="fa fa-fw fa-plus"></i>
+                                        Add <i className="fas fa-fw fa-plus"></i>
                                     </Button>
                                 </ButtonGroup>
                             </div>

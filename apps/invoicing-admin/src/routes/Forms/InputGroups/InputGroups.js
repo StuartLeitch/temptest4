@@ -1,20 +1,20 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
     Card,
     CardTitle,
     CardBody,
-    Button, 
+    Button,
     InputGroup,
     InputGroupAddon,
     CustomInput,
-    Form, 
-    FormGroup, 
+    Form,
+    FormGroup,
     Label,
-    UncontrolledButtonDropdown, 
+    UncontrolledButtonDropdown,
     DropdownMenu,
     DropdownToggle,
     DropdownItem,
@@ -27,19 +27,19 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const InputGroups = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Input Groups"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Basic Inputs Groups" 
+                    <HeaderDemo
+                        no={1}
+                        title="Basic Inputs Groups"
                         subTitle={(
                             <React.Fragment>
-                                Easily extend form controls by adding text, buttons, 
+                                Easily extend form controls by adding text, buttons,
                                 or button groups on either side of textual inputs, custom selects, and custom file inputs.
                             </React.Fragment>
                         )}
@@ -172,7 +172,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-user"></i>
+                                                <i className="fas fa-fw fa-user"></i>
                                             </InputGroupAddon>
                                             <Input placeholder="Left Addon..." id="leftIcon" />
                                         </InputGroup>
@@ -188,7 +188,7 @@ const InputGroups = () => (
                                         <InputGroup>
                                             <Input placeholder="Left Addon..." id="rightIcon" />
                                             <InputGroupAddon addonType="append">
-                                                <i className="fa fa-fw fa-lock"></i>
+                                                <i className="fas fa-fw fa-lock"></i>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </Col>
@@ -202,7 +202,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-dollar"></i>
+                                                <i className="fas fa-fw fa-dollar"></i>
                                             </InputGroupAddon>
                                             <Input placeholder="Amount..." id="bothIcon" />
                                             <InputGroupAddon addonType="append">
@@ -220,7 +220,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-link"></i>
+                                                <i className="fas fa-fw fa-link"></i>
                                             </InputGroupAddon>
                                             <Input placeholder="Enter Your Nick..." id="urlIcon" />
                                         </InputGroup>
@@ -235,7 +235,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-file-text-o"></i>
+                                                <i className="fas fa-fw fa-file-text-o"></i>
                                             </InputGroupAddon>
                                             <Input type="textarea" name="text" id="leftIconTextarea" />
                                         </InputGroup>
@@ -251,7 +251,7 @@ const InputGroups = () => (
                                         <InputGroup>
                                             <Input type="textarea" name="text" id="rightIconTextarea" />
                                             <InputGroupAddon addonType="append">
-                                                <i className="fa fa-fw fa-file-text-o"></i>
+                                                <i className="fas fa-fw fa-file-text-o"></i>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </Col>
@@ -265,11 +265,11 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-comment-o"></i>
+                                                <i className="fas fa-fw fa-comment-o"></i>
                                             </InputGroupAddon>
                                             <Input type="textarea" name="text" id="bothIconTextarea" />
                                             <InputGroupAddon addonType="append">
-                                                <i className="fa fa-fw fa-file-text-o"></i>
+                                                <i className="fas fa-fw fa-file-text-o"></i>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </Col>
@@ -294,7 +294,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-spinner fa-spin"></i>
+                                                <i className="fas fa-fw fa-spinner fa-spin"></i>
                                             </InputGroupAddon>
                                             <Input placeholder="Left Addon..." id="leftSpin" />
                                         </InputGroup>
@@ -310,7 +310,7 @@ const InputGroups = () => (
                                         <InputGroup>
                                             <Input placeholder="Left Addon..." id="rightSpin" />
                                             <InputGroupAddon addonType="append">
-                                                <i className="fa fa-fw fa-spinner fa-spin"></i>
+                                                <i className="fas fa-fw fa-spinner fa-spin"></i>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </Col>
@@ -324,7 +324,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-spinner fa-spin"></i>
+                                                <i className="fas fa-fw fa-spinner fa-spin"></i>
                                             </InputGroupAddon>
                                             <Input type="textarea" name="text" id="leftSpinTextarea" />
                                         </InputGroup>
@@ -340,7 +340,7 @@ const InputGroups = () => (
                                         <InputGroup>
                                             <Input type="textarea" name="text" id="rightSpinTextarea" />
                                             <InputGroupAddon addonType="append">
-                                                <i className="fa fa-fw fa-spinner fa-spin"></i>
+                                                <i className="fas fa-fw fa-spinner fa-spin"></i>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </Col>
@@ -418,12 +418,12 @@ const InputGroups = () => (
             { /* END Section 1 */}
 
             { /* START Header 2 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
+                    <HeaderDemo
+                        no={2}
                         title="Input Groups Buttons"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Indicate the current page’s location within a navigational hierarchy that automatically adds separators via CSS.
@@ -473,7 +473,7 @@ const InputGroups = () => (
                                             <Input placeholder="Right Addon..." id="rightButton" />
                                             <InputGroupAddon addonType="append">
                                                  <Button color="secondary" outline>
-                                                    Add <i className="fa fa-angle-right ml-2"></i>
+                                                    Add <i className="fas fa-angle-right ml-2"></i>
                                                  </Button>
                                             </InputGroupAddon>
                                         </InputGroup>
@@ -495,7 +495,7 @@ const InputGroups = () => (
                                             <Input placeholder="Amount..." id="bothButtons" />
                                             <InputGroupAddon addonType="append">
                                                  <Button color="secondary" outline>
-                                                    Add <i className="fa fa-angle-right ml-2"></i>
+                                                    Add <i className="fas fa-angle-right ml-2"></i>
                                                  </Button>
                                             </InputGroupAddon>
                                         </InputGroup>
@@ -511,7 +511,7 @@ const InputGroups = () => (
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
                                                 <Button color="secondary" outline>
-                                                    <i className="fa fa-close mr-2"></i>
+                                                    <i className="fas fa-close mr-2"></i>
                                                     Clear
                                                 </Button>
                                             </InputGroupAddon>
@@ -530,10 +530,10 @@ const InputGroups = () => (
                                             <Input type="textarea" name="text" id="rightButtonTextarea" />
                                             <InputGroupAddon addonType="append">
                                                 <Button color="secondary" outline>
-                                                    <i className="fa fa-close mr-2"></i>
+                                                    <i className="fas fa-close mr-2"></i>
                                                     Clear
                                                 </Button>
-                                            </InputGroupAddon>                                            
+                                            </InputGroupAddon>
                                         </InputGroup>
                                     </Col>
                                 </FormGroup>
@@ -549,14 +549,14 @@ const InputGroups = () => (
                                                 <Button color="secondary" outline>
                                                     Change...
                                                 </Button>
-                                            </InputGroupAddon>  
+                                            </InputGroupAddon>
                                             <Input type="textarea" name="text" id="bothButtonTextarea" />
                                             <InputGroupAddon addonType="append">
                                                 <Button color="secondary" outline>
-                                                    <i className="fa fa-close mr-2"></i>
+                                                    <i className="fas fa-close mr-2"></i>
                                                     Clear
                                                 </Button>
-                                            </InputGroupAddon>                                            
+                                            </InputGroupAddon>
                                         </InputGroup>
                                     </Col>
                                 </FormGroup>
@@ -588,23 +588,23 @@ const InputGroups = () => (
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -633,23 +633,23 @@ const InputGroups = () => (
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -678,20 +678,20 @@ const InputGroups = () => (
                                                         Select Priveleges:
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-circle-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-circle-o mr-2"></i>
                                                         Administrator
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-o mr-2"></i>
                                                         User
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-users mr-2"></i>
+                                                        <i className="fas fa-fw fa-users mr-2"></i>
                                                         All
                                                     </DropdownItem>
                                                     <DropdownItem divider />
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-plus mr-2"></i>
+                                                        <i className="fas fa-fw fa-plus mr-2"></i>
                                                         Add New User
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -708,23 +708,23 @@ const InputGroups = () => (
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -745,29 +745,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="prepend">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -790,29 +790,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="append">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist right>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -841,20 +841,20 @@ const InputGroups = () => (
                                                         Select Priveleges:
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-circle-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-circle-o mr-2"></i>
                                                         Administrator
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-o mr-2"></i>
                                                         User
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-users mr-2"></i>
+                                                        <i className="fas fa-fw fa-users mr-2"></i>
                                                         All
                                                     </DropdownItem>
                                                     <DropdownItem divider />
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-plus mr-2"></i>
+                                                        <i className="fas fa-fw fa-plus mr-2"></i>
                                                         Add New User
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -865,29 +865,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="append">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist right>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                     { /* END Dropdown Content */}
@@ -926,29 +926,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="prepend">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -976,29 +976,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="append">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist right>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -1024,7 +1024,7 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="prepend">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-user-circle-o"></i>
+                                                    <i className="fas fa-fw fa-user-circle-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist>
                                                     { /* START Dropdown Content */}
@@ -1032,20 +1032,20 @@ const InputGroups = () => (
                                                         Select Priveleges:
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-circle-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-circle-o mr-2"></i>
                                                         Administrator
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-o mr-2"></i>
                                                         User
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-users mr-2"></i>
+                                                        <i className="fas fa-fw fa-users mr-2"></i>
                                                         All
                                                     </DropdownItem>
                                                     <DropdownItem divider />
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-plus mr-2"></i>
+                                                        <i className="fas fa-fw fa-plus mr-2"></i>
                                                         Add New User
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -1061,29 +1061,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="append">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist right>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -1104,29 +1104,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="prepend">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -1159,29 +1159,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="append">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist right>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -1215,20 +1215,20 @@ const InputGroups = () => (
                                                         Select Priveleges:
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-circle-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-circle-o mr-2"></i>
                                                         Administrator
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-user-o mr-2"></i>
+                                                        <i className="fas fa-fw fa-user-o mr-2"></i>
                                                         User
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-users mr-2"></i>
+                                                        <i className="fas fa-fw fa-users mr-2"></i>
                                                         All
                                                     </DropdownItem>
                                                     <DropdownItem divider />
                                                     <DropdownItem>
-                                                        <i className="fa fa-fw fa-plus mr-2"></i>
+                                                        <i className="fas fa-fw fa-plus mr-2"></i>
                                                         Add New User
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -1244,29 +1244,29 @@ const InputGroups = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="append">
                                                 <DropdownToggle color="secondary" outline caret>
-                                                    <i className="fa fa-fw fa-folder-open-o"></i>
+                                                    <i className="fas fa-fw fa-folder-open-o"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist right>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                     { /* END Dropdown Content */}
@@ -1286,15 +1286,15 @@ const InputGroups = () => (
             { /* END Section 2 */}
 
             { /* START Header 3 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
-                        title="Input Groups Buttons" 
+                    <HeaderDemo
+                        no={3}
+                        title="Input Groups Buttons"
                         className="mt-5"
                         subTitle={(
                             <React.Fragment>
-                                Easily extend form controls by adding text, buttons, 
+                                Easily extend form controls by adding text, buttons,
                                 or button groups on either side of textual inputs, custom selects, and custom file inputs.
                             </React.Fragment>
                         )}
@@ -1323,7 +1323,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup size="lg">
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-user"></i>
+                                                <i className="fas fa-fw fa-user"></i>
                                             </InputGroupAddon>
                                             <Input placeholder="Enter Your Nick..." id="leftLargeAddon" />
                                         </InputGroup>
@@ -1338,7 +1338,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-envelope"></i>
+                                                <i className="fas fa-fw fa-envelope"></i>
                                             </InputGroupAddon>
                                             <Input placeholder="Enter Your Email..." id="leftDefaultAddon" />
                                         </InputGroup>
@@ -1353,7 +1353,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup size="sm">
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-lock"></i>
+                                                <i className="fas fa-fw fa-lock"></i>
                                             </InputGroupAddon>
                                             <Input placeholder="Enter Password..." id="leftSmallAddon" />
                                         </InputGroup>
@@ -1596,7 +1596,7 @@ const InputGroups = () => (
                                             </CustomInput>
                                             <InputGroupAddon addonType="append">
                                                 <Button color="secondary" outline>
-                                                    <i className="fa fa-fw fa-check"></i>
+                                                    <i className="fas fa-fw fa-check"></i>
                                                 </Button>{' '}
                                             </InputGroupAddon>
                                         </InputGroup>
@@ -1623,7 +1623,7 @@ const InputGroups = () => (
                                         <InputGroup>
                                             <CustomInput type="file" id="leftFileInput" name="customFile" />
                                             <InputGroupAddon addonType="append">
-                                                <i className="fa fa-fw fa-info-circle mr-2"></i>
+                                                <i className="fas fa-fw fa-info-circle mr-2"></i>
                                                 All Images Accepted
                                             </InputGroupAddon>
                                         </InputGroup>
@@ -1638,7 +1638,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-file-pdf-o mr-2"></i>
+                                                <i className="fas fa-fw fa-file-pdf-o mr-2"></i>
                                                 Only PDF Accepted
                                             </InputGroupAddon>
                                             <CustomInput type="file" id="rightFileInput" name="customFile" />
@@ -1660,7 +1660,7 @@ const InputGroups = () => (
                                             </InputGroupAddon>
                                             <CustomInput type="file" id="leftFileInput2" name="customFile" />
                                             <InputGroupAddon addonType="append">
-                                                <i className="fa fa-fw fa-info-circle mr-2"></i>
+                                                <i className="fas fa-fw fa-info-circle mr-2"></i>
                                                 All Images Accepted
                                             </InputGroupAddon>
                                         </InputGroup>
@@ -1675,7 +1675,7 @@ const InputGroups = () => (
                                     <Col sm={9}>
                                         <InputGroup>
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-file-pdf-o mr-2"></i>
+                                                <i className="fas fa-fw fa-file-pdf-o mr-2"></i>
                                                 Only PDF Accepted
                                             </InputGroupAddon>
                                             <CustomInput type="file" id="rightFileInput" name="customFile" />

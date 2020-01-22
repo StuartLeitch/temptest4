@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import faker from 'faker/locale/en_US';
-import { 
-    Media, 
-    Button 
+import {
+    Media,
+    Button
 } from 'reactstrap';
 
 const Attachment = (props) => (
         <Media className={ `${ props.mediaClassName }` }>
             <Media left className="mr-2">
                 <span className="fa-stack fa-lg">
-                    <i className={ `fa fa-square fa-stack-2x fa-${ props.BgIcon } fa-stack-1x ${ props.BgIconClassName }` }></i>
-                    <i className={ `fa fa-${ props.icon } fa-stack-1x ${ props.iconClassName }` }></i>
+                    <i className={ `fas fa-square fa-stack-2x fa-${ props.BgIcon } fa-stack-1x ${ props.BgIconClassName }` }></i>
+                    <i className={ `fas fa-${ props.icon } fa-stack-1x ${ props.iconClassName }` }></i>
                 </span>
             </Media>
             <Media body className="d-flex flex-column flex-md-row">
@@ -22,8 +22,8 @@ const Attachment = (props) => (
                     <span>
                         by <span>
                             { faker.name.firstName() } { faker.name.firstName() }
-                        </span> 
-                        <span className="text-muted"> · </span> 
+                        </span>
+                        <span className="text-muted"> · </span>
                         <span>
                             { faker.finance.amount() } Kb
                         </span>
@@ -35,7 +35,7 @@ const Attachment = (props) => (
                         05:20 PM
                     </div>
                     <Button color="link" className="align-self-center mr-2 mr-md-0">
-                        <i className="fa fa-fw fa-download"></i>
+                        <i className="fas fa-fw fa-download"></i>
                     </Button>
                 </div>
             </Media>

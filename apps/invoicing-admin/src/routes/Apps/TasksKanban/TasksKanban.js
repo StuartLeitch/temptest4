@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -21,14 +21,14 @@ import { TasksCardGrid } from "../../components/Tasks/TasksCardGrid";
 const TasksKanban = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Tasks Kanban"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <ProjectsSmHeader 
+                    <ProjectsSmHeader
                         btnShowKanban
                         linkList="/apps/tasks/list"
                         linkGrid="/apps/tasks/grid"
@@ -52,13 +52,13 @@ const TasksKanban = () => (
                                         16 Jun 2016 - 23 Aug 2016
                                         <span className="ml-auto">
                                             <a href="#" className="mr-2" id="TooltipSettings">
-                                                <i className="fa fa-gear"></i>
+                                                <i className="fas fa-gear"></i>
                                             </a>
                                             <a href="#" className="mr-2" id="TooltipCollapse">
-                                                <i className="fa fa-angle-down"></i>
+                                                <i className="fas fa-angle-down"></i>
                                             </a>
                                             <a href="#" id="TooltipAddNew">
-                                                <i className="fa fa-plus"></i>
+                                                <i className="fas fa-plus"></i>
                                             </a>
                                             <UncontrolledTooltip placement="top" target="TooltipSettings">
                                                 Settings
@@ -74,17 +74,17 @@ const TasksKanban = () => (
                                 </div>
                                 { /* END CardHeader */}
                                 <TasksCardGrid />
-                                <TasksCardGrid 
+                                <TasksCardGrid
                                     id="2"
                                 />
-                                <TasksCardGrid 
+                                <TasksCardGrid
                                     id="3"
                                 />
                             </CardBody>
                             { /* START Card Footer */}
                             <CardFooter className="text-center">
                                 <a href="#">
-                                    <i className="fa fa-plus text-success mr-2"></i>
+                                    <i className="fas fa-plus text-success mr-2"></i>
                                     Add Task
                                 </a>
                             </CardFooter>
@@ -106,13 +106,13 @@ const TasksKanban = () => (
                                         16 Jun 2016 - 23 Aug 2016
                                         <span className="ml-auto">
                                             <a href="#" className="mr-2" id="TooltipSettings">
-                                                <i className="fa fa-gear"></i>
+                                                <i className="fas fa-gear"></i>
                                             </a>
                                             <a href="#" className="mr-2" id="TooltipCollapse">
-                                                <i className="fa fa-angle-down"></i>
+                                                <i className="fas fa-angle-down"></i>
                                             </a>
                                             <a href="#" id="TooltipAddNew">
-                                                <i className="fa fa-plus"></i>
+                                                <i className="fas fa-plus"></i>
                                             </a>
                                             <UncontrolledTooltip placement="top" target="TooltipSettings">
                                                 Settings
@@ -127,17 +127,17 @@ const TasksKanban = () => (
                                     </span>
                                 </div>
                                 { /* END CardHeader */}
-                                <TasksCardGrid 
+                                <TasksCardGrid
                                     id="4"
                                 />
-                                <TasksCardGrid 
+                                <TasksCardGrid
                                     id="5"
                                 />
                             </CardBody>
                             { /* START Card Footer */}
                             <CardFooter className="text-center">
                                 <a href="#">
-                                    <i className="fa fa-plus text-success mr-2"></i>
+                                    <i className="fas fa-plus text-success mr-2"></i>
                                     Add Task
                                 </a>
                             </CardFooter>
@@ -159,13 +159,13 @@ const TasksKanban = () => (
                                         16 Jun 2016 - 23 Aug 2016
                                         <span className="ml-auto">
                                             <a href="#" className="mr-2" id="TooltipSettings">
-                                                <i className="fa fa-gear"></i>
+                                                <i className="fas fa-gear"></i>
                                             </a>
                                             <a href="#" className="mr-2" id="TooltipCollapse">
-                                                <i className="fa fa-angle-down"></i>
+                                                <i className="fas fa-angle-down"></i>
                                             </a>
                                             <a href="#" id="TooltipAddNew">
-                                                <i className="fa fa-plus"></i>
+                                                <i className="fas fa-plus"></i>
                                             </a>
                                             <UncontrolledTooltip placement="top" target="TooltipSettings">
                                                 Settings
@@ -180,14 +180,14 @@ const TasksKanban = () => (
                                     </span>
                                 </div>
                                 { /* END CardHeader */}
-                                <TasksCardGrid 
+                                <TasksCardGrid
                                     id="6"
                                 />
                             </CardBody>
                             { /* START Card Footer */}
                             <CardFooter className="text-center">
                                 <a href="#">
-                                    <i className="fa fa-plus text-success mr-2"></i>
+                                    <i className="fas fa-plus text-success mr-2"></i>
                                     Add Task
                                 </a>
                             </CardFooter>
@@ -198,7 +198,7 @@ const TasksKanban = () => (
                         <Card type="border-dash">
                             <CardBody className="d-flex align-items-center justify-content-center">
                                 <a href="#" className="py-5">
-                                    <i className="fa fa-plus text-success mr-2"></i>
+                                    <i className="fas fa-plus text-success mr-2"></i>
                                     Add New Column
                                 </a>
                             </CardBody>

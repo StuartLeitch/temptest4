@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Badge,
     Media,
     Avatar,
@@ -20,13 +20,13 @@ const ProfileHeader = () => (
                 src={ randomAvatar() }
                 className="mr-2"
                 addOns={[
-                    <AvatarAddOn.Icon 
-                        className="fa fa-circle"
+                    <AvatarAddOn.Icon
+                        className="fas fa-circle"
                         color="white"
                         key="avatar-icon-bg"
                     />,
-                    <AvatarAddOn.Icon 
-                        className="fa fa-circle"
+                    <AvatarAddOn.Icon
+                        className="fas fa-circle"
                         color="success"
                         key="avatar-icon-fg"
                     />
@@ -39,7 +39,7 @@ const ProfileHeader = () => (
                         { faker.name.firstName() } { faker.name.lastName() }
                     </Link> <span className="text-muted mx-1"> / </span> Profile Edit
                 </h5>
-                <Badge color="primary" pill className="mr-2">Premium</Badge> 
+                <Badge color="primary" pill className="mr-2">Premium</Badge>
                 <span className="text-muted">Edit Your Name, Avatar, etc.</span>
             </Media>
         </Media>

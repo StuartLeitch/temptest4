@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -24,7 +24,7 @@ import { ProfileHeader } from "../../components/Profile/ProfileHeader";
 const SettingsEdit = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Settings Edit"
                 className="mb-5 mt-4"
             />
@@ -49,7 +49,7 @@ const SettingsEdit = () => (
                                         Monthly Newsletter
                                     </Label>
                                     <p className="mb-2">
-                                        Do you want receive our monthly newsletter about 
+                                        Do you want receive our monthly newsletter about
                                         new products and offers?
                                     </p>
                                     <CustomInput type="checkbox" id="notifyMe" label="Notify Me" inline />
@@ -94,12 +94,12 @@ const SettingsEdit = () => (
                                 </FormGroup>
                                 { /* END Input */}
 
-                            
+
                             </Form>
                             { /* END Form */}
                         </CardBody>
                         <CardFooter className="small">
-                            <i className="fa fa-fw fa-support text-muted mr-2"></i>
+                            <i className="fas fa-fw fa-support text-muted mr-2"></i>
                              If you have trouble with the configuration, you can contact us. <a href="#">We Can Help</a>
                         </CardFooter>
                     </Card>

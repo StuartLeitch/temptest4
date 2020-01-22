@@ -27,8 +27,8 @@ const columns = [
         },
         formatter: function AvailableFormatter(cell) {
             return cell === 'Y' ?
-                <i className="fa fa-fw fa-check"></i> :
-                <i className="fa fa-fw fa-times"></i>;
+                <i className="fas fa-fw fa-check"></i> :
+                <i className="fas fa-fw fa-times"></i>;
         },
         headerClasses: 'text-nowrap'
     }, {

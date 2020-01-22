@@ -29,7 +29,7 @@ export class Toggles extends React.Component {
     render() {
         return (
             <Container>
-                <HeaderMain 
+                <HeaderMain
                     title="Toggles"
                     className="mb-5 mt-4"
                 />
@@ -122,7 +122,7 @@ export class Toggles extends React.Component {
                                         <Toggle
                                             defaultChecked={this.state.soupIsReady}
                                             icons={{
-                                                checked: <i className="fa fa-heart text-white" />,
+                                                checked: <i className="fas fa-heart text-white" />,
                                                 unchecked: null,
                                             }}
                                             onChange={ () => { this.setState({ soupIsReady: !this.state.soupIsReady }) } } />

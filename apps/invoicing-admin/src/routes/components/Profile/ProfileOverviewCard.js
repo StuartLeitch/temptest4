@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { 
+import {
     CardTitle,
     Badge
 } from './../../../components';
@@ -27,7 +27,7 @@ const ProfileOverviewCard = (props) => (
                 { props.footerTitle }
             </span>
             <span className={ `ml-auto ${ props.footerTitleClassName }` }>
-                <i className={ `fa mr-1 fa-${ props.footerIcon }` }></i>
+                <i className={ `fas mr-1 fa-${ props.footerIcon }` }></i>
                 { props.footerValue }
             </span>
         </div>

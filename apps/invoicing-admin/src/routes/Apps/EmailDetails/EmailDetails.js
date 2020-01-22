@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -26,7 +26,7 @@ import { Attachment } from "../../components/Attachment";
 const EmailDetails = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Email Details"
                 className="mb-5 mt-4"
             />
@@ -42,19 +42,19 @@ const EmailDetails = () => (
                             <div className="d-lg-flex justify-content-end mb-4">
                                 <div className="mr-auto d-flex align-items-center mb-3 mb-xl-0">
                                     <Button color="link" tag={ Link } to="/apps/inbox" className="text-decoration-none">
-                                        <i className="fa fa-angle-left mr-2"></i>  Inbox
+                                        <i className="fas fa-angle-left mr-2"></i>  Inbox
                                     </Button>
                                 </div>
                                 <ButtonToolbar>
                                     <ButtonGroup className="mr-2 mb-3 mb-sm-0">
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipPrev">
-                                            <i className="fa fa-fw fa-angle-left"></i>
+                                            <i className="fas fa-fw fa-angle-left"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipPrev">
                                             Prev Message
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipNext">
-                                            <i className="fa fa-fw fa-angle-right"></i>
+                                            <i className="fas fa-fw fa-angle-right"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipNext">
                                             Next Message
@@ -62,25 +62,25 @@ const EmailDetails = () => (
                                     </ButtonGroup>
                                     <ButtonGroup className="mr-2">
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipForward">
-                                            <i className="fa fa-fw fa-mail-forward"></i>
+                                            <i className="fas fa-fw fa-mail-forward"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipForward">
                                             Forward
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipFav">
-                                            <i className="fa fa-fw fa-star"></i>
+                                            <i className="fas fa-fw fa-star"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipFav">
                                             Add to Favorites
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipPrint">
-                                            <i className="fa fa-fw fa-print"></i>
+                                            <i className="fas fa-fw fa-print"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipPrint">
                                             Print
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipDelete">
-                                            <i className="fa fa-fw fa-trash"></i>
+                                            <i className="fas fa-fw fa-trash"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipDelete">
                                             Delete
@@ -88,7 +88,7 @@ const EmailDetails = () => (
                                     </ButtonGroup>
                                     <ButtonGroup className="ml-auto ml-lg-0">
                                         <Button color="primary" className="align-self-center" tag={ Link } to="/apps/inbox" id="tooltipReply">
-                                            <i className="fa fa-fw fa-reply"></i>
+                                            <i className="fas fa-fw fa-reply"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipReply">
                                             Reply
@@ -106,18 +106,18 @@ const EmailDetails = () => (
                                                 size="md"
                                                 src={ randomAvatar() }
                                                 addOns={[
-                                                    <AvatarAddOn.Icon 
-                                                        className="fa fa-circle"
+                                                    <AvatarAddOn.Icon
+                                                        className="fas fa-circle"
                                                         color="white"
                                                         key="avatar-icon-bg"
                                                     />,
-                                                    <AvatarAddOn.Icon 
-                                                        className="fa fa-circle"
+                                                    <AvatarAddOn.Icon
+                                                        className="fas fa-circle"
                                                         color="danger"
                                                         key="avatar-icon-fg"
                                                     />
                                                 ]}
-                                            /> 
+                                            />
                                         </Media>
                                         <Media body>
                                             <a className="mt-0 text-decoration-none d-flex" href="#">
@@ -158,17 +158,17 @@ const EmailDetails = () => (
                                     </span>
                                     <Badge pill color="secondary">3</Badge>
                                 </div>
-                                <Attachment 
+                                <Attachment
                                     BgIconClassName="text-primary"
                                     icon="file-word-o"
                                     mediaClassName="mb-3"
                                 />
-                                <Attachment 
+                                <Attachment
                                     BgIconClassName="text-success"
                                     icon="file-excel-o"
                                     mediaClassName="mb-3"
                                 />
-                                <Attachment 
+                                <Attachment
                                     BgIconClassName="text-warning"
                                     icon="file-powerpoint-o"
                                 />
@@ -178,13 +178,13 @@ const EmailDetails = () => (
                             <ButtonToolbar className="flex-column flex-lg-row">
                                 <ButtonGroup className="mb-2 mb-lg-0">
                                     <Button color="link" className="text-decoration-none align-self-center" id="tooltipPrevBtm">
-                                        <i className="fa fa-fw fa-angle-left"></i>
+                                        <i className="fas fa-fw fa-angle-left"></i>
                                     </Button>
                                     <UncontrolledTooltip placement="top" target="tooltipPrevBtm">
                                         Prev Message
                                     </UncontrolledTooltip>
                                     <Button color="link" className="text-decoration-none align-self-center" id="tooltipNextBtm">
-                                        <i className="fa fa-fw fa-angle-right"></i>
+                                        <i className="fas fa-fw fa-angle-right"></i>
                                     </Button>
                                     <UncontrolledTooltip placement="top" target="tooltipNextBtm">
                                         Next Message
@@ -193,25 +193,25 @@ const EmailDetails = () => (
                                 <ButtonToolbar className="flex-column flex-sm-row ml-0 ml-lg-auto">
                                     <ButtonGroup className="mr-2 mb-2 mb-sm-0">
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipForwardBtm">
-                                            <i className="fa fa-fw fa-mail-forward"></i>
+                                            <i className="fas fa-fw fa-mail-forward"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="top" target="tooltipForwardBtm">
                                             Forward
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipFavBtm">
-                                            <i className="fa fa-fw fa-star"></i>
+                                            <i className="fas fa-fw fa-star"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="top" target="tooltipFavBtm">
                                             Add to Favorites
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipPrintBtm">
-                                            <i className="fa fa-fw fa-print"></i>
+                                            <i className="fas fa-fw fa-print"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="top" target="tooltipPrintBtm">
                                             Print
                                         </UncontrolledTooltip>
                                         <Button color="link" className="text-decoration-none align-self-center" id="tooltipDeleteBtm">
-                                            <i className="fa fa-fw fa-trash"></i>
+                                            <i className="fas fa-fw fa-trash"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="top" target="tooltipDeleteBtm">
                                             Delete
@@ -219,7 +219,7 @@ const EmailDetails = () => (
                                     </ButtonGroup>
                                     <ButtonGroup className="ml-0 ml-md-auto m-lg-0">
                                         <Button color="primary" className="align-self-center" tag={ Link } to="/apps/inbox" id="tooltipReplyBtm">
-                                            <i className="fa fa-fw fa-reply"></i>
+                                            <i className="fas fa-fw fa-reply"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="top" target="tooltipReplyBtm">
                                             Reply

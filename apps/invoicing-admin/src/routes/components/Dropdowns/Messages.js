@@ -1,8 +1,8 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
-    Avatar, 
+import {
+    Avatar,
     AvatarAddOn,
     Media
 } from './../../../components';
@@ -23,13 +23,13 @@ const Messages = () => (
                     size="md"
                     src={ randomAvatar() }
                     addOns={[
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="white"
                             key="avatar-icon-bg"
                         />,
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color={ randomArray(status) }
                             key="avatar-icon-fg"
                         />
@@ -41,7 +41,7 @@ const Messages = () => (
                     <span className="h6 pb-0 mb-0 d-flex align-items-center">
                         { faker.name.firstName() } { faker.name.lastName() }
                     </span>
-                    
+
                     <span className="ml-1 small">(23)</span>
                     <span className="ml-auto small">Now</span>
                 </span>

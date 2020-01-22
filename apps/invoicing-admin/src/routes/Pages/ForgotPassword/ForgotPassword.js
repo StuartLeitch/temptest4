@@ -19,7 +19,7 @@ const ForgotPassword = () => (
     <EmptyLayout>
         <EmptyLayout.Section center>
             { /* START Header */}
-            <HeaderAuth 
+            <HeaderAuth
                 title="Forgot Password"
             />
             { /* END Header */}
@@ -45,7 +45,7 @@ const ForgotPassword = () => (
                     }
                     </ThemeConsumer>
                     <Button color="link" tag={ Link } to="/" className="align-self-center ml-auto pr-0 text-decoration-none">
-                        <i className="fa fa-angle-left mr-2"></i> Back to Home
+                        <i className="fas fa-angle-left mr-2"></i> Back to Home
                     </Button>
                 </div>
             </Form>

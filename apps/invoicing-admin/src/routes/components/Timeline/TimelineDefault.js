@@ -57,7 +57,7 @@ const TimelineDefault = (props) => (
             <div className="timeline-item pr-3">
                 { /* START Small ICON  */}
                 <div className="timeline-icon">
-                    <i className={` fa fa-circle-o text-${ props.smallIconColor }`}></i>
+                    <i className={` fas fa-circle-o text-${ props.smallIconColor }`}></i>
                 </div>
                 { /* END Small ICON  */}
                 <div className="timeline-item-inner pb-0">
@@ -70,8 +70,8 @@ const TimelineDefault = (props) => (
                         { /* START ICON Circle  */}
                         <div className="pull-left mr-2">
                             <span className="fa-stack fa-lg">
-                                <i className={` fa fa-circle fa-stack-2x text-${ props.iconCircleColor }`}></i> 
-                                <i className={` fa fa-stack-1x text-white fa-${ props.iconCircle }`}></i>
+                                <i className={` fas fa-circle fa-stack-2x text-${ props.iconCircleColor }`}></i>
+                                <i className={` fas fa-stack-1x text-white fa-${ props.iconCircle }`}></i>
                             </span>
                         </div>
                         { /* END ICON Circle  */}

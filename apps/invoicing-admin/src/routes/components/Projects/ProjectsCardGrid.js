@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Card,
     CardBody,
     Badge,
@@ -49,7 +49,7 @@ const ProjectsCardGrid = () => (
                     { randomArray(badges) }
                     <div className="mb-2">
                         <a href="#" className="mr-2">
-                            <i className="fa fa-fw fa-star-o"></i>
+                            <i className="fas fa-fw fa-star-o"></i>
                         </a>
                         <Link to="/apps/tasks/grid" className="text-decoration-none">
                             { faker.company.catchPhrase() }
@@ -62,7 +62,7 @@ const ProjectsCardGrid = () => (
                     <div className="mb-3">
                         <Progress value={ randomArray(taskCompleted) } style={{height: "5px"}} className="mb-2" />
                         <div>
-                            Tasks Completed: 
+                            Tasks Completed:
                             <span className="text-inverse">
                                 36/94
                             </span>
@@ -92,24 +92,24 @@ const ProjectsCardGrid = () => (
                     </span>
                     <UncontrolledButtonDropdown className="align-self-center ml-auto">
                         <DropdownToggle color="link" size="sm" className="pr-0">
-                            <i className="fa fa-gear" /><i className="fa fa-angle-down ml-2" />
+                            <i className="fas fa-gear" /><i className="fas fa-angle-down ml-2" />
                         </DropdownToggle>
                         <DropdownMenu right>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                <i className="fas fa-fw fa-folder-open mr-2"></i>
                                 View
                             </DropdownItem>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-ticket mr-2"></i>
+                                <i className="fas fa-fw fa-ticket mr-2"></i>
                                 Add Task
                             </DropdownItem>
                             <DropdownItem>
-                                <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                <i className="fas fa-fw fa-paperclip mr-2"></i>
                                 Add Files
                             </DropdownItem>
                             <DropdownItem divider />
                             <DropdownItem>
-                                <i className="fa fa-fw fa-trash mr-2"></i>
+                                <i className="fas fa-fw fa-trash mr-2"></i>
                                 Delete
                             </DropdownItem>
                         </DropdownMenu>

@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Sidebar,
     UncontrolledButtonDropdown,
     Avatar,
@@ -26,13 +26,13 @@ const SidebarTopA = () => (
                             size="lg"
                             src={ avatarImg }
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="success"
                                     key="avatar-icon-fg"
                                 />
@@ -40,11 +40,11 @@ const SidebarTopA = () => (
                         />
                     </Sidebar.HideSlim>
                 </Link>
-                
+
                 <UncontrolledButtonDropdown>
                     <DropdownToggle color="link" className="pl-0 pb-0 btn-profile sidebar__link">
                         { faker.name.firstName() } { faker.name.lastName() }
-                        <i className="fa fa-angle-down ml-2"></i>
+                        <i className="fas fa-angle-down ml-2"></i>
                     </DropdownToggle>
                     <DropdownMenu persist>
                     <DropdownItem header>
@@ -62,7 +62,7 @@ const SidebarTopA = () => (
                     </DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem tag={ Link } to="/pages/login">
-                        <i className="fa fa-fw fa-sign-out mr-2"></i>
+                        <i className="fas fa-fw fa-sign-out mr-2"></i>
                         Sign Out
                     </DropdownItem>
                     </DropdownMenu>
@@ -81,13 +81,13 @@ const SidebarTopA = () => (
                     size="sm"
                     src={ avatarImg }
                     addOns={[
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="white"
                             key="avatar-icon-bg"
                         />,
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="success"
                             key="avatar-icon-fg"
                         />

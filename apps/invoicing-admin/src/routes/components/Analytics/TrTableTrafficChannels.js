@@ -1,8 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
 import faker from 'faker/locale/en_US';
-import {  
-    Media, 
+import {
+    Media,
     Avatar,
     AvatarAddOn
 } from './../../../components';
@@ -42,7 +42,7 @@ const TrTableTrafficChannels = () => (
                         { faker.finance.amount() }
                     </td>
                     <td className="align-middle text-right">
-                        { randomArray(change) } <i className="fa fa-caret-down text-danger ml-1"></i>
+                        { randomArray(change) } <i className="fas fa-caret-down text-danger ml-1"></i>
                     </td>
                     <td className="text-right align-middle">
                         <TinyAreaChart />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -34,16 +34,16 @@ import { Activity } from "../../components/Dropdowns/Activity";
 const Dropdowns = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Dropdowns"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Dropdown States" 
+                    <HeaderDemo
+                        no={1}
+                        title="Dropdown States"
                         subTitle={(
                             <React.Fragment>
                                 Dropdown component states
@@ -145,10 +145,10 @@ const Dropdowns = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
+                    <HeaderDemo
+                        no={2}
                         title="Dropdown Headers"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Dropdown header with options
@@ -204,7 +204,7 @@ const Dropdowns = () => (
                                 </DropdownToggle>
                                 <DropdownMenu persist>
                                     <DropdownItem header>
-                                        <i className="fa fa-angle-down mr-2"></i>
+                                        <i className="fas fa-angle-down mr-2"></i>
                                         Menu
                                     </DropdownItem>
                                     <DropdownItem>Profile</DropdownItem>
@@ -237,7 +237,7 @@ const Dropdowns = () => (
                                 <DropdownMenu persist>
                                     <DropdownItem header className="d-flex">
                                         Menu
-                                        <i className="fa fa-angle-down ml-auto"></i>
+                                        <i className="fas fa-angle-down ml-auto"></i>
                                     </DropdownItem>
                                     <DropdownItem>Profile</DropdownItem>
                                     <DropdownItem>Settings</DropdownItem>
@@ -264,9 +264,9 @@ const Dropdowns = () => (
                                 </DropdownToggle>
                                 <DropdownMenu persist>
                                     <DropdownItem header className="d-flex">
-                                        <i className="fa fa-gear mr-2"></i>
+                                        <i className="fas fa-gear mr-2"></i>
                                         Menu
-                                        <i className="fa fa-angle-down ml-auto"></i>
+                                        <i className="fas fa-angle-down ml-auto"></i>
                                     </DropdownItem>
                                     <DropdownItem>Profile</DropdownItem>
                                     <DropdownItem>Settings</DropdownItem>
@@ -284,10 +284,10 @@ const Dropdowns = () => (
             { /* START Header 3 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
+                    <HeaderDemo
+                        no={3}
                         title="Dropdown Options"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Icons, checkboxes, radios, switches etc.
@@ -319,16 +319,16 @@ const Dropdowns = () => (
                                 <DropdownMenu persist>
                                     <DropdownItem header>Menu</DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-user mr-2"></i>
+                                        <i className="fas fa-fw fa-user mr-2"></i>
                                         Profile
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-gear mr-2"></i>
+                                        <i className="fas fa-fw fa-gear mr-2"></i>
                                         Settings
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-sign-out mr-2"></i>
+                                        <i className="fas fa-fw fa-sign-out mr-2"></i>
                                         Logout
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -354,16 +354,16 @@ const Dropdowns = () => (
                                     <DropdownItem header>Menu</DropdownItem>
                                     <DropdownItem className="d-flex">
                                         Profile
-                                        <i className="fa fa-fw fa-user align-self-center ml-auto"></i>
+                                        <i className="fas fa-fw fa-user align-self-center ml-auto"></i>
                                     </DropdownItem>
                                     <DropdownItem className="d-flex">
                                         Settings
-                                        <i className="fa fa-fw fa-gear align-self-center ml-auto"></i>
+                                        <i className="fas fa-fw fa-gear align-self-center ml-auto"></i>
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem className="d-flex">
                                         Logout
-                                        <i className="fa fa-fw fa-sign-out align-self-center ml-auto"></i>
+                                        <i className="fas fa-fw fa-sign-out align-self-center ml-auto"></i>
                                     </DropdownItem>
                                 </DropdownMenu>
                             </UncontrolledButtonDropdown>
@@ -551,20 +551,20 @@ const Dropdowns = () => (
                                 <DropdownMenu persist>
                                     <DropdownItem header>Menu</DropdownItem>
                                     <DropdownItem className="d-flex">
-                                        <i className="fa fa-fw fa-angle-right align-self-center mr-2"></i>
+                                        <i className="fas fa-fw fa-angle-right align-self-center mr-2"></i>
                                         Profile
-                                        <i className="fa fa-fw fa-user align-self-center ml-auto"></i>
+                                        <i className="fas fa-fw fa-user align-self-center ml-auto"></i>
                                     </DropdownItem>
                                     <DropdownItem className="d-flex">
-                                        <i className="fa fa-fw fa-angle-right align-self-center mr-2"></i>
+                                        <i className="fas fa-fw fa-angle-right align-self-center mr-2"></i>
                                         Settings
-                                        <i className="fa fa-fw fa-gear align-self-center ml-auto"></i>
+                                        <i className="fas fa-fw fa-gear align-self-center ml-auto"></i>
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem className="d-flex">
-                                        <i className="fa fa-fw fa-angle-right align-self-center mr-2"></i>
+                                        <i className="fas fa-fw fa-angle-right align-self-center mr-2"></i>
                                         Logout
-                                        <i className="fa fa-fw fa-sign-out align-self-center ml-auto"></i>
+                                        <i className="fas fa-fw fa-sign-out align-self-center ml-auto"></i>
                                     </DropdownItem>
                                 </DropdownMenu>
                             </UncontrolledButtonDropdown>
@@ -590,29 +590,29 @@ const Dropdowns = () => (
                                         Select Style
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <CustomInput 
-                                            type="radio" 
-                                            id="DropdownLeftRadios1" 
-                                            name="DropdownLeftRadios" 
-                                            label="Minimal" 
-                                            defaultChecked 
+                                        <CustomInput
+                                            type="radio"
+                                            id="DropdownLeftRadios1"
+                                            name="DropdownLeftRadios"
+                                            label="Minimal"
+                                            defaultChecked
                                         />
                                     </DropdownItem>
                                     <DropdownItem>
-                                         <CustomInput 
-                                            type="radio" 
-                                            id="DropdownLeftRadios2" 
-                                            name="DropdownLeftRadios" 
-                                            label="Compact" 
+                                         <CustomInput
+                                            type="radio"
+                                            id="DropdownLeftRadios2"
+                                            name="DropdownLeftRadios"
+                                            label="Compact"
                                         />
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <CustomInput 
-                                            type="radio" 
-                                            id="DropdownLeftRadios3" 
-                                            name="DropdownLeftRadios" 
-                                            label="Custom..." 
+                                        <CustomInput
+                                            type="radio"
+                                            id="DropdownLeftRadios3"
+                                            name="DropdownLeftRadios"
+                                            label="Custom..."
                                         />
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -639,26 +639,26 @@ const Dropdowns = () => (
                                         Select Javascript
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <CustomInput 
-                                            type="checkbox" 
-                                            id="DropdownLeftCheckbox1" 
-                                            label="ReactJS" 
-                                            defaultChecked 
+                                        <CustomInput
+                                            type="checkbox"
+                                            id="DropdownLeftCheckbox1"
+                                            label="ReactJS"
+                                            defaultChecked
                                         />
                                     </DropdownItem>
                                     <DropdownItem>
-                                         <CustomInput 
-                                            type="checkbox" 
-                                            id="DropdownLeftCheckbox2" 
-                                            label="Angular" 
+                                         <CustomInput
+                                            type="checkbox"
+                                            id="DropdownLeftCheckbox2"
+                                            label="Angular"
                                         />
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <CustomInput 
-                                            type="checkbox" 
-                                            id="DropdownLeftCheckbox3"  
-                                            label="Other..." 
+                                        <CustomInput
+                                            type="checkbox"
+                                            id="DropdownLeftCheckbox3"
+                                            label="Other..."
                                         />
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -668,7 +668,7 @@ const Dropdowns = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6">
-                                Dropdown: Forms 
+                                Dropdown: Forms
                                 <span className="small ml-1 text-muted">
                                     #3.10
                                 </span>
@@ -709,13 +709,13 @@ const Dropdowns = () => (
             { /* START Header 4 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={4} 
+                    <HeaderDemo
+                        no={4}
                         title="Dropdown Directions"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
-                                Positions are available for: <code>&lt;Dropdown direction="left" /&gt;</code>, 
+                                Positions are available for: <code>&lt;Dropdown direction="left" /&gt;</code>,
                                 <code>&lt;Dropdown direction="right" /&gt;</code> and <code>&lt;Dropdown direction="up" /&gt;</code>.
                             </React.Fragment>
                         )}
@@ -736,8 +736,8 @@ const Dropdowns = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Trigger dropdown menus above elements by adding 
-                                <code>&lt;Dropdown direction="up" /&gt;</code> 
+                                Trigger dropdown menus above elements by adding
+                                <code>&lt;Dropdown direction="up" /&gt;</code>
                                 to the parent element.
                             </p>
                             <UncontrolledButtonDropdown direction="up">
@@ -767,8 +767,8 @@ const Dropdowns = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Trigger dropdown menus above elements by adding 
-                                <code>&lt;Dropdown direction="left" /&gt;</code> 
+                                Trigger dropdown menus above elements by adding
+                                <code>&lt;Dropdown direction="left" /&gt;</code>
                                 to the parent element.
                             </p>
                             <UncontrolledButtonDropdown direction="left">
@@ -798,8 +798,8 @@ const Dropdowns = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Trigger dropdown menus above elements by adding 
-                                <code>&lt;Dropdown direction="right" /&gt;</code> 
+                                Trigger dropdown menus above elements by adding
+                                <code>&lt;Dropdown direction="right" /&gt;</code>
                                 to the parent element.
                             </p>
                             <UncontrolledButtonDropdown direction="right">
@@ -824,10 +824,10 @@ const Dropdowns = () => (
             { /* START Header 5 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={5} 
+                    <HeaderDemo
+                        no={5}
                         title="Dropdown Custom"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Dropdown as combo with Lists, Buttons, Input and Media...
@@ -862,25 +862,25 @@ const Dropdowns = () => (
                                     <ExtendedDropdown.Section list>
                                         <ListGroup>
                                             <ListGroupItem tag={ Link } to="/widgets" action>
-                                                <Activity 
+                                                <Activity
                                                     iconColorBelow="success"
                                                     icon="check"
                                                 />
                                             </ListGroupItem>
                                             <ListGroupItem tag={ Link } to="/widgets" action>
-                                                <Activity 
+                                                <Activity
                                                     iconColorBelow="danger"
                                                     icon="close"
                                                 />
                                             </ListGroupItem>
                                             <ListGroupItem tag={ Link } to="/widgets" action>
-                                                <Activity 
+                                                <Activity
                                                     iconColorBelow="warning"
                                                     icon="exclamation"
                                                 />
                                             </ListGroupItem>
                                             <ListGroupItem tag={ Link } to="/widgets" action>
-                                                <Activity 
+                                                <Activity
                                                     iconColorBelow="primary"
                                                     icon="info"
                                                 />
@@ -890,7 +890,7 @@ const Dropdowns = () => (
                                     <ExtendedDropdown.Section className="text-center">
                                         <Link to="/widgets">
                                             See All Notifications
-                                            <i className="fa fa-angle-right fa-fw ml-2" />
+                                            <i className="fas fa-angle-right fa-fw ml-2" />
                                         </Link>
                                     </ExtendedDropdown.Section>
                                 </ExtendedDropdown>
@@ -904,7 +904,7 @@ const Dropdowns = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6">
-                                Dropdown: List Group (as Buttons) 
+                                Dropdown: List Group (as Buttons)
                                 <span className="small ml-1 text-muted">
                                     #5.02
                                 </span>
@@ -918,7 +918,7 @@ const Dropdowns = () => (
                                     <ExtendedDropdown.Section className="d-flex justify-content-between align-items-center">
                                         <h6 className="mb-0">Messages</h6>
                                         <Link to="/apps/inbox">
-                                            <i className="fa fa-pencil"></i>
+                                            <i className="fas fa-pencil"></i>
                                         </Link>
                                     </ExtendedDropdown.Section>
                                     <ExtendedDropdown.Section>
@@ -926,7 +926,7 @@ const Dropdowns = () => (
                                             <Input placeholder="Search Messages..." />
                                             <InputGroupAddon addonType="append">
                                                 <Button>
-                                                    <i className="fa fa-search" />
+                                                    <i className="fas fa-search" />
                                                 </Button>
                                             </InputGroupAddon>
                                         </InputGroup>
@@ -950,7 +950,7 @@ const Dropdowns = () => (
                                     <ExtendedDropdown.Section className="text-center">
                                         <Link to="/apps/inbox">
                                             See All Messages
-                                            <i className="fa fa-angle-right fa-fw ml-2" />
+                                            <i className="fas fa-angle-right fa-fw ml-2" />
                                         </Link>
                                     </ExtendedDropdown.Section>
                                 </ExtendedDropdown>

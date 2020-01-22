@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Badge,
     Avatar,
     AvatarAddOn,
@@ -35,13 +35,13 @@ const TrTableMessages = () => (
                             size="sm"
                             src="http://bs4.webkom.co/img/avatars/2.jpg"
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(status) }
                                     key="avatar-icon-fg"
                                 />
@@ -67,7 +67,7 @@ const TrTableMessages = () => (
                     { faker.lorem.sentence() }
                 </div>
                 <Badge color={ randomArray(tag) } pill className="mr-1">
-                    { faker.commerce.department() }   
+                    { faker.commerce.department() }
                 </Badge>
             </td>
             <td className="align-middle text-right">

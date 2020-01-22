@@ -10,7 +10,7 @@ const HeaderAuth = (props) => (
             <Link to="/" className="d-inline-block">
                 {
                     props.icon ? (
-                        <i className={ `fa fa-${ props.icon } fa-3x ${ props.iconClassName }` }></i>
+                        <i className={ `fas fa-${ props.icon } fa-3x ${ props.iconClassName }` }></i>
                     ) : (
                         <LogoThemed checkBackground height="30" />
                     )
