@@ -1,0 +1,36 @@
+@mixin no-icon {
+  @include no-icon;
+  display: none;
+}
+
+.nested-dropdown__submenu-item__link::after {
+  @include no-icon;
+}
+
+.navbar-expand .navbar-nav .nested-dropdown__submenu-item__link::after {
+  @include no-icon;
+}
+
+.sidebar-menu__entry--nested {
+  .sidebar-menu__entry__link::after {
+    @include no-icon;
+  }
+
+  &.open .sidebar-menu__entry__link::after {
+    @include no-icon;
+  }
+}
+
+.open.sidebar-menu__entry--nested > .sidebar-submenu__entry__link::after {
+  @include no-icon;
+}
+
+.sidebar-submenu__entry {
+  &--nested > .sidebar-submenu__entry__link::after {
+    @include no-icon;
+  }
+
+  &--nested.open > .sidebar-submenu__entry__link::after {
+    @include no-icon;
+  }
+}
