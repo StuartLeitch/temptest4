@@ -9,7 +9,7 @@ import ProjectsDashboard from './Dashboards/Projects';
 // import Financial from './Dashboards/Financial';
 // import Stock from './Dashboards/Stock';
 // import Reports from './Dashboards/Reports';
-
+import RecentInvoicesList from './Invoices/Recent';
 // import Widgets from './Widgets';
 
 // import Cards from './Cards/Cards';
@@ -111,6 +111,9 @@ export const RoutedContent = () => {
   return (
     <Switch>
       <Redirect from='/' to='/dashboards/projects' exact />
+      {/*     Invoices Routes      */}
+      <Route path='/invoices/recent' exact component={RecentInvoicesList} />
+
       <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
       {/* <Route path="/dashboards/analytics" exact component={Analytics} />
             <Route path="/dashboards/system" exact component={System} />

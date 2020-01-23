@@ -17,6 +17,7 @@ import Layout, {
   PageConfigProvider,
   PageConfigConsumer
 } from './Layout';
+import ListPagination from './ListPagination';
 import Nav from './Nav';
 import Navbar from './Navbar';
 import NavbarThemeProvider from './NavbarThemeProvider';
@@ -104,6 +105,7 @@ export {
   PopoverBody,
   PopoverHeader,
   Row,
+  Spinner,
   TabContent,
   Table,
   TabPane,
@@ -132,6 +134,7 @@ export {
   InputGroupAddon,
   HolderProvider,
   Layout,
+  ListPagination,
   Nav,
   Navbar,
   NavbarThemeProvider,

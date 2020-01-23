@@ -5,10 +5,10 @@ import { SidebarMenu } from './../../components';
 export const SidebarMiddleNav = () => (
   <SidebarMenu>
     <SidebarMenu.Item
-      icon={<i className='fa fa-file-invoice-dollar'></i>}
+      icon={<i className='fa fa-fw fa-home'></i>}
       title='Invoices'
     >
-      <SidebarMenu.Item title='Recent Invoices' to='/invoices/recent' exact />
+      <SidebarMenu.Item title='Recent' to='/invoices/recent' exact />
     </SidebarMenu.Item>
     <SidebarMenu.Item
       icon={<i className='fa fa-fw fa-home'></i>}

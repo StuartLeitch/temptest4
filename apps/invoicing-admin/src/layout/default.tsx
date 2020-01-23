@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { GraphQLClient, ClientContext } from 'graphql-hooks';
 
 import {
   Layout,
@@ -42,6 +43,10 @@ const favIcons = [
   }
 ];
 
+const client = new GraphQLClient({
+  url: 'https://demo-gql.invoicing.hindawi.com/graphql'
+});
+
 class AppLayout extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired
@@ -63,7 +68,11 @@ class AppLayout extends React.Component {
           </Layout.Sidebar>
 
           {/* -------- Content ------------*/}
-          <Layout.Content>{children}</Layout.Content>
+          <Layout.Content>
+            <ClientContext.Provider value={client}>
+              {children}
+            </ClientContext.Provider>
+          </Layout.Content>
 
           {/* -- Theme Selector (DEMO) ----*/}
           <PageConfigConsumer>
