@@ -28,9 +28,11 @@ const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
 `;
 
 const RecentInvoicesList = () => {
-  const [offset, setOffset] = useState(0);
+  // const [offset, setOffset] = useState(0);
+  const [pagination, setPagination] = useState({});
+
   const [fetchInvoices, { loading, error, data }] = useManualQuery(
-    INVOICES_QUERY
+    INVOICES_QUERY,
     // {
     //   variables: {
     //     offset: 0,
@@ -38,8 +40,8 @@ const RecentInvoicesList = () => {
     //   }
     // }
   );
-
   const onPageChanged = (data: any) => {
+    setPagination(data);
     fetchInvoices({
       variables: { offset: data?.currentPage - 1, limit: data?.pageLimit }
     });
@@ -48,7 +50,8 @@ const RecentInvoicesList = () => {
   useEffect(() => {
     async function fetchData() {
       await fetchInvoices({
-        variables: { offset, limit: 10 }
+        // variables: { offset, limit: 10 }
+        variables: { offset: 0, limit: 10 }
       });
     }
     fetchData();
@@ -89,6 +92,7 @@ const RecentInvoicesList = () => {
           pageLimit={10}
           pageNeighbours={1}
           onPageChanged={onPageChanged}
+          {...pagination}
         />
       </CardFooter>
     </Card>

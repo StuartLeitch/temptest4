@@ -1,36 +1,35 @@
-@mixin no-icon {
-  @include no-icon;
-  display: none;
+@mixin no-caret {
+  content: none;
 }
 
 .nested-dropdown__submenu-item__link::after {
-  @include no-icon;
+  @include no-caret;
 }
 
 .navbar-expand .navbar-nav .nested-dropdown__submenu-item__link::after {
-  @include no-icon;
+  @include no-caret;
 }
 
 .sidebar-menu__entry--nested {
   .sidebar-menu__entry__link::after {
-    @include no-icon;
+    @include no-caret;
   }
 
   &.open .sidebar-menu__entry__link::after {
-    @include no-icon;
+    @include no-caret;
   }
 }
 
 .open.sidebar-menu__entry--nested > .sidebar-submenu__entry__link::after {
-  @include no-icon;
+  @include no-caret;
 }
 
 .sidebar-submenu__entry {
   &--nested > .sidebar-submenu__entry__link::after {
-    @include no-icon;
+    @include no-caret;
   }
 
   &--nested.open > .sidebar-submenu__entry__link::after {
-    @include no-icon;
+    @include no-caret;
   }
 }

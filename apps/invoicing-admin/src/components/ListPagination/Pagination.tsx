@@ -25,7 +25,8 @@ export class ListPagination extends Component {
     totalRecords: PropTypes.number,
     pageLimit: PropTypes.number,
     pageNeighbours: PropTypes.number,
-    totalPages: PropTypes.number
+    totalPages: PropTypes.number,
+    currentPage: PropTypes.number
   };
 
   totalRecords: number;
@@ -36,7 +37,10 @@ export class ListPagination extends Component {
   constructor(props: any) {
     super(props);
 
-    const { totalRecords = null, pageLimit = 30, pageNeighbours = 0 } = props;
+    const {
+      totalRecords = null, pageLimit = 30, pageNeighbours = 0,
+      currentPage: currentPage = 1
+    } = props;
 
     this.pageLimit = typeof pageLimit === 'number' ? pageLimit : 30;
     this.totalRecords = typeof totalRecords === 'number' ? totalRecords : 0;
@@ -48,7 +52,7 @@ export class ListPagination extends Component {
 
     this.totalPages = Math.ceil(this.totalRecords / this.pageLimit);
 
-    this.state = { currentPage: 1 };
+    this.state = { currentPage };
   }
 
   componentDidMount() {
@@ -67,7 +71,8 @@ export class ListPagination extends Component {
       totalRecords: this.totalRecords
     };
 
-    this.setState({ currentPage }, () => onPageChanged(paginationData));
+    // this.setState({ currentPage }, () => onPageChanged(paginationData, this));
+    onPageChanged(paginationData, this);
   };
 
   handleClick = (page, evt) => {
