@@ -1,11 +1,11 @@
 import React from 'react';
 import { map } from 'lodash';
-import { 
-    AreaChart, 
-    CartesianGrid, 
-    XAxis, 
-    YAxis, 
-    Tooltip, 
+import {
+    AreaChart,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Tooltip,
     ResponsiveContainer,
     Area,
     Dot,
@@ -44,7 +44,7 @@ const generateSquare = ({ height, fill, stroke }) =>
             fillOpacity={ 1 }
             width={ height }
             height={ height }
-        /> 
+        />
     );
     /* eslint-enable */
 

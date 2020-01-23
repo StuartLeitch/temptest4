@@ -5,21 +5,21 @@ import { Container, Row, Col } from './../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
 
-import ProjectsList from './ProjectsList';
-import ProjectsGrid from './ProjectsGrid';
-import { ProjectsLeftNav } from '../../components/Projects/ProjectsLeftNav';
-import { ProjectsSmHeader } from '../../components/Projects/ProjectsSmHeader';
+import InvoicesList from './List';
+// import ProjectsGrid from './ProjectsGrid';
+import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
+// import { InvoicesSmHeader } from '../../components/Invoices/InvoicesSmHeader';
 
-const Projects = props => (
+const InvoicesContainer = props => (
   <React.Fragment>
-    <Container>
-      <HeaderMain title='Projects' className='mb-5 mt-4' />
+    <Container fluid={true}>
+      <HeaderMain title='Invoices' className='mb-5 mt-4' />
       <Row>
         <Col lg={3}>
-          <ProjectsLeftNav />
+          <InvoicesLeftNav />
         </Col>
         <Col lg={9}>
-          <ProjectsSmHeader
+          {/* <InvoicesSmHeader
             subTitle={
               props.match.params.type === 'list'
                 ? 'Projects List'
@@ -29,18 +29,19 @@ const Projects = props => (
             linkGrid='/apps/projects/grid'
           />
 
-          {props.match.params.type === 'list' ? (
-            <ProjectsList />
-          ) : (
+          {props.match.params.type === 'list' ? ( */}
+          <InvoicesList />
+          {/* ) : (
             <ProjectsGrid />
-          )}
+          )} */}
         </Col>
       </Row>
     </Container>
   </React.Fragment>
 );
-Projects.propTypes = {
+
+InvoicesContainer.propTypes = {
   match: PropTypes.object.isRequired
 };
 
-export default Projects;
+export default InvoicesContainer;

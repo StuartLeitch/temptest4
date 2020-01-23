@@ -6,10 +6,10 @@ import ProjectsDashboard from './Dashboards/Projects';
 // import Analytics from './Dashboards/Analytics';
 // import System from './Dashboards/System';
 // import Monitor from './Dashboards/Monitor';
-// import Financial from './Dashboards/Financial';
+import Financial from './Dashboards/Financial';
 // import Stock from './Dashboards/Stock';
 // import Reports from './Dashboards/Reports';
-import RecentInvoicesList from './Invoices/Recent';
+import InvoicesList from './Invoices/List';
 // import Widgets from './Widgets';
 
 // import Cards from './Cards/Cards';
@@ -110,15 +110,15 @@ import { SidebarASidebar } from './../layout/components/SidebarASidebar';
 export const RoutedContent = () => {
   return (
     <Switch>
-      <Redirect from='/' to='/dashboards/projects' exact />
+      <Redirect from='/' to='/dashboards/financial' exact />
       {/*     Invoices Routes      */}
-      <Route path='/invoices/recent' exact component={RecentInvoicesList} />
+      <Route path='/invoices/list' exact component={InvoicesList} />
 
       <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
+      <Route path='/dashboards/financial' exact component={Financial} />
       {/* <Route path="/dashboards/analytics" exact component={Analytics} />
             <Route path="/dashboards/system" exact component={System} />
             <Route path="/dashboards/monitor" exact component={Monitor} />
-            <Route path="/dashboards/financial" exact component={Financial} />
             <Route path="/dashboards/stock" exact component={Stock} />
             <Route path="/dashboards/reports" exact component={Reports} />
 

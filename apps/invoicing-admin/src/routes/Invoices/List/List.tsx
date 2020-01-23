@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useQuery, useManualQuery } from 'graphql-hooks';
+import { useManualQuery } from 'graphql-hooks';
 
 import {
   Card,
@@ -10,6 +10,8 @@ import {
 } from '../../../components';
 
 import { TrTableInvoicesList } from './components/TrTableList';
+// import { InvoicesLeftNav } from '../../components/InvoicesLeftNav';
+// import { InvoicesSmHeader } from '../../components/InvoicesSmHeader';
 
 const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
   invoices(offset: $offset, limit: $limit) {
@@ -28,17 +30,10 @@ const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
 `;
 
 const RecentInvoicesList = () => {
-  // const [offset, setOffset] = useState(0);
   const [pagination, setPagination] = useState({});
 
   const [fetchInvoices, { loading, error, data }] = useManualQuery(
-    INVOICES_QUERY,
-    // {
-    //   variables: {
-    //     offset: 0,
-    //     limit: 10
-    //   }
-    // }
+    INVOICES_QUERY
   );
   const onPageChanged = (data: any) => {
     setPagination(data);
@@ -50,7 +45,6 @@ const RecentInvoicesList = () => {
   useEffect(() => {
     async function fetchData() {
       await fetchInvoices({
-        // variables: { offset, limit: 10 }
         variables: { offset: 0, limit: 10 }
       });
     }
@@ -59,13 +53,13 @@ const RecentInvoicesList = () => {
 
   if (loading)
     return (
-      <Spinner style={{ width: '25em', height: '25em' }} color='secondary' />
+      <Spinner style={{ width: '12em', height: '12em' }} color='secondary' />
     );
 
   if (error) return <div>Something Bad Happened</div>;
 
   return (
-    <Card className='mb-3'>
+    <Card className='mb-'>
       {/* START Table */}
       <div className='table-responsive-xl'>
         <Table className='mb-0 table-striped' hover>

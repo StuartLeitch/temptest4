@@ -38,7 +38,9 @@ export class ListPagination extends Component {
     super(props);
 
     const {
-      totalRecords = null, pageLimit = 30, pageNeighbours = 0,
+      totalRecords = null,
+      pageLimit = 30,
+      pageNeighbours = 0,
       currentPage: currentPage = 1
     } = props;
 
@@ -136,37 +138,12 @@ export class ListPagination extends Component {
   };
 
   render() {
-    console.info(this.state);
     if (!this.totalRecords) return null;
 
     if (this.totalPages === 1) return null;
 
     const { currentPage } = this.state;
     const pages = this.fetchPageNumbers();
-
-    /**
-     <Pagination aria-label='navigation'>
-        <PaginationItem>
-          <PaginationLink previous href='#'>
-            <i className='fa fa-fw fa-angle-left'></i>
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem active>
-          <PaginationLink href='#'>1</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href='#'>2</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href='#'>3</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink next href='#'>
-            <i className='fa fa-fw fa-angle-right'></i>
-          </PaginationLink>
-        </PaginationItem>
-      </Pagination>
-     */
 
     return (
       <Fragment>
