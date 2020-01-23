@@ -1,5 +1,5 @@
 /**
- * Generic interface for a filter
+ * Generic interface for filtering data that matches specific conditions
  */
 export interface Filter<T> {
   /**
