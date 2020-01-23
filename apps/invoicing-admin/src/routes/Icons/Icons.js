@@ -114,7 +114,6 @@ const Icons = () => (
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-bed" aria-hidden="true"></i> bed</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-beer" aria-hidden="true"></i> beer</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-bell" aria-hidden="true"></i> bell</div>
-                        <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-bell-o" aria-hidden="true"></i> bell-o</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-bell-slash" aria-hidden="true"></i> bell-slash</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-bell-slash-o" aria-hidden="true"></i> bell-slash-o</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-bicycle" aria-hidden="true"></i> bicycle</div>
@@ -204,7 +203,6 @@ const Icons = () => (
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-ellipsis-h" aria-hidden="true"></i> ellipsis-h</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-ellipsis-v" aria-hidden="true"></i> ellipsis-v</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-envelope" aria-hidden="true"></i> envelope</div>
-                        <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-envelope-o" aria-hidden="true"></i> envelope-o</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-envelope-square" aria-hidden="true"></i> envelope-square</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-eraser" aria-hidden="true"></i> eraser</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-exchange" aria-hidden="true"></i> exchange</div>

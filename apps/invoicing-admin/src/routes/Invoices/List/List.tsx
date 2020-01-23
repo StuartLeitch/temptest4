@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
+import LoadingOverlay from 'react-loading-overlay';
 
 import {
   Card,
@@ -10,8 +11,6 @@ import {
 } from '../../../components';
 
 import { TrTableInvoicesList } from './components/TrTableList';
-// import { InvoicesLeftNav } from '../../components/InvoicesLeftNav';
-// import { InvoicesSmHeader } from '../../components/InvoicesSmHeader';
 
 const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
   invoices(offset: $offset, limit: $limit) {
@@ -53,13 +52,21 @@ const RecentInvoicesList = () => {
 
   if (loading)
     return (
-      <Spinner style={{ width: '12em', height: '12em' }} color='secondary' />
+      <LoadingOverlay
+        active={loading}
+        spinner={
+          <Spinner
+            style={{ width: '12em', height: '12em' }}
+            color='secondary'
+          />
+        }
+      />
     );
 
   if (error) return <div>Something Bad Happened</div>;
 
   return (
-    <Card className='mb-'>
+    <Card className='mb-0'>
       {/* START Table */}
       <div className='table-responsive-xl'>
         <Table className='mb-0 table-striped' hover>

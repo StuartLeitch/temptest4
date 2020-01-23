@@ -1140,7 +1140,7 @@ const Cards = () => (
                                     <FormGroup>
                                         <InputGroup size="sm">
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fas fa-fw fa-envelope-o mr-1"></i>
+                                                <i className="fas fa-fw fa-envelope mr-1"></i>
                                                 Email
                                             </InputGroupAddon>
                                             <Input type="text" name="text" id="text" className="ml-auto" placeholder="Enter..." />

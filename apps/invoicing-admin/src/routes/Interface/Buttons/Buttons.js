@@ -1169,7 +1169,7 @@ const Buttons = () => (
                                 Display icon on the left side
                             </p>
                             <Button outline color="secondary">
-                                <i className="fas fa-envelope-o mr-2"></i>
+                                <i className="fas fa-envelope mr-2"></i>
                                 Left Position
                             </Button>{' '}
                         </CardBody>
@@ -1187,7 +1187,7 @@ const Buttons = () => (
                             </p>
                             <Button outline color="secondary">
                                 Right Position
-                                <i className="fas fa-envelope-o ml-2"></i>
+                                <i className="fas fa-envelope ml-2"></i>
                             </Button>{' '}
                         </CardBody>
                     </Card>
@@ -1207,7 +1207,7 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" outline caret>
-                                    Dropdown <i className="fas fa-fw fa-envelope-o mx-1"></i>
+                                    Dropdown <i className="fas fa-fw fa-envelope mx-1"></i>
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem header>
@@ -1251,7 +1251,7 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" outline caret>
-                                    <i className="fas fa-fw fa-envelope-o"></i> Dropdown
+                                    <i className="fas fa-fw fa-envelope"></i> Dropdown
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem header>

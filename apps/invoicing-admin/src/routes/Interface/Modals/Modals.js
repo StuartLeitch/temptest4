@@ -100,7 +100,7 @@ export const Modals = () => (
                         { /* START Example Modal */}
                         <UncontrolledModal target="modalDefault102">
                             <ModalHeader tag="h6">
-                                <i className="fas fa-envelope-o mr-2"></i>  Modal: Icons
+                                <i className="fas fa-envelope mr-2"></i>  Modal: Icons
                                 <span className="small ml-1 text-muted">
                                     #1.02
                                 </span>

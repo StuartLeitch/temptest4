@@ -117,7 +117,7 @@ export const SidebarMiddleNav = () => (
     </SidebarMenu.Item> */}
     {/* -------- Tables ---------*/}
     <SidebarMenu.Item
-      icon={<i className='fas fa-fw fa-trello'></i>}
+      icon={<i className='fab fa-fw fa-trello'></i>}
       title='Tables'
     >
       <SidebarMenu.Item title='Tables' to='/tables/tables' />
