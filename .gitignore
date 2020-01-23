@@ -47,3 +47,4 @@ Thumbs.db
 !.elasticbeanstalk/*.global.yml
 .invoicing.backend.env
 .invoicing.backend.gsw.env
+.reporting.backend.env

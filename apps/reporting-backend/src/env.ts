@@ -50,6 +50,12 @@ export const env = {
     sqs: {
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
       endpoint: getOsEnv('AWS_SQS_ENDPOINT')
+    },
+    s3: {
+      apiVersion: getOsEnv('AWS_S3_API_VERSION'),
+      accessKey: getOsEnv('AWS_S3_ACCESS_KEY'),
+      secretKey: getOsEnv('AWS_S3_SECRET_KEY'),
+      endpoint: getOsEnv('AWS_S3_ENDPOINT')
     }
   }
 };
