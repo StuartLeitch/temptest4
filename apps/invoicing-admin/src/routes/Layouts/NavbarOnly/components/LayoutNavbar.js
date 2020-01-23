@@ -36,7 +36,7 @@ export const LayoutNavbar = () => (
             id='navbar-navigation-toggler'
             className='b-0'
           >
-            <i className='fa fa-fw fa-bars'></i>
+            <i className='fas fa-fw fa-bars'></i>
           </NavLink>
         </NavItem>
       </Nav>
@@ -57,12 +57,12 @@ export const LayoutNavbar = () => (
               src={null /*randomAvatar()*/}
               addOns={[
                 <AvatarAddOn.Icon
-                  className='fa fa-circle'
+                  className='fas fa-circle'
                   color='white'
                   key='avatar-icon-bg'
                 />,
                 <AvatarAddOn.Icon
-                  className='fa fa-circle'
+                  className='fas fa-circle'
                   color='danger'
                   key='avatar-icon-fg'
                 />
@@ -83,7 +83,7 @@ export const LayoutNavbar = () => (
       <ThemeConsumer>
         {({ color }) => (
           <Button color={color} className='px-4 my-sm-0'>
-            Download <i className='fa ml-1 fa-fw fa-download'></i>
+            Download <i className='fas ml-1 fa-fw fa-download'></i>
           </Button>
         )}
       </ThemeConsumer>

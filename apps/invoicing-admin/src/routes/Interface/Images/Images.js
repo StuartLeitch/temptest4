@@ -25,16 +25,16 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 
 const Images = () => (
     <Container>
-        <HeaderMain 
+        <HeaderMain
             title="Images"
             className="mb-5 mt-4"
         />
         { /* START Header 1 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={4} 
-                    title="Images" 
+                <HeaderDemo
+                    no={4}
+                    title="Images"
                     subTitle="Documentation and examples for opting images into responsive behavior."
                 />
             </Col>
@@ -44,7 +44,7 @@ const Images = () => (
         <Row>
             <Col lg={ 12 }>
                 <h6 className="">
-                    Images: Responsive Images 
+                    Images: Responsive Images
                     <small className="text-muted">#1.01</small>
                 </h6>
                 <HolderProvider.Icon
@@ -68,8 +68,8 @@ const Images = () => (
                     width={200}
                     height={200}
                 >
-                    <CardImg 
-                        className="img-thumbnail mr-2" 
+                    <CardImg
+                        className="img-thumbnail mr-2"
                     />
                 </HolderProvider.Icon>
                 <HolderProvider.Icon
@@ -78,8 +78,8 @@ const Images = () => (
                     width={200}
                     height={200}
                 >
-                    <CardImg 
-                        className="img-thumbnail mr-2" 
+                    <CardImg
+                        className="img-thumbnail mr-2"
                     />
                 </HolderProvider.Icon>
                 <HolderProvider.Icon
@@ -88,8 +88,8 @@ const Images = () => (
                     width={200}
                     height={200}
                 >
-                    <CardImg 
-                        className="img-thumbnail mr-2" 
+                    <CardImg
+                        className="img-thumbnail mr-2"
                     />
                 </HolderProvider.Icon>
                 <HolderProvider.Icon
@@ -98,8 +98,8 @@ const Images = () => (
                     width={200}
                     height={200}
                 >
-                    <CardImg 
-                        className="img-thumbnail" 
+                    <CardImg
+                        className="img-thumbnail"
                     />
                 </HolderProvider.Icon>
             </Col>
@@ -116,8 +116,8 @@ const Images = () => (
                     width={200}
                     height={200}
                 >
-                    <CardImg 
-                        className="rounded float-left" 
+                    <CardImg
+                        className="rounded float-left"
                     />
                 </HolderProvider.Icon>
                 <HolderProvider.Icon
@@ -126,8 +126,8 @@ const Images = () => (
                     width={200}
                     height={200}
                 >
-                    <CardImg 
-                        className="rounded float-right" 
+                    <CardImg
+                        className="rounded float-right"
                     />
                 </HolderProvider.Icon>
             </Col>
@@ -138,8 +138,8 @@ const Images = () => (
                     width={200}
                     height={200}
                 >
-                    <CardImg 
-                        className="rounded mx-auto d-block" 
+                    <CardImg
+                        className="rounded mx-auto d-block"
                     />
                 </HolderProvider.Icon>
             </Col>
@@ -157,8 +157,8 @@ const Images = () => (
                         width={400}
                         height={400}
                     >
-                        <CardImg 
-                            className="figure-img img-fluid rounded" 
+                        <CardImg
+                            className="figure-img img-fluid rounded"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption">
@@ -172,8 +172,8 @@ const Images = () => (
                         width={400}
                         height={400}
                     >
-                        <CardImg 
-                            className="figure-img img-fluid rounded" 
+                        <CardImg
+                            className="figure-img img-fluid rounded"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption text-right">
@@ -195,8 +195,8 @@ const Images = () => (
                         width={125}
                         height={125}
                     >
-                        <CardImg 
-                            className="rounded" 
+                        <CardImg
+                            className="rounded"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption">
@@ -210,8 +210,8 @@ const Images = () => (
                         width={125}
                         height={125}
                     >
-                        <CardImg 
-                            className="rounded-top" 
+                        <CardImg
+                            className="rounded-top"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption">
@@ -225,8 +225,8 @@ const Images = () => (
                         width={125}
                         height={125}
                     >
-                        <CardImg 
-                            className="rounded-right" 
+                        <CardImg
+                            className="rounded-right"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption">
@@ -240,8 +240,8 @@ const Images = () => (
                         width={125}
                         height={125}
                     >
-                        <CardImg 
-                            className="rounded-bottom" 
+                        <CardImg
+                            className="rounded-bottom"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption">
@@ -255,8 +255,8 @@ const Images = () => (
                         width={125}
                         height={125}
                     >
-                        <CardImg 
-                            className="rounded-left" 
+                        <CardImg
+                            className="rounded-left"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption">
@@ -270,8 +270,8 @@ const Images = () => (
                         width={125}
                         height={125}
                     >
-                        <CardImg 
-                            className="rounded-circle" 
+                        <CardImg
+                            className="rounded-circle"
                         />
                     </HolderProvider.Icon>
                     <figcaption className="figure-caption">
@@ -285,8 +285,8 @@ const Images = () => (
         { /* START Header 2 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={2} 
+                <HeaderDemo
+                    no={2}
                     title="Images: Title Options"
                     className="mt-5"
                     subTitle="Documentation and examples for opting images into responsive behavior."
@@ -316,7 +316,7 @@ const Images = () => (
                     <CardBody>
                         <CardTitle className="d-flex h6 mb-0">
                             <span className="">Icon Right Title</span>
-                            <i className="fa fa-info-circle ml-auto"></i>
+                            <i className="fas fa-info-circle ml-auto"></i>
                         </CardTitle>
                     </CardBody>
                     <HolderProvider.Icon
@@ -364,7 +364,7 @@ const Images = () => (
                     </HolderProvider.Icon>
                     <CardBody>
                         <CardTitle className="h6">
-                             <i className="fa fa-play-circle mr-2"></i>
+                             <i className="fas fa-play-circle mr-2"></i>
                              Icon Left Title
                         </CardTitle>
                         <CardText>
@@ -380,8 +380,8 @@ const Images = () => (
         { /* START Header 3 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={3} 
+                <HeaderDemo
+                    no={3}
                     title="Images: Heading Options"
                     className="mt-5"
                     subTitle="Documentation and examples for opting images into responsive behavior."
@@ -415,7 +415,7 @@ const Images = () => (
                     <CardBody>
                         <CardTitle className="d-flex h6 mb-0">
                              Icon Right Title
-                             <i className="fa fa-info-circle ml-auto"></i>
+                             <i className="fas fa-info-circle ml-auto"></i>
                         </CardTitle>
                     </CardBody>
                     <HolderProvider.Icon
@@ -476,7 +476,7 @@ const Images = () => (
                 <Card className="mb-3">
                     <CardBody>
                         <CardTitle className="d-flex h6 mb-0">
-                             <i className="fa fa-play-circle mr-2"></i>
+                             <i className="fas fa-play-circle mr-2"></i>
                              Icon Left Title
                         </CardTitle>
                     </CardBody>
@@ -520,8 +520,8 @@ const Images = () => (
         { /* START Header 4 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={4} 
+                <HeaderDemo
+                    no={4}
                     title="Images: Footer Options"
                     className="mt-5"
                     subTitle="Documentation and examples for opting images into responsive behavior."
@@ -551,10 +551,10 @@ const Images = () => (
                     <CardFooter className="d-flex">
                         <div className="mr-auto">
                             <span className="mr-3">
-                                <i className="fa-heart fa mr-1"></i> 9
+                                <i className="fa-heart fas mr-1"></i> 9
                             </span>
                             <span className="mr-3">
-                                <i className="fa-comment fa mr-1"></i> 37
+                                <i className="fa-comment fas mr-1"></i> 37
                             </span>
                         </div>
                         <span>4 Minutes Ago</span>
@@ -578,8 +578,8 @@ const Images = () => (
                     </CardBody>
                     <CardFooter className="d-flex">
                         <a href="#">
-                            Read More 
-                            <i className="fa fa-angle-right ml-2"></i>
+                            Read More
+                            <i className="fas fa-angle-right ml-2"></i>
                         </a>
                         <div className="align-self-center ml-auto">
                             <i className="fa-star-o fa"></i>
@@ -606,10 +606,10 @@ const Images = () => (
                     </CardBody>
                     <CardFooter className="d-flex">
                         <div className="mr-auto">
-                            <i className="fa-heart-o fa mr-1"></i> 9
+                            <i className="fa-heart-o fas mr-1"></i> 9
                         </div>
                         <div>
-                            <i className="fa-eye fa mr-1"></i> 87
+                            <i className="fa-eye fas mr-1"></i> 87
                         </div>
                     </CardFooter>
                 </Card>
@@ -636,18 +636,18 @@ const Images = () => (
                                     size="md"
                                     src={ randomAvatar() }
                                     addOns={[
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="white"
                                             key="avatar-icon-bg"
                                         />,
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="danger"
                                             key="avatar-icon-fg"
                                         />
                                     ]}
-                                /> 
+                                />
                             </Media>
                             <Media body>
                                 <span className="mt-0 d-flex h6 mb-0">
@@ -683,8 +683,8 @@ const Images = () => (
                     </CardBody>
                     <CardFooter className="d-flex">
                          <Button color="primary mr-auto">
-                            Read More 
-                            <i className="fa fa-angle-right ml-2"></i>
+                            Read More
+                            <i className="fas fa-angle-right ml-2"></i>
                          </Button>{' '}
                         <div className="align-self-center">
                             16 Min. Ago
@@ -714,13 +714,13 @@ const Images = () => (
                                 src={ randomAvatar() }
                                 className="mr-2"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="success"
                                         key="avatar-icon-fg"
                                     />
@@ -731,13 +731,13 @@ const Images = () => (
                                 src={ randomAvatar() }
                                 className="mr-2"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="warning"
                                         key="avatar-icon-fg"
                                     />
@@ -748,18 +748,18 @@ const Images = () => (
                                 src={ randomAvatar() }
                                 className="mr-2"
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="secondary"
                                         key="avatar-icon-fg"
                                     />
                                 ]}
-                            /> 
+                            />
                         </div>
                         <div className="align-self-center ml-auto">
                             <i className="fa-heart-o fa"></i>
@@ -773,8 +773,8 @@ const Images = () => (
         { /* START Header 5 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={5} 
+                <HeaderDemo
+                    no={5}
                     title="Images: Image Overlays"
                     className="mt-5"
                     subTitle="Documentation and examples for opting images into responsive behavior."
@@ -814,10 +814,10 @@ const Images = () => (
                         <div className="d-flex">
                             <div className="ml-auto">
                                 <span className="mr-3">
-                                    <i className="fa-heart fa mr-1"></i> 34
+                                    <i className="fa-heart fas mr-1"></i> 34
                                 </span>
                                 <span className="mr-3">
-                                    <i className="fa-comment fa mr-1"></i> 8
+                                    <i className="fa-comment fas mr-1"></i> 8
                                 </span>
                             </div>
                             <span>
@@ -858,10 +858,10 @@ const Images = () => (
                     <CardFooter className="d-flex">
                         <div>
                             <span className="mr-3">
-                                <i className="fa-heart fa mr-1"></i> 34
+                                <i className="fa-heart fas mr-1"></i> 34
                             </span>
                             <span className="mr-3">
-                                <i className="fa-comment fa mr-1"></i> 8
+                                <i className="fa-comment fas mr-1"></i> 8
                             </span>
                         </div>
                         <span className="ml-auto">

@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 
-import { 
+import {
     Badge,
     Avatar,
     CustomInput,
@@ -34,7 +34,7 @@ const TrTableClients = (props) => (
             </td>
             <td className="align-middle">
                 <a href="#" id={`trTableClientsTooltip-${ props.id }` }>
-                    <i className="fa fa-fw fa-star-o"></i>
+                    <i className="fas fa-fw fa-star-o"></i>
                 </a>
                 <UncontrolledTooltip placement="top" target={`trTableClientsTooltip-${ props.id }` }>
                     Add To Favorites
@@ -47,18 +47,18 @@ const TrTableClients = (props) => (
                             size="md"
                             src="http://bs4.webkom.co/img/avatars/2.jpg"
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(status) }
                                     key="avatar-icon-fg"
                                 />
                             ]}
-                        /> 
+                        />
                     </Media>
                     <Media body>
                         <a className="mt-0 d-flex text-decoration-none" href="#">

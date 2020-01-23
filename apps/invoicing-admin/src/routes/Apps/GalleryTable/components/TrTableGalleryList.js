@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 
-import { 
+import {
     Badge,
     CustomInput,
     Avatar,
@@ -70,25 +70,25 @@ const TrTableGalleryList = (props) => (
                             size="md"
                             src={ randomAvatar() }
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(status) }
                                     key="avatar-icon-fg"
                                 />
                             ]}
-                        /> 
+                        />
                     </Media>
                     <Media body>
                         <a className="mt-0 text-decoration-none d-flex" href="#">
                             { faker.name.firstName() } { faker.name.lastName() }
                         </a>
                         <span>
-                            { faker.address.state() }, { faker.address.stateAbbr() } 
+                            { faker.address.state() }, { faker.address.stateAbbr() }
                         </span>
                     </Media>
                 </Media>
@@ -102,7 +102,7 @@ const TrTableGalleryList = (props) => (
             </td>
             <td className="align-middle text-right">
                 <Button color="link" id={`trTableGalleryListTooltip-${ props.id }` }>
-                    <i className="fa fa-fw fa-download"></i>
+                    <i className="fas fa-fw fa-download"></i>
                 </Button>
                 <UncontrolledTooltip placement="left" target={`trTableGalleryListTooltip-${ props.id }` }>
                    Download

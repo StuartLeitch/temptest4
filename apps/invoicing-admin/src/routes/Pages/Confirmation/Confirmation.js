@@ -12,14 +12,14 @@ const Confirmation = () => (
     <EmptyLayout>
         <EmptyLayout.Section center>
             { /* START Header */}
-            <HeaderAuth 
+            <HeaderAuth
                 title="Confirm Your Email Address"
                 icon="envelope"
                 text={(
                     <React.Fragment>
-                        The confirmation mail was sent to 
-                        <i>email@example.com</i> Check your mailbox 
-                        and hit the <strong>Confirm My Email</strong> 
+                        The confirmation mail was sent to
+                        <i>email@example.com</i> Check your mailbox
+                        and hit the <strong>Confirm My Email</strong>
                         link to confirm your email address.
                     </React.Fragment>
                 )}
@@ -28,7 +28,7 @@ const Confirmation = () => (
             { /* START Bottom Links */}
             <div className="text-center mb-5">
                 <Link to="/" className="text-decoration-none">
-                    <i className="fa fa-angle-left mr-2"></i>Back to Home
+                    <i className="fas fa-angle-left mr-2"></i>Back to Home
                 </Link>
             </div>
             { /* END Bottom Links */}

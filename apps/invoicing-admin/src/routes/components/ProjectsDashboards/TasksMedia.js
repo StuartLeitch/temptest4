@@ -3,7 +3,7 @@ import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Media,
     CustomInput
 } from './../../../components';
@@ -25,7 +25,7 @@ const TasksMedia = (props) => (
                 </div>
             </Media>
             <Media right className="ml-3">
-                <i className={ `fa fa-fw fa-circle text-${ props.iconColor }` }></i>
+                <i className={ `fas fa-fw fa-circle text-${ props.iconColor }` }></i>
             </Media>
         </Media>
     </React.Fragment>

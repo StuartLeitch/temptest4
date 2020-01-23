@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {  
-    Card, 
+import {
+    Card,
     CardBody,
     Badge
 } from './../../../../components';
@@ -41,7 +41,7 @@ const CardSystem = (props) => (
            <div className="d-flex">
                <span>
                     <Badge pill className="mb-3" color={ props.badgeColor } >
-                        <i className={` fa fa-fw fa-caret-${ randomArray(caret) }`} />
+                        <i className={` fas fa-fw fa-caret-${ randomArray(caret) }`} />
                         { randomArray(percents) }%
                     </Badge>
                     <h6 className="mb-0">
@@ -52,7 +52,7 @@ const CardSystem = (props) => (
                     </h2>
                 </span>
                 <span className="text-right ml-auto">
-                    <TinyDonutChart 
+                    <TinyDonutChart
                         pieColor={props.pieColor}
                     />
                 </span>

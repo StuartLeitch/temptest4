@@ -37,15 +37,15 @@ const expandRow = {
         );
     },
     expandHeaderColumnRenderer: ({ isAnyExpands }) => isAnyExpands ? (
-            <i className="fa fa-angle-down fa-fw fa-lg text-muted"></i>
+            <i className="fas fa-angle-down fa-fw fa-lg text-muted"></i>
         ) : (
-            <i className="fa fa-angle-right fa-fw fa-lg text-muted"></i>
+            <i className="fas fa-angle-right fa-fw fa-lg text-muted"></i>
         ),
     expandColumnRenderer: ({ expanded }) =>
         expanded ? (
-            <i className="fa fa-angle-down fa-fw fa-lg text-muted"></i>
+            <i className="fas fa-angle-down fa-fw fa-lg text-muted"></i>
         ) : (
-            <i className="fa fa-angle-right fa-fw fa-lg text-muted"></i>
+            <i className="fas fa-angle-right fa-fw fa-lg text-muted"></i>
         )
 };
 
@@ -57,13 +57,13 @@ export const LargeTable = () => (
             </CardHeader>
             <div className={ classes['table-scroll-wrap'] }>
                 <BootstrapTable
-                    classes="table-responsive-sm"                
+                    classes="table-responsive-sm"
                     keyField='id'
                     data={ data }
                     columns={ columns }
                     bordered={ false }
                     selectRow={ { mode: 'checkbox', clickToSelect: true } }
-                    expandRow={ expandRow }    
+                    expandRow={ expandRow }
                 />
             </div>
         </Card>

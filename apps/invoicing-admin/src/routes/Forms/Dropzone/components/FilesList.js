@@ -32,7 +32,7 @@ export const FilesList = ({ files, onFileRemove }) => (
                 <tr key={ index }>
                     <td className="align-middle">
                         <div className={ classes['ph--small'] }>
-                            <i className={`fa fa-fw fa-2x ${getFileIcon(file)}`} />
+                            <i className={`fas fa-fw fa-2x ${getFileIcon(file)}`} />
                         </div>
                     </td>
                     <td className="align-middle">
@@ -54,7 +54,7 @@ export const FilesList = ({ files, onFileRemove }) => (
                             size="sm"
                             id={`delete-file-${index}`}
                         >
-                            <i className="fa fa-times fa-fw text-danger"></i>
+                            <i className="fas fa-times fa-fw text-danger"></i>
                         </Button>
                         <UncontrolledTooltip placement="left" target={`delete-file-${index}`}>
                             Delete File

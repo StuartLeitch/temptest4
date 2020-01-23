@@ -11,7 +11,7 @@ import {
 const AddonInputFR = React.forwardRef((props, ref) => (
     <InputGroup className={props.className}>
         <InputGroupAddon addonType="prepend">
-            <i className="fa fa-calendar-o"></i>
+            <i className="fas fa-calendar-o"></i>
         </InputGroupAddon>
         <Input
             onClick={ props.onClick }

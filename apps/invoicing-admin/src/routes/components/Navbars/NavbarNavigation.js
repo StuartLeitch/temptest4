@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { NavLink as Link } from 'react-router-dom';
 import classNames from 'classnames';
 
-import { 
+import {
     Nav,
     DropdownToggle,
     NavLink,
@@ -19,7 +19,7 @@ const NavbarNavigation = ({ accent, pills, ...navbarProps }) => (
         <NavItem>
             <NavLink tag={ Link } to="/interface/navbars">
                 <span className={ classNames({ 'mr-3': !(pills || accent) }) }>
-                    <i className="fa fa-fw fa-home d-none d-md-inline"></i>
+                    <i className="fas fa-fw fa-home d-none d-md-inline"></i>
                     <span className="d-md-none">
                         Home
                     </span>
@@ -29,7 +29,7 @@ const NavbarNavigation = ({ accent, pills, ...navbarProps }) => (
         <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav>
                 Dashboards
-                <i className="fa fa-angle-down fa-fw ml-1"></i>
+                <i className="fas fa-angle-down fa-fw ml-1"></i>
             </DropdownToggle>
             <DropdownMenu>
                 <DropdownItem tag={ Link } to="/dashboards/analytics">Analytics</DropdownItem>
@@ -40,7 +40,7 @@ const NavbarNavigation = ({ accent, pills, ...navbarProps }) => (
         <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav>
                 Interface
-                <i className="fa fa-angle-down fa-fw ml-1"></i>
+                <i className="fas fa-angle-down fa-fw ml-1"></i>
             </DropdownToggle>
             <DropdownMenu>
                 <DropdownItem tag={ Link } to="/interface/colors">Colors</DropdownItem>
@@ -67,7 +67,7 @@ const NavbarNavigation = ({ accent, pills, ...navbarProps }) => (
         <NestedDropdown nav inNavbar>
             <DropdownToggle nav>
                 Apps
-                <i className="fa fa-angle-down fa-fw ml-1"></i>
+                <i className="fas fa-angle-down fa-fw ml-1"></i>
             </DropdownToggle>
             <DropdownMenu>
                 <NestedDropdown.Submenu title="Projects">
@@ -118,8 +118,8 @@ const NavbarNavigation = ({ accent, pills, ...navbarProps }) => (
 
         <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav>
-                Layouts                                 
-                <i className="fa fa-angle-down fa-fw ml-1"></i>
+                Layouts
+                <i className="fas fa-angle-down fa-fw ml-1"></i>
             </DropdownToggle>
             <DropdownMenu>
                 <DropdownItem tag={ Link } to="/layouts/navbar">Navbar</DropdownItem>
@@ -130,7 +130,7 @@ const NavbarNavigation = ({ accent, pills, ...navbarProps }) => (
 
         <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav>
-                <i className="fa fa-ellipsis-h fa-fw"></i>
+                <i className="fas fa-ellipsis-h fa-fw"></i>
             </DropdownToggle>
             <DropdownMenu>
                 <DropdownItem header>Cards</DropdownItem>

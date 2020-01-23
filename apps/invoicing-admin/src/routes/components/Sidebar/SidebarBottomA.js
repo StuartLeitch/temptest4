@@ -33,7 +33,7 @@ const SidebarBottomA = () => (
                     sidebar
                     compact
                     render={() => (
-                        <i className="fa fa-fw fa-toggle-on"></i>
+                        <i className="fas fa-fw fa-toggle-on"></i>
                     )}
                 />
 
@@ -43,7 +43,7 @@ const SidebarBottomA = () => (
                     color="link"
                     className="sidebar__link p-0 mt-3"
                 >
-                    <i className="fa fa-fw fa-question-circle-o"></i>
+                    <i className="fas fa-fw fa-question-circle-o"></i>
                 </Button>
                 <UncontrolledPopover placement="left-end" target="UncontrolledSidebarPopoverFooter">
                     <PopoverBody>

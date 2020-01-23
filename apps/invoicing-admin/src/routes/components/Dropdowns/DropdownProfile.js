@@ -3,7 +3,7 @@ import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     DropdownMenu,
     DropdownItem
 } from './../../../components';
@@ -26,7 +26,7 @@ const DropdownProfile = (props) => (
             </DropdownItem>
             <DropdownItem divider />
             <DropdownItem tag={ Link } to="/pages/login">
-                <i className="fa fa-fw fa-sign-out mr-2"></i>
+                <i className="fas fa-fw fa-sign-out mr-2"></i>
                 Sign Out
             </DropdownItem>
         </DropdownMenu>

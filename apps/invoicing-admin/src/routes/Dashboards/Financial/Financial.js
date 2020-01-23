@@ -47,7 +47,7 @@ const Financial = () => (
     <Container>
         <Row className="mb-2">
             <Col lg={ 12 }>
-                <HeaderMain 
+                <HeaderMain
                     title="Financial"
                     className="mb-4 mb-lg-3"
                 />
@@ -71,7 +71,7 @@ const Financial = () => (
                                 <h2>$ 188.00</h2>
                             </div>
                             <div>
-                                <i className="fa fa-caret-down fa-fw text-danger"></i> $464.00
+                                <i className="fas fa-caret-down fa-fw text-danger"></i> $464.00
                             </div>
                         </div>
                     </CardBody>
@@ -88,7 +88,7 @@ const Financial = () => (
                                 <h2>$ 553.00</h2>
                             </div>
                             <div>
-                                <i className="fa fa-caret-down fa-fw text-danger"></i> $994.00
+                                <i className="fas fa-caret-down fa-fw text-danger"></i> $994.00
                             </div>
                         </div>
                     </CardBody>
@@ -105,7 +105,7 @@ const Financial = () => (
                                 <h2>$ 451.00</h2>
                             </div>
                             <div>
-                                <i className="fa fa-caret-up fa-fw text-success"></i> $938.00
+                                <i className="fas fa-caret-up fa-fw text-success"></i> $938.00
                             </div>
                         </div>
                     </CardBody>
@@ -122,7 +122,7 @@ const Financial = () => (
                                 <h2>$ 194.00</h2>
                             </div>
                             <div>
-                                <i className="fa fa-caret-up fa-fw text-success"></i> $519.00
+                                <i className="fas fa-caret-up fa-fw text-success"></i> $519.00
                             </div>
                         </div>
                     </CardBody>
@@ -157,7 +157,7 @@ const Financial = () => (
                             <CardTitle className="mb-1 d-flex">
                                 <h6>Recent Fundings</h6>
                                 <Button color="link" size="sm" className="pt-0 ml-auto">
-                                    View All <i className="fa fa-angle-right"></i>
+                                    View All <i className="fas fa-angle-right"></i>
                                 </Button>
                             </CardTitle>
                         </CardBody>
@@ -181,7 +181,7 @@ const Financial = () => (
                         <CardTitle className="mb-1 d-flex">
                             <h6>Invoices</h6>
                             <Button color="link" size="sm" className="pt-0 ml-auto">
-                                View All <i className="fa fa-angle-right"></i>
+                                View All <i className="fas fa-angle-right"></i>
                             </Button>
                         </CardTitle>
                     </CardBody>

@@ -18,7 +18,7 @@ const LockScreen = () => (
     <EmptyLayout>
         <EmptyLayout.Section center>
             { /* START Header */}
-            <HeaderAuth 
+            <HeaderAuth
                 title="Your Session is Blocked"
             />
             { /* END Header */}
@@ -47,7 +47,7 @@ const LockScreen = () => (
                     Sign as Diffrent User
                 </Link>
                 <Link to="/" className="ml-auto text-decoration-none">
-                    <i className="fa fa-angle-left mr-2"></i> Back to Home
+                    <i className="fas fa-angle-left mr-2"></i> Back to Home
                 </Link>
             </div>
             { /* END Bottom Links */}

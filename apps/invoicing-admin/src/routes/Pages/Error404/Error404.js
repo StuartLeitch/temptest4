@@ -20,7 +20,7 @@ const Error404 = () => (
     <EmptyLayout>
         <EmptyLayout.Section center>
             { /* START Header */}
-            <HeaderAuth 
+            <HeaderAuth
                 title="Error 404"
             />
             { /* END Header */}
@@ -37,7 +37,7 @@ const Error404 = () => (
                             {
                                 ({ color }) => (
                                     <Button color={ color } tag={ Link } to="/">
-                                        <i className="fa fa-search"></i>
+                                        <i className="fas fa-search"></i>
                                     </Button>
                                 )
                             }

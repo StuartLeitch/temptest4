@@ -39,7 +39,7 @@ const NavbarExample = ({ themeColor, themeStyle, navStyle }) => {
                 <Nav pills>
                     <NavItem>
                         <NavLink tag={ NavbarToggler } id="navbar-navigation-toggler" className="b-0">
-                            <i className="fa fa-fw fa-bars"></i>
+                            <i className="fas fa-fw fa-bars"></i>
                         </NavLink>
                     </NavItem>
                 </Nav>
@@ -64,21 +64,21 @@ const NavbarExample = ({ themeColor, themeStyle, navStyle }) => {
                                 size="sm"
                                 src={ randomAvatar() }
                                 addOns={[
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="white"
                                         key="avatar-icon-bg"
                                     />,
-                                    <AvatarAddOn.Icon 
-                                        className="fa fa-circle"
+                                    <AvatarAddOn.Icon
+                                        className="fas fa-circle"
                                         color="danger"
                                         key="avatar-icon-fg"
                                     />
                                 ]}
-                            /> 
+                            />
                         </DropdownToggle>
-                        <DropdownProfile  
-                            right  
+                        <DropdownProfile
+                            right
                         />
                     </UncontrolledDropdown>
                     { /* END Navbar: Dropdown */ }
@@ -91,9 +91,9 @@ const NavbarExample = ({ themeColor, themeStyle, navStyle }) => {
                 <h1 className="mb-0 h4">
                     Navbar Only
                 </h1>
-                
+
                 <Button color={ themeColor } className="px-4 my-sm-0">
-                    Download <i className="fa ml-1 fa-fw fa-download"></i>
+                    Download <i className="fas ml-1 fa-fw fa-download"></i>
                 </Button>
             </Navbar>
         </NavbarThemeProvider>

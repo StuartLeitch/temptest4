@@ -4,10 +4,10 @@ import { map, isInteger } from 'lodash';
 import { Pagination, PaginationItem, PaginationLink, Col } from './../../../../components';
 
 const mapToFa = {
-    '<': <i className="fa fa-angle-left" />,
-    '<<': <i className="fa fa-angle-double-left" />,
-    '>': <i className="fa fa-angle-right" />,
-    '>>': <i className="fa fa-angle-double-right" />
+    '<': <i className="fas fa-angle-left" />,
+    '<<': <i className="fas fa-angle-double-left" />,
+    '>': <i className="fas fa-angle-right" />,
+    '>>': <i className="fas fa-angle-double-right" />
 }
 
 export const CustomPaginationPanel = ({ onPageChange, pages, ...otherProps }) => (

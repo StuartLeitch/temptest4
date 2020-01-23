@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Card,
     CardImg,
     HolderProvider,
@@ -43,7 +43,7 @@ const ImagesResultsCard = () => (
                         </a>
                     </span>
                     <a href="#" className="ml-auto">
-                        <i className="fa fa-external-link"></i>
+                        <i className="fas fa-external-link"></i>
                     </a>
                 </div>
                 <Media>
@@ -52,18 +52,18 @@ const ImagesResultsCard = () => (
                             size="md"
                             src={ randomAvatar() }
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(status) }
                                     key="avatar-icon-fg"
                                 />
                             ]}
-                        /> 
+                        />
                     </Media>
                     <Media body>
                         <div className="mt-0 d-flex text-inverse">
@@ -77,10 +77,10 @@ const ImagesResultsCard = () => (
             </CardBody>
             <CardFooter className="bt-0">
                 <span className="mr-3">
-                    <i className="fa fa-eye mr-1"></i> <span className="text-inverse">233</span> 
+                    <i className="fas fa-eye mr-1"></i> <span className="text-inverse">233</span>
                 </span>
                 <span>
-                    <i className="fa fa-heart-o mr-1"></i> <span className="text-inverse">98</span> 
+                    <i className="fas fa-heart-o mr-1"></i> <span className="text-inverse">98</span>
                 </span>
             </CardFooter>
         </Card>

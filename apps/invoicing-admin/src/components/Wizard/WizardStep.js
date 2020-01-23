@@ -22,7 +22,7 @@ export const WizardStep = props => {
 };
 
 WizardStep.defaultProps = {
-    successIcon: (<i className='fa fa-check fa-fw'></i>),
+    successIcon: (<i className='fas fa-check fa-fw'></i>),
     onClick: () => {}
 }
 

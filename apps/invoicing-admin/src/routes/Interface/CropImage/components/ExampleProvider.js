@@ -86,7 +86,7 @@ export class ExampleProvider extends React.Component {
                     (!imageUrl) && (
                         <div className="d-flex align-items-center justify-content-center b-2 b-dashed h-100 p-4">
                             <span className="d-block text-muted text-center">
-                                <i className="fa fa-fw fa-info-circle mb-2 fa-2x"></i>
+                                <i className="fas fa-fw fa-info-circle mb-2 fa-2x"></i>
                                 <br />
                                 Select the part of the image on the left and click &quot;Crop&quot;
                             </span>

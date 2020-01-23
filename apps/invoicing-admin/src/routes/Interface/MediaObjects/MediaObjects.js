@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Checkable,
     Container,
     Row,
@@ -17,7 +17,7 @@ import {
     ListGroup,
     ListGroupItem,
     Nav,
-    NavItem, 
+    NavItem,
     NavLink,
     CustomInput,
     Badge,
@@ -29,16 +29,16 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const MediaObjects = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Media Objects"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Media Options" 
+                    <HeaderDemo
+                        no={1}
+                        title="Media Options"
                         subTitle={(
                             <React.Fragment>
                                 Media list and media object layouts
@@ -66,18 +66,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -94,18 +94,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -122,18 +122,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -149,7 +149,7 @@ const MediaObjects = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6" className="mb-4">
-                                Media: Link 
+                                Media: Link
                                 <span className="small ml-1 text-muted">
                                     #1.02
                                 </span>
@@ -160,18 +160,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 h6 mb-1">
@@ -190,18 +190,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 h6 mb-1">
@@ -220,18 +220,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 h6 mb-1">
@@ -249,7 +249,7 @@ const MediaObjects = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6" className="mb-4">
-                                Media: Right Badge 
+                                Media: Right Badge
                                 <span className="small ml-1 text-muted">
                                     #1.03
                                 </span>
@@ -260,18 +260,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 h6 mb-1">
@@ -291,18 +291,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 h6 mb-1">
@@ -322,18 +322,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 h6 mb-1">
@@ -363,18 +363,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Checkable.Trigger>
                                 <Checkable.Trigger tag={ Media } body>
                                     <span className="mt-0 h6 mb-1">
@@ -394,18 +394,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Checkable.Trigger>
                                 <Checkable.Trigger tag={ Media } body>
                                     <span className="mt-0 h6 mb-1">
@@ -425,18 +425,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Checkable.Trigger>
                                 <Checkable.Trigger tag={ Media } body>
                                     <span className="mt-0 h6 mb-1">
@@ -466,18 +466,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Checkable.Trigger>
                                 <Checkable.Trigger tag={ Media } body>
                                     <span className="mt-0 h6 mb-1">
@@ -497,18 +497,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Checkable.Trigger>
                                 <Checkable.Trigger tag={ Media } body>
                                     <span className="mt-0 h6 mb-1">
@@ -528,18 +528,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Checkable.Trigger>
                                 <Checkable.Trigger tag={ Media } body>
                                     <span className="mt-0 h6 mb-1">
@@ -566,8 +566,8 @@ const MediaObjects = () => (
                             <Media>
                                 <Media left top className="mr-3">
                                     <span className="fa-stack fa-lg">
-                                        <i className="fa fa-circle fa-stack-2x text-success"></i>
-                                        <i className="fa fa-check fa-stack-1x text-white"></i>
+                                        <i className="fas fa-circle fa-stack-2x text-success"></i>
+                                        <i className="fas fa-check fa-stack-1x text-white"></i>
                                     </span>
                                 </Media>
                                 <Media body>
@@ -582,8 +582,8 @@ const MediaObjects = () => (
                             <Media>
                                 <Media left top className="mr-3">
                                     <span className="fa-stack fa-lg">
-                                        <i className="fa fa-circle fa-stack-2x text-danger"></i>
-                                        <i className="fa fa-close fa-stack-1x text-white"></i>
+                                        <i className="fas fa-circle fa-stack-2x text-danger"></i>
+                                        <i className="fas fa-close fa-stack-1x text-white"></i>
                                     </span>
                                 </Media>
                                 <Media body>
@@ -598,8 +598,8 @@ const MediaObjects = () => (
                             <Media>
                                 <Media left top className="mr-3">
                                     <span className="fa-stack fa-lg">
-                                        <i className="fa fa-circle fa-stack-2x text-warning"></i>
-                                        <i className="fa fa-exclamation fa-stack-1x text-white"></i>
+                                        <i className="fas fa-circle fa-stack-2x text-warning"></i>
+                                        <i className="fas fa-exclamation fa-stack-1x text-white"></i>
                                     </span>
                                 </Media>
                                 <Media body>
@@ -684,18 +684,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                             <Media>
@@ -712,18 +712,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                             <Media>
@@ -740,18 +740,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                         </CardBody>
@@ -782,18 +782,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                             <Media>
@@ -810,18 +810,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                             <Media>
@@ -838,18 +838,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                         </CardBody>
@@ -876,18 +876,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                             <Media>
@@ -904,18 +904,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                             <Media>
@@ -932,18 +932,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                             </Media>
                         </CardBody>
@@ -962,18 +962,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -984,7 +984,7 @@ const MediaObjects = () => (
                                     </p>
                                 </Media>
                                 <Media left top>
-                                    <i className="fa fa-circle text-danger"></i>
+                                    <i className="fas fa-circle text-danger"></i>
                                 </Media>
                             </Media>
                             <Media>
@@ -993,18 +993,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1015,7 +1015,7 @@ const MediaObjects = () => (
                                     </p>
                                 </Media>
                                 <Media left top>
-                                    <i className="fa fa-circle text-warning"></i>
+                                    <i className="fas fa-circle text-warning"></i>
                                 </Media>
                             </Media>
                             <Media>
@@ -1024,18 +1024,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1046,7 +1046,7 @@ const MediaObjects = () => (
                                     </p>
                                 </Media>
                                 <Media left top>
-                                    <i className="fa fa-circle text-success"></i>
+                                    <i className="fas fa-circle text-success"></i>
                                 </Media>
                             </Media>
                         </CardBody>
@@ -1065,18 +1065,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1087,7 +1087,7 @@ const MediaObjects = () => (
                                     </p>
                                 </Media>
                                 <Media left top className="ml-2">
-                                    <i className="fa fa-user"></i>
+                                    <i className="fas fa-user"></i>
                                 </Media>
                             </Media>
                             <Media>
@@ -1096,18 +1096,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1118,7 +1118,7 @@ const MediaObjects = () => (
                                     </p>
                                 </Media>
                                 <Media left top className="ml-2">
-                                    <i className="fa fa-gear"></i>
+                                    <i className="fas fa-gear"></i>
                                 </Media>
                             </Media>
                             <Media>
@@ -1127,18 +1127,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1149,7 +1149,7 @@ const MediaObjects = () => (
                                     </p>
                                 </Media>
                                 <Media left top className="ml-2">
-                                    <i className="fa fa-exclamation-circle"></i>
+                                    <i className="fas fa-exclamation-circle"></i>
                                 </Media>
                             </Media>
                         </CardBody>
@@ -1168,18 +1168,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1191,7 +1191,7 @@ const MediaObjects = () => (
                                 </Media>
                                 <Media left top className="ml-2">
                                     <Button outline color="secondary" size="sm">
-                                        <i className="fa fa-user fa-fw"></i>
+                                        <i className="fas fa-user fa-fw"></i>
                                     </Button>{' '}
                                 </Media>
                             </Media>
@@ -1201,18 +1201,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1224,7 +1224,7 @@ const MediaObjects = () => (
                                 </Media>
                                 <Media left top className="ml-2">
                                     <Button outline color="secondary" size="sm">
-                                        <i className="fa fa-gear fa-fw"></i>
+                                        <i className="fas fa-gear fa-fw"></i>
                                     </Button>{' '}
                                 </Media>
                             </Media>
@@ -1234,18 +1234,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="secondary"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1257,7 +1257,7 @@ const MediaObjects = () => (
                                 </Media>
                                 <Media left top className="ml-2">
                                     <Button outline color="secondary" size="sm">
-                                        <i className="fa fa-exclamation-circle fa-fw"></i>
+                                        <i className="fas fa-exclamation-circle fa-fw"></i>
                                     </Button>{' '}
                                 </Media>
                             </Media>
@@ -1273,7 +1273,7 @@ const MediaObjects = () => (
                             </CardTitle>
                             <Media>
                                 <Media left top className="mr-3">
-                                    <i className="fa fa-file-pdf-o fa-fw fa-lg text-danger"></i>
+                                    <i className="fas fa-file-pdf-o fa-fw fa-lg text-danger"></i>
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1286,7 +1286,7 @@ const MediaObjects = () => (
                             </Media>
                             <Media>
                                 <Media left top className="mr-3">
-                                    <i className="fa fa-file-word-o fa-fw fa-lg text-primary"></i>
+                                    <i className="fas fa-file-word-o fa-fw fa-lg text-primary"></i>
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1299,7 +1299,7 @@ const MediaObjects = () => (
                             </Media>
                             <Media>
                                 <Media left top className="mr-3">
-                                    <i className="fa fa-file-excel-o fa-fw fa-lg text-success"></i>
+                                    <i className="fas fa-file-excel-o fa-fw fa-lg text-success"></i>
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1360,7 +1360,7 @@ const MediaObjects = () => (
                                 </Media>
                             </Media>
                         </CardBody>
-                    </Card>     
+                    </Card>
                 </Col>
             { /* END Col6 2 */}
             </Row>
@@ -1369,10 +1369,10 @@ const MediaObjects = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
+                    <HeaderDemo
+                        no={2}
                         title="Media Text"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Media list and media object layouts
@@ -1400,18 +1400,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="d-flex mb-1">
@@ -1433,18 +1433,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="d-flex mb-1">
@@ -1466,18 +1466,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="d-flex mb-1">
@@ -1509,18 +1509,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="d-flex mb-1">
@@ -1542,18 +1542,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="d-flex mb-1">
@@ -1575,18 +1575,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="d-flex mb-1">
@@ -1618,18 +1618,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <div className="mb-1">
@@ -1651,18 +1651,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <div className="mb-1">
@@ -1684,18 +1684,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <div className="mb-1">
@@ -1731,18 +1731,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1762,18 +1762,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1793,18 +1793,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1834,18 +1834,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="danger"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1856,13 +1856,13 @@ const MediaObjects = () => (
                                     </p>
                                     <ButtonGroup size="sm" className="mb-3">
                                         <Button outline color="secondary">
-                                            <i className="fa fa-reply"></i>
+                                            <i className="fas fa-reply"></i>
                                         </Button>
                                         <Button outline color="secondary">
-                                            <i className="fa fa-ban"></i>
+                                            <i className="fas fa-ban"></i>
                                         </Button>
                                         <Button outline color="secondary">
-                                            <i className="fa fa-trash"></i>
+                                            <i className="fas fa-trash"></i>
                                         </Button>
                                     </ButtonGroup>
                                 </Media>
@@ -1873,18 +1873,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="warning"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1895,13 +1895,13 @@ const MediaObjects = () => (
                                     </p>
                                     <ButtonGroup size="sm" className="mb-3">
                                         <Button outline color="secondary">
-                                            <i className="fa fa-reply"></i>
+                                            <i className="fas fa-reply"></i>
                                         </Button>
                                         <Button outline color="secondary">
-                                            <i className="fa fa-ban"></i>
+                                            <i className="fas fa-ban"></i>
                                         </Button>
                                         <Button outline color="secondary">
-                                            <i className="fa fa-trash"></i>
+                                            <i className="fas fa-trash"></i>
                                         </Button>
                                     </ButtonGroup>
                                 </Media>
@@ -1912,18 +1912,18 @@ const MediaObjects = () => (
                                         size="md"
                                         src={ randomAvatar() }
                                         addOns={[
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="white"
                                                 key="avatar-icon-bg"
                                             />,
-                                            <AvatarAddOn.Icon 
-                                                className="fa fa-circle"
+                                            <AvatarAddOn.Icon
+                                                className="fas fa-circle"
                                                 color="success"
                                                 key="avatar-icon-fg"
                                             />
                                         ]}
-                                    /> 
+                                    />
                                 </Media>
                                 <Media body>
                                     <span className="mt-0 d-flex h6 mb-1">
@@ -1934,13 +1934,13 @@ const MediaObjects = () => (
                                     </p>
                                     <ButtonGroup size="sm" className="mb-3">
                                         <Button outline color="secondary">
-                                            <i className="fa fa-reply"></i>
+                                            <i className="fas fa-reply"></i>
                                         </Button>
                                         <Button outline color="secondary">
-                                            <i className="fa fa-ban"></i>
+                                            <i className="fas fa-ban"></i>
                                         </Button>
                                         <Button outline color="secondary">
-                                            <i className="fa fa-trash"></i>
+                                            <i className="fas fa-trash"></i>
                                         </Button>
                                     </ButtonGroup>
                                 </Media>
@@ -1955,10 +1955,10 @@ const MediaObjects = () => (
             { /* START Header 3 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
+                    <HeaderDemo
+                        no={3}
                         title="Media Layouts"
-                        className="mt-5" 
+                        className="mt-5"
                         subTitle={(
                             <React.Fragment>
                                 Media list and media object layouts
@@ -1989,18 +1989,18 @@ const MediaObjects = () => (
                                             size="md"
                                             src={ randomAvatar() }
                                             addOns={[
-                                                <AvatarAddOn.Icon 
-                                                    className="fa fa-circle"
+                                                <AvatarAddOn.Icon
+                                                    className="fas fa-circle"
                                                     color="white"
                                                     key="avatar-icon-bg"
                                                 />,
-                                                <AvatarAddOn.Icon 
-                                                    className="fa fa-circle"
+                                                <AvatarAddOn.Icon
+                                                    className="fas fa-circle"
                                                     color="danger"
                                                     key="avatar-icon-fg"
                                                 />
                                             ]}
-                                        /> 
+                                        />
                                     </Media>
                                     <Media body>
                                         <span className="mt-0 d-flex h6 mb-1">
@@ -2019,18 +2019,18 @@ const MediaObjects = () => (
                                             size="md"
                                             src={ randomAvatar() }
                                             addOns={[
-                                                <AvatarAddOn.Icon 
-                                                    className="fa fa-circle"
+                                                <AvatarAddOn.Icon
+                                                    className="fas fa-circle"
                                                     color="white"
                                                     key="avatar-icon-bg"
                                                 />,
-                                                <AvatarAddOn.Icon 
-                                                    className="fa fa-circle"
+                                                <AvatarAddOn.Icon
+                                                    className="fas fa-circle"
                                                     color="warning"
                                                     key="avatar-icon-fg"
                                                 />
                                             ]}
-                                        /> 
+                                        />
                                     </Media>
                                     <Media body>
                                         <span className="mt-0 d-flex h6 mb-1">
@@ -2049,18 +2049,18 @@ const MediaObjects = () => (
                                             size="md"
                                             src={ randomAvatar() }
                                             addOns={[
-                                                <AvatarAddOn.Icon 
-                                                    className="fa fa-circle"
+                                                <AvatarAddOn.Icon
+                                                    className="fas fa-circle"
                                                     color="white"
                                                     key="avatar-icon-bg"
                                                 />,
-                                                <AvatarAddOn.Icon 
-                                                    className="fa fa-circle"
+                                                <AvatarAddOn.Icon
+                                                    className="fas fa-circle"
                                                     color="success"
                                                     key="avatar-icon-fg"
                                                 />
                                             ]}
-                                        /> 
+                                        />
                                     </Media>
                                     <Media body>
                                         <span className="mt-0 d-flex h6 mb-1">
@@ -2095,18 +2095,18 @@ const MediaObjects = () => (
                                                     size="md"
                                                     src={ randomAvatar() }
                                                     addOns={[
-                                                        <AvatarAddOn.Icon 
-                                                            className="fa fa-circle"
+                                                        <AvatarAddOn.Icon
+                                                            className="fas fa-circle"
                                                             color="white"
                                                             key="avatar-icon-bg"
                                                         />,
-                                                        <AvatarAddOn.Icon 
-                                                            className="fa fa-circle"
+                                                        <AvatarAddOn.Icon
+                                                            className="fas fa-circle"
                                                             color="danger"
                                                             key="avatar-icon-fg"
                                                         />
                                                     ]}
-                                                /> 
+                                                />
                                             </Media>
                                             <Media body>
                                                 <span className="mt-0 d-flex h6 mb-1">
@@ -2127,18 +2127,18 @@ const MediaObjects = () => (
                                                     size="md"
                                                     src={ randomAvatar() }
                                                     addOns={[
-                                                        <AvatarAddOn.Icon 
-                                                            className="fa fa-circle"
+                                                        <AvatarAddOn.Icon
+                                                            className="fas fa-circle"
                                                             color="white"
                                                             key="avatar-icon-bg"
                                                         />,
-                                                        <AvatarAddOn.Icon 
-                                                            className="fa fa-circle"
+                                                        <AvatarAddOn.Icon
+                                                            className="fas fa-circle"
                                                             color="warning"
                                                             key="avatar-icon-fg"
                                                         />
                                                     ]}
-                                                /> 
+                                                />
                                             </Media>
                                             <Media body>
                                                 <span className="mt-0 d-flex h6 mb-1">
@@ -2159,18 +2159,18 @@ const MediaObjects = () => (
                                                     size="md"
                                                     src={ randomAvatar() }
                                                     addOns={[
-                                                        <AvatarAddOn.Icon 
-                                                            className="fa fa-circle"
+                                                        <AvatarAddOn.Icon
+                                                            className="fas fa-circle"
                                                             color="white"
                                                             key="avatar-icon-bg"
                                                         />,
-                                                        <AvatarAddOn.Icon 
-                                                            className="fa fa-circle"
+                                                        <AvatarAddOn.Icon
+                                                            className="fas fa-circle"
                                                             color="success"
                                                             key="avatar-icon-fg"
                                                         />
                                                     ]}
-                                                /> 
+                                                />
                                             </Media>
                                             <Media body>
                                                 <span className="mt-0 d-flex h6 mb-1">

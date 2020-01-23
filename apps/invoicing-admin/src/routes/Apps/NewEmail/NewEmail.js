@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -25,7 +25,7 @@ import { Attachment } from "../../components/Attachment";
 const NewEmail = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="New Email"
                 className="mb-5 mt-4"
             />
@@ -41,7 +41,7 @@ const NewEmail = () => (
                             <div className="flex-column flex-md-row d-flex mb-4">
                                 <div className="mr-md-auto mr-sm-0">
                                     <Button color="link" tag={ Link } to="/apps/inbox" className="text-decoration-none">
-                                        <i className="fa fa-angle-left mr-2"></i>  Inbox
+                                        <i className="fas fa-angle-left mr-2"></i>  Inbox
                                     </Button>
                                 </div>
                                 <ButtonToolbar>
@@ -52,7 +52,7 @@ const NewEmail = () => (
                                     </ButtonGroup>
                                     <ButtonGroup>
                                         <Button color="primary" tag={ Link } to="/apps/inbox" id="tooltipSend">
-                                            <i className="fa fa-send"></i>
+                                            <i className="fas fa-send"></i>
                                         </Button>
                                         <UncontrolledTooltip placement="bottom" target="tooltipSend">
                                             Send Now
@@ -70,7 +70,7 @@ const NewEmail = () => (
                                     <Input placeholder="Enter email(s)..." />
                                     <InputGroupAddon addonType="append">
                                         <Button color="secondary" outline>
-                                            <i className="fa fa-fw fa-plus"></i>
+                                            <i className="fas fa-fw fa-plus"></i>
                                         </Button>
                                     </InputGroupAddon>
                                 </InputGroup>
@@ -109,17 +109,17 @@ const NewEmail = () => (
                                     </span>
                                     <Badge pill color="secondary">3</Badge>
                                 </div>
-                                <Attachment 
+                                <Attachment
                                     BgIconClassName="text-primary"
                                     icon="file-word-o"
                                     mediaClassName="mb-3"
                                 />
-                                <Attachment 
+                                <Attachment
                                     BgIconClassName="text-success"
                                     icon="file-excel-o"
                                     mediaClassName="mb-3"
                                 />
-                                <Attachment 
+                                <Attachment
                                     BgIconClassName="text-warning"
                                     icon="file-powerpoint-o"
                                 />
@@ -128,7 +128,7 @@ const NewEmail = () => (
                         </CardBody>
                         <CardFooter className="text-right">
                             <Button color="link" className="text-decoration-none">
-                                <i className="fa fa-paperclip mr-2"></i>
+                                <i className="fas fa-paperclip mr-2"></i>
                                 Add New Files
                             </Button>
                         </CardFooter>

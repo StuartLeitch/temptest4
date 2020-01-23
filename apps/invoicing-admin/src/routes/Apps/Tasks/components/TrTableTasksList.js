@@ -3,7 +3,7 @@ import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { 
+import {
     Badge,
     Avatar,
     CustomInput,
@@ -29,20 +29,20 @@ const avatarStatus = [
 
 const prioStatus = [
         <React.Fragment key="1">
-            <i className="fa fa-circle text-success mr-2"></i>
-            Small<i className="fa fa-angle-down ml-2" />
+            <i className="fas fa-circle text-success mr-2"></i>
+            Small<i className="fas fa-angle-down ml-2" />
         </React.Fragment>,
         <React.Fragment key="2">
-            <i className="fa fa-circle text-primary mr-2"></i>
-            Normal<i className="fa fa-angle-down ml-2" />
+            <i className="fas fa-circle text-primary mr-2"></i>
+            Normal<i className="fas fa-angle-down ml-2" />
         </React.Fragment>,
         <React.Fragment key="3">
-            <i className="fa fa-circle text-warning mr-2"></i>
-            High<i className="fa fa-angle-down ml-2" />
+            <i className="fas fa-circle text-warning mr-2"></i>
+            High<i className="fas fa-angle-down ml-2" />
         </React.Fragment>,
         <React.Fragment key="3">
-            <i className="fa fa-circle text-danger mr-2"></i>
-            Big<i className="fa fa-angle-down ml-2" />
+            <i className="fas fa-circle text-danger mr-2"></i>
+            Big<i className="fas fa-angle-down ml-2" />
         </React.Fragment>
 ];
 
@@ -60,20 +60,20 @@ const TrTableTasksList = (props) => (
                     <DropdownMenu>
                         <DropdownItem header>Select Priority</DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-circle text-danger mr-2"></i>
-                            Big 
+                            <i className="fas fa-circle text-danger mr-2"></i>
+                            Big
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-circle text-warning mr-2"></i>
-                            High 
+                            <i className="fas fa-circle text-warning mr-2"></i>
+                            High
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-circle text-primary mr-2"></i>
-                            Normal 
+                            <i className="fas fa-circle text-primary mr-2"></i>
+                            Normal
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-circle text-success mr-2"></i>
-                            Small 
+                            <i className="fas fa-circle text-success mr-2"></i>
+                            Small
                         </DropdownItem>
                     </DropdownMenu>
                 </UncontrolledButtonDropdown>
@@ -103,13 +103,13 @@ const TrTableTasksList = (props) => (
                     src={ randomAvatar() }
                     className="mr-3"
                     addOns={[
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="white"
                             key="avatar-icon-bg"
                         />,
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color={ randomArray(avatarStatus) }
                             key="avatar-icon-fg"
                         />
@@ -122,24 +122,24 @@ const TrTableTasksList = (props) => (
             <td className="align-middle text-right">
                 <UncontrolledButtonDropdown className="align-self-center ml-auto">
                     <DropdownToggle color="link" size="sm">
-                        <i className="fa fa-gear" /><i className="fa fa-angle-down ml-2" />
+                        <i className="fas fa-gear" /><i className="fas fa-angle-down ml-2" />
                     </DropdownToggle>
                     <DropdownMenu right>
                         <DropdownItem>
-                            <i className="fa fa-fw fa-folder-open mr-2"></i>
+                            <i className="fas fa-fw fa-folder-open mr-2"></i>
                             View
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-fw fa-ticket mr-2"></i>
+                            <i className="fas fa-fw fa-ticket mr-2"></i>
                             Add Task
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-fw fa-paperclip mr-2"></i>
+                            <i className="fas fa-fw fa-paperclip mr-2"></i>
                             Add Files
                         </DropdownItem>
                         <DropdownItem divider />
                         <DropdownItem>
-                            <i className="fa fa-fw fa-trash mr-2"></i>
+                            <i className="fas fa-fw fa-trash mr-2"></i>
                             Delete
                         </DropdownItem>
                     </DropdownMenu>

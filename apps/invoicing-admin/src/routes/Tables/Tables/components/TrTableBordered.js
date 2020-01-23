@@ -2,7 +2,7 @@ import React from 'react';
 import faker from 'faker/locale/en_US';
 import _ from 'lodash';
 
-import { 
+import {
     Progress,
     ButtonGroup,
     Button
@@ -39,10 +39,10 @@ const TrTableBordered = () => (
                     <td className="align-middle text-right">
                         <ButtonGroup>
                             <Button color="link" className="text-decoration-none">
-                                <i className="fa fa-clone"></i>
+                                <i className="fas fa-clone"></i>
                             </Button>
                             <Button color="link" className="text-decoration-none">
-                                <i className="fa fa-close"></i>
+                                <i className="fas fa-close"></i>
                             </Button>
                         </ButtonGroup>
                     </td>

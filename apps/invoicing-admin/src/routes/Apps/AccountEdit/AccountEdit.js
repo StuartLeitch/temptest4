@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -22,7 +22,7 @@ import { ProfileHeader } from "../../components/Profile/ProfileHeader";
 const AccountEdit = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Account Edit"
                 className="mb-5 mt-4"
             />
@@ -52,10 +52,10 @@ const AccountEdit = () => (
                                         <span className="text-danger">*</span> Old Password
                                     </Label>
                                     <Col sm={8}>
-                                        <Input 
-                                            type="password" 
-                                            name="password" 
-                                            id="oldPassword" 
+                                        <Input
+                                            type="password"
+                                            name="password"
+                                            id="oldPassword"
                                             defaultValue="********"
                                         />
                                     </Col>
@@ -67,10 +67,10 @@ const AccountEdit = () => (
                                         <span className="text-danger">*</span> New Password
                                     </Label>
                                     <Col sm={8}>
-                                        <Input 
-                                            type="password" 
-                                            name="password" 
-                                            id="newPassword" 
+                                        <Input
+                                            type="password"
+                                            name="password"
+                                            id="newPassword"
                                             defaultValue="********"
                                         />
                                     </Col>
@@ -82,10 +82,10 @@ const AccountEdit = () => (
                                         <span className="text-danger">*</span> Confirm New Password
                                     </Label>
                                     <Col sm={8}>
-                                        <Input 
-                                            type="password" 
-                                            name="password" 
-                                            id="confirmNewPassword" 
+                                        <Input
+                                            type="password"
+                                            name="password"
+                                            id="confirmNewPassword"
                                             defaultValue="********"
                                         />
                                     </Col>
@@ -94,7 +94,7 @@ const AccountEdit = () => (
                                 { /* START Input */}
                                 <FormGroup row>
                                     <Label sm={3} >
-                                       
+
                                     </Label>
                                     <Col sm={8}>
                                         <Button color="primary">
@@ -110,7 +110,7 @@ const AccountEdit = () => (
                             { /* END Form */}
                         </CardBody>
                         <CardFooter className="small">
-                            <i className="fa fa-fw fa-support text-muted mr-2"></i>
+                            <i className="fas fa-fw fa-support text-muted mr-2"></i>
                             If you have trouble with the configuration, you can contact us. <a href="#">We Can Help</a>
                         </CardFooter>
                     </Card>
@@ -120,7 +120,7 @@ const AccountEdit = () => (
                                 Change Username
                            </CardTitle>
                             <p>
-                                Changing the username is not recommended. In this connection, 
+                                Changing the username is not recommended. In this connection,
                                 I can appear <a href="#">many problems</a>.
                             </p>
                             <Button color="secondary" outline>
@@ -141,7 +141,7 @@ const AccountEdit = () => (
                             </Button>
                         </CardBody>
                         <CardFooter className="small">
-                            <i className="fa fa-fw fa-support text-muted mr-2"></i>
+                            <i className="fas fa-fw fa-support text-muted mr-2"></i>
                             Are you sure you don’t want to just downgrade your account to a <strong>Free Account</strong>? We won’t charge your PayPal account anymore.
                         </CardFooter>
                     </Card>

@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 
-import { 
+import {
     Badge,
     Progress
 } from './../../../components';
@@ -9,10 +9,10 @@ import {
 /*eslint-disable */
 const status = [
     <td className="text-right">
-        Healthly <i className="fa fa-fw fa-check-circle text-success"></i>
+        Healthly <i className="fas fa-fw fa-check-circle text-success"></i>
     </td>,
     <td className="text-right">
-        Degraded <i className="fa fa-fw fa-exclamation-circle text-danger"></i>
+        Degraded <i className="fas fa-fw fa-exclamation-circle text-danger"></i>
     </td>
 ];
 /*eslint-enable */

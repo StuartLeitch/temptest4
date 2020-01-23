@@ -51,7 +51,7 @@ const VerticalList = React.memo((props) => {
                 <div
                     ref={provided.innerRef}
                     className={`list-group list-group-flush flex-grow-1 ${getListClass(snapshot.isDraggingOver)}`}
-                >                    
+                >
                     {props.items.map((item, index) => (
                         <Draggable
                             key={item.id}
@@ -66,7 +66,7 @@ const VerticalList = React.memo((props) => {
                                 >
                                     <Media>
                                         <Media left className="align-self-center pr-3">
-                                            <i className="fa fa-ellipsis-v text-muted" />
+                                            <i className="fas fa-ellipsis-v text-muted" />
                                         </Media>
                                         <Media left middle className="mr-4 align-self-center">
                                             <Avatar.Image
@@ -74,18 +74,18 @@ const VerticalList = React.memo((props) => {
                                                 className="d-block"
                                                 src={ item.avatarUrl }
                                                 addOns={[
-                                                    <AvatarAddOn.Icon 
-                                                        className="fa fa-circle"
+                                                    <AvatarAddOn.Icon
+                                                        className="fas fa-circle"
                                                         color="white"
                                                         key="avatar-icon-bg"
                                                     />,
-                                                    <AvatarAddOn.Icon 
-                                                        className="fa fa-circle"
+                                                    <AvatarAddOn.Icon
+                                                        className="fas fa-circle"
                                                         color={ item.status }
                                                         key="avatar-icon-fg"
                                                     />
                                                 ]}
-                                            /> 
+                                            />
                                         </Media>
                                         <Media body>
                                             <span className="mt-0 h6 mb-1">
@@ -138,7 +138,7 @@ class Column extends React.Component {
                         <Card className="h-100">
                             <CardHeader {...provided.dragHandleProps} className="b-0 bg-none">
                                 <CardTitle className="h6 mb-0">
-                                    <i className="fa fa-ellipsis-v mr-3 text-muted" />
+                                    <i className="fas fa-ellipsis-v mr-3 text-muted" />
                                     { title }
                                 </CardTitle>
                             </CardHeader>

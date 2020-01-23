@@ -45,7 +45,7 @@ const Stock = () => (
     <Container>
         <Row className="mb-2">
             <Col lg={ 12 }>
-                <HeaderMain 
+                <HeaderMain
                     title="Stock"
                     className="mb-4 mb-lg-4"
                 />
@@ -67,7 +67,7 @@ const Stock = () => (
                                     AAPL
                                 </h4>
                                 <span className="text-success">
-                                    <i className="fa fa-caret-up mr-1"></i> 22.38
+                                    <i className="fas fa-caret-up mr-1"></i> 22.38
                                 </span> / 5.9%
                             </td>
                             <td className="bt-0">
@@ -75,7 +75,7 @@ const Stock = () => (
                                     MSFT
                                 </h4>
                                 <span className="text-danger">
-                                    <i className="fa fa-caret-down mr-1"></i> 34.18
+                                    <i className="fas fa-caret-down mr-1"></i> 34.18
                                 </span> / 0.56%
                             </td>
                             <td className="bt-0">
@@ -83,7 +83,7 @@ const Stock = () => (
                                     CAT
                                 </h4>
                                 <span className="text-success">
-                                    <i className="fa fa-caret-up mr-1"></i> 22.38
+                                    <i className="fas fa-caret-up mr-1"></i> 22.38
                                 </span> / 12.2%
                             </td>
                             <td className="bt-0">
@@ -91,7 +91,7 @@ const Stock = () => (
                                     TSLA
                                 </h4>
                                 <span className="text-success">
-                                    <i className="fa fa-caret-up mr-1"></i> 31.03
+                                    <i className="fas fa-caret-up mr-1"></i> 31.03
                                 </span> / 3.2%
                             </td>
                             <td className="bt-0">
@@ -99,7 +99,7 @@ const Stock = () => (
                                     KN
                                 </h4>
                                 <span className="text-danger">
-                                    <i className="fa fa-caret-down mr-1"></i> 34.18
+                                    <i className="fas fa-caret-down mr-1"></i> 34.18
                                 </span> / 0.56%
                             </td>
                             <td className="bt-0">
@@ -107,7 +107,7 @@ const Stock = () => (
                                     QZA
                                 </h4>
                                 <span className="text-danger">
-                                    <i className="fa fa-caret-down mr-1"></i> 4.02
+                                    <i className="fas fa-caret-down mr-1"></i> 4.02
                                 </span> / 4.21%
                             </td>
                         </tr>
@@ -122,10 +122,10 @@ const Stock = () => (
                     <CardBody>
                         <span className="d-flex mb-3">
                             <CardTitle>
-                                <h6>Nokia Corp. 
+                                <h6>Nokia Corp.
                                     <small>
                                         <span className="text-success ml-2">
-                                            <i className="fa fa-caret-up mr-1"></i> 22.38
+                                            <i className="fas fa-caret-up mr-1"></i> 22.38
                                         </span> / 5.9%
                                     </small>
                                 </h6>
@@ -188,7 +188,7 @@ const Stock = () => (
                     <CardBody className="pb-1">
                         <CardTitle className="mb-0">
                             <h6>
-                                Cheap Stock 
+                                Cheap Stock
                             </h6>
                         </CardTitle>
                     </CardBody>
@@ -214,7 +214,7 @@ const Stock = () => (
                     <CardBody className="pb-1">
                         <CardTitle className="mb-0">
                             <h6>
-                                Expensive Stock 
+                                Expensive Stock
                             </h6>
                         </CardTitle>
                     </CardBody>

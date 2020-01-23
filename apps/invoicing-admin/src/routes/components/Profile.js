@@ -1,76 +1,76 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Avatar,
     AvatarAddOn
 } from './../../components';
 
 import { randomArray, randomAvatar } from './../../utilities';
 
-const Profile = () => { 
+const Profile = () => {
 
     const avatar = [
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="facebook"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-facebook"
+            <AvatarAddOn.Icon
+                className="fas fa-facebook"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="twitter"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-twitter"
+            <AvatarAddOn.Icon
+                className="fas fa-twitter"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="linkedin"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-linkedin"
+            <AvatarAddOn.Icon
+                className="fas fa-linkedin"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="foursquare"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-foursquare"
+            <AvatarAddOn.Icon
+                className="fas fa-foursquare"
                 color="white"
                 key="avatar-icon-fg"
                 small
             />
         ],
         [
-            <AvatarAddOn.Icon 
-                className="fa fa-circle"
+            <AvatarAddOn.Icon
+                className="fas fa-circle"
                 color="paypal"
                 key="avatar-icon-bg"
             />,
-            <AvatarAddOn.Icon 
-                className="fa fa-paypal"
+            <AvatarAddOn.Icon
+                className="fas fa-paypal"
                 color="white"
                 key="avatar-icon-fg"
                 small
@@ -84,14 +84,14 @@ const Profile = () => {
                     size="lg"
                     src={ randomAvatar() }
                     addOns={[
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="white"
                             key="avatar-icon-white-bg"
                         />,
                         ...randomArray(avatar)
                     ]}
-                /> 
+                />
             </div>
             <div className="mb-4 text-center">
                 <a className="h6 text-decoration-none" href="#">
@@ -101,7 +101,7 @@ const Profile = () => {
                     { faker.name.jobTitle() }
                 </div>
                 <div className="text-center">
-                    <i className="fa fa-map-marker mr-1"></i>
+                    <i className="fas fa-map-marker mr-1"></i>
                     { faker.address.city() }
                 </div>
             </div>

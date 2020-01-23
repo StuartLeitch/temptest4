@@ -43,15 +43,15 @@ import {
 const Cards = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Cards Headers"
             />
             { /* START Header 1 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Cards Headers - Text" 
+                    <HeaderDemo
+                        no={1}
+                        title="Cards Headers - Text"
                         subTitle="Provide contextual feedback messages"
                     />
                 </Col>
@@ -66,7 +66,7 @@ const Cards = () => (
                             <CardTitle tag="h6">
                                 Default Header
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.01"
                             />
                         </CardBody>
@@ -81,7 +81,7 @@ const Cards = () => (
                                     Small Text
                                 </span>
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.02"
                             />
                         </CardBody>
@@ -96,7 +96,7 @@ const Cards = () => (
                                     3
                                 </Badge>
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.03"
                             />
                         </CardBody>
@@ -111,7 +111,7 @@ const Cards = () => (
                                     Updated
                                 </Badge>
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.04"
                             />
                         </CardBody>
@@ -121,9 +121,9 @@ const Cards = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6">
-                                <i className="fa fa-gear mr-2"></i> Header Left Icon
+                                <i className="fas fa-gear mr-2"></i> Header Left Icon
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.05"
                             />
                         </CardBody>
@@ -135,10 +135,10 @@ const Cards = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6">
-                                Header Right Icon 
-                                <i className="fa fa-gear ml-2"></i>
+                                Header Right Icon
+                                <i className="fas fa-gear ml-2"></i>
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.06"
                             />
                         </CardBody>
@@ -148,10 +148,10 @@ const Cards = () => (
                     <Card className="mb-3">
                         <CardBody>
                             <CardTitle tag="h6" className="d-flex">
-                                Header Right Icon 
-                                <i className="fa fa-gear ml-auto"></i>
+                                Header Right Icon
+                                <i className="fas fa-gear ml-auto"></i>
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.07"
                             />
                         </CardBody>
@@ -163,7 +163,7 @@ const Cards = () => (
                             <CardTitle tag="h6" className="text-center">
                                 Header Center
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.08"
                             />
                         </CardBody>
@@ -179,7 +179,7 @@ const Cards = () => (
                                 <br />
                                 Header Above Small Text
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.09"
                             />
                         </CardBody>
@@ -194,7 +194,7 @@ const Cards = () => (
                                     New
                                 </Badge>
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.10"
                             />
                         </CardBody>
@@ -209,7 +209,7 @@ const Cards = () => (
                                     4
                                 </Badge>
                             </CardTitle>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="1.11"
                             />
                         </CardBody>
@@ -222,9 +222,9 @@ const Cards = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Cards Headers - Navs" 
+                    <HeaderDemo
+                        no={2}
+                        title="Cards Headers - Navs"
                         className="mt-5"
                         subTitle="Provide contextual feedback messages"
                     />
@@ -254,12 +254,12 @@ const Cards = () => (
                             <CardBody>
                                 <UncontrolledTabs.TabContent>
                                     <TabPane tabId="users201a">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.01a"
                                         />
                                     </TabPane>
                                     <TabPane tabId="settings201b">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.01b"
                                         />
                                     </TabPane>
@@ -275,12 +275,12 @@ const Cards = () => (
                                 <Nav tabs className="card-header-tabs">
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="users202a">
-                                            <i className="fa fa-user mr-2"></i> Users
+                                            <i className="fas fa-user mr-2"></i> Users
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="settings202b">
-                                            <i className="fa fa-gear mr-2"></i> Settings
+                                            <i className="fas fa-gear mr-2"></i> Settings
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                 </Nav>
@@ -288,12 +288,12 @@ const Cards = () => (
                             <CardBody>
                                 <UncontrolledTabs.TabContent>
                                     <TabPane tabId="users202a">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.02a"
                                         />
                                     </TabPane>
                                     <TabPane tabId="settings202b">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.02b"
                                         />
                                     </TabPane>
@@ -309,12 +309,12 @@ const Cards = () => (
                                 <Nav tabs className="card-header-tabs">
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="users203a">
-                                            <i className="fa fa-user fa-fw"></i>
+                                            <i className="fas fa-user fa-fw"></i>
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="settings203b">
-                                            <i className="fa fa-gear fa-fw"></i>
+                                            <i className="fas fa-gear fa-fw"></i>
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                 </Nav>
@@ -322,12 +322,12 @@ const Cards = () => (
                             <CardBody>
                                 <UncontrolledTabs.TabContent>
                                     <TabPane tabId="users203a">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.03a"
                                         />
                                     </TabPane>
                                     <TabPane tabId="settings203b">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.03b"
                                         />
                                     </TabPane>
@@ -354,12 +354,12 @@ const Cards = () => (
                                 </Nav>
                                 <UncontrolledTabs.TabContent>
                                     <TabPane tabId="users204a">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.04a"
                                         />
                                     </TabPane>
                                     <TabPane tabId="settings204b">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.04b"
                                         />
                                     </TabPane>
@@ -377,23 +377,23 @@ const Cards = () => (
                                 <Nav pills className="mb-3">
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="users205a">
-                                            <i className="fa fa-user mr-2"></i> Users
+                                            <i className="fas fa-user mr-2"></i> Users
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="settings205b">
-                                            <i className="fa fa-gear mr-2"></i> Settings
+                                            <i className="fas fa-gear mr-2"></i> Settings
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                 </Nav>
                                 <UncontrolledTabs.TabContent>
                                     <TabPane tabId="users205a">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.05a"
                                         />
                                     </TabPane>
                                     <TabPane tabId="settings205b">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.05b"
                                         />
                                     </TabPane>
@@ -409,23 +409,23 @@ const Cards = () => (
                                 <Nav pills className="mb-3">
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="users206a">
-                                            <i className="fa fa-user"></i>
+                                            <i className="fas fa-user"></i>
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                     <NavItem>
                                         <UncontrolledTabs.NavLink tabId="settings206b">
-                                            <i className="fa fa-gear"></i>
+                                            <i className="fas fa-gear"></i>
                                         </UncontrolledTabs.NavLink>
                                     </NavItem>
                                 </Nav>
                                 <UncontrolledTabs.TabContent>
                                     <TabPane tabId="users206a">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.06a"
                                         />
                                     </TabPane>
                                     <TabPane tabId="settings206b">
-                                        <CardTextDemo 
+                                        <CardTextDemo
                                             cardNo="2.06b"
                                         />
                                     </TabPane>
@@ -441,9 +441,9 @@ const Cards = () => (
             { /* START Header 3 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
-                        title="Cards Headers - Buttons" 
+                    <HeaderDemo
+                        no={3}
+                        title="Cards Headers - Buttons"
                         className="mt-5"
                         subTitle="Provide contextual feedback messages"
                     />
@@ -462,7 +462,7 @@ const Cards = () => (
                                 </CardTitle>
                                 <Pagination size="sm" aria-label="Page navigation example" className="ml-auto">                                    <PaginationItem>
                                     <PaginationLink previous href="#">
-                                        <i className="fa fa-angle-left"></i>
+                                        <i className="fas fa-angle-left"></i>
                                     </PaginationLink>
                                     </PaginationItem>
                                     <PaginationItem active>
@@ -482,12 +482,12 @@ const Cards = () => (
                                     </PaginationItem>
                                     <PaginationItem>
                                         <PaginationLink next href="#">
-                                            <i className="fa fa-angle-right"></i>
+                                            <i className="fas fa-angle-right"></i>
                                         </PaginationLink>
                                     </PaginationItem>
                                 </Pagination>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.01"
                             />
                         </CardBody>
@@ -502,16 +502,16 @@ const Cards = () => (
                                 </CardTitle>
                                 <ButtonGroup className="ml-auto" size="sm">
                                     <Button outline>
-                                        <i className="fa fa-angle-left mr-2"></i>
+                                        <i className="fas fa-angle-left mr-2"></i>
                                         Prev
                                     </Button>
                                     <Button outline>
                                         Next
-                                        <i className="fa fa-angle-right ml-2"></i>
+                                        <i className="fas fa-angle-right ml-2"></i>
                                     </Button>
                                 </ButtonGroup>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.02"
                             />
                         </CardBody>
@@ -528,7 +528,7 @@ const Cards = () => (
                                     Add
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.03"
                             />
                         </CardBody>
@@ -545,7 +545,7 @@ const Cards = () => (
                                     Button
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.04"
                             />
                         </CardBody>
@@ -559,10 +559,10 @@ const Cards = () => (
                                     Buttons Right
                                 </CardTitle>
                                 <Button outline size="sm" className="ml-auto">
-                                    <i className="fa fa-gear"></i>
+                                    <i className="fas fa-gear"></i>
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.05"
                             />
                         </CardBody>
@@ -576,10 +576,10 @@ const Cards = () => (
                                     Link Right Icon
                                 </CardTitle>
                                 <Button color="link" size="sm" className="ml-auto pt-0">
-                                    <i className="fa fa-pencil"></i>
+                                    <i className="fas fa-pencil"></i>
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.06"
                             />
                         </CardBody>
@@ -594,14 +594,14 @@ const Cards = () => (
                                 </CardTitle>
                                 <ButtonGroup vertical size="sm" className="ml-auto">
                                     <Button outline>
-                                        <i className="fa fa-angle-up"></i>
+                                        <i className="fas fa-angle-up"></i>
                                     </Button>
                                     <Button outline>
-                                        <i className="fa fa-angle-down"></i>
+                                        <i className="fas fa-angle-down"></i>
                                     </Button>
                                 </ButtonGroup>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.07"
                             />
                         </CardBody>
@@ -626,7 +626,7 @@ const Cards = () => (
                                     </Button>
                                 </ButtonGroup>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.08"
                             />
                         </CardBody>
@@ -641,17 +641,17 @@ const Cards = () => (
                                 </CardTitle>
                                 <ButtonGroup className="ml-auto" size="sm">
                                     <Button outline>
-                                        <i className="fa fa-star-o"></i>
+                                        <i className="fas fa-star-o"></i>
                                     </Button>
                                     <Button outline>
-                                        <i className="fa fa-star-half-o"></i>
+                                        <i className="fas fa-star-half-o"></i>
                                     </Button>
                                     <Button outline>
-                                        <i className="fa fa-star"></i>
+                                        <i className="fas fa-star"></i>
                                     </Button>
                                 </ButtonGroup>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.09"
                             />
                         </CardBody>
@@ -685,7 +685,7 @@ const Cards = () => (
                                     </UncontrolledButtonDropdown>
                                 </ButtonGroup>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.10"
                             />
                         </CardBody>
@@ -701,10 +701,10 @@ const Cards = () => (
                                     Button Right Icon-Left
                                 </CardTitle>
                                 <Button outline size="sm" className="ml-auto">
-                                    <i className="fa fa-plus mr-2"></i>Button
+                                    <i className="fas fa-plus mr-2"></i>Button
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.11"
                             />
                         </CardBody>
@@ -718,10 +718,10 @@ const Cards = () => (
                                     Button Right Icon-Right
                                 </CardTitle>
                                 <Button outline size="sm" className="ml-auto">
-                                    Button<i className="fa fa-copy ml-2"></i>
+                                    Button<i className="fas fa-copy ml-2"></i>
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.12"
                             />
                         </CardBody>
@@ -743,7 +743,7 @@ const Cards = () => (
                                     </Button>
                                 </ButtonToolbar>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.13"
                             />
                         </CardBody>
@@ -758,14 +758,14 @@ const Cards = () => (
                                 </CardTitle>
                                 <ButtonToolbar className="ml-auto">
                                     <Button color="primary" size="sm" className="mr-2">
-                                        <i className="fa fa-fw fa-check"></i>
+                                        <i className="fas fa-fw fa-check"></i>
                                     </Button>
                                     <Button color="primary" outline size="sm">
-                                        <i className="fa fa-fw fa-close"></i>
+                                        <i className="fas fa-fw fa-close"></i>
                                     </Button>
                                 </ButtonToolbar>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.14"
                             />
                         </CardBody>
@@ -779,10 +779,10 @@ const Cards = () => (
                                     Button Icon-Left
                                 </CardTitle>
                                 <Button outline size="sm" className="ml-3">
-                                    <i className="fa fa-fw fa-gear"></i>
+                                    <i className="fas fa-fw fa-gear"></i>
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.15"
                             />
                         </CardBody>
@@ -799,7 +799,7 @@ const Cards = () => (
                                     Link
                                 </Button>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.16"
                             />
                         </CardBody>
@@ -819,22 +819,22 @@ const Cards = () => (
                                     <DropdownMenu right>
                                         <DropdownItem header>Menu</DropdownItem>
                                         <DropdownItem>
-                                            <i className="fa fa-user fa-fw mr-2"></i>
+                                            <i className="fas fa-user fa-fw mr-2"></i>
                                             Profile
                                         </DropdownItem>
                                         <DropdownItem>
-                                            <i className="fa fa-gear fa-fw mr-2"></i>
+                                            <i className="fas fa-gear fa-fw mr-2"></i>
                                             Settings
                                         </DropdownItem>
                                         <DropdownItem divider />
                                         <DropdownItem>
-                                            <i className="fa fa-sign-out fa-fw mr-2"></i>
+                                            <i className="fas fa-sign-out fa-fw mr-2"></i>
                                             Log Out
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledButtonDropdown>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.17"
                             />
                         </CardBody>
@@ -849,27 +849,27 @@ const Cards = () => (
                                 </CardTitle>
                                 <UncontrolledButtonDropdown className="ml-auto">
                                     <DropdownToggle size="sm" outline caret>
-                                        <i className="fa fa-bars mr-1"></i>
+                                        <i className="fas fa-bars mr-1"></i>
                                     </DropdownToggle>
                                     <DropdownMenu right>
                                         <DropdownItem header>Menu</DropdownItem>
                                         <DropdownItem>
-                                            <i className="fa fa-user fa-fw mr-2"></i>
+                                            <i className="fas fa-user fa-fw mr-2"></i>
                                             Profile
                                         </DropdownItem>
                                         <DropdownItem>
-                                            <i className="fa fa-gear fa-fw mr-2"></i>
+                                            <i className="fas fa-gear fa-fw mr-2"></i>
                                             Settings
                                         </DropdownItem>
                                         <DropdownItem divider />
                                         <DropdownItem>
-                                            <i className="fa fa-sign-out fa-fw mr-2"></i>
+                                            <i className="fas fa-sign-out fa-fw mr-2"></i>
                                             Log Out
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledButtonDropdown>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.18"
                             />
                         </CardBody>
@@ -885,26 +885,26 @@ const Cards = () => (
                                 <ButtonToolbar className="ml-auto">
                                     <ButtonGroup size="sm" className="mr-2">
                                         <Button outline>
-                                            <i className="fa fa-fw fa-bold"></i>
+                                            <i className="fas fa-fw fa-bold"></i>
                                         </Button>
                                         <Button outline>
-                                            <i className="fa fa-fw fa-underline"></i>
+                                            <i className="fas fa-fw fa-underline"></i>
                                         </Button>
                                         <Button outline>
-                                            <i className="fa fa-fw fa-eraser"></i>
+                                            <i className="fas fa-fw fa-eraser"></i>
                                         </Button>
                                     </ButtonGroup>
                                     <ButtonGroup size="sm">
                                         <Button outline>
-                                            <i className="fa fa-fw fa-link"></i>
+                                            <i className="fas fa-fw fa-link"></i>
                                         </Button>
                                         <Button outline>
-                                            <i className="fa fa-fw fa-image"></i>
+                                            <i className="fas fa-fw fa-image"></i>
                                         </Button>
                                     </ButtonGroup>
                                 </ButtonToolbar>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="3.19"
                             />
                         </CardBody>
@@ -917,9 +917,9 @@ const Cards = () => (
             { /* START Header 4 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={4} 
-                        title="Cards Headers - Forms" 
+                    <HeaderDemo
+                        no={4}
+                        title="Cards Headers - Forms"
                         className="mt-5"
                         subTitle="Provide contextual feedback messages"
                     />
@@ -938,7 +938,7 @@ const Cards = () => (
                                 </CardTitle>
                                 <CustomInput type="checkbox" className="ml-auto" id="rightCheckbox" label="On/Off" />
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.01"
                             />
                         </CardBody>
@@ -956,7 +956,7 @@ const Cards = () => (
                                     <CustomInput type="checkbox" id="rightCheckbox2" label="2" />
                                 </div>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.02"
                             />
                         </CardBody>
@@ -971,7 +971,7 @@ const Cards = () => (
                                 </CardTitle>
                                 <CustomInput type="checkbox" className="ml-auto" id="rightCheckboxEmpty" label="" />
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.03"
                             />
                         </CardBody>
@@ -985,7 +985,7 @@ const Cards = () => (
                                     <CustomInput type="checkbox" className="ml-auto" id="leftCheckbox" label="Left Checkbox" inline />
                                 </CardTitle>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.04"
                             />
                         </CardBody>
@@ -1000,7 +1000,7 @@ const Cards = () => (
                                 </CardTitle>
                                 <CustomInput type="radio" className="ml-auto" id="rightRadio" label="Select" />
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.05"
                             />
                         </CardBody>
@@ -1014,7 +1014,7 @@ const Cards = () => (
                                     <CustomInput type="radio" className="ml-auto" id="leftRadio" label="Left Radio" />
                                 </CardTitle>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.06"
                             />
                         </CardBody>
@@ -1032,7 +1032,7 @@ const Cards = () => (
                                     <CustomInput type="radio" name="rightRadioInline" id="rightRadioNo" label="No" />
                                 </div>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.07"
                             />
                         </CardBody>
@@ -1056,13 +1056,13 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.07"
                             />
                         </CardBody>
                     </Card>
                     { /* END Card */}
-                </Col> 
+                </Col>
                 <Col lg={ 6 }>
                     { /* START Card */}
                     <Card className="mb-3">
@@ -1077,7 +1077,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.09"
                             />
                         </CardBody>
@@ -1099,7 +1099,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.10"
                             />
                         </CardBody>
@@ -1116,14 +1116,14 @@ const Cards = () => (
                                     <FormGroup>
                                         <InputGroup size="sm">
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-user"></i>
+                                                <i className="fas fa-fw fa-user"></i>
                                             </InputGroupAddon>
                                             <Input type="text" name="text" id="text" className="ml-auto" placeholder="Enter Nick..." />
                                         </InputGroup>
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.11"
                             />
                         </CardBody>
@@ -1140,7 +1140,7 @@ const Cards = () => (
                                     <FormGroup>
                                         <InputGroup size="sm">
                                             <InputGroupAddon addonType="prepend">
-                                                <i className="fa fa-fw fa-envelope-o mr-1"></i>
+                                                <i className="fas fa-fw fa-envelope-o mr-1"></i>
                                                 Email
                                             </InputGroupAddon>
                                             <Input type="text" name="text" id="text" className="ml-auto" placeholder="Enter..." />
@@ -1148,7 +1148,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.12"
                             />
                         </CardBody>
@@ -1172,7 +1172,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.13"
                             />
                         </CardBody>
@@ -1196,7 +1196,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.14"
                             />
                         </CardBody>
@@ -1222,7 +1222,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.15"
                             />
                         </CardBody>
@@ -1241,14 +1241,14 @@ const Cards = () => (
                                             <Input type="text" name="text" id="text" className="ml-auto" placeholder="Enter..." />
                                             <InputGroupAddon addonType="append">
                                                 <Button color="primary">
-                                                    <i className="fa fa-fw fa-search"></i>
+                                                    <i className="fas fa-fw fa-search"></i>
                                                 </Button>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.16"
                             />
                         </CardBody>
@@ -1268,29 +1268,29 @@ const Cards = () => (
                                             { /* START Button Dropdown */}
                                             <UncontrolledButtonDropdown tag={ InputGroupAddon } addonType="append">
                                                 <DropdownToggle color="primary" caret>
-                                                    <i className="fa fa-fw fa-folder-open"></i>
+                                                    <i className="fas fa-fw fa-folder-open"></i>
                                                 </DropdownToggle>
                                                 <DropdownMenu persist right>
                                                     { /* START Dropdown Content */}
                                                     <DropdownItem header>Select Folder:</DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         Content
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Movies
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Documents
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Pictures
                                                     </DropdownItem>
                                                     <DropdownItem>
-                                                        <i className="fa fa-folder-o mr-2"></i>
+                                                        <i className="fas fa-folder-o mr-2"></i>
                                                         My Music
                                                     </DropdownItem>
                                                 { /* END Dropdown Content */}
@@ -1301,7 +1301,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.17"
                             />
                         </CardBody>
@@ -1330,7 +1330,7 @@ const Cards = () => (
                                     </FormGroup>
                                 </Form>
                             </div>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="4.18"
                             />
                         </CardBody>
@@ -1342,9 +1342,9 @@ const Cards = () => (
             { /* START Header 5 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={5} 
-                        title="Cards Headers - Various" 
+                    <HeaderDemo
+                        no={5}
+                        title="Cards Headers - Various"
                         className="mt-5"
                         subTitle="Provide contextual feedback messages"
                     />
@@ -1367,15 +1367,15 @@ const Cards = () => (
                                     <Progress value={25}>25%</Progress>
                                 </Col>
                             </Row>
-                            <CardTextDemo 
+                            <CardTextDemo
                                 cardNo="5.01"
                             />
                         </CardBody>
                     </Card>
                     { /* END Card */}
-                </Col> 
+                </Col>
                 <Col lg={ 6 }>
-                   
+
                 </Col>
             </Row>
             { /* END Section 4 */}

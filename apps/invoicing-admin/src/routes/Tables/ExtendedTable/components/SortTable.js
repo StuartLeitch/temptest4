@@ -5,9 +5,9 @@ import faker from 'faker/locale/en_US';
 
 const sortCaret = (order) => {
     if (!order)
-        return <i className="fa fa-fw fa-sort text-muted"></i>;
+        return <i className="fas fa-fw fa-sort text-muted"></i>;
     if (order)
-        return <i className={`fa fa-fw text-muted fa-sort-${order}`}></i>
+        return <i className={`fas fa-fw text-muted fa-sort-${order}`}></i>
 }
 
 const columns = [

@@ -1,8 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
 import faker from 'faker/locale/en_US';
-import {  
-    Media, 
+import {
+    Media,
     Avatar,
     AvatarAddOn
 } from './../../../components';
@@ -31,18 +31,18 @@ const TrTableInvoices = () => (
                                     size="md"
                                     src={ randomAvatar() }
                                     addOns={[
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="white"
                                             key="avatar-icon-bg"
                                         />,
-                                        <AvatarAddOn.Icon 
-                                            className="fa fa-circle"
+                                        <AvatarAddOn.Icon
+                                            className="fas fa-circle"
                                             color="danger"
                                             key="avatar-icon-fg"
                                         />
                                     ]}
-                                /> 
+                                />
                             </Media>
                             <Media body>
                                 <span className="d-flex mb-1">
@@ -63,7 +63,7 @@ const TrTableInvoices = () => (
                         { faker.phone.phoneNumber() }
                     </td>
                     <td className="text-right align-middle text-nowrap">
-                        <a href="#" className="text-decoration-none">View <i className="fa fa-angle-right"></i></a>
+                        <a href="#" className="text-decoration-none">View <i className="fas fa-angle-right"></i></a>
                     </td>
                 </tr>
             ))

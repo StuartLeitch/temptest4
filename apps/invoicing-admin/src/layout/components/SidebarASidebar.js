@@ -12,7 +12,7 @@ export const SidebarASidebar = () => (
     {/* START SIDEBAR-OVERLAY: Close (x) */}
     <Sidebar.Close>
       <SidebarTrigger tag={'a'} href='#' onClick={e => e.preventDefault()}>
-        <i className='fa fa-times-circle fa-fw'></i>
+        <i className='fas fa-times-circle fa-fw'></i>
       </SidebarTrigger>
     </Sidebar.Close>
     {/* END SIDEBAR-OVERLAY: Close (x) */}

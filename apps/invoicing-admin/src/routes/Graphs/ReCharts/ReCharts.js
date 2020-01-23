@@ -6,7 +6,7 @@ import {
     Col,
     Card,
     CardBody,
-    CardDeck, 
+    CardDeck,
     Button
 } from './../../../components'
 import { HeaderMain } from "../../components/HeaderMain";
@@ -43,13 +43,13 @@ import { VerticalComposedChart } from './components/VerticalComposedChart';
 
 export const ReCharts = () => (
     <Container>
-        <HeaderMain 
+        <HeaderMain
             title="ReCharts"
             className="mb-4 mt-4"
         />
         <p>
-            Recharts is a Redefined chart library built with React and D3. 
-            The main purpose of this library is to help you to write charts in React applications without any pain. 
+            Recharts is a Redefined chart library built with React and D3.
+            The main purpose of this library is to help you to write charts in React applications without any pain.
             Main principles of Recharts are:
         </p>
         <ul className="mb-5">
@@ -61,9 +61,9 @@ export const ReCharts = () => (
         { /* START Header 1 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={1} 
-                    title="Bar Charts" 
+                <HeaderDemo
+                    no={1}
+                    title="Bar Charts"
                     subTitle={(
                         <React.Fragment>
                             Quickly build your charts with decoupled, reusable React components.
@@ -90,7 +90,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/30763kr7/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -113,7 +113,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/90v76x08/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -138,7 +138,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/9hjfkp73/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -161,7 +161,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/q68cz43w/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -186,7 +186,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/p82xhe2a/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -209,7 +209,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/q4eonc12/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -223,9 +223,9 @@ export const ReCharts = () => (
         { /* START Header 2 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={2} 
-                    title="Line Charts" 
+                <HeaderDemo
+                    no={2}
+                    title="Line Charts"
                     className="mt-5"
                     subTitle={(
                         <React.Fragment>
@@ -253,7 +253,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/xqjtetw0/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -276,7 +276,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/nptzh7ez/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -301,7 +301,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/rrr9q7x5/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -324,7 +324,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/9y9zrpjp/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -338,9 +338,9 @@ export const ReCharts = () => (
         { /* START Header 3 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={3} 
-                    title="Area Charts" 
+                <HeaderDemo
+                    no={3}
+                    title="Area Charts"
                     className="mt-5"
                     subTitle={(
                         <React.Fragment>
@@ -368,7 +368,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/Lrffmzfc/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -391,7 +391,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/c1rLyqj1/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -416,7 +416,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/zsax2hyq/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -439,7 +439,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/64v6ocdx/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -453,9 +453,9 @@ export const ReCharts = () => (
         { /* START Header 4 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={4} 
-                    title="Pie Charts" 
+                <HeaderDemo
+                    no={4}
+                    title="Pie Charts"
                     className="mt-5"
                     subTitle={(
                         <React.Fragment>
@@ -483,7 +483,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/w6wsrc52/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -506,7 +506,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/pb1jwdt1/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -528,7 +528,7 @@ export const ReCharts = () => (
                         </h6>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/3Leoa7f4/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -548,7 +548,7 @@ export const ReCharts = () => (
                         </h6>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/3Leoa7f4/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -573,7 +573,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/c9pL8k61/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -587,9 +587,9 @@ export const ReCharts = () => (
         { /* START Header 5 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={5} 
-                    title="Radar Charts" 
+                <HeaderDemo
+                    no={5}
+                    title="Radar Charts"
                     className="mt-5"
                     subTitle={(
                         <React.Fragment>
@@ -617,7 +617,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/dpgb3xjq/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -640,7 +640,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/9km41z5z/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -654,9 +654,9 @@ export const ReCharts = () => (
         { /* START Header 6 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={6} 
-                    title="Composed Charts" 
+                <HeaderDemo
+                    no={6}
+                    title="Composed Charts"
                     className="mt-5"
                     subTitle={(
                         <React.Fragment>
@@ -681,7 +681,7 @@ export const ReCharts = () => (
                         </h6>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/9xopwa9v/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -704,7 +704,7 @@ export const ReCharts = () => (
                         </div>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/shjsn5su/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -718,9 +718,9 @@ export const ReCharts = () => (
         { /* START Header 7 */}
         <Row>
             <Col lg={ 12 }>
-                <HeaderDemo 
-                    no={7} 
-                    title="Tiny Charts" 
+                <HeaderDemo
+                    no={7}
+                    title="Tiny Charts"
                     className="mt-5"
                     subTitle={(
                         <React.Fragment>
@@ -745,7 +745,7 @@ export const ReCharts = () => (
                         </h6>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/exh283uh/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -765,7 +765,7 @@ export const ReCharts = () => (
                         </h6>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/tv8zfzxo/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -785,7 +785,7 @@ export const ReCharts = () => (
                         </h6>
                         <span className="ml-auto">
                             <Button color="link" href="https://jsfiddle.net/alidingling/9kd8rssL/" target="_blank">
-                                <i className="fa fa-external-link"></i>
+                                <i className="fas fa-external-link"></i>
                             </Button>
                         </span>
                     </div>
@@ -808,7 +808,7 @@ export const ReCharts = () => (
                             </h6>
                             <span className="ml-auto">
                                 <Button color="link" href="https://jsfiddle.net/alidingling/9kd8rssL/" target="_blank">
-                                    <i className="fa fa-external-link"></i>
+                                    <i className="fas fa-external-link"></i>
                                 </Button>
                             </span>
                         </div>
@@ -830,7 +830,7 @@ export const ReCharts = () => (
                             </h6>
                             <span className="ml-auto">
                                 <Button color="link" href="https://jsfiddle.net/alidingling/9kd8rssL/" target="_blank">
-                                    <i className="fa fa-external-link"></i>
+                                    <i className="fas fa-external-link"></i>
                                 </Button>
                             </span>
                         </div>

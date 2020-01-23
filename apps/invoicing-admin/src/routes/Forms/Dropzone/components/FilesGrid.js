@@ -25,7 +25,7 @@ export const FilesGrid = ({ files, onFileRemove }) => (
             <Col lg={ 4 } md={ 6 } key={index}>
                 <Card className="mb-3">
                     <div className={ classNames("card-img-top", classes['ph--large']) }>
-                        <i className={`fa fa-fw fa-3x ${getFileIcon(file)}`} />
+                        <i className={`fas fa-fw fa-3x ${getFileIcon(file)}`} />
                     </div>
                     <CardBody className="pt-2">
                         <div className="d-flex align-items-center mb-0 mt-0">
@@ -38,7 +38,7 @@ export const FilesGrid = ({ files, onFileRemove }) => (
                                 size="sm"
                                 id={`delete-file-${index}`}
                             >
-                                <i className="fa fa-times fa-fw text-danger"></i>
+                                <i className="fas fa-times fa-fw text-danger"></i>
                             </Button>
                             <UncontrolledTooltip placement="left" target={`delete-file-${index}`}>
                                 Delete File

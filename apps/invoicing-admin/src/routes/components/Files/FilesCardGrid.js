@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Card,
     CardBody,
     Badge,
@@ -41,7 +41,7 @@ const FilesCardGrid = () => (
                 </HolderProvider.Icon>
                 <CardBody>
                     <h6 className="mb-2">
-                        { faker.commerce.productName() }   
+                        { faker.commerce.productName() }
                     </h6>
                     <span className="mb-2">
                         { faker.finance.amount() } Mb
@@ -54,13 +54,13 @@ const FilesCardGrid = () => (
                     </div>
                     <div className="mb-3">
                         <Badge color={ randomArray(badges) } pill className="mr-1">
-                            { faker.commerce.department() }   
+                            { faker.commerce.department() }
                         </Badge>
                         <Badge color={ randomArray(badges) } pill className="mr-1">
-                            { faker.commerce.department() }   
+                            { faker.commerce.department() }
                         </Badge>
                         <Badge color={ randomArray(badges) } pill className="mr-1">
-                            { faker.commerce.department() }   
+                            { faker.commerce.department() }
                         </Badge>
                     </div>
                     <div>
@@ -69,13 +69,13 @@ const FilesCardGrid = () => (
                             src={ randomAvatar() }
                             className="mr-3"
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(avatarStatus) }
                                     key="avatar-icon-fg"
                                 />
@@ -86,13 +86,13 @@ const FilesCardGrid = () => (
                             src={ randomAvatar() }
                             className="mr-3"
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(avatarStatus) }
                                     key="avatar-icon-fg"
                                 />
@@ -103,13 +103,13 @@ const FilesCardGrid = () => (
                             src={ randomAvatar() }
                             className="mr-3"
                             addOns={[
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color="white"
                                     key="avatar-icon-bg"
                                 />,
-                                <AvatarAddOn.Icon 
-                                    className="fa fa-circle"
+                                <AvatarAddOn.Icon
+                                    className="fas fa-circle"
                                     color={ randomArray(avatarStatus) }
                                     key="avatar-icon-fg"
                                 />
@@ -120,32 +120,32 @@ const FilesCardGrid = () => (
                 <CardFooter>
                     <div className="d-flex">
                         <a href="#" className="align-self-center text-decoration-none">
-                            Details<i className="fa fa-fw fa-angle-right ml-1"></i>
+                            Details<i className="fas fa-fw fa-angle-right ml-1"></i>
                         </a>
                         <UncontrolledButtonDropdown className="align-self-center ml-auto">
                             <DropdownToggle color="link" size="sm" className="pr-0">
-                                <i className="fa fa-gear" /><i className="fa fa-angle-down ml-2" />
+                                <i className="fas fa-gear" /><i className="fas fa-angle-down ml-2" />
                             </DropdownToggle>
                             <DropdownMenu right>
                                 <DropdownItem>
-                                    <i className="fa fa-fw fa-reply mr-2"></i>
+                                    <i className="fas fa-fw fa-reply mr-2"></i>
                                     Share
                                 </DropdownItem>
                                 <DropdownItem>
-                                    <i className="fa fa-fw fa-download mr-2"></i>
+                                    <i className="fas fa-fw fa-download mr-2"></i>
                                     Download
                                 </DropdownItem>
                                 <DropdownItem>
-                                    <i className="fa fa-fw fa-trash mr-2"></i>
+                                    <i className="fas fa-fw fa-trash mr-2"></i>
                                     Delete
                                 </DropdownItem>
                                 <DropdownItem>
-                                    <i className="fa fa-fw fa-pencil mr-2"></i>
+                                    <i className="fas fa-fw fa-pencil mr-2"></i>
                                     Edit
                                 </DropdownItem>
                                 <DropdownItem divider />
                                 <DropdownItem>
-                                    <i className="fa fa-fw fa-files-o mr-2"></i>
+                                    <i className="fas fa-fw fa-files-o mr-2"></i>
                                     Copy
                                 </DropdownItem>
                             </DropdownMenu>

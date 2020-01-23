@@ -40,7 +40,7 @@ const Monitor = () => (
     <Container>
         <Row className="mb-2">
             <Col lg={ 12 }>
-                <HeaderMain 
+                <HeaderMain
                     title="Monitor"
                     className="mb-4 mb-lg-5"
                 />
@@ -85,21 +85,21 @@ const Monitor = () => (
                             <div className="d-flex justify-content-between">
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-info"></i> Allocated
+                                        <i className="fas fa-circle fa-fw text-info"></i> Allocated
                                     </div>
                                     <h6 className="mb-0">48,7 MB</h6>
                                     <span>79%</span>
                                 </div>
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-primary"></i> In Cache
+                                        <i className="fas fa-circle fa-fw text-primary"></i> In Cache
                                     </div>
                                     <h6 className="mb-0">26,9 MB</h6>
                                     <span>65%</span>
                                 </div>
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-gray-300"></i> Available
+                                        <i className="fas fa-circle fa-fw text-gray-300"></i> Available
                                     </div>
                                     <h6 className="mb-0">2,7 MB</h6>
                                     <span>34%</span>
@@ -139,13 +139,13 @@ const Monitor = () => (
                             </div>
                             <div className="d-flex justify-content-between mb-3">
                                 <div className="text-left">
-                                    <i className="fa fa-caret-down fa-fw text-danger"></i>Min: 19ºC
+                                    <i className="fas fa-caret-down fa-fw text-danger"></i>Min: 19ºC
                                 </div>
                                 <div className="text-left">
-                                    <i className="fa fa-caret-up fa-fw text-success"></i>Min: 26ºC
+                                    <i className="fas fa-caret-up fa-fw text-success"></i>Min: 26ºC
                                 </div>
                                 <div className="text-left">
-                                    <i className="fa fa-caret-up fa-fw text-success"></i>Min: 32ºC
+                                    <i className="fas fa-caret-up fa-fw text-success"></i>Min: 32ºC
                                 </div>
                             </div>
                             <TinyAreaChart />
@@ -156,13 +156,13 @@ const Monitor = () => (
                             </div>
                             <div className="d-flex justify-content-between mb-3">
                                 <div className="text-left">
-                                    <i className="fa fa-caret-down fa-fw text-danger"></i>Min: 19ºC
+                                    <i className="fas fa-caret-down fa-fw text-danger"></i>Min: 19ºC
                                 </div>
                                 <div className="text-left">
-                                    <i className="fa fa-caret-up fa-fw text-success"></i>Min: 26ºC
+                                    <i className="fas fa-caret-up fa-fw text-success"></i>Min: 26ºC
                                 </div>
                                 <div className="text-left">
-                                    <i className="fa fa-caret-up fa-fw text-success"></i>Min: 32ºC
+                                    <i className="fas fa-caret-up fa-fw text-success"></i>Min: 32ºC
                                 </div>
                             </div>
                             <TinyAreaChart />
@@ -173,13 +173,13 @@ const Monitor = () => (
                             </div>
                             <div className="d-flex justify-content-between mb-3">
                                 <div className="text-left">
-                                    <i className="fa fa-caret-down fa-fw text-danger"></i>Min: 19ºC
+                                    <i className="fas fa-caret-down fa-fw text-danger"></i>Min: 19ºC
                                 </div>
                                 <div className="text-left">
-                                    <i className="fa fa-caret-up fa-fw text-success"></i>Min: 26ºC
+                                    <i className="fas fa-caret-up fa-fw text-success"></i>Min: 26ºC
                                 </div>
                                 <div className="text-left">
-                                    <i className="fa fa-caret-up fa-fw text-success"></i>Min: 32ºC
+                                    <i className="fas fa-caret-up fa-fw text-success"></i>Min: 32ºC
                                 </div>
                             </div>
                             <TinyAreaChart />
@@ -189,7 +189,7 @@ const Monitor = () => (
             </Col>
             <Col lg={ 8 }>
                 <p>
-                    Nesciunt odit eius nihil molestiae tenetur earum enim quidem. Aperiam non sapiente voluptatum in doloremque rerum magnam quae sed. 
+                    Nesciunt odit eius nihil molestiae tenetur earum enim quidem. Aperiam non sapiente voluptatum in doloremque rerum magnam quae sed.
                     Quisquam eos non voluptate sapiente qui temporibus harum in illo. Aliquid at dolor labore. Qui error modi.
                 </p>
                 <div className="hr-text hr-text-left mt-4 mb-4">
@@ -206,20 +206,20 @@ const Monitor = () => (
                                 <h2 className="mb-0">2.24 <small>TiB</small></h2>
                                 <span>Volume Size</span>
                             </div>
-                            <TinyDonutChartBig 
+                            <TinyDonutChartBig
                                 pieColor="primary"
                             />
                             <div className="d-flex justify-content-between">
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-purple"></i> Used Space
+                                        <i className="fas fa-circle fa-fw text-purple"></i> Used Space
                                     </div>
                                     <h6 className="mb-0">483,7 MB</h6>
                                     <span>79%</span>
                                 </div>
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-gray-300"></i> Free Space
+                                        <i className="fas fa-circle fa-fw text-gray-300"></i> Free Space
                                     </div>
                                     <h6 className="mb-0">269,3 MB</h6>
                                     <span>65%</span>
@@ -237,20 +237,20 @@ const Monitor = () => (
                                 <h2 className="mb-0">5.07 <small>TiB</small></h2>
                                 <span>Volume Size</span>
                             </div>
-                            <TinyDonutChartBig 
+                            <TinyDonutChartBig
                                 pieColor="purple"
                             />
                             <div className="d-flex justify-content-between">
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-purple"></i> Used Space
+                                        <i className="fas fa-circle fa-fw text-purple"></i> Used Space
                                     </div>
                                     <h6 className="mb-0">48,7 MB</h6>
                                     <span>79%</span>
                                 </div>
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-gray-300"></i> Free Space
+                                        <i className="fas fa-circle fa-fw text-gray-300"></i> Free Space
                                     </div>
                                     <h6 className="mb-0">26,9 MB</h6>
                                     <span>65%</span>
@@ -268,20 +268,20 @@ const Monitor = () => (
                                 <h2 className="mb-0">3.16 <small>TiB</small></h2>
                                 <span>Volume Size</span>
                             </div>
-                            <TinyDonutChartBig 
+                            <TinyDonutChartBig
                                 pieColor="success"
                             />
                             <div className="d-flex justify-content-between">
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-success"></i> Used Space
+                                        <i className="fas fa-circle fa-fw text-success"></i> Used Space
                                     </div>
                                     <h6 className="mb-0">483,3 MB</h6>
                                     <span>79%</span>
                                 </div>
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-gray-300"></i> Free Space
+                                        <i className="fas fa-circle fa-fw text-gray-300"></i> Free Space
                                     </div>
                                     <h6 className="mb-0">262,9 MB</h6>
                                     <span>65%</span>
@@ -299,20 +299,20 @@ const Monitor = () => (
                                 <h2 className="mb-0">9.27 <small>TiB</small></h2>
                                 <span>Volume Size</span>
                             </div>
-                            <TinyDonutChartBig 
+                            <TinyDonutChartBig
                                 pieColor="yellow"
                             />
                             <div className="d-flex justify-content-between">
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-yellow"></i> Used Space
+                                        <i className="fas fa-circle fa-fw text-yellow"></i> Used Space
                                     </div>
                                     <h6 className="mb-0">482,7 MB</h6>
                                     <span>79%</span>
                                 </div>
                                 <div className="text-left">
                                     <div className="small mb-2">
-                                        <i className="fa fa-circle fa-fw text-gray-300"></i> Free Space
+                                        <i className="fas fa-circle fa-fw text-gray-300"></i> Free Space
                                     </div>
                                     <h6 className="mb-0">26,9 MB</h6>
                                     <span>65%</span>

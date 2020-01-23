@@ -21,7 +21,7 @@ const ComingSoon = () => (
     <EmptyLayout>
         <EmptyLayout.Section center>
             { /* START Header */}
-            <HeaderAuth 
+            <HeaderAuth
                 title="Coming Soon"
                 icon="clock-o"
                 text="Our website is under construction. Still, the app is not ready, but we're working hard on it and will be available for around:"
@@ -74,7 +74,7 @@ const ComingSoon = () => (
             { /* START Bottom Links */}
             <div className="d-flex mb-5">
                 <Link to="/" className="text-decoration-none">
-                    <i className="fa fa-angle-left mr-2" /> Back to Home
+                    <i className="fas fa-angle-left mr-2" /> Back to Home
                 </Link>
                 <Link to="/" className="ml-auto text-decoration-none">
                     Contact

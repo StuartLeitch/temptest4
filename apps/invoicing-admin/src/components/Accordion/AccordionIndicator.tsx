@@ -22,6 +22,6 @@ AccordionIndicator.propTypes = {
     className: PropTypes.string
 }
 AccordionIndicator.defaultProps = {
-    open: <i className="fa fa-fw fa-minus"></i>,
-    closed: <i className="fa fa-fw fa-plus"></i>
+    open: <i className="fas fa-fw fa-minus"></i>,
+    closed: <i className="fas fa-fw fa-plus"></i>
 }

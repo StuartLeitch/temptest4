@@ -66,7 +66,7 @@ const WizardStep1 = () => (
                     Discover amazing stuff or open your own store for free!
                 </p>
                 <small>
-                    Below is a sample page for your cart, 
+                    Below is a sample page for your cart,
                     Created using pages design UI Elementes
                 </small>
             </div>
@@ -86,7 +86,7 @@ const WizardStep1 = () => (
                         _.map(items, (item, index) => (
                             <tr key={index}>
                                 <td>
-                                    <i className="fa fa-close text-danger"></i>
+                                    <i className="fas fa-close text-danger"></i>
                                 </td>
                                 <td>
                                     { item.name }
@@ -148,7 +148,7 @@ const WizardStep2 = () => (
                                 First Name <span className="text-danger">*</span>
                             </Label>
                             <Input
-                                id="firstName" 
+                                id="firstName"
                                 placeholder='First Name...'
                             />
                         </FormGroup>
@@ -159,7 +159,7 @@ const WizardStep2 = () => (
                                 Last Name <span className="text-danger">*</span>
                             </Label>
                             <Input
-                                id="lastName" 
+                                id="lastName"
                                 placeholder='Last Name...'
                             />
                         </FormGroup>
@@ -193,7 +193,7 @@ const WizardStep2 = () => (
                             </Label>
                             <UncontrolledDropdown className="d-block">
                                 <DropdownToggle color="secondary" outline id="country">
-                                    PL (+48) <i className="fa fa-fw fa-angle-down"></i>
+                                    PL (+48) <i className="fas fa-fw fa-angle-down"></i>
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem active>PL (+48)</DropdownItem>
@@ -239,7 +239,7 @@ const WizardStep2 = () => (
                                     tag={UncontrolledDropdown}
                                 >
                                     <DropdownToggle outline>
-                                        PL (+48) <i className="fa fa-fw fa-angle-down"></i>
+                                        PL (+48) <i className="fas fa-fw fa-angle-down"></i>
                                     </DropdownToggle>
                                     <DropdownMenu>
                                         <DropdownItem active>PL (+48)</DropdownItem>
@@ -279,7 +279,7 @@ const WizardStep3 = () => (
                             _.map(items, (item, index) => (
                                 <tr key={index}>
                                     <td>
-                                        <i className="fa fa-close text-danger"></i>
+                                        <i className="fas fa-close text-danger"></i>
                                     </td>
                                     <td>
                                         { item.name }
@@ -301,8 +301,8 @@ const WizardStep3 = () => (
                     </tbody>
                 </Table>
                 <small>
-                    Invoice are issued on the date of despatch. 
-                    Payment terms: Pre-orders: within 10 days of invoice date with 4% discount, 
+                    Invoice are issued on the date of despatch.
+                    Payment terms: Pre-orders: within 10 days of invoice date with 4% discount,
                     from the 11th to the 30th day net. Re-orders: non-reduced stock items are payable net after 20 days.
                 </small>
             </div>
@@ -331,9 +331,9 @@ const WizardStep3 = () => (
                     <div className="d-flex justify-content-between align-items-center pb-3">
                         <h5>Credit Card</h5>
                         <div className="d-flex align-items-start">
-                            <i className="fa fa-lg fa-cc-visa text-primary mr-1"></i>
-                            <i className="fa fa-lg fa-cc-mastercard text-muted mr-1"></i>
-                            <i className="fa fa-lg fa-cc-jcb text-muted mr-1"></i>
+                            <i className="fas fa-lg fa-cc-visa text-primary mr-1"></i>
+                            <i className="fas fa-lg fa-cc-mastercard text-muted mr-1"></i>
+                            <i className="fas fa-lg fa-cc-jcb text-muted mr-1"></i>
                         </div>
                     </div>
                     <Form>
@@ -358,7 +358,7 @@ const WizardStep3 = () => (
                                 <div className="d-flex">
                                     <UncontrolledDropdown className="d-block">
                                         <DropdownToggle outline>
-                                            Jun (06) <i className="fa fa-fw fa-angle-down"></i>
+                                            Jun (06) <i className="fas fa-fw fa-angle-down"></i>
                                         </DropdownToggle>
                                         <DropdownMenu>
                                             <DropdownItem active>Jun (06)</DropdownItem>
@@ -369,7 +369,7 @@ const WizardStep3 = () => (
                                     &nbsp;
                                     <UncontrolledDropdown className="d-block">
                                         <DropdownToggle outline>
-                                            2018 <i className="fa fa-fw fa-angle-down"></i>
+                                            2018 <i className="fas fa-fw fa-angle-down"></i>
                                         </DropdownToggle>
                                         <DropdownMenu>
                                             <DropdownItem active>2018</DropdownItem>
@@ -416,7 +416,7 @@ const WizardStep4 = () => (
                             _.map(items, (item, index) => (
                                 <tr key={index}>
                                     <td>
-                                        <i className="fa fa-close text-danger"></i>
+                                        <i className="fas fa-close text-danger"></i>
                                     </td>
                                     <td>
                                         { item.name }
@@ -456,7 +456,7 @@ const WizardStep4 = () => (
 
                 <dt className="col-sm-4"></dt>
                 <dd className="col-sm-8">
-                    <Button color='link' className="p-0"><i className="fa fa-angle-left mr-1"></i> Change</Button>
+                    <Button color='link' className="p-0"><i className="fas fa-angle-left mr-1"></i> Change</Button>
                 </dd>
             </Row>
             <h6 className="my-3">Billing Address</h6>
@@ -481,20 +481,20 @@ const WizardStep4 = () => (
 
                 <dt className="col-sm-4"></dt>
                 <dd className="col-sm-8">
-                    <Button color='link' className="p-0"><i className="fa fa-angle-left mr-1"></i> Change</Button>
+                    <Button color='link' className="p-0"><i className="fas fa-angle-left mr-1"></i> Change</Button>
                 </dd>
             </Row>
             <h6 className="my-3">Credit Card</h6>
             <Row tag="dl">
                 <dt className="col-sm-4">Card Name</dt>
-                <dd className="col-sm-8"><i className="fa fa-cc-visa text-primary mr-1"></i> Visa </dd>
+                <dd className="col-sm-8"><i className="fas fa-cc-visa text-primary mr-1"></i> Visa </dd>
 
                 <dt className="col-sm-4">Card Number</dt>
                 <dd className="col-sm-8">**** **** **** 6765</dd>
 
                 <dt className="col-sm-4"></dt>
                 <dd className="col-sm-8">
-                    <Button color='link' className="p-0"><i className="fa fa-angle-left mr-1"></i> Change</Button>
+                    <Button color='link' className="p-0"><i className="fas fa-angle-left mr-1"></i> Change</Button>
                 </dd>
             </Row>
         </Col>
@@ -511,7 +511,7 @@ export class WizardExample extends React.Component {
 
         return (
             <Container>
-                <HeaderMain 
+                <HeaderMain
                     title="Wizard"
                     className="my-4"
                 />
@@ -523,28 +523,28 @@ export class WizardExample extends React.Component {
                         >
                             <Wizard.Step
                                 id={ sequence[0] }
-                                icon={ <i className="fa fa-shopping-basket fa-fw"></i> }
+                                icon={ <i className="fas fa-shopping-basket fa-fw"></i> }
                                 complete={ this._isComplete(sequence[0]) }
                             >
                                 Your Cart
                             </Wizard.Step>
                             <Wizard.Step
                                 id={ sequence[1] }
-                                icon={ <i className="fa fa-cube fa-fw"></i> }
+                                icon={ <i className="fas fa-cube fa-fw"></i> }
                                 complete={ this._isComplete(sequence[1]) }
                             >
                                 Shipping
                             </Wizard.Step>
                             <Wizard.Step
                                 id={ sequence[2] }
-                                icon={ <i className="fa fa-credit-card fa-fw"></i> }
+                                icon={ <i className="fas fa-credit-card fa-fw"></i> }
                                 complete={ this._isComplete(sequence[2]) }
                             >
                                 Payment
                             </Wizard.Step>
                             <Wizard.Step
                                 id={ sequence[3] }
-                                icon={ <i className="fa fa-navicon fa-fw"></i> }
+                                icon={ <i className="fas fa-navicon fa-fw"></i> }
                                 complete={ this._isComplete(sequence[3]) }
                             >
                                 Summary
@@ -574,7 +574,7 @@ export class WizardExample extends React.Component {
                             {
                                 currentStep !== sequence[0] && (
                                     <Button onClick={() => {this._prevStep()}} color="link" className='mr-3'>
-                                        <i className='fa fa-angle-left mr-2'></i>
+                                        <i className='fas fa-angle-left mr-2'></i>
                                         Previous
                                     </Button>
                                 )
@@ -583,7 +583,7 @@ export class WizardExample extends React.Component {
                                 currentStep !== sequence[sequence.length - 1] && (
                                     <Button color='primary' onClick={() => {this._nextStep()}} className="ml-auto px-4">
                                         Next
-                                        <i className='fa fa-angle-right ml-2'></i>
+                                        <i className='fas fa-angle-right ml-2'></i>
                                     </Button>
                                 )
                             }

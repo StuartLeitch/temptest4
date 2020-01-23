@@ -39,16 +39,16 @@ const cardContent = (title = 'Some Card Title') => (
 const Buttons = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Buttons"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Buttons Colors" 
+                    <HeaderDemo
+                        no={1}
+                        title="Buttons Colors"
                         subTitle="Available panel styles and colors"
                     />
                 </Col>
@@ -66,7 +66,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="primary"&gt;Primary&lt;/Button&gt;{' '}
                                 </code>
@@ -83,7 +83,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="secondary"&gt;Secondary&lt;/Button&gt;{' '}
                                 </code>
@@ -100,7 +100,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="success"&gt;Success&lt;/Button&gt;{' '}
                                 </code>
@@ -119,7 +119,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="warning"&gt;Warning&lt;/Button&gt;{' '}
                                 </code>
@@ -136,7 +136,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="danger"&gt;Danger&lt;/Button&gt;{' '}
                                 </code>
@@ -153,7 +153,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="info"&gt;Info&lt;/Button&gt;{' '}
                                 </code>
@@ -172,7 +172,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="light"&gt;Light&lt;/Button&gt;{' '}
                                 </code>
@@ -189,7 +189,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="dark"&gt;Dark&lt;/Button&gt;{' '}
                                 </code>
@@ -206,7 +206,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Custom color button, example:  
+                                Custom color button, example:
                                 <code>
                                     &lt;Button color="purple"&gt;Purple&lt;/Button&gt;{' '}
                                 </code>
@@ -221,9 +221,9 @@ const Buttons = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Buttons Social Colors" 
+                    <HeaderDemo
+                        no={2}
+                        title="Buttons Social Colors"
                         className="mt-5"
                         subTitle="Often the colors used in applications with social networking sites."
                     />
@@ -242,13 +242,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="facebook"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="facebook">
-                                <i className="fa fa-facebook mr-2"></i>
+                                <i className="fas fa-facebook mr-2"></i>
                                 Facebook Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -261,13 +261,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="twitter"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="facebook">
-                                <i className="fa fa-twitter mr-2"></i>
+                                <i className="fas fa-twitter mr-2"></i>
                                 Twitter Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -280,13 +280,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="lastfm"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="lastfm">
-                                <i className="fa fa-lastfm mr-2"></i>
+                                <i className="fas fa-lastfm mr-2"></i>
                                 LastFM Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -299,13 +299,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="pinterest"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="pinterest">
-                                <i className="fa fa-pinterest mr-2"></i>
+                                <i className="fas fa-pinterest mr-2"></i>
                                 Pinterest Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -318,13 +318,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="linkedin"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="linkedin">
-                                <i className="fa fa-linkedin mr-2"></i>
+                                <i className="fas fa-linkedin mr-2"></i>
                                 Linkedin Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -339,13 +339,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="medium"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="medium">
-                                <i className="fa fa-medium mr-2"></i>
+                                <i className="fas fa-medium mr-2"></i>
                                 Medium Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -358,13 +358,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="android"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="android">
-                                <i className="fa fa-android mr-2"></i>
+                                <i className="fas fa-android mr-2"></i>
                                 Android Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -377,13 +377,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="spotify"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="spotify">
-                                <i className="fa fa-spotify mr-2"></i>
+                                <i className="fas fa-spotify mr-2"></i>
                                 Spotify Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -396,13 +396,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="foursquare"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="foursquare">
-                                <i className="fa fa-foursquare mr-2"></i>
+                                <i className="fas fa-foursquare mr-2"></i>
                                 Foursquare Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -415,13 +415,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="skype"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="skype">
-                                <i className="fa fa-skype mr-2"></i>
+                                <i className="fas fa-skype mr-2"></i>
                                 Skype Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -436,13 +436,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="youtube"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="youtube">
-                                <i className="fa fa-play mr-2"></i>
+                                <i className="fas fa-play mr-2"></i>
                                 Youtube Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -455,13 +455,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="windows"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="windows">
-                                <i className="fa fa-windows mr-2"></i>
+                                <i className="fas fa-windows mr-2"></i>
                                 Windows Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -474,13 +474,13 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                                 <code>
                                     &lt;Button color="amazon"&gt;...&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button color="amazon">
-                                <i className="fa fa-amazon mr-2"></i>
+                                <i className="fas fa-amazon mr-2"></i>
                                 Amazon Button</Button>{' '}
                         </CardBody>
                     </Card>
@@ -491,9 +491,9 @@ const Buttons = () => (
             { /* START Header 3 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Buttons Layouts" 
+                    <HeaderDemo
+                        no={2}
+                        title="Buttons Layouts"
                         className="mt-5"
                         subTitle="Media list and media object layouts."
                     />
@@ -512,7 +512,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Outline button, example:  
+                                Outline button, example:
                                 <code>
                                     &lt;Button outline color="secondary"&gt;...&lt;/Button&gt;{' '}
                                 </code>
@@ -531,12 +531,12 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Available in both directions, example:  
+                                Available in both directions, example:
                                 <code>&lt;Button outline color="secondary"&gt;&lt;i className="fa fa-home mr-2" /&gt;&lt;/Button&gt;{' '}
                                 </code>
                             </p>
                             <Button outline color="secondary">
-                                <i className="fa fa-home mr-2"></i>
+                                <i className="fas fa-home mr-2"></i>
                                 With Icon Button
                             </Button>{' '}
                         </CardBody>
@@ -562,20 +562,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -611,7 +611,7 @@ const Buttons = () => (
                                 Button with Contextual Colors
                             </p>
                             <Button color="secondary">
-                                <i className="fa fa-gear mr-2"></i>
+                                <i className="fas fa-gear mr-2"></i>
                                 With Icon
                             </Button>{' '}
                         </CardBody>
@@ -637,20 +637,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -688,7 +688,7 @@ const Buttons = () => (
                                 Available in both directions
                             </p>
                             <Button color="secondary">
-                                <i className="fa fa-gear mr-2"></i>
+                                <i className="fas fa-gear mr-2"></i>
                                 With Icon
                             </Button>{' '}
                         </CardBody>
@@ -740,7 +740,7 @@ const Buttons = () => (
                                  Button as Link with Icon
                             </p>
                             <Button color="link">
-                                <i className="fa fa-gear mr-2"></i>
+                                <i className="fas fa-gear mr-2"></i>
                                 With Icon
                             </Button>{' '}
                         </CardBody>
@@ -766,20 +766,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -799,7 +799,7 @@ const Buttons = () => (
                                 Button with a single icon only
                             </p>
                             <Button outline color="secondary">
-                                <i className="fa fa-fw fa-bars"></i>
+                                <i className="fas fa-fw fa-bars"></i>
                             </Button>{' '}
                         </CardBody>
                     </Card>
@@ -815,7 +815,7 @@ const Buttons = () => (
                                 Button with a single icon only
                             </p>
                             <Button outline color="secondary">
-                                <i className="fa fa-fw fa-bars"></i>
+                                <i className="fas fa-fw fa-bars"></i>
                             </Button>{' '}
                         </CardBody>
                     </Card>
@@ -835,27 +835,27 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" outline caret>
-                                    <i className="fa fa-fw fa-bars"></i>
+                                    <i className="fas fa-fw fa-bars"></i>
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem header>
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -875,7 +875,7 @@ const Buttons = () => (
                                 Button with a single icon only
                             </p>
                             <Button color="secondary">
-                                <i className="fa fa-fw fa-bars"></i>
+                                <i className="fas fa-fw fa-bars"></i>
                             </Button>{' '}
                         </CardBody>
                     </Card>
@@ -891,7 +891,7 @@ const Buttons = () => (
                                 Works with all button types
                             </p>
                             <Button color="secondary">
-                                <i className="fa fa-fw fa-bars"></i>
+                                <i className="fas fa-fw fa-bars"></i>
                             </Button>{' '}
                         </CardBody>
                     </Card>
@@ -909,27 +909,27 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" caret>
-                                    <i className="fa fa-fw fa-bars"></i>
+                                    <i className="fas fa-fw fa-bars"></i>
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem header>
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -950,13 +950,13 @@ const Buttons = () => (
                             </p>
                             <div className="d-flex">
                                 <Button color="secondary" outline size="sm" className="mr-2 align-self-center">
-                                    <i className="fa fa-fw fa-caret-left"></i>
+                                    <i className="fas fa-fw fa-caret-left"></i>
                                 </Button>
                                 <Button color="secondary" size="lg" className="mr-2 align-self-center">
-                                    <i className="fa fa-fw fa-check"></i>
+                                    <i className="fas fa-fw fa-check"></i>
                                 </Button>
                                 <Button color="secondary" outline size="sm" className="mr-2 align-self-center">
-                                    <i className="fa fa-fw fa-caret-right"></i>
+                                    <i className="fas fa-fw fa-caret-right"></i>
                                 </Button>
                             </div>
                         </CardBody>
@@ -974,15 +974,15 @@ const Buttons = () => (
                             </p>
                             <div className="d-flex">
                                 <Button color="secondary" outline size="sm" className="mr-2 align-self-center text-center">
-                                    <i className="fa fa-fw fa-caret-left"></i>
+                                    <i className="fas fa-fw fa-caret-left"></i>
                                     <div>Prev</div>
                                 </Button>
                                 <Button color="secondary" size="lg" className="mr-2 align-self-center text-center">
-                                    <i className="fa fa-fw fa-check"></i>
+                                    <i className="fas fa-fw fa-check"></i>
                                     <div>Confirm</div>
                                 </Button>
                                 <Button color="secondary" outline size="sm" className="mr-2 align-self-center">
-                                    <i className="fa fa-fw fa-caret-right"></i>
+                                    <i className="fas fa-fw fa-caret-right"></i>
                                     <div>Next</div>
                                 </Button>
                             </div>
@@ -995,9 +995,9 @@ const Buttons = () => (
             { /* START Header 4 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={5} 
-                        title="Buttons Styling" 
+                    <HeaderDemo
+                        no={5}
+                        title="Buttons Styling"
                         className="mt-5"
                         subTitle="Media list and media object layouts."
                     />
@@ -1019,17 +1019,17 @@ const Buttons = () => (
                                 Button with a single icon only
                             </p>
                             <Button color="primary" size="lg" className="mb-2">
-                                <i className="fa fa-folder-open-o mr-2"></i>
+                                <i className="fas fa-folder-open-o mr-2"></i>
                                 Large Button
                             </Button>{' '}
                             <br />
                             <Button color="secondary" className="mb-2">
-                                <i className="fa fa-folder-open-o mr-2"></i>
+                                <i className="fas fa-folder-open-o mr-2"></i>
                                 Default Button
                             </Button>{' '}
                             <br />
                             <Button color="secondary" outline>
-                                <i className="fa fa-folder-open-o mr-2"></i>
+                                <i className="fas fa-folder-open-o mr-2"></i>
                                 Small Button
                             </Button>{' '}
                         </CardBody>
@@ -1048,17 +1048,17 @@ const Buttons = () => (
                                 Available styling of <code>.r-30</code> button
                             </p>
                             <Button color="primary" size="lg" className="mb-2">
-                                <i className="fa fa-folder-open-o mr-2"></i>
+                                <i className="fas fa-folder-open-o mr-2"></i>
                                 Large Button
                             </Button>{' '}
                             <br />
                             <Button color="secondary" className="mb-2">
-                                <i className="fa fa-folder-open-o mr-2"></i>
+                                <i className="fas fa-folder-open-o mr-2"></i>
                                 Default Button
                             </Button>{' '}
                             <br />
                             <Button color="secondary" outline>
-                                <i className="fa fa-folder-open-o mr-2"></i>
+                                <i className="fas fa-folder-open-o mr-2"></i>
                                 Small Button
                             </Button>{' '}
                         </CardBody>
@@ -1071,9 +1071,9 @@ const Buttons = () => (
             { /* START Header 5 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={4} 
-                        title="Buttons States" 
+                    <HeaderDemo
+                        no={4}
+                        title="Buttons States"
                         className="mt-5"
                         subTitle="Media list and media object layouts."
                     />
@@ -1092,7 +1092,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default button, example:  
+                                Default button, example:
                             </p>
                             <Button color="primary">
                                 Default Button
@@ -1110,7 +1110,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Active button, just add: <code>active</code> to 
+                                Active button, just add: <code>active</code> to
                                 <code>&lt;Button /&gt;</code>.
                             </p>
                             <Button color="primary" active>
@@ -1129,7 +1129,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Active button, just add: <code>disabled</code> to 
+                                Active button, just add: <code>disabled</code> to
                                 <code>&lt;Button /&gt;</code>.
                             </p>
                             <Button color="primary" active>
@@ -1145,9 +1145,9 @@ const Buttons = () => (
             { /* START Header 6 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={6} 
-                        title="Buttons Icons Positions" 
+                    <HeaderDemo
+                        no={6}
+                        title="Buttons Icons Positions"
                         className="mt-5"
                         subTitle="Media list and media object layouts."
                     />
@@ -1169,7 +1169,7 @@ const Buttons = () => (
                                 Display icon on the left side
                             </p>
                             <Button outline color="secondary">
-                                <i className="fa fa-envelope-o mr-2"></i>
+                                <i className="fas fa-envelope-o mr-2"></i>
                                 Left Position
                             </Button>{' '}
                         </CardBody>
@@ -1187,7 +1187,7 @@ const Buttons = () => (
                             </p>
                             <Button outline color="secondary">
                                 Right Position
-                                <i className="fa fa-envelope-o ml-2"></i>
+                                <i className="fas fa-envelope-o ml-2"></i>
                             </Button>{' '}
                         </CardBody>
                     </Card>
@@ -1207,27 +1207,27 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" outline caret>
-                                    Dropdown <i className="fa fa-fw fa-envelope-o mx-1"></i>
+                                    Dropdown <i className="fas fa-fw fa-envelope-o mx-1"></i>
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem header>
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1251,27 +1251,27 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" outline caret>
-                                    <i className="fa fa-fw fa-envelope-o"></i> Dropdown 
+                                    <i className="fas fa-fw fa-envelope-o"></i> Dropdown
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem header>
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1287,9 +1287,9 @@ const Buttons = () => (
             { /* START Header 7 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={7} 
-                        title="Buttons Dropdowns" 
+                    <HeaderDemo
+                        no={7}
+                        title="Buttons Dropdowns"
                         className="mt-5"
                         subTitle="Dropdown menus attached to buttons."
                     />
@@ -1320,20 +1320,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1355,7 +1355,7 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" outline caret>
-                                    <i className="fa fa-fw fa-user mr-1"></i>
+                                    <i className="fas fa-fw fa-user mr-1"></i>
                                     Dropdown
                                 </DropdownToggle>
                                 <DropdownMenu>
@@ -1363,20 +1363,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1405,20 +1405,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1448,27 +1448,27 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
                             </UncontrolledButtonDropdown>
                             { /* END Button Dropdown */}
                         </CardBody>
-                    </Card>        
+                    </Card>
                 </Col>
                 <Col lg={ 4 }>
                     <Card className="mb-3">
@@ -1492,20 +1492,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1534,20 +1534,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1570,27 +1570,27 @@ const Buttons = () => (
                             { /* START Button Dropdown */}
                             <UncontrolledButtonDropdown direction="up">
                                 <DropdownToggle color="secondary" outline caret>
-                                    <i className="fa fa-fw fa-gear"></i>
+                                    <i className="fas fa-fw fa-gear"></i>
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     <DropdownItem header>
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1612,7 +1612,7 @@ const Buttons = () => (
                             { /* START Button Group Dropdown */}
                             <ButtonGroup>
                                 <Button outline>
-                                    <i className="fa fa-fw fa-gear"></i>
+                                    <i className="fas fa-fw fa-gear"></i>
                                 </Button>
                                 <UncontrolledButtonDropdown direction="up">
                                     <DropdownToggle color="secondary" outline caret />
@@ -1621,20 +1621,20 @@ const Buttons = () => (
                                             Your Options
                                         </DropdownItem>
                                         <DropdownItem>
-                                            <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                            <i className="fas fa-fw fa-folder-open mr-2"></i>
                                             View
                                         </DropdownItem>
                                         <DropdownItem>
-                                            <i className="fa fa-fw fa-ticket mr-2"></i>
+                                            <i className="fas fa-fw fa-ticket mr-2"></i>
                                             Add Task
                                         </DropdownItem>
                                         <DropdownItem>
-                                            <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                            <i className="fas fa-fw fa-paperclip mr-2"></i>
                                             Add Files
                                         </DropdownItem>
                                         <DropdownItem divider />
                                         <DropdownItem>
-                                            <i className="fa fa-fw fa-trash mr-2"></i>
+                                            <i className="fas fa-fw fa-trash mr-2"></i>
                                             Delete
                                         </DropdownItem>
                                     </DropdownMenu>
@@ -1659,7 +1659,7 @@ const Buttons = () => (
                             { /* START Button Group Dropdown */}
                             <ButtonGroup>
                                 <Button outline>
-                                    <i className="fa fa-fw fa-gear"></i>
+                                    <i className="fas fa-fw fa-gear"></i>
                                 </Button>
                                 <UncontrolledButtonDropdown>
                                 <DropdownToggle color="secondary" outline caret />
@@ -1668,20 +1668,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1711,20 +1711,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1753,20 +1753,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1795,20 +1795,20 @@ const Buttons = () => (
                                         Your Options
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-folder-open mr-2"></i>
+                                        <i className="fas fa-fw fa-folder-open mr-2"></i>
                                         View
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-ticket mr-2"></i>
+                                        <i className="fas fa-fw fa-ticket mr-2"></i>
                                         Add Task
                                     </DropdownItem>
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-paperclip mr-2"></i>
+                                        <i className="fas fa-fw fa-paperclip mr-2"></i>
                                         Add Files
                                     </DropdownItem>
                                     <DropdownItem divider />
                                     <DropdownItem>
-                                        <i className="fa fa-fw fa-trash mr-2"></i>
+                                        <i className="fas fa-fw fa-trash mr-2"></i>
                                         Delete
                                     </DropdownItem>
                                 </DropdownMenu>
@@ -1823,9 +1823,9 @@ const Buttons = () => (
             { /* START Header 8 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={8} 
-                        title="Buttons Options" 
+                    <HeaderDemo
+                        no={8}
+                        title="Buttons Options"
                         className="mt-5"
                         subTitle="Media list and media object layouts."
                     />
@@ -1844,7 +1844,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Default Button Group, example:  
+                                Default Button Group, example:
                                 <code>
                                 &lt;ButtonGroup&gt;&lt;Button outline color="secondary"&gt;...&lt;/Button&gt;&lt;/ButtonGroup&gt;
                                 </code>
@@ -1865,7 +1865,7 @@ const Buttons = () => (
                                 </span>
                             </CardTitle>
                             <p>
-                                Example:   
+                                Example:
                                 <code>
                                 &lt;ButtonToolbar&gt;&lt;ButtonGroup&gt;&lt;Button outline color="secondary"&gt;...&lt;/Button&gt;&lt;/ButtonGroup&gt;&lt;/ButtonToolbar&gt;
                                 </code>

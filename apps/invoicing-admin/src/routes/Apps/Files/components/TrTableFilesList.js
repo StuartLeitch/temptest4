@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Badge,
     Avatar,
     UncontrolledButtonDropdown,
@@ -31,11 +31,11 @@ const TrTableFilesList = () => (
             <td className="align-middle">
                 <Media>
                     <Media left middle>
-                       <i className="fa fa-fw fa-folder-o fa-3x mr-2"></i>
+                       <i className="fas fa-fw fa-folder-o fa-3x mr-2"></i>
                     </Media>
                     <Media body>
                         <div className="text-inverse">
-                            { faker.commerce.department() }   
+                            { faker.commerce.department() }
                         </div>
                         <span>
                             { faker.finance.amount() } Mb
@@ -52,13 +52,13 @@ const TrTableFilesList = () => (
                     size="md"
                     src={ randomAvatar() }
                     addOns={[
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color="white"
                             key="avatar-icon-bg"
                         />,
-                        <AvatarAddOn.Icon 
-                            className="fa fa-circle"
+                        <AvatarAddOn.Icon
+                            className="fas fa-circle"
                             color={ randomArray(status) }
                             key="avatar-icon-fg"
                         />
@@ -67,40 +67,40 @@ const TrTableFilesList = () => (
             </td>
             <td className="align-middle">
                 <Badge color={ randomArray(badges) } pill className="mr-1">
-                    { faker.commerce.department() }   
+                    { faker.commerce.department() }
                 </Badge>
                 <Badge color={ randomArray(badges) } pill className="mr-1">
-                    { faker.commerce.department() }   
+                    { faker.commerce.department() }
                 </Badge>
                 <Badge color={ randomArray(badges) } pill className="mr-1">
-                    { faker.commerce.department() }   
+                    { faker.commerce.department() }
                 </Badge>
             </td>
             <td className="align-middle text-right">
                 <UncontrolledButtonDropdown>
                     <DropdownToggle color="link">
-                        <i className="fa fa-gear" /><i className="fa fa-angle-down ml-2" />
+                        <i className="fas fa-gear" /><i className="fas fa-angle-down ml-2" />
                     </DropdownToggle>
                     <DropdownMenu right>
                         <DropdownItem>
-                            <i className="fa fa-fw fa-reply mr-2"></i>
+                            <i className="fas fa-fw fa-reply mr-2"></i>
                             Share
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-fw fa-download mr-2"></i>
+                            <i className="fas fa-fw fa-download mr-2"></i>
                             Download
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-fw fa-trash mr-2"></i>
+                            <i className="fas fa-fw fa-trash mr-2"></i>
                             Delete
                         </DropdownItem>
                         <DropdownItem>
-                            <i className="fa fa-fw fa-pencil mr-2"></i>
+                            <i className="fas fa-fw fa-pencil mr-2"></i>
                             Edit
                         </DropdownItem>
                         <DropdownItem divider />
                         <DropdownItem>
-                            <i className="fa fa-fw fa-files-o mr-2"></i>
+                            <i className="fas fa-fw fa-files-o mr-2"></i>
                             Copy
                         </DropdownItem>
                     </DropdownMenu>
