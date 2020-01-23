@@ -20,6 +20,7 @@ dist/
 *.launch
 .settings/
 *.sublime-workspace
+report.*.json
 
 # IDE - VSCode
 .vscode
