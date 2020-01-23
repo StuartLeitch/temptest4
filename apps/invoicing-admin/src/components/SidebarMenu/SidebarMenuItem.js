@@ -7,7 +7,7 @@ import uuid from 'uuid/v4';
 import { MenuContext } from './MenuContext';
 
 /**
- * Renders a collapse trigger or a ReactRouter Link 
+ * Renders a collapse trigger or a ReactRouter Link
  */
 const SidebarMenuItemLink = (props) => (
     (props.to || props.href) ? (
@@ -25,7 +25,7 @@ const SidebarMenuItemLink = (props) => (
                 { props.children }
             </a>
         )
-        
+
     ) : (
         <a
             href="javascript:;"
@@ -89,7 +89,7 @@ export class SidebarMenuItem extends React.Component {
             parentId: this.props.parentId,
             exact: !!this.props.exact
         };
-        
+
         if (this.props.to) {
             entry.url = this.props.to;
         }
@@ -145,6 +145,8 @@ export class SidebarMenuItem extends React.Component {
                             <span>{ this.props.title }</span> :
                             this.props.title
                     }
+
+                    <i className='fas fa-angle-left'></i>
                 </SidebarMenuItemLink>
                 {
                     this.props.children && (
