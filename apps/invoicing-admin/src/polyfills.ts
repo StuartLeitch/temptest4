@@ -10,4 +10,3 @@ import 'regenerator-runtime/runtime';
 /**
  * This file contains polyfills loaded on all browsers
  */
-import '@fortawesome/fontawesome-free/js/all';
