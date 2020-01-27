@@ -26,6 +26,22 @@ const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
       dateCreated
       dateIssued
     }
+
+    _filters {
+      invoices {
+        invoiceItem {
+          article {
+            journalTitle(eq: "...")
+            customID(eq: "...")
+          }
+        }
+        transaction {
+          status(eq: "...")
+        }
+        status(eq: "...")
+        referenceNumber(eq: "...")
+      }
+    }
   }
 }
 `;
