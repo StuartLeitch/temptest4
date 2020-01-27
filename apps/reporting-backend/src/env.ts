@@ -7,7 +7,8 @@ import {
   getOsEnvOptional,
   getOsPath,
   normalizePort,
-  toBool
+  toBool,
+  toNumber
 } from './lib/env';
 
 export const env = {
@@ -25,7 +26,9 @@ export const env = {
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR')
-    }
+    },
+    batchSize: toNumber(getOsEnvOptional('BATCH_SIZE') || '100'),
+    batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000')
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),
@@ -50,12 +53,6 @@ export const env = {
     sqs: {
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
       endpoint: getOsEnv('AWS_SQS_ENDPOINT')
-    },
-    s3: {
-      apiVersion: getOsEnv('AWS_S3_API_VERSION'),
-      accessKey: getOsEnv('AWS_S3_ACCESS_KEY'),
-      secretKey: getOsEnv('AWS_S3_SECRET_KEY'),
-      endpoint: getOsEnv('AWS_S3_ENDPOINT')
     }
   }
 };
