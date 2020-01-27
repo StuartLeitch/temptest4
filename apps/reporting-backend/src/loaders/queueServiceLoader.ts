@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { Consumer } = require('sqs-consumer');
+import { Consumer } from 'sqs-consumer';
 import {
   MicroframeworkLoader,
   MicroframeworkSettings
@@ -59,8 +58,8 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     registry
   );
 
-  const handler = BatchUtils.withTimeout<EventDTO>(
-    async events => {
+  const handler = BatchUtils.withTimeout<AWS.SQS.Message>(
+    async (events: AWS.SQS.Message[]) => {
       let filteredEvents = events
         .map(parseEvent)
         .filter(e => !!e && e.event && e.id && e.data);

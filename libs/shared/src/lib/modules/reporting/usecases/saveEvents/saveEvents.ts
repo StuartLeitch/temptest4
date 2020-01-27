@@ -43,17 +43,19 @@ export class SaveEventsUsecase
         console.log('No events to save');
         return right(null);
       }
-      await this.policyRegistry.mapEvents(request.events).map(mapping => {
-        const persistenceEvents = mapping.events.map(raw => {
-          return EventMap.toDomain({
-            id: raw.id,
-            time: new Date(),
-            type: raw.event,
-            payload: JSON.stringify(raw.data)
+      await Promise.all(
+        this.policyRegistry.mapEvents(request.events).map(mapping => {
+          const persistenceEvents = mapping.events.map(raw => {
+            return EventMap.toDomain({
+              id: raw.id,
+              time: new Date(),
+              type: raw.event,
+              payload: JSON.stringify(raw.data)
+            });
           });
-        });
-        this.eventsRepo.upsertEvents(mapping.table, persistenceEvents);
-      });
+          return this.eventsRepo.upsertEvents(mapping.table, persistenceEvents);
+        })
+      );
     } catch (error) {
       console.log(error.message);
       console.log(

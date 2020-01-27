@@ -1,9 +1,9 @@
 export class BatchUtils {
   public static withTimeout<T>(
-    callBack: (batch: T[]) => void,
+    callBack: (batch: T[]) => any,
     batchSize: number,
     timeout: number
-  ): (batch: T[]) => void {
+  ): (batch: T[]) => any {
     let batch = [];
     let timeoutHandler;
 
