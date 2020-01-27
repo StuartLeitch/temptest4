@@ -17,12 +17,14 @@ const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
     totalCount
     invoices {
       id: invoiceId
+      referenceNumber
       status
       manuscriptTitle: title
       type
       price
       customId
       dateCreated
+      dateIssued
     }
   }
 }
@@ -72,12 +74,15 @@ const RecentInvoicesList = () => {
         <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
+              <th className='align-middle bt-0'>#</th>
               <th className='align-middle bt-0'>Status</th>
+              <th className='align-middle bt-0'>Reference</th>
+              <th className='align-middle bt-0'>Issue Date</th>
+              <th className='align-middle bt-0'>APC</th>
+              <th className='align-middle bt-0'>Journal Title</th>
+              <th className='align-middle bt-0'>Manuscript Custom ID</th>
               <th className='align-middle bt-0'>Manuscript Title</th>
-              <th className='align-middle bt-0'>Type</th>
-              <th className='align-middle bt-0'>Amount</th>
-              <th className='align-middle bt-0'>Created On</th>
-              <th className='align-middle bt-0'>Corresponding Author</th>
+              <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
               <th className='align-middle bt-0 text-right'>Actions</th>
             </tr>
           </thead>

@@ -122,6 +122,7 @@
     "reselect": "^4.0.0",
     "routing-controllers": "^0.8.0",
     "rxjs": "^6.5.4",
+    "sass": "^1.25.0",
     "shallow-equal-object": "^1.1.1",
     "soap": "^0.30.0",
     "solid-element": "^0.16.2",

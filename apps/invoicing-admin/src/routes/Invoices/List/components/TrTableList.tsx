@@ -2,6 +2,8 @@ import React from 'react';
 // import faker from 'faker/locale/en_US';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
+import format from 'date-fns/format';
+import fromUnixTime from 'date-fns/fromUnixTime';
 
 import {
   Badge,
@@ -38,42 +40,47 @@ const TrTableInvoicesList = ({ invoices }) => (
     {invoices.map(
       ({
         id,
-        status, // customId,
+        status,
+        referenceNumber,
+        customId,
         manuscriptTitle,
         type,
         price,
-        dateCreated
+        dateIssued,
+        dateCreated,
+        journalTitle
       }) => (
         <tr key={id}>
-          <td className='align-middle'>{INVOICE_STATUS[status]}</td>
           <td className='align-middle'>
             <div>
-              <Link to='/apps/tasks/list' className='text-decoration-none'>
-                {manuscriptTitle}
+              <Link
+                to={`/invoices/details/${id}`}
+                className='text-decoration-none'
+              >
+                {id}
               </Link>
             </div>
           </td>
+          <td className='align-middle'>{INVOICE_STATUS[status]}</td>
           <td className='align-middle'>
-            <span>{type}</span>
+            <span>#{referenceNumber}</span>
+          </td>
+          <td className='align-middle text-nowrap'>
+            {dateIssued &&
+              format(new Date(parseInt(dateIssued, 10)), 'dd MMMM yyyy')}
           </td>
           <td className='align-middle'>
             <strong>$</strong>
             {price}
           </td>
-          <td className='align-middle text-nowrap'>
-            {new Intl.DateTimeFormat('en-GB', {
-              year: 'numeric',
-              month: 'numeric',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-              second: 'numeric',
-              hour12: false,
-              timeZone: 'Europe/London'
-            }).format(dateCreated)}
-          </td>
+          <td className='align-middle text-nowrap'>{journalTitle}</td>
           <td className='align-middle'>
-            <Avatar.Image size='md' src={randomAvatar()} />
+            <span>#{customId}</span>
+          </td>
+          <td className='align-middle'>{manuscriptTitle}</td>
+          <td className='align-middle text-nowrap'>
+            {dateCreated &&
+              format(new Date(parseInt(dateCreated, 10)), 'dd MMMM yyyy')}
           </td>
           <td className='align-middle text-right'>
             <UncontrolledButtonDropdown>

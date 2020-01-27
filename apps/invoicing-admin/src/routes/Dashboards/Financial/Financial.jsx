@@ -16,8 +16,8 @@ import {
   ListGroupItem,
   Button,
   Col
-} from './../../../components';
-import { setupPage } from './../../../components/Layout/setupPage';
+} from '../../../components';
+import { setupPage } from '../../../components/Layout/setupPage';
 
 import { HeaderMain } from '../../components/HeaderMain';
 

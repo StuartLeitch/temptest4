@@ -29,9 +29,9 @@ module.exports = (nxConfig, context) => {
     }
   };
 
-  // console.info(webpackConfig.module.rules);
-
   webpackConfig.plugins.push(new ExtractCssChunks());
+
+  console.info(webpackConfig.module.rules[2].use[1].options);
 
   webpackConfig.module.rules.unshift(
     // // Modular Styles
@@ -54,19 +54,24 @@ module.exports = (nxConfig, context) => {
     // {
     //   test: /\.scss$/,
     //   use: [
-    //     { loader: 'style-loader' },
-    //     {
-    //       loader: 'css-loader',
-    //       options: {
-    //         modules: true,
-    //         importLoaders: 1
-    //       }
-    //     },
+    //     'style-loader',
+    //     // {
+    //     //   loader: 'css-loader',
+    //     //   options: {
+    //     //     modules: true,
+    //     //     importLoaders: 1
+    //     //   }
+    //     // },
     //     { loader: 'postcss-loader' },
     //     {
     //       loader: 'sass-loader',
     //       options: {
-    //         includePaths: config.scssIncludes
+    //         // Prefer `dart-sass`
+    //         implementation: require('sass'),
+    //         includePaths: config.scssIncludes,
+    //         sassOptions: {
+    //           fiber: require('fibers'),
+    //         },
     //       }
     //     }
     //   ],

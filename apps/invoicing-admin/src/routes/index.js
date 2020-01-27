@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router';
 
 // ----------- Pages Imports ---------------
 import ProjectsDashboard from './Dashboards/Projects';
+import InvoicingDashboard from './Dashboards/Invoicing';
 // import Analytics from './Dashboards/Analytics';
 // import System from './Dashboards/System';
 // import Monitor from './Dashboards/Monitor';
@@ -85,16 +86,17 @@ import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
 // import UsersResults from './Apps/UsersResults';
 // import VideosResults from './Apps/VideosResults';
 
-// import ComingSoon from './Pages/ComingSoon';
-// import Confirmation from './Pages/Confirmation';
-// import Danger from './Pages/Danger';
-// import Error404 from './Pages/Error404';
-// import ForgotPassword from './Pages/ForgotPassword';
-// import LockScreen from './Pages/LockScreen';
-// import Login from './Pages/Login';
-// import Register from './Pages/Register';
-// import Success from './Pages/Success';
-// import Timeline from './Pages/Timeline';
+import ComingSoon from './Pages/ComingSoon';
+import Confirmation from './Pages/Confirmation';
+import Danger from './Pages/Danger';
+import Error404 from './Pages/Error404';
+import ForgotPassword from './Pages/ForgotPassword';
+import LockScreen from './Pages/LockScreen';
+import Login from './Pages/Login';
+import Register from './Pages/Register';
+import Success from './Pages/Success';
+import Timeline from './Pages/Timeline';
+import Invoice from './Pages/Invoice';
 
 // import Icons from './Icons';
 
@@ -110,11 +112,16 @@ import { SidebarASidebar } from './../layout/components/SidebarASidebar';
 export const RoutedContent = () => {
   return (
     <Switch>
-      <Redirect from='/' to='/dashboards/financial' exact />
+      <Redirect from='/' to='/dashboards/invoicing' exact />
       {/*     Invoices Routes      */}
       <Route path='/invoices/list' exact component={InvoicesList} />
 
       <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
+      <Route
+        path='/dashboards/invoicing'
+        exact
+        component={InvoicingDashboard}
+      />
       <Route path='/dashboards/financial' exact component={Financial} />
       {/* <Route path="/dashboards/analytics" exact component={Analytics} />
             <Route path="/dashboards/system" exact component={System} />
@@ -207,7 +214,7 @@ export const RoutedContent = () => {
       <Route component={Users} path='/apps/users/:type' />
       <Route component={UsersResults} path='/apps/users-results' />
       <Route component={VideosResults} path='/apps/videos-results' />
-      {/*    Pages Routes    *}
+      {/*    Pages Routes    */}
       <Route component={ComingSoon} path='/pages/coming-soon' />
       <Route component={Confirmation} path='/pages/confirmation' />
       <Route component={Danger} path='/pages/danger' />
@@ -218,7 +225,8 @@ export const RoutedContent = () => {
       <Route component={Register} path='/pages/register' />
       <Route component={Success} path='/pages/success' />
       <Route component={Timeline} path='/pages/timeline' />
-      <Route path='/icons' exact component={Icons} /> */}
+      <Route component={Invoice} path='/pages/invoice' />
+      {/* <Route path='/icons' exact component={Icons} /> */}
       {/*    404    */}
       <Redirect to='/pages/error-404' />
     </Switch>
