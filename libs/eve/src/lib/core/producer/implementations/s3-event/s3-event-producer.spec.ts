@@ -1,4 +1,11 @@
 import { S3EventProducer } from './s3-event-producer';
+import { Selector } from '../../../selector';
+import { Filter } from '../../../filters';
+
+interface MockEvent {
+  messageId: string;
+  body: string;
+}
 
 let S3;
 
@@ -19,6 +26,33 @@ const mockObjects = {
   '2': `{"messageId":"2","body":"{'a':'2'}"}`,
   '3': `{"messageId":"3","body":"{'a':'3'}"}`
 };
+
+class MockSelector implements Selector<string> {
+  private acceptedKeys: string[];
+
+  constructor(acceptedKeys: string[]) {
+    this.acceptedKeys = acceptedKeys;
+  }
+  shouldSelect(key: string): boolean {
+    return this.acceptedKeys.includes(key);
+  }
+
+  select(keys: string[]): string[] {
+    return keys.filter(this.shouldSelect.bind(this));
+  }
+}
+
+class MockFilter implements Filter<MockEvent> {
+  private acceptedEvents: string[];
+
+  constructor(acceptedEvents: string[]) {
+    this.acceptedEvents = acceptedEvents;
+  }
+
+  match(event: MockEvent): boolean {
+    return this.acceptedEvents.includes(event.messageId);
+  }
+}
 
 describe('S3 Event Producer', () => {
   beforeEach(() => {
@@ -66,5 +100,45 @@ describe('S3 Event Producer', () => {
     expect(results.map(e => ({ ...e, body: e.body.replace(' ', '') }))).toEqual(
       expectedResult.map(e => ({ ...e, body: e.body.replace(' ', '') }))
     );
+  });
+
+  it('should call getObjects only for the keys that match the selector', async () => {
+    const s3 = S3();
+    const producer = new S3EventProducer('', s3);
+    producer.addSelector(new MockSelector(['1', '3']));
+
+    const list = producer.produce();
+
+    const results = [];
+    for await (const event of list) {
+      results.push(event);
+    }
+
+    expect(s3.getObject.mock.calls[0][0].Key).toBe('1');
+    expect(s3.getObject.mock.calls[1][0].Key).toBe('3');
+  });
+
+  it('should call getObjects only for the keys that match the selector', async () => {
+    const s3 = S3();
+    const producer = new S3EventProducer('', s3);
+    producer.addFilter(new MockFilter(['1', '3']));
+
+    const list = producer.produce();
+    const expectedResult = [
+      { messageId: '1', body: "{'a':'1'}" },
+      { messageId: '3', body: "{'a':'3'}" }
+    ];
+
+    const results = [];
+    for await (const event of list) {
+      results.push(event);
+    }
+
+    expect(results.map(e => ({ ...e, body: e.body.replace(' ', '') }))).toEqual(
+      expectedResult.map(e => ({ ...e, body: e.body.replace(' ', '') }))
+    );
+    expect(s3.getObject.mock.calls[0][0].Key).toBe('1');
+    expect(s3.getObject.mock.calls[1][0].Key).toBe('2');
+    expect(s3.getObject.mock.calls[2][0].Key).toBe('3');
   });
 });
