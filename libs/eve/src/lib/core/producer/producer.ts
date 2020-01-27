@@ -12,7 +12,7 @@ export interface Producer<T, U> {
 
   /**
    * Method for setting the base object from which each instance in the
-   * iterator wil be extended from, a.k.a. adding custom constant fields.
+   * iterator will be extended from, a.k.a. adding custom constant fields.
    * @param base Object with the custom fields and their value
    */
   setDefaultValues(base: Partial<T>): void;
