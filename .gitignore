@@ -3,6 +3,7 @@
 .env
 /dev/data
 /apps/invoicing-graphql/src/environments/*
+/apps/reporting-backend/src/environments/*
 
 # compiled output
 dist/
@@ -46,3 +47,4 @@ Thumbs.db
 !.elasticbeanstalk/*.global.yml
 .invoicing.backend.env
 .invoicing.backend.gsw.env
+.reporting.backend.env
