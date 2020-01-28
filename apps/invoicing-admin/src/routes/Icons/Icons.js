@@ -140,7 +140,7 @@ const Icons = () => (
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-calendar" aria-hidden="true"></i> calendar</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-calendar-check-o" aria-hidden="true"></i> calendar-check-o</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-calendar-minus-o" aria-hidden="true"></i> calendar-minus-o</div>
-                        <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-calendar-o" aria-hidden="true"></i> calendar-o</div>
+                        <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-calendar" aria-hidden="true"></i> calendar-o</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-calendar-plus-o" aria-hidden="true"></i> calendar-plus-o</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-calendar-times-o" aria-hidden="true"></i> calendar-times-o</div>
                         <div className="fa-hover col-md-3 col-sm-4"><i className="fas fa-fw fa-camera" aria-hidden="true"></i> camera</div>

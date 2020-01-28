@@ -26,22 +26,6 @@ const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
       dateCreated
       dateIssued
     }
-
-    _filters {
-      invoices {
-        invoiceItem {
-          article {
-            journalTitle(eq: "...")
-            customID(eq: "...")
-          }
-        }
-        transaction {
-          status(eq: "...")
-        }
-        status(eq: "...")
-        referenceNumber(eq: "...")
-      }
-    }
   }
 }
 `;
@@ -99,7 +83,7 @@ const RecentInvoicesList = () => {
               <th className='align-middle bt-0'>Manuscript Custom ID</th>
               <th className='align-middle bt-0'>Manuscript Title</th>
               <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
-              <th className='align-middle bt-0 text-right'>Actions</th>
+              {/* <th className='align-middle bt-0 text-right'>Actions</th> */}
             </tr>
           </thead>
           <tbody>

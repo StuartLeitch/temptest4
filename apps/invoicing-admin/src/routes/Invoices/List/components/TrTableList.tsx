@@ -82,7 +82,7 @@ const TrTableInvoicesList = ({ invoices }) => (
             {dateCreated &&
               format(new Date(parseInt(dateCreated, 10)), 'dd MMMM yyyy')}
           </td>
-          <td className='align-middle text-right'>
+          {/* <td className='align-middle text-right'>
             <UncontrolledButtonDropdown>
               <DropdownToggle color='link' outline>
                 <i className='fa fa-gear' />
@@ -93,7 +93,7 @@ const TrTableInvoicesList = ({ invoices }) => (
                   <i className='fa fa-fw fa-folder-open mr-2'></i>
                   Accept Manuscript
                 </DropdownItem>
-                {/* <DropdownItem>
+                <DropdownItem>
                 <i className='fa fa-fw fa-ticket mr-2'></i>
                 Add Task
               </DropdownItem>
@@ -105,10 +105,10 @@ const TrTableInvoicesList = ({ invoices }) => (
               <DropdownItem>
                 <i className='fa fa-fw fa-trash mr-2'></i>
                 Delete
-              </DropdownItem> */}
+              </DropdownItem>
               </DropdownMenu>
             </UncontrolledButtonDropdown>
-          </td>
+          </td> */}
         </tr>
       )
     )}

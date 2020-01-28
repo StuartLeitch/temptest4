@@ -11,6 +11,7 @@ import Financial from './Dashboards/Financial';
 // import Stock from './Dashboards/Stock';
 // import Reports from './Dashboards/Reports';
 import InvoicesList from './Invoices/List';
+import InvoiceDetails from './Invoice/Details';
 // import Widgets from './Widgets';
 
 // import Cards from './Cards/Cards';
@@ -115,6 +116,7 @@ export const RoutedContent = () => {
       <Redirect from='/' to='/dashboards/invoicing' exact />
       {/*     Invoices Routes      */}
       <Route path='/invoices/list' exact component={InvoicesList} />
+      <Route path='/invoices/details/:id' exact component={InvoiceDetails} />
 
       <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
       <Route
