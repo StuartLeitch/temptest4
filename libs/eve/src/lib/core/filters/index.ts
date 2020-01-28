@@ -1,4 +1,2 @@
-import { MockFilter } from './implementations/mock-filter';
-import { Filter } from './filter';
-
-export { MockFilter, Filter };
+export * from './implementations/mock-filter';
+export * from './filter';

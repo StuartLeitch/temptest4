@@ -1,4 +1,2 @@
-import { MockEvent } from './mock-event';
-import { Event } from './event';
-
-export { MockEvent, Event };
+export * from './mock-event';
+export * from './event';

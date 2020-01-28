@@ -1,4 +1,3 @@
-import { MockConsumer } from './implementations/mock-consumer';
-import { Consumer } from './consumer';
-
-export { MockConsumer, Consumer };
+export * from './implementations/mock-consumer';
+export * from './implementations/sqs-publish';
+export * from './consumer';
