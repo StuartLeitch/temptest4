@@ -149,12 +149,14 @@ type ClientToken {
   token: String!
 }
 
+directive @filters on OBJECT
+
 type PaginatedInvoices {
   totalCount: Int
   invoices: [Invoice]
 }
 
-type Query {
+type Query @filters {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
   invoice(invoiceId: String): Invoice

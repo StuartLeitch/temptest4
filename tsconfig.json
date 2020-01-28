@@ -21,7 +21,8 @@
       "@hindawi/shared": ["libs/shared/src/index.ts"],
       "@hindawi/react-components": ["libs/react-components/src/index.ts"],
       "@hindawi/invoicing-web/*": ["apps/invoicing-web/src/*"],
-      "@hindawi/invoicing-graphql/*": ["apps/invoicing-graphql/src/*"]
+      "@hindawi/invoicing-graphql/*": ["apps/invoicing-graphql/src/*"],
+      "@hindawi/eve": ["libs/eve/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

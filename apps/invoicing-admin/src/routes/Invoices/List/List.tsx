@@ -12,7 +12,16 @@ import {
 
 import { TrTableInvoicesList } from './components/TrTableList';
 
-const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
+const INVOICES_QUERY = `
+query fetchInvoices(
+  $offset: Int,
+  $limit: Int,
+  $journalTitle: [String],
+  $customId: String,
+  $transactionStatus: String,
+  $status: [InvoiceStatus],
+  $referenceNumber: String
+) {
   invoices(offset: $offset, limit: $limit) {
     totalCount
     invoices {
@@ -25,6 +34,22 @@ const INVOICES_QUERY = `query fetchInvoices($offset: Int, $limit: Int) {
       customId
       dateCreated
       dateIssued
+    }
+  }
+
+  _invoices {
+    invoices {
+      invoiceItem {
+        article {
+          journalTitle(in: $journalTitle)
+          customId(eq: $customId)
+        }
+      }
+      transaction {
+        status(eq: $transactionStatus)
+      }
+      status(in: $status)
+      referenceNumber(eq: $referenceNumber)
     }
   }
 }
