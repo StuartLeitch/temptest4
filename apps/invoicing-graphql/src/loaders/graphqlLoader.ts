@@ -13,6 +13,7 @@ import { getErrorCode, getErrorMessage, handlingErrors } from '../lib/graphql';
 // import {Context} from '../context';
 import { typeDefs } from '../graphql/schema';
 import { resolvers } from '../graphql/resolvers';
+import directives from '../graphql/directives';
 
 export const graphqlLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -24,6 +25,9 @@ export const graphqlLoader: MicroframeworkLoader = (
     const graphqlServer = new ApolloServer({
       typeDefs,
       resolvers,
+      schemaDirectives: {
+        filters: directives.FiltersDirective
+      },
       context: () => context,
       playground: env.graphql.editor,
       formatError: error => ({
