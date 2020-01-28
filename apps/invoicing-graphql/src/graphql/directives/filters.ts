@@ -1,39 +1,12 @@
 /* eslint-disable max-len */
-/**
- * Filter by
- *   journal title (allow multiple selection)
- *   transaction status
- *   invoice status (allow multiple selection)
- *   manuscript customID
- *   invoice reference
- */
-
-import {
-  PayerMap,
-  InvoiceId,
-  JournalId,
-  ArticleMap,
-  UniqueEntityID,
-  InvoiceItemMap,
-  GetInvoiceDetailsDTO,
-  GetInvoiceDetailsUsecase,
-  GetArticleDetailsUsecase,
-  GetItemsForInvoiceUsecase,
-  Roles,
-  InvoiceItemId
-} from '@hindawi/shared';
 
 import { SchemaDirectiveVisitor } from "graphql-tools";
 import {
-  defaultFieldResolver,
   GraphQLField,
-  GraphQLFieldMap,
-  GraphQLInputObjectType, GraphQLInputType,
   GraphQLList,
   GraphQLObjectType, isObjectType
 } from 'graphql';
 import {
-  GraphQLObjectTypeConfig,
   GraphQLOutputType,
   GraphQLResolveInfo,
   GraphQLScalarType
@@ -67,10 +40,10 @@ function FilterPrototype<TSource, TContext, TArgs>(field: GraphQLField<TSource, 
     description: `@${name}/filter`,
     type: FiltersPrototype(type),
     args: ArgumentsPrototype(field),
-    resolve(source: TSource, args: TArgs, context: TContext, info: GraphQLResolveInfo) {
-      console.info('[RESOLVE]', name, arguments);
-      return;
-    }
+    // resolve(source: TSource, args: TArgs, context: TContext, info: GraphQLResolveInfo) {
+    //   console.info('[RESOLVE]', name, [context, info], '[/RESOLVE]');
+    //   return FilterResult(context, info);
+    // }
   };
 }
 
@@ -135,4 +108,20 @@ function resolveType(type: GraphQLOutputType) {
     return resolveType(type.ofType);
 
   return type;
+}
+
+function FilterResult<TContext>(context: TContext, info: GraphQLResolveInfo) {
+  const { variableValues: variables, operation: { variableDefinitions }} = info;
+  const definitions = new Map(
+    variableDefinitions.map(definition => [definition.variable.name.value, definition])
+  );
+  return {
+    context,
+    info: {
+      ...info,
+      variables: Object.entries(variables).map(([name, value]) => {
+        return { ...definitions.get(name), name, value };
+      }),
+    }
+  };
 }
