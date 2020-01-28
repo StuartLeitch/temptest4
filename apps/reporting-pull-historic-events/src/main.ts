@@ -1,18 +1,36 @@
+import 'reflect-metadata';
+
+import { bootstrapMicroframework } from 'microframework-w3tec';
+
+import { banner } from './lib/banner';
+import { Logger } from './lib/logger';
+
 /**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
+ * Loaders
  */
+import { contextLoader } from './loaders/contextLoader';
+import { winstonLoader } from './loaders/winstonLoader';
+import { pullHistoricEventsLoader } from './loaders/pull-historic-events-loader';
+/**
+ * EXPRESS TYPESCRIPT BOILERPLATE
+ * ----------------------------------------
+ *
+ * This is a boilerplate for Node.js Application written in TypeScript.
+ * The basic layer of this app is express. For further information visit
+ * the 'README.md' file.
+ */
+const log = new Logger(__filename);
 
-import * as express from 'express';
-
-const app = express();
-
-app.get('/api', (req, res) => {
-  res.send({ message: 'Welcome to reporting-pull-historic-events!' });
-});
-
-const port = process.env.port || 3333;
-const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
-});
-server.on('error', console.error);
+bootstrapMicroframework({
+  /**
+   * Loader is a place where you can configure all your modules during microframework
+   * bootstrap process. All loaders are executed one by one in a sequential order.
+   */
+  loaders: [winstonLoader, contextLoader, pullHistoricEventsLoader]
+})
+  .then(() => banner(log))
+  .catch(error => {
+    console.log(error);
+    log.error(`Application crashed: ${error}`);
+    process.exit(1);
+  });

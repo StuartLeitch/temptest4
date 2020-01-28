@@ -85,7 +85,7 @@ describe('S3 Event Producer', () => {
   });
 
   it('should get events from s3', async () => {
-    const producer = new S3EventProducer('', S3());
+    const producer = new S3EventProducer(S3(), '');
     const list = producer.produce();
     const expectedResult = [
       { messageId: '1', body: "{'a':'1'}" },
@@ -104,7 +104,7 @@ describe('S3 Event Producer', () => {
 
   it('should call getObjects only for the keys that match the selector', async () => {
     const s3 = S3();
-    const producer = new S3EventProducer('', s3);
+    const producer = new S3EventProducer(s3, '');
     producer.addSelector(new MockSelector(['1', '3']));
 
     const list = producer.produce();
@@ -120,7 +120,7 @@ describe('S3 Event Producer', () => {
 
   it('should call getObjects only for the keys that match the selector', async () => {
     const s3 = S3();
-    const producer = new S3EventProducer('', s3);
+    const producer = new S3EventProducer(s3, '');
     producer.addFilter(new MockFilter(['1', '3']));
 
     const list = producer.produce();

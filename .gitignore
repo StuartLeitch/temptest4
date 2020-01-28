@@ -48,3 +48,4 @@ Thumbs.db
 .invoicing.backend.env
 .invoicing.backend.gsw.env
 .reporting.backend.env
+*.env
