@@ -24,8 +24,7 @@ export const env = {
     publisherName: getOsEnv('PUBLISHER_NAME'),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     dirs: {
-      migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
-      seedsDir: getOsPath('DB_SEEDS_DIR')
+      migrationsDir: getOsPath('DB_MIGRATIONS_DIR')
     },
     batchSize: toNumber(getOsEnvOptional('BATCH_SIZE') || '100'),
     batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000')

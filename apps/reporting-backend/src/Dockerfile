@@ -22,6 +22,7 @@ RUN npm ci --only=production
 # Copying the rest of the code to the working directory
 COPY config/ ./config/
 COPY dist/apps/reporting-backend .
+COPY apps/reporting-backend/src/infrastructure/database/migrations ./migrations/
 
 # Make port 3000 available to the world outside this container
 EXPOSE 3000
