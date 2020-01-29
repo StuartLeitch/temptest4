@@ -4,25 +4,25 @@ export class BatchUtils {
     batchSize: number,
     timeout: number
   ): (batch: T[]) => any {
-    let batch = [];
-    let timeoutHandler;
+    let timeoutHandler: NodeJS.Timeout;
+    let batch: T[] = [];
+
+    function cleanBatch() {
+      while (batch.length) {
+        callBack(batch.splice(0, batchSize));
+      }
+      timeoutHandler = setTimeout(cleanBatch, timeout);
+    }
 
     return function(objectList) {
-      function cleanBatch() {
-        while (batch.length) {
-          callBack(batch.splice(0, batchSize));
-        }
-      }
-
-      if (timeoutHandler) {
-        clearTimeout(timeoutHandler);
+      if (!timeoutHandler) {
+        timeoutHandler = setTimeout(cleanBatch, timeout);
       }
 
       batch.push(...objectList);
 
-      if (batch.length < batchSize) {
-        timeoutHandler = setTimeout(cleanBatch, timeout);
-      } else {
+      if (batch.length >= batchSize) {
+        clearTimeout(timeoutHandler);
         cleanBatch();
       }
     };
@@ -34,12 +34,13 @@ export class BatchUtils {
     timeout: number
   ): (generator: AsyncGenerator<T, any, unknown>) => Promise<void> {
     let timeoutHandler: NodeJS.Timeout;
-    let batch: T[] = [];
+    const batch: T[] = [];
 
     const clearBatch = () => {
       while (batch.length) {
         callBack(batch.splice(0, batchSize));
       }
+      timeoutHandler = setTimeout(clearBatch, timeout);
     };
 
     return async generator => {
@@ -51,12 +52,7 @@ export class BatchUtils {
         if (batch.length >= batchSize) {
           clearTimeout(timeoutHandler);
           clearBatch();
-          timeoutHandler = setTimeout(clearBatch, timeout);
         }
-      }
-
-      if (timeoutHandler) {
-        clearTimeout(timeoutHandler);
       }
     };
   }
