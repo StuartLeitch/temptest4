@@ -40,13 +40,16 @@ export class GenerateClientTokenUsecase
   constructor() {}
 
   public async execute(
-    request: {},
+    request: { merchantId: string },
     context?: GenerateClientTokenContext
   ): Promise<GenerateClientTokenResponse> {
     const braintree = new Braintree();
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
-    const braintreePayment = new BraintreePayment(BraintreeGateway);
+    const braintreePayment = new BraintreePayment(
+      BraintreeGateway,
+      request.merchantId
+    );
 
     try {
       const tokenGenerated: any = await braintreePayment.generateClientToken();

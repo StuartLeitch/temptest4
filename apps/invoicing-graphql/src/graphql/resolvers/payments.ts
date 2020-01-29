@@ -1,13 +1,15 @@
-import { Roles, GetPaymentMethodsUseCase } from '@hindawi/shared';
-
-import { Resolvers } from '../schema';
-
-import { MigratePaymentUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/migratePayment/migratePayment';
 import {
   RecordCreditCardPaymentUsecase,
-  RecordPayPalPaymentUsecase
+  GenerateClientTokenUsecase,
+  RecordPayPalPaymentUsecase,
+  GetPaymentMethodsUseCase,
+  MigratePaymentUsecase,
+  Roles
 } from '@hindawi/shared';
-import { GenerateClientTokenUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/generateClientToken/generateClientToken';
+
+import { env } from '../../env';
+
+import { Resolvers } from '../schema';
 
 export const payments: Resolvers<any> = {
   Query: {
@@ -25,7 +27,9 @@ export const payments: Resolvers<any> = {
     async getClientToken(parent, args, context) {
       const usecase = new GenerateClientTokenUsecase();
 
-      const result = await usecase.execute({});
+      const result = await usecase.execute({
+        merchantId: env.braintree.merchantId
+      });
 
       if (result.isRight()) {
         const paymentClientToken = result.value.getValue();
@@ -56,6 +60,7 @@ export const payments: Resolvers<any> = {
 
       const result = await recordCreditCardPaymentUsecase.execute(
         {
+          merchantId: env.braintree.merchantId,
           paymentMethodId,
           paymentMethodNonce,
           invoiceId,

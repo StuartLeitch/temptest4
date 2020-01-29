@@ -1,7 +1,8 @@
 export interface RecordCreditCardPaymentDTO {
   // foreignPaymentId?: string;
-  paymentMethodId: string;
   paymentMethodNonce: string;
+  paymentMethodId: string;
+  merchantId: string;
   invoiceId: string;
   datePaid?: string;
   payerId: string;

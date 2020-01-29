@@ -55,7 +55,7 @@ export class RecordCreditCardPaymentUsecase
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Braintree', new BraintreePayment(BraintreeGateway)]
+      ['Braintree', new BraintreePayment(BraintreeGateway, request.merchantId)]
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'BraintreePayment'

@@ -108,11 +108,11 @@ export const env = {
     }
   },
   braintree: {
+    tokenizationKey: getOsEnv('BT_TOKENIZATION_KEY'),
     environment: getOsEnv('BT_ENVIRONMENT'),
     merchantId: getOsEnv('BT_MERCHANT_ID'),
-    publicKey: getOsEnv('BT_PUBLIC_KEY'),
     privateKey: getOsEnv('BT_PRIVATE_KEY'),
-    tokenizationKey: getOsEnv('BT_TOKENIZATION_KEY')
+    publicKey: getOsEnv('BT_PUBLIC_KEY')
   },
   paypal: {
     environment: getOsEnv('PP_ENVIRONMENT'),

@@ -127,6 +127,9 @@ export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPayme
 export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPaymentDTO';
 export * from './modules/payments/usecases/recordCreditCardPayment/recordCreditCardPayment';
 export * from './modules/payments/usecases/recordCreditCardPayment/recordCreditCardPaymentDTO';
+export * from './modules/payments/usecases/migratePayment/migratePayment';
+export * from './modules/payments/usecases/migratePayment/migratePaymentDTO';
+export * from './modules/payments/usecases/generateClientToken/generateClientToken';
 
 export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
