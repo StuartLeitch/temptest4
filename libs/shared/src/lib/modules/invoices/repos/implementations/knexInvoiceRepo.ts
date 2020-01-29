@@ -53,20 +53,19 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const { db } = this;
 
     const getModel = () =>
-      db(TABLES.INVOICES)
-        .whereNot(`${TABLES.INVOICES}.deleted`, 1)
-        .join(
-          TABLES.INVOICE_ITEMS,
-          `${TABLES.INVOICES}.id`,
-          '=',
-          `${TABLES.INVOICE_ITEMS}.invoiceId`
-        )
-        .join(
-          TABLES.ARTICLES,
-          `${TABLES.INVOICE_ITEMS}.manuscriptId`,
-          '=',
-          `${TABLES.ARTICLES}.id`
-        );
+      db(TABLES.INVOICES).whereNot(`${TABLES.INVOICES}.deleted`, 1);
+    // .join(
+    //   TABLES.INVOICE_ITEMS,
+    //   `${TABLES.INVOICES}.id`,
+    //   '=',
+    //   `${TABLES.INVOICE_ITEMS}.invoiceId`
+    // )
+    // .join(
+    //   TABLES.ARTICLES,
+    //   `${TABLES.INVOICE_ITEMS}.manuscriptId`,
+    //   '=',
+    //   `${TABLES.ARTICLES}.id`
+    // );
 
     const totalCount = await getModel().count(`${TABLES.INVOICES}.id`);
 
@@ -76,9 +75,12 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .limit(limit)
       .select();
 
+    //  console.info(invoices);
+    // console.info(invoices.map(i => InvoiceMap.toDomain(i)));
+
     return {
       totalCount: totalCount[0]['count'],
-      invoices // .map(i => InvoiceMap.toDomain(i));
+      invoices: invoices.map(i => InvoiceMap.toDomain(i))
     };
   }
 
