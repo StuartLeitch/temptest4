@@ -174,6 +174,8 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                   )}
                   {methods[values.paymentMethodId] === "Paypal" && (
                     <Paypal
+                      invoiceReferenceNumber={invoice.referenceNumber}
+                      manuscriptCustomId={invoice.article.customId}
                       paymentMethodId={values.paymentMethodId}
                       onSuccess={payByPayPalSubmit}
                       total={calculateTotalToBePaid(invoice)}

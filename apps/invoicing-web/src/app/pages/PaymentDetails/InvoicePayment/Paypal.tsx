@@ -9,6 +9,8 @@ interface Props {
   isScriptLoaded: boolean;
   isScriptLoadSucceed: boolean;
   paymentMethodId: string;
+  invoiceReferenceNumber: string;
+  manuscriptCustomId: string;
   onError?(data?: any): void;
   onCancel?(data?: any): void;
   onSuccess?(data?: any): void;
@@ -27,6 +29,8 @@ const Paypal: React.FunctionComponent<Props> = ({
   onError,
   onCancel,
   onSuccess,
+  invoiceReferenceNumber,
+  manuscriptCustomId,
   isScriptLoaded,
   paymentMethodId,
   isScriptLoadSucceed,
@@ -46,6 +50,8 @@ const Paypal: React.FunctionComponent<Props> = ({
                     currency_code: currency,
                     value: total,
                   },
+                  invoice_id: invoiceReferenceNumber,
+                  description: `${manuscriptCustomId} Article Processing charges`,
                 },
               ],
             });
