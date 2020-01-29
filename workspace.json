@@ -426,7 +426,7 @@
             "outputPath": "dist/apps/reporting-pull-historic-events",
             "main": "apps/reporting-pull-historic-events/src/main.ts",
             "tsConfig": "apps/reporting-pull-historic-events/tsconfig.app.json",
-            "assets": ["apps/reporting-pull-historic-events/src/assets"]
+            "assets": []
           },
           "configurations": {
             "production": {
