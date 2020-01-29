@@ -1,9 +1,10 @@
 import { Repo } from '../../../infrastructure/Repo';
-import { Invoice, InvoiceCollection } from '../domain/Invoice';
+import { Invoice, InvoiceCollection, InvoiceStatus } from '../domain/Invoice';
 import { InvoiceId } from '../domain/InvoiceId';
 import { InvoiceItemId } from '../domain/InvoiceItemId';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../domain/InvoicePaymentInfo';
+import { Bundle } from '@hindawi/shared';
 
 interface Paginated {
   offset?: number;
@@ -11,7 +12,7 @@ interface Paginated {
 }
 
 export interface InvoiceRepoContract extends Repo<Invoice> {
-  getRecentInvoices(paginated: Paginated): Promise<any>;
+  getRecentInvoices(paginated: Paginated, filters?: Bundle<string, any>): Promise<any>;
   getInvoiceById(invoiceId: InvoiceId): Promise<Invoice>;
   getInvoiceByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Invoice>;
   getInvoicesByTransactionId(transactionId: TransactionId): Promise<Invoice[]>;

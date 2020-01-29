@@ -5,7 +5,6 @@ import { payer } from './payer';
 import { invoice } from './invoice';
 import { payments } from './payments';
 import { transactions } from './transactions';
-import { filtering } from './filtering';
 
 export const resolvers: Resolvers<any> = merge(
   {},
@@ -13,5 +12,4 @@ export const resolvers: Resolvers<any> = merge(
   invoice,
   payments,
   transactions,
-  filtering
 );

@@ -182,3 +182,5 @@ export * from './domain/services/WaiverService';
 // * Export Utils
 export * from './utils/FormatUtils';
 export * from './utils/BatchUtils';
+
+export * from './utils/Utils';

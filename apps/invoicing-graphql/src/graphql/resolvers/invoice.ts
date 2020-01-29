@@ -66,12 +66,12 @@ export const invoice: Resolvers<any> = {
 
     async invoices(parent, args, context) {
       const { repos } = context;
-      const usecase = new GetRecentInvoicesUsecase(repos.invoice);
+      const usecase = new GetRecentInvoicesUsecase(repos.invoice, context);
       const usecaseContext = {
         roles: [Roles.ADMIN]
-      };
+      };   //global['Y'] = context;
       const result = await usecase.execute(args, usecaseContext);
-
+           //console.info('[INVOICES]', global['X'], global['Y'], global['X'] === global['Y']);
       if (result.isLeft()) {
         return undefined;
       }
