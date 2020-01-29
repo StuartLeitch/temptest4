@@ -2,7 +2,7 @@ const path = require('path');
 const ExtractCssChunks = require('extract-css-chunks-webpack-plugin');
 
 const config = require('./config');
-console.info(config);
+// console.info(config);
 // const babelWebpackConfig = require('@nrwl/react/plugins/bundle-babel');
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -31,7 +31,7 @@ module.exports = (nxConfig, context) => {
 
   webpackConfig.plugins.push(new ExtractCssChunks());
 
-  console.info(webpackConfig.module.rules[2].use[1].options);
+  // console.info(webpackConfig.module.rules[2].use[1].options);
 
   webpackConfig.module.rules.unshift(
     // // Modular Styles

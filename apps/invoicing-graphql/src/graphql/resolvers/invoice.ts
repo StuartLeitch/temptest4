@@ -1,3 +1,4 @@
+import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 /* eslint-disable max-len */
 
 import {
@@ -76,7 +77,26 @@ export const invoice: Resolvers<any> = {
         return undefined;
       }
 
-      return result.value.getValue();
+      const invoicesList = result.value.getValue();
+
+      return {
+        totalCount: invoicesList.totalCount,
+        invoices: invoicesList.invoices.map(invoiceDetails => ({
+          ...InvoiceMap.toPersistence(invoiceDetails),
+          invoiceId: invoiceDetails.id.toString(),
+          // status: invoiceDetails.status,
+          // charge: invoiceDetails.charge,
+          dateCreated: invoiceDetails.dateCreated.toISOString(),
+          dateAccepted: invoiceDetails.dateAccepted.toISOString(),
+          dateIssued:
+            invoiceDetails.dateIssued &&
+            invoiceDetails.dateIssued.toISOString(),
+          referenceNumber:
+            invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
+              ? invoiceDetails.referenceNumber
+              : null
+        }))
+      };
     },
 
     async invoiceIdByManuscriptCustomId(parent, args, context) {

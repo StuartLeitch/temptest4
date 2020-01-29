@@ -15,43 +15,81 @@ import { TrTableInvoicesList } from './components/TrTableList';
 const INVOICES_QUERY = `
 query fetchInvoices(
   $offset: Int,
-  $limit: Int,
-  $journalTitle: [String],
-  $customId: String,
-  $transactionStatus: String,
-  $status: [InvoiceStatus],
-  $referenceNumber: String
+  $limit: Int
 ) {
   invoices(offset: $offset, limit: $limit) {
     totalCount
     invoices {
-      id: invoiceId
-      referenceNumber
-      status
-      manuscriptTitle: title
-      type
-      price
-      customId
-      dateCreated
-      dateIssued
+      ...invoiceFragment
     }
   }
-
-  _invoices {
-    invoices {
-      invoiceItem {
-        article {
-          journalTitle(in: $journalTitle)
-          customId(eq: $customId)
-        }
-      }
-      transaction {
-        status(eq: $transactionStatus)
-      }
-      status(in: $status)
-      referenceNumber(eq: $referenceNumber)
+}
+fragment invoiceFragment on Invoice {
+  id: invoiceId
+  status
+  dateCreated
+  dateIssued
+  dateAccepted
+  referenceNumber
+  payer {
+    ...payerFragment
+  }
+  invoiceItem {
+    id
+    price
+    rate
+    vat
+    vatnote
+    dateCreated
+    coupons {
+      ...couponFragment
+    }
+    waivers {
+      ...waiverFragment
+    }
+    article {
+      ...articleFragment
     }
   }
+}
+fragment payerFragment on Payer {
+  id
+  type
+  name
+  email
+  vatId
+  organization
+  address {
+    ...addressFragment
+  }
+}
+fragment addressFragment on Address {
+  city
+  country
+  state
+  postalCode
+  addressLine1
+}
+fragment couponFragment on Coupon {
+  code
+  reduction
+}
+fragment waiverFragment on Waiver {
+  reduction
+  type_id
+}
+fragment articleFragment on Article {
+  id
+  title
+  created
+  articleType
+  authorCountry
+  authorEmail
+  customId
+  journalTitle
+  authorSurname
+  authorFirstName
+  journalTitle
 }
 `;
 
@@ -99,7 +137,7 @@ const RecentInvoicesList = () => {
         <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
-              <th className='align-middle bt-0'>#</th>
+              {/* <th className='align-middle bt-0'>#</th> */}
               <th className='align-middle bt-0'>Status</th>
               <th className='align-middle bt-0'>Reference</th>
               <th className='align-middle bt-0'>Issue Date</th>

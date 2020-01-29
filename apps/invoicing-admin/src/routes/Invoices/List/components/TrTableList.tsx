@@ -44,14 +44,12 @@ const TrTableInvoicesList = ({ invoices }) => (
         referenceNumber,
         customId,
         manuscriptTitle,
-        type,
-        price,
+        invoiceItem,
         dateIssued,
-        dateCreated,
-        journalTitle
+        dateCreated
       }) => (
         <tr key={id}>
-          <td className='align-middle'>
+          {/* <td className='align-middle'>
             <div>
               <Link
                 to={`/invoices/details/${id}`}
@@ -60,27 +58,36 @@ const TrTableInvoicesList = ({ invoices }) => (
                 {id}
               </Link>
             </div>
-          </td>
-          <td className='align-middle'>{INVOICE_STATUS[status]}</td>
+          </td> */}
           <td className='align-middle'>
-            <span>#{referenceNumber}</span>
+            <div>
+              <Link
+                to={`/invoices/details/${id}`}
+                className='text-decoration-none'
+              >
+                {INVOICE_STATUS[status]}
+              </Link>
+            </div>
+          </td>
+          <td className='align-middle'>
+            <span>{referenceNumber ? `#${referenceNumber}` : ' '}</span>
           </td>
           <td className='align-middle text-nowrap'>
-            {dateIssued &&
-              format(new Date(parseInt(dateIssued, 10)), 'dd MMMM yyyy')}
+            {dateIssued && format(new Date(dateIssued), 'dd MMMM yyyy')}
           </td>
           <td className='align-middle'>
             <strong>$</strong>
-            {price}
+            {invoiceItem && invoiceItem.price}
           </td>
-          <td className='align-middle text-nowrap'>{journalTitle}</td>
-          <td className='align-middle'>
-            <span>#{customId}</span>
-          </td>
-          <td className='align-middle'>{manuscriptTitle}</td>
           <td className='align-middle text-nowrap'>
-            {dateCreated &&
-              format(new Date(parseInt(dateCreated, 10)), 'dd MMMM yyyy')}
+            {invoiceItem?.article?.journalTitle}
+          </td>
+          <td className='align-middle'>
+            <span>{invoiceItem?.article?.customId}</span>
+          </td>
+          <td className='align-middle'>{invoiceItem?.article?.title}</td>
+          <td className='align-middle text-nowrap'>
+            {dateCreated && format(new Date(dateCreated), 'dd MMMM yyyy')}
           </td>
           {/* <td className='align-middle text-right'>
             <UncontrolledButtonDropdown>
