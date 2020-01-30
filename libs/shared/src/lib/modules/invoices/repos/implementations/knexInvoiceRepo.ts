@@ -10,70 +10,59 @@ import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRep
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 
-import { Bundle, JoinTag } from "../../../../utils/Utils";
-
+import { Bundle, JoinTag } from '../../../../utils/Utils';
 
 function filtered(src: any, filters: Bundle<string, any>) {
-  if (filters == null)
-    return src;
+  if (filters == null) return src;
 
   let here = src;
   const invoices = filters.navigate('invoices', 'invoices');
   const article = invoices.navigate('invoiceItem', 'article');
   const journalTitle = article.navigate('journalTitle');
   if (journalTitle.with('in')) {
-    here = here
-      [JoinTag(journalTitle)] (
-        TABLES.JOURNALS,
-        `${TABLES.ARTICLES}.journalId`,
-        '=',
-        `${TABLES.JOURNALS}.id`
-      )
-      .whereIn(`${TABLES.JOURNALS}.name`, journalTitle.get('in'));
+    here = here[JoinTag(journalTitle)](
+      TABLES.JOURNALS,
+      `${TABLES.ARTICLES}.journalId`,
+      '=',
+      `${TABLES.JOURNALS}.id`
+    ).whereIn(`${TABLES.JOURNALS}.name`, journalTitle.get('in'));
   }
 
   const customId = article.navigate('customId');
   if (customId.with('in')) {
-    here = here
-      .whereIn(`${TABLES.ARTICLES}.customId`, customId.get('in'));
+    here = here.whereIn(`${TABLES.ARTICLES}.customId`, customId.get('in'));
   }
 
   const transactionStatus = invoices.navigate('transaction', 'status');
   if (transactionStatus.with('in')) {
-    here = here
-      [JoinTag(journalTitle)] (
-        TABLES.TRANSACTIONS,
-        `${TABLES.INVOICES}.transactionId`,
-        '=',
-        `${TABLES.TRANSACTIONS}.id`
-      )
-      .whereIn(`${TABLES.TRANSACTIONS}.status`, transactionStatus.get('in'));
+    here = here[JoinTag(journalTitle)](
+      TABLES.TRANSACTIONS,
+      `${TABLES.INVOICES}.transactionId`,
+      '=',
+      `${TABLES.TRANSACTIONS}.id`
+    ).whereIn(`${TABLES.TRANSACTIONS}.status`, transactionStatus.get('in'));
   }
 
   const status = invoices.navigate('status');
   if (status.with('in')) {
-    here = here
-      .whereIn(`${TABLES.INVOICES}.status`, status.get('in'));
+    here = here.whereIn(`${TABLES.INVOICES}.status`, status.get('in'));
   }
 
   const referenceNumber = invoices.navigate('referenceNumber');
   if (referenceNumber.with('in')) {
     for (const number of referenceNumber.get('in')) {
       const [paddedNumber, creationYear] = number.split('/');
-      const invoiceNumber = parseInt(paddedNumber);
-      here = here
-        .whereRaw(`(
-          ${TABLES.INVOICES}.invoiceNumber = ${invoiceNumber} and
-          to_char(${TABLES.INVOICES}.dateAccepted, 'yyyy') = '${creationYear}')`);
+      const invoiceNumber = parseInt(paddedNumber, 10);
+      here = here.whereRaw(
+        `"${TABLES.INVOICES}"."invoiceNumber" = ${invoiceNumber} and extract(year from "${TABLES.INVOICES}"."dateAccepted") = ${creationYear}`
+      );
     }
   }
-
   return here;
 }
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
-
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const { db } = this;
 
@@ -111,7 +100,10 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return InvoiceMap.toDomain(invoice);
   }
 
-  async getRecentInvoices({ limit, offset }, filters?: Bundle<string, any>): Promise<any> {
+  async getRecentInvoices(
+    { limit, offset },
+    filters?: Bundle<string, any>
+  ): Promise<any> {
     const { db } = this;
 
     const getModel = () =>
@@ -129,9 +121,12 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     //   `${TABLES.ARTICLES}.id`
     // );
 
-    const totalCount = await filtered(getModel(), filters).count(`${TABLES.INVOICES}.id`);
+    const totalCount = await filtered(getModel(), filters).count(
+      `${TABLES.INVOICES}.id`
+    );
+    // const totalCount = await getModel().count(`${TABLES.INVOICES}.id`);
 
-    const invoices = await filtered(getModel(), filters)
+    const invoices = await getModel()
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset)
       .limit(limit)

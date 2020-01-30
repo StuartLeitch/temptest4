@@ -1,5 +1,6 @@
 import * as path from 'path';
 import Knex from 'knex';
+import knexTinyLogger from 'knex-tiny-logger';
 
 export { Knex };
 
