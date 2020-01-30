@@ -7,12 +7,9 @@ export class BraintreePayment extends PaymentService<
   Braintree,
   PaymentGateway
 > {
-  private merchantId: string;
-
-  constructor(private paymentGateway: PaymentGateway, merchantId: string) {
+  constructor(private paymentGateway: PaymentGateway) {
     super();
     this.paymentGateway = paymentGateway;
-    this.merchantId = merchantId;
   }
 
   public async makePayment(pm: Braintree, amount: number): Promise<any> {
@@ -20,10 +17,17 @@ export class BraintreePayment extends PaymentService<
       `Paying ${amount} using Braintree method with "${this.paymentGateway.config.environment.server}"`
     );
 
-    return this.createTransaction(pm.paymentMethodNonce, amount);
+    return this.createTransaction(
+      pm.invoiceReferenceNumber,
+      pm.manuscriptCustomId,
+      pm.paymentMethodNonce,
+      amount
+    );
   }
 
   private async createTransaction(
+    invoiceReferenceNumber: string,
+    manuscriptCustomId: string,
     paymentMethodNonce: string,
     amount: number
   ): Promise<any> {
@@ -35,7 +39,11 @@ export class BraintreePayment extends PaymentService<
           options: {
             // threeDSecure: true,
             submitForSettlement: true
-          }
+          },
+          customFields: {
+            manuscript: manuscriptCustomId
+          },
+          orderId: invoiceReferenceNumber
         },
         (err: any, result: any) => {
           if (err) {
@@ -47,10 +55,10 @@ export class BraintreePayment extends PaymentService<
     });
   }
 
-  public async generateClientToken(): Promise<any> {
+  public async generateClientToken(merchantId: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.paymentGateway.clientToken.generate(
-        { merchantAccountId: this.merchantId },
+        { merchantAccountId: merchantId },
         (err: any, response: any) => {
           const { clientToken } = response;
           return resolve(PaymentClientToken.create(clientToken));

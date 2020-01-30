@@ -46,13 +46,12 @@ export class GenerateClientTokenUsecase
     const braintree = new Braintree();
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
-    const braintreePayment = new BraintreePayment(
-      BraintreeGateway,
-      request.merchantId
-    );
+    const braintreePayment = new BraintreePayment(BraintreeGateway);
 
     try {
-      const tokenGenerated: any = await braintreePayment.generateClientToken();
+      const tokenGenerated: any = await braintreePayment.generateClientToken(
+        request.merchantId
+      );
 
       if (tokenGenerated.isFailure) {
         return left(new GenerateClientTokenErrors.ClientTokenNotGenerated());

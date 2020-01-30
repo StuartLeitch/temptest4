@@ -13,12 +13,18 @@ import {
 
 // * Usecase specific
 import { BraintreeGateway } from '../../../payments/infrastructure/gateways/braintree/gateway';
-import { InvoiceRepoContract } from '../../../invoices/repos';
+import {
+  InvoiceRepoContract,
+  InvoiceItemRepoContract
+} from '../../../invoices/repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { RecordCreditCardPaymentResponse } from './recordCreditCardPaymentResponse';
 import { RecordCreditCardPaymentErrors } from './recordCreditCardPaymentErrors';
 import { RecordCreditCardPaymentDTO } from './recordCreditCardPaymentDTO';
+
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 
 import { Braintree } from './../../domain/strategies/Braintree';
 import { BraintreePayment } from '../../domain/strategies/BraintreePayment';
@@ -26,6 +32,7 @@ import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 import { PaymentModel } from './../../domain/contracts/PaymentModel';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
 import { RecordPaymentUsecase } from '../recordPayment';
+import { ArticleRepoContract } from '../../../manuscripts/repos';
 
 export type RecordCreditCardPaymentContext = AuthorizationContext<Roles>;
 
@@ -43,19 +50,58 @@ export class RecordCreditCardPaymentUsecase
     > {
   constructor(
     private paymentRepo: PaymentRepoContract,
-    private invoiceRepo: InvoiceRepoContract
+    private invoiceRepo: InvoiceRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private invoiceItemRepo: InvoiceItemRepoContract
   ) {}
 
   public async execute(
     request: RecordCreditCardPaymentDTO,
     context?: RecordCreditCardPaymentContext
   ): Promise<RecordCreditCardPaymentResponse> {
+    const getInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(
+      this.invoiceRepo
+    );
+    const invoiceDetailsResult = await getInvoiceDetailsUsecase.execute(
+      {
+        invoiceId: request.invoiceId
+      },
+      {
+        roles: [Roles.PAYER]
+      }
+    );
+    if (invoiceDetailsResult.isLeft()) {
+      return left(
+        new RecordCreditCardPaymentErrors.PaymentError(
+          `Invalid invoice id {${request.invoiceId}}`
+        )
+      );
+    }
+    const invoiceDetails = invoiceDetailsResult.value.getValue();
+
+    const getManuscriptsByInvoiceIdUsecase = new GetManuscriptByInvoiceIdUsecase(
+      this.manuscriptRepo,
+      this.invoiceItemRepo
+    );
+    const maybeManuscripts = await getManuscriptsByInvoiceIdUsecase.execute({
+      invoiceId: request.invoiceId
+    });
+    if (maybeManuscripts.isLeft()) {
+      return maybeManuscripts as any;
+    }
+    const manuscripts = maybeManuscripts.value.getValue();
+
     const braintree = new Braintree();
     braintree.paymentMethodNonce = request.paymentMethodNonce;
+    braintree.invoiceReferenceNumber = invoiceDetails.referenceNumber;
+    braintree.manuscriptCustomId = manuscripts.reduce(
+      (acc, manuscript) => `${acc} ${manuscript.customId}`,
+      ''
+    );
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Braintree', new BraintreePayment(BraintreeGateway, request.merchantId)]
+      ['Braintree', new BraintreePayment(BraintreeGateway)]
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'BraintreePayment'

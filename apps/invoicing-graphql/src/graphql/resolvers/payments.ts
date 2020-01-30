@@ -42,7 +42,12 @@ export const payments: Resolvers<any> = {
   Mutation: {
     async creditCardPayment(parent, args, context) {
       const {
-        repos: { payment: paymentRepo, invoice: invoiceRepo }
+        repos: {
+          payment: paymentRepo,
+          invoice: invoiceRepo,
+          invoiceItem: invoiceItemRepo,
+          manuscript: manuscriptRepo
+        }
       } = context;
       const {
         invoiceId,
@@ -54,7 +59,9 @@ export const payments: Resolvers<any> = {
 
       const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
         paymentRepo,
-        invoiceRepo
+        invoiceRepo,
+        manuscriptRepo,
+        invoiceItemRepo
       );
       const usecaseContext = { roles: [Roles.PAYER] };
 
@@ -71,6 +78,7 @@ export const payments: Resolvers<any> = {
       );
 
       if (result.isLeft()) {
+        console.log(result.value.errorValue());
         return null;
       }
 
