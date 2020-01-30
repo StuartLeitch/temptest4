@@ -6,22 +6,25 @@ const DlRowArticleDetails = props => (
     <dl className='row'>
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>Journal Title</dt>
       <dd className={`col-sm-9 ${props.rightSideClassName}`}>
-        Disease Markers
+        {props.journalTitle}
       </dd>
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>Article Title</dt>
-      <dd className={`col-sm-9 ${props.rightSideClassName}`}>
-        Gas6/TAM receptors in systemic lupus erythematosus
-      </dd>
+      <dd className={`col-sm-9 ${props.rightSideClassName}`}>{props.title}</dd>
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>Article ID</dt>
-      <dd className={`col-sm-9 ${props.rightSideClassName}`}>7838195</dd>
+      <dd className={`col-sm-9 ${props.rightSideClassName}`}>{props.id}</dd>
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>Article Type</dt>
-      <dd className={`col-sm-9 ${props.rightSideClassName}`}>Review Article</dd>
+      <dd className={`col-sm-9 ${props.rightSideClassName}`}>
+        {props.articleType}
+      </dd>
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>License</dt>
       <dd className={`col-sm-9 ${props.rightSideClassName}`}>CC-BY 4.0</dd>
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>
-        Author (Corresponding) S
+        Author (Corresponding)
       </dt>
-      <dd className={`col-sm-9 ${props.rightSideClassName}`}>Shao Wen-Hai</dd>
+      <dd className={`col-sm-9 ${props.rightSideClassName}`}>
+        {props.authorFirstName} {props.authorSurname} (
+        <a href='#'>{props.authorEmail}</a>)
+      </dd>
     </dl>
   </React.Fragment>
 );
