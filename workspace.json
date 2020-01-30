@@ -412,6 +412,65 @@
           }
         }
       }
+    },
+    "reporting-pull-historic-events": {
+      "root": "apps/reporting-pull-historic-events",
+      "sourceRoot": "apps/reporting-pull-historic-events/src",
+      "projectType": "application",
+      "prefix": "reporting-pull-historic-events",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/reporting-pull-historic-events",
+            "main": "apps/reporting-pull-historic-events/src/main.ts",
+            "tsConfig": "apps/reporting-pull-historic-events/tsconfig.app.json",
+            "assets": []
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/reporting-pull-historic-events/src/environments/environment.ts",
+                  "with": "apps/reporting-pull-historic-events/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "reporting-pull-historic-events:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/reporting-pull-historic-events/.eslintrc",
+            "tsConfig": [
+              "apps/reporting-pull-historic-events/tsconfig.app.json",
+              "apps/reporting-pull-historic-events/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/reporting-pull-historic-events/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/reporting-pull-historic-events/jest.config.js",
+            "tsConfig": "apps/reporting-pull-historic-events/tsconfig.spec.json"
+          }
+        }
+      }
     }
   },
   "cli": {

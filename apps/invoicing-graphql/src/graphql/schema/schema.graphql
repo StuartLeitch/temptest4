@@ -150,6 +150,7 @@ type ClientToken {
 }
 
 directive @filters on OBJECT
+directive @outer on FIELD
 
 type PaginatedInvoices {
   totalCount: Int

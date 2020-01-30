@@ -21,7 +21,7 @@ export class S3EventProducer implements Producer<Event, string> {
   private bucketName: string;
   private s3: S3;
 
-  constructor(bucketName: string, s3: S3) {
+  constructor(s3: S3, bucketName: string) {
     this.bucketName = bucketName;
     this.s3 = s3;
   }

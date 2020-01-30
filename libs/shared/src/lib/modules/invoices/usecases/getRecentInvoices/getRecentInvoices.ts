@@ -31,10 +31,14 @@ export class GetRecentInvoicesUsecase
       GetRecentInvoicesAuthenticationContext,
       AccessControlContext
     > {
-  constructor(private invoiceRepo: InvoiceRepoContract) {}
+  constructor(private invoiceRepo: InvoiceRepoContract, private _context) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
+  }
+
+  get filters() {
+    return this._context.filters;
   }
 
   @Authorize('invoice:read')
@@ -47,7 +51,7 @@ export class GetRecentInvoicesUsecase
 
     try {
       try {
-        paginatedResult = await this.invoiceRepo.getRecentInvoices(request);
+        paginatedResult = await this.invoiceRepo.getRecentInvoices(request, this.filters);
       } catch (err) {
         return left(
           new AppError.UnexpectedError(

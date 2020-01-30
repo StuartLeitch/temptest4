@@ -14,9 +14,6 @@ export const knexLoader: MicroframeworkLoader = async (
     migrations: {
       directory: env.app.dirs.migrationsDir
     },
-    seeds: {
-      directory: env.app.dirs.seedsDir
-    },
     connection: {
       host: env.db.host,
       user: env.db.username,
@@ -26,7 +23,7 @@ export const knexLoader: MicroframeworkLoader = async (
   });
 
   // USE knex for creating views?
-  // await knex.migrate.latest();
+  await knex.migrate.latest();
 
   if (settings) {
     settings.setData('connection', knex);

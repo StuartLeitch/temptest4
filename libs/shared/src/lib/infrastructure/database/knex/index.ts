@@ -17,6 +17,7 @@ export enum TABLES {
   TRANSACTIONS = 'transactions',
   WAIVERS = 'waivers',
   EDITORS = 'editors',
+  JOURNALS = 'journals',
   INVOICE_ITEMS_TO_COUPONS = 'invoice_items_to_coupons',
   INVOICE_ITEMS_TO_WAIVERS = 'invoice_items_to_waivers'
 }
