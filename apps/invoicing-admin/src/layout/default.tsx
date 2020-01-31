@@ -44,8 +44,8 @@ const favIcons = [
 ];
 
 const client = new GraphQLClient({
-  // url: 'https://demo-gql.invoicing.hindawi.com/graphql'
-  url: 'http://localhost:4000/graphql'
+  url: 'https://demo-gql.invoicing.hindawi.com/graphql'
+  // url: 'http://localhost:4000/graphql'
 });
 
 class AppLayout extends React.Component {

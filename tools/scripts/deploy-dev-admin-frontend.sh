@@ -9,8 +9,8 @@ AWS_ENVIRONMENT="dev"
 APP="invoicing-admin"
 TO="${AWS_ENVIRONMENT}-${APP}"
 
-# printf -- "Build FrontEnd App for ${AWS_ENVIRONMENT} environment"
-# npm run build invoicing-web --configuration=production
+printf -- "Build FrontEnd App for ${AWS_ENVIRONMENT} environment"
+npm run build invoicing-admin --configuration=production
 
 printf -- "Dockerize Admin FrontEnd App for ${AWS_ENVIRONMENT} environment\n"
 APP=$APP TO=$TO AWS_ENVIRONMENT=$AWS_ENVIRONMENT AWS_REGISTRY=$AWS_REGISTRY CI_COMMIT_SHA=$CI_COMMIT_SHA ./tools/scripts/dockerize-admin-local.sh
