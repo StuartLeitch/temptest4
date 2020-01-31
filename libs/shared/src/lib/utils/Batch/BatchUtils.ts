@@ -4,26 +4,26 @@ export class BatchUtils {
     batchSize: number,
     timeout: number
   ): (batch: T[]) => any {
-    let timeoutHandler: NodeJS.Timeout;
+    let intervalHandler: NodeJS.Timeout;
     let batch: T[] = [];
 
     function cleanBatch() {
       while (batch.length) {
         callBack(batch.splice(0, batchSize));
       }
-      timeoutHandler = setTimeout(cleanBatch, timeout);
     }
 
     return function(objectList) {
-      if (!timeoutHandler) {
-        timeoutHandler = setTimeout(cleanBatch, timeout);
+      if (!intervalHandler) {
+        intervalHandler = setInterval(cleanBatch, timeout);
       }
 
       batch.push(...objectList);
 
       if (batch.length >= batchSize) {
-        clearTimeout(timeoutHandler);
+        clearInterval(intervalHandler);
         cleanBatch();
+        intervalHandler = setInterval(cleanBatch, timeout);
       }
     };
   }
@@ -33,27 +33,30 @@ export class BatchUtils {
     batchSize: number,
     timeout: number
   ): (generator: AsyncGenerator<T, any, unknown>) => Promise<void> {
-    let timeoutHandler: NodeJS.Timeout;
-    const batch: T[] = [];
-
-    const clearBatch = () => {
-      while (batch.length) {
-        callBack(batch.splice(0, batchSize));
-      }
-      timeoutHandler = setTimeout(clearBatch, timeout);
-    };
-
     return async generator => {
-      timeoutHandler = setTimeout(clearBatch, timeout);
+      let intervalHandler: NodeJS.Timeout;
+      const batch: T[] = [];
+
+      function clearBatch() {
+        while (batch.length) {
+          callBack(batch.splice(0, batchSize));
+        }
+      }
+
+      intervalHandler = setInterval(clearBatch, timeout);
 
       for await (const obj of generator) {
         batch.push(obj);
 
         if (batch.length >= batchSize) {
-          clearTimeout(timeoutHandler);
+          clearInterval(intervalHandler);
           clearBatch();
+          intervalHandler = setInterval(clearBatch, timeout);
         }
       }
+
+      clearInterval(intervalHandler);
+      clearBatch();
     };
   }
 }
