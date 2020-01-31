@@ -40,7 +40,7 @@ export class GenerateClientTokenUsecase
   constructor() {}
 
   public async execute(
-    request: { merchantId: string },
+    request: { merchantAccountId: string },
     context?: GenerateClientTokenContext
   ): Promise<GenerateClientTokenResponse> {
     const braintree = new Braintree();
@@ -50,7 +50,7 @@ export class GenerateClientTokenUsecase
 
     try {
       const tokenGenerated: any = await braintreePayment.generateClientToken(
-        request.merchantId
+        request.merchantAccountId
       );
 
       if (tokenGenerated.isFailure) {

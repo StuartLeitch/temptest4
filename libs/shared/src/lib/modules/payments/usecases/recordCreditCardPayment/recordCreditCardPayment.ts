@@ -94,6 +94,7 @@ export class RecordCreditCardPaymentUsecase
     const braintree = new Braintree();
     braintree.paymentMethodNonce = request.paymentMethodNonce;
     braintree.invoiceReferenceNumber = invoiceDetails.referenceNumber;
+    braintree.merchantAccountId = request.merchantAccountId;
     braintree.manuscriptCustomId = manuscripts.reduce(
       (acc, manuscript) => `${acc} ${manuscript.customId}`,
       ''

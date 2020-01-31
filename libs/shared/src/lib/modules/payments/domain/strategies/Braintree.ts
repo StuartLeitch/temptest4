@@ -5,6 +5,7 @@ export class Braintree implements PaymentModel {
 
   private InvoiceReferenceNumber: string;
   private ManuscriptCustomId: string;
+  private MerchantAccountId: string;
 
   public PaymentMethodNonce: string;
 
@@ -30,6 +31,14 @@ export class Braintree implements PaymentModel {
 
   set invoiceReferenceNumber(newValue: string) {
     this.InvoiceReferenceNumber = newValue;
+  }
+
+  get merchantAccountId(): string {
+    return this.MerchantAccountId;
+  }
+
+  set merchantAccountId(newValue: string) {
+    this.MerchantAccountId = newValue;
   }
 
   public getType(): symbol {

@@ -28,7 +28,7 @@ export const payments: Resolvers<any> = {
       const usecase = new GenerateClientTokenUsecase();
 
       const result = await usecase.execute({
-        merchantId: env.braintree.merchantId
+        merchantAccountId: env.braintree.merchantAccountId
       });
 
       if (result.isRight()) {
@@ -67,7 +67,7 @@ export const payments: Resolvers<any> = {
 
       const result = await recordCreditCardPaymentUsecase.execute(
         {
-          merchantId: env.braintree.merchantId,
+          merchantAccountId: env.braintree.merchantAccountId,
           paymentMethodId,
           paymentMethodNonce,
           invoiceId,
