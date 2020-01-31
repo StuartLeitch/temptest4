@@ -30,6 +30,7 @@ type InvoiceItem {
   id: String
   invoiceId: String
   manuscriptId: String
+  type: String
   price: Float
   rate: Float
   vat: Float

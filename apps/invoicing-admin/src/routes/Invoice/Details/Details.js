@@ -50,6 +50,7 @@ import { DlRowContacts } from '../../components/Profile/DlRowContacts';
 import { DlRowAddress } from '../../components/Profile/DlRowAddress';
 import { TrTableMessages } from '../../Apps/ProfileDetails/components/TrTableMessages';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
+import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { Coupon } from '../../components/Invoice/Coupon';
 
 const INVOICE_QUERY = `
@@ -71,6 +72,7 @@ fragment invoiceFragment on Invoice {
   invoiceItem {
     id
     price
+    type
     rate
     vat
     vatnote
@@ -149,6 +151,30 @@ const Details = () => {
 
   const { invoice } = data;
   console.info(invoice);
+  const { coupons, waivers, price } = invoice?.invoiceItem;
+  let netCharges = price;
+  if (coupons?.length) {
+    netCharges -= coupons.reduce(
+      (acc, coupon) => acc + (coupon.reduction / 100) * price,
+      0
+    );
+  }
+  if (waivers?.length) {
+    netCharges -= waivers.reduce(
+      (acc, waiver) => acc + (waiver.reduction / 100) * price,
+      0
+    );
+  }
+  const vat = (netCharges / 100) * invoice?.invoiceItem?.vat;
+  const total = netCharges + vat;
+
+  let statusClassName = 'warning';
+  if (invoice.status === 'ACTIVE') {
+    statusClassName = 'primary';
+  }
+  if (invoice.status === 'FINAL') {
+    statusClassName = 'success';
+  }
 
   return (
     <React.Fragment>
@@ -168,8 +194,10 @@ const Details = () => {
                     color='link'
                     className='p-0 text-decoration-none'
                   >
-                    <i className='fas fa-circle text-success mr-2'></i>
-                    Active
+                    <i
+                      className={`fas fa-circle text-${statusClassName} mr-2`}
+                    ></i>
+                    {invoice.status}
                     <i className='fas fa-angle-down ml-2' />
                   </DropdownToggle>
                   <DropdownMenu right>
@@ -229,6 +257,11 @@ const Details = () => {
                     Article Details
                   </UncontrolledTabs.NavLink>
                 </NavItem>
+                <NavItem>
+                  <UncontrolledTabs.NavLink tabId='payer'>
+                    Payer Details
+                  </UncontrolledTabs.NavLink>
+                </NavItem>
               </Nav>
               {/* END Pills Nav */}
               <UncontrolledTabs.TabContent>
@@ -285,78 +318,133 @@ const Details = () => {
                         {/* <span className='small ml-1 text-muted'>#02</span> */}
                       </CardTitle>
                       <Table className='mb-0' responsive>
-                        <thead>
+                        <thead className='thead-light'>
                           <tr>
-                            <th className='bt-0'>Item</th>
-                            <th className='bt-0'>Price</th>
-                            <th className='bt-0'></th>
-                            <th className='text-right bt-0'>Totals</th>
+                            <th className='bt-1'>Item</th>
+                            <th className='bt-1 w-25'></th>
+                            <th className='text-right bt-1'>Price</th>
+                            <th className='bt-1'></th>
+                            <th className='text-right bt-1'>Totals</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
                             <td className='align-middle'>
-                              <span>APC</span>
+                              <span>{invoice?.invoiceItem?.type}</span>
                             </td>
+                            <td colSpan='2' className='align-middle text-right'>
+                              <span>${invoice?.invoiceItem?.price}</span>
+                            </td>
+                            <td
+                              colSpan='2'
+                              className='align-middle text-right text-dark font-weight-bold'
+                            >
+                              ${invoice?.invoiceItem?.price}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan='3'></td>
                             <td className='align-middle'>
-                              <span>$1</span>
-                            </td>
-                            <td colspan='2' className='align-middle text-right'>
-                              $1
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colspan='3' className='align-middle text-right'>
-                              <span>Subtotal</span>
-                            </td>
-                            <td className='align-middle text-right'>$1</td>
-                          </tr>
-                          <tr>
-                            <td colspan='2' className='align-middle text-right'>
-                              <Badge pill color='success'>
-                                coupon
-                              </Badge>
-                            </td>
-                            <td>
-                              <span className='small mt-2'>150OFF</span>
-                              <span className='text-muted px-2'>(-15%)</span>
-                            </td>
-                            <td className='align-middle text-right'>$0.15</td>
-                          </tr>
-                          <tr>
-                            <td colspan='2' className='align-middle text-right'>
-                              <Badge pill color='success'>
-                                waiver
-                              </Badge>
-                            </td>
-                            <td>
-                              <span className='small mt-2'>
-                                EDITOR_DISCOUNT
+                              <span className='text-uppercase text-muted font-weight-bold'>
+                                Sub&ndash;Total
                               </span>
-                              <span className='text-muted px-2'>(-50%)</span>
                             </td>
-                            <td className='align-middle text-right'>- $0.5</td>
+                            <td className='align-middle text-right text-dark font-weight-bold'>
+                              ${invoice?.invoiceItem?.price}
+                            </td>
                           </tr>
+                          {invoice?.invoiceItem?.coupons?.length > 0 &&
+                            invoice.invoiceItem.coupons.map(coupon => (
+                              <tr>
+                                <td
+                                  colSpan='2'
+                                  style={{ borderTop: 'none' }}
+                                ></td>
+                                <td
+                                  className='align-middle text-right'
+                                  style={{ borderTop: 'none' }}
+                                >
+                                  <Badge pill color='success'>
+                                    coupon
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <span className='small mt-2'>
+                                    {coupon.code}
+                                  </span>
+                                  <span className='text-muted px-2'>
+                                    (&ndash;{coupon.reduction}%)
+                                  </span>
+                                </td>
+                                <td className='align-middle text-right text-dark font-weight-bold'>
+                                  &ndash;$0.15
+                                </td>
+                              </tr>
+                            ))}
+                          {invoice?.invoiceItem?.waivers?.length > 0 &&
+                            invoice.invoiceItem.waivers.map(waiver => (
+                              <tr>
+                                <td
+                                  colSpan='2'
+                                  style={{ borderTop: 'none' }}
+                                ></td>
+                                <td
+                                  className='align-middle text-right'
+                                  style={{ borderTop: 'none' }}
+                                >
+                                  <Badge pill color='success'>
+                                    waiver
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <span className='small mt-2'>
+                                    {waiver.type_id}
+                                  </span>
+                                  <span className='text-muted px-2'>
+                                    (&ndash;{waiver.reduction}%)
+                                  </span>
+                                </td>
+                                <td className='align-middle text-right text-dark font-weight-bold'>
+                                  &ndash;$
+                                  {(waiver.reduction / 100) *
+                                    invoice.invoiceItem.price}
+                                </td>
+                              </tr>
+                            ))}
                           <tr>
-                            <td colspan='3' className='align-middle text-right'>
+                            <td colSpan='3' style={{ borderTop: 'none' }}></td>
+                            <td className='align-middle text-uppercase text-muted font-weight-bold'>
                               Net Charges
                             </td>
                             {/* <td>Really?</td> */}
-                            <td className='align-middle text-right'>$0.35</td>
+                            <td className='align-middle text-right text-dark font-weight-bold'>
+                              ${netCharges}
+                            </td>
                           </tr>
                           <tr>
-                            <td colspan='3' className='align-middle text-right'>
-                              VAT
+                            <td colSpan='3' style={{ borderTop: 'none' }}></td>
+                            <td className='align-middle'>
+                              <span className='text-uppercase text-muted font-weight-bold'>
+                                VAT
+                              </span>
+                              <span className='text-muted px-2'>
+                                (+{invoice?.invoiceItem?.vat}%)
+                              </span>
                             </td>
                             {/* <td>Really?</td> */}
-                            <td className='align-middle text-right'>$0.07</td>
+                            <td className='align-middle text-right text-dark font-weight-bold'>
+                              ${vat.toFixed(2)}
+                            </td>
                           </tr>
                           <tr>
-                            <td colspan='3' className='align-middle text-right'>
+                            <td colSpan='3' style={{ borderTop: 'none' }}></td>
+                            <td className='align-middle h4 text-uppercase text-dark font-weight-bold'>
                               Total
                             </td>
                             {/* <td>Really?</td> */}
-                            <td className='align-middle text-right'>$0.42</td>
+                            <td className='align-middle text-right h2 text-uppercase text-info font-weight-bold'>
+                              ${total.toFixed(2)}
+                            </td>
                           </tr>
                         </tbody>
                       </Table>
@@ -399,21 +487,69 @@ const Details = () => {
                 </TabPane>
                 <TabPane tabId='article'>
                   <Card body className='border-top-0'>
-                    <div className='mb-2'>
-                      <span className='small'>Article</span>
-                    </div>
-                    <DlRowArticleDetails
-                      {...invoice?.invoiceItem?.article}
-                      leftSideClassName='text-lg-right'
-                      rightSideClassName='text-inverse'
-                    />
-                    {/* <div className='mt-4 mb-2'>
-                    <span className='small'>Journal</span>
-                  </div>
-                  <DlRowAddress
-                    leftSideClassName='text-lg-right'
-                    rightSideClassName='text-inverse'
-                  /> */}
+                    <CardBody>
+                      <CardTitle tag='h6' className='mb-4'>
+                        Article: Details
+                        <span className='small ml-1 text-muted'>
+                          #{invoice?.invoiceItem?.article?.id}
+                        </span>
+                      </CardTitle>
+                      <DlRowArticleDetails
+                        {...invoice?.invoiceItem?.article}
+                        leftSideClassName='text-lg-right'
+                        rightSideClassName='text-inverse'
+                      />
+                    </CardBody>
+                  </Card>
+                </TabPane>
+                <TabPane tabId='payer'>
+                  <Card body className='border-top-0'>
+                    <CardBody>
+                      <CardTitle tag='h6' className='mb-4'>
+                        Payer: Details
+                        <span className='small ml-1 text-muted'>
+                          #{invoice?.payer?.id}
+                        </span>
+                      </CardTitle>
+                      <div className='mt-4 mb-2'>
+                        <span className='small'>Contact</span>
+                      </div>
+                      <DlRowPayerDetails
+                        {...invoice?.payer}
+                        leftSideClassName='text-lg-right'
+                        rightSideClassName='text-inverse'
+                      />
+                      <div className='mt-4 mb-2'>
+                        <span className='small'>Address</span>
+                      </div>
+                      <dl className='row'>
+                        {' '}
+                        <dt className={`col-sm-3 text-lg-right`}>
+                          Address Line 1
+                        </dt>
+                        <dd className={`col-sm-9 text-inverse`}>
+                          {invoice?.payer?.address?.addressLine1}
+                        </dd>
+                        <dt className={`col-sm-3 text-lg-right`}>City</dt>
+                        <dd className={`col-sm-9 text-inverse`}>
+                          {invoice?.payer?.address?.city}
+                        </dd>
+                        <dt className={`col-sm-3 text-lg-right`}>Country</dt>
+                        <dd className={`col-sm-9 text-inverse`}>
+                          {invoice?.payer?.address?.country}
+                        </dd>
+                        <dt className={`col-sm-3 text-lg-right`}>State</dt>
+                        <dd className={`col-sm-9 text-inverse`}>
+                          {invoice?.payer?.address?.state}
+                        </dd>
+                        <dt className={`col-sm-3 text-lg-right`}>
+                          Postal Code
+                        </dt>
+                        <dd className={`col-sm-9 text-inverse`}>
+                          {invoice?.payer?.address?.postalCode}
+                        </dd>
+                      </dl>
+                    </CardBody>
                   </Card>
                 </TabPane>
               </UncontrolledTabs.TabContent>

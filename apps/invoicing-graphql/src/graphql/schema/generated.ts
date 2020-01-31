@@ -11,6 +11,8 @@ export type Scalars = {
   Date: any,
 };
 
+
+
 export type Address = {
    __typename?: 'Address',
   city?: Maybe<Scalars['String']>,
@@ -92,6 +94,7 @@ export type InvoiceItem = {
   id?: Maybe<Scalars['String']>,
   invoiceId?: Maybe<Scalars['String']>,
   manuscriptId?: Maybe<Scalars['String']>,
+  type?: Maybe<Scalars['String']>,
   price?: Maybe<Scalars['Float']>,
   rate?: Maybe<Scalars['Float']>,
   vat?: Maybe<Scalars['Float']>,
@@ -355,6 +358,8 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   info: GraphQLResolveInfo
 ) => Maybe<TTypes>;
 
+export type isTypeOfResolverFn = (obj: any, info: GraphQLResolveInfo) => boolean;
+
 export type NextResolverFn<T> = () => Promise<T>;
 
 export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
@@ -425,12 +430,17 @@ export type ResolversParentTypes = {
   CreditCardInput: CreditCardInput,
 };
 
+export type FiltersDirectiveResolver<Result, Parent, ContextType = any, Args = {  }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type OuterDirectiveResolver<Result, Parent, ContextType = any, Args = {  }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
   city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   state?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   postalCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type ArticleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Article'] = ResolversParentTypes['Article']> = {
@@ -445,15 +455,18 @@ export type ArticleResolvers<ContextType = any, ParentType extends ResolversPare
   authorCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   authorSurname?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   authorFirstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type ClientTokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['ClientToken'] = ResolversParentTypes['ClientToken']> = {
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type CouponResolvers<ContextType = any, ParentType extends ResolversParentTypes['Coupon'] = ResolversParentTypes['Coupon']> = {
   reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
@@ -476,16 +489,19 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type InvoiceIdResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceId'] = ResolversParentTypes['InvoiceId']> = {
   invoiceId?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   manuscriptId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
@@ -494,12 +510,14 @@ export type InvoiceItemResolvers<ContextType = any, ParentType extends Resolvers
   dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
   coupons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Coupon']>>>, ParentType, ContextType>,
   waivers?: Resolver<Maybe<Array<Maybe<ResolversTypes['Waiver']>>>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type InvoiceVatResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceVat'] = ResolversParentTypes['InvoiceVat']> = {
   vatPercentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   vatNote?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -517,6 +535,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type PayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payer'] = ResolversParentTypes['Payer']> = {
@@ -527,6 +546,7 @@ export type PayerResolvers<ContextType = any, ParentType extends ResolversParent
   organization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   address?: Resolver<Maybe<ResolversTypes['Address']>, ParentType, ContextType>,
   vatId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type PaymentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {
@@ -538,12 +558,14 @@ export type PaymentResolvers<ContextType = any, ParentType extends ResolversPare
   paymentProof?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   amount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   datePaid?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type PaymentMethodResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaymentMethod'] = ResolversParentTypes['PaymentMethod']> = {
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   isActive?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -559,11 +581,13 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type WaiverResolvers<ContextType = any, ParentType extends ResolversParentTypes['Waiver'] = ResolversParentTypes['Waiver']> = {
   reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   type_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type Resolvers<ContextType = any> = {
@@ -592,3 +616,14 @@ export type Resolvers<ContextType = any> = {
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
 */
 export type IResolvers<ContextType = any> = Resolvers<ContextType>;
+export type DirectiveResolvers<ContextType = any> = {
+  filters?: FiltersDirectiveResolver<any, any, ContextType>,
+  outer?: OuterDirectiveResolver<any, any, ContextType>,
+};
+
+
+/**
+* @deprecated
+* Use "DirectiveResolvers" root object instead. If you wish to get "IDirectiveResolvers", add "typesPrefix: I" to your config.
+*/
+export type IDirectiveResolvers<ContextType = any> = DirectiveResolvers<ContextType>;
