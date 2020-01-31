@@ -1,0 +1,22 @@
+{
+  "name": "@hindawi/eve",
+  "version": "1.0.1",
+  "description": "eve library for importing exporting events",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/hindawi/phenom/tree/develop/libs/eve.git"
+  },
+  "author": "team.belzebuth@hindawi.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/hindawi/phenom/tree/develop/libs/eve/issues"
+  },
+  "homepage": "https://gitlab.com/hindawi/phenom/tree/develop/libs/eve#readme",
+  "dependencies": {
+    "aws-sdk": "^2.610.0"
+  }
+}
