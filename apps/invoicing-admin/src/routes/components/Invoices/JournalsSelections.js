@@ -6,10 +6,11 @@ import journals from './journals';
 export const JournalsSelections = () => (
   <Typeahead
     clearButton
+    multiple
+    id='journalsSelections'
     // defaultSelected={journals.slice(0, 5)}
     labelKey='journalTitle'
-    multiple
     options={journals}
-    placeholder='Choose a journal title&hellip;'
+    placeholder='Enter a journal title&hellip;'
   />
 );
