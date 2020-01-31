@@ -126,9 +126,10 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     );
     // const totalCount = await getModel().count(`${TABLES.INVOICES}.id`);
 
+    // console.info('limit = %s, offset = %s', limit, offset);
     const invoices = await getModel()
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
-      .offset(offset)
+      .offset(offset * limit)
       .limit(limit)
       .select();
 
