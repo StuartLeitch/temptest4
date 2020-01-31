@@ -82,6 +82,7 @@ export type Invoice = {
   price?: Maybe<Scalars['Float']>,
   customId?: Maybe<Scalars['String']>,
   type?: Maybe<Scalars['String']>,
+  payment?: Maybe<Payment>,
 };
 
 export type InvoiceId = {
@@ -237,6 +238,7 @@ export type Payment = {
   paymentProof?: Maybe<Scalars['String']>,
   amount?: Maybe<Scalars['Float']>,
   datePaid?: Maybe<Scalars['Date']>,
+  paymentMethod?: Maybe<PaymentMethod>,
 };
 
 export type PaymentMethod = {
@@ -388,6 +390,7 @@ export type ResolversTypes = {
   Date: ResolverTypeWrapper<Scalars['Date']>,
   Coupon: ResolverTypeWrapper<Coupon>,
   Waiver: ResolverTypeWrapper<Waiver>,
+  Payment: ResolverTypeWrapper<Payment>,
   InvoiceVat: ResolverTypeWrapper<InvoiceVat>,
   Int: ResolverTypeWrapper<Scalars['Int']>,
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>,
@@ -396,7 +399,6 @@ export type ResolversTypes = {
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Transaction: ResolverTypeWrapper<Transaction>,
-  Payment: ResolverTypeWrapper<Payment>,
   CreditCardInput: CreditCardInput,
 };
 
@@ -418,6 +420,7 @@ export type ResolversParentTypes = {
   Date: Scalars['Date'],
   Coupon: Coupon,
   Waiver: Waiver,
+  Payment: Payment,
   InvoiceVat: InvoiceVat,
   Int: Scalars['Int'],
   PaginatedInvoices: PaginatedInvoices,
@@ -426,7 +429,6 @@ export type ResolversParentTypes = {
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Transaction: Transaction,
-  Payment: Payment,
   CreditCardInput: CreditCardInput,
 };
 
@@ -489,6 +491,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  payment?: Resolver<Maybe<ResolversTypes['Payment']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn,
 };
 
@@ -558,6 +561,7 @@ export type PaymentResolvers<ContextType = any, ParentType extends ResolversPare
   paymentProof?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   amount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   datePaid?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+  paymentMethod?: Resolver<Maybe<ResolversTypes['PaymentMethod']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn,
 };
 

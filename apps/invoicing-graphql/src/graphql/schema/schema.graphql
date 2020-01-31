@@ -57,6 +57,7 @@ type Invoice {
   price: Float
   customId: String
   type: String
+  payment: Payment
 }
 
 type InvoiceVat {
@@ -128,6 +129,7 @@ type Payment {
   paymentProof: String
   amount: Float
   datePaid: Date
+  paymentMethod: PaymentMethod
 }
 
 type PaymentMethod {

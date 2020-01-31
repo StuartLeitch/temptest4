@@ -69,6 +69,9 @@ fragment invoiceFragment on Invoice {
   payer {
     ...payerFragment
   }
+  payment {
+    ...paymentFragment
+  }
   invoiceItem {
     id
     price
@@ -98,6 +101,18 @@ fragment payerFragment on Payer {
   address {
     ...addressFragment
   }
+}
+fragment paymentFragment on Payment {
+  id
+  foreignPaymentId
+  amount
+  paymentMethod {
+    ...paymentMethodFragment
+  }
+}
+fragment paymentMethodFragment on PaymentMethod {
+  id
+  name
 }
 fragment addressFragment on Address {
   city
@@ -448,40 +463,35 @@ const Details = () => {
                           </tr>
                         </tbody>
                       </Table>
-                      {/* <Table className='mb-0'>
-                        <tbody>
-                          <tr>
-                            <td className='align-middle'>
-                              <span>APC</span>
-                            </td>
-                            <td className='align-middle'>
-                              <span>$1</span>
-                            </td>
-                            <td className='align-middle text-right'>$1</td>
-                          </tr>
-                        </tbody>
-                      </Table> */}
-                      {/* START Coupons */}
-                      {/* <div className='mb-4'>
-                        <div className='mb-3'>
-                          <span className='small mr-3'>Coupons</span>
-                          <Badge pill color='secondary'>
-                            {invoice?.invoiceItem?.coupons?.length}
-                          </Badge>
-                        </div>
-                        {invoice?.invoiceItem?.coupons.map(c => (
-                          <div className='mb-3'>
-                            <Coupon
-                              code={c.code}
-                              reduction={c.reduction}
-                              icon='minus'
-                              iconClassName='text-white'
-                              BgIconClassName='text-success'
-                            />
-                          </div>
-                        ))}
-                      </div> */}
-                      {/* END Coupons */}
+                      <CardTitle tag='h6' className='mt-5 mb-4'>
+                        Invoice: Payment Method
+                        <span className='small ml-1 text-muted'>
+                          #{invoice?.payment?.paymentMethod?.id}
+                        </span>
+                      </CardTitle>
+                      <div className='mb-2'>
+                        <i className='fas fa-fw fa-credit-card text-primary mr-2'></i>
+                        <span className='text-inverse'>
+                          {invoice?.payment?.paymentMethod?.name}
+                        </span>{' '}
+                        - Payer:{' '}
+                        <samp>
+                          {invoice?.payer?.name} (
+                          <a href='#'>{invoice?.payer?.email}</a>)
+                        </samp>
+                      </div>
+                      <dl className='row'>
+                        <dt className='col-sm-4 text-right'>Amount</dt>
+                        <dd className='col-sm-8 text-inverse'>
+                          $ {invoice?.payment?.amount.toFixed(2)}
+                        </dd>
+                        <dt className='col-sm-4 text-right'>
+                          Foreign Payment ID
+                        </dt>
+                        <dd className='col-sm-8 text-info'>
+                          {invoice?.payment?.foreignPaymentId}
+                        </dd>
+                      </dl>
                     </CardBody>
                   </Card>
                 </TabPane>
