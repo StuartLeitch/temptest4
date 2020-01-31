@@ -470,7 +470,14 @@ const Details = () => {
                         </span>
                       </CardTitle>
                       <div className='mb-2'>
-                        <i className='fas fa-fw fa-credit-card text-primary mr-2'></i>
+                        <i
+                          className={`fa-fw ${
+                            invoice?.payment?.paymentMethod?.name ===
+                            'Credit Card'
+                              ? 'fas fa-credit-card'
+                              : 'fab fa-paypal'
+                          } text-primary mr-2`}
+                        ></i>
                         <span className='text-inverse'>
                           {invoice?.payment?.paymentMethod?.name}
                         </span>{' '}
