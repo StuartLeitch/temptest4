@@ -6,6 +6,8 @@ import Knex from 'knex';
 
 import { env } from '../env';
 
+require('ts-node');
+
 export const knexLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
