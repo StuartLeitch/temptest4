@@ -21,6 +21,7 @@ export class BraintreePayment extends PaymentService<
       pm.invoiceReferenceNumber,
       pm.manuscriptCustomId,
       pm.paymentMethodNonce,
+      pm.merchantAccountId,
       amount
     );
   }
@@ -29,12 +30,14 @@ export class BraintreePayment extends PaymentService<
     invoiceReferenceNumber: string,
     manuscriptCustomId: string,
     paymentMethodNonce: string,
+    merchantAccountId: string,
     amount: number
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.paymentGateway.transaction.sale(
         {
           amount,
+          merchantAccountId,
           paymentMethodNonce,
           options: {
             // threeDSecure: true,
@@ -55,10 +58,10 @@ export class BraintreePayment extends PaymentService<
     });
   }
 
-  public async generateClientToken(merchantId: string): Promise<any> {
+  public async generateClientToken(merchantAccountId: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.paymentGateway.clientToken.generate(
-        { merchantAccountId: merchantId },
+        { merchantAccountId: merchantAccountId },
         (err: any, response: any) => {
           const { clientToken } = response;
           return resolve(PaymentClientToken.create(clientToken));

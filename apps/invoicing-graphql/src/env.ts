@@ -108,6 +108,7 @@ export const env = {
     }
   },
   braintree: {
+    merchantAccountId: getOsEnv('BT_MERCHANT_ACCOUNT_ID'),
     tokenizationKey: getOsEnv('BT_TOKENIZATION_KEY'),
     environment: getOsEnv('BT_ENVIRONMENT'),
     merchantId: getOsEnv('BT_MERCHANT_ID'),
