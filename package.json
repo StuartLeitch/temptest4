@@ -190,6 +190,7 @@
     "@types/stream-to-promise": "^2.2.0",
     "@types/styled-components": "^4.4.2",
     "@types/styled-system": "^5.1.5",
+    "@types/webpack": "^4.41.3",
     "@typescript-eslint/eslint-plugin": "2.18.0",
     "@typescript-eslint/parser": "2.18.0",
     "@zeit/next-css": "1.0.1",
@@ -236,6 +237,7 @@
     "typesafe-actions": "5.1.0",
     "typescript": "~3.7.5",
     "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
     "webpack-graphql-loader": "^1.0.2"
   },
   "bolt": {
