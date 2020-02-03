@@ -26,6 +26,12 @@ type Transaction {
   status: String
 }
 
+enum TransactionStatus {
+  DRAFT
+  ACTIVE
+  FINAL
+}
+
 type InvoiceItem {
   id: String
   invoiceId: String
@@ -152,15 +158,57 @@ type ClientToken {
   token: String!
 }
 
-directive @filters on OBJECT
-directive @outer on FIELD
-
 type PaginatedInvoices {
   totalCount: Int
   invoices: [Invoice]
 }
 
-type Query @filters {
+input Pagination {
+  offset: Int
+  limit: Int
+}
+
+input StatusFilter {
+  in: [InvoiceStatus]
+}
+input TransactionStatusFilter {
+  in: [TransactionStatus]
+}
+input ReferenceNumberFilter {
+  eq: String
+}
+input JournalTitleFilter {
+  in: [String]
+}
+input CustomIdFilter {
+  eq: String
+}
+input ArticleFilter {
+  journalTitle: JournalTitleFilter
+  customId: CustomIdFilter
+}
+input TransactionFilter {
+  status: TransactionStatusFilter
+}
+input InvoiceItemFiltering {
+  article: ArticleFilter
+}
+
+input InvoicesFiltering {
+  status: StatusFilter
+  referenceNumber: ReferenceNumberFilter
+  transaction: TransactionFilter
+  invoiceItem: InvoiceItemFiltering
+}
+
+input Filtering {
+  invoices: InvoicesFiltering
+}
+
+# directive @filters on OBJECT
+# directive @outer on FIELD
+
+type Query {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
   invoice(invoiceId: String): Invoice
@@ -171,7 +219,7 @@ type Query @filters {
     postalCode: String
     payerType: String
   ): InvoiceVat
-  invoices(offset: Int, limit: Int): PaginatedInvoices
+  invoices(filtering: Filtering, pagination: Pagination): PaginatedInvoices
   invoiceIdByManuscriptCustomId(customId: String): InvoiceId
   echo(value: String): String
 }

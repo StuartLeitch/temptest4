@@ -3,7 +3,7 @@ import {
   MicroframeworkSettings
 } from 'microframework-w3tec';
 import Knex from 'knex';
-// import knexTinyLogger from 'knex-tiny-logger';
+import knexTinyLogger from 'knex-tiny-logger';
 
 import { env } from '../env';
 
@@ -25,7 +25,7 @@ export const knexLoader: MicroframeworkLoader = async (
       database: env.db.database
     }
   });
-  // knexTinyLogger(knex);
+  knexTinyLogger(knex);
 
   await knex.migrate.latest();
 

@@ -12,114 +12,170 @@ import {
 
 import { TrTableInvoicesList } from './components/TrTableList';
 
+// const INVOICES_QUERY = `
+// query fetchInvoices(
+//   $offset: Int,
+//   $limit: Int
+// ) {
+//   invoices(offset: $offset, limit: $limit) {
+//     totalCount
+//     invoices {
+//       ...invoiceFragment
+//     }
+//   }
+// }
+// fragment invoiceFragment on Invoice {
+//   id: invoiceId
+//   status
+//   dateCreated
+//   dateIssued
+//   dateAccepted
+//   referenceNumber
+//   payer {
+//     ...payerFragment
+//   }
+//   invoiceItem {
+//     id
+//     price
+//     rate
+//     vat
+//     vatnote
+//     dateCreated
+//     coupons {
+//       ...couponFragment
+//     }
+//     waivers {
+//       ...waiverFragment
+//     }
+//     article {
+//       ...articleFragment
+//     }
+//   }
+// }
+// fragment payerFragment on Payer {
+//   id
+//   type
+//   name
+//   email
+//   vatId
+//   organization
+//   address {
+//     ...addressFragment
+//   }
+// }
+// fragment addressFragment on Address {
+//   city
+//   country
+//   state
+//   postalCode
+//   addressLine1
+// }
+// fragment couponFragment on Coupon {
+//   code
+//   reduction
+// }
+// fragment waiverFragment on Waiver {
+//   reduction
+//   type_id
+// }
+// fragment articleFragment on Article {
+//   id
+//   title
+//   created
+//   articleType
+//   authorCountry
+//   authorEmail
+//   customId
+//   journalTitle
+//   authorSurname
+//   authorFirstName
+//   journalTitle
+// }
+// `;
+
 const INVOICES_QUERY = `
 query fetchInvoices(
-  $offset: Int,
   $limit: Int
+  $offset: Int
+  $customId: String
+  $referenceNumber: String
+  $invoiceStatus: [InvoiceStatus]
+  $transactionStatus: [TransactionStatus]
+  $journalTitle: [String]
 ) {
-  invoices(offset: $offset, limit: $limit) {
+  invoices(
+    filtering: {
+      invoices: {
+        status: { in: $invoiceStatus }
+        referenceNumber: { eq: $referenceNumber }
+        invoiceItem: {
+          article: {
+            journalTitle: { in: $journalTitle }
+            customId: { eq: $customId }
+          }
+        }
+        transaction: { status: { in: $transactionStatus } }
+      }
+    }
+    pagination: { limit: $limit, offset: $offset }
+  ) {
     totalCount
     invoices {
-      ...invoiceFragment
+      invoiceId
+      status
+      referenceNumber
     }
   }
-}
-fragment invoiceFragment on Invoice {
-  id: invoiceId
-  status
-  dateCreated
-  dateIssued
-  dateAccepted
-  referenceNumber
-  payer {
-    ...payerFragment
-  }
-  invoiceItem {
-    id
-    price
-    rate
-    vat
-    vatnote
-    dateCreated
-    coupons {
-      ...couponFragment
-    }
-    waivers {
-      ...waiverFragment
-    }
-    article {
-      ...articleFragment
-    }
-  }
-}
-fragment payerFragment on Payer {
-  id
-  type
-  name
-  email
-  vatId
-  organization
-  address {
-    ...addressFragment
-  }
-}
-fragment addressFragment on Address {
-  city
-  country
-  state
-  postalCode
-  addressLine1
-}
-fragment couponFragment on Coupon {
-  code
-  reduction
-}
-fragment waiverFragment on Waiver {
-  reduction
-  type_id
-}
-fragment articleFragment on Article {
-  id
-  title
-  created
-  articleType
-  authorCountry
-  authorEmail
-  customId
-  journalTitle
-  authorSurname
-  authorFirstName
-  journalTitle
 }
 `;
 
 const RecentInvoicesList = props => {
-  const [pagination, setPagination] = useState({});
+  const paginator = {
+    offset: 0,
+    limit: 10
+  };
+  const [pagination, setPagination] = useState(paginator);
 
   const [fetchInvoices, { loading, error, data }] = useManualQuery(
     INVOICES_QUERY
   );
+
+  let currPaginator = { ...paginator };
   const onPageChanged = (data: any) => {
-    setPagination(data);
+    const filters = {
+      invoiceStatus: []
+    };
+    if (props.filters.id === 'invoice-status-draft' && props.filters.checked) {
+      filters.invoiceStatus = ['DRAFT'];
+    }
+
+    currPaginator = {
+      offset: data?.currentPage - 1,
+      limit: data?.pageLimit
+    };
+    setPagination({ ...currPaginator });
     fetchInvoices({
-      variables: { offset: data?.currentPage - 1, limit: data?.pageLimit }
+      variables: { ...filters, ...currPaginator }
     });
   };
 
   useEffect(() => {
     async function fetchData() {
       const filters = {
-        status: []
+        invoiceStatus: []
       };
-      // console.info(props.filters);
       if (
         props.filters.id === 'invoice-status-draft' &&
         props.filters.checked
       ) {
-        filters.status = ['DRAFT'];
+        filters.invoiceStatus = ['DRAFT'];
       }
+      setPagination({ ...paginator });
       await fetchInvoices({
-        variables: { ...filters, offset: 0, limit: 10 }
+        variables: {
+          ...filters,
+          ...paginator
+        }
       });
     }
     fetchData();
@@ -171,7 +227,7 @@ const RecentInvoicesList = props => {
           pageLimit={10}
           pageNeighbours={1}
           onPageChanged={onPageChanged}
-          {...pagination}
+          currentPage={pagination.offset + 1}
         />
       </CardFooter>
     </Card>

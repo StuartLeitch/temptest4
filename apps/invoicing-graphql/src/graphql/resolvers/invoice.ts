@@ -70,7 +70,7 @@ export const invoice: Resolvers<any> = {
 
     async invoices(parent, args, context) {
       const { repos } = context;
-      const usecase = new GetRecentInvoicesUsecase(repos.invoice, context);
+      const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
         roles: [Roles.ADMIN]
       }; //global['Y'] = context;
