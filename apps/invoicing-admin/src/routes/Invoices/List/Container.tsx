@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Container, Row, Col } from './../../../components';
@@ -10,16 +10,25 @@ import InvoicesList from './List';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 // import { InvoicesSmHeader } from '../../components/Invoices/InvoicesSmHeader';
 
-const InvoicesContainer = props => (
-  <React.Fragment>
-    <Container fluid={true}>
-      <HeaderMain title='Invoices' className='mb-5 mt-4' />
-      <Row>
-        <Col lg={3}>
-          <InvoicesLeftNav />
-        </Col>
-        <Col lg={9}>
-          {/* <InvoicesSmHeader
+const InvoicesContainer = props => {
+  const [filters, setFilters] = useState({});
+  const _setFilter = target => {
+    const { id, checked } = target;
+    // console.info(id);
+    // console.info(checked);
+    setFilters({ id, checked });
+  };
+
+  return (
+    <React.Fragment>
+      <Container fluid={true}>
+        <HeaderMain title='Invoices' className='mb-5 mt-4' />
+        <Row>
+          <Col lg={3}>
+            <InvoicesLeftNav setFilter={_setFilter} />
+          </Col>
+          <Col lg={9}>
+            {/* <InvoicesSmHeader
             subTitle={
               props.match.params.type === 'list'
                 ? 'Projects List'
@@ -30,15 +39,16 @@ const InvoicesContainer = props => (
           />
 
           {props.match.params.type === 'list' ? ( */}
-          <InvoicesList />
-          {/* ) : (
+            <InvoicesList filters={filters} />
+            {/* ) : (
             <ProjectsGrid />
           )} */}
-        </Col>
-      </Row>
-    </Container>
-  </React.Fragment>
-);
+          </Col>
+        </Row>
+      </Container>
+    </React.Fragment>
+  );
+};
 
 InvoicesContainer.propTypes = {
   match: PropTypes.object.isRequired

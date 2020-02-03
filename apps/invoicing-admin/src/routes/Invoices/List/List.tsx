@@ -93,7 +93,7 @@ fragment articleFragment on Article {
 }
 `;
 
-const RecentInvoicesList = () => {
+const RecentInvoicesList = props => {
   const [pagination, setPagination] = useState({});
 
   const [fetchInvoices, { loading, error, data }] = useManualQuery(
@@ -108,12 +108,22 @@ const RecentInvoicesList = () => {
 
   useEffect(() => {
     async function fetchData() {
+      const filters = {
+        status: []
+      };
+      // console.info(props.filters);
+      if (
+        props.filters.id === 'invoice-status-draft' &&
+        props.filters.checked
+      ) {
+        filters.status = ['DRAFT'];
+      }
       await fetchInvoices({
-        variables: { offset: 0, limit: 10 }
+        variables: { ...filters, offset: 0, limit: 10 }
       });
     }
     fetchData();
-  }, []);
+  }, [props.filters]);
 
   if (loading)
     return (

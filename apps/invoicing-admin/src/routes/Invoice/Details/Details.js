@@ -457,7 +457,7 @@ const Details = () => {
                               Total
                             </td>
                             {/* <td>Really?</td> */}
-                            <td className='align-middle text-right h2 text-uppercase text-info font-weight-bold'>
+                            <td className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
                               ${total.toFixed(2)}
                             </td>
                           </tr>
@@ -495,7 +495,7 @@ const Details = () => {
                         <dt className='col-sm-4 text-right'>
                           Foreign Payment ID
                         </dt>
-                        <dd className='col-sm-8 text-info'>
+                        <dd className='col-sm-8 text-success'>
                           {invoice?.payment?.foreignPaymentId}
                         </dd>
                       </dl>
