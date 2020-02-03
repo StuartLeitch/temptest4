@@ -14,21 +14,37 @@ const InvoicesContainer = props => {
   const [filters, setFilters] = useState({
     invoiceStatus: []
   });
-  const setFilter = (filterName, value, target) => {
-    // console.info(filterName);
-    // console.info(value);
+  const setFilter = (filterName, filterValue, target) => {
     // console.info(target);
+
     const _filters = { ...filters };
 
-    const { checked } = target;
-    if (checked) {
-      if (!(filterName in _filters)) {
-        _filters[filterName] = [];
+    const { checked, value } = target;
+    // console.info(filterName);
+    // console.info(checked);
+    // console.info(value);
+
+    if (checked in target) {
+      if (checked) {
+        if (!(filterName in _filters)) {
+          _filters[filterName] = [];
+        }
+        _filters[filterName].push(filterValue);
+      } else {
+        _filters[filterName].splice(
+          _filters[filterName].indexOf(filterValue),
+          1
+        );
       }
-      _filters[filterName].push(value);
-    } else {
-      _filters[filterName].splice(_filters[filterName].indexOf(value), 1);
     }
+
+    if (value) {
+      if (!(filterName in _filters)) {
+        _filters[filterName] = '';
+      }
+      _filters[filterName] = value;
+    }
+
     // console.info(_filters);
     setFilters(_filters);
   };

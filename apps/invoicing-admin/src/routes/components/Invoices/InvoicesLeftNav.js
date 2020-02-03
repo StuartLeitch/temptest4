@@ -6,7 +6,7 @@ import { CustomInput, Input, Nav, NavItem, NavLink } from '../../../components';
 import { JournalsSelections } from '../Invoices/JournalsSelections';
 
 const InvoicesLeftNav = props => {
-  const onFilterHandler = (filterName, value) => e => {
+  const onFilterHandler = (filterName, value = null) => e => {
     props.setFilter(filterName, value, e.target);
   };
   return (
@@ -28,9 +28,9 @@ const InvoicesLeftNav = props => {
             label='Draft'
             inline
           />
-          <span className='small ml-auto align-self-center'>
+          {/* <span className='small ml-auto align-self-center'>
             ({faker.finance.mask()})
-          </span>
+          </span> */}
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
@@ -41,9 +41,9 @@ const InvoicesLeftNav = props => {
             label='Active'
             inline
           />
-          <span className='small ml-auto align-self-center'>
+          {/* <span className='small ml-auto align-self-center'>
             ({faker.finance.mask()})
-          </span>
+          </span> */}
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
@@ -54,9 +54,9 @@ const InvoicesLeftNav = props => {
             label='Final'
             inline
           />
-          <span className='small ml-auto align-self-center'>
+          {/* <span className='small ml-auto align-self-center'>
             ({faker.finance.mask()})
-          </span>
+          </span> */}
         </NavItem>
       </Nav>
       {/* END Invoice Status */}
@@ -76,9 +76,9 @@ const InvoicesLeftNav = props => {
             label='Draft'
             inline
           />
-          <span className='small ml-auto align-self-center'>
+          {/* <span className='small ml-auto align-self-center'>
             ({faker.finance.mask()})
-          </span>
+          </span> */}
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
@@ -88,9 +88,9 @@ const InvoicesLeftNav = props => {
             label='Active'
             inline
           />
-          <span className='small ml-auto align-self-center'>
+          {/* <span className='small ml-auto align-self-center'>
             ({faker.finance.mask()})
-          </span>
+          </span> */}
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
@@ -100,9 +100,9 @@ const InvoicesLeftNav = props => {
             label='Final'
             inline
           />
-          <span className='small ml-auto align-self-center'>
+          {/* <span className='small ml-auto align-self-center'>
             ({faker.finance.mask()})
-          </span>
+          </span> */}
         </NavItem>
       </Nav>
       {/* END Transaction Status */}
@@ -143,6 +143,7 @@ const InvoicesLeftNav = props => {
             ]}
             className='form-control'
             placeholder='Enter a reference number'
+            onChange={onFilterHandler('referenceNumber')}
             tag={MaskedInput}
             id='refNumber'
           />

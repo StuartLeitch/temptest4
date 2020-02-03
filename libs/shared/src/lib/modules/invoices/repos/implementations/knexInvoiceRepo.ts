@@ -48,8 +48,14 @@ function filtered(src: any, filters: any) {
     here = here.whereIn(`${TABLES.INVOICES}.status`, invoiceStatusFilter['in']);
   }
 
-  // const referenceNumber = invoices.navigate('referenceNumber');
-  // if (referenceNumber.with('in')) {
+  const referenceNumber = filters?.invoices?.referenceNumber;
+  if ('eq' in referenceNumber && referenceNumber?.eq?.length > 0) {
+    const [paddedNumber, creationYear] = referenceNumber.eq.split('/');
+    const invoiceNumber = parseInt(paddedNumber, 10);
+    here = here.whereRaw(
+      `"${TABLES.INVOICES}"."invoiceNumber" = ${invoiceNumber} and extract(year from "${TABLES.INVOICES}"."dateAccepted") = ${creationYear}`
+    );
+  }
   //   for (const number of referenceNumber.get('in')) {
   //     const [paddedNumber, creationYear] = number.split('/');
   //     const invoiceNumber = parseInt(paddedNumber, 10);
@@ -113,6 +119,10 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const totalCount = await filtered(getModel(), filters).count(
       `${TABLES.INVOICES}.id`
     );
+    // const draftCount = await filtered(
+    //   getModel(),
+    //   getModel().whereIn(`${TABLES.INVOICES}.status`, ['DRAFT'])
+    // ).count(`${TABLES.INVOICES}.id`);
 
     // console.info(
     //   'limit = %s, offset = %s, totalCount = %s',
@@ -131,6 +141,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     return {
       totalCount: totalCount[0]['count'],
+      // draftCount: draftCount[0]['count'],
       invoices: invoices.map(i => InvoiceMap.toDomain(i))
     };
   }
