@@ -6,8 +6,8 @@ import { CustomInput, Input, Nav, NavItem, NavLink } from '../../../components';
 import { JournalsSelections } from '../Invoices/JournalsSelections';
 
 const InvoicesLeftNav = props => {
-  const onFilterHandler = e => {
-    props.setFilter(e.target);
+  const onFilterHandler = (filterName, value) => e => {
+    props.setFilter(filterName, value, e.target);
   };
   return (
     <React.Fragment>
@@ -21,7 +21,7 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={onFilterHandler}
+            onChange={onFilterHandler('invoiceStatus', 'DRAFT')}
             className='text-warning'
             type='checkbox'
             id='invoice-status-draft'
@@ -34,7 +34,7 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={onFilterHandler}
+            onChange={onFilterHandler('invoiceStatus', 'ACTIVE')}
             className='text-primary'
             type='checkbox'
             id='invoice-status-active'
@@ -47,7 +47,7 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={onFilterHandler}
+            onChange={onFilterHandler('invoiceStatus', 'FINAL')}
             className='text-success'
             type='checkbox'
             id='invoice-status-final'

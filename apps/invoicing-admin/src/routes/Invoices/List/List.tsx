@@ -161,15 +161,8 @@ const RecentInvoicesList = props => {
 
   useEffect(() => {
     async function fetchData() {
-      const filters = {
-        invoiceStatus: []
-      };
-      if (
-        props.filters.id === 'invoice-status-draft' &&
-        props.filters.checked
-      ) {
-        filters.invoiceStatus = ['DRAFT'];
-      }
+      const { filters } = props;
+
       setPagination({ ...paginator });
       await fetchInvoices({
         variables: {

@@ -11,12 +11,26 @@ import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 // import { InvoicesSmHeader } from '../../components/Invoices/InvoicesSmHeader';
 
 const InvoicesContainer = props => {
-  const [filters, setFilters] = useState({});
-  const _setFilter = target => {
-    const { id, checked } = target;
-    // console.info(id);
-    // console.info(checked);
-    setFilters({ id, checked });
+  const [filters, setFilters] = useState({
+    invoiceStatus: []
+  });
+  const setFilter = (filterName, value, target) => {
+    // console.info(filterName);
+    // console.info(value);
+    // console.info(target);
+    const _filters = { ...filters };
+
+    const { checked } = target;
+    if (checked) {
+      if (!(filterName in _filters)) {
+        _filters[filterName] = [];
+      }
+      _filters[filterName].push(value);
+    } else {
+      _filters[filterName].splice(_filters[filterName].indexOf(value), 1);
+    }
+    // console.info(_filters);
+    setFilters(_filters);
   };
 
   return (
@@ -25,7 +39,7 @@ const InvoicesContainer = props => {
         <HeaderMain title='Invoices' className='mb-5 mt-4' />
         <Row>
           <Col lg={3}>
-            <InvoicesLeftNav setFilter={_setFilter} />
+            <InvoicesLeftNav setFilter={setFilter} />
           </Col>
           <Col lg={9}>
             {/* <InvoicesSmHeader
