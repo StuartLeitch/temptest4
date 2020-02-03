@@ -1,7 +1,4 @@
-import {
-  OrderUtils,
-  WithDependencies
-} from '../../../../shared/src/lib/utils/OrderUtils';
+import { OrderUtils, WithDependencies } from './OrderUtils';
 
 class MockWithDependencies implements WithDependencies {
   constructor(public dependecies: MockWithDependencies[], public id?: String) {}

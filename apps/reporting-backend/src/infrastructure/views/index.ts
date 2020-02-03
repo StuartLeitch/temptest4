@@ -1,6 +1,6 @@
 import Knex from 'knex';
 
-import { OrderUtils } from '../../../../../libs/shared/src/lib/utils/OrderUtils';
+import { OrderUtils } from '../../../../../libs/shared/src/lib/utils/Order';
 import { Logger } from '../../lib/logger';
 import { differenceInSeconds } from '../../utils/utils';
 

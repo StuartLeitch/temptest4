@@ -5,7 +5,6 @@ import {
 } from 'microframework-w3tec';
 import AWS from 'aws-sdk';
 
-import { EventDTO } from 'libs/shared/src/lib/modules/reporting/domain/EventDTO';
 import { EventMappingRegistry } from 'libs/shared/src/lib/modules/reporting/EventMappingRegistry';
 import {
   InvoiceMappingPolicy,
@@ -14,7 +13,7 @@ import {
   UserMappingPolicy
 } from 'libs/shared/src/lib/modules/reporting/policies';
 import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
-import { BatchUtils } from 'libs/shared/src/lib/utils/BatchUtils';
+import { BatchUtils } from 'libs/shared/src/lib/utils/Batch';
 
 import { env } from '../env';
 import { Logger } from '../lib/logger';

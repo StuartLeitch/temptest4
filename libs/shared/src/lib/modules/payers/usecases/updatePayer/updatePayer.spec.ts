@@ -65,7 +65,7 @@ describe('UpdatePayerUsecase', () => {
       });
     });
 
-    fdescribe('And Payer ID is VALID', () => {
+    describe('And Payer ID is VALID', () => {
       it('should return the payer details', async () => {
         // arrange
         result = await usecase.execute(
