@@ -29,9 +29,7 @@ module.exports = (nxConfig, context) => {
     }
   };
 
-  webpackConfig.plugins.push(new ExtractCssChunks());
-
-  // console.info(webpackConfig.module.rules[2].use[1].options);
+  // webpackConfig.plugins.push(new ExtractCssChunks());
 
   webpackConfig.module.rules.unshift(
     // // Modular Styles
@@ -99,6 +97,16 @@ module.exports = (nxConfig, context) => {
     //   ],
     //   include: [path.resolve(config.srcDir, 'styles')]
     // },
+    // Fonts
+    {
+      test: /\.(ttf|eot|woff|woff2)$/,
+      loader: 'file-loader',
+      options: {
+        esModule: false,
+        name: 'fonts/[name].[ext]'
+      }
+    },
+    // Files
     {
       test: /\.(jpg|jpeg|png|gif|svg|ico)$/,
       loader: 'file-loader',
@@ -107,7 +115,32 @@ module.exports = (nxConfig, context) => {
         name: 'static/[name].[ext]'
       }
     }
+    // {
+    //   test: /\.s[ac]ss$/i,
+    //   use: [
+    //     'style-loader',
+    //     'css-loader',
+    //     {
+    //       loader: 'sass-loader',
+    //       options: {
+    //         implementation: require('sass'),
+    //         sassOptions: {
+    //           fiber: require('fibers')
+    //         }
+    //       }
+    //     }
+    //   ]
+    // }
   );
+
+  webpackConfig.module.rules[3].oneOf[2].use.splice(1, 1, {
+    loader: 'css-loader'
+  });
+  webpackConfig.module.rules[3].oneOf[6].use.splice(1, 1, 'css-loader');
+
+  // console.info(webpackConfig.module.rules[3].oneOf[2]);
+  // console.info(webpackConfig.module.rules[3].oneOf[6]);
+  // return;
 
   return webpackConfig;
 };

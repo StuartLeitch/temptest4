@@ -4,8 +4,6 @@ import { PieChart, Pie, Cell } from 'recharts';
 
 import colors from './../../../colors';
 
-console.info(colors);
-
 const data = [
   { name: 'Group A', value: 400 },
   { name: 'Group B', value: 300 },

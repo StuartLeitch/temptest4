@@ -28,8 +28,8 @@ import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
 // import Avatars from './Interface/Avatars';
 // import BadgesLabels from './Interface/BadgesLabels';
 // import Breadcrumbs from './Interface/Breadcrumbs';
-// import Buttons from './Interface/Buttons';
-// import Colors from './Interface/Colors';
+import Buttons from './Interface/Buttons';
+import Colors from './Interface/Colors';
 // import Dropdowns from './Interface/Dropdowns';
 // import Images from './Interface/Images';
 // import ListGroups from './Interface/ListGroups';
@@ -40,7 +40,7 @@ import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
 // import ProgressBars from './Interface/ProgressBars';
 // import TabsPills from './Interface/TabsPills';
 // import TooltipPopovers from './Interface/TooltipsPopovers';
-// import Typography from './Interface/Typography';
+import Typography from './Interface/Typography';
 // import Notifications from './Interface/Notifications';
 // import CropImage from './Interface/CropImage';
 // import DragAndDropElements from './Interface/DragAndDropElements';
@@ -150,10 +150,10 @@ export const RoutedContent = () => {
       <Route component={Alerts} path='/interface/alerts' />
       <Route component={Avatars} path='/interface/avatars' />
       <Route component={BadgesLabels} path='/interface/badges-and-labels' />
-      <Route component={Breadcrumbs} path='/interface/breadcrumbs' />
+  <Route component={Breadcrumbs} path='/interface/breadcrumbs' />*/}
       <Route component={Buttons} path='/interface/buttons' />
       <Route component={Colors} path='/interface/colors' />
-      <Route component={Dropdowns} path='/interface/dropdowns' />
+      {/*<Route component={Dropdowns} path='/interface/dropdowns' />
       <Route component={Images} path='/interface/images' />
       <Route component={ListGroups} path='/interface/list-groups' />
       <Route component={MediaObjects} path='/interface/media-objects' />
@@ -165,9 +165,9 @@ export const RoutedContent = () => {
       <Route
         component={TooltipPopovers}
         path='/interface/tooltips-and-popovers'
-      />
+/>*/}
       <Route component={Typography} path='/interface/typography' />
-      <Route component={Notifications} path='/interface/notifications' />
+      {/*<Route component={Notifications} path='/interface/notifications' />
       <Route component={CropImage} path='/interface/crop-image' />
       <Route
         component={DragAndDropElements}

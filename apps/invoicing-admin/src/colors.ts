@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
 import colors from './colors.scss';
-console.info(colors);
 
 const colorKeys = _.chain(colors)
   .keys()
