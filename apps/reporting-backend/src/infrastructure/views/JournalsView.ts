@@ -7,7 +7,7 @@ import {
 class JournalsDataView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
     return `
-CREATE MATERIALIZED VIEW ${this.getViewName()}
+CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT journal_events.type AS event,
     journal_events.payload ->> 'id'::text AS journal_id,
     journal_events.payload ->> 'issn'::text AS journal_issn,

@@ -19,6 +19,10 @@ function makeViewObject(viewFileExport: any): KnexMigration {
   };
 }
 
+// View migration should be done following the steps:
+// 1. Delete de view
+// 2. Create the view
+// 3. Run post create queries
 class KnexMigrationSource {
   private migrations: KnexMigration[] = [
     create_events_table,

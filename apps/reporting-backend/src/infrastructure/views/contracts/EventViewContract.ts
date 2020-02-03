@@ -14,12 +14,11 @@ export abstract class AbstractEventView implements WithDependencies {
   abstract getCreateQuery(): string;
 
   getDeleteQuery(): string {
-    return `DROP MATERIALIZED VIEW IF EXISTS ${this.getViewName()}`;
+    return `DROP MATERIALIZED VIEW IF EXISTS ${this.getViewName()} CASCADE`;
   }
 
   getRefreshQuery(): string {
-    // CONCURRENTLY doesn't lock the view while it's updating
-    return `REFRESH MATERIALIZED VIEW CONCURRENTLY ${this.getViewName()} WITH DATA`;
+    return `REFRESH MATERIALIZED VIEW ${this.getViewName()} WITH DATA`;
   }
 
   getPostCreateQueries(): string[] {

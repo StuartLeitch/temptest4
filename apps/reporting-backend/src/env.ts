@@ -11,6 +11,8 @@ import {
   toNumber
 } from './lib/env';
 
+const everyHourCron = '0 */1 * * *';
+
 export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
@@ -23,6 +25,7 @@ export const env = {
     eventNamespace: getOsEnv('EVENT_NAMESPACE'),
     publisherName: getOsEnv('PUBLISHER_NAME'),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
+    viewRefreshCron: getOsEnvOptional('VIEW_CRON') || everyHourCron,
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR')
     },

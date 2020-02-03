@@ -7,7 +7,7 @@ import {
 class InvoicesDataView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
     return `
-CREATE MATERIALIZED VIEW ${this.getViewName()}
+CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT invoice_events.type AS event,
     invoice_events.payload ->> 'invoiceId'::text AS invoice_id,
     invoice_events.payload ->> 'invoiceStatus'::text AS status,

@@ -8,7 +8,7 @@ import submissionDataView from './SubmissionDataView';
 class SubmissionView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
     return `
-CREATE MATERIALIZED VIEW ${this.getViewName()}
+CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT s.submission_id,
     s.manuscript_custom_id,
     s.submission_event,

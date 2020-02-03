@@ -12,6 +12,7 @@ import { contextLoader } from './loaders/contextLoader';
 import { winstonLoader } from './loaders/winstonLoader';
 import { knexLoader } from './loaders/knexLoader';
 import { queueServiceLoader } from './loaders/queueServiceLoader';
+import { cronLoader } from './loaders/cronLoader';
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
  * ----------------------------------------
@@ -27,7 +28,13 @@ bootstrapMicroframework({
    * Loader is a place where you can configure all your modules during microframework
    * bootstrap process. All loaders are executed one by one in a sequential order.
    */
-  loaders: [winstonLoader, knexLoader, contextLoader, queueServiceLoader]
+  loaders: [
+    winstonLoader,
+    knexLoader,
+    contextLoader,
+    queueServiceLoader,
+    cronLoader
+  ]
 })
   .then(() => banner(log))
   .catch(error => {

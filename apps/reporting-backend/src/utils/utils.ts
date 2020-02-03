@@ -13,3 +13,7 @@ export function makeCallback(callback): Function {
     result.push(entry);
   };
 }
+
+export function differenceInSeconds(start: Date) {
+  return (new Date().getTime() - start.getTime()) / 1000;
+}
