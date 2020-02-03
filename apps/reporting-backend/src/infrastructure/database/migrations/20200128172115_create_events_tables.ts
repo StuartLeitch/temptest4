@@ -27,6 +27,8 @@ export async function down(knex: Knex): Promise<any> {
   ]);
 }
 
+export const name = '20200128172115_create_events_tables.ts';
+
 function createEventTable(table) {
   table.uuid('id').primary();
   table.timestamp('time');

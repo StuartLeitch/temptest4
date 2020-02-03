@@ -3,7 +3,8 @@ import { materializedViewList } from '../../views/index';
 
 export async function up(knex: Knex): Promise<any> {
   for (const view of materializedViewList) {
-    await knex.raw(view.getViewName());
+    console.log('Migrating view: ', view.getViewName());
+    await knex.raw(view.getCreateQuery());
     for (const indexQuery of view.getPostCreateQueries()) {
       await knex.raw(indexQuery);
     }
@@ -19,3 +20,5 @@ export async function down(knex: Knex): Promise<any> {
       )
   );
 }
+
+export const name = '20200131135858_create_materialized_views.ts';

@@ -15,3 +15,5 @@ export async function up(knex: Knex): Promise<any> {
 export async function down(knex: Knex): Promise<any> {
   return knex.schema.dropTable('countries');
 }
+
+export const name = '20200131121058_create_countries_table.ts';

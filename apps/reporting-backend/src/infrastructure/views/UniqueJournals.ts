@@ -8,8 +8,7 @@ class UniqueJournalsView extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
-CREATE MATERIALIZED VIEW public.unique_journals
-TABLESPACE pg_default
+CREATE MATERIALIZED VIEW ${this.getViewName()}
 AS SELECT DISTINCT ON (j1.event_date) j1.event,
     j1.journal_id,
     j1.journal_issn,

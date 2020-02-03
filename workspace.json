@@ -342,6 +342,7 @@
         "build": {
           "builder": "@nrwl/node:build",
           "options": {
+            "webpackConfig": "apps/reporting-backend/webpack.config.js",
             "outputPath": "dist/apps/reporting-backend",
             "main": "apps/reporting-backend/src/main.ts",
             "tsConfig": "apps/reporting-backend/tsconfig.app.json",

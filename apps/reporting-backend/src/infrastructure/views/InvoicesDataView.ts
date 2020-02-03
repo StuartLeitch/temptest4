@@ -25,7 +25,7 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (status)`,
-    `create index on ${this.getViewName()} (manuscriptcustomid)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (event)`
   ];
 
