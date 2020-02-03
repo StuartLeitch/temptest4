@@ -1,16 +1,17 @@
-import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
-import {RepoError, RepoErrorCode} from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
-import {PaymentMap} from './../../mapper/Payment';
-import {PaymentRepoContract} from './../paymentRepo';
-import {PaymentId} from './../../domain/PaymentId';
-import {Payment} from './../../domain/Payment';
+import { PaymentMap } from './../../mapper/Payment';
+import { PaymentRepoContract } from './../paymentRepo';
+import { PaymentId } from './../../domain/PaymentId';
+import { Payment } from './../../domain/Payment';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
   implements PaymentRepoContract {
   async getPaymentById(paymentId: PaymentId): Promise<Payment> {
-    const {db} = this;
+    const { db } = this;
 
     const paymentRow = await db(TABLES.PAYMENTS)
       .select()
@@ -27,8 +28,27 @@ export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
     return PaymentMap.toDomain(paymentRow);
   }
 
+  async getPaymentByInvoiceId(invoiceId: InvoiceId): Promise<Payment> {
+    const { db } = this;
+
+    const paymentRow = await db(TABLES.PAYMENTS)
+      .select()
+      .where('invoiceId', invoiceId.id.toString())
+      .first();
+
+    if (!paymentRow) {
+      // throw RepoError.createEntityNotFoundError(
+      //   'payment',
+      //   invoiceId.id.toString()
+      // );
+      return null;
+    }
+
+    return PaymentMap.toDomain(paymentRow);
+  }
+
   async save(payment: Payment): Promise<Payment> {
-    const {db} = this;
+    const { db } = this;
 
     try {
       await db(TABLES.PAYMENTS).insert(PaymentMap.toPersistence(payment));

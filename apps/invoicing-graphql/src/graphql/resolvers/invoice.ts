@@ -1,4 +1,3 @@
-import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 /* eslint-disable max-len */
 
 import {
@@ -25,6 +24,10 @@ import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/share
 
 import { Resolvers, Invoice, PayerType } from '../schema';
 import { WaiverMap } from 'libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
+import { PaymentMap } from './../../../../../libs/shared/src/lib/modules/payments/mapper/Payment';
+import { PaymentMethodMap } from './../../../../../libs/shared/src/lib/modules/payments/mapper/PaymentMethod';
+import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
+import { GetPaymentMethodByIdUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/getPaymentMethodById/getPaymentMethodById';
 
 export const invoice: Resolvers<any> = {
   Query: {
@@ -70,9 +73,9 @@ export const invoice: Resolvers<any> = {
       const usecase = new GetRecentInvoicesUsecase(repos.invoice, context);
       const usecaseContext = {
         roles: [Roles.ADMIN]
-      };   //global['Y'] = context;
+      }; //global['Y'] = context;
       const result = await usecase.execute(args, usecaseContext);
-           //console.info('[INVOICES]', global['X'], global['Y'], global['X'] === global['Y']);
+      //console.info('[INVOICES]', global['X'], global['Y'], global['X'] === global['Y']);
       if (result.isLeft()) {
         return undefined;
       }
@@ -267,6 +270,21 @@ export const invoice: Resolvers<any> = {
       }
 
       return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
+    },
+    async payment(parent: Invoice, args, context) {
+      const {
+        repos: { payment: paymentRepo }
+      } = context;
+      const invoiceId = InvoiceId.create(
+        new UniqueEntityID(parent.invoiceId)
+      ).getValue();
+
+      const payment = await paymentRepo.getPaymentByInvoiceId(invoiceId);
+
+      if (!payment) {
+        return null;
+      }
+      return PaymentMap.toPersistence(payment);
     }
   },
   InvoiceItem: {
@@ -305,6 +323,23 @@ export const invoice: Resolvers<any> = {
       );
 
       return catalogItem.journalTitle;
+    }
+  },
+  Payment: {
+    async paymentMethod(parent, args, context) {
+      const getPaymentMethodUseCase = new GetPaymentMethodByIdUsecase(
+        context.repos.paymentMethod
+      );
+
+      const paymentMethod = await getPaymentMethodUseCase.execute({
+        paymentMethodId: parent.paymentMethodId
+      });
+
+      if (paymentMethod.isLeft()) {
+        throw paymentMethod.value.errorValue();
+      }
+
+      return PaymentMethodMap.toPersistence(paymentMethod.value.getValue());
     }
   },
 

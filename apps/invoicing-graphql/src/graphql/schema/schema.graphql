@@ -30,6 +30,7 @@ type InvoiceItem {
   id: String
   invoiceId: String
   manuscriptId: String
+  type: String
   price: Float
   rate: Float
   vat: Float
@@ -56,6 +57,7 @@ type Invoice {
   price: Float
   customId: String
   type: String
+  payment: Payment
 }
 
 type InvoiceVat {
@@ -127,6 +129,7 @@ type Payment {
   paymentProof: String
   amount: Float
   datePaid: Date
+  paymentMethod: PaymentMethod
 }
 
 type PaymentMethod {

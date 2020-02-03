@@ -411,6 +411,24 @@
             "jestConfig": "libs/eve/jest.config.js",
             "tsConfig": "libs/eve/tsconfig.spec.json"
           }
+        },
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "main": "libs/eve/src/index.ts",
+            "tsConfig": "libs/eve/tsconfig.lib.json",
+            "outputPath": "dist/libs/eve",
+            "assets": []
+          }
+        },
+        "package": {
+          "builder": "@nrwl/node:package",
+          "options": {
+            "main": "libs/eve/src/index.ts",
+            "tsConfig": "libs/eve/tsconfig.lib.json",
+            "outputPath": "dist/libs/eve",
+            "packageJson": "libs/eve/package.json"
+          }
         }
       }
     },
