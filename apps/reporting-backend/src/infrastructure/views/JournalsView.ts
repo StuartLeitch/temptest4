@@ -20,11 +20,13 @@ AS SELECT journal_events.type AS event,
 WITH DATA;
     `;
   }
+
   postCreateQueries = [
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`,
     `CREATE INDEX ON ${this.getViewName()} (event_date)`,
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id, journal_issn)`
   ];
+
   getViewName(): string {
     return 'journals_data';
   }

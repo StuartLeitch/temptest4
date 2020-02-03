@@ -1,4 +1,4 @@
-import { WithDependencies } from 'libs/shared/src/lib/utils/OrderUtils';
+import { WithDependencies } from '@hindawi/shared';
 
 export interface EventViewContract extends WithDependencies {
   getCreateQuery(): String;

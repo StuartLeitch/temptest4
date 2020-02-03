@@ -21,11 +21,13 @@ AS SELECT submission_events.type AS submission_event,
 WITH DATA;
     `;
   }
+
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`
   ];
+
   getViewName(): string {
     return 'submission_data';
   }

@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { materializedViewList } from '../../views/index';
+import { materializedViewList } from '../../views';
 
 export async function up(knex: Knex): Promise<any> {
   for (const view of materializedViewList) {

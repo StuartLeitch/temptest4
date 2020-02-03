@@ -25,9 +25,11 @@ AS SELECT DISTINCT ON (j1.event_date) j1.event,
 WITH DATA;
     `;
   }
+
   postCreateQueries = [
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`
   ];
+
   getViewName(): string {
     return 'unique_journals';
   }

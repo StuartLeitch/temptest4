@@ -24,11 +24,13 @@ AS SELECT s.submission_id,
 WITH DATA;
     `;
   }
+
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`
   ];
+
   getViewName(): string {
     return 'submissions';
   }
