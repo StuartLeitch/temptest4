@@ -29,11 +29,8 @@ class KnexMigrationSource {
     create_countries_table,
     create_materialized_views
   ].map(makeViewObject);
-  // Must return a Promise containing a list of migrations.
-  // Migrations can be whatever you want, they will be passed as
-  // arguments to getMigrationName and getMigration
+
   getMigrations(): Promise<KnexMigration[]> {
-    // In this example we are just returning migration names
     return Promise.resolve(this.migrations);
   }
 

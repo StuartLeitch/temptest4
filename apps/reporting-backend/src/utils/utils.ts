@@ -14,6 +14,6 @@ export function makeCallback(callback): Function {
   };
 }
 
-export function differenceInSeconds(start: Date) {
-  return (new Date().getTime() - start.getTime()) / 1000;
+export function differenceInSeconds(start: Date, end: Date = new Date()) {
+  return (end.getTime() - start.getTime()) / 1000;
 }
