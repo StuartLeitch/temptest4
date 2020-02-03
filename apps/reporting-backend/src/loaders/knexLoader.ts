@@ -6,13 +6,15 @@ import Knex from 'knex';
 
 import { env } from '../env';
 
+import { knexMigrationSource } from '../infrastructure/database/migrationSource';
+
 export const knexLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   const knex = Knex({
     client: 'pg',
     migrations: {
-      directory: env.app.dirs.migrationsDir
+      migrationSource: knexMigrationSource
     },
     connection: {
       host: env.db.host,

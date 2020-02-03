@@ -5,8 +5,9 @@
 // 	payload jsonb NULL,
 // 	CONSTRAINT dump_events_pkey PRIMARY KEY (id)
 // );
+import * as Knex from 'knex';
 
-exports.up = function(knex) {
+export async function up(knex: Knex): Promise<any> {
   return Promise.all([
     knex.schema.createTable('dump_events', createEventTable),
     knex.schema.createTable('submission_events', createEventTable),
@@ -14,9 +15,9 @@ exports.up = function(knex) {
     knex.schema.createTable('user_events', createEventTable),
     knex.schema.createTable('invoice_events', createEventTable)
   ]);
-};
+}
 
-exports.down = function(knex) {
+export async function down(knex: Knex): Promise<any> {
   return Promise.all([
     knex.schema.dropTable('dump_events'),
     knex.schema.dropTable('submission_events'),
@@ -24,7 +25,9 @@ exports.down = function(knex) {
     knex.schema.dropTable('user_events'),
     knex.schema.dropTable('invoice_events')
   ]);
-};
+}
+
+export const name = '20200128172115_create_events_tables.ts';
 
 function createEventTable(table) {
   table.uuid('id').primary();
