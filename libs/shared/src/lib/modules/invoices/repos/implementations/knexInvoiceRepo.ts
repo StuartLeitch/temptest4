@@ -159,7 +159,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset * limit)
       .limit(limit)
-      .select();
+      .select(['invoices.*']);
 
     //  console.info(invoices);
     // console.info(invoices.map(i => InvoiceMap.toDomain(i)));

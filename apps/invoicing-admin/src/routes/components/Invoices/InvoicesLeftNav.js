@@ -3,7 +3,16 @@ import faker from 'faker/locale/en_US';
 import useDebouncedEffect from 'use-debounced-effect';
 import MaskedInput from 'react-text-mask';
 
-import { CustomInput, Input, Nav, NavItem, NavLink } from '../../../components';
+import {
+  Button,
+  CustomInput,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  Nav,
+  NavItem,
+  NavLink
+} from '../../../components';
 import { JournalsSelections } from '../Invoices/JournalsSelections';
 
 const InvoicesLeftNav = props => {
@@ -176,6 +185,21 @@ const InvoicesLeftNav = props => {
             tag={MaskedInput}
             id='refNumber'
           />
+          <InputGroupAddon addonType='append'>
+            <Button
+              color='secondary'
+              outline
+              onClick={evt => {
+                const newValue = '';
+                document.getElementById('refNumber').value = newValue;
+                const target = { name: 'refNumber', value: newValue };
+                onFilterHandler(target);
+              }}
+            >
+              <i className='fa fa-times mr-2'></i>
+              Clear
+            </Button>
+          </InputGroupAddon>
         </NavItem>
       </Nav>
       {/* END Reference Number */}
@@ -188,14 +212,30 @@ const InvoicesLeftNav = props => {
           </NavLink>
         </NavItem>
         <NavItem className='d-flex p-0'>
-          <Input
-            name='customId'
-            onChange={evt => onFilterHandler(evt.target)}
-            className='form-control'
-            placeholder='Enter a custom ID'
-            // tag={MaskedInput}
-            id='customId'
-          />
+          <InputGroup>
+            <Input
+              name='customId'
+              onChange={evt => onFilterHandler(evt.target)}
+              className='form-control'
+              placeholder='Enter a custom ID'
+              id='customId'
+            />
+            <InputGroupAddon addonType='append'>
+              <Button
+                color='secondary'
+                outline
+                onClick={evt => {
+                  const newValue = '';
+                  document.getElementById('customId').value = newValue;
+                  const target = { name: 'customId', value: newValue };
+                  onFilterHandler(target);
+                }}
+              >
+                <i className='fa fa-times mr-2'></i>
+                Clear
+              </Button>
+            </InputGroupAddon>
+          </InputGroup>
         </NavItem>
       </Nav>
       {/* END Reference Number */}

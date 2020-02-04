@@ -236,12 +236,14 @@ export const invoice: Resolvers<any> = {
         invoiceId: parent.invoiceId
       });
 
+      let rawItem;
       if (result.isLeft()) {
-        throw result.value.errorValue();
+        // throw result.value.errorValue();
+        rawItem = null;
+      } else {
+        const [item] = result.value.getValue();
+        rawItem = InvoiceItemMap.toPersistence(item);
       }
-
-      const [item] = result.value.getValue();
-      const rawItem = InvoiceItemMap.toPersistence(item);
 
       let rate = 1.42; // ! Average value for the last seven years
       if (parent && parent.dateIssued) {
@@ -269,6 +271,10 @@ export const invoice: Resolvers<any> = {
         vatnote = template;
       }
 
+      // if (!rawItem) {
+      //   return null;
+      // }
+
       return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
     },
     async payment(parent: Invoice, args, context) {
@@ -289,6 +295,8 @@ export const invoice: Resolvers<any> = {
   },
   InvoiceItem: {
     async article(parent, args, context) {
+      if (!parent) return null;
+
       const getArticleUseCase = new GetArticleDetailsUsecase(
         context.repos.manuscript
       );
