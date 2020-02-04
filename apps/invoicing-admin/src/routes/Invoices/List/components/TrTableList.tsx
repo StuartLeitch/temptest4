@@ -49,28 +49,18 @@ const TrTableInvoicesList = ({ invoices }) => (
         dateCreated
       }) => (
         <tr key={id}>
-          {/* <td className='align-middle'>
-            <div>
-              <Link
-                to={`/invoices/details/${id}`}
-                className='text-decoration-none'
-              >
-                {id}
-              </Link>
-            </div>
-          </td> */}
           <td className='align-middle'>
-            <div>
-              <Link
-                to={`/invoices/details/${id}`}
-                className='text-decoration-none'
-              >
-                {INVOICE_STATUS[status]}
-              </Link>
-            </div>
+            <div>{INVOICE_STATUS[status]}</div>
           </td>
           <td className='align-middle'>
-            <span>{referenceNumber ? `#${referenceNumber}` : ' '}</span>
+            <Link
+              to={`/invoices/details/${id}`}
+              className='text-decoration-none'
+            >
+              <span className='text-secondary'>
+                <strong>{referenceNumber || ' '}</strong>
+              </span>
+            </Link>
           </td>
           <td className='align-middle text-nowrap'>
             {dateIssued && format(new Date(dateIssued), 'dd MMMM yyyy')}
@@ -83,7 +73,9 @@ const TrTableInvoicesList = ({ invoices }) => (
             {invoiceItem?.article?.journalTitle}
           </td>
           <td className='align-middle'>
-            <span>{invoiceItem?.article?.customId}</span>
+            <span className='text-secondary'>
+              {invoiceItem?.article?.customId}
+            </span>
           </td>
           <td className='align-middle'>{invoiceItem?.article?.title}</td>
           <td className='align-middle text-nowrap'>

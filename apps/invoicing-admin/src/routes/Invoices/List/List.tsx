@@ -45,7 +45,7 @@ query fetchInvoices(
   }
 }
 fragment invoiceFragment on Invoice {
-  invoiceId
+  id: invoiceId
   status
   dateCreated
   dateIssued
