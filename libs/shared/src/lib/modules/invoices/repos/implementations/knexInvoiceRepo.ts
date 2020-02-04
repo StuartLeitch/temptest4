@@ -16,32 +16,64 @@ function filtered(src: any, filters: any) {
   if (!filters) return src;
 
   let here = src;
-  // const invoices = filters.navigate('invoices', 'invoices');
-  // const article = invoices.navigate('invoiceItem', 'article');
-  // const journalTitle = article.navigate('journalTitle');
-  // if (journalTitle.with('in')) {
-  //   here = here[JoinTag(journalTitle)](
-  //     TABLES.JOURNALS,
-  //     `${TABLES.ARTICLES}.journalId`,
-  //     '=',
-  //     `${TABLES.JOURNALS}.id`
-  //   ).whereIn(`${TABLES.JOURNALS}.name`, journalTitle.get('in'));
-  // }
 
-  // const customId = article.navigate('customId');
-  // if (customId.with('in')) {
-  //   here = here.whereIn(`${TABLES.ARTICLES}.customId`, customId.get('in'));
-  // }
+  const journalTitleFilter =
+    filters?.invoices?.invoiceItem?.article?.journalTitle;
+  if ('in' in journalTitleFilter && journalTitleFilter?.in?.length > 0) {
+    here = here
+      .join(
+        TABLES.INVOICE_ITEMS,
+        `${TABLES.INVOICES}.id`,
+        '=',
+        `${TABLES.INVOICE_ITEMS}.invoiceId`
+      )
+      .join(
+        TABLES.ARTICLES,
+        `${TABLES.ARTICLES}.id`,
+        '=',
+        `${TABLES.INVOICE_ITEMS}.manuscriptId`
+      )
+      .join(
+        TABLES.CATALOG,
+        `${TABLES.CATALOG}.journalId`,
+        '=',
+        `${TABLES.ARTICLES}.journalId`
+      )
+      .whereIn(`${TABLES.CATALOG}.id`, journalTitleFilter['in']);
+  }
 
-  // const transactionStatus = invoices.navigate('transaction', 'status');
-  // if (transactionStatus.with('in')) {
-  //   here = here[JoinTag(journalTitle)](
-  //     TABLES.TRANSACTIONS,
-  //     `${TABLES.INVOICES}.transactionId`,
-  //     '=',
-  //     `${TABLES.TRANSACTIONS}.id`
-  //   ).whereIn(`${TABLES.TRANSACTIONS}.status`, transactionStatus.get('in'));
-  // }
+  const customIdFilter = filters?.invoices?.invoiceItem?.article?.customId;
+  if ('eq' in customIdFilter && customIdFilter?.eq?.length > 0) {
+    here = here
+      .join(
+        TABLES.INVOICE_ITEMS,
+        `${TABLES.INVOICES}.id`,
+        '=',
+        `${TABLES.INVOICE_ITEMS}.invoiceId`
+      )
+      .join(
+        TABLES.ARTICLES,
+        `${TABLES.ARTICLES}.id`,
+        '=',
+        `${TABLES.INVOICE_ITEMS}.manuscriptId`
+      )
+      .where(`${TABLES.ARTICLES}.customId`, customIdFilter['eq']);
+  }
+
+  const transactionStatusFilter = filters?.invoices?.transaction?.status;
+  if (
+    'in' in transactionStatusFilter &&
+    transactionStatusFilter?.in?.length > 0
+  ) {
+    here = here
+      .join(
+        TABLES.TRANSACTIONS,
+        `${TABLES.INVOICES}.transactionId`,
+        '=',
+        `${TABLES.TRANSACTIONS}.id`
+      )
+      .whereIn(`${TABLES.TRANSACTIONS}.status`, transactionStatusFilter['in']);
+  }
 
   const invoiceStatusFilter = filters?.invoices?.status;
   if ('in' in invoiceStatusFilter && invoiceStatusFilter?.in.length > 0) {
@@ -56,14 +88,7 @@ function filtered(src: any, filters: any) {
       `"${TABLES.INVOICES}"."invoiceNumber" = ${invoiceNumber} and extract(year from "${TABLES.INVOICES}"."dateAccepted") = ${creationYear}`
     );
   }
-  //   for (const number of referenceNumber.get('in')) {
-  //     const [paddedNumber, creationYear] = number.split('/');
-  //     const invoiceNumber = parseInt(paddedNumber, 10);
-  //     here = here.whereRaw(
-  //       `"${TABLES.INVOICES}"."invoiceNumber" = ${invoiceNumber} and extract(year from "${TABLES.INVOICES}"."dateAccepted") = ${creationYear}`
-  //     );
-  //   }
-  // }
+
   return here;
 }
 

@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import faker from 'faker/locale/en_US';
+import useDebouncedEffect from 'use-debounced-effect';
 import MaskedInput from 'react-text-mask';
 
 import { CustomInput, Input, Nav, NavItem, NavLink } from '../../../components';
 import { JournalsSelections } from '../Invoices/JournalsSelections';
 
 const InvoicesLeftNav = props => {
-  const onFilterHandler = (filterName, value = null) => e => {
-    props.setFilter(filterName, value, e.target);
-  };
+  const [eventTarget, onFilterHandler] = useState('');
+
+  useDebouncedEffect(
+    () => {
+      // * debounced 300 millisecs
+      const value =
+        eventTarget?.type === 'checkbox'
+          ? eventTarget.checked
+          : eventTarget.value;
+      props.setFilter({ [eventTarget.name]: value });
+    },
+    300,
+    [eventTarget]
+  );
+
   return (
     <React.Fragment>
       {/* START Invoice Status */}
@@ -21,7 +34,8 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={onFilterHandler('invoiceStatus', 'DRAFT')}
+            onChange={evt => onFilterHandler(evt.target)}
+            name='invoiceStatus.DRAFT'
             className='text-warning'
             type='checkbox'
             id='invoice-status-draft'
@@ -34,7 +48,8 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={onFilterHandler('invoiceStatus', 'ACTIVE')}
+            name='invoiceStatus.ACTIVE'
+            onChange={evt => onFilterHandler(evt.target)}
             className='text-primary'
             type='checkbox'
             id='invoice-status-active'
@@ -47,7 +62,8 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={onFilterHandler('invoiceStatus', 'FINAL')}
+            name='invoiceStatus.FINAL'
+            onChange={evt => onFilterHandler(evt.target)}
             className='text-success'
             type='checkbox'
             id='invoice-status-final'
@@ -70,6 +86,8 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
+            onChange={evt => onFilterHandler(evt.target)}
+            name='transactionStatus.DRAFT'
             className='text-warning'
             type='checkbox'
             id='checkbox1'
@@ -82,6 +100,8 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
+            onChange={evt => onFilterHandler(evt.target)}
+            name='transactionStatus.ACTIVE'
             className='text-primary'
             type='checkbox'
             id='checkbox2'
@@ -94,6 +114,8 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
+            onChange={evt => onFilterHandler(evt.target)}
+            name='transactionStatus.FINAL'
             className='text-success'
             type='checkbox'
             id='checkbox3'
@@ -114,7 +136,12 @@ const InvoicesLeftNav = props => {
             <i className='fas fa-angle-down align-self-center ml-auto'></i>
           </NavLink>
         </NavItem>
-        <JournalsSelections />
+        <JournalsSelections
+          onChange={selections => {
+            const target = { name: 'journalTitle', value: selections };
+            onFilterHandler(target);
+          }}
+        />
         {/* <NavItem className='d-flex p-0 form-control'>
       </NavItem> */}
       </Nav>
@@ -143,7 +170,9 @@ const InvoicesLeftNav = props => {
             ]}
             className='form-control'
             placeholder='Enter a reference number'
-            onChange={onFilterHandler('referenceNumber')}
+            name='referenceNumber'
+            type='input'
+            onChange={evt => onFilterHandler(evt.target)}
             tag={MaskedInput}
             id='refNumber'
           />
@@ -160,6 +189,8 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex p-0'>
           <Input
+            name='customId'
+            onChange={evt => onFilterHandler(evt.target)}
             className='form-control'
             placeholder='Enter a custom ID'
             // tag={MaskedInput}

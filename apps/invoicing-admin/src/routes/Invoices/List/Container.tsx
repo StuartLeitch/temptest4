@@ -10,42 +10,76 @@ import InvoicesList from './List';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 // import { InvoicesSmHeader } from '../../components/Invoices/InvoicesSmHeader';
 
+const createPath = (obj, path, value = null) => {
+  path = typeof path === 'string' ? path.split('.') : path;
+  let current = obj;
+  while (path.length > 1) {
+    const [head, ...tail] = path;
+    path = tail;
+    if (current[head] === undefined) {
+      current[head] = {};
+    }
+    current = current[head];
+  }
+  current[path[0]] = value;
+  return obj;
+};
+
 const InvoicesContainer = props => {
   const [filters, setFilters] = useState({
-    invoiceStatus: []
+    invoiceStatus: [],
+    transactionStatus: [],
+    journalTitle: [],
+    referenceNumber: null,
+    customId: null
   });
-  const setFilter = (filterName, filterValue, target) => {
-    // console.info(target);
+  const setFilter = filterConfig => {
+    let _filters = { ...filters };
+    const [[key, value]] = Object.entries(filterConfig);
+    const currentCriteria = createPath({}, key, value);
 
-    const _filters = { ...filters };
-
-    const { checked, value } = target;
-    // console.info(filterName);
-    // console.info(checked);
-    // console.info(value);
-
-    if (checked in target) {
-      if (checked) {
-        if (!(filterName in _filters)) {
-          _filters[filterName] = [];
-        }
-        _filters[filterName].push(filterValue);
+    if ('invoiceStatus' in currentCriteria) {
+      const [[status, selected]] = Object.entries(
+        currentCriteria.invoiceStatus
+      );
+      if (selected) {
+        _filters['invoiceStatus'].push(status);
       } else {
-        _filters[filterName].splice(
-          _filters[filterName].indexOf(filterValue),
+        _filters['invoiceStatus'].splice(
+          _filters['invoiceStatus'].indexOf(status),
           1
         );
       }
     }
 
-    if (value) {
-      if (!(filterName in _filters)) {
-        _filters[filterName] = '';
+    if ('transactionStatus' in currentCriteria) {
+      const [[status, selected]] = Object.entries(
+        currentCriteria.transactionStatus
+      );
+      if (selected) {
+        _filters['transactionStatus'].push(status);
+      } else {
+        _filters['transactionStatus'].splice(
+          _filters['transactionStatus'].indexOf(status),
+          1
+        );
       }
-      _filters[filterName] = value;
     }
 
-    // console.info(_filters);
+    if ('journalTitle' in currentCriteria) {
+      const journals = currentCriteria.journalTitle;
+      _filters['journalTitle'] = journals.map(j => j.journalId);
+    }
+
+    if ('referenceNumber' in currentCriteria) {
+      _filters['referenceNumber'] = currentCriteria.referenceNumber;
+    }
+
+    if ('customId' in currentCriteria) {
+      _filters['customId'] = currentCriteria.customId;
+    }
+
+    console.info(_filters);
     setFilters(_filters);
   };
 

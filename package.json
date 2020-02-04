@@ -139,6 +139,7 @@
     "styled-components": "^5.0.0",
     "styled-system": "^5.1.4",
     "text-mask-addons": "^3.8.0",
+    "use-debounced-effect": "0.0.3",
     "webcomponent-router": "^0.4.3",
     "winston": "^3.2.1",
     "winston-cloudwatch": "^2.3.0",

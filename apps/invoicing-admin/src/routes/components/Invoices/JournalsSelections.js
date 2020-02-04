@@ -3,8 +3,9 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 
 import journals from './journals';
 
-export const JournalsSelections = () => (
+export const JournalsSelections = props => (
   <Typeahead
+    {...props}
     clearButton
     multiple
     id='journalsSelections'

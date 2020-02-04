@@ -121,11 +121,76 @@ query fetchInvoices(
   ) {
     totalCount
     invoices {
-      invoiceId
-      status
-      referenceNumber
+      ...invoiceFragment
     }
   }
+}
+fragment invoiceFragment on Invoice {
+  invoiceId
+  status
+  dateCreated
+  dateIssued
+  dateAccepted
+  referenceNumber
+  payer {
+    ...payerFragment
+  }
+  invoiceItem {
+    id
+    price
+    rate
+    vat
+    vatnote
+    dateCreated
+    coupons {
+      ...couponFragment
+    }
+    waivers {
+      ...waiverFragment
+    }
+    article {
+      ...articleFragment
+    }
+  }
+}
+fragment payerFragment on Payer {
+  id
+  type
+  name
+  email
+  vatId
+  organization
+  address {
+    ...addressFragment
+  }
+}
+fragment addressFragment on Address {
+  city
+  country
+  state
+  postalCode
+  addressLine1
+}
+fragment couponFragment on Coupon {
+  code
+  reduction
+}
+fragment waiverFragment on Waiver {
+  reduction
+  type_id
+}
+fragment articleFragment on Article {
+  id
+  title
+  created
+  articleType
+  authorCountry
+  authorEmail
+  customId
+  journalTitle
+  authorSurname
+  authorFirstName
+  journalTitle
 }
 `;
 
@@ -145,9 +210,9 @@ const RecentInvoicesList = props => {
     const filters = {
       invoiceStatus: []
     };
-    if (props.filters.id === 'invoice-status-draft' && props.filters.checked) {
-      filters.invoiceStatus = ['DRAFT'];
-    }
+    // if (props.filters.id === 'invoice-status-draft' && props.filters.checked) {
+    //   filters.invoiceStatus = ['DRAFT'];
+    // }
 
     currPaginator = {
       offset: data?.currentPage - 1,
@@ -161,7 +226,8 @@ const RecentInvoicesList = props => {
 
   useEffect(() => {
     async function fetchData() {
-      const { filters } = props;
+      let { filters } = props;
+      // console.info(filters);
 
       setPagination({ ...paginator });
       await fetchInvoices({
