@@ -13,10 +13,10 @@ import {
   NavItem,
   NavLink
 } from '../../../components';
-import { JournalsSelections } from '../Invoices/JournalsSelections';
+import { JournalsSelections } from './JournalsSelections';
 
 const InvoicesLeftNav = props => {
-  const [eventTarget, onFilterHandler] = useState('');
+  const [eventTarget, onFilterHandler]: [any, (any) => void] = useState('');
 
   useDebouncedEffect(
     () => {
