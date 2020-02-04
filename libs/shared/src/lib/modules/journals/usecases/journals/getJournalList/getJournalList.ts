@@ -36,7 +36,7 @@ export class GetJournalListUsecase
     return {};
   }
 
-  @Authorize('invoice:read')
+  @Authorize('journal:read')
   public async execute(
     request: GetJournalListDTO,
     context?: GetJournalListAuthenticationContext
