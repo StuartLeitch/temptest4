@@ -9,7 +9,8 @@ class SubmissionDataView extends AbstractEventView
   getCreateQuery(): string {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS SELECT submission_events.type AS submission_event,
+AS SELECT submission_events.id as event_id,
+    submission_events.type AS submission_event,
     submission_events.payload ->> 'submissionId'::text AS submission_id,
     ((submission_events.payload -> 'manuscripts'::text) -> 0) ->> 'customId'::text AS manuscript_custom_id,
     (((submission_events.payload -> 'manuscripts'::text) -> 0) -> 'articleType'::text) ->> 'name'::text AS article_type,
@@ -23,6 +24,8 @@ WITH DATA;
   }
 
   postCreateQueries = [
+    `create index on ${this.getViewName()} (submission_id)`,
+    `create index on ${this.getViewName()} (submission_date)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`

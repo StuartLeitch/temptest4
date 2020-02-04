@@ -8,7 +8,8 @@ class InvoicesDataView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS SELECT invoice_events.type AS event,
+AS SELECT invoice_events.id as event_id,
+    invoice_events.type AS event,
     invoice_events.payload ->> 'invoiceId'::text AS invoice_id,
     invoice_events.payload ->> 'invoiceStatus'::text AS status,
     (invoice_events.payload ->> 'invoiceCreatedDate'::text)::timestamp without time zone AS manuscript_accepted_date,
@@ -25,6 +26,8 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (status)`,
+    `create index on ${this.getViewName()} (manuscript_accepted_date)`,
+    `create index on ${this.getViewName()} (invoice_issue_date)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (event)`
   ];
