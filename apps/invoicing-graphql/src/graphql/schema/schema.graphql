@@ -95,6 +95,12 @@ input PayerInput {
   address: AddressInput
 }
 
+type Journal {
+  journalId: String
+  journalTitle: String
+  # ... (TODO: add missing fields here)
+}
+
 enum PayerType {
   INSTITUTION
   INDIVIDUAL
@@ -205,9 +211,6 @@ input Filtering {
   invoices: InvoicesFiltering
 }
 
-# directive @filters on OBJECT
-# directive @outer on FIELD
-
 type Query {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
@@ -221,6 +224,7 @@ type Query {
   ): InvoiceVat
   invoices(filtering: Filtering, pagination: Pagination): PaginatedInvoices
   invoiceIdByManuscriptCustomId(customId: String): InvoiceId
+  journals: [Journal]
   echo(value: String): String
 }
 
