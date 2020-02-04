@@ -12,6 +12,7 @@ export type AllMigrateEntireInvoiceErrors =
   | MigrateEntireInvoiceErrors.PostalCodeRequired
   | MigrateEntireInvoiceErrors.PayerNameRequired
   | MigrateEntireInvoiceErrors.PayerTypeRequired
+  | MigrateEntireInvoiceErrors.TransactionError
   | MigrateEntireInvoiceErrors.CityRequired
   | MigrateEntireInvoiceErrors.ApcRequired;
 
@@ -121,6 +122,14 @@ export namespace MigrateEntireInvoiceErrors {
     constructor() {
       super(false, {
         message: `Payer name is required, it must contain First Name and Last Name.`
+      });
+    }
+  }
+
+  export class TransactionError extends Result<UseCaseError> {
+    constructor(message: string) {
+      super(false, {
+        message
       });
     }
   }
