@@ -10,6 +10,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
+    "downlevelIteration": true,
     "module": "esnext",
     "typeRoots": ["node_modules/@types"],
     "lib": ["es2017", "dom"],
@@ -23,7 +24,9 @@
       "@hindawi/invoicing-web/*": ["apps/invoicing-web/src/*"],
       "@hindawi/reporting-backend/*": ["apps/reporting-backend/src/*"],
       "@hindawi/invoicing-graphql/*": ["apps/invoicing-graphql/src/*"],
-      "@hindawi/eve": ["libs/eve/src/index.ts"]
+      "@hindawi/eve": ["libs/eve/src/index.ts"],
+      "@hindawi/utils": ["libs/shared/src/lib/utils/index.ts"],
+      "@hindawi/infrastructure": ["libs/shared/src/lib/infrastructure/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

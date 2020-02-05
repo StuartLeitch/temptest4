@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import faker from 'faker/locale/en_US';
-import useDebouncedEffect from 'use-debounced-effect';
+import React from 'react';
 import MaskedInput from 'react-text-mask';
+import { useDebouncedCallback } from 'use-debounce';
 
 import {
   Button,
@@ -16,19 +15,16 @@ import {
 import { JournalsSelections } from './JournalsSelections';
 
 const InvoicesLeftNav = props => {
-  const [eventTarget, onFilterHandler]: [any, (any) => void] = useState('');
-
-  useDebouncedEffect(
-    () => {
-      // * debounced 300 millisecs
+  // const [eventTarget, onFilterHandler]: [any, (any) => void] = useState('');
+  const [onFilterHandler] = useDebouncedCallback(
+    (eventTarget) => {
       const value =
         eventTarget?.type === 'checkbox'
           ? eventTarget.checked
           : eventTarget.value;
-      props.setFilter({ [eventTarget.name]: value });
+      props.setFilter(eventTarget.name, value);
     },
-    300,
-    [eventTarget]
+    300
   );
 
   return (

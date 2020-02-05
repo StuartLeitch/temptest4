@@ -27,7 +27,7 @@ import { GetManuscriptByInvoiceIdResponse } from './getManuscriptByInvoiceIdResp
 import { GetManuscriptByInvoiceIdErrors } from './getManuscriptByInvoiceIdErrors';
 import { GetManuscriptByInvoiceIdDTO } from './getManuscriptByInvoiceIdDTO';
 
-import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+// import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { Manuscript } from '../../domain/Manuscript';
 
 export type GetManuscriptByInvoiceIdContext = AuthorizationContext<Roles>;

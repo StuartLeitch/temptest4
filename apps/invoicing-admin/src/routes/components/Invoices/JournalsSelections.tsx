@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { useManualQuery, useQuery } from 'graphql-hooks';
+import { useQuery } from 'graphql-hooks';
 
 const JOURNALS_QUERY = `
 query fetchJournals {

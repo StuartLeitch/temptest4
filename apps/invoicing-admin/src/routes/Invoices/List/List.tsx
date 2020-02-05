@@ -20,7 +20,7 @@ query fetchInvoices(
   $referenceNumber: String
   $invoiceStatus: [InvoiceStatus]
   $transactionStatus: [TransactionStatus]
-  $journalTitle: [String]
+  $journalId: [String]
 ) {
   invoices(
     filtering: {
@@ -29,7 +29,7 @@ query fetchInvoices(
         referenceNumber: { eq: $referenceNumber }
         invoiceItem: {
           article: {
-            journalTitle: { in: $journalTitle }
+            journalId: { in: $journalId }
             customId: { eq: $customId }
           }
         }
@@ -124,40 +124,52 @@ const RecentInvoicesList = props => {
     INVOICES_QUERY
   );
 
-  let currPaginator = { ...paginator };
+  // let currPaginator = { ...paginator };
   const onPageChanged = (data: any) => {
-    const filters = {
-      invoiceStatus: []
-    };
+    // const filters = {
+    //   invoiceStatus: []
+    // };
     // if (props.filters.id === 'invoice-status-draft' && props.filters.checked) {
     //   filters.invoiceStatus = ['DRAFT'];
     // }
 
-    currPaginator = {
+    // currPaginator = {
+    //   offset: data?.currentPage - 1,
+    //   limit: data?.pageLimit
+    // };
+    // setPagination({ ...currPaginator });
+    setPagination({
       offset: data?.currentPage - 1,
       limit: data?.pageLimit
-    };
-    setPagination({ ...currPaginator });
-    fetchInvoices({
-      variables: { ...filters, ...currPaginator }
     });
+    // fetchInvoices({
+    //   // variables: { ...filters, ...currPaginator }
+    //   variables: currPaginator
+    // });
   };
 
   useEffect(() => {
     async function fetchData() {
-      let { filters } = props;
-      // console.info(filters);
+      const { filters } = props;
+      const _filters = {
+        invoiceStatus: [...filters.invoiceStatus],
+        transactionStatus: [...filters.transactionStatus],
+        journalId: filters.journalId,
+        referenceNumber: filters.referenceNumber,
+        customId: filters.customId
+      };
 
-      setPagination({ ...paginator });
+      // setPagination({ ...paginator });
       await fetchInvoices({
         variables: {
-          ...filters,
-          ...paginator
+          ..._filters,
+          // ...paginator
+          ...pagination
         }
       });
     }
     fetchData();
-  }, [props.filters]);
+  }, [props.filters, pagination]);
 
   if (loading)
     return (

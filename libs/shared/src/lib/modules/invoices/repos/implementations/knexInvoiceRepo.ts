@@ -3,94 +3,14 @@ import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceMap } from '../../mappers/InvoiceMap';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
-import { TransactionId } from './../../../transactions/domain/TransactionId';
+import { TransactionId } from '../../../transactions/domain/TransactionId';
 
 import { InvoiceRepoContract } from '../invoiceRepo';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 
-import { Bundle, JoinTag } from '../../../../utils/Utils';
-
-function filtered(src: any, filters: any) {
-  if (!filters) return src;
-
-  let here = src;
-
-  const journalTitleFilter =
-    filters?.invoices?.invoiceItem?.article?.journalTitle;
-  if ('in' in journalTitleFilter && journalTitleFilter?.in?.length > 0) {
-    here = here
-      .join(
-        TABLES.INVOICE_ITEMS,
-        `${TABLES.INVOICES}.id`,
-        '=',
-        `${TABLES.INVOICE_ITEMS}.invoiceId`
-      )
-      .join(
-        TABLES.ARTICLES,
-        `${TABLES.ARTICLES}.id`,
-        '=',
-        `${TABLES.INVOICE_ITEMS}.manuscriptId`
-      )
-      .join(
-        TABLES.CATALOG,
-        `${TABLES.CATALOG}.journalId`,
-        '=',
-        `${TABLES.ARTICLES}.journalId`
-      )
-      .whereIn(`${TABLES.CATALOG}.id`, journalTitleFilter['in']);
-  }
-
-  const customIdFilter = filters?.invoices?.invoiceItem?.article?.customId;
-  if ('eq' in customIdFilter && customIdFilter?.eq?.length > 0) {
-    here = here
-      .join(
-        TABLES.INVOICE_ITEMS,
-        `${TABLES.INVOICES}.id`,
-        '=',
-        `${TABLES.INVOICE_ITEMS}.invoiceId`
-      )
-      .join(
-        TABLES.ARTICLES,
-        `${TABLES.ARTICLES}.id`,
-        '=',
-        `${TABLES.INVOICE_ITEMS}.manuscriptId`
-      )
-      .where(`${TABLES.ARTICLES}.customId`, customIdFilter['eq']);
-  }
-
-  const transactionStatusFilter = filters?.invoices?.transaction?.status;
-  if (
-    'in' in transactionStatusFilter &&
-    transactionStatusFilter?.in?.length > 0
-  ) {
-    here = here
-      .join(
-        TABLES.TRANSACTIONS,
-        `${TABLES.INVOICES}.transactionId`,
-        '=',
-        `${TABLES.TRANSACTIONS}.id`
-      )
-      .whereIn(`${TABLES.TRANSACTIONS}.status`, transactionStatusFilter['in']);
-  }
-
-  const invoiceStatusFilter = filters?.invoices?.status;
-  if ('in' in invoiceStatusFilter && invoiceStatusFilter?.in.length > 0) {
-    here = here.whereIn(`${TABLES.INVOICES}.status`, invoiceStatusFilter['in']);
-  }
-
-  const referenceNumber = filters?.invoices?.referenceNumber;
-  if ('eq' in referenceNumber && referenceNumber?.eq?.length > 0) {
-    const [paddedNumber, creationYear] = referenceNumber.eq.split('/');
-    const invoiceNumber = parseInt(paddedNumber, 10);
-    here = here.whereRaw(
-      `"${TABLES.INVOICES}"."invoiceNumber" = ${invoiceNumber} and extract(year from "${TABLES.INVOICES}"."dateAccepted") = ${creationYear}`
-    );
-  }
-
-  return here;
-}
+import { filtered } from './utils';
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
@@ -159,7 +79,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset * limit)
       .limit(limit)
-      .select(['invoices.*']);
+      .select([`${TABLES.INVOICES}.*`]);
 
     //  console.info(invoices);
     // console.info(invoices.map(i => InvoiceMap.toDomain(i)));

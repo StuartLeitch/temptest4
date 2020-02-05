@@ -51,7 +51,7 @@ export class GetRecentInvoicesUsecase
       } catch (err) {
         return left(
           new AppError.UnexpectedError(
-            new Error('Getting recent invoices failed.')
+            'Getting recent invoices failed.', err
           )
         );
       }

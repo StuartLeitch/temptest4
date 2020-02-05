@@ -183,14 +183,14 @@ input TransactionStatusFilter {
 input ReferenceNumberFilter {
   eq: String
 }
-input JournalTitleFilter {
+input JournalIdFilter {
   in: [String]
 }
 input CustomIdFilter {
   eq: String
 }
 input ArticleFilter {
-  journalTitle: JournalTitleFilter
+  journalId: JournalIdFilter
   customId: CustomIdFilter
 }
 input TransactionFilter {

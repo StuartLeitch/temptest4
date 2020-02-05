@@ -28,60 +28,37 @@ const createPath = (obj, path, value = null) => {
 
 const InvoicesContainer = props => {
   const [filters, setFilters] = useState({
-    invoiceStatus: [],
-    transactionStatus: [],
-    journalTitle: [],
+    invoiceStatus: new Set,
+    transactionStatus: new Set,
+    journalId: null,
     referenceNumber: null,
     customId: null
   });
-  const setFilter = filterConfig => {
-    let _filters = { ...filters };
-    const [[key, value]] = Object.entries(filterConfig);
-    const currentCriteria = createPath({}, key, value);
-
-    if ('invoiceStatus' in currentCriteria) {
-      const [[status, selected]] = Object.entries(
-        currentCriteria.invoiceStatus
-      );
-      if (selected) {
-        _filters['invoiceStatus'].push(status);
+  const setFilter = (name, value: string|any[]) => {
+    const [m, id, status] = /^(\S+?)(?:\.(\S+))?$/.exec(name);
+    const newFilters = { ...filters };
+    switch (id) {
+    case 'invoiceStatus':
+    case 'transactionStatus':
+      newFilters[id] = new Set(filters[id]);
+      if (value) {
+        newFilters[id].add(status);
       } else {
-        _filters['invoiceStatus'].splice(
-          _filters['invoiceStatus'].indexOf(status),
-          1
-        );
+        newFilters[id].delete(status);
       }
+      break;
+
+    case 'journalTitle':
+      newFilters.journalId = (value as any[]).map(j => j.journalId);
+      break;
+
+    default:
+      // 'referenceNumber'
+      // 'customId'
+      newFilters[id] = value;
     }
 
-    if ('transactionStatus' in currentCriteria) {
-      const [[status, selected]] = Object.entries(
-        currentCriteria.transactionStatus
-      );
-      if (selected) {
-        _filters['transactionStatus'].push(status);
-      } else {
-        _filters['transactionStatus'].splice(
-          _filters['transactionStatus'].indexOf(status),
-          1
-        );
-      }
-    }
-
-    if ('journalTitle' in currentCriteria) {
-      const journals = currentCriteria.journalTitle;
-      _filters['journalTitle'] = journals.map(j => j.journalId);
-    }
-
-    if ('referenceNumber' in currentCriteria) {
-      _filters['referenceNumber'] = currentCriteria.referenceNumber;
-    }
-
-    if ('customId' in currentCriteria) {
-      _filters['customId'] = currentCriteria.customId;
-    }
-
-    console.info(_filters);
-    setFilters(_filters);
+    setFilters(newFilters);
   };
 
   return (

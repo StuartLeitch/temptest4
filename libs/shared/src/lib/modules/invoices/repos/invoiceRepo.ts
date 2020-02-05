@@ -12,7 +12,7 @@ interface Paginated {
 }
 
 export interface InvoiceRepoContract extends Repo<Invoice> {
-  getRecentInvoices(paginated: Paginated, filters?: Bundle<string, any>): Promise<any>;
+  getRecentInvoices(args?: any): Promise<any>;
   getInvoiceById(invoiceId: InvoiceId): Promise<Invoice>;
   getInvoiceByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Invoice>;
   getInvoicesByTransactionId(transactionId: TransactionId): Promise<Invoice[]>;
