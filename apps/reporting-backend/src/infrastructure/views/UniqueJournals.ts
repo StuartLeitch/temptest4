@@ -14,7 +14,7 @@ AS SELECT DISTINCT ON (j1.event_date) j1.event,
     j1.journal_issn,
     j1.journal_name,
     j1.is_active,
-    j1.jurnal_code,
+    j1.journal_code,
     j1.journal_email,
     j1.event_date
     FROM ${journalsDataView.getViewName()} j1

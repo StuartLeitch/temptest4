@@ -5,11 +5,14 @@ import { Logger } from '../../lib/logger';
 import { differenceInSeconds } from '../../utils/utils';
 
 import { AbstractEventView } from './contracts/EventViewContract';
+
 import invoicesDataView from './InvoicesDataView';
 import journalsView from './JournalsView';
 import submissionDataView from './SubmissionDataView';
 import submissionsView from './SubmissionsView';
 import uniqueJournals from './UniqueJournals';
+import authorsView from './AuthorsView';
+import invoicesView from './InvoicesView';
 
 const logger = new Logger('materializedView');
 
@@ -19,7 +22,9 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     journalsView,
     submissionDataView,
     submissionsView,
-    uniqueJournals
+    uniqueJournals,
+    authorsView,
+    invoicesView
   ]
 ) as AbstractEventView[];
 

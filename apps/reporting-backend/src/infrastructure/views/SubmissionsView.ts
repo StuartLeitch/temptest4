@@ -16,11 +16,15 @@ AS SELECT
   t.submission_event,
   t.article_type,
   t.submission_date,
+  t.special_issue_id,
+  t.section_id,
   t.updated_date,
   t.title,
   t.journal_id,
   t.journal_name,
-  t.submitting_author_country
+  t.journal_code,
+  t.submitting_author_country,
+  t.last_version_index
 FROM (
   SELECT
   sd.*,
@@ -34,8 +38,12 @@ FROM (
       s.submission_date,
       s.updated_date,
       s.title,
+      s.last_version_index,
+      s.special_issue_id,
+      s.section_id,
       j.journal_id,
       j.journal_name,
+      j.journal_code,
       COALESCE(c.name, s.submitting_author_country, 'Unknown Country') AS submitting_author_country
       FROM ${submissionDataView.getViewName()} s
       LEFT JOIN ${uniqueJournalsView.getViewName()} j ON s.journal_id = j.journal_id
