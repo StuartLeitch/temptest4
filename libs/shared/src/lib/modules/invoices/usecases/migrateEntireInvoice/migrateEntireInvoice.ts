@@ -1,7 +1,7 @@
 // * Core Domain
 import { Result, left, right, Either } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { AsyncEither, all, asyncAll } from '../../../../core/logic/AsyncEither';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
@@ -18,6 +18,8 @@ import { TransactionRepoContract } from '../../../transactions/repos/transaction
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+
+import { Invoice } from '../../domain/Invoice';
 
 import { PublishInvoiceCreatedUsecase } from '../publishInvoiceCreated';
 import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
@@ -71,35 +73,53 @@ export class MigrateEntireInvoiceUsecase
     request: MigrateEntireInvoiceDTO,
     context?: MigrateEntireInvoiceContext
   ): Promise<MigrateEntireInvoiceResponse> {
-    const a = new AsyncEither<
-      AppError.UnexpectedError,
-      MigrateEntireInvoiceDTO
-    >(request);
-    const maybeRequest = a.chain(request => validateRequest(request));
+    const a = new AsyncEither<null, MigrateEntireInvoiceDTO>(request);
+    const maybeInvoicesAndRequest = a
+      .chain(request => validateRequest(request))
+      .asyncChain(this.requestWithInvoices);
+    const transactionExecution = maybeInvoicesAndRequest
+      .map(({ request, invoices }) => ({
+        acceptanceDate: request.acceptanceDate,
+        invoices
+      }))
+      .asyncChain(this.updateTransactionStatusOfInvoice);
+    const maybeTransaction = await transactionExecution.execute();
     return null;
   }
 
-  private async getTransactionId(manuscriptId: string) {
+  private async requestWithInvoices(request: MigrateEntireInvoiceDTO) {
+    return this.invoicesWithManuscriptCustomId(request.apc.manuscriptId).then(
+      maybeInvoices => {
+        return maybeInvoices.map(invoices => ({ invoices, request }));
+      }
+    );
+  }
+
+  private async invoicesWithManuscriptCustomId(customId: string) {
     const invoiceIdByManuscriptCustomIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
       this.manuscriptRepo,
       this.invoiceItemRepo
     );
     const getInvoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
 
-    const transactionIdExecution = new AsyncEither<null, string>(manuscriptId)
-      .asyncChain(manuscriptId =>
-        invoiceIdByManuscriptCustomIdUsecase.execute({
-          customId: manuscriptId
-        })
-      )
-      .map(invoiceIdsResponse => invoiceIdsResponse.getValue())
-      .asyncChain(invoiceIds =>
-        getInvoiceUsecase.execute({
-          invoiceId: invoiceIds[0].id.toString()
-        })
-      )
-      .map(invoiceResponse => invoiceResponse.getValue().transactionId);
-    return transactionIdExecution.execute();
+    const customIdObj = { customId };
+
+    const execution = new AsyncEither<null, { customId: string }>(customIdObj)
+      .asyncChain(invoiceIdByManuscriptCustomIdUsecase.execute)
+      .map(response => response.getValue())
+      .asyncChain(invoiceIds => {
+        return asyncAll(
+          invoiceIds
+            .map(id => ({ invoiceId: id.id.toString() }))
+            .map(invoiceRequest => getInvoiceUsecase.execute(invoiceRequest))
+        );
+      })
+      .map(invoices => invoices.map(invoice => invoice.getValue()));
+    return execution.execute();
+  }
+
+  private getTransactionId(invoices: Invoice[]) {
+    return invoices[0].transactionId;
   }
 
   private async getTransactionDetails(
@@ -116,5 +136,38 @@ export class MigrateEntireInvoiceUsecase
       );
     }
     return right(response.getValue());
+  }
+
+  private async updateTransactionStatusOfInvoice({
+    acceptanceDate,
+    invoices
+  }: {
+    acceptanceDate: string;
+    invoices: Invoice[];
+  }) {
+    const transactionId = this.getTransactionId(invoices);
+    const execution = new AsyncEither<null, TransactionId>(transactionId)
+      .asyncChain(this.getTransactionDetails)
+      .asyncChain(transaction => {
+        return this.updateTransactionStatus(acceptanceDate, transaction);
+      });
+    return execution.execute();
+  }
+
+  private async updateTransactionStatus(
+    acceptanceDate: string,
+    transaction: Transaction
+  ): Promise<Either<AppError.UnexpectedError, Transaction>> {
+    if (acceptanceDate) {
+      transaction.markAsActive();
+      try {
+        const newTransaction = await this.transactionRepo.save(transaction);
+        return right(newTransaction);
+      } catch (err) {
+        return left(new AppError.UnexpectedError(e));
+      }
+    }
+
+    return right(transaction);
   }
 }
