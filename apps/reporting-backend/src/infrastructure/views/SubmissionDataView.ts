@@ -14,7 +14,8 @@ AS SELECT se.id as event_id,
     se.payload ->> 'submissionId'::text AS submission_id,
     ((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) ->> 'customId'::text AS manuscript_custom_id,
     (((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) -> 'articleType'::text) ->> 'name'::text AS article_type,
-    (((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) ->> 'updated'::text)::timestamp without time zone AS submission_date,
+    (((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) ->> 'created'::text)::timestamp without time zone AS submission_date,
+    (((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) ->> 'updated'::text)::timestamp without time zone AS updated_date,
     ((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) ->> 'journalId'::text AS journal_id,
     ((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) ->> 'title'::text AS title,
     ((((se.payload -> 'manuscripts'::text) -> last_version_index.manuscripts_array_index) -> 'authors'::text) -> 0) ->> 'country'::text AS submitting_author_country,
@@ -51,6 +52,7 @@ WITH DATA;
   postCreateQueries = [
     `create index on ${this.getViewName()} (submission_id)`,
     `create index on ${this.getViewName()} (submission_date)`,
+    `create index on ${this.getViewName()} (updated_date)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`

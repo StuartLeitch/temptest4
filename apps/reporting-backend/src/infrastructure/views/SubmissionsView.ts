@@ -16,6 +16,7 @@ AS SELECT
   t.submission_event,
   t.article_type,
   t.submission_date,
+  t.updated_date,
   t.title,
   t.journal_id,
   t.journal_name,
@@ -23,7 +24,7 @@ AS SELECT
 FROM (
   SELECT
   sd.*,
-      row_number() over(partition by sd.manuscript_custom_id order by submission_date desc) as rn
+      row_number() over(partition by sd.manuscript_custom_id order by updated_date desc) as rn
   from
     (SELECT s.event_id,
       s.submission_id,
@@ -31,6 +32,7 @@ FROM (
       s.submission_event,
       s.article_type,
       s.submission_date,
+      s.updated_date,
       s.title,
       j.journal_id,
       j.journal_name,
@@ -48,6 +50,8 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (submission_date)`,
+    `create index on ${this.getViewName()} (updated_date)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`
   ];
