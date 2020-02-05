@@ -1,4 +1,4 @@
-import { Either } from './Result';
+import { Either, right } from './Result';
 import { Right } from './Right';
 
 type MutationType = 'map' | 'chain' | 'asyncChain';
@@ -59,4 +59,22 @@ export class AsyncEither<L, R> {
     };
     return (objectMapping[type] || objectMapping.default)(val);
   }
+}
+
+export function all<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
+  const response: R[] = [];
+  for (const either of eithers) {
+    if (either.isLeft()) {
+      return (either as unknown) as Either<L, R[]>;
+    }
+    response.push(either.value);
+  }
+
+  return right(response);
+}
+
+export async function asyncAll<L, R>(
+  eithers: Promise<Either<L, R>>[]
+): Promise<Either<L, R[]>> {
+  return Promise.all(eithers).then(all);
 }
