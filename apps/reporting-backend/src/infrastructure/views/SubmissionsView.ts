@@ -10,6 +10,7 @@ class SubmissionView extends AbstractEventView implements EventViewContract {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT 
+  t.event_id,
   t.submission_id,
   t.manuscript_custom_id,
   t.submission_event,
@@ -24,7 +25,8 @@ FROM (
   sd.*,
       row_number() over(partition by sd.manuscript_custom_id order by submission_date desc) as rn
   from
-    (SELECT s.submission_id,
+    (SELECT s.event_id,
+      s.submission_id,
       s.manuscript_custom_id,
       s.submission_event,
       s.article_type,
@@ -32,7 +34,7 @@ FROM (
       s.title,
       j.journal_id,
       j.journal_name,
-      c.name AS submitting_author_country
+      COALESCE(c.name, s.submitting_author_country, 'Unknown Country') AS submitting_author_country
       FROM ${submissionDataView.getViewName()} s
       LEFT JOIN ${uniqueJournalsView.getViewName()} j ON s.journal_id = j.journal_id
       LEFT JOIN countries c ON UPPER(s.submitting_author_country) = c.iso
