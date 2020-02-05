@@ -164,42 +164,44 @@ const InvoicesLeftNav = props => {
           </NavLink>
         </NavItem>
         <NavItem className='d-flex p-0'>
-          <Input
-            mask={[
-              /[0-9]/,
-              /\d/,
-              /\d/,
-              /\d/,
-              /\d/,
-              '/',
-              /1|2/,
-              /0|9/,
-              /\d/,
-              /\d/
-            ]}
-            className='form-control'
-            placeholder='Enter a reference number'
-            name='referenceNumber'
-            type='input'
-            onChange={evt => onFilterHandler(evt.target)}
-            tag={MaskedInput}
-            id='refNumber'
-          />
-          <InputGroupAddon addonType='append'>
-            <Button
-              color='secondary'
-              outline
-              onClick={evt => {
-                const newValue = '';
-                document.getElementById('refNumber').value = newValue;
-                const target = { name: 'refNumber', value: newValue };
-                onFilterHandler(target);
-              }}
-            >
-              <i className='fa fa-times mr-2'></i>
-              Clear
-            </Button>
-          </InputGroupAddon>
+          <InputGroup>
+            <Input
+              mask={[
+                /[0-9]/,
+                /\d/,
+                /\d/,
+                /\d/,
+                /\d/,
+                '/',
+                /1|2/,
+                /0|9/,
+                /\d/,
+                /\d/
+              ]}
+              className='form-control'
+              placeholder='Enter a reference number'
+              name='referenceNumber'
+              type='input'
+              onChange={evt => onFilterHandler(evt.target)}
+              tag={MaskedInput}
+              id='refNumber'
+            />
+            <InputGroupAddon addonType='append'>
+              <Button
+                color='secondary'
+                outline
+                onClick={evt => {
+                  const newValue = '';
+                  document.getElementById('refNumber').value = newValue;
+                  const target = { name: 'refNumber', value: newValue };
+                  onFilterHandler(target);
+                }}
+              >
+                <i className='fa fa-times mr-2'></i>
+                Clear
+              </Button>
+            </InputGroupAddon>
+          </InputGroup>
         </NavItem>
       </Nav>
       {/* END Reference Number */}

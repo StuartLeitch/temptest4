@@ -1,6 +1,8 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router';
 
+import { useAuth } from '../contexts/Auth';
+
 // ----------- Pages Imports ---------------
 import ProjectsDashboard from './Dashboards/Projects';
 import InvoicingDashboard from './Dashboards/Invoicing';
@@ -98,6 +100,7 @@ import Register from './Pages/Register';
 import Success from './Pages/Success';
 import Timeline from './Pages/Timeline';
 import Invoice from './Pages/Invoice';
+import PendingLogging from './Pages/PendingLogging';
 
 // import Icons from './Icons';
 
@@ -117,12 +120,10 @@ export const RoutedContent = () => {
       {/*     Invoices Routes      */}
       <Route path='/invoices/list' exact component={InvoicesList} />
       <Route path='/invoices/details/:id' exact component={InvoiceDetails} />
-
       <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
-      <Route
-        path='/dashboards/invoicing'
-        exact
-        component={InvoicingDashboard}
+      <PrivateRoute exact path='/dashboards/invoicing'>
+        <InvoicingDashboard />
+      </PrivateRoute>
       />
       <Route path='/dashboards/financial' exact component={Financial} />
       {/* <Route path="/dashboards/analytics" exact component={Analytics} />
@@ -262,3 +263,33 @@ export const RoutedSidebars = () => (
     <Route component={DefaultSidebar} />
   </Switch>
 );
+
+function PrivateRoute({ children, ...rest }) {
+  const auth = useAuth();
+
+  // * If auth is not enabled
+  if (typeof auth === 'object' && !auth) {
+    return <React.Suspense fallback={null}>{children}</React.Suspense>;
+  }
+
+  let toRender = null;
+
+  const { data, login } = auth;
+  if (!data || !data.isAuthenticated) {
+    // * Ask user to login!
+    login();
+  }
+
+  if (data && 'isAuthenticated' in data && data.isAuthenticated) {
+    // pre-load the authenticated side in the background while the user's
+    // filling out the login form.
+    // React.useEffect(() => {
+    //   loadInvoicesList();
+    // }, []);
+    toRender = (
+      <React.Suspense fallback={<PendingLogging />}>{children}</React.Suspense>
+    );
+  }
+
+  return <Route {...rest} render={() => toRender} />;
+}

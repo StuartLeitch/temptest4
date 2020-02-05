@@ -1,7 +1,7 @@
 const allAvatars = (ctx => {
-  let keys = ctx.keys();
+  const keys = ctx.keys();
   return keys.map(ctx);
-})(require.context('./assets/images/avatars', true, /.*/));
+})((require as any).context('./assets/images/avatars', true, /.*/));
 
 export function randomArray(arr) {
   const index = Math.round(Math.random() * (arr.length - 1));

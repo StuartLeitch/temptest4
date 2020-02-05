@@ -174,7 +174,7 @@ export const SidebarMiddleNav = () => (
       <SidebarMenu.Item title='Chat' to='/apps/chat' exact />
     </SidebarMenu.Item> */}
     {/* -------- Pages ---------*/}
-    {/* <SidebarMenu.Item
+    <SidebarMenu.Item
       icon={<i className='fas fa-fw fa-copy'></i>}
       title='Pages'
     >
@@ -189,7 +189,7 @@ export const SidebarMiddleNav = () => (
       <SidebarMenu.Item title='Coming Soon' to='/pages/coming-soon' />
       <SidebarMenu.Item title='Timeline' to='/pages/timeline' />
       <SidebarMenu.Item title='Invoice' to='/pages/invoice' />
-    </SidebarMenu.Item> */}
+    </SidebarMenu.Item>
     {/* <SidebarMenu.Item
       icon={<i className='fas fa-fw fa-star-o'></i>}
       title='Icons'

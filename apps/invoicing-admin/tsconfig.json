@@ -7,5 +7,11 @@
     "allowSyntheticDefaultImports": true,
     "types": ["node", "jest"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "src/components/Layout/Layout.js"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "src/routes/Pages/PendingLogging/PendingLogging.js",
+    "src/components/Layout/Layout.js",
+    "src/routes/Pages/PendingLogging/index.js"
+  ]
 }
