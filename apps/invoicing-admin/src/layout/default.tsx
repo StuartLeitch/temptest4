@@ -10,6 +10,7 @@ import {
 } from '../components';
 
 import AppProviders from '../contexts';
+import config from '../config';
 
 import '../styles/bootstrap.scss';
 import '../styles/main.scss';
@@ -46,8 +47,7 @@ const favIcons = [
 ];
 
 const client = new GraphQLClient({
-  // url: 'https://demo-gql.invoicing.hindawi.com/graphql'
-  url: 'http://localhost:4000/graphql'
+  url: config.gqlRoot
 });
 
 class AppLayout extends React.Component {

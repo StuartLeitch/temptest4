@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Container, Row, Col } from './../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
+import PendingLogging from '../../components/PendingLogging';
 
 import InvoicesList from './List';
 // import ProjectsGrid from './ProjectsGrid';

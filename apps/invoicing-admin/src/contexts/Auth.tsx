@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useAsync } from 'react-async';
 import { useLocation } from 'react-router-dom';
 
-import PendingLogging from '../routes/Pages/Success';
+import PendingLogging from '../routes/components/PendingLogging';
 import Danger from '../routes/Pages/Danger';
 
 /** Utils */
@@ -27,12 +27,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props: any) => {
 
   if (!firstAttemptFinished) {
     if (isPending) {
-      // ! Ugly hack as fuck!
-      return pathname === '/' ? (
-        <div style={{ color: 'pink' }}>
-          <p>Pending&hellip;</p>
-        </div>
-      ) : null;
+      return <PendingLogging />;
     }
     if (isRejected) {
       return (

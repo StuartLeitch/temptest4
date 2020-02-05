@@ -100,7 +100,7 @@ import Register from './Pages/Register';
 import Success from './Pages/Success';
 import Timeline from './Pages/Timeline';
 import Invoice from './Pages/Invoice';
-import PendingLogging from './Pages/PendingLogging';
+import PendingLogging from './components/PendingLogging';
 
 // import Icons from './Icons';
 

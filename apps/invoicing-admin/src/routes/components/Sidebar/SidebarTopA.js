@@ -13,8 +13,12 @@ import {
 import { useAuth } from '../../../contexts/Auth';
 
 const SidebarTopA = () => {
-  const { data, logout } = useAuth();
-  const { picture, name, profile, username } = data;
+  const auth = useAuth();
+
+  if (!auth) {
+    return null;
+  }
+  const { picture, name, profile, username } = auth.data;
 
   return (
     <React.Fragment>
