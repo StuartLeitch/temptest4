@@ -32,8 +32,11 @@ const ProjectsDashboard = () => (
   <Container>
     <Row className='mb-5'>
       <Col lg={12}>
-        <HeaderMain title='Projects' className='mb-4 mb-lg-5' />
-        <p>{faker.lorem.paragraph()}</p>
+        <HeaderMain title='Invoicing' className='mb-4 mb-lg-5' />
+        <p>
+          Some words about how great <strong>Phenom Invoicing</strong> is and
+          what you'll see in here&hellip;
+        </p>
       </Col>
       <Col lg={3}>
         <div className='hr-text hr-text-center my-2'>
@@ -77,7 +80,7 @@ const ProjectsDashboard = () => (
       </Col>
       <Col lg={3} md={6}>
         <div className='hr-text hr-text-left my-2'>
-          <span>All Tasks</span>
+          <span>Dummy Title</span>
         </div>
         <Media>
           <Media left className='mr-3'>
@@ -94,14 +97,14 @@ const ProjectsDashboard = () => (
             </div>
             <div>
               <i className='fa fa-circle mr-1 text-success'></i>
-              <span className='text-inverse'>34</span> Completed
+              <span className='text-inverse'>34</span> Final
             </div>
           </Media>
         </Media>
       </Col>
       <Col lg={3} md={6} className='mb-4 mb-lg-0'>
         <div className='hr-text hr-text-left my-2'>
-          <span>All Projects</span>
+          <span>Another Title</span>
         </div>
         <Media>
           <Media left className='mr-3'>
@@ -109,39 +112,39 @@ const ProjectsDashboard = () => (
           </Media>
           <Media body>
             <div>
-              <i className='fa fa-circle mr-1 text-info'></i>
-              <span className='text-inverse'>14</span> Pending
+              <i className='fa fa-circle mr-1 text-warning'></i>
+              <span className='text-inverse'>14</span> Draft
             </div>
             <div>
               <i className='fa fa-circle mr-1 text-primary'></i>
-              <span className='text-inverse'>24</span> Behind
+              <span className='text-inverse'>24</span> Active
             </div>
             <div>
-              <i className='fa fa-circle mr-1 text-purple'></i>
-              <span className='text-inverse'>2</span> Completed
+              <i className='fa fa-circle mr-1 text-success'></i>
+              <span className='text-inverse'>2</span> Final
             </div>
           </Media>
         </Media>
       </Col>
       <Col lg={3}>
         <div className='hr-text hr-text-left my-2'>
-          <span>My Stats</span>
+          <span>Statistics</span>
         </div>
         <Table size='sm'>
           <tbody>
             <tr>
-              <td className='text-inverse bt-0'>Active Projects</td>
+              <td className='text-inverse bt-0'>Active Invoices</td>
               <td className='text-right bt-0'>
                 <Badge color='success' pill>
-                  6
+                  16
                 </Badge>
               </td>
             </tr>
             <tr>
-              <td className='text-inverse'>Open Tasks</td>
+              <td className='text-inverse'>Invoice Items</td>
               <td className='text-right'>
                 <Badge color='primary' pill>
-                  4
+                  34
                 </Badge>
               </td>
             </tr>
@@ -149,12 +152,12 @@ const ProjectsDashboard = () => (
               <td className='text-inverse'>Support Tickets</td>
               <td className='text-right'>
                 <Badge color='info' pill>
-                  15
+                  5
                 </Badge>
               </td>
             </tr>
             <tr>
-              <td className='text-inverse'>Active Timers</td>
+              <td className='text-inverse'>Active Transactions</td>
               <td className='text-right'>
                 <Badge color='secondary' pill>
                   0

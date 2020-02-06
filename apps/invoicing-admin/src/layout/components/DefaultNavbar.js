@@ -43,25 +43,6 @@ export const DefaultNavbar = () => {
             );
           })}
         </Breadcrumb>
-        {/* <NavItem className="d-none d-md-block">
-                <span className="navbar-text">
-                    <Link to="/">
-                        <i className="fas fa-home"></i>
-                    </Link>
-                </span>
-                <span className="navbar-text px-2">
-                    <i className="fas fa-angle-right"></i>
-                </span>
-                <span className="navbar-text">
-                    <Link to="/">Start</Link>
-                </span>
-                <span className="navbar-text px-2">
-                    <i className="fas fa-angle-right"></i>
-                </span>
-                <span className="navbar-text">
-                    Page Link
-                </span>
-</NavItem> */}
       </Nav>
       {/* <Nav navbar className='ml-auto'>
       <NavbarActivityFeed />

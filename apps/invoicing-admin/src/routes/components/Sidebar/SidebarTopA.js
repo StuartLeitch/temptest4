@@ -90,12 +90,12 @@ const SidebarTopA = () => {
             src={picture}
             addOns={[
               <AvatarAddOn.Icon
-                className='fas fa-circle'
+                className='fa fas fa-circle'
                 color='white'
                 key='avatar-icon-bg'
               />,
               <AvatarAddOn.Icon
-                className='fas fa-circle'
+                className='fa fas fa-circle'
                 color='success'
                 key='avatar-icon-fg'
               />
