@@ -28,6 +28,10 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
   ]
 ) as AbstractEventView[];
 
+if (materializedViewList === null) {
+  throw Error('Circle dependency found, could not compile views.');
+}
+
 export async function refreshViews(knex: Knex) {
   const refreshStart = new Date();
   for (const view of materializedViewList) {
