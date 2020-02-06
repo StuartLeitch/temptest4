@@ -716,3 +716,8 @@ dt {
 .navbar-tabs .nav-link.active:hover {
   box-shadow: inset -1px -11px 0px -8px darken($primary, 13%) !important;
 }
+
+// Override .breadcrumb
+.breadcrumb {
+  padding: 0;
+}

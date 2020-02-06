@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 
-import { 
+import {
     Container,
     Row,
     Col,
@@ -22,16 +22,16 @@ import { HeaderDemo } from "../../components/HeaderDemo";
 const TooltipsPopovers = () => (
     <React.Fragment>
         <Container>
-            <HeaderMain 
+            <HeaderMain
                 title="Tooltips & Popovers"
                 className="mb-5 mt-4"
             />
             { /* START Header 1 */}
-            <Row> 
+            <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={1} 
-                        title="Tooltips Examples" 
+                    <HeaderDemo
+                        no={1}
+                        title="Tooltips Examples"
                         subTitle={(
                             <React.Fragment>
                                 A rendered modal with header, body, and set of actions in the footer.
@@ -47,13 +47,13 @@ const TooltipsPopovers = () => (
                     <Card className="mb-3">
                         <CardBody>
                            <CardText>
-                                Tight pants next level keffiyeh <a href="#" id="UncontrolledTooltip1">you probably</a> haven't heard of them. 
-                                Photo booth beard raw denim letterpress vegan messenger bag stumptown. 
-                                Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american 
-                                apparel <a href="#" id="UncontrolledTooltip2">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans 
-                                banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko 
-                                mcsweeney's cleanse vegan chambray. A really ironic artisan <a href="#" id="UncontrolledTooltip3">whatever keytar</a>, 
-                                scenester farm-to-table banksy Austin <a href="#" id="UncontrolledTooltip4">twitter handle</a> freegan cred raw denim 
+                                Tight pants next level keffiyeh <a href="#" id="UncontrolledTooltip1">you probably</a> haven't heard of them.
+                                Photo booth beard raw denim letterpress vegan messenger bag stumptown.
+                                Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american
+                                apparel <a href="#" id="UncontrolledTooltip2">have a</a> terry richardson vinyl chambray. Beard stumptown, cardigans
+                                banh mi lomo thundercats. Tofu biodiesel williamsburg marfa, four loko
+                                mcsweeney's cleanse vegan chambray. A really ironic artisan <a href="#" id="UncontrolledTooltip3">whatever keytar</a>,
+                                scenester farm-to-table banksy Austin <a href="#" id="UncontrolledTooltip4">twitter handle</a> freegan cred raw denim
                                 single-origin coffee viral.
                            </CardText>
                         </CardBody>
@@ -76,9 +76,9 @@ const TooltipsPopovers = () => (
             { /* START Header 2 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={2} 
-                        title="Tooltips Demos" 
+                    <HeaderDemo
+                        no={2}
+                        title="Tooltips Demos"
                         className="mt-5"
                         subTitle={(
                             <React.Fragment>
@@ -168,9 +168,9 @@ const TooltipsPopovers = () => (
             { /* START Header 3 */}
             <Row>
                 <Col lg={ 12 }>
-                    <HeaderDemo 
-                        no={3} 
-                        title="Popovers Examples" 
+                    <HeaderDemo
+                        no={3}
+                        title="Popovers Examples"
                         className="mt-5"
                         subTitle={(
                             <React.Fragment>

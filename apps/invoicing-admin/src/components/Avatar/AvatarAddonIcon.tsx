@@ -2,14 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-const avatarColors = require('./../../colors.scss');
-
 const AvatarAddonIcon = props => {
   const addOnClass = classNames(
     {
       avatar__icon__inner: props.small
     },
-    avatarColors[`fg-color--${props.color}`]
+    `fg-color--${props.color}`
   );
 
   return <i className={classNames(addOnClass, props.className)}></i>;

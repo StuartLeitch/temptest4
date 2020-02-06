@@ -5,7 +5,7 @@ import {
   Sidebar,
   UncontrolledButtonDropdown,
   Avatar,
-  // AvatarAddOn,
+  AvatarAddOn,
   DropdownToggle,
   DropdownMenu,
   DropdownItem
@@ -27,7 +27,22 @@ const SidebarTopA = () => {
         <Sidebar.Section className='pt-0'>
           <Link to='/' className='d-block'>
             <Sidebar.HideSlim>
-              <Avatar.Image size='lg' src={picture} />
+              <Avatar.Image
+                size='lg'
+                src={picture}
+                addOns={[
+                  <AvatarAddOn.Icon
+                    className='fa fas fa-circle'
+                    color='white'
+                    key='avatar-icon-bg'
+                  />,
+                  <AvatarAddOn.Icon
+                    className='fa fas fa-circle'
+                    color='success'
+                    key='avatar-icon-fg'
+                  />
+                ]}
+              />
             </Sidebar.HideSlim>
           </Link>
 
@@ -68,26 +83,26 @@ const SidebarTopA = () => {
       {/* END: Sidebar Default */}
 
       {/* START: Sidebar Slim */}
-      {/* <Sidebar.ShowSlim>
-      <Sidebar.Section>
-        <Avatar.Image
-          size='sm'
-          src={avatarImg}
-          addOns={[
-            <AvatarAddOn.Icon
-              className='fas fa-circle'
-              color='white'
-              key='avatar-icon-bg'
-            />,
-            <AvatarAddOn.Icon
-              className='fas fa-circle'
-              color='success'
-              key='avatar-icon-fg'
-            />
-          ]}
-        />
-      </Sidebar.Section>
-    </Sidebar.ShowSlim> */}
+      <Sidebar.ShowSlim>
+        <Sidebar.Section>
+          <Avatar.Image
+            size='sm'
+            src={picture}
+            addOns={[
+              <AvatarAddOn.Icon
+                className='fas fa-circle'
+                color='white'
+                key='avatar-icon-bg'
+              />,
+              <AvatarAddOn.Icon
+                className='fas fa-circle'
+                color='success'
+                key='avatar-icon-fg'
+              />
+            ]}
+          />
+        </Sidebar.Section>
+      </Sidebar.ShowSlim>
       {/* END: Sidebar Slim */}
     </React.Fragment>
   );

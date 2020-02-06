@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import { Avatar } from './Avatar';
 
-const avatarColors = require('./../../colors.scss');
+import avatarColors from '../../colors.scss';
 
 const AvatarFont = props => {
   const {
