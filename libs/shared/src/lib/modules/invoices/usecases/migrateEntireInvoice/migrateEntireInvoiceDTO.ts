@@ -10,13 +10,13 @@ export interface MigratePayerAddress {
 export interface MigratePayer {
   vatRegistrationNumber: string;
   address: MigratePayerAddress;
-  invoiceId: string;
   email: string;
   name: string;
   type: string;
 }
 
 export interface MigrateAPC {
+  paymentAmount: number;
   manuscriptId: string;
   discount: number;
   price: string;
@@ -25,10 +25,12 @@ export interface MigrateAPC {
 
 export interface MigrateEntireInvoiceDTO {
   acceptanceDate?: string;
+  submissionDate?: string;
   paymentDate?: string;
   issueDate?: string;
 
-  payer: MigratePayer;
-  apc: MigrateAPC;
   erpReference?: string;
+  payer: MigratePayer;
+  invoiceId: string;
+  apc: MigrateAPC;
 }

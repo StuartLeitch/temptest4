@@ -1,7 +1,7 @@
 import { Either, right } from './Result';
 import { Right } from './Right';
 
-type MutationType = 'map' | 'chain' | 'asyncChain';
+type MutationType = 'map' | 'chain' | 'asyncChain' | 'asyncMap';
 type MutationFunction = (r: any) => any;
 
 type ObjectMapping<L, R> = {
@@ -29,6 +29,11 @@ export class AsyncEither<L, R> {
     return (this as unknown) as AsyncEither<L, R2>;
   }
 
+  asyncMap<R2>(fn: (r: R) => Promise<R2>) {
+    this.mutations.push({ type: 'asyncMap', fn });
+    return (this as unknown) as AsyncEither<L, R2>;
+  }
+
   asyncChain<L2, R2>(fn: (r: R) => Promise<Either<L2, R2>>) {
     this.mutations.push({ type: 'asyncChain', fn });
     return (this as unknown) as AsyncEither<L2 | L, R2>;
@@ -50,6 +55,8 @@ export class AsyncEither<L, R> {
 
   private functionToApply<L, R>(type: MutationType, val: Either<L, R>) {
     const objectMapping: ObjectMapping<L, R> = {
+      asyncMap: (val: Either<L, R>) => (fn: MutationFunction) =>
+        (val.map(fn) as unknown) as Promise<Either<L, R>>,
       asyncChain: (val: Either<L, R>) => (fn: MutationFunction) =>
         (val.chain(fn) as unknown) as Promise<Either<L, R>>,
       chain: (val: Either<L, R>) => (fn: MutationFunction) =>

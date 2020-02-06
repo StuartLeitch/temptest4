@@ -40,7 +40,7 @@ export function validateRequest(
   request: MigrateEntireInvoiceDTO
 ): ValidateRequestReturn {
   const result = validateMainRequestArguments(request)
-    .chain(() => validatePayerAddress(request.payerAddress))
+    .chain(() => validatePayerAddress(request.payer.address))
     .chain(() => validateAPC(request.apc))
     .map(() => request);
   return result;
@@ -49,16 +49,19 @@ export function validateRequest(
 function validateMainRequestArguments(
   request: MigrateEntireInvoiceDTO
 ): ValidateMainRequestReturn {
-  if (!request.payerName) {
+  if (!request.payer.name) {
     return left(new MigrateEntireInvoiceErrors.PayerNameRequired());
   }
-  if (!request.payerType) {
+  if (!request.payer.type) {
     return left(new MigrateEntireInvoiceErrors.PayerTypeRequired());
   }
-  if (!(request.payerType in PayerType)) {
+  if (!(request.payer.type in PayerType)) {
     return left(
-      new MigrateEntireInvoiceErrors.IncorrectPayerType(request.payerType)
+      new MigrateEntireInvoiceErrors.IncorrectPayerType(request.payer.type)
     );
+  }
+  if (!request.invoiceId) {
+    return left(new MigrateEntireInvoiceErrors.InvoiceIdRequired());
   }
   return right(request);
 }
@@ -91,11 +94,6 @@ function validatePayerAddress(
   }
   if (!payerAddress.postalCode) {
     return left(new MigrateEntireInvoiceErrors.PostalCodeRequired());
-  }
-  if (payerAddress.countryCode === 'US' && !payerAddress.state) {
-    return left(
-      new MigrateEntireInvoiceErrors.StateIsRequiredForUnitedStates()
-    );
   }
 
   return right(payerAddress);

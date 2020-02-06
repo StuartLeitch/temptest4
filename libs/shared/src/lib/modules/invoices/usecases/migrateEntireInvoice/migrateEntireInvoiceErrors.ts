@@ -2,6 +2,7 @@ import { UseCaseError } from '../../../../core/logic/UseCaseError';
 import { Result } from '../../../../core/logic/Result';
 
 export type AllMigrateEntireInvoiceErrors =
+  | MigrateEntireInvoiceErrors.MigrationPaymentMethodNotFound
   | MigrateEntireInvoiceErrors.StateIsRequiredForUnitedStates
   | MigrateEntireInvoiceErrors.AddressLine1Required
   | MigrateEntireInvoiceErrors.ManuscriptIdRequired
@@ -10,6 +11,7 @@ export type AllMigrateEntireInvoiceErrors =
   | MigrateEntireInvoiceErrors.IncorrectPayerType
   | MigrateEntireInvoiceErrors.ManuscriptNotFound
   | MigrateEntireInvoiceErrors.PostalCodeRequired
+  | MigrateEntireInvoiceErrors.InvoiceIdRequired
   | MigrateEntireInvoiceErrors.PayerNameRequired
   | MigrateEntireInvoiceErrors.PayerTypeRequired
   | MigrateEntireInvoiceErrors.TransactionError
@@ -38,6 +40,14 @@ export namespace MigrateEntireInvoiceErrors {
     }
   }
 
+  export class InvoiceIdRequired extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Invoice id is required.`
+      });
+    }
+  }
+
   export class ManuscriptNotFound extends Result<UseCaseError> {
     constructor(id: string) {
       super(false, {
@@ -50,6 +60,14 @@ export namespace MigrateEntireInvoiceErrors {
     constructor() {
       super(false, {
         message: `Address of payer is required, with the following fields: addressLine1, countryCode, city, postalCode, state (if country is US) and optionally addressLine2 `
+      });
+    }
+  }
+
+  export class MigrationPaymentMethodNotFound extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Migration payment method not found.`
       });
     }
   }
