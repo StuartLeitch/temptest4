@@ -43,21 +43,19 @@ export class GetRecentInvoicesUsecase
     context?: GetRecentInvoicesAuthenticationContext
   ): Promise<GetRecentInvoicesResponse> {
     // TODO: add proper DDD types to the paginated result
-    let paginatedResult: any;
-
     try {
-      try {
-        paginatedResult = await this.invoiceRepo.getRecentInvoices(request);
-      } catch (err) {
-        return left(
-          new AppError.UnexpectedError(
-            'Getting recent invoices failed.', err
-          )
-        );
+      const paginatedResult = await this.invoiceRepo.getRecentInvoices(request);
+      const offset = request.offset * request.limit;
+      if (paginatedResult.totalCount < offset) {
+        paginatedResult
       }
       return right(Result.ok<any>(paginatedResult));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(
+        new AppError.UnexpectedError(
+          err, 'Getting recent invoices failed'
+        )
+      );
     }
   }
 }

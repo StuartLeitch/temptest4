@@ -10,7 +10,8 @@ import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRep
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 
-import { filtered } from './utils';
+import { applyFilters } from './utils';
+
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
@@ -53,15 +54,15 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
   async getRecentInvoices(args?: any): Promise<any> {
     const {
-      pagination: { limit, offset },
-      filtering: filters
+      pagination,
+      filters
     } = args;
     const { db } = this;
 
     const getModel = () =>
       db(TABLES.INVOICES).whereNot(`${TABLES.INVOICES}.deleted`, 1);
 
-    const totalCount = await filtered(getModel(), filters).count(
+    const totalCount = await applyFilters(getModel(), filters).count(
       `${TABLES.INVOICES}.id`
     );
     // const draftCount = await filtered(
@@ -75,10 +76,11 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     //   offset,
     //   totalCount[0]
     // );
-    const invoices = await filtered(getModel(), filters)
+    const offset = pagination.offset * pagination.limit;
+    const invoices = await applyFilters(getModel(), filters)
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
-      .offset(offset * limit)
-      .limit(limit)
+      .offset(offset < totalCount ? offset : 0)
+      .limit(pagination.limit)
       .select([`${TABLES.INVOICES}.*`]);
 
     //  console.info(invoices);

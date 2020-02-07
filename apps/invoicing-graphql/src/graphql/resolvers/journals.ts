@@ -1,11 +1,9 @@
 /* eslint-disable max-len */
 
-import {
-  Roles,
-} from '@hindawi/shared';
-
+import { Roles } from '@hindawi/shared';
 import { Resolvers } from '../schema';
 import { GetJournalListUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/journals/getJournalList/getJournalList';
+import { CatalogMap } from  '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
 
 export const journals: Resolvers<any> = {
   Query: {
@@ -21,11 +19,13 @@ export const journals: Resolvers<any> = {
       }
 
       const journalsList = result.value.getValue();
-      console.info('[INFO] Journal list:', journalsList.slice(0,6), '...');
-      return journalsList.map(({ props: { journalId, journalTitle } }) => ({
-        journalId: journalId.id.toString(),
-        journalTitle,
-      }));
+      // console.info('[INFO] Journal list:', journalsList.slice(0,6), '...');
+
+      return journalsList.map(CatalogMap.toPersistence);
+      // return journalsList.map(({ props: { journalId, journalTitle } }) => ({
+      //   journalId: journalId.id.toString(),
+      //   journalTitle,
+      // }));
     },
   },
 };

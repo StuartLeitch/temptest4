@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
+import { Filters } from '@utils';
 
 import {
   Card,
   CardFooter,
+  Error,
   ListPagination,
   Spinner,
   Table
@@ -14,29 +16,12 @@ import { TrTableInvoicesList } from './components/TrTableList';
 
 const INVOICES_QUERY = `
 query fetchInvoices(
-  $limit: Int
-  $offset: Int
-  $customId: String
-  $referenceNumber: String
-  $invoiceStatus: [InvoiceStatus]
-  $transactionStatus: [TransactionStatus]
-  $journalId: [String]
+  $filters: InvoiceFilters,
+  $pagination: Pagination
 ) {
   invoices(
-    filtering: {
-      invoices: {
-        status: { in: $invoiceStatus }
-        referenceNumber: { eq: $referenceNumber }
-        invoiceItem: {
-          article: {
-            journalId: { in: $journalId }
-            customId: { eq: $customId }
-          }
-        }
-        transaction: { status: { in: $transactionStatus } }
-      }
-    }
-    pagination: { limit: $limit, offset: $offset }
+    filters: $filters
+    pagination: $pagination
   ) {
     totalCount
     invoices {
@@ -118,7 +103,7 @@ const RecentInvoicesList = props => {
     offset: 0,
     limit: 10
   };
-  const [pagination, setPagination] = useState(paginator);
+  let [pagination, setPagination] = useState(paginator);
 
   const [fetchInvoices, { loading, error, data }] = useManualQuery(
     INVOICES_QUERY
@@ -150,21 +135,12 @@ const RecentInvoicesList = props => {
 
   useEffect(() => {
     async function fetchData() {
-      const { filters } = props;
-      const _filters = {
-        invoiceStatus: [...filters.invoiceStatus],
-        transactionStatus: [...filters.transactionStatus],
-        journalId: filters.journalId,
-        referenceNumber: filters.referenceNumber,
-        customId: filters.customId
-      };
-
       // setPagination({ ...paginator });
       await fetchInvoices({
         variables: {
-          ..._filters,
+          filters: Filters.collect(props.filters),
           // ...paginator
-          ...pagination
+          pagination
         }
       });
     }
@@ -184,7 +160,15 @@ const RecentInvoicesList = props => {
       />
     );
 
-  if (error) return <div>Something Bad Happened</div>;
+  if (error) return (
+    <Error data={error} />
+  );
+
+  const offset = pagination.offset * pagination.limit;
+  if ((data?.length ?? 0 > 0) && offset >= data?.length) {
+    // pagination.offset = 0; //({ ...pagination, offset: 0 });
+    pagination = paginator;
+  }
 
   return (
     <Card className='mb-0'>
@@ -214,9 +198,9 @@ const RecentInvoicesList = props => {
       <CardFooter className='d-flex justify-content-center pb-0'>
         <ListPagination
           totalRecords={data?.invoices?.totalCount}
-          pageLimit={10}
           pageNeighbours={1}
           onPageChanged={onPageChanged}
+          pageLimit={pagination.limit}
           currentPage={pagination.offset + 1}
         />
       </CardFooter>

@@ -1,6 +1,7 @@
 import {Result} from '../core/logic/Result';
 
 type ParseDataType = 'number' | 'string' | 'object';
+type EventName = [string, string?];
 
 class ParseArrayConfig {
   private raw: any;
@@ -41,5 +42,15 @@ export class ParseUtils {
 
   public static parseArray(rawArrayString: any): ParseArrayConfig {
     return new ParseArrayConfig(rawArrayString);
+  }
+
+  public static parseEvent(name: string): EventName {
+    const [m/* aka. 'matched string' */, ...captures] = /^\s*(\S+?)(?:\.(\S+))?\s*$/.exec(name);
+    return captures as EventName;
+  }
+
+  public static parseRefNumber(value: string) {
+    const [m, ...captures] = /^\s*0*(\d+)\/(\d+)\s*$/.exec(value);
+    return captures;
   }
 }

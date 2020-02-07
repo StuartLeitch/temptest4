@@ -1,15 +1,10 @@
 import { Repo } from '../../../infrastructure/Repo';
-import { Invoice, InvoiceCollection, InvoiceStatus } from '../domain/Invoice';
+import { Invoice } from '../domain/Invoice';
 import { InvoiceId } from '../domain/InvoiceId';
 import { InvoiceItemId } from '../domain/InvoiceItemId';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../domain/InvoicePaymentInfo';
-import { Bundle } from '@hindawi/shared';
 
-interface Paginated {
-  offset?: number;
-  limit?: number;
-}
 
 export interface InvoiceRepoContract extends Repo<Invoice> {
   getRecentInvoices(args?: any): Promise<any>;

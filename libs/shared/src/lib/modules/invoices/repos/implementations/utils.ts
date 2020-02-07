@@ -1,10 +1,32 @@
 import { TABLES } from '@hindawi/infrastructure';
-import { reduce } from '@hindawi/utils';
+import { LeanTraversal, ParseUtils, toPath, Categories, Cached } from '@utils';
+import { QueryBuilder } from 'knex';
 
-export function filtered(src: any, filters: any) {
-  return reduce(filters, {
-    ['/invoices/invoiceItem/article/journalId/in'](here, filter) {
-      return here
+type Scalar = boolean | string | number;
+type Filter = Scalar[];
+
+interface Filters {
+  // TODO: Add missing declarations here
+}
+
+function applyJoins(src: QueryBuilder, filterEntries) {
+  let here: QueryBuilder = src;
+  const categorizedPaths = new Categories([
+    ["/invoiceItem/article/journalId", "/invoiceItem/article/customId"],
+    ["/transactionStatus"]
+  ]);
+
+  for (const [keyList] of filterEntries) {
+    const path = toPath(keyList);
+    if (!categorizedPaths.has(path))
+      continue;
+
+    categorizedPaths.dropCategoryOf(path);
+
+    switch (path) {
+    case "/invoiceItem/article/journalId":
+    case "/invoiceItem/article/customId":
+      here = here
         .join(
           TABLES.INVOICE_ITEMS,
           `${TABLES.INVOICES}.id`,
@@ -16,54 +38,62 @@ export function filtered(src: any, filters: any) {
           `${TABLES.ARTICLES}.id`,
           '=',
           `${TABLES.INVOICE_ITEMS}.manuscriptId`
-        )
-        .whereIn(`${TABLES.ARTICLES}.journalId`, filter);
+        );
         // .join(
         //   TABLES.CATALOG,
         //   `${TABLES.CATALOG}.journalId`,
         //   '=',
         //   `${TABLES.ARTICLES}.journalId`
         // )
-        // .whereIn(`${TABLES.CATALOG}.id`, filter);
-    },
+      break;
 
-    ['/invoices/invoiceItem/article/customId/eq'](here, filter) {
-      return here
-        .join(
-          TABLES.INVOICE_ITEMS,
-          `${TABLES.INVOICES}.id`,
-          '=',
-          `${TABLES.INVOICE_ITEMS}.invoiceId`
-        )
-        .join(
-          TABLES.ARTICLES,
-          `${TABLES.ARTICLES}.id`,
-          '=',
-          `${TABLES.INVOICE_ITEMS}.manuscriptId`
-        )
-        .where(`${TABLES.ARTICLES}.customId`, filter);
-    },
-
-    ['/invoices/transaction/status/in'](here, filter) {
-      return here
+    case "/transactionStatus":
+      here = here
         .join(
           TABLES.TRANSACTIONS,
           `${TABLES.INVOICES}.transactionId`,
           '=',
           `${TABLES.TRANSACTIONS}.id`
-        )
-        .whereIn(`${TABLES.TRANSACTIONS}.status`, filter);
-    },
+        );
+      break;
+    }
+  }
 
-    ['/invoices/status/in'](here, filter) {
-      return here.whereIn(`${TABLES.INVOICES}.status`, filter);
-    },
+  return here;
+}
 
-    ['/invoices/referenceNumber/eq'](here, filter) {
-      const [m, invoiceNumber, creationYear] = /^0*(\d+)\/(\d+)$/.exec(filter);
-      return here.whereRaw(
+export function applyFilters(src: QueryBuilder, filters: Filters) {
+  const cachedEntries = new Cached(LeanTraversal.deepTraverse(filters));
+  let here: QueryBuilder = applyJoins(src, cachedEntries);
+
+  let invoiceNumber: string, creationYear: string;
+  for (const [keyList, filter] of cachedEntries) {
+    switch (toPath(keyList)) {
+    case "/invoiceItem/article/journalId":
+      here = here.whereIn(`${TABLES.ARTICLES}.journalId`, filter);
+      //         .whereIn(`${TABLES.CATALOG}.id`, filter);
+      break;
+
+    case "/invoiceItem/article/customId":
+      here = here.whereIn(`${TABLES.ARTICLES}.customId`, filter);
+      break;
+
+    case "/transactionStatus":
+      here = here.whereIn(`${TABLES.TRANSACTIONS}.status`, filter);
+      break;
+
+    case "/invoiceStatus":
+      here = here.whereIn(`${TABLES.INVOICES}.status`, filter);
+      break;
+
+    case "/referenceNumber":
+      [invoiceNumber, creationYear] = ParseUtils.parseRefNumber(filter[0]);
+      here = here.whereRaw(
         `"${TABLES.INVOICES}"."invoiceNumber" = ${invoiceNumber} and extract(year from "${TABLES.INVOICES}"."dateAccepted") = ${creationYear}`
       );
+      break;
     }
-  }, src);
+  }
+
+  return here;
 }

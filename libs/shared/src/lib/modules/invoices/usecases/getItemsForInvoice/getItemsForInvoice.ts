@@ -72,15 +72,14 @@ export class GetItemsForInvoiceUsecase
           )
         );
       }
-      // return right(Result.ok<InvoiceItem[]>(items));
 
       if (items.length === 0) {
-        return right(Result.ok<InvoiceItem[]>([]));
-        // return left(
-        //   new GetItemsForInvoiceErrors.InvoiceHasNoItems(
-        //     invoiceId.id.toString()
-        //   )
-        // );
+        // return right(Result.ok<InvoiceItem[]>([]));
+        return left(
+          new GetItemsForInvoiceErrors.InvoiceHasNoItems(
+            invoiceId.id.toString()
+          )
+        );
       } else {
         return right(Result.ok<InvoiceItem[]>(items));
       }

@@ -187,4 +187,4 @@ export * from './utils/FormatUtils';
 export * from './utils/Order/OrderUtils';
 export * from './utils/Batch';
 
-export * from './utils/Utils';
+export * from './utils/ObjectUtils';

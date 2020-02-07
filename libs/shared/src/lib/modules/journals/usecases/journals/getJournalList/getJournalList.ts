@@ -41,21 +41,15 @@ export class GetJournalListUsecase
     request: GetJournalListDTO,
     context?: GetJournalListAuthenticationContext
   ): Promise<GetJournalListResponse> {
-    let result: CatalogItem[];
-
     try {
-      try {
-        result = await this.journalRepo.getCatalogCollection();
-      } catch (err) {
-        return left(
-          new AppError.UnexpectedError(
-            'Getting journal list failed.', err
-          )
-        );
-      }
+      const result = await this.journalRepo.getCatalogCollection();
       return right(Result.ok<CatalogItem[]>(result));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(
+        new AppError.UnexpectedError(
+          err, 'Getting journal list failed'
+        )
+      );
     }
   }
 }

@@ -25,8 +25,9 @@
       "@hindawi/reporting-backend/*": ["apps/reporting-backend/src/*"],
       "@hindawi/invoicing-graphql/*": ["apps/invoicing-graphql/src/*"],
       "@hindawi/eve": ["libs/eve/src/index.ts"],
-      "@hindawi/utils": ["libs/shared/src/lib/utils/index.ts"],
-      "@hindawi/infrastructure": ["libs/shared/src/lib/infrastructure/index.ts"]
+      "@hindawi/infrastructure": ["libs/shared/src/lib/infrastructure/index.ts"],
+      "@hindawi/domain": ["libs/shared/src/lib/domain/index.ts"],
+      "@utils": ["libs/shared/src/lib/utils/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

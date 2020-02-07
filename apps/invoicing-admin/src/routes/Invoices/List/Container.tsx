@@ -9,6 +9,7 @@ import PendingLogging from '../../components/PendingLogging';
 import InvoicesList from './List';
 // import ProjectsGrid from './ProjectsGrid';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
+import { ParseUtils } from '@utils';
 // import { InvoicesSmHeader } from '../../components/Invoices/InvoicesSmHeader';
 
 const createPath = (obj, path, value = null) => {
@@ -30,36 +31,10 @@ const InvoicesContainer = props => {
   const [filters, setFilters] = useState({
     invoiceStatus: new Set,
     transactionStatus: new Set,
-    journalId: null,
+    journalId: [],
     referenceNumber: null,
     customId: null
   });
-  const setFilter = (name, value: string|any[]) => {
-    const [m, id, status] = /^(\S+?)(?:\.(\S+))?$/.exec(name);
-    const newFilters = { ...filters };
-    switch (id) {
-    case 'invoiceStatus':
-    case 'transactionStatus':
-      newFilters[id] = new Set(filters[id]);
-      if (value) {
-        newFilters[id].add(status);
-      } else {
-        newFilters[id].delete(status);
-      }
-      break;
-
-    case 'journalTitle':
-      newFilters.journalId = (value as any[]).map(j => j.journalId);
-      break;
-
-    default:
-      // 'referenceNumber'
-      // 'customId'
-      newFilters[id] = value;
-    }
-
-    setFilters(newFilters);
-  };
 
   return (
     <React.Fragment>
@@ -90,6 +65,39 @@ const InvoicesContainer = props => {
       </Container>
     </React.Fragment>
   );
+
+  /**
+   * Updates the filter given by `key` to the new `value`.
+   *
+   * @param key The key of the filter to be updated (e.g. 'invoiceStatus.FINAL')
+   * @param value The value of the filter being updated (varies by input type)
+   */
+  function setFilter(key: string, value: boolean|string|any[]) {
+    const [name, status] = ParseUtils.parseEvent(key);
+    const newFilters = { ...filters };    // FIXME: USe immutables here
+    switch (name) {
+    case 'invoiceStatus':
+    case 'transactionStatus':
+      newFilters[name] = new Set(filters[name]);
+      if (value) {
+        newFilters[name].add(status);
+      } else {
+        newFilters[name].delete(status);
+      }
+      break;
+
+    case 'journalTitle':
+      newFilters.journalId = (value as any[]).map(j => j.journalId);
+      break;
+
+    default:
+      // 'referenceNumber'
+      // 'customId'
+      newFilters[name] = value;
+    }
+
+    setFilters(newFilters);
+  }
 };
 
 InvoicesContainer.propTypes = {

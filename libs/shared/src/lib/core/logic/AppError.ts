@@ -3,18 +3,18 @@ import {UseCaseError} from './UseCaseError';
 
 export namespace AppError {
   export class UnexpectedError extends Result<UseCaseError> {
-    public constructor(message: string | any, err?: any) {
-      const error = err ?? message;
+    public constructor(err: any, message?: string) {
+      const msg = message ?? `An unexpected error occurred.`;
       super(false, {
-        message: typeof message == 'string' ? message : `An unexpected error occurred.`,
-        error
+        message: msg,
+        err
       } as UseCaseError);
-      console.log(`[AppError]: An unexpected error occurred`);
-      console.error(error);
+      console.log(`[AppError]: ${msg}`);
+      console.error(err);
     }
 
-    public static create(err: any): UnexpectedError {
-      return new UnexpectedError(err);
+    public static create(err: Error, message?: string): UnexpectedError {
+      return new UnexpectedError(err, message);
     }
   }
 }
