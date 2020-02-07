@@ -15,6 +15,7 @@ AS SELECT
   author_view.country as "country",
   author_view."isCorresponding" as is_corresponding,
   author_view."isSubmitting" as is_submitting,
+  author_view."userId" as user_id,
   author_view."givenNames" as given_names,
   author_view."surname" as "surname",
   author_view."aff" as "aff",
@@ -32,6 +33,7 @@ AS SELECT
     jsonb_to_recordset(((se.payload -> 'manuscripts') -> se.last_version_index) -> 'authors') as author_view(
       email text,
       country text,
+      "userId" text,
       "isCorresponding" bool,
       "isSubmitting" bool,
       "givenNames" text,
