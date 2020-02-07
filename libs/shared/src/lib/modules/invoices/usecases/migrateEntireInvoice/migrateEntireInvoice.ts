@@ -77,6 +77,7 @@ import { MigrateEntireInvoiceDTO as DTO } from './migrateEntireInvoiceDTO';
 import { validateRequest } from './utils';
 import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { InvoiceId } from '../../domain/InvoiceId';
+import { ManuscriptId } from '../../domain/ManuscriptId';
 
 type Context = AuthorizationContext<Roles>;
 export type MigrateEntireInvoiceContext = Context;
@@ -321,8 +322,21 @@ export class MigrateEntireInvoiceUsecase
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
         invoice.props.dateCreated = new Date(request.submissionDate);
         invoice.props.dateUpdated = new Date(request.acceptanceDate);
+        invoice.props.charge =
+          request.apc.price - request.apc.discount + request.apc.vat;
 
         return this.invoiceRepo.save(invoice);
+      })
+      .map(async invoice => {
+        const items = await this.invoiceItemRepo.getItemsByInvoiceId(
+          invoice.invoiceId
+        );
+        items[0].props.price = request.apc.price - request.apc.discount;
+        const vatPercentage = (request.apc.vat / items[0].props.price) * 100;
+        items[0].props.vat = vatPercentage;
+
+        await this.invoiceItemRepo.update(items[0]);
+        return invoice;
       })
       .map(() => request)
       .execute();
@@ -341,12 +355,34 @@ export class MigrateEntireInvoiceUsecase
         return this.getInvoice(payer.invoiceId.id.toString());
       })
       .asyncMap(invoice => {
+        const invoiceNumberPadded = request.apc.invoiceReference.split('/')[0];
+        const invoiceNumber = Number.parseInt(
+          invoiceNumberPadded,
+          10
+        ).toString();
+
         invoice.props.status = InvoiceStatus.ACTIVE;
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
         invoice.props.dateUpdated = new Date(request.acceptanceDate);
         invoice.props.erpReference = request.erpReference;
+        invoice.props.invoiceNumber = invoiceNumber;
 
         return this.invoiceRepo.save(invoice);
+      })
+      .asyncMap(async invoice => {
+        const manuscript = await this.manuscriptRepo.findById(
+          ManuscriptId.create(
+            new UniqueEntityID(request.apc.manuscriptId)
+          ).getValue()
+        );
+        manuscript.props.authorFirstName = request.payer.name;
+        manuscript.props.authorSurname = request.payer.name;
+        manuscript.props.authorEmail = request.payer.email;
+        manuscript.props.authorCountry = request.payer.address.countryCode;
+
+        await this.manuscriptRepo.update(manuscript);
+
+        return invoice;
       })
       .map(invoice => ({ invoice, payer, request }))
       .execute();

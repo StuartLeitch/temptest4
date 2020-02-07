@@ -16,10 +16,11 @@ export interface MigratePayer {
 }
 
 export interface MigrateAPC {
+  invoiceReference: string;
   paymentAmount: number;
   manuscriptId: string;
   discount: number;
-  price: string;
+  price: number;
   vat: number;
 }
 
