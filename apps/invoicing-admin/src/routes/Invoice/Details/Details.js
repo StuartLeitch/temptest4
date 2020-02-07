@@ -64,7 +64,7 @@ import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { Coupon } from '../../components/Invoice/Coupon';
 
 const INVOICE_QUERY = `
-query invoice($id: String) {
+query invoice($id: ID) {
   invoice(invoiceId: $id) {
     ...invoiceFragment
   }

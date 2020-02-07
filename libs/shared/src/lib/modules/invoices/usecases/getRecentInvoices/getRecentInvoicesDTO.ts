@@ -1,4 +1,7 @@
 export interface GetRecentInvoicesDTO {
-  offset?: number;
-  limit?: number;
+  pagination?: {
+    offset?: number;
+    limit?: number;
+  };
+  filters?: {};
 }

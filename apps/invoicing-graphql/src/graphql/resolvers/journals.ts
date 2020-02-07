@@ -3,7 +3,7 @@
 import { Roles } from '@hindawi/shared';
 import { Resolvers } from '../schema';
 import { GetJournalListUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/journals/getJournalList/getJournalList';
-import { CatalogMap } from  '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
+import { CatalogMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
 
 export const journals: Resolvers<any> = {
   Query: {
@@ -26,6 +26,6 @@ export const journals: Resolvers<any> = {
       //   journalId: journalId.id.toString(),
       //   journalTitle,
       // }));
-    },
-  },
+    }
+  }
 };

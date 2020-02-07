@@ -8,8 +8,12 @@ export type Scalars = {
   Boolean: boolean,
   Int: number,
   Float: number,
+  ReferenceNumber: any,
   Date: any,
+  Name: any,
 };
+
+
 
 export type Address = {
    __typename?: 'Address',
@@ -31,9 +35,9 @@ export type AddressInput = {
 export type Article = {
    __typename?: 'Article',
   id?: Maybe<Scalars['String']>,
-  journalId?: Maybe<Scalars['String']>,
+  journalId?: Maybe<Scalars['ID']>,
   journalTitle?: Maybe<Scalars['String']>,
-  customId?: Maybe<Scalars['String']>,
+  customId?: Maybe<Scalars['ID']>,
   created?: Maybe<Scalars['Date']>,
   title?: Maybe<Scalars['String']>,
   articleType?: Maybe<Scalars['String']>,
@@ -43,9 +47,9 @@ export type Article = {
   authorFirstName?: Maybe<Scalars['String']>,
 };
 
-export type ArticleFilter = {
-  journalTitle?: Maybe<JournalTitleFilter>,
-  customId?: Maybe<CustomIdFilter>,
+export type ArticleFilters = {
+  journalId?: Maybe<Array<Maybe<Scalars['ID']>>>,
+  customId?: Maybe<Array<Maybe<Scalars['ID']>>>,
 };
 
 export type ClientToken = {
@@ -67,18 +71,10 @@ export type CreditCardInput = {
   postalCode?: Maybe<Scalars['String']>,
 };
 
-export type CustomIdFilter = {
-  eq?: Maybe<Scalars['String']>,
-};
-
-
-export type Filtering = {
-  invoices?: Maybe<InvoicesFiltering>,
-};
 
 export type Invoice = {
    __typename?: 'Invoice',
-  invoiceId?: Maybe<Scalars['String']>,
+  invoiceId?: Maybe<Scalars['ID']>,
   dateCreated?: Maybe<Scalars['String']>,
   dateChanged?: Maybe<Scalars['String']>,
   dateIssued?: Maybe<Scalars['String']>,
@@ -87,25 +83,32 @@ export type Invoice = {
   charge?: Maybe<Scalars['Float']>,
   status?: Maybe<InvoiceStatus>,
   payer?: Maybe<Payer>,
-  referenceNumber?: Maybe<Scalars['String']>,
+  referenceNumber?: Maybe<Scalars['ReferenceNumber']>,
   invoiceItem?: Maybe<InvoiceItem>,
   title?: Maybe<Scalars['String']>,
   price?: Maybe<Scalars['Float']>,
-  customId?: Maybe<Scalars['String']>,
+  customId?: Maybe<Scalars['ID']>,
   type?: Maybe<Scalars['String']>,
   payment?: Maybe<Payment>,
 };
 
+export type InvoiceFilters = {
+  invoiceStatus?: Maybe<Array<Maybe<InvoiceStatus>>>,
+  transactionStatus?: Maybe<Array<Maybe<TransactionStatus>>>,
+  referenceNumber?: Maybe<Array<Maybe<Scalars['ReferenceNumber']>>>,
+  invoiceItem?: Maybe<InvoiceItemFilters>,
+};
+
 export type InvoiceId = {
    __typename?: 'InvoiceId',
-  invoiceId?: Maybe<Array<Maybe<Scalars['String']>>>,
+  invoiceId?: Maybe<Array<Maybe<Scalars['ID']>>>,
 };
 
 export type InvoiceItem = {
    __typename?: 'InvoiceItem',
   id?: Maybe<Scalars['String']>,
-  invoiceId?: Maybe<Scalars['String']>,
-  manuscriptId?: Maybe<Scalars['String']>,
+  invoiceId?: Maybe<Scalars['ID']>,
+  manuscriptId?: Maybe<Scalars['ID']>,
   type?: Maybe<Scalars['String']>,
   price?: Maybe<Scalars['Float']>,
   rate?: Maybe<Scalars['Float']>,
@@ -117,15 +120,8 @@ export type InvoiceItem = {
   waivers?: Maybe<Array<Maybe<Waiver>>>,
 };
 
-export type InvoiceItemFiltering = {
-  article?: Maybe<ArticleFilter>,
-};
-
-export type InvoicesFiltering = {
-  status?: Maybe<StatusFilter>,
-  referenceNumber?: Maybe<ReferenceNumberFilter>,
-  transaction?: Maybe<TransactionFilter>,
-  invoiceItem?: Maybe<InvoiceItemFiltering>,
+export type InvoiceItemFilters = {
+  article?: Maybe<ArticleFilters>,
 };
 
 export enum InvoiceStatus {
@@ -142,8 +138,10 @@ export type InvoiceVat = {
   rate?: Maybe<Scalars['Float']>,
 };
 
-export type JournalTitleFilter = {
-  in?: Maybe<Array<Maybe<Scalars['String']>>>,
+export type Journal = {
+   __typename?: 'Journal',
+  journalId?: Maybe<Scalars['ID']>,
+  journalTitle?: Maybe<Scalars['String']>,
 };
 
 export type Mutation = {
@@ -167,7 +165,7 @@ export type MutationConfirmInvoiceArgs = {
 
 
 export type MutationApplyCouponArgs = {
-  invoiceId?: Maybe<Scalars['String']>,
+  invoiceId?: Maybe<Scalars['ID']>,
   couponCode?: Maybe<Scalars['String']>
 };
 
@@ -178,17 +176,17 @@ export type MutationCreateInvoiceArgs = {
 
 
 export type MutationDeleteInvoiceArgs = {
-  id: Scalars['String']
+  id: Scalars['ID']
 };
 
 
 export type MutationSetTransactionToActiveArgs = {
-  customId?: Maybe<Scalars['String']>
+  customId?: Maybe<Scalars['ID']>
 };
 
 
 export type MutationCreditCardPaymentArgs = {
-  invoiceId: Scalars['String'],
+  invoiceId: Scalars['ID'],
   payerId: Scalars['String'],
   paymentMethodId: Scalars['String'],
   paymentMethodNonce: Scalars['String'],
@@ -208,14 +206,14 @@ export type MutationBankTransferPaymentArgs = {
 
 export type MutationRecordPayPalPaymentArgs = {
   paymentMethodId: Scalars['String'],
-  invoiceId: Scalars['String'],
+  invoiceId: Scalars['ID'],
   payerId: Scalars['String'],
   orderId: Scalars['String']
 };
 
 
 export type MutationMigratePaymentArgs = {
-  invoiceId: Scalars['String'],
+  invoiceId: Scalars['ID'],
   payerId: Scalars['String'],
   amount?: Maybe<Scalars['Float']>,
   datePaid?: Maybe<Scalars['String']>
@@ -223,7 +221,7 @@ export type MutationMigratePaymentArgs = {
 
 
 export type MutationMigrateInvoiceArgs = {
-  invoiceId: Scalars['String'],
+  invoiceId: Scalars['ID'],
   vatValue?: Maybe<Scalars['Float']>,
   invoiceReference?: Maybe<Scalars['Float']>,
   discount?: Maybe<Scalars['Float']>,
@@ -231,6 +229,7 @@ export type MutationMigrateInvoiceArgs = {
   dateIssued?: Maybe<Scalars['String']>,
   dateAccepted?: Maybe<Scalars['String']>
 };
+
 
 export type PaginatedInvoices = {
    __typename?: 'PaginatedInvoices',
@@ -298,17 +297,18 @@ export type Query = {
   invoiceVat?: Maybe<InvoiceVat>,
   invoices?: Maybe<PaginatedInvoices>,
   invoiceIdByManuscriptCustomId?: Maybe<InvoiceId>,
+  journals?: Maybe<Array<Maybe<Journal>>>,
   echo?: Maybe<Scalars['String']>,
 };
 
 
 export type QueryInvoiceArgs = {
-  invoiceId?: Maybe<Scalars['String']>
+  invoiceId?: Maybe<Scalars['ID']>
 };
 
 
 export type QueryInvoiceVatArgs = {
-  invoiceId?: Maybe<Scalars['String']>,
+  invoiceId?: Maybe<Scalars['ID']>,
   country?: Maybe<Scalars['String']>,
   state?: Maybe<Scalars['String']>,
   postalCode?: Maybe<Scalars['String']>,
@@ -317,13 +317,13 @@ export type QueryInvoiceVatArgs = {
 
 
 export type QueryInvoicesArgs = {
-  filtering?: Maybe<Filtering>,
+  filters?: Maybe<InvoiceFilters>,
   pagination?: Maybe<Pagination>
 };
 
 
 export type QueryInvoiceIdByManuscriptCustomIdArgs = {
-  customId?: Maybe<Scalars['String']>
+  customId?: Maybe<Scalars['ID']>
 };
 
 
@@ -331,13 +331,6 @@ export type QueryEchoArgs = {
   value?: Maybe<Scalars['String']>
 };
 
-export type ReferenceNumberFilter = {
-  eq?: Maybe<Scalars['String']>,
-};
-
-export type StatusFilter = {
-  in?: Maybe<Array<Maybe<InvoiceStatus>>>,
-};
 
 export type Transaction = {
    __typename?: 'Transaction',
@@ -345,19 +338,11 @@ export type Transaction = {
   status?: Maybe<Scalars['String']>,
 };
 
-export type TransactionFilter = {
-  status?: Maybe<TransactionStatusFilter>,
-};
-
 export enum TransactionStatus {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   FINAL = 'FINAL'
 }
-
-export type TransactionStatusFilter = {
-  in?: Maybe<Array<Maybe<TransactionStatus>>>,
-};
 
 export type Waiver = {
    __typename?: 'Waiver',
@@ -443,12 +428,14 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   ClientToken: ResolverTypeWrapper<ClientToken>,
+  ID: ResolverTypeWrapper<Scalars['ID']>,
   Invoice: ResolverTypeWrapper<Invoice>,
   Float: ResolverTypeWrapper<Scalars['Float']>,
   InvoiceStatus: InvoiceStatus,
   Payer: ResolverTypeWrapper<Payer>,
   PayerType: PayerType,
   Address: ResolverTypeWrapper<Address>,
+  ReferenceNumber: ResolverTypeWrapper<Scalars['ReferenceNumber']>,
   InvoiceItem: ResolverTypeWrapper<InvoiceItem>,
   Article: ResolverTypeWrapper<Article>,
   Date: ResolverTypeWrapper<Scalars['Date']>,
@@ -456,25 +443,20 @@ export type ResolversTypes = {
   Waiver: ResolverTypeWrapper<Waiver>,
   Payment: ResolverTypeWrapper<Payment>,
   InvoiceVat: ResolverTypeWrapper<InvoiceVat>,
-  Filtering: Filtering,
-  InvoicesFiltering: InvoicesFiltering,
-  StatusFilter: StatusFilter,
-  ReferenceNumberFilter: ReferenceNumberFilter,
-  TransactionFilter: TransactionFilter,
-  TransactionStatusFilter: TransactionStatusFilter,
+  InvoiceFilters: InvoiceFilters,
   TransactionStatus: TransactionStatus,
-  InvoiceItemFiltering: InvoiceItemFiltering,
-  ArticleFilter: ArticleFilter,
-  JournalTitleFilter: JournalTitleFilter,
-  CustomIdFilter: CustomIdFilter,
+  InvoiceItemFilters: InvoiceItemFilters,
+  ArticleFilters: ArticleFilters,
   Pagination: Pagination,
   Int: ResolverTypeWrapper<Scalars['Int']>,
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>,
   InvoiceId: ResolverTypeWrapper<InvoiceId>,
+  Journal: ResolverTypeWrapper<Journal>,
   Mutation: ResolverTypeWrapper<{}>,
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Transaction: ResolverTypeWrapper<Transaction>,
+  Name: ResolverTypeWrapper<Scalars['Name']>,
   CreditCardInput: CreditCardInput,
 };
 
@@ -485,12 +467,14 @@ export type ResolversParentTypes = {
   String: Scalars['String'],
   Boolean: Scalars['Boolean'],
   ClientToken: ClientToken,
+  ID: Scalars['ID'],
   Invoice: Invoice,
   Float: Scalars['Float'],
   InvoiceStatus: InvoiceStatus,
   Payer: Payer,
   PayerType: PayerType,
   Address: Address,
+  ReferenceNumber: Scalars['ReferenceNumber'],
   InvoiceItem: InvoiceItem,
   Article: Article,
   Date: Scalars['Date'],
@@ -498,27 +482,26 @@ export type ResolversParentTypes = {
   Waiver: Waiver,
   Payment: Payment,
   InvoiceVat: InvoiceVat,
-  Filtering: Filtering,
-  InvoicesFiltering: InvoicesFiltering,
-  StatusFilter: StatusFilter,
-  ReferenceNumberFilter: ReferenceNumberFilter,
-  TransactionFilter: TransactionFilter,
-  TransactionStatusFilter: TransactionStatusFilter,
+  InvoiceFilters: InvoiceFilters,
   TransactionStatus: TransactionStatus,
-  InvoiceItemFiltering: InvoiceItemFiltering,
-  ArticleFilter: ArticleFilter,
-  JournalTitleFilter: JournalTitleFilter,
-  CustomIdFilter: CustomIdFilter,
+  InvoiceItemFilters: InvoiceItemFilters,
+  ArticleFilters: ArticleFilters,
   Pagination: Pagination,
   Int: Scalars['Int'],
   PaginatedInvoices: PaginatedInvoices,
   InvoiceId: InvoiceId,
+  Journal: Journal,
   Mutation: {},
   PayerInput: PayerInput,
   AddressInput: AddressInput,
   Transaction: Transaction,
+  Name: Scalars['Name'],
   CreditCardInput: CreditCardInput,
 };
+
+export type ModelDirectiveResolver<Result, Parent, ContextType = any, Args = {   id?: Maybe<Scalars['ID']> }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type FilterDirectiveResolver<Result, Parent, ContextType = any, Args = {   key?: Maybe<Scalars['Name']> }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
   city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -531,9 +514,9 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
 
 export type ArticleResolvers<ContextType = any, ParentType extends ResolversParentTypes['Article'] = ResolversParentTypes['Article']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  journalId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  journalId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   journalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  customId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   created?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   articleType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -560,7 +543,7 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 }
 
 export type InvoiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Invoice'] = ResolversParentTypes['Invoice']> = {
-  invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   dateCreated?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   dateChanged?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   dateIssued?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -569,25 +552,25 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   charge?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>,
   payer?: Resolver<Maybe<ResolversTypes['Payer']>, ParentType, ContextType>,
-  referenceNumber?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  referenceNumber?: Resolver<Maybe<ResolversTypes['ReferenceNumber']>, ParentType, ContextType>,
   invoiceItem?: Resolver<Maybe<ResolversTypes['InvoiceItem']>, ParentType, ContextType>,
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  customId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  customId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   payment?: Resolver<Maybe<ResolversTypes['Payment']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type InvoiceIdResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceId'] = ResolversParentTypes['InvoiceId']> = {
-  invoiceId?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>,
+  invoiceId?: Resolver<Maybe<Array<Maybe<ResolversTypes['ID']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn,
 };
 
 export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  manuscriptId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
+  manuscriptId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
@@ -607,6 +590,12 @@ export type InvoiceVatResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: isTypeOfResolverFn,
 };
 
+export type JournalResolvers<ContextType = any, ParentType extends ResolversParentTypes['Journal'] = ResolversParentTypes['Journal']> = {
+  journalId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
+  journalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn,
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, MutationApplyCouponArgs>,
@@ -619,6 +608,10 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
 };
+
+export interface NameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Name'], any> {
+  name: 'Name'
+}
 
 export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
@@ -664,8 +657,13 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, QueryInvoiceVatArgs>,
   invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, QueryInvoicesArgs>,
   invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, QueryInvoiceIdByManuscriptCustomIdArgs>,
+  journals?: Resolver<Maybe<Array<Maybe<ResolversTypes['Journal']>>>, ParentType, ContextType>,
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
 };
+
+export interface ReferenceNumberScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ReferenceNumber'], any> {
+  name: 'ReferenceNumber'
+}
 
 export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -689,12 +687,15 @@ export type Resolvers<ContextType = any> = {
   InvoiceId?: InvoiceIdResolvers<ContextType>,
   InvoiceItem?: InvoiceItemResolvers<ContextType>,
   InvoiceVat?: InvoiceVatResolvers<ContextType>,
+  Journal?: JournalResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
+  Name?: GraphQLScalarType,
   PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>,
   Payer?: PayerResolvers<ContextType>,
   Payment?: PaymentResolvers<ContextType>,
   PaymentMethod?: PaymentMethodResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
+  ReferenceNumber?: GraphQLScalarType,
   Transaction?: TransactionResolvers<ContextType>,
   Waiver?: WaiverResolvers<ContextType>,
 };
@@ -705,3 +706,14 @@ export type Resolvers<ContextType = any> = {
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
 */
 export type IResolvers<ContextType = any> = Resolvers<ContextType>;
+export type DirectiveResolvers<ContextType = any> = {
+  model?: ModelDirectiveResolver<any, any, ContextType>,
+  filter?: FilterDirectiveResolver<any, any, ContextType>,
+};
+
+
+/**
+* @deprecated
+* Use "DirectiveResolvers" root object instead. If you wish to get "IDirectiveResolvers", add "typesPrefix: I" to your config.
+*/
+export type IDirectiveResolvers<ContextType = any> = DirectiveResolvers<ContextType>;
