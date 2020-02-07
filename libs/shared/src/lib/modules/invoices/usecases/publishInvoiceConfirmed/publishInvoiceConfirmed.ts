@@ -21,7 +21,8 @@ export class PublishInvoiceConfirmed {
     invoiceItems: InvoiceItem[],
     manuscript: Manuscript,
     payer: Payer,
-    address: Address
+    address: Address,
+    messageTimestamp?: Date
   ): Promise<any> {
     const data: InvoiceConfirmedEvent = {
       ...EventUtils.createEventObject(),
@@ -69,6 +70,7 @@ export class PublishInvoiceConfirmed {
 
     try {
       await this.publishService.publishMessage({
+        timestamp: messageTimestamp.toISOString(),
         event: INVOICE_CONFIRMED,
         data
       });

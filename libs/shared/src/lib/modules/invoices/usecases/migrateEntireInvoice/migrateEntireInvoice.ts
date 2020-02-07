@@ -48,12 +48,12 @@ import { Invoice } from '../../domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
 
+import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
+import { PublishInvoicePaid } from '../publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
   PublishInvoiceCreatedDTO
 } from '../publishInvoiceCreated';
-import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
-import { PublishInvoicePaid } from '../publishInvoicePaid';
 
 import { GetArticleDetailsUsecase } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
@@ -128,9 +128,17 @@ export class MigrateEntireInvoiceUsecase
       .asyncChain(request => this.makeMigrationPayment(request))
       .asyncChain(({ request, payment }) =>
         this.updateInvoicePayed(payment, request)
-      );
+      )
+      .asyncChain(({ request, invoice, payment }) =>
+        this.sendInvoicePayedEvent(invoice, payment, request)
+      )
+      .execute();
 
-    return null;
+    return all([
+      maybeInvoiceCreated,
+      maybeInvoiceConfirmed,
+      maybeInvoicePayed
+    ]).map(val => Result.ok<void>());
   }
 
   private async getTransactionWithAcceptanceDate(request: DTO) {
@@ -245,6 +253,7 @@ export class MigrateEntireInvoiceUsecase
         ({ invoice, manuscript }) =>
           ({
             invoiceItems: invoice.invoiceItems.currentItems,
+            messageTimestamp: invoice.dateAccepted,
             manuscript,
             invoice
           } as PublishInvoiceCreatedDTO)
@@ -348,9 +357,10 @@ export class MigrateEntireInvoiceUsecase
     request: DTO,
     payer: Payer
   ) {
+    const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
     const usecase = new PublishInvoiceConfirmed(this.sqsPublishService);
     const addressUsecase = new GetAddressUseCase(this.addressRepo);
-    const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
+    const messageTimestamp = new Date(request.issueDate);
 
     const invoiceItems = invoice.invoiceItems.currentItems;
 
@@ -377,7 +387,8 @@ export class MigrateEntireInvoiceUsecase
           invoiceItems,
           manuscript,
           payer,
-          billingAddress
+          billingAddress,
+          messageTimestamp
         );
       })
       .execute();
@@ -464,6 +475,39 @@ export class MigrateEntireInvoiceUsecase
         return this.invoiceRepo.save(invoice);
       })
       .map(invoice => ({ invoice, payment, request }))
+      .execute();
+  }
+
+  private async sendInvoicePayedEvent(
+    invoice: Invoice,
+    payment: Payment,
+    request: DTO
+  ) {
+    if (!invoice || !payment) {
+      return right<null, null>(null);
+    }
+
+    const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
+    const usecase = new PublishInvoicePaid(this.sqsPublishService);
+    const messageTimestamp = new Date(request.paymentDate);
+    const invoiceItems = invoice.invoiceItems.currentItems;
+    const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(
+      invoice.invoiceId
+    );
+
+    return new AsyncEither<null, string>(request.apc.manuscriptId)
+      .map(articleId => ({ articleId }))
+      .asyncChain(request => manuscriptUsecase.execute(request))
+      .map(result => result.getValue())
+      .asyncMap(manuscript =>
+        usecase.execute(
+          invoice,
+          invoiceItems,
+          manuscript,
+          paymentDetails,
+          messageTimestamp
+        )
+      )
       .execute();
   }
 }
