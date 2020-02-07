@@ -5,11 +5,13 @@ import LoadingOverlay from 'react-loading-overlay';
 import DatePicker, { setDefaultLocale } from 'react-datepicker';
 import format from 'date-fns/format';
 import subWeeks from 'date-fns/subWeeks';
+import { toast } from 'react-toastify';
 
 import {
   Accordion,
   Badge,
   Button,
+  ButtonDropdown,
   ButtonGroup,
   ButtonToolbar,
   Card,
@@ -25,19 +27,27 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
+  ModalDropdown,
   FormFeedback,
   Form,
   FormGroup,
+  Media,
   Label,
   Input,
+  InputGroup,
+  InputGroupAddon,
   Row,
   FormText,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Nav,
   NavItem,
   Spinner,
   Table,
   TabPane,
   UncontrolledButtonDropdown,
+  UncontrolledModal,
   UncontrolledTabs
 } from './../../../components';
 import { HeaderMain } from '../../components/HeaderMain';
@@ -217,10 +227,6 @@ const Details = () => {
                   </DropdownToggle>
                   <DropdownMenu right>
                     <DropdownItem header>Select Status</DropdownItem>
-                    {/* <DropdownItem>
-                    <i className='fas fa-circle text-danger mr-2'></i>
-                    Big
-                  </DropdownItem> */}
                     <DropdownItem>
                       <i className='fas fa-circle text-warning mr-2'></i>
                       Draft
@@ -235,13 +241,115 @@ const Details = () => {
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledButtonDropdown>
-                <Button color='primary' className='mr-2'>
-                  Add Payment
-                </Button>
-                <Button color='secondary' className='mr-2' outline>
+                {invoice.status === 'ACTIVE' && (
+                  <ModalDropdown
+                    dropdownToggle={
+                      <DropdownToggle color='primary' caret>
+                        <i className='fas fa-dollar-sign mr-2'></i>
+                        Add Payment
+                      </DropdownToggle>
+                    }
+                    onSave={() => {
+                      return toast.success(({ closeToast }) => (
+                        <Media>
+                          <Media middle left className='mr-3'>
+                            <i className='fas fa-fw fa-2x fa-check'></i>
+                          </Media>
+                          <Media body>
+                            <Media heading tag='h6'>
+                              Success!
+                            </Media>
+                            <p>
+                              You successfully read this important alert
+                              message.
+                            </p>
+                            <div className='d-flex mt-2'>
+                              <Button
+                                color='success'
+                                onClick={() => {
+                                  closeToast;
+                                }}
+                              >
+                                Got it
+                              </Button>
+                              <Button
+                                color='link'
+                                onClick={() => {
+                                  closeToast;
+                                }}
+                                className='ml-2 text-success'
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </Media>
+                        </Media>
+                      ));
+                    }}
+                  >
+                    <ModalBody>
+                      {/* START Form */}
+                      <Form>
+                        {/* START Input */}
+                        <FormGroup row>
+                          <Label sm={4}>Payment Date</Label>
+                          <Col sm={8}>
+                            <InputGroup>
+                              <DatePicker
+                                dateFormat='d MMMM yyyy'
+                                customInput={<ButtonInput />}
+                                selected={new Date()}
+                                onChange={() => {}}
+                              />
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        {/* END Input */}
+                        {/* START Amount Input */}
+                        <FormGroup row>
+                          <Label for='bothAddon' sm={4}>
+                            Payment Amount
+                          </Label>
+                          <Col sm={8}>
+                            <InputGroup>
+                              <InputGroupAddon addonType='prepend'>
+                                $
+                              </InputGroupAddon>
+                              <Input placeholder='Amount...' id='bothAddon' />
+                              <InputGroupAddon addonType='append'>
+                                .00
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        {/* END Amount Input */}
+                        <FormGroup row>
+                          <Label for='staticText' sm={4}>
+                            Payment Method
+                          </Label>
+                          <Col sm={8}>
+                            <Input plaintext readOnly value={'Bank Transfer'} />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for='staticText' sm={4}>
+                            Payment Reference
+                          </Label>
+                          <Col sm={8}>
+                            <Input placeholder='Reference' />
+                          </Col>
+                        </FormGroup>
+                      </Form>
+                      {/* END Form */}
+                    </ModalBody>
+                  </ModalDropdown>
+                  //   </DropdownMenu>
+                  // </UncontrolledButtonDropdown>
+                )}
+                <Button color='secondary' className='mr-2' outline disabled>
                   Split Payment
                 </Button>
-                <Button color='primary' outline>
+                <Button color='primary' outline disabled>
                   Apply Coupon
                 </Button>
               </ButtonToolbar>

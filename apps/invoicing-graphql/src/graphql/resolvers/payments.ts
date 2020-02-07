@@ -1,5 +1,6 @@
 import {
   RecordCreditCardPaymentUsecase,
+  RecordBankTransferPaymentUsecase,
   GenerateClientTokenUsecase,
   RecordPayPalPaymentUsecase,
   GetPaymentMethodsUseCase,
@@ -175,6 +176,59 @@ export const payments: Resolvers<any> = {
         amount: migratedPayment.amount.value,
         invoiceId: migratedPayment.invoiceId.id.toString(),
         foreignPaymentId: migratedPayment.foreignPaymentId
+      };
+    },
+
+    async bankTransferPayment(parent, args, context) {
+      const {
+        repos: {
+          payment: paymentRepo,
+          invoice: invoiceRepo,
+          invoiceItem: invoiceItemRepo,
+          manuscript: manuscriptRepo
+        }
+      } = context;
+      const {
+        invoiceId,
+        paymentMethodId,
+        paymentReference,
+        amount,
+        datePaid
+      } = args;
+
+      const recordBankTransferPaymentUsecase = new RecordBankTransferPaymentUsecase(
+        paymentRepo,
+        invoiceRepo,
+        manuscriptRepo,
+        invoiceItemRepo
+      );
+      const usecaseContext = { roles: [Roles.PAYER] };
+
+      const result = await recordBankTransferPaymentUsecase.execute(
+        {
+          invoiceId,
+          paymentMethodId,
+          paymentReference,
+          amount,
+          datePaid
+        },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        console.log(result.value.errorValue());
+        return null;
+      }
+
+      const confirmedPayment = result.value.getValue();
+
+      return {
+        id: confirmedPayment.paymentId.id.toString(),
+        invoiceId: confirmedPayment.invoiceId.id.toString(),
+        paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
+        foreignPaymentId: confirmedPayment.foreignPaymentId,
+        amount: confirmedPayment.amount.value,
+        datePaid: confirmedPayment.datePaid.toISOString()
       };
     }
   }

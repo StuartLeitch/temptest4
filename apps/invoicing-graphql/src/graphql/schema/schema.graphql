@@ -237,6 +237,13 @@ type Mutation {
     paymentMethodNonce: String!
     amount: Float!
   ): Payment!
+  bankTransferPayment(
+    invoiceId: String!
+    paymentMethodId: String!
+    paymentReference: String!
+    amount: Float!
+    datePaid: String!
+  ): Payment!
   recordPayPalPayment(
     paymentMethodId: String!
     invoiceId: String!

@@ -22,6 +22,7 @@ import Nav from './Nav';
 import Navbar from './Navbar';
 import NavbarThemeProvider from './NavbarThemeProvider';
 import NestedDropdown from './NestedDropdown';
+import ModalDropdown from './ModalDropdown';
 import OuterClick from './OuterClick';
 import PageLoader from './PageLoader';
 import Progress from './Progress';
@@ -135,6 +136,7 @@ export {
   HolderProvider,
   Layout,
   ListPagination,
+  ModalDropdown,
   Nav,
   Navbar,
   NavbarThemeProvider,

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
+import { ToastContainer } from 'react-toastify';
 
 import {
   Layout,
@@ -85,6 +86,12 @@ class AppLayout extends React.Component {
               )}
             </PageConfigConsumer>
           </Layout>
+          <ToastContainer
+            position='top-right'
+            autoClose={50000}
+            draggable={false}
+            hideProgressBar={true}
+          />
         </ThemeProvider>
       </AppProviders>
     );

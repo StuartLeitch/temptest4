@@ -1,10 +1,12 @@
-import {PaymentStrategyContract} from '../contracts/PaymentStrategy';
-import {BankTransfer} from './BankTransfer';
+import { BankTransfer } from './BankTransfer';
+import { PaymentService } from '../contracts/PaymentService';
+import { PaymentGateway } from '../contracts/PaymentGateway';
 
-export class BankTransferPayment implements PaymentStrategyContract {
-  // private accountNumber: string = '';
-
-  public makePayment(pm: BankTransfer, amount = 0) {
-    console.info(`Paying ${amount} using Bank Transfer.`);
+export class BankTransferPayment extends PaymentService<
+  BankTransfer,
+  PaymentGateway
+> {
+  public async makePayment(pm: BankTransfer, amount: number): Promise<any> {
+    console.log(`Paying ${amount} using BankTransfer method`);
   }
 }

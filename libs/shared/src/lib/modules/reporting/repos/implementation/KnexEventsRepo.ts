@@ -10,7 +10,7 @@ export class KnexEventsRepo extends AbstractBaseDBRepo<Knex, Event>
     if (events.length === 0) {
       return;
     }
-    var updateQuery = [
+    const updateQuery = [
       'INSERT INTO ?? (id, time, type, payload) VALUES',
       events.map(() => '(?, to_timestamp(?), ?, ?)').join(','),
       'ON CONFLICT (id) DO NOTHING'

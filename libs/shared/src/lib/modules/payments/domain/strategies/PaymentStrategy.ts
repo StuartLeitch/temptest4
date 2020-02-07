@@ -1,7 +1,7 @@
-import {PaymentGateway} from '../contracts/PaymentGateway';
-import {PaymentService} from '../contracts/PaymentService';
-import {PaymentStrategyContract} from '../contracts/PaymentStrategy';
-import {PaymentModel} from '../contracts/PaymentModel';
+import { PaymentGateway } from '../contracts/PaymentGateway';
+import { PaymentService } from '../contracts/PaymentService';
+import { PaymentStrategyContract } from '../contracts/PaymentStrategy';
+import { PaymentModel } from '../contracts/PaymentModel';
 
 export class PaymentStrategy implements PaymentStrategyContract {
   private paymentServices: Map<
