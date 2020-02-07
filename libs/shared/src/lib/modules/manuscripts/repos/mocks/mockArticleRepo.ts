@@ -4,6 +4,7 @@ import { ArticleRepoContract } from '../articleRepo';
 import { Article } from '../../domain/Article';
 import { ArticleId } from '../../domain/ArticleId';
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
+import { Manuscript } from '../../domain/Manuscript';
 
 export class MockArticleRepo extends BaseMockRepo<Article>
   implements ArticleRepoContract {
@@ -14,6 +15,11 @@ export class MockArticleRepo extends BaseMockRepo<Article>
   public async findById(manuscriptId: ManuscriptId): Promise<Article> {
     const match = this._items.find(i => i.manuscriptId.equals(manuscriptId));
 
+    return match ? match : null;
+  }
+
+  public async findByCustomId(customId: string): Promise<Article> {
+    const match = this._items.find(item => item.customId === customId);
     return match ? match : null;
   }
 
@@ -42,6 +48,17 @@ export class MockArticleRepo extends BaseMockRepo<Article>
     }
 
     return article;
+  }
+
+  public async delete(manuscript: Manuscript): Promise<unknown> {
+    const index = this._items.findIndex(item => item.id === manuscript.id);
+    return index < 0 ? null : this._items.splice(index, 1);
+  }
+
+  public async update(manuscript: Manuscript): Promise<Manuscript> {
+    const index = this._items.findIndex(item => item.id === manuscript.id);
+    index < -1 ? null : (this._items[index] = manuscript as Article);
+    return manuscript;
   }
 
   public compareMockItems(a: Article, b: Article): boolean {

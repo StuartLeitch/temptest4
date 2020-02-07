@@ -168,6 +168,7 @@ export class PublishInvoiceCreatedUsecase
 }
 
 interface InvoiceCreatedMessage {
-  event: 'InvoiceCreated';
   data: InvoiceCreatedMessagePayload;
+  event: 'InvoiceCreated';
+  timestamp: string;
 }

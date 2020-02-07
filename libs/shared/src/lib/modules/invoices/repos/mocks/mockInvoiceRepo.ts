@@ -22,6 +22,10 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     }
   }
 
+  public async getFailedErpInvoices(): Promise<Invoice[]> {
+    return [];
+  }
+
   public async getInvoiceByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Invoice> {

@@ -1,9 +1,9 @@
-import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
+import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
-import {InvoiceItemRepoContract} from '../invoiceItemRepo';
-import {InvoiceItem} from '../../domain/InvoiceItem';
-import {InvoiceItemId} from '../../domain/InvoiceItemId';
-import {ManuscriptId} from '../../domain/ManuscriptId';
+import { InvoiceItemRepoContract } from '../invoiceItemRepo';
+import { InvoiceItem } from '../../domain/InvoiceItem';
+import { InvoiceItemId } from '../../domain/InvoiceItemId';
+import { ManuscriptId } from '../../domain/ManuscriptId';
 
 export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   implements InvoiceItemRepoContract {
@@ -24,9 +24,9 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
 
   public async getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
-  ): Promise<InvoiceItem> {
-    const match = this._items.find(i => i.manuscriptId.equals(manuscriptId));
-    return match ? match : null;
+  ): Promise<InvoiceItem[]> {
+    const match = this._items.filter(i => i.manuscriptId.equals(manuscriptId));
+    return match;
   }
 
   public async getInvoiceItemCollection(): Promise<InvoiceItem[]> {
@@ -81,7 +81,7 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   public compareMockItems(a: InvoiceItem, b: InvoiceItem): boolean {
     return a.id.equals(b.id);
   }
-  
+
   getItemsByInvoiceId(): Promise<InvoiceItem[] | any> {
     return Promise.resolve(42);
   }
