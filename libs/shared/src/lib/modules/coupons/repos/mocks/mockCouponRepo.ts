@@ -23,17 +23,17 @@ export class MockCouponRepo extends BaseMockRepo<Coupon>
   }
 
   async getCouponById(couponId: CouponId): Promise<Coupon> {
-    const match = this._items.find(item => item.couponId === couponId);
+    const match = this._items.find(item => item.couponId.equals(couponId));
     return match ? match : null;
   }
 
   async getCouponByCode(code: CouponCode): Promise<Coupon> {
-    const match = this._items.find(item => item.code === code);
+    const match = this._items.find(item => item.code.equals(code));
     return match || null;
   }
 
   async incrementRedeemedCount(coupon: Coupon): Promise<Coupon> {
-    const match = this._items.find(item => item.id === coupon.id);
+    const match = this._items.find(item => item.id.equals(coupon.id));
     if (!match) {
       throw Error('not existing');
     }

@@ -29,12 +29,13 @@ import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { ManuscriptId } from '../../domain/ManuscriptId';
 import { Article } from '../../../manuscripts/domain/Article';
 import { ArticleId } from '../../../manuscripts/domain/ArticleId';
+import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 
 class MockSQSPublishService implements SQSPublishServiceContract {
-  message: PublishMessage;
+  messages: PublishMessage[] = [];
 
   async publishMessage(message: PublishMessage): Promise<void> {
-    this.message = message;
+    this.messages.push(message);
   }
 }
 
@@ -65,8 +66,10 @@ describe('migrate entire invoice usecase', () => {
     waiverRepo = new MockWaiverRepo();
     payerRepo = new MockPayerRepo();
 
+    addPaymentMethods(paymentMethodRepo);
     addInvoiceItems(invoiceItemRepo);
     addTransactions(transactionRepo);
+    addManuscripts(manuscriptRepo);
     addInvoices(invoiceRepo);
 
     migrateUsecase = new MigrateEntireInvoiceUsecase(
@@ -82,6 +85,47 @@ describe('migrate entire invoice usecase', () => {
       waiverRepo,
       payerRepo
     );
+  });
+
+  it('should publish the 3 invoices messages when all data is passed', async () => {
+    const request: MigrateEntireInvoiceDTO = {
+      invoiceId: '1',
+      acceptanceDate: new Date('03-08-2019').toISOString(),
+      submissionDate: new Date('12-12-2018').toISOString(),
+      paymentDate: new Date('07-08-2019').toISOString(),
+      issueDate: new Date('06-08-2019').toISOString(),
+      erpReference: '1234',
+      apc: {
+        invoiceReference: '00001/2019',
+        paymentAmount: 220,
+        manuscriptId: '1',
+        discount: 20,
+        price: 220,
+        vat: 20
+      },
+      payer: {
+        email: 'rares.stan@hindawi.com',
+        vatRegistrationNumber: null,
+        name: 'Rares Stan',
+        type: 'INDIVIDUAL',
+        address: {
+          addressLine1: 'Str. Mihai Eminescu Nr. 3B',
+          postalCode: '70047',
+          countryCode: 'RO',
+          addressLine2: null,
+          city: 'Iasi',
+          state: null
+        }
+      }
+    };
+
+    const result = await migrateUsecase.execute(request);
+    // console.info(result.value);
+    expect(result.isRight()).toBeTruthy();
+    // console.info(sqsPublishService.messages[0]);
+    // console.info(sqsPublishService.messages[1]);
+    // console.info(sqsPublishService.messages[2]);
+    expect(sqsPublishService.messages.length).toBe(3);
   });
 });
 
@@ -234,5 +278,19 @@ function addManuscripts(manuscriptRepo: MockArticleRepo) {
       new UniqueEntityID(props.id)
     ).getValue();
     manuscriptRepo.addMockItem(manuscript);
+  }
+}
+
+function addPaymentMethods(paymentMethodRepo: MockPaymentMethodRepo) {
+  const paymentMethodsProps = [
+    {
+      name: 'Migration',
+      isActive: true
+    }
+  ];
+
+  for (const props of paymentMethodsProps) {
+    const paymentMethod = PaymentMethod.create(props).getValue();
+    paymentMethodRepo.addMockItem(paymentMethod);
   }
 }

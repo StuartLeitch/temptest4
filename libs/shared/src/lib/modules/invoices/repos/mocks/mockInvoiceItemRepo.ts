@@ -4,6 +4,7 @@ import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { ManuscriptId } from '../../domain/ManuscriptId';
+import { InvoiceId } from '../../domain/InvoiceId';
 
 export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   implements InvoiceItemRepoContract {
@@ -82,7 +83,10 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
     return a.id.equals(b.id);
   }
 
-  getItemsByInvoiceId(): Promise<InvoiceItem[] | any> {
-    return Promise.resolve(42);
+  async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
+    const matches = this._items.filter(item => {
+      return item.invoiceId.equals(invoiceId);
+    });
+    return matches;
   }
 }

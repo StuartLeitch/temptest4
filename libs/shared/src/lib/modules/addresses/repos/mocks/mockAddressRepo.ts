@@ -11,18 +11,18 @@ export class MockAddressRepo extends BaseMockRepo<Address>
   }
 
   async findById(addressId: AddressId): Promise<Address> {
-    const match = this._items.find(item => item.addressId === addressId);
+    const match = this._items.find(item => item.addressId.equals(addressId));
     return match ? match : null;
   }
 
   async exists(address: Address): Promise<boolean> {
-    const match = this._items.find(
-      item => item.addressId === address.addressId
+    const match = this._items.find(item =>
+      item.addressId.equals(address.addressId)
     );
     return !!match;
   }
   async save(address: Address): Promise<Address> {
-    if (this.exists(address)) {
+    if (await this.exists(address)) {
       throw Error('duplicate');
     }
 
