@@ -15,6 +15,8 @@ import authorsView from './AuthorsView';
 import invoicesView from './InvoicesView';
 import manuscriptEditors from './ManuscriptEditorsView';
 import manuscriptReviewers from './ManuscriptReviewersView';
+import journalSectionsView from './JournalSectionsView';
+import journalSpecialIssuesView from './JournalSpecialIssues';
 
 const logger = new Logger('materializedView');
 
@@ -28,7 +30,9 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     authorsView,
     invoicesView,
     manuscriptEditors,
-    manuscriptReviewers
+    manuscriptReviewers,
+    journalSectionsView,
+    journalSpecialIssuesView
   ]
 ) as AbstractEventView[];
 
