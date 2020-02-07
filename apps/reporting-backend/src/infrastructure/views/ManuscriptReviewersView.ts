@@ -13,15 +13,15 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
   se.manuscript_custom_id as "manuscript_custom_id",
   reviewer_view.email as "email",
-  reviewer_view.responded as "responded_date",
+  reviewer_view.responded::timestamp as "responded_date",
   reviewer_view.status as "status",
   reviewer_view."aff" as "aff",
   reviewer_view.country as "country",
   reviewer_view."userId" as user_id,
   reviewer_view."givenNames" as given_names,
   reviewer_view."surname" as "surname",
-  reviewer_view.created as "created_date",
-  reviewer_view.updated as "updated_date",
+  reviewer_view.created::timestamp as "created_date",
+  reviewer_view.updated::timestamp as "updated_date",
   event_id
   FROM(
     SELECT
