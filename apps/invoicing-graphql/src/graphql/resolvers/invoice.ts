@@ -73,9 +73,8 @@ export const invoice: Resolvers<any> = {
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
         roles: [Roles.ADMIN]
-      }; //global['Y'] = context;
+      };
       const result = await usecase.execute(args, usecaseContext);
-      //console.info('[INVOICES]', global['X'], global['Y'], global['X'] === global['Y']);
       if (result.isLeft()) {
         return undefined;
       }

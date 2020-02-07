@@ -14,9 +14,10 @@ AS SELECT DISTINCT ON (j1.event_date) j1.event,
     j1.journal_issn,
     j1.journal_name,
     j1.is_active,
-    j1.jurnal_code,
+    j1.journal_code,
     j1.journal_email,
-    j1.event_date
+    j1.event_date,
+    j1.event_id
     FROM ${journalsDataView.getViewName()} j1
   WHERE j1.event_date = (( SELECT max(j2.event_date) AS max
             FROM ${journalsDataView.getViewName()} j2
@@ -27,7 +28,9 @@ WITH DATA;
   }
 
   postCreateQueries = [
-    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`,
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_code)`,
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_issn)`
   ];
 
   getViewName(): string {

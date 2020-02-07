@@ -34,5 +34,6 @@ function createEventTable(table) {
   table.timestamp('time');
   table.string('type');
   table.jsonb('payload');
-  table.index('type'); // btree
+  table.index('type');
+  table.index('time');
 }

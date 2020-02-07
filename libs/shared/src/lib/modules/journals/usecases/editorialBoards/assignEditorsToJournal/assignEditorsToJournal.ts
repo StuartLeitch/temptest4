@@ -19,6 +19,7 @@ import { CatalogRepoContract } from '../../../repos';
 import { CreateEditorDTO } from '../createEditor/createEditorDTO';
 import { CreateEditor } from '../createEditor/createEditor';
 import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import { UseCaseError } from '../../../../../core/logic/UseCaseError';
 
 interface AssignEditorsToJournalDTO {
   journalId: string;
@@ -97,7 +98,7 @@ export class AssignEditorsToJournalUsecase
       console.log(`Expected editor number: ${allEditors.length}`);
 
       const editorsToCreate = allEditors.filter(e => {
-        // TODO filter assistants 
+        // TODO filter assistants
         const isCreated = currentEditorsIds.includes(e.editorId);
         return !isCreated;
       });

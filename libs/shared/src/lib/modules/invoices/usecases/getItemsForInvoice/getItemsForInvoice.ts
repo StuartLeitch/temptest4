@@ -74,6 +74,7 @@ export class GetItemsForInvoiceUsecase
       }
 
       if (items.length === 0) {
+        // return right(Result.ok<InvoiceItem[]>([]));
         return left(
           new GetItemsForInvoiceErrors.InvoiceHasNoItems(
             invoiceId.id.toString()

@@ -5,11 +5,16 @@ import { Logger } from '../../lib/logger';
 import { differenceInSeconds } from '../../utils/utils';
 
 import { AbstractEventView } from './contracts/EventViewContract';
+
 import invoicesDataView from './InvoicesDataView';
 import journalsView from './JournalsView';
 import submissionDataView from './SubmissionDataView';
 import submissionsView from './SubmissionsView';
 import uniqueJournals from './UniqueJournals';
+import authorsView from './AuthorsView';
+import invoicesView from './InvoicesView';
+import manuscriptEditors from './ManuscriptEditorsView';
+import manuscriptReviewers from './ManuscriptReviewersView';
 
 const logger = new Logger('materializedView');
 
@@ -19,9 +24,17 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     journalsView,
     submissionDataView,
     submissionsView,
-    uniqueJournals
+    uniqueJournals,
+    authorsView,
+    invoicesView,
+    manuscriptEditors,
+    manuscriptReviewers
   ]
 ) as AbstractEventView[];
+
+if (materializedViewList === null) {
+  throw Error('Circle dependency found, could not compile views.');
+}
 
 export async function refreshViews(knex: Knex) {
   const refreshStart = new Date();

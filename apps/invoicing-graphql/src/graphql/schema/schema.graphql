@@ -1,4 +1,10 @@
 scalar Date
+scalar ReferenceNumber
+scalar ID
+scalar Name
+
+directive @model(id: ID) on OBJECT
+directive @filter(key: Name) on FIELD_DEFINITION
 
 enum InvoiceStatus {
   DRAFT
@@ -7,11 +13,11 @@ enum InvoiceStatus {
   FINAL
 }
 
-type Article {
+type Article @model(id: "articles") {
   id: String
-  journalId: String
+  journalId: ID @filter
   journalTitle: String
-  customId: String
+  customId: ID @filter
   created: Date
   title: String
   articleType: String
@@ -21,9 +27,9 @@ type Article {
   authorFirstName: String
 }
 
-type Transaction {
+type Transaction @model(id: "transactions") {
   id: String
-  status: String
+  status: String @filter(key: "transactionStatus")
 }
 
 enum TransactionStatus {
@@ -32,10 +38,10 @@ enum TransactionStatus {
   FINAL
 }
 
-type InvoiceItem {
+type InvoiceItem @model(id: "invoice_items") {
   id: String
-  invoiceId: String
-  manuscriptId: String
+  invoiceId: ID
+  manuscriptId: ID
   type: String
   price: Float
   rate: Float
@@ -47,21 +53,21 @@ type InvoiceItem {
   waivers: [Waiver]
 }
 
-type Invoice {
-  invoiceId: String
+type Invoice @model(id: "invoices") {
+  invoiceId: ID
   dateCreated: String
   dateChanged: String
   dateIssued: String
   dateAccepted: String
   vat: Float
   charge: Float
-  status: InvoiceStatus
+  status: InvoiceStatus @filter(key: "invoiceStatus")
   payer: Payer
-  referenceNumber: String
+  referenceNumber: ReferenceNumber @filter
   invoiceItem: InvoiceItem
   title: String
   price: Float
-  customId: String
+  customId: ID
   type: String
   payment: Payment
 }
@@ -73,7 +79,7 @@ type InvoiceVat {
 }
 
 type InvoiceId {
-  invoiceId: [String]
+  invoiceId: [ID]
 }
 
 input AddressInput {
@@ -93,6 +99,12 @@ input PayerInput {
   organization: String
   vatId: String
   address: AddressInput
+}
+
+type Journal {
+  journalId: ID
+  journalTitle: String
+  # ... (TODO: add missing fields here)
 }
 
 enum PayerType {
@@ -163,75 +175,50 @@ type PaginatedInvoices {
   invoices: [Invoice]
 }
 
+input ArticleFilters {
+  journalId: [ID]
+  customId: [ID]
+}
+input InvoiceItemFilters {
+  article: ArticleFilters
+}
+input InvoiceFilters {
+  invoiceStatus: [InvoiceStatus]
+  transactionStatus: [TransactionStatus]
+  referenceNumber: [ReferenceNumber]
+  invoiceItem: InvoiceItemFilters
+}
+
 input Pagination {
   offset: Int
   limit: Int
 }
 
-input StatusFilter {
-  in: [InvoiceStatus]
-}
-input TransactionStatusFilter {
-  in: [TransactionStatus]
-}
-input ReferenceNumberFilter {
-  eq: String
-}
-input JournalTitleFilter {
-  in: [String]
-}
-input CustomIdFilter {
-  eq: String
-}
-input ArticleFilter {
-  journalTitle: JournalTitleFilter
-  customId: CustomIdFilter
-}
-input TransactionFilter {
-  status: TransactionStatusFilter
-}
-input InvoiceItemFiltering {
-  article: ArticleFilter
-}
-
-input InvoicesFiltering {
-  status: StatusFilter
-  referenceNumber: ReferenceNumberFilter
-  transaction: TransactionFilter
-  invoiceItem: InvoiceItemFiltering
-}
-
-input Filtering {
-  invoices: InvoicesFiltering
-}
-
-# directive @filters on OBJECT
-# directive @outer on FIELD
-
 type Query {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
-  invoice(invoiceId: String): Invoice
+  invoice(invoiceId: ID): Invoice
   invoiceVat(
-    invoiceId: String
+    invoiceId: ID
     country: String
     state: String
     postalCode: String
     payerType: String
   ): InvoiceVat
-  invoices(filtering: Filtering, pagination: Pagination): PaginatedInvoices
-  invoiceIdByManuscriptCustomId(customId: String): InvoiceId
+  invoices(filters: InvoiceFilters, pagination: Pagination): PaginatedInvoices
+  invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
+  journals: [Journal]
   echo(value: String): String
 }
 
 type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
-  applyCoupon(invoiceId: String, couponCode: String): Coupon
+  applyCoupon(invoiceId: ID, couponCode: String): Coupon
   createInvoice(totalAmount: Float): Invoice
-  deleteInvoice(id: String!): Boolean
-  setTransactionToActive(customId: String): Transaction
+  deleteInvoice(id: ID!): Boolean
+  setTransactionToActive(customId: ID): Transaction
   creditCardPayment(
-    invoiceId: String!
+    invoiceId: ID!
     payerId: String!
     paymentMethodId: String!
     paymentMethodNonce: String!
@@ -247,18 +234,18 @@ type Mutation {
   ): Payment!
   recordPayPalPayment(
     paymentMethodId: String!
-    invoiceId: String!
+    invoiceId: ID!
     payerId: String!
     orderId: String!
   ): Payment!
   migratePayment(
-    invoiceId: String!
+    invoiceId: ID!
     payerId: String!
     amount: Float
     datePaid: String
   ): Payment!
   migrateInvoice(
-    invoiceId: String!
+    invoiceId: ID!
     vatValue: Float
     invoiceReference: Float
     discount: Float
