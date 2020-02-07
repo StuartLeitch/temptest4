@@ -19,16 +19,13 @@ const InvoicesLeftNav = props => {
   const [customId, set_customId] = useState('');
 
   // const [eventTarget, onFilterHandler]: [any, (any) => void] = useState('');
-  const [onFilterHandler] = useDebouncedCallback(
-    (eventTarget) => {
-      const value =
-        eventTarget?.type === 'checkbox'
-          ? eventTarget.checked
-          : eventTarget.value;
-      props.setFilter(eventTarget.name, value);
-    },
-    300
-  );
+  const [onFilterHandler] = useDebouncedCallback(eventTarget => {
+    const value =
+      eventTarget?.type === 'checkbox'
+        ? eventTarget.checked
+        : eventTarget.value;
+    props.setFilter(eventTarget.name, value);
+  }, 300);
 
   useEffect(() => {
     onFilterHandler({ name: 'referenceNumber', value: refNumber });
@@ -130,7 +127,7 @@ const InvoicesLeftNav = props => {
             ({faker.finance.mask()})
           </span> */}
         </NavItem>
-        <NavItem className='d-flex px-2 mb-2'>
+        {/* <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
             onChange={evt => onFilterHandler(evt.target)}
             name='transactionStatus.FINAL'
@@ -140,10 +137,7 @@ const InvoicesLeftNav = props => {
             label='Final'
             inline
           />
-          {/* <span className='small ml-auto align-self-center'>
-            ({faker.finance.mask()})
-          </span> */}
-        </NavItem>
+        </NavItem> */}
       </Nav>
       {/* END Transaction Status */}
       {/* START Journal Title */}
