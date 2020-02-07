@@ -239,6 +239,7 @@ type Mutation {
   ): Payment!
   bankTransferPayment(
     invoiceId: String!
+    payerId: String!
     paymentMethodId: String!
     paymentReference: String!
     amount: Float!

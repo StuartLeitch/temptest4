@@ -102,7 +102,6 @@ export class RecordBankTransferPaymentUsecase
 
     const payload = {
       ...request,
-      payerId: null,
       foreignPaymentId: request.paymentReference
     };
 

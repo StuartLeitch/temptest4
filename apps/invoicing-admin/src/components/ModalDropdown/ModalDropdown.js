@@ -78,6 +78,8 @@ export const ModalDropdown = ({
                 Save Payment
               </DropdownToggle>
               <DropdownMenu>
+                <DropdownItem disabled>Save Payment</DropdownItem>
+                <DropdownItem divider />
                 <DropdownItem
                   tag={Button}
                   color='primary'
@@ -86,10 +88,8 @@ export const ModalDropdown = ({
                     onSave();
                   }}
                 >
-                  Save Payment
+                  Save Payment & Set Invoice to FINAL
                 </DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem>Save Payment & Set Invoice to FINAL</DropdownItem>
               </DropdownMenu>
             </UncontrolledButtonDropdown>
           </ButtonToolbar>

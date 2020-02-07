@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from 'graphql-hooks';
+import { useQuery, useMutation } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
 import DatePicker, { setDefaultLocale } from 'react-datepicker';
 import format from 'date-fns/format';
@@ -154,12 +154,58 @@ fragment articleFragment on Article {
 }
 `;
 
+const GET_PAYMENT_METHODS_QUERY = `
+query {
+  getPaymentMethods {
+    ...paymentMethodFragment
+  }
+}
+
+fragment paymentMethodFragment on PaymentMethod {
+  id
+  name
+  isActive
+}
+`;
+
+const BANK_TRANSFER_MUTATION = `
+mutation bankTransferPayment (
+  $invoiceId: String!
+  $payerId: String!
+  $paymentMethodId: String!
+  $amount: Float!
+  $paymentReference: String!
+  $datePaid: String!
+) {
+  bankTransferPayment(
+    invoiceId: $invoiceId
+    payerId: $payerId
+    paymentMethodId: $paymentMethodId
+    paymentReference: $paymentReference
+    amount: $amount
+    datePaid: $datePaid
+  ) {
+    id
+    foreignPaymentId
+  }
+}
+`;
+
 const Details = () => {
   let { id } = useParams();
   const { loading, error, data } = useQuery(INVOICE_QUERY, {
     variables: {
       id
     }
+  });
+  const { data: paymentMethods } = useQuery(GET_PAYMENT_METHODS_QUERY);
+  const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
+  const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
+    paymentDate: new Date(),
+    paymentAmount: 0,
+    paymentReference: ''
+    // paymentMethodId: ''
+    // payerId: ''
   });
 
   if (loading)
@@ -174,6 +220,7 @@ const Details = () => {
 
   if (error) return <div>Something Bad Happened</div>;
 
+  const { getPaymentMethods } = paymentMethods;
   const { invoice } = data;
   console.info(invoice);
   const { coupons, waivers, price } = invoice?.invoiceItem;
@@ -249,7 +296,32 @@ const Details = () => {
                         Add Payment
                       </DropdownToggle>
                     }
-                    onSave={() => {
+                    onSave={async () => {
+                      const {
+                        bankTransferPayment
+                      } = await recordBankTransferPayment({
+                        variables: {
+                          invoiceId: invoice?.id,
+                          payerId: invoice?.payer?.id,
+                          paymentMethodId: getPaymentMethods.find(
+                            pm => pm.name === 'Bank Transfer'
+                          ).id,
+                          amount: parseFloat(
+                            bankTransferPaymentData.paymentAmount
+                          ),
+                          paymentReference:
+                            bankTransferPaymentData.paymentReference,
+                          datePaid: bankTransferPaymentData.paymentDate.toISOString()
+                        }
+                      });
+
+                      invoice.payment = {
+                        paymentMethod: 'Bank Transfer',
+                        paymentAmount: bankTransferPaymentData.paymentAmount,
+                        foreignPaymentId:
+                          bankTransferPaymentData.paymentReference
+                      };
+
                       return toast.success(({ closeToast }) => (
                         <Media>
                           <Media middle left className='mr-3'>
@@ -260,8 +332,8 @@ const Details = () => {
                               Success!
                             </Media>
                             <p>
-                              You successfully read this important alert
-                              message.
+                              You successfully processed a bank transfer
+                              payment.
                             </p>
                             <div className='d-flex mt-2'>
                               <Button
@@ -298,8 +370,13 @@ const Details = () => {
                               <DatePicker
                                 dateFormat='d MMMM yyyy'
                                 customInput={<ButtonInput />}
-                                selected={new Date()}
-                                onChange={() => {}}
+                                selected={bankTransferPaymentData.paymentDate}
+                                onChange={date => {
+                                  setBankTransferPaymentData({
+                                    ...bankTransferPaymentData,
+                                    paymentDate: date
+                                  });
+                                }}
                               />
                             </InputGroup>
                           </Col>
@@ -315,10 +392,20 @@ const Details = () => {
                               <InputGroupAddon addonType='prepend'>
                                 $
                               </InputGroupAddon>
-                              <Input placeholder='Amount...' id='bothAddon' />
-                              <InputGroupAddon addonType='append'>
+                              <Input
+                                placeholder='Amount...'
+                                id='bothAddon'
+                                onChange={e => {
+                                  const { name, value } = e.target;
+                                  setBankTransferPaymentData({
+                                    ...bankTransferPaymentData,
+                                    paymentAmount: value
+                                  });
+                                }}
+                              />
+                              {/* <InputGroupAddon addonType='append'>
                                 .00
-                              </InputGroupAddon>
+                              </InputGroupAddon> */}
                             </InputGroup>
                           </Col>
                         </FormGroup>
@@ -336,7 +423,16 @@ const Details = () => {
                             Payment Reference
                           </Label>
                           <Col sm={8}>
-                            <Input placeholder='Reference' />
+                            <Input
+                              placeholder='Reference'
+                              onChange={e => {
+                                const { name, value } = e.target;
+                                setBankTransferPaymentData({
+                                  ...bankTransferPaymentData,
+                                  paymentReference: value
+                                });
+                              }}
+                            />
                           </Col>
                         </FormGroup>
                       </Form>

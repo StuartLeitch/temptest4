@@ -190,6 +190,7 @@ export const payments: Resolvers<any> = {
       } = context;
       const {
         invoiceId,
+        payerId,
         paymentMethodId,
         paymentReference,
         amount,
@@ -207,6 +208,7 @@ export const payments: Resolvers<any> = {
       const result = await recordBankTransferPaymentUsecase.execute(
         {
           invoiceId,
+          payerId,
           paymentMethodId,
           paymentReference,
           amount,

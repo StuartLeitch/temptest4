@@ -35,7 +35,7 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       let invoiceItems = invoice.invoiceItems.currentItems;
       if (invoiceItems.length === 0) {
-        let getItemsUsecase = new GetItemsForInvoiceUsecase(
+        const getItemsUsecase = new GetItemsForInvoiceUsecase(
           this.invoiceItemRepo,
           this.couponRepo,
           this.waiverRepo
