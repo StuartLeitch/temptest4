@@ -12,87 +12,6 @@ import {
 
 import { TrTableInvoicesList } from './components/TrTableList';
 
-// const INVOICES_QUERY = `
-// query fetchInvoices(
-//   $offset: Int,
-//   $limit: Int
-// ) {
-//   invoices(offset: $offset, limit: $limit) {
-//     totalCount
-//     invoices {
-//       ...invoiceFragment
-//     }
-//   }
-// }
-// fragment invoiceFragment on Invoice {
-//   id: invoiceId
-//   status
-//   dateCreated
-//   dateIssued
-//   dateAccepted
-//   referenceNumber
-//   payer {
-//     ...payerFragment
-//   }
-//   invoiceItem {
-//     id
-//     price
-//     rate
-//     vat
-//     vatnote
-//     dateCreated
-//     coupons {
-//       ...couponFragment
-//     }
-//     waivers {
-//       ...waiverFragment
-//     }
-//     article {
-//       ...articleFragment
-//     }
-//   }
-// }
-// fragment payerFragment on Payer {
-//   id
-//   type
-//   name
-//   email
-//   vatId
-//   organization
-//   address {
-//     ...addressFragment
-//   }
-// }
-// fragment addressFragment on Address {
-//   city
-//   country
-//   state
-//   postalCode
-//   addressLine1
-// }
-// fragment couponFragment on Coupon {
-//   code
-//   reduction
-// }
-// fragment waiverFragment on Waiver {
-//   reduction
-//   type_id
-// }
-// fragment articleFragment on Article {
-//   id
-//   title
-//   created
-//   articleType
-//   authorCountry
-//   authorEmail
-//   customId
-//   journalTitle
-//   authorSurname
-//   authorFirstName
-//   journalTitle
-// }
-// `;
-
 const INVOICES_QUERY = `
 query fetchInvoices(
   $limit: Int
@@ -126,7 +45,7 @@ query fetchInvoices(
   }
 }
 fragment invoiceFragment on Invoice {
-  invoiceId
+  id: invoiceId
   status
   dateCreated
   dateIssued

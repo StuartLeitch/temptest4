@@ -241,7 +241,11 @@
             "tsConfig": "apps/invoicing-admin/tsconfig.app.json",
             "assets": [
               "apps/invoicing-admin/src/favicon.ico",
-              "apps/invoicing-admin/src/assets"
+              "apps/invoicing-admin/src/assets",
+              "apps/invoicing-admin/src/silent-check-sso.html",
+              "apps/invoicing-admin/src/env-template.js",
+              "apps/invoicing-admin/src/Dockerfile",
+              "apps/invoicing-admin/src/nginx.conf"
             ],
             "styles": ["apps/invoicing-admin/src/styles.scss"],
             "scripts": []

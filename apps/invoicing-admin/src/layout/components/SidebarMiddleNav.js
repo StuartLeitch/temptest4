@@ -55,14 +55,14 @@ export const SidebarMiddleNav = () => (
       />
     </SidebarMenu.Item> */}
     {/* -------- Interface ---------*/}
-    <SidebarMenu.Item
+    {/*<SidebarMenu.Item
       icon={<i className='fas fa-fw fa-toggle-on'></i>}
       title='Interface'
     >
       <SidebarMenu.Item title='Colors' to='/interface/colors' />
       <SidebarMenu.Item title='Typography' to='/interface/typography' />
       <SidebarMenu.Item title='Buttons' to='/interface/buttons' />
-      {/*<SidebarMenu.Item title='Paginations' to='/interface/paginations' />
+      <SidebarMenu.Item title='Paginations' to='/interface/paginations' />
       <SidebarMenu.Item title='Images' to='/interface/images' />
       <SidebarMenu.Item title='Avatars' to='/interface/avatars' />
       <SidebarMenu.Item title='Progress Bars' to='/interface/progress-bars' />
@@ -89,8 +89,8 @@ export const SidebarMiddleNav = () => (
         title='Drag &amp; Drop Elements'
         to='/interface/drag-and-drop-elements'
       />
-      <SidebarMenu.Item title='Calendar' to='/interface/calendar' /> */}
-    </SidebarMenu.Item>
+      <SidebarMenu.Item title='Calendar' to='/interface/calendar' />
+    </SidebarMenu.Item> */}
     {/* -------- Graphs ---------*/}
     {/* <SidebarMenu.Item
       icon={<i className='fas fa-fw fa-pie-chart'></i>}

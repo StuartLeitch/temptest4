@@ -314,7 +314,11 @@ const Details = () => {
                             Reference Number
                           </Label>
                           <Col sm={9}>
-                            <Input plaintext value={invoice.referenceNumber} />
+                            <Input
+                              plaintext
+                              readOnly
+                              value={invoice.referenceNumber}
+                            />
                           </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -322,7 +326,11 @@ const Details = () => {
                             Terms
                           </Label>
                           <Col sm={9}>
-                            <Input plaintext value='Payable upon Receipt' />
+                            <Input
+                              readOnly
+                              plaintext
+                              value='Payable upon Receipt'
+                            />
                           </Col>
                         </FormGroup>
                       </Form>
