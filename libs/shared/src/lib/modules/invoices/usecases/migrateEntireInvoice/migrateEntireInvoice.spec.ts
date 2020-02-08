@@ -121,9 +121,6 @@ describe('migrate entire invoice usecase', () => {
 
     const result = await migrateUsecase.execute(request);
     expect(result.isRight()).toBeTruthy();
-    console.info(sqsPublishService.messages[0]);
-    console.info(sqsPublishService.messages[1]);
-    console.info(sqsPublishService.messages[2]);
     expect(sqsPublishService.messages.length).toBe(3);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toBe(
@@ -154,6 +151,26 @@ describe('migrate entire invoice usecase', () => {
       request.apc.invoiceReference
     );
     expect(sqsPublishService.messages[2].data.invoiceStatus).toBe('FINAL');
+
+    const invoiceId = InvoiceId.create(
+      new UniqueEntityID(request.invoiceId)
+    ).getValue();
+    const invoice = await invoiceRepo.getInvoiceById(invoiceId);
+    const transaction = await transactionRepo.getTransactionById(
+      invoice.transactionId
+    );
+
+    expect(transaction.status).toBe(TransactionStatus.ACTIVE);
+    expect(invoice.status).toBe('FINAL');
+
+    expect(transaction.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(transaction.dateUpdated.toISOString()).toBe(request.acceptanceDate);
+
+    expect(invoice.dateIssued.toISOString()).toBe(request.issueDate);
+    expect(invoice.referenceNumber).toBe(request.apc.invoiceReference);
+    expect(invoice.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(invoice.props.dateUpdated.toISOString()).toBe(request.paymentDate);
+    expect(invoice.dateAccepted.toISOString()).toBe(request.acceptanceDate);
   });
 
   it('should publish only the InvoiceCreated message when only the acceptanceDate is provided', async () => {
