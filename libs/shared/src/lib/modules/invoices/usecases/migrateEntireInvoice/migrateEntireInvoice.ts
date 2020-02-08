@@ -195,9 +195,12 @@ export class MigrateEntireInvoiceUsecase
   }): Promise<Either<AppError.UnexpectedError, string>> {
     if (data && data.acceptanceDate) {
       const { acceptanceDate, submissionDate, transaction, invoiceId } = data;
-      transaction.props.dateCreated = new Date(submissionDate);
-      transaction.props.dateUpdated = new Date(acceptanceDate);
-      transaction.props.status = TransactionStatus.ACTIVE;
+
+      if (transaction.status === TransactionStatus.DRAFT) {
+        transaction.props.dateCreated = new Date(submissionDate);
+        transaction.props.dateUpdated = new Date(acceptanceDate);
+        transaction.props.status = TransactionStatus.ACTIVE;
+      }
 
       try {
         await this.transactionRepo.save(transaction);
@@ -433,6 +436,7 @@ export class MigrateEntireInvoiceUsecase
         invoice.props.dateIssued = new Date(request.issueDate);
         invoice.props.erpReference = request.erpReference;
         invoice.props.invoiceNumber = invoiceNumber;
+        invoice.payerId = payer.payerId;
 
         return invoice;
       })

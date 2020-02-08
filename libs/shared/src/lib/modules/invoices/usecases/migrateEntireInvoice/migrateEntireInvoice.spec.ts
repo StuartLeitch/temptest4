@@ -87,7 +87,7 @@ describe('migrate entire invoice usecase', () => {
     );
   });
 
-  it('should publish the 3 invoices messages when all data is passed', async () => {
+  it('should publish the 3 invoices events when all data is passed', async () => {
     const request: MigrateEntireInvoiceDTO = {
       invoiceId: '1',
       acceptanceDate: new Date('03-08-2019').toISOString(),
@@ -171,9 +171,99 @@ describe('migrate entire invoice usecase', () => {
     expect(invoice.dateCreated.toISOString()).toBe(request.submissionDate);
     expect(invoice.props.dateUpdated.toISOString()).toBe(request.paymentDate);
     expect(invoice.dateAccepted.toISOString()).toBe(request.acceptanceDate);
+    expect(invoice.payerId).toBeTruthy();
+
+    const payer = await payerRepo.getPayerById(invoice.payerId);
+
+    expect(payer).toBeTruthy();
+    expect(payer.name.value).toBe(request.payer.name);
+    expect(payer.type).toBe(request.payer.type);
   });
 
-  it('should publish only the InvoiceCreated message when only the acceptanceDate is provided', async () => {
+  it('should publish the first 2 invoices events when acceptance date, payer and issue date is provided', async () => {
+    const request: MigrateEntireInvoiceDTO = {
+      invoiceId: '1',
+      acceptanceDate: new Date('03-08-2019').toISOString(),
+      submissionDate: new Date('12-12-2018').toISOString(),
+      paymentDate: null,
+      issueDate: new Date('06-08-2019').toISOString(),
+      erpReference: '1234',
+      apc: {
+        invoiceReference: '00001/2019',
+        paymentAmount: null,
+        manuscriptId: '1',
+        discount: 20,
+        price: 220,
+        vat: 20
+      },
+      payer: {
+        email: 'rares.stan@hindawi.com',
+        vatRegistrationNumber: null,
+        name: 'Rares Stan',
+        type: 'INDIVIDUAL',
+        address: {
+          addressLine1: 'Str. Mihai Eminescu Nr. 3B',
+          postalCode: '70047',
+          countryCode: 'RO',
+          addressLine2: null,
+          city: 'Iasi',
+          state: null
+        }
+      }
+    };
+
+    const result = await migrateUsecase.execute(request);
+    expect(result.isRight()).toBeTruthy();
+    expect(sqsPublishService.messages.length).toBe(2);
+    expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
+    expect(sqsPublishService.messages[0].timestamp).toBe(
+      request.acceptanceDate
+    );
+    expect(sqsPublishService.messages[0].data.invoiceId).toBe(
+      request.invoiceId
+    );
+    expect(sqsPublishService.messages[0].data.referenceNumber).toBeFalsy();
+    expect(sqsPublishService.messages[0].data.invoiceStatus).toBe('DRAFT');
+
+    expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
+    expect(sqsPublishService.messages[1].timestamp).toBe(request.issueDate);
+    expect(sqsPublishService.messages[1].data.invoiceId).toBe(
+      request.invoiceId
+    );
+    expect(sqsPublishService.messages[1].data.referenceNumber).toBe(
+      request.apc.invoiceReference
+    );
+    expect(sqsPublishService.messages[1].data.invoiceStatus).toBe('ACTIVE');
+
+    const invoiceId = InvoiceId.create(
+      new UniqueEntityID(request.invoiceId)
+    ).getValue();
+    const invoice = await invoiceRepo.getInvoiceById(invoiceId);
+    const transaction = await transactionRepo.getTransactionById(
+      invoice.transactionId
+    );
+
+    expect(transaction.status).toBe(TransactionStatus.ACTIVE);
+    expect(invoice.status).toBe('ACTIVE');
+
+    expect(transaction.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(transaction.dateUpdated.toISOString()).toBe(request.acceptanceDate);
+
+    expect(invoice.dateIssued.toISOString()).toBe(request.issueDate);
+    expect(invoice.referenceNumber).toBe(request.apc.invoiceReference);
+    expect(invoice.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(invoice.props.dateUpdated.toISOString()).toBe(request.issueDate);
+    expect(invoice.dateAccepted.toISOString()).toBe(request.acceptanceDate);
+    expect(invoice.payerId).toBeTruthy();
+
+    const payer = await payerRepo.getPayerById(invoice.payerId);
+
+    expect(payer).toBeTruthy();
+    expect(payer.name.value).toBe(request.payer.name);
+    expect(payer.type).toBe(request.payer.type);
+  });
+
+  it('should publish only the InvoiceCreated event when only the acceptanceDate is provided', async () => {
     const request: MigrateEntireInvoiceDTO = {
       invoiceId: '1',
       acceptanceDate: new Date('03-08-2019').toISOString(),
@@ -224,6 +314,7 @@ describe('migrate entire invoice usecase', () => {
     expect(invoice.props.dateUpdated.toISOString()).toBe(
       request.acceptanceDate
     );
+    expect(invoice.payerId).toBeFalsy();
   });
 
   it('should not send any events if the acceptance date is not provided', async () => {
@@ -269,6 +360,70 @@ describe('migrate entire invoice usecase', () => {
     expect(invoice.props.dateUpdated.toISOString()).toBe(
       request.submissionDate
     );
+  });
+
+  it('should update the transaction only once, if there are multiple invoices for it', async () => {
+    const request1: MigrateEntireInvoiceDTO = {
+      invoiceId: '3',
+      acceptanceDate: new Date('03-08-2019').toISOString(),
+      submissionDate: new Date('12-12-2018').toISOString(),
+      paymentDate: new Date('07-08-2019').toISOString(),
+      issueDate: new Date('06-08-2019').toISOString(),
+      erpReference: '1234',
+      apc: {
+        invoiceReference: '00001/2019',
+        paymentAmount: 220,
+        manuscriptId: '1',
+        discount: 20,
+        price: 220,
+        vat: 20
+      },
+      payer: {
+        email: 'rares.stan@hindawi.com',
+        vatRegistrationNumber: null,
+        name: 'Rares Stan',
+        type: 'INDIVIDUAL',
+        address: {
+          addressLine1: 'Str. Mihai Eminescu Nr. 3B',
+          postalCode: '70047',
+          countryCode: 'RO',
+          addressLine2: null,
+          city: 'Iasi',
+          state: null
+        }
+      }
+    };
+
+    const request2: MigrateEntireInvoiceDTO = {
+      invoiceId: '4',
+      acceptanceDate: new Date('03-08-2019').toISOString(),
+      submissionDate: new Date('12-12-2018').toISOString(),
+      paymentDate: null,
+      issueDate: null,
+      erpReference: null,
+      apc: {
+        invoiceReference: null,
+        paymentAmount: 220,
+        manuscriptId: '1',
+        discount: 20,
+        price: 220,
+        vat: 20
+      },
+      payer: null
+    };
+    transactionRepo.update = jest.fn(async input => input);
+
+    const result1 = await migrateUsecase.execute(request1);
+    const result2 = await migrateUsecase.execute(request2);
+
+    expect(result1.isRight()).toBeTruthy();
+    expect(result2.isRight()).toBeTruthy();
+    expect(sqsPublishService.messages.length).toBe(4);
+
+    expect(
+      ((transactionRepo.update as unknown) as jest.Mock<Transaction>).mock.calls
+        .length
+    ).toBe(2);
   });
 });
 
