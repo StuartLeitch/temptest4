@@ -120,11 +120,10 @@ describe('migrate entire invoice usecase', () => {
     };
 
     const result = await migrateUsecase.execute(request);
-    // console.info(result.value);
     expect(result.isRight()).toBeTruthy();
-    // console.info(sqsPublishService.messages[0]);
-    // console.info(sqsPublishService.messages[1]);
-    // console.info(sqsPublishService.messages[2]);
+    console.info(sqsPublishService.messages[0]);
+    console.info(sqsPublishService.messages[1]);
+    console.info(sqsPublishService.messages[2]);
     expect(sqsPublishService.messages.length).toBe(3);
   });
 });

@@ -321,23 +321,31 @@ export class MigrateEntireInvoiceUsecase
     }));
   }
 
+  private async saveInvoice(invoice: Invoice) {
+    try {
+      const result = await this.invoiceRepo.save(invoice);
+      return right<Errors.InvoiceSaveFailed, Invoice>(result);
+    } catch (err) {
+      return left<Errors.InvoiceSaveFailed, Invoice>(
+        new Errors.InvoiceSaveFailed(invoice.id.toString(), err)
+      );
+    }
+  }
+
   private async updateInvoiceAtQualityPass(request: DTO) {
     return new AsyncEither<null, string>(request.invoiceId)
       .asyncChain(invoiceId => this.getInvoice(invoiceId))
-      .asyncChain(async invoice => {
-        if (!request.acceptanceDate) {
-          return right<null, Invoice>(invoice);
+      .map(invoice => {
+        if (request.acceptanceDate) {
+          invoice.props.dateAccepted = new Date(request.acceptanceDate);
+          invoice.props.dateCreated = new Date(request.submissionDate);
+          invoice.props.dateUpdated = new Date(request.acceptanceDate);
+          invoice.props.charge =
+            request.apc.price - request.apc.discount + request.apc.vat;
         }
-
-        invoice.props.dateAccepted = new Date(request.acceptanceDate);
-        invoice.props.dateCreated = new Date(request.submissionDate);
-        invoice.props.dateUpdated = new Date(request.acceptanceDate);
-        invoice.props.charge =
-          request.apc.price - request.apc.discount + request.apc.vat;
-        // TODO: call usecase
-        const result = await this.invoiceRepo.save(invoice);
-        return right<null, Invoice>(result);
+        return invoice;
       })
+      .asyncChain(invoice => this.saveInvoice(invoice))
       .map(async invoice => {
         const items = await this.invoiceItemRepo.getItemsByInvoiceId(
           invoice.invoiceId
@@ -365,7 +373,7 @@ export class MigrateEntireInvoiceUsecase
       .asyncChain(payer => {
         return this.getInvoice(payer.invoiceId.id.toString());
       })
-      .asyncChain(async invoice => {
+      .map(invoice => {
         const invoiceNumberPadded = request.apc.invoiceReference.split('/')[0];
         const invoiceNumber = Number.parseInt(
           invoiceNumberPadded,
@@ -379,10 +387,9 @@ export class MigrateEntireInvoiceUsecase
         invoice.props.erpReference = request.erpReference;
         invoice.props.invoiceNumber = invoiceNumber;
 
-        // TODO: use usecase
-        const result = await this.invoiceRepo.save(invoice);
-        return right<null, Invoice>(result);
+        return invoice;
       })
+      .asyncChain(invoice => this.saveInvoice(invoice))
       .asyncChain(async invoice => {
         const manuscript = await this.manuscriptRepo.findById(
           ManuscriptId.create(
@@ -505,10 +512,7 @@ export class MigrateEntireInvoiceUsecase
         const result = await this.paymentRepo.save(payment);
         return right<null, Payment>(result);
       })
-      .map(payment => {
-        console.info(payment);
-        return { payment, request };
-      })
+      .map(payment => ({ payment, request }))
       .execute();
   }
 
@@ -525,14 +529,13 @@ export class MigrateEntireInvoiceUsecase
     }
     return new AsyncEither<null, Payment>(payment)
       .asyncChain(payment => this.getInvoice(payment.invoiceId.id.toString()))
-      .asyncChain(async invoice => {
+      .map(invoice => {
         invoice.props.status = InvoiceStatus.FINAL;
         invoice.props.dateUpdated = new Date(request.paymentDate);
 
-        // TODO: Use usecase
-        const result = await this.invoiceRepo.save(invoice);
-        return right<null, Invoice>(result);
+        return invoice;
       })
+      .asyncChain(invoice => this.saveInvoice(invoice))
       .map(invoice => ({ invoice, payment, request }))
       .execute();
   }
@@ -566,7 +569,6 @@ export class MigrateEntireInvoiceUsecase
           paymentDetails,
           messageTimestamp
         );
-        console.log(result);
         return right<null, void>(result);
       })
       .execute();

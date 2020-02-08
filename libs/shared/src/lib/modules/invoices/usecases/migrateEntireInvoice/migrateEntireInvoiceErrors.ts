@@ -12,6 +12,7 @@ export type AllMigrateEntireInvoiceErrors =
   | MigrateEntireInvoiceErrors.ManuscriptNotFound
   | MigrateEntireInvoiceErrors.PostalCodeRequired
   | MigrateEntireInvoiceErrors.InvoiceIdRequired
+  | MigrateEntireInvoiceErrors.InvoiceSaveFailed
   | MigrateEntireInvoiceErrors.PayerNameRequired
   | MigrateEntireInvoiceErrors.PayerTypeRequired
   | MigrateEntireInvoiceErrors.TransactionError
@@ -36,6 +37,14 @@ export namespace MigrateEntireInvoiceErrors {
     constructor() {
       super(false, {
         message: `Manuscript id is required.`
+      });
+    }
+  }
+
+  export class InvoiceSaveFailed extends Result<UseCaseError> {
+    constructor(invoiceId: string, err: Error) {
+      super(false, {
+        message: `Saving invoice with id {${invoiceId}} encountered error: ${err}.`
       });
     }
   }

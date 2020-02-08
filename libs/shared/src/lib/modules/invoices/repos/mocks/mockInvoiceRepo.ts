@@ -103,8 +103,6 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
       this._items.push(invoice);
     }
 
-    console.log(this._items);
-
     return invoice;
   }
 
