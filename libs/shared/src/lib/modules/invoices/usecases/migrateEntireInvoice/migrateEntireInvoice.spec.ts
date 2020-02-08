@@ -319,7 +319,7 @@ function addInvoices(invoicesRepo: MockInvoiceRepo) {
     },
     {
       status: InvoiceStatus.DRAFT,
-      transactionId: TransactionId.create(new UniqueEntityID('4')),
+      transactionId: TransactionId.create(new UniqueEntityID('3')),
       charge: 0,
       id: '4'
     }

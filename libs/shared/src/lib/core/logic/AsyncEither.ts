@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 import { Either, right } from './Result';
 import { Right } from './Right';
 
-type MutationType = 'map' | 'chain' | 'asyncChain';
+type MutationType = 'map' | 'then';
 type MutationFunction = (r: any) => any;
 
 type ObjectMapping<L, R> = {
@@ -32,15 +32,9 @@ export class AsyncEither<L, R> {
     return (newInstance as unknown) as AsyncEither<L, R2>;
   }
 
-  asyncChain<L2, R2>(fn: (r: R) => Promise<Either<L2, R2>>) {
+  then<L2, R2>(fn: (r: R) => Promise<Either<L2, R2>>) {
     const newInstance = this.clone();
-    newInstance.mutations.push({ type: 'asyncChain', fn });
-    return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
-  }
-
-  chain<L2, R2>(fn: (r: R) => Either<L2, R2>) {
-    const newInstance = this.clone();
-    newInstance.mutations.push({ type: 'chain', fn });
+    newInstance.mutations.push({ type: 'then', fn });
     return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
   }
 
@@ -59,10 +53,8 @@ export class AsyncEither<L, R> {
 
   private functionToApply<L, R>(type: MutationType, val: Either<L, R>) {
     const objectMapping: ObjectMapping<L, R> = {
-      asyncChain: (val: Either<L, R>) => (fn: MutationFunction) =>
+      then: (val: Either<L, R>) => (fn: MutationFunction) =>
         (val.chain(fn) as unknown) as Promise<Either<L, R>>,
-      chain: (val: Either<L, R>) => (fn: MutationFunction) =>
-        val.chain<L, R>(fn),
       map: (val: Either<L, R>) => (fn: MutationFunction) => val.map<R>(fn),
       default: (val: Either<L, R>) => () => val
     };
@@ -70,7 +62,7 @@ export class AsyncEither<L, R> {
   }
 }
 
-export function all<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
+export function flattenEither<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
   const response: R[] = [];
   for (const either of eithers) {
     if (either.isLeft()) {
@@ -82,8 +74,8 @@ export function all<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
   return right(response);
 }
 
-export async function asyncAll<L, R>(
+export async function asyncFlattenEither<L, R>(
   eithers: Promise<Either<L, R>>[]
 ): Promise<Either<L, R[]>> {
-  return Promise.all(eithers).then(all);
+  return Promise.all(eithers).then(flattenEither);
 }
