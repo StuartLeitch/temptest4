@@ -382,7 +382,7 @@ export class MigrateEntireInvoiceUsecase
 
         invoice.props.status = InvoiceStatus.ACTIVE;
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
-        invoice.props.dateUpdated = new Date(request.acceptanceDate);
+        invoice.props.dateUpdated = new Date(request.issueDate);
         invoice.props.dateIssued = new Date(request.issueDate);
         invoice.props.erpReference = request.erpReference;
         invoice.props.invoiceNumber = invoiceNumber;
@@ -414,16 +414,15 @@ export class MigrateEntireInvoiceUsecase
     request: DTO,
     payer: Payer
   ) {
+    if (!invoice || !payer) {
+      return right<null, null>(null);
+    }
+
     const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
     const usecase = new PublishInvoiceConfirmed(this.sqsPublishService);
     const addressUsecase = new GetAddressUseCase(this.addressRepo);
     const messageTimestamp = new Date(request.issueDate);
-
     const invoiceItems = invoice.invoiceItems.currentItems;
-
-    if (!invoice || !payer) {
-      return right<null, null>(null);
-    }
 
     return new AsyncEither<null, string>(payer.billingAddressId.id.toString())
       .asyncChain(billingAddressId =>

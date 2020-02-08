@@ -5,19 +5,26 @@ import { PayerType } from '../../../payers/domain/Payer';
 import {
   MigrateEntireInvoiceDTO,
   MigratePayerAddress,
+  MigratePayer,
   MigrateAPC
 } from './migrateEntireInvoiceDTO';
 import {
+  AllMigrateEntireInvoiceErrors,
   MigrateEntireInvoiceErrors,
-  PayerAddressErrors,
-  AllMigrateEntireInvoiceErrors
+  PayerAddressErrors
 } from './migrateEntireInvoiceErrors';
 
 type ValidateMainRequestReturn = Either<
+  MigrateEntireInvoiceErrors.InvoiceIdRequired,
+  MigrateEntireInvoiceDTO
+>;
+
+type ValidatePayerReturn = Either<
   | MigrateEntireInvoiceErrors.PayerNameRequired
   | MigrateEntireInvoiceErrors.PayerTypeRequired
-  | MigrateEntireInvoiceErrors.IncorrectPayerType,
-  MigrateEntireInvoiceDTO
+  | MigrateEntireInvoiceErrors.IncorrectPayerType
+  | PayerAddressErrors,
+  MigratePayer
 >;
 
 type ValidateApcReturn = Either<
@@ -40,7 +47,7 @@ export function validateRequest(
   request: MigrateEntireInvoiceDTO
 ): ValidateRequestReturn {
   const result = validateMainRequestArguments(request)
-    .chain(() => validatePayerAddress(request.payer.address))
+    .chain(() => validatePayer(request))
     .chain(() => validateAPC(request.apc))
     .map(() => request);
   return result;
@@ -49,21 +56,28 @@ export function validateRequest(
 function validateMainRequestArguments(
   request: MigrateEntireInvoiceDTO
 ): ValidateMainRequestReturn {
-  if (!request.payer.name) {
-    return left(new MigrateEntireInvoiceErrors.PayerNameRequired());
-  }
-  if (!request.payer.type) {
-    return left(new MigrateEntireInvoiceErrors.PayerTypeRequired());
-  }
-  if (!(request.payer.type in PayerType)) {
-    return left(
-      new MigrateEntireInvoiceErrors.IncorrectPayerType(request.payer.type)
-    );
-  }
   if (!request.invoiceId) {
     return left(new MigrateEntireInvoiceErrors.InvoiceIdRequired());
   }
   return right(request);
+}
+
+function validatePayer(request: MigrateEntireInvoiceDTO): ValidatePayerReturn {
+  const { payer } = request;
+  if (!request.paymentDate || !request.issueDate) {
+    return right(payer);
+  }
+  if (!payer.name) {
+    return left(new MigrateEntireInvoiceErrors.PayerNameRequired());
+  }
+  if (!payer.type) {
+    return left(new MigrateEntireInvoiceErrors.PayerTypeRequired());
+  }
+  if (!(payer.type in PayerType)) {
+    return left(new MigrateEntireInvoiceErrors.IncorrectPayerType(payer.type));
+  }
+
+  return validatePayerAddress(payer.address).map(() => payer);
 }
 
 function validateAPC(apc: MigrateAPC): ValidateApcReturn {
