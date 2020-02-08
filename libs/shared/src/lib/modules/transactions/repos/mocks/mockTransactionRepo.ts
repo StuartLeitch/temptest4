@@ -1,9 +1,9 @@
-import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
+import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
-import {TransactionRepoContract} from '../transactionRepo';
-import {Transaction} from '../../domain/Transaction';
-import {TransactionId} from '../../domain/TransactionId';
-import {InvoiceId} from '../../../invoices/domain/InvoiceId';
+import { TransactionRepoContract } from '../transactionRepo';
+import { Transaction } from '../../domain/Transaction';
+import { TransactionId } from '../../domain/TransactionId';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 export class MockTransactionRepo extends BaseMockRepo<Transaction>
   implements TransactionRepoContract {
@@ -19,7 +19,7 @@ export class MockTransactionRepo extends BaseMockRepo<Transaction>
     const alreadyExists = await this.exists(transaction);
 
     if (alreadyExists) {
-      this._items.map(t => {
+      this._items = this._items.map(t => {
         if (this.compareMockItems(t, transaction)) {
           return transaction;
         } else {

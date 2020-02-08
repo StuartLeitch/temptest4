@@ -1,7 +1,7 @@
 // * Core Domain
-import { Result, left, right, Either } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, Result, right, left } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
@@ -38,7 +38,10 @@ import { MigrationPayment } from '../../../payments/domain/strategies/MigrationP
 import { Migration } from '../../../payments/domain/strategies/Migration';
 
 import { TransactionId } from '../../../transactions/domain/TransactionId';
+import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { ManuscriptId } from '../../domain/ManuscriptId';
+import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -195,22 +198,32 @@ export class MigrateEntireInvoiceUsecase
   }): Promise<Either<AppError.UnexpectedError, string>> {
     if (data && data.acceptanceDate) {
       const { acceptanceDate, submissionDate, transaction, invoiceId } = data;
-
-      if (transaction.status === TransactionStatus.DRAFT) {
-        transaction.props.dateCreated = new Date(submissionDate);
-        transaction.props.dateUpdated = new Date(acceptanceDate);
-        transaction.props.status = TransactionStatus.ACTIVE;
-      }
-
-      try {
-        await this.transactionRepo.save(transaction);
-        return right<null, string>(invoiceId);
-      } catch (err) {
-        return left(new AppError.UnexpectedError(err));
-      }
+      return await new AsyncEither<null, Transaction>(transaction)
+        .map(transaction => {
+          if (transaction.status === TransactionStatus.DRAFT) {
+            transaction.props.dateCreated = new Date(submissionDate);
+            transaction.props.dateUpdated = new Date(acceptanceDate);
+            transaction.props.status = TransactionStatus.ACTIVE;
+          }
+          return transaction;
+        })
+        .then(transaction => this.updateTransactionDetails(transaction))
+        .map(() => invoiceId)
+        .execute();
     }
 
     return right<null, null>(null);
+  }
+
+  private async updateTransactionDetails(transaction: Transaction) {
+    try {
+      const result = await this.transactionRepo.update(transaction);
+      return right<AppError.UnexpectedError, Transaction>(result);
+    } catch (err) {
+      return left<AppError.UnexpectedError, Transaction>(
+        new AppError.UnexpectedError(err)
+      );
+    }
   }
 
   private async updateInitialInvoice(request: DTO) {
@@ -230,21 +243,14 @@ export class MigrateEntireInvoiceUsecase
     return await new AsyncEither<null, Invoice>(invoice)
       .then(invoice => this.getTransactionDetails(invoice.transactionId))
       .map(transaction => {
-        transaction.props.dateCreated = invoice.dateCreated;
-        transaction.props.dateUpdated = invoice.props.dateUpdated;
+        if (transaction.status === TransactionStatus.DRAFT) {
+          transaction.props.dateCreated = invoice.dateCreated;
+          transaction.props.dateUpdated = invoice.props.dateUpdated;
+        }
 
         return transaction;
       })
-      .then(async transaction => {
-        try {
-          const newTransaction = await this.transactionRepo.update(transaction);
-          return right<AppError.UnexpectedError, Transaction>(newTransaction);
-        } catch (err) {
-          return left<AppError.UnexpectedError, Transaction>(
-            new AppError.UnexpectedError(err)
-          );
-        }
-      })
+      .then(transaction => this.updateTransactionDetails(transaction))
       .execute();
   }
 
@@ -396,19 +402,39 @@ export class MigrateEntireInvoiceUsecase
         return invoice;
       })
       .then(invoice => this.saveInvoice(invoice))
-      .map(async invoice => {
-        const items = await this.invoiceItemRepo.getItemsByInvoiceId(
-          invoice.invoiceId
-        );
+      .then(invoice => this.getInvoiceItemsByInvoiceId(invoice.invoiceId))
+      .map(items => {
         items[0].props.price = request.apc.price - request.apc.discount;
         const vatPercentage = (request.apc.vat / items[0].props.price) * 100;
         items[0].props.vat = vatPercentage;
 
-        await this.invoiceItemRepo.update(items[0]);
-        return invoice;
+        return items[0];
       })
+      .then(item => this.updateInvoiceItem(item))
       .map(() => request)
       .execute();
+  }
+
+  private async updateInvoiceItem(item: InvoiceItem) {
+    try {
+      const result = await this.invoiceItemRepo.update(item);
+      return right<AppError.UnexpectedError, InvoiceItem>(result);
+    } catch (err) {
+      return left<AppError.UnexpectedError, InvoiceItem>(
+        new AppError.UnexpectedError(err)
+      );
+    }
+  }
+
+  private async getInvoiceItemsByInvoiceId(invoiceId: InvoiceId) {
+    try {
+      const items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
+      return right<AppError.UnexpectedError, InvoiceItem[]>(items);
+    } catch (err) {
+      return left<AppError.UnexpectedError, InvoiceItem[]>(
+        new AppError.UnexpectedError(err)
+      );
+    }
   }
 
   private async confirmInvoice(payer: Payer, request: DTO) {
@@ -442,22 +468,48 @@ export class MigrateEntireInvoiceUsecase
       })
       .then(invoice => this.saveInvoice(invoice))
       .then(async invoice => {
-        const manuscript = await this.manuscriptRepo.findById(
-          ManuscriptId.create(
-            new UniqueEntityID(request.apc.manuscriptId)
-          ).getValue()
+        const maybeManuscript = await this.getManuscript(
+          request.apc.manuscriptId
         );
+        return maybeManuscript.map(manuscript => ({ manuscript, invoice }));
+      })
+      .map(({ invoice, manuscript }) => {
         manuscript.props.authorFirstName = request.payer.name;
         manuscript.props.authorSurname = request.payer.name;
         manuscript.props.authorEmail = request.payer.email;
         manuscript.props.authorCountry = request.payer.address.countryCode;
 
-        await this.manuscriptRepo.update(manuscript);
-
-        return right<null, Invoice>(invoice);
+        return { invoice, manuscript };
+      })
+      .then(async ({ invoice, manuscript }) => {
+        const maybeSavedManuscript = await this.updateManuscript(manuscript);
+        return maybeSavedManuscript.map(() => invoice);
       })
       .map(invoice => ({ invoice, payer, request }))
       .execute();
+  }
+
+  private async getManuscript(id: string) {
+    const manuscriptId = ManuscriptId.create(new UniqueEntityID(id)).getValue();
+    try {
+      const manuscript = await this.manuscriptRepo.findById(manuscriptId);
+      return right<AppError.UnexpectedError, Manuscript>(manuscript);
+    } catch (err) {
+      return left<AppError.UnexpectedError, Manuscript>(
+        new AppError.UnexpectedError(err)
+      );
+    }
+  }
+
+  private async updateManuscript(manuscript: Manuscript) {
+    try {
+      const newManuscript = await this.manuscriptRepo.update(manuscript);
+      return right<AppError.UnexpectedError, Manuscript>(newManuscript);
+    } catch (err) {
+      return left<AppError.UnexpectedError, Manuscript>(
+        new AppError.UnexpectedError(err)
+      );
+    }
   }
 
   private async sendInvoiceConfirmedEvent(
@@ -540,11 +592,11 @@ export class MigrateEntireInvoiceUsecase
     return new AsyncEither<null, null>(null)
       .then(() => this.getMigrationPaymentMethod())
       .then(async paymentMethod => {
+        const maybePayer = await this.getPayerByInvoiceId(request.invoiceId);
+        return maybePayer.map(payer => ({ paymentMethod, payer }));
+      })
+      .then(async ({ paymentMethod, payer }) => {
         const paymentMethodId = paymentMethod.paymentMethodId.id.toString();
-        const invoiceIdObj = InvoiceId.create(
-          new UniqueEntityID(request.invoiceId)
-        ).getValue();
-        const payer = await this.payerRepo.getPayerByInvoiceId(invoiceIdObj);
         const payerId = payer.id.toString();
         return right<null, any>({
           amount: request.apc.paymentAmount,
@@ -556,12 +608,32 @@ export class MigrateEntireInvoiceUsecase
         });
       })
       .map(rawPayment => PaymentMap.toDomain(rawPayment))
-      .then(async payment => {
-        const result = await this.paymentRepo.save(payment);
-        return right<null, Payment>(result);
-      })
+      .then(payment => this.savePayment(payment))
       .map(payment => ({ payment, request }))
       .execute();
+  }
+
+  private async savePayment(payment: Payment) {
+    try {
+      const result = await this.paymentRepo.save(payment);
+      return right<AppError.UnexpectedError, Payment>(result);
+    } catch (err) {
+      return left<AppError.UnexpectedError, Payment>(
+        new AppError.UnexpectedError(err)
+      );
+    }
+  }
+
+  private async getPayerByInvoiceId(id: string) {
+    const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
+    try {
+      const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+      return right<AppError.UnexpectedError, Payer>(payer);
+    } catch (err) {
+      return left<AppError.UnexpectedError, Payer>(
+        new AppError.UnexpectedError(err)
+      );
+    }
   }
 
   private async updateInvoicePayed(payment: Payment, request: DTO) {
@@ -588,6 +660,21 @@ export class MigrateEntireInvoiceUsecase
       .execute();
   }
 
+  private async getInvoicePaymentInfo(invoiceId: InvoiceId) {
+    try {
+      const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(
+        invoiceId
+      );
+      return right<AppError.UnexpectedError, InvoicePaymentInfo>(
+        paymentDetails
+      );
+    } catch (err) {
+      return left<AppError.UnexpectedError, InvoicePaymentInfo>(
+        new AppError.UnexpectedError(err)
+      );
+    }
+  }
+
   private async sendInvoicePayedEvent(
     invoice: Invoice,
     payment: Payment,
@@ -601,15 +688,21 @@ export class MigrateEntireInvoiceUsecase
     const usecase = new PublishInvoicePaid(this.sqsPublishService);
     const messageTimestamp = new Date(request.paymentDate);
     const invoiceItems = invoice.invoiceItems.currentItems;
-    const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(
-      invoice.invoiceId
-    );
 
     return new AsyncEither<null, string>(request.apc.manuscriptId)
       .map(articleId => ({ articleId }))
       .then(request => manuscriptUsecase.execute(request))
       .map(result => result.getValue())
       .then(async manuscript => {
+        const maybePaymentInfo = await this.getInvoicePaymentInfo(
+          invoice.invoiceId
+        );
+        return maybePaymentInfo.map(paymentDetails => ({
+          paymentDetails,
+          manuscript
+        }));
+      })
+      .then(async ({ paymentDetails, manuscript }) => {
         const result = await usecase.execute(
           invoice,
           invoiceItems,
