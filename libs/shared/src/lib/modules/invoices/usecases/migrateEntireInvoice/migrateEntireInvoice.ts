@@ -110,6 +110,12 @@ export class MigrateEntireInvoiceUsecase
       request
     ).chain(request => validateRequest(request));
 
+    const maybeInitialInvoice = await requestExecution
+      .asyncChain(request => this.updateInitialInvoice(request))
+      .asyncChain(invoice => this.updateTransactionDates(invoice))
+      .map(() => {})
+      .execute();
+
     const maybeInvoiceCreated = await requestExecution
       .asyncChain(request => this.updateInvoiceAtQualityPass(request))
       .asyncChain(request => this.getTransactionWithAcceptanceDate(request))
@@ -136,13 +142,18 @@ export class MigrateEntireInvoiceUsecase
       .execute();
 
     return all([
-      maybeInvoiceCreated,
       maybeInvoiceConfirmed,
+      maybeInvoiceCreated,
+      maybeInitialInvoice,
       maybeInvoicePayed
     ]).map(val => Result.ok<void>());
   }
 
   private async getTransactionWithAcceptanceDate(request: DTO) {
+    if (!request || !request.acceptanceDate) {
+      return right<null, null>(null);
+    }
+
     const acceptanceDate = request.acceptanceDate;
     const submissionDate = request.submissionDate;
     const invoiceId = request.invoiceId;
@@ -179,30 +190,62 @@ export class MigrateEntireInvoiceUsecase
     return right(response.getValue());
   }
 
-  private async updateTransactionStatus({
-    acceptanceDate,
-    submissionDate,
-    transaction,
-    invoiceId
-  }: {
+  private async updateTransactionStatus(data: {
     transaction: Transaction;
     acceptanceDate: string;
     submissionDate: string;
     invoiceId: string;
   }): Promise<Either<AppError.UnexpectedError, string>> {
-    if (acceptanceDate) {
+    if (data && data.acceptanceDate) {
+      const { acceptanceDate, submissionDate, transaction, invoiceId } = data;
       transaction.props.dateCreated = new Date(submissionDate);
       transaction.props.dateUpdated = new Date(acceptanceDate);
       transaction.props.status = TransactionStatus.ACTIVE;
 
       try {
         await this.transactionRepo.save(transaction);
+        return right<null, string>(invoiceId);
       } catch (err) {
         return left(new AppError.UnexpectedError(err));
       }
     }
 
-    return right(invoiceId);
+    return right<null, null>(null);
+  }
+
+  private async updateInitialInvoice(request: DTO) {
+    return await new AsyncEither<null, DTO>(request)
+      .asyncChain(request => this.getInvoice(request.invoiceId))
+      .map(invoice => {
+        invoice.props.dateCreated = new Date(request.submissionDate);
+        invoice.props.dateUpdated = new Date(request.submissionDate);
+
+        return invoice;
+      })
+      .asyncChain(invoice => this.saveInvoice(invoice))
+      .execute();
+  }
+
+  private async updateTransactionDates(invoice: Invoice) {
+    return await new AsyncEither<null, Invoice>(invoice)
+      .asyncChain(invoice => this.getTransactionDetails(invoice.transactionId))
+      .map(transaction => {
+        transaction.props.dateCreated = invoice.dateCreated;
+        transaction.props.dateUpdated = invoice.props.dateUpdated;
+
+        return transaction;
+      })
+      .asyncChain(async transaction => {
+        try {
+          const newTransaction = await this.transactionRepo.update(transaction);
+          return right<AppError.UnexpectedError, Transaction>(newTransaction);
+        } catch (err) {
+          return left<AppError.UnexpectedError, Transaction>(
+            new AppError.UnexpectedError(err)
+          );
+        }
+      })
+      .execute();
   }
 
   private async createPayer(request: DTO) {
@@ -249,6 +292,10 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private async sendInvoiceCreatedEvent(invoiceId: string) {
+    if (!invoiceId) {
+      return right<null, null>(null);
+    }
+
     const usecase = new PublishInvoiceCreatedUsecase(this.sqsPublishService);
 
     const execution = new AsyncEither<null, string>(invoiceId)
@@ -333,12 +380,15 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private async updateInvoiceAtQualityPass(request: DTO) {
+    if (!request.acceptanceDate) {
+      return right<null, null>(null);
+    }
+
     return new AsyncEither<null, string>(request.invoiceId)
       .asyncChain(invoiceId => this.getInvoice(invoiceId))
       .map(invoice => {
         if (request.acceptanceDate) {
           invoice.props.dateAccepted = new Date(request.acceptanceDate);
-          invoice.props.dateCreated = new Date(request.submissionDate);
           invoice.props.dateUpdated = new Date(request.acceptanceDate);
           invoice.props.charge =
             request.apc.price - request.apc.discount + request.apc.vat;

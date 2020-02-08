@@ -192,12 +192,65 @@ describe('migrate entire invoice usecase', () => {
       new UniqueEntityID(request.invoiceId)
     ).getValue();
     const invoice = await invoiceRepo.getInvoiceById(invoiceId);
+    const transaction = await transactionRepo.getTransactionById(
+      invoice.transactionId
+    );
+
+    expect(transaction.status).toBe(TransactionStatus.ACTIVE);
+    expect(transaction.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(transaction.dateUpdated.toISOString()).toBe(request.acceptanceDate);
+
     expect(invoice.status).toBe('DRAFT');
     expect(invoice.dateIssued).toBeFalsy();
     expect(invoice.invoiceNumber).toBeFalsy();
     expect(invoice.dateCreated.toISOString()).toBe(request.submissionDate);
     expect(invoice.props.dateUpdated.toISOString()).toBe(
       request.acceptanceDate
+    );
+  });
+
+  it('should not send any events if the acceptance date is not provided', async () => {
+    const request: MigrateEntireInvoiceDTO = {
+      invoiceId: '1',
+      acceptanceDate: null,
+      submissionDate: new Date('12-12-2018').toISOString(),
+      paymentDate: null,
+      issueDate: null,
+      erpReference: null,
+      apc: {
+        invoiceReference: null,
+        paymentAmount: 220,
+        manuscriptId: '1',
+        discount: 20,
+        price: 220,
+        vat: 20
+      },
+      payer: null
+    };
+
+    const result = await migrateUsecase.execute(request);
+    expect(result.isRight()).toBeTruthy();
+    expect(sqsPublishService.messages.length).toBe(0);
+
+    const invoiceId = InvoiceId.create(
+      new UniqueEntityID(request.invoiceId)
+    ).getValue();
+    const invoice = await invoiceRepo.getInvoiceById(invoiceId);
+    const transaction = await transactionRepo.getTransactionById(
+      invoice.transactionId
+    );
+
+    expect(transaction.status).toBe(TransactionStatus.DRAFT);
+    expect(transaction.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(transaction.dateUpdated.toISOString()).toBe(request.submissionDate);
+
+    expect(invoice.status).toBe('DRAFT');
+    expect(invoice.dateIssued).toBeFalsy();
+    expect(invoice.invoiceNumber).toBeFalsy();
+    expect(invoice.dateAccepted).toBeFalsy();
+    expect(invoice.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(invoice.props.dateUpdated.toISOString()).toBe(
+      request.submissionDate
     );
   });
 });
