@@ -56,11 +56,16 @@ export const migrateEntireInvoice: Resolvers<any> = {
         return null;
       }
 
-      const maybeResult = await migrateUsecase.execute(usecaseRequest);
+      try {
+        const maybeResult = await migrateUsecase.execute(usecaseRequest);
 
-      if (maybeResult.isLeft()) {
-        console.log(maybeResult.value);
-        throw new Error(maybeResult.value.errorValue().message);
+        if (maybeResult.isLeft()) {
+          console.log(maybeResult.value);
+          throw new Error(maybeResult.value.errorValue().message);
+        }
+      } catch (err) {
+        console.info(err);
+        throw err;
       }
 
       return 'migration ok';

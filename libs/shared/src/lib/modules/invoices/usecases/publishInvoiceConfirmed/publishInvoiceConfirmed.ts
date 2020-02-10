@@ -44,7 +44,7 @@ export class PublishInvoiceConfirmed {
           ? ii.waivers.map(w => WaiverMap.toEvent(w))
           : undefined
       })),
-      organization: payer.organization.value.toString(),
+      organization: payer.organization?.value.toString(),
       invoiceStatus: invoice.status as PhenomInvoiceStatus,
       payerName: payer.name.value.toString(),
       payerEmail: payer.email.value.toString(),

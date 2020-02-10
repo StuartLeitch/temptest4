@@ -110,6 +110,8 @@ export class MigrateEntireInvoiceUsecase
       request
     ).then(async request => validateRequest(request));
 
+    const maybeRequest = await requestExecution.execute();
+
     const maybeInitialInvoice = await requestExecution
       .then(request => this.updateInitialInvoice(request))
       .then(invoice => this.updateTransactionDates(invoice))
@@ -117,6 +119,8 @@ export class MigrateEntireInvoiceUsecase
       .execute();
 
     const maybeInvoiceCreated = await requestExecution
+      .then(async () => maybeInitialInvoice)
+      .then(async () => maybeRequest)
       .then(request => this.updateInvoiceAtQualityPass(request))
       .then(request => this.getTransactionWithAcceptanceDate(request))
       .then(transaction => this.updateTransactionStatus(transaction))
@@ -124,6 +128,8 @@ export class MigrateEntireInvoiceUsecase
       .execute();
 
     const maybeInvoiceConfirmed = await requestExecution
+      .then(async () => maybeInvoiceCreated)
+      .then(async () => maybeRequest)
       .then(request => this.createPayer(request))
       .then(({ request, payer }) => this.confirmInvoice(payer, request))
       .then(({ request, payer, invoice }) =>
@@ -132,6 +138,8 @@ export class MigrateEntireInvoiceUsecase
       .execute();
 
     const maybeInvoicePayed = await requestExecution
+      .then(async () => maybeInvoiceConfirmed)
+      .then(async () => maybeRequest)
       .then(request => this.makeMigrationPayment(request))
       .then(({ request, payment }) => {
         return this.updateInvoicePayed(payment, request);
@@ -271,7 +279,7 @@ export class MigrateEntireInvoiceUsecase
         const payerRequest: CreatePayerRequestDTO = {
           vatId: payer.vatRegistrationNumber,
           addressId: address.addressId.id.toString(),
-          organization: payer.organization,
+          organization: payer.organization ? payer.organization : ' ',
           invoiceId: invoiceId,
           email: payer.email,
           name: payer.name,
@@ -375,7 +383,7 @@ export class MigrateEntireInvoiceUsecase
 
   private async saveInvoice(invoice: Invoice) {
     try {
-      const result = await this.invoiceRepo.save(invoice);
+      const result = await this.invoiceRepo.update(invoice);
       return right<Errors.InvoiceSaveFailed, Invoice>(result);
     } catch (err) {
       return left<Errors.InvoiceSaveFailed, Invoice>(
@@ -453,7 +461,6 @@ export class MigrateEntireInvoiceUsecase
           request.apc.invoiceReference,
           10
         ).toString();
-
         invoice.props.status = InvoiceStatus.ACTIVE;
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
         invoice.props.dateUpdated = new Date(request.issueDate);
@@ -472,6 +479,7 @@ export class MigrateEntireInvoiceUsecase
         return maybeManuscript.map(manuscript => ({ manuscript, invoice }));
       })
       .map(({ invoice, manuscript }) => {
+        console.info('invoice confirm manuscript', manuscript);
         manuscript.props.authorFirstName = request.payer.name;
         manuscript.props.authorSurname = request.payer.name;
         manuscript.props.authorEmail = request.payer.email;
@@ -487,10 +495,9 @@ export class MigrateEntireInvoiceUsecase
       .execute();
   }
 
-  private async getManuscript(id: string) {
-    const manuscriptId = ManuscriptId.create(new UniqueEntityID(id)).getValue();
+  private async getManuscript(customId: string) {
     try {
-      const manuscript = await this.manuscriptRepo.findById(manuscriptId);
+      const manuscript = await this.manuscriptRepo.findByCustomId(customId);
       return right<AppError.UnexpectedError, Manuscript>(manuscript);
     } catch (err) {
       return left<AppError.UnexpectedError, Manuscript>(
