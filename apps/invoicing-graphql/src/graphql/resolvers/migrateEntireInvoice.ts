@@ -52,10 +52,16 @@ export const migrateEntireInvoice: Resolvers<any> = {
       };
 
       if (args.token !== env.migration.token) {
+        console.log('invalid token');
         return null;
       }
 
       const maybeResult = await migrateUsecase.execute(usecaseRequest);
+
+      if (maybeResult.isLeft()) {
+        console.log(maybeResult.value);
+        throw new Error(maybeResult.value.errorValue().message);
+      }
 
       return 'migration ok';
     }

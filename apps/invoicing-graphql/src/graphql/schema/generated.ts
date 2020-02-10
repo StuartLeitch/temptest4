@@ -236,7 +236,6 @@ export type MigratePayerAddress = {
   addressLine2?: Maybe<Scalars['String']>,
   addressLine1: Scalars['String'],
   countryCode: Scalars['String'],
-  postalCode: Scalars['String'],
   state?: Maybe<Scalars['String']>,
   city: Scalars['String']
 }

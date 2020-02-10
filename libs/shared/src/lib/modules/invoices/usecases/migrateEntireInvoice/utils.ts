@@ -106,9 +106,6 @@ function validatePayerAddress(
   if (!payerAddress.countryCode) {
     return left(new MigrateEntireInvoiceErrors.CountryCodeRequired());
   }
-  if (!payerAddress.postalCode) {
-    return left(new MigrateEntireInvoiceErrors.PostalCodeRequired());
-  }
 
   return right(payerAddress);
 }

@@ -288,7 +288,6 @@ export class MigrateEntireInvoiceUsecase
     const usecase = new CreateAddress(this.addressRepo);
     const addressRequest: CreateAddressRequestDTO = {
       addressLine1: address.addressLine1,
-      postalCode: address.postalCode,
       country: address.countryCode,
       state: address.state,
       city: address.city
@@ -450,9 +449,8 @@ export class MigrateEntireInvoiceUsecase
         return this.getInvoice(payer.invoiceId.id.toString());
       })
       .map(invoice => {
-        const invoiceNumberPadded = request.apc.invoiceReference.split('/')[0];
         const invoiceNumber = Number.parseInt(
-          invoiceNumberPadded,
+          request.apc.invoiceReference,
           10
         ).toString();
 

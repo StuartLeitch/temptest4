@@ -198,7 +198,6 @@ input MigratePayerAddress {
   addressLine2: String
   addressLine1: String!
   countryCode: String!
-  postalCode: String!
   state: String
   city: String!
 }

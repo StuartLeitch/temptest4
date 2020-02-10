@@ -5,7 +5,8 @@ import { payer } from './payer';
 import { invoice } from './invoice';
 import { payments } from './payments';
 import { transactions } from './transactions';
-import { journals } from './journals'
+import { journals } from './journals';
+import { migrateEntireInvoice } from './migrateEntireInvoice';
 
 export const resolvers: Resolvers<any> = merge(
   {},
@@ -14,4 +15,5 @@ export const resolvers: Resolvers<any> = merge(
   payments,
   transactions,
   journals,
+  migrateEntireInvoice
 );
