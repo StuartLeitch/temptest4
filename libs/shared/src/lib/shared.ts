@@ -130,6 +130,8 @@ export * from './modules/payments/usecases/recordCreditCardPayment/recordCreditC
 export * from './modules/payments/usecases/migratePayment/migratePayment';
 export * from './modules/payments/usecases/migratePayment/migratePaymentDTO';
 export * from './modules/payments/usecases/generateClientToken/generateClientToken';
+export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPayment';
+export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPaymentDTO';
 
 export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
@@ -187,4 +189,4 @@ export * from './utils/FormatUtils';
 export * from './utils/Order/OrderUtils';
 export * from './utils/Batch';
 
-export * from './utils/Utils';
+export * from './utils/ObjectUtils';

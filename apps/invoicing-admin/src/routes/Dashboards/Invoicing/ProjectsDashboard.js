@@ -1,33 +1,42 @@
 import React from 'react';
-import faker from 'faker/locale/en_US';
-import { Link } from 'react-router-dom';
+// import faker from 'faker/locale/en_US';
+// import { Link } from 'react-router-dom';
 import {
   Container,
   Row,
   Card,
   CardBody,
+  CardDeck,
+  CardTitle,
+  CustomInput,
   Badge,
   Table,
-  CardTitle,
   Button,
-  InputGroup,
-  InputGroupAddon,
-  Input,
+  // InputGroup,
+  // InputGroupAddon,
+  // Input,
   ListGroup,
   ListGroupItem,
   Media,
-  Col
+  Col,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
 } from './../../../components';
 import { setupPage } from './../../../components/Layout/setupPage';
 
 import { HeaderMain } from '../../components/HeaderMain';
 
-import { TasksMedia } from '../../components/ProjectsDashboards/TasksMedia';
+// import { TasksMedia } from '../../components/ProjectsDashboards/TasksMedia';
+import { TrTableInvoices } from '../../components/Financial/TrTableInvoices';
 import { TinyDonutChart } from '../../components/ProjectsDashboards/TinyDonutChart';
+import { TinyDonutChartBig } from '../../components/Financial/TinyDonutChartBig';
 import { TinyDonutChartAllProjects } from '../../components/ProjectsDashboards/TinyDonutChartAllProjects';
-import { TimelineMini } from '../../components/Timeline/TimelineMini';
-import { DraggableProjects } from './DraggableProjects';
-
+import { StackedAreaChart } from '../../components/Financial/StackedAreaChart';
+// import { TimelineMini } from '../../components/Timeline/TimelineMini';
+// import { DraggableProjects } from './DraggableProjects';
+import { TrTableRecentFundings } from '../../components/Financial/TrTableRecentFundings';
 const ProjectsDashboard = () => (
   <Container>
     <Row className='mb-5'>
@@ -169,125 +178,201 @@ const ProjectsDashboard = () => (
       </Col>
     </Row>
     <Row>
-      <Col lg={4}>
+      <Col lg={12}>
+        <div className='hr-text hr-text-center mt-4 mb-4'>
+          <span>Your Cash</span>
+        </div>
+      </Col>
+      <Col lg={3}>
         <Card className='mb-3'>
           <CardBody>
-            <CardTitle tag='h6' className='mb-3'>
-              Tasks
+            <CardTitle tag='h6' className='mb-4'>
+              Main Fundings
             </CardTitle>
-            <InputGroup>
-              <Input placeholder='Search Tasks...' />
-              <InputGroupAddon addonType='append'>
-                <Button
-                  color='secondary'
-                  outline
-                  tag={Link}
-                  to='/apps/tasks/list'
-                >
-                  <i className='fa fa-search'></i>
-                </Button>
-              </InputGroupAddon>
-            </InputGroup>
+            <div>
+              <div className='mb-3'>
+                <h2>$ 188.00</h2>
+              </div>
+              <div>
+                <i className='fas fa-caret-down fa-fw text-danger'></i> $464.00
+              </div>
+            </div>
           </CardBody>
-          <ListGroup flush>
-            <ListGroupItem action>
-              <TasksMedia iconColor='success' />
-            </ListGroupItem>
-            <ListGroupItem action>
-              <TasksMedia iconColor='danger' id='2' />
-            </ListGroupItem>
-            <ListGroupItem action>
-              <TasksMedia iconColor='warning' id='3' />
-            </ListGroupItem>
-            <ListGroupItem action>
-              <TasksMedia id='4' />
-            </ListGroupItem>
-            <ListGroupItem
-              action
-              tag={Link}
-              to='/apps/tasks/list'
-              className='text-center'
-            >
-              View All Tasks
-              <i className='fa fa-angle-right ml-2'></i>
-            </ListGroupItem>
-          </ListGroup>
+        </Card>
+      </Col>
+      <Col lg={3}>
+        <Card className='mb-3'>
+          <CardBody>
+            <CardTitle tag='h6' className='mb-4'>
+              Invoices
+            </CardTitle>
+            <div>
+              <div className='mb-3'>
+                <h2>$ 553.00</h2>
+              </div>
+              <div>
+                <i className='fas fa-caret-down fa-fw text-danger'></i> $994.00
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </Col>
+      <Col lg={3}>
+        <Card className='mb-3'>
+          <CardBody>
+            <CardTitle tag='h6' className='mb-4'>
+              Accounts Receivable
+            </CardTitle>
+            <div>
+              <div className='mb-3'>
+                <h2>$ 451.00</h2>
+              </div>
+              <div>
+                <i className='fas fa-caret-up fa-fw text-success'></i> $938.00
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </Col>
+      <Col lg={3}>
+        <Card className='mb-3'>
+          <CardBody>
+            <CardTitle tag='h6' className='mb-4'>
+              Accounts Receivable
+            </CardTitle>
+            <div>
+              <div className='mb-3'>
+                <h2>$ 194.00</h2>
+              </div>
+              <div>
+                <i className='fas fa-caret-up fa-fw text-success'></i> $519.00
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </Col>
+      <Col lg={12}>
+        <Card className='mb-3'>
+          <CardBody>
+            <CardTitle className='mb-1 d-flex'>
+              <h6>Invoices</h6>
+              <Button color='link' size='sm' className='pt-0 ml-auto'>
+                View All <i className='fas fa-angle-right'></i>
+              </Button>
+            </CardTitle>
+          </CardBody>
+          <Table responsive striped className='mb-0'>
+            <thead>
+              <tr>
+                <th className='bt-0'>Company</th>
+                <th className='bt-0'>Amount</th>
+                <th className='bt-0'>Date</th>
+                <th className='bt-0'>Contact</th>
+                <th className='bt-0'>Email</th>
+                <th className='bt-0 text-right'>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <TrTableInvoices />
+            </tbody>
+          </Table>
+        </Card>
+      </Col>
+      <Col lg={8}>
+        <Card className='mb-3'>
+          <CardBody>
+            <CardTitle className='mb-4 d-flex'>
+              <h6>Account Performance</h6>
+            </CardTitle>
+            <div className='d-flex justify-content-center'>
+              <StackedAreaChart />
+            </div>
+          </CardBody>
         </Card>
       </Col>
       <Col lg={4}>
         <Card className='mb-3'>
           <CardBody>
-            <CardTitle tag='h6'>Timeline Mini</CardTitle>
-            <TimelineMini
-              showPillDate
-              pillDate='2 Days ago'
-              icon='times-circle'
-              iconClassName='text-danger'
-              badgeTitle='Alert'
-              badgeColor='danger'
-            />
-            <TimelineMini
-              icon='question-circle'
-              iconClassName='text-warning'
-              badgeTitle='Warning'
-              badgeColor='warning'
-            />
-            <TimelineMini
-              icon='info-circle'
-              iconClassName='text-info'
-              badgeTitle='Info'
-              badgeColor='info'
-            />
-            <TimelineMini
-              showPillDate
-              pillDate='Yesterday'
-              icon='plus-circle'
-              iconClassName='text-primary'
-              badgeTitle='Message'
-              badgeColor='primary'
-            />
-            <TimelineMini
-              icon='check-circle'
-              iconClassName='text-success'
-              badgeTitle='Success'
-              badgeColor='success'
-            />
-            <TimelineMini icon='circle' badgeTitle='Obsolete' />
+            <CardTitle className='mb-1'>
+              <h6 className='mb-0'>Settings</h6>
+            </CardTitle>
           </CardBody>
           <ListGroup flush>
-            <ListGroupItem
-              action
-              tag={Link}
-              to='/pages/timeline'
-              className='text-center'
-            >
-              Timeline Details
-              <i className='fa fa-angle-right ml-2'></i>
+            <ListGroupItem className='d-flex'>
+              <span>My Cash</span>
+              <CustomInput
+                type='switch'
+                id='exampleCustomSwitch'
+                name='customSwitch'
+                label=''
+                className='ml-auto'
+              />
+            </ListGroupItem>
+            <ListGroupItem className='d-flex'>
+              <span>My Cap</span>
+              <CustomInput
+                type='switch'
+                id='exampleCustomSwitch1'
+                name='customSwitch'
+                label=''
+                className='ml-auto'
+                defaultChecked
+              />
+            </ListGroupItem>
+            <ListGroupItem className='d-flex'>
+              <span>Client List</span>
+              <CustomInput
+                type='switch'
+                id='exampleCustomSwitch2'
+                name='customSwitch'
+                label=''
+                className='ml-auto'
+                defaultChecked
+              />
+            </ListGroupItem>
+            <ListGroupItem className='d-flex'>
+              <span>Recent Fundings</span>
+              <CustomInput
+                type='switch'
+                id='exampleCustomSwitch3'
+                name='customSwitch'
+                label=''
+                className='ml-auto'
+              />
+            </ListGroupItem>
+            <ListGroupItem className='d-flex'>
+              <span>Invoice Creator</span>
+              <CustomInput
+                type='switch'
+                id='exampleCustomSwitch4'
+                name='customSwitch'
+                label=''
+                className='ml-auto'
+              />
+            </ListGroupItem>
+            <ListGroupItem className='d-flex'>
+              <span>Sales Lead</span>
+              <CustomInput
+                type='switch'
+                id='exampleCustomSwitch5'
+                name='customSwitch'
+                label=''
+                className='ml-auto'
+                defaultChecked
+              />
+            </ListGroupItem>
+            <ListGroupItem className='d-flex'>
+              <span>Q&A</span>
+              <CustomInput
+                type='switch'
+                id='exampleCustomSwitch6'
+                name='customSwitch'
+                label=''
+                className='ml-auto'
+                defaultChecked
+              />
             </ListGroupItem>
           </ListGroup>
-        </Card>
-      </Col>
-      <Col lg={4}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle tag='h6' className='mb-3'>
-              Projects
-            </CardTitle>
-            <InputGroup>
-              <Input placeholder='Search Projects...' />
-              <InputGroupAddon addonType='append'>
-                <Button
-                  color='secondary'
-                  outline
-                  tag={Link}
-                  to='/apps/projects/list'
-                >
-                  <i className='fa fa-search'></i>
-                </Button>
-              </InputGroupAddon>
-            </InputGroup>
-          </CardBody>
-          <DraggableProjects />
         </Card>
       </Col>
     </Row>
@@ -295,5 +380,5 @@ const ProjectsDashboard = () => (
 );
 
 export default setupPage({
-  pageTitle: 'Projects Dashboard'
+  pageTitle: 'Invoicing Dashboard'
 })(ProjectsDashboard);

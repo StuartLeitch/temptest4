@@ -1,4 +1,5 @@
 import Accordion from './Accordion';
+import Alerts from './Alerts';
 import Avatar, { AvatarAddOn } from './Avatar';
 import Card from './Card';
 import CardHeader from './CardHeader';
@@ -6,6 +7,7 @@ import Checkable from './Checkable';
 import CustomInput from './CustomInput';
 import Divider from './Divider';
 import EmptyLayout from './EmptyLayout';
+import Error from './Error';
 import ExtendedDropdown from './ExtendedDropdown';
 import FloatGrid from './FloatGrid';
 import HolderProvider from './HolderProvider';
@@ -22,6 +24,7 @@ import Nav from './Nav';
 import Navbar from './Navbar';
 import NavbarThemeProvider from './NavbarThemeProvider';
 import NestedDropdown from './NestedDropdown';
+import ModalDropdown from './ModalDropdown';
 import OuterClick from './OuterClick';
 import PageLoader from './PageLoader';
 import Progress from './Progress';
@@ -128,6 +131,7 @@ export {
   CustomInput,
   Divider,
   EmptyLayout,
+  Error,
   ExtendedDropdown,
   FloatGrid,
   IconWithBadge,
@@ -135,6 +139,7 @@ export {
   HolderProvider,
   Layout,
   ListPagination,
+  ModalDropdown,
   Nav,
   Navbar,
   NavbarThemeProvider,

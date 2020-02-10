@@ -89,6 +89,10 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     this.props.articleType = articleType;
   }
 
+  get created(): Date {
+    return this.props.created;
+  }
+
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {
     super(props, id);
   }

@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from 'graphql-hooks';
+import { useQuery, useMutation } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
 import DatePicker, { setDefaultLocale } from 'react-datepicker';
 import format from 'date-fns/format';
 import subWeeks from 'date-fns/subWeeks';
+import { toast } from 'react-toastify';
 
 import {
   Accordion,
   Badge,
   Button,
+  ButtonDropdown,
   ButtonGroup,
   ButtonToolbar,
   Card,
@@ -25,19 +27,27 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
+  ModalDropdown,
   FormFeedback,
   Form,
   FormGroup,
+  Media,
   Label,
   Input,
+  InputGroup,
+  InputGroupAddon,
   Row,
   FormText,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Nav,
   NavItem,
   Spinner,
   Table,
   TabPane,
   UncontrolledButtonDropdown,
+  UncontrolledModal,
   UncontrolledTabs
 } from './../../../components';
 import { HeaderMain } from '../../components/HeaderMain';
@@ -144,12 +154,58 @@ fragment articleFragment on Article {
 }
 `;
 
+const GET_PAYMENT_METHODS_QUERY = `
+query {
+  getPaymentMethods {
+    ...paymentMethodFragment
+  }
+}
+
+fragment paymentMethodFragment on PaymentMethod {
+  id
+  name
+  isActive
+}
+`;
+
+const BANK_TRANSFER_MUTATION = `
+mutation bankTransferPayment (
+  $invoiceId: String!
+  $payerId: String!
+  $paymentMethodId: String!
+  $amount: Float!
+  $paymentReference: String!
+  $datePaid: String!
+) {
+  bankTransferPayment(
+    invoiceId: $invoiceId
+    payerId: $payerId
+    paymentMethodId: $paymentMethodId
+    paymentReference: $paymentReference
+    amount: $amount
+    datePaid: $datePaid
+  ) {
+    id
+    foreignPaymentId
+  }
+}
+`;
+
 const Details = () => {
   let { id } = useParams();
   const { loading, error, data } = useQuery(INVOICE_QUERY, {
     variables: {
       id
     }
+  });
+  const { data: paymentMethods } = useQuery(GET_PAYMENT_METHODS_QUERY);
+  const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
+  const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
+    paymentDate: new Date(),
+    paymentAmount: 0,
+    paymentReference: ''
+    // paymentMethodId: ''
+    // payerId: ''
   });
 
   if (loading)
@@ -164,6 +220,7 @@ const Details = () => {
 
   if (error) return <div>Something Bad Happened</div>;
 
+  const { getPaymentMethods } = paymentMethods;
   const { invoice } = data;
   console.info(invoice);
   const { coupons, waivers, price } = invoice?.invoiceItem;
@@ -217,10 +274,6 @@ const Details = () => {
                   </DropdownToggle>
                   <DropdownMenu right>
                     <DropdownItem header>Select Status</DropdownItem>
-                    {/* <DropdownItem>
-                    <i className='fas fa-circle text-danger mr-2'></i>
-                    Big
-                  </DropdownItem> */}
                     <DropdownItem>
                       <i className='fas fa-circle text-warning mr-2'></i>
                       Draft
@@ -235,13 +288,164 @@ const Details = () => {
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledButtonDropdown>
-                <Button color='primary' className='mr-2'>
-                  Add Payment
-                </Button>
-                <Button color='secondary' className='mr-2' outline>
+                {invoice.status === 'ACTIVE' && (
+                  <ModalDropdown
+                    dropdownToggle={
+                      <DropdownToggle color='primary' caret>
+                        <i className='fas fa-dollar-sign mr-2'></i>
+                        Add Payment
+                      </DropdownToggle>
+                    }
+                    onSave={async () => {
+                      const {
+                        bankTransferPayment
+                      } = await recordBankTransferPayment({
+                        variables: {
+                          invoiceId: invoice?.id,
+                          payerId: invoice?.payer?.id,
+                          paymentMethodId: getPaymentMethods.find(
+                            pm => pm.name === 'Bank Transfer'
+                          ).id,
+                          amount: parseFloat(
+                            bankTransferPaymentData.paymentAmount
+                          ),
+                          paymentReference:
+                            bankTransferPaymentData.paymentReference,
+                          datePaid: bankTransferPaymentData.paymentDate.toISOString()
+                        }
+                      });
+
+                      invoice.payment = {
+                        paymentMethod: 'Bank Transfer',
+                        paymentAmount: bankTransferPaymentData.paymentAmount,
+                        foreignPaymentId:
+                          bankTransferPaymentData.paymentReference
+                      };
+
+                      return toast.success(({ closeToast }) => (
+                        <Media>
+                          <Media middle left className='mr-3'>
+                            <i className='fas fa-fw fa-2x fa-check'></i>
+                          </Media>
+                          <Media body>
+                            <Media heading tag='h6'>
+                              Success!
+                            </Media>
+                            <p>
+                              You successfully processed a bank transfer
+                              payment.
+                            </p>
+                            <div className='d-flex mt-2'>
+                              <Button
+                                color='success'
+                                onClick={() => {
+                                  closeToast;
+                                }}
+                              >
+                                Got it
+                              </Button>
+                              <Button
+                                color='link'
+                                onClick={() => {
+                                  closeToast;
+                                }}
+                                className='ml-2 text-success'
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </Media>
+                        </Media>
+                      ));
+                    }}
+                  >
+                    <ModalBody>
+                      {/* START Form */}
+                      <Form>
+                        {/* START Input */}
+                        <FormGroup row>
+                          <Label sm={4}>Payment Date</Label>
+                          <Col sm={8}>
+                            <InputGroup>
+                              <DatePicker
+                                dateFormat='d MMMM yyyy'
+                                customInput={<ButtonInput />}
+                                selected={bankTransferPaymentData.paymentDate}
+                                onChange={date => {
+                                  setBankTransferPaymentData({
+                                    ...bankTransferPaymentData,
+                                    paymentDate: date
+                                  });
+                                }}
+                              />
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        {/* END Input */}
+                        {/* START Amount Input */}
+                        <FormGroup row>
+                          <Label for='bothAddon' sm={4}>
+                            Payment Amount
+                          </Label>
+                          <Col sm={8}>
+                            <InputGroup>
+                              <InputGroupAddon addonType='prepend'>
+                                $
+                              </InputGroupAddon>
+                              <Input
+                                placeholder='Amount...'
+                                id='bothAddon'
+                                onChange={e => {
+                                  const { name, value } = e.target;
+                                  setBankTransferPaymentData({
+                                    ...bankTransferPaymentData,
+                                    paymentAmount: value
+                                  });
+                                }}
+                              />
+                              {/* <InputGroupAddon addonType='append'>
+                                .00
+                              </InputGroupAddon> */}
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        {/* END Amount Input */}
+                        <FormGroup row>
+                          <Label for='staticText' sm={4}>
+                            Payment Method
+                          </Label>
+                          <Col sm={8}>
+                            <Input plaintext readOnly value={'Bank Transfer'} />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label for='staticText' sm={4}>
+                            Payment Reference
+                          </Label>
+                          <Col sm={8}>
+                            <Input
+                              placeholder='Reference'
+                              onChange={e => {
+                                const { name, value } = e.target;
+                                setBankTransferPaymentData({
+                                  ...bankTransferPaymentData,
+                                  paymentReference: value
+                                });
+                              }}
+                            />
+                          </Col>
+                        </FormGroup>
+                      </Form>
+                      {/* END Form */}
+                    </ModalBody>
+                  </ModalDropdown>
+                  //   </DropdownMenu>
+                  // </UncontrolledButtonDropdown>
+                )}
+                <Button color='secondary' className='mr-2' outline disabled>
                   Split Payment
                 </Button>
-                <Button color='primary' outline>
+                <Button color='primary' outline disabled>
                   Apply Coupon
                 </Button>
               </ButtonToolbar>

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import faker from 'faker/locale/en_US';
-import useDebouncedEffect from 'use-debounced-effect';
+import React, { useEffect, useState } from 'react';
 import MaskedInput from 'react-text-mask';
+import { useDebouncedCallback } from 'use-debounce';
 
 import {
   Button,
@@ -13,23 +12,33 @@ import {
   NavItem,
   NavLink
 } from '../../../components';
-import { JournalsSelections } from '../Invoices/JournalsSelections';
+import { JournalsSelections } from './JournalsSelections';
 
 const InvoicesLeftNav = props => {
-  const [eventTarget, onFilterHandler] = useState('');
+  const [refNumber, set_refNumber] = useState('');
+  const [customId, set_customId] = useState('');
 
-  useDebouncedEffect(
-    () => {
-      // * debounced 300 millisecs
+  // const [eventTarget, onFilterHandler]: [any, (any) => void] = useState('');
+  const [onFilterHandler] = useDebouncedCallback(
+    (eventTarget) => {
       const value =
         eventTarget?.type === 'checkbox'
           ? eventTarget.checked
           : eventTarget.value;
-      props.setFilter({ [eventTarget.name]: value });
+      props.setFilter(eventTarget.name, value);
     },
-    300,
-    [eventTarget]
+    300
   );
+
+  useEffect(() => {
+    onFilterHandler({ name: 'referenceNumber', value: refNumber });
+    // props.setFilter('refNumber', refNumber);
+  }, [refNumber]);
+
+  useEffect(() => {
+    onFilterHandler({ name: 'customId', value: customId });
+    // props.setFilter('customId', customId);
+  }, [customId]);
 
   return (
     <React.Fragment>
@@ -182,7 +191,8 @@ const InvoicesLeftNav = props => {
               placeholder='Enter a reference number'
               name='referenceNumber'
               type='input'
-              onChange={evt => onFilterHandler(evt.target)}
+              value={refNumber}
+              onChange={evt => set_refNumber(evt.target.value)}
               tag={MaskedInput}
               id='refNumber'
             />
@@ -191,10 +201,11 @@ const InvoicesLeftNav = props => {
                 color='secondary'
                 outline
                 onClick={evt => {
-                  const newValue = '';
-                  document.getElementById('refNumber').value = newValue;
-                  const target = { name: 'refNumber', value: newValue };
-                  onFilterHandler(target);
+                  // const newValue = '';
+                  // document.getElementById('refNumber').value = newValue;
+                  // const target = { name: 'refNumber', value: newValue };
+                  // onFilterHandler(target);
+                  set_refNumber('');
                 }}
               >
                 <i className='fa fa-times mr-2'></i>
@@ -217,20 +228,22 @@ const InvoicesLeftNav = props => {
           <InputGroup>
             <Input
               name='customId'
-              onChange={evt => onFilterHandler(evt.target)}
+              onChange={evt => set_customId(evt.target.value)}
               className='form-control'
               placeholder='Enter a custom ID'
               id='customId'
+              value={customId}
             />
             <InputGroupAddon addonType='append'>
               <Button
                 color='secondary'
                 outline
                 onClick={evt => {
-                  const newValue = '';
-                  document.getElementById('customId').value = newValue;
-                  const target = { name: 'customId', value: newValue };
-                  onFilterHandler(target);
+                  // const newValue = '';
+                  // document.getElementById('customId').value = newValue;
+                  // const target = { name: 'customId', value: newValue };
+                  // onFilterHandler(target);
+                  set_customId('');
                 }}
               >
                 <i className='fa fa-times mr-2'></i>

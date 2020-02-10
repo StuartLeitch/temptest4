@@ -22,6 +22,10 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     }
   }
 
+  public async getFailedErpInvoices(): Promise<Invoice[]> {
+    return [];
+  }
+
   public async getInvoiceByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Invoice> {
@@ -56,7 +60,28 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   public async getInvoicePaymentInfo(
     invoiceId: InvoiceId
   ): Promise<InvoicePaymentInfo> {
-    return null;
+    const invoice = this._items.find(item => item.id.equals(invoiceId.id));
+    if (!invoice) {
+      return null;
+    }
+    return {
+      invoiceId: invoiceId.id.toString(),
+      transactionId: invoice.transactionId.id.toString(),
+      invoiceStatus: invoice.status,
+      invoiceNumber: invoice.invoiceNumber,
+      invoiceIssueDate: invoice.dateIssued.toISOString(),
+      payerName: '',
+      payerEmail: '',
+      payerType: '',
+      address: '',
+      city: '',
+      country: '',
+      vatRegistrationNumber: '',
+      foreignPaymentId: '',
+      amount: invoice.charge,
+      paymentDate: invoice.props.dateUpdated.toISOString(),
+      paymentType: ''
+    };
   }
 
   public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
@@ -67,7 +92,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     const alreadyExists = await this.exists(invoice);
 
     if (alreadyExists) {
-      this._items.map(i => {
+      this._items = this._items.map(i => {
         if (this.compareMockItems(i, invoice)) {
           return invoice;
         } else {

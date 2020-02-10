@@ -18,7 +18,8 @@ export class PublishInvoicePaid {
     invoice: Invoice,
     invoiceItems: InvoiceItem[],
     manuscript: Manuscript,
-    paymentDetails: InvoicePaymentInfo
+    paymentDetails: InvoicePaymentInfo,
+    messageTimestamp?: Date
   ): Promise<any> {
     const data: InvoicePaidEvent = {
       ...EventUtils.createEventObject(),
@@ -64,6 +65,7 @@ export class PublishInvoicePaid {
 
     try {
       await this.publishService.publishMessage({
+        timestamp: messageTimestamp.toISOString(),
         event: INVOICE_PAID_EVENT,
         data
       });

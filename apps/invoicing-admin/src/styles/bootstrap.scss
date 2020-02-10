@@ -721,3 +721,14 @@ dt {
 .breadcrumb {
   padding: 0;
 }
+
+// Override timeline
+.timeline {
+  .timeline-item {
+    .timeline-icon {
+      i {
+        left: -21px !important;
+      }
+    }
+  }
+}

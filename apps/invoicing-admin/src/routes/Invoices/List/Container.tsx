@@ -9,6 +9,7 @@ import PendingLogging from '../../components/PendingLogging';
 import InvoicesList from './List';
 // import ProjectsGrid from './ProjectsGrid';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
+import { ParseUtils } from '@utils';
 // import { InvoicesSmHeader } from '../../components/Invoices/InvoicesSmHeader';
 
 const createPath = (obj, path, value = null) => {
@@ -28,61 +29,12 @@ const createPath = (obj, path, value = null) => {
 
 const InvoicesContainer = props => {
   const [filters, setFilters] = useState({
-    invoiceStatus: [],
-    transactionStatus: [],
-    journalTitle: [],
+    invoiceStatus: new Set,
+    transactionStatus: new Set,
+    journalId: [],
     referenceNumber: null,
     customId: null
   });
-  const setFilter = filterConfig => {
-    let _filters = { ...filters };
-    const [[key, value]] = Object.entries(filterConfig);
-    const currentCriteria = createPath({}, key, value);
-
-    if ('invoiceStatus' in currentCriteria) {
-      const [[status, selected]] = Object.entries(
-        currentCriteria.invoiceStatus
-      );
-      if (selected) {
-        _filters['invoiceStatus'].push(status);
-      } else {
-        _filters['invoiceStatus'].splice(
-          _filters['invoiceStatus'].indexOf(status),
-          1
-        );
-      }
-    }
-
-    if ('transactionStatus' in currentCriteria) {
-      const [[status, selected]] = Object.entries(
-        currentCriteria.transactionStatus
-      );
-      if (selected) {
-        _filters['transactionStatus'].push(status);
-      } else {
-        _filters['transactionStatus'].splice(
-          _filters['transactionStatus'].indexOf(status),
-          1
-        );
-      }
-    }
-
-    if ('journalTitle' in currentCriteria) {
-      const journals = currentCriteria.journalTitle;
-      _filters['journalTitle'] = journals.map(j => j.journalId);
-    }
-
-    if ('referenceNumber' in currentCriteria) {
-      _filters['referenceNumber'] = currentCriteria.referenceNumber;
-    }
-
-    if ('customId' in currentCriteria) {
-      _filters['customId'] = currentCriteria.customId;
-    }
-
-    console.info(_filters);
-    setFilters(_filters);
-  };
 
   return (
     <React.Fragment>
@@ -113,6 +65,39 @@ const InvoicesContainer = props => {
       </Container>
     </React.Fragment>
   );
+
+  /**
+   * Updates the filter given by `key` to the new `value`.
+   *
+   * @param key The key of the filter to be updated (e.g. 'invoiceStatus.FINAL')
+   * @param value The value of the filter being updated (varies by input type)
+   */
+  function setFilter(key: string, value: boolean|string|any[]) {
+    const [name, status] = ParseUtils.parseEvent(key);
+    const newFilters = { ...filters };    // FIXME: USe immutables here
+    switch (name) {
+    case 'invoiceStatus':
+    case 'transactionStatus':
+      newFilters[name] = new Set(filters[name]);
+      if (value) {
+        newFilters[name].add(status);
+      } else {
+        newFilters[name].delete(status);
+      }
+      break;
+
+    case 'journalTitle':
+      newFilters.journalId = (value as any[]).map(j => j.journalId);
+      break;
+
+    default:
+      // 'referenceNumber'
+      // 'customId'
+      newFilters[name] = value;
+    }
+
+    setFilters(newFilters);
+  }
 };
 
 InvoicesContainer.propTypes = {

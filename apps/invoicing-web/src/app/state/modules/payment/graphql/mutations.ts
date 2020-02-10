@@ -38,3 +38,23 @@ export const recordPayPalPayment: ASTNode = gql`
     }
   }
 `;
+
+export const bankTransferPayment: ASTNode = gql`
+  mutation bankTransferPayment(
+    $invoiceId: String!
+    $paymentMethodId: String!
+    $amount: Float!
+    $paymentReference: String!
+    $datePaid: String!
+  ) {
+    bankTransferPayment(
+      invoiceId: $invoiceId
+      paymentMethodId: $paymentMethodId
+      paymentReference: $paymentReference
+      amount: $amount
+      datePaid: $datePaid
+    ) {
+      id
+    }
+  }
+`;
