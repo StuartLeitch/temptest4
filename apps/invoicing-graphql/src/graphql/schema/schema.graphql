@@ -194,6 +194,33 @@ input Pagination {
   limit: Int
 }
 
+input MigratePayerAddress {
+  addressLine2: String
+  addressLine1: String!
+  countryCode: String!
+  postalCode: String!
+  state: String
+  city: String!
+}
+
+input MigratePayer {
+  vatRegistrationNumber: String
+  address: MigratePayerAddress!
+  organization: String
+  email: String!
+  name: String!
+  type: String!
+}
+
+input MigrateAPC {
+  invoiceReference: String
+  paymentAmount: Float
+  manuscriptId: String!
+  discount: Float
+  price: Float!
+  vat: Float
+}
+
 type Query {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
@@ -253,4 +280,15 @@ type Mutation {
     dateIssued: String
     dateAccepted: String
   ): Invoice
+  migrateEntireInvoice(
+    acceptanceDate: String
+    submissionDate: String!
+    paymentDate: String
+    issueDate: String
+    erpReference: String
+    payer: MigratePayer
+    invoiceId: String!
+    apc: MigrateAPC!
+    token: String!
+  ): String
 }

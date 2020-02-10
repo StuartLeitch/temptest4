@@ -232,6 +232,45 @@ export type MutationMigrateInvoiceArgs = {
   dateAccepted?: Maybe<Scalars['String']>
 };
 
+export type MigratePayerAddress = {
+  addressLine2?: Maybe<Scalars['String']>,
+  addressLine1: Scalars['String'],
+  countryCode: Scalars['String'],
+  postalCode: Scalars['String'],
+  state?: Maybe<Scalars['String']>,
+  city: Scalars['String']
+}
+
+export type MigratePayer = {
+  vatRegistrationNumber?: Maybe<Scalars['String']>,
+  address: MigratePayerAddress,
+  organization?: Maybe<Scalars['String']>,
+  email: Scalars['String'],
+  name: Scalars['String'],
+  type: Scalars['String']
+}
+
+export type MigrateAPC = {
+  invoiceReference?: Maybe<Scalars['String']>,
+  paymentAmount?: Maybe<Scalars['Float']>,
+  manuscriptId: Scalars['String'],
+  discount?: Maybe<Scalars['Float']>,
+  price: Scalars['Float'],
+  vat?: Maybe<Scalars['Float']>
+}
+
+export type MutationMigrateEntireInvoiceArgs = {
+  acceptanceDate?: Maybe<Scalars['String']>,
+  submissionDate: Scalars['String'],
+  paymentDate?: Maybe<Scalars['String']>,
+  issueDate?: Maybe<Scalars['String']>,
+  erpReference?: Maybe<Scalars['String']>,
+  payer?: MigratePayer,
+  invoiceId: Scalars['String'],
+  apc: MigrateAPC,
+  token: Scalars['String']
+};
+
 export type PaginatedInvoices = {
    __typename?: 'PaginatedInvoices',
   totalCount?: Maybe<Scalars['Int']>,
@@ -618,6 +657,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'paymentMethodId' | 'invoiceId' | 'payerId' | 'orderId'>>,
   migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
+  migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'invoiceId' | 'apc' | 'submissionDate' | 'token'>>,
 };
 
 export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {

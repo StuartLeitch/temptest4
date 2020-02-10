@@ -75,6 +75,8 @@ export * from './modules/invoices/mappers/InvoiceMap';
 // export * from './modules/invoices/dtos/InvoiceDTO';
 export * from './modules/invoices/mappers/InvoiceItemMap';
 
+export * from './modules/invoices/usecases/migrateEntireInvoice/';
+
 // export {
 //   PoliciesRegister as InvoicePoliciesRegister
 // } from './modules/invoices/domain/policies/PoliciesRegister';

@@ -271,8 +271,8 @@ export class MigrateEntireInvoiceUsecase
         const payerRequest: CreatePayerRequestDTO = {
           vatId: payer.vatRegistrationNumber,
           addressId: address.addressId.id.toString(),
+          organization: payer.organization,
           invoiceId: invoiceId,
-          organization: 't',
           email: payer.email,
           name: payer.name,
           type: payer.type

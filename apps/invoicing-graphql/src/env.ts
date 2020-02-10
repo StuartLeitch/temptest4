@@ -125,5 +125,8 @@ export const env = {
     user: getOsEnv('SAGE_USER'),
     password: getOsEnv('SAGE_PASSWORD'),
     securityToken: getOsEnv('SAGE_SECURITY_TOKEN')
+  },
+  migration: {
+    token: getOsEnv('MIGRATION_TOKEN')
   }
 };
