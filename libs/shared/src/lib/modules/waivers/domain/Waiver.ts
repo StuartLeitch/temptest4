@@ -27,6 +27,10 @@ export class Waiver extends Reduction<WaiverProps> {
     return this.props.reduction;
   }
 
+  get id(): UniqueEntityID {
+    return this._id;
+  }
+
   get waiverType(): WaiverType {
     return this.props.waiverType;
   }

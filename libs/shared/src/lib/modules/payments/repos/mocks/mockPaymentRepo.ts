@@ -1,8 +1,9 @@
-import {BaseMockRepo} from '../../../../core/tests/mocks/BaseMockRepo';
+import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
-import {PaymentRepoContract} from '../paymentRepo';
-import {Payment} from '../../domain/Payment';
-import {PaymentId} from '../../domain/PaymentId';
+import { PaymentRepoContract } from '../paymentRepo';
+import { Payment } from '../../domain/Payment';
+import { PaymentId } from '../../domain/PaymentId';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 export class MockPaymentRepo extends BaseMockRepo<Payment>
   implements PaymentRepoContract {
@@ -21,6 +22,11 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
 
   public async getPaymentCollection() {
     return this._items;
+  }
+
+  public async getPaymentByInvoiceId(invoiceId: InvoiceId): Promise<Payment> {
+    const match = this._items.find(item => item.invoiceId === invoiceId);
+    return match ? match : null;
   }
 
   public async update(payment: Payment): Promise<Payment> {

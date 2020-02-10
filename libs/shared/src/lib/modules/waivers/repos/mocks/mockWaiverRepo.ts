@@ -1,9 +1,10 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
 import { WaiverRepoContract } from '../waiverRepo';
-import { Waiver } from '../../domain/Waiver';
-import { WaiverId } from '../../domain/WaiverId';
+import { Waiver, WaiverType } from '../../domain/Waiver';
+// import { WaiverId } from '../../domain/WaiverId';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
 // import {TransactionId} from '../../../transactions/domain/TransactionId';
 
 export class MockWaiverRepo extends BaseMockRepo<Waiver>
@@ -12,35 +13,52 @@ export class MockWaiverRepo extends BaseMockRepo<Waiver>
     super();
   }
 
-  public async getWaiverById(waiverId: WaiverId): Promise<Waiver> {
-    const matches = this._items.filter(i => i.waiverId.equals(waiverId));
-    if (matches.length !== 0) {
-      return matches[0];
-    } else {
-      return null;
-    }
+  // public async getWaiverById(waiverId: WaiverId): Promise<Waiver> {
+  //   const matches = this._items.filter(i => i.waiverId.equals(waiverId));
+  //   if (matches.length !== 0) {
+  //     return matches[0];
+  //   } else {
+  //     return null;
+  //   }
+  // }
+
+  public async getWaivers(): Promise<Waiver[]> {
+    return this._items;
+  }
+
+  public async getWaiverByType(type: WaiverType): Promise<Waiver> {
+    const match = this._items.find(item => item.waiverType === type);
+    return match ? match : null;
   }
 
   public async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
-    const matches = this._items.filter(w => w.invoiceId.equals(invoiceId));
-    if (matches.length !== 0) {
-      return matches;
-    } else {
-      return null;
-    }
+    // const matches = this._items.filter(w => w.invoiceId.equals(invoiceId));
+    // if (matches.length !== 0) {
+    //   return matches;
+    // } else {
+    //   return null;
+    // }
+    return [];
   }
 
-  public async attachWaiverToInvoice(
-    waiverId: WaiverId,
+  public async getWaiversByInvoiceItemId(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Waiver[]> {
+    return [];
+  }
+
+  public async attachWaiversToInvoice(
+    waivers: WaiverType[],
     invoiceId: InvoiceId
-  ): Promise<void> {
-    const [match] = this._items.filter(i => i.waiverId.equals(waiverId));
-    if (!match) {
-      return null;
-    } else {
-      // TODO: Emulate mocked association
-      // return match;
-    }
+  ): Promise<Waiver[]> {
+    // const [match] = this._items.filter(i => i.waiverId.equals(waiverId));
+    // if (!match) {
+    //   return null;
+    // } else {
+    //   // TODO: Emulate mocked association
+    //   // return match;
+    // }
+    return [];
   }
 
   public async getWaiverCollection(): Promise<Waiver[]> {

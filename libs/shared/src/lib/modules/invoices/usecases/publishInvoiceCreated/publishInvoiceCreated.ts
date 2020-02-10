@@ -62,7 +62,9 @@ export class PublishInvoiceCreatedUsecase
         payload = this.payloadWithInvoiceData(invoice, payload);
         return payload;
       })
-      .map(this.constructMessageFromPayload);
+      .map(
+        this.constructMessageFromPayload.bind(null, request.messageTimestamp)
+      );
 
     const eventSentResult = ((await chain(
       [this.publishMessage.bind(this)],
@@ -84,9 +86,11 @@ export class PublishInvoiceCreatedUsecase
   }
 
   private constructMessageFromPayload(
+    timestamp: Date,
     payload: InvoiceCreatedMessagePayload
   ): InvoiceCreatedMessage {
     return {
+      timestamp: timestamp.toISOString(),
       event: 'InvoiceCreated',
       data: payload
     };
@@ -164,6 +168,7 @@ export class PublishInvoiceCreatedUsecase
 }
 
 interface InvoiceCreatedMessage {
-  event: 'InvoiceCreated';
   data: InvoiceCreatedMessagePayload;
+  event: 'InvoiceCreated';
+  timestamp: string;
 }
