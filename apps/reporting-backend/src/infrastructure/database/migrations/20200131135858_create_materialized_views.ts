@@ -12,8 +12,8 @@ export async function up(knex: Knex): Promise<any> {
 }
 
 export async function down(knex: Knex): Promise<any> {
-  Promise.all(
-    materializedViewList
+  return Promise.all(
+    [...materializedViewList]
       .reverse()
       .map(view =>
         knex.raw(`DROP MATERIALIZED VIEW IF EXISTS ${view.getViewName()}`)

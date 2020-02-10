@@ -6,17 +6,18 @@ import { differenceInSeconds } from '../../utils/utils';
 
 import { AbstractEventView } from './contracts/EventViewContract';
 
+import authorsView from './AuthorsView';
 import invoicesDataView from './InvoicesDataView';
+import invoicesView from './InvoicesView';
+import journalSectionsView from './JournalSectionsView';
+import journalSpecialIssuesView from './JournalSpecialIssues';
 import journalsView from './JournalsView';
+import manuscriptEditors from './ManuscriptEditorsView';
+import manuscriptReviewers from './ManuscriptReviewersView';
+import manucriptsView from './ManuscriptsView';
 import submissionDataView from './SubmissionDataView';
 import submissionsView from './SubmissionsView';
 import uniqueJournals from './UniqueJournals';
-import authorsView from './AuthorsView';
-import invoicesView from './InvoicesView';
-import manuscriptEditors from './ManuscriptEditorsView';
-import manuscriptReviewers from './ManuscriptReviewersView';
-import journalSectionsView from './JournalSectionsView';
-import journalSpecialIssuesView from './JournalSpecialIssues';
 
 const logger = new Logger('materializedView');
 
@@ -32,7 +33,8 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     manuscriptEditors,
     manuscriptReviewers,
     journalSectionsView,
-    journalSpecialIssuesView
+    journalSpecialIssuesView,
+    manucriptsView
   ]
 ) as AbstractEventView[];
 

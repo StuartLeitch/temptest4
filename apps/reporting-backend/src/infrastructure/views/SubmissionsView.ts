@@ -23,7 +23,6 @@ AS SELECT
   t.journal_id,
   t.journal_name,
   t.journal_code,
-  t.submitting_author_country,
   t.last_version_index
 FROM (
   SELECT
@@ -43,11 +42,9 @@ FROM (
       s.section_id,
       j.journal_id,
       j.journal_name,
-      j.journal_code,
-      COALESCE(c.name, s.submitting_author_country, 'Unknown Country') AS submitting_author_country
+      j.journal_code
       FROM ${submissionDataView.getViewName()} s
       LEFT JOIN ${uniqueJournalsView.getViewName()} j ON s.journal_id = j.journal_id
-      LEFT JOIN countries c ON UPPER(s.submitting_author_country) = c.iso
       WHERE s.manuscript_custom_id is not null
     ) sd
 ) t
