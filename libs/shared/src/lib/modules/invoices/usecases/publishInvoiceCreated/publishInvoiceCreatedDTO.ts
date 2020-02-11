@@ -4,7 +4,7 @@ import { Invoice } from '../../domain/Invoice';
 
 export interface PublishInvoiceCreatedDTO {
   invoiceItems: InvoiceItem[];
-  messageTimestamp: Date;
+  messageTimestamp?: Date;
   manuscript: Manuscript;
   invoice: Invoice;
 }

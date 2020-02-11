@@ -2,26 +2,26 @@ export interface MigratePayerAddress {
   addressLine2?: string;
   addressLine1: string;
   countryCode: string;
-  postalCode: string;
   state?: string;
   city: string;
 }
 
 export interface MigratePayer {
-  vatRegistrationNumber: string;
+  vatRegistrationNumber?: string;
   address: MigratePayerAddress;
+  organization?: string;
   email: string;
   name: string;
   type: string;
 }
 
 export interface MigrateAPC {
-  invoiceReference: string;
-  paymentAmount: number;
+  invoiceReference?: string;
+  paymentAmount?: number;
   manuscriptId: string;
-  discount: number;
+  discount?: number;
   price: number;
-  vat: number;
+  vat?: number;
 }
 
 export interface MigrateEntireInvoiceDTO {
