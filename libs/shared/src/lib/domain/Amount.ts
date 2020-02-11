@@ -1,5 +1,5 @@
-import {ValueObject} from '../core/domain/ValueObject';
-import {Result} from '../core/logic/Result';
+import { ValueObject } from '../core/domain/ValueObject';
+import { Result } from '../core/logic/Result';
 
 interface AmountProps {
   value: number;
@@ -18,7 +18,7 @@ export class Amount extends ValueObject<AmountProps> {
     if (isNaN(value) || value === 0 || value < 0) {
       return Result.fail<Amount>('Must provide a valid amount');
     } else {
-      return Result.ok<Amount>(new Amount({value}));
+      return Result.ok<Amount>(new Amount({ value }));
     }
   }
 }

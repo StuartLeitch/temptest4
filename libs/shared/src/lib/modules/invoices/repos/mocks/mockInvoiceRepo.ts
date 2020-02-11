@@ -69,7 +69,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
       transactionId: invoice.transactionId.id.toString(),
       invoiceStatus: invoice.status,
       invoiceNumber: invoice.invoiceNumber,
-      invoiceIssueDate: invoice.dateIssued.toISOString(),
+      invoiceIssueDate: invoice.dateIssued?.toISOString(),
       payerName: '',
       payerEmail: '',
       payerType: '',
@@ -79,7 +79,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
       vatRegistrationNumber: '',
       foreignPaymentId: '',
       amount: invoice.charge,
-      paymentDate: invoice.props.dateUpdated.toISOString(),
+      paymentDate: invoice.props.dateUpdated?.toISOString(),
       paymentType: ''
     };
   }

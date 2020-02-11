@@ -44,14 +44,16 @@ export class PublishInvoiceConfirmed {
           ? ii.waivers.map(w => WaiverMap.toEvent(w))
           : undefined
       })),
-      organization: payer.organization?.value.toString(),
+      organization: payer ? payer.organization?.value.toString() : null,
       invoiceStatus: invoice.status as PhenomInvoiceStatus,
-      payerName: payer.name.value.toString(),
-      payerEmail: payer.email.value.toString(),
-      payerType: payer.type,
-      vatRegistrationNumber: payer.VATId,
-      address: `${address.addressLine1}, ${address.city}, ${address.country}`,
-      country: address.country,
+      payerName: payer ? payer.name.value.toString() : null,
+      payerEmail: payer ? payer.email.value.toString() : null,
+      payerType: payer ? payer.type : null,
+      vatRegistrationNumber: payer ? payer.VATId : null,
+      address: address
+        ? `${address.addressLine1}, ${address.city}, ${address.country}`
+        : null,
+      country: address?.country,
       valueWithoutVAT: invoiceItems.reduce(
         (acc, curr) => acc + curr.calculatePrice(),
         0
