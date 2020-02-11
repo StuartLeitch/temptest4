@@ -4,7 +4,7 @@
 for APP in $APP
 do
   echo "Building dist/apps/${APP}/Dockerfile"
-  docker build -f dist/apps/$APP/Dockerfile -t $AWS_REGISTRY/$TO:$CI_COMMIT_SHA . --no-cache
+  docker build -f dist/apps/$APP/Dockerfile -t $AWS_REGISTRY/$TO:$CI_COMMIT_SHA .
   docker push $AWS_REGISTRY/$TO:$CI_COMMIT_SHA
   echo "Running commmand: docker tag ${AWS_REGISTRY}/${TO}:${CI_COMMIT_SHA} ${AWS_REGISTRY}/${TO}:${AWS_ENVIRONMENT}";
   docker tag $AWS_REGISTRY/$TO:$CI_COMMIT_SHA $AWS_REGISTRY/$TO:$AWS_ENVIRONMENT
