@@ -159,10 +159,10 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
         'payment_methods.name as paymentType'
       )
       .from('invoices')
-      .join('payers', 'payers.invoiceId', '=', 'invoices.id')
-      .join('addresses', 'payers.billingAddressId', '=', 'addresses.id')
-      .join('payments', 'payments.invoiceId', '=', 'invoices.id')
-      .join(
+      .leftJoin('payers', 'payers.invoiceId', '=', 'invoices.id')
+      .leftJoin('addresses', 'payers.billingAddressId', '=', 'addresses.id')
+      .leftJoin('payments', 'payments.invoiceId', '=', 'invoices.id')
+      .leftJoin(
         'payment_methods',
         'payment_methods.id',
         '=',

@@ -36,7 +36,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
     "@hindawi/phenom-events": "^1.0.3",
-    "@hindawi/queue-service": "^1.2.1",
+    "@hindawi/queue-service": "^1.2.2",
     "@owczar/dashboard-style--airframe": "^0.1.23",
     "@paypal/checkout-server-sdk": "^1.0.2",
     "@pubsweet/component-email-templating": "0.2.10",
@@ -130,7 +130,7 @@
     "sass": "^1.25.0",
     "shallow-equal-object": "^1.1.1",
     "soap": "^0.30.0",
-    "solid-element": "^0.16.5",
+    "solid-element": "^0.16.7",
     "solid-scripts": "0.0.27",
     "sqs-consumer": "^5.4.0",
     "state-list": "^1.0.1",
@@ -241,7 +241,7 @@
     "typesafe-actions": "5.1.0",
     "typescript": "~3.7.5",
     "use-debounce": "^3.3.0",
-    "webpack": "^4.41.5",
+    "webpack": "^4.41.6",
     "webpack-cli": "^3.3.10",
     "webpack-graphql-loader": "^1.0.2"
   },
