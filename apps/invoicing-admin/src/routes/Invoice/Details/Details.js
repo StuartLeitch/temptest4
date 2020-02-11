@@ -178,7 +178,7 @@ mutation bankTransferPayment (
   $amount: Float!
   $paymentReference: String!
   $datePaid: String!
-  markInvoiceAsFinal: Boolean
+  $markInvoiceAsPaid: Boolean
 ) {
   bankTransferPayment(
     invoiceId: $invoiceId
@@ -187,7 +187,7 @@ mutation bankTransferPayment (
     paymentReference: $paymentReference
     amount: $amount
     datePaid: $datePaid
-    markInvoiceAsFinal: $markInvoiceAsFinal
+    markInvoiceAsPaid: $markInvoiceAsPaid
   ) {
     id
     foreignPaymentId
@@ -320,12 +320,12 @@ const Details = () => {
                         }
                       });
 
-                      invoice.payment = {
-                        paymentMethod: 'Bank Transfer',
-                        paymentAmount: bankTransferPaymentData.paymentAmount,
-                        foreignPaymentId:
-                          bankTransferPaymentData.paymentReference
-                      };
+                      // invoice.payment = {
+                      //   paymentMethod: 'Bank Transfer',
+                      //   paymentAmount: bankTransferPaymentData.paymentAmount,
+                      //   foreignPaymentId:
+                      //     bankTransferPaymentData.paymentReference
+                      // };
 
                       return toast.success(({ closeToast }) => (
                         <Media>
@@ -383,12 +383,12 @@ const Details = () => {
                         }
                       });
 
-                      invoice.payment = {
-                        paymentMethod: 'Bank Transfer',
-                        paymentAmount: bankTransferPaymentData.paymentAmount,
-                        foreignPaymentId:
-                          bankTransferPaymentData.paymentReference
-                      };
+                      // invoice.payment = {
+                      //   paymentMethod: 'Bank Transfer',
+                      //   paymentAmount: bankTransferPaymentData.paymentAmount,
+                      //   foreignPaymentId:
+                      //     bankTransferPaymentData.paymentReference
+                      // };
 
                       return toast.success(({ closeToast }) => (
                         <Media>

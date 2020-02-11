@@ -84,7 +84,7 @@ export const ModalDropdown = ({
                   color='secondary'
                   onClick={() => {
                     onClose();
-                    onSaveAndMarkInvoiceAsFinal();
+                    onSave();
                   }}
                 >
                   Save Payment
@@ -95,7 +95,7 @@ export const ModalDropdown = ({
                   color='primary'
                   onClick={() => {
                     onClose();
-                    onSave();
+                    onSaveAndMarkInvoiceAsFinal();
                   }}
                 >
                   Save Payment & Set Invoice to FINAL
