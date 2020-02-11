@@ -191,8 +191,8 @@ describe('migrate entire invoice usecase', () => {
         invoiceReference: '00001/2019',
         paymentAmount: 0,
         manuscriptId: '1',
-        discount: 200,
-        price: 200,
+        discount: 0,
+        price: 0,
         vat: 0
       },
       payer: null

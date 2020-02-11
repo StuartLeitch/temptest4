@@ -509,8 +509,12 @@ export class MigrateEntireInvoiceUsecase
       })
       .map(({ invoice, manuscript }) => {
         if (payer) {
-          manuscript.props.authorFirstName = request.payer.name;
-          manuscript.props.authorSurname = request.payer.name;
+          const first = request.payer.name.split(' ')[0];
+          const firstName = first.length < 40 ? first : '';
+          const surname = request.payer.name.replace(firstName + ' ', '');
+
+          manuscript.props.authorFirstName = firstName;
+          manuscript.props.authorSurname = surname;
           manuscript.props.authorEmail = request.payer.email;
           manuscript.props.authorCountry = request.payer.address.countryCode;
         }
@@ -611,6 +615,7 @@ export class MigrateEntireInvoiceUsecase
 
   private async makeMigrationPayment(request: DTO) {
     if (
+      !request.apc.paymentAmount ||
       !request.acceptanceDate ||
       !request.paymentDate ||
       !request.issueDate ||
@@ -649,6 +654,9 @@ export class MigrateEntireInvoiceUsecase
       .then(async ({ paymentMethod, payer }) => {
         const paymentMethodId = paymentMethod.paymentMethodId.id.toString();
         const payerId = payer ? payer.id.toString() : null;
+        if (!request.apc.paymentAmount) {
+          return right<null, null>(null);
+        }
         return right<null, any>({
           amount: request.apc.paymentAmount,
           datePaid: request.paymentDate,
@@ -658,8 +666,18 @@ export class MigrateEntireInvoiceUsecase
           payerId
         });
       })
-      .map(rawPayment => PaymentMap.toDomain(rawPayment))
-      .then(payment => this.savePayment(payment))
+      .map(rawPayment => {
+        if (!rawPayment) {
+          return null;
+        }
+        return PaymentMap.toDomain(rawPayment);
+      })
+      .then(payment => {
+        if (!payment) {
+          return Promise.resolve(right<null, null>(null));
+        }
+        return this.savePayment(payment);
+      })
       .map(payment => ({ payment, request }))
       .execute();
   }
