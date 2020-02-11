@@ -78,6 +78,7 @@ import { MigrateEntireInvoiceErrors as Errors } from './migrateEntireInvoiceErro
 import { MigrateEntireInvoiceDTO as DTO } from './migrateEntireInvoiceDTO';
 
 import { validateRequest } from './utils';
+import { PublishInvoiceCreatedErrors } from '../publishInvoiceCreated/publishInvoiceCreatedErrors';
 
 type Context = AuthorizationContext<Roles>;
 export type MigrateEntireInvoiceContext = Context;
@@ -298,13 +299,21 @@ export class MigrateEntireInvoiceUsecase
       addressLine1: address.addressLine1,
       country: address.countryCode,
       state: address.state,
-      city: address.city
+      city: address.city,
+      postalCode: ''
     };
     const maybeAddress = await usecase.execute(addressRequest);
     return maybeAddress.map(result => result.getValue());
   }
 
-  private async sendInvoiceCreatedEvent(invoiceId: string) {
+  private async sendInvoiceCreatedEvent(
+    invoiceId: string
+  ): Promise<
+    Either<
+      AppError.UnexpectedError | PublishInvoiceCreatedErrors.InputNotProvided,
+      void
+    >
+  > {
     if (!invoiceId) {
       return right<null, null>(null);
     }
@@ -392,6 +401,20 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
+  private calculateVatPercentage(vatValue: number, total: number) {
+    if (!vatValue || !total) {
+      return 0;
+    }
+
+    const percentage = (vatValue / total) * 100;
+
+    if (!percentage) {
+      return 0;
+    }
+
+    return percentage;
+  }
+
   private async updateInvoiceAtQualityPass(request: DTO) {
     if (!request.acceptanceDate) {
       return right<null, null>(null);
@@ -412,7 +435,13 @@ export class MigrateEntireInvoiceUsecase
       .then(invoice => this.getInvoiceItemsByInvoiceId(invoice.invoiceId))
       .map(items => {
         items[0].props.price = request.apc.price - request.apc.discount;
-        const vatPercentage = (request.apc.vat / items[0].props.price) * 100;
+        if (items[0].props.price < 0) {
+          items[0].props.price = 0;
+        }
+        const vatPercentage = this.calculateVatPercentage(
+          request.apc.vat,
+          items[0].props.price
+        );
         items[0].props.vat = vatPercentage;
 
         return items[0];
@@ -445,16 +474,16 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private async confirmInvoice(payer: Payer, request: DTO) {
-    if (!payer) {
+    if (!request.acceptanceDate || !request.issueDate) {
       return right<null, { invoice: null; payer: null; request: DTO }>({
         invoice: null,
         payer: null,
         request
       });
     }
-    return new AsyncEither<null, Payer>(payer)
-      .then(payer => {
-        return this.getInvoice(payer.invoiceId.id.toString());
+    return new AsyncEither<null, null>(null)
+      .then(() => {
+        return this.getInvoice(request.invoiceId);
       })
       .map(invoice => {
         const invoiceNumber = Number.parseInt(
@@ -467,7 +496,7 @@ export class MigrateEntireInvoiceUsecase
         invoice.props.dateIssued = new Date(request.issueDate);
         invoice.props.erpReference = request.erpReference;
         invoice.props.invoiceNumber = invoiceNumber;
-        invoice.payerId = payer.payerId;
+        invoice.payerId = payer ? payer.payerId : null;
 
         return invoice;
       })
@@ -479,11 +508,12 @@ export class MigrateEntireInvoiceUsecase
         return maybeManuscript.map(manuscript => ({ manuscript, invoice }));
       })
       .map(({ invoice, manuscript }) => {
-        console.info('invoice confirm manuscript', manuscript);
-        manuscript.props.authorFirstName = request.payer.name;
-        manuscript.props.authorSurname = request.payer.name;
-        manuscript.props.authorEmail = request.payer.email;
-        manuscript.props.authorCountry = request.payer.address.countryCode;
+        if (payer) {
+          manuscript.props.authorFirstName = request.payer.name;
+          manuscript.props.authorSurname = request.payer.name;
+          manuscript.props.authorEmail = request.payer.email;
+          manuscript.props.authorCountry = request.payer.address.countryCode;
+        }
 
         return { invoice, manuscript };
       })
@@ -522,8 +552,8 @@ export class MigrateEntireInvoiceUsecase
     request: DTO,
     payer: Payer
   ) {
-    if (!invoice || !payer) {
-      return right<null, null>(null);
+    if (!invoice) {
+      return right<null, void>(null);
     }
 
     const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
@@ -532,9 +562,19 @@ export class MigrateEntireInvoiceUsecase
     const messageTimestamp = new Date(request.issueDate);
     const invoiceItems = invoice.invoiceItems.currentItems;
 
-    return new AsyncEither<null, string>(payer.billingAddressId.id.toString())
-      .then(billingAddressId => addressUsecase.execute({ billingAddressId }))
-      .map(result => result.getValue())
+    return new AsyncEither<null, string>(payer?.billingAddressId?.id.toString())
+      .then(billingAddressId => {
+        if (!billingAddressId) {
+          return Promise.resolve(right<null, null>(null));
+        }
+        return addressUsecase.execute({ billingAddressId });
+      })
+      .map(result => {
+        if (!result) {
+          return null;
+        }
+        return result.getValue();
+      })
       .then(async billingAddress => {
         const maybeResponse = await manuscriptUsecase.execute({
           articleId: request.apc.manuscriptId
@@ -597,12 +637,18 @@ export class MigrateEntireInvoiceUsecase
     return new AsyncEither<null, null>(null)
       .then(() => this.getMigrationPaymentMethod())
       .then(async paymentMethod => {
+        if (!request.payer) {
+          return right<null, { paymentMethod: PaymentMethod; payer: null }>({
+            paymentMethod,
+            payer: null
+          });
+        }
         const maybePayer = await this.getPayerByInvoiceId(request.invoiceId);
         return maybePayer.map(payer => ({ paymentMethod, payer }));
       })
       .then(async ({ paymentMethod, payer }) => {
         const paymentMethodId = paymentMethod.paymentMethodId.id.toString();
-        const payerId = payer.id.toString();
+        const payerId = payer ? payer.id.toString() : null;
         return right<null, any>({
           amount: request.apc.paymentAmount,
           datePaid: request.paymentDate,
@@ -642,7 +688,7 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private async updateInvoicePayed(payment: Payment, request: DTO) {
-    if (!payment) {
+    if (!payment && request.apc.price !== request.apc.discount) {
       return right<
         null,
         {
@@ -652,8 +698,8 @@ export class MigrateEntireInvoiceUsecase
         }
       >({ invoice: null, payment: null, request });
     }
-    return new AsyncEither<null, Payment>(payment)
-      .then(payment => this.getInvoice(payment.invoiceId.id.toString()))
+    return new AsyncEither<null, null>(null)
+      .then(() => this.getInvoice(request.invoiceId))
       .map(invoice => {
         invoice.props.status = InvoiceStatus.FINAL;
         invoice.props.dateUpdated = new Date(request.paymentDate);
@@ -685,7 +731,11 @@ export class MigrateEntireInvoiceUsecase
     payment: Payment,
     request: DTO
   ) {
-    if (!invoice || !payment) {
+    if (!invoice) {
+      return right<null, null>(null);
+    }
+
+    if (!payment && request.apc.price !== request.apc.discount) {
       return right<null, null>(null);
     }
 
