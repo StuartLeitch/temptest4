@@ -146,7 +146,7 @@ export class RecordPayPalPaymentUsecase
     orderId: string,
     payload: RecordPaymentDTO
   ) {
-    return { ...payload, foreignPaymentId: orderId };
+    return { ...payload, foreignPaymentId: orderId, markInvoiceAsPaid: true };
   }
 
   private async getPayloadWithPayerId(

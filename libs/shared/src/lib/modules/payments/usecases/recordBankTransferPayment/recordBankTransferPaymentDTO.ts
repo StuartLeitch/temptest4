@@ -5,4 +5,5 @@ export interface RecordBankTransferPaymentDTO {
   paymentReference: string;
   amount: number;
   datePaid?: string;
+  markInvoiceAsPaid?: boolean;
 }

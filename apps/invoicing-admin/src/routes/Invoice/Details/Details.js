@@ -5,6 +5,7 @@ import LoadingOverlay from 'react-loading-overlay';
 import DatePicker, { setDefaultLocale } from 'react-datepicker';
 import format from 'date-fns/format';
 import subWeeks from 'date-fns/subWeeks';
+import compareDesc from 'date-fns/compareDesc';
 import { toast } from 'react-toastify';
 
 import {
@@ -79,7 +80,7 @@ fragment invoiceFragment on Invoice {
   payer {
     ...payerFragment
   }
-  payment {
+  payments {
     ...paymentFragment
   }
   invoiceItem {
@@ -116,6 +117,7 @@ fragment paymentFragment on Payment {
   id
   foreignPaymentId
   amount
+  datePaid
   paymentMethod {
     ...paymentMethodFragment
   }
@@ -176,6 +178,7 @@ mutation bankTransferPayment (
   $amount: Float!
   $paymentReference: String!
   $datePaid: String!
+  markInvoiceAsFinal: Boolean
 ) {
   bankTransferPayment(
     invoiceId: $invoiceId
@@ -184,6 +187,7 @@ mutation bankTransferPayment (
     paymentReference: $paymentReference
     amount: $amount
     datePaid: $datePaid
+    markInvoiceAsFinal: $markInvoiceAsFinal
   ) {
     id
     foreignPaymentId
@@ -311,7 +315,71 @@ const Details = () => {
                           ),
                           paymentReference:
                             bankTransferPaymentData.paymentReference,
-                          datePaid: bankTransferPaymentData.paymentDate.toISOString()
+                          datePaid: bankTransferPaymentData.paymentDate.toISOString(),
+                          markInvoiceAsPaid: false
+                        }
+                      });
+
+                      invoice.payment = {
+                        paymentMethod: 'Bank Transfer',
+                        paymentAmount: bankTransferPaymentData.paymentAmount,
+                        foreignPaymentId:
+                          bankTransferPaymentData.paymentReference
+                      };
+
+                      return toast.success(({ closeToast }) => (
+                        <Media>
+                          <Media middle left className='mr-3'>
+                            <i className='fas fa-fw fa-2x fa-check'></i>
+                          </Media>
+                          <Media body>
+                            <Media heading tag='h6'>
+                              Success!
+                            </Media>
+                            <p>
+                              You successfully processed a bank transfer
+                              payment.
+                            </p>
+                            <div className='d-flex mt-2'>
+                              <Button
+                                color='success'
+                                onClick={() => {
+                                  closeToast;
+                                }}
+                              >
+                                Got it
+                              </Button>
+                              <Button
+                                color='link'
+                                onClick={() => {
+                                  closeToast;
+                                }}
+                                className='ml-2 text-success'
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </Media>
+                        </Media>
+                      ));
+                    }}
+                    onSaveAndMarkInvoiceAsFinal={async () => {
+                      const {
+                        bankTransferPayment
+                      } = await recordBankTransferPayment({
+                        variables: {
+                          invoiceId: invoice?.id,
+                          payerId: invoice?.payer?.id,
+                          paymentMethodId: getPaymentMethods.find(
+                            pm => pm.name === 'Bank Transfer'
+                          ).id,
+                          amount: parseFloat(
+                            bankTransferPaymentData.paymentAmount
+                          ),
+                          paymentReference:
+                            bankTransferPaymentData.paymentReference,
+                          datePaid: bankTransferPaymentData.paymentDate.toISOString(),
+                          markInvoiceAsPaid: true
                         }
                       });
 
@@ -498,20 +566,24 @@ const Details = () => {
                         {/* START Input */}
                         <FormGroup row>
                           <Label sm={3}>Invoice Issue Date</Label>
-                          <DatePicker
-                            customInput={<ButtonInput />}
-                            selected={new Date(invoice.dateIssued)}
-                            onChange={() => {}}
-                          />
+                          <Col sm={9}>
+                            <DatePicker
+                              customInput={<ButtonInput />}
+                              selected={new Date(invoice.dateIssued)}
+                              onChange={() => {}}
+                            />
+                          </Col>
                         </FormGroup>
                         {/* END Input */}
                         <FormGroup row>
                           <Label sm={3}>Date of Supply</Label>
-                          <DatePicker
-                            readOnly
-                            customInput={<ButtonInput />}
-                            selected={Date.now()}
-                          />
+                          <Col sm={9}>
+                            <DatePicker
+                              readOnly
+                              customInput={<ButtonInput />}
+                              selected={Date.now()}
+                            />
+                          </Col>
                         </FormGroup>
                         <FormGroup row>
                           <Label for='staticText' sm={3}>
@@ -676,41 +748,71 @@ const Details = () => {
                         </tbody>
                       </Table>
                       <CardTitle tag='h6' className='mt-5 mb-4'>
-                        Invoice: Payment Method
-                        <span className='small ml-1 text-muted'>
+                        Invoice: Payments
+                        {/* <span className='small ml-1 text-muted'>
                           #{invoice?.payment?.paymentMethod?.id}
-                        </span>
+                        </span> */}
                       </CardTitle>
-                      <div className='mb-2'>
-                        <i
-                          className={`fa-fw ${
-                            invoice?.payment?.paymentMethod?.name ===
-                            'Credit Card'
-                              ? 'fas fa-credit-card'
-                              : 'fab fa-paypal'
-                          } text-primary mr-2`}
-                        ></i>
-                        <span className='text-inverse'>
-                          {invoice?.payment?.paymentMethod?.name}
-                        </span>{' '}
-                        - Payer:{' '}
-                        <samp>
-                          {invoice?.payer?.name} (
-                          <a href='#'>{invoice?.payer?.email}</a>)
-                        </samp>
-                      </div>
-                      <dl className='row'>
-                        <dt className='col-sm-4 text-right'>Amount</dt>
-                        <dd className='col-sm-8 text-inverse'>
-                          $ {invoice?.payment?.amount.toFixed(2)}
-                        </dd>
-                        <dt className='col-sm-4 text-right'>
-                          Foreign Payment ID
-                        </dt>
-                        <dd className='col-sm-8 text-success'>
-                          {invoice?.payment?.foreignPaymentId}
-                        </dd>
-                      </dl>
+                      {invoice?.payments?.length === 0 && (
+                        <span className='medium text-muted'>
+                          No payments processed yet.
+                        </span>
+                      )}
+                      {invoice?.payments?.length > 0 &&
+                        invoice?.payments?.map(payment => {
+                          const paymentMethod = payment?.paymentMethod?.name;
+                          let paymentMethodClassName = '';
+                          switch (paymentMethod) {
+                            case 'Credit Card':
+                              paymentMethodClassName = 'fas fa-credit-card';
+                              break;
+                            case 'Bank Transfer':
+                              paymentMethodClassName = 'fas fa-landmark';
+                              break;
+                            default:
+                              paymentMethodClassName = 'fab fa-paypal';
+                          }
+
+                          return (
+                            <React.Fragment key={payment.id}>
+                              <h6 className='my-3'>
+                                <i
+                                  className={`fa-fw text-primary mr-2 ${paymentMethodClassName}`}
+                                ></i>
+                                {` ${paymentMethod}`}
+                                <span className='small ml-1 text-muted'>
+                                  payment method
+                                </span>
+                              </h6>
+                              <Row tag='dl'>
+                                <dt className='col-sm-4'>Payer</dt>
+                                <dd className='col-sm-8 text-inverse'>
+                                  <samp>
+                                    {invoice?.payer?.name} (
+                                    <a href='#'>{invoice?.payer?.email}</a>)
+                                  </samp>
+                                </dd>
+
+                                <dt className='col-sm-4'>Paid Date</dt>
+                                <dd className='col-sm-8 text-inverse'>
+                                  {format(
+                                    new Date(payment?.datePaid),
+                                    'dd MMMM yyyy'
+                                  )}
+                                </dd>
+                                <dt className='col-sm-4'>Amount</dt>
+                                <dd className='col-sm-8 text-inverse'>
+                                  {' '}
+                                  $ {payment?.amount.toFixed(2)}
+                                </dd>
+                                <dt className='col-sm-4'>External Reference</dt>
+                                <dd className='col-sm-8 text-success'>
+                                  {payment?.foreignPaymentId}
+                                </dd>
+                              </Row>
+                            </React.Fragment>
+                          );
+                        })}
                     </CardBody>
                   </Card>
                 </TabPane>
@@ -789,29 +891,43 @@ const Details = () => {
             <Card className='mb-3'>
               <CardBody>
                 <CardTitle tag='h6'>Timeline</CardTitle>
-                <TimelineMini
-                  icon='circle'
-                  badgeTitle='Draft'
-                  badgeColor='secondary'
-                  date={format(subWeeks(new Date(), 3), 'dd MMMM yyyy')}
-                  phrase={'Invoice enters DRAFT state.'}
-                />
-                <TimelineMini
-                  icon='times-circle'
-                  iconClassName='text-primary'
-                  badgeTitle='Active'
-                  badgeColor='primary'
-                  date={format(subWeeks(new Date(), 2), 'dd MMMM yyyy')}
-                  phrase={'Invoice enters ACTIVE state.'}
-                />
-                <TimelineMini
-                  icon='check-circle'
-                  iconClassName='text-success'
-                  badgeTitle='Paid'
-                  badgeColor='success'
-                  date={format(subWeeks(new Date(), 1), 'dd MMMM yyyy')}
-                  phrase={'Invoice enters FINAL state.'}
-                />
+                {invoice?.dateCreated && (
+                  <TimelineMini
+                    icon='circle'
+                    badgeTitle='Draft'
+                    badgeColor='secondary'
+                    date={format(
+                      new Date(invoice?.dateCreated),
+                      'dd MMMM yyyy'
+                    )}
+                    phrase={'Invoice enters DRAFT state.'}
+                  />
+                )}
+                {invoice?.dateIssued && (
+                  <TimelineMini
+                    icon='times-circle'
+                    iconClassName='text-primary'
+                    badgeTitle='Active'
+                    badgeColor='primary'
+                    date={format(new Date(invoice?.dateIssued), 'dd MMMM yyyy')}
+                    phrase={'Invoice enters ACTIVE state.'}
+                  />
+                )}
+                {invoice?.payments?.length > 0 && (
+                  <TimelineMini
+                    icon='check-circle'
+                    iconClassName='text-success'
+                    badgeTitle='Paid'
+                    badgeColor='success'
+                    date={format(
+                      invoice?.payments
+                        ?.map(i => new Date(i.datePaid))
+                        .sort(compareDesc)[0],
+                      'dd MMMM yyyy'
+                    )}
+                    phrase={'Invoice enters FINAL state.'}
+                  />
+                )}
               </CardBody>
             </Card>
             {/* END Card Widget */}

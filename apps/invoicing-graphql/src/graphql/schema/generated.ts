@@ -90,6 +90,7 @@ export type Invoice = {
   customId?: Maybe<Scalars['ID']>,
   type?: Maybe<Scalars['String']>,
   payment?: Maybe<Payment>,
+  payments?: Maybe<Array<Maybe<Payment>>>,
 };
 
 export type InvoiceFilters = {
@@ -200,7 +201,8 @@ export type MutationBankTransferPaymentArgs = {
   paymentMethodId: Scalars['String'],
   paymentReference: Scalars['String'],
   amount: Scalars['Float'],
-  datePaid: Scalars['String']
+  datePaid: Scalars['String'],
+  markInvoiceAsFinal?: Maybe<Scalars['Boolean']>
 };
 
 
@@ -559,6 +561,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   customId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   payment?: Resolver<Maybe<ResolversTypes['Payment']>, ParentType, ContextType>,
+  payments?: Resolver<Maybe<Array<Maybe<ResolversTypes['Payment']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn,
 };
 

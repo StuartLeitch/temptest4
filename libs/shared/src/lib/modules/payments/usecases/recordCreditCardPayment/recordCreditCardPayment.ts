@@ -120,7 +120,11 @@ export class RecordCreditCardPaymentUsecase
     }
 
     console.log('BT Transaction ID: ' + payment.transaction.id);
-    const payload = { ...request, foreignPaymentId: payment.transaction.id };
+    const payload = {
+      ...request,
+      foreignPaymentId: payment.transaction.id,
+      markInvoiceAsPaid: true
+    };
 
     const usecase = new RecordPaymentUsecase(
       this.paymentRepo,

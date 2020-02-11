@@ -5,4 +5,5 @@ export interface RecordPaymentDTO {
   datePaid?: string;
   payerId: string;
   amount: number;
+  markInvoiceAsPaid?: boolean;
 }

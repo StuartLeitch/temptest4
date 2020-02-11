@@ -70,6 +70,7 @@ type Invoice @model(id: "invoices") {
   customId: ID
   type: String
   payment: Payment
+  payments: [Payment]
 }
 
 type InvoiceVat {
@@ -231,6 +232,7 @@ type Mutation {
     paymentReference: String!
     amount: Float!
     datePaid: String!
+    markInvoiceAsPaid: Boolean
   ): Payment!
   recordPayPalPayment(
     paymentMethodId: String!
