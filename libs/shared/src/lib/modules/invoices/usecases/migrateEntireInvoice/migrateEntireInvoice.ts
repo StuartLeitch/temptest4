@@ -424,6 +424,7 @@ export class MigrateEntireInvoiceUsecase
       .then(invoiceId => this.getInvoice(invoiceId))
       .map(invoice => {
         if (request.acceptanceDate) {
+          invoice.props.status = InvoiceStatus.DRAFT;
           invoice.props.dateAccepted = new Date(request.acceptanceDate);
           invoice.props.dateUpdated = new Date(request.acceptanceDate);
           invoice.props.charge =
@@ -564,7 +565,7 @@ export class MigrateEntireInvoiceUsecase
     const usecase = new PublishInvoiceConfirmed(this.sqsPublishService);
     const addressUsecase = new GetAddressUseCase(this.addressRepo);
     const messageTimestamp = new Date(request.issueDate);
-    const invoiceItems = invoice.invoiceItems.currentItems;
+    // const invoiceItems = invoice.invoiceItems.currentItems;
 
     return new AsyncEither<null, string>(payer?.billingAddressId?.id.toString())
       .then(billingAddressId => {
@@ -587,7 +588,13 @@ export class MigrateEntireInvoiceUsecase
           .map(response => response.getValue())
           .map(manuscript => ({ manuscript, billingAddress }));
       })
-      .then(async ({ billingAddress, manuscript }) => {
+      .then(async data => {
+        const maybeItem = await this.getInvoiceItemsByInvoiceId(
+          invoice.invoiceId
+        );
+        return maybeItem.map(invoiceItems => ({ ...data, invoiceItems }));
+      })
+      .then(async ({ billingAddress, manuscript, invoiceItems }) => {
         const result = await usecase.execute(
           invoice,
           invoiceItems,
@@ -760,7 +767,6 @@ export class MigrateEntireInvoiceUsecase
     const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
     const usecase = new PublishInvoicePaid(this.sqsPublishService);
     const messageTimestamp = new Date(request.paymentDate);
-    const invoiceItems = invoice.invoiceItems.currentItems;
 
     return new AsyncEither<null, string>(request.apc.manuscriptId)
       .map(articleId => ({ articleId }))
@@ -775,7 +781,13 @@ export class MigrateEntireInvoiceUsecase
           manuscript
         }));
       })
-      .then(async ({ paymentDetails, manuscript }) => {
+      .then(async data => {
+        const maybeInvoice = await this.getInvoiceItemsByInvoiceId(
+          invoice.invoiceId
+        );
+        return maybeInvoice.map(invoiceItems => ({ ...data, invoiceItems }));
+      })
+      .then(async ({ paymentDetails, manuscript, invoiceItems }) => {
         const result = await usecase.execute(
           invoice,
           invoiceItems,
