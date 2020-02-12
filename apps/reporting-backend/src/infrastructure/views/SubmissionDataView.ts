@@ -15,7 +15,7 @@ AS SELECT se.id as event_id,
     ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'customId'::text AS manuscript_custom_id,
     (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) -> 'articleType'::text) ->> 'name'::text AS article_type,
     (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'created'::text)::timestamp without time zone AS submission_date,
-    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'updated'::text)::timestamp without time zone AS updated_date,
+    COALESCE((((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'updated'::text)::timestamp without time zone, se.time) AS updated_date,
     ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'journalId'::text AS journal_id,
     ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'title'::text AS title,
     (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'specialIssueId') as "special_issue_id",
@@ -23,7 +23,7 @@ AS SELECT se.id as event_id,
     ((((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) -> 'authors'::text) -> 0) ->> 'country'::text AS submitting_author_country,
     last_version_index.manuscripts_array_index as last_version_index
     FROM ${REPORTING_TABLES.SUBMISSION} se
-    JOIN (
+    LEFT JOIN (
       ${'' /*manuscript index of latest version*/}
       SELECT
         t.rn,

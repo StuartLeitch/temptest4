@@ -12,7 +12,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
   se.manuscript_custom_id as "manuscript_custom_id",
   author_view.email as "email",
-  author_view.country as "country",
+  coalesce(c."name", author_view.country) as "country",
   author_view."isCorresponding" as is_corresponding,
   author_view."isSubmitting" as is_submitting,
   author_view."userId" as user_id,
@@ -40,6 +40,7 @@ AS SELECT
       surname text,
       aff text
     )
+    LEFT JOIN countries c on upper(author_view.country) = c.iso
 WITH DATA;
     `;
   }

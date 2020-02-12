@@ -22,9 +22,11 @@ export const knexLoader: MicroframeworkLoader = async (
       password: env.db.password,
       database: env.db.database
     }
+    // debug: true
   });
 
   // USE knex for creating views?
+  // await knex.migrate.rollback();
   await knex.migrate.latest();
 
   if (settings) {
