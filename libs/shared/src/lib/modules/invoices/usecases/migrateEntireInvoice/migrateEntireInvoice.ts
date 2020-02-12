@@ -60,6 +60,7 @@ import {
 
 import { GetArticleDetailsUsecase } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { GetManuscriptByManuscriptIdUsecase } from '../../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
@@ -463,7 +464,7 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
-  private async getInvoiceItemsByInvoiceId(invoiceId: InvoiceId) {
+  private async getInvoiceItemsByInvoiceId(invoiceId: InvoiceId): any {
     try {
       const items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
       return right<AppError.UnexpectedError, InvoiceItem[]>(items);
@@ -561,7 +562,10 @@ export class MigrateEntireInvoiceUsecase
       return right<null, void>(null);
     }
 
-    const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
+    // const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
+    const manuscriptUsecase = new GetManuscriptByManuscriptIdUsecase(
+      this.manuscriptRepo
+    );
     const usecase = new PublishInvoiceConfirmed(this.sqsPublishService);
     const addressUsecase = new GetAddressUseCase(this.addressRepo);
     const messageTimestamp = new Date(request.issueDate);
@@ -581,9 +585,15 @@ export class MigrateEntireInvoiceUsecase
         return result.getValue();
       })
       .then(async billingAddress => {
-        const maybeResponse = await manuscriptUsecase.execute({
-          articleId: request.apc.manuscriptId
-        });
+        const context = {
+          roles: [Roles.ADMIN]
+        };
+        const maybeResponse = await manuscriptUsecase.execute(
+          {
+            manuscriptId: request.apc.manuscriptId
+          },
+          context
+        );
         return maybeResponse
           .map(response => response.getValue())
           .map(manuscript => ({ manuscript, billingAddress }));
@@ -592,7 +602,10 @@ export class MigrateEntireInvoiceUsecase
         const maybeItem = await this.getInvoiceItemsByInvoiceId(
           invoice.invoiceId
         );
-        return maybeItem.map(invoiceItems => ({ ...data, invoiceItems }));
+        return maybeItem.map((invoiceItems: any) => ({
+          ...data,
+          invoiceItems
+        }));
       })
       .then(async ({ billingAddress, manuscript, invoiceItems }) => {
         const result = await usecase.execute(
@@ -764,39 +777,56 @@ export class MigrateEntireInvoiceUsecase
       return right<null, null>(null);
     }
 
-    const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
+    // const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
+    const manuscriptUsecase = new GetManuscriptByManuscriptIdUsecase(
+      this.manuscriptRepo
+    );
     const usecase = new PublishInvoicePaid(this.sqsPublishService);
     const messageTimestamp = new Date(request.paymentDate);
 
-    return new AsyncEither<null, string>(request.apc.manuscriptId)
-      .map(articleId => ({ articleId }))
-      .then(request => manuscriptUsecase.execute(request))
-      .map(result => result.getValue())
-      .then(async manuscript => {
-        const maybePaymentInfo = await this.getInvoicePaymentInfo(
-          invoice.invoiceId
-        );
-        return maybePaymentInfo.map(paymentDetails => ({
-          paymentDetails,
-          manuscript
-        }));
-      })
-      .then(async data => {
-        const maybeInvoice = await this.getInvoiceItemsByInvoiceId(
-          invoice.invoiceId
-        );
-        return maybeInvoice.map(invoiceItems => ({ ...data, invoiceItems }));
-      })
-      .then(async ({ paymentDetails, manuscript, invoiceItems }) => {
-        const result = await usecase.execute(
-          invoice,
-          invoiceItems,
-          manuscript,
-          paymentDetails,
-          messageTimestamp
-        );
-        return right<null, void>(result);
-      })
-      .execute();
+    return (
+      new AsyncEither<null, string>(request.apc.manuscriptId)
+        // .map(articleId => ({ articleId }))
+        .then(async () => {
+          const context = {
+            roles: [Roles.ADMIN]
+          };
+          const maybeResponse = await manuscriptUsecase.execute(
+            {
+              manuscriptId: request.apc.manuscriptId
+            },
+            context
+          );
+
+          return maybeResponse;
+        })
+        .map(result => result.getValue())
+        .then(async manuscript => {
+          const maybePaymentInfo = await this.getInvoicePaymentInfo(
+            invoice.invoiceId
+          );
+          return maybePaymentInfo.map(paymentDetails => ({
+            paymentDetails,
+            manuscript
+          }));
+        })
+        .then(async data => {
+          const maybeInvoice = await this.getInvoiceItemsByInvoiceId(
+            invoice.invoiceId
+          );
+          return maybeInvoice.map(invoiceItems => ({ ...data, invoiceItems }));
+        })
+        .then(async ({ paymentDetails, manuscript, invoiceItems }) => {
+          const result = await usecase.execute(
+            invoice,
+            invoiceItems,
+            manuscript,
+            paymentDetails,
+            messageTimestamp
+          );
+          return right<null, void>(result);
+        })
+        .execute()
+    );
   }
 }

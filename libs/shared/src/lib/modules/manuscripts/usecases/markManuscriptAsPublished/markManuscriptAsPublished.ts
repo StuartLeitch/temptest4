@@ -12,38 +12,38 @@ import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  GetManuscriptByManuscriptIdAuthorizationContext
-} from './getManuscriptAuthorizationContext';
-import { GetManuscriptByManuscriptIdDTO } from './getManuscriptByManuscriptIdDTO';
-import { GetManuscriptByManuscriptIdResponse } from './getManuscriptByManuscriptIdResponse';
-import { GetManuscriptByManuscriptIdErrors } from './getManuscriptByManuscriptIdErrors';
+  MarkManuscriptAsPublishedAuthorizationContext
+} from './markManuscriptAsPublishedContext';
+import { MarkManuscriptAsPublishedDTO } from './markManuscriptAsPublishedDTO';
+import { MarkManuscriptAsPublishedResponse } from './markManuscriptAsPublishedResponse';
+import { MarkManuscriptAsPublishedErrors } from './markManuscriptAsPublishedErrors';
 
-export class GetManuscriptByManuscriptIdUsecase
+export class MarkManuscriptAsPublishedUsecase
   implements
     UseCase<
-      GetManuscriptByManuscriptIdDTO,
-      Promise<GetManuscriptByManuscriptIdResponse>,
-      GetManuscriptByManuscriptIdAuthorizationContext
+      MarkManuscriptAsPublishedDTO,
+      Promise<MarkManuscriptAsPublishedResponse>,
+      MarkManuscriptAsPublishedAuthorizationContext
     >,
     AccessControlledUsecase<
-      GetManuscriptByManuscriptIdDTO,
-      GetManuscriptByManuscriptIdAuthorizationContext,
+      MarkManuscriptAsPublishedDTO,
+      MarkManuscriptAsPublishedAuthorizationContext,
       AccessControlContext
     > {
   constructor(private manuscriptRepo: ManuscriptRepoContract) {}
 
   private async getAccessControlContext(
-    request: GetManuscriptByManuscriptIdDTO,
-    context?: GetManuscriptByManuscriptIdAuthorizationContext
+    request: MarkManuscriptAsPublishedDTO,
+    context?: MarkManuscriptAsPublishedAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
 
-  @Authorize('read:manuscript')
+  @Authorize('write:manuscript')
   public async execute(
-    request: GetManuscriptByManuscriptIdDTO,
-    context?: GetManuscriptByManuscriptIdAuthorizationContext
-  ): Promise<GetManuscriptByManuscriptIdResponse> {
+    request: MarkManuscriptAsPublishedDTO,
+    context?: MarkManuscriptAsPublishedAuthorizationContext
+  ): Promise<MarkManuscriptAsPublishedResponse> {
     let manuscript: Manuscript;
 
     const manuscriptId = ManuscriptId.create(
@@ -52,14 +52,16 @@ export class GetManuscriptByManuscriptIdUsecase
 
     try {
       try {
-        manuscript = await this.manuscriptRepo.findByCustomId(manuscriptId);
+        manuscript = await this.manuscriptRepo.findById(manuscriptId);
       } catch (e) {
         return left(
-          new GetManuscriptByManuscriptIdErrors.ManuscriptFoundError(
+          new MarkManuscriptAsPublishedErrors.ManuscriptFoundError(
             manuscriptId.id.toString()
           )
         );
       }
+
+      manuscript.markAsPublished();
 
       return right(Result.ok<Manuscript>(manuscript));
     } catch (err) {

@@ -5,7 +5,6 @@ import { App } from "./app/app";
 import { config } from "./config";
 import { Context } from "./context";
 import { makeStore } from "./app/state";
-import { getInvoices } from "./app/state/modules/invoice/actions";
 
 import AppProviders from "./app/contexts";
 
@@ -17,9 +16,4 @@ ReactDOM.render(
     <App />
   </AppProviders>,
   document.getElementById("root"),
-  () => {
-    store.dispatch(
-      getInvoices.request({ offset: 0, limit: config.invoicesPerPage }),
-    );
-  },
 );

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
-import DatePicker, { setDefaultLocale } from 'react-datepicker';
+import DatePicker from 'react-datepicker';
 import format from 'date-fns/format';
-import subWeeks from 'date-fns/subWeeks';
+// import subWeeks from 'date-fns/subWeeks';
 import compareDesc from 'date-fns/compareDesc';
 import { toast } from 'react-toastify';
 
@@ -12,24 +12,24 @@ import {
   Accordion,
   Badge,
   Button,
-  ButtonDropdown,
-  ButtonGroup,
+  // ButtonDropdown,
+  // ButtonGroup,
   ButtonToolbar,
   Card,
   CardBody,
-  CardGroup,
-  CardText,
+  // CardGroup,
+  // CardText,
   CardTitle,
   Col,
-  CardHeader,
-  CardFooter,
+  // CardHeader,
+  // CardFooter,
   Container,
-  CustomInput,
+  // CustomInput,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
   ModalDropdown,
-  FormFeedback,
+  // FormFeedback,
   Form,
   FormGroup,
   Media,
@@ -38,31 +38,31 @@ import {
   InputGroup,
   InputGroupAddon,
   Row,
-  FormText,
-  ModalHeader,
+  // FormText,
+  // ModalHeader,
   ModalBody,
-  ModalFooter,
+  // ModalFooter,
   Nav,
   NavItem,
   Spinner,
   Table,
   TabPane,
   UncontrolledButtonDropdown,
-  UncontrolledModal,
+  // UncontrolledModal,
   UncontrolledTabs
 } from './../../../components';
 import { HeaderMain } from '../../components/HeaderMain';
-import { HeaderDemo } from '../../components/HeaderDemo';
+// import { HeaderDemo } from '../../components/HeaderDemo';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 import { TimelineMini } from '../../components/Timeline/TimelineMini';
 // import { CardTextDemo } from '../../components/CardTextDemo';
-import { TimelineDefault } from '../../components/Timeline/TimelineDefault';
-import { DlRowContacts } from '../../components/Profile/DlRowContacts';
-import { DlRowAddress } from '../../components/Profile/DlRowAddress';
-import { TrTableMessages } from '../../Apps/ProfileDetails/components/TrTableMessages';
+// import { TimelineDefault } from '../../components/Timeline/TimelineDefault';
+// import { DlRowContacts } from '../../components/Profile/DlRowContacts';
+// import { DlRowAddress } from '../../components/Profile/DlRowAddress';
+// import { TrTableMessages } from '../../Apps/ProfileDetails/components/TrTableMessages';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
-import { Coupon } from '../../components/Invoice/Coupon';
+// import { Coupon } from '../../components/Invoice/Coupon';
 
 const INVOICE_QUERY = `
 query invoice($id: ID) {
@@ -208,8 +208,6 @@ const Details = () => {
     paymentDate: new Date(),
     paymentAmount: 0,
     paymentReference: ''
-    // paymentMethodId: ''
-    // payerId: ''
   });
 
   if (loading)
@@ -226,7 +224,7 @@ const Details = () => {
 
   const { getPaymentMethods } = paymentMethods;
   const { invoice } = data;
-  console.info(invoice);
+  // console.info(invoice);
   const { coupons, waivers, price } = invoice?.invoiceItem;
   let netCharges = price;
   if (coupons?.length) {

@@ -4,7 +4,7 @@ import { ASTNode } from "graphql";
 import { invoiceFragment, invoiceVatFragment } from "./fragments";
 
 export const getInvoice: ASTNode = gql`
-  query invoice($id: String) {
+  query invoice($id: ID) {
     invoice(invoiceId: $id) {
       ...invoiceFragment
     }
