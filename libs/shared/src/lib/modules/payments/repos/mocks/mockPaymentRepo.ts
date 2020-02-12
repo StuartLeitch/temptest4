@@ -29,6 +29,13 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
     return match ? match : null;
   }
 
+  public async getPaymentsByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Payment[]> {
+    const match = this._items.filter(item => item.invoiceId === invoiceId);
+    return match;
+  }
+
   public async update(payment: Payment): Promise<Payment> {
     const alreadyExists = await this.exists(payment);
 

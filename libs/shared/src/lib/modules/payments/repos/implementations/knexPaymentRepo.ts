@@ -47,6 +47,19 @@ export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
     return PaymentMap.toDomain(paymentRow);
   }
 
+  async getPaymentsByInvoiceId(invoiceId: InvoiceId): Promise<Payment[]> {
+    const { db } = this;
+
+    const paymentRows = await db(TABLES.PAYMENTS)
+      .select()
+      .where('invoiceId', invoiceId.id.toString());
+
+    return paymentRows.reduce((aggregator: any[], p) => {
+      aggregator.push(PaymentMap.toDomain(p));
+      return aggregator;
+    }, []);
+  }
+
   async save(payment: Payment): Promise<Payment> {
     const { db } = this;
 

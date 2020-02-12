@@ -22,7 +22,9 @@ export class PaymentMap extends Mapper<Payment> {
   public static toDomain(raw: any): Payment {
     const invoiceOrError = Payment.create(
       {
-        payerId: PayerId.create(new UniqueEntityID(raw.payerId)),
+        payerId: raw.payerId
+          ? PayerId.create(new UniqueEntityID(raw.payerId))
+          : null,
         invoiceId: InvoiceId.create(
           new UniqueEntityID(raw.invoiceId)
         ).getValue(),

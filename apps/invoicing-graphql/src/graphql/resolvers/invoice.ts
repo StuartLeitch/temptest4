@@ -290,6 +290,21 @@ export const invoice: Resolvers<any> = {
         return null;
       }
       return PaymentMap.toPersistence(payment);
+    },
+    async payments(parent: Invoice, args, context) {
+      const {
+        repos: { payment: paymentRepo }
+      } = context;
+      const invoiceId = InvoiceId.create(
+        new UniqueEntityID(parent.invoiceId)
+      ).getValue();
+
+      const payments = await paymentRepo.getPaymentsByInvoiceId(invoiceId);
+
+      if (!payments) {
+        return null;
+      }
+      return payments.map(p => PaymentMap.toPersistence(p));
     }
   },
   InvoiceItem: {

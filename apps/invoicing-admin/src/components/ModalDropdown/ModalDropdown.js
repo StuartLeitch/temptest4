@@ -21,6 +21,7 @@ export const ModalDropdown = ({
   className,
   dropdownToggle,
   onSave,
+  onSaveAndMarkInvoiceAsFinal,
   children,
   ...otherProps
 }) => {
@@ -78,7 +79,16 @@ export const ModalDropdown = ({
                 Save Payment
               </DropdownToggle>
               <DropdownMenu>
-                <DropdownItem disabled>Save Payment</DropdownItem>
+                <DropdownItem
+                  tag={Button}
+                  color='secondary'
+                  onClick={() => {
+                    onClose();
+                    onSaveAndMarkInvoiceAsFinal();
+                  }}
+                >
+                  Save Payment
+                </DropdownItem>
                 <DropdownItem divider />
                 <DropdownItem
                   tag={Button}

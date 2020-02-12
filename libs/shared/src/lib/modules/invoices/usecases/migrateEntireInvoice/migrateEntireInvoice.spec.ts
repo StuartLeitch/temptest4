@@ -110,7 +110,6 @@ describe('migrate entire invoice usecase', () => {
         type: 'INDIVIDUAL',
         address: {
           addressLine1: 'Str. Mihai Eminescu Nr. 3B',
-          postalCode: '70047',
           countryCode: 'RO',
           addressLine2: null,
           city: 'Iasi',
@@ -180,6 +179,80 @@ describe('migrate entire invoice usecase', () => {
     expect(payer.type).toBe(request.payer.type);
   });
 
+  it('should publish the 3 invoices events when all data is passed and payer is null and payment is 0', async () => {
+    const request: MigrateEntireInvoiceDTO = {
+      invoiceId: '1',
+      acceptanceDate: new Date('03-08-2019').toISOString(),
+      submissionDate: new Date('12-12-2018').toISOString(),
+      paymentDate: new Date('07-08-2019').toISOString(),
+      issueDate: new Date('06-08-2019').toISOString(),
+      erpReference: '1234',
+      apc: {
+        invoiceReference: '00001/2019',
+        paymentAmount: 0,
+        manuscriptId: '1',
+        discount: 0,
+        price: 0,
+        vat: 0
+      },
+      payer: null
+    };
+
+    const result = await migrateUsecase.execute(request);
+    console.info(result.value);
+    expect(result.isRight()).toBeTruthy();
+    expect(sqsPublishService.messages.length).toBe(3);
+    expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
+    expect(sqsPublishService.messages[0].timestamp).toBe(
+      request.acceptanceDate
+    );
+    expect(sqsPublishService.messages[0].data.invoiceId).toBe(
+      request.invoiceId
+    );
+    expect(sqsPublishService.messages[0].data.referenceNumber).toBeFalsy();
+    expect(sqsPublishService.messages[0].data.invoiceStatus).toBe('DRAFT');
+
+    expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
+    expect(sqsPublishService.messages[1].timestamp).toBe(request.issueDate);
+    expect(sqsPublishService.messages[1].data.invoiceId).toBe(
+      request.invoiceId
+    );
+    expect(sqsPublishService.messages[1].data.referenceNumber).toBe(
+      request.apc.invoiceReference
+    );
+    expect(sqsPublishService.messages[1].data.invoiceStatus).toBe('ACTIVE');
+
+    expect(sqsPublishService.messages[2].event).toBe('InvoicePaid');
+    expect(sqsPublishService.messages[2].timestamp).toBe(request.paymentDate);
+    expect(sqsPublishService.messages[2].data.invoiceId).toBe(
+      request.invoiceId
+    );
+    expect(sqsPublishService.messages[2].data.referenceNumber).toBe(
+      request.apc.invoiceReference
+    );
+    expect(sqsPublishService.messages[2].data.invoiceStatus).toBe('FINAL');
+
+    const invoiceId = InvoiceId.create(
+      new UniqueEntityID(request.invoiceId)
+    ).getValue();
+    const invoice = await invoiceRepo.getInvoiceById(invoiceId);
+    const transaction = await transactionRepo.getTransactionById(
+      invoice.transactionId
+    );
+
+    expect(transaction.status).toBe(TransactionStatus.ACTIVE);
+    expect(invoice.status).toBe('FINAL');
+
+    expect(transaction.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(transaction.dateUpdated.toISOString()).toBe(request.acceptanceDate);
+
+    expect(invoice.dateIssued.toISOString()).toBe(request.issueDate);
+    expect(invoice.referenceNumber).toBe(request.apc.invoiceReference);
+    expect(invoice.dateCreated.toISOString()).toBe(request.submissionDate);
+    expect(invoice.props.dateUpdated.toISOString()).toBe(request.paymentDate);
+    expect(invoice.dateAccepted.toISOString()).toBe(request.acceptanceDate);
+  });
+
   it('should publish the first 2 invoices events when acceptance date, payer and issue date is provided', async () => {
     const request: MigrateEntireInvoiceDTO = {
       invoiceId: '1',
@@ -203,7 +276,6 @@ describe('migrate entire invoice usecase', () => {
         type: 'INDIVIDUAL',
         address: {
           addressLine1: 'Str. Mihai Eminescu Nr. 3B',
-          postalCode: '70047',
           countryCode: 'RO',
           addressLine2: null,
           city: 'Iasi',

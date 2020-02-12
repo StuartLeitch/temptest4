@@ -194,7 +194,8 @@ export const payments: Resolvers<any> = {
         paymentMethodId,
         paymentReference,
         amount,
-        datePaid
+        datePaid,
+        markInvoiceAsPaid
       } = args;
 
       const recordBankTransferPaymentUsecase = new RecordBankTransferPaymentUsecase(
@@ -212,7 +213,8 @@ export const payments: Resolvers<any> = {
           paymentMethodId,
           paymentReference,
           amount,
-          datePaid
+          datePaid,
+          markInvoiceAsPaid
         },
         usecaseContext
       );

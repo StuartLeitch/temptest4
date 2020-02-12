@@ -67,10 +67,19 @@ function validatePayer(request: MigrateEntireInvoiceDTO): ValidatePayerReturn {
   if (!request.paymentDate || !request.issueDate) {
     return right(payer);
   }
-  if (!payer.name) {
+
+  if (!payer && request.apc.discount === request.apc.price) {
+    return right(payer);
+  }
+
+  if (!payer) {
     return left(new MigrateEntireInvoiceErrors.PayerNameRequired());
   }
-  if (!payer.type) {
+
+  if (!payer?.name) {
+    return left(new MigrateEntireInvoiceErrors.PayerNameRequired());
+  }
+  if (!payer?.type) {
     return left(new MigrateEntireInvoiceErrors.PayerTypeRequired());
   }
   if (!(payer.type in PayerType)) {
@@ -105,9 +114,6 @@ function validatePayerAddress(
   }
   if (!payerAddress.countryCode) {
     return left(new MigrateEntireInvoiceErrors.CountryCodeRequired());
-  }
-  if (!payerAddress.postalCode) {
-    return left(new MigrateEntireInvoiceErrors.PostalCodeRequired());
   }
 
   return right(payerAddress);

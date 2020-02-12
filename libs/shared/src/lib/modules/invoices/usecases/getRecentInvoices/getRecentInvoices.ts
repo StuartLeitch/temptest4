@@ -45,16 +45,10 @@ export class GetRecentInvoicesUsecase
     // TODO: add proper DDD types to the paginated result
     try {
       const paginatedResult = await this.invoiceRepo.getRecentInvoices(request);
-      const offset = request.offset * request.limit;
-      if (paginatedResult.totalCount < offset) {
-        paginatedResult
-      }
       return right(Result.ok<any>(paginatedResult));
     } catch (err) {
       return left(
-        new AppError.UnexpectedError(
-          err, 'Getting recent invoices failed'
-        )
+        new AppError.UnexpectedError(err, 'Getting recent invoices failed')
       );
     }
   }

@@ -12,7 +12,6 @@ import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 
 import { applyFilters } from './utils';
 
-
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
@@ -53,10 +52,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   }
 
   async getRecentInvoices(args?: any): Promise<any> {
-    const {
-      pagination,
-      filters
-    } = args;
+    const { pagination, filters } = args;
     const { db } = this;
 
     const getModel = () =>
@@ -70,16 +66,16 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     //   getModel().whereIn(`${TABLES.INVOICES}.status`, ['DRAFT'])
     // ).count(`${TABLES.INVOICES}.id`);
 
+    const offset = pagination.offset * pagination.limit;
     // console.info(
     //   'limit = %s, offset = %s, totalCount = %s',
-    //   limit,
+    //   pagination.limit,
     //   offset,
     //   totalCount[0]
     // );
-    const offset = pagination.offset * pagination.limit;
     const invoices = await applyFilters(getModel(), filters)
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
-      .offset(offset < totalCount ? offset : 0)
+      .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.INVOICES}.*`]);
 
@@ -163,10 +159,10 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
         'payment_methods.name as paymentType'
       )
       .from('invoices')
-      .join('payers', 'payers.invoiceId', '=', 'invoices.id')
-      .join('addresses', 'payers.billingAddressId', '=', 'addresses.id')
-      .join('payments', 'payments.invoiceId', '=', 'invoices.id')
-      .join(
+      .leftJoin('payers', 'payers.invoiceId', '=', 'invoices.id')
+      .leftJoin('addresses', 'payers.billingAddressId', '=', 'addresses.id')
+      .leftJoin('payments', 'payments.invoiceId', '=', 'invoices.id')
+      .leftJoin(
         'payment_methods',
         'payment_methods.id',
         '=',

@@ -62,7 +62,8 @@ export class RecordPaymentUsecase
       paymentMethodId: PaymentMethodId.create(
         new UniqueEntityID(payload.paymentMethodId)
       ),
-      datePaid: payload.datePaid ? new Date(payload.datePaid) : new Date()
+      datePaid: payload.datePaid ? new Date(payload.datePaid) : new Date(),
+      markInvoiceAsPaid: !!payload.markInvoiceAsPaid
     };
 
     try {
@@ -79,7 +80,9 @@ export class RecordPaymentUsecase
         );
       }
 
-      invoice.markAsPaid(payment.paymentId);
+      if (payload.markInvoiceAsPaid) {
+        invoice.markAsPaid(payment.paymentId);
+      }
 
       await this.paymentRepo.save(payment);
       await this.invoiceRepo.update(invoice);
