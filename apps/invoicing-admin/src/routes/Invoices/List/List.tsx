@@ -160,9 +160,7 @@ const RecentInvoicesList = props => {
       />
     );
 
-  if (error) return (
-    <Error data={error} />
-  );
+  if (error) return <Error data={error} />;
 
   const offset = pagination.offset * pagination.limit;
   if ((data?.length ?? 0 > 0) && offset >= data?.length) {
@@ -180,10 +178,10 @@ const RecentInvoicesList = props => {
               {/* <th className='align-middle bt-0'>#</th> */}
               <th className='align-middle bt-0'>Status</th>
               <th className='align-middle bt-0'>Reference</th>
+              <th className='align-middle bt-0'>Manuscript Custom ID</th>
               <th className='align-middle bt-0'>Issue Date</th>
               <th className='align-middle bt-0'>APC</th>
               <th className='align-middle bt-0'>Journal Title</th>
-              <th className='align-middle bt-0'>Manuscript Custom ID</th>
               <th className='align-middle bt-0'>Manuscript Title</th>
               <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
               {/* <th className='align-middle bt-0 text-right'>Actions</th> */}

@@ -62,6 +62,16 @@ const TrTableInvoicesList = ({ invoices }) => (
               </span>
             </Link>
           </td>
+          <td className='align-middle'>
+            <Link
+              to={`/invoices/details/${id}`}
+              className='text-decoration-none'
+            >
+              <span className='text-secondary'>
+                {invoiceItem?.article?.customId}
+              </span>
+            </Link>
+          </td>
           <td className='align-middle text-nowrap'>
             {dateIssued && format(new Date(dateIssued), 'dd MMMM yyyy')}
           </td>
@@ -71,11 +81,6 @@ const TrTableInvoicesList = ({ invoices }) => (
           </td>
           <td className='align-middle text-nowrap'>
             {invoiceItem?.article?.journalTitle}
-          </td>
-          <td className='align-middle'>
-            <span className='text-secondary'>
-              {invoiceItem?.article?.customId}
-            </span>
           </td>
           <td className='align-middle'>{invoiceItem?.article?.title}</td>
           <td className='align-middle text-nowrap'>
