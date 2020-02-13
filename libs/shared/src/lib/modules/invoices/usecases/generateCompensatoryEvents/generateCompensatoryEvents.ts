@@ -1,9 +1,8 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
-import { Result, left, right, Either } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { AppError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
@@ -16,16 +15,21 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
+import { AddressId } from '../../../addresses/domain/AddressId';
+import { InvoiceStatus } from '../../domain/Invoice';
+import { Payer } from '../../../payers/domain/Payer';
 import { InvoiceId } from '../../domain/InvoiceId';
-import { Invoice, InvoiceStatus } from '../../domain/Invoice';
 
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
 import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
@@ -40,6 +44,9 @@ import {
 import { GenerateCompensatoryEventsResponse as Response } from './generateCompensatoryEventsResponse';
 import { GenerateCompensatoryEventsErrors as Errors } from './generateCompensatoryEventsErrors';
 import { GenerateCompensatoryEventsDTO as DTO } from './generateCompensatoryEventsDTO';
+import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
+
+class GenericError extends AppError.UnexpectedError {}
 
 type Context = AuthorizationContext<Roles>;
 export type GenerateCompensatoryEventsContext = Context;
@@ -56,9 +63,11 @@ export class GenerateCompensatoryEventsUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private sqsPublish: SQSPublishServiceContract,
     private manuscriptRepo: ArticleRepoContract,
+    private addressRepo: AddressRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private couponRepo: CouponRepoContract,
-    private waiverRepo: WaiverRepoContract
+    private waiverRepo: WaiverRepoContract,
+    private payerRepo: PayerRepoContract
   ) {}
 
   private async getAccessControlContext(request, context?) {
@@ -72,9 +81,12 @@ export class GenerateCompensatoryEventsUsecase
   ): Promise<Response> {
     const requestExecution = new AsyncEither<null, DTO>(request)
       .then(this.verifyInput)
-      .then(request => this.publishInvoiceCreated(request));
+      .then(request => this.publishInvoiceCreated(request))
+      .then(request => this.publishInvoiceConfirmed(request))
+      .then(request => this.publishInvoicePayed(request))
+      .map(() => Result.ok<void>(null));
 
-    return null;
+    return requestExecution.execute();
   }
 
   private async verifyInput(
@@ -116,6 +128,39 @@ export class GenerateCompensatoryEventsUsecase
     return maybeResult.map(result => result.getValue());
   }
 
+  private async getPayerForInvoiceId(invoiceId: InvoiceId) {
+    try {
+      const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+      if (!payer) {
+        return left<GenericError, Payer>(
+          new GenericError({
+            message: `No payer found for invoice with id {${invoiceId.id.toString()}}`
+          })
+        );
+      }
+      return right<GenericError, Payer>(payer);
+    } catch (err) {
+      return left<GenericError, Payer>(new GenericError(err));
+    }
+  }
+
+  private async getAddressWithId(addressId: AddressId) {
+    const usecase = new GetAddressUseCase(this.addressRepo);
+    const maybeResult = await usecase.execute({
+      billingAddressId: addressId.id.toString()
+    });
+    return maybeResult.map(result => result.getValue());
+  }
+
+  private async getPaymentInfo(invoiceId: InvoiceId) {
+    try {
+      const payment = await this.invoiceRepo.getInvoicePaymentInfo(invoiceId);
+      return right<GenericError, InvoicePaymentInfo>(payment);
+    } catch (err) {
+      return left<GenericError, InvoicePaymentInfo>(new GenericError(err));
+    }
+  }
+
   private async publishInvoiceCreated(request: DTO) {
     const publishUsecase = new PublishInvoiceCreatedUsecase(this.sqsPublish);
     const execution = new AsyncEither<null, null>(null)
@@ -138,7 +183,7 @@ export class GenerateCompensatoryEventsUsecase
       })
       .map(data => {
         const { invoice } = data;
-        if (!invoice.dateAccepted || invoice.status === InvoiceStatus.DRAFT) {
+        if (!invoice.dateAccepted) {
           return null;
         }
         invoice.props.dateUpdated = invoice.dateAccepted;
@@ -156,6 +201,145 @@ export class GenerateCompensatoryEventsUsecase
         }
 
         return publishUsecase.execute(publishRequest);
+      })
+      .map(() => request);
+    return execution.execute();
+  }
+
+  private async publishInvoiceConfirmed(request: DTO) {
+    const publishUsecase = new PublishInvoiceConfirmed(this.sqsPublish);
+
+    const execution = new AsyncEither<null, null>(null)
+      .then(() => this.getInvoiceWithId(request.invoiceId))
+      .then(async invoice => {
+        const maybeResult = await this.getInvoiceItemsForInvoiceId(
+          invoice.invoiceId
+        );
+        return maybeResult.map(invoiceItems => ({ invoice, invoiceItems }));
+      })
+      .then(async data => {
+        const maybeResult = await this.getManuscriptByInvoiceId(
+          data.invoice.invoiceId
+        );
+        return maybeResult.map(manuscripts => ({
+          ...data,
+          manuscript: manuscripts[0]
+        }));
+      })
+      .then(async data => {
+        const maybePayer = await this.getPayerForInvoiceId(
+          data.invoice.invoiceId
+        );
+        return maybePayer.map(payer => ({ ...data, payer }));
+      })
+      .then(async data => {
+        const maybeAddress = await this.getAddressWithId(
+          data.payer.billingAddressId
+        );
+        return maybeAddress.map(address => ({ ...data, address }));
+      })
+      .map(data => {
+        const invoice = data.invoice;
+        if (
+          !invoice.dateAccepted ||
+          !invoice.dateIssued ||
+          invoice.status === InvoiceStatus.DRAFT
+        ) {
+          return null;
+        }
+
+        invoice.props.dateUpdated = invoice.dateIssued;
+        invoice.status = InvoiceStatus.ACTIVE;
+
+        return { ...data, invoice };
+      })
+      .then(async data => {
+        if (!data) {
+          return right<null, null>(null);
+        }
+
+        try {
+          const result = await publishUsecase.execute(
+            data.invoice,
+            data.invoiceItems,
+            data.manuscript,
+            data.payer,
+            data.address,
+            data.invoice.dateIssued
+          );
+          return right<GenericError, void>(result);
+        } catch (err) {
+          return left<GenericError, void>(new GenericError(err));
+        }
+      })
+      .map(() => request);
+
+    return execution.execute();
+  }
+
+  private async publishInvoicePayed(request: DTO) {
+    const publishUsecase = new PublishInvoicePaid(this.sqsPublish);
+
+    const execution = new AsyncEither<null, null>(null)
+      .then(() => this.getInvoiceWithId(request.invoiceId))
+      .then(async invoice => {
+        const maybeItems = await this.getInvoiceItemsForInvoiceId(
+          invoice.invoiceId
+        );
+        return maybeItems.map(invoiceItems => ({ invoice, invoiceItems }));
+      })
+      .then(async data => {
+        const maybeManuscript = await this.getManuscriptByInvoiceId(
+          data.invoice.invoiceId
+        );
+        return maybeManuscript.map(manuscripts => ({
+          ...data,
+          manuscript: manuscripts[0]
+        }));
+      })
+      .then(async data => {
+        const maybePaymentInfo = await this.getPaymentInfo(
+          data.invoice.invoiceId
+        );
+        return maybePaymentInfo.map(paymentInfo => ({ ...data, paymentInfo }));
+      })
+      .map(data => {
+        const invoice = data.invoice;
+        if (
+          invoice.status !== InvoiceStatus.FINAL ||
+          !invoice.dateAccepted ||
+          !invoice.dateIssued
+        ) {
+          return null;
+        }
+        let paymentDate: Date;
+        if (!data.paymentInfo) {
+          paymentDate = invoice.dateIssued;
+        } else {
+          paymentDate = new Date(data.paymentInfo.paymentDate);
+        }
+
+        invoice.props.dateUpdated = paymentDate;
+
+        return { ...data, invoice, paymentDate };
+      })
+      .then(async data => {
+        if (!data) {
+          return right<null, null>(null);
+        }
+
+        try {
+          const result = await publishUsecase.execute(
+            data.invoice,
+            data.invoiceItems,
+            data.manuscript,
+            data.paymentInfo,
+            data.paymentDate
+          );
+          return right<GenericError, void>(result);
+        } catch (err) {
+          return left<GenericError, void>(new GenericError(err));
+        }
       })
       .map(() => request);
     return execution.execute();
