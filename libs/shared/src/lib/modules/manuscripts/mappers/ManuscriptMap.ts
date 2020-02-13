@@ -12,7 +12,8 @@ export class ManuscriptMap extends Mapper<Manuscript> {
         articleType: raw.articleType,
         authorEmail: raw.authorEmail,
         authorCountry: raw.authorCountry,
-        authorSurname: raw.authorSurname
+        authorSurname: raw.authorSurname,
+        datePublished: raw.datePublished
       },
       new UniqueEntityID(raw.id)
     );
@@ -34,7 +35,8 @@ export class ManuscriptMap extends Mapper<Manuscript> {
       authorSurname: manuscript.props.authorSurname,
       authorFirstName: manuscript.props.authorFirstName,
       created: manuscript.props.created,
-      customId: manuscript.props.customId
+      customId: manuscript.props.customId,
+      datePublished: manuscript.props.datePublished
     };
   }
 }

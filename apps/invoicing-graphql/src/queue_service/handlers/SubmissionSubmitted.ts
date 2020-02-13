@@ -39,7 +39,7 @@ export const SubmissionSubmittedHandler = {
           journalId,
           title,
           articleType: { name },
-          created,
+          submissionCreatedDate: created,
           authors
         }
       ]

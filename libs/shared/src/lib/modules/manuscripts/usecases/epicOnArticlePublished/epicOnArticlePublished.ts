@@ -18,7 +18,7 @@ import {
 
 // import { PaymentMethodRepoContract } from '../../../payments/repos/paymentMethodRepo';
 // import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
-// import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 // import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 // import { PaymentRepoContract } from '../../../payments/repos/paymentRepo';
 // import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
@@ -76,28 +76,27 @@ import {
 import { EpicOnArticlePublishedResponse as Response } from './epicOnArticlePublishedResponse';
 import { EpicOnArticlePublishedErrors as Errors } from './epicOnArticlePublishedErrors';
 import { EpicOnArticlePublishedDTO as DTO } from './epicOnArticlePublishedDTO';
+import {
+  MarkManuscriptAsPublishedUsecase,
+  MarkManuscriptAsPublishedDTO
+} from '../markManuscriptAsPublished';
 
 // import { validateRequest } from './utils';
 
 type Context = AuthorizationContext<Roles>;
 export type OnArticlePublishedContext = Context;
 
-export class OnArticlePublishedUsecase
+export class EpicOnArticlePublishedUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor() // private paymentMethodRepo: PaymentMethodRepoContract,
-  // private sqsPublishService: SQSPublishServiceContract,
-  // private invoiceItemRepo: InvoiceItemRepoContract,
-  // private transactionRepo: TransactionRepoContract,
-  // private manuscriptRepo: ArticleRepoContract,
-  // private addressRepo: AddressRepoContract,
-  // private invoiceRepo: InvoiceRepoContract,
-  // private paymentRepo: PaymentRepoContract,
-  // private couponRepo: CouponRepoContract,
-  // private waiverRepo: WaiverRepoContract,
-  // private payerRepo: PayerRepoContract
-  {}
+  constructor(
+    // private paymentMethodRepo: PaymentMethodRepoContract,
+    // private sqsPublishService: SQSPublishServiceContract,
+    // private invoiceItemRepo: InvoiceItemRepoContract,
+    // private transactionRepo: TransactionRepoContract,
+    private manuscriptRepo: ArticleRepoContract // private addressRepo: AddressRepoContract, // private invoiceRepo: InvoiceRepoContract, // private paymentRepo: PaymentRepoContract, // private couponRepo: CouponRepoContract, // private waiverRepo: WaiverRepoContract, // private payerRepo: PayerRepoContract
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -105,55 +104,62 @@ export class OnArticlePublishedUsecase
 
   // @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    // const requestExecution = new AsyncEither<null, DTO>(
-    //   request
-    // ).then(async request => validateRequest(request));
+    const { customId, published } = request;
 
-    // const maybeRequest = await requestExecution.execute();
+    const requestExecution = new AsyncEither<null, DTO>(request);
+    return (
+      requestExecution
+        .then(() => this.markManuscriptAsPublished(request))
+        // .then(autoConfirmInvoiceAtPublication)
+        // .then(sendRevenueRecognitionToERP)
+        .map(() => {
+          console.info('ciubuc!');
+          return Result.ok<void>();
+        })
+        .execute()
+    );
+  }
 
-    // const maybeInitialInvoice = await requestExecution
-    //   .then(request => this.updateInitialInvoice(request))
-    //   .then(invoice => this.updateTransactionDates(invoice))
-    //   .map(() => {})
-    //   .execute();
+  private async markManuscriptAsPublished(request: any) {
+    const { customId } = request;
+    if (!customId) {
+      return right<null, null>(null);
+    }
 
-    // const maybeInvoiceCreated = await requestExecution
-    //   .then(async () => maybeInitialInvoice)
-    //   .then(async () => maybeRequest)
-    //   .then(request => this.updateInvoiceAtQualityPass(request))
-    //   .then(request => this.getTransactionWithAcceptanceDate(request))
-    //   .then(transaction => this.updateTransactionStatus(transaction))
-    //   .then(invoiceId => this.sendInvoiceCreatedEvent(invoiceId))
-    //   .execute();
+    const { manuscriptRepo } = this;
 
-    // const maybeInvoiceConfirmed = await requestExecution
-    //   .then(async () => maybeInvoiceCreated)
-    //   .then(async () => maybeRequest)
-    //   .then(request => this.createPayer(request))
-    //   .then(({ request, payer }) => this.confirmInvoice(payer, request))
-    //   .then(({ request, payer, invoice }) =>
-    //     this.sendInvoiceConfirmedEvent(invoice, request, payer)
-    //   )
-    //   .execute();
+    const markManuscriptAsPublishedUsecase = new MarkManuscriptAsPublishedUsecase(
+      manuscriptRepo
+    );
+    const context = {
+      roles: [Roles.ADMIN]
+    };
 
-    // const maybeInvoicePayed = await requestExecution
-    //   .then(async () => maybeInvoiceConfirmed)
-    //   .then(async () => maybeRequest)
-    //   .then(request => this.makeMigrationPayment(request))
-    //   .then(({ request, payment }) => {
-    //     return this.updateInvoicePayed(payment, request);
-    //   })
-    //   .then(({ request, invoice, payment }) => {
-    //     return this.sendInvoicePayedEvent(invoice, payment, request);
-    //   })
-    //   .execute();
+    const execution = new AsyncEither<null, MarkManuscriptAsPublishedDTO>({
+      customId: request.customId,
+      publicationDate: request.published
+    })
+      // .then(invoiceId => this.getInvoice(invoiceId))
+      // .then(invoice => {
+      //   return this.addItemsToInvoice(invoice);
+      // })
+      // .then(invoice => this.getManuscriptWithInvoice(invoice))
+      // .map(
+      //   ({ invoice, manuscript }) =>
+      //     ({
+      //       invoiceItems: invoice.invoiceItems.currentItems,
+      //       messageTimestamp: invoice.dateAccepted,
+      //       manuscript,
+      //       invoice
+      //     } as PublishInvoiceCreatedDTO)
+      // )
+      .then(async args => {
+        return (
+          await markManuscriptAsPublishedUsecase.execute(args, context)
+        ).map(result => result.getValue());
+      });
 
-    return flattenEither([
-      maybeMarkManuscriptAsPublished
-      // maybeInvoiceCreated,
-      // maybeInitialInvoice,
-      // maybeInvoicePayed
-    ]).map(val => Result.ok<void>());
+    return execution.execute();
   }
 
   // private async getTransactionWithAcceptanceDate(request: DTO) {

@@ -1,3 +1,4 @@
 export interface MarkManuscriptAsPublishedDTO {
-  manuscriptId: string;
+  customId: string;
+  publicationDate: string;
 }

@@ -47,12 +47,12 @@ export class MarkManuscriptAsPublishedUsecase
     let manuscript: Manuscript;
 
     const manuscriptId = ManuscriptId.create(
-      new UniqueEntityID(request.manuscriptId)
+      new UniqueEntityID(request.customId)
     ).getValue();
 
     try {
       try {
-        manuscript = await this.manuscriptRepo.findById(manuscriptId);
+        manuscript = await this.manuscriptRepo.findByCustomId(manuscriptId);
       } catch (e) {
         return left(
           new MarkManuscriptAsPublishedErrors.ManuscriptFoundError(
@@ -61,7 +61,8 @@ export class MarkManuscriptAsPublishedUsecase
         );
       }
 
-      manuscript.markAsPublished();
+      manuscript.markAsPublished(request.publicationDate);
+      await this.manuscriptRepo.update(manuscript);
 
       return right(Result.ok<Manuscript>(manuscript));
     } catch (err) {

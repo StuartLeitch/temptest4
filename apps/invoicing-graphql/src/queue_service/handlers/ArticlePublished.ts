@@ -1,7 +1,8 @@
+import { ArticlePublished as ArticlePublishedEventPayload } from '@hindawi/phenom-events';
 import {
-  EpicOnArticlePublishedUseCase,
-  EpicOnArticlePublishedUseCaseRequestDTO
-} from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+  EpicOnArticlePublishedUsecase,
+  EpicOnArticlePublishedDTO
+} from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
 import { Logger } from '../../lib/logger';
 
 const ARTICLE_PUBLISHED = 'ArticlePublished';
@@ -9,25 +10,27 @@ const logger = new Logger(`events:${ARTICLE_PUBLISHED}`);
 
 export const ArticlePublishedHandler = {
   event: ARTICLE_PUBLISHED,
-  async handler(data: any) {
+  async handler(data: ArticlePublishedEventPayload) {
     logger.info(`Incoming Event Data`, data);
+
     const {
-      repos: { catalog: catalogRepo }
+      customId,
+      // articleType: { name },
+      // journalId,
+      published
+      // title
+    } = data;
+
+    const {
+      repos: { /*catalog: catalogRepo, */ manuscript: manuscriptRepo }
     } = this;
 
-    const addJournalUsecase = new AddCatalogItemToCatalogUseCase(catalogRepo);
+    const epicOnArticlePublishedUsecase = new EpicOnArticlePublishedUsecase(
+      manuscriptRepo
+    );
     try {
-      const result = await addJournalUsecase.execute({
-        // type: data.id,
-        amount: data.apc,
-        created: data.created,
-        updated: data.updated,
-        currency: 'USD',
-        issn: data.issn,
-        journalTitle: data.name,
-        isActive: data.isActive,
-        journalId: data.id
-      } as AddCatalogItemToCatalogUseCaseRequestDTO);
+      const args: EpicOnArticlePublishedDTO = { customId, published };
+      const result = await epicOnArticlePublishedUsecase.execute(args);
 
       if (result.isLeft()) {
         console.error(result.value.error);

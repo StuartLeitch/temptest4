@@ -14,6 +14,7 @@ interface ManuscriptProps {
   authorCountry?: string;
   authorSurname?: string;
   authorFirstName?: string;
+  datePublished?: Date;
 }
 
 export class Manuscript extends AggregateRoot<ManuscriptProps> {
@@ -93,6 +94,14 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.created;
   }
 
+  set datePublished(publishedDate: Date) {
+    this.props.datePublished = publishedDate;
+  }
+
+  get datePublished(): Date {
+    return this.props.datePublished;
+  }
+
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -110,5 +119,10 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     );
 
     return Result.ok<Manuscript>(manuscript);
+  }
+
+  public markAsPublished(published?: string): void {
+    const publishedDate = published ? new Date(published) : new Date();
+    this.props.datePublished = publishedDate;
   }
 }

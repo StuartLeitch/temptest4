@@ -13,9 +13,12 @@ import { ManuscriptMap } from '../../mappers/ManuscriptMap';
 
 import { ArticleRepoContract } from '../articleRepo';
 
-export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article>
+export class KnexArticleRepo
+  extends AbstractBaseDBRepo<Knex, Article | Manuscript>
   implements ArticleRepoContract {
-  async findById(manuscriptId: ManuscriptId | string): Promise<Article> {
+  async findById(
+    manuscriptId: ManuscriptId | string
+  ): Promise<Article | Manuscript> {
     if (typeof manuscriptId === 'string') {
       manuscriptId = ManuscriptId.create(
         new UniqueEntityID(manuscriptId)

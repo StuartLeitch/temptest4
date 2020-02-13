@@ -582,7 +582,7 @@ export class MigrateEntireInvoiceUsecase
         if (!result) {
           return null;
         }
-        return result.getValue();
+        return result?.getValue();
       })
       .then(async billingAddress => {
         const context = {
