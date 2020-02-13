@@ -12,6 +12,8 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT 
   t.event_id,
   t.submission_id,
+  t.version,
+  t.manuscript_version_id,
   t.manuscript_custom_id,
   t.submission_event,
   t.article_type,
@@ -34,6 +36,8 @@ FROM (
       s.manuscript_custom_id,
       s.submission_event,
       s.article_type,
+      s.version,
+      s.manuscript_version_id,
       s.submission_date,
       s.updated_date,
       s.title,
