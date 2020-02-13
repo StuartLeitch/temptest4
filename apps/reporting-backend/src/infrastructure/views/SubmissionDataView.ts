@@ -20,6 +20,8 @@ AS SELECT se.id as event_id,
     ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'title'::text AS title,
     (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'specialIssueId') as "special_issue_id",
     (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'sectionId') as "section_id",
+    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'version') as "version",
+    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'id') as "manuscript_version_id",
     ((((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) -> 'authors'::text) -> 0) ->> 'country'::text AS submitting_author_country,
     last_version_index.manuscripts_array_index as last_version_index
     FROM ${REPORTING_TABLES.SUBMISSION} se
