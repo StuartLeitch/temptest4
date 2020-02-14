@@ -45,7 +45,7 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${invoicesView.getViewName()} i where i.manuscript_custom_id = s.manuscript_custom_id limit 1) i on i.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id and sd.submission_event in ('SubmissionQualityCheckPassed', 'SubmissionWithdrawn', 'SubmissionScreeningRTCd', 'SubmissionQualityCheckRTCd', 'SubmissionRejected') 
     order by updated_date desc limit 1) sd on sd.submission_id = s.submission_id
-  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} order by updated_date desc limit 1) last_sd on last_sd.submission_id = s.submission_id
+  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id order by updated_date desc limit 1) last_sd on last_sd.submission_id = s.submission_id
 WITH DATA;
     `;
   }

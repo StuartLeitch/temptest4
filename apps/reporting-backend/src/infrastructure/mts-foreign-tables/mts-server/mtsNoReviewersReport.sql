@@ -7,45 +7,33 @@ CREATE FOREIGN TABLE mts_no_reviewers
 )
 SERVER mssql_mts
 OPTIONS (
- query 'SELECT CONVERT(CHAR(7), v.editorassigndate, 120) AS Month_No
-	   ,v.ManuscriptId
-	   ,v.SubmitDate AS ManuscriptSubmitDate
-	   ,j.FullName AS JournalName
-	   ,en.FullName AS EditorName
-	   ,v.EditorAssignDate
-	   ,j.EditorialVendor
-	   ,ean.FullName AS EA
-	   ,mt.MsTypeName AS ArticleType
-	   ,COALESCE(vh.Editor_Invites,1) AS Editor_Invites
-	   ,DATEDIFF(DAY, v.SubmitDate, GETDATE()) AS Days_Since_Submission
-	   ,COALESCE(vh.editor_assign_date, v.EditorAssignDate) AS FirstEditorAssign_Date
-	   ,v.EditorAssignDate, GETDATE() AS CurrentEditorAssign_Date
-from dbo.versions v
-	 LEFT JOIN review r ON r.manuscriptid = v.manuscriptid 
-	 INNER JOIN journals j ON j.JournalId = v.JournalId
-	 INNER JOIN (SELECT sm.*
-						,u.FullName
-				 from dbo.StaffManuscripts sm INNER JOIN users u ON u.UserId = sm.UserId
-				) ean ON ean.ManuscriptId = v.ManuscriptId
-	 INNER JOIN (SELECT v2.*
-						,u.FullName
-				 from dbo.versions v2 INNER JOIN users u ON u.UserId = v2.EditorId
-				) en ON en.ManuscriptId = v.ManuscriptId
-	 INNER JOIN Manuscripts m ON m.manuscriptid = v.manuscriptid
-	 INNER JOIN MsTypes mt ON mt.MsTypeId = m.MsTypeId AND mt.MsTypeId NOT IN (4,64,55,31,52)
-	 LEFT JOIN (SELECT manuscriptid
-						,MIN(editorassigndate) AS editor_assign_date
-						,COUNT(DISTINCT EditorId) AS Editor_Invites
-				 from dbo.VersionsHistory
-                 WHERE YEAR(editorassigndate) >= 2019
-					   AND versionnumber = 1
-                 GROUP BY manuscriptid
-				) vh ON vh.manuscriptid = v.manuscriptid -- find the earliest editor assign date for each manuscript
-WHERE v.editorassigndate >= ''2019-01-01''
-	  AND v.versionnumber = 1
-	  AND v.editorassigndate IS NOT NULL
-	  AND v.EditorRecommendationDate IS NULL
-	  AND v.RecommendationId = ''Not''
-	  AND r.manuscriptid IS NULL
-ORDER BY CONVERT(CHAR(7), v.editorassigndate, 120)' 
+ query 'select 
+	m.ManuscriptId as manuscript_custom_id, 
+	r.versionnumber as version_number,
+	sm.assigndate as screening_assign_date,
+	v.first_editor_assign_date,
+	v.current_editor_assign_date,
+	r.first_reviewer_assign_date,
+	r.current_reviewer_assign_date,
+	r.review_return_date,
+	r.Reviewers_Invited as reviewers_invited,
+	r.Reviews_Pending as reviews_pending,
+	r.Reviews_Completed as reviews_completed
+from manuscripts m
+left join InHouseScreeningManuscripts sm on m.ManuscriptId = sm.ManuscriptId
+left join (select v.ManuscriptId, MIN(v.editorassigndate) as first_editor_assign_date, max(v.editorassigndate) current_editor_assign_date from Versions v group by v.ManuscriptId) v on v.ManuscriptId = m.ManuscriptId
+left join (select r.ManuscriptId,  r.versionnumber,
+		MIN(r.AssignDate) as first_reviewer_assign_date, 
+		MAX(r.AssignDate) current_reviewer_assign_date,
+		MIN(r.SubmitDate) as review_return_date,
+		COUNT(DISTINCT UserId) AS Reviewers_Invited,
+		SUM(CASE WHEN Status = ''Submit'' THEN 1 ELSE 0 END) AS Reviews_Completed,
+		SUM(CASE WHEN Status IN (''Agreed'',''Partial'') THEN 1 ELSE 0 END) AS Reviews_Pending,
+		MIN(assigndate) AS reviewer_assign_date,
+		MAX(assigndate) AS Last_Assign_Date
+ FROM review r
+ GROUP BY manuscriptid, versionnumber
+) r ON r.manuscriptid = v.manuscriptid
+WHERE m.CurrentRecommendationId in (''Not'',''EdMajor'',''EdMinor'')
+	and m.JournalId in (''BCA'', ''JT'', ''4242'', ''1720'', ''9403'',''APEC'',''ACE'',''AFS'',''AHCI'',''AMET'',''AM'',''AT'',''9309'',''ACISC'',''CIN'',''6471'',''7258'',''EDU'',''6816'',''IJAE'',''IJBI'',''IJCE'',''IJCGT'',''IJDMB'',''IJGP'',''IJRC'',''IJRM'',''IJTA'',''1409'',''JC'',''JCNC'',''JCSE'',''ENERGY'',''7158'',''JRE'',''JR'',''JS'',''9071'',''MSE'',''STNI'',''5192'',''2037'',''3148'',''6302'')' 
 );
