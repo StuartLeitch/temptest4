@@ -15,10 +15,13 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { AddressId } from '../../../addresses/domain/AddressId';
+import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
 import { InvoiceId } from '../../domain/InvoiceId';
+import { Invoice } from '../../domain/Invoice';
 
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
@@ -101,7 +104,10 @@ export class GenerateCompensatoryEventsUsecase
 
   private async getInvoiceWithId(invoiceId: string) {
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
-    const maybeResult = await usecase.execute({ invoiceId });
+    const context = {
+      roles: [Roles.PAYER]
+    };
+    const maybeResult = await usecase.execute({ invoiceId }, context);
     return maybeResult.map(result => result.getValue());
   }
 
@@ -131,13 +137,13 @@ export class GenerateCompensatoryEventsUsecase
   private async getPayerForInvoiceId(invoiceId: InvoiceId) {
     try {
       const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-      if (!payer) {
-        return left<GenericError, Payer>(
-          new GenericError({
-            message: `No payer found for invoice with id {${invoiceId.id.toString()}}`
-          })
-        );
-      }
+      // if (!payer) {
+      //   return left<GenericError, Payer>(
+      //     new GenericError({
+      //       message: `No payer found for invoice with id {${invoiceId.id.toString()}}`
+      //     })
+      //   );
+      // }
       return right<GenericError, Payer>(payer);
     } catch (err) {
       return left<GenericError, Payer>(new GenericError(err));
@@ -233,6 +239,19 @@ export class GenerateCompensatoryEventsUsecase
         return maybePayer.map(payer => ({ ...data, payer }));
       })
       .then(async data => {
+        if (!data.payer) {
+          return right<
+            null,
+            {
+              invoiceItems: InvoiceItem[];
+              manuscript: Manuscript;
+              invoice: Invoice;
+              address: null;
+              payer: Payer;
+            }
+          >({ ...data, address: null });
+        }
+
         const maybeAddress = await this.getAddressWithId(
           data.payer.billingAddressId
         );
@@ -258,6 +277,7 @@ export class GenerateCompensatoryEventsUsecase
           return right<null, null>(null);
         }
 
+        console.log('before invoiceConfirm');
         try {
           const result = await publishUsecase.execute(
             data.invoice,
@@ -267,6 +287,7 @@ export class GenerateCompensatoryEventsUsecase
             data.address,
             data.invoice.dateIssued
           );
+          console.log('after invoice confirmed');
           return right<GenericError, void>(result);
         } catch (err) {
           return left<GenericError, void>(new GenericError(err));
@@ -316,6 +337,7 @@ export class GenerateCompensatoryEventsUsecase
         if (!data.paymentInfo) {
           paymentDate = invoice.dateIssued;
         } else {
+          console.info(data.paymentInfo);
           paymentDate = new Date(data.paymentInfo.paymentDate);
         }
 
@@ -329,6 +351,8 @@ export class GenerateCompensatoryEventsUsecase
         }
 
         try {
+          console.log('before invoice payed');
+          console.info(data.paymentDate);
           const result = await publishUsecase.execute(
             data.invoice,
             data.invoiceItems,
@@ -336,6 +360,7 @@ export class GenerateCompensatoryEventsUsecase
             data.paymentInfo,
             data.paymentDate
           );
+          console.log('after invoice payed');
           return right<GenericError, void>(result);
         } catch (err) {
           return left<GenericError, void>(new GenericError(err));

@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
 import { InvoiceRepoContract } from '../invoiceRepo';
@@ -16,7 +18,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const matches = this._items.filter(i => i.invoiceId.equals(invoiceId));
     if (matches.length !== 0) {
-      return matches[0];
+      return cloneDeep(matches[0]);
     } else {
       return null;
     }
@@ -29,11 +31,12 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   public async getInvoiceByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Invoice> {
-    return this._items.find(i =>
+    const match = this._items.find(i =>
       i.invoiceItems
         .getItems()
         .some(ii => ii.invoiceItemId.equals(invoiceItemId))
     );
+    return match ? cloneDeep(match) : null;
   }
 
   public async getInvoicesByTransactionId(
@@ -43,18 +46,18 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
       i.transactionId.equals(transactionId)
     );
     if (matches.length !== 0) {
-      return matches;
+      return cloneDeep(matches);
     } else {
       return null;
     }
   }
 
   async getRecentInvoices(): Promise<any[]> {
-    return this._items;
+    return cloneDeep(this._items);
   }
 
   public async getInvoiceCollection(): Promise<Invoice[]> {
-    return this._items; // .filter(i => i.invoiceId.id.toString() === invoiceId);
+    return cloneDeep(this._items); // .filter(i => i.invoiceId.id.toString() === invoiceId);
   }
 
   public async getInvoicePaymentInfo(
@@ -103,7 +106,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
       this._items.push(invoice);
     }
 
-    return invoice;
+    return cloneDeep(invoice);
   }
 
   public async update(invoice: Invoice): Promise<Invoice> {
@@ -119,7 +122,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
       });
     }
 
-    return invoice;
+    return cloneDeep(invoice);
   }
 
   public async delete(invoice: Invoice): Promise<void> {

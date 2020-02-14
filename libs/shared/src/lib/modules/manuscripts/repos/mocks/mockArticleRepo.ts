@@ -18,7 +18,13 @@ export class MockArticleRepo extends BaseMockRepo<Article>
     return match ? match : null;
   }
 
-  public async findByCustomId(customId: string): Promise<Article> {
+  public async findByCustomId(
+    customId: ManuscriptId | string
+  ): Promise<Article> {
+    if (customId instanceof ManuscriptId) {
+      return this.findById(customId);
+    }
+
     const match = this._items.find(item => item.customId === customId);
     return match ? match : null;
   }
