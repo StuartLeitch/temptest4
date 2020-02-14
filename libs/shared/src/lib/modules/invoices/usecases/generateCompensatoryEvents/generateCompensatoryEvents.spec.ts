@@ -88,6 +88,47 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages[2].event).toBe('InvoicePaid');
     expect(sqsPublishService.messages[2].timestamp).toContain('2019-12-01');
   });
+
+  it('should not send events if the invoice with provided id is draft and has no acceptance date', async () => {
+    const result = await compensatoryEventsUsecase.execute({ invoiceId: '2' });
+
+    expect(result.isRight()).toBeTruthy();
+
+    expect(sqsPublishService.messages.length).toBe(0);
+  });
+
+  it('should send 2 events if the invoice with provided id is active with issued date and acceptance date', async () => {
+    const result = await compensatoryEventsUsecase.execute({ invoiceId: '3' });
+
+    expect(result.isRight()).toBeTruthy();
+
+    expect(sqsPublishService.messages.length).toBe(2);
+    expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
+    expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
+
+    expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
+    expect(sqsPublishService.messages[1].timestamp).toContain('2019-11-01');
+  });
+
+  it('should send 1 event if the invoice with provided id is pending', async () => {
+    const result = await compensatoryEventsUsecase.execute({ invoiceId: '4' });
+
+    expect(result.isRight()).toBeTruthy();
+
+    expect(sqsPublishService.messages.length).toBe(1);
+    expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
+    expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
+  });
+
+  it('should send 1 event if the invoice with provided id is draft with acceptance date', async () => {
+    const result = await compensatoryEventsUsecase.execute({ invoiceId: '5' });
+
+    expect(result.isRight()).toBeTruthy();
+
+    expect(sqsPublishService.messages.length).toBe(1);
+    expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
+    expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
+  });
 });
 
 function addInvoices(invoicesRepo: MockInvoiceRepo) {
@@ -183,6 +224,13 @@ function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
       type: 'APC',
       dateCreated: new Date(),
       id: '4'
+    },
+    {
+      invoiceId: InvoiceId.create(new UniqueEntityID('5')).getValue(),
+      manuscriptId: ManuscriptId.create(new UniqueEntityID('5')).getValue(),
+      type: 'APC',
+      dateCreated: new Date(),
+      id: '5'
     }
   ];
 
@@ -228,6 +276,14 @@ function addManuscripts(manuscriptRepo: MockArticleRepo) {
       articleType: '4',
       created: new Date(),
       id: '4'
+    },
+    {
+      journalId: '5',
+      customId: '5',
+      title: 'Test 5',
+      articleType: '5',
+      created: new Date(),
+      id: '5'
     }
   ];
 

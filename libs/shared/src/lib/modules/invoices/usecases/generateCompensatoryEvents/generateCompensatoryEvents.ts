@@ -260,9 +260,10 @@ export class GenerateCompensatoryEventsUsecase
       .map(data => {
         const invoice = data.invoice;
         if (
+          invoice.status === InvoiceStatus.PENDING ||
+          invoice.status === InvoiceStatus.DRAFT ||
           !invoice.dateAccepted ||
-          !invoice.dateIssued ||
-          invoice.status === InvoiceStatus.DRAFT
+          !invoice.dateIssued
         ) {
           return null;
         }
@@ -277,7 +278,6 @@ export class GenerateCompensatoryEventsUsecase
           return right<null, null>(null);
         }
 
-        console.log('before invoiceConfirm');
         try {
           const result = await publishUsecase.execute(
             data.invoice,
@@ -287,7 +287,6 @@ export class GenerateCompensatoryEventsUsecase
             data.address,
             data.invoice.dateIssued
           );
-          console.log('after invoice confirmed');
           return right<GenericError, void>(result);
         } catch (err) {
           return left<GenericError, void>(new GenericError(err));
@@ -337,7 +336,6 @@ export class GenerateCompensatoryEventsUsecase
         if (!data.paymentInfo) {
           paymentDate = invoice.dateIssued;
         } else {
-          console.info(data.paymentInfo);
           paymentDate = new Date(data.paymentInfo.paymentDate);
         }
 
@@ -351,8 +349,6 @@ export class GenerateCompensatoryEventsUsecase
         }
 
         try {
-          console.log('before invoice payed');
-          console.info(data.paymentDate);
           const result = await publishUsecase.execute(
             data.invoice,
             data.invoiceItems,
@@ -360,7 +356,6 @@ export class GenerateCompensatoryEventsUsecase
             data.paymentInfo,
             data.paymentDate
           );
-          console.log('after invoice payed');
           return right<GenericError, void>(result);
         } catch (err) {
           return left<GenericError, void>(new GenericError(err));
