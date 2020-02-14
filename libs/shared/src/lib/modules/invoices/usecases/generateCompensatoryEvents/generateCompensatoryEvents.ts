@@ -177,14 +177,13 @@ export class GenerateCompensatoryEventsUsecase
         );
         return maybeItems.map(invoiceItems => ({ invoice, invoiceItems }));
       })
-      .then(async ({ invoice, invoiceItems }) => {
+      .then(async data => {
         const maybeManuscript = await this.getManuscriptByInvoiceId(
-          invoice.invoiceId
+          data.invoice.invoiceId
         );
         return maybeManuscript.map(manuscripts => ({
           manuscript: manuscripts[0],
-          invoice,
-          invoiceItems
+          ...data
         }));
       })
       .map(data => {
