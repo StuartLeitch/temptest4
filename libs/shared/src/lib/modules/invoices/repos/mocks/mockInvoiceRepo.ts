@@ -8,6 +8,7 @@ import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
+import { id } from 'date-fns/locale';
 
 export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   implements InvoiceRepoContract {
@@ -136,5 +137,15 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
 
   public compareMockItems(a: Invoice, b: Invoice): boolean {
     return a.id.equals(b.id);
+  }
+
+  public async getInvoicesIds(
+    ids: string[],
+    journalIds: string[],
+    page: number
+  ): Promise<string[]> {
+    return this._items
+      .filter(item => ids.includes(item.id.toString()))
+      .map(item => item.id.toString());
   }
 }

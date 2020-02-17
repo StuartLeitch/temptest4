@@ -255,4 +255,33 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     return this.getInvoiceById(invoice.invoiceId);
   }
+
+  async getInvoicesIds(
+    ids: string[],
+    journalIds: string[],
+    page: number
+  ): Promise<string[]> {
+    const { db } = this;
+    const pageSize = 20;
+
+    let aa = db(`${TABLES.INVOICES} as i`)
+      .join(`${TABLES.INVOICE_ITEMS} as ii`, 'i.id', 'ii.invoiceId')
+      .join(`${TABLES.ARTICLES} as a`, 'a.id', 'ii.manuscriptId')
+      .join(`${TABLES.CATALOG} as c`, 'c.id', 'a.journalId')
+      .select('ii.invoiceId');
+    if (ids.length) {
+      aa = aa.whereIn('ii.invoiceId', ids);
+    }
+
+    if (journalIds.length) {
+      aa = aa.whereIn('c.id', journalIds);
+    }
+
+    aa = aa
+      .where('i.deleted', 0)
+      .offset(page * pageSize)
+      .limit(pageSize);
+
+    return (await aa).map(item => item.invoiceId);
+  }
 }
