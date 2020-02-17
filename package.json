@@ -36,7 +36,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
     "@hindawi/phenom-events": "^1.0.3",
-    "@hindawi/queue-service": "^1.2.2",
+    "@hindawi/queue-service": "^1.2.3",
     "@owczar/dashboard-style--airframe": "^0.1.23",
     "@paypal/checkout-server-sdk": "^1.0.2",
     "@pubsweet/component-email-templating": "0.2.10",
