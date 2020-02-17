@@ -48,7 +48,7 @@ export class SaveEventsUsecase
           const persistenceEvents = mapping.events.map(raw => {
             return EventMap.toDomain({
               id: raw.id,
-              time: new Date(),
+              time: raw.timestamp,
               type: raw.event,
               payload: JSON.stringify(raw.data)
             });
