@@ -86,9 +86,10 @@ export class S3EventProducer implements Producer<Event, string> {
       yield* keys.filter(this.checkSelectors.bind(this));
 
       if (!isTruncated) {
-        lastKey = keys[keys.length - 1];
         break;
       }
+
+      lastKey = keys[keys.length - 1];
     }
   }
 
