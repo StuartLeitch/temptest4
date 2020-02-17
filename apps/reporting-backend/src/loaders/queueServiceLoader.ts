@@ -14,6 +14,7 @@ import {
 } from 'libs/shared/src/lib/modules/reporting/policies';
 import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
 import { BatchUtils } from 'libs/shared/src/lib/utils/Batch';
+import { EventDTO } from 'libs/shared/src/lib/modules/reporting/domain/EventDTO';
 
 import { env } from '../env';
 import { Logger } from '../lib/logger';
@@ -39,7 +40,18 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     serviceName: env.app.name
   };
 
-  const sqs = new AWS.SQS(config);
+  const s3 = new AWS.S3({
+    endpoint: process.env.AWS_S3_ENDPOINT,
+    secretAccessKey: config.secretAccessKey,
+    accessKeyId: config.accessKeyId
+  });
+
+  const sqs = new AWS.SQS({
+    accessKeyId: config.accessKeyId,
+    secretAccessKey: config.secretAccessKey,
+    endpoint: config.sqsEndpoint,
+    region: config.region
+  });
 
   let { QueueUrl } = await sqs
     .getQueueUrl({ QueueName: config.queueName })
@@ -59,9 +71,66 @@ export const queueServiceLoader: MicroframeworkLoader = async (
 
   const handler = BatchUtils.withTimeout<AWS.SQS.Message>(
     async (events: AWS.SQS.Message[]) => {
-      let filteredEvents = events
-        .map(parseEvent)
-        .filter(e => !!e && e.event && e.id && e.data);
+      let processedEvents: EventDTO[] = [];
+
+      for (const event of events) {
+        const { MessageId, Body } = event;
+        let id = null;
+
+        let isLongEvent = false;
+        let parsedEvent = null;
+
+        try {
+          const body = JSON.parse(Body);
+          id = body.MessageId;
+          isLongEvent =
+            body?.MessageAttributes?.PhenomMessageTooLarge?.Value === 'Y';
+          parsedEvent = JSON.parse(body.Message);
+        } catch (error) {
+          logger.error('Failed to parse event: ' + MessageId);
+          continue;
+        }
+
+        if (isLongEvent) {
+          try {
+            const [Bucket, Key] = parsedEvent.data.split('::');
+            parsedEvent.data = JSON.parse(
+              await s3
+                .getObject({ Bucket, Key })
+                .promise()
+                .then(result => result.Body.toString())
+            );
+          } catch (error) {
+            logger.error(error);
+            logger.error(
+              'Failed to get event from s3 ' +
+                JSON.stringify({
+                  MessageId,
+                  parsedEvent
+                })
+            );
+            continue;
+          }
+        }
+
+        try {
+          processedEvents.push({
+            id,
+            data: parsedEvent.data,
+            event: parsedEvent.event.split(':').pop(),
+            timestamp: parsedEvent.timestamp
+              ? new Date(parsedEvent.timestamp)
+              : new Date()
+          });
+        } catch (error) {
+          logger.error(`Payload not correct for ${MessageId} `);
+          logger.error(error);
+        }
+      }
+
+      let filteredEvents = processedEvents.filter(
+        e => !!e && e.event && e.id && e.data
+      );
       if (events.length !== filteredEvents.length) {
         logger.info(
           'Filtered ' + (events.length - filteredEvents.length) + ' events'
@@ -82,6 +151,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     env.app.batchSize,
     env.app.batchTimeout
   );
+
   const sqsConsumer = Consumer.create({
     sqs,
     queueUrl: QueueUrl,
