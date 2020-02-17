@@ -22,7 +22,7 @@ export const confirmInvoice: ASTNode = gql`
 `;
 
 export const applyCoupon: ASTNode = gql`
-  mutation applyCoupon($invoiceId: String, $couponCode: String) {
+  mutation applyCoupon($invoiceId: ID, $couponCode: String) {
     applyCoupon(invoiceId: $invoiceId, couponCode: $couponCode) {
       ...couponFragment
     }

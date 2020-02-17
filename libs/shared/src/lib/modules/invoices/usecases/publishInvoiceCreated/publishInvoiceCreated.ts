@@ -90,7 +90,7 @@ export class PublishInvoiceCreatedUsecase
     payload: InvoiceCreatedMessagePayload
   ): InvoiceCreatedMessage {
     return {
-      timestamp: timestamp.toISOString(),
+      timestamp: timestamp?.toISOString(),
       event: 'InvoiceCreated',
       data: payload
     };

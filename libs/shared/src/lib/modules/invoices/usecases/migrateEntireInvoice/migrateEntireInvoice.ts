@@ -464,7 +464,7 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
-  private async getInvoiceItemsByInvoiceId(invoiceId: InvoiceId): any {
+  private async getInvoiceItemsByInvoiceId(invoiceId: InvoiceId) {
     try {
       const items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
       return right<AppError.UnexpectedError, InvoiceItem[]>(items);

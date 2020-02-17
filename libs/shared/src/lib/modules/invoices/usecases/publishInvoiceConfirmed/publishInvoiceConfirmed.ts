@@ -72,7 +72,7 @@ export class PublishInvoiceConfirmed {
 
     try {
       await this.publishService.publishMessage({
-        timestamp: messageTimestamp.toISOString(),
+        timestamp: messageTimestamp?.toISOString(),
         event: INVOICE_CONFIRMED,
         data
       });

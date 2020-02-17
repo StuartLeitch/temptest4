@@ -3,7 +3,7 @@ import { ASTNode } from "graphql";
 
 export const creditCardPayment: ASTNode = gql`
   mutation creditCardPayment(
-    $invoiceId: String!
+    $invoiceId: ID!
     $payerId: String!
     $paymentMethodId: String!
     $paymentMethodNonce: String!
@@ -24,7 +24,7 @@ export const creditCardPayment: ASTNode = gql`
 export const recordPayPalPayment: ASTNode = gql`
   mutation recordPayPalPayment(
     $paymentMethodId: String!
-    $invoiceId: String!
+    $invoiceId: ID!
     $payerId: String!
     $orderId: String!
   ) {

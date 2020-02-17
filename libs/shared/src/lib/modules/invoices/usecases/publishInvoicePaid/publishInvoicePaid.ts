@@ -65,7 +65,7 @@ export class PublishInvoicePaid {
 
     try {
       await this.publishService.publishMessage({
-        timestamp: messageTimestamp.toISOString(),
+        timestamp: messageTimestamp?.toISOString(),
         event: INVOICE_PAID_EVENT,
         data
       });

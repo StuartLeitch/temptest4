@@ -29,7 +29,8 @@ export const queueServiceLoader: MicroframeworkLoader = async (
       queueName: env.aws.sqs.queueName,
       eventNamespace: env.app.eventNamespace,
       publisherName: env.app.publisherName,
-      serviceName: env.app.name
+      serviceName: env.app.name,
+      bucketName: env.aws.s3.largeEventBucket
     };
 
     let queue: any;

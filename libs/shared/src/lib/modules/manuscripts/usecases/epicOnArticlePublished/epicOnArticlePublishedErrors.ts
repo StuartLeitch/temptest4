@@ -2,35 +2,35 @@ import { UseCaseError } from '../../../../core/logic/UseCaseError';
 import { Result } from '../../../../core/logic/Result';
 
 export type AllEpicOnArticlePublishedErrors =
-  | MigrateEntireInvoiceErrors.MigrationPaymentMethodNotFound
-  | MigrateEntireInvoiceErrors.StateIsRequiredForUnitedStates
-  | MigrateEntireInvoiceErrors.AddressLine1Required
-  | MigrateEntireInvoiceErrors.ManuscriptIdRequired
-  | MigrateEntireInvoiceErrors.PayerAddressRequired
-  | MigrateEntireInvoiceErrors.CountryCodeRequired
-  | MigrateEntireInvoiceErrors.IncorrectPayerType
-  | MigrateEntireInvoiceErrors.ManuscriptNotFound
-  | MigrateEntireInvoiceErrors.PostalCodeRequired
-  | MigrateEntireInvoiceErrors.InvoiceIdRequired
-  | MigrateEntireInvoiceErrors.InvoiceSaveFailed
-  | MigrateEntireInvoiceErrors.PayerNameRequired
-  | MigrateEntireInvoiceErrors.PayerTypeRequired
-  | MigrateEntireInvoiceErrors.TransactionError
-  | MigrateEntireInvoiceErrors.CityRequired
-  | MigrateEntireInvoiceErrors.ApcRequired;
+  | EpicOnArticlePublishedErrors.MigrationPaymentMethodNotFound
+  | EpicOnArticlePublishedErrors.StateIsRequiredForUnitedStates
+  | EpicOnArticlePublishedErrors.AddressLine1Required
+  | EpicOnArticlePublishedErrors.ManuscriptIdRequired
+  | EpicOnArticlePublishedErrors.PayerAddressRequired
+  | EpicOnArticlePublishedErrors.CountryCodeRequired
+  | EpicOnArticlePublishedErrors.IncorrectPayerType
+  | EpicOnArticlePublishedErrors.ManuscriptNotFound
+  | EpicOnArticlePublishedErrors.PostalCodeRequired
+  | EpicOnArticlePublishedErrors.InvoiceIdRequired
+  | EpicOnArticlePublishedErrors.InvoiceSaveFailed
+  | EpicOnArticlePublishedErrors.PayerNameRequired
+  | EpicOnArticlePublishedErrors.PayerTypeRequired
+  | EpicOnArticlePublishedErrors.TransactionError
+  | EpicOnArticlePublishedErrors.CityRequired
+  | EpicOnArticlePublishedErrors.ApcRequired;
 
 export type PayerAddressErrors =
-  | MigrateEntireInvoiceErrors.StateIsRequiredForUnitedStates
-  | MigrateEntireInvoiceErrors.AddressLine1Required
-  | MigrateEntireInvoiceErrors.PayerAddressRequired
-  | MigrateEntireInvoiceErrors.CountryCodeRequired
-  | MigrateEntireInvoiceErrors.PostalCodeRequired
-  | MigrateEntireInvoiceErrors.CityRequired;
+  | EpicOnArticlePublishedErrors.StateIsRequiredForUnitedStates
+  | EpicOnArticlePublishedErrors.AddressLine1Required
+  | EpicOnArticlePublishedErrors.PayerAddressRequired
+  | EpicOnArticlePublishedErrors.CountryCodeRequired
+  | EpicOnArticlePublishedErrors.PostalCodeRequired
+  | EpicOnArticlePublishedErrors.CityRequired;
 
 export type ApcErrors =
-  | MigrateEntireInvoiceErrors.ManuscriptIdRequired
-  | MigrateEntireInvoiceErrors.ManuscriptNotFound
-  | MigrateEntireInvoiceErrors.ApcRequired;
+  | EpicOnArticlePublishedErrors.ManuscriptIdRequired
+  | EpicOnArticlePublishedErrors.ManuscriptNotFound
+  | EpicOnArticlePublishedErrors.ApcRequired;
 
 export namespace EpicOnArticlePublishedErrors {
   export class ManuscriptIdRequired extends Result<UseCaseError> {

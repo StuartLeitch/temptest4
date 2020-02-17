@@ -105,6 +105,9 @@ export const env = {
     sqs: {
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
       endpoint: getOsEnv('AWS_SQS_ENDPOINT')
+    },
+    s3: {
+      largeEventBucket: getOsEnv('PHENOM_LARGE_EVENTS_BUCKET')
     }
   },
   braintree: {

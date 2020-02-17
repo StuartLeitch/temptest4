@@ -31,7 +31,7 @@ export const getInvoices: ASTNode = gql`
 
 export const getInvoiceVat: ASTNode = gql`
   query invoiceWithVat(
-    $invoiceId: String
+    $invoiceId: ID
     $country: String
     $payerType: String
     $state: String
