@@ -145,7 +145,7 @@ export class PublishInvoiceToErpUsecase
         invoice,
         items: invoiceItems,
         payer,
-        article: manuscript,
+        article: manuscript as any,
         billingAddress: address,
         journalName: catalog.journalTitle,
         vatNote,

@@ -52,7 +52,7 @@ export class GetArticleDetailsUsecase
 
     try {
       try {
-        article = await this.articleRepo.findById(manuscriptId);
+        article = (await this.articleRepo.findById(manuscriptId)) as any;
       } catch (e) {
         return left(
           new GetArticleDetailsErrors.ArticleNotFoundError(
