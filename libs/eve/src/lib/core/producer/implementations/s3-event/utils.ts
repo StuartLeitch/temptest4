@@ -2,7 +2,13 @@ import { Event } from '../../../../modules/event';
 
 function extractEventData(serializedEvent: string): Event | null {
   try {
-    return JSON.parse(serializedEvent.trim());
+    const partial = JSON.parse(serializedEvent.trim());
+    const message: Event = {
+      MessageAttributes: partial.messageAttributes,
+      MessageId: partial.messageId,
+      Message: partial.body
+    };
+    return message;
   } catch (e) {
     console.error(
       '[AWS] Object data cannot be JSON deserialized:',
