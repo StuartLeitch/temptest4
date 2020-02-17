@@ -431,7 +431,8 @@
             "main": "libs/eve/src/index.ts",
             "tsConfig": "libs/eve/tsconfig.lib.json",
             "outputPath": "dist/libs/eve",
-            "packageJson": "libs/eve/package.json"
+            "packageJson": "libs/eve/package.json",
+            "assets": ["libs/eve/README.md"]
           }
         }
       }
