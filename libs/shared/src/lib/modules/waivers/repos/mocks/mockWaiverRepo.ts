@@ -9,6 +9,10 @@ import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
 
 export class MockWaiverRepo extends BaseMockRepo<Waiver>
   implements WaiverRepoContract {
+  private invoiceItemToWaiverMapper: {
+    [key: string]: string[];
+  } = {};
+
   constructor() {
     super();
   }
@@ -31,20 +35,35 @@ export class MockWaiverRepo extends BaseMockRepo<Waiver>
     return match ? match : null;
   }
 
+  public addMockWaiverForInvoiceItem(
+    newWaiver: Waiver,
+    invoiceItemId: InvoiceItemId
+  ) {
+    const invoiceIdValue = invoiceItemId.id.toString();
+    if (!this.invoiceItemToWaiverMapper[invoiceIdValue]) {
+      this.invoiceItemToWaiverMapper[invoiceIdValue] = [];
+    }
+
+    this.invoiceItemToWaiverMapper[invoiceIdValue].push(
+      newWaiver.id.toString()
+    );
+    this._items.push(newWaiver);
+  }
+
   public async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
-    // const matches = this._items.filter(w => w.invoiceId.equals(invoiceId));
-    // if (matches.length !== 0) {
-    //   return matches;
-    // } else {
-    //   return null;
-    // }
     return [];
   }
 
   public async getWaiversByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Waiver[]> {
-    return [];
+    const waiverIds = this.invoiceItemToWaiverMapper[
+      invoiceItemId.id.toString()
+    ];
+    if (!waiverIds) {
+      return [];
+    }
+    return this._items.filter(item => waiverIds.includes(item.id.toString()));
   }
 
   public async attachWaiversToInvoice(

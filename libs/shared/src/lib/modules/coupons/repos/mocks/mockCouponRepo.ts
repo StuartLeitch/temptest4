@@ -8,6 +8,10 @@ import { Coupon } from '../../domain/Coupon';
 
 export class MockCouponRepo extends BaseMockRepo<Coupon>
   implements CouponRepoContract {
+  private invoiceItemToCouponMapper: {
+    [key: string]: string[];
+  } = {};
+
   constructor() {
     super();
   }
@@ -16,10 +20,26 @@ export class MockCouponRepo extends BaseMockRepo<Coupon>
     return this._items;
   }
 
+  addMockCouponToInvoiceItem(coupon: Coupon, invoiceItemId: InvoiceItemId) {
+    const invoiceIdValue = invoiceItemId.id.toString();
+    if (!this.invoiceItemToCouponMapper[invoiceIdValue]) {
+      this.invoiceItemToCouponMapper[invoiceIdValue] = [];
+    }
+
+    this.invoiceItemToCouponMapper[invoiceIdValue].push(coupon.id.toString());
+    this._items.push(coupon);
+  }
+
   async getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Coupon[]> {
-    return [];
+    const couponIds = this.invoiceItemToCouponMapper[
+      invoiceItemId.id.toString()
+    ];
+    if (!couponIds) {
+      return [];
+    }
+    return this._items.filter(item => couponIds.includes(item.id.toString()));
   }
 
   async getCouponById(couponId: CouponId): Promise<Coupon> {

@@ -76,6 +76,7 @@ export * from './modules/invoices/mappers/InvoiceMap';
 export * from './modules/invoices/mappers/InvoiceItemMap';
 
 export * from './modules/invoices/usecases/migrateEntireInvoice/';
+export * from './modules/invoices/usecases/generateCompensatoryEvents';
 
 // export {
 //   PoliciesRegister as InvoicePoliciesRegister

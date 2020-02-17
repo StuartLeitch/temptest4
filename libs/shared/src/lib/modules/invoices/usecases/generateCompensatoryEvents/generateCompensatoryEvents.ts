@@ -137,13 +137,6 @@ export class GenerateCompensatoryEventsUsecase
   private async getPayerForInvoiceId(invoiceId: InvoiceId) {
     try {
       const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-      // if (!payer) {
-      //   return left<GenericError, Payer>(
-      //     new GenericError({
-      //       message: `No payer found for invoice with id {${invoiceId.id.toString()}}`
-      //     })
-      //   );
-      // }
       return right<GenericError, Payer>(payer);
     } catch (err) {
       return left<GenericError, Payer>(new GenericError(err));
@@ -305,14 +298,17 @@ export class GenerateCompensatoryEventsUsecase
         const maybeItems = await this.getInvoiceItemsForInvoiceId(
           invoice.invoiceId
         );
-        return maybeItems.map(invoiceItems => ({ invoice, invoiceItems }));
+        return maybeItems.map(invoiceItems => {
+          invoiceItems.forEach(item => invoice.addInvoiceItem(item));
+          return invoice;
+        });
       })
-      .then(async data => {
+      .then(async invoice => {
         const maybeManuscript = await this.getManuscriptByInvoiceId(
-          data.invoice.invoiceId
+          invoice.invoiceId
         );
         return maybeManuscript.map(manuscripts => ({
-          ...data,
+          invoice,
           manuscript: manuscripts[0]
         }));
       })
@@ -350,7 +346,7 @@ export class GenerateCompensatoryEventsUsecase
         try {
           const result = await publishUsecase.execute(
             data.invoice,
-            data.invoiceItems,
+            data.invoice.invoiceItems.currentItems,
             data.manuscript,
             data.paymentInfo,
             data.paymentDate

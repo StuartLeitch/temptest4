@@ -272,6 +272,10 @@ export type MutationMigrateEntireInvoiceArgs = {
   token: Scalars['String']
 };
 
+export type MutationGenerateCompensatoryEventsArgs = {
+  invoiceIds?: Maybe<Array<Scalars['String']>>,
+  journalIds?: Maybe<Array<Scalars['String']>>
+};
 
 export type PaginatedInvoices = {
    __typename?: 'PaginatedInvoices',
@@ -657,6 +661,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
   migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token'>>,
+  generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, MutationGenerateCompensatoryEventsArgs>,
 };
 
 export interface NameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Name'], any> {

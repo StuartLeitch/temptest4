@@ -81,7 +81,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
       country: '',
       vatRegistrationNumber: '',
       foreignPaymentId: '',
-      amount: invoice.charge,
+      amount: null,
       paymentDate: invoice.props.dateUpdated?.toISOString(),
       paymentType: ''
     };

@@ -292,4 +292,5 @@ type Mutation {
     apc: MigrateAPC!
     token: String!
   ): String
+  generateCompensatoryEvents(invoiceIds: [String], journalIds: [String]): String
 }
