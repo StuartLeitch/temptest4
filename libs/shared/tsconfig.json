@@ -40,6 +40,7 @@
     "src/lib/infrastructure/database/knex/migrations/20191216172738_create_invoice_items_to_coupons_table.js",
     "src/lib/infrastructure/database/knex/migrations/20191218133638_add_state_to_addresses.js",
     "src/lib/infrastructure/database/knex/migrations/20200109094913_update_waiver_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20200213134454_add_publisheddate_to_articles.js"
+    "src/lib/infrastructure/database/knex/migrations/20200213134454_add_publisheddate_to_articles.js",
+    "src/lib/infrastructure/database/knex/migrations/20200218140825_change_filed_lengh.js"
   ]
 }
