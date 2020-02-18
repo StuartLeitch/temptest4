@@ -267,7 +267,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     let aa = db(`${TABLES.INVOICES} as i`)
       .join(`${TABLES.INVOICE_ITEMS} as ii`, 'i.id', 'ii.invoiceId')
       .join(`${TABLES.ARTICLES} as a`, 'a.id', 'ii.manuscriptId')
-      .join(`${TABLES.CATALOG} as c`, 'c.id', 'a.journalId')
+      .join(`${TABLES.CATALOG} as c`, 'c.journalId', 'a.journalId')
       .select('ii.invoiceId');
     if (ids.length) {
       aa = aa.whereIn('ii.invoiceId', ids);
