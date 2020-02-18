@@ -10,6 +10,7 @@ class SubmissionDataView extends AbstractEventView
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT se.id as event_id,
+    se.time as event_timestamp,
     se.type AS submission_event,
     se.payload ->> 'submissionId'::text AS submission_id,
     ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'customId'::text AS manuscript_custom_id,

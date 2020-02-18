@@ -11,6 +11,7 @@ class SubmissionView extends AbstractEventView implements EventViewContract {
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT 
   t.event_id,
+  t.event_timestamp,
   t.submission_id,
   t.version,
   t.manuscript_version_id,
@@ -29,9 +30,10 @@ AS SELECT
 FROM (
   SELECT
   sd.*,
-      row_number() over(partition by sd.manuscript_custom_id order by updated_date desc) as rn
+      row_number() over(partition by sd.manuscript_custom_id order by event_timestamp desc) as rn
   from
     (SELECT s.event_id,
+      s.event_timestamp,
       s.submission_id,
       s.manuscript_custom_id,
       s.submission_event,
