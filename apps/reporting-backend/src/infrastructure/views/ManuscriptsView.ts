@@ -18,6 +18,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT 
   s.*,
   last_sd.submission_event as last_event_type,
+  last_sd.event_timestamp as last_event_date,
   sd.event_timestamp as final_decision_date,
   sd.submission_event as final_decision_type,
   case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as accepted_date,
@@ -55,6 +56,10 @@ WITH DATA;
     `create index on ${this.getViewName()} (submission_date)`,
     `create index on ${this.getViewName()} (updated_date)`,
     `create index on ${this.getViewName()} (article_type)`,
+    `create index on ${this.getViewName()} (triage_editor_email)`,
+    `create index on ${this.getViewName()} (handling_editor_email)`,
+    `create index on ${this.getViewName()} (editorial_assistant_email)`,
+    `create index on ${this.getViewName()} (version)`,
     `create index on ${this.getViewName()} (journal_id)`
   ];
 
