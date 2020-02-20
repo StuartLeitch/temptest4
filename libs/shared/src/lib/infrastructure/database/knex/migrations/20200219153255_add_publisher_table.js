@@ -1,7 +1,11 @@
+const uuid = require('uuid/v4');
+
 module.exports.up = async function(knex) {
   await knex.schema.createTable('publishers', table => {
     table.string('id', 40).primary();
     table.string('name');
+    table.dateTime('dateCreated', { precision: 2, useTz: false });
+    table.dateTime('dateUpdated', { precision: 2, useTz: false });
     table.unique('name');
   });
 
@@ -13,75 +17,83 @@ module.exports.up = async function(knex) {
     table.primary(['name', 'publisherId']);
   });
 
+  const now = new Date();
+  const hindawiId = uuid();
+  const wileyId = uuid();
+
   await knex('publishers').insert([
     {
-      id: '1',
-      name: 'Hindawi'
+      dateCreated: now,
+      dateUpdated: now,
+      name: 'Hindawi',
+      id: hindawiId
     },
     {
-      id: '2',
-      name: 'Wiley'
+      dateCreated: now,
+      dateUpdated: now,
+      name: 'Wiley',
+      id: wileyId
     }
   ]);
 
   await knex.schema.table('catalog', table => {
     table
       .string('publisherId', 40)
-      .defaultTo(1)
+      .defaultTo(hindawiId)
       .notNullable();
     table.foreign('publisherId').references('publishers.id');
   });
 
   await knex('publisher_custom_values').insert([
     {
-      name: 's2cor__Sage_ACC_Journal__c.s2cor__Reference__c',
-      publisherId: '1',
-      value: 'Wiley-Hindawi APC Recognition for article'
-    },
-    {
-      name: 's2cor__Sage_ACC_Journal__c.s2cor__Reference__c',
-      publisherId: '2',
+      name: 'journalItemReference',
+      publisherId: hindawiId,
       value: 'Hindawi APC Recognition for article'
     },
     {
-      name: 's2cor__Sage_ACC_Journal_Item__c.s2cor__Reference__c',
-      publisherId: '1',
-      value: 'Hindawi APC Recognition for article'
-    },
-    {
-      name: 's2cor__Sage_ACC_Journal_Item__c.s2cor__Reference__c',
-      publisherId: '2',
+      name: 'journalItemReference',
+      publisherId: wileyId,
       value: 'Wiley-Hindawi APC Recognition for article'
     },
     {
-      name: 's2cor__Sage_ACC_Journal_Tag__c.s2cor__Tag__c',
-      publisherId: '1',
-      value: 'a5L0Y000000g0EeUAI'
-    },
-    {
-      name: 's2cor__Sage_ACC_Journal_Tag__c.s2cor__Tag__c',
-      publisherId: '2',
-      value: 'a5L0Y000000g0TMUAY'
-    },
-    {
-      name: 's2cor__Sage_ACC_Journal_Item_Tag__c.s2cor__Tag__c',
-      publisherId: '1',
-      value: 'a5L0Y000000PFE7UAO'
-    },
-    {
-      name: 's2cor__Sage_ACC_Journal_Item_Tag__c.s2cor__Tag__c',
-      publisherId: '2',
-      value: 'a5L0Y000000fzUOUAY'
-    },
-    {
-      name: 'S2cor__Sage_INV_Trade_Document_Item__c.s2cor__Product__c',
-      publisherId: '1',
+      name: 'tradeDocumentItem',
+      publisherId: hindawiId,
       value: '01t0Y000002BuB9QAK'
     },
     {
-      name: 'S2cor__Sage_INV_Trade_Document_Item__c.s2cor__Product__c',
-      publisherId: '2',
+      name: 'tradeDocumentItem',
+      publisherId: wileyId,
       value: '01t0Y000002BkzAQAS'
+    },
+    {
+      name: 'journalReference',
+      publisherId: hindawiId,
+      value: 'Wiley-Hindawi APC Recognition for article'
+    },
+    {
+      name: 'journalReference',
+      publisherId: wileyId,
+      value: 'Hindawi APC Recognition for article'
+    },
+    {
+      name: 'journalItemTag',
+      publisherId: hindawiId,
+      value: 'a5L0Y000000PFE7UAO'
+    },
+    {
+      name: 'journalItemTag',
+      publisherId: wileyId,
+      value: 'a5L0Y000000fzUOUAY'
+    },
+    {
+      name: 'journalTag',
+      publisherId: hindawiId,
+      value: 'a5L0Y000000g0EeUAI'
+    },
+    {
+      name: 'journalTag',
+      publisherId: wileyId,
+      value: 'a5L0Y000000g0TMUAY'
     }
   ]);
 };
