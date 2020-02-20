@@ -10,8 +10,8 @@ class ManuscriptReviewersView extends AbstractEventView
   getCreateQuery(): string {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS SELECT
-  se.manuscript_custom_id as "manuscript_custom_id",
+AS select se.manuscript_custom_id as "manuscript_custom_id",
+  manuscripts->>'version' as "version",
   reviewer_view.email as "email",
   reviewer_view.responded::timestamp as "responded_date",
   reviewer_view.status as "status",
@@ -22,35 +22,29 @@ AS SELECT
   reviewer_view."surname" as "surname",
   reviewer_view.created::timestamp as "created_date",
   reviewer_view.updated::timestamp as "updated_date",
-  event_id
-  FROM(
-    SELECT
-      s.last_version_index,
-      se.payload,
-      s.event_id,
-      s.manuscript_custom_id
-    FROM
-      ${REPORTING_TABLES.SUBMISSION} se
-    JOIN ${submissionView.getViewName()} s on
-      s.event_id = se.id) se,
-    jsonb_to_recordset(((se.payload -> 'manuscripts') -> se.last_version_index) -> 'reviewers') as reviewer_view(
-      email text,
-      country text,
-      "userId" text,
-      "givenNames" text,
-      surname text,
-      aff text,
-      created text,
-      updated text,
-      responded text,
-      status text
-    )
+  event_id from (select  s.*, se.payload
+from ${REPORTING_TABLES.SUBMISSION} se	
+  join ${submissionView.getViewName()} s on se.id = s.event_id) se,
+  jsonb_array_elements(se.payload->'manuscripts') manuscripts,
+  jsonb_to_recordset(manuscripts->'reviewers') as reviewer_view(
+    email text,
+    country text,
+    "userId" text,
+    "givenNames" text,
+    surname text,
+    aff text,
+    created text,
+    updated text,
+    responded text,
+    status text
+  ) 
 WITH DATA;
 `;
   }
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (version)`,
     `create index on ${this.getViewName()} (responded_date)`,
     `create index on ${this.getViewName()} (created_date)`,
     `create index on ${this.getViewName()} (status)`,

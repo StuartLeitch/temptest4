@@ -52,6 +52,7 @@ FROM (
       FROM ${submissionDataView.getViewName()} s
       LEFT JOIN ${uniqueJournalsView.getViewName()} j ON s.journal_id = j.journal_id
       WHERE s.manuscript_custom_id is not null
+      AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
     ) sd
 ) t
 WHERE t.rn = 1
