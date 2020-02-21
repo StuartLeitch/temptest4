@@ -7,4 +7,5 @@ import { Publisher } from '../domain/Publisher';
 export interface PublisherRepoContract extends Repo<Publisher> {
   getCustomValuesByPublisherId(id: PublisherId): Promise<PublisherCustomValues>;
   getPublisherById(id: PublisherId): Promise<Publisher>;
+  publisherWithIdExists(id: PublisherId): Promise<boolean>;
 }

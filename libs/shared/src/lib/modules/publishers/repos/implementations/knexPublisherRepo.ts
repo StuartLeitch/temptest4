@@ -63,6 +63,18 @@ export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
     return PublisherMap.toDomain(props);
   }
 
+  async publisherWithIdExists(id: PublisherId): Promise<boolean> {
+    try {
+      await this.getPublisherById(id);
+    } catch (e) {
+      if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
+        return false;
+      }
+      throw e;
+    }
+    return true;
+  }
+
   async exists(publisher: Publisher): Promise<boolean> {
     try {
       await this.getPublisherById(publisher.publisherId);

@@ -13,26 +13,26 @@ import {
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
 
-import { PublisherRepoContract } from '../../repos/publisherRepo';
+import { PublisherRepoContract } from '../../repos';
 
 // * Usecase specific
-import { GetPublisherCustomValuesResponse } from './getPublisherCustomValuesResponse';
-import { GetPublisherCustomValuesErrors } from './getPublisherCustomValuesErrors';
-import { GetPublisherCustomValuesDTO } from './getPublisherCustomValuesDTO';
+import { GetPublisherDetailsResponse } from './getPublisherDetailsResponse';
+import { GetPublisherDetailsErrors } from './getPublisherDetailsErrors';
+import { GetPublisherDetailsDTO } from './getPublisherDetailsDTO';
 import { PublisherId } from '../../domain/PublisherId';
 
-export type GetPublisherCustomValuesContext = AuthorizationContext<Roles>;
+export type GetPublisherDetailsContext = AuthorizationContext<Roles>;
 
-export class GetPublisherCustomValuesUsecase
+export class GetPublisherDetailsUsecase
   implements
     UseCase<
-      GetPublisherCustomValuesDTO,
-      Promise<GetPublisherCustomValuesResponse>,
-      GetPublisherCustomValuesContext
+      GetPublisherDetailsDTO,
+      Promise<GetPublisherDetailsResponse>,
+      GetPublisherDetailsContext
     >,
     AccessControlledUsecase<
-      GetPublisherCustomValuesDTO,
-      GetPublisherCustomValuesContext,
+      GetPublisherDetailsDTO,
+      GetPublisherDetailsContext,
       AccessControlContext
     > {
   constructor(private publisherRepo: PublisherRepoContract) {}
@@ -43,9 +43,9 @@ export class GetPublisherCustomValuesUsecase
 
   // @Authorize('invoice:read')
   public async execute(
-    request: GetPublisherCustomValuesDTO,
-    context?: GetPublisherCustomValuesContext
-  ): Promise<GetPublisherCustomValuesResponse> {
+    request: GetPublisherDetailsDTO,
+    context?: GetPublisherDetailsContext
+  ): Promise<GetPublisherDetailsResponse> {
     try {
       const id = PublisherId.create(
         new UniqueEntityID(request.publisherId)
@@ -54,16 +54,14 @@ export class GetPublisherCustomValuesUsecase
       const exists = await this.publisherRepo.publisherWithIdExists(id);
       if (!exists) {
         return left(
-          new GetPublisherCustomValuesErrors.PublisherNotFount(
+          new GetPublisherDetailsErrors.PublisherNotFoundError(
             request.publisherId
           )
         );
       }
 
-      const customValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        id
-      );
-      return right(Result.ok(customValues));
+      const publisher = await this.publisherRepo.getPublisherById(id);
+      return right(Result.ok(publisher));
     } catch (e) {
       return left(new AppError.UnexpectedError(e));
     }
