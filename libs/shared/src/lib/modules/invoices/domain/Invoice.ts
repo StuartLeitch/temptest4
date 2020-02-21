@@ -37,6 +37,7 @@ interface InvoiceProps {
   charge?: number;
   totalNumInvoiceItems?: number;
   erpReference?: string;
+  revenueRecognitionReference?: string;
   vatnote?: string;
 }
 
@@ -128,6 +129,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.erpReference = erpReference;
   }
 
+  get revenueRecognitionReference(): string {
+    return this.props.revenueRecognitionReference;
+  }
+
+  set revenueRecognitionReference(revenueRecognitionReference: string) {
+    this.props.revenueRecognitionReference = revenueRecognitionReference;
+  }
+
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
     if (this.props.invoiceItems.exists(invoiceItem)) {
       this.props.invoiceItems.remove(invoiceItem);
@@ -153,6 +162,9 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   ): Result<Invoice> {
     const defaultValues = {
       ...props,
+      totalNumInvoiceItems: props.totalNumInvoiceItems
+        ? props.totalNumInvoiceItems
+        : 0,
       invoiceItems: props.invoiceItems
         ? props.invoiceItems
         : InvoiceItems.create([]),

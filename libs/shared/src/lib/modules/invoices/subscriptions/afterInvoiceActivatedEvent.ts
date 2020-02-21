@@ -9,7 +9,7 @@ import { ArticleRepoContract } from '../../manuscripts/repos';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
-import { VATService, PayerType } from '@hindawi/shared';
+// import { VATService, PayerType } from '@hindawi/shared';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
@@ -23,13 +23,15 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceActivated: PublishInvoiceConfirmed,
-    private invoiceToErpUsecase: PublishInvoiceToErpUsecase
+    private invoiceToErpUsecase: PublishInvoiceToErpUsecase,
+    private loggerService: any
   ) {
+    // this.loggerService.setScope('AfterInvoiceActivatedEvent');
     this.setupSubscriptions();
   }
 
   setupSubscriptions(): void {
-    // Register to the domain event
+    // * Register to the domain event
     DomainEvents.register(
       this.onPublishInvoiceActivated.bind(this),
       InvoiceActivated.name
@@ -40,10 +42,9 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     event: InvoiceActivated
   ): Promise<void> {
     const { invoice } = event;
-    console.log('sending to erp');
 
     try {
-      // todo move this to usescase
+      // TODO move this to usecase
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
@@ -90,11 +91,11 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
         address
       );
 
-      console.log(
+      this.loggerService.info(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`
       );
     } catch (err) {
-      console.log(
+      this.loggerService.info(
         `[AfterInvoiceActivated]: Failed to execute onPublishInvoiceActivated use case AfterInvoiceActivated. Err: ${err}`
       );
     }
@@ -106,12 +107,12 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
       if (resp.isLeft()) {
         throw resp.value;
       } else {
-        console.log(
+        this.loggerService.info(
           `[AfterInvoiceActivated]: Successfully executed invoiceToErpUsecase use case AfterInvoiceActivated`
         );
       }
     } catch (error) {
-      console.log(
+      this.loggerService.info(
         `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error}`
       );
     }

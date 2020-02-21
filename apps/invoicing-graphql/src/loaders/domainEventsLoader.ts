@@ -12,8 +12,13 @@ import { PublishInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules
 import { PublishInvoicePaid } from '../../../../libs/shared/src/lib/modules/invoices/usecases/PublishInvoicePaid/publishInvoicePaid';
 import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceCreated/publishInvoiceCreated';
+import { AfterManuscriptPublishedEvent } from '../../../../libs/shared/src/lib/modules/manuscripts/subscriptions/AfterManuscriptPublishedEvent';
 
 // import { env } from '../env';
+import { Logger } from '../lib/logger';
+
+// This feature is a copy from https://github.com/kadirahq/graphql-errors
+const logger = new Logger('domain:events');
 
 export const domainEventsRegisterLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -31,7 +36,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         coupon,
         waiver
       },
-      services: { erpService },
+      services: { erpService, logger: loggerService },
       qq: queue
     } = context;
 
@@ -44,7 +49,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       catalog,
-      erpService
+      erpService,
+      loggerService
     );
 
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
@@ -70,8 +76,10 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       publishInvoiceActivated,
-      publishInvoiceToErpUsecase
+      publishInvoiceToErpUsecase,
+      loggerService
     );
+
     // tslint:disable-next-line: no-unused-expression
     new AfterInvoicePaidEvent(
       invoice,
@@ -81,5 +89,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       publishInvoicePaid
     );
+
+    // tslint:disable-next-line: no-unused-expression
+    new AfterManuscriptPublishedEvent(logger, manuscript);
   }
 };

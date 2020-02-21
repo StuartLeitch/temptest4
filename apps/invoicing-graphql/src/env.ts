@@ -68,7 +68,13 @@ export const env = {
   log: {
     level: getOsEnv('LOG_LEVEL'),
     json: toBool(getOsEnvOptional('LOG_JSON')),
-    output: getOsEnv('LOG_OUTPUT')
+    output: getOsEnv('LOG_OUTPUT'),
+    cloudwatch: {
+      region: getOsEnv('LOG_CLOUDWATCH_REGION'),
+      groupName: getOsEnv('LOG_CLOUDWATCH_GROUP_NAME'),
+      accessKey: getOsEnv('LOG_CLOUDWATCH_ACCESS_KEY'),
+      secretAccessKey: getOsEnv('LOG_CLOUDWATCH_SECRET_ACCESS_KEY')
+    }
   },
   db: {
     host: getOsEnvOptional('DB_HOST'),

@@ -18,29 +18,30 @@ import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
+import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
-export interface RetryFailedErpInvoicesRequestDTO {}
-export type RetryFailedErpInvoicesResponse = Either<
+export type RetryRevenueRecognitionErpInvoicesResponse = Either<
   AppError.UnexpectedError,
   Result<ErpResponse[]>
 >;
 
-export type RetryFailedErpInvoicesContext = AuthorizationContext<Roles>;
+export type RetryRevenueRecognitionErpInvoicesContext = AuthorizationContext<
+  Roles
+>;
 
-export class RetryFailedErpInvoicesUsecase
+export class RetryRevenueRecognitionErpInvoicesUsecase
   implements
     UseCase<
-      RetryFailedErpInvoicesRequestDTO,
-      Promise<RetryFailedErpInvoicesResponse>,
-      RetryFailedErpInvoicesContext
+      {},
+      Promise<RetryRevenueRecognitionErpInvoicesResponse>,
+      RetryRevenueRecognitionErpInvoicesContext
     >,
     AccessControlledUsecase<
-      RetryFailedErpInvoicesRequestDTO,
-      RetryFailedErpInvoicesContext,
+      {},
+      RetryRevenueRecognitionErpInvoicesContext,
       AccessControlContext
     > {
-  private publishToErpUsecase: PublishInvoiceToErpUsecase;
+  private publishRevenueRecognitionToErpUsecase: PublishRevenueRecognitionToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -53,7 +54,7 @@ export class RetryFailedErpInvoicesUsecase
     private erpService: ErpServiceContract,
     private loggerService: any
   ) {
-    this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
+    this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
       this.couponRepo,
@@ -61,48 +62,52 @@ export class RetryFailedErpInvoicesUsecase
       this.payerRepo,
       this.addressRepo,
       this.manuscriptRepo,
-      this.catalogRepo,
+      // this.catalogRepo,
       this.erpService,
       this.loggerService
     );
   }
 
-  private async getAccessControlContext(request, context?) {
+  private async getAccessControlContext(request: any, context?: any) {
     return {};
   }
 
   // @Authorize('zzz:zzz')
   public async execute(
-    request?: RetryFailedErpInvoicesRequestDTO,
-    context?: RetryFailedErpInvoicesContext
-  ): Promise<RetryFailedErpInvoicesResponse> {
+    request?: any,
+    context?: RetryRevenueRecognitionErpInvoicesContext
+  ): Promise<RetryRevenueRecognitionErpInvoicesResponse> {
     try {
-      const failedErpInvoices = await this.invoiceRepo.getFailedErpInvoices();
+      const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedErpInvoices();
       const updatedInvoices: ErpResponse[] = [];
 
-      if (failedErpInvoices.length === 0) {
+      if (unrecognizedErpInvoices.length === 0) {
         this.loggerService.info('No failed erp invoices');
         return right(Result.ok<ErpResponse[]>(updatedInvoices));
       }
+
       this.loggerService.info(
-        `Retrying sync with erp for invoices: ${failedErpInvoices
-          .map(i => i.invoiceId.id.toString())
+        `Retrying recognizing in erp for invoices: ${unrecognizedErpInvoices
+          .map(i => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const failedInvoice of failedErpInvoices) {
-        const updatedInvoiceResponse = await this.publishToErpUsecase.execute({
-          invoiceId: failedInvoice.invoiceId.id.toString()
-        });
+      for (const unrecognizedInvoice of unrecognizedErpInvoices) {
+        const updatedInvoiceResponse = await this.publishRevenueRecognitionToErpUsecase.execute(
+          {
+            invoiceId: unrecognizedInvoice.id.toString()
+          }
+        );
         if (updatedInvoiceResponse.isLeft()) {
           errs.push(updatedInvoiceResponse.value.error);
         } else {
           const assignedErpReference = updatedInvoiceResponse.value.getValue();
-          console.log(
-            `Assigned successfully ${
-              assignedErpReference.tradeDocumentId
-            } to invoice ${failedInvoice.invoiceId.id.toString()}`
+
+          this.loggerService.info(
+            `Invoice ${unrecognizedInvoice.id.toString()} successfully recognized ${
+              (assignedErpReference as any).journal?.id
+            }`
           );
           updatedInvoices.push(assignedErpReference);
         }

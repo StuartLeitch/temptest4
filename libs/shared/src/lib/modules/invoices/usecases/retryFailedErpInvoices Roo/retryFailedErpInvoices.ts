@@ -3,21 +3,17 @@ import {
   Roles,
   AccessControlledUsecase,
   AccessControlContext,
+  InvoiceRepoContract,
   ErpResponse
 } from '@hindawi/shared';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { right, Result, left, Either } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
-
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
+import {
+  right,
+  Result,
+  left,
+  Either
+} from 'libs/shared/src/lib/core/logic/Result';
+import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 
 export interface RetryFailedErpInvoicesRequestDTO {}
@@ -40,32 +36,10 @@ export class RetryFailedErpInvoicesUsecase
       RetryFailedErpInvoicesContext,
       AccessControlContext
     > {
-  private publishToErpUsecase: PublishInvoiceToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract,
-    private couponRepo: CouponRepoContract,
-    private waiverRepo: WaiverRepoContract,
-    private payerRepo: PayerRepoContract,
-    private addressRepo: AddressRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
-    private catalogRepo: CatalogRepoContract,
-    private erpService: ErpServiceContract,
-    private loggerService: any
-  ) {
-    this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
-      this.invoiceRepo,
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo,
-      this.payerRepo,
-      this.addressRepo,
-      this.manuscriptRepo,
-      this.catalogRepo,
-      this.erpService,
-      this.loggerService
-    );
-  }
+    private publishToErpUsecase: PublishInvoiceToErpUsecase
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -81,10 +55,10 @@ export class RetryFailedErpInvoicesUsecase
       const updatedInvoices: ErpResponse[] = [];
 
       if (failedErpInvoices.length === 0) {
-        this.loggerService.info('No failed erp invoices');
+        console.log('No failed erp invoices');
         return right(Result.ok<ErpResponse[]>(updatedInvoices));
       }
-      this.loggerService.info(
+      console.log(
         `Retrying sync with erp for invoices: ${failedErpInvoices
           .map(i => i.invoiceId.id.toString())
           .join(', ')}`

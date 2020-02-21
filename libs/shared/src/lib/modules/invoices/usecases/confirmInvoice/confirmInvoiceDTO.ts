@@ -19,4 +19,6 @@ export interface PayerInput {
 
 export interface ConfirmInvoiceDTO {
   payer: PayerInput;
+  sanctionedCountryNotificationReceiver?: string;
+  sanctionedCountryNotificationSender?: string;
 }

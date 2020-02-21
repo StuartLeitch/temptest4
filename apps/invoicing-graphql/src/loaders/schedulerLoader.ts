@@ -2,34 +2,21 @@ import {
   MicroframeworkLoader,
   MicroframeworkSettings
 } from 'microframework-w3tec';
+import {
+  setIntervalAsync
+  // clearIntervalAsync
+} from 'set-interval-async/dynamic';
 
-import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { RetryFailedErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/retryFailedErpInvoices/retryFailedErpInvoices';
+import { RetryRevenueRecognitionErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/retryRevenueRecognizedErpInvoices/retryRevenueRecognitionErpInvoices';
 
 import { env } from '../env';
 import { Logger } from '../lib/logger';
 
-type Job = () => Promise<void>;
+const INVOICE_TO_ERP = Symbol('InvoiceToErpCronJob');
+const REVENUE_RECOGNITION_TO_ERP = Symbol('RevenueRecognitionToErpCronJob');
 
-const jobHandles = {};
-const config = {
-  failedErpTimerInMinutes: env.app.failedErpCronRetryTimeMinutes || 15
-};
 const logger = new Logger('scheduler:loader');
-
-async function registerJob(
-  job: Job,
-  jobName: string,
-  timeInMinutes: number
-): Promise<void> {
-  try {
-    await job();
-  } catch (error) {
-    // do nothing yet
-  }
-
-  jobHandles[jobName] = setInterval(job, timeInMinutes * 60 * 1000);
-}
 
 export const schedulerLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -47,11 +34,11 @@ export const schedulerLoader: MicroframeworkLoader = async (
         coupon,
         waiver
       },
-      services: { erpService }
+      services: { erpService, logger: loggerService }
     } = context;
-    const erpRetryJobName = 'InvoiceToErpCronJob';
+    const { failedErpCronRetryTimeMinutes } = env.app;
 
-    const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
+    const retryFailedErpInvoicesUsecase = new RetryFailedErpInvoicesUsecase(
       invoice,
       invoiceItem,
       coupon,
@@ -60,32 +47,67 @@ export const schedulerLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       catalog,
-      erpService
+      erpService,
+      loggerService
     );
 
-    const retryFailedErpInvoicesUsecase = new RetryFailedErpInvoicesUsecase(
+    const retryRevenueRecognizedInvoicesToErpUsecase = new RetryRevenueRecognitionErpInvoicesUsecase(
       invoice,
-      publishInvoiceToErpUsecase
+      invoiceItem,
+      coupon,
+      waiver,
+      payer,
+      address,
+      manuscript,
+      catalog,
+      erpService,
+      loggerService
     );
 
-    if (env.app.failedErpCronRetryTimeMinutes !== 0) {
-      await registerJob(
-        async () => {
-          logger.info('Starting job', erpRetryJobName);
-          try {
-            const response = await retryFailedErpInvoicesUsecase.execute();
-            if (response.isLeft()) {
-              throw response.value.error;
-            }
-          } catch (error) {
-            logger.error(error);
+    // start scheduler
+    let jobsQueue = [
+      // TODO Describe first job
+      // async () => {
+      //   try {
+      //     const response = await retryFailedErpInvoicesUsecase.execute();
+      //     if (response.isLeft()) {
+      //       throw response.value.error;
+      //     }
+      //   } catch (error) {
+      //     logger.error(error);
+      //   }
+      // }
+      // TODO Describe second job
+      async () => {
+        try {
+          const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
+          if (response.isLeft()) {
+            throw response.value.error;
           }
-        },
-        erpRetryJobName,
-        config.failedErpTimerInMinutes
+        } catch (error) {
+          logger.error(error);
+        }
+      }
+    ];
+
+    async function processJobsQueue() {
+      if (jobsQueue.length === 0) {
+        return;
+      }
+      const head = jobsQueue[0];
+      // console.log(`Processing: ${head.name}.`);
+      await head();
+      // console.log(`Done processing: ${head.name}.`);
+      jobsQueue = jobsQueue.slice(1);
+    }
+
+    if (failedErpCronRetryTimeMinutes > -1) {
+      setIntervalAsync(
+        processJobsQueue,
+        failedErpCronRetryTimeMinutes === 0
+          ? 1000
+          : failedErpCronRetryTimeMinutes * 60 * 1000
       );
-    } else {
-      logger.warn('Skipping cron job', erpRetryJobName);
     }
   }
 };

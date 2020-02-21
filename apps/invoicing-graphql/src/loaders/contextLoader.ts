@@ -26,6 +26,8 @@ import { CheckoutService } from '../services/checkout';
 // import { AuthService } from '../services/auth';
 import { PayPalService } from '../services/paypal';
 import { ErpService } from '../services/erp';
+import { Logger } from '../lib/logger';
+
 import { env } from '../env';
 
 export const contextLoader: MicroframeworkLoader = (
@@ -49,7 +51,9 @@ export const contextLoader: MicroframeworkLoader = (
       coupon: new KnexCouponRepo(db)
     };
 
+    const logger = new Logger();
     const services = {
+      logger,
       checkoutService: new CheckoutService(),
       // authService: new AuthService({}),
       vatService: new VATService(),
@@ -57,7 +61,7 @@ export const contextLoader: MicroframeworkLoader = (
       emailService: new EmailService(),
       exchangeRateService: new ExchangeRateService(),
       payPalService: new PayPalService(env.paypal),
-      erpService: new ErpService(env.salesForce)
+      erpService: new ErpService(logger, env.salesForce)
     };
 
     const context = {

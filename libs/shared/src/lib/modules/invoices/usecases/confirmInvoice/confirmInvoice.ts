@@ -59,6 +59,8 @@ export class ConfirmInvoiceUsecase
   authorizationContext: AuthorizationContext<Roles>;
   sanctionedCountryPolicy: SanctionedCountryPolicy;
   reductionsPoliciesRegister: PoliciesRegister;
+  receiverEmail: string;
+  senderEmail: string;
 
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -69,9 +71,9 @@ export class ConfirmInvoiceUsecase
     private waiverRepo: WaiverRepoContract,
     private emailService: EmailService,
     private vatService: VATService,
-    private receiverEmail: string,
-    private senderEmail: string
+    private loggerService: any
   ) {
+    this.loggerService.setScope('ConfirmInvoiceUsecase');
     this.authorizationContext = { roles: [Roles.PAYER] };
 
     this.sanctionedCountryPolicy = new SanctionedCountryPolicy();
@@ -86,10 +88,17 @@ export class ConfirmInvoiceUsecase
     request: ConfirmInvoiceDTO,
     context?: ConfirmInvoiceContext
   ): Promise<ConfirmInvoiceResponse> {
-    const { payer: payerInput } = request;
+    const {
+      payer: payerInput,
+      sanctionedCountryNotificationReceiver,
+      sanctionedCountryNotificationSender
+    } = request;
+    this.receiverEmail = sanctionedCountryNotificationReceiver;
+    this.senderEmail = sanctionedCountryNotificationSender;
 
     await this.checkVatId(payerInput);
     const maybePayerData = await this.savePayerData(payerInput);
+
     await chain(
       [
         this.updateInvoiceStatus.bind(this),
@@ -122,6 +131,10 @@ export class ConfirmInvoiceUsecase
     payerData: PayerDataDomain
   ): Promise<Either<unknown, PayerDataDomain>> {
     const { invoice, address } = payerData;
+    this.loggerService.info(
+      `Update status for Invoice with id {${payerData?.invoice.id}}`
+    );
+
     if (this.isPayerFromSanctionedCountry(address)) {
       return (await this.markInvoiceAsPending(invoice))
         .map(pendingInvoice => this.sendEmail(pendingInvoice))
@@ -151,6 +164,7 @@ export class ConfirmInvoiceUsecase
   }
 
   private async savePayerData(payerInput: PayerInput) {
+    this.loggerService.info(`Save payer ${payerInput.name} data`);
     const emptyPayload: PayerDataDomain = {
       address: null,
       invoice: null,
@@ -171,6 +185,7 @@ export class ConfirmInvoiceUsecase
     { invoiceId }: PayerInput,
     payerData: PayerDataDomain
   ) {
+    this.loggerService.info(`Get Invoice details for id ${invoiceId}`);
     const getInvoiceDetailsUseCase = new GetInvoiceDetailsUsecase(
       this.invoiceRepo
     );
@@ -188,6 +203,7 @@ export class ConfirmInvoiceUsecase
     { invoiceId }: PayerInput,
     payerData: PayerDataDomain
   ) {
+    this.loggerService.info(`Get Invoice Items for id {${invoiceId}}`);
     const getInvoiceItemsUsecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
       this.couponRepo,
@@ -198,7 +214,7 @@ export class ConfirmInvoiceUsecase
       this.authorizationContext
     );
     return maybeDetails.map(invoiceItemsResult => {
-      let items = invoiceItemsResult.getValue();
+      const items = invoiceItemsResult.getValue();
       items.forEach(ii => payerData.invoice.addInvoiceItem(ii));
       return payerData;
     });
@@ -208,6 +224,7 @@ export class ConfirmInvoiceUsecase
     payerInput: PayerInput,
     payerData: PayerDataDomain
   ) {
+    this.loggerService.info(`Create Payer for ${payerInput.name}`);
     const createPayerUseCase = new CreatePayerUsecase(this.payerRepo);
     const payerDTO: CreatePayerRequestDTO = {
       invoiceId: payerInput.invoiceId,
@@ -228,6 +245,7 @@ export class ConfirmInvoiceUsecase
     { address }: PayerInput,
     payerData: PayerDataDomain
   ) {
+    this.loggerService.info(`Create Address for ${address}`);
     const createAddressUseCase = new CreateAddress(this.addressRepo);
     const addressDTO = {
       addressLine1: address.addressLine1,
@@ -248,6 +266,7 @@ export class ConfirmInvoiceUsecase
   }
 
   private async checkVatId(payer: PayerInput) {
+    this.loggerService.info(`Check VAT for ${payer.name}`);
     if (payer.type === PayerType.INSTITUTION) {
       const vatResult = await this.vatService.checkVAT({
         countryCode: payer.address.country,
@@ -255,13 +274,13 @@ export class ConfirmInvoiceUsecase
       });
 
       if (!vatResult.valid) {
-        console.log(`VAT ${payer.vatId} is not valid.`);
+        this.loggerService.info(`VAT ${payer.vatId} is not valid.`);
       }
     }
   }
 
   private async markInvoiceAsPending(invoice: Invoice) {
-    console.log(
+    this.loggerService.info(
       `Invoice with id {${invoice.id.toString()}} is confirmed with a sanctioned country.`
     );
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(

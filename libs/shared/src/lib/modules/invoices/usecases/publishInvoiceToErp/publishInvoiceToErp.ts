@@ -25,6 +25,7 @@ import { InvoiceId } from '../../domain/InvoiceId';
 import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
+import { Invoice } from '../../domain/Invoice';
 
 export interface PublishInvoiceToErpRequestDTO {
   invoiceId?: string;
@@ -53,10 +54,13 @@ export class PublishInvoiceToErpUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private erpService: ErpServiceContract
-  ) {}
+    private erpService: ErpServiceContract,
+    private loggerService: any
+  ) {
+    // this.loggerService.setScope('PublishInvoiceToERPUsecase');
+  }
 
-  private async getAccessControlContext(request, context?) {
+  private async getAccessControlContext(request: any, context?: any) {
     return {};
   }
 
@@ -69,15 +73,17 @@ export class PublishInvoiceToErpUsecase
       return right(Result.ok<any>(null));
     }
 
+    let invoice: Invoice;
+
     try {
-      let invoice = await this.invoiceRepo.getInvoiceById(
+      invoice = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
       );
 
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
-        let getItemsUsecase = new GetItemsForInvoiceUsecase(
+        const getItemsUsecase = new GetItemsForInvoiceUsecase(
           this.invoiceItemRepo,
           this.couponRepo,
           this.waiverRepo
@@ -143,8 +149,8 @@ export class PublishInvoiceToErpUsecase
       }
       const erpResponse = await this.erpService.registerInvoice({
         invoice,
-        items: invoiceItems,
         payer,
+        items: invoiceItems,
         article: manuscript as any,
         billingAddress: address,
         journalName: catalog.journalTitle,
@@ -152,7 +158,7 @@ export class PublishInvoiceToErpUsecase
         rate
       });
 
-      console.log(
+      this.loggerService.info(
         `Updating invoice ${invoice.id.toString()}: erpReference -> ${
           erpResponse.tradeDocumentId
         }`

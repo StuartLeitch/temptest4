@@ -4,11 +4,16 @@ import {
   InvoiceStatus,
   Invoice,
   InvoiceId,
-  InvoiceMap,
+  InvoiceMap
 } from '../../../../shared';
-import {Knex, clearTable, makeDb, destroyDb} from '../../../../infrastructure/database/knex';
-import {RepoError} from '../../../../infrastructure/RepoError';
-import {KnexInvoiceRepo as InvoiceRepo} from './knexInvoiceRepo';
+import {
+  Knex,
+  clearTable,
+  makeDb,
+  destroyDb
+} from '../../../../infrastructure/database/knex';
+import { RepoError } from '../../../../infrastructure/RepoError';
+import { KnexInvoiceRepo as InvoiceRepo } from './knexInvoiceRepo';
 
 function makeInvoiceData(overwrites?: any): Invoice {
   return InvoiceMap.toDomain({
@@ -38,7 +43,7 @@ describe('InvoiceRepo', () => {
     it('should find the invoice', async () => {
       const invoiceId = 'invoice-1';
 
-      const invoice = makeInvoiceData({id: invoiceId});
+      const invoice = makeInvoiceData({ id: invoiceId });
       await repo.save(invoice);
 
       const foundInvoice = await repo.getInvoiceById(invoice.invoiceId);
@@ -98,7 +103,7 @@ describe('InvoiceRepo', () => {
   describe('CRUD methods', () => {
     let invoice: Invoice;
     beforeEach(async () => {
-      invoice = makeInvoiceData({id: 'invoice-1'});
+      invoice = makeInvoiceData({ id: 'invoice-1' });
       await db('invoices').insert(InvoiceMap.toPersistence(invoice));
     });
 
@@ -111,7 +116,7 @@ describe('InvoiceRepo', () => {
 
       it('should reject promise for unknown invoices', () => {
         const id = 'unknown-invoice';
-        const invoice = makeInvoiceData({id});
+        const invoice = makeInvoiceData({ id });
 
         expect(repo.delete(invoice)).rejects.toThrowErrorMatchingInlineSnapshot(
           `"Entity(invoice) with id[unknown-invoice] not found"`
@@ -141,7 +146,7 @@ describe('InvoiceRepo', () => {
 
       it('should reject promise when invoice does not exist', async () => {
         const id = 'unknown-invoice';
-        const invoice = makeInvoiceData({id});
+        const invoice = makeInvoiceData({ id });
 
         expect(repo.update(invoice)).rejects.toThrowErrorMatchingInlineSnapshot(
           `"Entity(invoice) with id[unknown-invoice] not found"`
@@ -151,60 +156,69 @@ describe('InvoiceRepo', () => {
 
     describe('.assignInvoiceNumber()', () => {
       it('should update invoice with invoice number 1 when tables empty', async () => {
-        const invoice = makeInvoiceData({id: 'invoice-number-test'});
-        await repo.save(invoice)
-        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
-        expect(updatedInvoice.invoiceNumber).toEqual(1)
-      })
+        const invoice = makeInvoiceData({ id: 'invoice-number-test' });
+        await repo.save(invoice);
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice);
+        expect(updatedInvoice.invoiceNumber).toEqual(1);
+      });
 
       it('should update invoice with invoice number 2 when another with 1 exists', async () => {
-        await repo.save(makeInvoiceData({id: 'invoice-number-test', invoiceNumber: 1}));
-        const invoice = makeInvoiceData({id: 'invoice-number-test-2'});
-        await repo.save(invoice)
-        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
-        expect(updatedInvoice.invoiceNumber).toEqual(2)
-      })
+        await repo.save(
+          makeInvoiceData({ id: 'invoice-number-test', invoiceNumber: 1 })
+        );
+        const invoice = makeInvoiceData({ id: 'invoice-number-test-2' });
+        await repo.save(invoice);
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice);
+        expect(updatedInvoice.invoiceNumber).toEqual(2);
+      });
 
       it('should update invoice with invoice number 9001 when configuration is 9000', async () => {
-        await repo.save(makeInvoiceData({id: 'invoice-number-test', invoiceNumber: 1}));
-        
-        const invoice = makeInvoiceData({id: 'invoice-number-test-2'});
+        await repo.save(
+          makeInvoiceData({ id: 'invoice-number-test', invoiceNumber: 1 })
+        );
 
-        await repo.save(invoice)
-        await db("configurations").insert({invoiceReferenceNumber: 9000})
+        const invoice = makeInvoiceData({ id: 'invoice-number-test-2' });
 
-        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
-        expect(updatedInvoice.invoiceNumber).toEqual(9001)
-      })
+        await repo.save(invoice);
+        await db('configurations').insert({ invoiceReferenceNumber: 9000 });
+
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice);
+        expect(updatedInvoice.invoiceNumber).toEqual(9001);
+      });
 
       it('should update invoice with invoice number 9002 when configuration is 9000', async () => {
-        await repo.save(makeInvoiceData({id: 'invoice-number-test', invoiceNumber: 9001}));
-        const invoice = makeInvoiceData({id: 'invoice-number-test-2'});
-        await repo.save(invoice)
-        await db("configurations").insert({invoiceReferenceNumber: 9000})
-        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
-        expect(updatedInvoice.invoiceNumber).toEqual(9002)
-      })
+        await repo.save(
+          makeInvoiceData({ id: 'invoice-number-test', invoiceNumber: 9001 })
+        );
+        const invoice = makeInvoiceData({ id: 'invoice-number-test-2' });
+        await repo.save(invoice);
+        await db('configurations').insert({ invoiceReferenceNumber: 9000 });
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice);
+        expect(updatedInvoice.invoiceNumber).toEqual(9002);
+      });
 
       it('should fail when reference number is set', async () => {
-        const invoice = makeInvoiceData({id: 'invoice-number-test-2', invoiceNumber: 9001});
-        await repo.save(invoice)
+        const invoice = makeInvoiceData({
+          id: 'invoice-number-test-2',
+          invoiceNumber: 9001
+        });
+        await repo.save(invoice);
 
-        const updatedInvoice = await repo.assignInvoiceNumber(invoice)
-        expect(updatedInvoice.invoiceNumber).toThrowError()
-      })
-    })
+        const updatedInvoice = await repo.assignInvoiceNumber(invoice);
+        expect(updatedInvoice.invoiceNumber).toThrowError();
+      });
+    });
 
     describe('.exists()', () => {
       it('should return true for existing invoices', async () => {
-        const invoice = makeInvoiceData({id: 'invoice-1'});
+        const invoice = makeInvoiceData({ id: 'invoice-1' });
         const result = await repo.exists(invoice);
 
         expect(result).toBe(true);
       });
 
       it('should return false for inexistent invoices', async () => {
-        const invoice = makeInvoiceData({id: 'unknown-invoice'});
+        const invoice = makeInvoiceData({ id: 'unknown-invoice' });
         const result = await repo.exists(invoice);
 
         expect(result).toBe(false);
@@ -213,14 +227,14 @@ describe('InvoiceRepo', () => {
 
     describe('.save()', () => {
       it('should save a new invoice', async () => {
-        const invoice = makeInvoiceData({id: 'invoice-2'});
+        const invoice = makeInvoiceData({ id: 'invoice-2' });
         const result = await repo.save(invoice);
 
         expect(result).toEqual(invoice);
       });
 
       it('should throw if invoice already exists', async () => {
-        const invoice = makeInvoiceData({id: 'invoice-1'});
+        const invoice = makeInvoiceData({ id: 'invoice-1' });
         expect(repo.save(invoice)).rejects.toThrow(RepoError);
       });
     });

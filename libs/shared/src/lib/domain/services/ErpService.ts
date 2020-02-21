@@ -1,10 +1,4 @@
-import {
-  Invoice,
-  Payer,
-  InvoiceItem,
-  Address,
-  Article
-} from '@hindawi/shared';
+import { Invoice, Payer, InvoiceItem, Address, Article } from '@hindawi/shared';
 
 export interface ErpData {
   invoice: Invoice;
@@ -13,8 +7,8 @@ export interface ErpData {
   article: Article;
   billingAddress: Address;
   journalName?: string;
-  vatNote?: object
-  rate?: number
+  vatNote?: object;
+  rate?: number;
 }
 
 export interface ErpResponse {
@@ -25,4 +19,5 @@ export interface ErpResponse {
 
 export interface ErpServiceContract {
   registerInvoice(data: ErpData): Promise<ErpResponse>;
+  registerRevenueRecognition(data: any): Promise<any>;
 }

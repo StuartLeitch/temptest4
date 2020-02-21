@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/camelcase */
-
 import { Connection } from 'jsforce';
 import {
   ErpData,
@@ -27,9 +26,12 @@ export class ErpService implements ErpServiceContract {
   private loginPromise: Promise<any>;
 
   constructor(
+    private readonly logger: any,
     private config: any,
     private fixedValues: ErpFixedValues = defaultErpFixedValues
-  ) {}
+  ) {
+    this.logger.setScope('ErpService');
+  }
 
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
     const { items } = data;
@@ -50,6 +52,31 @@ export class ErpService implements ErpServiceContract {
     };
   }
 
+  public async registerRevenueRecognition(data: any): Promise<any> {
+    const journal = await this.registerJournal(data);
+
+    if (journal == null) {
+      return null;
+    }
+
+    const journalItem = await this.registerJournalItem({
+      journal,
+      ...data
+    });
+    const journalTags = await this.registerJournalTags({ journal, ...data });
+    const journalItemTag = await this.registerJournalItemTag({
+      journalItem,
+      ...data
+    });
+
+    return {
+      journal,
+      journalItem,
+      journalTags,
+      journalItemTag
+    };
+  }
+
   private async getConnection(): Promise<Connection> {
     const { user, password, securityToken, loginUrl } = this.config;
 
@@ -64,14 +91,14 @@ export class ErpService implements ErpServiceContract {
       this.connection.authorize;
       await this.loginPromise;
       // TODO: Log this message in the banner
-      console.log('ERP login successful');
+      this.logger.info('ERP login successful');
     }
 
     return this.connection;
   }
 
   private async registerPayer(data: Partial<ErpData>): Promise<string> {
-    console.log('Register payer');
+    this.logger.info('Register payer');
     const connection = await this.getConnection();
 
     const { article, payer, billingAddress } = data;
@@ -209,7 +236,7 @@ export class ErpService implements ErpServiceContract {
       throw tradeDocument;
     }
 
-    console.log('Trade Document registered: ', tradeDocument.id);
+    this.logger.info('Trade Document registered: ', tradeDocument.id);
 
     return tradeDocument.id;
   }
@@ -306,5 +333,183 @@ export class ErpService implements ErpServiceContract {
         ).toFixed(2)}`
       )
       .replace('{Rate}', rate);
+  }
+
+  private async registerJournal(data: any) {
+    const connection = await this.getConnection();
+    const {
+      fixedValues: { companyId }
+    } = this;
+    const { invoice, manuscript } = data;
+
+    const existingTagsByInvoiceNumber = await connection
+      .sobject('s2cor__Sage_ACC_Tag__c')
+      .select({ Id: true })
+      .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
+      .execute();
+
+    if (existingTagsByInvoiceNumber.length === 0) {
+      return null;
+    }
+
+    const journalReference = `Hindawi APC Recognition for article ${manuscript.customId} ${invoice.referenceNumber}`;
+    const journalData = {
+      name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
+      s2cor__Reference__c: journalReference,
+      s2cor__Approval_Status__c: 'Posted',
+      s2cor__Date__c: manuscript.datePublished,
+      s2cor__Create_Tags__c: false,
+      s2cor__Company__c: 'a5T0Y000000TR3pUAG',
+      s2cor__Default_Tax_Treatment__c: 'a6B0Y000000fyP2UAI',
+      s2cor__Currency__c: 'a5W0Y000000GnlcUAC',
+      s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW'
+    };
+
+    const existingJournal = await connection
+      .sobject('s2cor__Sage_ACC_Journal__c')
+      .select({ Id: true })
+      .where({ Name: journalData.name })
+      .execute();
+
+    let journal: any;
+    if (existingJournal.length) {
+      journal = existingJournal[0];
+      journal.id = journal.Id || journal.id;
+      this.logger.info('Journal object reused', journal.id);
+    } else {
+      journal = await connection
+        .sobject('s2cor__Sage_ACC_Journal__c')
+        .create(journalData);
+      if (!journal.success) {
+        throw journal;
+      }
+      this.logger.info('Journal object registered: ', journal.id);
+    }
+
+    return journal;
+  }
+
+  private async registerJournalItem(data: any) {
+    const connection = await this.getConnection();
+    const { journal, manuscript, invoice, invoiceTotal } = data;
+
+    const journalItemData = {
+      Name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
+      s2cor__Journal__c: journal.id,
+      s2cor__Reference__c: `Hindawi APC Recognition for article ${manuscript.customId} ${invoice.referenceNumber}`,
+      s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW',
+      s2cor__Amount__c: invoiceTotal,
+      s2cor__Date__c: manuscript.datePublished,
+      s2cor__Approval_Status__c: 'Posted',
+      s2cor__Status__c: 'Submitted'
+    };
+
+    const existingJournalItem = await connection
+      .sobject('s2cor__Sage_ACC_Journal_Item__c')
+      .select({ Id: true })
+      .where({ Name: journalItemData.Name })
+      .execute();
+
+    let journalItem: any;
+    if (existingJournalItem.length) {
+      journalItem = existingJournalItem[0];
+      journalItem.id = journalItem.Id || journalItem.id;
+      this.logger.info('Journal Item object reused: ', journalItem.id);
+    } else {
+      journalItem = await connection
+        .sobject('s2cor__Sage_ACC_Journal_Item__c')
+        .create(journalItemData);
+      if (!journalItem.success) {
+        throw journalItem;
+      }
+      this.logger.info('Journal Item object registered: ', journalItem.id);
+    }
+
+    return journalItem;
+  }
+
+  private async registerJournalTags(data: any) {
+    const connection = await this.getConnection();
+    const {
+      fixedValues: { companyId }
+    } = this;
+    const { invoice, journal } = data;
+
+    const journalTags = [];
+    const dimensions = {
+      RevenueRecognitionType: 'a4V0Y0000001chdUAA',
+      SalesInvoiceNumber: 'a4V0Y0000001chSUAQ'
+    };
+
+    const existingJournalTags = await connection
+      .sobject('s2cor__Sage_ACC_Tag__c')
+      .select({ Id: true, Name: true })
+      .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
+      .execute();
+
+    const journalTagData = {
+      s2cor__Journal__c: journal.id,
+      s2cor__Dimension__c: dimensions.RevenueRecognitionType,
+      s2cor__Tag__c: 'a5L0Y000000g0EeUAI' // For Hindawi journals
+    };
+
+    let journalTag: any;
+    journalTag = await connection
+      .sobject('s2cor__Sage_ACC_Journal_Tag__c')
+      .create(journalTagData);
+
+    if (!journalTag.success) {
+      throw journalTag;
+    }
+    this.logger.info(
+      `Journal Tag for ${dimensions.RevenueRecognitionType} object registered`,
+      journalTag.id
+    );
+    journalTags.push(journalTag);
+
+    journalTagData.s2cor__Tag__c = (existingJournalTags[0] as any).Id;
+    journalTagData.s2cor__Dimension__c = dimensions.SalesInvoiceNumber;
+    journalTag = await connection
+      .sobject('s2cor__Sage_ACC_Journal_Tag__c')
+      .create(journalTagData);
+    journalTags.push(journalTag);
+
+    return journalTags;
+  }
+
+  private async registerJournalItemTag(data: any) {
+    const connection = await this.getConnection();
+    const { journalItem } = data;
+
+    const journalItemTagData = {
+      s2cor__Journal_Item__c: journalItem.id,
+      s2cor__Tag__c: 'a5L0Y000000PFE7UAO' // For Hindawi journals
+    };
+
+    const existingJournalItemTag = await connection
+      .sobject('s2cor__Sage_ACC_Journal_Item_Tag__c')
+      .select({ Id: true })
+      .where({ s2cor__Journal_Item__c: journalItem.id })
+      .execute();
+
+    let journalItemTag: any;
+    if (existingJournalItemTag.length) {
+      journalItemTag = existingJournalItemTag[0];
+      journalItemTag.id = journalItemTag.Id || journalItemTag.id;
+      this.logger.info('Journal Item Tag object reused: ', journalItemTag.id);
+    } else {
+      journalItemTag = await connection
+        .sobject('s2cor__Sage_ACC_Journal_Item_Tag__c')
+        .create(journalItemTagData);
+      if (!journalItemTag.success) {
+        throw journalItemTag;
+      }
+      this.logger.info(
+        'Journal Item Tag object registered: ',
+        journalItemTag.id
+      );
+    }
+
+    return journalItemTag;
   }
 }

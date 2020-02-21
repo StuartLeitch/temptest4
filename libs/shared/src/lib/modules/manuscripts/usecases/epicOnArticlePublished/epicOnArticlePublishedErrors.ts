@@ -57,6 +57,14 @@ export namespace EpicOnArticlePublishedErrors {
     }
   }
 
+  export class InvoiceItemNotFoundError extends Result<UseCaseError> {
+    constructor(manuscriptCustomId: string) {
+      super(false, {
+        message: `Couldn't find an Invoice Item associated with Manuscript custom Id {${manuscriptCustomId}}.`
+      } as UseCaseError);
+    }
+  }
+
   export class ManuscriptNotFound extends Result<UseCaseError> {
     constructor(id: string) {
       super(false, {

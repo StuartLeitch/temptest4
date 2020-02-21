@@ -1,7 +1,7 @@
-import {Repo} from '../../../infrastructure/Repo';
-import {CatalogItem} from '../domain/CatalogItem';
-import {JournalId} from '../domain/JournalId';
-import {UniqueEntityID} from '@hindawi/shared';
+import { Repo } from '../../../infrastructure/Repo';
+import { CatalogItem } from '../domain/CatalogItem';
+import { JournalId } from '../domain/JournalId';
+import { UniqueEntityID } from '@hindawi/shared';
 
 export interface CatalogRepoContract extends Repo<CatalogItem> {
   getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem>;
@@ -12,5 +12,5 @@ export interface CatalogRepoContract extends Repo<CatalogItem> {
   getCatalogCollection(): Promise<CatalogItem[]>;
   // delete(transaction: Transaction): Promise<unknown>;
   // update(transaction: Transaction): Promise<Transaction>;
-  updateCatalogItem(catalogItem: CatalogItem): Promise<CatalogItem>
+  updateCatalogItem(catalogItem: CatalogItem): Promise<CatalogItem>;
 }

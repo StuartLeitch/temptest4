@@ -192,6 +192,39 @@ class EmailService {
     }
     return this.createTemplate(templateProps);
   }
+
+  public autoConfirmMissingCountryNotification(
+    invoice: Invoice,
+    manuscript: Manuscript,
+    receiverEmail: string,
+    senderEmail: string
+  ) {
+    return this.createTemplate({
+      type: 'user',
+      fromEmail: senderEmail,
+      toUser: {
+        email: receiverEmail
+      },
+      content: {
+        subject: `[Auto-Confirm Invoice] Country not available when auto-confirming published article`,
+        paragraph: `
+Hello,
+
+The country is not available for the corresponding author of the manuscript having custom Id {${
+          manuscript.customId
+        }}.
+Please confirm manually the invoice using this link {${EmailService.createURL(
+          `/payment-details/${invoice.invoiceId.id.toString()}`
+        )}}.
+`
+      },
+      bodyProps: {
+        hasLink: false,
+        hasIntro: true,
+        hasSignature: false
+      }
+    });
+  }
 }
 
 export default EmailService;

@@ -1,3 +1,4 @@
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -192,6 +193,30 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .whereNull('erpReference');
 
     return invoices.map(i => InvoiceMap.toDomain(i));
+  }
+
+  async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
+    const { db } = this;
+
+    const invoices = await db(TABLES.INVOICES)
+      .select(
+        'invoices.id as invoiceId',
+        'invoices.transactionId as transactionId',
+        'invoices.status as invoiceStatus',
+        'articles.id AS manuscriptId',
+        'articles.datePublished'
+      )
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
+      .whereNot(`invoices.deleted`, 1)
+      .whereNull('invoices.revenueRecognitionReference')
+      .whereNotNull('invoices.erpReference')
+      .whereNotNull('articles.datePublished');
+
+    return invoices.map(i =>
+      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
+    );
   }
 
   async delete(invoice: Invoice): Promise<unknown> {

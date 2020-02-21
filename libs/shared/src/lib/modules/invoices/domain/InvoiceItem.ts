@@ -127,10 +127,11 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
       reductions.push(...withReductions);
     }
 
-    let totalDiscount = reductions.reduce(
+    const totalDiscount = reductions.reduce(
       (acc, curr) => acc + curr.reduction,
       0
     );
+
     if (totalDiscount >= 100) {
       return 0;
     }
