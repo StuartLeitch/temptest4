@@ -8,6 +8,7 @@ import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
 import { PublisherId } from '../../domain/PublisherId';
 import { Publisher } from '../../domain/Publisher';
 import { PublisherMap } from '../../mappers/PublisherMap';
+import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
   implements PublisherRepoContract {
@@ -50,6 +51,30 @@ export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
     if (!publisher) {
       throw RepoError.createEntityNotFoundError('publisher', id.id.toString());
     }
+
+    const customValues = await this.getCustomValuesByPublisherId(id);
+    const props = {
+      dateCreated: publisher.dateCreated,
+      dateUpdated: publisher.dateUpdated,
+      name: publisher.name,
+      id: publisher.id,
+      customValues
+    };
+
+    return PublisherMap.toDomain(props);
+  }
+
+  async getPublisherByName(name: string): Promise<Publisher> {
+    const publisher = await this.db(TABLES.PUBLISHERS)
+      .select()
+      .where('name', name)
+      .first();
+
+    if (!publisher) {
+      throw RepoError.createEntityNotFoundError('publisher', name);
+    }
+
+    const id = PublisherId.create(new UniqueEntityID(publisher.id)).getValue();
 
     const customValues = await this.getCustomValuesByPublisherId(id);
     const props = {

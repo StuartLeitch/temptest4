@@ -24,6 +24,11 @@ export class MockPublisherRepo extends BaseMockRepo<Publisher>
     return publisher?.customValue || null;
   }
 
+  async getPublisherByName(name: string): Promise<Publisher> {
+    const match = this._items.find(item => item.name === name);
+    return match || null;
+  }
+
   async publisherWithIdExists(id: PublisherId): Promise<boolean> {
     const found = this._items.find(item => item.id.equals(id.id));
     return !!found;
