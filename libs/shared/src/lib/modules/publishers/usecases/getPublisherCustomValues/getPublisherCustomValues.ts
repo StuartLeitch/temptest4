@@ -19,6 +19,7 @@ import { PublisherRepoContract } from '../../repos/publisherRepo';
 import { GetPublisherCustomValuesResponse } from './getPublisherCustomValuesResponse';
 import { GetPublisherCustomValuesErrors } from './getPublisherCustomValuesErrors';
 import { GetPublisherCustomValuesDTO } from './getPublisherCustomValuesDTO';
+import { PublisherId } from '../../domain/PublisherId';
 
 export type GetPublisherCustomValuesContext = AuthorizationContext<Roles>;
 
@@ -45,6 +46,24 @@ export class GetPublisherCustomValuesUsecase
     request: GetPublisherCustomValuesDTO,
     context?: GetPublisherCustomValuesContext
   ): Promise<GetPublisherCustomValuesResponse> {
-    return null;
+    try {
+      const id = PublisherId.create(
+        new UniqueEntityID(request.publisherId)
+      ).getValue();
+      const customValues = await this.publisherRepo.getCustomValuesByPublisherId(
+        id
+      );
+      return right(Result.ok(customValues));
+    } catch (e) {
+      if (e.code) {
+        return left(
+          new GetPublisherCustomValuesErrors.PublisherNotFount(
+            request.publisherId
+          )
+        );
+      } else {
+        return left(new AppError.UnexpectedError(e));
+      }
+    }
   }
 }
