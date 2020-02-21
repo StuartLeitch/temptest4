@@ -13,7 +13,7 @@ export const payer: Resolvers<any> = {
     async confirmInvoice(parent, args, context) {
       const {
         repos,
-        services: { vatService, emailService }
+        services: { vatService, emailService, logger: loggerService }
       } = context;
       const { payer: inputPayer } = args;
 
@@ -26,11 +26,14 @@ export const payer: Resolvers<any> = {
         repos.waiver,
         emailService,
         vatService,
-        env.app.sanctionedCountryNotificationReceiver,
-        env.app.sanctionedCountryNotificationSender
+        loggerService
       );
       const maybeUpdatedPayer = await confirmInvoiceUsecase.execute({
-        payer: inputPayer
+        payer: inputPayer,
+        sanctionedCountryNotificationReceiver:
+          env.app.sanctionedCountryNotificationReceiver,
+        sanctionedCountryNotificationSender:
+          env.app.sanctionedCountryNotificationSender
       });
       if (maybeUpdatedPayer.isLeft()) {
         throw new Error(
