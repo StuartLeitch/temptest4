@@ -7,6 +7,7 @@ import { PublisherRepoContract } from '../publisherRepo';
 import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
 import { PublisherId } from '../../domain/PublisherId';
 import { Publisher } from '../../domain/Publisher';
+import { PublisherMap } from '../../mappers/PublisherMap';
 
 export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
   implements PublisherRepoContract {
@@ -23,6 +24,14 @@ export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
     const data = await this.db(TABLES.PUBLISHER_CUSTOM_VALUES)
       .select('name', 'value')
       .where('publisherId', id.id.toString());
+
+    if (!data.length) {
+      throw RepoError.createEntityNotFoundError(
+        'publisher custom values with publisher id',
+        id.id.toString()
+      );
+    }
+
     return data.reduce(
       (acc: PublisherCustomValues, val: { name: string; value: string }) => {
         acc[val.name] = val.value;
@@ -33,6 +42,43 @@ export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
   }
 
   async getPublisherById(id: PublisherId): Promise<Publisher> {
-    return null;
+    const publisher = await this.db(TABLES.PUBLISHERS)
+      .select()
+      .where('id', id.id.toString())
+      .first();
+
+    if (!publisher) {
+      throw RepoError.createEntityNotFoundError('publisher', id.id.toString());
+    }
+
+    const customValues = await this.getCustomValuesByPublisherId(id);
+    const props = {
+      dateCreated: publisher.dateCreated,
+      dateUpdated: publisher.dateUpdated,
+      name: publisher.name,
+      id: publisher.id,
+      customValues
+    };
+
+    return PublisherMap.toDomain(props);
+  }
+
+  async exists(publisher: Publisher): Promise<boolean> {
+    try {
+      await this.getPublisherById(publisher.publisherId);
+    } catch (e) {
+      if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
+        return false;
+      }
+      throw e;
+    }
+    return true;
+  }
+
+  async save(publisher: Publisher): Promise<Publisher> {
+    throw new RepoError(
+      RepoErrorCode.DB_ERROR,
+      'Save not supported for publishers'
+    );
   }
 }
