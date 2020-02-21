@@ -10,28 +10,27 @@ class ManuscriptReviewsView extends AbstractEventView
   getCreateQuery(): string {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS SELECT se.manuscript_custom_id,
+AS SELECT s.manuscript_custom_id,
+  manuscripts->>'version' as "version",
   review_view.id as review_id,
   review_view.created as created_date,
   review_view.updated as updated_date,
   review_view.submitted as submitted_date,
   review_view.recommendation,
   review_view."teamMemberId" as team_member_id,
-  se.event_id
- FROM ( SELECT s.last_version_index,
-      se_1.payload,
-      s.event_id,
-      s.manuscript_custom_id
-    FROM ${REPORTING_TABLES.SUBMISSION} se_1
-    JOIN ${submissionView.getViewName()} s ON s.event_id = se_1.id) se,
-  LATERAL jsonb_to_recordset(((se.payload -> 'manuscripts'::text) -> se.last_version_index) -> 'reviews'::text) 
-  review_view(id text, created timestamp, updated timestamp, submitted timestamp, recommendation text, "teamMemberId" text)
+  s.event_id
+from ${REPORTING_TABLES.SUBMISSION} se	
+  join ${submissionView.getViewName()} s on se.id = s.event_id,
+  jsonb_array_elements(se.payload->'manuscripts') manuscripts,
+  jsonb_to_recordset(manuscripts->'reviews') as 
+    review_view(id text, created timestamp, updated timestamp, submitted timestamp, recommendation text, "teamMemberId" text)
 WITH DATA;
 `;
   }
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (version)`,
     `create index on ${this.getViewName()} (created_date)`,
     `create index on ${this.getViewName()} (updated_date)`,
     `create index on ${this.getViewName()} (submitted_date)`,

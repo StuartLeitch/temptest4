@@ -37,6 +37,9 @@
     },
     "reporting-pull-historic-events": {
       "tags": []
+    },
+    "sisif": {
+      "tags": []
     }
   }
 }
