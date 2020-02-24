@@ -4,7 +4,7 @@ import { Mapper } from '../../../infrastructure/Mapper';
 import { PublisherCustomValues } from '../domain/PublisherCustomValues';
 import { Publisher } from '../domain/Publisher';
 
-interface RawPublisher {
+export interface RawPublisher {
   customValues: PublisherCustomValues;
   dateCreated: string;
   dateUpdated: string;
