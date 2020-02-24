@@ -30,7 +30,7 @@ describe('GetPublisherDetailsByNameUsecase', () => {
     expect(value.name).toBe('Hindawi');
   });
 
-  it('should get error if id does not exist', async () => {
+  it('should get error if name does not exist', async () => {
     const request: GetPublisherDetailsByNameDTO = {
       publisherName: '3'
     };
