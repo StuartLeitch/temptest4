@@ -4,6 +4,7 @@ import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
 import { CatalogItem } from '../domain/CatalogItem';
 import { JournalId } from '../domain/JournalId';
+import { PublisherId } from '../../publishers/domain/PublisherId';
 // import {STATUS as TransactionStatus} from '../domain/Transaction';
 
 export class CatalogMap extends Mapper<CatalogItem> {
@@ -20,6 +21,9 @@ export class CatalogMap extends Mapper<CatalogItem> {
         currency: raw.currency,
         isActive: !!raw.isActive,
         journalTitle: raw.journalTitle,
+        publisherId: PublisherId.create(
+          new UniqueEntityID(raw.publisherId)
+        ).getValue(),
         issn: raw.issn
         // price: Money.fromInteger({amount: raw.amount, currency: Currencies.USD})
         // dateUpdated: new Date(raw.dateUpdated)
@@ -41,6 +45,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
       isActive: catalogItem.isActive ? 1 : 0,
       currency: catalogItem.currency,
       journalTitle: catalogItem.journalTitle,
+      publisherId: catalogItem.publisherId.id.toString(),
       issn: catalogItem.issn
       // status: catalog.status,
       // amount: catalog.amount.value,

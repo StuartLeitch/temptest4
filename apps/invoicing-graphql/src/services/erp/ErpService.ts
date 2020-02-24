@@ -34,14 +34,19 @@ export class ErpService implements ErpServiceContract {
   }
 
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
-    const { items } = data;
+    const { items, tradeDocumentItemProduct } = data;
 
     const accountId = await this.registerPayer(data);
     const tradeDocumentId = await this.registerTradeDocument(accountId, data);
 
     const tradeItemIds = await Promise.all(
       items.map(async item =>
-        this.registerInvoiceItem(tradeDocumentId, data, item)
+        this.registerInvoiceItem(
+          tradeDocumentId,
+          data,
+          item,
+          tradeDocumentItemProduct
+        )
       )
     );
 
@@ -250,7 +255,8 @@ export class ErpService implements ErpServiceContract {
   private async registerInvoiceItem(
     tradeDocumentId: string,
     data: Partial<ErpData>,
-    invoiceItem: InvoiceItem
+    invoiceItem: InvoiceItem,
+    product: string
   ): Promise<string> {
     const connection = await this.getConnection();
     const { journalName, article, payer, vatNote } = data;
@@ -266,7 +272,7 @@ export class ErpService implements ErpServiceContract {
       s2cor__Tax_Code__c: this.getTaxCode(vatNote),
       s2cor__Tax_Treatment__c: this.getTaxTreatment(vatNote),
       s2cor__Unit_Price__c: invoiceItem.price,
-      s2cor__Product__c: '01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
+      s2cor__Product__c: product, //'01t0Y000002BuB9QAK', // TODO to be determined based on journal ownership
       s2cor__Discount_Type__c: 'Amount',
       s2cor__Discount_Amount__c: discountAmount,
       s2cor__Discount_Value__c: discountAmount,

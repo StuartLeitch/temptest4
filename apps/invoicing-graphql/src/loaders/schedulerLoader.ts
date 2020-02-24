@@ -32,7 +32,8 @@ export const schedulerLoader: MicroframeworkLoader = async (
         address,
         catalog,
         coupon,
-        waiver
+        waiver,
+        publisher
       },
       services: { erpService, logger: loggerService }
     } = context;
@@ -48,6 +49,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       manuscript,
       catalog,
       erpService,
+      publisher,
       loggerService
     );
 
