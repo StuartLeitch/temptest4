@@ -1,9 +1,3 @@
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-
-import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
-import { PublisherId } from '../../domain/PublisherId';
-import { Publisher } from '../../domain/Publisher';
-
 import { MockPublisherRepo } from '../../repos/mocks/mockPublisherRepo';
 import { PublisherMap, RawPublisher } from '../../mappers/PublisherMap';
 
@@ -12,8 +6,8 @@ import { GetPublisherDetailsUsecase } from './getPublisherDetails';
 import { GetPublisherDetailsDTO } from './getPublisherDetailsDTO';
 
 describe('GetPublisherDetailsUsecase', () => {
-  let publisherRepo: MockPublisherRepo;
   let usecase: GetPublisherDetailsUsecase;
+  let publisherRepo: MockPublisherRepo;
 
   beforeEach(() => {
     publisherRepo = new MockPublisherRepo();
@@ -84,8 +78,8 @@ function addPublishers(publisherRepo: MockPublisherRepo) {
       },
       dateCreated: new Date().toISOString(),
       dateUpdated: new Date().toISOString(),
-      name: 'Hindawi',
-      id: '1'
+      name: 'Wiley',
+      id: '2'
     }
   ];
 

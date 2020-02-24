@@ -14,7 +14,10 @@ export class MockPublisherRepo extends BaseMockRepo<Publisher>
 
   async getPublisherById(id: PublisherId): Promise<Publisher> {
     const match = this._items.find(item => item.id.equals(id.id));
-    return match || null;
+    if (!match) {
+      throw RepoError.createEntityNotFoundError('publisher', id.id.toString());
+    }
+    return match;
   }
 
   async getCustomValuesByPublisherId(
@@ -26,7 +29,10 @@ export class MockPublisherRepo extends BaseMockRepo<Publisher>
 
   async getPublisherByName(name: string): Promise<Publisher> {
     const match = this._items.find(item => item.name === name);
-    return match || null;
+    if (!match) {
+      throw RepoError.createEntityNotFoundError('publisher', name);
+    }
+    return match;
   }
 
   async publisherWithIdExists(id: PublisherId): Promise<boolean> {
