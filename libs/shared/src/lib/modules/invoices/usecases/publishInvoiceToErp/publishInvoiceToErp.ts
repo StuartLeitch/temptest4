@@ -26,6 +26,8 @@ import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../domain/Invoice';
+import { PublisherRepoContract } from '../../../publishers/repos';
+import { GetPublisherCustomValuesUsecase } from '../../../publishers/usecases/getPublisherCustomValues';
 
 export interface PublishInvoiceToErpRequestDTO {
   invoiceId?: string;
@@ -55,6 +57,7 @@ export class PublishInvoiceToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private erpService: ErpServiceContract,
+    private publisherRepo: PublisherRepoContract,
     private loggerService: any
   ) {}
 
@@ -127,6 +130,13 @@ export class PublishInvoiceToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
       }
 
+      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
+        catalog.publisherId
+      );
+      if (!publisherCustomValues) {
+        throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
+      }
+
       const vatService = new VATService();
       const vatNote = vatService.getVATNote(
         {
@@ -153,7 +163,8 @@ export class PublishInvoiceToErpUsecase
         billingAddress: address,
         journalName: catalog.journalTitle,
         vatNote,
-        rate
+        rate,
+        tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem
       });
 
       this.loggerService.info(

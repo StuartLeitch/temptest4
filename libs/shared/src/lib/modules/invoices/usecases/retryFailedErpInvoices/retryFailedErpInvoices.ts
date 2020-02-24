@@ -19,6 +19,7 @@ import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
+import { PublisherRepoContract } from '../../../publishers/repos';
 
 export interface RetryFailedErpInvoicesRequestDTO {}
 export type RetryFailedErpInvoicesResponse = Either<
@@ -51,6 +52,7 @@ export class RetryFailedErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private erpService: ErpServiceContract,
+    private publisherRepo: PublisherRepoContract,
     private loggerService: any
   ) {
     this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
@@ -63,6 +65,7 @@ export class RetryFailedErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.erpService,
+      this.publisherRepo,
       this.loggerService
     );
   }

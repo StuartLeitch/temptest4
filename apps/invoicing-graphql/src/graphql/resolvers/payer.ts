@@ -29,7 +29,11 @@ export const payer: Resolvers<any> = {
         loggerService
       );
       const maybeUpdatedPayer = await confirmInvoiceUsecase.execute({
-        payer: inputPayer
+        payer: inputPayer,
+        sanctionedCountryNotificationReceiver:
+          env.app.sanctionedCountryNotificationReceiver,
+        sanctionedCountryNotificationSender:
+          env.app.sanctionedCountryNotificationSender
       });
       if (maybeUpdatedPayer.isLeft()) {
         throw new Error(

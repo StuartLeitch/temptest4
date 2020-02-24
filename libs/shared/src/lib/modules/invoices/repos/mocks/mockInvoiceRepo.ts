@@ -8,7 +8,6 @@ import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
-import { id } from 'date-fns/locale';
 
 export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   implements InvoiceRepoContract {

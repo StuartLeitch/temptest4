@@ -3,6 +3,7 @@ import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Result } from '../../../core/logic/Result';
 import { JournalId } from '../domain/JournalId';
+import { PublisherId } from '../../publishers/domain/PublisherId';
 
 export interface CatalogItemProps {
   type: string;
@@ -13,6 +14,7 @@ export interface CatalogItemProps {
   issn?: string;
   created?: Date;
   updated?: Date;
+  publisherId?: PublisherId;
   isActive?: boolean;
 }
 
@@ -72,5 +74,9 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   public get isActive(): boolean {
     return this.props.isActive;
+  }
+
+  get publisherId(): PublisherId {
+    return this.props.publisherId;
   }
 }

@@ -34,7 +34,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         address,
         catalog,
         coupon,
-        waiver
+        waiver,
+        publisher
       },
       services: { erpService, logger: loggerService },
       qq: queue
@@ -50,6 +51,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       catalog,
       erpService,
+      publisher,
       loggerService
     );
 

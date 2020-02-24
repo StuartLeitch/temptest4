@@ -9,6 +9,7 @@ export interface ErpData {
   journalName?: string;
   vatNote?: object;
   rate?: number;
+  tradeDocumentItemProduct: string;
 }
 
 export interface ErpResponse {

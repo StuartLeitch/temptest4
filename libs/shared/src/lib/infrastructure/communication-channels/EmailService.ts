@@ -4,6 +4,7 @@ import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../modules/journals/domain/CatalogItem';
 import { InvoiceItem } from '../../modules/invoices/domain/InvoiceItem';
 import { Invoice } from '../../modules/invoices/domain/Invoice';
+import hindawiDefault from '../../../../../../config/default';
 import gswConfig from '../../../../../../config/default-gsw';
 
 interface JournalConfig {
@@ -18,8 +19,11 @@ interface JournalConfig {
 
 let journalConfig: JournalConfig = {};
 
-if (process.env.TENANT_NAME) {
+if (process.env.TENANT_NAME === 'GeoScienceWorld') {
   journalConfig = { ...gswConfig.journal };
+  journalConfig.address = ''; // address is in privacy text
+} else if (process.env.TENANT_NAME === 'Hindawi') {
+  journalConfig = { ...hindawiDefault.journal };
   journalConfig.address = ''; // address is in privacy text
 }
 

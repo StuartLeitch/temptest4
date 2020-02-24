@@ -99,6 +99,17 @@ export * from './modules/payers/usecases/getPayer/getPayer';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
 
+// * Export Publisher Subdomain
+export * from './modules/publishers/domain/Publisher';
+export * from './modules/publishers/domain/PublisherId';
+export * from './modules/publishers/domain/PublisherCustomValues';
+export * from './modules/publishers/repos/publisherRepo';
+export * from './modules/publishers/repos/implementations/knexPublisherRepo';
+export * from './modules/publishers/usecases/getPublisherCustomValues';
+export * from './modules/publishers/usecases/getPublisherCustomValuesByName';
+export * from './modules/publishers/usecases/getPublisherDetails';
+export * from './modules/publishers/usecases/getPublisherDetailsByName';
+
 // * Export Catalog Subdomain
 export { CatalogItem } from './modules/journals/domain/CatalogItem';
 export * from './modules/journals/domain/JournalId';
