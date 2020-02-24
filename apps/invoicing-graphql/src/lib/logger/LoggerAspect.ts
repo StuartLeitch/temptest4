@@ -12,7 +12,7 @@ export class LoggerAspect {
   })
   invokeBeforeMethod(meta: Metadata) {
     // meta.advisedMetadata == { bar: 42 }
-    logger.info('usecaseExecute', {
+    logger.info('usecaseBeforeExecute', {
       usecaseClassName: meta.className,
       usecaseMethodName: meta.method.name,
       ...meta.method.args
