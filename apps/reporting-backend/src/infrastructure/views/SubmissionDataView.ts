@@ -24,7 +24,8 @@ CREATE TABLE ${this.getViewName()} (
   section_id text NULL,
   "version" text NULL,
   manuscript_version_id text NULL,
-  last_version_index int4 NULL
+  last_version_index int4 NULL,
+  CONSTRAINT submission_data_pkey PRIMARY KEY (event_id)
 )`;
   }
 
@@ -67,7 +68,7 @@ begin
 	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'sectionId'),
 	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'version'),
 	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'id'),
-	    _last_version_index);
+	    _last_version_index) ON CONFLICT (event_id) DO NOTHING;
     RETURN NEW;
 END
 $$
