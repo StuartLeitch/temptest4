@@ -58,9 +58,7 @@ export class EpicOnArticlePublishedUsecase
     private emailService: EmailService,
     private vatService: VATService,
     private loggerService: any
-  ) {
-    this.loggerService.setScope('EpicOnArticlePublished');
-  }
+  ) {}
 
   private async getAccessControlContext(request, context?) {
     return {};

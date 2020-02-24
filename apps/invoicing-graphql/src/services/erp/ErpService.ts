@@ -29,9 +29,7 @@ export class ErpService implements ErpServiceContract {
     private readonly logger: any,
     private config: any,
     private fixedValues: ErpFixedValues = defaultErpFixedValues
-  ) {
-    this.logger.setScope('ErpService');
-  }
+  ) {}
 
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
     const { items } = data;
@@ -438,7 +436,8 @@ export class ErpService implements ErpServiceContract {
     const journalTags = [];
     const dimensions = {
       RevenueRecognitionType: 'a4V0Y0000001chdUAA',
-      SalesInvoiceNumber: 'a4V0Y0000001chSUAQ'
+      SalesInvoiceNumber: 'a4V0Y0000001chSUAQ',
+      Product: 'a4V0Y0000001chNUAQ'
     };
 
     const existingJournalTags = await connection
@@ -483,13 +482,18 @@ export class ErpService implements ErpServiceContract {
 
     const journalItemTagData = {
       s2cor__Journal_Item__c: journalItem.id,
-      s2cor__Tag__c: 'a5L0Y000000PFE7UAO' // For Hindawi journals
+      s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
+      s2cor__Tag__c: 'a5L0Y000000g0BmUAI' // For Hindawi journals
     };
 
     const existingJournalItemTag = await connection
       .sobject('s2cor__Sage_ACC_Journal_Item_Tag__c')
       .select({ Id: true })
-      .where({ s2cor__Journal_Item__c: journalItem.id })
+      .where({
+        s2cor__Journal_Item__c: journalItem.id,
+        s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
+        s2cor__Tag__c: 'a5L0Y000000g0BmUAI'
+      })
       .execute();
 
     let journalItemTag: any;

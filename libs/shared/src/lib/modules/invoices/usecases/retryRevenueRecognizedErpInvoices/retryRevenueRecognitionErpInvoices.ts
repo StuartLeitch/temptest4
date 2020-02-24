@@ -82,7 +82,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       const updatedInvoices: ErpResponse[] = [];
 
       if (unrecognizedErpInvoices.length === 0) {
-        this.loggerService.info('No failed erp invoices');
+        this.loggerService.info('No revenue unrecognized invoices');
         return right(Result.ok<ErpResponse[]>(updatedInvoices));
       }
 

@@ -15,7 +15,14 @@ import { Resolvers } from '../schema';
 export const payments: Resolvers<any> = {
   Query: {
     async getPaymentMethods(parent, args, context) {
-      const usecase = new GetPaymentMethodsUseCase(context.repos.paymentMethod);
+      const {
+        repos: { paymentMethod: paymentMethodRepo },
+        services: { logger: loggerService }
+      } = context;
+      const usecase = new GetPaymentMethodsUseCase(
+        paymentMethodRepo,
+        loggerService
+      );
 
       const result = await usecase.execute();
 

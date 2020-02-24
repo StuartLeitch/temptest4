@@ -32,10 +32,6 @@ export class Logger {
     this.scope = Logger.parsePathToScope(scope ? scope : Logger.DEFAULT_SCOPE);
   }
 
-  setScope(scope: string) {
-    this.scope = Logger.parsePathToScope(scope);
-  }
-
   public debug(message: string, ...args: any[]): void {
     this.log('debug', message, args);
   }

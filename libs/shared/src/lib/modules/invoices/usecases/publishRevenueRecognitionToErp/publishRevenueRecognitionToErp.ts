@@ -63,9 +63,7 @@ export class PublishRevenueRecognitionToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: any
-  ) {
-    // this.loggerService.setScope('PublishRevenueRecognitionToERPUsecase');
-  }
+  ) {}
 
   private async getAccessControlContext(request: any, context?: any) {
     return {};

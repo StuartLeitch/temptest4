@@ -50,6 +50,7 @@
     "antd": "^3.26.9",
     "apollo-server": "^2.10.0",
     "apollo-server-testing": "^2.10.0",
+    "aspect.js": "^0.8.1",
     "aws-sdk": "^2.615.0",
     "axios": "^0.19.2",
     "axios-cancel": "^0.2.2",

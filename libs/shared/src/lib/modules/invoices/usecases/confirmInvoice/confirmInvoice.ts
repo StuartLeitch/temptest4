@@ -73,7 +73,6 @@ export class ConfirmInvoiceUsecase
     private vatService: VATService,
     private loggerService: any
   ) {
-    this.loggerService.setScope('ConfirmInvoiceUsecase');
     this.authorizationContext = { roles: [Roles.PAYER] };
 
     this.sanctionedCountryPolicy = new SanctionedCountryPolicy();

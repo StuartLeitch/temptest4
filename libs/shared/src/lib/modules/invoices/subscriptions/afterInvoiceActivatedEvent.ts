@@ -26,7 +26,6 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     private invoiceToErpUsecase: PublishInvoiceToErpUsecase,
     private loggerService: any
   ) {
-    // this.loggerService.setScope('AfterInvoiceActivatedEvent');
     this.setupSubscriptions();
   }
 

@@ -56,9 +56,7 @@ export class PublishInvoiceToErpUsecase
     private catalogRepo: CatalogRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: any
-  ) {
-    // this.loggerService.setScope('PublishInvoiceToERPUsecase');
-  }
+  ) {}
 
   private async getAccessControlContext(request: any, context?: any) {
     return {};

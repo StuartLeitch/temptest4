@@ -12,7 +12,10 @@ import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
 export class GetPaymentMethodsUseCase
   implements UseCase<undefined, Promise<GetPaymentMethodsResponse>> {
-  constructor(private paymentMethodRepo: PaymentMethodRepoContract) {}
+  constructor(
+    private paymentMethodRepo: PaymentMethodRepoContract,
+    loggerService: any
+  ) {}
 
   public async execute(): Promise<GetPaymentMethodsResponse> {
     let paymentMethods: PaymentMethodPersistenceDTO[];
