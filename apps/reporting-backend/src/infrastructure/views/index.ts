@@ -26,7 +26,7 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
   [
     invoicesDataView,
     journalsView,
-    submissionDataView,
+    // submissionDataView, -> is a table, updated by triggers
     submissionsView,
     uniqueJournals,
     authorsView,
@@ -62,3 +62,5 @@ export async function refreshViews(knex: Knex) {
     `Refreshing views took ${differenceInSeconds(refreshStart)} seconds`
   );
 }
+
+export { submissionDataView };

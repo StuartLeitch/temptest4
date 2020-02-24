@@ -4,54 +4,82 @@ import {
 } from './contracts/EventViewContract';
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 
+// move version array to separate table
 class SubmissionDataView extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
-CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS SELECT se.id as event_id,
-    se.time as event_timestamp,
-    se.type AS submission_event,
-    se.payload ->> 'submissionId'::text AS submission_id,
-    ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'customId'::text AS manuscript_custom_id,
-    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) -> 'articleType'::text) ->> 'name'::text AS article_type,
-    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'created'::text)::timestamp without time zone AS submission_date,
-    COALESCE((((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'updated'::text)::timestamp without time zone, se.time) AS updated_date,
-    ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'journalId'::text AS journal_id,
-    ((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'title'::text AS title,
-    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'specialIssueId') as "special_issue_id",
-    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'sectionId') as "section_id",
-    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'version') as "version",
-    (((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) ->> 'id') as "manuscript_version_id",
-    ((((se.payload -> 'manuscripts') -> last_version_index.manuscripts_array_index) -> 'authors'::text) -> 0) ->> 'country'::text AS submitting_author_country,
-    last_version_index.manuscripts_array_index as last_version_index
-    FROM ${REPORTING_TABLES.SUBMISSION} se
-    LEFT JOIN (
-      ${'' /*manuscript index of latest version*/}
-      SELECT
-        t.rn,
-        t.manuscripts_array_index - 1  as manuscripts_array_index,
-        t.event_id
+CREATE TABLE ${this.getViewName()} (
+  event_id uuid NULL,
+  event_timestamp timestamptz NULL,
+  submission_event varchar(255) NULL,
+  submission_id text NULL,
+  manuscript_custom_id text NULL,
+  article_type text NULL,
+  submission_date timestamp NULL,
+  updated_date timestamptz NULL,
+  journal_id text NULL,
+  title text NULL,
+  special_issue_id text NULL,
+  section_id text NULL,
+  "version" text NULL,
+  manuscript_version_id text NULL,
+  last_version_index int4 NULL
+)`;
+  }
+
+  public getTriggerQuery(): string {
+    return `
+create or replace FUNCTION ${this.getTriggerName()}()
+RETURNS trigger as 
+$$
+declare
+  _last_version_index int;
+begin
+	SELECT
+        t.manuscripts_array_index - 1 into _last_version_index
       from
         (
         SELECT
-          sd.event_id,
           sd.version_arr,
           row_number() over(partition by sd.event_id)::int as manuscripts_array_index,
-          row_number() over(partition by sd.event_id order by	sd.version_arr desc)::int as rn
+          row_number() over(partition by sd.event_id order by sd.version_arr desc)::int as rn
         FROM(
-          SELECT
-            se.id as event_id,
+          select
+          	NEW.id as event_id,
             string_to_array("version", '.')::int[] as version_arr
           FROM
-            ${REPORTING_TABLES.SUBMISSION} se,
-            jsonb_to_recordset(((se.payload -> 'manuscripts'))) as manuscripts_view("version" text)) sd 
+            jsonb_to_recordset(((NEW.payload -> 'manuscripts'))) as manuscripts_view("version" text)) sd 
         ) t
-        WHERE t.rn = 1
-      ) last_version_index on
-      se.id = last_version_index.event_id
-WITH DATA;
+        WHERE t.rn = 1;
+
+    insert into ${this.getViewName()} values(NEW.id,
+	    NEW.time,
+	    NEW.type,
+	    NEW.payload ->> 'submissionId'::text,
+	    ((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'customId'::text,
+	    (((NEW.payload -> 'manuscripts') -> _last_version_index) -> 'articleType'::text) ->> 'name'::text,
+	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'created'::text)::timestamp without time zone,
+	    COALESCE((((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'updated'::text)::timestamp without time zone, NEW.time),
+	    ((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'journalId'::text,
+	    ((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'title'::text,
+	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'specialIssueId'),
+	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'sectionId'),
+	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'version'),
+	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'id'),
+	    _last_version_index);
+    RETURN NEW;
+END
+$$
+language plpgsql;
+create trigger after_se_insert after insert on ${REPORTING_TABLES.SUBMISSION}
+for each row 
+execute procedure ${this.getTriggerName()}();
     `;
+  }
+
+  getTriggerName() {
+    return 'insert_into_submission_data';
   }
 
   postCreateQueries = [
