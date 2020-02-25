@@ -13,9 +13,6 @@ import { RetryRevenueRecognitionErpInvoicesUsecase } from '../../../../libs/shar
 import { env } from '../env';
 import { Logger } from '../lib/logger';
 
-const INVOICE_TO_ERP = Symbol('InvoiceToErpCronJob');
-const REVENUE_RECOGNITION_TO_ERP = Symbol('RevenueRecognitionToErpCronJob');
-
 const logger = new Logger('scheduler:loader');
 
 export const schedulerLoader: MicroframeworkLoader = async (
@@ -62,6 +59,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       catalog,
+      publisher,
       erpService,
       loggerService
     );
@@ -69,27 +67,27 @@ export const schedulerLoader: MicroframeworkLoader = async (
     // start scheduler
     let jobsQueue = [
       // TODO Describe first job
-      // async () => {
-      //   try {
-      //     const response = await retryFailedErpInvoicesUsecase.execute();
-      //     if (response.isLeft()) {
-      //       throw response.value.error;
-      //     }
-      //   } catch (error) {
-      //     logger.error(error);
-      //   }
-      // }
+      async () => {
+        try {
+          const response = await retryFailedErpInvoicesUsecase.execute();
+          if (response.isLeft()) {
+            throw response.value.error;
+          }
+        } catch (error) {
+          logger.error(error);
+        }
+      },
       // TODO Describe second job
-      // async () => {
-      //   try {
-      //     const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
-      //     if (response.isLeft()) {
-      //       throw response.value.error;
-      //     }
-      //   } catch (error) {
-      //     logger.error(error);
-      //   }
-      // }
+      async () => {
+        try {
+          const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
+          if (response.isLeft()) {
+            throw response.value.error;
+          }
+        } catch (error) {
+          logger.error(error);
+        }
+      }
     ];
 
     async function processJobsQueue() {

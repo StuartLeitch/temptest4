@@ -344,7 +344,7 @@ export class ErpService implements ErpServiceContract {
     const {
       fixedValues: { companyId }
     } = this;
-    const { invoice, manuscript } = data;
+    const { invoice, manuscript, publisherCustomValues } = data;
 
     const existingTagsByInvoiceNumber = await connection
       .sobject('s2cor__Sage_ACC_Tag__c')
@@ -356,7 +356,7 @@ export class ErpService implements ErpServiceContract {
       return null;
     }
 
-    const journalReference = `Hindawi APC Recognition for article ${manuscript.customId} ${invoice.referenceNumber}`;
+    const journalReference = `${publisherCustomValues.journalReference} ${manuscript.customId} ${invoice.referenceNumber}`;
     const journalData = {
       name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       s2cor__Reference__c: journalReference,
@@ -395,12 +395,18 @@ export class ErpService implements ErpServiceContract {
 
   private async registerJournalItem(data: any) {
     const connection = await this.getConnection();
-    const { journal, manuscript, invoice, invoiceTotal } = data;
+    const {
+      journal,
+      manuscript,
+      invoice,
+      invoiceTotal,
+      publisherCustomValues
+    } = data;
 
     const journalItemData = {
       Name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       s2cor__Journal__c: journal.id,
-      s2cor__Reference__c: `Hindawi APC Recognition for article ${manuscript.customId} ${invoice.referenceNumber}`,
+      s2cor__Reference__c: `${publisherCustomValues.journalItemReference} ${manuscript.customId} ${invoice.referenceNumber}`,
       s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW',
       s2cor__Amount__c: invoiceTotal,
       s2cor__Date__c: manuscript.datePublished,
@@ -437,7 +443,7 @@ export class ErpService implements ErpServiceContract {
     const {
       fixedValues: { companyId }
     } = this;
-    const { invoice, journal } = data;
+    const { invoice, journal, publisherCustomValues } = data;
 
     const journalTags = [];
     const dimensions = {
@@ -455,7 +461,7 @@ export class ErpService implements ErpServiceContract {
     const journalTagData = {
       s2cor__Journal__c: journal.id,
       s2cor__Dimension__c: dimensions.RevenueRecognitionType,
-      s2cor__Tag__c: 'a5L0Y000000g0EeUAI' // For Hindawi journals
+      s2cor__Tag__c: publisherCustomValues.journalTag
     };
 
     let journalTag: any;
@@ -484,12 +490,12 @@ export class ErpService implements ErpServiceContract {
 
   private async registerJournalItemTag(data: any) {
     const connection = await this.getConnection();
-    const { journalItem } = data;
+    const { journalItem, publisherCustomValues } = data;
 
     const journalItemTagData = {
       s2cor__Journal_Item__c: journalItem.id,
       s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
-      s2cor__Tag__c: 'a5L0Y000000g0BmUAI' // For Hindawi journals
+      s2cor__Tag__c: publisherCustomValues.journalItemTag
     };
 
     const existingJournalItemTag = await connection
@@ -498,7 +504,7 @@ export class ErpService implements ErpServiceContract {
       .where({
         s2cor__Journal_Item__c: journalItem.id,
         s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
-        s2cor__Tag__c: 'a5L0Y000000g0BmUAI'
+        s2cor__Tag__c: publisherCustomValues.journalItemTag
       })
       .execute();
 

@@ -17,6 +17,7 @@ import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { CatalogRepoContract } from '../../../journals/repos';
+import { PublisherRepoContract } from '../../../publishers/repos';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
@@ -51,6 +52,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
+    private publisherRepo: PublisherRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: any
   ) {
@@ -62,7 +64,8 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       this.payerRepo,
       this.addressRepo,
       this.manuscriptRepo,
-      // this.catalogRepo,
+      this.catalogRepo,
+      this.publisherRepo,
       this.erpService,
       this.loggerService
     );

@@ -1,9 +1,9 @@
-import {Entity} from '../../../core/domain/Entity';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { Entity } from '../../../core/domain/Entity';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
 
-import {CatalogId} from './CatalogId';
-import {CatalogItem} from './CatalogItem';
+import { CatalogId } from './CatalogId';
+import { CatalogItem } from './CatalogItem';
 
 export interface CatalogProps {
   name: string;
@@ -27,22 +27,6 @@ export class Catalog extends Entity<CatalogProps> {
     return this.props.items;
   }
 
-  public addCatalogItem(catalogItem: CatalogItem): void {
-    const alreadyAdded = this.props.items.find(i =>
-      i.id.equals(catalogItem.id)
-    );
-
-    if (!alreadyAdded) {
-      this.props.items.push(catalogItem);
-    }
-  }
-
-  public removeCatalogItem(catalogItem: CatalogItem): void {
-    this.props.items = this.props.items.filter(
-      p => !p.id.equals(catalogItem.id)
-    );
-  }
-
   private constructor(props: CatalogProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -59,6 +43,22 @@ export class Catalog extends Entity<CatalogProps> {
         },
         id
       )
+    );
+  }
+
+  public addCatalogItem(catalogItem: CatalogItem): void {
+    const alreadyAdded = this.props.items.find(i =>
+      i.id.equals(catalogItem.id)
+    );
+
+    if (!alreadyAdded) {
+      this.props.items.push(catalogItem);
+    }
+  }
+
+  public removeCatalogItem(catalogItem: CatalogItem): void {
+    this.props.items = this.props.items.filter(
+      p => !p.id.equals(catalogItem.id)
     );
   }
 }

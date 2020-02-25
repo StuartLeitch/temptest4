@@ -15,8 +15,8 @@ import {
   // PayerRepoContract,
   // ArticleRepoContract,
   InvoiceRepoContract,
-  VATService,
-  PayerType,
+  // VATService,
+  // PayerType,
   GetItemsForInvoiceUsecase
 } from '@hindawi/shared';
 // import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
@@ -31,7 +31,8 @@ import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
-// import { CatalogRepoContract } from '../../../journals/repos';
+import { CatalogRepoContract } from '../../../journals/repos';
+import { PublisherRepoContract } from '../../../publishers/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { PublishRevenueRecognitionToErpResponse } from './publishRevenueRecognitionToErpResponse';
 
@@ -61,6 +62,8 @@ export class PublishRevenueRecognitionToErpUsecase
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
+    private catalogRepo: CatalogRepoContract,
+    private publisherRepo: PublisherRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: any
   ) {}
@@ -130,6 +133,20 @@ export class PublishRevenueRecognitionToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
+      const catalog = await this.catalogRepo.getCatalogItemByJournalId(
+        JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+      );
+      if (!catalog) {
+        throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
+      }
+
+      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
+        catalog.publisherId
+      );
+      if (!publisherCustomValues) {
+        throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
+      }
+
       const invoiceItem = invoice.invoiceItems.getItems().shift();
       const { coupons, waivers, price, vat } = invoiceItem;
       let netCharges = price;
@@ -151,7 +168,8 @@ export class PublishRevenueRecognitionToErpUsecase
       const erpResponse = await this.erpService.registerRevenueRecognition({
         invoice,
         manuscript,
-        invoiceTotal: total
+        invoiceTotal: total,
+        publisherCustomValues
       });
 
       this.loggerService.info(

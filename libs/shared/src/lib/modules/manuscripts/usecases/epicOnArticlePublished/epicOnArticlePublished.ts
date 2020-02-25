@@ -127,20 +127,20 @@ export class EpicOnArticlePublishedUsecase
         return left(new Errors.InvoiceIdRequired());
       }
 
-      // if (invoice.getInvoiceTotal() === 0) {
-      //   return;
-      // }
+      if (invoice.getInvoiceTotal() === 0) {
+        return;
+      }
 
-      // if (typeof manuscript.authorCountry === 'undefined') {
-      //   emailService
-      //     .autoConfirmMissingCountryNotification(
-      //       invoice,
-      //       manuscript,
-      //       sanctionedCountryNotificationReceiver,
-      //       sanctionedCountryNotificationSender
-      //     )
-      //     .sendEmail();
-      // }
+      if (typeof manuscript.authorCountry === 'undefined') {
+        emailService
+          .autoConfirmMissingCountryNotification(
+            invoice,
+            manuscript,
+            sanctionedCountryNotificationReceiver,
+            sanctionedCountryNotificationSender
+          )
+          .sendEmail();
+      }
 
       // * create new address
       const newAddress = AddressMap.toDomain({

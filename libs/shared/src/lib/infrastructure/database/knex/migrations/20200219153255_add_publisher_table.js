@@ -46,16 +46,6 @@ module.exports.up = async function(knex) {
 
   await knex('publisher_custom_values').insert([
     {
-      name: 'journalItemReference',
-      publisherId: hindawiId,
-      value: 'Hindawi APC Recognition for article'
-    },
-    {
-      name: 'journalItemReference',
-      publisherId: wileyId,
-      value: 'Wiley-Hindawi APC Recognition for article'
-    },
-    {
       name: 'tradeDocumentItem',
       publisherId: hindawiId,
       value: '01t0Y000002BuB9QAK'
@@ -68,22 +58,22 @@ module.exports.up = async function(knex) {
     {
       name: 'journalReference',
       publisherId: hindawiId,
-      value: 'Wiley-Hindawi APC Recognition for article'
+      value: 'Hindawi APC Recognition for article'
     },
     {
       name: 'journalReference',
       publisherId: wileyId,
+      value: 'Wiley-Hindawi APC Recognition for article'
+    },
+    {
+      name: 'journalItemReference',
+      publisherId: hindawiId,
       value: 'Hindawi APC Recognition for article'
     },
     {
-      name: 'journalItemTag',
-      publisherId: hindawiId,
-      value: 'a5L0Y000000PFE7UAO'
-    },
-    {
-      name: 'journalItemTag',
+      name: 'journalItemReference',
       publisherId: wileyId,
-      value: 'a5L0Y000000fzUOUAY'
+      value: 'Wiley-Hindawi APC Recognition for article'
     },
     {
       name: 'journalTag',
@@ -94,6 +84,16 @@ module.exports.up = async function(knex) {
       name: 'journalTag',
       publisherId: wileyId,
       value: 'a5L0Y000000g0TMUAY'
+    },
+    {
+      name: 'journalItemTag',
+      publisherId: hindawiId,
+      value: 'a5L0Y000000g0BmUAI'
+    },
+    {
+      name: 'journalItemTag',
+      publisherId: wileyId,
+      value: 'a5L0Y000000fzUOUAY'
     }
   ]);
 };
