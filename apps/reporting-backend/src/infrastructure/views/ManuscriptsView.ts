@@ -75,7 +75,6 @@ manuscriptsView.addDependency(invoicesView);
 manuscriptsView.addDependency(journalSectionsView);
 manuscriptsView.addDependency(journalSpecialIssuesView);
 manuscriptsView.addDependency(manuscriptEditorsView);
-manuscriptsView.addDependency(submissionDataView);
 manuscriptsView.addDependency(submissionView);
 
 export default manuscriptsView;
