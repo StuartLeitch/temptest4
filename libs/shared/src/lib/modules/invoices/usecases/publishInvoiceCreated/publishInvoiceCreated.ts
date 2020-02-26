@@ -138,7 +138,7 @@ export class PublishInvoiceCreatedUsecase
       referenceNumber: invoice.referenceNumber,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status as PhenomInvoiceStatus,
-      invoiceCreatedDate: invoice.dateCreated
+      invoiceCreatedDate: invoice.dateCreated.toISOString()
     };
   }
 

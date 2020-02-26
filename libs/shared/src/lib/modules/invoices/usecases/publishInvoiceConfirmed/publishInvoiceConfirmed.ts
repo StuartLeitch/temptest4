@@ -27,9 +27,9 @@ export class PublishInvoiceConfirmed {
     const data: InvoiceConfirmedEvent = {
       ...EventUtils.createEventObject(),
       invoiceId: invoice.id.toString(),
-      invoiceCreatedDate: invoice.dateCreated,
+      invoiceCreatedDate: invoice.dateCreated.toISOString(),
       referenceNumber: invoice.referenceNumber,
-      invoiceIssueDate: invoice.dateIssued,
+      invoiceIssueDate: invoice.dateIssued.toISOString(),
       invoiceItems: invoiceItems.map(ii => ({
         id: ii.id.toString(),
         manuscriptCustomId: manuscript.customId,
