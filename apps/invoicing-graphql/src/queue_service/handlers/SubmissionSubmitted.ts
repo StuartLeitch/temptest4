@@ -97,7 +97,6 @@ export const SubmissionSubmittedHandler = {
     if (alreadyExistingManuscriptResult.isLeft()) {
       logger.error(alreadyExistingManuscriptResult.value.errorValue().message);
       throw alreadyExistingManuscriptResult.value.error;
-      return;
     }
 
     if (name in ManuscriptTypeNotInvoiceable) {

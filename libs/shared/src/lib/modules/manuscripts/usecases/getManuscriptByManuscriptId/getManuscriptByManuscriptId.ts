@@ -52,7 +52,7 @@ export class GetManuscriptByManuscriptIdUsecase
 
     try {
       try {
-        manuscript = await this.manuscriptRepo.findByCustomId(manuscriptId);
+        manuscript = await this.manuscriptRepo.findById(manuscriptId);
       } catch (e) {
         return left(
           new GetManuscriptByManuscriptIdErrors.ManuscriptFoundError(

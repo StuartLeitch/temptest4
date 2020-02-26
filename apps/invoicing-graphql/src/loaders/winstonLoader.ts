@@ -11,11 +11,16 @@ export const winstonLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
   const {
+    output,
+    tenant,
     cloudwatch: { region, groupName, accessKey, secretAccessKey }
   } = env.log;
+  console.log(
+    `CloudWatch log stream is: ${output}-backend-${groupName}-${tenant}`
+  );
   const cloudwatchConfig: any = {
     logGroupName: groupName,
-    logStreamName: `${groupName}-${env.node}`,
+    logStreamName: `${output}-backend-${groupName}-${tenant}`, // development-backend-invoicing-hindawi
     awsAccessKeyId: accessKey,
     awsSecretKey: secretAccessKey,
     awsRegion: region,

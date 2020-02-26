@@ -66,6 +66,7 @@ export const env = {
     invoicePaymentEmailSenderName: getOsEnv('INVOICE_PAYMENT_EMAIL_SENDER_NAME')
   },
   log: {
+    tenant: getOsEnv('LOG_TENANT'),
     level: getOsEnv('LOG_LEVEL'),
     json: toBool(getOsEnvOptional('LOG_JSON')),
     output: getOsEnv('LOG_OUTPUT'),
