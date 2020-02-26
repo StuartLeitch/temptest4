@@ -89,7 +89,7 @@ export const invoice: Resolvers<any> = {
           // status: invoiceDetails.status,
           // charge: invoiceDetails.charge,
           dateCreated: invoiceDetails.dateCreated.toISOString(),
-          dateAccepted: invoiceDetails.dateAccepted.toISOString(),
+          dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
           dateIssued:
             invoiceDetails.dateIssued &&
             invoiceDetails.dateIssued.toISOString(),
@@ -432,7 +432,7 @@ export const invoice: Resolvers<any> = {
         invoiceId: migratedInvoice.invoiceId.id.toString(),
         referenceNumber: migratedInvoice.invoiceNumber,
         dateIssued: migratedInvoice.dateIssued.toISOString(),
-        dateAccepted: migratedInvoice.dateAccepted.toISOString()
+        dateAccepted: migratedInvoice?.dateAccepted?.toISOString()
         // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
         // datePaid: migratedPayment.datePaid.toISOString(),
         // amount: migratedPayment.amount.value,

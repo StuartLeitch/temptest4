@@ -108,7 +108,9 @@ class EmailService {
         paragraph: `
           The invoice with id {${invoice.id.toString()}} and reference number {${
           invoice.invoiceNumber
-        }/${invoice.dateAccepted.getFullYear()}} has been confirmed from a Sanctioned Country.
+        }/${(
+          invoice.dateAccepted || invoice.dateCreated
+        ).getFullYear()}} has been confirmed from a Sanctioned Country.
         `
       },
       bodyProps: {

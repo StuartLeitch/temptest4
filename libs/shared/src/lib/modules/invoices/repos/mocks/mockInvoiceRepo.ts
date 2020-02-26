@@ -113,7 +113,7 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     const alreadyExists = await this.exists(invoice);
 
     if (alreadyExists) {
-      this._items.map(i => {
+      this._items = this._items.map(i => {
         if (this.compareMockItems(i, invoice)) {
           return invoice;
         } else {
@@ -146,5 +146,9 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     return this._items
       .filter(item => ids.includes(item.id.toString()))
       .map(item => item.id.toString());
+  }
+
+  async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
+    return [];
   }
 }
