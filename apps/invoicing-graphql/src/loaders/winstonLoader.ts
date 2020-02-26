@@ -19,7 +19,49 @@ export const winstonLoader: MicroframeworkLoader = (
     awsAccessKeyId: accessKey,
     awsSecretKey: secretAccessKey,
     awsRegion: region,
-    jsonMessage: true
+    jsonMessage: false,
+    messageFormatter(log: any) {
+      const { level, message, ...meta } = log;
+
+      const messageFormat = {} as any;
+
+      let scope = '';
+      let rawMessage = '';
+      const matches = message.match(/\[(.*?)\]\s+(.*)/);
+      if (matches) {
+        scope = matches[1];
+        rawMessage = matches[2];
+      }
+
+      const scoping = scope.split(':');
+      if (scoping[0] === 'PhenomEvent') {
+        messageFormat.eventType = scoping[0];
+        messageFormat.eventName = scoping[1];
+        messageFormat.message = rawMessage;
+      }
+
+      if (scoping[0] === 'Usecase' && scoping[1] === 'Aspect') {
+        messageFormat.usecase = meta.usecaseClassName;
+        messageFormat.method = meta.usecaseMethodName;
+        delete meta.usecaseClassName;
+        delete meta.usecaseMethodName;
+        // messageFormat.eventName = scoping[1];
+        // messageFormat.message = rawMessage;
+      }
+
+      const output = {
+        level,
+        context:
+          'eventType' in messageFormat || 'usecase' in messageFormat
+            ? {
+                ...messageFormat
+              }
+            : { scope, message: rawMessage },
+        data: 'args' in meta ? meta.args.request : meta
+      };
+
+      return JSON.stringify(output);
+    }
   };
 
   configure({

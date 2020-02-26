@@ -13,7 +13,7 @@ import * as winston from 'winston';
  */
 
 export class Logger {
-  public static DEFAULT_SCOPE = 'app';
+  public static DEFAULT_SCOPE = 'Invoicing/Backend';
   private scope: string;
 
   private static parsePathToScope(filePath: string): string {
@@ -23,7 +23,7 @@ export class Logger {
       filePath = filePath.replace(`${path.sep}dist${path.sep}`, '');
       filePath = filePath.replace('.ts', '');
       filePath = filePath.replace('.js', '');
-      filePath = filePath.replace(path.sep, ':');
+      filePath = filePath.replace(path.sep, '/');
     }
     return filePath;
   }
@@ -50,7 +50,7 @@ export class Logger {
 
   private log(level: string, message: string, args: any[]): void {
     if (winston) {
-      winston[level](`${this.formatScope()} ${message}`, args);
+      winston[level](`${this.formatScope()} ${message}`, ...args);
     }
   }
 

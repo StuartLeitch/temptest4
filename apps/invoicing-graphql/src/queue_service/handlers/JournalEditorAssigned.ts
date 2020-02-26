@@ -6,7 +6,7 @@ import { Logger } from '../../lib/logger';
 
 const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
 const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
-const logger = new Logger(`events:${JOURNAL_EDITOR_ASSIGNED}`);
+const logger = new Logger(`PhenomEvent:${JOURNAL_EDITOR_ASSIGNED}`);
 // const JOURNAL_SECTION_SPECIAL_ISSUE_EDITOR_ASSIGNED =
 //   'JournalSectionSpecialIssueEditorAssigned';
 // const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
@@ -32,12 +32,16 @@ function addEditorEventHandlerFactory(eventName: string): any {
         journalId,
         allEditors: editors
       });
+
       if (assignEditorResponse.isLeft()) {
-        console.error(assignEditorResponse.value.error);
+        logger.error(assignEditorResponse.value.errorValue().message);
+        throw assignEditorResponse.value.error;
       }
-      console.log(`Successfully executed event ${eventName}`);
+
+      logger.info(`Successfully executed event ${eventName}`);
     } catch (error) {
-      console.error(error);
+      logger.error(error.message);
+      throw error;
     }
   };
 }

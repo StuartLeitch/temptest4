@@ -7,7 +7,7 @@ import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 const ARTICLE_PUBLISHED = 'ArticlePublished';
-const logger = new Logger(`events:${ARTICLE_PUBLISHED}`);
+const logger = new Logger(`PhenomEvent:${ARTICLE_PUBLISHED}`);
 
 export const ArticlePublishedHandler = {
   event: ARTICLE_PUBLISHED,
@@ -52,20 +52,17 @@ export const ArticlePublishedHandler = {
       loggerService
     );
 
-    try {
-      const args: EpicOnArticlePublishedDTO = {
-        customId,
-        published,
-        sanctionedCountryNotificationReceiver,
-        sanctionedCountryNotificationSender
-      };
-      const result = await epicOnArticlePublishedUsecase.execute(args);
+    const args: EpicOnArticlePublishedDTO = {
+      customId,
+      published,
+      sanctionedCountryNotificationReceiver,
+      sanctionedCountryNotificationSender
+    };
 
-      if (result.isLeft()) {
-        logger.error(result.value.error.toString());
-      }
-    } catch (error) {
-      logger.error(error);
+    const result = await epicOnArticlePublishedUsecase.execute(args);
+    if (result.isLeft()) {
+      logger.error(result.value.errorValue().message);
+      throw result.value.error;
     }
   }
 };

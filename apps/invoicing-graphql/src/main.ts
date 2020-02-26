@@ -47,6 +47,6 @@ bootstrapMicroframework({
 })
   .then(() => banner(log))
   .catch(error => {
-    log.error(`Application crashed: ${error}`);
+    log.error('Application crashed', error);
     process.exit(1);
   });

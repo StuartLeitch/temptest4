@@ -5,7 +5,7 @@ import {
 import { Logger } from '../../lib/logger';
 
 const JOURNAL_ADDED = 'JournalAdded';
-const logger = new Logger(`events:${JOURNAL_ADDED}`);
+const logger = new Logger(`PhenomEvent:${JOURNAL_ADDED}`);
 
 export const JournalAddedHandler = {
   event: JOURNAL_ADDED,
@@ -30,10 +30,12 @@ export const JournalAddedHandler = {
       } as AddCatalogItemToCatalogUseCaseRequestDTO);
 
       if (result.isLeft()) {
-        console.error(result.value.error);
+        logger.error(result.value.errorValue().message);
+        throw result.value.error;
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error.message);
+      throw error;
     }
   }
 };

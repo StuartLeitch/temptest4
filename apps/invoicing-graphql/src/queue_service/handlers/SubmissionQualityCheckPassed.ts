@@ -14,7 +14,7 @@ import { env } from '../../env';
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
-const logger = new Logger(`events:${SUBMISSION_QUALITY_CHECK_PASSED}`);
+const logger = new Logger(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
 
 export const SubmissionQualityCheckPassedHandler = {
   event: SUBMISSION_QUALITY_CHECK_PASSED,
@@ -87,7 +87,8 @@ export const SubmissionQualityCheckPassedHandler = {
     );
 
     if (result.isLeft()) {
-      logger.error(result.value.error.toString());
+      logger.error(result.value.errorValue().message);
+      throw result.value.error;
     }
   }
 };

@@ -11,7 +11,7 @@ const SUBMISSION_WITHDRAWN = 'SubmissionWithdrawn';
 const defaultContext: SoftDeleteDraftTransactionAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN]
 };
-const logger = new Logger(`events:${SUBMISSION_WITHDRAWN}`);
+const logger = new Logger(`PhenomEvent:${SUBMISSION_WITHDRAWN}`);
 
 export const SubmissionWithdrawn = {
   event: SUBMISSION_WITHDRAWN,
@@ -44,7 +44,8 @@ export const SubmissionWithdrawn = {
     );
 
     if (result.isLeft()) {
-      logger.error(result.value.error.toString());
+      logger.error(result.value.errorValue().message);
+      throw result.value.error;
     }
   }
 };

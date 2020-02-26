@@ -24,7 +24,7 @@ import { Logger } from '../../lib/logger';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
-const logger = new Logger(`events:${SUBMISSION_SUBMITTED}`);
+const logger = new Logger(`PhenomEvent:${SUBMISSION_SUBMITTED}`);
 
 export const SubmissionSubmittedHandler = {
   event: SUBMISSION_SUBMITTED,
@@ -95,6 +95,8 @@ export const SubmissionSubmittedHandler = {
     );
 
     if (alreadyExistingManuscriptResult.isLeft()) {
+      logger.error(alreadyExistingManuscriptResult.value.errorValue().message);
+      throw alreadyExistingManuscriptResult.value.error;
       return;
     }
 
@@ -120,8 +122,6 @@ export const SubmissionSubmittedHandler = {
       }
 
       if (journalId !== alreadyExistingManuscript.journalId) {
-        // console.info(alreadyExistingManuscript);
-
         let invoiceId = null;
         const invoiceIdResult = await getInvoiceIdByManuscriptCustomIdUsecase.execute(
           {
@@ -130,7 +130,8 @@ export const SubmissionSubmittedHandler = {
           defaultContext
         );
         if (invoiceIdResult.isLeft()) {
-          console.error(invoiceIdResult.value.error);
+          logger.error(invoiceIdResult.value.errorValue().message);
+          throw invoiceIdResult.value.error;
         } else {
           [invoiceId] = invoiceIdResult.value.getValue();
           logger.info(
@@ -147,7 +148,8 @@ export const SubmissionSubmittedHandler = {
           defaultContext
         );
         if (itemsResult.isLeft()) {
-          console.error(itemsResult.value.error);
+          logger.error(itemsResult.value.errorValue().message);
+          throw itemsResult.value.error;
         }
 
         items = itemsResult.value.getValue();
@@ -162,10 +164,11 @@ export const SubmissionSubmittedHandler = {
         );
 
         if (journalResult.isLeft()) {
-          console.error(journalResult.value.error);
+          logger.error(journalResult.value.errorValue().message);
+          throw journalResult.value.error;
         }
 
-        journal = journalResult.value.getValue();
+        journal = (journalResult as any).value.getValue();
         logger.info('Get Journal details for new journal ID', journal);
 
         items.forEach((i: any) => {
@@ -180,7 +183,8 @@ export const SubmissionSubmittedHandler = {
         );
 
         if (updatedInvoiceItemsResult.isLeft()) {
-          console.error(updatedInvoiceItemsResult.value.error);
+          logger.error(updatedInvoiceItemsResult.value.errorValue().message);
+          throw updatedInvoiceItemsResult.value.error;
         }
 
         logger.info(
@@ -226,7 +230,8 @@ export const SubmissionSubmittedHandler = {
       );
 
       if (result.isLeft()) {
-        console.error(result.value.error);
+        logger.error(result.value.errorValue().message);
+        throw result.value.error;
       } else {
         const newTransaction = result.value.getValue();
         logger.info(`Transaction Data`, newTransaction);
@@ -254,6 +259,7 @@ export const SubmissionSubmittedHandler = {
         );
 
         if (createManuscriptResult.isLeft()) {
+          logger.error(createManuscriptResult.value.errorValue().message);
           throw createManuscriptResult.value.error;
         } else {
           const newManuscript = createManuscriptResult.value.getValue();
