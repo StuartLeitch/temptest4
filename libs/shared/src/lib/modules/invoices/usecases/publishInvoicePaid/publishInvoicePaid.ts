@@ -24,7 +24,7 @@ export class PublishInvoicePaid {
     const data: InvoicePaidEvent = {
       ...EventUtils.createEventObject(),
       invoiceId: invoice.id.toString(),
-      invoiceCreatedDate: invoice.dateCreated,
+      invoiceCreatedDate: invoice.dateCreated.toISOString(),
       valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
       invoiceItems: invoiceItems.map(ii => ({
         id: ii.id.toString(),
@@ -44,7 +44,7 @@ export class PublishInvoicePaid {
       invoiceStatus: paymentDetails.invoiceStatus as any,
       referenceNumber: invoice.referenceNumber,
       invoiceIssueDate: paymentDetails.invoiceIssueDate
-        ? new Date(paymentDetails.invoiceIssueDate)
+        ? new Date(paymentDetails.invoiceIssueDate).toISOString()
         : null,
       payerName: paymentDetails.payerName,
       payerEmail: paymentDetails.payerEmail,
@@ -54,7 +54,7 @@ export class PublishInvoicePaid {
       country: paymentDetails.country,
       foreignPaymentId: paymentDetails.foreignPaymentId,
       paymentDate: paymentDetails.paymentDate
-        ? new Date(paymentDetails.paymentDate)
+        ? new Date(paymentDetails.paymentDate).toISOString()
         : null,
       paymentType: paymentDetails.paymentType,
       paymentAmount: paymentDetails.amount

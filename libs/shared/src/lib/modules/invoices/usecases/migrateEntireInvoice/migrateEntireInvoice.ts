@@ -40,6 +40,7 @@ import { Migration } from '../../../payments/domain/strategies/Migration';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { Address } from '../../../addresses/domain/Address';
 import { ManuscriptId } from '../../domain/ManuscriptId';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
@@ -582,7 +583,7 @@ export class MigrateEntireInvoiceUsecase
         if (!result) {
           return null;
         }
-        return result?.getValue();
+        return (result as any).getValue() as Address;
       })
       .then(async billingAddress => {
         const context = {
@@ -673,7 +674,9 @@ export class MigrateEntireInvoiceUsecase
       })
       .then(async ({ paymentMethod, payer }) => {
         const paymentMethodId = paymentMethod.paymentMethodId.id.toString();
-        const payerId = payer ? payer.id.toString() : null;
+        const payerId = !!payer
+          ? ((payer as any).id.toString() as string)
+          : null;
         if (!request.apc.paymentAmount) {
           return right<null, null>(null);
         }
