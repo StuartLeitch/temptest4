@@ -57,6 +57,8 @@ export const invoice: Resolvers<any> = {
         status: invoiceDetails.status,
         charge: invoiceDetails.charge,
         dateCreated: invoiceDetails.dateCreated.toISOString(),
+        erpReference: invoiceDetails.erpReference,
+        revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         dateIssued:
           invoiceDetails.dateIssued && invoiceDetails.dateIssued.toISOString(),
         referenceNumber:

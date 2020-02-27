@@ -53,6 +53,7 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (submission_id)`,
     `create index on ${this.getViewName()} (submission_date)`,
     `create index on ${this.getViewName()} (updated_date)`,
     `create index on ${this.getViewName()} (article_type)`,

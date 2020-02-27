@@ -77,6 +77,8 @@ fragment invoiceFragment on Invoice {
   dateIssued
   dateAccepted
   referenceNumber
+  erpReference
+  revenueRecognitionReference
   payer {
     ...payerFragment
   }
@@ -153,6 +155,7 @@ fragment articleFragment on Article {
   authorSurname
   authorFirstName
   journalTitle
+  datePublished
 }
 `;
 
@@ -560,53 +563,88 @@ const Details = () => {
                         </span>
                       </CardTitle>
                       {/* START Form */}
-                      <Form>
-                        {/* START Input */}
-                        <FormGroup row>
-                          <Label sm={3}>Invoice Issue Date</Label>
-                          <Col sm={9}>
-                            <DatePicker
-                              customInput={<ButtonInput />}
-                              selected={new Date(invoice.dateIssued)}
-                              onChange={() => {}}
-                            />
-                          </Col>
-                        </FormGroup>
-                        {/* END Input */}
-                        <FormGroup row>
-                          <Label sm={3}>Date of Supply</Label>
-                          <Col sm={9}>
-                            <DatePicker
-                              readOnly
-                              customInput={<ButtonInput />}
-                              selected={Date.now()}
-                            />
-                          </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                          <Label for='staticText' sm={3}>
-                            Reference Number
-                          </Label>
-                          <Col sm={9}>
-                            <Input
-                              plaintext
-                              readOnly
-                              value={invoice.referenceNumber}
-                            />
-                          </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                          <Label for='staticText' sm={3}>
-                            Terms
-                          </Label>
-                          <Col sm={9}>
-                            <Input
-                              readOnly
-                              plaintext
-                              value='Payable upon Receipt'
-                            />
-                          </Col>
-                        </FormGroup>
+                      <Form
+                        style={{
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          flexDirection: 'row',
+                          display: 'flex'
+                        }}
+                      >
+                        <div style={{ flex: 1 }} className='mr-2'>
+                          {/* START Input */}
+                          <FormGroup row>
+                            <Label sm={5}>Invoice Issue Date</Label>
+                            <Col sm={7}>
+                              <DatePicker
+                                customInput={<ButtonInput />}
+                                selected={new Date(invoice.dateIssued)}
+                                onChange={() => {}}
+                              />
+                            </Col>
+                          </FormGroup>
+                          {/* END Input */}
+                          <FormGroup row>
+                            <Label sm={5}>Date of Supply</Label>
+                            <Col sm={7}>
+                              <DatePicker
+                                readOnly
+                                customInput={<ButtonInput />}
+                                selected={Date.now()}
+                              />
+                            </Col>
+                          </FormGroup>
+                          <FormGroup row>
+                            <Label for='staticText' sm={5}>
+                              Terms
+                            </Label>
+                            <Col sm={7}>
+                              <Input
+                                readOnly
+                                plaintext
+                                value='Payable upon Receipt'
+                              />
+                            </Col>
+                          </FormGroup>
+                        </div>
+                        <div style={{ flex: 1 }} className='ml-2'>
+                          <FormGroup row>
+                            <Label for='staticText' sm={5}>
+                              Ref. Number
+                            </Label>
+                            <Col sm={7}>
+                              <Input
+                                plaintext
+                                readOnly
+                                value={invoice.referenceNumber}
+                              />
+                            </Col>
+                          </FormGroup>
+                          <FormGroup row>
+                            <Label for='staticText' sm={5}>
+                              ERP Reference
+                            </Label>
+                            <Col sm={7}>
+                              <Input
+                                plaintext
+                                readOnly
+                                value={invoice.erpReference}
+                              />
+                            </Col>
+                          </FormGroup>
+                          <FormGroup row>
+                            <Label for='staticText' sm={5}>
+                              Rev. Rec. ERP Ref.
+                            </Label>
+                            <Col sm={7}>
+                              <Input
+                                plaintext
+                                readOnly
+                                value={invoice.revenueRecognitionReference}
+                              />
+                            </Col>
+                          </FormGroup>
+                        </div>
                       </Form>
                       {/* END Form */}
 
@@ -674,7 +712,10 @@ const Details = () => {
                                   </span>
                                 </td>
                                 <td className='align-middle text-right text-dark font-weight-bold'>
-                                  &ndash;$0.15
+                                  &ndash;$
+                                  {(invoice.invoiceItem.price *
+                                    coupon.reduction) /
+                                    100}
                                 </td>
                               </tr>
                             ))}
@@ -924,6 +965,19 @@ const Details = () => {
                       'dd MMMM yyyy'
                     )}
                     phrase={'Invoice enters FINAL state.'}
+                  />
+                )}
+                {invoice?.invoiceItem?.article?.datePublished && (
+                  <TimelineMini
+                    icon='play-circle'
+                    iconClassName='text-blue'
+                    badgeTitle='Published'
+                    badgeColor='blue'
+                    date={format(
+                      new Date(invoice?.invoiceItem?.article?.datePublished),
+                      'dd MMMM yyyy'
+                    )}
+                    phrase={'Article enters PUBLISHED state.'}
                   />
                 )}
               </CardBody>

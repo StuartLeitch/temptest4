@@ -24,9 +24,11 @@ export class PublishInvoiceConfirmed {
     address: Address,
     messageTimestamp?: Date
   ): Promise<any> {
-    const data: InvoiceConfirmedEvent = {
+    // const data: InvoiceConfirmedEvent
+    const data = {
       ...EventUtils.createEventObject(),
       invoiceId: invoice.id.toString(),
+      erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
       referenceNumber: invoice.referenceNumber,
       invoiceIssueDate: invoice.dateIssued.toISOString(),

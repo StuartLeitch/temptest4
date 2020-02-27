@@ -25,6 +25,7 @@ type Article @model(id: "articles") {
   authorCountry: String
   authorSurname: String
   authorFirstName: String
+  datePublished: Date
 }
 
 type Transaction @model(id: "transactions") {
@@ -63,6 +64,8 @@ type Invoice @model(id: "invoices") {
   charge: Float
   status: InvoiceStatus @filter(key: "invoiceStatus")
   payer: Payer
+  erpReference: String
+  revenueRecognitionReference: String
   referenceNumber: ReferenceNumber @filter
   invoiceItem: InvoiceItem
   title: String
