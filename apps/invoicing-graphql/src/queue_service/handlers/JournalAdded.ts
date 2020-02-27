@@ -1,7 +1,6 @@
-import {
-  AddCatalogItemToCatalogUseCase,
-  AddCatalogItemToCatalogUseCaseRequestDTO
-} from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+import { AddCatalogItemToCatalogUseCaseRequestDTO } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogDTOs';
+
 import { Logger } from '../../lib/logger';
 
 const JOURNAL_ADDED = 'JournalAdded';
@@ -12,10 +11,13 @@ export const JournalAddedHandler = {
   async handler(data: any) {
     logger.info(`Incoming Event Data`, data);
     const {
-      repos: { catalog: catalogRepo }
+      repos: { catalog: catalogRepo, publisher: publisherRepo }
     } = this;
 
-    const addJournalUsecase = new AddCatalogItemToCatalogUseCase(catalogRepo);
+    const addJournalUsecase = new AddCatalogItemToCatalogUseCase(
+      catalogRepo,
+      publisherRepo
+    );
     try {
       const result = await addJournalUsecase.execute({
         // type: data.id,
