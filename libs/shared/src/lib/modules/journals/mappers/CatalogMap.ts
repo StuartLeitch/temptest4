@@ -11,19 +11,19 @@ export class CatalogMap extends Mapper<CatalogItem> {
   public static toDomain(raw: any): CatalogItem {
     const catalogOrError = CatalogItem.create(
       {
+        type: raw.type,
+        amount: raw.amount,
         journalId: JournalId.create(
           new UniqueEntityID(raw.journalId)
         ).getValue(),
-        type: raw.type,
-        amount: raw.amount,
         created: raw.created ? new Date(raw.created) : null,
         updated: raw.updated ? new Date(raw.updated) : null,
         currency: raw.currency,
         isActive: !!raw.isActive,
         journalTitle: raw.journalTitle,
-        publisherId: PublisherId.create(
-          new UniqueEntityID(raw.publisherId)
-        ).getValue(),
+        publisherId: raw.publisherId
+          ? PublisherId.create(new UniqueEntityID(raw.publisherId)).getValue()
+          : null,
         issn: raw.issn
         // price: Money.fromInteger({amount: raw.amount, currency: Currencies.USD})
         // dateUpdated: new Date(raw.dateUpdated)

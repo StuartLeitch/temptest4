@@ -1,8 +1,8 @@
-import {UseCase} from '../../../../../core/domain/UseCase';
-import {Result} from '../../../../../core/logic/Result';
+import { UseCase } from '../../../../../core/domain/UseCase';
+import { Result } from '../../../../../core/logic/Result';
 
-import {CatalogItem} from '../../../domain/CatalogItem';
-import {CatalogRepoContract} from '../../../repos/catalogRepo';
+import { CatalogItem } from '../../../domain/CatalogItem';
+import { CatalogRepoContract } from '../../../repos/catalogRepo';
 
 export class GetAllCatalogItemsUseCase
   implements UseCase<{}, Result<CatalogItem[]>> {
