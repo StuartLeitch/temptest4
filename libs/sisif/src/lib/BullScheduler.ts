@@ -1,12 +1,7 @@
 import Queue from 'bull';
 import Redis from 'ioredis';
 
-import {
-  SchedulerContract,
-  Job,
-  ScheduleTimer,
-  TimerType
-} from '@hindawi/shared';
+import { SchedulerContract, Job, ScheduleTimer, TimerType } from './Types';
 
 export class BullScheduler implements SchedulerContract {
   private client: Redis.Redis;
@@ -15,6 +10,7 @@ export class BullScheduler implements SchedulerContract {
   constructor(private redisConnectionString: string) {
     this.client = new Redis(this.redisConnectionString);
     this.subscriber = new Redis(this.redisConnectionString);
+    this.getRedisConnection = this.getRedisConnection.bind(this);
   }
 
   public async schedule(
@@ -22,22 +18,30 @@ export class BullScheduler implements SchedulerContract {
     queueName: string,
     timer: ScheduleTimer
   ): Promise<any> {
+    // TODO add logging
     let queue = this.createQueue(queueName);
-    if (timer.kind === TimerType.DelayedTimer) {
-      return queue.add(job.type, job, { jobId: job.id, delay: timer.delay });
-    } else if (timer.kind === TimerType.RepeatableTimer) {
-      return queue.add(job.type, job, {
-        jobId: job.id,
-        repeat: { every: timer.every }
-      });
-    } else if (timer.kind === TimerType.CronRepeatableTimer) {
-      return queue.add(job.type, job, {
-        jobId: job.id,
-        repeat: { cron: timer.cron }
-      });
+    try {
+      if (timer.kind === TimerType.DelayedTimer) {
+        await queue.add(job, {
+          jobId: job.id,
+          delay: timer.delay
+        });
+      } else if (timer.kind === TimerType.RepeatableTimer) {
+        await queue.add(job, {
+          jobId: job.id,
+          repeat: { every: timer.every }
+        });
+      } else if (timer.kind === TimerType.CronRepeatableTimer) {
+        await queue.add(job, {
+          jobId: job.id,
+          repeat: { cron: timer.cron }
+        });
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      queue.close();
     }
-
-    return Promise.reject('Wrong timer format');
   }
 
   removeRepeatable(jobId: string): Promise<any> {
@@ -52,10 +56,7 @@ export class BullScheduler implements SchedulerContract {
   }
 
   private createQueue(queueName: string, options = {}): Queue.Queue {
-    return new Queue(queueName, {
-      createClient: this.getRedisConnection,
-      ...options
-    });
+    return new Queue(queueName);
   }
 
   /**

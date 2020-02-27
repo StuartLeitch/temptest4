@@ -520,6 +520,63 @@
           }
         }
       }
+    },
+    "sisif-test": {
+      "root": "apps/sisif-test",
+      "sourceRoot": "apps/sisif-test/src",
+      "projectType": "application",
+      "prefix": "sisif-test",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/sisif-test",
+            "main": "apps/sisif-test/src/main.ts",
+            "tsConfig": "apps/sisif-test/tsconfig.app.json",
+            "assets": ["apps/sisif-test/src/Dockerfile"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/sisif-test/src/environments/environment.ts",
+                  "with": "apps/sisif-test/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "sisif-test:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/sisif-test/.eslintrc",
+            "tsConfig": [
+              "apps/sisif-test/tsconfig.app.json",
+              "apps/sisif-test/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/sisif-test/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/sisif-test/jest.config.js",
+            "tsConfig": "apps/sisif-test/tsconfig.spec.json",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
