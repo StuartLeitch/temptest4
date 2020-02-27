@@ -188,7 +188,10 @@ export * from './modules/users/mappers/UserMap';
 // * Infra
 // export * from './infra/http/app';
 export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
+export { SchedulerContract } from './infrastructure/scheduler/Scheduler';
 export * from './infrastructure/database/knex';
+export * from './infrastructure/message-queues/contracts/Job';
+export * from './infrastructure/message-queues/contracts/Time';
 export { EmailService } from './infrastructure/communication-channels';
 
 // ? Should we export this

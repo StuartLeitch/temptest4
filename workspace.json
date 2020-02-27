@@ -497,57 +497,26 @@
       }
     },
     "sisif": {
-      "root": "apps/sisif",
-      "sourceRoot": "apps/sisif/src",
-      "projectType": "application",
-      "prefix": "sisif",
+      "root": "libs/sisif",
+      "sourceRoot": "libs/sisif/src",
+      "projectType": "library",
       "schematics": {},
       "architect": {
-        "build": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "outputPath": "dist/apps/sisif",
-            "main": "apps/sisif/src/main.ts",
-            "tsConfig": "apps/sisif/tsconfig.app.json",
-            "assets": ["apps/sisif/src/Dockerfile"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/sisif/src/environments/environment.ts",
-                  "with": "apps/sisif/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "builder": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "sisif:build"
-          }
-        },
         "lint": {
-          "builder": "@nrwl/linter:lint",
+          "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "linter": "eslint",
-            "config": "apps/sisif/.eslintrc",
             "tsConfig": [
-              "apps/sisif/tsconfig.app.json",
-              "apps/sisif/tsconfig.spec.json"
+              "libs/sisif/tsconfig.lib.json",
+              "libs/sisif/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/sisif/**"]
+            "exclude": ["**/node_modules/**", "!libs/sisif/**"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
-            "jestConfig": "apps/sisif/jest.config.js",
-            "tsConfig": "apps/sisif/tsconfig.spec.json"
+            "jestConfig": "libs/sisif/jest.config.js",
+            "tsConfig": "libs/sisif/tsconfig.spec.json"
           }
         }
       }
