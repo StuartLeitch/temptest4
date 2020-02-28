@@ -1,6 +1,6 @@
-import {ValueObject} from '../core/domain/ValueObject';
-import {Result} from '../core/logic/Result';
-import {Guard} from '../core/logic/Guard';
+import { ValueObject } from '../core/domain/ValueObject';
+import { Result } from '../core/logic/Result';
+import { Guard } from '../core/logic/Guard';
 
 interface EditorRoleProps {
   label: string;
@@ -22,8 +22,7 @@ export class EditorRole extends ValueObject<EditorRoleProps> {
 
   public static create(props: EditorRoleProps): Result<EditorRole> {
     const nullGuard = Guard.againstNullOrUndefinedBulk([
-      {argument: props.label, argumentName: 'label'},
-      {argument: props.type, argumentName: 'type'}
+      { argument: props.type, argumentName: 'type' }
     ]);
 
     if (!nullGuard.succeeded) {
