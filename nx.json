@@ -40,6 +40,9 @@
     },
     "sisif": {
       "tags": []
+    },
+    "sisif-test": {
+      "tags": []
     }
   }
 }
