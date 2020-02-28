@@ -21,9 +21,11 @@ export class PublishInvoicePaid {
     paymentDetails: InvoicePaymentInfo,
     messageTimestamp?: Date
   ): Promise<any> {
-    const data: InvoicePaidEvent = {
+    // const data: InvoicePaidEvent
+    const data = {
       ...EventUtils.createEventObject(),
       invoiceId: invoice.id.toString(),
+      erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
       valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
       invoiceItems: invoiceItems.map(ii => ({
