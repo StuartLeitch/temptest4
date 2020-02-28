@@ -1,4 +1,4 @@
-import { beforeMethod, Metadata } from 'aspect.js';
+import { beforeMethod, afterMethod, Metadata } from 'aspect.js';
 
 import { EpicOnArticlePublishedUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
 import { GetPaymentMethodsUseCase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
@@ -19,49 +19,45 @@ import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/l
 import { Logger } from './logger';
 const logger = new Logger('Usecase:Aspect');
 
+const watchList = [
+  GetPaymentMethodsUseCase,
+  EpicOnArticlePublishedUsecase,
+  CreateTransactionUsecase,
+  CreateManuscriptUsecase,
+  GetManuscriptByManuscriptIdUsecase,
+  SoftDeleteDraftTransactionUsecase,
+  EditManuscriptUsecase,
+  UpdateInvoiceItemsUsecase,
+  GetInvoiceIdByManuscriptCustomIdUsecase,
+  GetItemsForInvoiceUsecase,
+  GetJournal,
+  UpdateTransactionOnAcceptManuscriptUsecase,
+  UpdateCatalogItemToCatalogUseCase,
+  AssignEditorsToJournalUsecase,
+  AddCatalogItemToCatalogUseCase
+];
+const aspect = {
+  classes: watchList,
+  methods: watchList.map(klass => klass.prototype.execute)
+};
+
 export class LoggerAspect {
-  @beforeMethod({
-    classes: [
-      GetPaymentMethodsUseCase,
-      EpicOnArticlePublishedUsecase,
-      CreateTransactionUsecase,
-      CreateManuscriptUsecase,
-      GetManuscriptByManuscriptIdUsecase,
-      SoftDeleteDraftTransactionUsecase,
-      EditManuscriptUsecase,
-      UpdateInvoiceItemsUsecase,
-      GetInvoiceIdByManuscriptCustomIdUsecase,
-      GetItemsForInvoiceUsecase,
-      GetJournal,
-      UpdateTransactionOnAcceptManuscriptUsecase,
-      UpdateCatalogItemToCatalogUseCase,
-      AssignEditorsToJournalUsecase,
-      AddCatalogItemToCatalogUseCase
-    ],
-    methods: [
-      GetPaymentMethodsUseCase.prototype.execute,
-      EpicOnArticlePublishedUsecase.prototype.execute,
-      CreateTransactionUsecase.prototype.execute,
-      CreateManuscriptUsecase.prototype.execute,
-      GetManuscriptByManuscriptIdUsecase.prototype.execute,
-      SoftDeleteDraftTransactionUsecase.prototype.execute,
-      EditManuscriptUsecase.prototype.execute,
-      UpdateInvoiceItemsUsecase.prototype.execute,
-      GetInvoiceIdByManuscriptCustomIdUsecase.prototype.execute,
-      GetItemsForInvoiceUsecase.prototype.execute,
-      GetJournal.prototype.execute,
-      UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
-      UpdateCatalogItemToCatalogUseCase.prototype.execute,
-      AssignEditorsToJournalUsecase.prototype.execute,
-      AddCatalogItemToCatalogUseCase.prototype.execute
-    ]
-  })
+  @beforeMethod(aspect)
   invokeBeforeMethod(meta: Metadata) {
-    // meta.advisedMetadata == { bar: 42 }
-    logger.info('onExecute', {
+    logger.info('beforeExecute', {
       usecaseClassName: meta.className,
       usecaseMethodName: meta.method.name,
       request: meta.method.args
+    });
+  }
+
+  @afterMethod(aspect)
+  async invokeAfterMethod(meta: Metadata) {
+    const result = await meta.method.result;
+    logger.info('afterExecute', {
+      usecaseClassName: meta.className,
+      usecaseMethodName: meta.method.name,
+      result
     });
   }
 }

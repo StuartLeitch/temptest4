@@ -42,7 +42,7 @@ export class AddCatalogItemToCatalogUseCase
 
     let catalogItem: CatalogItem;
     let publisher: Publisher;
-    const defaultPublisher = 'hindawi';
+    const defaultPublisher = 'Hindawi';
 
     try {
       try {
@@ -51,7 +51,9 @@ export class AddCatalogItemToCatalogUseCase
         );
       } catch (err) {
         return left(
-          new AddCatalogItemToCatalogErrors.PublisherNotFoundError(name)
+          new AddCatalogItemToCatalogErrors.PublisherNotFoundError(
+            defaultPublisher
+          )
         );
       }
 

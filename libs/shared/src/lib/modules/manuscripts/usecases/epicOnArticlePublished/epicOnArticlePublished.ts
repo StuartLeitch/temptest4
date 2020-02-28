@@ -127,8 +127,10 @@ export class EpicOnArticlePublishedUsecase
         return left(new Errors.InvoiceIdRequired());
       }
 
+      invoiceItems.forEach(ii => invoice.addInvoiceItem(ii));
+
       if (invoice.getInvoiceTotal() === 0) {
-        return;
+        return right(Result.ok<void>());
       }
 
       if (typeof manuscript.authorCountry === 'undefined') {

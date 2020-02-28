@@ -68,13 +68,10 @@ export const schedulerLoader: MicroframeworkLoader = async (
     let jobsQueue = [
       // TODO Describe first job
       async () => {
-        try {
-          const response = await retryFailedErpInvoicesUsecase.execute();
-          if (response.isLeft()) {
-            throw response.value.error;
-          }
-        } catch (error) {
-          logger.error(error);
+        const response = await retryFailedErpInvoicesUsecase.execute();
+        if (response.isLeft()) {
+          logger.error(response.value.errorValue().message);
+          throw response.value.error;
         }
       }
       // TODO Describe second job

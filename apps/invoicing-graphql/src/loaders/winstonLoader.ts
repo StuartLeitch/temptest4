@@ -48,13 +48,14 @@ export const winstonLoader: MicroframeworkLoader = (
       if (scoping[0] === 'Usecase' && scoping[1] === 'Aspect') {
         messageFormat.usecase = meta.usecaseClassName;
         messageFormat.method = meta.usecaseMethodName;
+
         delete meta.usecaseClassName;
         delete meta.usecaseMethodName;
         // messageFormat.eventName = scoping[1];
         // messageFormat.message = rawMessage;
       }
 
-      const output = {
+      const _output = {
         level,
         context:
           'eventType' in messageFormat || 'usecase' in messageFormat
@@ -65,7 +66,7 @@ export const winstonLoader: MicroframeworkLoader = (
         data: 'args' in meta ? meta.args.request : meta
       };
 
-      return JSON.stringify(output);
+      return JSON.stringify(_output);
     }
   };
 
