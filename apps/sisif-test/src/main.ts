@@ -1,14 +1,20 @@
 // will be used for testing
 import { BullScheduler, TimerType, SchedulingTime } from '@hindawi/sisif';
+import express from 'express';
 
-const schedulingService = new BullScheduler('localhost:6379');
+let schedulingService = new BullScheduler({
+  host: process.env.REDIS_HOST,
+  port: Number(process.env.REDIS_PORT || 6379),
+  password: process.env.REDIS_PASSWORD
+});
 
-const queueName = 'qq';
+const queueName = process.env.QUEUE || 'qq';
 
 if (process.env.PRODUCER) {
-  (async function() {
-    for (let i = 0; i < 1000; i++) {
-      console.log('Sending');
+  const interval = Number(process.env.INTERVAL) || 10000;
+  setInterval(async function() {
+    console.log('Sending');
+    try {
       await schedulingService.schedule(
         {
           type: 'TEST',
@@ -18,18 +24,20 @@ if (process.env.PRODUCER) {
         queueName,
         { kind: TimerType.DelayedTimer, delay: 2 * SchedulingTime.Second }
       );
+    } catch (error) {
+      console.log(error);
     }
-    process.exit(0);
-  })();
+  }, interval);
 } else {
-  let i = 1;
   schedulingService.startListening(queueName, job => {
-    if (i % 10 === 0) {
-      console.log(i);
-    }
-    i++;
+    console.log(job.data);
   });
-  setTimeout(() => {
-    process.exit(1);
-  }, Number(process.env.TIMEOUT) || 100);
 }
+
+const app = express();
+
+app.get('/', (req, res) => {
+  res.json({ ready: true });
+});
+
+app.listen(process.env.PORT || '80');

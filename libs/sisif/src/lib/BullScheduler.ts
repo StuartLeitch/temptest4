@@ -2,14 +2,20 @@ import Queue from 'bull';
 import Redis from 'ioredis';
 
 import { SchedulerContract, Job, ScheduleTimer, TimerType } from './Types';
-
+interface RedisCredentials {
+  port?: number;
+  host: string;
+  password?: string;
+}
 export class BullScheduler implements SchedulerContract {
+  private redisConnection: RedisCredentials;
   private client: Redis.Redis;
   private subscriber: Redis.Redis;
 
-  constructor(private redisConnectionString: string) {
-    this.client = new Redis(this.redisConnectionString);
-    this.subscriber = new Redis(this.redisConnectionString);
+  constructor(redisConnection: RedisCredentials) {
+    this.redisConnection = redisConnection;
+    this.client = new Redis(this.redisConnection);
+    this.subscriber = new Redis(this.redisConnection);
     this.getRedisConnection = this.getRedisConnection.bind(this);
   }
 
@@ -56,7 +62,7 @@ export class BullScheduler implements SchedulerContract {
   }
 
   private createQueue(queueName: string, options = {}): Queue.Queue {
-    return new Queue(queueName);
+    return new Queue(queueName, { createClient: this.getRedisConnection });
   }
 
   /**
@@ -71,7 +77,7 @@ export class BullScheduler implements SchedulerContract {
       case 'subscriber':
         return this.subscriber;
       default:
-        return new Redis(this.redisConnectionString);
+        return new Redis(this.redisConnection);
     }
   }
 }
