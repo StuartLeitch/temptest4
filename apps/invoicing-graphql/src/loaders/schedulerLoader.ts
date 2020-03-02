@@ -68,18 +68,26 @@ export const schedulerLoader: MicroframeworkLoader = async (
     let jobsQueue = [
       // TODO Describe first job
       async () => {
-        const response = await retryFailedErpInvoicesUsecase.execute();
-        if (response.isLeft()) {
-          logger.error(response.value.errorValue().message);
-          throw response.value.error;
+        try {
+          const response = await retryFailedErpInvoicesUsecase.execute();
+          if (response.isLeft()) {
+            logger.error(response.value.errorValue().message);
+            throw response.value.error;
+          }
+        } catch (err) {
+          throw err;
         }
       },
       // TODO Describe second job
       async () => {
-        const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
-        if (response.isLeft()) {
-          logger.error(response.value.errorValue().message);
-          throw response.value.error;
+        try {
+          const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
+          if (response.isLeft()) {
+            logger.error(response.value.errorValue().message);
+            throw response.value.error;
+          }
+        } catch (err) {
+          throw err;
         }
       }
     ];
