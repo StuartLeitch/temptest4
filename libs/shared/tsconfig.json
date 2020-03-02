@@ -43,6 +43,7 @@
     "src/lib/infrastructure/database/knex/migrations/20200213134454_add_publisheddate_to_articles.js",
     "src/lib/infrastructure/database/knex/migrations/20200218140825_change_filed_lengh.js",
     "src/lib/infrastructure/database/knex/migrations/20200221112239_add_revenue_recognition_reference_to_invoices_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20200219153255_add_publisher_table.js"
+    "src/lib/infrastructure/database/knex/migrations/20200219153255_add_publisher_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20200302105157_add_notification_history_table.js"
   ]
 }
