@@ -162,13 +162,13 @@ export class PublishRevenueRecognitionToErpUsecase
           0
         );
       }
-      const vatValue = (netCharges / 100) * vat;
-      const total = netCharges + vatValue;
+      // const vatValue = (netCharges / 100) * vat;
+      // const total = netCharges; // + vatValue;
 
       const erpResponse = await this.erpService.registerRevenueRecognition({
         invoice,
         manuscript,
-        invoiceTotal: total,
+        invoiceTotal: netCharges,
         publisherCustomValues
       });
 

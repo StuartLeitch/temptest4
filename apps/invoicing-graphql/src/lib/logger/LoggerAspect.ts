@@ -38,11 +38,46 @@ const watchList = [
 ];
 const aspect = {
   classes: watchList,
-  methods: watchList.map(klass => klass.prototype.execute)
+  methods: watchList.map((usecaseClass: any) => usecaseClass.prototype.execute)
 };
 
 export class LoggerAspect {
-  @beforeMethod(aspect)
+  @beforeMethod({
+    classes: [
+      GetPaymentMethodsUseCase,
+      EpicOnArticlePublishedUsecase,
+      CreateTransactionUsecase,
+      CreateManuscriptUsecase,
+      GetManuscriptByManuscriptIdUsecase,
+      SoftDeleteDraftTransactionUsecase,
+      EditManuscriptUsecase,
+      UpdateInvoiceItemsUsecase,
+      GetInvoiceIdByManuscriptCustomIdUsecase,
+      GetItemsForInvoiceUsecase,
+      GetJournal,
+      UpdateTransactionOnAcceptManuscriptUsecase,
+      UpdateCatalogItemToCatalogUseCase,
+      AssignEditorsToJournalUsecase,
+      AddCatalogItemToCatalogUseCase
+    ],
+    methods: [
+      GetPaymentMethodsUseCase.prototype.execute,
+      EpicOnArticlePublishedUsecase.prototype.execute,
+      CreateTransactionUsecase.prototype.execute,
+      CreateManuscriptUsecase.prototype.execute,
+      GetManuscriptByManuscriptIdUsecase.prototype.execute,
+      SoftDeleteDraftTransactionUsecase.prototype.execute,
+      EditManuscriptUsecase.prototype.execute,
+      UpdateInvoiceItemsUsecase.prototype.execute,
+      GetInvoiceIdByManuscriptCustomIdUsecase.prototype.execute,
+      GetItemsForInvoiceUsecase.prototype.execute,
+      GetJournal.prototype.execute,
+      UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
+      UpdateCatalogItemToCatalogUseCase.prototype.execute,
+      AssignEditorsToJournalUsecase.prototype.execute,
+      AddCatalogItemToCatalogUseCase.prototype.execute
+    ]
+  })
   invokeBeforeMethod(meta: Metadata) {
     logger.info('beforeExecute', {
       usecaseClassName: meta.className,
@@ -51,7 +86,42 @@ export class LoggerAspect {
     });
   }
 
-  @afterMethod(aspect)
+  @afterMethod({
+    classes: [
+      GetPaymentMethodsUseCase,
+      EpicOnArticlePublishedUsecase,
+      CreateTransactionUsecase,
+      CreateManuscriptUsecase,
+      GetManuscriptByManuscriptIdUsecase,
+      SoftDeleteDraftTransactionUsecase,
+      EditManuscriptUsecase,
+      UpdateInvoiceItemsUsecase,
+      GetInvoiceIdByManuscriptCustomIdUsecase,
+      GetItemsForInvoiceUsecase,
+      GetJournal,
+      UpdateTransactionOnAcceptManuscriptUsecase,
+      UpdateCatalogItemToCatalogUseCase,
+      AssignEditorsToJournalUsecase,
+      AddCatalogItemToCatalogUseCase
+    ],
+    methods: [
+      GetPaymentMethodsUseCase.prototype.execute,
+      EpicOnArticlePublishedUsecase.prototype.execute,
+      CreateTransactionUsecase.prototype.execute,
+      CreateManuscriptUsecase.prototype.execute,
+      GetManuscriptByManuscriptIdUsecase.prototype.execute,
+      SoftDeleteDraftTransactionUsecase.prototype.execute,
+      EditManuscriptUsecase.prototype.execute,
+      UpdateInvoiceItemsUsecase.prototype.execute,
+      GetInvoiceIdByManuscriptCustomIdUsecase.prototype.execute,
+      GetItemsForInvoiceUsecase.prototype.execute,
+      GetJournal.prototype.execute,
+      UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
+      UpdateCatalogItemToCatalogUseCase.prototype.execute,
+      AssignEditorsToJournalUsecase.prototype.execute,
+      AddCatalogItemToCatalogUseCase.prototype.execute
+    ]
+  })
   async invokeAfterMethod(meta: Metadata) {
     const result = await meta.method.result;
     logger.info('afterExecute', {
