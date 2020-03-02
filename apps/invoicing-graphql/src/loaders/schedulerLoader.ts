@@ -65,9 +65,9 @@ export const schedulerLoader: MicroframeworkLoader = async (
     );
 
     // start scheduler
-    let jobsQueue = [
+    const jobsQueue = [
       // TODO Describe first job
-      async () => {
+      async function retryFailedErpInvoicesJob() {
         try {
           const response = await retryFailedErpInvoicesUsecase.execute();
           if (response.isLeft()) {
@@ -79,7 +79,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
         }
       },
       // TODO Describe second job
-      async () => {
+      async function retryRevenueRecognizedInvoicesToErpJob() {
         try {
           const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
           if (response.isLeft()) {
@@ -93,23 +93,27 @@ export const schedulerLoader: MicroframeworkLoader = async (
     ];
 
     async function processJobsQueue() {
-      if (jobsQueue.length === 0) {
+      // * clones the jobs queue
+      let queue = [...jobsQueue];
+
+      if (queue.length === 0) {
         return;
       }
-      const head = jobsQueue[0];
-      // console.log(`Processing: ${head.name}.`);
-      await head();
-      // console.log(`Done processing: ${head.name}.`);
-      jobsQueue = jobsQueue.slice(1);
+
+      while (queue.length) {
+        const head = queue[0];
+        logger.debug('startProcessing', { job: head.name });
+        await head();
+        logger.debug('doneProcessing', { job: head.name });
+        queue = queue.slice(1);
+      }
     }
 
-    if (failedErpCronRetryTimeMinutes > -1) {
-      setIntervalAsync(
-        processJobsQueue,
-        failedErpCronRetryTimeMinutes === 0
-          ? 1000
-          : failedErpCronRetryTimeMinutes * 60 * 1000
-      );
-    }
+    setIntervalAsync(
+      processJobsQueue,
+      failedErpCronRetryTimeMinutes === 0
+        ? 1000
+        : failedErpCronRetryTimeMinutes * 60 * 1000
+    );
   }
 };
