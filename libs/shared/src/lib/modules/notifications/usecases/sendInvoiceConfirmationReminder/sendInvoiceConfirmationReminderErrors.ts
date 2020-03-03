@@ -9,4 +9,51 @@ export namespace SendInvoiceConfirmationReminderErrors {
       });
     }
   }
+  export class InvoiceIdRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Invoice id is required.`
+      });
+    }
+  }
+
+  export class RecipientEmailRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Recipient email is required.`
+      });
+    }
+  }
+
+  export class RecipientNameRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Recipient name is required.`
+      });
+    }
+  }
+
+  export class SenderEmailRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Sender Email is required.`
+      });
+    }
+  }
+
+  export class SenderNameRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Sender name is required.`
+      });
+    }
+  }
+
+  export class ManuscriptCustomIdRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `Manuscript custom id is required.`
+      });
+    }
+  }
 }
