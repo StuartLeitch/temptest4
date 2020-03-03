@@ -4,7 +4,6 @@ import {
 } from './contracts/EventViewContract';
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 
-// move version array to separate table
 class SubmissionDataView extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
@@ -60,8 +59,8 @@ begin
 	    NEW.payload ->> 'submissionId'::text,
 	    ((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'customId'::text,
 	    (((NEW.payload -> 'manuscripts') -> _last_version_index) -> 'articleType'::text) ->> 'name'::text,
-	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'created'::text)::timestamp without time zone,
-	    COALESCE((((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'updated'::text)::timestamp without time zone, NEW.time),
+	    cast_to_timestamp(((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'created'::text),
+	    COALESCE(cast_to_timestamp(((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'updated'::text), NEW.time),
 	    ((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'journalId'::text,
 	    ((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'title'::text,
 	    (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'specialIssueId'),
@@ -96,7 +95,6 @@ execute procedure ${this.getTriggerName()}();
     return 'submission_data';
   }
 }
-
 const submissionDataView = new SubmissionDataView();
 
 export default submissionDataView;
