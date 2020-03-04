@@ -16,7 +16,7 @@ export interface NotificationProps {
   type: NotificationType;
   invoiceId: InvoiceId;
   recipientEmail: string;
-  dateSent: Date;
+  dateSent?: Date;
 }
 
 export class Notification extends AggregateRoot<NotificationProps> {
