@@ -5,4 +5,9 @@ export interface SendInvoiceConfirmationReminderDTO {
   senderEmail: string;
   senderName: string;
   invoiceId: string;
+  job: {
+    queName: string;
+    delay: number;
+    type: string;
+  };
 }

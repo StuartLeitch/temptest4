@@ -56,4 +56,28 @@ export namespace SendInvoiceConfirmationReminderErrors {
       });
     }
   }
+
+  export class EmailSendingFailure extends Result<UseCaseError> {
+    constructor(err: Error) {
+      super(false, {
+        message: `Email sending has failed with error {${err}}`
+      });
+    }
+  }
+
+  export class NotificationDbSaveError extends Result<UseCaseError> {
+    constructor(err: Error) {
+      super(false, {
+        message: `Failed to save the notification send in the DB with error {${err}}`
+      });
+    }
+  }
+
+  export class RescheduleTaskFailed extends Result<UseCaseError> {
+    constructor(err: Error) {
+      super(false, {
+        message: `Failed to reschedule the notification task with error {${err}}`
+      });
+    }
+  }
 }

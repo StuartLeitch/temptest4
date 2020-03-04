@@ -8,9 +8,12 @@ export type SendInvoiceConfirmationReminderResponse = Either<
   | SendInvoiceConfirmationReminderErrors.RecipientEmailRequiredError
   | SendInvoiceConfirmationReminderErrors.RecipientNameRequiredError
   | SendInvoiceConfirmationReminderErrors.SenderEmailRequiredError
+  | SendInvoiceConfirmationReminderErrors.NotificationDbSaveError
   | SendInvoiceConfirmationReminderErrors.SenderNameRequiredError
   | SendInvoiceConfirmationReminderErrors.InvoiceIdRequiredError
   | SendInvoiceConfirmationReminderErrors.InvoiceNotFoundError
+  | SendInvoiceConfirmationReminderErrors.RescheduleTaskFailed
+  | SendInvoiceConfirmationReminderErrors.EmailSendingFailure
   | AppError.UnexpectedError,
   Result<void>
 >;

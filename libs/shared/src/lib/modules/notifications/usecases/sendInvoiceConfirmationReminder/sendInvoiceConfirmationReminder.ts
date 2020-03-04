@@ -1,25 +1,29 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { AppError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
+import {
+  AccessControlledUsecase,
+  AuthorizationContext,
+  Authorize
+} from '../../../../domain/authorization/decorators/Authorize';
 
+import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
+import { delayedTimer, SchedulingTime, makeJob } from '@hindawi/sisif';
+
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
+import { NotificationType, Notification } from '../../domain/Notification';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { Invoice } from '../../../invoices/domain/Invoice';
-import { Notification } from '../../domain/Notification';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 
@@ -38,6 +42,7 @@ export class SendInvoiceConfirmationReminderUsecase
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private invoiceRepo: InvoiceRepoContract,
+    private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
     this.decideOnSideEffects = this.decideOnSideEffects.bind(this);
@@ -55,13 +60,17 @@ export class SendInvoiceConfirmationReminderUsecase
 
   // @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const execution = new AsyncEither<null, DTO>(request)
-      .then(this.validateRequest)
-      .then(this.getInvoice)
-      .then(this.decideOnSideEffects(request));
+    try {
+      const execution = new AsyncEither<null, DTO>(request)
+        .then(this.validateRequest)
+        .then(this.getInvoice)
+        .then(this.decideOnSideEffects(request));
 
-    const maybeResult = await execution.execute();
-    return maybeResult.map(val => Result.ok(val));
+      const maybeResult = await execution.execute();
+      return maybeResult.map(val => Result.ok(val));
+    } catch (e) {
+      return left(new AppError.UnexpectedError(e));
+    }
   }
 
   private async validateRequest(request: DTO) {
@@ -109,29 +118,70 @@ export class SendInvoiceConfirmationReminderUsecase
       .execute();
   }
 
-  private async sendEmail(request: DTO) {
-    const result = await this.emailService
-      .invoiceConfirmationReminder({
-        author: {
-          email: request.recipientEmail,
-          name: request.recipientName
-        },
-        sender: {
-          email: request.senderEmail,
-          name: request.senderName
-        },
-        articleCustomId: request.manuscriptCustomId,
-        invoiceId: request.invoiceId
-      })
-      .sendEmail();
-    return right<null, any>(result);
+  private async sendEmail(
+    request: DTO
+  ): Promise<Either<Errors.EmailSendingFailure, DTO>> {
+    try {
+      const result = await this.emailService
+        .invoiceConfirmationReminder({
+          author: {
+            email: request.recipientEmail,
+            name: request.recipientName
+          },
+          sender: {
+            email: request.senderEmail,
+            name: request.senderName
+          },
+          articleCustomId: request.manuscriptCustomId,
+          invoiceId: request.invoiceId
+        })
+        .sendEmail();
+      return right(request);
+    } catch (e) {
+      return left(new Errors.EmailSendingFailure(e));
+    }
   }
 
-  private async saveNotification() {
-    return right<null, null>(null);
+  private async saveNotification(
+    request: DTO
+  ): Promise<Either<Errors.NotificationDbSaveError, DTO>> {
+    try {
+      const invoiceUUID = new UniqueEntityID(request.invoiceId);
+      const invoiceId = InvoiceId.create(invoiceUUID).getValue();
+      const notification = Notification.create({
+        type: NotificationType.REMINDER_CONFIRMATION,
+        recipientEmail: request.recipientEmail,
+        invoiceId
+      }).getValue();
+
+      await this.sentNotificationRepo.addNotification(notification);
+      return right(request);
+    } catch (e) {
+      return left(new Errors.NotificationDbSaveError(e));
+    }
   }
 
-  private async scheduleTask() {
-    return right<null, null>(null);
+  private async scheduleTask(
+    request: DTO
+  ): Promise<Either<Errors.RescheduleTaskFailed, void>> {
+    const { job: jobData } = request;
+    const data = {
+      manuscriptCustomId: request.manuscriptCustomId,
+      recipientEmail: request.recipientEmail,
+      recipientName: request.recipientName,
+      senderEmail: request.senderEmail,
+      senderName: request.senderName,
+      invoiceId: request.invoiceId
+    };
+
+    const timer = delayedTimer(jobData.delay, SchedulingTime.Day);
+    const newJob = makeJob(jobData.type, data);
+
+    try {
+      await this.scheduler.schedule(newJob, jobData.queName, timer);
+      return right(null);
+    } catch (e) {
+      return left(new Errors.RescheduleTaskFailed(e));
+    }
   }
 }
