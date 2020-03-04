@@ -1,5 +1,5 @@
-import {Result} from './Result';
-import {UseCaseError} from './UseCaseError';
+import { Result } from './Result';
+import { UseCaseError } from './UseCaseError';
 
 export namespace AppError {
   export class UnexpectedError extends Result<UseCaseError> {
@@ -9,8 +9,8 @@ export namespace AppError {
         message: msg,
         err
       } as UseCaseError);
-      console.log(`[AppError]: ${msg}`);
-      console.error(err);
+      // console.log(`[AppError]: ${msg}`);
+      // console.error(err);
     }
 
     public static create(err: Error, message?: string): UnexpectedError {

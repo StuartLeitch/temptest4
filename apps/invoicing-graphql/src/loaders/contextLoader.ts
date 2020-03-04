@@ -3,6 +3,8 @@ import {
   MicroframeworkSettings
 } from 'microframework-w3tec';
 
+// import { CorrelationID } from '../../../../libs/shared/src/lib/core/domain/CorrelationID';
+
 import {
   KnexPaymentMethodRepo,
   KnexAddressRepo,
@@ -36,6 +38,7 @@ export const contextLoader: MicroframeworkLoader = (
 ) => {
   if (settings) {
     const db = settings.getData('connection');
+    const logger = new Logger();
 
     const repos = {
       address: new KnexAddressRepo(db),
@@ -45,7 +48,7 @@ export const contextLoader: MicroframeworkLoader = (
       transaction: new KnexTransactionRepo(db),
       payer: new KnexPayerRepo(db),
       payment: new KnexPaymentRepo(db),
-      paymentMethod: new KnexPaymentMethodRepo(db),
+      paymentMethod: new KnexPaymentMethodRepo(db, logger),
       waiver: new KnexWaiverRepo(db),
       manuscript: new KnexArticleRepo(db),
       editor: new KnexEditorRepo(db),
@@ -53,7 +56,6 @@ export const contextLoader: MicroframeworkLoader = (
       publisher: new KnexPublisherRepo(db)
     };
 
-    const logger = new Logger();
     const services = {
       logger,
       checkoutService: new CheckoutService(),

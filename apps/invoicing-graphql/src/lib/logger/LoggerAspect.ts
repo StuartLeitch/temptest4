@@ -20,7 +20,9 @@ import { Logger } from './logger';
 const logger = new Logger('Usecase:Aspect');
 
 const watchList = [
-  GetPaymentMethodsUseCase,
+  // GetPaymentMethodsUseCase,
+
+  // Phenom Events handling usecases
   EpicOnArticlePublishedUsecase,
   CreateTransactionUsecase,
   CreateManuscriptUsecase,
@@ -38,30 +40,17 @@ const watchList = [
 ];
 const aspect = {
   classes: watchList,
-  methods: watchList.map((usecaseClass: any) => usecaseClass.prototype.execute)
+  methods: watchList.map((usecaseClass: any) =>
+    usecaseClass.prototype.execute.bind(usecaseClass)
+  )
 };
 
 export class LoggerAspect {
   @beforeMethod({
-    classes: [
-      GetPaymentMethodsUseCase,
-      EpicOnArticlePublishedUsecase,
-      CreateTransactionUsecase,
-      CreateManuscriptUsecase,
-      GetManuscriptByManuscriptIdUsecase,
-      SoftDeleteDraftTransactionUsecase,
-      EditManuscriptUsecase,
-      UpdateInvoiceItemsUsecase,
-      GetInvoiceIdByManuscriptCustomIdUsecase,
-      GetItemsForInvoiceUsecase,
-      GetJournal,
-      UpdateTransactionOnAcceptManuscriptUsecase,
-      UpdateCatalogItemToCatalogUseCase,
-      AssignEditorsToJournalUsecase,
-      AddCatalogItemToCatalogUseCase
-    ],
+    classes: aspect.classes,
     methods: [
-      GetPaymentMethodsUseCase.prototype.execute,
+      // GetPaymentMethodsUseCase.prototype.execute,
+      // Phenom Events handling usecases
       EpicOnArticlePublishedUsecase.prototype.execute,
       CreateTransactionUsecase.prototype.execute,
       CreateManuscriptUsecase.prototype.execute,
@@ -87,23 +76,7 @@ export class LoggerAspect {
   }
 
   @afterMethod({
-    classes: [
-      GetPaymentMethodsUseCase,
-      EpicOnArticlePublishedUsecase,
-      CreateTransactionUsecase,
-      CreateManuscriptUsecase,
-      GetManuscriptByManuscriptIdUsecase,
-      SoftDeleteDraftTransactionUsecase,
-      EditManuscriptUsecase,
-      UpdateInvoiceItemsUsecase,
-      GetInvoiceIdByManuscriptCustomIdUsecase,
-      GetItemsForInvoiceUsecase,
-      GetJournal,
-      UpdateTransactionOnAcceptManuscriptUsecase,
-      UpdateCatalogItemToCatalogUseCase,
-      AssignEditorsToJournalUsecase,
-      AddCatalogItemToCatalogUseCase
-    ],
+    classes: aspect.classes,
     methods: [
       GetPaymentMethodsUseCase.prototype.execute,
       EpicOnArticlePublishedUsecase.prototype.execute,

@@ -5,11 +5,13 @@ import {
 import Knex from 'knex';
 // import knexTinyLogger from 'knex-tiny-logger';
 
+import { Logger } from '../lib/logger';
 import { env } from '../env';
 
 export const knexLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
+  const logger = new Logger();
   const knex = Knex({
     client: 'pg',
     migrations: {
@@ -25,9 +27,15 @@ export const knexLoader: MicroframeworkLoader = async (
       database: env.db.database
     }
   });
-  // knexTinyLogger(knex);
 
   await knex.migrate.latest();
+
+  // knex.on('query-response', function(response, obj, builder) {
+  //   logger.debug(obj.method, {
+  //     query: obj.sql,
+  //     rowCount: obj.response.rowCount
+  //   });
+  // });
 
   if (settings) {
     settings.setData('connection', knex);

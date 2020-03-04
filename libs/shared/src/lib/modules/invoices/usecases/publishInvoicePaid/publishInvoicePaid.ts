@@ -4,7 +4,7 @@ import { Invoice } from '../../domain/Invoice';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
-import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
+// import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
 import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoiceItem';
 import { EventUtils } from '../../../../utils/EventUtils';
 import { CouponMap } from '../../../coupons/mappers/CouponMap';

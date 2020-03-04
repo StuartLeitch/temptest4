@@ -12,7 +12,7 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
-import { BraintreeGateway } from '@hindawi/shared';
+import { BraintreeGateway } from './../../infrastructure/gateways/braintree/gateway';
 import { Braintree } from './../../domain/strategies/Braintree';
 import { BraintreePayment } from '../../domain/strategies/BraintreePayment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
