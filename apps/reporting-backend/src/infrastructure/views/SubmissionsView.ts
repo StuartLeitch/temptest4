@@ -19,9 +19,9 @@ AS SELECT
   t.submission_event,
   t.article_type,
   t.submission_date,
+  t.resubmission_date,
   t.special_issue_id,
   t.section_id,
-  t.updated_date,
   t.title,
   t.journal_id,
   t.journal_name,
@@ -37,11 +37,14 @@ FROM (
       s.submission_id,
       s.manuscript_custom_id,
       s.submission_event,
+      submission_submitted_dates.min as submission_date,
+      CASE 
+        WHEN submission_submitted_dates.count = 1 THEN null
+        ELSE submission_submitted_dates.max
+      END as resubmission_date,
       s.article_type,
       s.version,
       s.manuscript_version_id,
-      s.submission_date,
-      s.updated_date,
       s.title,
       s.last_version_index,
       s.special_issue_id,
@@ -51,6 +54,7 @@ FROM (
       j.journal_code
       FROM ${submissionDataView.getViewName()} s
       LEFT JOIN ${uniqueJournalsView.getViewName()} j ON s.journal_id = j.journal_id
+      JOIN  (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionSubmitted' group by submission_id) submission_submitted_dates on submission_submitted_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
     ) sd
@@ -63,8 +67,8 @@ WITH DATA;
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (submission_id)`,
+    `create index on ${this.getViewName()} (event_timestamp)`,
     `create index on ${this.getViewName()} (submission_date)`,
-    `create index on ${this.getViewName()} (updated_date)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`
   ];

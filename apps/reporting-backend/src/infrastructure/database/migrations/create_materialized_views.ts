@@ -21,4 +21,4 @@ export async function down(knex: Knex): Promise<any> {
   );
 }
 
-export const name = '20200224135858_create_materialized_views.ts';
+export const name = 'create_materialized_views.ts';
