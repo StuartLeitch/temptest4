@@ -3,5 +3,6 @@ export enum REPORTING_TABLES {
   JOURNAL = 'journal_events',
   USER = 'user_events',
   INVOICE = 'invoice_events',
+  ARTICLE = 'article_events',
   DEFAULT = 'dump_events'
 }
