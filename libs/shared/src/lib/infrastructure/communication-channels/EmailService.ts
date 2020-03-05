@@ -253,17 +253,16 @@ Please confirm manually the invoice using this link {${EmailService.createURL(
   }: ConfirmationReminder) {
     const subject = `${articleCustomId}: Article Processing Charges - confirmation reminder`;
     const paragraph = `
-      Dear Dr. ${author.name}, <br/>
       We would like to gently remind you to confirm your invoice.<br/>
       <b>What to do next</b><br/>
       Please determine the payer for your invoice, an individual or an institution.<br/>
       If an institution is making the payment, please send the below URL to the payer to generate the invoice and proceed with the payment process.<br/>
-      You can confirm the invoice for your article and make payment through the following URL:<br/><br/>
-
+      You can confirm the invoice for your article and make payment through the following URL:
+      <br /><br />
       ${EmailService.createSingleButton(
         'INVOICE DETAILS',
         EmailService.createURL(`/payment-details/${invoiceId}`)
-      )}<br/><br/>
+      )}
 
       <ol>
         <li>

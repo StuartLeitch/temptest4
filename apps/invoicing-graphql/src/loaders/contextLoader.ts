@@ -19,7 +19,8 @@ import {
   EmailService,
   KnexEditorRepo,
   KnexCouponRepo,
-  KnexPublisherRepo
+  KnexPublisherRepo,
+  KnexSentNotificationsRepo
 } from '@hindawi/shared';
 
 import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
@@ -30,6 +31,7 @@ import { ErpService } from '../services/erp';
 import { Logger } from '../lib/logger';
 
 import { env } from '../env';
+import { BullScheduler } from '@hindawi/sisif';
 
 export const contextLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -50,7 +52,14 @@ export const contextLoader: MicroframeworkLoader = (
       manuscript: new KnexArticleRepo(db),
       editor: new KnexEditorRepo(db),
       coupon: new KnexCouponRepo(db),
-      publisher: new KnexPublisherRepo(db)
+      publisher: new KnexPublisherRepo(db),
+      sentNotifications: new KnexSentNotificationsRepo(db)
+    };
+
+    const bullData = {
+      password: env.scheduler.db.password,
+      host: env.scheduler.db.host,
+      port: env.scheduler.db.port
     };
 
     const logger = new Logger();
@@ -63,7 +72,8 @@ export const contextLoader: MicroframeworkLoader = (
       emailService: new EmailService(),
       exchangeRateService: new ExchangeRateService(),
       payPalService: new PayPalService(env.paypal),
-      erpService: new ErpService(logger, env.salesForce)
+      erpService: new ErpService(logger, env.salesForce),
+      schedulingService: new BullScheduler(bullData)
     };
 
     const context = {

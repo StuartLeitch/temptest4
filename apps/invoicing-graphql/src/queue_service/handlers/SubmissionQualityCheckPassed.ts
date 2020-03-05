@@ -7,6 +7,7 @@ import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/e
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
+import { TimerType, SchedulingTime } from '@hindawi/sisif';
 
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
@@ -50,7 +51,7 @@ export const SubmissionQualityCheckPassedHandler = {
         waiver: waiverRepo,
         catalog: catalogRepo
       },
-      services: { waiverService, emailService }
+      services: { waiverService, emailService, schedulingService }
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
@@ -90,5 +91,21 @@ export const SubmissionQualityCheckPassedHandler = {
       logger.error(result.value.errorValue().message);
       throw result.value.error;
     }
+
+    schedulingService.schedule(
+      {
+        type: 'ConfirmationReminder',
+        data: {
+          recipientName: `${givenNames} ${surname}`,
+          manuscriptCustomId: customId,
+          recipientEmail: email
+        }
+      },
+      env.scheduler.notificationsQueue,
+      {
+        delay: env.scheduler.confirmationReminderDelay * SchedulingTime.Day,
+        kind: TimerType.DelayedTimer
+      }
+    );
   }
 };

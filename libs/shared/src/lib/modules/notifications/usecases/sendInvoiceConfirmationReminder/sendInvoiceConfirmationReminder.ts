@@ -18,12 +18,16 @@ import { SchedulerContract } from '../../../../infrastructure/scheduler/Schedule
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { delayedTimer, SchedulingTime, makeJob } from '@hindawi/sisif';
 
+import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
+import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
+
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { Invoice } from '../../../invoices/domain/Invoice';
+import { Invoice, InvoiceStatus } from '../../../invoices/domain/Invoice';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 
@@ -31,6 +35,10 @@ import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceD
 import { SendInvoiceConfirmationReminderResponse as Response } from './SendInvoiceConfirmationReminderResponse';
 import { SendInvoiceConfirmationReminderErrors as Errors } from './SendInvoiceConfirmationReminderErrors';
 import { SendInvoiceConfirmationReminderDTO as DTO } from './SendInvoiceConfirmationReminderDTO';
+
+interface DTOWithInvoiceId extends DTO {
+  invoiceId: string;
+}
 
 type Context = AuthorizationContext<Roles>;
 export type SendInvoiceConfirmationReminderContext = Context;
@@ -41,6 +49,8 @@ export class SendInvoiceConfirmationReminderUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private scheduler: SchedulerContract,
     private emailService: EmailService
@@ -63,7 +73,7 @@ export class SendInvoiceConfirmationReminderUsecase
     try {
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
-        .then(this.getInvoice)
+        .then(this.getInvoice(context))
         .then(this.decideOnSideEffects(request));
 
       const maybeResult = await execution.execute();
@@ -74,9 +84,6 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   private async validateRequest(request: DTO) {
-    if (!request.invoiceId) {
-      return left(new Errors.InvoiceIdRequiredError());
-    }
     if (!request.manuscriptCustomId) {
       return left(new Errors.ManuscriptCustomIdRequiredError());
     }
@@ -97,20 +104,40 @@ export class SendInvoiceConfirmationReminderUsecase
 
   private decideOnSideEffects(request: DTO) {
     return async (invoice: Invoice) => {
-      if (invoice.dateAccepted && !invoice.dateIssued) {
-        return this.performSideEffects(request);
+      if (
+        invoice.status === InvoiceStatus.DRAFT &&
+        invoice.dateAccepted &&
+        !invoice.dateIssued
+      ) {
+        return this.performSideEffects({
+          ...request,
+          invoiceId: invoice.id.toString()
+        });
       }
       return right<null, null>(null);
     };
   }
 
-  private async getInvoice({ invoiceId }: DTO) {
-    const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
-    const maybeResult = await invoiceUsecase.execute({ invoiceId });
-    return maybeResult.map(result => result.getValue());
+  private getInvoice(context: Context) {
+    return async ({ manuscriptCustomId }: DTO) => {
+      const getInvoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+        this.manuscriptRepo,
+        this.invoiceItemRepo
+      );
+      const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
+
+      const execution = new AsyncEither<null, string>(manuscriptCustomId)
+        .then(customId => getInvoiceIdUsecase.execute({ customId }, context))
+        .map(result => result.getValue())
+        .map(invoiceIds => invoiceIds[0].id.toString())
+        .then(invoiceId => invoiceUsecase.execute({ invoiceId }, context))
+        .map(result => result.getValue());
+
+      return execution.execute();
+    };
   }
 
-  private async performSideEffects(request: DTO) {
+  private async performSideEffects(request: DTOWithInvoiceId) {
     return new AsyncEither<null, DTO>(request)
       .then(this.sendEmail)
       .then(this.saveNotification)
@@ -119,7 +146,7 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   private async sendEmail(
-    request: DTO
+    request: DTOWithInvoiceId
   ): Promise<Either<Errors.EmailSendingFailure, DTO>> {
     try {
       const result = await this.emailService
@@ -143,7 +170,7 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   private async saveNotification(
-    request: DTO
+    request: DTOWithInvoiceId
   ): Promise<Either<Errors.NotificationDbSaveError, DTO>> {
     try {
       const invoiceUUID = new UniqueEntityID(request.invoiceId);
@@ -168,13 +195,11 @@ export class SendInvoiceConfirmationReminderUsecase
     const data = {
       manuscriptCustomId: request.manuscriptCustomId,
       recipientEmail: request.recipientEmail,
-      recipientName: request.recipientName,
-      senderEmail: request.senderEmail,
-      senderName: request.senderName,
-      invoiceId: request.invoiceId
+      recipientName: request.recipientName
     };
 
     const timer = delayedTimer(jobData.delay, SchedulingTime.Day);
+    console.log(timer);
     const newJob = makeJob(jobData.type, data);
 
     try {

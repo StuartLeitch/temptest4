@@ -17,6 +17,7 @@ import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
 import { expressLoader } from './loaders/expressLoader';
 import { monitorLoader } from './loaders/monitorLoader';
 import { graphqlLoader } from './loaders/graphqlLoader';
+import { sisifLoader } from './loaders/sisifLoader';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -42,7 +43,8 @@ bootstrapMicroframework({
     domainEventsRegisterLoader,
     expressLoader,
     monitorLoader,
-    graphqlLoader
+    graphqlLoader,
+    sisifLoader
   ]
 })
   .then(() => banner(log))
