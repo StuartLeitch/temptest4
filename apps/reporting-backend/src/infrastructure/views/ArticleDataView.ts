@@ -12,15 +12,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS 
 SELECT
 	ae.id AS event_id,
-	ae. "time" AS event_timestamp,
-	ae. "type" AS "event",
+	ae."time" AS event_timestamp,
+	ae."type" AS "event",
 	author_view.title,
 	cast_to_timestamp(author_view.published) AS published_date,
 	author_view."customId" AS manuscript_custom_id,
 	author_view."submissionId" AS submission_id,
 	author_view.doi,
 	author_view.volume,
-	author_view."sectionId" AS section_id,
 	author_view."figCount" AS fig_count,
 	author_view."refCount" AS ref_count,
 	author_view."journalId" AS journal_id,
@@ -37,7 +36,6 @@ FROM
 		"pageCount" int,
 		"published" text,
 		"hasSupplementaryMaterials" bool,
-		"sectionId" text,
 		"specialIssueId" text,
 		"submissionId" text,
 		title text)
@@ -52,7 +50,6 @@ WITH DATA;
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (journal_id)`,
     `create index on ${this.getViewName()} (published_date)`,
-    `create index on ${this.getViewName()} (section_id)`,
     `create index on ${this.getViewName()} (submission_id)`
   ];
 

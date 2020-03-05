@@ -23,6 +23,7 @@ AS SELECT
   sd.submission_event as final_decision_type,
   case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as accepted_date,
   i.apc,
+  i.published_date,
   CASE
     WHEN s.special_issue_id is NULL THEN 'special'::text
     ELSE 'regular'::text
