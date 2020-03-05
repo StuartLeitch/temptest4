@@ -1,4 +1,4 @@
-export type JobData = any;
+export type JobData<T = unknown> = T;
 
 export interface Job {
   id?: string;

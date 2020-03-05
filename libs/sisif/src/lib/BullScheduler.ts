@@ -56,9 +56,9 @@ export class BullScheduler implements SchedulerContract {
 
   public startListening<T>(
     queueName: string,
-    callback: Queue.ProcessCallbackFunction<T>
+    callback: (data: T) => void
   ): void {
-    this.createQueue(queueName).process(callback);
+    this.createQueue(queueName).process(job => callback(job.data));
   }
 
   private createQueue(queueName: string, options = {}): Queue.Queue {

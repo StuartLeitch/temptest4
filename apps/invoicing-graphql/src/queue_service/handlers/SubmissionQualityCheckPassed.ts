@@ -7,7 +7,14 @@ import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/e
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
-import { TimerType, SchedulingTime } from '@hindawi/sisif';
+import {
+  TimerType,
+  SchedulingTime,
+  makeJob,
+  delayedTimer
+} from '@hindawi/sisif';
+
+import { SisifJobTypes } from '../../sisif';
 
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
@@ -92,20 +99,22 @@ export const SubmissionQualityCheckPassedHandler = {
       throw result.value.error;
     }
 
+    const jobData = {
+      recipientName: `${givenNames} ${surname}`,
+      manuscriptCustomId: customId,
+      recipientEmail: email
+    };
+    const newJob = makeJob(SisifJobTypes.InvoiceConfirmReminder, jobData);
+
+    const newTimer = delayedTimer(
+      env.scheduler.confirmationReminderDelay,
+      SchedulingTime.Day
+    );
+
     schedulingService.schedule(
-      {
-        type: 'ConfirmationReminder',
-        data: {
-          recipientName: `${givenNames} ${surname}`,
-          manuscriptCustomId: customId,
-          recipientEmail: email
-        }
-      },
+      newJob,
       env.scheduler.notificationsQueue,
-      {
-        delay: env.scheduler.confirmationReminderDelay * SchedulingTime.Day,
-        kind: TimerType.DelayedTimer
-      }
+      newTimer
     );
   }
 };

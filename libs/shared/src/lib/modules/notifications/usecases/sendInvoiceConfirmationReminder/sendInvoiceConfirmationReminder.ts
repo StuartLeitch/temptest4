@@ -199,7 +199,6 @@ export class SendInvoiceConfirmationReminderUsecase
     };
 
     const timer = delayedTimer(jobData.delay, SchedulingTime.Day);
-    console.log(timer);
     const newJob = makeJob(jobData.type, data);
 
     try {
