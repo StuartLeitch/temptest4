@@ -1,21 +1,15 @@
 /* eslint-disable max-len */
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
-
-import { VersionCompare } from './../../../../../libs/shared/src/lib/utils/VersionCompare';
-import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
-
-import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
-import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
+import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 import {
-  TimerType,
-  SchedulingTime,
-  makeJob,
-  delayedTimer
-} from '@hindawi/sisif';
+  UpdateTransactionOnAcceptManuscriptUsecase,
+  UpdateTransactionContext,
+  VersionCompare,
+  Roles
+} from '@hindawi/shared';
 
 import { SisifJobTypes } from '../../sisif';
-
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
@@ -104,9 +98,12 @@ export const SubmissionQualityCheckPassedHandler = {
       manuscriptCustomId: customId,
       recipientEmail: email
     };
-    const newJob = makeJob(SisifJobTypes.InvoiceConfirmReminder, jobData);
+    const newJob = JobBuilder.basic(
+      SisifJobTypes.InvoiceConfirmReminder,
+      jobData
+    );
 
-    const newTimer = delayedTimer(
+    const newTimer = TimerBuilder.delayed(
       env.scheduler.confirmationReminderDelay,
       SchedulingTime.Day
     );

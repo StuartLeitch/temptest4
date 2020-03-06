@@ -46,6 +46,9 @@ export * from './modules/transactions/repos';
 // export * from './modules/transactions/usecases/createTransaction/createTransaction';
 // // export * from './transactions/subscribers/AfterTransactionCreatedEvents';
 export * from './modules/transactions/mappers/TransactionMap';
+export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
+export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
+export * from './modules/transactions/usecases/updateTransaction/updateTransaction';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
@@ -214,5 +217,6 @@ export * from './domain/services/WaiverService';
 export * from './utils/FormatUtils';
 export * from './utils/Order/OrderUtils';
 export * from './utils/Batch';
+export * from './utils/VersionCompare';
 
 export * from './utils/ObjectUtils';

@@ -2,7 +2,7 @@ export class InvoiceConfirmationReminderTemplate {
   static build(articleCustomId: string, invoiceButton: string) {
     const subject = `${articleCustomId}: Article Processing Charges - confirmation reminder`;
     const paragraph = `
-      We would like to gently remind you to confirm your invoice.<br/>
+      We would like to gently remind you to confirm your invoice.<br/><br/>
       <b>What to do next</b><br/>
       Please determine the payer for your invoice, an individual or an institution.<br/>
       If an institution is making the payment, please send the below URL to the payer to generate the invoice and proceed with the payment process.<br/>

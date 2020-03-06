@@ -14,9 +14,10 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
+import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
-import { delayedTimer, SchedulingTime, makeJob } from '@hindawi/sisif';
 
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
@@ -26,8 +27,8 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 
 import { NotificationType, Notification } from '../../domain/Notification';
+import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { Invoice, InvoiceStatus } from '../../../invoices/domain/Invoice';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 
@@ -198,8 +199,8 @@ export class SendInvoiceConfirmationReminderUsecase
       recipientName: request.recipientName
     };
 
-    const timer = delayedTimer(jobData.delay, SchedulingTime.Day);
-    const newJob = makeJob(jobData.type, data);
+    const timer = TimerBuilder.delayed(jobData.delay, SchedulingTime.Day);
+    const newJob = JobBuilder.basic(jobData.type, data);
 
     try {
       await this.scheduler.schedule(newJob, jobData.queName, timer);
