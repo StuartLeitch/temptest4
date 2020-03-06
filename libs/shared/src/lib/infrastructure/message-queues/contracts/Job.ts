@@ -1,22 +1,24 @@
 export type JobData<T = unknown> = T;
 
-export interface Job {
+export interface Job<T = unknown> {
   id?: string;
   type: string;
   created: string; // ISO Date String
-  data: JobData; // Serializable format
+  data: JobData<T>; // Serializable format
 }
 
-export function makeJob(
-  type: string,
-  data: JobData,
-  created: Date = new Date(),
-  id?: string
-): Job {
-  return {
-    created: created.toISOString(),
-    data,
-    type,
-    id
-  };
+export class JobBuilder {
+  static basic<T = unknown>(
+    type: string,
+    data: JobData<T>,
+    created: Date = new Date(),
+    id?: string
+  ): Job<T> {
+    return {
+      created: created.toISOString(),
+      data,
+      type,
+      id
+    };
+  }
 }
