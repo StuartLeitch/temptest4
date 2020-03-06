@@ -3,9 +3,9 @@ import {
   MicroframeworkLoader
 } from 'microframework-w3tec';
 
-import { SchedulingTime, TimerType, Job } from '@hindawi/sisif';
+import { Job } from '@hindawi/sisif';
 
-import { SisifHandlers, SisifJobTypes } from '../sisif';
+import { SisifHandlers } from '../sisif';
 
 import { env } from '../env';
 
@@ -17,22 +17,6 @@ export const sisifLoader: MicroframeworkLoader = async (
     const {
       services: { schedulingService }
     } = context;
-
-    // await schedulingService.schedule(
-    //   {
-    //     type: SisifJobTypes.InvoiceConfirmReminder,
-    //     data: {
-    //       manuscriptCustomId: '11111111',
-    //       recipientEmail: 'rares.stan@hindawi.com',
-    //       recipientName: 'Rares Stan'
-    //     }
-    //   },
-    //   env.scheduler.notificationsQueue,
-    //   {
-    //     kind: TimerType.DelayedTimer,
-    //     delay: SchedulingTime.Second
-    //   }
-    // );
 
     schedulingService.startListening(
       env.scheduler.notificationsQueue,
