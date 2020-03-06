@@ -6,8 +6,11 @@ import {
 import { Job } from '@hindawi/sisif';
 
 import { SisifHandlers } from '../sisif';
+import { Logger } from '../lib/logger';
 
 import { env } from '../env';
+
+const logger = new Logger('sisif:loader');
 
 export const sisifLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -15,14 +18,24 @@ export const sisifLoader: MicroframeworkLoader = async (
   if (settings) {
     const context = settings.getData('context');
     const {
-      services: { schedulingService }
+      services: { schedulingService, logger: loggerService }
     } = context;
 
     schedulingService.startListening(
       env.scheduler.notificationsQueue,
       (job: Job) => {
         const { data, type } = job;
-        (SisifHandlers[type] || SisifHandlers['default'])(data, context);
+        try {
+          SisifHandlers.get(type)(data, context, loggerService);
+        } catch (e) {
+          logger.error(
+            `
+              Error while handling job of type {${type}}, with data ${data}.
+              Got error ${e.message}
+            `
+          );
+          throw e;
+        }
       }
     );
   }

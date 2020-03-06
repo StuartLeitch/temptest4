@@ -1,7 +1,12 @@
 /* eslint-disable max-len */
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+import {
+  SchedulingTime,
+  SisifJobTypes,
+  TimerBuilder,
+  JobBuilder
+} from '@hindawi/sisif';
 import {
   UpdateTransactionOnAcceptManuscriptUsecase,
   UpdateTransactionContext,
@@ -9,7 +14,6 @@ import {
   Roles
 } from '@hindawi/shared';
 
-import { SisifJobTypes } from '../../sisif';
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 

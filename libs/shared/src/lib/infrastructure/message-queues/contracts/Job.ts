@@ -1,3 +1,10 @@
+export enum SisifJobTypes {
+  SanctionedCountryNotification = 'SanctionedCountryNotification',
+  InvoiceCreatedNotification = 'InvoiceCreatedNotification',
+  InvoiceConfirmReminder = 'InvoiceConfirmReminder',
+  InvoicePaymentReminder = 'InvoicePaymentReminder'
+}
+
 export type JobData<T = unknown> = T;
 
 export interface Job<T = unknown> {

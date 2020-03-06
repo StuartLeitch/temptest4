@@ -1,13 +1,13 @@
-import { JobData } from '@hindawi/sisif';
+import { SisifJobTypes, JobData } from '@hindawi/sisif';
 import {
   SendInvoiceConfirmationReminderUsecase,
   SendInvoiceConfirmationReminderDTO,
   Roles
 } from '@hindawi/shared';
 
-import { env } from '../../env';
+import { Logger } from '../../lib/logger';
 
-import { SisifJobTypes } from '../JobTypes';
+import { env } from '../../env';
 
 interface Payload {
   manuscriptCustomId: string;
@@ -17,7 +17,8 @@ interface Payload {
 
 export const invoiceConfirmHandler = (
   payload: JobData<Payload>,
-  appContext: any
+  appContext: any,
+  loggerService: Logger
 ) => {
   const {
     repos: { sentNotifications, invoice, manuscript, invoiceItem },
@@ -52,7 +53,8 @@ export const invoiceConfirmHandler = (
 
   usecase.execute(request, usecaseContext).then(maybeResult => {
     if (maybeResult.isLeft()) {
-      console.error(maybeResult.value.errorValue());
+      loggerService.error(maybeResult.value.errorValue().message);
+      throw Error(maybeResult.value.errorValue().message);
     }
   });
 };
