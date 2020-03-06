@@ -23,9 +23,9 @@ export class BullScheduler implements SchedulerContract {
     job: Job,
     queueName: string,
     timer: ScheduleTimer
-  ): Promise<any> {
+  ): Promise<void> {
     // TODO add logging
-    let queue = this.createQueue(queueName);
+    const queue = this.createQueue(queueName);
     try {
       if (timer.kind === TimerType.DelayedTimer) {
         await queue.add(job, {
@@ -44,6 +44,7 @@ export class BullScheduler implements SchedulerContract {
         });
       }
     } catch (error) {
+      console.error(error);
       throw error;
     } finally {
       queue.close();

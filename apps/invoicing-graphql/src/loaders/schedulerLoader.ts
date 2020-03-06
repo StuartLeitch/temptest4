@@ -109,11 +109,11 @@ export const schedulerLoader: MicroframeworkLoader = async (
       }
     }
 
-    // setIntervalAsync(
-    //   processJobsQueue,
-    //   failedErpCronRetryTimeMinutes === 0
-    //     ? 1000
-    //     : failedErpCronRetryTimeMinutes * 60 * 1000
-    // );
+    setIntervalAsync(
+      processJobsQueue,
+      failedErpCronRetryTimeMinutes === 0
+        ? 1000
+        : failedErpCronRetryTimeMinutes * 60 * 1000
+    );
   }
 };
