@@ -1,7 +1,10 @@
-import Queue from 'bull';
 import Redis from 'ioredis';
+import Queue from 'bull';
 
-import { SchedulerContract, Job, ScheduleTimer, TimerType } from './Types';
+import { SchedulerContract, ScheduleTimer, Job } from './Types';
+
+import { timerMapping } from './utils';
+
 interface RedisCredentials {
   port?: number;
   host: string;
@@ -27,22 +30,8 @@ export class BullScheduler implements SchedulerContract {
     // TODO add logging
     const queue = this.createQueue(queueName);
     try {
-      if (timer.kind === TimerType.DelayedTimer) {
-        await queue.add(job, {
-          jobId: job.id,
-          delay: timer.delay
-        });
-      } else if (timer.kind === TimerType.RepeatableTimer) {
-        await queue.add(job, {
-          jobId: job.id,
-          repeat: { every: timer.every }
-        });
-      } else if (timer.kind === TimerType.CronRepeatableTimer) {
-        await queue.add(job, {
-          jobId: job.id,
-          repeat: { cron: timer.cron }
-        });
-      }
+      const options = timerMapping[timer.kind](job.id, timer);
+      await queue.add(job, options);
     } catch (error) {
       console.error(error);
       throw error;
