@@ -1,32 +1,42 @@
 import Redis from 'ioredis';
 import Queue from 'bull';
 
+import { LoggerContract } from '@hindawi/shared';
+
 import {
   SchedulerContract,
+  ListenerContract,
   ScheduleTimer,
-  Job,
-  ListenerContract
+  Job
 } from './Types';
 
 import { TimerMap } from './utils';
 
 interface RedisCredentials {
+  password?: string;
   port?: number;
   host: string;
-  password?: string;
 }
-export class BullScheduler implements SchedulerContract, ListenerContract {
-  private redisConnection: RedisCredentials;
-  private subscriber: Redis.Redis;
-  private client: Redis.Redis;
-  private loggerService: any;
 
-  constructor(redisConnection: RedisCredentials, loggerService: any) {
-    this.redisConnection = redisConnection;
-    this.client = new Redis(this.redisConnection);
-    this.subscriber = new Redis(this.redisConnection);
+type ConnectionPool = {
+  default: () => Redis.Redis;
+  subscriber: Redis.Redis;
+  client: Redis.Redis;
+};
+
+export class BullScheduler implements SchedulerContract, ListenerContract {
+  private connections: ConnectionPool;
+
+  constructor(
+    private redisConnection: RedisCredentials,
+    private loggerService: LoggerContract
+  ) {
     this.getRedisConnection = this.getRedisConnection.bind(this);
-    this.loggerService = loggerService;
+    this.connections = {
+      default: () => new Redis(this.redisConnection),
+      subscriber: new Redis(this.redisConnection),
+      client: new Redis(this.redisConnection)
+    };
   }
 
   public async schedule(
@@ -77,13 +87,6 @@ export class BullScheduler implements SchedulerContract, ListenerContract {
    * @param type connection type
    */
   private getRedisConnection(type: string): Redis.Redis {
-    switch (type) {
-      case 'client':
-        return this.client;
-      case 'subscriber':
-        return this.subscriber;
-      default:
-        return new Redis(this.redisConnection);
-    }
+    return this.connections[type] || this.connections.default();
   }
 }

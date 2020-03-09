@@ -1,6 +1,8 @@
 import * as path from 'path';
 import * as winston from 'winston';
 
+import { LoggerContract } from '@hindawi/shared';
+
 /**
  * core.Log
  * ------------------------------------------------
@@ -12,7 +14,7 @@ import * as winston from 'winston';
  * this in the start up process in the core/index.ts file.
  */
 
-export class Logger {
+export class Logger implements LoggerContract {
   public static DEFAULT_SCOPE = 'Invoicing/Backend';
   private scope: string;
 

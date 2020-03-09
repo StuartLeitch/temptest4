@@ -201,6 +201,7 @@ export * from './modules/users/mappers/UserMap';
 export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
 export { SchedulerContract } from './infrastructure/scheduler/Scheduler';
 export { ListenerContract } from './infrastructure/listener/Listener';
+export { LoggerContract } from './infrastructure/logging/Logger';
 export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';
 export * from './infrastructure/message-queues/contracts/Time';
