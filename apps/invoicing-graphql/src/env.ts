@@ -126,6 +126,7 @@ export const env = {
       host: getOsEnv('SCHEDULER_DB_HOST')
     },
     notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
+    emailRemindersQueue: getOsEnv('EMAIL_REMINDERS_QUEUE'),
     confirmationReminderDelay: toFloat(
       getOsEnv('CONFIRMATION_REMINDER_DELAY_DAYS')
     )

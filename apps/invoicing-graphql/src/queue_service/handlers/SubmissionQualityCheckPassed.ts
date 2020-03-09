@@ -114,7 +114,7 @@ export const SubmissionQualityCheckPassedHandler = {
 
     schedulingService.schedule(
       newJob,
-      env.scheduler.notificationsQueue,
+      env.scheduler.emailRemindersQueue,
       newTimer
     );
   }
