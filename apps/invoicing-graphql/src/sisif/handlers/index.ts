@@ -1,11 +1,14 @@
 import { SisifJobTypes, JobData } from '@hindawi/sisif';
-
-import { Logger } from '../../lib/logger';
+import { LoggerContract } from '@hindawi/shared';
 
 import { invoiceConfirmHandler } from './InvoiceConfirmReminder';
 import { emptyHandler } from './EmptyHandler';
 
-type SisifHandler = (payload: JobData, appContext: any, logger: Logger) => void;
+type SisifHandler = (
+  payload: JobData,
+  appContext: any,
+  logger: LoggerContract
+) => void;
 
 type SisifHandlersRepo = {
   [key in SisifJobTypes & 'default']: SisifHandler;
