@@ -23,7 +23,7 @@ const watchList = [
   // GetPaymentMethodsUseCase,
 
   // Phenom Events handling usecases
-  EpicOnArticlePublishedUsecase,
+  // EpicOnArticlePublishedUsecase,
   CreateTransactionUsecase,
   CreateManuscriptUsecase,
   GetManuscriptByManuscriptIdUsecase,
@@ -51,7 +51,7 @@ export class LoggerAspect {
     methods: [
       // GetPaymentMethodsUseCase.prototype.execute,
       // Phenom Events handling usecases
-      EpicOnArticlePublishedUsecase.prototype.execute,
+      // EpicOnArticlePublishedUsecase.prototype.execute,
       CreateTransactionUsecase.prototype.execute,
       CreateManuscriptUsecase.prototype.execute,
       GetManuscriptByManuscriptIdUsecase.prototype.execute,
@@ -78,8 +78,8 @@ export class LoggerAspect {
   @afterMethod({
     classes: aspect.classes,
     methods: [
-      GetPaymentMethodsUseCase.prototype.execute,
-      EpicOnArticlePublishedUsecase.prototype.execute,
+      // GetPaymentMethodsUseCase.prototype.execute,
+      // EpicOnArticlePublishedUsecase.prototype.execute,
       CreateTransactionUsecase.prototype.execute,
       CreateManuscriptUsecase.prototype.execute,
       GetManuscriptByManuscriptIdUsecase.prototype.execute,

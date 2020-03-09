@@ -67,29 +67,29 @@ export const schedulerLoader: MicroframeworkLoader = async (
     // start scheduler
     const jobsQueue = [
       // TODO Describe first job
-      async function retryFailedErpInvoicesJob() {
-        try {
-          const response = await retryFailedErpInvoicesUsecase.execute();
-          if (response.isLeft()) {
-            logger.error(response.value.errorValue().message);
-            throw response.value.error;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
+      // async function retryFailedErpInvoicesJob() {
+      //   try {
+      //     const response = await retryFailedErpInvoicesUsecase.execute();
+      //     if (response.isLeft()) {
+      //       logger.error(response.value.errorValue().message);
+      //       throw response.value.error;
+      //     }
+      //   } catch (err) {
+      //     throw err;
+      //   }
+      // },
       // TODO Describe second job
-      async function retryRevenueRecognizedInvoicesToErpJob() {
-        try {
-          const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
-          if (response.isLeft()) {
-            logger.error(response.value.errorValue().message);
-            throw response.value.error;
-          }
-        } catch (err) {
-          throw err;
-        }
-      }
+      // async function retryRevenueRecognizedInvoicesToErpJob() {
+      //   try {
+      //     const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
+      //     if (response.isLeft()) {
+      //       logger.error(response.value.errorValue().message);
+      //       throw response.value.error;
+      //     }
+      //   } catch (err) {
+      //     throw err;
+      //   }
+      // }
     ];
 
     async function processJobsQueue() {
@@ -112,7 +112,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
     setIntervalAsync(
       processJobsQueue,
       failedErpCronRetryTimeMinutes === 0
-        ? 1000
+        ? 10000
         : failedErpCronRetryTimeMinutes * 60 * 1000
     );
   }

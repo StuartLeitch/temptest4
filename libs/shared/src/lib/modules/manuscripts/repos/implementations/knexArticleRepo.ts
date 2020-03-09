@@ -33,13 +33,33 @@ export class KnexArticleRepo
   }
 
   async findByCustomId(customId: ManuscriptId | string): Promise<Article> {
-    const articleData = await this.db(TABLES.ARTICLES)
+    const { db, logger } = this;
+
+    const correlationId =
+      'correlationId' in this ? (this as any).correlationId : null;
+
+    const articleDataQuery = db(TABLES.ARTICLES)
       .select()
       .where(
         'customId',
         typeof customId === 'string' ? customId : customId.id.toString()
       )
       .first();
+
+    logger.debug('select', {
+      correlationId,
+      sql: articleDataQuery.toString()
+    });
+
+    let articleData;
+    try {
+      articleData = await articleDataQuery;
+    } catch (e) {
+      throw RepoError.createEntityNotFoundError(
+        'customId',
+        typeof customId === 'string' ? customId : customId.id.toString()
+      );
+    }
 
     return articleData ? ArticleMap.toDomain(articleData) : null;
   }

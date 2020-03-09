@@ -16,12 +16,20 @@ import { applyFilters } from './utils';
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
-    const { db } = this;
+    const { db, logger } = this;
+
+    const correlationId =
+      'correlationId' in this ? (this as any).correlationId : null;
 
     const invoice = await db(TABLES.INVOICES)
       .select()
       .where('id', invoiceId.id.toString())
       .first();
+
+    logger.debug('select', {
+      correlationId,
+      sql: invoice.toString()
+    });
 
     if (!invoice) {
       throw RepoError.createEntityNotFoundError(

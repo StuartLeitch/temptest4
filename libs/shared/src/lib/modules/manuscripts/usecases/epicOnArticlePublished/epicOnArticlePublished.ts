@@ -41,7 +41,10 @@ import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/con
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { VATService } from '../../../../domain/services/VATService';
 
-type Context = AuthorizationContext<Roles>;
+interface CorrelationContext {
+  correlationId: string;
+}
+type Context = AuthorizationContext<Roles> & CorrelationContext;
 
 export class EpicOnArticlePublishedUsecase
   implements
@@ -88,8 +91,10 @@ export class EpicOnArticlePublishedUsecase
       sanctionedCountryNotificationReceiver,
       sanctionedCountryNotificationSender
     } = request;
+    (manuscriptRepo as any).correlationId = context.correlationId;
+    (invoiceRepo as any).correlationId = context.correlationId;
+    (invoiceItemRepo as any).correlationId = context.correlationId;
 
-    // ? Try first a dream code descriptor
     // * It should describe the business rules with minimal amount of implementation details.
 
     const manuscriptId = ManuscriptId.create(
@@ -97,15 +102,32 @@ export class EpicOnArticlePublishedUsecase
     ).getValue();
 
     try {
+      loggerService.info('Find Manuscript by Custom Id', {
+        correlationId: context.correlationId,
+        manuscriptId: manuscriptId.id.toString()
+      });
       try {
         manuscript = await manuscriptRepo.findByCustomId(manuscriptId);
       } catch (e) {
         return left(new Errors.ManuscriptNotFound(manuscriptId.id.toString()));
       }
 
+      loggerService.info('Mark Manuscript as Published', {
+        correlationId: context.correlationId,
+        manuscriptId: manuscriptId.id.toString()
+      });
       manuscript.markAsPublished(published);
-      await manuscriptRepo.update(manuscript);
 
+      try {
+        await manuscriptRepo.update(manuscript);
+      } catch (e) {
+        // do nothing yet
+      }
+
+      loggerService.info('Find Invoice Item by Manuscript Id', {
+        correlationId: context.correlationId,
+        manuscriptId: manuscriptId.id.toString()
+      });
       try {
         // * System identifies Invoice Item by Manuscript Id
         invoiceItems = await invoiceItemRepo.getInvoiceItemByManuscriptId(
@@ -134,6 +156,13 @@ export class EpicOnArticlePublishedUsecase
       }
 
       if (typeof manuscript.authorCountry === 'undefined') {
+        loggerService.info('sendEmail', {
+          correlationId: context.correlationId,
+          invoiceId: invoiceId.id.toString(),
+          manuscriptIdId: manuscript.manuscriptId.id.toString(),
+          sanctionedCountryNotificationReceiver,
+          sanctionedCountryNotificationSender
+        });
         emailService
           .autoConfirmMissingCountryNotification(
             invoice,
@@ -189,7 +218,7 @@ export class EpicOnArticlePublishedUsecase
 
         // * Confirm the invoice automagically
         try {
-          await confirmInvoiceUsecase.execute(confirmInvoiceArgs);
+          await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
         } catch (err) {}
       }
 

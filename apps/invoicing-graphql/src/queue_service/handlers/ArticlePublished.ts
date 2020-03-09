@@ -3,6 +3,7 @@ import {
   EpicOnArticlePublishedUsecase,
   EpicOnArticlePublishedDTO
 } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
+import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
@@ -12,7 +13,8 @@ const logger = new Logger(`PhenomEvent:${ARTICLE_PUBLISHED}`);
 export const ArticlePublishedHandler = {
   event: ARTICLE_PUBLISHED,
   async handler(data: ArticlePublishedEventPayload) {
-    logger.info(`Incoming Event Data`, data);
+    const correlationId = new CorrelationID().toString();
+    logger.info(`Incoming Event Data`, { correlationId, data });
 
     const {
       customId,
@@ -59,9 +61,12 @@ export const ArticlePublishedHandler = {
       sanctionedCountryNotificationSender
     };
 
-    const result = await epicOnArticlePublishedUsecase.execute(args);
+    const result = await epicOnArticlePublishedUsecase.execute(args, {
+      correlationId,
+      roles: []
+    });
     if (result.isLeft()) {
-      logger.error(result.value.errorValue().message);
+      logger.error(result.value.errorValue().message, { correlationId });
       throw result.value.error;
     }
   }

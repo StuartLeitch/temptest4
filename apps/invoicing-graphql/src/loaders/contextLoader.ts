@@ -43,14 +43,14 @@ export const contextLoader: MicroframeworkLoader = (
     const repos = {
       address: new KnexAddressRepo(db),
       catalog: new KnexCatalogRepo(db),
-      invoice: new KnexInvoiceRepo(db),
-      invoiceItem: new KnexInvoiceItemRepo(db),
+      invoice: new KnexInvoiceRepo(db, logger),
+      invoiceItem: new KnexInvoiceItemRepo(db, logger),
       transaction: new KnexTransactionRepo(db),
       payer: new KnexPayerRepo(db),
       payment: new KnexPaymentRepo(db),
       paymentMethod: new KnexPaymentMethodRepo(db, logger),
       waiver: new KnexWaiverRepo(db),
-      manuscript: new KnexArticleRepo(db),
+      manuscript: new KnexArticleRepo(db, logger),
       editor: new KnexEditorRepo(db),
       coupon: new KnexCouponRepo(db),
       publisher: new KnexPublisherRepo(db)
