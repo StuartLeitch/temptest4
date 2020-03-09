@@ -122,6 +122,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       expanded={
         status === "ACTIVE" || status === "FINAL" || "PENDING" ? true : false
       }
+      disabled={status === "DRAFT"}
     >
       {invoiceIsPaid ? (
         <SuccessfulPayment
