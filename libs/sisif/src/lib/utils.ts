@@ -8,13 +8,10 @@ import {
   TimerType
 } from './Types';
 
-export type TimerMapperFunction = (
-  id: string,
-  timer: ScheduleTimer
-) => JobOptions;
+type TimerMapper = (id: string, timer: ScheduleTimer) => JobOptions;
 
-type TimerMapper = {
-  [key in TimerType]: TimerMapperFunction;
+type TimerMapRepo = {
+  [key in TimerType & 'default']: TimerMapper;
 };
 
 function getDelayOptions(id: string, timer: DelayedTimer): JobOptions {
@@ -35,8 +32,21 @@ function getCronRepeatableOptions(
   return { jobId: id, repeat: { cron: timer.cron } };
 }
 
-export const timerMapping: TimerMapper = {
+function unsupportedTimer(kind: unknown): unknown {
+  return () => {
+    throw Error(`Unsupported Timer Type {${kind}}`);
+  };
+}
+
+const timerMapRepo: TimerMapRepo = {
   [TimerType.CronRepeatableTimer]: getCronRepeatableOptions,
   [TimerType.RepeatableTimer]: getRepeatableOptions,
-  [TimerType.DelayedTimer]: getDelayOptions
+  [TimerType.DelayedTimer]: getDelayOptions,
+  default: unsupportedTimer
 };
+
+export class TimerMap {
+  static get(kind: TimerType): TimerMapper {
+    return timerMapRepo[kind] || timerMapRepo['default'](kind);
+  }
+}
