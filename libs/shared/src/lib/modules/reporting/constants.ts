@@ -7,3 +7,12 @@ export enum REPORTING_TABLES {
   CHECKER = 'checker_events',
   DEFAULT = 'dump_events'
 }
+
+export const CHECKER_TEAM_EVENTS = ['CheckerTeamCreated', 'CheckerTeamUpdated'];
+
+export const CHECKER_SUBMISSION_EVENTS = [
+  'ScreenerAssigned',
+  'ScreenerReassigned',
+  'QualityCheckerAssigned',
+  'QualityCheckerReassigned'
+];

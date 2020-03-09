@@ -9,6 +9,8 @@ import { AbstractEventView } from './contracts/EventViewContract';
 import authorsView from './AuthorsView';
 import articleDataView from './ArticleDataView';
 import invoicesDataView from './InvoicesDataView';
+import checkerSubmissionData from './CheckerSubmissionData';
+import checkerTeamData from './CheckerTeamData';
 import invoicesView from './InvoicesView';
 import journalSectionsView from './JournalSectionsView';
 import journalSpecialIssuesView from './JournalSpecialIssues';
@@ -28,6 +30,8 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     invoicesDataView,
     journalsView,
     articleDataView,
+    checkerSubmissionData,
+    checkerTeamData,
     // submissionDataView, -> is a table, updated by triggers
     submissionsView,
     uniqueJournals,
