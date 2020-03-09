@@ -47,6 +47,9 @@ export const env = {
     failedErpCronRetryTimeMinutes: toNumber(
       getOsEnv('FAILED_ERP_CRON_RETRY_TIME_MINUTES')
     ),
+    failedErpCronRetryDisabled: toBool(
+      getOsEnv('FAILED_ERP_CRON_RETRY_DISABLED')
+    ),
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     banner: toBool(getOsEnv('APP_BANNER')),

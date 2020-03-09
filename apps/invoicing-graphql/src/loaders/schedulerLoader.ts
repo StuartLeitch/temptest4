@@ -3,10 +3,10 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings,
+  MicroframeworkSettings
 } from 'microframework-w3tec';
 import {
-  setIntervalAsync,
+  setIntervalAsync
   // clearIntervalAsync
 } from 'set-interval-async/dynamic';
 
@@ -33,11 +33,14 @@ export const schedulerLoader: MicroframeworkLoader = async (
         catalog,
         coupon,
         waiver,
-        publisher,
+        publisher
       },
-      services: { erpService, logger: loggerService },
+      services: { erpService, logger: loggerService }
     } = context;
-    const { failedErpCronRetryTimeMinutes } = env.app;
+    const {
+      failedErpCronRetryTimeMinutes,
+      failedErpCronRetryDisabled
+    } = env.app;
 
     const retryFailedErpInvoicesUsecase = new RetryFailedErpInvoicesUsecase(
       invoice,
@@ -92,7 +95,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
         } catch (err) {
           throw err;
         }
-      },
+      }
     ];
 
     async function processJobsQueue() {
@@ -112,11 +115,13 @@ export const schedulerLoader: MicroframeworkLoader = async (
       }
     }
 
-    setIntervalAsync(
-      processJobsQueue,
-      failedErpCronRetryTimeMinutes === 0
-        ? 10000
-        : failedErpCronRetryTimeMinutes * 60 * 1000
-    );
+    if (!failedErpCronRetryDisabled) {
+      setIntervalAsync(
+        processJobsQueue,
+        failedErpCronRetryTimeMinutes === 0
+          ? 10000
+          : failedErpCronRetryTimeMinutes * 60 * 1000
+      );
+    }
   }
 };
