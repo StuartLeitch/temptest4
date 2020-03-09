@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "sisif.fullname" . }}
+  name: "{{ include "sisif.fullname" . }}-producer"
   labels:
     {{- include "sisif.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.producerReplicaCount }}
   selector:
     matchLabels:
       {{- include "sisif.selectorLabels" . | nindent 6 }}
@@ -29,15 +29,89 @@ spec:
           env:
             - name: PORT 
               value: "80"
-            - name: AWS_SNS_SQS_ACCESS_KEY
-              value: "{{ .Values.AWS_SNS_SQS_ACCESS_KEY }}"
-            - name: AWS_SNS_SQS_SECRET_KEY
-              value: "{{ .Values.AWS_SNS_SQS_SECRET_KEY }}"
-            - name: MONGO_PASSWORD
+            - name: PRODUCER
+              value: "true"
+            - name: REDIS_HOST
+              value: {{ .Values.redisHost }}
+            - name: REDIS_PORT
+              value: "{{ .Values.redisPort }}"
+          {{- with .Values.redisSecret }}  
+            - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: sisif-persistance-mongodb
-                  key: mongodb-root-password
+                  name: {{ .Values.redisSecret}}
+                  key: redis-password
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "sisif.fullname" . }}-consumer"
+  labels:
+    {{- include "sisif.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.consumerReplicaCount }}
+  selector:
+    matchLabels:
+      {{- include "sisif.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sisif.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "sisif.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          env:
+          {{- with .Values.redisSecret }}  
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.redisSecret}}
+                  key: redis-password
+          {{- end }}
+            - name: PORT 
+              value: "80"
+            - name: REDIS_HOST
+              value: {{ .Values.redisHost }}
+            - name: REDIS_PORT
+              value: "{{ .Values.redisPort }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

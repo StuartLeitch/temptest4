@@ -2,14 +2,20 @@ import Queue from 'bull';
 import Redis from 'ioredis';
 
 import { SchedulerContract, Job, ScheduleTimer, TimerType } from './Types';
-
+interface RedisCredentials {
+  port?: number;
+  host: string;
+  password?: string;
+}
 export class BullScheduler implements SchedulerContract {
+  private redisConnection: RedisCredentials;
   private client: Redis.Redis;
   private subscriber: Redis.Redis;
 
-  constructor(private redisConnectionString: string) {
-    this.client = new Redis(this.redisConnectionString);
-    this.subscriber = new Redis(this.redisConnectionString);
+  constructor(redisConnection: RedisCredentials) {
+    this.redisConnection = redisConnection;
+    this.client = new Redis(this.redisConnection);
+    this.subscriber = new Redis(this.redisConnection);
     this.getRedisConnection = this.getRedisConnection.bind(this);
   }
 
@@ -17,9 +23,9 @@ export class BullScheduler implements SchedulerContract {
     job: Job,
     queueName: string,
     timer: ScheduleTimer
-  ): Promise<any> {
+  ): Promise<void> {
     // TODO add logging
-    let queue = this.createQueue(queueName);
+    const queue = this.createQueue(queueName);
     try {
       if (timer.kind === TimerType.DelayedTimer) {
         await queue.add(job, {
@@ -38,6 +44,7 @@ export class BullScheduler implements SchedulerContract {
         });
       }
     } catch (error) {
+      console.error(error);
       throw error;
     } finally {
       queue.close();
@@ -50,13 +57,13 @@ export class BullScheduler implements SchedulerContract {
 
   public startListening<T>(
     queueName: string,
-    callback: Queue.ProcessCallbackFunction<T>
+    callback: (data: T) => void
   ): void {
-    this.createQueue(queueName).process(callback);
+    this.createQueue(queueName).process(job => callback(job.data));
   }
 
   private createQueue(queueName: string, options = {}): Queue.Queue {
-    return new Queue(queueName);
+    return new Queue(queueName, { createClient: this.getRedisConnection });
   }
 
   /**
@@ -71,7 +78,7 @@ export class BullScheduler implements SchedulerContract {
       case 'subscriber':
         return this.subscriber;
       default:
-        return new Redis(this.redisConnectionString);
+        return new Redis(this.redisConnection);
     }
   }
 }

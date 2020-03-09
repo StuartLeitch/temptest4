@@ -4,7 +4,9 @@ import Knex from 'knex';
 import * as create_events_table from './migrations/20200128172115_create_events_tables';
 import * as create_countries_table from './migrations/20200131121058_create_countries_table';
 import * as create_submission_data_table from './migrations/20200224125858_create_submission_data_table';
-import * as create_materialized_views from './migrations/20200224135858_create_materialized_views';
+import * as remove_submission_data_dates from './migrations/20200304113458_remove_wrong_dates_from_submission_data';
+import * as create_article_events_table from './migrations/20200304123458_create_article_events_table';
+import * as create_materialized_views from './migrations/create_materialized_views';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -29,6 +31,8 @@ class KnexMigrationSource {
     create_events_table,
     create_countries_table,
     create_submission_data_table,
+    remove_submission_data_dates,
+    create_article_events_table,
     create_materialized_views
   ].map(makeViewObject);
 

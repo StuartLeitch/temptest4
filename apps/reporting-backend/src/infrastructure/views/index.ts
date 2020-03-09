@@ -7,6 +7,7 @@ import { differenceInSeconds } from '../../utils/utils';
 import { AbstractEventView } from './contracts/EventViewContract';
 
 import authorsView from './AuthorsView';
+import articleDataView from './ArticleDataView';
 import invoicesDataView from './InvoicesDataView';
 import invoicesView from './InvoicesView';
 import journalSectionsView from './JournalSectionsView';
@@ -26,6 +27,7 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
   [
     invoicesDataView,
     journalsView,
+    articleDataView,
     // submissionDataView, -> is a table, updated by triggers
     submissionsView,
     uniqueJournals,

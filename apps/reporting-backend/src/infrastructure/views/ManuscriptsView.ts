@@ -23,6 +23,7 @@ AS SELECT
   sd.submission_event as final_decision_type,
   case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as accepted_date,
   i.apc,
+  i.published_date,
   CASE
     WHEN s.special_issue_id is NULL THEN 'special'::text
     ELSE 'regular'::text
@@ -55,7 +56,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (submission_id)`,
     `create index on ${this.getViewName()} (submission_date)`,
-    `create index on ${this.getViewName()} (updated_date)`,
+    `create index on ${this.getViewName()} (resubmission_date)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (triage_editor_email)`,
     `create index on ${this.getViewName()} (handling_editor_email)`,

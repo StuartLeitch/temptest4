@@ -38,6 +38,10 @@ export function toNumber(value: string): number {
   return parseInt(value, 10);
 }
 
+export function toFloat(value: string): number {
+  return parseFloat(value);
+}
+
 export function toBool(value: string): boolean {
   return value === 'true';
 }

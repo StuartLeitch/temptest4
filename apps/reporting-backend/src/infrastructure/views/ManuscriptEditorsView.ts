@@ -13,6 +13,12 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
   se.manuscript_custom_id as "manuscript_custom_id",
   editor_view.email as "email",
+  cast_to_timestamp(editor_view."expiredDate") as expired_date,
+  cast_to_timestamp(editor_view."invitedDate") as invited_date,
+  cast_to_timestamp(editor_view."removedDate") as removed_date,
+  cast_to_timestamp(editor_view."acceptedDate") as accepted_date,
+  cast_to_timestamp(editor_view."assignedDate") as assigned_date,
+  cast_to_timestamp(editor_view."declinedDate") as declined_date,
   editor_view.country as "country",
   editor_view."isCorresponding" as is_corresponding,
   editor_view."userId" as user_id,
@@ -33,6 +39,13 @@ AS SELECT
     JOIN ${submissionView.getViewName()} s on
       s.event_id = se.id) se,
     jsonb_to_recordset(((se.payload -> 'manuscripts') -> se.last_version_index) -> 'editors') as editor_view(
+      "expiredDate" text,
+      "invitedDate" text,
+      "removedDate" text,
+      "acceptedDate" text,
+      "assignedDate" text,
+      "declinedDate" text,
+      status text,
       email text,
       country text,
       "isCorresponding" bool,
@@ -48,6 +61,12 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (assigned_date)`,
+    `create index on ${this.getViewName()} (invited_date)`,
+    `create index on ${this.getViewName()} (removed_date)`,
+    `create index on ${this.getViewName()} (accepted_date)`,
+    `create index on ${this.getViewName()} (assigned_date)`,
+    `create index on ${this.getViewName()} (declined_date)`,
     `create index on ${this.getViewName()} (email)`,
     `create index on ${this.getViewName()} (user_id)`,
     `create index on ${this.getViewName()} (role_type)`,

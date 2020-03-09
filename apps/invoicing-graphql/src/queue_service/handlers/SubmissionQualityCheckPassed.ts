@@ -7,6 +7,14 @@ import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/e
 
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
+import {
+  TimerType,
+  SchedulingTime,
+  makeJob,
+  delayedTimer
+} from '@hindawi/sisif';
+
+import { SisifJobTypes } from '../../sisif';
 
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
@@ -50,7 +58,7 @@ export const SubmissionQualityCheckPassedHandler = {
         waiver: waiverRepo,
         catalog: catalogRepo
       },
-      services: { waiverService, emailService }
+      services: { waiverService, emailService, schedulingService }
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
@@ -90,5 +98,23 @@ export const SubmissionQualityCheckPassedHandler = {
       logger.error(result.value.errorValue().message);
       throw result.value.error;
     }
+
+    const jobData = {
+      recipientName: `${givenNames} ${surname}`,
+      manuscriptCustomId: customId,
+      recipientEmail: email
+    };
+    const newJob = makeJob(SisifJobTypes.InvoiceConfirmReminder, jobData);
+
+    const newTimer = delayedTimer(
+      env.scheduler.confirmationReminderDelay,
+      SchedulingTime.Day
+    );
+
+    schedulingService.schedule(
+      newJob,
+      env.scheduler.notificationsQueue,
+      newTimer
+    );
   }
 };

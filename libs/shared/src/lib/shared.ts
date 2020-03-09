@@ -172,6 +172,14 @@ export * from './domain/services/ErpService';
 // export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/coupons/repos';
 
+// * Export Notifications Subdomain
+export * from './modules/notifications/domain/Notification';
+export * from './modules/notifications/domain/NotificationId';
+export * from './modules/notifications/mappers/NotificationMap';
+export * from './modules/notifications/repos/SentNotificationRepo';
+export * from './modules/notifications/repos/implementations/KnexSentNotificationsRepo';
+export * from './modules/notifications/usecases/sendInvoiceConfirmationReminder';
+
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
 export * from './modules/authors/mappers/AuthorMap';

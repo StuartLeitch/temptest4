@@ -21,7 +21,7 @@ RUN npm ci --only=production
 
 # Copying the rest of the code to the working directory
 COPY config/ ./config/
-COPY dist/apps/sisif .
+COPY dist/apps/sisif-test .
 
 # Make port 3000 available to the world outside this container
 EXPOSE 3000

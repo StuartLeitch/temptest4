@@ -7,8 +7,23 @@
 // );
 import * as Knex from 'knex';
 
+const toTimestampFunction = `
+CREATE OR REPLACE FUNCTION cast_to_timestamp(v text)
+RETURNS timestamp AS $$
+DECLARE ret timestamp DEFAULT NULL;
+BEGIN
+    BEGIN
+        ret := v::timestamp;
+    EXCEPTION WHEN OTHERS THEN
+        RETURN NULL;
+    END;
+RETURN ret;
+END;
+$$ LANGUAGE plpgsql;`;
+
 export async function up(knex: Knex): Promise<any> {
   return Promise.all([
+    knex.raw(toTimestampFunction),
     knex.schema.createTable('dump_events', createEventTable),
     knex.schema.createTable('submission_events', createEventTable),
     knex.schema.createTable('journal_events', createEventTable),

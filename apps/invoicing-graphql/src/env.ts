@@ -3,13 +3,14 @@ import 'config';
 
 import * as pkg from '../../../package.json';
 import {
-  getOsEnv,
   getOsEnvOptional,
-  getOsPath,
-  // getOsPaths,
   normalizePort,
-  toBool,
-  toNumber
+  getOsPath,
+  getOsEnv,
+  toNumber,
+  toFloat,
+  toBool
+  // getOsPaths,
 } from './lib/env';
 
 /**
@@ -116,6 +117,17 @@ export const env = {
     s3: {
       largeEventBucket: getOsEnv('PHENOM_LARGE_EVENTS_BUCKET')
     }
+  },
+  scheduler: {
+    db: {
+      port: toNumber(getOsEnv('SCHEDULER_DB_PORT')),
+      password: getOsEnv('SCHEDULER_DB_PASSWORD'),
+      host: getOsEnv('SCHEDULER_DB_HOST')
+    },
+    notificationsQueue: getOsEnv('NOTIFICATIONS_QUEUE'),
+    confirmationReminderDelay: toFloat(
+      getOsEnv('CONFIRMATION_REMINDER_DELAY_DAYS')
+    )
   },
   braintree: {
     merchantAccountId: getOsEnv('BT_MERCHANT_ACCOUNT_ID'),

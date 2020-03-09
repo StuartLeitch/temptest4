@@ -10,7 +10,8 @@ import {
   InvoiceMappingPolicy,
   JournalMappingPolicy,
   SubmissionMappingPolicy,
-  UserMappingPolicy
+  UserMappingPolicy,
+  ArticleMappingPolicy
 } from 'libs/shared/src/lib/modules/reporting/policies';
 import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
 import { BatchUtils } from 'libs/shared/src/lib/utils/Batch';
@@ -63,6 +64,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
   registry.addPolicy(new SubmissionMappingPolicy());
   registry.addPolicy(new JournalMappingPolicy());
   registry.addPolicy(new UserMappingPolicy());
+  registry.addPolicy(new ArticleMappingPolicy());
 
   const saveEventsUsecase = new SaveEventsUsecase(
     context.repos.eventsRepo,
