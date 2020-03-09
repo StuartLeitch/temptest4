@@ -44,11 +44,11 @@ export class BullScheduler implements SchedulerContract, ListenerContract {
     queueName: string,
     timer: ScheduleTimer
   ): Promise<void> {
-    // TODO add logging
     const queue = this.createQueue(queueName);
     try {
       const options = TimerMap.get(timer.kind)(job.id, timer);
       await queue.add(job, options);
+      this.loggerService.debug(`Queueing on ${queueName} job ${job}`);
     } catch (error) {
       this.loggerService.error(
         `Scheduling on queue ${queueName} got error ${error.message}`
@@ -69,6 +69,7 @@ export class BullScheduler implements SchedulerContract, ListenerContract {
   ): Promise<void> {
     try {
       await this.createQueue(queueName).process(job => callback(job.data));
+      this.loggerService.debug(`Started listening on ${queueName}`);
     } catch (e) {
       this.loggerService.error(
         `Listening on que ${queueName} got error ${e.message}`
