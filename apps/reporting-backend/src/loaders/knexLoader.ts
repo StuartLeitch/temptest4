@@ -25,9 +25,12 @@ export const knexLoader: MicroframeworkLoader = async (
     // debug: true
   });
 
-  // USE knex for creating views?
-  // await knex.migrate.rollback();
-  await knex.migrate.latest();
+  let [batch, migrations] = await knex.migrate.latest();
+
+  if (migrations.length > 0) {
+    console.log('Migrating views:');
+    knexMigrationSource.migrateViews(knex);
+  }
 
   if (settings) {
     settings.setData('connection', knex);

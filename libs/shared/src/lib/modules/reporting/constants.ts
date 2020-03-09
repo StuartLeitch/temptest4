@@ -4,5 +4,6 @@ export enum REPORTING_TABLES {
   USER = 'user_events',
   INVOICE = 'invoice_events',
   ARTICLE = 'article_events',
+  CHECKER = 'checker_events',
   DEFAULT = 'dump_events'
 }

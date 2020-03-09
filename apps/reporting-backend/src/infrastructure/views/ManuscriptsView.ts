@@ -62,7 +62,8 @@ WITH DATA;
     `create index on ${this.getViewName()} (handling_editor_email)`,
     `create index on ${this.getViewName()} (editorial_assistant_email)`,
     `create index on ${this.getViewName()} (version)`,
-    `create index on ${this.getViewName()} (journal_id)`
+    `create index on ${this.getViewName()} (journal_id)`,
+    `create index on ${this.getViewName()} (journal_name)`
   ];
 
   getViewName(): string {

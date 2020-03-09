@@ -70,7 +70,8 @@ WITH DATA;
     `create index on ${this.getViewName()} (event_timestamp)`,
     `create index on ${this.getViewName()} (submission_date)`,
     `create index on ${this.getViewName()} (article_type)`,
-    `create index on ${this.getViewName()} (journal_id)`
+    `create index on ${this.getViewName()} (journal_id)`,
+    `create index on ${this.getViewName()} (journal_name)`
   ];
 
   getViewName(): string {

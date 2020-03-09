@@ -11,7 +11,8 @@ import {
   JournalMappingPolicy,
   SubmissionMappingPolicy,
   UserMappingPolicy,
-  ArticleMappingPolicy
+  ArticleMappingPolicy,
+  CheckerMappingPolicy
 } from 'libs/shared/src/lib/modules/reporting/policies';
 import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
 import { BatchUtils } from 'libs/shared/src/lib/utils/Batch';
@@ -19,7 +20,6 @@ import { EventDTO } from 'libs/shared/src/lib/modules/reporting/domain/EventDTO'
 
 import { env } from '../env';
 import { Logger } from '../lib/logger';
-import { parseEvent } from '../queue_service/handlers';
 
 const logger = new Logger('queueService:loader');
 
@@ -65,6 +65,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
   registry.addPolicy(new JournalMappingPolicy());
   registry.addPolicy(new UserMappingPolicy());
   registry.addPolicy(new ArticleMappingPolicy());
+  registry.addPolicy(new CheckerMappingPolicy());
 
   const saveEventsUsecase = new SaveEventsUsecase(
     context.repos.eventsRepo,
