@@ -2,20 +2,30 @@ import { cloneDeep } from 'lodash';
 
 import { Either, right } from './Result';
 import { Right } from './Right';
+import { Left } from './Left';
 
-type MutationType = 'map' | 'then';
 type MutationFunction = (r: any) => any;
 
-type ObjectMapping<L, R> = {
-  [key in MutationType | 'default']: (
-    val: Either<L, R>
-  ) => (fn: MutationFunction) => Promise<Either<L, R>> | Either<L, R>;
-};
+type MappingFunction<L = unknown, R = unknown> = (
+  val: Either<L, R>
+) => (fn: MutationFunction) => Promise<Either<L, R>> | Either<L, R>;
+
+interface ObjectMapping<L = unknown, R = unknown> {
+  combine: MappingFunction<L, R>;
+  default: MappingFunction<L, R>;
+  guard: MappingFunction<L, R>;
+  then: MappingFunction<L, R>;
+  map: MappingFunction<L, R>;
+}
+
+type MutationType = keyof Omit<ObjectMapping, 'default'>;
 
 interface Mutation {
   fn: MutationFunction;
   type: MutationType;
 }
+
+class GuardError {}
 
 export class AsyncEither<L, R> {
   private readonly value: R;
@@ -38,14 +48,33 @@ export class AsyncEither<L, R> {
     return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
   }
 
+  combine<L2, R2>(fn: (r: R) => Promise<AsyncEither<L2, R2>>) {
+    const newInstance = this.clone();
+    newInstance.mutations.push({ type: 'combine', fn });
+    return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
+  }
+
+  advanceOrEnd(...fns: { (r: R): Promise<boolean> }[]) {
+    const newInstance = this.clone();
+    newInstance.mutations.push({ type: 'guard', fn: allFilters(fns) });
+    return newInstance;
+  }
+
   private clone() {
     return cloneDeep(this);
   }
 
   async execute(): Promise<Either<L, R>> {
     let val: Either<L, R> = new Right(this.value);
-    for (const mutation of this.mutations) {
-      val = await this.functionToApply<L, R>(mutation.type, val)(mutation.fn);
+
+    try {
+      for (const mutation of this.mutations) {
+        val = await this.functionToApply<L, R>(mutation.type, val)(mutation.fn);
+      }
+    } catch (e) {
+      if (!(e instanceof GuardError)) {
+        throw e;
+      }
     }
 
     return val;
@@ -53,10 +82,11 @@ export class AsyncEither<L, R> {
 
   private functionToApply<L, R>(type: MutationType, val: Either<L, R>) {
     const objectMapping: ObjectMapping<L, R> = {
-      then: (val: Either<L, R>) => (fn: MutationFunction) =>
-        (val.chain(fn) as unknown) as Promise<Either<L, R>>,
-      map: (val: Either<L, R>) => (fn: MutationFunction) => val.map<R>(fn),
-      default: (val: Either<L, R>) => () => val
+      combine: combineAsyncEithers,
+      guard: advancePastGuard,
+      default: emptyMapping,
+      then: doThen,
+      map: doMap
     };
     return (objectMapping[type] || objectMapping.default)(val);
   }
@@ -78,4 +108,74 @@ export async function asyncFlattenEither<L, R>(
   eithers: Promise<Either<L, R>>[]
 ): Promise<Either<L, R[]>> {
   return Promise.all(eithers).then(flattenEither);
+}
+
+function advancePastGuard<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    if (val.isLeft()) return val;
+
+    const rez = await fn(val.value);
+    if (rez) {
+      return val;
+    } else {
+      throw new GuardError();
+    }
+  };
+}
+
+function emptyMapping<L, R>(val: Either<L, R>) {
+  return async () => val;
+}
+
+function combineAsyncEithers<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    if (val.isLeft()) return val;
+    const execution = await fn(val.value);
+    return execution.execute();
+  };
+}
+
+function doThen<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    return val.chain<L, R>(fn);
+  };
+}
+
+function doMap<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    return val.map<R>(fn);
+  };
+}
+
+async function extractValue<L, L2, R2>(
+  e: Either<L, AsyncEither<L2, R2>>
+): Promise<Either<L | L2, R2>> {
+  if (e.isLeft()) {
+    return (e as unknown) as Left<L | L2, R2>;
+  } else {
+    const ae = e.value;
+    return ae.execute();
+  }
+}
+
+function allFilters<R>(filters: { (r: R): Promise<boolean> }[]) {
+  return async (r: R) => {
+    for (const fn of filters) {
+      if (!(await fn(r))) {
+        return false;
+      }
+    }
+    return true;
+  };
+}
+
+function anyFilter<R>(filters: { (r: R): Promise<boolean> }[]) {
+  return async (r: R) => {
+    for (const fn of filters) {
+      if (await fn(r)) {
+        return true;
+      }
+    }
+    return false;
+  };
 }
