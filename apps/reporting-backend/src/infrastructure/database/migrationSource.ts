@@ -23,6 +23,14 @@ function makeViewObject(viewFileExport: any): KnexMigration {
   };
 }
 
+function rebuild_materialized_views(name: string): any {
+  return {
+    up: async () => {},
+    down: async () => {},
+    name
+  };
+}
+
 // View migration should be done following the steps:
 // 1. Delete de view
 // 2. Create the view
@@ -34,7 +42,8 @@ class KnexMigrationSource {
     create_submission_data_table,
     remove_submission_data_dates,
     create_article_events_table,
-    create_checker_events_table
+    create_checker_events_table,
+    rebuild_materialized_views('20200310150525_rebuild_materialized_views')
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
