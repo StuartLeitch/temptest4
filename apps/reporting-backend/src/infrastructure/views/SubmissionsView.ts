@@ -2,7 +2,7 @@ import {
   AbstractEventView,
   EventViewContract
 } from './contracts/EventViewContract';
-import uniqueJournalsView from './UniqueJournals';
+import journalsView from './JournalsView';
 import submissionDataView from './SubmissionDataView';
 
 class SubmissionView extends AbstractEventView implements EventViewContract {
@@ -53,7 +53,7 @@ FROM (
       j.journal_name,
       j.journal_code
       FROM ${submissionDataView.getViewName()} s
-      LEFT JOIN ${uniqueJournalsView.getViewName()} j ON s.journal_id = j.journal_id
+      LEFT JOIN ${journalsView.getViewName()} j ON s.journal_id = j.journal_id
       JOIN  (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionSubmitted' group by submission_id) submission_submitted_dates on submission_submitted_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
@@ -80,6 +80,6 @@ WITH DATA;
 }
 
 const submissionView = new SubmissionView();
-submissionView.addDependency(uniqueJournalsView);
+submissionView.addDependency(journalsView);
 
 export default submissionView;

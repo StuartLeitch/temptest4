@@ -3,7 +3,7 @@ import {
   AbstractEventView,
   EventViewContract
 } from './contracts/EventViewContract';
-import uniqueJournalsView from './UniqueJournals';
+import uniqueJournalsView from './JournalsView';
 import journalSectionsView from './JournalSectionsView';
 
 class JournalSpecialIssuesView extends AbstractEventView

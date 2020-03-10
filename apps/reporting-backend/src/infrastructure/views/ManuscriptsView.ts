@@ -10,6 +10,7 @@ import journalSpecialIssuesView from './JournalSpecialIssues';
 import manuscriptEditorsView from './ManuscriptEditorsView';
 import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';
+import checkerToSubmissionView from './CheckerToSubmissionView';
 
 class ManuscriptsView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -35,7 +36,11 @@ AS SELECT
   concat(a2.given_names, ' ', a2.surname) as submitting_author, a2.email as submitting_author_email, a2.country as submitting_author_country, a2.aff as submitting_author_affiliation,
   concat(e.given_names, ' ', e.surname) as triage_editor, e.email as triage_editor_email, e.country as triage_editor_country, e.aff as triage_editor_affiliation,
   concat(e2.given_names, ' ', e2.surname) as handling_editor, e2.email as handling_editor_email, e2.country as handling_editor_country, e2.aff as handling_editor_affiliation,
-  concat(e3.given_names, ' ', e3.surname) as editorial_assistant, e3.email as editorial_assistant_email, e3.country as editorial_assistant_country, e3.aff as editorial_assistant_affiliation
+  concat(e3.given_names, ' ', e3.surname) as editorial_assistant, e3.email as editorial_assistant_email, e3.country as editorial_assistant_country, e3.aff as editorial_assistant_affiliation,
+  screener.checker_name as screener_name,
+  screener.checker_email as screener_email,
+  quality_checker.checker_name as quality_checker_name,
+  quality_checker.checker_email as quality_checker_email
 FROM ${submissionView.getViewName()} s 
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_corresponding = true limit 1) a on a.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_submitting = true limit 1) a2 on a.manuscript_custom_id = s.manuscript_custom_id
@@ -48,6 +53,8 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id and sd.submission_event in ('SubmissionQualityCheckPassed', 'SubmissionWithdrawn', 'SubmissionScreeningRTCd', 'SubmissionQualityCheckRTCd', 'SubmissionRejected') 
     order by updated_date desc limit 1) sd on sd.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
+  LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'screener' limit 1) screener on screener.submission_id = s.submission_id
+  LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id
 WITH DATA;
     `;
   }
@@ -79,5 +86,6 @@ manuscriptsView.addDependency(journalSectionsView);
 manuscriptsView.addDependency(journalSpecialIssuesView);
 manuscriptsView.addDependency(manuscriptEditorsView);
 manuscriptsView.addDependency(submissionView);
+manuscriptsView.addDependency(checkerToSubmissionView);
 
 export default manuscriptsView;

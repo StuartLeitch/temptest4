@@ -15,7 +15,7 @@ class CheckerTeamData extends AbstractEventView implements EventViewContract {
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
     ce.id AS event_id,
-    ce."time" AS event_timesampt,
+    ce."time" AS event_timestamp,
     ce."type" AS event,
     checker_team_view.id as team_id,
     checker_team_view.name as team_name,
@@ -34,7 +34,12 @@ WITH DATA;
   }
 
   postCreateQueries = [
-    `create index on ${this.getViewName()} (manuscript_custom_id)`
+    `create index on ${this.getViewName()} (event_id)`,
+    `create index on ${this.getViewName()} (event)`,
+    `create index on ${this.getViewName()} (event, event_timestamp)`,
+    `create index on ${this.getViewName()} (event_timestamp)`,
+    `create index on ${this.getViewName()} (team_id)`,
+    `create index on ${this.getViewName()} (team_type)`
   ];
 
   getViewName(): string {

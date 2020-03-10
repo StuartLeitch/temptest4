@@ -16,13 +16,14 @@ class CheckerSubmissionData extends AbstractEventView
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
     ce.id AS event_id,
-    ce."time" AS event_timesampt,
+    ce."time" AS event_timestamp,
     ce."type" AS event,
     checker_view."teamId" as team_id,
     checker_view.id as checker_id,
     checker_view."submissionId" as submission_id,
     cast_to_timestamp(checker_view."assignationDate") as assignation_date,
     checker_view."givenNames" || ' ' || checker_view.surname as checker_name,
+    checker_view.email as checker_email,
     checker_view."role" as checker_role,
     checker_view."isConfirmed" as is_confirmed
   FROM
@@ -35,7 +36,8 @@ AS SELECT
       id text,
       "teamId" text,
       "isConfirmed" bool,
-      "assignationDate" text
+      "assignationDate" text,
+      email text
     )
   WHERE
     ce."type" in (${checkerSubmissionEvents.join(',')})
@@ -44,7 +46,17 @@ WITH DATA;
   }
 
   postCreateQueries = [
-    `create index on ${this.getViewName()} (manuscript_custom_id)`
+    `create index on ${this.getViewName()} (event_id)`,
+    `create index on ${this.getViewName()} (event)`,
+    `create index on ${this.getViewName()} (event, event_timestamp)`,
+    `create index on ${this.getViewName()} (event_timestamp)`,
+    `create index on ${this.getViewName()} (submission_id)`,
+    `create index on ${this.getViewName()} (checker_id)`,
+    `create index on ${this.getViewName()} (team_id)`,
+    `create index on ${this.getViewName()} (assignation_date)`,
+    `create index on ${this.getViewName()} (submission_id, checker_role, assignation_date)`,
+    `create index on ${this.getViewName()} (checker_role)`,
+    `create index on ${this.getViewName()} (checker_email)`
   ];
 
   getViewName(): string {
