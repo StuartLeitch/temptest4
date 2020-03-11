@@ -1,5 +1,9 @@
 export class InvoiceConfirmationReminderTemplate {
-  static build(articleCustomId: string, invoiceButton: string) {
+  static build(
+    articleCustomId: string,
+    invoiceButton: string,
+    publisherName: string
+  ) {
     const subject = `${articleCustomId}: Article Processing Charges - confirmation reminder`;
     const paragraph = `
       We would like to gently remind you to confirm your invoice.<br/>
@@ -34,7 +38,7 @@ export class InvoiceConfirmationReminderTemplate {
       If you have any questions related to the invoice or confirmation process, just reply to this email and our Customer Service team will be happy to help.<br/>
       --------------------------------<br/>
       Customer Service Team<br/>
-      Hindawi Ltd<br/>
+      ${publisherName}<br/>
     `;
     return {
       subject,

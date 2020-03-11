@@ -11,7 +11,11 @@ import { Invoice } from '../../modules/invoices/domain/Invoice';
 import {
   AutoConfirmMissingCountryNotificationTemplate,
   InvoiceCanBeConfirmedNotificationTemplate,
+  InvoicePaymentFourthReminderTemplate,
+  InvoicePaymentSecondReminderTemplate,
   InvoiceConfirmationReminderTemplate,
+  InvoicePaymentFirstReminderTemplate,
+  InvoicePaymentThirdReminderTemplate,
   InvoicePendingNotificationTemplate,
   ButtonLinkTemplate
 } from './email-templates';
@@ -70,6 +74,20 @@ interface ConfirmationReminder {
   };
   articleCustomId: string;
   invoiceId: string;
+}
+
+interface PaymentReminder {
+  manuscriptCustomId: string;
+  catalogItem: CatalogItem;
+  invoice: Invoice;
+  author: {
+    email: string;
+    name: string;
+  };
+  sender: {
+    email: string;
+    name: string;
+  };
 }
 
 class EmailService {
@@ -219,13 +237,15 @@ class EmailService {
     sender,
     author
   }: ConfirmationReminder) {
+    const publisherName = process.env.TENANT_NAME;
     const invoiceButton = EmailService.createSingleButton(
       'INVOICE DETAILS',
       EmailService.createURL(`/payment-details/${invoiceId}`)
     );
     const { paragraph, subject } = InvoiceConfirmationReminderTemplate.build(
       articleCustomId,
-      invoiceButton
+      invoiceButton,
+      publisherName
     );
 
     return this.createTemplate({
@@ -234,6 +254,87 @@ class EmailService {
       toUser: {
         email: author.email,
         name: author.name
+      },
+      content: {
+        subject,
+        paragraph,
+        ...journalConfig
+      },
+      bodyProps: {
+        hasLink: false,
+        hasIntro: true,
+        hasSignature: false
+      }
+    });
+  }
+
+  private getEmailDataForInvoicePaymentReminder(
+    { catalogItem, invoice, manuscriptCustomId }: PaymentReminder,
+    kind: 'first' | 'second' | 'third' | 'fourth',
+    invoiceButton: string
+  ) {
+    const publisherName = process.env.TENANT_NAME;
+    switch (kind) {
+      case 'first':
+        return InvoicePaymentFirstReminderTemplate.build(
+          manuscriptCustomId,
+          catalogItem,
+          invoice,
+          invoiceButton,
+          publisherName,
+          journalConfig.logoLink
+        );
+      case 'second':
+        return InvoicePaymentSecondReminderTemplate.build(
+          manuscriptCustomId,
+          catalogItem,
+          invoice,
+          invoiceButton,
+          publisherName,
+          journalConfig.logoLink
+        );
+      case 'third':
+        return InvoicePaymentThirdReminderTemplate.build(
+          manuscriptCustomId,
+          catalogItem,
+          invoice,
+          invoiceButton,
+          publisherName,
+          journalConfig.logoLink
+        );
+      case 'fourth':
+        return InvoicePaymentFourthReminderTemplate.build(
+          manuscriptCustomId,
+          catalogItem,
+          invoice,
+          invoiceButton,
+          publisherName,
+          journalConfig.logoLink
+        );
+    }
+  }
+
+  public invoicePaymentReminder(
+    data: PaymentReminder,
+    kind: 'first' | 'second' | 'third' | 'fourth'
+  ) {
+    const invoiceButton = EmailService.createSingleButton(
+      'INVOICE DETAILS',
+      EmailService.createURL(`/payment-details/${data.invoice.invoiceId}`)
+    );
+
+    const { paragraph, subject } = this.getEmailDataForInvoicePaymentReminder(
+      data,
+      kind,
+      invoiceButton
+    );
+
+    return this.createTemplate({
+      type: 'user',
+      fromEmail: `${data.sender.name} <${data.sender.email}>`,
+      toUser: {
+        email: data.author.email,
+        name: data.author.name
       },
       content: {
         subject,

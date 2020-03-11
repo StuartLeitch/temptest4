@@ -8,9 +8,9 @@ export class InvoicePaymentFirstReminderTemplate {
     manuscriptCustomId: string,
     catalogItem: CatalogItem,
     invoice: Invoice,
+    invoiceButton: string,
     publisherName: string,
-    publisherSite: string,
-    invoiceButton: string
+    publisherSite: string
   ) {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
 
@@ -44,9 +44,9 @@ export class InvoicePaymentSecondReminderTemplate {
     manuscriptCustomId: string,
     catalogItem: CatalogItem,
     invoice: Invoice,
+    invoiceButton: string,
     publisherName: string,
-    publisherSite: string,
-    invoiceButton: string
+    publisherSite: string
   ) {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const issueDate = format(invoice.dateIssued, 'd MMMM yyyy');
@@ -87,9 +87,9 @@ export class InvoicePaymentThirdReminderTemplate {
     manuscriptCustomId: string,
     catalogItem: CatalogItem,
     invoice: Invoice,
+    invoiceButton: string,
     publisherName: string,
-    publisherSite: string,
-    invoiceButton: string
+    publisherSite: string
   ) {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const daysNo = differenceInCalendarDays(new Date(), invoice.dateIssued);
@@ -126,9 +126,9 @@ export class InvoicePaymentFourthReminderTemplate {
     manuscriptCustomId: string,
     catalogItem: CatalogItem,
     invoice: Invoice,
+    invoiceButton: string,
     publisherName: string,
-    publisherSite: string,
-    invoiceButton: string
+    publisherSite: string
   ) {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const daysNo = differenceInCalendarDays(new Date(), invoice.dateIssued);
