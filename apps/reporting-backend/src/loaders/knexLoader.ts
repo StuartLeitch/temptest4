@@ -29,7 +29,7 @@ export const knexLoader: MicroframeworkLoader = async (
 
   if (migrations.length > 0) {
     console.log('Migrating views:');
-    knexMigrationSource.migrateViews(knex);
+    await knexMigrationSource.migrateViews(knex);
   }
 
   if (settings) {

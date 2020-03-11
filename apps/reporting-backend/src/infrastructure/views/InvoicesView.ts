@@ -46,6 +46,7 @@ AS SELECT
     s.title as "manuscript_title",
     s.article_type as "manuscript_article_type",
     s.journal_name as "journal_name",
+    s.publisher_name as "publisher_name",
     s.journal_code as "journal_code",
     CASE WHEN s.special_issue_id is null THEN 'special'
          ELSE 'regular'
@@ -86,6 +87,8 @@ WITH DATA;
     `create index on ${this.getViewName()} (journal_code)`,
     `create index on ${this.getViewName()} (issue_type)`,
     `create index on ${this.getViewName()} (invoice_id)`,
+    `create index on ${this.getViewName()} (publisher_name)`,
+    `create index on ${this.getViewName()} (journal_name)`,
     `create index on ${this.getViewName()} (event_id)`
   ];
 

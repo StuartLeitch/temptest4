@@ -12,12 +12,14 @@ AS SELECT DISTINCT ON (j1.event_date) j1.event,
     j1.journal_id,
     j1.journal_issn,
     j1.journal_name,
+    COALESCE(publisher.publisher_name, 'Hindawi') as publisher_name,
     j1.is_active,
     j1.journal_code,
     j1.journal_email,
     j1.event_date,
     j1.event_id
     FROM ${journalsDataView.getViewName()} j1
+    left join journal_to_publisher publisher on j1.journal_id = publisher.journal_id
   WHERE j1.event_date = (( SELECT max(j2.event_date) AS max
             FROM ${journalsDataView.getViewName()} j2
           WHERE j1.journal_id = j2.journal_id))
@@ -29,6 +31,8 @@ WITH DATA;
   postCreateQueries = [
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`,
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_code)`,
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_name)`,
+    `CREATE INDEX ON ${this.getViewName()} USING btree (publisher_name)`,
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_issn)`
   ];
 

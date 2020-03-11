@@ -8,6 +8,7 @@ import * as remove_submission_data_dates from './migrations/20200304113458_remov
 import * as create_article_events_table from './migrations/20200304123458_create_article_events_table';
 import * as create_checker_events_table from './migrations/20200309150525_create_checker_events_table';
 import * as create_materialized_views from './migrations/create_materialized_views';
+import * as create_journal_to_publisher_table from './migrations/20200311104931_create_journal_to_publisher_table';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -43,7 +44,8 @@ class KnexMigrationSource {
     remove_submission_data_dates,
     create_article_events_table,
     create_checker_events_table,
-    rebuild_materialized_views('20200310150525_rebuild_materialized_views')
+    rebuild_materialized_views('20200310150525_rebuild_materialized_views'),
+    create_journal_to_publisher_table
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
