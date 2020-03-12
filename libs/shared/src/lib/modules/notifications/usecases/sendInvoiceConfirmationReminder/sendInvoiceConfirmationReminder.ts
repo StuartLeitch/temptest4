@@ -33,9 +33,9 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 
 // * Usecase specific
-import { SendInvoiceConfirmationReminderResponse as Response } from './SendInvoiceConfirmationReminderResponse';
-import { SendInvoiceConfirmationReminderErrors as Errors } from './SendInvoiceConfirmationReminderErrors';
-import { SendInvoiceConfirmationReminderDTO as DTO } from './SendInvoiceConfirmationReminderDTO';
+import { SendInvoiceConfirmationReminderResponse as Response } from './sendInvoiceConfirmationReminderResponse';
+import { SendInvoiceConfirmationReminderErrors as Errors } from './sendInvoiceConfirmationReminderErrors';
+import { SendInvoiceConfirmationReminderDTO as DTO } from './sendInvoiceConfirmationReminderDTO';
 
 interface DTOWithInvoiceId extends DTO {
   invoiceId: string;

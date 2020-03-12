@@ -32,16 +32,16 @@ import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJo
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 
 // * Usecase specific
-import { SendInvoicePaymentReminderResponse as Response } from './SendInvoicePaymentReminderResponse';
-import { SendInvoicePaymentReminderErrors as Errors } from './SendInvoicePaymentReminderErrors';
-import { SendInvoicePaymentReminderDTO as DTO } from './SendInvoicePaymentReminderDTO';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { SendInvoicePaymentReminderResponse as Response } from './sendInvoicePaymentReminderResponse';
+import { SendInvoicePaymentReminderErrors as Errors } from './sendInvoicePaymentReminderErrors';
+import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
 
 interface DTOWithInvoiceId extends DTO {
   invoiceId: string;
@@ -146,6 +146,12 @@ export class SendInvoicePaymentReminderUsecase
         });
       return execution.execute();
     };
+  }
+
+  private async getSentPaymentNotificationsCount(
+    invoiceId: InvoiceId
+  ): Promise<number> {
+    return 0;
   }
 
   private async sendEmail(
