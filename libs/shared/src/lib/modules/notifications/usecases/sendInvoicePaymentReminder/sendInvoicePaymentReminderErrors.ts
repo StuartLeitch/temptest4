@@ -9,4 +9,20 @@ export namespace SendInvoicePaymentReminderErrors {
       });
     }
   }
+
+  export class ManuscriptNotFound extends Result<UseCaseError> {
+    constructor(customId: string) {
+      super(false, {
+        message: `No manuscript with custom id {${customId}} was found.`
+      });
+    }
+  }
+
+  export class EmailSendingFailure extends Result<UseCaseError> {
+    constructor(err: Error) {
+      super(false, {
+        message: `Email sending has failed with error {${err}}`
+      });
+    }
+  }
 }

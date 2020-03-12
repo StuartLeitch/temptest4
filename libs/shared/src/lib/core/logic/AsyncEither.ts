@@ -27,7 +27,7 @@ interface Mutation {
 
 class GuardError {}
 
-export class AsyncEither<L, R> {
+export class AsyncEither<L = null, R = unknown> {
   private readonly value: R;
   private mutations: Mutation[];
 
