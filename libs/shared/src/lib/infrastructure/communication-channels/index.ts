@@ -1,1 +1,1 @@
-export {default as EmailService} from './EmailService';
+export * from './EmailService';

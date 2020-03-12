@@ -182,6 +182,8 @@ export * from './modules/notifications/mappers/NotificationMap';
 export * from './modules/notifications/repos/SentNotificationRepo';
 export * from './modules/notifications/repos/implementations/KnexSentNotificationsRepo';
 export * from './modules/notifications/usecases/sendInvoiceConfirmationReminder';
+export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
+export * from './modules/notifications/usecases/getSentNotificationForInvoice';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';

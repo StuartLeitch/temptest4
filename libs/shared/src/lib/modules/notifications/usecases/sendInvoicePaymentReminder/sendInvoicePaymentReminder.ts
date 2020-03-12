@@ -19,7 +19,10 @@ import {
 import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
-import { EmailService } from '../../../../infrastructure/communication-channels';
+import {
+  EmailService,
+  PaymentReminderType
+} from '../../../../infrastructure/communication-channels';
 
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
@@ -28,6 +31,10 @@ import { CatalogRepoContract } from '../../../journals/repos/catalogRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+import {
+  GetSentNotificationForInvoiceUsecase,
+  GetSentNotificationForInvoiceErrors
+} from '../getSentNotificationForInvoice';
 import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJournal';
 
 import { NotificationType, Notification } from '../../domain/Notification';
@@ -63,6 +70,8 @@ export class SendInvoicePaymentReminderUsecase
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
+    this.sendPaymentReminderEmail = this.sendPaymentReminderEmail.bind(this);
+    this.getNotificationsCount = this.getNotificationsCount.bind(this);
     this.getCatalogItem = this.getCatalogItem.bind(this);
     this.getManuscript = this.getManuscript.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
@@ -79,7 +88,7 @@ export class SendInvoicePaymentReminderUsecase
       .then(this.getInvoice(context))
       .then(this.getCatalogItem(context))
       .advanceOrEnd(shouldSendEmail)
-      .then(this.sendEmail);
+      .then(this.sendPaymentReminderEmail);
     return null;
   }
 
@@ -148,30 +157,44 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private async getSentPaymentNotificationsCount(
-    invoiceId: InvoiceId
-  ): Promise<number> {
-    return 0;
+  private getNotificationsCount(invoiceId: InvoiceId) {
+    const getNotificationsUsecase = new GetSentNotificationForInvoiceUsecase(
+      this.sentNotificationRepo
+    );
+    const filterPayment = (notification: Notification) =>
+      notification.type === NotificationType.REMINDER_PAYMENT;
+
+    const execution = new AsyncEither(invoiceId.id.toString())
+      .then(invoiceId => getNotificationsUsecase.execute({ invoiceId }))
+      .map(result => result.getValue())
+      .map(notifications => notifications.filter(filterPayment))
+      .map(notifications => notifications.length);
+    return execution.execute();
   }
 
-  private async sendEmail(
-    data: AllData
-  ): Promise<Either<Errors.EmailSendingFailure, AllData>> {
-    try {
-      const days = differenceInCalendarDays(
-        new Date(),
-        data.invoice.dateIssued
-      );
+  private sendEmail(data: AllData) {
+    return async (
+      template: PaymentReminderType
+    ): Promise<Either<Errors.EmailSendingFailure, AllData>> => {
+      try {
+        const emailData = constructPaymentReminderData(data);
+        await this.emailService
+          .invoicePaymentReminder(emailData, 'first')
+          .sendEmail();
 
-      const emailData = constructPaymentReminderData(data);
-      await this.emailService
-        .invoicePaymentReminder(emailData, 'first')
-        .sendEmail();
+        return right(data);
+      } catch (e) {
+        return left(new Errors.EmailSendingFailure(e));
+      }
+    };
+  }
 
-      return right(data);
-    } catch (e) {
-      return left(new Errors.EmailSendingFailure(e));
-    }
+  private sendPaymentReminderEmail(data: AllData) {
+    const execution = new AsyncEither(data.invoice.invoiceId)
+      .then(this.getNotificationsCount)
+      .map(templateTypeBasedOnPreviousNotifications)
+      .then(this.sendEmail(data));
+    return execution.execute();
   }
 }
 
@@ -220,4 +243,19 @@ function constructPaymentReminderData(data: AllData): PaymentReminder {
       name: data.senderName
     }
   };
+}
+
+function templateTypeBasedOnPreviousNotifications(
+  previousNotificationsCount: number
+) {
+  const mapping: {
+    [key: number]: PaymentReminderType;
+  } = {
+    0: 'first',
+    1: 'second',
+    2: 'third',
+    3: 'fourth'
+  };
+
+  return mapping[previousNotificationsCount] || mapping[3];
 }

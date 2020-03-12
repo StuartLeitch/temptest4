@@ -76,7 +76,7 @@ interface ConfirmationReminder {
   invoiceId: string;
 }
 
-interface PaymentReminder {
+export interface PaymentReminder {
   manuscriptCustomId: string;
   catalogItem: CatalogItem;
   invoice: Invoice;
@@ -90,7 +90,14 @@ interface PaymentReminder {
   };
 }
 
-class EmailService {
+export type PaymentReminderType = 'first' | 'second' | 'third' | 'fourth';
+type PaymentReminderTemplateMapper = {
+  [key in PaymentReminderType]: (
+    ...d: any
+  ) => { subject: string; paragraph: string };
+};
+
+export class EmailService {
   private email: any;
 
   static createURL(path: string) {
@@ -270,53 +277,30 @@ class EmailService {
 
   private getEmailDataForInvoicePaymentReminder(
     { catalogItem, invoice, manuscriptCustomId }: PaymentReminder,
-    kind: 'first' | 'second' | 'third' | 'fourth',
+    kind: PaymentReminderType,
     invoiceButton: string
   ) {
     const publisherName = process.env.TENANT_NAME;
-    switch (kind) {
-      case 'first':
-        return InvoicePaymentFirstReminderTemplate.build(
-          manuscriptCustomId,
-          catalogItem,
-          invoice,
-          invoiceButton,
-          publisherName,
-          journalConfig.logoLink
-        );
-      case 'second':
-        return InvoicePaymentSecondReminderTemplate.build(
-          manuscriptCustomId,
-          catalogItem,
-          invoice,
-          invoiceButton,
-          publisherName,
-          journalConfig.logoLink
-        );
-      case 'third':
-        return InvoicePaymentThirdReminderTemplate.build(
-          manuscriptCustomId,
-          catalogItem,
-          invoice,
-          invoiceButton,
-          publisherName,
-          journalConfig.logoLink
-        );
-      case 'fourth':
-        return InvoicePaymentFourthReminderTemplate.build(
-          manuscriptCustomId,
-          catalogItem,
-          invoice,
-          invoiceButton,
-          publisherName,
-          journalConfig.logoLink
-        );
-    }
+    const template: PaymentReminderTemplateMapper = {
+      first: InvoicePaymentFirstReminderTemplate.build,
+      second: InvoicePaymentSecondReminderTemplate.build,
+      third: InvoicePaymentThirdReminderTemplate.build,
+      fourth: InvoicePaymentFourthReminderTemplate.build
+    };
+
+    return template[kind](
+      manuscriptCustomId,
+      catalogItem,
+      invoice,
+      invoiceButton,
+      publisherName,
+      journalConfig.logoLink
+    );
   }
 
   public invoicePaymentReminder(
     data: PaymentReminder,
-    kind: 'first' | 'second' | 'third' | 'fourth'
+    kind: PaymentReminderType
   ) {
     const invoiceButton = EmailService.createSingleButton(
       'INVOICE DETAILS',
@@ -349,5 +333,3 @@ class EmailService {
     });
   }
 }
-
-export default EmailService;

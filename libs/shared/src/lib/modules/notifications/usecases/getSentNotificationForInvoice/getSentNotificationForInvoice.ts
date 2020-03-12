@@ -24,14 +24,10 @@ import { GetSentNotificationForInvoiceResponse as Response } from './getSentNoti
 import { GetSentNotificationForInvoiceErrors as Errors } from './getSentNotificationForInvoiceErrors';
 import { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationForInvoiceDTO';
 
-interface DTOWithInvoiceId extends DTO {
-  invoiceId: string;
-}
-
 type Context = AuthorizationContext<Roles>;
-export type getSentNotificationForInvoiceContext = Context;
+export type GetSentNotificationForInvoiceContext = Context;
 
-export class getSentNotificationForInvoiceUsecase
+export class GetSentNotificationForInvoiceUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
