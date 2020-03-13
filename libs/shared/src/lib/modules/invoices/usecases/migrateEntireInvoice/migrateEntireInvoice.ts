@@ -798,16 +798,12 @@ export class MigrateEntireInvoiceUsecase
           const context = {
             roles: [Roles.ADMIN]
           };
-          const maybeResponse = await manuscriptUsecase.execute(
-            {
-              manuscriptId: request.apc.manuscriptId
-            },
-            context
+          const maybeResponse = await this.getManuscript(
+            request.apc.manuscriptId
           );
 
           return maybeResponse;
         })
-        .map(result => result.getValue())
         .then(async manuscript => {
           const maybePaymentInfo = await this.getInvoicePaymentInfo(
             invoice.invoiceId
