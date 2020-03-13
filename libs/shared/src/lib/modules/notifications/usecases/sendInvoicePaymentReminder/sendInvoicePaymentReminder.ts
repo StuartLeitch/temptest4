@@ -21,7 +21,8 @@ import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import {
   EmailService,
-  PaymentReminderType
+  PaymentReminderType,
+  PaymentReminder
 } from '../../../../infrastructure/communication-channels';
 
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
@@ -31,11 +32,10 @@ import { CatalogRepoContract } from '../../../journals/repos/catalogRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
-import {
-  GetSentNotificationForInvoiceUsecase,
-  GetSentNotificationForInvoiceErrors
-} from '../getSentNotificationForInvoice';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetSentNotificationForInvoiceUsecase } from '../getSentNotificationForInvoice';
 import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJournal';
+import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
@@ -43,12 +43,17 @@ import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-
 // * Usecase specific
 import { SendInvoicePaymentReminderResponse as Response } from './sendInvoicePaymentReminderResponse';
 import { SendInvoicePaymentReminderErrors as Errors } from './sendInvoicePaymentReminderErrors';
 import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
+
+import {
+  constructPaymentReminderData,
+  numberToTemplateMapper,
+  shouldSendEmail,
+  CompoundData
+} from './utils';
 
 interface DTOWithInvoiceId extends DTO {
   invoiceId: string;
@@ -73,6 +78,7 @@ export class SendInvoicePaymentReminderUsecase
     this.sendPaymentReminderEmail = this.sendPaymentReminderEmail.bind(this);
     this.getNotificationsCount = this.getNotificationsCount.bind(this);
     this.getCatalogItem = this.getCatalogItem.bind(this);
+    this.getPauseStatus = this.getPauseStatus.bind(this);
     this.getManuscript = this.getManuscript.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
@@ -87,6 +93,7 @@ export class SendInvoicePaymentReminderUsecase
     const execution = new AsyncEither(request)
       .then(this.getInvoice(context))
       .then(this.getCatalogItem(context))
+      .then(this.getPauseStatus(context))
       .advanceOrEnd(shouldSendEmail)
       .then(this.sendPaymentReminderEmail);
     return null;
@@ -114,7 +121,7 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private async getManuscript(data: DTO & { invoice: Invoice }) {
+  private getManuscript(data: DTO & { invoice: Invoice }) {
     const execution = new AsyncEither<null, string>(data.manuscriptCustomId)
       .then(async customId => {
         try {
@@ -172,90 +179,54 @@ export class SendInvoicePaymentReminderUsecase
     return execution.execute();
   }
 
-  private sendEmail(data: AllData) {
-    return async (
-      template: PaymentReminderType
-    ): Promise<Either<Errors.EmailSendingFailure, AllData>> => {
-      try {
-        const emailData = constructPaymentReminderData(data);
-        await this.emailService
-          .invoicePaymentReminder(emailData, 'first')
-          .sendEmail();
+  private async sendEmail(
+    data: CompoundData,
+    template: PaymentReminderType
+  ): Promise<Either<Errors.EmailSendingFailure, CompoundData>> {
+    try {
+      const emailData = constructPaymentReminderData(data);
+      await this.emailService
+        .invoicePaymentReminder(emailData, template)
+        .sendEmail();
 
-        return right(data);
-      } catch (e) {
-        return left(new Errors.EmailSendingFailure(e));
-      }
+      return right(data);
+    } catch (e) {
+      return left(new Errors.EmailSendingFailure(e));
+    }
+  }
+
+  private sendPaymentReminderEmail(data: CompoundData) {
+    const days = differenceInCalendarDays(new Date(), data.invoice.dateIssued);
+    const emailNum = Math.trunc(days / data.job.delay);
+
+    return this.sendEmail(data, numberToTemplateMapper[emailNum]);
+  }
+
+  private getPauseStatus(context: Context) {
+    return async (data: CompoundData) => {
+      const usecase = new AreNotificationsPausedUsecase(
+        this.sentNotificationRepo
+      );
+
+      const { invoice } = data;
+      const invoiceId = invoice.id.toString();
+
+      const maybeResult = await usecase.execute(
+        {
+          notificationType: NotificationType.REMINDER_PAYMENT,
+          invoiceId
+        },
+        context
+      );
+
+      return maybeResult.map(result => ({
+        ...data,
+        paused: result.getValue()
+      }));
     };
   }
 
-  private sendPaymentReminderEmail(data: AllData) {
-    const execution = new AsyncEither(data.invoice.invoiceId)
-      .then(this.getNotificationsCount)
-      .map(templateTypeBasedOnPreviousNotifications)
-      .then(this.sendEmail(data));
-    return execution.execute();
-  }
-}
+  private saveNotification(data: CompoundData) {}
 
-type AllData = DTO & {
-  invoice: Invoice;
-  journal: CatalogItem;
-  manuscript: Manuscript;
-};
-
-interface PaymentReminder {
-  manuscriptCustomId: string;
-  catalogItem: CatalogItem;
-  invoice: Invoice;
-  author: {
-    email: string;
-    name: string;
-  };
-  sender: {
-    email: string;
-    name: string;
-  };
-}
-
-async function shouldSendEmail(data: AllData) {
-  const { invoice } = data;
-  const days = differenceInCalendarDays(new Date(), invoice.dateIssued);
-  if (invoice.status === InvoiceStatus.ACTIVE && days <= 18) {
-    return true;
-  }
-  return false;
-}
-
-function constructPaymentReminderData(data: AllData): PaymentReminder {
-  const { invoice, journal, manuscriptCustomId } = data;
-
-  return {
-    manuscriptCustomId,
-    catalogItem: journal,
-    invoice,
-    author: {
-      email: data.recipientEmail,
-      name: data.recipientName
-    },
-    sender: {
-      email: data.senderEmail,
-      name: data.senderName
-    }
-  };
-}
-
-function templateTypeBasedOnPreviousNotifications(
-  previousNotificationsCount: number
-) {
-  const mapping: {
-    [key: number]: PaymentReminderType;
-  } = {
-    0: 'first',
-    1: 'second',
-    2: 'third',
-    3: 'fourth'
-  };
-
-  return mapping[previousNotificationsCount] || mapping[3];
+  private scheduleNextJob(data: CompoundData) {}
 }

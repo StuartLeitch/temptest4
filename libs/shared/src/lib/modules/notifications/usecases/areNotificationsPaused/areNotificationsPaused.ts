@@ -43,7 +43,11 @@ export class AreNotificationsPausedUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private sentNotificationRepo: SentNotificationRepoContract) {}
+  constructor(private sentNotificationRepo: SentNotificationRepoContract) {
+    this.fetchNotificationPauses = this.fetchNotificationPauses.bind(this);
+    this.validateRequest = this.validateRequest.bind(this);
+    this.getPauseStatus = this.getPauseStatus.bind(this);
+  }
 
   private async getAccessControlContext(request, context?) {
     return {};
