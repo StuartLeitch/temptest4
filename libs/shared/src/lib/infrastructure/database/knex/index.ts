@@ -23,7 +23,8 @@ export enum TABLES {
   INVOICE_ITEMS_TO_WAIVERS = 'invoice_items_to_waivers',
   PUBLISHERS = 'publishers',
   PUBLISHER_CUSTOM_VALUES = 'publisher_custom_values',
-  NOTIFICATIONS_SENT = 'notifications_sent'
+  NOTIFICATIONS_SENT = 'notifications_sent',
+  PAUSED_NOTIFICATIONS = 'paused_notifications'
 }
 
 interface DbOptions {

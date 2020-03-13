@@ -8,6 +8,7 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationId } from '../../domain/NotificationId';
 
 import { SentNotificationRepoContract } from '../SentNotificationRepo';
+import { NotificationPause } from '../../domain/NotificationPause';
 
 export class KnexSentNotificationsRepo
   extends AbstractBaseDBRepo<Knex, Notification>
@@ -99,5 +100,28 @@ export class KnexSentNotificationsRepo
     }
 
     return true;
+  }
+
+  async getNotificationPausedStatus(
+    invoiceId: InvoiceId
+  ): Promise<NotificationPause> {
+    const pause = await this.db
+      .select()
+      .where('id', invoiceId.id.toString())
+      .first();
+
+    if (!pause) {
+      return {
+        confirmation: false,
+        payment: false,
+        invoiceId
+      };
+    } else {
+      return {
+        confirmation: pause.pauseConfirmation,
+        payment: pause.pausePayment,
+        invoiceId
+      };
+    }
   }
 }

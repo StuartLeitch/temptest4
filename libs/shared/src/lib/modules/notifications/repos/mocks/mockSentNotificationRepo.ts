@@ -6,6 +6,7 @@ import { NotificationType, Notification } from '../../domain/Notification';
 import { SentNotificationRepoContract } from '../SentNotificationRepo';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationId } from '../../domain/NotificationId';
+import { NotificationPause } from '../../domain/NotificationPause';
 
 export class MockSentNotificationRepo extends BaseMockRepo<Notification>
   implements SentNotificationRepoContract {
@@ -94,6 +95,16 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
       this.compareMockItems(item, notification)
     );
     return !!match;
+  }
+
+  async getNotificationPausedStatus(
+    invoiceId: InvoiceId
+  ): Promise<NotificationPause> {
+    return {
+      confirmation: false,
+      payment: false,
+      invoiceId
+    };
   }
 
   compareMockItems(a: Notification, b: Notification): boolean {
