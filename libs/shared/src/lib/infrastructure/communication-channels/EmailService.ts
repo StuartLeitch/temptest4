@@ -11,7 +11,7 @@ import { Invoice } from '../../modules/invoices/domain/Invoice';
 import {
   AutoConfirmMissingCountryNotificationTemplate,
   InvoiceCanBeConfirmedNotificationTemplate,
-  InvoicePaymentFourthReminderTemplate,
+  InvoiceCreditControlReminderTemplate,
   InvoicePaymentSecondReminderTemplate,
   InvoiceConfirmationReminderTemplate,
   InvoicePaymentFirstReminderTemplate,
@@ -90,7 +90,7 @@ export interface PaymentReminder {
   };
 }
 
-export type PaymentReminderType = 'first' | 'second' | 'third' | 'fourth';
+export type PaymentReminderType = 'first' | 'second' | 'third';
 type PaymentReminderTemplateMapper = {
   [key in PaymentReminderType]: (
     ...d: any
@@ -284,8 +284,7 @@ export class EmailService {
     const template: PaymentReminderTemplateMapper = {
       first: InvoicePaymentFirstReminderTemplate.build,
       second: InvoicePaymentSecondReminderTemplate.build,
-      third: InvoicePaymentThirdReminderTemplate.build,
-      fourth: InvoicePaymentFourthReminderTemplate.build
+      third: InvoicePaymentThirdReminderTemplate.build
     };
 
     return template[kind](
@@ -311,6 +310,41 @@ export class EmailService {
       data,
       kind,
       invoiceButton
+    );
+
+    return this.createTemplate({
+      type: 'user',
+      fromEmail: `${data.sender.name} <${data.sender.email}>`,
+      toUser: {
+        email: data.author.email,
+        name: data.author.name
+      },
+      content: {
+        subject,
+        paragraph,
+        ...journalConfig
+      },
+      bodyProps: {
+        hasLink: false,
+        hasIntro: true,
+        hasSignature: false
+      }
+    });
+  }
+
+  public invoiceCreditControlReminder(data: PaymentReminder) {
+    const invoiceButton = EmailService.createSingleButton(
+      'INVOICE DETAILS',
+      EmailService.createURL(`/payment-details/${data.invoice.invoiceId}`)
+    );
+
+    const { paragraph, subject } = InvoiceCreditControlReminderTemplate.build(
+      data.manuscriptCustomId,
+      data.catalogItem,
+      data.invoice,
+      invoiceButton,
+      data.sender.name,
+      journalConfig.logoLink
     );
 
     return this.createTemplate({
