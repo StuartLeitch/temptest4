@@ -6,8 +6,8 @@ producerReplicaCount: 1
 consumerReplicaCount: 1
 
 image:
-  repository: sisif
-  pullPolicy: Never
+  repository: 918602980697.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground
+  pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ''
@@ -15,7 +15,7 @@ fullnameOverride: ''
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.

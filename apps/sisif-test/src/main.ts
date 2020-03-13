@@ -2,11 +2,14 @@
 import { BullScheduler, TimerType, SchedulingTime } from '@hindawi/sisif';
 import express from 'express';
 
-let schedulingService = new BullScheduler({
-  host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT || 6379),
-  password: process.env.REDIS_PASSWORD
-});
+let schedulingService = new BullScheduler(
+  {
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT || 6379),
+    password: process.env.REDIS_PASSWORD
+  },
+  console
+);
 
 const queueName = process.env.QUEUE || 'qq';
 
@@ -29,7 +32,7 @@ if (process.env.PRODUCER) {
     }
   }, interval);
 } else {
-  schedulingService.startListening(queueName, job => {
+  schedulingService.startListening(queueName, (job: any) => {
     console.log(job.data);
   });
 }
