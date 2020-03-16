@@ -184,6 +184,8 @@ export * from './modules/notifications/repos/implementations/KnexSentNotificatio
 export * from './modules/notifications/usecases/sendInvoiceConfirmationReminder';
 export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
 export * from './modules/notifications/usecases/getSentNotificationForInvoice';
+export * from './modules/notifications/usecases/sendInvoiceCreditControlReminder';
+export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';

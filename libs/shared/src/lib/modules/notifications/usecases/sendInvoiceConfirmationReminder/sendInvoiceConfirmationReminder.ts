@@ -202,7 +202,7 @@ export class SendInvoiceConfirmationReminderUsecase
     const newJob = JobBuilder.basic(jobData.type, data);
 
     try {
-      await this.scheduler.schedule(newJob, jobData.queName, timer);
+      await this.scheduler.schedule(newJob, jobData.queueName, timer);
       return right(null);
     } catch (e) {
       return left(new Errors.RescheduleTaskFailed(e));

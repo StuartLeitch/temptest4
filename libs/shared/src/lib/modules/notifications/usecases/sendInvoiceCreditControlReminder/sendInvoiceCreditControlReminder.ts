@@ -53,8 +53,8 @@ export class SendInvoiceCreditControlReminderUsecase
     private sentNotificationRepo: SentNotificationRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private journalRepo: CatalogRepoContract,
     private invoiceRepo: InvoiceRepoContract,
+    private journalRepo: CatalogRepoContract,
     private emailService: EmailService
   ) {
     this.saveNotification = this.saveNotification.bind(this);

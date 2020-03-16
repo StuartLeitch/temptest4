@@ -1,7 +1,7 @@
-import { SisifJobTypes, JobData } from '@hindawi/sisif';
+import { JobData } from '@hindawi/sisif';
 import {
-  SendInvoiceConfirmationReminderUsecase,
-  SendInvoiceConfirmationReminderDTO,
+  SendInvoiceCreditControlReminderUsecase,
+  SendInvoiceCreditControlReminderDTO,
   Roles
 } from '@hindawi/shared';
 
@@ -15,35 +15,30 @@ interface Payload {
   recipientName: string;
 }
 
-export const invoiceConfirmHandler = (
+export const invoiceCreditControlHandler = (
   payload: JobData<Payload>,
   appContext: any,
   loggerService: Logger
 ) => {
   const {
-    repos: { sentNotifications, invoice, manuscript, invoiceItem },
-    services: { schedulingService, emailService }
+    repos: { sentNotifications, invoice, manuscript, invoiceItem, catalog },
+    services: { emailService }
   } = appContext;
   const { manuscriptCustomId, recipientEmail, recipientName } = payload;
 
-  const usecase = new SendInvoiceConfirmationReminderUsecase(
+  const usecase = new SendInvoiceCreditControlReminderUsecase(
     sentNotifications,
     invoiceItem,
     manuscript,
     invoice,
-    schedulingService,
+    catalog,
     emailService
   );
   const usecaseContext = {
     roles: [Roles.PAYER]
   };
 
-  const request: SendInvoiceConfirmationReminderDTO = {
-    job: {
-      delay: env.scheduler.confirmationReminderDelay,
-      queueName: env.scheduler.emailRemindersQueue,
-      type: SisifJobTypes.InvoiceConfirmReminder
-    },
+  const request: SendInvoiceCreditControlReminderDTO = {
     senderEmail: env.app.invoicePaymentEmailSenderAddress,
     senderName: env.app.invoicePaymentEmailSenderName,
     manuscriptCustomId,

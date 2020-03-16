@@ -4,9 +4,4 @@ export interface SendInvoiceCreditControlReminderDTO {
   recipientName: string;
   senderEmail: string;
   senderName: string;
-  job: {
-    queName: string;
-    delay: number;
-    type: string;
-  };
 }

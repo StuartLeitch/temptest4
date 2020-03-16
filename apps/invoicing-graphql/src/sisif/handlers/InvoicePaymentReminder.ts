@@ -1,7 +1,7 @@
 import { SisifJobTypes, JobData } from '@hindawi/sisif';
 import {
-  SendInvoiceConfirmationReminderUsecase,
-  SendInvoiceConfirmationReminderDTO,
+  SendInvoicePaymentReminderUsecase,
+  SendInvoicePaymentReminderDTO,
   Roles
 } from '@hindawi/shared';
 
@@ -15,22 +15,23 @@ interface Payload {
   recipientName: string;
 }
 
-export const invoiceConfirmHandler = (
+export const invoicePaymentHandler = (
   payload: JobData<Payload>,
   appContext: any,
   loggerService: Logger
 ) => {
   const {
-    repos: { sentNotifications, invoice, manuscript, invoiceItem },
+    repos: { sentNotifications, invoice, manuscript, invoiceItem, catalog },
     services: { schedulingService, emailService }
   } = appContext;
   const { manuscriptCustomId, recipientEmail, recipientName } = payload;
 
-  const usecase = new SendInvoiceConfirmationReminderUsecase(
+  const usecase = new SendInvoicePaymentReminderUsecase(
     sentNotifications,
     invoiceItem,
     manuscript,
     invoice,
+    catalog,
     schedulingService,
     emailService
   );
@@ -38,7 +39,7 @@ export const invoiceConfirmHandler = (
     roles: [Roles.PAYER]
   };
 
-  const request: SendInvoiceConfirmationReminderDTO = {
+  const request: SendInvoicePaymentReminderDTO = {
     job: {
       delay: env.scheduler.confirmationReminderDelay,
       queueName: env.scheduler.emailRemindersQueue,
