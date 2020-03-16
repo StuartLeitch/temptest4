@@ -53,3 +53,15 @@ export const numberToTemplateMapper: { [key: number]: PaymentReminderType } = {
   2: 'second',
   3: 'third'
 };
+
+export async function shouldRescheduleJob(
+  data: CompoundData
+): Promise<boolean> {
+  const days = differenceInCalendarDays(new Date(), data.invoice.dateIssued);
+  const count = Math.trunc(days / data.job.delay);
+  if (count >= 3) {
+    return false;
+  }
+
+  return true;
+}
