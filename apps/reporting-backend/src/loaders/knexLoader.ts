@@ -25,12 +25,7 @@ export const knexLoader: MicroframeworkLoader = async (
     // debug: true
   });
 
-  let [batch, migrations] = await knex.migrate.latest();
-
-  if (migrations.length > 0) {
-    console.log('Migrating views:');
-    await knexMigrationSource.migrateViews(knex);
-  }
+  await knex.migrate.latest();
 
   if (settings) {
     settings.setData('connection', knex);

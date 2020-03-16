@@ -42,6 +42,8 @@ AS SELECT
     inv.payment_type as "payment_type",
     inv.payer_country as "payer_country",
     inv.payment_currency as "payment_currency",
+    waivers.waiver_types as waivers,
+    coupons.coupon_names as coupons,
     inv.event_id as "event_id",
     s.title as "manuscript_title",
     s.article_type as "manuscript_article_type",
@@ -78,6 +80,18 @@ AS SELECT
       and a.is_submitting = true
     LIMIT 1) a on
     a.manuscript_custom_id = inv.manuscript_custom_id
+  LEFT JOIN (
+    select id as event_id, STRING_AGG(type_id, ', ') as waiver_types
+    from ${REPORTING_TABLES.INVOICE} ie,
+    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'waivers') as waivers(type_id text)
+    group by event_id
+  ) waivers on waivers.event_id = inv.event_id
+  LEFT JOIN (
+    select id as event_id, STRING_AGG(name, ', ') as coupon_names
+    from ${REPORTING_TABLES.INVOICE} ie,
+    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(name text)
+    group by event_id
+  ) coupons on coupons.event_id = inv.event_id
 WITH DATA;
     `;
   }

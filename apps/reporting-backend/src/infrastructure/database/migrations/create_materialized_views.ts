@@ -2,7 +2,6 @@ import * as Knex from 'knex';
 import { materializedViewList } from '../../views';
 
 export async function up(knex: Knex): Promise<any> {
-  await down(knex);
   for (const view of materializedViewList) {
     console.log('Migrating view: ', view.getViewName());
     await knex.raw(view.getCreateQuery());

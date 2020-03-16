@@ -26,8 +26,11 @@ function makeViewObject(viewFileExport: any): KnexMigration {
 
 function rebuild_materialized_views(name: string): any {
   return {
-    up: async () => {},
-    down: async () => {},
+    up: async (knex: any) => {
+      await create_materialized_views.down(knex);
+      return create_materialized_views.up(knex);
+    },
+    down: create_materialized_views.down,
     name
   };
 }
@@ -45,7 +48,8 @@ class KnexMigrationSource {
     create_article_events_table,
     create_checker_events_table,
     rebuild_materialized_views('20200310150525_rebuild_materialized_views'),
-    create_journal_to_publisher_table
+    create_journal_to_publisher_table,
+    rebuild_materialized_views('20200316122800_add_waivers_to_invoices_view')
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
@@ -58,14 +62,6 @@ class KnexMigrationSource {
 
   getMigration(migration): KnexMigration {
     return migration;
-  }
-
-  /**
-   * migrateViews is used after the migrations are done to refresh the views.
-   * @param Knex
-   */
-  public async migrateViews(Knex: Knex): Promise<any> {
-    return create_materialized_views.up(Knex);
   }
 }
 
