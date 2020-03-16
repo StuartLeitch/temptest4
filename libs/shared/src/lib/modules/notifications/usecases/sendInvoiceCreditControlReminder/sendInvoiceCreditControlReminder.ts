@@ -14,24 +14,22 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
-
-import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
 
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { CatalogRepoContract } from '../../../journals/repos/catalogRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJournal';
+import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
-import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { Invoice } from '../../../invoices/domain/Invoice';
 
 // * Usecase specific
 import { SendInvoiceCreditControlReminderResponse as Response } from './sendInvoiceCreditControlReminderResponse';
@@ -55,11 +53,15 @@ export class SendInvoiceCreditControlReminderUsecase
     private sentNotificationRepo: SentNotificationRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
+    private journalRepo: CatalogRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private emailService: EmailService
   ) {
     this.saveNotification = this.saveNotification.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
+    this.getCatalogItem = this.getCatalogItem.bind(this);
+    this.getPauseStatus = this.getPauseStatus.bind(this);
+    this.getManuscript = this.getManuscript.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
   }
@@ -73,7 +75,13 @@ export class SendInvoiceCreditControlReminderUsecase
     try {
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
-        .then(this.getInvoice(context));
+        .then(this.getInvoice(context))
+        .then(this.getManuscript)
+        .then(this.getCatalogItem(context))
+        .then(this.getPauseStatus(context))
+        .advanceOrEnd(shouldSendEmail)
+        .then(this.sendEmail)
+        .then(this.saveNotification);
 
       const maybeResult = await execution.execute();
       return maybeResult.map(() => Result.ok(null));
@@ -102,19 +110,24 @@ export class SendInvoiceCreditControlReminderUsecase
   }
 
   private getInvoice(context: Context) {
-    return async ({ manuscriptCustomId }: DTO) => {
+    return async (request: DTO) => {
       const getInvoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
       );
       const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
 
-      const execution = new AsyncEither<null, string>(manuscriptCustomId)
+      const execution = new AsyncEither<null, string>(
+        request.manuscriptCustomId
+      )
         .then(customId => getInvoiceIdUsecase.execute({ customId }, context))
         .map(result => result.getValue())
         .map(invoiceIds => invoiceIds[0].id.toString())
         .then(invoiceId => invoiceUsecase.execute({ invoiceId }, context))
-        .map(result => result.getValue());
+        .map(result => ({
+          ...request,
+          invoice: result.getValue()
+        }));
 
       return execution.execute();
     };
@@ -140,6 +153,49 @@ export class SendInvoiceCreditControlReminderUsecase
       })
       .map(manuscript => ({ ...data, manuscript }));
     return execution.execute();
+  }
+
+  private getCatalogItem(context: Context) {
+    return async (data: DTO & { invoice: Invoice; manuscript: Manuscript }) => {
+      const getJournalUsecase = new GetJournal(this.journalRepo);
+
+      const execution = new AsyncEither(data)
+        .then(this.getManuscript)
+        .then(async data => {
+          const { manuscript } = data;
+          const maybeResult = await getJournalUsecase.execute(
+            { journalId: manuscript.journalId },
+            context
+          );
+          return maybeResult.map(result => ({
+            ...data,
+            journal: result.getValue()
+          }));
+        });
+      return execution.execute();
+    };
+  }
+
+  private getPauseStatus(context: Context) {
+    return async (data: CompoundData) => {
+      const usecase = new AreNotificationsPausedUsecase(
+        this.sentNotificationRepo
+      );
+      const invoiceId = data.invoice.id.toString();
+
+      const maybeResult = await usecase.execute(
+        {
+          notificationType: NotificationType.REMINDER_PAYMENT,
+          invoiceId
+        },
+        context
+      );
+
+      return maybeResult.map(result => ({
+        ...data,
+        paused: result.getValue()
+      }));
+    };
   }
 
   private async sendEmail(

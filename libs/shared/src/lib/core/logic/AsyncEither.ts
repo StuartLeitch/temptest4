@@ -54,7 +54,7 @@ export class AsyncEither<L = null, R = unknown> {
     return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
   }
 
-  advanceOrEnd(...fns: { (r: R): Promise<boolean> }[]) {
+  advanceOrEnd(...fns: { (r: R): Promise<Either<unknown, boolean>> }[]) {
     const newInstance = this.clone();
     newInstance.mutations.push({ type: 'guard', fn: allFilters(fns) });
     return newInstance;
@@ -114,12 +114,16 @@ function advancePastGuard<L, R>(val: Either<L, R>) {
   return async (fn: MutationFunction) => {
     if (val.isLeft()) return val;
 
-    const rez = await fn(val.value);
-    if (rez) {
-      return val;
-    } else {
-      throw new GuardError();
+    const maybeResult: Either<unknown, unknown> = await fn(val.value);
+
+    if (maybeResult.isRight()) {
+      if (!!maybeResult.value) {
+        return val;
+      } else {
+        throw new GuardError();
+      }
     }
+    return maybeResult;
   };
 }
 
@@ -158,24 +162,28 @@ async function extractValue<L, L2, R2>(
   }
 }
 
-function allFilters<R>(filters: { (r: R): Promise<boolean> }[]) {
+function allFilters<R>(
+  filters: { (r: R): Promise<Either<unknown, boolean>> }[]
+) {
+  let finalResult = right<null, boolean>(true);
   return async (r: R) => {
     for (const fn of filters) {
-      if (!(await fn(r))) {
-        return false;
-      }
+      const result = await fn(r);
+      finalResult.chain(val => result.map(resVal => val && resVal));
     }
-    return true;
+    finalResult;
   };
 }
 
-function anyFilter<R>(filters: { (r: R): Promise<boolean> }[]) {
+function anyFilter<R>(
+  filters: { (r: R): Promise<Either<unknown, boolean>> }[]
+) {
+  let finalResult = right<null, boolean>(false);
   return async (r: R) => {
     for (const fn of filters) {
-      if (await fn(r)) {
-        return true;
-      }
+      const result = await fn(r);
+      finalResult.chain(val => result.map(resVal => val || resVal));
     }
-    return false;
+    return finalResult;
   };
 }

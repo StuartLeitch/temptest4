@@ -1,5 +1,7 @@
 import { differenceInCalendarDays } from 'date-fns';
 
+import { right } from '../../../../core/logic/Result';
+
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
@@ -22,10 +24,14 @@ export async function shouldSendEmail(data: CompoundData) {
   const { invoice, paused } = data;
 
   const days = differenceInCalendarDays(new Date(), invoice.dateIssued);
-  if (invoice.status === InvoiceStatus.ACTIVE && days <= 18 && !paused) {
-    return true;
+  if (
+    invoice.status === InvoiceStatus.ACTIVE &&
+    days <= 3 * data.job.delay &&
+    !paused
+  ) {
+    return right<null, boolean>(true);
   }
-  return false;
+  return right<null, boolean>(false);
 }
 
 export function constructPaymentReminderData(
@@ -54,14 +60,12 @@ export const numberToTemplateMapper: { [key: number]: PaymentReminderType } = {
   3: 'third'
 };
 
-export async function shouldRescheduleJob(
-  data: CompoundData
-): Promise<boolean> {
+export async function shouldRescheduleJob(data: CompoundData) {
   const days = differenceInCalendarDays(new Date(), data.invoice.dateIssued);
   const count = Math.trunc(days / data.job.delay);
   if (count >= 3) {
-    return false;
+    return right<null, boolean>(false);
   }
 
-  return true;
+  return right<null, boolean>(true);
 }

@@ -71,7 +71,7 @@ export class SendInvoicePaymentReminderUsecase
     private emailService: EmailService
   ) {
     this.sendPaymentReminderEmail = this.sendPaymentReminderEmail.bind(this);
-    this.getNotificationsCount = this.getNotificationsCount.bind(this);
+    this.bellowEmailMaxCount = this.bellowEmailMaxCount.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
     this.scheduleNextJob = this.scheduleNextJob.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
@@ -94,7 +94,7 @@ export class SendInvoicePaymentReminderUsecase
         .then(this.getInvoice(context))
         .then(this.getCatalogItem(context))
         .then(this.getPauseStatus(context))
-        .advanceOrEnd(shouldSendEmail)
+        .advanceOrEnd(shouldSendEmail, this.bellowEmailMaxCount)
         .then(this.sendPaymentReminderEmail)
         .then(this.saveNotification)
         .advanceOrEnd(shouldRescheduleJob)
@@ -170,7 +170,7 @@ export class SendInvoicePaymentReminderUsecase
   }
 
   private getCatalogItem(context: Context) {
-    return async (data: DTO & { invoice: Invoice }) => {
+    return async (data: DTO & { invoice: Invoice; manuscript: Manuscript }) => {
       const getJournalUsecase = new GetJournal(this.journalRepo);
 
       const execution = new AsyncEither(data)
@@ -190,18 +190,20 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private getNotificationsCount(invoiceId: InvoiceId) {
+  private bellowEmailMaxCount({ invoice }: CompoundData) {
     const getNotificationsUsecase = new GetSentNotificationForInvoiceUsecase(
       this.sentNotificationRepo
     );
     const filterPayment = (notification: Notification) =>
       notification.type === NotificationType.REMINDER_PAYMENT;
 
-    const execution = new AsyncEither(invoiceId.id.toString())
+    const execution = new AsyncEither(invoice.id.toString())
       .then(invoiceId => getNotificationsUsecase.execute({ invoiceId }))
       .map(result => result.getValue())
       .map(notifications => notifications.filter(filterPayment))
-      .map(notifications => notifications.length);
+      .map(notifications => notifications.length)
+      .map(count => count < 3);
+
     return execution.execute();
   }
 
