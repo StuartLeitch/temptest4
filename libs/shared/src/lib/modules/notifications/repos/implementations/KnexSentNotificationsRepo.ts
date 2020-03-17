@@ -105,9 +105,9 @@ export class KnexSentNotificationsRepo
   async getNotificationPausedStatus(
     invoiceId: InvoiceId
   ): Promise<NotificationPause> {
-    const pause = await this.db
+    const pause = await this.db(TABLES.PAUSED_REMINDERS)
       .select()
-      .where('id', invoiceId.id.toString())
+      .where('invoiceId', invoiceId.id.toString())
       .first();
 
     if (!pause) {

@@ -33,7 +33,7 @@ export namespace AreNotificationsPausedErrors {
   export class EncounteredDbError extends Result<UseCaseError> {
     constructor(invoiceId: string, e: Error) {
       super(false, {
-        message: `While retrieving the notification pauses for invoice id {${invoiceId}} an error war encountered: ${e.message}.`
+        message: `While retrieving the notification pauses for invoice id {${invoiceId}} an error was encountered: ${e.message}.`
       });
     }
   }

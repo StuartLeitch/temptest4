@@ -17,23 +17,23 @@ export class InvoiceCreditControlReminderTemplate {
 
     const subject = `${manuscriptCustomId}: Article Processing Charges OVERDUE`;
     const paragraph = `
-      I am writing to you with regard to the invoice for manuscript ${manuscriptCustomId} in the amount of ${price} which is still unpaid despite multiple requests for payment.</br>
-      </br>
-      As this invoice is now ${daysNo} days overdue it has been escalated to the Hindawi Credit Control team for resolution. Please contact me immediately to discuss the payment of this invoice.</br>
-      </br>
+      I am writing to you with regard to the invoice for manuscript ${manuscriptCustomId} in the amount of ${price} which is still unpaid despite multiple requests for payment.<br/>
+      <br/>
+      As this invoice is now ${daysNo} days overdue it has been escalated to the Hindawi Credit Control team for resolution. Please contact me immediately to discuss the payment of this invoice.<br/>
+      <br/>
       Alternatively, you can access the invoice for your article and make payment through the following URL:
-      </br></br>
+      <br/><br/>
       ${invoiceButton}
 
-      Please make the payment as a matter of urgency.</br>
-      </br>
-      Kind regards,</br>
-      </br>
-      ********************************</br>
-      Accounts Receivable Team</br>
-      Credit Control Specialist</br>
-      ${publisherName}</br>
-      ${publisherSite}</br>
+      Please make the payment as a matter of urgency.<br/>
+      <br/>
+      Kind regards,<br/>
+      <br/>
+      ********************************<br/>
+      Accounts Receivable Team<br/>
+      Credit Control Specialist<br/>
+      ${publisherName}<br/>
+      ${publisherSite}<br/>
       ********************************
     `;
 

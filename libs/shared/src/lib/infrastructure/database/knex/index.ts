@@ -24,7 +24,7 @@ export enum TABLES {
   PUBLISHERS = 'publishers',
   PUBLISHER_CUSTOM_VALUES = 'publisher_custom_values',
   NOTIFICATIONS_SENT = 'notifications_sent',
-  PAUSED_NOTIFICATIONS = 'paused_notifications'
+  PAUSED_REMINDERS = 'paused_reminders'
 }
 
 interface DbOptions {

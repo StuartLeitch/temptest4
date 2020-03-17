@@ -165,24 +165,28 @@ async function extractValue<L, L2, R2>(
 function allFilters<R>(
   filters: { (r: R): Promise<Either<unknown, boolean>> }[]
 ) {
-  let finalResult = right<null, boolean>(true);
   return async (r: R) => {
+    let finalResult = right<null, boolean>(true);
     for (const fn of filters) {
       const result = await fn(r);
-      finalResult.chain(val => result.map(resVal => val && resVal));
+      finalResult = finalResult.chain(val =>
+        result.map(resVal => val && resVal)
+      );
     }
-    finalResult;
+    return finalResult;
   };
 }
 
 function anyFilter<R>(
   filters: { (r: R): Promise<Either<unknown, boolean>> }[]
 ) {
-  let finalResult = right<null, boolean>(false);
   return async (r: R) => {
+    let finalResult = right<null, boolean>(false);
     for (const fn of filters) {
       const result = await fn(r);
-      finalResult.chain(val => result.map(resVal => val || resVal));
+      finalResult = finalResult.chain(val =>
+        result.map(resVal => val || resVal)
+      );
     }
     return finalResult;
   };

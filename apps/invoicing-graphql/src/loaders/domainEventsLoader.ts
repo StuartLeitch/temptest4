@@ -3,7 +3,7 @@
 
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings,
+  MicroframeworkSettings
 } from 'microframework-w3tec';
 
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
@@ -19,7 +19,7 @@ import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modu
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceCreated/publishInvoiceCreated';
 // import { AfterManuscriptPublishedEvent } from '../../../../libs/shared/src/lib/modules/manuscripts/subscriptions/AfterManuscriptPublishedEvent';
 
-// import { env } from '../env';
+import { env } from '../env';
 import { Logger } from '../lib/logger';
 
 // This feature is a copy from https://github.com/kadirahq/graphql-errors
@@ -40,10 +40,10 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         catalog,
         coupon,
         waiver,
-        publisher,
+        publisher
       },
-      services: { erpService, logger: loggerService },
-      qq: queue,
+      services: { erpService, logger: loggerService, schedulingService },
+      qq: queue
     } = context;
 
     const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
@@ -99,7 +99,11 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       publishInvoiceConfirmed,
       publishInvoiceToErpUsecase,
-      loggerService
+      schedulingService,
+      loggerService,
+      env.scheduler.creditControlReminderDelay,
+      env.scheduler.paymentReminderDelay,
+      env.scheduler.emailRemindersQueue
     );
 
     // tslint:disable-next-line: no-unused-expression

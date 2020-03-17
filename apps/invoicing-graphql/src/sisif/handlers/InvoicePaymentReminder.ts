@@ -41,9 +41,9 @@ export const invoicePaymentHandler = (
 
   const request: SendInvoicePaymentReminderDTO = {
     job: {
-      delay: env.scheduler.confirmationReminderDelay,
+      delay: env.scheduler.paymentReminderDelay,
       queueName: env.scheduler.emailRemindersQueue,
-      type: SisifJobTypes.InvoiceConfirmReminder
+      type: SisifJobTypes.InvoicePaymentReminder
     },
     senderEmail: env.app.invoicePaymentEmailSenderAddress,
     senderName: env.app.invoicePaymentEmailSenderName,

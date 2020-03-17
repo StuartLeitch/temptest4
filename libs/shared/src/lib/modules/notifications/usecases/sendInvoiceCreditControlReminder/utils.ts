@@ -21,6 +21,7 @@ export async function shouldSendEmail(data: CompoundData) {
   if (invoice.status === InvoiceStatus.ACTIVE && !paused) {
     return right<null, boolean>(true);
   }
+
   return right<null, boolean>(false);
 }
 

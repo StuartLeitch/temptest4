@@ -282,19 +282,19 @@ export class EmailService {
   ) {
     const publisherName = process.env.TENANT_NAME;
     const template: PaymentReminderTemplateMapper = {
-      first: InvoicePaymentFirstReminderTemplate.build,
-      second: InvoicePaymentSecondReminderTemplate.build,
-      third: InvoicePaymentThirdReminderTemplate.build
+      first: data => InvoicePaymentFirstReminderTemplate.build(data),
+      second: data => InvoicePaymentSecondReminderTemplate.build(data),
+      third: data => InvoicePaymentThirdReminderTemplate.build(data)
     };
 
-    return template[kind](
+    return template[kind]({
       manuscriptCustomId,
       catalogItem,
       invoice,
       invoiceButton,
       publisherName,
-      journalConfig.logoLink
-    );
+      publisherSite: journalConfig.logoLink
+    });
   }
 
   public invoicePaymentReminder(

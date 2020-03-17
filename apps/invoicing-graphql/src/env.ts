@@ -139,6 +139,10 @@ export const env = {
     ),
     confirmationReminderDelay: toFloat(
       getOsEnvWithDefault('CONFIRMATION_REMINDER_DELAY_DAYS', '5')
+    ),
+    paymentReminderDelay: toFloat(getOsEnv('PAYMENT_REMINDER_DELAY_DAYS')),
+    creditControlReminderDelay: toFloat(
+      getOsEnv('CREDIT_CONTROL_REMINDER_DELAY_DAYS')
     )
   },
   braintree: {

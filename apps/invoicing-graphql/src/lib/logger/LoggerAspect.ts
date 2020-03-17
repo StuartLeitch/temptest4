@@ -15,6 +15,11 @@ import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/
 import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
 import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+import {
+  SendInvoiceCreditControlReminderUsecase,
+  SendInvoiceConfirmationReminderUsecase,
+  SendInvoicePaymentReminderUsecase
+} from '@hindawi/shared';
 
 import { Logger } from './logger';
 const logger = new Logger('Usecase:Aspect');
@@ -36,6 +41,9 @@ const watchList = [
   UpdateTransactionOnAcceptManuscriptUsecase,
   UpdateCatalogItemToCatalogUseCase,
   AssignEditorsToJournalUsecase,
+  SendInvoiceCreditControlReminderUsecase,
+  SendInvoiceConfirmationReminderUsecase,
+  SendInvoicePaymentReminderUsecase,
   AddCatalogItemToCatalogUseCase
 ];
 const aspect = {
@@ -64,6 +72,9 @@ export class LoggerAspect {
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,
+      SendInvoiceCreditControlReminderUsecase.prototype.execute,
+      SendInvoiceConfirmationReminderUsecase.prototype.execute,
+      SendInvoicePaymentReminderUsecase.prototype.execute,
       AddCatalogItemToCatalogUseCase.prototype.execute
     ]
   })
@@ -92,6 +103,9 @@ export class LoggerAspect {
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,
+      SendInvoiceCreditControlReminderUsecase.prototype.execute,
+      SendInvoiceConfirmationReminderUsecase.prototype.execute,
+      SendInvoicePaymentReminderUsecase.prototype.execute,
       AddCatalogItemToCatalogUseCase.prototype.execute
     ]
   })

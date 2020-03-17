@@ -16,6 +16,7 @@ const sisifLogger = new Logger('sisif:loader');
 function jobHandlerDispatcher(context: any, loggerService: LoggerContract) {
   return (job: Job) => {
     const { data, type } = job;
+
     try {
       SisifHandlers.get(type)(data, context, loggerService);
     } catch (e) {

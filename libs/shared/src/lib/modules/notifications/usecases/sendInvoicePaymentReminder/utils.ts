@@ -1,6 +1,6 @@
-import { differenceInCalendarDays } from 'date-fns';
-
 import { right } from '../../../../core/logic/Result';
+
+import { SchedulingTime } from '../../../../infrastructure/message-queues/contracts/Time';
 
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
@@ -23,14 +23,17 @@ export interface CompoundData extends DTO {
 export async function shouldSendEmail(data: CompoundData) {
   const { invoice, paused } = data;
 
-  const days = differenceInCalendarDays(new Date(), invoice.dateIssued);
+  const passedTime = new Date().getTime() - data.invoice.dateIssued.getTime();
+  const period = data.job.delay * SchedulingTime.Day;
+
   if (
     invoice.status === InvoiceStatus.ACTIVE &&
-    days <= 3 * data.job.delay &&
+    passedTime <= 3.2 * period &&
     !paused
   ) {
     return right<null, boolean>(true);
   }
+
   return right<null, boolean>(false);
 }
 
@@ -61,9 +64,10 @@ export const numberToTemplateMapper: { [key: number]: PaymentReminderType } = {
 };
 
 export async function shouldRescheduleJob(data: CompoundData) {
-  const days = differenceInCalendarDays(new Date(), data.invoice.dateIssued);
-  const count = Math.trunc(days / data.job.delay);
-  if (count >= 3) {
+  const passedTime = new Date().getTime() - data.invoice.dateIssued.getTime();
+  const period = data.job.delay * SchedulingTime.Day;
+
+  if (passedTime >= 3 * period) {
     return right<null, boolean>(false);
   }
 

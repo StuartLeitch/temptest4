@@ -1,3 +1,17 @@
+import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import {
+  Job,
+  JobBuilder,
+  SisifJobTypes,
+} from '../../../infrastructure/message-queues/contracts/Job';
+import {
+  ScheduleTimer,
+  TimerBuilder,
+  SchedulingTime,
+  TimerType,
+} from '../../../infrastructure/message-queues/contracts/Time';
+
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
@@ -24,7 +38,11 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceConfirmed: PublishInvoiceConfirmed,
     private invoiceToErpUsecase: PublishInvoiceToErpUsecase,
-    private loggerService: any
+    private scheduler: SchedulerContract,
+    private loggerService: LoggerContract,
+    private creditControlReminderDelay: number,
+    private paymentReminderDelay: number,
+    private jobQue: string
   ) {
     this.setupSubscriptions();
   }
@@ -81,6 +99,39 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
           `Invoice ${invoice.id.toString()} has no manuscripts associated.`
         );
       }
+
+      const jobData = {
+        recipientName: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
+        manuscriptCustomId: manuscript.customId,
+        recipientEmail: manuscript.authorEmail,
+      };
+      const jobPaymentReminder = JobBuilder.basic(
+        SisifJobTypes.InvoicePaymentReminder,
+        jobData
+      );
+      const jobCreditControlReminder = JobBuilder.basic(
+        SisifJobTypes.InvoiceCreditControlReminder,
+        jobData
+      );
+      const creditControlTimer = TimerBuilder.delayed(
+        this.creditControlReminderDelay,
+        SchedulingTime.Day
+      );
+      const paymentTimer = TimerBuilder.delayed(
+        this.paymentReminderDelay,
+        SchedulingTime.Day
+      );
+
+      await this.scheduler.schedule(
+        jobCreditControlReminder,
+        this.jobQue,
+        creditControlTimer
+      );
+      await this.scheduler.schedule(
+        jobPaymentReminder,
+        this.jobQue,
+        paymentTimer
+      );
 
       await this.publishInvoiceConfirmed.execute(
         invoice,

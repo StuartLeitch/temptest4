@@ -1,5 +1,3 @@
-import { differenceInCalendarDays } from 'date-fns';
-
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -38,7 +36,6 @@ import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { Invoice } from '../../../invoices/domain/Invoice';
 
 // * Usecase specific
@@ -211,6 +208,14 @@ export class SendInvoicePaymentReminderUsecase
     data: CompoundData,
     template: PaymentReminderType
   ): Promise<Either<Errors.EmailSendingFailure, CompoundData>> {
+    if (!template) {
+      return left(
+        new AppError.UnexpectedError(
+          'Invalid email template has been tried to send'
+        )
+      );
+    }
+
     try {
       const emailData = constructPaymentReminderData(data);
       await this.emailService
@@ -224,8 +229,9 @@ export class SendInvoicePaymentReminderUsecase
   }
 
   private sendPaymentReminderEmail(data: CompoundData) {
-    const days = differenceInCalendarDays(new Date(), data.invoice.dateIssued);
-    const emailNum = Math.trunc(days / data.job.delay);
+    const passedTime = new Date().getTime() - data.invoice.dateIssued.getTime();
+    const period = data.job.delay * SchedulingTime.Day;
+    const emailNum = Math.trunc(passedTime / period);
 
     return this.sendEmail(data, numberToTemplateMapper[emailNum]);
   }
