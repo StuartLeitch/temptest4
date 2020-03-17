@@ -426,9 +426,15 @@ export class MigrateEntireInvoiceUsecase
       .then(invoiceId => this.getInvoice(invoiceId))
       .map(invoice => {
         if (request.acceptanceDate) {
+          const invoiceNumber = Number.parseInt(
+            request.apc.invoiceReference,
+            10
+          ).toString();
+
           invoice.props.status = InvoiceStatus.DRAFT;
           invoice.props.dateAccepted = new Date(request.acceptanceDate);
           invoice.props.dateUpdated = new Date(request.acceptanceDate);
+          invoice.props.invoiceNumber = invoiceNumber;
           invoice.props.charge =
             request.apc.price - request.apc.discount + request.apc.vat;
         }
