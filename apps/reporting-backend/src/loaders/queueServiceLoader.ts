@@ -162,7 +162,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     handleMessageBatch: handler
   });
 
-  if (!sqsConsumer.isRunning) {
+  if (!env.aws.sqs.disabled && !sqsConsumer.isRunning) {
     sqsConsumer.start();
   }
 };
