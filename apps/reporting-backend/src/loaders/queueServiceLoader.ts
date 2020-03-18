@@ -82,12 +82,13 @@ export const queueServiceLoader: MicroframeworkLoader = async (
 
         let isLongEvent = false;
         let parsedEvent = null;
-
         try {
           const body = JSON.parse(Body);
           id = body.MessageId;
           isLongEvent =
-            body?.MessageAttributes?.PhenomMessageTooLarge?.Value === 'Y';
+            body?.MessageAttributes?.PhenomMessageTooLarge?.Value === 'Y' ||
+            body?.MessageAttributes['PhenomMessageTooLarge']?.stringValue ===
+              'Y';
           parsedEvent = JSON.parse(body.Message);
         } catch (error) {
           logger.error('Failed to parse event: ' + MessageId);
