@@ -16,9 +16,9 @@ export class SqsPublishConsumer<T> implements Consumer<T> {
     const events = [].concat(inputEventOrEvents);
     let count = 0;
     for (const event of events) {
-      count++;
       try {
         await this.sendMessage(event, queue);
+        count++;
       } catch (error) {
         console.log(error);
       }
