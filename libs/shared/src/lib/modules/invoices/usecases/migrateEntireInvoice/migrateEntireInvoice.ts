@@ -795,7 +795,9 @@ export class MigrateEntireInvoiceUsecase
       this.manuscriptRepo
     );
     const usecase = new PublishInvoicePaid(this.sqsPublishService);
-    const messageTimestamp = new Date(request.paymentDate);
+    const messageTimestamp = request.paymentDate
+      ? new Date(request.paymentDate)
+      : invoice.dateIssued;
 
     return (
       new AsyncEither<null, string>(request.apc.manuscriptId)
