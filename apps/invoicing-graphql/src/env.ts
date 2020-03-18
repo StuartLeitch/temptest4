@@ -69,7 +69,15 @@ export const env = {
     invoicePaymentEmailSenderAddress: getOsEnv(
       'INVOICE_PAYMENT_EMAIL_SENDER_ADDRESS'
     ),
-    invoicePaymentEmailSenderName: getOsEnv('INVOICE_PAYMENT_EMAIL_SENDER_NAME')
+    invoicePaymentEmailSenderName: getOsEnv(
+      'INVOICE_PAYMENT_EMAIL_SENDER_NAME'
+    ),
+    creditControlReminderSenderEmail: getOsEnv(
+      'CREDIT_CONTROL_REMINDER_SENDER_EMAIL'
+    ),
+    creditControlReminderSenderName: getOsEnv(
+      'CREDIT_CONTROL_REMINDER_SENDER_NAME'
+    )
   },
   log: {
     tenant: getOsEnv('LOG_TENANT'),
