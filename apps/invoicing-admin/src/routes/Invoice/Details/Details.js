@@ -239,7 +239,9 @@ const Details = () => {
     paymentReference: ''
   });
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
-  const [creditNoteData, setCreditNoteData] = useState({});
+  const [creditNoteData, setCreditNoteData] = useState({
+    createDraft: false
+  });
 
   if (loading)
     return (
@@ -619,7 +621,9 @@ const Details = () => {
                               });
                             }}
                           >
-                            <option value='0'>Withdrawn Manuscript</option>
+                            <option value='0' selected>
+                              Withdrawn Manuscript
+                            </option>
                             <option value='1'>Reduction Applied</option>
                             <option value='0'>Waived Manuscript</option>
                             <option value='1'>Change Payer Details</option>

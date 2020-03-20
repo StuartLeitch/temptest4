@@ -95,8 +95,8 @@ export class CreateCreditNoteUsecase
 
       // * set the invoice status to FINAL
       invoice.markAsFinal();
-      console.log('Original Invoice:');
-      console.info(invoice);
+      // console.log('Original Invoice:');
+      // console.info(invoice);
       await this.invoiceRepo.update(invoice);
 
       try {
@@ -121,7 +121,7 @@ export class CreateCreditNoteUsecase
       // * actually create the Credit Note
       const clonedRawInvoice = InvoiceMap.toPersistence(invoice);
       delete clonedRawInvoice.id;
-      clonedRawInvoice.transactionId = transaction.id;
+      clonedRawInvoice.transactionId = transaction.transactionId;
       clonedRawInvoice.dateCreated = new Date();
       clonedRawInvoice.dateIssued = new Date();
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
@@ -136,8 +136,8 @@ export class CreateCreditNoteUsecase
           const creditNoteInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
           // creditNote.addInvoiceItem(invoiceItem);
 
-          console.log('Anti Invoice Item:');
-          console.info(creditNoteInvoiceItem);
+          // console.log('Anti Invoice Item:');
+          // console.info(creditNoteInvoiceItem);
           await this.invoiceItemRepo.save(creditNoteInvoiceItem);
         });
       }
@@ -145,8 +145,8 @@ export class CreateCreditNoteUsecase
       // * Assign the cancelled invoice reference
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
 
-      console.log('New Credit Note:');
-      console.info(creditNote);
+      // console.log('New Credit Note:');
+      // console.info(creditNote);
       await this.invoiceRepo.save(creditNote);
       // transaction.addInvoice(creditNote);
 
@@ -154,26 +154,38 @@ export class CreateCreditNoteUsecase
       // console.info(creditNote);
 
       // ? should generate a DRAFT invoice
-      // if (request.createDraft) {
-      //   const invoiceProps = {
-      //     ...clonedRawInvoice,
-      //     status: InvoiceStatus.DRAFT
-      //   } as any; // TODO: should reference the real invoice props, as in its domain
+      if (request.createDraft) {
+        const invoiceProps = {
+          ...clonedRawInvoice,
+          status: InvoiceStatus.DRAFT
+        } as any; // TODO: should reference the real invoice props, as in its domain
 
-      //   // * System creates DRAFT invoice
-      //   const invoiceOrError = Invoice.create(invoiceProps);
+        // * System creates DRAFT invoice
+        // console.info(invoiceProps);
+        const invoiceOrError = Invoice.create(invoiceProps);
 
-      //   // This is where all the magic happens
-      //   const draftInvoice = invoiceOrError.getValue();
-      //   if (items.length) {
-      //     items.forEach(async invoiceItem => {
-      //       invoiceItem.price *= -1;
-      //       draftInvoice.addInvoiceItem(invoiceItem);
-      //       await this.invoiceItemRepo.save(invoiceItem);
-      //     });
-      //   }
-      //   await this.invoiceRepo.save(draftInvoice);
-      // }
+        // This is where all the magic happens
+        const draftInvoice = invoiceOrError.getValue();
+        if (items.length) {
+          items.forEach(async invoiceItem => {
+            const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
+            rawInvoiceItem.invoiceId = draftInvoice.id.toString();
+            rawInvoiceItem.price = invoiceItem.price * -1;
+            rawInvoiceItem.dateCreated = new Date();
+            delete rawInvoiceItem.id;
+
+            const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
+            draftInvoice.addInvoiceItem(draftInvoiceItem);
+            // console.log('Draft Invoice Item:');
+            // console.info(draftInvoiceItem);
+            await this.invoiceItemRepo.save(draftInvoiceItem);
+          });
+        }
+
+        // console.log('Draft Invoice:');
+        // console.info(draftInvoice);
+        await this.invoiceRepo.save(draftInvoice);
+      }
 
       return right(Result.ok<Invoice>(creditNote));
     } catch (err) {

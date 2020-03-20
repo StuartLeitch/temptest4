@@ -303,6 +303,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const { db } = this;
 
     const rawInvoice = InvoiceMap.toPersistence(invoice);
+    console.info(rawInvoice);
 
     try {
       await db(TABLES.INVOICES).insert(rawInvoice);

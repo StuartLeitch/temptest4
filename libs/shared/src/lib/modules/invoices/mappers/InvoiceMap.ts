@@ -29,8 +29,10 @@ export class InvoiceMap extends Mapper<Invoice> {
   }
 
   public static toPersistence(invoice: Invoice): any {
+    console.info(invoice);
     console.info('invoice.id', invoice.id.toString());
-    console.info('invoice.transactionId', invoice.transactionId.id.toString());
+    console.info('invoice.status', invoice.status);
+    console.info(invoice.transactionId);
 
     return {
       id: invoice.id.toString(),
@@ -40,8 +42,8 @@ export class InvoiceMap extends Mapper<Invoice> {
       dateCreated: invoice.dateCreated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
-      erpReference: invoice.erpReference,
-      revenueRecognitionReference: invoice.revenueRecognitionReference,
+      erpReference: invoice.erpReference ?? null,
+      revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null
     };
   }
