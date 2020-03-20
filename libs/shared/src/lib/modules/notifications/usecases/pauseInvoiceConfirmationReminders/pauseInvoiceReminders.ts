@@ -89,9 +89,9 @@ export class PauseInvoiceRemindersUsecase
 
     try {
       await this.sentNotificationRepo.setNotificationPausedStatus({
-        invoiceId,
-        confirmation,
-        payment
+        confirmation: !!confirmation,
+        payment: !!payment,
+        invoiceId
       });
       return right(null);
     } catch (e) {
