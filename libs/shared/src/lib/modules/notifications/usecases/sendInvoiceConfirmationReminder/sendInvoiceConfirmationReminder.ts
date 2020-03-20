@@ -26,18 +26,19 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 // * Usecase specific
 import { SendInvoiceConfirmationReminderResponse as Response } from './sendInvoiceConfirmationReminderResponse';
 import { SendInvoiceConfirmationReminderErrors as Errors } from './sendInvoiceConfirmationReminderErrors';
 import { SendInvoiceConfirmationReminderDTO as DTO } from './sendInvoiceConfirmationReminderDTO';
 
-interface DTOWithInvoiceId extends DTO {
-  invoiceId: string;
+interface CompoundDTO extends DTO {
+  invoice: Invoice;
+  paused: boolean;
 }
 
 type Context = AuthorizationContext<Roles>;
@@ -55,10 +56,10 @@ export class SendInvoiceConfirmationReminderUsecase
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
-    this.decideOnSideEffects = this.decideOnSideEffects.bind(this);
-    this.performSideEffects = this.performSideEffects.bind(this);
+    this.shouldSendReminder = this.shouldSendReminder.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
+    this.getPauseStatus = this.getPauseStatus.bind(this);
     this.scheduleTask = this.scheduleTask.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
@@ -74,10 +75,14 @@ export class SendInvoiceConfirmationReminderUsecase
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
         .then(this.getInvoice(context))
-        .then(this.decideOnSideEffects(request));
+        .then(this.getPauseStatus(context))
+        .advanceOrEnd(this.shouldSendReminder)
+        .then(this.sendEmail)
+        .then(this.saveNotification)
+        .then(this.scheduleTask)
+        .map(() => Result.ok(null));
 
-      const maybeResult = await execution.execute();
-      return maybeResult.map(val => Result.ok(val));
+      return execution.execute();
     } catch (e) {
       return left(new AppError.UnexpectedError(e));
     }
@@ -102,54 +107,71 @@ export class SendInvoiceConfirmationReminderUsecase
     return right<null, DTO>(request);
   }
 
-  private decideOnSideEffects(request: DTO) {
-    return async (invoice: Invoice) => {
-      if (
-        invoice.status === InvoiceStatus.DRAFT &&
-        invoice.dateAccepted &&
-        !invoice.dateIssued
-      ) {
-        return this.performSideEffects({
-          ...request,
-          invoiceId: invoice.id.toString()
-        });
-      }
-      return right<null, null>(null);
-    };
-  }
-
   private getInvoice(context: Context) {
-    return async ({ manuscriptCustomId }: DTO) => {
+    return async (request: DTO) => {
       const getInvoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
       );
       const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
+      const { manuscriptCustomId } = request;
 
       const execution = new AsyncEither<null, string>(manuscriptCustomId)
         .then(customId => getInvoiceIdUsecase.execute({ customId }, context))
         .map(result => result.getValue())
         .map(invoiceIds => invoiceIds[0].id.toString())
         .then(invoiceId => invoiceUsecase.execute({ invoiceId }, context))
-        .map(result => result.getValue());
+        .map(result => ({
+          ...request,
+          invoice: result.getValue()
+        }));
 
       return execution.execute();
     };
   }
 
-  private async performSideEffects(request: DTOWithInvoiceId) {
-    return new AsyncEither<null, DTO>(request)
-      .then(this.sendEmail)
-      .then(this.saveNotification)
-      .then(this.scheduleTask)
-      .execute();
+  private getPauseStatus(context: Context) {
+    return async (data: DTO & { invoice: Invoice }) => {
+      const usecase = new AreNotificationsPausedUsecase(
+        this.sentNotificationRepo
+      );
+
+      const { invoice } = data;
+      const invoiceId = invoice.id.toString();
+
+      const maybeResult = await usecase.execute(
+        {
+          notificationType: NotificationType.REMINDER_CONFIRMATION,
+          invoiceId
+        },
+        context
+      );
+
+      return maybeResult.map(result => ({
+        ...data,
+        paused: result.getValue()
+      }));
+    };
+  }
+
+  private async shouldSendReminder({ invoice, paused }: CompoundDTO) {
+    if (
+      invoice.status === InvoiceStatus.DRAFT &&
+      invoice.dateAccepted &&
+      !invoice.dateIssued &&
+      !paused
+    ) {
+      return right<null, boolean>(true);
+    }
+
+    return right<null, boolean>(false);
   }
 
   private async sendEmail(
-    request: DTOWithInvoiceId
+    request: CompoundDTO
   ): Promise<Either<Errors.EmailSendingFailure, DTO>> {
     try {
-      const result = await this.emailService
+      await this.emailService
         .invoiceConfirmationReminder({
           author: {
             email: request.recipientEmail,
@@ -160,7 +182,7 @@ export class SendInvoiceConfirmationReminderUsecase
             name: request.senderName
           },
           articleCustomId: request.manuscriptCustomId,
-          invoiceId: request.invoiceId
+          invoiceId: request.invoice.id.toString()
         })
         .sendEmail();
       return right(request);
@@ -170,11 +192,10 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   private async saveNotification(
-    request: DTOWithInvoiceId
+    request: CompoundDTO
   ): Promise<Either<Errors.NotificationDbSaveError, DTO>> {
     try {
-      const invoiceUUID = new UniqueEntityID(request.invoiceId);
-      const invoiceId = InvoiceId.create(invoiceUUID).getValue();
+      const invoiceId = request.invoice.invoiceId;
       const notification = Notification.create({
         type: NotificationType.REMINDER_CONFIRMATION,
         recipientEmail: request.recipientEmail,

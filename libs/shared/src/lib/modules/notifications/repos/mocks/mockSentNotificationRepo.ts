@@ -10,6 +10,8 @@ import { NotificationPause } from '../../domain/NotificationPause';
 
 export class MockSentNotificationRepo extends BaseMockRepo<Notification>
   implements SentNotificationRepoContract {
+  private pauses: NotificationPause[];
+
   constructor() {
     super();
   }
@@ -100,11 +102,30 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
   async getNotificationPausedStatus(
     invoiceId: InvoiceId
   ): Promise<NotificationPause> {
-    return {
-      confirmation: false,
-      payment: false,
-      invoiceId
-    };
+    const found = this.pauses.find(pause => pause.invoiceId.equals(invoiceId));
+
+    if (!found) {
+      throw Error(
+        `Notification pause does not exist for the provided invoice id {${invoiceId.id.toString()}}`
+      );
+    }
+
+    return found;
+  }
+
+  async setNotificationPausedStatus(
+    newPause: NotificationPause
+  ): Promise<void> {
+    const found = this.pauses.find(pause =>
+      pause.invoiceId.equals(newPause.invoiceId)
+    );
+
+    if (found) {
+      found.confirmation = newPause.confirmation;
+      found.payment = newPause.confirmation;
+    } else {
+      this.pauses.push(newPause);
+    }
   }
 
   compareMockItems(a: Notification, b: Notification): boolean {
