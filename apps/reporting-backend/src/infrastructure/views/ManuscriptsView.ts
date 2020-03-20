@@ -26,8 +26,8 @@ AS SELECT
   i.apc,
   i.published_date,
   CASE
-    WHEN s.special_issue_id is NULL THEN 'special'::text
-    ELSE 'regular'::text
+    WHEN s.special_issue_id is NULL THEN 'regular'::text
+    ELSE 'special'::text
   END AS issue_type,
   spec.special_issue_name as "special_issue",
   spec.special_issue_custom_id as "special_issue_custom_id",
