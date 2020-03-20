@@ -10,6 +10,7 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   getInvoiceById(invoiceId: InvoiceId): Promise<Invoice>;
   getInvoiceByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Invoice>;
   getInvoicesByTransactionId(transactionId: TransactionId): Promise<Invoice[]>;
+  findByCancelledInvoiceReference(invoiceId: InvoiceId): Promise<Invoice>;
   getFailedErpInvoices(): Promise<Invoice[]>;
   getUnrecognizedErpInvoices(): Promise<InvoiceId[]>;
   getInvoicePaymentInfo(invoiceId: InvoiceId): Promise<InvoicePaymentInfo>;

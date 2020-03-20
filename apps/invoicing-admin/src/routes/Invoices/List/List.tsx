@@ -36,6 +36,7 @@ fragment invoiceFragment on Invoice {
   dateIssued
   dateAccepted
   referenceNumber
+  cancelledInvoiceReference
   payer {
     ...payerFragment
   }
@@ -55,6 +56,9 @@ fragment invoiceFragment on Invoice {
     article {
       ...articleFragment
     }
+  }
+  creditNote {
+    ...creditNoteFragment
   }
 }
 fragment payerFragment on Payer {
@@ -95,6 +99,12 @@ fragment articleFragment on Article {
   authorSurname
   authorFirstName
   journalTitle
+}
+fragment creditNoteFragment on Invoice {
+  invoiceId
+  dateCreated
+  cancelledInvoiceReference
+  referenceNumber
 }
 `;
 

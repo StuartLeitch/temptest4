@@ -67,6 +67,7 @@ type Invoice @model(id: "invoices") {
   erpReference: String
   revenueRecognitionReference: String
   referenceNumber: ReferenceNumber @filter
+  cancelledInvoiceReference: ID
   invoiceItem: InvoiceItem
   title: String
   price: Float
@@ -74,6 +75,7 @@ type Invoice @model(id: "invoices") {
   type: String
   payment: Payment
   payments: [Payment]
+  creditNote: Invoice
 }
 
 type InvoiceVat {
@@ -152,6 +154,11 @@ type Payment {
   amount: Float
   datePaid: Date
   paymentMethod: PaymentMethod
+}
+
+type CreditNote {
+  id: String!
+  cancelledInvoiceReference: ID!
 }
 
 type PaymentMethod {
@@ -263,6 +270,7 @@ type Mutation {
     datePaid: String!
     markInvoiceAsPaid: Boolean
   ): Payment!
+  createCreditNote(invoiceId: String!, createDraft: Boolean): CreditNote!
   recordPayPalPayment(
     paymentMethodId: String!
     invoiceId: ID!

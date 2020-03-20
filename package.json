@@ -97,6 +97,7 @@
     "lodash": "^4.17.15",
     "microframework-w3tec": "^0.6.3",
     "node-fetch": "^2.6.0",
+    "numeral": "^2.0.6",
     "pg": "^7.18.2",
     "react": "^16.12.0",
     "react-async": "^10.0.0",

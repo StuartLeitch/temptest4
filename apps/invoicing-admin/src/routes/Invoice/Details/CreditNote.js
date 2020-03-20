@@ -4,9 +4,10 @@ import { useQuery, useMutation } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
 import DatePicker from 'react-datepicker';
 import format from 'date-fns/format';
+import numeral from 'numeral';
 // import subWeeks from 'date-fns/subWeeks';
-import compareDesc from 'date-fns/compareDesc';
-import { toast } from 'react-toastify';
+// import compareDesc from 'date-fns/compareDesc';
+// import { toast } from 'react-toastify';
 
 import {
   Accordion,
@@ -286,7 +287,7 @@ const Details = () => {
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain
-          title={`Invoice #${invoice.referenceNumber}`}
+          title={`Credit Note #CN-${invoice.referenceNumber}`}
           className='mb-5 mt-4'
         />
         {/* START Header 1 */}
@@ -322,406 +323,18 @@ const Details = () => {
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledButtonDropdown>
-                {invoice.status === 'ACTIVE' && (
-                  <ModalDropdown
-                    dropdownToggle={
-                      <DropdownToggle color='primary' caret>
-                        <i className='fas fa-dollar-sign mr-2'></i>
-                        Add Payment
-                      </DropdownToggle>
-                    }
-                    onSave={async () => {
-                      const {
-                        bankTransferPayment
-                      } = await recordBankTransferPayment({
-                        variables: {
-                          invoiceId: invoice?.id,
-                          payerId: invoice?.payer?.id,
-                          paymentMethodId: getPaymentMethods.find(
-                            pm => pm.name === 'Bank Transfer'
-                          ).id,
-                          amount: parseFloat(
-                            bankTransferPaymentData.paymentAmount
-                          ),
-                          paymentReference:
-                            bankTransferPaymentData.paymentReference,
-                          datePaid: bankTransferPaymentData.paymentDate.toISOString(),
-                          markInvoiceAsPaid: false
-                        }
-                      });
-
-                      return toast.success(({ closeToast }) => (
-                        <Media>
-                          <Media middle left className='mr-3'>
-                            <i className='fas fa-fw fa-2x fa-check'></i>
-                          </Media>
-                          <Media body>
-                            <Media heading tag='h6'>
-                              Success!
-                            </Media>
-                            <p>
-                              You successfully processed a bank transfer
-                              payment.
-                            </p>
-                            <div className='d-flex mt-2'>
-                              <Button
-                                color='success'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                              >
-                                Got it
-                              </Button>
-                              <Button
-                                color='link'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                                className='ml-2 text-success'
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </Media>
-                        </Media>
-                      ));
-                    }}
-                    onSaveAndMarkInvoiceAsFinal={async () => {
-                      const {
-                        bankTransferPayment
-                      } = await recordBankTransferPayment({
-                        variables: {
-                          invoiceId: invoice?.id,
-                          payerId: invoice?.payer?.id,
-                          paymentMethodId: getPaymentMethods.find(
-                            pm => pm.name === 'Bank Transfer'
-                          ).id,
-                          amount: parseFloat(
-                            bankTransferPaymentData.paymentAmount
-                          ),
-                          paymentReference:
-                            bankTransferPaymentData.paymentReference,
-                          datePaid: bankTransferPaymentData.paymentDate.toISOString(),
-                          markInvoiceAsPaid: true
-                        }
-                      });
-
-                      return toast.success(({ closeToast }) => (
-                        <Media>
-                          <Media middle left className='mr-3'>
-                            <i className='fas fa-fw fa-2x fa-check'></i>
-                          </Media>
-                          <Media body>
-                            <Media heading tag='h6'>
-                              Success!
-                            </Media>
-                            <p>
-                              You successfully processed a bank transfer
-                              payment.
-                            </p>
-                            <div className='d-flex mt-2'>
-                              <Button
-                                color='success'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                              >
-                                Got it
-                              </Button>
-                              <Button
-                                color='link'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                                className='ml-2 text-success'
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </Media>
-                        </Media>
-                      ));
-                    }}
-                  >
-                    <ModalBody>
-                      {/* START Form */}
-                      <Form>
-                        {/* START Input */}
-                        <FormGroup row>
-                          <Label sm={4}>Payment Date</Label>
-                          <Col sm={8}>
-                            <InputGroup>
-                              <DatePicker
-                                dateFormat='d MMMM yyyy'
-                                customInput={<ButtonInput />}
-                                selected={bankTransferPaymentData.paymentDate}
-                                onChange={date => {
-                                  setBankTransferPaymentData({
-                                    ...bankTransferPaymentData,
-                                    paymentDate: date
-                                  });
-                                }}
-                              />
-                            </InputGroup>
-                          </Col>
-                        </FormGroup>
-                        {/* END Input */}
-                        {/* START Amount Input */}
-                        <FormGroup row>
-                          <Label for='bothAddon' sm={4}>
-                            Payment Amount
-                          </Label>
-                          <Col sm={8}>
-                            <InputGroup>
-                              <InputGroupAddon addonType='prepend'>
-                                $
-                              </InputGroupAddon>
-                              <Input
-                                placeholder='Amount...'
-                                id='bothAddon'
-                                onChange={e => {
-                                  const { name, value } = e.target;
-                                  setBankTransferPaymentData({
-                                    ...bankTransferPaymentData,
-                                    paymentAmount: value
-                                  });
-                                }}
-                              />
-                              {/* <InputGroupAddon addonType='append'>
-                                .00
-                              </InputGroupAddon> */}
-                            </InputGroup>
-                          </Col>
-                        </FormGroup>
-                        {/* END Amount Input */}
-                        <FormGroup row>
-                          <Label for='staticText' sm={4}>
-                            Payment Method
-                          </Label>
-                          <Col sm={8}>
-                            <Input plaintext readOnly value={'Bank Transfer'} />
-                          </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                          <Label for='staticText' sm={4}>
-                            Payment Reference
-                          </Label>
-                          <Col sm={8}>
-                            <Input
-                              placeholder='Reference'
-                              onChange={e => {
-                                const { name, value } = e.target;
-                                setBankTransferPaymentData({
-                                  ...bankTransferPaymentData,
-                                  paymentReference: value
-                                });
-                              }}
-                            />
-                          </Col>
-                        </FormGroup>
-                      </Form>
-                      {/* END Form */}
-                    </ModalBody>
-                  </ModalDropdown>
-                  //   </DropdownMenu>
-                  // </UncontrolledButtonDropdown>
-                )}
-                {/* <Button color='secondary' className='mr-2' outline disabled>
-                  Split Payment
-                </Button> */}
-                {invoice.creditNote === null && invoice.status === 'ACTIVE' && (
-                  <Button
-                    id='modalCreateCreditNote'
-                    color='danger'
-                    className='mr-2'
-                  >
-                    Create Credit Note
-                  </Button>
-                )}
-                <UncontrolledModal target='modalCreateCreditNote' centered>
-                  <ModalHeader tag='h4'>Create Credit Note</ModalHeader>
-                  <ModalBody>
-                    {/* START Form */}
-                    <Form>
-                      {/* START Input */}
-                      <FormGroup row>
-                        <Label sm={4}>Issue Date</Label>
-                        <Col sm={8}>
-                          <InputGroup>
-                            <DatePicker
-                              dateFormat='d MMMM yyyy'
-                              customInput={<ButtonInput />}
-                              selected={new Date()}
-                              onChange={date => {
-                                // setBankTransferPaymentData({
-                                //   ...bankTransferPaymentData,
-                                //   paymentDate: date
-                                // });
-                              }}
-                            />
-                          </InputGroup>
-                        </Col>
-                      </FormGroup>
-                      {/* END Input */}
-                      {/* START Amount Input */}
-                      {/* <FormGroup row>
-                        <Label for='bothAddon' sm={4}>
-                          Payment Amount
-                        </Label>
-                        <Col sm={8}>
-                          <InputGroup>
-                            <InputGroupAddon addonType='prepend'>
-                              $
-                            </InputGroupAddon>
-                            <Input
-                              placeholder='Amount...'
-                              id='bothAddon'
-                              onChange={e => {
-                                const { name, value } = e.target;
-                                setBankTransferPaymentData({
-                                  ...bankTransferPaymentData,
-                                  paymentAmount: value
-                                });
-                              }}
-                            />
-                          </InputGroup>
-                        </Col>
-                      </FormGroup> */}
-                      {/* END Amount Input */}
-                      <FormGroup row>
-                        {invoice?.invoiceItem && (
-                          <>
-                            <Label for='staticText' sm={4}>
-                              Amount Value
-                            </Label>
-                            <Col sm={8}>
-                              <span className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                                &ndash; ${total.toFixed(2)}
-                              </span>
-                            </Col>
-                          </>
-                        )}
-                      </FormGroup>
-                      <FormGroup row>
-                        <Label for='staticText' sm={4}>
-                          Reason
-                        </Label>
-                        <Col sm={8}>
-                          <Input
-                            type='select'
-                            name='createDraft'
-                            id='draftReason'
-                            onChange={e => {
-                              const { value } = e.target;
-                              setCreditNoteData({
-                                ...creditNoteData,
-                                createDraft: !!value
-                              });
-                            }}
-                          >
-                            <option value='0'>Withdrawn Manuscript</option>
-                            <option value='1'>Reduction Applied</option>
-                            <option value='0'>Waived Manuscript</option>
-                            <option value='1'>Change Payer Details</option>
-                            <option value='1'>Other</option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Form>
-                    {/* END Form */}
-                  </ModalBody>
-                  <ModalFooter>
-                    <UncontrolledModal.Close
-                      color='link'
-                      className='text-primary'
-                    >
-                      <i className='fas fa-close mr-2'></i>
-                      Close
-                    </UncontrolledModal.Close>
-                    <UncontrolledModal.Close
-                      color='link'
-                      className='text-primary'
-                    >
-                      <Button
-                        color='primary'
-                        onClick={async e => {
-                          const {
-                            data: { createCreditNote: creditNote }
-                          } = await recordCreditNote({
-                            variables: {
-                              ...creditNoteData,
-                              invoiceId: invoice?.id
-                            }
-                          });
-
-                          return toast.success(({ closeToast }) => (
-                            <Media>
-                              <Media middle left className='mr-3'>
-                                <i className='fas fa-fw fa-2x fa-check'></i>
-                              </Media>
-                              <Media body>
-                                <Media heading tag='h6'>
-                                  Success!
-                                </Media>
-                                <p>You successfully created a Credit Note.</p>
-                                <div className='d-flex mt-2'>
-                                  <Button
-                                    color='success'
-                                    onClick={() => {
-                                      closeToast;
-                                      history.push(
-                                        `/invoices/details/${creditNote.id}`
-                                      );
-                                    }}
-                                  >
-                                    Got it
-                                  </Button>
-                                  <Button
-                                    color='link'
-                                    onClick={() => {
-                                      closeToast;
-                                      // window.location = `/invoices/details/${creditNote.id}`;
-                                    }}
-                                    className='ml-2 text-success'
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </Media>
-                            </Media>
-                          ));
-                        }}
-                      >
-                        <i className='fas fa-check mr-2'></i>
-                        Save
-                      </Button>
-                    </UncontrolledModal.Close>
-                  </ModalFooter>
-                </UncontrolledModal>
-                <Button color='primary' outline disabled>
-                  Apply Coupon
-                </Button>
               </ButtonToolbar>
             </div>
           </Col>
         </Row>
-        {/* <Row>
-        <Col lg={12}>
-          <HeaderDemo
-            no={1}
-            title='Invoice Details'
-            subTitle='Basic button layout options'
-          />
-        </Col>
-      </Row> */}
         <Row>
           <Col lg={8}>
-            <UncontrolledTabs initialActiveTabId='invoice'>
+            <UncontrolledTabs initialActiveTabId='creditNote'>
               {/* START Pills Nav */}
               <Nav tabs className='flex-column flex-md-row mt-4 mt-lg-0'>
                 <NavItem>
-                  <UncontrolledTabs.NavLink tabId='invoice'>
-                    Invoice Details
+                  <UncontrolledTabs.NavLink tabId='creditNote'>
+                    Credit Note Details
                   </UncontrolledTabs.NavLink>
                 </NavItem>
                 <NavItem>
@@ -737,11 +350,11 @@ const Details = () => {
               </Nav>
               {/* END Pills Nav */}
               <UncontrolledTabs.TabContent>
-                <TabPane tabId='invoice'>
+                <TabPane tabId='creditNote'>
                   <Card body className='border-top-0'>
                     <CardBody>
                       <CardTitle tag='h6' className='mb-4'>
-                        Invoice: Details
+                        Credit Note: Details
                         <span className='small ml-1 text-muted'>
                           #{invoice.id}
                         </span>
@@ -758,7 +371,7 @@ const Details = () => {
                         <div style={{ flex: 1 }} className='mr-2'>
                           {/* START Input */}
                           <FormGroup row>
-                            <Label sm={5}>Invoice Issue Date</Label>
+                            <Label sm={5}>Credit Note Issue Date</Label>
                             <Col sm={7}>
                               <DatePicker
                                 customInput={<ButtonInput />}
@@ -769,30 +382,6 @@ const Details = () => {
                           </FormGroup>
                           {/* END Input */}
                           <FormGroup row>
-                            <Label sm={5}>Date of Supply</Label>
-                            <Col sm={7}>
-                              <DatePicker
-                                readOnly
-                                customInput={<ButtonInput />}
-                                selected={Date.now()}
-                              />
-                            </Col>
-                          </FormGroup>
-                          <FormGroup row>
-                            <Label for='staticText' sm={5}>
-                              Terms
-                            </Label>
-                            <Col sm={7}>
-                              <Input
-                                readOnly
-                                plaintext
-                                value='Payable upon Receipt'
-                              />
-                            </Col>
-                          </FormGroup>
-                        </div>
-                        <div style={{ flex: 1 }} className='ml-2'>
-                          <FormGroup row>
                             <Label for='staticText' sm={5}>
                               Ref. Number
                             </Label>
@@ -800,10 +389,12 @@ const Details = () => {
                               <Input
                                 plaintext
                                 readOnly
-                                value={invoice.referenceNumber}
+                                value={`CN-${invoice.referenceNumber}`}
                               />
                             </Col>
                           </FormGroup>
+                        </div>
+                        <div style={{ flex: 1 }} className='ml-2'>
                           <FormGroup row>
                             <Label for='staticText' sm={5}>
                               ERP Reference
@@ -833,7 +424,7 @@ const Details = () => {
                       {/* END Form */}
 
                       <CardTitle tag='h6' className='mt-5 mb-4'>
-                        Invoice: Charges
+                        Credit Note: Charges
                         {/* <span className='small ml-1 text-muted'>#02</span> */}
                       </CardTitle>
                       <Table className='mb-0' responsive>
@@ -852,13 +443,19 @@ const Details = () => {
                               <span>{invoice?.invoiceItem?.type}</span>
                             </td>
                             <td colSpan='2' className='align-middle text-right'>
-                              <span>${invoice?.invoiceItem?.price}</span>
+                              <span>
+                                {numeral(invoice?.invoiceItem?.price).format(
+                                  '$0.00'
+                                )}
+                              </span>
                             </td>
                             <td
                               colSpan='2'
                               className='align-middle text-right text-dark font-weight-bold'
                             >
-                              ${invoice?.invoiceItem?.price}
+                              {numeral(invoice?.invoiceItem?.price).format(
+                                '$0.00'
+                              )}
                             </td>
                           </tr>
                           <tr>
@@ -869,7 +466,9 @@ const Details = () => {
                               </span>
                             </td>
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              ${invoice?.invoiceItem?.price}
+                              {numeral(invoice?.invoiceItem?.price).format(
+                                '$0.00'
+                              )}
                             </td>
                           </tr>
                           {invoice?.invoiceItem?.coupons?.length > 0 &&
@@ -896,10 +495,12 @@ const Details = () => {
                                   </span>
                                 </td>
                                 <td className='align-middle text-right text-dark font-weight-bold'>
-                                  &ndash;$
-                                  {(invoice.invoiceItem.price *
-                                    coupon.reduction) /
-                                    100}
+                                  &ndash;
+                                  {numeral(
+                                    (invoice.invoiceItem.price *
+                                      coupon.reduction) /
+                                      100
+                                  ).format('$0.00')}
                                 </td>
                               </tr>
                             ))}
@@ -940,7 +541,7 @@ const Details = () => {
                             </td>
                             {/* <td>Really?</td> */}
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              ${netCharges}
+                              {numeral(netCharges).format('$0.00')}
                             </td>
                           </tr>
                           <tr>
@@ -955,7 +556,7 @@ const Details = () => {
                             </td>
                             {/* <td>Really?</td> */}
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              ${vat.toFixed(2)}
+                              {numeral(vat.toFixed(2)).format('$0.00')}
                             </td>
                           </tr>
                           <tr>
@@ -965,13 +566,13 @@ const Details = () => {
                             </td>
                             {/* <td>Really?</td> */}
                             <td className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                              ${total.toFixed(2)}
+                              {numeral(total.toFixed(2)).format('$0.00')}
                             </td>
                           </tr>
                         </tbody>
                       </Table>
                       <CardTitle tag='h6' className='mt-5 mb-4'>
-                        Invoice: Payments
+                        Credit Note: Payments
                         {/* <span className='small ml-1 text-muted'>
                           #{invoice?.payment?.paymentMethod?.id}
                         </span> */}
@@ -1132,26 +733,27 @@ const Details = () => {
                 {invoice?.dateCreated && (
                   <TimelineMini
                     icon='circle'
-                    badgeTitle='Draft'
-                    badgeColor='secondary'
+                    iconClassName='text-success'
+                    badgeTitle='Final'
+                    badgeColor='success'
                     date={format(
                       new Date(invoice?.dateCreated),
                       'dd MMMM yyyy'
                     )}
-                    phrase={'Invoice enters DRAFT state.'}
+                    phrase={'Credit Note enters FINAL state.'}
                   />
                 )}
-                {invoice?.dateIssued && (
+                {/* {invoice?.dateIssued && (
                   <TimelineMini
                     icon='times-circle'
                     iconClassName='text-primary'
                     badgeTitle='Active'
                     badgeColor='primary'
                     date={format(new Date(invoice?.dateIssued), 'dd MMMM yyyy')}
-                    phrase={'Invoice enters ACTIVE state.'}
+                    phrase={'Credit Note enters ACTIVE state.'}
                   />
-                )}
-                {invoice?.payments?.length > 0 && (
+                )} */}
+                {/* {invoice?.payments?.length > 0 && (
                   <TimelineMini
                     icon='check-circle'
                     iconClassName='text-success'
@@ -1159,13 +761,13 @@ const Details = () => {
                     badgeColor='success'
                     date={format(
                       invoice?.payments
-                        ?.map(i => new Date(i.datePaid))
+                        ?.map(i => new Date(i.dateCreated))
                         .sort(compareDesc)[0],
                       'dd MMMM yyyy'
                     )}
-                    phrase={'Invoice enters FINAL state.'}
+                    phrase={'Credit Note enters FINAL state.'}
                   />
-                )}
+                )} */}
                 {invoice?.creditNote && (
                   <TimelineMini
                     icon='check-circle'

@@ -11,6 +11,7 @@ import { InvoiceSentEvent } from './events/invoiceSent';
 import { InvoicePaidEvent } from './events/invoicePaid';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceActivated } from './events/invoiceActivated';
+import { InvoiceCredited } from './events/invoiceCredited';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentId } from '../../payments/domain/PaymentId';
@@ -38,6 +39,7 @@ interface InvoiceProps {
   totalNumInvoiceItems?: number;
   erpReference?: string;
   revenueRecognitionReference?: string;
+  cancelledInvoiceReference?: string;
   vatnote?: string;
 }
 
@@ -137,6 +139,18 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.revenueRecognitionReference = revenueRecognitionReference;
   }
 
+  get cancelledInvoiceReference(): string {
+    return this.props.cancelledInvoiceReference;
+  }
+
+  set cancelledInvoiceReference(cancelledInvoiceReference: string) {
+    this.props.cancelledInvoiceReference = cancelledInvoiceReference;
+
+    if (cancelledInvoiceReference) {
+      this.addDomainEvent(new InvoiceCredited(this.invoiceId, new Date()));
+    }
+  }
+
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
     if (this.props.invoiceItems.exists(invoiceItem)) {
       this.props.invoiceItems.remove(invoiceItem);
@@ -207,6 +221,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.FINAL;
     this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, paymentId, now));
+  }
+
+  public markAsFinal(): void {
+    this.props.status = InvoiceStatus.FINAL;
   }
 
   public getInvoiceTotal(): number {

@@ -21,6 +21,8 @@ import { MigrateInvoiceUsecase } from './../../../../../libs/shared/src/lib/modu
 import { ApplyCouponToInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
+import { CreateCreditNoteUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/createCreditNote/createCreditNote';
+import { GetCreditNoteByInvoiceIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
 import { WaiverMap } from 'libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
@@ -59,6 +61,7 @@ export const invoice: Resolvers<any> = {
         dateCreated: invoiceDetails.dateCreated.toISOString(),
         erpReference: invoiceDetails.erpReference,
         revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
+        cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued:
           invoiceDetails.dateIssued && invoiceDetails.dateIssued.toISOString(),
         referenceNumber:
@@ -307,6 +310,49 @@ export const invoice: Resolvers<any> = {
         return null;
       }
       return payments.map(p => PaymentMap.toPersistence(p));
+    },
+    async creditNote(parent: Invoice, args, context) {
+      const {
+        repos: { invoice: invoiceRepo }
+      } = context;
+      const usecase = new GetCreditNoteByInvoiceIdUsecase(invoiceRepo);
+
+      const request: GetInvoiceDetailsDTO = {
+        invoiceId: parent.invoiceId
+      };
+
+      const usecaseContext = {
+        roles: [Roles.ADMIN]
+      };
+
+      const result = await usecase.execute(request, usecaseContext);
+
+      if (result.isLeft()) {
+        return undefined;
+      }
+
+      // There is a TSLint error for when try to use a shadowed variable!
+      const creditNoteDetails = result.value.getValue();
+
+      return {
+        invoiceId: creditNoteDetails.id.toString(),
+        cancelledInvoiceReference: creditNoteDetails.cancelledInvoiceReference,
+        status: creditNoteDetails.status,
+        charge: creditNoteDetails.charge,
+        dateCreated: creditNoteDetails.dateCreated.toISOString(),
+        erpReference: creditNoteDetails.erpReference,
+        revenueRecognitionReference:
+          creditNoteDetails.revenueRecognitionReference,
+        dateIssued:
+          creditNoteDetails.dateIssued &&
+          creditNoteDetails.dateIssued.toISOString(),
+        referenceNumber:
+          creditNoteDetails.invoiceNumber && creditNoteDetails.dateAccepted
+            ? `CN-${creditNoteDetails.referenceNumber}`
+            : '---'
+        // totalAmount: entity.totalAmount,
+        // netAmount: entity.netAmount
+      };
     }
   },
   InvoiceItem: {
@@ -440,6 +486,59 @@ export const invoice: Resolvers<any> = {
         // amount: migratedPayment.amount.value,
         // invoiceId: migratedPayment.invoiceId.id.toString(),
         // foreignPaymentId: migratedPayment.foreignPaymentId
+      };
+    },
+    async createCreditNote(parent, args, context) {
+      const {
+        repos: {
+          // payment: paymentRepo,
+          invoice: invoiceRepo,
+          invoiceItem: invoiceItemRepo,
+          transaction: transactionRepo
+          // manuscript: manuscriptRepo
+        }
+      } = context;
+
+      const { invoiceId, createDraft } = args;
+
+      const createCreditNoteUsecase = new CreateCreditNoteUsecase(
+        // paymentRepo,
+        invoiceRepo,
+        // manuscriptRepo,
+        invoiceItemRepo,
+        transactionRepo
+      );
+      const usecaseContext = { roles: [Roles.ADMIN] };
+
+      const result = await createCreditNoteUsecase.execute(
+        {
+          invoiceId,
+          createDraft
+        },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        // console.log(result.value.errorValue());
+        return null;
+      }
+
+      const creditNote = result.value.getValue();
+
+      return {
+        id: creditNote.invoiceId.id.toString(),
+        cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
+        status: creditNote.status,
+        charge: creditNote.charge,
+        dateCreated: creditNote.dateCreated.toISOString(),
+        erpReference: creditNote.erpReference,
+        revenueRecognitionReference: creditNote.revenueRecognitionReference,
+        dateIssued:
+          creditNote.dateIssued && creditNote.dateIssued.toISOString(),
+        referenceNumber:
+          creditNote.invoiceNumber && creditNote.dateAccepted
+            ? `CN-${creditNote.referenceNumber}`
+            : '---'
       };
     }
   }

@@ -24,12 +24,31 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
   }
 
   async getTransactionByInvoiceId(invoiceId: InvoiceId): Promise<Transaction> {
-    const { db } = this;
+    const { db, logger } = this;
+    const correlationId =
+      'correlationId' in this ? (this as any).correlationId : null;
 
-    const transactionRow = await db(TABLES.TRANSACTIONS)
-      .select()
-      .where('invoice_id', invoiceId.id.toString())
+    const transactionRow = await db(TABLES.INVOICES)
+      .select(
+        'transactions.id as id',
+        'transactions.status as status',
+        'transactions.deleted as deleted',
+        'transactions.dateCreated as dateCreated',
+        'transactions.dateUpdated as dateUpdated'
+      )
+      .leftJoin(
+        'transactions',
+        'transactions.id',
+        '=',
+        'invoices.transactionId'
+      )
+      .where('invoices.id', invoiceId.id.toString())
       .first();
+
+    logger.debug('select', {
+      correlationId,
+      sql: transactionRow.toString()
+    });
 
     return transactionRow ? TransactionMap.toDomain(transactionRow) : null;
   }

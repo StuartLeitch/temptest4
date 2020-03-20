@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+// import { TextUtils } from '@hindawi/shared';
 
 import {
   Breadcrumb,
@@ -36,9 +37,19 @@ export const DefaultNavbar = () => {
             <a href='#'>Home</a>
           </BreadcrumbItem>
           {breadcrumbs.map(breadcrumb => {
+            let bc;
+            const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+            if (isUUID.test(breadcrumb)) {
+              bc = breadcrumb;
+            } else {
+              bc = breadcrumb
+                .replace('-', ' ')
+                .replace(/\b(\w)/g, c => c.toUpperCase());
+            }
             return (
               <BreadcrumbItem active className='navbar-text'>
-                {breadcrumb.replace(/^\w/, c => c.toUpperCase())}
+                {bc}
               </BreadcrumbItem>
             );
           })}
