@@ -331,7 +331,9 @@ export class GenerateCompensatoryEventsUsecase
         if (!data.paymentInfo) {
           paymentDate = invoice.dateIssued;
         } else {
-          paymentDate = new Date(data.paymentInfo.paymentDate);
+          paymentDate = data.paymentInfo.paymentDate
+            ? new Date(data.paymentInfo.paymentDate)
+            : data.invoice.dateIssued;
         }
 
         invoice.props.dateUpdated = paymentDate;

@@ -42,10 +42,13 @@ AS SELECT
     inv.payment_type as "payment_type",
     inv.payer_country as "payer_country",
     inv.payment_currency as "payment_currency",
+    waivers.waiver_types as waivers,
+    coupons.coupon_names as coupons,
     inv.event_id as "event_id",
     s.title as "manuscript_title",
     s.article_type as "manuscript_article_type",
     s.journal_name as "journal_name",
+    s.publisher_name as "publisher_name",
     s.journal_code as "journal_code",
     CASE WHEN s.special_issue_id is null THEN 'special'
          ELSE 'regular'
@@ -60,7 +63,7 @@ AS SELECT
     a.aff as "corresponding_author_affiliation" 
   FROM
     ${invoiceDataView.getViewName()} inv
-  JOIN (select event_id from (select event_id, row_number() over (partition by invoice_id order by event_timestamp desc) as rn from ${invoiceDataView.getViewName()} id) i where i.rn = 1) last_invoices
+  JOIN (select event_id from (select event_id, row_number() over (partition by invoice_id ORDER BY case when id.status = 'FINAL' then 1 when id.status = 'ACTIVE' then 2 else 3 end) as rn from ${invoiceDataView.getViewName()} id) i where i.rn = 1) last_invoices
     ON last_invoices.event_id = inv.event_id
   LEFT JOIN LATERAL (select * from ${articleDataView.getViewName()} a WHERE
       a.manuscript_custom_id = inv.manuscript_custom_id
@@ -77,6 +80,18 @@ AS SELECT
       and a.is_submitting = true
     LIMIT 1) a on
     a.manuscript_custom_id = inv.manuscript_custom_id
+  LEFT JOIN (
+    select id as event_id, STRING_AGG(type_id, ', ') as waiver_types
+    from ${REPORTING_TABLES.INVOICE} ie,
+    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'waivers') as waivers(type_id text)
+    group by event_id
+  ) waivers on waivers.event_id = inv.event_id
+  LEFT JOIN (
+    select id as event_id, STRING_AGG(name, ', ') as coupon_names
+    from ${REPORTING_TABLES.INVOICE} ie,
+    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(name text)
+    group by event_id
+  ) coupons on coupons.event_id = inv.event_id
 WITH DATA;
     `;
   }
@@ -86,6 +101,8 @@ WITH DATA;
     `create index on ${this.getViewName()} (journal_code)`,
     `create index on ${this.getViewName()} (issue_type)`,
     `create index on ${this.getViewName()} (invoice_id)`,
+    `create index on ${this.getViewName()} (publisher_name)`,
+    `create index on ${this.getViewName()} (journal_name)`,
     `create index on ${this.getViewName()} (event_id)`
   ];
 

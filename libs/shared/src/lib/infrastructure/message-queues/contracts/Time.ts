@@ -7,63 +7,56 @@ export enum SchedulingTime {
 }
 
 export enum TimerType {
-  DelayedTimer = 'DelayedTimer',
+  CronRepeatableTimer = 'CronRepeatableTimer',
   RepeatableTimer = 'RepeatableTimer',
-  CronRepeatableTimer = 'CronRepeatableTimer'
+  DelayedTimer = 'DelayedTimer'
 }
 
-interface ITimer {
+interface EmptyTimer {
   kind: TimerType;
 }
 
-export interface DelayedTimer extends ITimer {
+export interface DelayedTimer extends EmptyTimer {
   kind: TimerType.DelayedTimer;
   delay: SchedulingTime;
 }
 
-export function delayedTimer(
-  count: number,
-  baseValue: SchedulingTime
-): DelayedTimer {
-  return {
-    kind: TimerType.DelayedTimer,
-    delay: count * baseValue
-  };
-}
-
-export interface RepeatableTimer extends ITimer {
+export interface RepeatableTimer extends EmptyTimer {
   kind: TimerType.RepeatableTimer;
   every: SchedulingTime;
 }
 
-export function repeatableTimer(
-  count: number,
-  baseValue: SchedulingTime
-): RepeatableTimer {
-  return {
-    kind: TimerType.RepeatableTimer,
-    every: count * baseValue
-  };
-}
-
-export interface CronRepeatableTimer extends ITimer {
+export interface CronRepeatableTimer extends EmptyTimer {
   kind: TimerType.CronRepeatableTimer;
-  cron: string;
   description: string;
-}
-
-export function cronRepeatableTimer(
-  cron: string,
-  description: string
-): CronRepeatableTimer {
-  return {
-    kind: TimerType.CronRepeatableTimer,
-    description,
-    cron
-  };
+  cron: string;
 }
 
 export type ScheduleTimer =
-  | DelayedTimer
+  | CronRepeatableTimer
   | RepeatableTimer
-  | CronRepeatableTimer;
+  | DelayedTimer;
+
+export class TimerBuilder {
+  static delayed(count: number, baseValue: SchedulingTime): DelayedTimer {
+    return {
+      kind: TimerType.DelayedTimer,
+      delay: count * baseValue
+    };
+  }
+
+  static every(count: number, baseValue: SchedulingTime): RepeatableTimer {
+    return {
+      kind: TimerType.RepeatableTimer,
+      every: count * baseValue
+    };
+  }
+
+  static everyCron(cron: string, description: string): CronRepeatableTimer {
+    return {
+      kind: TimerType.CronRepeatableTimer,
+      description,
+      cron
+    };
+  }
+}
