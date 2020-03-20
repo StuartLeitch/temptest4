@@ -1,3 +1,3 @@
 redisHost: test-redis-master
 redisPort: 6379
-# redisSecret: test-redis
+# debug: true

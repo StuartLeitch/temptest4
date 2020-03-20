@@ -46,6 +46,9 @@ export * from './modules/transactions/repos';
 // export * from './modules/transactions/usecases/createTransaction/createTransaction';
 // // export * from './transactions/subscribers/AfterTransactionCreatedEvents';
 export * from './modules/transactions/mappers/TransactionMap';
+export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
+export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
+export * from './modules/transactions/usecases/updateTransaction/updateTransaction';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
@@ -197,6 +200,8 @@ export * from './modules/users/mappers/UserMap';
 // export * from './infra/http/app';
 export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
 export { SchedulerContract } from './infrastructure/scheduler/Scheduler';
+export { ListenerContract } from './infrastructure/listener/Listener';
+export { LoggerContract } from './infrastructure/logging/Logger';
 export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';
 export * from './infrastructure/message-queues/contracts/Time';
@@ -214,5 +219,6 @@ export * from './domain/services/WaiverService';
 export * from './utils/FormatUtils';
 export * from './utils/Order/OrderUtils';
 export * from './utils/Batch';
+export * from './utils/VersionCompare';
 
 export * from './utils/ObjectUtils';

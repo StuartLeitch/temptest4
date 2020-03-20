@@ -75,7 +75,7 @@ export const contextLoader: MicroframeworkLoader = (
       exchangeRateService: new ExchangeRateService(),
       payPalService: new PayPalService(env.paypal),
       erpService: new ErpService(logger, env.salesForce),
-      schedulingService: new BullScheduler(bullData)
+      schedulingService: new BullScheduler(bullData, logger)
     };
 
     const context = {

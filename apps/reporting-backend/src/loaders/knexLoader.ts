@@ -25,8 +25,6 @@ export const knexLoader: MicroframeworkLoader = async (
     // debug: true
   });
 
-  // USE knex for creating views?
-  // await knex.migrate.rollback();
   await knex.migrate.latest();
 
   if (settings) {

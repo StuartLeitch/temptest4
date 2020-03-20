@@ -53,6 +53,7 @@ export const env = {
       sqsSecretKey: getOsEnv('AWS_SNS_SQS_SECRET_KEY')
     },
     sqs: {
+      disabled: toBool(getOsEnvOptional('AWS_SQS_DISABLED')),
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
       endpoint: getOsEnv('AWS_SQS_ENDPOINT')
     }

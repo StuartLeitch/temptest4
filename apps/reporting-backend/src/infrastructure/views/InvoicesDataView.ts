@@ -16,7 +16,7 @@ AS SELECT ie.id as event_id,
     ie.payload ->> 'invoiceStatus'::text AS status,
     cast_to_timestamp(ie.payload ->> 'invoiceCreatedDate'::text) AS manuscript_accepted_date,
     cast_to_timestamp(ie.payload ->> 'invoiceIssueDate'::text) AS invoice_issue_date,
-    cast_to_timestamp(ie.payload ->> 'created'::text) AS created_date,
+    cast_to_timestamp(ie.payload ->> 'updated'::text) AS updated_date,
     ie.payload ->> 'referenceNumber'::text AS reference_number,
     (((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'price'::text)::float AS gross_apc_value,
     COALESCE((((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float, 0) AS vat_percentage,
@@ -37,7 +37,7 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (invoice_id)`,
-    `create index on ${this.getViewName()} (invoice_id, event_timestamp)`,
+    `create index on ${this.getViewName()} (invoice_id, event_timestamp, updated_date)`,
     `create index on ${this.getViewName()} (event_timestamp)`,
     `create index on ${this.getViewName()} (status)`,
     `create index on ${this.getViewName()} (manuscript_accepted_date)`,

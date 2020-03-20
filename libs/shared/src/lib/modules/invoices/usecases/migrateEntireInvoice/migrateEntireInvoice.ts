@@ -426,9 +426,15 @@ export class MigrateEntireInvoiceUsecase
       .then(invoiceId => this.getInvoice(invoiceId))
       .map(invoice => {
         if (request.acceptanceDate) {
+          const invoiceNumber = Number.parseInt(
+            request.apc.invoiceReference,
+            10
+          ).toString();
+
           invoice.props.status = InvoiceStatus.DRAFT;
           invoice.props.dateAccepted = new Date(request.acceptanceDate);
           invoice.props.dateUpdated = new Date(request.acceptanceDate);
+          invoice.props.invoiceNumber = invoiceNumber;
           invoice.props.charge =
             request.apc.price - request.apc.discount + request.apc.vat;
         }
@@ -589,15 +595,19 @@ export class MigrateEntireInvoiceUsecase
         const context = {
           roles: [Roles.ADMIN]
         };
-        const maybeResponse = await manuscriptUsecase.execute(
-          {
-            manuscriptId: request.apc.manuscriptId
-          },
-          context
+        // const maybeResponse = await manuscriptUsecase.execute(
+        //   {
+        //     manuscriptId: request.apc.manuscriptId
+        //   },
+        //   context
+        // );
+        const maybeResponse = await this.getManuscript(
+          request.apc.manuscriptId
         );
-        return maybeResponse
-          .map(response => response.getValue())
-          .map(manuscript => ({ manuscript, billingAddress }));
+        return maybeResponse.map(manuscript => ({
+          manuscript,
+          billingAddress
+        }));
       })
       .then(async data => {
         const maybeItem = await this.getInvoiceItemsByInvoiceId(
@@ -785,7 +795,9 @@ export class MigrateEntireInvoiceUsecase
       this.manuscriptRepo
     );
     const usecase = new PublishInvoicePaid(this.sqsPublishService);
-    const messageTimestamp = new Date(request.paymentDate);
+    const messageTimestamp = request.paymentDate
+      ? new Date(request.paymentDate)
+      : invoice.dateIssued;
 
     return (
       new AsyncEither<null, string>(request.apc.manuscriptId)
@@ -794,16 +806,12 @@ export class MigrateEntireInvoiceUsecase
           const context = {
             roles: [Roles.ADMIN]
           };
-          const maybeResponse = await manuscriptUsecase.execute(
-            {
-              manuscriptId: request.apc.manuscriptId
-            },
-            context
+          const maybeResponse = await this.getManuscript(
+            request.apc.manuscriptId
           );
 
           return maybeResponse;
         })
-        .map(result => result.getValue())
         .then(async manuscript => {
           const maybePaymentInfo = await this.getInvoicePaymentInfo(
             invoice.invoiceId

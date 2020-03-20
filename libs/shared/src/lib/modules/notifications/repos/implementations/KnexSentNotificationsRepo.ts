@@ -1,4 +1,5 @@
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
 import { NotificationType, Notification } from '../../domain/Notification';
@@ -7,8 +8,6 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationId } from '../../domain/NotificationId';
 
 import { SentNotificationRepoContract } from '../SentNotificationRepo';
-import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 
 export class KnexSentNotificationsRepo
   extends AbstractBaseDBRepo<Knex, Notification>
@@ -34,13 +33,6 @@ export class KnexSentNotificationsRepo
       .select()
       .where('invoiceId', id.id.toString());
 
-    if (notifications.length === 0) {
-      throw RepoError.createEntityNotFoundError(
-        'notification by invoiceId',
-        id.id.toString()
-      );
-    }
-
     return notifications.map(NotificationMap.toDomain);
   }
 
@@ -48,13 +40,6 @@ export class KnexSentNotificationsRepo
     const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
       .select()
       .where('recipientEmail', email);
-
-    if (notifications.length === 0) {
-      throw RepoError.createEntityNotFoundError(
-        'notification by recipient email',
-        email
-      );
-    }
 
     return notifications.map(NotificationMap.toDomain);
   }
@@ -65,10 +50,6 @@ export class KnexSentNotificationsRepo
     const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
       .select()
       .where('type', type);
-
-    if (notifications.length === 0) {
-      throw RepoError.createEntityNotFoundError('notification by type', type);
-    }
 
     return notifications.map(NotificationMap.toDomain);
   }

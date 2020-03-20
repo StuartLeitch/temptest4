@@ -1,22 +1,42 @@
-import Queue from 'bull';
 import Redis from 'ioredis';
+import Queue from 'bull';
 
-import { SchedulerContract, Job, ScheduleTimer, TimerType } from './Types';
+import { LoggerContract } from '@hindawi/shared';
+
+import {
+  SchedulerContract,
+  ListenerContract,
+  ScheduleTimer,
+  Job
+} from './Types';
+
+import { TimerMap } from './utils';
+
 interface RedisCredentials {
+  password?: string;
   port?: number;
   host: string;
-  password?: string;
 }
-export class BullScheduler implements SchedulerContract {
-  private redisConnection: RedisCredentials;
-  private client: Redis.Redis;
-  private subscriber: Redis.Redis;
 
-  constructor(redisConnection: RedisCredentials) {
-    this.redisConnection = redisConnection;
-    this.client = new Redis(this.redisConnection);
-    this.subscriber = new Redis(this.redisConnection);
+type ConnectionPool = {
+  default: () => Redis.Redis;
+  subscriber: Redis.Redis;
+  client: Redis.Redis;
+};
+
+export class BullScheduler implements SchedulerContract, ListenerContract {
+  private connections: ConnectionPool;
+
+  constructor(
+    private redisConnection: RedisCredentials,
+    private loggerService: LoggerContract
+  ) {
     this.getRedisConnection = this.getRedisConnection.bind(this);
+    this.connections = {
+      default: () => new Redis(this.redisConnection),
+      subscriber: new Redis(this.redisConnection),
+      client: new Redis(this.redisConnection)
+    };
   }
 
   public async schedule(
@@ -24,42 +44,38 @@ export class BullScheduler implements SchedulerContract {
     queueName: string,
     timer: ScheduleTimer
   ): Promise<void> {
-    // TODO add logging
     const queue = this.createQueue(queueName);
     try {
-      if (timer.kind === TimerType.DelayedTimer) {
-        await queue.add(job, {
-          jobId: job.id,
-          delay: timer.delay
-        });
-      } else if (timer.kind === TimerType.RepeatableTimer) {
-        await queue.add(job, {
-          jobId: job.id,
-          repeat: { every: timer.every }
-        });
-      } else if (timer.kind === TimerType.CronRepeatableTimer) {
-        await queue.add(job, {
-          jobId: job.id,
-          repeat: { cron: timer.cron }
-        });
-      }
+      const options = TimerMap.get(timer.kind)(job.id, timer);
+      await queue.add(job, options);
+      this.loggerService.debug(`Queueing on ${queueName} job ${job}`);
     } catch (error) {
-      console.error(error);
+      this.loggerService.error(
+        `Scheduling on queue ${queueName} got error ${error.message}`
+      );
       throw error;
     } finally {
       queue.close();
     }
   }
 
-  removeRepeatable(jobId: string): Promise<any> {
+  removeRepeatable(jobId: string): Promise<unknown> {
     throw new Error('Method not implemented.');
   }
 
-  public startListening<T>(
+  public async startListening<T>(
     queueName: string,
     callback: (data: T) => void
-  ): void {
-    this.createQueue(queueName).process(job => callback(job.data));
+  ): Promise<void> {
+    try {
+      await this.createQueue(queueName).process(job => callback(job.data));
+      this.loggerService.debug(`Started listening on ${queueName}`);
+    } catch (e) {
+      this.loggerService.error(
+        `Listening on que ${queueName} got error ${e.message}`
+      );
+      throw e;
+    }
   }
 
   private createQueue(queueName: string, options = {}): Queue.Queue {
@@ -72,13 +88,6 @@ export class BullScheduler implements SchedulerContract {
    * @param type connection type
    */
   private getRedisConnection(type: string): Redis.Redis {
-    switch (type) {
-      case 'client':
-        return this.client;
-      case 'subscriber':
-        return this.subscriber;
-      default:
-        return new Redis(this.redisConnection);
-    }
+    return this.connections[type] || this.connections.default();
   }
 }

@@ -5,6 +5,7 @@ import * as pkg from '../../../package.json';
 import {
   getOsEnvOptional,
   normalizePort,
+  getOsEnvArray,
   getOsPath,
   getOsEnv,
   toNumber,
@@ -124,7 +125,8 @@ export const env = {
       password: getOsEnv('SCHEDULER_DB_PASSWORD'),
       host: getOsEnv('SCHEDULER_DB_HOST')
     },
-    notificationsQueue: getOsEnv('NOTIFICATIONS_QUEUE'),
+    notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
+    emailRemindersQueue: getOsEnv('EMAIL_REMINDERS_QUEUE'),
     confirmationReminderDelay: toFloat(
       getOsEnv('CONFIRMATION_REMINDER_DELAY_DAYS')
     )
