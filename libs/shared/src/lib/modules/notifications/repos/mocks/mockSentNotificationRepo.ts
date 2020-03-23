@@ -62,7 +62,7 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
     const alreadyExists = await this.exists(notification);
 
     if (alreadyExists) {
-      throw Error('duplicate');
+      throw new Error('duplicate');
     }
 
     this._items.push(cloneDeep(notification));
@@ -97,35 +97,6 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
       this.compareMockItems(item, notification)
     );
     return !!match;
-  }
-
-  async getNotificationPausedStatus(
-    invoiceId: InvoiceId
-  ): Promise<NotificationPause> {
-    const found = this.pauses.find(pause => pause.invoiceId.equals(invoiceId));
-
-    if (!found) {
-      throw Error(
-        `Notification pause does not exist for the provided invoice id {${invoiceId.id.toString()}}`
-      );
-    }
-
-    return found;
-  }
-
-  async setNotificationPausedStatus(
-    newPause: NotificationPause
-  ): Promise<void> {
-    const found = this.pauses.find(pause =>
-      pause.invoiceId.equals(newPause.invoiceId)
-    );
-
-    if (found) {
-      found.confirmation = newPause.confirmation;
-      found.payment = newPause.confirmation;
-    } else {
-      this.pauses.push(newPause);
-    }
   }
 
   compareMockItems(a: Notification, b: Notification): boolean {

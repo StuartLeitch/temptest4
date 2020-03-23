@@ -5,7 +5,10 @@ import { ResumeConfirmationRemindersErrors } from './resumeConfirmationReminders
 
 export type ResumeConfirmationRemindersResponse = Either<
   | ResumeConfirmationRemindersErrors.ConfirmationRemindersNotPausedError
+  | ResumeConfirmationRemindersErrors.ReminderDelayRequiredError
+  | ResumeConfirmationRemindersErrors.ReminderResumeSaveDbError
   | ResumeConfirmationRemindersErrors.InvoiceIdRequiredError
+  | ResumeConfirmationRemindersErrors.QueueNameRequiredError
   | ResumeConfirmationRemindersErrors.InvoiceNotFoundError
   | AppError.UnexpectedError,
   Result<void>

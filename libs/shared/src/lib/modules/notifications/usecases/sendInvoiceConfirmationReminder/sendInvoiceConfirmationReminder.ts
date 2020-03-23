@@ -22,6 +22,7 @@ import { EmailService } from '../../../../infrastructure/communication-channels'
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
@@ -50,6 +51,7 @@ export class SendInvoiceConfirmationReminderUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
+    private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -133,7 +135,7 @@ export class SendInvoiceConfirmationReminderUsecase
   private getPauseStatus(context: Context) {
     return async (data: DTO & { invoice: Invoice }) => {
       const usecase = new AreNotificationsPausedUsecase(
-        this.sentNotificationRepo
+        this.pausedReminderRepo
       );
 
       const { invoice } = data;

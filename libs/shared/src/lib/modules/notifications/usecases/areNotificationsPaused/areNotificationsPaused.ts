@@ -14,7 +14,7 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
+import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 
 import { NotificationType } from '../../domain/Notification';
 import { NotificationPause } from '../../domain/NotificationPause';
@@ -43,7 +43,7 @@ export class AreNotificationsPausedUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private sentNotificationRepo: SentNotificationRepoContract) {
+  constructor(private pausedReminderRepo: PausedReminderRepoContract) {
     this.fetchNotificationPauses = this.fetchNotificationPauses.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.getPauseStatus = this.getPauseStatus.bind(this);
@@ -101,7 +101,7 @@ export class AreNotificationsPausedUsecase
     const invoiceId = InvoiceId.create(uuid).getValue();
 
     try {
-      const result = await this.sentNotificationRepo.getNotificationPausedStatus(
+      const result = await this.pausedReminderRepo.getNotificationPausedStatus(
         invoiceId
       );
 

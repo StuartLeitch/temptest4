@@ -21,13 +21,21 @@ export const invoicePaymentHandler = (
   loggerService: Logger
 ) => {
   const {
-    repos: { sentNotifications, invoice, manuscript, invoiceItem, catalog },
+    repos: {
+      sentNotifications,
+      pausedReminder,
+      invoiceItem,
+      manuscript,
+      catalog,
+      invoice
+    },
     services: { schedulingService, emailService }
   } = appContext;
   const { manuscriptCustomId, recipientEmail, recipientName } = payload;
 
   const usecase = new SendInvoicePaymentReminderUsecase(
     sentNotifications,
+    pausedReminder,
     invoiceItem,
     manuscript,
     invoice,

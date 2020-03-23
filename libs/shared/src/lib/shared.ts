@@ -181,11 +181,16 @@ export * from './modules/notifications/domain/NotificationId';
 export * from './modules/notifications/mappers/NotificationMap';
 export * from './modules/notifications/repos/SentNotificationRepo';
 export * from './modules/notifications/repos/implementations/KnexSentNotificationsRepo';
+export * from './modules/notifications/repos/PausedReminderRepo';
+export * from './modules/notifications/repos/implementations/KnexPausedReminderRepo';
 export * from './modules/notifications/usecases/sendInvoiceConfirmationReminder';
 export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
 export * from './modules/notifications/usecases/getSentNotificationForInvoice';
 export * from './modules/notifications/usecases/sendInvoiceCreditControlReminder';
 export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
+export * from './modules/notifications/usecases/areNotificationsPaused';
+export * from './modules/notifications/usecases/pauseInvoiceConfirmationReminders';
+export * from './modules/notifications/usecases/resumeConfirmationReminders';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';

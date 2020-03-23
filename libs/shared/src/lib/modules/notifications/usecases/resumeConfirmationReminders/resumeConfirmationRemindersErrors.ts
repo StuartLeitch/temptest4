@@ -27,4 +27,28 @@ export namespace ResumeConfirmationRemindersErrors {
       });
     }
   }
+
+  export class QueueNameRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The queue name for the reminder jobs is required.`
+      });
+    }
+  }
+
+  export class ReminderDelayRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The reminder delay is required.`
+      });
+    }
+  }
+
+  export class ReminderResumeSaveDbError extends Result<UseCaseError> {
+    constructor(e: Error) {
+      super(false, {
+        message: `While updating the paused status a db error ocurred: ${e.message}`
+      });
+    }
+  }
 }

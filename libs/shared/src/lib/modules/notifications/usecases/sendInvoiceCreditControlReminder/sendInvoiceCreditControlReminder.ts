@@ -19,6 +19,7 @@ import { EmailService } from '../../../../infrastructure/communication-channels'
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { CatalogRepoContract } from '../../../journals/repos/catalogRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
@@ -51,6 +52,7 @@ export class SendInvoiceCreditControlReminderUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
+    private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -179,7 +181,7 @@ export class SendInvoiceCreditControlReminderUsecase
   private getPauseStatus(context: Context) {
     return async (data: CompoundData) => {
       const usecase = new AreNotificationsPausedUsecase(
-        this.sentNotificationRepo
+        this.pausedReminderRepo
       );
       const invoiceId = data.invoice.id.toString();
 

@@ -8,13 +8,6 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationId } from '../../domain/NotificationId';
 
 import { SentNotificationRepoContract } from '../SentNotificationRepo';
-import { NotificationPause } from '../../domain/NotificationPause';
-
-import {
-  mapPauseToPersistance,
-  mapPauseToDomain,
-  emptyPause
-} from './knexUtils';
 
 export class KnexSentNotificationsRepo
   extends AbstractBaseDBRepo<Knex, Notification>
@@ -106,41 +99,5 @@ export class KnexSentNotificationsRepo
     }
 
     return true;
-  }
-
-  async getNotificationPausedStatus(
-    invoiceId: InvoiceId
-  ): Promise<NotificationPause> {
-    const pause = await this.db(TABLES.PAUSED_REMINDERS)
-      .select()
-      .where('invoiceId', invoiceId.id.toString())
-      .first();
-
-    if (!pause) {
-      return mapPauseToDomain(invoiceId);
-    } else {
-      return mapPauseToDomain(invoiceId, pause);
-    }
-  }
-
-  async setNotificationPausedStatus(pause: NotificationPause): Promise<void> {
-    const alreadyExists = await this.existsPauseForInvoice(pause.invoiceId);
-    const data = mapPauseToPersistance(pause);
-
-    if (alreadyExists) {
-      await this.db(TABLES.PAUSED_REMINDERS)
-        .where('invoiceId', data.invoiceId)
-        .update(data);
-    } else {
-      await this.db(TABLES.PAUSED_REMINDERS).insert(data);
-    }
-  }
-
-  private async existsPauseForInvoice(invoiceId: InvoiceId): Promise<boolean> {
-    const result = await this.db(TABLES.PAUSED_REMINDERS)
-      .select()
-      .where('invoiceId', invoiceId.id.toString())
-      .first();
-    return !!result;
   }
 }

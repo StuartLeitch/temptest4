@@ -14,25 +14,26 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
+import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { NotificationType } from '../../domain/Notification';
 
 // * Usecase specific
-import { PauseInvoiceRemindersResponse as Response } from './pauseInvoiceRemindersResponse';
-import { PauseInvoiceRemindersErrors as Errors } from './pauseInvoiceRemindersErrors';
-import { PauseInvoiceRemindersDTO as DTO } from './pauseInvoiceRemindersDTO';
+import { PauseInvoiceConfirmationRemindersResponse as Response } from './pauseInvoiceConfirmationRemindersResponse';
+import { PauseInvoiceConfirmationRemindersErrors as Errors } from './pauseInvoiceConfirmationRemindersErrors';
+import { PauseInvoiceConfirmationRemindersDTO as DTO } from './pauseInvoiceConfirmationRemindersDTO';
 
 type Context = AuthorizationContext<Roles>;
-export type PauseInvoiceRemindersContext = Context;
+export type PauseInvoiceConfirmationRemindersContext = Context;
 
-export class PauseInvoiceRemindersUsecase
+export class PauseInvoiceConfirmationRemindersUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
-    private sentNotificationRepo: SentNotificationRepoContract,
+    private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract
   ) {
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
@@ -85,14 +86,13 @@ export class PauseInvoiceRemindersUsecase
   ): Promise<Either<Errors.SetReminderPauseDbError, null>> {
     const uuid = new UniqueEntityID(request.invoiceId);
     const invoiceId = InvoiceId.create(uuid).getValue();
-    const { confirmation, payment } = request;
 
     try {
-      await this.sentNotificationRepo.setNotificationPausedStatus({
-        confirmation: !!confirmation,
-        payment: !!payment,
-        invoiceId
-      });
+      await this.pausedReminderRepo.setReminderPauseState(
+        invoiceId,
+        true,
+        NotificationType.REMINDER_CONFIRMATION
+      );
       return right(null);
     } catch (e) {
       return left(new Errors.SetReminderPauseDbError(e));

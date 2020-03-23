@@ -12,6 +12,4 @@ export interface SentNotificationRepoContract extends Repo<Notification> {
   getNotificationsByRecipient(email: string): Promise<Notification[]>;
   addNotification(notification: Notification): Promise<Notification>;
   updateNotification(notification: Notification): Promise<Notification>;
-  getNotificationPausedStatus(invoiceId: InvoiceId): Promise<NotificationPause>;
-  setNotificationPausedStatus(pause: NotificationPause): Promise<void>;
 }

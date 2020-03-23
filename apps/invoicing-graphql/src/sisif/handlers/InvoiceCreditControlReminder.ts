@@ -21,13 +21,21 @@ export const invoiceCreditControlHandler = (
   loggerService: Logger
 ) => {
   const {
-    repos: { sentNotifications, invoice, manuscript, invoiceItem, catalog },
+    repos: {
+      sentNotifications,
+      pausedReminder,
+      invoiceItem,
+      manuscript,
+      catalog,
+      invoice
+    },
     services: { emailService }
   } = appContext;
   const { manuscriptCustomId, recipientEmail, recipientName } = payload;
 
   const usecase = new SendInvoiceCreditControlReminderUsecase(
     sentNotifications,
+    pausedReminder,
     invoiceItem,
     manuscript,
     invoice,

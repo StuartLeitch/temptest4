@@ -8,11 +8,13 @@ export interface PausePersistance {
   invoiceId: string;
 }
 
-export const emptyPause: PausePersistance = {
-  pauseConfirmation: false,
-  pausePayment: false,
-  invoiceId: ''
-};
+export function emptyPause(invoiceId: InvoiceId): PausePersistance {
+  return {
+    invoiceId: invoiceId.id.toString(),
+    pauseConfirmation: false,
+    pausePayment: false
+  };
+}
 
 export function mapPauseToPersistance(
   pause: NotificationPause
@@ -26,7 +28,7 @@ export function mapPauseToPersistance(
 
 export function mapPauseToDomain(
   invoiceId: InvoiceId,
-  data: PausePersistance = emptyPause
+  data: PausePersistance = emptyPause(invoiceId)
 ): NotificationPause {
   return {
     confirmation: data.pauseConfirmation,

@@ -21,13 +21,20 @@ export const invoiceConfirmHandler = (
   loggerService: Logger
 ) => {
   const {
-    repos: { sentNotifications, invoice, manuscript, invoiceItem },
+    repos: {
+      sentNotifications,
+      pausedReminder,
+      invoiceItem,
+      manuscript,
+      invoice
+    },
     services: { schedulingService, emailService }
   } = appContext;
   const { manuscriptCustomId, recipientEmail, recipientName } = payload;
 
   const usecase = new SendInvoiceConfirmationReminderUsecase(
     sentNotifications,
+    pausedReminder,
     invoiceItem,
     manuscript,
     invoice,
