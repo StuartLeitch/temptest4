@@ -37,19 +37,6 @@ export class KnexPausedReminderRepo
     }
   }
 
-  // async setNotificationPausedStatus(pause: NotificationPause): Promise<void> {
-  //   const alreadyExists = await this.existsPauseForInvoice(pause.invoiceId);
-  //   const data = mapPauseToPersistance(pause);
-
-  //   if (alreadyExists) {
-  //     await this.db(TABLES.PAUSED_REMINDERS)
-  //       .where('invoiceId', data.invoiceId)
-  //       .update(data);
-  //   } else {
-  //     await this.db(TABLES.PAUSED_REMINDERS).insert(data);
-  //   }
-  // }
-
   async setReminderPauseState(
     invoiceId: InvoiceId,
     state: boolean,

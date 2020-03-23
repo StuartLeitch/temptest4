@@ -6,7 +6,6 @@ import { InvoiceId } from '../../invoices/domain/InvoiceId';
 
 export interface PausedReminderRepoContract extends Repo<NotificationPause> {
   getNotificationPausedStatus(invoiceId: InvoiceId): Promise<NotificationPause>;
-  // setNotificationPausedStatus(pause: NotificationPause): Promise<void>;
   setReminderPauseState(
     invoiceId: InvoiceId,
     status: boolean,
