@@ -49,7 +49,8 @@ class KnexMigrationSource {
     create_checker_events_table,
     rebuild_materialized_views('20200310150525_rebuild_materialized_views'),
     create_journal_to_publisher_table,
-    rebuild_materialized_views('20200316122800_add_waivers_to_invoices_view')
+    rebuild_materialized_views('20200316122800_add_waivers_to_invoices_view'),
+    rebuild_materialized_views('20200323252800_fix_manuscript_view')
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
