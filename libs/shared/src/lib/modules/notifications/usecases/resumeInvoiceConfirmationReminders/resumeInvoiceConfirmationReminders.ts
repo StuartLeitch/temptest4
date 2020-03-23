@@ -36,9 +36,9 @@ import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 // * Usecase specific
-import { ResumeConfirmationRemindersResponse as Response } from './resumeConfirmationRemindersResponse';
-import { ResumeConfirmationRemindersErrors as Errors } from './resumeConfirmationRemindersErrors';
-import { ResumeConfirmationRemindersDTO as DTO } from './resumeConfirmationRemindersDTO';
+import { ResumeInvoiceConfirmationRemindersResponse as Response } from './resumeInvoiceConfirmationRemindersResponse';
+import { ResumeInvoiceConfirmationRemindersErrors as Errors } from './resumeInvoiceConfirmationRemindersErrors';
+import { ResumeInvoiceConfirmationRemindersDTO as DTO } from './resumeInvoiceConfirmationRemindersDTO';
 
 interface CompoundDTO extends DTO {
   manuscript: Manuscript;
@@ -46,9 +46,9 @@ interface CompoundDTO extends DTO {
 }
 
 type Context = AuthorizationContext<Roles>;
-export type ResumeConfirmationReminderContext = Context;
+export type ResumeInvoiceConfirmationReminderContext = Context;
 
-export class ResumeConfirmationReminderUsecase
+export class ResumeInvoiceConfirmationReminderUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {

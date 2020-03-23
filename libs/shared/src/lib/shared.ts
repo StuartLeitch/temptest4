@@ -190,7 +190,7 @@ export * from './modules/notifications/usecases/sendInvoiceCreditControlReminder
 export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
 export * from './modules/notifications/usecases/areNotificationsPaused';
 export * from './modules/notifications/usecases/pauseInvoiceConfirmationReminders';
-export * from './modules/notifications/usecases/resumeConfirmationReminders';
+export * from './modules/notifications/usecases/resumeInvoiceConfirmationReminders';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
