@@ -1,14 +1,14 @@
+import { ReminderPayload } from '../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import {
-  Job,
-  JobBuilder,
   SisifJobTypes,
+  JobBuilder,
+  Job,
 } from '../../../infrastructure/message-queues/contracts/Job';
 import {
-  ScheduleTimer,
-  TimerBuilder,
   SchedulingTime,
+  TimerBuilder,
   TimerType,
 } from '../../../infrastructure/message-queues/contracts/Time';
 
@@ -100,7 +100,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         );
       }
 
-      const jobData = {
+      const jobData: ReminderPayload = {
         recipientName: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
         manuscriptCustomId: manuscript.customId,
         recipientEmail: manuscript.authorEmail,

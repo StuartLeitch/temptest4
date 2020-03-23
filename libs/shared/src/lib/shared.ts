@@ -215,6 +215,7 @@ export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';
 export * from './infrastructure/message-queues/contracts/Time';
 export { EmailService } from './infrastructure/communication-channels';
+export * as QueuePayloads from './infrastructure/message-queues/payloads';
 
 // ? Should we export this
 // * Redux Stuff

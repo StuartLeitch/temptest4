@@ -2,6 +2,7 @@ import { JobData } from '@hindawi/sisif';
 import {
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceCreditControlReminderDTO,
+  QueuePayloads,
   Roles
 } from '@hindawi/shared';
 
@@ -9,14 +10,8 @@ import { Logger } from '../../lib/logger';
 
 import { env } from '../../env';
 
-interface Payload {
-  manuscriptCustomId: string;
-  recipientEmail: string;
-  recipientName: string;
-}
-
 export const invoiceCreditControlHandler = (
-  payload: JobData<Payload>,
+  payload: JobData<QueuePayloads.ReminderPayload>,
   appContext: any,
   loggerService: Logger
 ) => {
