@@ -83,6 +83,8 @@ export class ResumeInvoiceConfirmationReminderUsecase
         .then(this.getInvoice(context))
         .then(this.getManuscript(context))
         .advanceOrEnd(shouldResumeReminder)
+        .then(this.resume)
+        .then(this.scheduleJob)
         .map(() => Result.ok<void>(null));
 
       return execution.execute();
