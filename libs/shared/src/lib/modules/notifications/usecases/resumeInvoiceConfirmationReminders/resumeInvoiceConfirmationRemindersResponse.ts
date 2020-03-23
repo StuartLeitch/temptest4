@@ -10,6 +10,7 @@ export type ResumeInvoiceConfirmationRemindersResponse = Either<
   | ResumeInvoiceConfirmationRemindersErrors.InvoiceIdRequiredError
   | ResumeInvoiceConfirmationRemindersErrors.QueueNameRequiredError
   | ResumeInvoiceConfirmationRemindersErrors.InvoiceNotFoundError
+  | ResumeInvoiceConfirmationRemindersErrors.ScheduleTaskFailed
   | AppError.UnexpectedError,
   Result<void>
 >;
