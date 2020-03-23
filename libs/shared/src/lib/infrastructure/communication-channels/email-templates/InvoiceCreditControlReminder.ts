@@ -30,8 +30,7 @@ export class InvoiceCreditControlReminderTemplate {
       Kind regards,<br/>
       <br/>
       ********************************<br/>
-      Accounts Receivable Team<br/>
-      Credit Control Specialist<br/>
+      Credit Control Team<br/>
       ${publisherName}<br/>
       ${publisherSite}<br/>
       ********************************

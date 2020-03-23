@@ -23,7 +23,7 @@ export class InvoicePaymentFirstReminderTemplate {
   }: BuildData) {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
 
-    const subject = `${manuscriptCustomId}: Article Processing Charges`;
+    const subject = `${manuscriptCustomId}: Article Processing Charges - Payment Reminder`;
     const paragraph = `
       We wanted to drop you a quick note to remind you that the invoice for manuscript ${manuscriptCustomId} in the amount of ${price} is still due for payment.<br/>
       <br/>
@@ -60,7 +60,7 @@ export class InvoicePaymentSecondReminderTemplate {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const issueDate = format(invoice.dateIssued, 'd MMMM yyyy');
 
-    const subject = `${manuscriptCustomId}: Article Processing Charges`;
+    const subject = `${manuscriptCustomId}: Article Processing Charges - Payment Reminder`;
     const paragraph = `
       The invoice for manuscript ${manuscriptCustomId} in the amount of ${price} is still due for payment. This invoice was issued on ${issueDate}.<br/>
       <br/>
@@ -103,7 +103,7 @@ export class InvoicePaymentThirdReminderTemplate {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const daysNo = differenceInCalendarDays(new Date(), invoice.dateIssued);
 
-    const subject = `${manuscriptCustomId}: Article Processing Charges`;
+    const subject = `${manuscriptCustomId}: Article Processing Charges - Payment Reminder`;
     const paragraph = `
       The invoice for manuscript ${manuscriptCustomId} in the amount of ${price} is still due for payment.<br/>
       <br/>

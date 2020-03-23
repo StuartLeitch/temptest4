@@ -1,5 +1,3 @@
-import { differenceInCalendarDays } from 'date-fns';
-
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -28,7 +26,6 @@ import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
@@ -85,9 +82,10 @@ export class ResumeInvoiceConfirmationReminderUsecase
         .then(this.validatePauseState(context))
         .then(this.getInvoice(context))
         .then(this.getManuscript(context))
-        .advanceOrEnd(shouldResumeReminder);
+        .advanceOrEnd(shouldResumeReminder)
+        .map(() => Result.ok<void>(null));
 
-      return null;
+      return execution.execute();
     } catch (e) {
       return left(new AppError.UnexpectedError(e));
     }
