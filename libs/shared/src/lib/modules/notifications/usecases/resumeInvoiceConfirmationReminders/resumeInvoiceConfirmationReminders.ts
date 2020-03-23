@@ -1,3 +1,5 @@
+import { differenceInCalendarDays } from 'date-fns';
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -16,6 +18,7 @@ import {
 
 import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 
+import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
 
@@ -181,14 +184,44 @@ export class ResumeInvoiceConfirmationReminderUsecase
     };
   }
 
-  private async resume(request: CompoundDTO) {
+  private async resume(
+    request: CompoundDTO
+  ): Promise<Either<Errors.ReminderResumeSaveDbError, CompoundDTO>> {
     try {
+      await this.pausedReminderRepo.setReminderPauseState(
+        request.invoice.invoiceId,
+        false,
+        NotificationType.REMINDER_CONFIRMATION
+      );
+      return right(request);
     } catch (e) {
       return left(new Errors.ReminderResumeSaveDbError(e));
     }
   }
 
-  private async scheduleJob(request: CompoundDTO) {}
+  private async scheduleJob(
+    request: CompoundDTO
+  ): Promise<Either<Errors.ScheduleTaskFailed, void>> {
+    const { reminderDelay, manuscript, queueName, jobType, invoice } = request;
+    const data = PayloadBuilder.authorReminder(manuscript);
+    const remainingDelay = calculateRemainingDelay(
+      invoice.dateAccepted,
+      reminderDelay
+    );
+    const timer = TimerBuilder.delayed(remainingDelay, SchedulingTime.Day);
+    const newJob = JobBuilder.basic(jobType, data);
+
+    try {
+      await this.scheduler.schedule(newJob, queueName, timer);
+    } catch (e) {
+      await this.pausedReminderRepo.setReminderPauseState(
+        request.invoice.invoiceId,
+        true,
+        NotificationType.REMINDER_CONFIRMATION
+      );
+      return left(new Errors.ScheduleTaskFailed(e));
+    }
+  }
 }
 
 async function shouldResumeReminder(request: CompoundDTO) {
@@ -197,4 +230,15 @@ async function shouldResumeReminder(request: CompoundDTO) {
   }
 
   return right<null, boolean>(true);
+}
+
+function calculateRemainingDelay(
+  dateAccepted: Date,
+  standardDelay: number
+): number {
+  const elapsedTime = new Date().getTime() - dateAccepted.getTime();
+  const period = standardDelay * SchedulingTime.Day;
+  const passedPeriods = Math.trunc(elapsedTime / period);
+  const nextTime = period * (passedPeriods + 1);
+  return (nextTime - elapsedTime) / SchedulingTime.Day;
 }

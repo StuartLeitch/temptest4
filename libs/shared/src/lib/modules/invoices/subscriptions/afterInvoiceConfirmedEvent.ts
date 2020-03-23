@@ -1,4 +1,4 @@
-import { ReminderPayload } from '../../../infrastructure/message-queues/payloads';
+import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import {
@@ -100,11 +100,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         );
       }
 
-      const jobData: ReminderPayload = {
-        recipientName: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
-        manuscriptCustomId: manuscript.customId,
-        recipientEmail: manuscript.authorEmail,
-      };
+      const jobData = PayloadBuilder.authorReminder(manuscript);
       const jobPaymentReminder = JobBuilder.basic(
         SisifJobTypes.InvoicePaymentReminder,
         jobData

@@ -16,7 +16,7 @@ import {
 
 import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 
-import { ReminderPayload } from '../../../../infrastructure/message-queues/payloads';
+import { AuthorReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
 
@@ -216,7 +216,7 @@ export class SendInvoiceConfirmationReminderUsecase
     request: DTO
   ): Promise<Either<Errors.RescheduleTaskFailed, void>> {
     const { job: jobData } = request;
-    const data: ReminderPayload = {
+    const data: AuthorReminderPayload = {
       manuscriptCustomId: request.manuscriptCustomId,
       recipientEmail: request.recipientEmail,
       recipientName: request.recipientName

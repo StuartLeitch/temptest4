@@ -51,4 +51,12 @@ export namespace ResumeInvoiceConfirmationRemindersErrors {
       });
     }
   }
+
+  export class ScheduleTaskFailed extends Result<UseCaseError> {
+    constructor(err: Error) {
+      super(false, {
+        message: `Failed to schedule the notification task with error {${err}}`
+      });
+    }
+  }
 }

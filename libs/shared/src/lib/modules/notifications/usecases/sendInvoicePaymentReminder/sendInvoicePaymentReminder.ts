@@ -16,7 +16,7 @@ import {
 
 import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 
-import { ReminderPayload } from '../../../../infrastructure/message-queues/payloads';
+import { AuthorReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import {
   PaymentReminderType,
@@ -285,7 +285,7 @@ export class SendInvoicePaymentReminderUsecase
     request: CompoundData
   ): Promise<Either<Errors.RescheduleTaskFailed, CompoundData>> {
     const { job: jobData } = request;
-    const data: ReminderPayload = {
+    const data: AuthorReminderPayload = {
       manuscriptCustomId: request.manuscriptCustomId,
       recipientEmail: request.recipientEmail,
       recipientName: request.recipientName
