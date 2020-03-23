@@ -2,7 +2,6 @@ import { cloneDeep } from 'lodash';
 
 import { Either, right } from './Result';
 import { Right } from './Right';
-import { Left } from './Left';
 
 type MutationFunction = (r: any) => any;
 
@@ -11,7 +10,6 @@ type MappingFunction<L = unknown, R = unknown> = (
 ) => (fn: MutationFunction) => Promise<Either<L, R>> | Either<L, R>;
 
 interface ObjectMapping<L = unknown, R = unknown> {
-  combine: MappingFunction<L, R>;
   default: MappingFunction<L, R>;
   guard: MappingFunction<L, R>;
   then: MappingFunction<L, R>;
@@ -48,12 +46,6 @@ export class AsyncEither<L = null, R = unknown> {
     return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
   }
 
-  combine<L2, R2>(fn: (r: R) => Promise<AsyncEither<L2, R2>>) {
-    const newInstance = this.clone();
-    newInstance.mutations.push({ type: 'combine', fn });
-    return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
-  }
-
   advanceOrEnd(...fns: { (r: R): Promise<Either<unknown, boolean>> }[]) {
     const newInstance = this.clone();
     newInstance.mutations.push({ type: 'guard', fn: allFilters(fns) });
@@ -82,7 +74,6 @@ export class AsyncEither<L = null, R = unknown> {
 
   private functionToApply<L, R>(type: MutationType, val: Either<L, R>) {
     const objectMapping: ObjectMapping<L, R> = {
-      combine: combineAsyncEithers,
       guard: advancePastGuard,
       default: emptyMapping,
       then: doThen,
@@ -149,17 +140,6 @@ function doMap<L, R>(val: Either<L, R>) {
   return async (fn: MutationFunction) => {
     return val.map<R>(fn);
   };
-}
-
-async function extractValue<L, L2, R2>(
-  e: Either<L, AsyncEither<L2, R2>>
-): Promise<Either<L | L2, R2>> {
-  if (e.isLeft()) {
-    return (e as unknown) as Left<L | L2, R2>;
-  } else {
-    const ae = e.value;
-    return ae.execute();
-  }
 }
 
 function allFilters<R>(
