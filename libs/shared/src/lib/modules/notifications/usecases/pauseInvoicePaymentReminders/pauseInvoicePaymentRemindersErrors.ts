@@ -1,7 +1,7 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
 import { Result } from '../../../../core/logic/Result';
 
-export namespace PauseInvoiceConfirmationRemindersErrors {
+export namespace PauseInvoicePaymentRemindersErrors {
   export class InvoiceIdRequiredError extends Result<UseCaseError> {
     constructor() {
       super(false, {
@@ -19,9 +19,9 @@ export namespace PauseInvoiceConfirmationRemindersErrors {
   }
 
   export class SetReminderPauseDbError extends Result<UseCaseError> {
-    constructor(e: Error) {
+    constructor(err: Error) {
       super(false, {
-        message: `While saving the pause state an error ocurred: ${e.message}`
+        message: `While saving the pause state an error ocurred: ${err.message}`
       });
     }
   }
