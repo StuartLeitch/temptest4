@@ -34,9 +34,9 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
 
 // * Usecase specific
-import { ResumeInvoiceConfirmationRemindersResponse as Response } from './resumeInvoiceConfirmationRemindersResponse';
-import { ResumeInvoiceConfirmationRemindersErrors as Errors } from './resumeInvoiceConfirmationRemindersErrors';
-import { ResumeInvoiceConfirmationRemindersDTO as DTO } from './resumeInvoiceConfirmationRemindersDTO';
+import { ResumeInvoicePaymentRemindersResponse as Response } from './resumeInvoicePaymentRemindersResponse';
+import { ResumeInvoicePaymentRemindersErrors as Errors } from './resumeInvoicePaymentRemindersErrors';
+import { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentRemindersDTO';
 
 interface CompoundDTO extends DTO {
   manuscript: Manuscript;
@@ -44,9 +44,9 @@ interface CompoundDTO extends DTO {
 }
 
 type Context = AuthorizationContext<Roles>;
-export type ResumeInvoiceConfirmationReminderContext = Context;
+export type ResumeInvoicePaymentReminderContext = Context;
 
-export class ResumeInvoiceConfirmationReminderUsecase
+export class ResumeInvoicePaymentReminderUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
@@ -80,6 +80,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
         .then(this.getManuscript(context))
         .advanceOrEnd(shouldResumeReminder)
         .then(this.resume)
+        .advanceOrEnd(shouldScheduleJob)
         .then(this.scheduleJob)
         .map(() => Result.ok<void>(null));
 
@@ -133,7 +134,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
       );
       const { invoiceId } = request;
       const maybeResult = await usecase.execute(
-        { invoiceId, notificationType: NotificationType.REMINDER_CONFIRMATION },
+        { invoiceId, notificationType: NotificationType.REMINDER_PAYMENT },
         context
       );
 
@@ -141,8 +142,8 @@ export class ResumeInvoiceConfirmationReminderUsecase
         .map(result => result.getValue())
         .chain(isPaused => {
           if (!isPaused) {
-            return left<Errors.ConfirmationRemindersNotPausedError, DTO>(
-              new Errors.ConfirmationRemindersNotPausedError(invoiceId)
+            return left<Errors.PaymentRemindersNotPausedError, DTO>(
+              new Errors.PaymentRemindersNotPausedError(invoiceId)
             );
           } else {
             return right<null, DTO>(request);
@@ -187,7 +188,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
       await this.pausedReminderRepo.setReminderPauseState(
         request.invoice.invoiceId,
         false,
-        NotificationType.REMINDER_CONFIRMATION
+        NotificationType.REMINDER_PAYMENT
       );
       return right(request);
     } catch (e) {
@@ -213,7 +214,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
       await this.pausedReminderRepo.setReminderPauseState(
         request.invoice.invoiceId,
         true,
-        NotificationType.REMINDER_CONFIRMATION
+        NotificationType.REMINDER_PAYMENT
       );
       return left(new Errors.ScheduleTaskFailed(e));
     }
@@ -221,7 +222,20 @@ export class ResumeInvoiceConfirmationReminderUsecase
 }
 
 async function shouldResumeReminder(request: CompoundDTO) {
-  if (request.invoice.status !== InvoiceStatus.DRAFT) {
+  if (request.invoice.status !== InvoiceStatus.ACTIVE) {
+    return right<null, boolean>(false);
+  }
+
+  return right<null, boolean>(true);
+}
+
+async function shouldScheduleJob(request: CompoundDTO) {
+  const elapsedTime =
+    new Date().getTime() - request.invoice.dateIssued.getTime();
+  const period = request.reminderDelay * SchedulingTime.Day;
+  const passedPeriods = Math.trunc(elapsedTime / period);
+
+  if (passedPeriods >= 3) {
     return right<null, boolean>(false);
   }
 
