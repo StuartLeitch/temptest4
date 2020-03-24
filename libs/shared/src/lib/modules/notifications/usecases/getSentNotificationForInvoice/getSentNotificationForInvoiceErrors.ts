@@ -17,4 +17,12 @@ export namespace GetSentNotificationForInvoiceErrors {
       });
     }
   }
+
+  export class InvoiceNotFoundError extends Result<UseCaseError> {
+    constructor(id: string) {
+      super(false, {
+        message: `The invoice with id {${id}} was not found.`
+      });
+    }
+  }
 }

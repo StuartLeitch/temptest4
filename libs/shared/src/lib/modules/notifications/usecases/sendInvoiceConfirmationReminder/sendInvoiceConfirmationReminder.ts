@@ -19,6 +19,7 @@ import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 import { AuthorReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
@@ -56,6 +57,7 @@ export class SendInvoiceConfirmationReminderUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
+    private loggerService: LoggerContract,
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
@@ -92,6 +94,8 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   private async validateRequest(request: DTO) {
+    this.loggerService.info(`Validate usecase request data`);
+
     if (!request.manuscriptCustomId) {
       return left(new Errors.ManuscriptCustomIdRequiredError());
     }
@@ -112,6 +116,10 @@ export class SendInvoiceConfirmationReminderUsecase
 
   private getInvoice(context: Context) {
     return async (request: DTO) => {
+      this.loggerService.info(
+        `Get the details of invoice associated with the manuscript with custom id ${request.manuscriptCustomId}`
+      );
+
       const getInvoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
@@ -134,12 +142,19 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   private getPauseStatus(context: Context) {
-    return async (data: DTO & { invoice: Invoice }) => {
-      const usecase = new AreNotificationsPausedUsecase(
-        this.pausedReminderRepo
+    return async (request: DTO & { invoice: Invoice }) => {
+      this.loggerService.info(
+        `Get the paused status of reminders of type ${
+          NotificationType.REMINDER_CONFIRMATION
+        } for invoice with id ${request.invoice.id.toString()}`
       );
 
-      const { invoice } = data;
+      const usecase = new AreNotificationsPausedUsecase(
+        this.pausedReminderRepo,
+        this.loggerService
+      );
+
+      const { invoice } = request;
       const invoiceId = invoice.id.toString();
 
       const maybeResult = await usecase.execute(
@@ -151,13 +166,19 @@ export class SendInvoiceConfirmationReminderUsecase
       );
 
       return maybeResult.map(result => ({
-        ...data,
+        ...request,
         paused: result.getValue()
       }));
     };
   }
 
   private async shouldSendReminder({ invoice, paused }: CompoundDTO) {
+    this.loggerService.info(
+      `Determine if the reminder, of type ${
+        NotificationType.REMINDER_CONFIRMATION
+      }, should be sent and rescheduled, for invoice with id ${invoice.id.toString()}`
+    );
+
     if (
       invoice.status === InvoiceStatus.DRAFT &&
       invoice.dateAccepted &&
@@ -173,6 +194,12 @@ export class SendInvoiceConfirmationReminderUsecase
   private async sendEmail(
     request: CompoundDTO
   ): Promise<Either<Errors.EmailSendingFailure, DTO>> {
+    this.loggerService.info(
+      `Send the reminder email for invoice with id ${request.invoice.id.toString()}, to "${
+        request.recipientEmail
+      }"`
+    );
+
     try {
       await this.emailService
         .invoiceConfirmationReminder({
@@ -197,6 +224,12 @@ export class SendInvoiceConfirmationReminderUsecase
   private async saveNotification(
     request: CompoundDTO
   ): Promise<Either<Errors.NotificationDbSaveError, DTO>> {
+    this.loggerService.info(
+      `Save that a reminder of type ${
+        NotificationType.REMINDER_CONFIRMATION
+      } was sent, for invoice with id ${request.invoice.id.toString()}`
+    );
+
     try {
       const invoiceId = request.invoice.invoiceId;
       const notification = Notification.create({
@@ -215,6 +248,10 @@ export class SendInvoiceConfirmationReminderUsecase
   private async scheduleTask(
     request: DTO
   ): Promise<Either<Errors.RescheduleTaskFailed, void>> {
+    this.loggerService.info(
+      `Reschedule the job for sending a reminder of type ${NotificationType.REMINDER_CONFIRMATION}, in ${request.job.delay} days`
+    );
+
     const { job: jobData } = request;
     const data: AuthorReminderPayload = {
       manuscriptCustomId: request.manuscriptCustomId,

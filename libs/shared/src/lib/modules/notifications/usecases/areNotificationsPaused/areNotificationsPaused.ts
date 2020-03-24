@@ -14,11 +14,13 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 
-import { NotificationType } from '../../domain/Notification';
 import { NotificationPause } from '../../domain/NotificationPause';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { NotificationType } from '../../domain/Notification';
 
 // * Usecase specific
 import { AreNotificationsPausedResponse as Response } from './areNotificationsPausedResponse';
@@ -43,7 +45,10 @@ export class AreNotificationsPausedUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private pausedReminderRepo: PausedReminderRepoContract) {
+  constructor(
+    private pausedReminderRepo: PausedReminderRepoContract,
+    private loggerService: LoggerContract
+  ) {
     this.fetchNotificationPauses = this.fetchNotificationPauses.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.getPauseStatus = this.getPauseStatus.bind(this);
@@ -77,6 +82,8 @@ export class AreNotificationsPausedUsecase
       DTO
     >
   > {
+    this.loggerService.info(`Validate the usecase request data`);
+
     const { notificationType, invoiceId } = request;
 
     if (!invoiceId) {
@@ -97,6 +104,10 @@ export class AreNotificationsPausedUsecase
   private async fetchNotificationPauses(
     request: DTO
   ): Promise<Either<Errors.EncounteredDbError, NotificationPause>> {
+    this.loggerService.info(
+      `Fetch pause state for reminders of invoice with id ${request.invoiceId}`
+    );
+
     const uuid = new UniqueEntityID(request.invoiceId);
     const invoiceId = InvoiceId.create(uuid).getValue();
 
@@ -113,6 +124,10 @@ export class AreNotificationsPausedUsecase
 
   private getPauseStatus(request: DTO) {
     return (pauses: NotificationPause): boolean => {
+      this.loggerService.info(
+        `Extract pause state for reminders of type ${request.notificationType}`
+      );
+
       const { notificationType } = request;
       return pauses[notificationTypeToPause[notificationType]] || false;
     };

@@ -14,6 +14,8 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
@@ -34,7 +36,8 @@ export class PauseInvoiceConfirmationRemindersUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
-    private invoiceRepo: InvoiceRepoContract
+    private invoiceRepo: InvoiceRepoContract,
+    private loggerService: LoggerContract
   ) {
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
@@ -59,17 +62,13 @@ export class PauseInvoiceConfirmationRemindersUsecase
     }
   }
 
-  private async existsInvoiceWithId(id: string) {
-    const uuid = new UniqueEntityID(id);
-    const invoiceId = InvoiceId.create(uuid).getValue();
-    return await this.invoiceRepo.existsWithId(invoiceId);
-  }
-
   private async validateRequest(
     request: DTO
   ): Promise<
     Either<Errors.InvoiceIdRequiredError | Errors.InvoiceNotFoundError, DTO>
   > {
+    this.loggerService.info(`Validate usecase request data`);
+
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
     }
@@ -81,9 +80,22 @@ export class PauseInvoiceConfirmationRemindersUsecase
     return right(request);
   }
 
+  private async existsInvoiceWithId(id: string) {
+    this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
+
+    const uuid = new UniqueEntityID(id);
+    const invoiceId = InvoiceId.create(uuid).getValue();
+
+    return await this.invoiceRepo.existsWithId(invoiceId);
+  }
+
   private async pause(
     request: DTO
   ): Promise<Either<Errors.SetReminderPauseDbError, null>> {
+    this.loggerService.info(
+      `Pause reminders of type ${NotificationType.REMINDER_CONFIRMATION} for invoice with id ${request.invoiceId}`
+    );
+
     const uuid = new UniqueEntityID(request.invoiceId);
     const invoiceId = InvoiceId.create(uuid).getValue();
 

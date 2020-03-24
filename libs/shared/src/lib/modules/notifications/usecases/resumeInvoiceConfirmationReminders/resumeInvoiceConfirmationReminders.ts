@@ -1,3 +1,5 @@
+import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -14,7 +16,7 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
@@ -55,8 +57,11 @@ export class ResumeInvoiceConfirmationReminderUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
+    private loggerService: LoggerContract,
     private scheduler: SchedulerContract
   ) {
+    this.calculateRemainingDelay = this.calculateRemainingDelay.bind(this);
+    this.shouldResumeReminder = this.shouldResumeReminder.bind(this);
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validatePauseState = this.validatePauseState.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
@@ -78,7 +83,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
         .then(this.validatePauseState(context))
         .then(this.getInvoice(context))
         .then(this.getManuscript(context))
-        .advanceOrEnd(shouldResumeReminder)
+        .advanceOrEnd(this.shouldResumeReminder)
         .then(this.resume)
         .then(this.scheduleJob)
         .map(() => Result.ok<void>(null));
@@ -87,12 +92,6 @@ export class ResumeInvoiceConfirmationReminderUsecase
     } catch (e) {
       return left(new AppError.UnexpectedError(e));
     }
-  }
-
-  private async existsInvoiceWithId(id: string) {
-    const uuid = new UniqueEntityID(id);
-    const invoiceId = InvoiceId.create(uuid).getValue();
-    return await this.invoiceRepo.existsWithId(invoiceId);
   }
 
   private async validateRequest(
@@ -106,6 +105,8 @@ export class ResumeInvoiceConfirmationReminderUsecase
       DTO
     >
   > {
+    this.loggerService.info(`Validate usecase request data`);
+
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
     }
@@ -126,10 +127,24 @@ export class ResumeInvoiceConfirmationReminderUsecase
     return right(request);
   }
 
+  private async existsInvoiceWithId(id: string) {
+    this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
+
+    const uuid = new UniqueEntityID(id);
+    const invoiceId = InvoiceId.create(uuid).getValue();
+
+    return await this.invoiceRepo.existsWithId(invoiceId);
+  }
+
   private validatePauseState(context: Context) {
     return async (request: DTO) => {
+      this.loggerService.info(
+        `Validate the state of the reminders of type ${NotificationType.REMINDER_CONFIRMATION} for invoice with id ${request.invoiceId}`
+      );
+
       const usecase = new AreNotificationsPausedUsecase(
-        this.pausedReminderRepo
+        this.pausedReminderRepo,
+        this.loggerService
       );
       const { invoiceId } = request;
       const maybeResult = await usecase.execute(
@@ -153,6 +168,10 @@ export class ResumeInvoiceConfirmationReminderUsecase
 
   private getInvoice(context: Context) {
     return async (request: CompoundDTO) => {
+      this.loggerService.info(
+        `Get details of invoice with id ${request.invoiceId}`
+      );
+
       const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
       const { invoiceId } = request;
       const maybeResult = await usecase.execute({ invoiceId }, context);
@@ -166,6 +185,10 @@ export class ResumeInvoiceConfirmationReminderUsecase
 
   private getManuscript(context: Context) {
     return async (request: CompoundDTO) => {
+      this.loggerService.info(
+        `Get details of manuscript associated with invoice with id ${request.invoiceId}`
+      );
+
       const usecase = new GetManuscriptByInvoiceIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
@@ -180,9 +203,25 @@ export class ResumeInvoiceConfirmationReminderUsecase
     };
   }
 
+  private async shouldResumeReminder(request: CompoundDTO) {
+    this.loggerService.info(
+      `Determine if the reminders of type ${NotificationType.REMINDER_CONFIRMATION} should be resumed for invoice with id ${request.invoiceId}`
+    );
+
+    if (request.invoice.status !== InvoiceStatus.DRAFT) {
+      return right<null, boolean>(false);
+    }
+
+    return right<null, boolean>(true);
+  }
+
   private async resume(
     request: CompoundDTO
   ): Promise<Either<Errors.ReminderResumeSaveDbError, CompoundDTO>> {
+    this.loggerService.info(
+      `Save the un-paused state of reminders of type ${NotificationType.REMINDER_CONFIRMATION} from invoice with id ${request.invoiceId}`
+    );
+
     try {
       await this.pausedReminderRepo.setReminderPauseState(
         request.invoice.invoiceId,
@@ -198,9 +237,13 @@ export class ResumeInvoiceConfirmationReminderUsecase
   private async scheduleJob(
     request: CompoundDTO
   ): Promise<Either<Errors.ScheduleTaskFailed, void>> {
+    this.loggerService.info(
+      `Schedule the next job for sending reminders of type ${NotificationType.REMINDER_CONFIRMATION} for invoice with id ${request.invoiceId}`
+    );
+
     const { reminderDelay, manuscript, queueName, jobType, invoice } = request;
     const data = PayloadBuilder.authorReminder(manuscript);
-    const remainingDelay = calculateRemainingDelay(
+    const remainingDelay = this.calculateRemainingDelay(
       invoice.dateAccepted,
       reminderDelay
     );
@@ -218,23 +261,20 @@ export class ResumeInvoiceConfirmationReminderUsecase
       return left(new Errors.ScheduleTaskFailed(e));
     }
   }
-}
 
-async function shouldResumeReminder(request: CompoundDTO) {
-  if (request.invoice.status !== InvoiceStatus.DRAFT) {
-    return right<null, boolean>(false);
+  private calculateRemainingDelay(
+    dateAccepted: Date,
+    standardDelay: number
+  ): number {
+    this.loggerService.info(
+      `Calculate the remaining delay until next reminder`
+    );
+
+    const elapsedTime = new Date().getTime() - dateAccepted.getTime();
+    const period = standardDelay * SchedulingTime.Day;
+    const passedPeriods = Math.trunc(elapsedTime / period);
+    const nextTime = period * (passedPeriods + 1);
+
+    return (nextTime - elapsedTime) / SchedulingTime.Day;
   }
-
-  return right<null, boolean>(true);
-}
-
-function calculateRemainingDelay(
-  dateAccepted: Date,
-  standardDelay: number
-): number {
-  const elapsedTime = new Date().getTime() - dateAccepted.getTime();
-  const period = standardDelay * SchedulingTime.Day;
-  const passedPeriods = Math.trunc(elapsedTime / period);
-  const nextTime = period * (passedPeriods + 1);
-  return (nextTime - elapsedTime) / SchedulingTime.Day;
 }

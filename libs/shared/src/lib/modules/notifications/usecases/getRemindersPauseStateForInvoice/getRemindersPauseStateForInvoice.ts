@@ -14,6 +14,8 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 
@@ -35,7 +37,8 @@ export class GetRemindersPauseStateForInvoiceUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private pausedRemindersRepo: PausedReminderRepoContract,
-    private invoiceRepo: InvoiceRepoContract
+    private invoiceRepo: InvoiceRepoContract,
+    private loggerService: LoggerContract
   ) {
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.fetchPauseState = this.fetchPauseState.bind(this);
@@ -63,6 +66,8 @@ export class GetRemindersPauseStateForInvoiceUsecase
   private async validateRequest(
     request: DTO
   ): Promise<Either<Errors.InvoiceIdRequiredError, DTO>> {
+    this.loggerService.info(`Validate usecase request data`);
+
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
     }
@@ -75,14 +80,21 @@ export class GetRemindersPauseStateForInvoiceUsecase
   }
 
   private async existsInvoiceWithId(id: string) {
+    this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
+
     const uuid = new UniqueEntityID(id);
     const invoiceId = InvoiceId.create(uuid).getValue();
+
     return await this.invoiceRepo.existsWithId(invoiceId);
   }
 
   private async fetchPauseState(
     request: DTO
   ): Promise<Either<Errors.GetRemindersPauseDbError, NotificationPause>> {
+    this.loggerService.info(
+      `Fetch the reminders pause state for invoice with id ${request.invoiceId}`
+    );
+
     const uuid = new UniqueEntityID(request.invoiceId);
     const invoiceId = InvoiceId.create(uuid).getValue();
 

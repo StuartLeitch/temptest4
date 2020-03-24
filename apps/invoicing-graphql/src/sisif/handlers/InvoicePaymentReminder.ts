@@ -11,7 +11,7 @@ import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 export const invoicePaymentHandler = (
-  payload: JobData<QueuePayloads.ReminderPayload>,
+  payload: JobData<QueuePayloads.AuthorReminderPayload>,
   appContext: any,
   loggerService: Logger
 ) => {
@@ -24,7 +24,7 @@ export const invoicePaymentHandler = (
       catalog,
       invoice
     },
-    services: { schedulingService, emailService }
+    services: { schedulingService, emailService, logger }
   } = appContext;
   const { manuscriptCustomId, recipientEmail, recipientName } = payload;
 
@@ -35,6 +35,7 @@ export const invoicePaymentHandler = (
     manuscript,
     invoice,
     catalog,
+    logger,
     schedulingService,
     emailService
   );

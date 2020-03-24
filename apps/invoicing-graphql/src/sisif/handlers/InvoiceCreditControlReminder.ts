@@ -24,7 +24,7 @@ export const invoiceCreditControlHandler = (
       catalog,
       invoice
     },
-    services: { emailService }
+    services: { emailService, logger }
   } = appContext;
   const { manuscriptCustomId, recipientEmail, recipientName } = payload;
 
@@ -35,6 +35,7 @@ export const invoiceCreditControlHandler = (
     manuscript,
     invoice,
     catalog,
+    logger,
     emailService
   );
   const usecaseContext = {

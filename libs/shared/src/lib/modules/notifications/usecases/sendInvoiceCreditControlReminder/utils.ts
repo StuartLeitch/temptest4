@@ -1,8 +1,6 @@
-import { right } from '../../../../core/logic/Result';
-
-import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
+import { Invoice } from '../../../invoices/domain/Invoice';
 
 import { PaymentReminder } from '../../../../infrastructure/communication-channels/EmailService';
 
@@ -13,16 +11,6 @@ export interface CompoundData extends DTO {
   journal: CatalogItem;
   invoice: Invoice;
   paused: boolean;
-}
-
-export async function shouldSendEmail(data: CompoundData) {
-  const { invoice, paused } = data;
-
-  if (invoice.status === InvoiceStatus.ACTIVE && !paused) {
-    return right<null, boolean>(true);
-  }
-
-  return right<null, boolean>(false);
 }
 
 export function constructCreditControlReminderData(

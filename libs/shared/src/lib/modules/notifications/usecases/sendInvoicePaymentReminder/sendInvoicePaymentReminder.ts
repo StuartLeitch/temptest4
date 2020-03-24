@@ -18,6 +18,7 @@ import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
 
 import { AuthorReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import {
   PaymentReminderType,
   EmailService
@@ -37,8 +38,8 @@ import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJo
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
+import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Invoice } from '../../../invoices/domain/Invoice';
 
 // * Usecase specific
 import { SendInvoicePaymentReminderResponse as Response } from './sendInvoicePaymentReminderResponse';
@@ -48,8 +49,6 @@ import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentRemind
 import {
   constructPaymentReminderData,
   numberToTemplateMapper,
-  shouldRescheduleJob,
-  shouldSendEmail,
   CompoundData
 } from './utils';
 
@@ -67,13 +66,17 @@ export class SendInvoicePaymentReminderUsecase
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private journalRepo: CatalogRepoContract,
+    private loggerService: LoggerContract,
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
     this.sendPaymentReminderEmail = this.sendPaymentReminderEmail.bind(this);
+    this.fetchFromManuscriptsDb = this.fetchFromManuscriptsDb.bind(this);
     this.bellowEmailMaxCount = this.bellowEmailMaxCount.bind(this);
+    this.shouldRescheduleJob = this.shouldRescheduleJob.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
     this.scheduleNextJob = this.scheduleNextJob.bind(this);
+    this.shouldSendEmail = this.shouldSendEmail.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.getCatalogItem = this.getCatalogItem.bind(this);
     this.getPauseStatus = this.getPauseStatus.bind(this);
@@ -94,10 +97,10 @@ export class SendInvoicePaymentReminderUsecase
         .then(this.getInvoice(context))
         .then(this.getCatalogItem(context))
         .then(this.getPauseStatus(context))
-        .advanceOrEnd(shouldSendEmail, this.bellowEmailMaxCount)
+        .advanceOrEnd(this.shouldSendEmail, this.bellowEmailMaxCount)
         .then(this.sendPaymentReminderEmail)
         .then(this.saveNotification)
-        .advanceOrEnd(shouldRescheduleJob)
+        .advanceOrEnd(this.shouldRescheduleJob)
         .then(this.scheduleNextJob)
         .map(() => Result.ok(null));
       return execution.execute();
@@ -107,6 +110,8 @@ export class SendInvoicePaymentReminderUsecase
   }
 
   private async validateRequest(request: DTO) {
+    this.loggerService.info(`Validate usecase request data`);
+
     if (!request.manuscriptCustomId) {
       return left(new Errors.ManuscriptCustomIdRequiredError());
     }
@@ -126,20 +131,26 @@ export class SendInvoicePaymentReminderUsecase
   }
 
   private getInvoice(context: Context) {
-    return async (data: DTO) => {
+    return async (request: DTO) => {
+      this.loggerService.info(
+        `Get the details of invoice associated with the manuscript with custom id ${request.manuscriptCustomId}`
+      );
+
       const getInvoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
       );
       const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
 
-      const execution = new AsyncEither<null, string>(data.manuscriptCustomId)
+      const execution = new AsyncEither<null, string>(
+        request.manuscriptCustomId
+      )
         .then(customId => getInvoiceIdUsecase.execute({ customId }, context))
         .map(result => result.getValue())
         .map(invoiceIds => invoiceIds[0].id.toString())
         .then(invoiceId => invoiceUsecase.execute({ invoiceId }, context))
         .map(result => ({
-          ...data,
+          ...request,
           invoice: result.getValue()
         }));
 
@@ -147,52 +158,68 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private getManuscript(data: DTO & { invoice: Invoice }) {
-    const execution = new AsyncEither<null, string>(data.manuscriptCustomId)
-      .then(async customId => {
-        try {
-          const result = await this.manuscriptRepo.findByCustomId(customId);
-          if (result) {
-            return right<Errors.ManuscriptNotFound, Manuscript>(result);
-          } else {
-            return left<Errors.ManuscriptNotFound, Manuscript>(
-              new Errors.ManuscriptNotFound(customId)
-            );
-          }
-        } catch (e) {
-          return left<Errors.ManuscriptNotFound, Manuscript>(
-            new Errors.ManuscriptNotFound(customId)
-          );
-        }
-      })
-      .map(manuscript => ({ ...data, manuscript }));
+  private async fetchFromManuscriptsDb(customId: string) {
+    try {
+      const result = await this.manuscriptRepo.findByCustomId(customId);
+      if (result) {
+        return right<Errors.ManuscriptNotFound, Manuscript>(result);
+      } else {
+        return left<Errors.ManuscriptNotFound, Manuscript>(
+          new Errors.ManuscriptNotFound(customId)
+        );
+      }
+    } catch (e) {
+      return left<Errors.ManuscriptNotFound, Manuscript>(
+        new Errors.ManuscriptNotFound(customId)
+      );
+    }
+  }
+
+  private getManuscript(request: DTO & { invoice: Invoice }) {
+    this.loggerService.info(
+      `Get manuscript with custom id ${request.manuscriptCustomId}`
+    );
+
+    const execution = new AsyncEither<null, string>(request.manuscriptCustomId)
+      .then(this.fetchFromManuscriptsDb)
+      .map(manuscript => ({ ...request, manuscript }));
     return execution.execute();
   }
 
   private getCatalogItem(context: Context) {
-    return async (data: DTO & { invoice: Invoice; manuscript: Manuscript }) => {
-      const getJournalUsecase = new GetJournal(this.journalRepo);
+    return async (
+      request: DTO & { invoice: Invoice; manuscript: Manuscript }
+    ) => {
+      this.loggerService.info(
+        `Get the journal data for manuscript with custom id ${request.manuscriptCustomId}`
+      );
 
-      const execution = new AsyncEither(data)
+      const journalExecution = async (manuscript: Manuscript) =>
+        getJournalUsecase.execute({ journalId: manuscript.journalId }, context);
+      const getJournalUsecase = new GetJournal(this.journalRepo);
+      const execution = new AsyncEither(request)
         .then(this.getManuscript)
-        .then(async data => {
-          const { manuscript } = data;
-          const maybeResult = await getJournalUsecase.execute(
-            { journalId: manuscript.journalId },
-            context
-          );
-          return maybeResult.map(result => ({
-            ...data,
-            journal: result.getValue()
-          }));
-        });
+        .map(data => data.manuscript)
+        .then(journalExecution)
+        .map(journalResult => ({
+          ...request,
+          journal: journalResult.getValue()
+        }));
       return execution.execute();
     };
   }
 
   private bellowEmailMaxCount({ invoice }: CompoundData) {
+    this.loggerService.info(
+      `Determine if the reminder of type ${
+        NotificationType.REMINDER_PAYMENT
+      } was sent less than 3 times for invoice with id ${invoice.id.toString()}`
+    );
+
     const getNotificationsUsecase = new GetSentNotificationForInvoiceUsecase(
-      this.sentNotificationRepo
+      this.sentNotificationRepo,
+      this.invoiceRepo,
+      this.loggerService
     );
     const filterPayment = (notification: Notification) =>
       notification.type === NotificationType.REMINDER_PAYMENT;
@@ -208,9 +235,15 @@ export class SendInvoicePaymentReminderUsecase
   }
 
   private async sendEmail(
-    data: CompoundData,
+    request: CompoundData,
     template: PaymentReminderType
   ): Promise<Either<Errors.EmailSendingFailure, CompoundData>> {
+    this.loggerService.info(
+      `Send the reminder email for invoice with id ${request.invoice.id.toString()}, to "${
+        request.recipientEmail
+      }", with ${template} template`
+    );
+
     if (!template) {
       return left(
         new AppError.UnexpectedError(
@@ -220,32 +253,40 @@ export class SendInvoicePaymentReminderUsecase
     }
 
     try {
-      const emailData = constructPaymentReminderData(data);
+      const emailData = constructPaymentReminderData(request);
       await this.emailService
         .invoicePaymentReminder(emailData, template)
         .sendEmail();
 
-      return right(data);
+      return right(request);
     } catch (e) {
       return left(new Errors.EmailSendingFailure(e));
     }
   }
 
-  private sendPaymentReminderEmail(data: CompoundData) {
-    const passedTime = new Date().getTime() - data.invoice.dateIssued.getTime();
-    const period = data.job.delay * SchedulingTime.Day;
+  private sendPaymentReminderEmail(request: CompoundData) {
+    const passedTime =
+      new Date().getTime() - request.invoice.dateIssued.getTime();
+    const period = request.job.delay * SchedulingTime.Day;
     const emailNum = Math.trunc(passedTime / period);
 
-    return this.sendEmail(data, numberToTemplateMapper[emailNum]);
+    return this.sendEmail(request, numberToTemplateMapper[emailNum]);
   }
 
   private getPauseStatus(context: Context) {
-    return async (data: CompoundData) => {
-      const usecase = new AreNotificationsPausedUsecase(
-        this.pausedReminderRepo
+    return async (request: CompoundData) => {
+      this.loggerService.info(
+        `Get the paused status of reminders of type ${
+          NotificationType.REMINDER_PAYMENT
+        } for invoice with id ${request.invoice.id.toString()}`
       );
 
-      const { invoice } = data;
+      const usecase = new AreNotificationsPausedUsecase(
+        this.pausedReminderRepo,
+        this.loggerService
+      );
+
+      const { invoice } = request;
       const invoiceId = invoice.id.toString();
 
       const maybeResult = await usecase.execute(
@@ -257,25 +298,31 @@ export class SendInvoicePaymentReminderUsecase
       );
 
       return maybeResult.map(result => ({
-        ...data,
+        ...request,
         paused: result.getValue()
       }));
     };
   }
 
   private async saveNotification(
-    data: CompoundData
+    request: CompoundData
   ): Promise<Either<Errors.NotificationDbSaveError, CompoundData>> {
-    try {
-      const notification = Notification.create({
-        type: NotificationType.REMINDER_PAYMENT,
-        recipientEmail: data.recipientEmail,
-        invoiceId: data.invoice.invoiceId
-      }).getValue();
+    this.loggerService.info(
+      `Save that a reminder of type ${
+        NotificationType.REMINDER_PAYMENT
+      } was sent, for invoice with id ${request.invoice.id.toString()}`
+    );
 
+    const notification = Notification.create({
+      type: NotificationType.REMINDER_PAYMENT,
+      recipientEmail: request.recipientEmail,
+      invoiceId: request.invoice.invoiceId
+    }).getValue();
+
+    try {
       await this.sentNotificationRepo.addNotification(notification);
 
-      return right(data);
+      return right(request);
     } catch (e) {
       return left(new Errors.NotificationDbSaveError(e));
     }
@@ -284,6 +331,10 @@ export class SendInvoicePaymentReminderUsecase
   private async scheduleNextJob(
     request: CompoundData
   ): Promise<Either<Errors.RescheduleTaskFailed, CompoundData>> {
+    this.loggerService.info(
+      `Reschedule the job for sending a reminder of type ${NotificationType.REMINDER_PAYMENT}, in ${request.job.delay} days`
+    );
+
     const { job: jobData } = request;
     const data: AuthorReminderPayload = {
       manuscriptCustomId: request.manuscriptCustomId,
@@ -300,5 +351,43 @@ export class SendInvoicePaymentReminderUsecase
     } catch (e) {
       return left(new Errors.RescheduleTaskFailed(e));
     }
+  }
+
+  private async shouldSendEmail({ invoice, paused, job }: CompoundData) {
+    this.loggerService.info(
+      `Determine if the reminder, of type ${
+        NotificationType.REMINDER_CONFIRMATION
+      }, should be sent for invoice with id ${invoice.id.toString()}`
+    );
+
+    const passedTime = new Date().getTime() - invoice.dateIssued.getTime();
+    const period = job.delay * SchedulingTime.Day;
+
+    if (
+      invoice.status === InvoiceStatus.ACTIVE &&
+      passedTime <= 3.2 * period &&
+      !paused
+    ) {
+      return right<null, boolean>(true);
+    }
+
+    return right<null, boolean>(false);
+  }
+
+  private async shouldRescheduleJob({ invoice, job }: CompoundData) {
+    this.loggerService.info(
+      `Determine if the reminder, of type ${
+        NotificationType.REMINDER_CONFIRMATION
+      }, should be rescheduled for invoice with id ${invoice.id.toString()}`
+    );
+
+    const passedTime = new Date().getTime() - invoice.dateIssued.getTime();
+    const period = job.delay * SchedulingTime.Day;
+
+    if (passedTime >= 3 * period) {
+      return right<null, boolean>(false);
+    }
+
+    return right<null, boolean>(true);
   }
 }

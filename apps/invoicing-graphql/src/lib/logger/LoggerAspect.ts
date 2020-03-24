@@ -18,7 +18,14 @@ import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/l
 import {
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceConfirmationReminderUsecase,
-  SendInvoicePaymentReminderUsecase
+  SendInvoicePaymentReminderUsecase,
+  PauseInvoiceConfirmationRemindersUsecase,
+  PauseInvoicePaymentRemindersUsecase,
+  ResumeInvoiceConfirmationReminderUsecase,
+  ResumeInvoicePaymentReminderUsecase,
+  GetRemindersPauseStateForInvoiceUsecase,
+  GetSentNotificationForInvoiceUsecase,
+  AreNotificationsPausedUsecase
 } from '@hindawi/shared';
 
 import { Logger } from './logger';
@@ -41,10 +48,17 @@ const watchList = [
   UpdateTransactionOnAcceptManuscriptUsecase,
   UpdateCatalogItemToCatalogUseCase,
   AssignEditorsToJournalUsecase,
+  AddCatalogItemToCatalogUseCase,
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceConfirmationReminderUsecase,
   SendInvoicePaymentReminderUsecase,
-  AddCatalogItemToCatalogUseCase
+  PauseInvoiceConfirmationRemindersUsecase,
+  PauseInvoicePaymentRemindersUsecase,
+  ResumeInvoiceConfirmationReminderUsecase,
+  ResumeInvoicePaymentReminderUsecase,
+  GetRemindersPauseStateForInvoiceUsecase,
+  GetSentNotificationForInvoiceUsecase,
+  AreNotificationsPausedUsecase
 ];
 const aspect = {
   classes: watchList,
@@ -72,10 +86,17 @@ export class LoggerAspect {
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,
+      AddCatalogItemToCatalogUseCase.prototype.execute,
       SendInvoiceCreditControlReminderUsecase.prototype.execute,
       SendInvoiceConfirmationReminderUsecase.prototype.execute,
       SendInvoicePaymentReminderUsecase.prototype.execute,
-      AddCatalogItemToCatalogUseCase.prototype.execute
+      PauseInvoiceConfirmationRemindersUsecase.prototype.execute,
+      PauseInvoicePaymentRemindersUsecase.prototype.execute,
+      ResumeInvoiceConfirmationReminderUsecase.prototype.execute,
+      ResumeInvoicePaymentReminderUsecase.prototype.execute,
+      GetRemindersPauseStateForInvoiceUsecase.prototype.execute,
+      GetSentNotificationForInvoiceUsecase.prototype.execute,
+      AreNotificationsPausedUsecase.prototype.execute
     ]
   })
   invokeBeforeMethod(meta: Metadata) {
@@ -103,10 +124,17 @@ export class LoggerAspect {
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,
+      AddCatalogItemToCatalogUseCase.prototype.execute,
       SendInvoiceCreditControlReminderUsecase.prototype.execute,
       SendInvoiceConfirmationReminderUsecase.prototype.execute,
       SendInvoicePaymentReminderUsecase.prototype.execute,
-      AddCatalogItemToCatalogUseCase.prototype.execute
+      PauseInvoiceConfirmationRemindersUsecase.prototype.execute,
+      PauseInvoicePaymentRemindersUsecase.prototype.execute,
+      ResumeInvoiceConfirmationReminderUsecase.prototype.execute,
+      ResumeInvoicePaymentReminderUsecase.prototype.execute,
+      GetRemindersPauseStateForInvoiceUsecase.prototype.execute,
+      GetSentNotificationForInvoiceUsecase.prototype.execute,
+      AreNotificationsPausedUsecase.prototype.execute
     ]
   })
   async invokeAfterMethod(meta: Metadata) {
