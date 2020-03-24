@@ -73,7 +73,11 @@ export const contextLoader: MicroframeworkLoader = (
       // authService: new AuthService({}),
       vatService: new VATService(),
       waiverService: new WaiverService(repos.waiver, repos.editor),
-      emailService: new EmailService(),
+      emailService: new EmailService(
+        env.app.mailingDisabled,
+        env.app.FERoot,
+        env.app.tenantName
+      ),
       exchangeRateService: new ExchangeRateService(),
       payPalService: new PayPalService(env.paypal),
       erpService: new ErpService(logger, env.salesForce),

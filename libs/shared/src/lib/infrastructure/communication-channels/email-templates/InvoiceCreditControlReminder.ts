@@ -1,4 +1,6 @@
-import { format, differenceInCalendarDays } from 'date-fns';
+import { differenceInCalendarDays } from 'date-fns';
+
+import { EmailContent } from '../EmailProps';
 
 import { CatalogItem } from '../../../modules/journals/domain/CatalogItem';
 import { Invoice } from '../../../modules/invoices/domain/Invoice';
@@ -11,7 +13,7 @@ export class InvoiceCreditControlReminderTemplate {
     invoiceButton: string,
     publisherName: string,
     publisherSite: string
-  ) {
+  ): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const daysNo = differenceInCalendarDays(new Date(), invoice.dateIssued);
 

@@ -53,6 +53,7 @@ export const env = {
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     banner: toBool(getOsEnv('APP_BANNER')),
+    tenantName: getOsEnv('TENANT_NAME'),
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR')

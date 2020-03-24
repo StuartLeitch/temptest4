@@ -1,5 +1,7 @@
 import { format, differenceInCalendarDays } from 'date-fns';
 
+import { EmailContent } from '../EmailProps';
+
 import { CatalogItem } from '../../../modules/journals/domain/CatalogItem';
 import { Invoice } from '../../../modules/invoices/domain/Invoice';
 
@@ -20,7 +22,7 @@ export class InvoicePaymentFirstReminderTemplate {
     invoiceButton,
     publisherName,
     publisherSite
-  }: BuildData) {
+  }: BuildData): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
 
     const subject = `${manuscriptCustomId}: Article Processing Charges - Payment Reminder`;
@@ -56,7 +58,7 @@ export class InvoicePaymentSecondReminderTemplate {
     invoiceButton,
     publisherName,
     publisherSite
-  }: BuildData) {
+  }: BuildData): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const issueDate = format(invoice.dateIssued, 'd MMMM yyyy');
 
@@ -99,7 +101,7 @@ export class InvoicePaymentThirdReminderTemplate {
     invoiceButton,
     publisherName,
     publisherSite
-  }: BuildData) {
+  }: BuildData): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const daysNo = differenceInCalendarDays(new Date(), invoice.dateIssued);
 

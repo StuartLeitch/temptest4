@@ -1,4 +1,4 @@
-import EmailTemplate from '@pubsweet/component-email-templating';
+import { cloneDeep } from 'lodash';
 
 import hindawiDefault from '../../../../../../config/default';
 import gswConfig from '../../../../../../config/default-gsw';
@@ -7,6 +7,9 @@ import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../modules/journals/domain/CatalogItem';
 import { InvoiceItem } from '../../modules/invoices/domain/InvoiceItem';
 import { Invoice } from '../../modules/invoices/domain/Invoice';
+
+import { EmailPropsBuilder, EmailReceiver } from './EmailProps';
+import { JournalProps, Email } from './Email';
 
 import {
   AutoConfirmMissingCountryNotificationTemplate,
@@ -19,49 +22,6 @@ import {
   InvoicePendingNotificationTemplate,
   ButtonLinkTemplate
 } from './email-templates';
-
-interface JournalConfig {
-  logo?: string;
-  address?: string;
-  privacy?: string;
-  ctaColor?: string;
-  logoLink?: string;
-  publisher?: string;
-  footerText?: string;
-}
-
-let journalConfig: JournalConfig = {};
-
-if (process.env.TENANT_NAME === 'GeoScienceWorld') {
-  journalConfig = { ...gswConfig.journal };
-  journalConfig.address = ''; // address is in privacy text
-} else if (process.env.TENANT_NAME === 'Hindawi') {
-  journalConfig = { ...hindawiDefault.journal };
-  journalConfig.address = ''; // address is in privacy text
-}
-
-interface TemplateProps {
-  type: string;
-  fromEmail: string;
-  toUser: {
-    email: string;
-    name?: string;
-  };
-  content: {
-    ctaText?: string;
-    signatureJournal?: string;
-    signatureName?: string;
-    subject: string;
-    paragraph: string;
-    ctaLink?: string;
-    footerText?: string;
-  };
-  bodyProps: {
-    hasLink: boolean;
-    hasIntro: boolean;
-    hasSignature: boolean;
-  };
-}
 
 interface ConfirmationReminder {
   author: {
@@ -98,25 +58,28 @@ type PaymentReminderTemplateMapper = {
 };
 
 export class EmailService {
-  private email: any;
+  private journalProps: JournalProps;
 
-  static createURL(path: string) {
-    return `${process.env.FE_ROOT}${path}`;
-  }
-
-  static createSingleButton(label: string, link: string) {
-    return ButtonLinkTemplate.build(label, link);
-  }
-
-  public createTemplate(templateProps: TemplateProps): EmailService {
-    this.email = new EmailTemplate(templateProps);
-    return this;
-  }
-
-  public sendEmail() {
-    if (process.env.MAILING_DISABLED === 'false') {
-      return this.email.sendEmail();
+  constructor(
+    private mailingDisabled: boolean,
+    private fePath: string,
+    tenantName: string
+  ) {
+    if (tenantName === 'GeoScienceWorld') {
+      this.journalProps = { ...gswConfig.journal };
+      this.journalProps.address = ''; // address is in privacy text
+    } else if (tenantName === 'Hindawi') {
+      this.journalProps = { ...hindawiDefault.journal };
+      this.journalProps.address = ''; // address is in privacy text
     }
+  }
+
+  private createURL(path: string) {
+    return `${this.fePath}${path}`;
+  }
+
+  private createSingleButton(label: string, path: string) {
+    return ButtonLinkTemplate.build(label, this.createURL(path));
   }
 
   public createInvoicePendingNotification(
@@ -124,26 +87,14 @@ export class EmailService {
     receiverEmail: string,
     senderEmail: string
   ) {
-    const { paragraph, subject } = InvoicePendingNotificationTemplate.build(
-      invoice
-    );
-    return this.createTemplate({
-      type: 'user',
-      fromEmail: senderEmail,
-      toUser: {
-        email: receiverEmail
-      },
-      content: {
-        paragraph,
-        subject,
-        ...journalConfig
-      },
-      bodyProps: {
-        hasLink: false,
-        hasIntro: true,
-        hasSignature: false
-      }
-    });
+    const content = InvoicePendingNotificationTemplate.build(invoice);
+    const emailProps = new EmailPropsBuilder()
+      .addSender(senderEmail)
+      .addReceiver(receiverEmail)
+      .addContent(content)
+      .buildProps();
+
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
   }
 
   public createInvoicePaymentTemplate(
@@ -156,16 +107,11 @@ export class EmailService {
     senderName: string
   ) {
     const publisherName = process.env.TENANT_NAME;
-    const invoiceLink = EmailService.createSingleButton(
+    const invoiceLink = this.createSingleButton(
       'INVOICE DETAILS',
-      EmailService.createURL(
-        `/payment-details/${invoiceItem.invoiceId.id.toString()}`
-      )
+      `/payment-details/${invoiceItem.invoiceId.id.toString()}`
     );
-    const {
-      paragraph,
-      subject
-    } = InvoiceCanBeConfirmedNotificationTemplate.build({
+    const content = InvoiceCanBeConfirmedNotificationTemplate.build({
       bankTransferCopyReceiverAddress,
       publisherName,
       catalogItem,
@@ -174,32 +120,25 @@ export class EmailService {
       manuscript,
       invoice
     });
-
-    const templateProps = {
-      type: 'user',
-      fromEmail: `${senderName} <${senderAddress}>`,
-      toUser: {
-        email: manuscript.authorEmail,
-        name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`
-      },
-      content: {
-        paragraph,
-        subject,
-        ...journalConfig
-      },
-      bodyProps: {
-        hasLink: false,
-        hasIntro: true,
-        hasSignature: false
-      }
+    const receiver: EmailReceiver = {
+      email: manuscript.authorEmail,
+      name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`
     };
-    if (templateProps.content.privacy) {
-      templateProps.content.privacy = templateProps.content.privacy.replace(
+    const emailProps = new EmailPropsBuilder()
+      .addSender(`${senderName} <${senderAddress}>`)
+      .addReceiver(receiver)
+      .addContent(content)
+      .buildProps();
+    const newJournalTemplate = cloneDeep(this.journalProps);
+
+    if (newJournalTemplate.privacy) {
+      newJournalTemplate.privacy = newJournalTemplate.privacy.replace(
         '[TO EMAIL]',
         manuscript.authorEmail
       );
     }
-    return this.createTemplate(templateProps);
+
+    return Email.create(emailProps, newJournalTemplate, this.mailingDisabled);
   }
 
   public autoConfirmMissingCountryNotification(
@@ -208,34 +147,21 @@ export class EmailService {
     receiverEmail: string,
     senderEmail: string
   ) {
-    const invoiceLink = EmailService.createURL(
+    const invoiceLink = this.createURL(
       `/payment-details/${invoice.invoiceId.id.toString()}`
     );
-    const {
-      paragraph,
-      subject
-    } = AutoConfirmMissingCountryNotificationTemplate.build(
+    const content = AutoConfirmMissingCountryNotificationTemplate.build(
       manuscript.customId,
       invoiceLink
     );
 
-    return this.createTemplate({
-      type: 'user',
-      fromEmail: senderEmail,
-      toUser: {
-        email: receiverEmail
-      },
-      content: {
-        paragraph,
-        subject,
-        ...journalConfig
-      },
-      bodyProps: {
-        hasLink: false,
-        hasIntro: true,
-        hasSignature: false
-      }
-    });
+    const emailProps = new EmailPropsBuilder()
+      .addSender(senderEmail)
+      .addReceiver(receiverEmail)
+      .addContent(content)
+      .buildProps();
+
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
   }
 
   public invoiceConfirmationReminder({
@@ -245,34 +171,26 @@ export class EmailService {
     author
   }: ConfirmationReminder) {
     const publisherName = process.env.TENANT_NAME;
-    const invoiceButton = EmailService.createSingleButton(
+    const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
-      EmailService.createURL(`/payment-details/${invoiceId}`)
+      `/payment-details/${invoiceId}`
     );
-    const { paragraph, subject } = InvoiceConfirmationReminderTemplate.build(
+    const content = InvoiceConfirmationReminderTemplate.build(
       articleCustomId,
       invoiceButton,
       publisherName
     );
+    const receiver: EmailReceiver = {
+      email: author.email,
+      name: author.name
+    };
+    const emailProps = new EmailPropsBuilder()
+      .addSender(`${sender.name} <${sender.email}>`)
+      .addReceiver(receiver)
+      .addContent(content)
+      .buildProps();
 
-    return this.createTemplate({
-      type: 'user',
-      fromEmail: `${sender.name} <${sender.email}>`,
-      toUser: {
-        email: author.email,
-        name: author.name
-      },
-      content: {
-        subject,
-        paragraph,
-        ...journalConfig
-      },
-      bodyProps: {
-        hasLink: false,
-        hasIntro: true,
-        hasSignature: false
-      }
-    });
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
   }
 
   private getEmailDataForInvoicePaymentReminder(
@@ -293,7 +211,7 @@ export class EmailService {
       invoice,
       invoiceButton,
       publisherName,
-      publisherSite: journalConfig.logoLink
+      publisherSite: this.journalProps.logoLink
     });
   }
 
@@ -301,69 +219,54 @@ export class EmailService {
     data: PaymentReminder,
     kind: PaymentReminderType
   ) {
-    const invoiceButton = EmailService.createSingleButton(
+    const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
-      EmailService.createURL(`/payment-details/${data.invoice.invoiceId}`)
+      `/payment-details/${data.invoice.invoiceId}`
     );
 
-    const { paragraph, subject } = this.getEmailDataForInvoicePaymentReminder(
+    const content = this.getEmailDataForInvoicePaymentReminder(
       data,
       kind,
       invoiceButton
     );
 
-    return this.createTemplate({
-      type: 'user',
-      fromEmail: `${data.sender.name} <${data.sender.email}>`,
-      toUser: {
-        email: data.author.email,
-        name: data.author.name
-      },
-      content: {
-        subject,
-        paragraph,
-        ...journalConfig
-      },
-      bodyProps: {
-        hasLink: false,
-        hasIntro: true,
-        hasSignature: false
-      }
-    });
+    const receiver: EmailReceiver = {
+      email: data.author.email,
+      name: data.author.name
+    };
+    const emailProps = new EmailPropsBuilder()
+      .addSender(`${data.sender.name} <${data.sender.email}>`)
+      .addReceiver(receiver)
+      .addContent(content)
+      .buildProps();
+
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
   }
 
   public invoiceCreditControlReminder(data: PaymentReminder) {
-    const invoiceButton = EmailService.createSingleButton(
+    const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
-      EmailService.createURL(`/payment-details/${data.invoice.invoiceId}`)
+      `/payment-details/${data.invoice.invoiceId}`
     );
 
-    const { paragraph, subject } = InvoiceCreditControlReminderTemplate.build(
+    const content = InvoiceCreditControlReminderTemplate.build(
       data.manuscriptCustomId,
       data.catalogItem,
       data.invoice,
       invoiceButton,
       data.sender.name,
-      journalConfig.logoLink
+      this.journalProps.logoLink
     );
+    const receiver: EmailReceiver = {
+      email: data.author.email,
+      name: data.author.name
+    };
+    const emailProps = new EmailPropsBuilder()
+      .addSender(`${data.sender.name} <${data.sender.email}>`)
+      .addReceiver(receiver)
+      .addContent(content)
+      .buildProps();
 
-    return this.createTemplate({
-      type: 'user',
-      fromEmail: `${data.sender.name} <${data.sender.email}>`,
-      toUser: {
-        email: data.author.email,
-        name: data.author.name
-      },
-      content: {
-        subject,
-        paragraph,
-        ...journalConfig
-      },
-      bodyProps: {
-        hasLink: false,
-        hasIntro: true,
-        hasSignature: false
-      }
-    });
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
   }
 }

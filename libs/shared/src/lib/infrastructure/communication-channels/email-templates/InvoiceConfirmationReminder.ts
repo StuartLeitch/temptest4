@@ -1,9 +1,11 @@
+import { EmailContent } from '../EmailProps';
+
 export class InvoiceConfirmationReminderTemplate {
   static build(
     articleCustomId: string,
     invoiceButton: string,
     publisherName: string
-  ) {
+  ): EmailContent {
     const subject = `${articleCustomId}: Article Processing Charges - confirmation reminder`;
     const paragraph = `
       We would like to gently remind you to confirm your invoice.<br/>
