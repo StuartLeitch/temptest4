@@ -47,14 +47,14 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
-        let getItemsUsecase = new GetItemsForInvoiceUsecase(
+        const getItemsUsecase = new GetItemsForInvoiceUsecase(
           this.invoiceItemRepo,
           this.couponRepo,
           this.waiverRepo
         );
 
         const resp = await getItemsUsecase.execute({
-          invoiceId: invoice.invoiceId.id.toString()
+          invoiceId: invoice.invoiceId.id.toString(),
         });
         if (resp.isLeft()) {
           throw new Error(
@@ -100,8 +100,8 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     }
 
     try {
-      let resp = await this.invoiceToErpUsecase.execute({
-        invoiceId: invoice.id.toString()
+      const resp = await this.invoiceToErpUsecase.execute({
+        invoiceId: invoice.id.toString(),
       });
       if (resp.isLeft()) {
         throw resp.value;

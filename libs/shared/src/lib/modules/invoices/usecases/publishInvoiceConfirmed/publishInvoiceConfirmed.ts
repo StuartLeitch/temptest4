@@ -2,13 +2,14 @@ import { InvoiceStatus as PhenomInvoiceStatus } from '@hindawi/phenom-events/src
 import { InvoiceConfirmed as InvoiceConfirmedEvent } from '@hindawi/phenom-events';
 
 import { AppError } from '../../../../core/logic/AppError';
+import { EventUtils } from '../../../../utils/EventUtils';
+
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 import { Invoice } from '../../domain/Invoice';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Payer } from '../../../payers/domain/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
-import { EventUtils } from 'libs/shared/src/lib/utils/EventUtils';
 import { CouponMap } from '../../../coupons/mappers/CouponMap';
 import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
 
@@ -28,11 +29,13 @@ export class PublishInvoiceConfirmed {
     const data = {
       ...EventUtils.createEventObject(),
       invoiceId: invoice.id.toString(),
+      isCreditNote: false,
       erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
       referenceNumber: invoice.referenceNumber,
       invoiceIssueDate: invoice.dateIssued.toISOString(),
-      invoiceItems: invoiceItems.map(ii => ({
+      cancelledInvoiceReference: invoice.cancelledInvoiceReference,
+      invoiceItems: invoiceItems.map((ii) => ({
         id: ii.id.toString(),
         manuscriptCustomId: manuscript.customId,
         manuscriptId: ii.manuscriptId.id.toString(),
@@ -40,11 +43,11 @@ export class PublishInvoiceConfirmed {
         price: ii.price,
         vatPercentage: ii.vat,
         coupons: ii.coupons
-          ? ii.coupons.map(c => CouponMap.toEvent(c))
+          ? ii.coupons.map((c) => CouponMap.toEvent(c))
           : undefined,
         waivers: ii.waivers
-          ? ii.waivers.map(w => WaiverMap.toEvent(w))
-          : undefined
+          ? ii.waivers.map((w) => WaiverMap.toEvent(w))
+          : undefined,
       })),
       organization: payer ? payer.organization?.value.toString() : null,
       invoiceStatus: invoice.status as PhenomInvoiceStatus,
@@ -67,7 +70,7 @@ export class PublishInvoiceConfirmed {
       VAT: invoiceItems.reduce(
         (acc, item) => acc + item.calculatePrice() * (item.vat / 100),
         0
-      )
+      ),
       // couponId: coupon.id,
       // dateApplied: coupon.applied
     };
@@ -76,7 +79,7 @@ export class PublishInvoiceConfirmed {
       await this.publishService.publishMessage({
         timestamp: messageTimestamp?.toISOString(),
         event: INVOICE_CONFIRMED,
-        data
+        data,
       });
     } catch (err) {
       throw new AppError.UnexpectedError(err.toString());

@@ -1,28 +1,29 @@
-import { ErpServiceContract } from 'libs/shared/src/lib/domain/services/ErpService';
-import { ExchangeRateService } from 'libs/shared/src/lib/domain/services/ExchangeRateService';
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 import {
   AuthorizationContext,
   Roles,
   AccessControlledUsecase,
   AccessControlContext,
-  Authorize,
+  // Authorize,
   InvoiceItemRepoContract,
   PayerRepoContract,
   ArticleRepoContract,
   InvoiceRepoContract,
   VATService,
   PayerType,
-  GetItemsForInvoiceUsecase
+  GetItemsForInvoiceUsecase,
 } from '@hindawi/shared';
-import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
-import { right, Result, left } from 'libs/shared/src/lib/core/logic/Result';
-import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { right, Result, left } from '../../../../core/logic/Result';
+import { AppError } from '../../../../core/logic/AppError';
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { InvoiceId } from '../../domain/InvoiceId';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../domain/Invoice';
@@ -91,7 +92,7 @@ export class PublishInvoiceToErpUsecase
         );
 
         const resp = await getItemsUsecase.execute({
-          invoiceId: request.invoiceId
+          invoiceId: request.invoiceId,
         });
         if (resp.isLeft()) {
           throw new Error(
@@ -142,7 +143,7 @@ export class PublishInvoiceToErpUsecase
         {
           postalCode: address.postalCode,
           countryCode: address.country,
-          stateCode: address.state
+          stateCode: address.state,
         },
         payer.type !== PayerType.INSTITUTION
       );
@@ -164,7 +165,7 @@ export class PublishInvoiceToErpUsecase
         journalName: catalog.journalTitle,
         vatNote,
         rate,
-        tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem
+        tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
       });
 
       this.loggerService.info(

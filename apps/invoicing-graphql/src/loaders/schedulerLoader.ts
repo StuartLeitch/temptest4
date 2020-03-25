@@ -1,9 +1,10 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import {
-  setIntervalAsync
+  setIntervalAsync,
   // clearIntervalAsync
 } from 'set-interval-async/dynamic';
 
@@ -30,9 +31,9 @@ export const schedulerLoader: MicroframeworkLoader = async (
         catalog,
         coupon,
         waiver,
-        publisher
+        publisher,
       },
-      services: { erpService, logger: loggerService }
+      services: { erpService, logger: loggerService },
     } = context;
     const { failedErpCronRetryTimeMinutes } = env.app;
 

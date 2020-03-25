@@ -667,18 +667,20 @@ const Details = () => {
                                 <Media heading tag='h6'>
                                   Success!
                                 </Media>
-                                <p>You successfully created a Credit Note.</p>
+                                <p>
+                                  You've successfully created a Credit Note.
+                                </p>
                                 <div className='d-flex mt-2'>
                                   <Button
                                     color='success'
                                     onClick={() => {
                                       closeToast;
                                       history.push(
-                                        `/invoices/details/${creditNote.id}`
+                                        `/credit-notes/details/${creditNote.id}`
                                       );
                                     }}
                                   >
-                                    Got it
+                                    See details
                                   </Button>
                                   <Button
                                     color='link'
@@ -794,6 +796,23 @@ const Details = () => {
                               />
                             </Col>
                           </FormGroup>
+                          {invoice.creditNote && (
+                            <FormGroup row>
+                              <Label for='staticText' sm={12}>
+                                Credit Note
+                                <Link
+                                  to={`/credit-notes/details/${invoice.creditNote.invoiceId}`}
+                                >
+                                  {
+                                    <span className='ml-1 font-weight-bold text-warning'>
+                                      Credit Note #
+                                      {invoice.creditNote.referenceNumber}
+                                    </span>
+                                  }
+                                </Link>
+                              </Label>
+                            </FormGroup>
+                          )}
                         </div>
                         <div style={{ flex: 1 }} className='ml-2'>
                           <FormGroup row>
@@ -1040,21 +1059,6 @@ const Details = () => {
                             </React.Fragment>
                           );
                         })}
-                      {invoice.creditNote && (
-                        <CardTitle tag='h6' className='mt-5 mb-4'>
-                          Invoice:
-                          <Link
-                            to={`/invoices/details/${invoice.creditNote.invoiceId}`}
-                          >
-                            {
-                              <span className='ml-1 font-weight-bold text-warning'>
-                                Credit Note #
-                                {invoice.creditNote.referenceNumber}
-                              </span>
-                            }
-                          </Link>
-                        </CardTitle>
-                      )}
                     </CardBody>
                   </Card>
                 </TabPane>

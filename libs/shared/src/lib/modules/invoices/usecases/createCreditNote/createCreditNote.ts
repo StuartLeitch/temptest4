@@ -18,7 +18,7 @@ import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  CreateCreditNoteAuthorizationContext
+  CreateCreditNoteAuthorizationContext,
 } from './createCreditNoteAuthorizationContext';
 import { CreateCreditNoteRequestDTO } from './createCreditNoteDTO';
 import { CreateCreditNoteResponse } from './createCreditNoteResponse';
@@ -127,7 +127,7 @@ export class CreateCreditNoteUsecase
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {
-        items.forEach(async invoiceItem => {
+        items.forEach(async (invoiceItem) => {
           const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
           rawInvoiceItem.invoiceId = creditNote.id.toString();
           rawInvoiceItem.price = invoiceItem.price * -1;
@@ -157,7 +157,7 @@ export class CreateCreditNoteUsecase
       if (request.createDraft) {
         const invoiceProps = {
           ...clonedRawInvoice,
-          status: InvoiceStatus.DRAFT
+          status: InvoiceStatus.DRAFT,
         } as any; // TODO: should reference the real invoice props, as in its domain
 
         // * System creates DRAFT invoice
@@ -167,7 +167,7 @@ export class CreateCreditNoteUsecase
         // This is where all the magic happens
         const draftInvoice = invoiceOrError.getValue();
         if (items.length) {
-          items.forEach(async invoiceItem => {
+          items.forEach(async (invoiceItem) => {
             const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
             rawInvoiceItem.invoiceId = draftInvoice.id.toString();
             rawInvoiceItem.price = invoiceItem.price * -1;

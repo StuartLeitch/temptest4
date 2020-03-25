@@ -6,7 +6,7 @@ export class EventUtils {
     return {
       id: uuid(),
       created: new Date().toISOString(),
-      updated: new Date().toISOString()
+      updated: new Date().toISOString(),
     };
   }
 }

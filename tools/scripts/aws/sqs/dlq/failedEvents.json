@@ -1,0 +1,692 @@
+[
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2015-05-20T09:53:02.000Z",
+    "submissionId": "09046dcb-c601-4587-b02f-8d1a4a3fecb0"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2013-09-17T01:40:04.000Z",
+    "submissionId": "73ce043c-efde-46b5-824e-d00d8f3f1332"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-07-08T08:59:33.000Z",
+    "submissionId": "54c16bb9-bcc7-4459-8190-d3ad8a7db333"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-10-25T12:00:58.000Z",
+    "submissionId": "04eb86f7-d6bb-4acb-a36a-4eae018c1ae2"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-04-10T02:01:01.000Z",
+    "submissionId": "c6ee19b4-7f1f-4eb4-b6d2-fb8aacbf9988"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-11-18T06:20:16.000Z",
+    "submissionId": "435e07a1-a562-4bdd-ad0b-2a532b73f8cc"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-07-09T11:31:49.000Z",
+    "submissionId": "19dee657-c607-40c1-9cce-fb8576ac7efe"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2011-09-08T10:29:49.000Z",
+    "submissionId": "11d95a93-ff51-47d8-9267-97fd785120ab"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2012-06-21T09:41:33.000Z",
+    "submissionId": "cd073491-c486-4424-83ad-8c647b30f831"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2014-10-20T11:52:28.000Z",
+    "submissionId": "bc67e92d-9a5a-463b-a2e5-4259ac7a8ca8"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2017-06-08T10:48:59.000Z",
+    "submissionId": "8433ab99-5958-408e-a0fb-b3aaebab9bc8"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2020-01-08T04:58:33.000Z",
+    "submissionId": "c2eeb16f-0398-4fc3-a2a7-fa38db6bc7e5"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2007-09-13T04:28:39.000Z",
+    "submissionId": "f805bfc4-44e1-4543-8f84-9f9a525d4448"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-06-27T12:12:31.000Z",
+    "submissionId": "81e02a30-58e9-4fb2-bf8f-a5182e04238e"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-11-07T02:45:59.000Z",
+    "submissionId": "bfb261c0-ebba-410e-9a33-109b86c68790"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2015-08-26T11:16:37.000Z",
+    "submissionId": "03dd0fa5-dab5-4f61-abe5-bf8336301bd5"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-11-22T07:27:03.000Z",
+    "submissionId": "0cc2c180-133d-4d62-ad93-1fe0bc9937eb"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-12-16T01:56:58.000Z",
+    "submissionId": "45a24111-424e-456e-b908-b1a43f80e639"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2009-06-03T12:00:00.000Z",
+    "submissionId": "f972becb-9229-4d3f-910b-a7ad7701de9a"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-04-30T08:24:04.000Z",
+    "submissionId": "aaada03a-1dc6-467f-afa9-4707ec98114c"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-10-05T09:40:57.000Z",
+    "submissionId": "4cd6a837-589b-458a-b8b6-652bcbbc4114"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2011-03-13T06:19:40.000Z",
+    "submissionId": "11d62f0e-f583-4154-a19d-96ff2e76e1aa"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-05-12T12:56:40.000Z",
+    "submissionId": "a6378a18-7756-46cc-8cdc-cfe01300787c"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2007-03-09T04:21:09.000Z",
+    "submissionId": "ffbe1f65-1960-4234-a34f-d15fb35d9b28"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-08-09T06:01:55.000Z",
+    "submissionId": "38205fc3-a0a6-44f1-9dbe-1f274b451553"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2016-11-06T11:52:05.000Z",
+    "submissionId": "3dd4cf0f-43c2-4641-836b-5756fc644f49"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2016-08-24T11:51:58.000Z",
+    "submissionId": "8d8db882-fb2d-499a-9973-be00262ef0dc"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-07-06T02:21:32.000Z",
+    "submissionId": "19df5cdc-e25d-4255-a950-8cf0cb9ffd77"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-02-14T10:48:52.000Z",
+    "submissionId": "657c63d0-291f-449d-abcb-df28f632cbb3"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-01-13T11:33:52.000Z",
+    "submissionId": "09ede501-6d06-4695-91a6-c4fc3a82b137"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2016-06-12T07:52:38.000Z",
+    "submissionId": "6301b8c7-3c06-4468-845c-3d25b5ae1978"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-05-14T08:27:50.000Z",
+    "submissionId": "bb8dd7e4-0e15-4ff2-a0ca-aec63337c9c6"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2014-01-06T09:42:08.000Z",
+    "submissionId": "8101cdfd-2c2b-4859-8073-257e8bfeebad"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-07-09T07:17:34.000Z",
+    "submissionId": "18fbe69b-d4f0-4f99-a44b-9250c00835c2"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2012-08-12T12:03:30.000Z",
+    "submissionId": "c5c22f26-2420-4b60-b830-d6db1bf48dde"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-09-10T12:51:53.000Z",
+    "submissionId": "534d62f1-ebcf-47b8-8e13-7230f414fee6"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-03-13T09:38:36.000Z",
+    "submissionId": "997321c6-eeae-4c51-86bd-c53afad49cd2"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-09-05T01:07:39.000Z",
+    "submissionId": "b7de10e0-5a3e-438e-bed0-0f689e330540"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2017-01-30T08:50:09.000Z",
+    "submissionId": "b9759b13-a071-47cf-a9ca-65e95b1a4fc9"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-10-31T04:48:28.000Z",
+    "submissionId": "2240bff6-f1ed-4d0d-b814-8278eed53beb"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2016-09-18T07:18:55.000Z",
+    "submissionId": "0c27b46d-fa7c-4909-a7b6-f1a5d3b47a0a"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-07-20T01:59:01.000Z",
+    "submissionId": "bc188d6a-6759-4596-ba64-56bcdfd1f8b9"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2010-10-04T01:57:09.000Z",
+    "submissionId": "34b328b0-a95e-4e67-b462-f94f044a6a0b"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2012-09-12T09:39:57.000Z",
+    "submissionId": "f6415d1f-49b8-4021-9bb6-d013aad9cc44"
+  },
+  {
+    "event": "SubmissionSubmitted",
+    "timestamp": "2020-03-18T07:22:48.835Z",
+    "submissionId": "6cf23995-c4ee-41b7-b778-34fd4888033b"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2013-04-02T11:15:40.000Z",
+    "submissionId": "42914a47-6efc-4a68-ba84-5e20e956d5b1"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-11-07T11:36:27.000Z",
+    "submissionId": "762137ad-4c0d-4818-8729-d4f71fb38b35"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-01-29T08:22:54.000Z",
+    "submissionId": "998766cb-acda-4e1a-8e39-65e23c0ffde1"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-11-27T10:01:02.000Z",
+    "submissionId": "eca7903d-7293-444b-8388-014605420af2"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-05-24T11:23:18.000Z",
+    "submissionId": "bfae7619-8f9a-47e8-80a2-6129afc8e0b6"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2015-07-06T12:10:00.000Z",
+    "submissionId": "78dc7a31-917c-4edc-a883-e0714d4a595d"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-04-28T08:14:36.000Z",
+    "submissionId": "ac137902-99e4-49a7-80e0-8d49bc5c6c39"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2012-03-29T02:02:44.000Z",
+    "submissionId": "dfc88735-a80b-4764-81ce-4aa4aca8a1ee"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-12-03T01:26:39.000Z",
+    "submissionId": "0a0907ec-ebbe-401e-8b35-8b884b98a12f"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-01-10T06:45:59.000Z",
+    "submissionId": "0c99fef0-c237-4977-9603-c9c880fdd45e"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-02-12T10:12:37.000Z",
+    "submissionId": "466d8bc3-b3b7-4bb7-a4d9-6d33b8b0803a"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2013-09-23T09:32:09.000Z",
+    "submissionId": "c4850e15-afca-42f3-b31b-45b62140c91f"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-12-03T01:26:11.000Z",
+    "submissionId": "fef34ff3-969b-443f-844a-3935abb2ffd2"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2014-12-08T08:55:35.000Z",
+    "submissionId": "a8a0d074-6d5f-4a3d-a053-51d8c16c5278"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2019-08-27T05:45:02.000Z",
+    "submissionId": "d480ff1c-1fa5-4ac9-af36-9b3feabe728c"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2016-09-01T09:44:44.000Z",
+    "submissionId": "751e7aa7-74b1-4cb1-838e-81fccf45036b"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2014-07-02T02:26:30.000Z",
+    "submissionId": "40fa0222-ad4d-4df5-86f1-cbfbcaa9ef03"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2014-11-24T02:43:33.000Z",
+    "submissionId": "1655dcc8-1929-4621-9765-29910d901971"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2008-12-15T12:00:00.000Z",
+    "submissionId": "fed2035d-6b52-49ce-bdc8-a79d63ce8d01"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-05-03T12:00:00.000Z",
+    "submissionId": "3a84a874-175c-456f-b323-fabd69808da9"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-02-08T06:31:08.000Z",
+    "submissionId": "11dacb96-38b3-4761-adaf-0e441856f7ab"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2015-09-30T12:24:07.000Z",
+    "submissionId": "8987a9eb-444f-4821-a88a-77b1cb4edeb6"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2014-12-04T01:27:28.000Z",
+    "submissionId": "8dda8b24-1d4e-43f3-82ca-4685d219e59f"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-09-15T02:25:33.000Z",
+    "submissionId": "970a0c7e-b609-4c5d-ba3d-91448b2a5910"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-06-23T11:23:09.000Z",
+    "submissionId": "bcc978da-e48d-4c4b-adb3-34e92cebd247"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-05-12T08:57:55.000Z",
+    "submissionId": "715635cd-e347-4313-b3dd-3828265599c4"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2012-07-17T07:49:59.000Z",
+    "submissionId": "96020916-ddc6-41d6-8b9b-adef8a784ceb"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-12-03T01:26:26.000Z",
+    "submissionId": "c52be9e9-83bf-4bb5-8a6c-fa73c9f7b942"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2017-10-25T09:38:40.000Z",
+    "submissionId": "3b2cbaf8-693a-4436-8c07-2374f45f43da"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-05-28T02:49:27.000Z",
+    "submissionId": "b111f657-f91a-44ef-a3d8-0731ebd322e6"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2016-11-08T09:00:49.000Z",
+    "submissionId": "b6b4416d-a1ab-4848-b74e-f1a8503357cf"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-10-23T11:41:17.000Z",
+    "submissionId": "4f54a68e-564b-432d-aca7-30af0e7ab112"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-02-20T09:58:10.000Z",
+    "submissionId": "d020d16f-fb0f-4c02-9517-d15933dd996d"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2015-07-26T11:29:59.000Z",
+    "submissionId": "0f10d023-3177-4a55-ab01-9e4fdda40384"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-06-14T02:17:24.000Z",
+    "submissionId": "9fa9fbcf-70df-4418-8429-9b52549d6bd6"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2012-08-16T10:55:30.000Z",
+    "submissionId": "c7d040ea-b0b3-4339-8277-290f98c6ec60"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-10-19T06:15:03.000Z",
+    "submissionId": "ff247d94-3204-442f-8993-e5d3ad06b1c8"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2009-11-11T12:15:16.000Z",
+    "submissionId": "4dbbae82-acb2-47a3-9912-70adb53485f4"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2012-12-16T01:49:20.000Z",
+    "submissionId": "66594936-3cd8-4a02-8543-b3f4b5d91999"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-08-23T08:03:03.000Z",
+    "submissionId": "b3eced36-d64f-44a7-8fef-d76b920f0aa6"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2010-10-04T01:57:52.000Z",
+    "submissionId": "7c7c1a99-2857-49db-b4b7-6aabc5df7da5"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2016-11-15T08:05:49.000Z",
+    "submissionId": "20a9056a-0a5a-4b8d-ae77-a28acf6a1cdf"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-09-04T01:00:36.000Z",
+    "submissionId": "3b08248f-7326-4eff-a194-836ca9c57a3f"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-12-11T07:22:32.000Z",
+    "submissionId": "cd42a969-e06c-4aab-96c8-3377bc87a4e8"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-11-07T03:02:36.000Z",
+    "submissionId": "6dcadac7-f2a7-4af7-8954-c995dbf4239a"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-11-08T09:24:14.000Z",
+    "submissionId": "78e8fbc1-3855-48c1-bce6-d49236ec0bc3"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2010-10-04T01:58:29.000Z",
+    "submissionId": "c839b274-89e4-4823-a308-a20afed7393e"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2016-01-19T09:07:17.000Z",
+    "submissionId": "f538f101-b0fa-4163-9202-4e03184569df"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2016-08-16T01:23:41.000Z",
+    "submissionId": "73dff6be-45a8-437e-8725-a6392c9b7ef4"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2019-03-21T01:47:36.000Z",
+    "submissionId": "31f419c3-fdf6-4676-a632-792be88d55f7"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2014-11-09T07:23:36.000Z",
+    "submissionId": "38134e86-8b8e-4742-b912-ffb2ba995ff2"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2014-11-19T07:53:55.000Z",
+    "submissionId": "94a2a195-1821-4cb1-8a36-74bda925c9be"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-07-25T07:08:52.000Z",
+    "submissionId": "2635c88e-4aec-4bbe-85e0-369fbe3821f8"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2013-11-06T07:59:44.000Z",
+    "submissionId": "d66df7f2-5313-4918-ba17-7fab570f040b"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-02-13T06:47:20.000Z",
+    "submissionId": "2d3114fc-516a-44e4-89a9-78e0dcd7c6c5"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2015-04-14T06:37:32.000Z",
+    "submissionId": "164e558d-40b5-4466-820f-499d3ea45051"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-06-16T07:02:14.000Z",
+    "submissionId": "147d9962-0394-46e0-a3ac-4ee027c774a3"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2010-02-21T10:12:35.000Z",
+    "submissionId": "62b6e1d1-6dc5-43ae-af70-2df0c3adfabb"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-06-17T07:11:46.000Z",
+    "submissionId": "f17ba26e-a979-4ec3-9c22-bbd1b47dd2ca"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2011-06-01T04:40:02.000Z",
+    "submissionId": "b10009cb-feda-4fb4-9cc3-9b9325192624"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-12-13T07:24:13.000Z",
+    "submissionId": "5fc75364-27c2-42b5-81db-8ac7742e9c50"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-07-02T02:25:37.000Z",
+    "submissionId": "c167d8a6-8836-4a81-92b2-409da9cf5999"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-08-04T12:00:00.000Z",
+    "submissionId": "74e4e4f1-e189-4232-9ffe-eda77a2505c4"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2010-11-14T11:21:43.000Z",
+    "submissionId": "db1ee318-fcc6-4118-ae3d-ba75ef70e817"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2020-01-06T04:56:03.000Z",
+    "submissionId": "51ce87eb-d062-4f24-a504-d737a388fa59"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-02-24T08:20:24.000Z",
+    "submissionId": "a913c664-59c0-49a5-8864-cb44eba38609"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-08-02T01:05:59.000Z",
+    "submissionId": "7167302a-c0a7-43c3-b58e-c3c690f952dc"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2008-04-05T09:38:41.000Z",
+    "submissionId": "a895739e-873e-4d75-aa86-3c65a4926b3b"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2014-02-26T03:04:57.000Z",
+    "submissionId": "be9ece89-8661-450c-8469-63d2e82428cc"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2007-11-20T12:00:00.000Z",
+    "submissionId": "e1fa8677-93e4-4f66-a882-f5c323cea63e"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2015-12-15T09:33:45.000Z",
+    "submissionId": "c9c09c7c-c25f-4ef6-8c9e-1ec750323ea2"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2012-04-04T08:58:40.000Z",
+    "submissionId": "015e4259-a169-4c1a-8819-4c189271358a"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2010-09-13T11:06:06.000Z",
+    "submissionId": "346a6cc3-ce56-41e3-b6ca-751b9e3d7c3f"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2013-05-15T10:45:44.000Z",
+    "submissionId": "40097e31-d3fd-43aa-a2cd-077ab155eb2e"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2008-07-28T12:00:00.000Z",
+    "submissionId": "483e5436-8862-453c-9e44-af7b02c55ddb"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2011-05-22T10:07:18.000Z",
+    "submissionId": "d8b4b1a5-68ae-4b56-b279-729f17d10848"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-12-26T01:16:19.000Z",
+    "submissionId": "fa0dddb9-dfd5-4953-9190-ffc54fd6806d"
+  },
+  {
+    "event": "SubmissionWithdrawn",
+    "timestamp": "2014-03-19T06:48:58.000Z",
+    "submissionId": "e5414e56-9719-440c-ac9d-25b70b47ffcb"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2015-02-16T08:02:49.000Z",
+    "submissionId": "cce248e7-dba3-43fe-8f93-d7263513a838"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-02-15T06:12:19.000Z",
+    "submissionId": "3dd64aaa-13b7-4b78-815f-d5f47965feb0"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2009-11-16T10:50:25.000Z",
+    "submissionId": "0b0c4694-0544-4441-ad2d-912564dbef5a"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-04-19T06:38:34.000Z",
+    "submissionId": "1456038c-5a90-4eeb-984c-fb52656d81ea"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-08-09T02:14:04.000Z",
+    "submissionId": "623f3e2e-7cc1-420b-920e-f3c67956c203"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-04-15T09:40:10.000Z",
+    "submissionId": "901dcf2d-b767-43fb-ae9c-9b7032ae16cf"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-10-26T06:18:35.000Z",
+    "submissionId": "eb7fe2a3-0bfa-406c-b3e9-0c5694d6f72a"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2009-09-19T11:56:47.000Z",
+    "submissionId": "d5a4b754-ec52-45f0-a1a8-694e315951a6"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2019-04-28T09:13:46.000Z",
+    "submissionId": "a8fc8b69-d990-4c3d-b407-f7dee8a965b4"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2014-02-27T01:57:14.000Z",
+    "submissionId": "625e33e8-1948-42e3-a362-11a71e9e9da9"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2018-12-03T01:27:08.000Z",
+    "submissionId": "5fc15a74-c8f4-4737-a8cd-bf80c0a486c8"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2012-10-04T12:05:44.000Z",
+    "submissionId": "099cd76a-10e8-4e13-b052-be19796fbb92"
+  },
+  {
+    "event": "SubmissionRejected",
+    "timestamp": "2019-12-27T02:24:01.000Z",
+    "submissionId": "bf309a77-c72e-431b-a0e1-af4b05eefd98"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2018-12-24T02:14:10.000Z",
+    "submissionId": "a3c9a9e1-d9f7-42b2-bd92-819cc9409c63"
+  },
+  {
+    "event": "SubmissionScreeningRTCd",
+    "timestamp": "2017-08-16T06:34:19.000Z",
+    "submissionId": "26c36aa1-6ddd-4711-98c0-bb5aa8b48185"
+  }
+]
