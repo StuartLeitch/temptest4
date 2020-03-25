@@ -9,6 +9,7 @@ import * as create_article_events_table from './migrations/20200304123458_create
 import * as create_checker_events_table from './migrations/20200309150525_create_checker_events_table';
 import * as create_materialized_views from './migrations/create_materialized_views';
 import * as create_journal_to_publisher_table from './migrations/20200311104931_create_journal_to_publisher_table';
+import * as create_superset_helper_functions from './migrations/20200325162543_create_superset_helper_functions';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -24,11 +25,18 @@ function makeViewObject(viewFileExport: any): KnexMigration {
   };
 }
 
-function rebuild_materialized_views(name: string): any {
+/**
+ * Rebuilds views as a migration. Add skip = true after adding a new rebuild materialized view migration.
+ * @param name
+ * @param skip
+ */
+export function rebuild_materialized_views(name: string, skip = false): any {
   return {
     up: async (knex: any) => {
-      await create_materialized_views.down(knex);
-      return create_materialized_views.up(knex);
+      if (!skip) {
+        await create_materialized_views.down(knex);
+        return create_materialized_views.up(knex);
+      }
     },
     down: create_materialized_views.down,
     name
@@ -47,10 +55,18 @@ class KnexMigrationSource {
     remove_submission_data_dates,
     create_article_events_table,
     create_checker_events_table,
-    rebuild_materialized_views('20200310150525_rebuild_materialized_views'),
+    rebuild_materialized_views(
+      '20200310150525_rebuild_materialized_views',
+      true
+    ), // todo delete this
     create_journal_to_publisher_table,
-    rebuild_materialized_views('20200316122800_add_waivers_to_invoices_view'),
-    rebuild_materialized_views('20200323252800_fix_manuscript_view')
+    rebuild_materialized_views(
+      '20200316122800_add_waivers_to_invoices_view',
+      true
+    ),
+    rebuild_materialized_views('20200323252800_fix_manuscript_view', true),
+    create_superset_helper_functions,
+    rebuild_materialized_views('20200323252800_add_ea_dates_manuscript_view')
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

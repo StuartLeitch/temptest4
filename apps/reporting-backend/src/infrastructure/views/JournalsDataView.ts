@@ -16,7 +16,8 @@ AS SELECT journal_events.id AS event_id,
     (journal_events.payload ->> 'isActive'::text)::boolean AS is_active,
     journal_events.payload ->> 'code'::text AS journal_code,
     journal_events.payload ->> 'email'::text AS journal_email,
-    cast_to_timestamp(journal_events.payload ->> 'updated'::text) AS event_date
+    journal_events.time as event_date,
+    cast_to_timestamp(journal_events.payload ->> 'updated'::text) AS updated_date
     FROM ${REPORTING_TABLES.JOURNAL}
 WITH DATA;
     `;
