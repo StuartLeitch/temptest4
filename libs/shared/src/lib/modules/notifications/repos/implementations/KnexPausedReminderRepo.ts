@@ -31,10 +31,12 @@ export class KnexPausedReminderRepo
       .first();
 
     if (!pause) {
-      return mapPauseToDomain(invoiceId);
-    } else {
-      return mapPauseToDomain(invoiceId, pause);
+      throw new Error(
+        `No pause found for invoice with id {${invoiceId.id.toString()}}`
+      );
     }
+
+    return mapPauseToDomain(invoiceId, pause);
   }
 
   async setReminderPauseState(
@@ -44,23 +46,21 @@ export class KnexPausedReminderRepo
   ): Promise<void> {
     const alreadyExists = await this.existsPauseForInvoice(invoiceId);
 
+    if (!alreadyExists) {
+      throw new Error(
+        `No pause found for invoice with id {${invoiceId.id.toString()}}`
+      );
+    }
+
     if (!notificationTypeToPersistance[type]) {
       return;
     }
 
-    if (alreadyExists) {
-      await this.db(TABLES.PAUSED_REMINDERS)
-        .where('invoiceId', invoiceId.id.toString())
-        .update({
-          [notificationTypeToPersistance[type]]: state
-        });
-    } else {
-      const base = emptyPause(invoiceId);
-      base[notificationTypeToPersistance[type]] = state;
-      await this.db(TABLES.PAUSED_REMINDERS).insert(base);
-    }
-
-    return;
+    await this.db(TABLES.PAUSED_REMINDERS)
+      .where('invoiceId', invoiceId.id.toString())
+      .update({
+        [notificationTypeToPersistance[type]]: state
+      });
   }
 
   async insertBasePause(invoiceId: InvoiceId): Promise<NotificationPause> {

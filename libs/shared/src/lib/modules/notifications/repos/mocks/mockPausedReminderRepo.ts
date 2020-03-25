@@ -42,11 +42,7 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     const found = this._items.find(pause => pause.invoiceId.equals(invoiceId));
 
     if (!found) {
-      return {
-        confirmation: false,
-        payment: false,
-        invoiceId
-      };
+      throw new Error('does not exist');
     }
 
     return found;
@@ -76,13 +72,7 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     }
 
     if (index == -1) {
-      const base = {
-        confirmation: false,
-        payment: false,
-        invoiceId
-      };
-      base[notificationTypeToPersistance[type]] = state;
-      this._items.push(base);
+      throw new Error('does not exist');
     }
 
     this._items[index][notificationTypeToPersistance[type]] = state;
