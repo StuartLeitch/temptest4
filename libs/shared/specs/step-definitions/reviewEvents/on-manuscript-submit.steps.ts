@@ -25,6 +25,7 @@ import {MockTransactionRepo} from '../../../src/lib/modules/transactions/repos/m
 import {MockInvoiceRepo} from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import {MockInvoiceItemRepo} from './../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import {MockCatalogRepo} from './../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import {MockPausedReminderRepo} from '../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
 
 const feature = loadFeature(
   '../../features/reviewEvents/on-manuscript-submit.feature',
@@ -38,6 +39,7 @@ defineFeature(feature, test => {
   const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
   const mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
   const mockCatalogRepo: MockCatalogRepo = new MockCatalogRepo();
+  const mockPausedReminderRepo = new MockPausedReminderRepo();
   let result: CreateTransactionResponse;
 
   const manuscriptId = 'manuscript-id';
@@ -51,7 +53,8 @@ defineFeature(feature, test => {
     mockTransactionRepo,
     mockInvoiceRepo,
     mockInvoiceItemRepo,
-    mockCatalogRepo
+    mockCatalogRepo,
+    mockPausedReminderRepo
   );
 
   beforeEach(() => {

@@ -17,6 +17,8 @@ import { TransactionMap } from './../../mappers/TransactionMap';
 // import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
 // import {Article} from '../../../articles/domain/Article';
 // import {ArticleId} from '../../../articles/domain/ArticleId';
+import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
+import { NotificationPause } from '../../../notifications/domain/NotificationPause';
 import { Invoice, InvoiceStatus } from './../../../invoices/domain/Invoice';
 import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
@@ -64,7 +66,8 @@ export class CreateTransactionUsecase
     private transactionRepo: TransactionRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private catalogRepo: CatalogRepoContract
+    private catalogRepo: CatalogRepoContract,
+    private pausedReminderRepo: PausedReminderRepoContract
   ) {}
 
   private async getAccessControlContext(request, context?) {
@@ -141,6 +144,12 @@ ${JSON.stringify(request)}
         );
       }
 
+      const reminderPause: NotificationPause = {
+        invoiceId: invoice.invoiceId,
+        confirmation: false,
+        payment: false
+      };
+
       // ! If no catalog item found for a given journalId
       if (catalogItem) {
         const { amount } = catalogItem;
@@ -151,6 +160,7 @@ ${JSON.stringify(request)}
         await this.invoiceRepo.save(invoice);
         await this.invoiceItemRepo.save(invoiceItem);
         await this.transactionRepo.save(transaction);
+        await this.pausedReminderRepo.save(reminderPause);
 
         console.log(`
 [CreateTransactionUsecase Result Data]:

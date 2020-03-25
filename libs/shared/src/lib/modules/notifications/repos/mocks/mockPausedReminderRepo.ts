@@ -52,6 +52,16 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     return found;
   }
 
+  async insertBasePause(invoiceId: InvoiceId) {
+    const pause: NotificationPause = {
+      invoiceId,
+      confirmation: false,
+      payment: false
+    };
+
+    return this.save(pause);
+  }
+
   async setReminderPauseState(
     invoiceId: InvoiceId,
     state: boolean,

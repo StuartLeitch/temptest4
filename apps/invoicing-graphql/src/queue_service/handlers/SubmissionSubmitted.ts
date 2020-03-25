@@ -57,7 +57,8 @@ export const SubmissionSubmittedHandler = {
         catalog: catalogRepo,
         manuscript: manuscriptRepo,
         coupon: couponRepo,
-        waiver: waiverRepo
+        waiver: waiverRepo,
+        pausedReminder: pausedReminderRepo
       }
     } = this;
 
@@ -217,7 +218,8 @@ export const SubmissionSubmittedHandler = {
         transactionRepo,
         invoiceRepo,
         invoiceItemRepo,
-        catalogRepo
+        catalogRepo,
+        pausedReminderRepo
       );
 
       const result = await createTransactionUsecase.execute(

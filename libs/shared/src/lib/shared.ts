@@ -194,6 +194,8 @@ export * from './modules/notifications/usecases/resumeInvoiceConfirmationReminde
 export * from './modules/notifications/usecases/pauseInvoicePaymentReminders';
 export * from './modules/notifications/usecases/resumeInvoicePaymentReminders';
 export * from './modules/notifications/usecases/getRemindersPauseStateForInvoice';
+export * from './modules/notifications/usecases/addEmptyPauseStateForInvoice';
+export * from './modules/notifications/usecases/scheduleRemindersForExistingInvoices';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';

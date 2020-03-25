@@ -63,6 +63,18 @@ export class KnexPausedReminderRepo
     return;
   }
 
+  async insertBasePause(invoiceId: InvoiceId): Promise<NotificationPause> {
+    const rawPause = emptyPause(invoiceId);
+
+    try {
+      await this.db(TABLES.PAUSED_REMINDERS).insert(rawPause);
+    } catch (e) {
+      throw RepoError.fromDBError(e);
+    }
+
+    return this.getNotificationPausedStatus(invoiceId);
+  }
+
   async save(pause: NotificationPause): Promise<NotificationPause> {
     const rawPause = mapPauseToPersistance(pause);
 
