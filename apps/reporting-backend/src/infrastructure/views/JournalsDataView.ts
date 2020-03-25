@@ -16,6 +16,7 @@ AS SELECT journal_events.id AS event_id,
     (journal_events.payload ->> 'isActive'::text)::boolean AS is_active,
     journal_events.payload ->> 'code'::text AS journal_code,
     journal_events.payload ->> 'email'::text AS journal_email,
+    journal_events.payload ->> 'publisherName'::text AS publisher_name,
     journal_events.time as event_date,
     cast_to_timestamp(journal_events.payload ->> 'updated'::text) AS updated_date
     FROM ${REPORTING_TABLES.JOURNAL}
@@ -26,6 +27,7 @@ WITH DATA;
   postCreateQueries = [
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`,
     `CREATE INDEX ON ${this.getViewName()} (event_date)`,
+    `CREATE INDEX ON ${this.getViewName()} (publisher_name)`,
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id, journal_issn)`
   ];
 

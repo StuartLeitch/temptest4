@@ -8,7 +8,7 @@ SELECT
 	days_since(submission_date) AS days_since_submission,
   screener_name,
   screener_email,
-	review_link (submission_id,manuscript_version_id) review_link
+	review_link(submission_id,manuscript_version_id) as review_link
 FROM
 	manuscripts
 WHERE
