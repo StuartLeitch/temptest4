@@ -78,6 +78,10 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     this._items[index][notificationTypeToPersistance[type]] = state;
   }
 
+  async invoiceIdsWithNoPauseSettings(): Promise<InvoiceId[]> {
+    return [];
+  }
+
   compareMockItems(a: NotificationPause, b: NotificationPause): boolean {
     return a.invoiceId.equals(b.invoiceId);
   }

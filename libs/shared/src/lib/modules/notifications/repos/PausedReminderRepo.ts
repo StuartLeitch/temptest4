@@ -1,12 +1,13 @@
 import { Repo } from '../../../infrastructure/Repo';
 
-import { NotificationType, Notification } from '../domain/Notification';
 import { NotificationPause } from '../domain/NotificationPause';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
+import { NotificationType } from '../domain/Notification';
 
 export interface PausedReminderRepoContract extends Repo<NotificationPause> {
   getNotificationPausedStatus(invoiceId: InvoiceId): Promise<NotificationPause>;
   insertBasePause(invoiceId: InvoiceId): Promise<NotificationPause>;
+  invoiceIdsWithNoPauseSettings(): Promise<InvoiceId[]>;
   setReminderPauseState(
     invoiceId: InvoiceId,
     status: boolean,

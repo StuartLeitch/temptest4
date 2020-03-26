@@ -9,4 +9,70 @@ export namespace ScheduleRemindersForExistingInvoicesErrors {
       });
     }
   }
+
+  export class GetInvoiceIdsWithoutPauseSettingsDbError extends Result<
+    UseCaseError
+  > {
+    constructor(err: Error) {
+      super(false, {
+        message: `While determining the invoice ids for scheduling an error ocurred: ${err.message}`
+      });
+    }
+  }
+
+  export class ConfirmationQueueNameRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The confirmation queue name is required`
+      });
+    }
+  }
+
+  export class ConfirmationJobTypeRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The confirmation job type is required`
+      });
+    }
+  }
+
+  export class ConfirmationDelayRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The confirmation delay is required`
+      });
+    }
+  }
+
+  export class PaymentQueueNameRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The payment queue name is required`
+      });
+    }
+  }
+
+  export class PaymentJobTypeRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The payment job type is required`
+      });
+    }
+  }
+
+  export class PaymentDelayRequiredError extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The payment delay is required`
+      });
+    }
+  }
+
+  export class CreditControlDelayIsRequired extends Result<UseCaseError> {
+    constructor() {
+      super(false, {
+        message: `The credit control delay is required`
+      });
+    }
+  }
 }

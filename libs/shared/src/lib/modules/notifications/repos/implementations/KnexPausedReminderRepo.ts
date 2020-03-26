@@ -13,6 +13,7 @@ import {
   mapPauseToDomain,
   emptyPause
 } from './knexPausedReminderUtils';
+import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'pauseConfirmation',
@@ -101,5 +102,23 @@ export class KnexPausedReminderRepo
       .where('invoiceId', invoiceId.id.toString())
       .first();
     return !!result;
+  }
+
+  async invoiceIdsWithNoPauseSettings(): Promise<InvoiceId[]> {
+    const invoices = await this.db(TABLES.INVOICES)
+      .select('id')
+      .leftJoin(
+        TABLES.PAUSED_REMINDERS,
+        `${TABLES.INVOICES}.id`,
+        '=',
+        `${TABLES.PAUSED_REMINDERS}.invoiceId`
+      )
+      .whereNull(`${TABLES.PAUSED_REMINDERS}.invoiceId`);
+
+    return invoices.map(invoice => {
+      const uuid = new UniqueEntityID(invoice.id);
+      const invoiceId = InvoiceId.create(uuid).getValue();
+      return invoiceId;
+    });
   }
 }

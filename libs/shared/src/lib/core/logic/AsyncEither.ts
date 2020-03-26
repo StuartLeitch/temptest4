@@ -81,6 +81,24 @@ export class AsyncEither<L = null, R = unknown> {
     };
     return (objectMapping[type] || objectMapping.default)(val);
   }
+
+  static async asyncAll<L, R>(
+    eithers: Promise<Either<L, R>>[]
+  ): Promise<Either<L, R[]>> {
+    return Promise.all(eithers).then(flattenEither);
+  }
+
+  static all<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
+    const response: R[] = [];
+    for (const either of eithers) {
+      if (either.isLeft()) {
+        return (either as unknown) as Either<L, R[]>;
+      }
+      response.push(either.value);
+    }
+
+    return right(response);
+  }
 }
 
 export function flattenEither<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {

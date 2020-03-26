@@ -13,13 +13,14 @@ import {
   AuthorizationContext,
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
+
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { NotificationPause } from '../../domain/NotificationPause';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { Invoice } from '../../../invoices/domain/Invoice';
 
 // * Usecase specific
 import { AddEmptyPauseStateForInvoiceResponse as Response } from './addEmptyPauseStateForInvoiceResponse';
@@ -35,7 +36,8 @@ export class AddEmptyPauseStateForInvoiceUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
-    private invoiceRepo: InvoiceRepoContract
+    private invoiceRepo: InvoiceRepoContract,
+    private loggerService: LoggerContract
   ) {
     this.addNewPauseInstance = this.addNewPauseInstance.bind(this);
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
@@ -65,6 +67,8 @@ export class AddEmptyPauseStateForInvoiceUsecase
   ): Promise<
     Either<Errors.InvoiceIdRequiredError | Errors.InvoiceNotFoundError, DTO>
   > {
+    this.loggerService.info(`Validate usecase request data`);
+
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
     }
@@ -77,6 +81,8 @@ export class AddEmptyPauseStateForInvoiceUsecase
   }
 
   private async existsInvoiceWithId(id: string) {
+    this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
+
     const uuid = new UniqueEntityID(id);
     const invoiceId = InvoiceId.create(uuid).getValue();
 
@@ -86,6 +92,10 @@ export class AddEmptyPauseStateForInvoiceUsecase
   private async addNewPauseInstance(
     request: DTO
   ): Promise<Either<Errors.AddPauseDbError, NotificationPause>> {
+    this.loggerService.info(
+      `Add empty pause settings for invoice with id ${request.invoiceId}`
+    );
+
     const uuid = new UniqueEntityID(request.invoiceId);
     const invoiceId = InvoiceId.create(uuid).getValue();
 
