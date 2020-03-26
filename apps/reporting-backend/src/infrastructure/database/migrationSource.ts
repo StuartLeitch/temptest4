@@ -66,7 +66,11 @@ class KnexMigrationSource {
     ),
     rebuild_materialized_views('20200323252800_fix_manuscript_view', true),
     create_superset_helper_functions,
-    rebuild_materialized_views('20200323252800_add_ea_dates_manuscript_view')
+    rebuild_materialized_views(
+      '20200323252800_add_ea_dates_manuscript_view',
+      true
+    ),
+    rebuild_materialized_views('20200325122800_add_id_to_reviewers')
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
