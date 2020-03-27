@@ -28,6 +28,7 @@ import { SchedulerContract } from '../../../../infrastructure/scheduler/Schedule
 
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
@@ -59,6 +60,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private transactionRepo: TransactionRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private loggerService: LoggerContract,
@@ -208,6 +210,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       const usecase = new ResumeInvoiceConfirmationReminderUsecase(
         this.pausedReminderRepo,
         this.invoiceItemRepo,
+        this.transactionRepo,
         this.manuscriptRepo,
         this.invoiceRepo,
         this.loggerService,

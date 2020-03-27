@@ -4,6 +4,7 @@ import { AppError } from '../../../../core/logic/AppError';
 import { ResumeInvoiceConfirmationRemindersErrors } from './resumeInvoiceConfirmationRemindersErrors';
 
 export type ResumeInvoiceConfirmationRemindersResponse = Either<
+  | ResumeInvoiceConfirmationRemindersErrors.CouldNotGetTransactionForInvoiceError
   | ResumeInvoiceConfirmationRemindersErrors.ConfirmationRemindersNotPausedError
   | ResumeInvoiceConfirmationRemindersErrors.ReminderDelayRequiredError
   | ResumeInvoiceConfirmationRemindersErrors.ReminderResumeSaveDbError
