@@ -256,13 +256,13 @@ export class ResumeInvoiceConfirmationReminderUsecase
     );
 
     if (
-      request.transaction.status !== TransactionStatus.DRAFT ||
-      request.invoice.status !== InvoiceStatus.DRAFT
+      request.transaction.status === TransactionStatus.ACTIVE ||
+      request.invoice.status === InvoiceStatus.DRAFT
     ) {
-      return right<null, boolean>(false);
+      return right<null, boolean>(true);
     }
 
-    return right<null, boolean>(true);
+    return right<null, boolean>(false);
   }
 
   private async resume(

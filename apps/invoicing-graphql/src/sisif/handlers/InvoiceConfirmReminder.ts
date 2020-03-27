@@ -20,6 +20,7 @@ export const invoiceConfirmHandler = (
       sentNotifications,
       pausedReminder,
       invoiceItem,
+      transaction,
       manuscript,
       invoice
     },
@@ -31,6 +32,7 @@ export const invoiceConfirmHandler = (
     sentNotifications,
     pausedReminder,
     invoiceItem,
+    transaction,
     manuscript,
     invoice,
     logger,

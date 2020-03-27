@@ -21,6 +21,7 @@ import { SchedulerContract } from '../../../../infrastructure/scheduler/Schedule
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
@@ -29,10 +30,15 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
+import {
+  STATUS as TransactionStatus,
+  Transaction
+} from '../../../transactions/domain/Transaction';
 
 // * Usecase specific
 import { SendInvoiceConfirmationReminderResponse as Response } from './sendInvoiceConfirmationReminderResponse';
@@ -40,6 +46,7 @@ import { SendInvoiceConfirmationReminderErrors as Errors } from './sendInvoiceCo
 import { SendInvoiceConfirmationReminderDTO as DTO } from './sendInvoiceConfirmationReminderDTO';
 
 interface CompoundDTO extends DTO {
+  transaction: Transaction;
   invoice: Invoice;
   paused: boolean;
 }
@@ -55,6 +62,7 @@ export class SendInvoiceConfirmationReminderUsecase
     private sentNotificationRepo: SentNotificationRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private transactionRepo: TransactionRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private loggerService: LoggerContract,
@@ -65,6 +73,7 @@ export class SendInvoiceConfirmationReminderUsecase
     this.saveNotification = this.saveNotification.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.getPauseStatus = this.getPauseStatus.bind(this);
+    this.getTransaction = this.getTransaction.bind(this);
     this.scheduleTask = this.scheduleTask.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
@@ -81,6 +90,7 @@ export class SendInvoiceConfirmationReminderUsecase
         .then(this.validateRequest)
         .then(this.getInvoice(context))
         .then(this.getPauseStatus(context))
+        .then(this.getTransaction(context))
         .advanceOrEnd(this.shouldSendReminder)
         .then(this.sendEmail)
         .then(this.saveNotification)
@@ -172,7 +182,51 @@ export class SendInvoiceConfirmationReminderUsecase
     };
   }
 
-  private async shouldSendReminder({ invoice, paused }: CompoundDTO) {
+  private getTransaction(context: Context) {
+    return async (request: CompoundDTO) => {
+      this.loggerService.info(
+        `Get transaction details for invoice with id ${request.invoice.id.toString()}`
+      );
+
+      const usecase = new GetTransactionUsecase(this.transactionRepo);
+      const transactionId = request.invoice?.transactionId?.id?.toString();
+      try {
+        const result = await usecase.execute({ transactionId }, context);
+
+        if (result.isFailure) {
+          return left<
+            Errors.CouldNotGetTransactionForInvoiceError,
+            CompoundDTO
+          >(
+            new Errors.CouldNotGetTransactionForInvoiceError(
+              request.invoice.id.toString(),
+              new Error(result.errorValue() as any)
+            )
+          );
+        }
+
+        return right<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
+          {
+            ...request,
+            transaction: result.getValue()
+          }
+        );
+      } catch (e) {
+        return left<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
+          new Errors.CouldNotGetTransactionForInvoiceError(
+            request.invoice.id.toString(),
+            e
+          )
+        );
+      }
+    };
+  }
+
+  private async shouldSendReminder({
+    transaction,
+    invoice,
+    paused
+  }: CompoundDTO) {
     this.loggerService.info(
       `Determine if the reminder, of type ${
         NotificationType.REMINDER_CONFIRMATION
@@ -180,6 +234,7 @@ export class SendInvoiceConfirmationReminderUsecase
     );
 
     if (
+      transaction.status === TransactionStatus.ACTIVE &&
       invoice.status === InvoiceStatus.DRAFT &&
       invoice.dateAccepted &&
       !invoice.dateIssued &&
