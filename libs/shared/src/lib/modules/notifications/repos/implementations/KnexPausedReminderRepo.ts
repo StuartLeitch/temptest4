@@ -1,8 +1,10 @@
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
 import { NotificationPause } from '../../domain/NotificationPause';
+import { InvoiceStatus } from '../../../invoices/domain/Invoice';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
 
@@ -13,7 +15,6 @@ import {
   mapPauseToDomain,
   emptyPause
 } from './knexPausedReminderUtils';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'pauseConfirmation',
@@ -113,7 +114,9 @@ export class KnexPausedReminderRepo
         '=',
         `${TABLES.PAUSED_REMINDERS}.invoiceId`
       )
-      .whereNull(`${TABLES.PAUSED_REMINDERS}.invoiceId`);
+      .whereNull(`${TABLES.PAUSED_REMINDERS}.invoiceId`)
+      .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.FINAL)
+      .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.PENDING);
 
     return invoices.map(invoice => {
       const uuid = new UniqueEntityID(invoice.id);
