@@ -1,11 +1,10 @@
 -- R1 - Reviewers Invited on First Version but no Reports Returned
--- added editorial_assistant, editorial_assistant_email, reviewers_invited_count, reviewers_accepted_count, days_since_last_reviewer_invited, days_since_last_reviewer_accepted
+-- added editorial_assistant, editorial_assistant_email, reviewers_invited_count, reviewers_declined_count, reviewers_accepted_count, days_since_last_reviewer_invited, days_since_last_reviewer_accepted
 select
 m.manuscript_custom_id,
   m.article_type,
   format_date(submission_date) AS submission_date,
 	m.journal_name,
-  m.journal_name,
   days_since(submission_date) AS days_since_submission,
   m.version, m.handling_editor, m.handling_editor_email,
   review_link(submission_id,manuscript_version_id) as review_link,
