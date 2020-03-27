@@ -13,7 +13,7 @@ select
   days_since(last_event_date) as days_since_editor_decision,
   reviews.recommendation
  from manuscripts m 
- left join (select * from (select *, row_number() over (partition by mr.manuscript_custom_id order by mr.submitted_date desc) as rn from manuscript_reviews mr ) s where rn = 1) reviews on reviews.manuscript_custom_id = m.manuscript_custom_id
+ left join (select * from (select *, row_number() over (partition by mr.manuscript_custom_id, version order by mr.submitted_date desc) as rn from manuscript_reviews mr ) s where rn = 1) reviews on reviews.manuscript_custom_id = m.manuscript_custom_id and m.version = reviews.version
     where m.last_event_type = 'SubmissionRevisionRequested'
     and final_decision_type is null
 order by submission_date

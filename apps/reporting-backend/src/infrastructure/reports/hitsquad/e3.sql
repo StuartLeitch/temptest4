@@ -19,8 +19,7 @@ SELECT
   m.triage_editor_email
 FROM
 	manuscripts m
-	LEFT JOIN manuscript_reviewers r ON r.manuscript_custom_id = m.manuscript_custom_id
-	LEFT JOIN mts_manuscript_details mts ON mts.manuscript_custom_id = m.manuscript_custom_id
+	LEFT JOIN manuscript_reviewers r ON r.manuscript_custom_id = m.manuscript_custom_id and m.version = r.version
   LEFT JOIN
   (select me.manuscript_custom_id, me.role_type, count(*), max(invited_date) from manuscript_editors me where role_type = 'academicEditor' group by me.manuscript_custom_id, me.role_type) m_editors on m_editors.manuscript_custom_id = m.manuscript_custom_id
   LEFT JOIN
@@ -31,6 +30,4 @@ WHERE
 	AND m.final_decision_type IS NULL
 	AND m.last_event_type NOT LIKE 'SubmissionQualityCheck%'
 	AND m.handling_editor_email IS NOT NULL
-	and(mts.reviewers_invited = 0
-		OR mts.reviewers_invited IS NULL)
 order by submission_Date

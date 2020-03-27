@@ -18,11 +18,11 @@ select
   days_since(reviewers_invited.max_invited_date) as days_since_last_reviewer_invited
  from manuscripts m 
     left join (select manuscript_custom_id, "version", count(*), max(mr.invited_date) as max_invited_date from manuscript_reviewers mr group by manuscript_custom_id, "version") reviewers_invited on m.manuscript_custom_id = reviewers_invited.manuscript_custom_id and m.version = reviewers_invited.version
-    left join (select manuscript_custom_id, "version", count(*) as review_reports_submitted, max(mr.submitted_date) last_review_submission_date from manuscript_reviews mr group by manuscript_custom_id, "version") reviews on reviews.manuscript_custom_id = m.manuscript_custom_id
-    left join (select mr.manuscript_custom_id, count(*) from manuscript_reviewers mr 
+    left join (select manuscript_custom_id, "version", count(*) as review_reports_submitted, max(mr.submitted_date) last_review_submission_date from manuscript_reviews mr group by manuscript_custom_id, "version") reviews on reviews.manuscript_custom_id = m.manuscript_custom_id and m.version = reviews.version
+    left join (select mr.manuscript_custom_id, mr.version, count(*) from manuscript_reviewers mr 
       left join manuscript_reviews reviews on reviews.team_member_id = mr.reviewer_id
       where mr.accepted_date is not null and reviews.team_member_id is null
-      group by mr.manuscript_custom_id) reviewers_accepted_no_sub on m.manuscript_custom_id = reviewers_accepted_no_sub.manuscript_custom_id
+      group by mr.manuscript_custom_id, mr.version) reviewers_accepted_no_sub on m.manuscript_custom_id = reviewers_accepted_no_sub.manuscript_custom_id and reviewers_accepted_no_sub.version = m.version
     left join (select manuscript_custom_id, count(*) as decisions_made from submission_data sd 
         where sd.submission_event in ('SubmissionAccepted', 'SubmissionRejected', 'SubmissionRecommendationToPublishMade', 'SubmissionRecommendationToRejectMade')
         group by manuscript_custom_id
