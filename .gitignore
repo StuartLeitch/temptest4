@@ -49,3 +49,5 @@ Thumbs.db
 .invoicing.backend.gsw.env
 .reporting.backend.env
 *.env
+tools/scripts/aws/sqs/dlq/failedEvents.json
+tools/scripts/aws/sqs/dlq/delete-message-batch.json

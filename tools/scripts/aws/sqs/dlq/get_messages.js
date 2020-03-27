@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-undef */
 /* eslint-disable max-len */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/promise-function-async */
@@ -37,13 +38,14 @@ const main = async () => {
 
     entries.push({
       Id: m.MessageId,
-      ReceiptHandle: m.ReceiptHandle
+      ReceiptHandle: m.ReceiptHandle,
     });
 
     acc.push({
       event,
+      data,
       timestamp: data.timestamp,
-      submissionId: data.data.submissionId
+      submissionId: data.data.submissionId,
     });
     return acc;
   }, []);

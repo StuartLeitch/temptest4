@@ -10,17 +10,17 @@ const categories = events.reduce((acc, e) => {
 
   acc[e.event].push({
     timestamp: e.timestamp,
-    submissionId: e.submissionId
+    customId: e.data.data.customId,
   });
 
   return acc;
 }, {});
 
-Object.keys(categories).forEach(c => {
+Object.keys(categories).forEach((c) => {
   console.info(`${c} event type count: `, categories[c].length);
 
   const ids = categories[c].reduce((acc, e) => {
-    acc.push(e.submissionId);
+    acc.push(e.customId);
     return acc;
   }, []);
   console.info('Ids', ids.join(', '));
