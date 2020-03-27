@@ -15,3 +15,4 @@ select manuscript_custom_id,
  from manuscripts m 
     where m.last_event_type = 'SubmissionAccepted'
     and m.final_decision_type is null
+	order by submission_date
