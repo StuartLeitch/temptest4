@@ -36,6 +36,7 @@ interface InvoiceProps {
   dateUpdated?: Date;
   dateAccepted?: Date;
   dateIssued?: Date;
+  dateMovedToFinal?: Date;
   charge?: number;
   totalNumInvoiceItems?: number;
   erpReference?: string;
@@ -93,6 +94,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set dateAccepted(dateAccepted: Date) {
     this.props.dateAccepted = dateAccepted;
+  }
+
+  get dateMovedToFinal(): Date {
+    return this.props.dateMovedToFinal;
+  }
+
+  set dateMovedToFinal(dateMovedToFinal: Date) {
+    this.props.dateMovedToFinal = dateMovedToFinal;
   }
 
   get invoiceItems(): InvoiceItems {
@@ -227,6 +236,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public markAsFinal(): void {
     const now = new Date();
     this.props.dateUpdated = now;
+    this.props.dateMovedToFinal = now;
     this.props.status = InvoiceStatus.FINAL;
     this.addDomainEvent(new InvoiceFinalizedEvent(this.invoiceId, now));
   }

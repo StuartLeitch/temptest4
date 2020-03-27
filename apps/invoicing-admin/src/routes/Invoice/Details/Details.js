@@ -49,7 +49,7 @@ import {
   TabPane,
   UncontrolledButtonDropdown,
   UncontrolledModal,
-  UncontrolledTabs
+  UncontrolledTabs,
 } from './../../../components';
 import { HeaderMain } from '../../components/HeaderMain';
 // import { HeaderDemo } from '../../components/HeaderDemo';
@@ -228,19 +228,19 @@ const Details = () => {
 
   const { loading, error, data } = useQuery(INVOICE_QUERY, {
     variables: {
-      id
-    }
+      id,
+    },
   });
   const { data: paymentMethods } = useQuery(GET_PAYMENT_METHODS_QUERY);
   const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
   const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
     paymentDate: new Date(),
     paymentAmount: 0,
-    paymentReference: ''
+    paymentReference: '',
   });
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
-    createDraft: false
+    createDraft: false,
   });
 
   if (loading)
@@ -334,13 +334,13 @@ const Details = () => {
                     }
                     onSave={async () => {
                       const {
-                        bankTransferPayment
+                        bankTransferPayment,
                       } = await recordBankTransferPayment({
                         variables: {
                           invoiceId: invoice?.id,
                           payerId: invoice?.payer?.id,
                           paymentMethodId: getPaymentMethods.find(
-                            pm => pm.name === 'Bank Transfer'
+                            (pm) => pm.name === 'Bank Transfer'
                           ).id,
                           amount: parseFloat(
                             bankTransferPaymentData.paymentAmount
@@ -348,8 +348,8 @@ const Details = () => {
                           paymentReference:
                             bankTransferPaymentData.paymentReference,
                           datePaid: bankTransferPaymentData.paymentDate.toISOString(),
-                          markInvoiceAsPaid: false
-                        }
+                          markInvoiceAsPaid: false,
+                        },
                       });
 
                       return toast.success(({ closeToast }) => (
@@ -390,13 +390,13 @@ const Details = () => {
                     }}
                     onSaveAndMarkInvoiceAsFinal={async () => {
                       const {
-                        bankTransferPayment
+                        bankTransferPayment,
                       } = await recordBankTransferPayment({
                         variables: {
                           invoiceId: invoice?.id,
                           payerId: invoice?.payer?.id,
                           paymentMethodId: getPaymentMethods.find(
-                            pm => pm.name === 'Bank Transfer'
+                            (pm) => pm.name === 'Bank Transfer'
                           ).id,
                           amount: parseFloat(
                             bankTransferPaymentData.paymentAmount
@@ -404,8 +404,8 @@ const Details = () => {
                           paymentReference:
                             bankTransferPaymentData.paymentReference,
                           datePaid: bankTransferPaymentData.paymentDate.toISOString(),
-                          markInvoiceAsPaid: true
-                        }
+                          markInvoiceAsPaid: true,
+                        },
                       });
 
                       return toast.success(({ closeToast }) => (
@@ -457,10 +457,10 @@ const Details = () => {
                                 dateFormat='d MMMM yyyy'
                                 customInput={<ButtonInput />}
                                 selected={bankTransferPaymentData.paymentDate}
-                                onChange={date => {
+                                onChange={(date) => {
                                   setBankTransferPaymentData({
                                     ...bankTransferPaymentData,
-                                    paymentDate: date
+                                    paymentDate: date,
                                   });
                                 }}
                               />
@@ -481,11 +481,11 @@ const Details = () => {
                               <Input
                                 placeholder='Amount...'
                                 id='bothAddon'
-                                onChange={e => {
+                                onChange={(e) => {
                                   const { name, value } = e.target;
                                   setBankTransferPaymentData({
                                     ...bankTransferPaymentData,
-                                    paymentAmount: value
+                                    paymentAmount: value,
                                   });
                                 }}
                               />
@@ -511,11 +511,11 @@ const Details = () => {
                           <Col sm={8}>
                             <Input
                               placeholder='Reference'
-                              onChange={e => {
+                              onChange={(e) => {
                                 const { name, value } = e.target;
                                 setBankTransferPaymentData({
                                   ...bankTransferPaymentData,
-                                  paymentReference: value
+                                  paymentReference: value,
                                 });
                               }}
                             />
@@ -531,15 +531,17 @@ const Details = () => {
                 {/* <Button color='secondary' className='mr-2' outline disabled>
                   Split Payment
                 </Button> */}
-                {invoice.creditNote === null && invoice.status === 'ACTIVE' && (
-                  <Button
-                    id='modalCreateCreditNote'
-                    color='danger'
-                    className='mr-2'
-                  >
-                    Create Credit Note
-                  </Button>
-                )}
+                {invoice.creditNote === null &&
+                  (invoice.status === 'ACTIVE' ||
+                    invoice.status === 'FINAL') && (
+                    <Button
+                      id='modalCreateCreditNote'
+                      color='danger'
+                      className='mr-2'
+                    >
+                      Create Credit Note
+                    </Button>
+                  )}
                 <UncontrolledModal target='modalCreateCreditNote' centered>
                   <ModalHeader tag='h4'>Create Credit Note</ModalHeader>
                   <ModalBody>
@@ -554,7 +556,7 @@ const Details = () => {
                               dateFormat='d MMMM yyyy'
                               customInput={<ButtonInput />}
                               selected={new Date()}
-                              onChange={date => {
+                              onChange={(date) => {
                                 // setBankTransferPaymentData({
                                 //   ...bankTransferPaymentData,
                                 //   paymentDate: date
@@ -613,11 +615,11 @@ const Details = () => {
                             type='select'
                             name='createDraft'
                             id='draftReason'
-                            onChange={e => {
+                            onChange={(e) => {
                               const { value } = e.target;
                               setCreditNoteData({
                                 ...creditNoteData,
-                                createDraft: !!value
+                                createDraft: !!value,
                               });
                             }}
                           >
@@ -648,14 +650,14 @@ const Details = () => {
                     >
                       <Button
                         color='primary'
-                        onClick={async e => {
+                        onClick={async (e) => {
                           const {
-                            data: { createCreditNote: creditNote }
+                            data: { createCreditNote: creditNote },
                           } = await recordCreditNote({
                             variables: {
                               ...creditNoteData,
-                              invoiceId: invoice?.id
-                            }
+                              invoiceId: invoice?.id,
+                            },
                           });
 
                           return toast.success(({ closeToast }) => (
@@ -758,7 +760,7 @@ const Details = () => {
                           justifyContent: 'space-between',
                           alignItems: 'flex-start',
                           flexDirection: 'row',
-                          display: 'flex'
+                          display: 'flex',
                         }}
                       >
                         <div style={{ flex: 1 }} className='mr-2'>
@@ -896,7 +898,7 @@ const Details = () => {
                             </td>
                           </tr>
                           {invoice?.invoiceItem?.coupons?.length > 0 &&
-                            invoice.invoiceItem.coupons.map(coupon => (
+                            invoice.invoiceItem.coupons.map((coupon) => (
                               <tr>
                                 <td
                                   colSpan='2'
@@ -927,7 +929,7 @@ const Details = () => {
                               </tr>
                             ))}
                           {invoice?.invoiceItem?.waivers?.length > 0 &&
-                            invoice.invoiceItem.waivers.map(waiver => (
+                            invoice.invoiceItem.waivers.map((waiver) => (
                               <tr>
                                 <td
                                   colSpan='2'
@@ -1005,7 +1007,7 @@ const Details = () => {
                         </span>
                       )}
                       {invoice?.payments?.length > 0 &&
-                        invoice?.payments?.map(payment => {
+                        invoice?.payments?.map((payment) => {
                           const paymentMethod = payment?.paymentMethod?.name;
                           let paymentMethodClassName = '';
                           switch (paymentMethod) {
@@ -1167,7 +1169,7 @@ const Details = () => {
                     badgeColor='success'
                     date={format(
                       invoice?.payments
-                        ?.map(i => new Date(i.datePaid))
+                        ?.map((i) => new Date(i.datePaid))
                         .sort(compareDesc)[0],
                       'dd MMMM yyyy'
                     )}

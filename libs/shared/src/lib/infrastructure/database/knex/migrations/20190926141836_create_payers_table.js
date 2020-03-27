@@ -1,5 +1,7 @@
-module.exports.up = function(knex) {
-  return knex.schema.createTable('payers', function(table) {
+/* eslint-disable no-undef */
+
+module.exports.up = function (knex) {
+  return knex.schema.createTable('payers', function (table) {
     table.string('id', 40).primary();
     table.string('invoiceId', 40);
     table.string('title');
@@ -12,10 +14,10 @@ module.exports.up = function(knex) {
     table.string('shippingAddressId');
     table.string('billingAddressId');
     table.string('vatId');
-    table.datetime('dateAdded', {precision: 2, useTz: false});
+    table.datetime('dateAdded', { precision: 2, useTz: false });
   });
 };
 
-module.exports.down = function(knex) {
+module.exports.down = function (knex) {
   return knex.schema.dropTable('payers');
 };

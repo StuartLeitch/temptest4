@@ -28,7 +28,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
 
     logger.debug('select', {
       correlationId,
-      sql: invoice.toString()
+      sql: invoice.toString(),
     });
 
     if (!invoice) {
@@ -94,7 +94,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return {
       totalCount: totalCount[0]['count'],
       // draftCount: draftCount[0]['count'],
-      invoices: invoices.map(i => InvoiceMap.toDomain(i))
+      invoices: invoices.map((i) => InvoiceMap.toDomain(i)),
     };
   }
 
@@ -106,7 +106,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .select()
       .where('transactionId', transactionId.id.toString());
 
-    return invoices.map(i => InvoiceMap.toDomain(i));
+    return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
   async findByCancelledInvoiceReference(
@@ -152,7 +152,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
           ) referenceNumbers), 1)
         `,
           [`${currentYear}-01-01`, `${currentYear}-12-31`]
-        )
+        ),
       });
 
     if (!updated) {
@@ -216,13 +216,13 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .select()
       .whereNot(`deleted`, 1)
       .where({
-        status: 'ACTIVE'
+        status: 'ACTIVE',
       })
       // filter the credit notes from this list
       .whereNull('cancelledInvoiceReference')
       .whereNull('erpReference');
 
-    return invoices.map(i => InvoiceMap.toDomain(i));
+    return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
   async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
@@ -246,7 +246,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .whereNotNull('invoices.erpReference')
       .whereNotNull('articles.datePublished');
 
-    return invoices.map(i =>
+    return invoices.map((i) =>
       InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
     );
   }
@@ -340,6 +340,6 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .offset(page * pageSize)
       .limit(pageSize);
 
-    return (await aa).map(item => item.invoiceId);
+    return (await aa).map((item) => item.invoiceId);
   }
 }

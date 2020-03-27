@@ -8,9 +8,11 @@ import {
 
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceActivated } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceActivatedEvent';
+import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { PublishInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceConfirmed';
+import { PublishInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceFinalized';
 import { PublishInvoicePaid } from '../../../../libs/shared/src/lib/modules/invoices/usecases/PublishInvoicePaid/publishInvoicePaid';
 import { PublishInvoiceCredited } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
@@ -62,6 +64,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       queue
     );
     const publishInvoiceActivated = new PublishInvoiceConfirmed(queue);
+    const publishInvoiceFinalized = new PublishInvoiceFinalized(queue);
     const publishInvoicePaid = new PublishInvoicePaid(queue);
     const publishInvoiceCredited = new PublishInvoiceCredited(queue);
 
@@ -80,6 +83,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       invoiceItem,
       coupon,
       waiver,
+      payer,
       manuscript,
       address,
       publishInvoiceCredited
@@ -95,6 +99,18 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       publishInvoiceActivated,
       publishInvoiceToErpUsecase,
+      loggerService
+    );
+
+    // tslint:disable-next-line: no-unused-expression
+    new AfterInvoiceFinalized(
+      invoiceItem,
+      coupon,
+      waiver,
+      payer,
+      address,
+      manuscript,
+      publishInvoiceFinalized,
       loggerService
     );
 
