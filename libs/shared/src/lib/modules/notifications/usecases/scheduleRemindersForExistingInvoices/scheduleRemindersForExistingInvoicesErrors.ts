@@ -28,14 +28,6 @@ export namespace ScheduleRemindersForExistingInvoicesErrors {
     }
   }
 
-  export class ConfirmationJobTypeRequiredError extends Result<UseCaseError> {
-    constructor() {
-      super(false, {
-        message: `The confirmation job type is required`
-      });
-    }
-  }
-
   export class ConfirmationDelayRequiredError extends Result<UseCaseError> {
     constructor() {
       super(false, {
@@ -52,14 +44,6 @@ export namespace ScheduleRemindersForExistingInvoicesErrors {
     }
   }
 
-  export class PaymentJobTypeRequiredError extends Result<UseCaseError> {
-    constructor() {
-      super(false, {
-        message: `The payment job type is required`
-      });
-    }
-  }
-
   export class PaymentDelayRequiredError extends Result<UseCaseError> {
     constructor() {
       super(false, {
@@ -72,6 +56,14 @@ export namespace ScheduleRemindersForExistingInvoicesErrors {
     constructor() {
       super(false, {
         message: `The credit control delay is required`
+      });
+    }
+  }
+
+  export class ScheduleCreditControlReminderError extends Result<UseCaseError> {
+    constructor(err: Error) {
+      super(false, {
+        message: `While scheduling the credit control reminder an error ocurred: ${err.message}`
       });
     }
   }

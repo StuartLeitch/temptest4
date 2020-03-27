@@ -1,4 +1,9 @@
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+import {
+  SchedulingTime,
+  SisifJobTypes,
+  TimerBuilder,
+  JobBuilder
+} from '@hindawi/sisif';
 
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
@@ -21,25 +26,19 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
-
 import { ResumeInvoiceConfirmationReminderUsecase } from '../resumeInvoiceConfirmationReminders';
 import { PauseInvoiceConfirmationRemindersUsecase } from '../pauseInvoiceConfirmationReminders';
 import { ResumeInvoicePaymentReminderUsecase } from '../resumeInvoicePaymentReminders';
 import { AddEmptyPauseStateForInvoiceUsecase } from '../addEmptyPauseStateForInvoice';
 import { PauseInvoicePaymentRemindersUsecase } from '../pauseInvoicePaymentReminders';
-
-import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { NotificationType } from '../../domain/Notification';
 
 // * Usecase specific
 import { ScheduleRemindersForExistingInvoicesResponse as Response } from './scheduleRemindersForExistingInvoicesResponse';
@@ -65,17 +64,16 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     private loggerService: LoggerContract,
     private scheduler: SchedulerContract
   ) {
-    this.resumeConfirmationReminders = this.resumeConfirmationReminders.bind(
-      this
-    );
-    this.pauseConfirmationReminders = this.pauseConfirmationReminders.bind(
-      this
-    );
+    this.scheduleOneCreditControl = this.scheduleOneCreditControl.bind(this);
+    this.scheduleAllCreditControl = this.scheduleAllCreditControl.bind(this);
     this.getUnscheduledInvoices = this.getUnscheduledInvoices.bind(this);
-    this.resumePaymentReminders = this.resumePaymentReminders.bind(this);
-    this.pausePaymentReminders = this.pausePaymentReminders.bind(this);
+    this.resumeConfirmation = this.resumeConfirmation.bind(this);
+    this.pauseConfirmation = this.pauseConfirmation.bind(this);
     this.addPauseSettings = this.addPauseSettings.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
+    this.resumePayment = this.resumePayment.bind(this);
+    this.pausePayment = this.pausePayment.bind(this);
+    this.scheduleJob = this.scheduleJob.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -89,9 +87,10 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         .then(this.validateRequest)
         .then(this.getUnscheduledInvoices)
         .then(this.addPauseSettings(context))
-        .then(this.pauseConfirmationReminders(context))
-        .then(this.resumeConfirmationReminders(context))
-        .then(this.resumePaymentReminders(context))
+        .then(this.pauseConfirmation(context))
+        .then(this.resumeConfirmation(context))
+        .then(this.resumePayment(context))
+        .then(this.scheduleAllCreditControl(context))
         .map(() => Result.ok<void>(null));
 
       return execution.execute();
@@ -105,20 +104,15 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   ): Promise<
     Either<
       | Errors.ConfirmationQueueNameRequiredError
-      | Errors.ConfirmationJobTypeRequiredError
       | Errors.ConfirmationDelayRequiredError
       | Errors.PaymentQueueNameRequiredError
       | Errors.CreditControlDelayIsRequired
-      | Errors.PaymentJobTypeRequiredError
       | Errors.PaymentDelayRequiredError,
       DTO
     >
   > {
     if (!request.confirmationDelay) {
       return left(new Errors.ConfirmationDelayRequiredError());
-    }
-    if (!request.confirmationJobType) {
-      return left(new Errors.ConfirmationJobTypeRequiredError());
     }
     if (!request.confirmationQueueName) {
       return left(new Errors.ConfirmationQueueNameRequiredError());
@@ -128,9 +122,6 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     }
     if (!request.paymentDelay) {
       return left(new Errors.PaymentDelayRequiredError());
-    }
-    if (!request.paymentJobType) {
-      return left(new Errors.PaymentJobTypeRequiredError());
     }
     if (!request.paymentQueueName) {
       return left(new Errors.PaymentQueueNameRequiredError());
@@ -181,7 +172,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private pauseConfirmationReminders(context: Context) {
+  private pauseConfirmation(context: Context) {
     return async (request: InvoiceIdsDTO) => {
       this.loggerService.info(
         `Pausing the confirmation reminders for the selected invoice ids`
@@ -202,7 +193,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private resumeConfirmationReminders(context: Context) {
+  private resumeConfirmation(context: Context) {
     return async (request: InvoiceIdsDTO) => {
       this.loggerService.info(
         `Resume the confirmation reminders for the selected invoice ids`
@@ -211,9 +202,9 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       const {
         confirmationQueueName: queueName,
         confirmationDelay: reminderDelay,
-        confirmationJobType: jobType,
         invoiceIds
       } = request;
+      const jobType = SisifJobTypes.InvoiceConfirmReminder;
       const usecase = new ResumeInvoiceConfirmationReminderUsecase(
         this.pausedReminderRepo,
         this.invoiceItemRepo,
@@ -234,7 +225,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private pausePaymentReminders(context: Context) {
+  private pausePayment(context: Context) {
     return async (request: InvoiceIdsDTO) => {
       this.loggerService.info(
         `Pausing the payment reminders for the selected invoice ids`
@@ -255,7 +246,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private resumePaymentReminders(context: Context) {
+  private resumePayment(context: Context) {
     return async (request: InvoiceIdsDTO) => {
       this.loggerService.info(
         `Resuming the payment reminders for the selected invoice ids`
@@ -264,9 +255,9 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       const {
         invoiceIds,
         paymentDelay: reminderDelay,
-        paymentJobType: jobType,
         paymentQueueName: queueName
       } = request;
+      const jobType = SisifJobTypes.InvoicePaymentReminder;
       const usecase = new ResumeInvoicePaymentReminderUsecase(
         this.pausedReminderRepo,
         this.invoiceItemRepo,
@@ -276,11 +267,74 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.scheduler
       );
       const results = invoiceIds.map(invoiceId =>
-        usecase.execute({ invoiceId, jobType, queueName, reminderDelay })
+        usecase.execute(
+          { invoiceId, jobType, queueName, reminderDelay },
+          context
+        )
       );
       const aggregated = await AsyncEither.asyncAll(results);
 
       return aggregated.map(() => request);
+    };
+  }
+
+  private scheduleAllCreditControl(context: Context) {
+    return async (request: InvoiceIdsDTO) => {
+      this.loggerService.info(`Scheduling the credit control reminder`);
+
+      const { invoiceIds, creditControlDelay, paymentQueueName } = request;
+      const usecase = new GetManuscriptByInvoiceIdUsecase(
+        this.manuscriptRepo,
+        this.invoiceItemRepo
+      );
+      const scheduleForInvoice = this.scheduleOneCreditControl(
+        usecase,
+        paymentQueueName,
+        creditControlDelay,
+        context
+      );
+      const results = invoiceIds.map(scheduleForInvoice);
+      const aggregated = await AsyncEither.asyncAll(results);
+
+      return aggregated.map(() => request);
+    };
+  }
+
+  private scheduleOneCreditControl(
+    getManuscriptUsecase: GetManuscriptByInvoiceIdUsecase,
+    queueName: string,
+    delay: number,
+    context: Context
+  ) {
+    return (invoiceId: string) => {
+      const execution = new AsyncEither(invoiceId)
+        .then(invoiceId => getManuscriptUsecase.execute({ invoiceId }, context))
+        .map(result => result.getValue()[0])
+        .then(
+          this.scheduleJob(
+            SisifJobTypes.InvoiceCreditControlReminder,
+            queueName,
+            delay
+          )
+        );
+      return execution.execute();
+    };
+  }
+
+  private scheduleJob(jobType: string, queueName: string, delay: number) {
+    return async (manuscript: Manuscript) => {
+      const jobData = PayloadBuilder.authorReminder(manuscript);
+      const job = JobBuilder.basic(jobType, jobData);
+      const timer = TimerBuilder.delayed(delay, SchedulingTime.Day);
+
+      try {
+        await this.scheduler.schedule(job, queueName, timer);
+        return right<Errors.ScheduleCreditControlReminderError, null>(null);
+      } catch (e) {
+        return left<Errors.ScheduleCreditControlReminderError, null>(
+          new Errors.ScheduleCreditControlReminderError(e)
+        );
+      }
     };
   }
 }
