@@ -14,9 +14,14 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+import {
+  SchedulingTime,
+  SisifJobTypes,
+  TimerBuilder,
+  JobBuilder
+} from '@hindawi/sisif';
 
-import { AuthorReminderPayload } from '../../../../infrastructure/message-queues/payloads';
+import { InvoiceReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import {
@@ -336,14 +341,14 @@ export class SendInvoicePaymentReminderUsecase
     );
 
     const { job: jobData } = request;
-    const data: AuthorReminderPayload = {
+    const data: InvoiceReminderPayload = {
       manuscriptCustomId: request.manuscriptCustomId,
       recipientEmail: request.recipientEmail,
       recipientName: request.recipientName
     };
 
     const timer = TimerBuilder.delayed(jobData.delay, SchedulingTime.Day);
-    const newJob = JobBuilder.basic(jobData.type, data);
+    const newJob = JobBuilder.basic(SisifJobTypes.InvoicePaymentReminder, data);
 
     try {
       await this.scheduler.schedule(newJob, jobData.queueName, timer);

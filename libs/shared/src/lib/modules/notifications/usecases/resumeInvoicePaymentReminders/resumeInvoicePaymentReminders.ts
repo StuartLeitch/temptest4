@@ -232,7 +232,18 @@ export class ResumeInvoicePaymentReminderUsecase
     );
 
     const { reminderDelay, manuscript, queueName, jobType, invoice } = request;
-    const data = PayloadBuilder.authorReminder(manuscript);
+    const {
+      authorFirstName,
+      authorSurname,
+      authorEmail,
+      customId
+    } = manuscript;
+    const data = PayloadBuilder.invoiceReminder(
+      customId,
+      authorEmail,
+      authorFirstName,
+      authorSurname
+    );
     const remainingDelay = this.calculateRemainingDelay(
       invoice.dateAccepted,
       reminderDelay

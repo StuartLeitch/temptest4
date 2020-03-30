@@ -1,1 +1,1 @@
-export * from './AuthorReminderPayload';
+export * from './InvoiceReminderPayload';

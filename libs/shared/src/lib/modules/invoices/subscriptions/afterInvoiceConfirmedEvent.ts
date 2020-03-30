@@ -16,11 +16,13 @@ import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
 import { InvoiceConfirmed } from '../domain/events/invoiceConfirmed';
+
+import { Manuscript } from '../../manuscripts/domain/Manuscript';
+import { Payer } from '../../payers/domain/Payer';
+
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
-import { Manuscript } from '../../manuscripts/domain/Manuscript';
 import { ArticleRepoContract } from '../../manuscripts/repos';
-
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 import { InvoiceItemRepoContract } from '../repos';
@@ -101,7 +103,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         );
       }
 
-      await this.scheduleReminders(manuscript);
+      await this.scheduleReminders(manuscript, payer);
 
       await this.publishInvoiceConfirmed.execute(
         invoice,
@@ -138,8 +140,13 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     }
   }
 
-  private async scheduleReminders(manuscript: Manuscript) {
-    const jobData = PayloadBuilder.authorReminder(manuscript);
+  private async scheduleReminders(manuscript: Manuscript, payer: Payer) {
+    const jobData = PayloadBuilder.invoiceReminder(
+      manuscript.customId,
+      payer.email.value,
+      payer.name.value,
+      ''
+    );
     const jobPaymentReminder = JobBuilder.basic(
       SisifJobTypes.InvoicePaymentReminder,
       jobData

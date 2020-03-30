@@ -11,7 +11,7 @@ import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 export const invoiceCreditControlHandler = (
-  payload: JobData<QueuePayloads.AuthorReminderPayload>,
+  payload: JobData<QueuePayloads.InvoiceReminderPayload>,
   appContext: any,
   loggerService: Logger
 ) => {

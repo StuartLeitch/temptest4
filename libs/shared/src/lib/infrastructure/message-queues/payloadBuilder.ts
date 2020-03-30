@@ -1,13 +1,16 @@
-import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
-
-import { AuthorReminderPayload } from './payloads';
+import { InvoiceReminderPayload } from './payloads';
 
 export class PayloadBuilder {
-  static authorReminder(manuscript: Manuscript): AuthorReminderPayload {
+  static invoiceReminder(
+    manuscriptCustomId: string,
+    email: string,
+    firstName: string,
+    lastName: string
+  ): InvoiceReminderPayload {
     return {
-      manuscriptCustomId: manuscript.customId,
-      recipientEmail: manuscript.authorEmail,
-      recipientName: `${manuscript.authorFirstName} ${manuscript.authorSurname}`
+      manuscriptCustomId: manuscriptCustomId,
+      recipientEmail: email,
+      recipientName: `${firstName} ${lastName}`
     };
   }
 }

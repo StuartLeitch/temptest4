@@ -7,6 +7,5 @@ export interface SendInvoicePaymentReminderDTO {
   job: {
     queueName: string;
     delay: number;
-    type: string;
   };
 }

@@ -11,7 +11,7 @@ import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 export const invoiceConfirmHandler = (
-  payload: JobData<QueuePayloads.AuthorReminderPayload>,
+  payload: JobData<QueuePayloads.InvoiceReminderPayload>,
   appContext: any,
   loggerService: Logger
 ) => {
@@ -46,8 +46,7 @@ export const invoiceConfirmHandler = (
   const request: SendInvoiceConfirmationReminderDTO = {
     job: {
       delay: env.scheduler.confirmationReminderDelay,
-      queueName: env.scheduler.emailRemindersQueue,
-      type: SisifJobTypes.InvoiceConfirmReminder
+      queueName: env.scheduler.emailRemindersQueue
     },
     senderEmail: env.app.invoicePaymentEmailSenderAddress,
     senderName: env.app.invoicePaymentEmailSenderName,

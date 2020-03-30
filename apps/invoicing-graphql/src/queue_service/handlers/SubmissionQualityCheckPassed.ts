@@ -98,7 +98,7 @@ export const SubmissionQualityCheckPassedHandler = {
       throw result.value.error;
     }
 
-    const jobData: QueuePayloads.ReminderPayload = {
+    const jobData: QueuePayloads.InvoiceReminderPayload = {
       recipientName: `${givenNames} ${surname}`,
       manuscriptCustomId: customId,
       recipientEmail: email

@@ -325,8 +325,18 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   }
 
   private scheduleJob(jobType: string, queueName: string, delay: number) {
-    return async (manuscript: Manuscript) => {
-      const jobData = PayloadBuilder.authorReminder(manuscript);
+    return async ({
+      authorFirstName,
+      authorSurname,
+      authorEmail,
+      customId
+    }: Manuscript) => {
+      const jobData = PayloadBuilder.invoiceReminder(
+        customId,
+        authorEmail,
+        authorFirstName,
+        authorSurname
+      );
       const job = JobBuilder.basic(jobType, jobData);
       const timer = TimerBuilder.delayed(delay, SchedulingTime.Day);
 
