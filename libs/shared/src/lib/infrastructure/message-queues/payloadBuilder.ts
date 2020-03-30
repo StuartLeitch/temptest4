@@ -7,10 +7,11 @@ export class PayloadBuilder {
     firstName: string,
     lastName: string
   ): InvoiceReminderPayload {
+    const name = lastName ? `${firstName} ${lastName}` : firstName;
     return {
       manuscriptCustomId: manuscriptCustomId,
       recipientEmail: email,
-      recipientName: `${firstName} ${lastName}`
+      recipientName: name
     };
   }
 }

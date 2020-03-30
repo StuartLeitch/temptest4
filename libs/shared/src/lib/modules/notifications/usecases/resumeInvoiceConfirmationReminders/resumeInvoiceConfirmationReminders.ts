@@ -1,4 +1,9 @@
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+import {
+  SchedulingTime,
+  SisifJobTypes,
+  TimerBuilder,
+  JobBuilder
+} from '@hindawi/sisif';
 
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
@@ -291,7 +296,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
       `Schedule the next job for sending reminders of type ${NotificationType.REMINDER_CONFIRMATION} for invoice with id ${request.invoiceId}`
     );
 
-    const { reminderDelay, manuscript, queueName, jobType, invoice } = request;
+    const { reminderDelay, manuscript, queueName, invoice } = request;
     const {
       authorFirstName,
       authorSurname,
@@ -309,7 +314,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
       reminderDelay
     );
     const timer = TimerBuilder.delayed(remainingDelay, SchedulingTime.Day);
-    const newJob = JobBuilder.basic(jobType, data);
+    const newJob = JobBuilder.basic(SisifJobTypes.InvoiceConfirmReminder, data);
 
     try {
       await this.scheduler.schedule(newJob, queueName, timer);

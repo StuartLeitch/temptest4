@@ -1,4 +1,9 @@
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+import {
+  SchedulingTime,
+  SisifJobTypes,
+  TimerBuilder,
+  JobBuilder
+} from '@hindawi/sisif';
 
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
@@ -24,16 +29,19 @@ import { SchedulerContract } from '../../../../infrastructure/scheduler/Schedule
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
+import { Payer } from '../../../payers/domain/Payer';
 
 // * Usecase specific
 import { ResumeInvoicePaymentRemindersResponse as Response } from './resumeInvoicePaymentRemindersResponse';
@@ -43,6 +51,7 @@ import { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentR
 interface CompoundDTO extends DTO {
   manuscript: Manuscript;
   invoice: Invoice;
+  payer: Payer;
 }
 
 type Context = AuthorizationContext<Roles>;
@@ -57,6 +66,7 @@ export class ResumeInvoicePaymentReminderUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
+    private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract,
     private scheduler: SchedulerContract
   ) {
@@ -69,6 +79,7 @@ export class ResumeInvoicePaymentReminderUsecase
     this.getManuscript = this.getManuscript.bind(this);
     this.scheduleJob = this.scheduleJob.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
+    this.getPayer = this.getPayer.bind(this);
     this.resume = this.resume.bind(this);
   }
 
@@ -84,6 +95,7 @@ export class ResumeInvoicePaymentReminderUsecase
         .then(this.validatePauseState(context))
         .then(this.getInvoice(context))
         .then(this.getManuscript(context))
+        .then(this.getPayer(context))
         .advanceOrEnd(this.shouldResumeReminder)
         .then(this.resume)
         .advanceOrEnd(this.shouldScheduleJob)
@@ -205,6 +217,28 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
+  private getPayer(context: Context) {
+    return async (request: CompoundDTO) => {
+      const usecase = new GetPayerDetailsByInvoiceIdUsecase(
+        this.payerRepo,
+        this.loggerService
+      );
+
+      const { invoiceId } = request;
+      const maybeResult = await usecase.execute(
+        {
+          invoiceId
+        },
+        context
+      );
+
+      return maybeResult.map(result => ({
+        ...request,
+        payer: result.getValue()
+      }));
+    };
+  }
+
   private async resume(
     request: CompoundDTO
   ): Promise<Either<Errors.ReminderResumeSaveDbError, CompoundDTO>> {
@@ -231,25 +265,20 @@ export class ResumeInvoicePaymentReminderUsecase
       `Schedule the next job for sending reminders of type ${NotificationType.REMINDER_PAYMENT} for invoice with id ${request.invoiceId}`
     );
 
-    const { reminderDelay, manuscript, queueName, jobType, invoice } = request;
-    const {
-      authorFirstName,
-      authorSurname,
-      authorEmail,
-      customId
-    } = manuscript;
+    const { reminderDelay, manuscript, queueName, invoice, payer } = request;
+    const { email, name } = payer;
     const data = PayloadBuilder.invoiceReminder(
-      customId,
-      authorEmail,
-      authorFirstName,
-      authorSurname
+      manuscript.customId,
+      email.value,
+      name.value,
+      ''
     );
     const remainingDelay = this.calculateRemainingDelay(
       invoice.dateAccepted,
       reminderDelay
     );
     const timer = TimerBuilder.delayed(remainingDelay, SchedulingTime.Day);
-    const newJob = JobBuilder.basic(jobType, data);
+    const newJob = JobBuilder.basic(SisifJobTypes.InvoicePaymentReminder, data);
 
     try {
       await this.scheduler.schedule(newJob, queueName, timer);
