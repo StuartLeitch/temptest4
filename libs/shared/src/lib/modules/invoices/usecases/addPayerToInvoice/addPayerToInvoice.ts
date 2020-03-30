@@ -30,6 +30,9 @@ import { PayerMap } from './../../../payers/mapper/Payer';
 
 export type AddPayerToInvoiceContext = AuthorizationContext<Roles>;
 
+/**
+ * @deprecated do not use, will break stuff
+ */
 export class AddPayerToInvoiceUsecase
   implements
     UseCase<
@@ -64,59 +67,60 @@ export class AddPayerToInvoiceUsecase
     let waivers: WaiverCollection;
 
     // * get a proper InvoiceId
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    // const invoiceId = InvoiceId.create(
+    //   new UniqueEntityID(request.invoiceId)
+    // ).getValue();
 
-    try {
-      try {
-        payer = PayerMap.toDomain({
-          ...request.payer
-        });
-      } catch (err) {
-        return left(
-          new AddPayerToInvoiceErrors.InvoiceNotFoundError(
-            invoiceId.id.toString()
-          )
-        );
-      }
+    // try {
+    //   try {
+    //     payer = PayerMap.toDomain({
+    //       ...request.payer
+    //     });
+    //   } catch (err) {
+    //     return left(
+    //       new AddPayerToInvoiceErrors.InvoiceNotFoundError(
+    //         invoiceId.id.toString()
+    //       )
+    //     );
+    //   }
 
-      await this.payerRepo.save(payer);
+    //   await this.payerRepo.save(payer);
 
-      try {
-        invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
-      } catch (err) {
-        return left(
-          new AddPayerToInvoiceErrors.InvoiceNotFoundError(
-            invoiceId.id.toString()
-          )
-        );
-      }
+    //   try {
+    //     invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+    //   } catch (err) {
+    //     return left(
+    //       new AddPayerToInvoiceErrors.InvoiceNotFoundError(
+    //         invoiceId.id.toString()
+    //       )
+    //     );
+    //   }
 
-      invoice.payerId = payer.payerId;
+    //   invoice.payerId = payer.payerId;
 
-      // * Mark invoice as ACTIVE
-      invoice.markAsActive();
+    //   // * Mark invoice as ACTIVE
+    //   invoice.markAsActive();
 
-      // * System identifies the associated waivers, if any
-      waivers = await this.waiverRepo.getWaiversByInvoiceId(invoiceId);
+    //   // * System identifies the associated waivers, if any
+    //   waivers = await this.waiverRepo.getWaiversByInvoiceId(invoiceId);
 
-      let invoiceCharge = invoice.getInvoiceTotal();
-      waivers.forEach((waiver: any) => {
-        const percentage = waiver.percentage;
-        invoiceCharge -= invoiceCharge * percentage;
-      });
-      invoice.charge = invoiceCharge;
+    //   let invoiceCharge = invoice.getInvoiceTotal();
+    //   waivers.forEach((waiver: any) => {
+    //     const percentage = waiver.percentage;
+    //     invoiceCharge -= invoiceCharge * percentage;
+    //   });
+    //   invoice.charge = invoiceCharge;
 
-      // * Save the newly calculated charge
-      await this.invoiceRepo.update(invoice);
+    //   // * Save the newly calculated charge
+    //   await this.invoiceRepo.update(invoice);
 
-      // * Save the associated VAT scheme
-      await this.invoiceRepo.update(invoice);
+    //   // * Save the associated VAT scheme
+    //   await this.invoiceRepo.update(invoice);
 
-      return right(Result.ok<Invoice>(invoice));
-    } catch (err) {
-      return left(new AppError.UnexpectedError(err));
-    }
+    //   return right(Result.ok<Invoice>(invoice));
+    // } catch (err) {
+    //   return left(new AppError.UnexpectedError(err));
+    // }
+    return right(Result.ok(null));
   }
 }
