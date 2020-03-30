@@ -9,12 +9,18 @@ import {
   toNumber,
   toBool
 } from './lib/env';
+import { ConsumerTransport } from './contants';
+
+const consumerTransport: ConsumerTransport =
+  (getOsEnvOptional('CONSUMER_TRANSPORT') as ConsumerTransport) ||
+  ConsumerTransport.SQS;
 
 export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
   isTest: process.env.NODE_ENV === 'test',
   isDevelopment: process.env.NODE_ENV === 'development',
+  consumerTransport,
   app: {
     name: getOsEnv('SERVICE_NAME'),
     version: (pkg as any).version,
@@ -29,7 +35,7 @@ export const env = {
     output: getOsEnv('LOG_OUTPUT')
   },
   aws: {
-    sqs: {
+    sqs: consumerTransport === ConsumerTransport.SQS && {
       apiVersion: getOsEnv('AWS_SQS_API_VERSION'),
       accessKey: getOsEnv('AWS_SQS_ACCESS_KEY'),
       secretKey: getOsEnv('AWS_SQS_SECRET_KEY'),
@@ -43,5 +49,8 @@ export const env = {
       secretKey: getOsEnv('AWS_S3_SECRET_KEY'),
       region: getOsEnv('AWS_S3_REGION')
     }
+  },
+  consumerHttp: consumerTransport === ConsumerTransport.HTTP && {
+    host: getOsEnv('CONSUMER_HOST')
   }
 };

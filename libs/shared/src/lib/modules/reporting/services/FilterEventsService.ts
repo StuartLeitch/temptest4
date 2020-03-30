@@ -32,6 +32,7 @@ export class FilterEventsService {
       if (isLongEvent) {
         try {
           const [Bucket, Key] = parsedEvent.data.split('::');
+          logger.debug(`Getting event from bucket: ${Bucket}, key: ${Key}`);
           parsedEvent.data = JSON.parse(
             await s3Service
               .getObject({ Bucket, Key })

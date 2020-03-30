@@ -1,3 +1,4 @@
+export * from './core/consumer/implementations/http-publish';
 export * from './core/consumer/implementations/sqs-publish';
 export * from './core/consumer/consumer';
 

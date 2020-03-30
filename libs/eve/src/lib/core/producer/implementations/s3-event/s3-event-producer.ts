@@ -26,7 +26,7 @@ export class S3EventProducer implements Producer<Event, string> {
     this.s3 = s3;
   }
 
-  async *produce(): AsyncGenerator<Event, void, undefined> {
+  async *produce(): AsyncGenerator<Event[], void, undefined> {
     const keys = this.getS3ObjectKeys();
 
     for await (const key of keys) {
@@ -34,7 +34,7 @@ export class S3EventProducer implements Producer<Event, string> {
       const events = splitS3ObjectIntoEvents(contents)
         .filter(this.checkFilters.bind(this))
         .map(event => Object.assign(cloneDeep(this.defaultValues), event));
-      yield* events;
+      yield events;
     }
   }
 
