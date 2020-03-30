@@ -1,5 +1,5 @@
 -- E7 - At least one Report submitted on Revised Version but no Recommendation from Academic Editor
--- added editorial_assistant, reviewers_invited_count, reviewers_accepted_with_no_submissions, review_reports_count, editorial_assistant_email, days_since_current_version_submission
+-- added editorial_assistant, editorial_assistant_email, reviewers_invited_count, reviewers_accepted_with_no_submissions, review_reports_count, days_since_current_version_submission, days_since_last_review_report, days_since_last_reviewer_invited
 
 select 
   m.manuscript_custom_id,

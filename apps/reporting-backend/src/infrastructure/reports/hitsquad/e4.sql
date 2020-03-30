@@ -13,7 +13,7 @@ select
   reviewers_invited.count as reviewers_invited_count,
   reviewers_accepted_no_sub.count as reviewers_accepted_with_no_submissions,
   reviews.review_reports_submitted as review_reports_count,
-  reviews.last_review_submission_date as last_review_report_date,
+  days_since(reviews.last_review_submission_date) as days_since_last_review_report,
   days_since(m.handling_editor_accepted_date) as days_since_handling_editor_accepted,
   days_since(reviewers_invited.max_invited_date) as days_since_last_reviewer_invited
  from manuscripts m 

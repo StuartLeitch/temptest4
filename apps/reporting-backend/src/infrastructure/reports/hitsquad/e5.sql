@@ -1,5 +1,5 @@
 -- E5 - Academic Editor Recommendation made but waiting for Triage Editor Approval 
--- added editorial_assistant, editorial_assistant_email,  triage_editor, triage_editor_email,
+-- added editorial_assistant, editorial_assistant_email,  triage_editor, triage_editor_email, days_since_editor_decision, recommendation
 select 
   m.manuscript_custom_id,
   article_type,

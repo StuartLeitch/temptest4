@@ -1,5 +1,5 @@
 -- E6 - Academic Editor Assigned but no Reviewers Invited on Revised Version 
--- added editorial_assistant, editorial_assistant_email, triage_editor, triage_editor_email, days_since_current_version_submission, days_since_handling_editor_accepted, invited_editors_count
+-- added editorial_assistant, editorial_assistant_email, triage_editor, triage_editor_email, days_since_current_version_submission, days_since_handling_editor_accepted, invited_editors_count, declined_editors_count
 
 SELECT
    m.manuscript_custom_id,

@@ -11,7 +11,7 @@ SELECT
 	days_since(submission_date) AS days_since_submission,
 	days_since(last_event_date) AS days_since_RTD,
   review_link(submission_id,manuscript_version_id) as review_link,
-  screening_link(manuscript_custom_id),
+  screening_link(manuscript_custom_id) as screening_link,
 	format_date(last_event_date) AS returned_to_draft_date,
   screener_name,
   screener_email
