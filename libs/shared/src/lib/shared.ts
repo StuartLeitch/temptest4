@@ -101,6 +101,7 @@ export * from './modules/payers/usecases/updatePayer/updatePayer';
 export * from './modules/payers/usecases/getPayer/getPayer';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
+export * from './modules/payers/usecases/getPayerDetailsByInvoiceId';
 
 // * Export Publisher Subdomain
 export * from './modules/publishers/domain/Publisher';
