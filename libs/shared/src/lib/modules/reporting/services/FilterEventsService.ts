@@ -69,7 +69,7 @@ export class FilterEventsService {
           event: parsedEvent.event.split(':').pop(),
           timestamp: parsedEvent.timestamp
             ? new Date(parsedEvent.timestamp)
-            : new Date()
+            : null
         });
       } catch (error) {
         logger.error(`Payload not correct for ${MessageId} `);
