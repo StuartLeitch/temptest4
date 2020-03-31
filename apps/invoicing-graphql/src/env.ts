@@ -125,10 +125,14 @@ export const env = {
       password: getOsEnv('SCHEDULER_DB_PASSWORD'),
       host: getOsEnv('SCHEDULER_DB_HOST')
     },
-    notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
-    emailRemindersQueue: getOsEnv('EMAIL_REMINDERS_QUEUE'),
+    // notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
+    notificationsQueues: getOsEnvOptional('NOTIFICATIONS_QUEUES')
+      ? getOsEnvArray('NOTIFICATIONS_QUEUES')
+      : ['email-reminders'],
+    emailRemindersQueue:
+      getOsEnvOptional('EMAIL_REMINDERS_QUEUE') || 'email-reminders',
     confirmationReminderDelay: toFloat(
-      getOsEnv('CONFIRMATION_REMINDER_DELAY_DAYS')
+      getOsEnvOptional('CONFIRMATION_REMINDER_DELAY_DAYS') || '5'
     )
   },
   braintree: {
