@@ -12,6 +12,13 @@ export function getOsEnvOptional(key: string): string | undefined {
   return process.env[key];
 }
 
+export function getOsEnvWithDefault(
+  key: string,
+  defaultValue: string = ''
+): string {
+  return getOsEnvOptional(key) || defaultValue;
+}
+
 export function getPath(path: string): string {
   return process.env.NODE_ENV === 'production'
     ? join(process.cwd(), `${path.replace('src/', 'dist/').slice(0, -3)}.js`)
@@ -44,6 +51,10 @@ export function toFloat(value: string): number {
 
 export function toBool(value: string): boolean {
   return value === 'true';
+}
+
+export function toArray(value: string, delimiter = ','): string[] {
+  return (value && value.split(delimiter)) || [];
 }
 
 export function normalizePort(port: string): number | string | boolean {
