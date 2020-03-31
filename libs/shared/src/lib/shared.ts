@@ -188,7 +188,6 @@ export * from './modules/notifications/usecases/sendInvoiceConfirmationReminder'
 export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
 export * from './modules/notifications/usecases/getSentNotificationForInvoice';
 export * from './modules/notifications/usecases/sendInvoiceCreditControlReminder';
-export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
 export * from './modules/notifications/usecases/areNotificationsPaused';
 export * from './modules/notifications/usecases/pauseInvoiceConfirmationReminders';
 export * from './modules/notifications/usecases/resumeInvoiceConfirmationReminders';

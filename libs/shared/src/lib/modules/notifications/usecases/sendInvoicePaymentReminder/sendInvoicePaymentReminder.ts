@@ -34,9 +34,12 @@ import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { CatalogRepoContract } from '../../../journals/repos/catalogRepo';
+import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
+import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetSentNotificationForInvoiceUsecase } from '../getSentNotificationForInvoice';
 import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJournal';
@@ -71,12 +74,15 @@ export class SendInvoicePaymentReminderUsecase
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private journalRepo: CatalogRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
     private loggerService: LoggerContract,
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
     this.sendPaymentReminderEmail = this.sendPaymentReminderEmail.bind(this);
     this.fetchFromManuscriptsDb = this.fetchFromManuscriptsDb.bind(this);
+    this.attachItemsToInvoice = this.attachItemsToInvoice.bind(this);
     this.bellowEmailMaxCount = this.bellowEmailMaxCount.bind(this);
     this.shouldRescheduleJob = this.shouldRescheduleJob.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
@@ -100,6 +106,7 @@ export class SendInvoicePaymentReminderUsecase
       const execution = new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.getInvoice(context))
+        .then(this.attachItemsToInvoice(context))
         .then(this.getCatalogItem(context))
         .then(this.getPauseStatus(context))
         .advanceOrEnd(this.shouldSendEmail, this.bellowEmailMaxCount)
@@ -159,6 +166,30 @@ export class SendInvoicePaymentReminderUsecase
           invoice: result.getValue()
         }));
 
+      return execution.execute();
+    };
+  }
+
+  private attachItemsToInvoice(context: Context) {
+    const usecase = new GetItemsForInvoiceUsecase(
+      this.invoiceItemRepo,
+      this.couponRepo,
+      this.waiverRepo
+    );
+
+    return async (request: DTO & { invoice: Invoice }) => {
+      const { invoice } = request;
+      const execution = new AsyncEither(invoice.id.toString())
+        .then(invoiceId => usecase.execute({ invoiceId }, context))
+        .map(result => result.getValue())
+        .map(items => {
+          items.forEach(item => invoice.addInvoiceItem(item));
+          return invoice;
+        })
+        .map(invoice => ({
+          ...request,
+          invoice
+        }));
       return execution.execute();
     };
   }

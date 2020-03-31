@@ -22,7 +22,9 @@ export const invoicePaymentHandler = (
       invoiceItem,
       manuscript,
       catalog,
-      invoice
+      invoice,
+      coupon,
+      waiver
     },
     services: { schedulingService, emailService, logger }
   } = appContext;
@@ -35,12 +37,14 @@ export const invoicePaymentHandler = (
     manuscript,
     invoice,
     catalog,
+    coupon,
+    waiver,
     logger,
     schedulingService,
     emailService
   );
   const usecaseContext = {
-    roles: [Roles.PAYER]
+    roles: [Roles.ADMIN]
   };
 
   const request: SendInvoicePaymentReminderDTO = {

@@ -22,7 +22,9 @@ export const invoiceCreditControlHandler = (
       invoiceItem,
       manuscript,
       catalog,
-      invoice
+      invoice,
+      coupon,
+      waiver
     },
     services: { emailService, logger }
   } = appContext;
@@ -35,11 +37,13 @@ export const invoiceCreditControlHandler = (
     manuscript,
     invoice,
     catalog,
+    coupon,
+    waiver,
     logger,
     emailService
   );
   const usecaseContext = {
-    roles: [Roles.PAYER]
+    roles: [Roles.ADMIN]
   };
 
   const request: SendInvoiceCreditControlReminderDTO = {

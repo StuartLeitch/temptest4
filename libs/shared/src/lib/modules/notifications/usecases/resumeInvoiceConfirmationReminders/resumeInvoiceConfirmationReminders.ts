@@ -318,6 +318,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
 
     try {
       await this.scheduler.schedule(newJob, queueName, timer);
+      return right(null);
     } catch (e) {
       await this.pausedReminderRepo.setReminderPauseState(
         request.invoice.invoiceId,
