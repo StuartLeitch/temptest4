@@ -33,6 +33,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (version)`,
     `create index on ${this.getViewName()} (created_date)`,
     `create index on ${this.getViewName()} (updated_date)`,
+    `create index on ${this.getViewName()} (team_member_id)`,
     `create index on ${this.getViewName()} (submitted_date)`,
     `create index on ${this.getViewName()} (recommendation)`
   ];

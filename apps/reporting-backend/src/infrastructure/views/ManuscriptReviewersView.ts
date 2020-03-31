@@ -13,6 +13,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS select se.manuscript_custom_id as "manuscript_custom_id",
   manuscripts->>'version' as "version",
   reviewer_view.email as "email",
+  reviewer_view.id as "reviewer_id",
   cast_to_timestamp(reviewer_view.responded) as "responded_date",
   reviewer_view."fromService" as from_service,
   cast_to_timestamp(reviewer_view."expiredDate") as expired_date,
@@ -32,6 +33,7 @@ from ${REPORTING_TABLES.SUBMISSION} se
   join ${submissionView.getViewName()} s on se.id = s.event_id) se,
   jsonb_array_elements(se.payload->'manuscripts') manuscripts,
   jsonb_to_recordset(manuscripts->'reviewers') as reviewer_view(
+    id text,
     email text,
     "fromService" text,
     "expiredDate" text,
@@ -55,6 +57,7 @@ WITH DATA;
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (version)`,
+    `create index on ${this.getViewName()} (reviewer_id)`,
     `create index on ${this.getViewName()} (responded_date)`,
     `create index on ${this.getViewName()} (created_date)`,
     `create index on ${this.getViewName()} (expired_date)`,

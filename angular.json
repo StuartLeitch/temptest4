@@ -508,7 +508,8 @@
         "serve": {
           "builder": "@nrwl/node:execute",
           "options": {
-            "buildTarget": "reporting-pull-historic-events:build"
+            "buildTarget": "reporting-pull-historic-events:build",
+            "port": 0
           }
         },
         "lint": {
