@@ -7,7 +7,7 @@ import numeral from 'numeral';
 import fromUnixTime from 'date-fns/fromUnixTime';
 
 import {
-  Badge
+  Badge,
   // Progress,
   // Avatar,
   // UncontrolledButtonDropdown,
@@ -33,7 +33,7 @@ const INVOICE_STATUS = {
     <Badge pill color='secondary'>
       Draft
     </Badge>
-  )
+  ),
 };
 
 const TrTableInvoicesList = ({ invoices }) => (
@@ -48,7 +48,7 @@ const TrTableInvoicesList = ({ invoices }) => (
         manuscriptTitle,
         invoiceItem,
         dateIssued,
-        dateCreated
+        dateAccepted,
       }) => (
         <tr
           key={id}
@@ -108,7 +108,7 @@ const TrTableInvoicesList = ({ invoices }) => (
           </td>
           <td className='align-middle'>{invoiceItem?.article?.title}</td>
           <td className='align-middle text-nowrap'>
-            {dateCreated && format(new Date(dateCreated), 'dd MMMM yyyy')}
+            {dateAccepted && format(new Date(dateAccepted), 'dd MMMM yyyy')}
           </td>
           {/* <td className='align-middle text-right'>
             <UncontrolledButtonDropdown>

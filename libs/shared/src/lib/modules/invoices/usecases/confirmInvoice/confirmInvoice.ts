@@ -16,7 +16,6 @@ import { EmailService } from '../../../../infrastructure/communication-channels'
 import { Address } from '../../../addresses/domain/Address';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
-import { CouponRepoContract } from '../../../coupons/repos';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { Payer, PayerType } from '../../../payers/domain/Payer';
@@ -34,6 +33,7 @@ import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
 import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
 import { ConfirmInvoiceDTO, PayerInput } from './confirmInvoiceDTO';
 import { ConfirmInvoiceResponse } from './confirmInvoiceResponse';
+import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 export type ConfirmInvoiceContext = AuthorizationContext<Roles>;

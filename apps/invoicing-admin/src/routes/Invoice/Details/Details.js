@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import React, { useState } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import { useQuery, useMutation } from 'graphql-hooks';
@@ -7,6 +8,7 @@ import format from 'date-fns/format';
 // import subWeeks from 'date-fns/subWeeks';
 import compareDesc from 'date-fns/compareDesc';
 import { toast } from 'react-toastify';
+import numeral from 'numeral';
 
 import {
   Accordion,
@@ -68,6 +70,9 @@ const INVOICE_QUERY = `
 query invoice($id: ID) {
   invoice(invoiceId: $id) {
     ...invoiceFragment
+  }
+  getPaymentMethods {
+    ...paymentMethodFragment
   }
 }
 fragment invoiceFragment on Invoice {
@@ -131,6 +136,7 @@ fragment paymentFragment on Payment {
 fragment paymentMethodFragment on PaymentMethod {
   id
   name
+  isActive
 }
 fragment addressFragment on Address {
   city
@@ -166,20 +172,6 @@ fragment creditNoteFragment on Invoice {
   dateCreated
   cancelledInvoiceReference
   referenceNumber
-}
-`;
-
-const GET_PAYMENT_METHODS_QUERY = `
-query {
-  getPaymentMethods {
-    ...paymentMethodFragment
-  }
-}
-
-fragment paymentMethodFragment on PaymentMethod {
-  id
-  name
-  isActive
 }
 `;
 
@@ -223,15 +215,15 @@ mutation createCreditNote (
 `;
 
 const Details = () => {
-  let { id } = useParams();
-  let history = useHistory();
+  const { id } = useParams();
+  const history = useHistory();
 
   const { loading, error, data } = useQuery(INVOICE_QUERY, {
     variables: {
       id,
     },
   });
-  const { data: paymentMethods } = useQuery(GET_PAYMENT_METHODS_QUERY);
+
   const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
   const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
     paymentDate: new Date(),
@@ -253,11 +245,11 @@ const Details = () => {
       />
     );
 
-  if (error) return <div>Something Bad Happened</div>;
+  if (error || typeof data === undefined)
+    return <div>Something Bad Happened</div>;
 
-  const { getPaymentMethods } = paymentMethods;
-  const { invoice } = data;
-  console.info(invoice);
+  const { invoice, getPaymentMethods } = data;
+  // console.info(invoice);
 
   const { coupons, waivers, price } = invoice?.invoiceItem;
   let netCharges = price;
@@ -600,7 +592,7 @@ const Details = () => {
                             </Label>
                             <Col sm={8}>
                               <span className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                                &ndash; ${total.toFixed(2)}
+                                {numeral(total.toFixed(2) * -1).format('$0.00')}
                               </span>
                             </Col>
                           </>
@@ -771,7 +763,7 @@ const Details = () => {
                               <DatePicker
                                 customInput={<ButtonInput />}
                                 selected={new Date(invoice.dateIssued)}
-                                onChange={() => {}}
+                                onChange={() => ({})}
                               />
                             </Col>
                           </FormGroup>
@@ -952,9 +944,11 @@ const Details = () => {
                                   </span>
                                 </td>
                                 <td className='align-middle text-right text-dark font-weight-bold'>
-                                  &ndash;$
-                                  {(waiver.reduction / 100) *
-                                    invoice.invoiceItem.price}
+                                  {numeral(
+                                    (waiver.reduction / 100) *
+                                      invoice.invoiceItem.price *
+                                      -1
+                                  ).format('$0.00')}
                                 </td>
                               </tr>
                             ))}
@@ -965,7 +959,7 @@ const Details = () => {
                             </td>
                             {/* <td>Really?</td> */}
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              ${netCharges}
+                              {numeral(netCharges).format('$0.00')}
                             </td>
                           </tr>
                           <tr>
@@ -980,7 +974,7 @@ const Details = () => {
                             </td>
                             {/* <td>Really?</td> */}
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              ${vat.toFixed(2)}
+                              {numeral(vat.toFixed(2)).format('$0.00')}
                             </td>
                           </tr>
                           <tr>
@@ -990,7 +984,7 @@ const Details = () => {
                             </td>
                             {/* <td>Really?</td> */}
                             <td className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                              ${total.toFixed(2)}
+                              {numeral(total.toFixed(2)).format('$0.00')}
                             </td>
                           </tr>
                         </tbody>

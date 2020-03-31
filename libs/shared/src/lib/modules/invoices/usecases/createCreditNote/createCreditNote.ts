@@ -13,6 +13,8 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { Transaction } from '../../../transactions/domain/Transaction';
+import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
 
 import {
   Authorize,
@@ -39,11 +41,15 @@ export class CreateCreditNoteUsecase
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private transactionRepo: TransactionRepoContract
+    private transactionRepo: TransactionRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract
   ) {
     this.invoiceRepo = invoiceRepo;
     this.invoiceItemRepo = invoiceItemRepo;
     this.transactionRepo = transactionRepo;
+    this.couponRepo = couponRepo;
+    this.waiverRepo = waiverRepo;
   }
 
   private async getAccessControlContext(
@@ -97,18 +103,18 @@ export class CreateCreditNoteUsecase
       invoice.markAsFinal();
       // console.log('Original Invoice:');
       // console.info(invoice);
-      // await this.invoiceRepo.update(invoice);
+      await this.invoiceRepo.update(invoice);
 
       try {
         items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
-        // for (const item of items) {
-        //   const [coupons, waivers] = await Promise.all([
-        //     this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
-        //     this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId)
-        //   ]);
-        //   item.coupons = coupons;
-        //   item.waivers = waivers;
-        // }
+        for (const item of items) {
+          const [coupons, waivers] = await Promise.all([
+            this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
+            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
+          ]);
+          item.coupons = coupons;
+          item.waivers = waivers;
+        }
       } catch (err) {
         return left(
           // new GetItemsForInvoiceErrors.InvoiceNotFoundError(
@@ -133,12 +139,26 @@ export class CreateCreditNoteUsecase
           rawInvoiceItem.price = invoiceItem.price * -1;
           rawInvoiceItem.dateCreated = new Date();
           delete rawInvoiceItem.id;
+
+          invoiceItem.coupons.forEach((c) => {
+            rawInvoiceItem.price -=
+              ((invoiceItem.price * -1) / 100) * c.reduction;
+          });
+
+          invoiceItem.waivers.forEach((w) => {
+            rawInvoiceItem.price -=
+              ((invoiceItem.price * -1) / 100) * w.reduction;
+          });
+
+          // const vat = (invoiceItem.price / 100) * rawInvoiceItem?.vat;
+          // rawInvoiceItem.price += vat;
+
           const creditNoteInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
           // creditNote.addInvoiceItem(invoiceItem);
 
           // console.log('Anti Invoice Item:');
           // console.info(creditNoteInvoiceItem);
-          // await this.invoiceItemRepo.save(creditNoteInvoiceItem);
+          await this.invoiceItemRepo.save(creditNoteInvoiceItem);
         });
       }
 
@@ -148,7 +168,7 @@ export class CreateCreditNoteUsecase
 
       // console.log('New Credit Note:');
       // console.info(creditNote);
-      // await this.invoiceRepo.save(creditNote);
+      await this.invoiceRepo.save(creditNote);
       // transaction.addInvoice(creditNote);
 
       // console.log('ITEMS = ');
@@ -161,6 +181,7 @@ export class CreateCreditNoteUsecase
           status: InvoiceStatus.DRAFT,
           invoiceNumber: null,
           erpReference: null,
+          dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain
 
         // * System creates DRAFT invoice
@@ -168,6 +189,7 @@ export class CreateCreditNoteUsecase
 
         // This is where all the magic happens
         let draftInvoice = InvoiceMap.toDomain(invoiceProps);
+        let waiverTypes = [];
         if (items.length) {
           items.forEach(async (invoiceItem) => {
             const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
@@ -176,11 +198,36 @@ export class CreateCreditNoteUsecase
             rawInvoiceItem.dateCreated = new Date();
             delete rawInvoiceItem.id;
 
+            // invoiceItem.coupons.forEach(async (c) => {
+            //   rawInvoiceItem.price -= (invoiceItem.price / 100) * c.reduction;
+            // });
+
+            // invoiceItem.waivers.forEach((w) => {
+            //   rawInvoiceItem.price -= (invoiceItem.price / 100) * w.reduction;
+            // });
+
+            // const vat = (rawInvoiceItem.price / 100) * rawInvoiceItem?.vat;
+            // rawInvoiceItem.price += vat;
+
             const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
             draftInvoice.addInvoiceItem(draftInvoiceItem);
+
             // console.log('Draft Invoice Item:');
             // console.info(draftInvoiceItem);
             await this.invoiceItemRepo.save(draftInvoiceItem);
+
+            // * save coupons
+            invoiceItem.coupons.forEach(async (c) => {
+              await this.couponRepo.assignCouponToInvoiceItem(
+                c,
+                draftInvoiceItem.invoiceItemId
+              );
+            });
+
+            waiverTypes = invoiceItem.waivers.reduce((acc, w) => {
+              acc.push(w.waiverType);
+              return acc;
+            }, []);
           });
         }
 
@@ -191,6 +238,12 @@ export class CreateCreditNoteUsecase
           draftInvoice.invoiceId
         );
         await this.invoiceRepo.update(draftInvoice);
+
+        // * save waivers
+        await this.waiverRepo.attachWaiversToInvoice(
+          waiverTypes,
+          draftInvoice.invoiceId
+        );
       }
 
       return right(Result.ok<Invoice>(creditNote));

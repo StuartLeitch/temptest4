@@ -506,6 +506,8 @@ export const invoice: Resolvers<any> = {
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           transaction: transactionRepo,
+          coupon: couponRepo,
+          waiver: waiverRepo,
           // manuscript: manuscriptRepo
         },
       } = context;
@@ -517,7 +519,9 @@ export const invoice: Resolvers<any> = {
         invoiceRepo,
         // manuscriptRepo,
         invoiceItemRepo,
-        transactionRepo
+        transactionRepo,
+        couponRepo,
+        waiverRepo
       );
       const usecaseContext = { roles: [Roles.ADMIN] };
 

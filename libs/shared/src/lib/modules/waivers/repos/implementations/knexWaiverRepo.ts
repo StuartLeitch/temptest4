@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 // import { Invoice } from '../../../invoices/domain/Invoice';
 import { Waiver, WaiverType } from '../../domain/Waiver';
@@ -86,8 +87,8 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
       );
     }
 
-    let _existingWaivers = await this.getWaiversByInvoiceId(invoiceId);
-    let existingWaivers = _existingWaivers.map((w) => w.waiverType);
+    const _existingWaivers = await this.getWaiversByInvoiceId(invoiceId);
+    const existingWaivers = _existingWaivers.map((w) => w.waiverType);
 
     const toInsert = waiverTypes
       .filter((w) => !existingWaivers.includes(w))

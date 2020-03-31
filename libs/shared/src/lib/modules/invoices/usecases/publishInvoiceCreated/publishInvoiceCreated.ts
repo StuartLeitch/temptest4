@@ -157,6 +157,7 @@ export class PublishInvoiceCreatedUsecase
     const payload: InvoiceCreatedMessagePayload = {
       ...EventUtils.createEventObject(),
       invoiceId: null,
+      isCreditNote: false,
       referenceNumber: null,
       invoiceItems: null,
       invoiceStatus: null,
