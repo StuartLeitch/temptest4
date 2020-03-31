@@ -1,18 +1,17 @@
-import { SQS, S3 } from 'aws-sdk';
 import {
-  MicroframeworkSettings,
-  MicroframeworkLoader
-} from 'microframework-w3tec';
-
-import { env } from '../env';
-
-import {
-  SqsPublishConsumer,
+  Event,
   HttpPublishConsumer,
   S3EventProducer,
-  Event
+  SqsPublishConsumer
 } from '@hindawi/eve';
+import { S3, SQS } from 'aws-sdk';
+import {
+  MicroframeworkLoader,
+  MicroframeworkSettings
+} from 'microframework-w3tec';
 import { ConsumerTransport } from '../contants';
+import { env } from '../env';
+import { Logger } from '../lib/logger';
 
 export const pullHistoricEventsLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -31,7 +30,11 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
   let consumer;
   switch (env.consumerTransport) {
     case ConsumerTransport.HTTP:
-      consumer = new HttpPublishConsumer(env.consumerHttp.host);
+      consumer = new HttpPublishConsumer(
+        env.consumerHttp.host,
+        env.consumerHttp.token,
+        new Logger('publisher:http')
+      );
       break;
 
     case ConsumerTransport.SQS:

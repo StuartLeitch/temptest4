@@ -51,6 +51,7 @@ export const env = {
     }
   },
   consumerHttp: consumerTransport === ConsumerTransport.HTTP && {
-    host: getOsEnv('CONSUMER_HOST')
+    host: getOsEnv('CONSUMER_HOST'),
+    token: getOsEnv('CONSUMER_TOKEN')
   }
 };

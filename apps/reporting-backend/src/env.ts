@@ -11,8 +11,8 @@ import {
   toNumber
 } from './lib/env';
 
-const everyHourCron = '0 */1 * * *';
-
+const everyDayCron = '0 0 * * *';
+const isRestEnabled = toBool(getOsEnvOptional('REST_ENABLED') || 'false');
 export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
@@ -25,12 +25,14 @@ export const env = {
     eventNamespace: getOsEnv('EVENT_NAMESPACE'),
     publisherName: getOsEnv('PUBLISHER_NAME'),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
-    viewRefreshCron: getOsEnvOptional('VIEW_CRON') || everyHourCron,
+    viewRefreshCron: getOsEnvOptional('VIEW_CRON') || everyDayCron,
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR')
     },
     batchSize: toNumber(getOsEnvOptional('BATCH_SIZE') || '100'),
-    batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000')
+    batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000'),
+    isRestEnabled,
+    restToken: isRestEnabled && getOsEnv('REST_TOKEN')
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),

@@ -15,21 +15,26 @@ export const expressLoader: MicroframeworkLoader = (
   if (settings) {
     const handlers: ReportingHandlers = settings.getData('handlers');
     const app = express();
-    // const auth = new AuthMiddleware(context);
-    app.use(express.json());
 
+    app.use(express.json({ limit: '50mb' }));
     app.get('/health', (_, res) => res.end());
-    app.post('/events', async (req, res) => {
-      try {
-        await handlers.saveEventsHandler(req.body as Event[]);
-      } catch (error) {
-        logger.error(error);
-        res.sendStatus(400);
-        res.json({ ok: false, error: error });
-      }
-      res.json({ ok: true });
-    });
-
+    if (env.app.isRestEnabled) {
+      app.put('/events', async (req, res) => {
+        try {
+          const events: Event[] = req.body;
+          if (req.headers['x-auth-token'] !== env.app.restToken) {
+            res.sendStatus(403);
+            return;
+          }
+          await handlers.saveEventsHandler(events as any);
+        } catch (error) {
+          logger.error(error);
+          res.sendStatus(400);
+          return;
+        }
+        res.json({ ok: true, received: req.body.length });
+      });
+    }
     // Run application to listen on given port
     if (!env.isTest) {
       const server = app.listen(env.app.port);

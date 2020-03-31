@@ -5,7 +5,7 @@ import {
 import { ReportingContext } from './contextLoader';
 import { Logger } from '../lib/logger';
 
-const logger = new Logger('handler:loader');
+const logger = new Logger('handler:saveEventsHandler');
 
 export const handlerLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined

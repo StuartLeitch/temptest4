@@ -1,9 +1,12 @@
 import { LoggerService } from '../../../domain/services/LoggerService';
 import { EventDTO } from '../domain/EventDTO';
+import { Event as EveEvent } from '@hindawi/eve';
 
 export class FilterEventsService {
   constructor(private s3Service: AWS.S3, private logger: LoggerService) {}
-  public async filterEvents(events: AWS.SQS.Message[]): Promise<EventDTO[]> {
+  public async filterEvents(
+    events: AWS.SQS.Message[] /* | EveEvent[] */
+  ): Promise<EventDTO[]> {
     const { s3Service, logger } = this;
     let processedEvents: EventDTO[] = [];
 
@@ -14,11 +17,18 @@ export class FilterEventsService {
       let isLongEvent = false;
       let parsedEvent = null;
       try {
-        const body = JSON.parse(Body);
+        let body: EveEvent;
+        if (Body) {
+          body = JSON.parse(Body);
+        } else if ((event as EveEvent).Message) {
+          body = event as EveEvent;
+        } else {
+          throw new Error('Unknown event format');
+        }
         id = body.MessageId;
         logger.debug(id);
         isLongEvent =
-          body?.MessageAttributes?.PhenomMessageTooLarge?.Value === 'Y' ||
+          body?.MessageAttributes?.['PhenomMessageTooLarge']?.Value === 'Y' ||
           body?.MessageAttributes?.['PhenomMessageTooLarge']?.stringValue ===
             'Y';
         parsedEvent = JSON.parse(body.Message);
