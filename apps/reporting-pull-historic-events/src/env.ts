@@ -27,7 +27,8 @@ export const env = {
     description: (pkg as any).description,
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     batchSize: toNumber(getOsEnvOptional('BATCH_SIZE') || '100'),
-    batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000')
+    batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000'),
+    resumeDir: getOsEnvOptional('RESUME_DIR') || '/tmp'
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),

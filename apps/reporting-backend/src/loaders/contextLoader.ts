@@ -54,9 +54,10 @@ export const contextLoader: MicroframeworkLoader = (
     };
 
     const s3 = new AWS.S3({
-      endpoint: process.env.AWS_S3_ENDPOINT,
-      secretAccessKey: config.secretAccessKey,
-      accessKeyId: config.accessKeyId
+      credentials: {
+        secretAccessKey: config.secretAccessKey,
+        accessKeyId: config.accessKeyId
+      }
     });
 
     const sqs = new AWS.SQS({

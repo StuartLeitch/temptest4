@@ -6,6 +6,7 @@ import { Event } from '../../../../modules/event';
 import { Selector } from '../../../selector';
 import { Filter } from '../../../filters';
 import { Producer } from '../../producer';
+import { ResumeService } from '../../resume';
 
 import { splitS3ObjectIntoEvents } from './utils';
 
@@ -20,10 +21,12 @@ export class S3EventProducer implements Producer<Event, string> {
   private filters: Filter<Event>[] = [];
   private bucketName: string;
   private s3: S3;
+  private resumeService: ResumeService;
 
-  constructor(s3: S3, bucketName: string) {
+  constructor(s3: S3, bucketName: string, resumeService?: ResumeService) {
     this.bucketName = bucketName;
     this.s3 = s3;
+    this.resumeService = resumeService;
   }
 
   async *produce(): AsyncGenerator<Event[], void, undefined> {
@@ -80,17 +83,26 @@ export class S3EventProducer implements Producer<Event, string> {
 
   private async *getS3ObjectKeys(): AsyncGenerator<string, void, undefined> {
     let lastKey = '';
+    if (this.resumeService) {
+      lastKey = await this.resumeService.getLastKey();
+    }
     while (true) {
       const { isTruncated, objects } = await this.listObjects(lastKey);
       const keys = objects.map(obj => obj.Key);
-      yield* keys.filter(this.checkSelectors.bind(this));
+
+      for (let k of keys.filter(this.checkSelectors.bind(this))) {
+        yield k;
+        if (this.resumeService) {
+          await this.resumeService.saveKey(k);
+        }
+      }
 
       if (!isTruncated) {
         break;
       }
-
       lastKey = keys[keys.length - 1];
     }
+    this.resumeService.clear();
   }
 
   private async getS3Object(key: string): Promise<null | string> {

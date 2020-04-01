@@ -2,7 +2,8 @@ import {
   Event,
   HttpPublishConsumer,
   S3EventProducer,
-  SqsPublishConsumer
+  SqsPublishConsumer,
+  FileResumeService
 } from '@hindawi/eve';
 import { S3, SQS } from 'aws-sdk';
 import {
@@ -25,7 +26,12 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
   };
 
   const s3 = new S3(s3Config);
-  const producer = new S3EventProducer(s3, s3Config.bucketName);
+  const fsResumeService = new FileResumeService(env.app.resumeDir);
+  const producer = new S3EventProducer(
+    s3,
+    s3Config.bucketName,
+    fsResumeService
+  );
 
   let consumer;
   switch (env.consumerTransport) {
