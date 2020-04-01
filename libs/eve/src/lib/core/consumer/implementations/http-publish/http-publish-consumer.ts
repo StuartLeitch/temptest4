@@ -15,7 +15,21 @@ export class HttpPublishConsumer<T> implements Consumer<T> {
       await this.sendEvent(events);
       this.logger.info('Sent ' + events.length + ' events');
     } catch (error) {
-      this.logger.error(error);
+      let retryCount = 1;
+      while (retryCount <= 5) {
+        this.logger.error('Retry ' + retryCount);
+        retryCount++;
+        try {
+          await this.wait(5000);
+          await this.sendEvent(events);
+          break;
+        } catch (e) {
+          if (retryCount >= 6) {
+            this.logger.error(error);
+            process.exit(1);
+          }
+        }
+      }
     }
   }
 
@@ -50,6 +64,11 @@ export class HttpPublishConsumer<T> implements Consumer<T> {
       req.on('error', e => reject(e));
       req.write(postData);
       req.end();
+    });
+  }
+  private async wait(ms: number): Promise<void> {
+    return new Promise(res => {
+      setTimeout(() => res(), ms);
     });
   }
 }
