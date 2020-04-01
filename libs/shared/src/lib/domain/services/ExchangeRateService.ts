@@ -25,6 +25,7 @@ export class ExchangeRateService {
     }
 
     const exchangeRates = rates['exchangeRateMonthList']['exchangeRate'];
+
     const foundByCurrency = exchangeRates.find(
       (er: any) => er.currencyCode === currency
     );
