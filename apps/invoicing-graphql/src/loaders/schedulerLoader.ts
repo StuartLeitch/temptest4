@@ -1,9 +1,13 @@
+/* eslint-disable no-useless-catch */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+/* eslint-disable no-inner-declarations */
+
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import {
-  setIntervalAsync
+  setIntervalAsync,
   // clearIntervalAsync
 } from 'set-interval-async/dynamic';
 
@@ -30,9 +34,9 @@ export const schedulerLoader: MicroframeworkLoader = async (
         catalog,
         coupon,
         waiver,
-        publisher
+        publisher,
       },
-      services: { erpService, logger: loggerService }
+      services: { erpService, logger: loggerService },
     } = context;
     const { failedErpCronRetryTimeMinutes } = env.app;
 
@@ -79,17 +83,17 @@ export const schedulerLoader: MicroframeworkLoader = async (
       //   }
       // },
       // TODO Describe second job
-      // async function retryRevenueRecognizedInvoicesToErpJob() {
-      //   try {
-      //     const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
-      //     if (response.isLeft()) {
-      //       logger.error(response.value.errorValue().message);
-      //       throw response.value.error;
-      //     }
-      //   } catch (err) {
-      //     throw err;
-      //   }
-      // }
+      async function retryRevenueRecognizedInvoicesToErpJob() {
+        try {
+          const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
+          if (response.isLeft()) {
+            logger.error(response.value.errorValue().message);
+            throw response.value.error;
+          }
+        } catch (err) {
+          throw err;
+        }
+      },
     ];
 
     async function processJobsQueue() {

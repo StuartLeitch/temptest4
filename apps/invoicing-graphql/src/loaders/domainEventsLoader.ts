@@ -1,8 +1,9 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
@@ -35,10 +36,10 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         catalog,
         coupon,
         waiver,
-        publisher
+        publisher,
       },
       services: { erpService, logger: loggerService },
-      qq: queue
+      qq: queue,
     } = context;
 
     const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
