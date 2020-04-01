@@ -1,9 +1,10 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   AuthorizationContext,
   Roles,
   AccessControlledUsecase,
   AccessControlContext,
-  ErpResponse
+  ErpResponse,
 } from '@hindawi/shared';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
@@ -21,7 +22,6 @@ import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 import { PublisherRepoContract } from '../../../publishers/repos';
 
-export interface RetryFailedErpInvoicesRequestDTO {}
 export type RetryFailedErpInvoicesResponse = Either<
   AppError.UnexpectedError,
   Result<ErpResponse[]>
@@ -32,12 +32,12 @@ export type RetryFailedErpInvoicesContext = AuthorizationContext<Roles>;
 export class RetryFailedErpInvoicesUsecase
   implements
     UseCase<
-      RetryFailedErpInvoicesRequestDTO,
+      {},
       Promise<RetryFailedErpInvoicesResponse>,
       RetryFailedErpInvoicesContext
     >,
     AccessControlledUsecase<
-      RetryFailedErpInvoicesRequestDTO,
+      {},
       RetryFailedErpInvoicesContext,
       AccessControlContext
     > {
@@ -76,7 +76,7 @@ export class RetryFailedErpInvoicesUsecase
 
   // @Authorize('zzz:zzz')
   public async execute(
-    request?: RetryFailedErpInvoicesRequestDTO,
+    request?: {},
     context?: RetryFailedErpInvoicesContext
   ): Promise<RetryFailedErpInvoicesResponse> {
     try {
@@ -89,14 +89,14 @@ export class RetryFailedErpInvoicesUsecase
       }
       this.loggerService.info(
         `Retrying sync with erp for invoices: ${failedErpInvoices
-          .map(i => i.invoiceId.id.toString())
+          .map((i) => i.invoiceId.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
       for (const failedInvoice of failedErpInvoices) {
         const updatedInvoiceResponse = await this.publishToErpUsecase.execute({
-          invoiceId: failedInvoice.invoiceId.id.toString()
+          invoiceId: failedInvoice.invoiceId.id.toString(),
         });
         if (updatedInvoiceResponse.isLeft()) {
           errs.push(updatedInvoiceResponse.value.error);

@@ -32,10 +32,18 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
   public async getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
   ): Promise<InvoiceItem[]> {
-    const { db } = this;
+    const { db, logger } = this;
+    const correlationId =
+      'correlationId' in this ? (this as any).correlationId : null;
+
     const invoiceItems = await db(TABLES.INVOICE_ITEMS)
       .select()
       .where('manuscriptId', manuscriptId.id.toString());
+
+    logger.debug('select', {
+      correlationId,
+      sql: invoiceItems.toString()
+    });
 
     return invoiceItems.map(InvoiceItemMap.toDomain);
   }

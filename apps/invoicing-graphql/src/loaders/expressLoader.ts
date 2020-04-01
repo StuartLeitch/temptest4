@@ -4,6 +4,7 @@ import {
 } from 'microframework-w3tec';
 import express from 'express';
 import corsMiddleware from 'cors';
+// import { CorrelationID } from '../../../../libs/shared/src/lib/core/domain/CorrelationID';
 
 import {
   // ErpData,
@@ -23,6 +24,21 @@ import {
 
 import { env } from '../env';
 
+// const correlator = {
+//   withId: (fn: Function, id: string) => {
+//     fn();
+//   }
+// };
+
+// function rebindOnFinished(container) {
+//   if (container.__onFinished) {
+//     // __onFinished is used by package (on-finished) that are used by koa itself (Application.handleRequest)
+//     // and morgan to run tasks once response ended
+//     // lib creates 1 field to store all on finish listeners in queue
+//     container.__onFinished = correlator.bind(container.__onFinished);
+//   }
+// }
+
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
@@ -33,6 +49,19 @@ export const expressLoader: MicroframeworkLoader = (
     // const auth = new AuthMiddleware(context);
     app.use(express.json());
     app.use(corsMiddleware());
+    // app.use(((req: any, res: any, next: any) => {
+    //   console.info(next);
+    //   await new Promise((resolve, reject) => {
+    //     correlator.withId(() => {
+    //       //  rebindOnFinished(ctx.res);
+    //       const correlationId = new CorrelationID().toString();
+    //       req['x-correlation-id'] = correlationId;
+    //       next()
+    //         .then(resolve)
+    //         .catch(reject);
+    //     }, req['x-correlation-id']);
+    //   });
+    // });
 
     app.post('/api/checkout', async (req, res) => {
       const { checkoutService } = context;

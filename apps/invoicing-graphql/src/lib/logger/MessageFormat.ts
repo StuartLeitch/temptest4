@@ -51,6 +51,12 @@ export class MessageFormat {
       message.context = { scope, message: rawMessage };
     }
 
+    // console.info(meta);
+    if (meta.correlationId) {
+      message.context.correlationId = meta.correlationId;
+      delete meta.correlationId;
+    }
+
     if ('request' in messageFormat) {
       message.data = messageFormat.request;
     } else if ('result' in messageFormat) {

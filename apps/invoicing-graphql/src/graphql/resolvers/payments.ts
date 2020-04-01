@@ -7,6 +7,7 @@ import {
   MigratePaymentUsecase,
   Roles
 } from '@hindawi/shared';
+import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 
 import { env } from '../../env';
 
@@ -19,12 +20,15 @@ export const payments: Resolvers<any> = {
         repos: { paymentMethod: paymentMethodRepo },
         services: { logger: loggerService }
       } = context;
+      const correlationId = new CorrelationID().toString();
       const usecase = new GetPaymentMethodsUseCase(
         paymentMethodRepo,
         loggerService
       );
 
-      const result = await usecase.execute();
+      const result = await usecase.execute(null, {
+        correlationId
+      });
 
       if (result.isRight()) {
         return result.value.getValue();

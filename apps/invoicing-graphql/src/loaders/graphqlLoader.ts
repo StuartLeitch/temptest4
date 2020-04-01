@@ -1,11 +1,12 @@
-import * as express from 'express';
-import GraphQLHTTP from 'express-graphql';
+// import * as path from 'path';
+// import * as express from 'express';
+// import GraphQLHTTP from 'express-graphql';
+
 import {
   MicroframeworkLoader,
   MicroframeworkSettings
 } from 'microframework-w3tec';
 import { ApolloServer } from 'apollo-server-express';
-import * as path from 'path';
 
 import { env } from '../env';
 import { getErrorCode, getErrorMessage, handlingErrors } from '../lib/graphql';

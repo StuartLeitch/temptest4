@@ -1,18 +1,19 @@
-import { ErpServiceContract } from 'libs/shared/src/lib/domain/services/ErpService';
-import { ExchangeRateService } from 'libs/shared/src/lib/domain/services/ExchangeRateService';
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 import {
   AuthorizationContext,
   Roles,
   AccessControlledUsecase,
   AccessControlContext,
-  Authorize,
+  // Authorize,
   InvoiceItemRepoContract,
   PayerRepoContract,
   ArticleRepoContract,
   InvoiceRepoContract,
   VATService,
   PayerType,
-  GetItemsForInvoiceUsecase
+  GetItemsForInvoiceUsecase,
 } from '@hindawi/shared';
 import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
 import { right, Result, left } from 'libs/shared/src/lib/core/logic/Result';
@@ -27,7 +28,7 @@ import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../domain/Invoice';
 import { PublisherRepoContract } from '../../../publishers/repos';
-import { GetPublisherCustomValuesUsecase } from '../../../publishers/usecases/getPublisherCustomValues';
+// import { GetPublisherCustomValuesUsecase } from '../../../publishers/usecases/getPublisherCustomValues';
 
 export interface PublishInvoiceToErpRequestDTO {
   invoiceId?: string;
@@ -91,7 +92,7 @@ export class PublishInvoiceToErpUsecase
         );
 
         const resp = await getItemsUsecase.execute({
-          invoiceId: request.invoiceId
+          invoiceId: request.invoiceId,
         });
         if (resp.isLeft()) {
           throw new Error(
@@ -104,6 +105,11 @@ export class PublishInvoiceToErpUsecase
 
       if (invoiceItems.length === 0) {
         throw new Error(`Invoice ${invoice.id} has no invoice items.`);
+      }
+
+      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      if (invoice.getInvoiceTotal() <= 0) {
+        return right(Result.ok<any>(null));
       }
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
@@ -142,7 +148,7 @@ export class PublishInvoiceToErpUsecase
         {
           postalCode: address.postalCode,
           countryCode: address.country,
-          stateCode: address.state
+          stateCode: address.state,
         },
         payer.type !== PayerType.INSTITUTION
       );
@@ -164,7 +170,7 @@ export class PublishInvoiceToErpUsecase
         journalName: catalog.journalTitle,
         vatNote,
         rate,
-        tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem
+        tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
       });
 
       this.loggerService.info(

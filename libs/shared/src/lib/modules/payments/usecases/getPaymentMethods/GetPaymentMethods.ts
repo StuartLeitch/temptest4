@@ -14,16 +14,29 @@ export class GetPaymentMethodsUseCase
   implements UseCase<undefined, Promise<GetPaymentMethodsResponse>> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
-    loggerService: any
+    private loggerService: any
   ) {}
 
-  public async execute(): Promise<GetPaymentMethodsResponse> {
+  public async execute(
+    request?: any,
+    context?: any
+  ): Promise<GetPaymentMethodsResponse> {
     let paymentMethods: PaymentMethodPersistenceDTO[];
+    // console.info(context);
+    // console.info(this.paymentMethodRepo);
+    (this.paymentMethodRepo as any).correlationId = context.correlationId;
+
+    this.loggerService.debug('GetPaymentMethodsUseCase', { request, context });
 
     try {
       paymentMethods = (await this.paymentMethodRepo.getPaymentMethods()).map(
         PaymentMethodMap.toPersistence
       );
+
+      this.loggerService.debug('GetPaymentMethodsUseCase', {
+        context,
+        data: paymentMethods
+      });
 
       return right(Result.ok<PaymentMethodPersistenceDTO[]>(paymentMethods));
     } catch (err) {

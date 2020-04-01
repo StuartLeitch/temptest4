@@ -17,6 +17,7 @@ import { LoggerContract } from '@hindawi/shared';
 export class Logger implements LoggerContract {
   public static DEFAULT_SCOPE = 'Invoicing/Backend';
   private scope: string;
+  // private correlationId: string;
 
   private static parsePathToScope(filePath: string): string {
     if (filePath.indexOf(path.sep) >= 0) {
@@ -30,8 +31,9 @@ export class Logger implements LoggerContract {
     return filePath;
   }
 
-  constructor(scope?: string) {
+  constructor(scope?: string, correlationId?: string) {
     this.scope = Logger.parsePathToScope(scope ? scope : Logger.DEFAULT_SCOPE);
+    // this.correlationId = correlationId ?? 'uncorrelated';
   }
 
   public debug(message: string, ...args: any[]): void {

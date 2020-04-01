@@ -65,10 +65,20 @@ export class KnexPaymentMethodRepo
   }
 
   async getPaymentMethods() {
-    const { db } = this;
+    const { db, logger } = this;
+
+    const paymentMethodsSelect = db(TABLES.PAYMENT_METHODS).select();
+
+    const correlationId =
+      'correlationId' in this ? (this as any).correlationId : null;
+
+    logger.debug('select', {
+      correlationId,
+      sql: paymentMethodsSelect.toString()
+    });
 
     try {
-      return db(TABLES.PAYMENT_METHODS).select();
+      return paymentMethodsSelect;
     } catch (e) {
       throw RepoError.fromDBError(e);
     }
@@ -104,5 +114,9 @@ export class KnexPaymentMethodRepo
     }
 
     return true;
+  }
+
+  public setCorrelation(correlation: string) {
+    // do nothing yet
   }
 }

@@ -3,12 +3,13 @@ import 'config';
 
 import * as pkg from '../../../package.json';
 import {
+  getOsEnvWithDefault,
   getOsEnvOptional,
   normalizePort,
-  getOsEnvArray,
   getOsPath,
   getOsEnv,
   toNumber,
+  toArray,
   toFloat,
   toBool
   // getOsPaths,
@@ -125,10 +126,16 @@ export const env = {
       password: getOsEnv('SCHEDULER_DB_PASSWORD'),
       host: getOsEnv('SCHEDULER_DB_HOST')
     },
-    notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
-    emailRemindersQueue: getOsEnv('EMAIL_REMINDERS_QUEUE'),
+    // notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
+    notificationsQueues: toArray(
+      getOsEnvWithDefault('NOTIFICATIONS_QUEUES', 'email-reminders')
+    ),
+    emailRemindersQueue: getOsEnvWithDefault(
+      'EMAIL_REMINDERS_QUEUE',
+      'email-reminders'
+    ),
     confirmationReminderDelay: toFloat(
-      getOsEnv('CONFIRMATION_REMINDER_DELAY_DAYS')
+      getOsEnvWithDefault('CONFIRMATION_REMINDER_DELAY_DAYS', '5')
     )
   },
   braintree: {
