@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { right, Result, left } from '../../../../core/logic/Result';
@@ -17,7 +18,7 @@ import {
   InvoiceRepoContract,
   // VATService,
   // PayerType,
-  GetItemsForInvoiceUsecase
+  GetItemsForInvoiceUsecase,
 } from '@hindawi/shared';
 // import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -100,7 +101,7 @@ export class PublishRevenueRecognitionToErpUsecase
       invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
 
       const itemsResult = await getItemsUsecase.execute({
-        invoiceId: request.invoiceId
+        invoiceId: request.invoiceId,
       });
 
       if (itemsResult.isLeft()) {
@@ -114,7 +115,7 @@ export class PublishRevenueRecognitionToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no invoice items.`);
       }
 
-      invoiceItems.forEach(ii => invoice.addInvoiceItem(ii));
+      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
 
       payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
       if (!payer) {
@@ -169,7 +170,7 @@ export class PublishRevenueRecognitionToErpUsecase
         invoice,
         manuscript,
         invoiceTotal: netCharges,
-        publisherCustomValues
+        publisherCustomValues,
       });
 
       this.loggerService.info(
