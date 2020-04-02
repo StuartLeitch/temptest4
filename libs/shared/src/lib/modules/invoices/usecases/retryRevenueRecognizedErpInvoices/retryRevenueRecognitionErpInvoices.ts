@@ -1,9 +1,10 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   AuthorizationContext,
   Roles,
   AccessControlledUsecase,
   AccessControlContext,
-  ErpResponse
+  ErpResponse,
 } from '@hindawi/shared';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
@@ -91,7 +92,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
 
       this.loggerService.info(
         `Retrying recognizing in erp for invoices: ${unrecognizedErpInvoices
-          .map(i => i.id.toString())
+          .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
@@ -99,7 +100,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       for (const unrecognizedInvoice of unrecognizedErpInvoices) {
         const updatedInvoiceResponse = await this.publishRevenueRecognitionToErpUsecase.execute(
           {
-            invoiceId: unrecognizedInvoice.id.toString()
+            invoiceId: unrecognizedInvoice.id.toString(),
           }
         );
         if (updatedInvoiceResponse.isLeft()) {

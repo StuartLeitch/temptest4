@@ -28,7 +28,7 @@ import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../domain/Invoice';
 import { PublisherRepoContract } from '../../../publishers/repos';
-import { GetPublisherCustomValuesUsecase } from '../../../publishers/usecases/getPublisherCustomValues';
+// import { GetPublisherCustomValuesUsecase } from '../../../publishers/usecases/getPublisherCustomValues';
 
 export interface PublishInvoiceToErpRequestDTO {
   invoiceId?: string;
@@ -105,6 +105,11 @@ export class PublishInvoiceToErpUsecase
 
       if (invoiceItems.length === 0) {
         throw new Error(`Invoice ${invoice.id} has no invoice items.`);
+      }
+
+      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      if (invoice.getInvoiceTotal() <= 0) {
+        return right(Result.ok<any>(null));
       }
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);

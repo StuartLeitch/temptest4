@@ -5,7 +5,7 @@ import { right, Result, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
+// import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
 import {
   AuthorizationContext,
@@ -165,6 +165,11 @@ export class PublishRevenueRecognitionToErpUsecase
       }
       // const vatValue = (netCharges / 100) * vat;
       // const total = netCharges; // + vatValue;
+
+      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      if (netCharges <= 0) {
+        return right(Result.ok<any>(null));
+      }
 
       const erpResponse = await this.erpService.registerRevenueRecognition({
         invoice,
