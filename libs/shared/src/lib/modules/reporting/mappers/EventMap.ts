@@ -12,7 +12,7 @@ export interface EventPersistenceDTO {
 export class EventMap extends Mapper<Event> {
   public static toDomain(raw: EventPersistenceDTO): Event {
     return Event.create(
-      { ...raw, time: new Date(raw.time) },
+      { ...raw, time: raw.time ? new Date(raw.time) : null },
       new UniqueEntityID(raw.id)
     ).getValue();
   }

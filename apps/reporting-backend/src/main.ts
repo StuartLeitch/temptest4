@@ -9,6 +9,8 @@ import { Logger } from './lib/logger';
  * Loaders
  */
 import { contextLoader } from './loaders/contextLoader';
+import { handlerLoader } from './loaders/handlerLoader';
+import { expressLoader } from './loaders/expressLoader';
 import { winstonLoader } from './loaders/winstonLoader';
 import { knexLoader } from './loaders/knexLoader';
 import { queueServiceLoader } from './loaders/queueServiceLoader';
@@ -32,7 +34,9 @@ bootstrapMicroframework({
     winstonLoader,
     knexLoader,
     contextLoader,
+    handlerLoader,
     queueServiceLoader,
+    expressLoader,
     cronLoader
   ]
 })

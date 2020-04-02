@@ -11,14 +11,7 @@ import { Logger } from './lib/logger';
 import { contextLoader } from './loaders/contextLoader';
 import { winstonLoader } from './loaders/winstonLoader';
 import { pullHistoricEventsLoader } from './loaders/pull-historic-events-loader';
-/**
- * EXPRESS TYPESCRIPT BOILERPLATE
- * ----------------------------------------
- *
- * This is a boilerplate for Node.js Application written in TypeScript.
- * The basic layer of this app is express. For further information visit
- * the 'README.md' file.
- */
+
 const log = new Logger(__filename);
 
 bootstrapMicroframework({

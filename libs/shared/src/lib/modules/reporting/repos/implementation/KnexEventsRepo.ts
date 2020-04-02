@@ -21,7 +21,7 @@ export class KnexEventsRepo extends AbstractBaseDBRepo<Knex, Event>
       values.push(
         ...[
           ev.id.toString(),
-          (ev.time.getTime() / 1000) as any,
+          ev.time ? ((ev.time.getTime() / 1000) as any) : null,
           ev.type,
           ev.payload
         ]
