@@ -4,8 +4,8 @@ import { InvoiceCreated } from '../domain/events/invoiceCreated';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
-import { PayerRepoContract } from '../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../addresses/repos/addressRepo';
+// import { PayerRepoContract } from '../../payers/repos/payerRepo';
+// import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PublishInvoiceCreatedUsecase } from '../usecases/publishInvoiceCreated/publishInvoiceCreated';
 
 export class AfterInvoiceCreatedEvent
@@ -58,7 +58,7 @@ export class AfterInvoiceCreatedEvent
       const result = await this.publishInvoiceCreated.execute({
         invoice,
         invoiceItems,
-        manuscript
+        manuscript,
       });
 
       if (result.isLeft()) {

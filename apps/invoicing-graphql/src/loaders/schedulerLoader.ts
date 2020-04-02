@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-catch */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable no-inner-declarations */
-
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   MicroframeworkLoader,
   MicroframeworkSettings,
@@ -71,17 +70,17 @@ export const schedulerLoader: MicroframeworkLoader = async (
     // start scheduler
     const jobsQueue = [
       // TODO Describe first job
-      // async function retryFailedErpInvoicesJob() {
-      //   try {
-      //     const response = await retryFailedErpInvoicesUsecase.execute();
-      //     if (response.isLeft()) {
-      //       logger.error(response.value.errorValue().message);
-      //       throw response.value.error;
-      //     }
-      //   } catch (err) {
-      //     throw err;
-      //   }
-      // },
+      async function retryFailedErpInvoicesJob() {
+        try {
+          const response = await retryFailedErpInvoicesUsecase.execute();
+          if (response.isLeft()) {
+            logger.error(response.value.errorValue().message);
+            throw response.value.error;
+          }
+        } catch (err) {
+          throw err;
+        }
+      },
       // TODO Describe second job
       async function retryRevenueRecognizedInvoicesToErpJob() {
         try {

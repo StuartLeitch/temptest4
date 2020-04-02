@@ -222,3 +222,4 @@ export * from './utils/Batch';
 export * from './utils/VersionCompare';
 
 export * from './utils/ObjectUtils';
+export * from './utils/EventUtils';

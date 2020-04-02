@@ -1,7 +1,8 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { ArticlePublished as ArticlePublishedEventPayload } from '@hindawi/phenom-events';
 import {
   EpicOnArticlePublishedUsecase,
-  EpicOnArticlePublishedDTO
+  EpicOnArticlePublishedDTO,
 } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
 import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 import { Logger } from '../../lib/logger';
@@ -20,7 +21,7 @@ export const ArticlePublishedHandler = {
       customId,
       // articleType: { name },
       // journalId,
-      published
+      published,
       // title
     } = data;
 
@@ -32,13 +33,13 @@ export const ArticlePublishedHandler = {
         payer: payerRepo,
         address: addressRepo,
         coupon: couponRepo,
-        waiver: waiverRepo
+        waiver: waiverRepo,
       },
-      services: { emailService, vatService, logger: loggerService }
+      services: { emailService, vatService, logger: loggerService },
     } = this;
     const {
       sanctionedCountryNotificationReceiver,
-      sanctionedCountryNotificationSender
+      sanctionedCountryNotificationSender,
     } = env.app;
 
     const epicOnArticlePublishedUsecase = new EpicOnArticlePublishedUsecase(
@@ -58,16 +59,16 @@ export const ArticlePublishedHandler = {
       customId,
       published,
       sanctionedCountryNotificationReceiver,
-      sanctionedCountryNotificationSender
+      sanctionedCountryNotificationSender,
     };
 
     const result = await epicOnArticlePublishedUsecase.execute(args, {
       correlationId,
-      roles: []
+      roles: [],
     });
     if (result.isLeft()) {
       logger.error(result.value.errorValue().message, { correlationId });
       throw result.value.error;
     }
-  }
+  },
 };

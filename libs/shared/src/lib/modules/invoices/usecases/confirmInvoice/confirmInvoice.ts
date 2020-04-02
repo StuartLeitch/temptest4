@@ -7,7 +7,7 @@ import { Either, Result, right } from '../../../../core/logic/Result';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 import { PoliciesRegister } from '../../../../domain/reductions/policies/PoliciesRegister';
 import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
@@ -16,14 +16,13 @@ import { EmailService } from '../../../../infrastructure/communication-channels'
 import { Address } from '../../../addresses/domain/Address';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
-import { CouponRepoContract } from '../../../coupons/repos';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { Payer, PayerType } from '../../../payers/domain/Payer';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import {
   CreatePayerRequestDTO,
-  CreatePayerUsecase
+  CreatePayerUsecase,
 } from '../../../payers/usecases/createPayer/createPayer';
 import { Roles } from '../../../users/domain/enums/Roles';
 // * Usecase specific
@@ -34,6 +33,7 @@ import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
 import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
 import { ConfirmInvoiceDTO, PayerInput } from './confirmInvoiceDTO';
 import { ConfirmInvoiceResponse } from './confirmInvoiceResponse';
+import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 export type ConfirmInvoiceContext = AuthorizationContext<Roles>;
@@ -90,7 +90,7 @@ export class ConfirmInvoiceUsecase
     const {
       payer: payerInput,
       sanctionedCountryNotificationReceiver,
-      sanctionedCountryNotificationSender
+      sanctionedCountryNotificationSender,
     } = request;
     this.receiverEmail = sanctionedCountryNotificationReceiver;
     this.senderEmail = sanctionedCountryNotificationSender;
@@ -102,7 +102,7 @@ export class ConfirmInvoiceUsecase
       [
         this.updateInvoiceStatus.bind(this),
         this.applyVatToInvoice.bind(this),
-        this.dispatchEvents.bind(this)
+        this.dispatchEvents.bind(this),
       ],
       maybePayerData
     );
@@ -136,22 +136,26 @@ export class ConfirmInvoiceUsecase
 
     if (this.isPayerFromSanctionedCountry(address)) {
       return (await this.markInvoiceAsPending(invoice))
-        .map(pendingInvoice => this.sendEmail(pendingInvoice))
-        .map(pendingInvoice => ({
+        .map((pendingInvoice) => this.sendEmail(pendingInvoice))
+        .map((pendingInvoice) => ({
           ...payerData,
-          invoice: pendingInvoice
+          invoice: pendingInvoice,
         }));
     } else {
       if (invoice.getInvoiceTotal() === 0) {
-        return (await this.markInvoiceAsFinal(invoice)).map(activeInvoice => ({
-          ...payerData,
-          invoice: activeInvoice
-        }));
+        return (await this.markInvoiceAsFinal(invoice)).map(
+          (activeInvoice) => ({
+            ...payerData,
+            invoice: activeInvoice,
+          })
+        );
       } else if (invoice.status !== InvoiceStatus.ACTIVE) {
-        return (await this.markInvoiceAsActive(invoice)).map(activeInvoice => ({
-          ...payerData,
-          invoice: activeInvoice
-        }));
+        return (await this.markInvoiceAsActive(invoice)).map(
+          (activeInvoice) => ({
+            ...payerData,
+            invoice: activeInvoice,
+          })
+        );
       }
     }
     return right(payerData);
@@ -167,14 +171,14 @@ export class ConfirmInvoiceUsecase
     const emptyPayload: PayerDataDomain = {
       address: null,
       invoice: null,
-      payer: null
+      payer: null,
     };
     return await chain(
       [
         this.getInvoiceDetails.bind(this, payerInput),
         this.getInvoiceItems.bind(this, payerInput),
         this.createAddress.bind(this, payerInput),
-        this.createPayer.bind(this, payerInput)
+        this.createPayer.bind(this, payerInput),
       ],
       emptyPayload
     );
@@ -192,9 +196,9 @@ export class ConfirmInvoiceUsecase
       { invoiceId },
       this.authorizationContext
     );
-    return maybeDetails.map(invoiceResult => ({
+    return maybeDetails.map((invoiceResult) => ({
       ...payerData,
-      invoice: invoiceResult.getValue()
+      invoice: invoiceResult.getValue(),
     }));
   }
 
@@ -212,9 +216,9 @@ export class ConfirmInvoiceUsecase
       { invoiceId },
       this.authorizationContext
     );
-    return maybeDetails.map(invoiceItemsResult => {
+    return maybeDetails.map((invoiceItemsResult) => {
       const items = invoiceItemsResult.getValue();
-      items.forEach(ii => payerData.invoice.addInvoiceItem(ii));
+      items.forEach((ii) => payerData.invoice.addInvoiceItem(ii));
       return payerData;
     });
   }
@@ -232,12 +236,12 @@ export class ConfirmInvoiceUsecase
       email: payerInput.email,
       vatId: payerInput.vatId,
       organization: payerInput.organization || ' ',
-      addressId: payerData.address.addressId.id.toString()
+      addressId: payerData.address.addressId.id.toString(),
     };
 
     return (
       await createPayerUseCase.execute(payerDTO, this.authorizationContext)
-    ).map(payerResult => ({ ...payerData, payer: payerResult.getValue() }));
+    ).map((payerResult) => ({ ...payerData, payer: payerResult.getValue() }));
   }
 
   private async createAddress(
@@ -251,14 +255,14 @@ export class ConfirmInvoiceUsecase
       country: address.country,
       postalCode: address.postalCode,
       state: address.state,
-      city: address.city
+      city: address.city,
     };
 
     return (await createAddressUseCase.execute(addressDTO)).map(
-      addressResult => {
+      (addressResult) => {
         return {
           ...payerData,
-          address: addressResult.getValue()
+          address: addressResult.getValue(),
         };
       }
     );
@@ -269,7 +273,7 @@ export class ConfirmInvoiceUsecase
     if (payer.type === PayerType.INSTITUTION) {
       const vatResult = await this.vatService.checkVAT({
         countryCode: payer.address.country,
-        vatNumber: payer.vatId
+        vatNumber: payer.vatId,
       });
 
       if (!vatResult.valid) {
@@ -287,9 +291,9 @@ export class ConfirmInvoiceUsecase
     );
     const maybePendingInvoice = await changeInvoiceStatusUseCase.execute({
       invoiceId: invoice.id.toString(),
-      status: InvoiceStatus.PENDING
+      status: InvoiceStatus.PENDING,
     });
-    return maybePendingInvoice.map(pendingInvoiceResult => {
+    return maybePendingInvoice.map((pendingInvoiceResult) => {
       const pendingInvoice = pendingInvoiceResult.getValue();
       return pendingInvoice;
     });
@@ -303,27 +307,30 @@ export class ConfirmInvoiceUsecase
     return (
       await changeInvoiceStatusUseCase.execute({
         invoiceId: invoice.id.toString(),
-        status: InvoiceStatus.ACTIVE
+        status: InvoiceStatus.ACTIVE,
       })
-    ).map(resultInvoice => resultInvoice.getValue());
+    ).map((resultInvoice) => resultInvoice.getValue());
   }
 
   private async markInvoiceAsFinal(invoice: Invoice) {
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );
+
+    invoice.markAsFinal();
+
     return (
       await changeInvoiceStatusUseCase.execute({
         invoiceId: invoice.id.toString(),
-        status: InvoiceStatus.FINAL
+        status: InvoiceStatus.FINAL,
       })
-    ).map(resultInvoice => resultInvoice.getValue());
+    ).map((resultInvoice) => resultInvoice.getValue());
   }
 
   private async applyVatToInvoice({
     invoice,
     address,
-    payer
+    payer,
   }: PayerDataDomain) {
     const applyVatToInvoice = new ApplyVatToInvoiceUsecase(
       this.invoiceItemRepo,
@@ -336,7 +343,7 @@ export class ConfirmInvoiceUsecase
       postalCode: address.postalCode,
       country: address.country,
       payerType: payer.type,
-      state: address.state
+      state: address.state,
     });
     return maybeAppliedVat.map(() => ({ invoice, address, payer }));
   }

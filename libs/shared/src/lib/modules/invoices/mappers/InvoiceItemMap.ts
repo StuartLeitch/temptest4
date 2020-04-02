@@ -2,7 +2,7 @@ import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
 import { InvoiceItem, InvoiceItemType } from '../domain/InvoiceItem';
 import { InvoiceId } from '../domain/InvoiceId';
-import { ManuscriptId } from 'libs/shared/src/lib/modules/invoices/domain/ManuscriptId';
+import { ManuscriptId } from '../domain/ManuscriptId';
 
 export interface InvoiceItemPersistenceDTO {
   id?: string;
@@ -28,7 +28,7 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
         type: raw.type,
         price: raw.price,
         vat: raw.vat,
-        dateCreated: new Date(raw.dateCreated)
+        dateCreated: new Date(raw.dateCreated),
       },
       new UniqueEntityID(raw.id)
     );
@@ -50,7 +50,7 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
       type: invoiceItem.type,
       price: invoiceItem.price,
       vat: invoiceItem.vat,
-      dateCreated: invoiceItem.dateCreated
+      dateCreated: invoiceItem.dateCreated,
     };
   }
 }

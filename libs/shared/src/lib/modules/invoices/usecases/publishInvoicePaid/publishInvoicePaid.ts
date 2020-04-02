@@ -25,10 +25,11 @@ export class PublishInvoicePaid {
     const data = {
       ...EventUtils.createEventObject(),
       invoiceId: invoice.id.toString(),
+      isCreditNote: false,
       erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
       valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
-      invoiceItems: invoiceItems.map(ii => ({
+      invoiceItems: invoiceItems.map((ii) => ({
         id: ii.id.toString(),
         manuscriptCustomId: manuscript.customId,
         manuscriptId: ii.manuscriptId.id.toString(),
@@ -36,11 +37,11 @@ export class PublishInvoicePaid {
         price: ii.price,
         vatPercentage: ii.vat,
         coupons: ii.coupons
-          ? ii.coupons.map(c => CouponMap.toEvent(c))
+          ? ii.coupons.map((c) => CouponMap.toEvent(c))
           : undefined,
         waivers: ii.waivers
-          ? ii.waivers.map(w => WaiverMap.toEvent(w))
-          : undefined
+          ? ii.waivers.map((w) => WaiverMap.toEvent(w))
+          : undefined,
       })),
       transactionId: paymentDetails.transactionId,
       invoiceStatus: paymentDetails.invoiceStatus as any,
@@ -59,7 +60,7 @@ export class PublishInvoicePaid {
         ? new Date(paymentDetails.paymentDate).toISOString()
         : null,
       paymentType: paymentDetails.paymentType,
-      paymentAmount: paymentDetails.amount
+      paymentAmount: paymentDetails.amount,
       // VAT: "todo"
       // couponId: coupon.id,
       // dateApplied: coupon.applied
@@ -69,7 +70,7 @@ export class PublishInvoicePaid {
       await this.publishService.publishMessage({
         timestamp: messageTimestamp?.toISOString(),
         event: INVOICE_PAID_EVENT,
-        data
+        data,
       });
     } catch (err) {
       throw new AppError.UnexpectedError(err.toString());

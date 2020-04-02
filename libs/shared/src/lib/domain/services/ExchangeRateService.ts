@@ -1,4 +1,5 @@
-import { environment } from '@env/environment';
+/* eslint-disable @typescript-eslint/no-var-requires */
+// import { environment } from '@env/environment';
 import fs from 'fs';
 import path from 'path';
 import format from 'date-fns/format';
@@ -24,6 +25,7 @@ export class ExchangeRateService {
     }
 
     const exchangeRates = rates['exchangeRateMonthList']['exchangeRate'];
+
     const foundByCurrency = exchangeRates.find(
       (er: any) => er.currencyCode === currency
     );

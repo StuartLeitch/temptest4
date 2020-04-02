@@ -3,10 +3,8 @@ import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { InvoicePaidEvent } from '../domain/events/invoicePaid';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos';
-import {
-  ArticleRepoContract,
-  GetItemsForInvoiceUsecase
-} from '@hindawi/shared';
+import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { PublishInvoicePaid } from '../usecases/PublishInvoicePaid';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
@@ -42,7 +40,7 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         );
 
         const resp = await getItemsUsecase.execute({
-          invoiceId: invoice.invoiceId.id.toString()
+          invoiceId: invoice.invoiceId.id.toString(),
         });
         if (resp.isLeft()) {
           throw new Error(

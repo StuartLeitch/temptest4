@@ -7,14 +7,14 @@ import { left, right, Result } from '../../../../core/logic/Result';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 import { CouponRepoContract } from '../../repos';
 import { Roles } from '../../../users/domain/enums/Roles';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import {
   InvoiceItemRepoContract,
-  InvoiceRepoContract
+  InvoiceRepoContract,
 } from '../../../invoices/repos';
 import { ApplyCouponToInvoiceDTO } from './applyCouponToInvoiceDTO';
 import { ApplyCouponToInvoiceErrors } from './ApplyCouponToInvoiceErrors';
@@ -117,7 +117,7 @@ export class ApplyCouponToInvoiceUsecase
         const existingCoupons = await this.couponRepo.getCouponsByInvoiceItemId(
           invoiceItem.invoiceItemId
         );
-        if (existingCoupons.some(c => c.couponId.equals(coupon.couponId))) {
+        if (existingCoupons.some((c) => c.couponId.equals(coupon.couponId))) {
           return left(
             new ApplyCouponToInvoiceErrors.CouponAlreadyUsedError(
               request.couponCode
@@ -132,7 +132,7 @@ export class ApplyCouponToInvoiceUsecase
         assignedCoupons++;
       }
 
-      if (assignedCoupons == 0) {
+      if (assignedCoupons === 0) {
         return left(
           new ApplyCouponToInvoiceErrors.CouponInvalidError(
             request.couponCode,

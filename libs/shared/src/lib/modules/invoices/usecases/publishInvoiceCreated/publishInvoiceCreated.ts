@@ -9,7 +9,7 @@ import { AccessControlContext } from '../../../../domain/authorization/AccessCon
 import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
@@ -21,11 +21,11 @@ import { PublishInvoiceCreatedDTO } from './publishInvoiceCreatedDTO';
 
 import { InvoiceCreated as InvoiceCreatedMessagePayload } from '@hindawi/phenom-events';
 import { InvoiceStatus as PhenomInvoiceStatus } from '@hindawi/phenom-events/src/lib/invoice';
+import { EventUtils } from '../../../../utils/EventUtils';
 
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Invoice } from '../../domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { EventUtils } from 'libs/shared/src/lib/utils/EventUtils';
 
 export type PublishInvoiceCreatedContext = AuthorizationContext<Roles>;
 
@@ -92,7 +92,7 @@ export class PublishInvoiceCreatedUsecase
     return {
       timestamp: timestamp?.toISOString(),
       event: 'InvoiceCreated',
-      data: payload
+      data: payload,
     };
   }
 
@@ -118,27 +118,28 @@ export class PublishInvoiceCreatedUsecase
   ): InvoiceCreatedMessagePayload {
     return {
       ...payload,
-      invoiceItems: invoiceItems.map(invoiceItem => ({
+      invoiceItems: invoiceItems.map((invoiceItem) => ({
         manuscriptId: invoiceItem.manuscriptId.id.toString(),
         manuscriptCustomId: manuscript.customId,
         vatPercentage: null,
         id: invoiceItem.id.toString(),
         price: invoiceItem.price,
-        type: invoiceItem.type as any
-      }))
+        type: invoiceItem.type as any,
+      })),
     };
   }
 
   private payloadWithInvoiceData(
     invoice: Invoice,
     payload: InvoiceCreatedMessagePayload
-  ): InvoiceCreatedMessagePayload {
+  ): InvoiceCreatedMessagePayload & { isCreditNote: boolean } {
     return {
       ...payload,
       referenceNumber: invoice.referenceNumber,
       invoiceId: invoice.id.toString(),
+      isCreditNote: false,
       invoiceStatus: invoice.status as PhenomInvoiceStatus,
-      invoiceCreatedDate: invoice.dateCreated.toISOString()
+      invoiceCreatedDate: invoice.dateCreated.toISOString(),
     };
   }
 
@@ -148,7 +149,7 @@ export class PublishInvoiceCreatedUsecase
   ): InvoiceCreatedMessagePayload {
     return {
       ...payload,
-      valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0)
+      valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
     };
   }
 
@@ -156,11 +157,14 @@ export class PublishInvoiceCreatedUsecase
     const payload: InvoiceCreatedMessagePayload = {
       ...EventUtils.createEventObject(),
       invoiceId: null,
+      isCreditNote: false,
       referenceNumber: null,
       invoiceItems: null,
       invoiceStatus: null,
       valueWithoutVAT: null,
-      invoiceCreatedDate: null
+      invoiceCreatedDate: null,
+      erpReference: null,
+      // cancelledInvoiceReference: null,
     };
 
     return payload;

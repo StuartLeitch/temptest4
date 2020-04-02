@@ -15,15 +15,15 @@ import {
   PayerType,
   GetItemsForInvoiceUsecase,
 } from '@hindawi/shared';
-import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
-import { right, Result, left } from 'libs/shared/src/lib/core/logic/Result';
-import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { right, Result, left } from '../../../../core/logic/Result';
+import { AppError } from '../../../../core/logic/AppError';
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { InvoiceId } from '../../domain/InvoiceId';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../domain/Invoice';

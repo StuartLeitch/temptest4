@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
 import {
@@ -12,7 +13,7 @@ import {
   GetArticleDetailsUsecase,
   GetItemsForInvoiceUsecase,
   Roles,
-  InvoiceItemId
+  InvoiceItemId,
 } from '@hindawi/shared';
 import { CouponMap } from './../../../../../libs/shared/src/lib/modules/coupons/mappers/CouponMap';
 
@@ -21,6 +22,8 @@ import { MigrateInvoiceUsecase } from './../../../../../libs/shared/src/lib/modu
 import { ApplyCouponToInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
+import { CreateCreditNoteUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/createCreditNote/createCreditNote';
+import { GetCreditNoteByInvoiceIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
 import { WaiverMap } from 'libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
@@ -36,11 +39,11 @@ export const invoice: Resolvers<any> = {
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
-        invoiceId: args.invoiceId
+        invoiceId: args.invoiceId,
       };
 
       const usecaseContext = {
-        roles: [Roles.PAYER]
+        roles: [Roles.PAYER],
       };
 
       const result = await usecase.execute(request, usecaseContext);
@@ -59,12 +62,13 @@ export const invoice: Resolvers<any> = {
         dateCreated: invoiceDetails.dateCreated.toISOString(),
         erpReference: invoiceDetails.erpReference,
         revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
+        cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued:
           invoiceDetails.dateIssued && invoiceDetails.dateIssued.toISOString(),
         referenceNumber:
           invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
             ? invoiceDetails.referenceNumber
-            : '---'
+            : '---',
         // totalAmount: entity.totalAmount,
         // netAmount: entity.netAmount
       };
@@ -74,7 +78,7 @@ export const invoice: Resolvers<any> = {
       const { repos } = context;
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
-        roles: [Roles.ADMIN]
+        roles: [Roles.ADMIN],
       };
       const result = await usecase.execute(args, usecaseContext);
       if (result.isLeft()) {
@@ -85,7 +89,7 @@ export const invoice: Resolvers<any> = {
 
       return {
         totalCount: invoicesList.totalCount,
-        invoices: invoicesList.invoices.map(invoiceDetails => ({
+        invoices: invoicesList.invoices.map((invoiceDetails) => ({
           ...InvoiceMap.toPersistence(invoiceDetails),
           invoiceId: invoiceDetails.id.toString(),
           // status: invoiceDetails.status,
@@ -98,14 +102,14 @@ export const invoice: Resolvers<any> = {
           referenceNumber:
             invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
               ? invoiceDetails.referenceNumber
-              : null
-        }))
+              : null,
+        })),
       };
     },
 
     async invoiceIdByManuscriptCustomId(parent, args, context) {
       const {
-        repos: { manuscript: articleRepo, invoiceItem: invoiceItemRepo }
+        repos: { manuscript: articleRepo, invoiceItem: invoiceItemRepo },
       } = context;
       const usecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         articleRepo,
@@ -113,11 +117,11 @@ export const invoice: Resolvers<any> = {
       );
 
       const request: GetInvoiceIdByManuscriptCustomIdDTO = {
-        customId: args.customId
+        customId: args.customId,
       };
 
       const usecaseContext = {
-        roles: [Roles.ADMIN]
+        roles: [Roles.ADMIN],
       };
 
       const result = await usecase.execute(request, usecaseContext);
@@ -129,7 +133,7 @@ export const invoice: Resolvers<any> = {
       // There is a TSLint error for when try to use a shadowed variable!
       const invoiceIds = result.value.getValue();
 
-      return { invoiceId: invoiceIds.map(ii => ii.id.toString()) };
+      return { invoiceId: invoiceIds.map((ii) => ii.id.toString()) };
     },
 
     async invoiceVat(parent, args, context) {
@@ -145,15 +149,15 @@ export const invoice: Resolvers<any> = {
       }
       const {
         repos,
-        services: { exchangeRateService, vatService }
+        services: { exchangeRateService, vatService },
       } = context;
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
-        invoiceId: args.invoiceId
+        invoiceId: args.invoiceId,
       };
       const usecaseContext = {
-        roles: [Roles.PAYER]
+        roles: [Roles.PAYER],
       };
 
       const result = await usecase.execute(request, usecaseContext);
@@ -180,7 +184,7 @@ export const invoice: Resolvers<any> = {
         {
           postalCode: args.postalCode,
           countryCode: args.country,
-          stateCode: args.state
+          stateCode: args.state,
         },
         args.payerType !== PayerType.INSTITUTION
       );
@@ -188,30 +192,40 @@ export const invoice: Resolvers<any> = {
         {
           postalCode: args.postalCode,
           countryCode: args.country,
-          stateCode: args.state
+          stateCode: args.state,
         },
         args.payerType !== PayerType.INSTITUTION
       );
       return {
         rate,
         vatNote: vatNote.template,
-        vatPercentage
+        vatPercentage,
       };
-    }
+    },
   },
   Invoice: {
     async payer(parent: Invoice, args, context) {
       const {
-        repos: { payer: payerRepo }
+        repos: { payer: payerRepo },
       } = context;
-      const invoiceId = InvoiceId.create(
+      let invoiceId = InvoiceId.create(
         new UniqueEntityID(parent.invoiceId)
       ).getValue();
 
-      const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
+      let payer = await payerRepo.getPayerByInvoiceId(invoiceId);
 
       if (!payer) {
-        return null;
+        if (parent.cancelledInvoiceReference) {
+          invoiceId = InvoiceId.create(
+            new UniqueEntityID(parent.cancelledInvoiceReference)
+          ).getValue();
+          payer = await payerRepo.getPayerByInvoiceId(invoiceId);
+          if (!payer) {
+            return null;
+          }
+        } else {
+          return null;
+        }
       }
       return PayerMap.toPersistence(payer);
     },
@@ -222,9 +236,9 @@ export const invoice: Resolvers<any> = {
           coupon: couponRepo,
           payer: payerRepo,
           address: addressRepo,
-          waiver: waiverRepo
+          waiver: waiverRepo,
         },
-        services: { exchangeRateService, vatService }
+        services: { exchangeRateService, vatService },
       } = context;
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
@@ -234,7 +248,7 @@ export const invoice: Resolvers<any> = {
       );
 
       const result = await getItemsUseCase.execute({
-        invoiceId: parent.invoiceId
+        invoiceId: parent.invoiceId,
       });
 
       let rawItem;
@@ -280,7 +294,7 @@ export const invoice: Resolvers<any> = {
     },
     async payment(parent: Invoice, args, context) {
       const {
-        repos: { payment: paymentRepo }
+        repos: { payment: paymentRepo },
       } = context;
       const invoiceId = InvoiceId.create(
         new UniqueEntityID(parent.invoiceId)
@@ -295,7 +309,7 @@ export const invoice: Resolvers<any> = {
     },
     async payments(parent: Invoice, args, context) {
       const {
-        repos: { payment: paymentRepo }
+        repos: { payment: paymentRepo },
       } = context;
       const invoiceId = InvoiceId.create(
         new UniqueEntityID(parent.invoiceId)
@@ -306,8 +320,51 @@ export const invoice: Resolvers<any> = {
       if (!payments) {
         return null;
       }
-      return payments.map(p => PaymentMap.toPersistence(p));
-    }
+      return payments.map((p) => PaymentMap.toPersistence(p));
+    },
+    async creditNote(parent: Invoice, args, context) {
+      const {
+        repos: { invoice: invoiceRepo },
+      } = context;
+      const usecase = new GetCreditNoteByInvoiceIdUsecase(invoiceRepo);
+
+      const request: GetInvoiceDetailsDTO = {
+        invoiceId: parent.invoiceId,
+      };
+
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
+      const result = await usecase.execute(request, usecaseContext);
+
+      if (result.isLeft()) {
+        return undefined;
+      }
+
+      // There is a TSLint error for when try to use a shadowed variable!
+      const creditNoteDetails = result.value.getValue();
+
+      return {
+        invoiceId: creditNoteDetails.id.toString(),
+        cancelledInvoiceReference: creditNoteDetails.cancelledInvoiceReference,
+        status: creditNoteDetails.status,
+        charge: creditNoteDetails.charge,
+        dateCreated: creditNoteDetails.dateCreated.toISOString(),
+        erpReference: creditNoteDetails.erpReference,
+        revenueRecognitionReference:
+          creditNoteDetails.revenueRecognitionReference,
+        dateIssued:
+          creditNoteDetails.dateIssued &&
+          creditNoteDetails.dateIssued.toISOString(),
+        referenceNumber:
+          creditNoteDetails.invoiceNumber && creditNoteDetails.dateAccepted
+            ? `CN-${creditNoteDetails.referenceNumber}`
+            : '---',
+        // totalAmount: entity.totalAmount,
+        // netAmount: entity.netAmount
+      };
+    },
   },
   InvoiceItem: {
     async article(parent, args, context) {
@@ -318,7 +375,7 @@ export const invoice: Resolvers<any> = {
       );
 
       const article = await getArticleUseCase.execute({
-        articleId: parent.manuscriptId
+        articleId: parent.manuscriptId,
       });
 
       if (article.isLeft()) {
@@ -338,7 +395,7 @@ export const invoice: Resolvers<any> = {
         InvoiceItemId.create(new UniqueEntityID(parent.id))
       );
       return waivers.map(WaiverMap.toPersistence);
-    }
+    },
   },
   Article: {
     async journalTitle(parent, args, context) {
@@ -347,7 +404,7 @@ export const invoice: Resolvers<any> = {
       );
 
       return catalogItem.journalTitle;
-    }
+    },
   },
   Payment: {
     async paymentMethod(parent, args, context) {
@@ -356,7 +413,7 @@ export const invoice: Resolvers<any> = {
       );
 
       const paymentMethod = await getPaymentMethodUseCase.execute({
-        paymentMethodId: parent.paymentMethodId
+        paymentMethodId: parent.paymentMethodId,
       });
 
       if (paymentMethod.isLeft()) {
@@ -364,7 +421,7 @@ export const invoice: Resolvers<any> = {
       }
 
       return PaymentMethodMap.toPersistence(paymentMethod.value.getValue());
-    }
+    },
   },
 
   Mutation: {
@@ -373,8 +430,8 @@ export const invoice: Resolvers<any> = {
         repos: {
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
-          coupon: couponRepo
-        }
+          coupon: couponRepo,
+        },
       } = context;
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
         invoiceRepo,
@@ -383,7 +440,7 @@ export const invoice: Resolvers<any> = {
       );
       const result = await applyCouponUsecase.execute({
         couponCode: args.couponCode,
-        invoiceId: args.invoiceId
+        invoiceId: args.invoiceId,
       });
       if (result.isLeft()) {
         console.log(result);
@@ -393,7 +450,7 @@ export const invoice: Resolvers<any> = {
     },
     async migrateInvoice(parent, args, context) {
       const {
-        repos: { invoice: invoiceRepo, invoiceItem: invoiceItemRepo }
+        repos: { invoice: invoiceRepo, invoiceItem: invoiceItemRepo },
       } = context;
       const {
         invoiceId,
@@ -402,7 +459,7 @@ export const invoice: Resolvers<any> = {
         discount,
         APC,
         dateIssued,
-        dateAccepted
+        dateAccepted,
       } = args;
 
       const migrateInvoiceUsecase = new MigrateInvoiceUsecase(
@@ -419,7 +476,7 @@ export const invoice: Resolvers<any> = {
           discount,
           APC,
           dateIssued,
-          dateAccepted
+          dateAccepted,
         },
         usecaseContext
       );
@@ -434,13 +491,70 @@ export const invoice: Resolvers<any> = {
         invoiceId: migratedInvoice.invoiceId.id.toString(),
         referenceNumber: migratedInvoice.invoiceNumber,
         dateIssued: migratedInvoice.dateIssued.toISOString(),
-        dateAccepted: migratedInvoice?.dateAccepted?.toISOString()
+        dateAccepted: migratedInvoice?.dateAccepted?.toISOString(),
         // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
         // datePaid: migratedPayment.datePaid.toISOString(),
         // amount: migratedPayment.amount.value,
         // invoiceId: migratedPayment.invoiceId.id.toString(),
         // foreignPaymentId: migratedPayment.foreignPaymentId
       };
-    }
-  }
+    },
+    async createCreditNote(parent, args, context) {
+      const {
+        repos: {
+          // payment: paymentRepo,
+          invoice: invoiceRepo,
+          invoiceItem: invoiceItemRepo,
+          transaction: transactionRepo,
+          coupon: couponRepo,
+          waiver: waiverRepo,
+          // manuscript: manuscriptRepo
+        },
+      } = context;
+
+      const { invoiceId, createDraft } = args;
+
+      const createCreditNoteUsecase = new CreateCreditNoteUsecase(
+        // paymentRepo,
+        invoiceRepo,
+        // manuscriptRepo,
+        invoiceItemRepo,
+        transactionRepo,
+        couponRepo,
+        waiverRepo
+      );
+      const usecaseContext = { roles: [Roles.ADMIN] };
+
+      const result = await createCreditNoteUsecase.execute(
+        {
+          invoiceId,
+          createDraft,
+        },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        // console.log(result.value.errorValue());
+        return null;
+      }
+
+      const creditNote = result.value.getValue();
+
+      return {
+        id: creditNote.invoiceId.id.toString(),
+        cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
+        status: creditNote.status,
+        charge: creditNote.charge,
+        dateCreated: creditNote.dateCreated.toISOString(),
+        erpReference: creditNote.erpReference,
+        revenueRecognitionReference: creditNote.revenueRecognitionReference,
+        dateIssued:
+          creditNote.dateIssued && creditNote.dateIssued.toISOString(),
+        referenceNumber:
+          creditNote.invoiceNumber && creditNote.dateAccepted
+            ? `CN-${creditNote.referenceNumber}`
+            : '---',
+      };
+    },
+  },
 };

@@ -109,6 +109,26 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
+  async findByCancelledInvoiceReference(
+    invoiceId: InvoiceId
+  ): Promise<Invoice> {
+    const { db } = this;
+
+    const invoice = await db(TABLES.INVOICES)
+      .select()
+      .where('cancelledInvoiceReference', invoiceId.id.toString())
+      .first();
+
+    if (!invoice) {
+      throw RepoError.createEntityNotFoundError(
+        'creditNote',
+        invoiceId.id.toString()
+      );
+    }
+
+    return InvoiceMap.toDomain(invoice);
+  }
+
   async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
     const { db } = this;
 
@@ -195,7 +215,11 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const invoices = await db(TABLES.INVOICES)
       .select()
       .whereNot(`deleted`, 1)
-      .whereIn('status', ['ACTIVE', 'FINAL'])
+      .where({
+        status: 'ACTIVE',
+      })
+      // filter the credit notes from this list
+      .whereNull('cancelledInvoiceReference')
       .whereNull('erpReference');
 
     return invoices.map((i) => InvoiceMap.toDomain(i));
@@ -217,6 +241,8 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
       .whereNot(`invoices.deleted`, 1)
       .whereNull('invoices.revenueRecognitionReference')
+      // filter the credit notes from this list
+      .whereNull('invoices.cancelledInvoiceReference')
       .whereNotNull('invoices.erpReference')
       .whereNotNull('articles.datePublished');
 

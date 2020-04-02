@@ -9,8 +9,10 @@ import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoiceSentEvent } from './events/invoiceSent';
 import { InvoicePaidEvent } from './events/invoicePaid';
+import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceActivated } from './events/invoiceActivated';
+import { InvoiceCredited } from './events/invoiceCredited';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentId } from '../../payments/domain/PaymentId';
@@ -21,7 +23,7 @@ export enum InvoiceStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
   PENDING = 'PENDING', // when a user confirms the invoice from a sanctioned country
   ACTIVE = 'ACTIVE', // when the customer is being notified
-  FINAL = 'FINAL' // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
+  FINAL = 'FINAL', // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
 }
 
 interface InvoiceProps {
@@ -34,10 +36,12 @@ interface InvoiceProps {
   dateUpdated?: Date;
   dateAccepted?: Date;
   dateIssued?: Date;
+  dateMovedToFinal?: Date;
   charge?: number;
   totalNumInvoiceItems?: number;
   erpReference?: string;
   revenueRecognitionReference?: string;
+  cancelledInvoiceReference?: string;
   vatnote?: string;
 }
 
@@ -46,10 +50,6 @@ export type InvoiceCollection = Invoice[];
 export class Invoice extends AggregateRoot<InvoiceProps> {
   get invoiceId(): InvoiceId {
     return InvoiceId.create(this._id).getValue();
-  }
-
-  get transactionId(): TransactionId {
-    return this.props.transactionId;
   }
 
   get payerId(): PayerId {
@@ -96,6 +96,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.dateAccepted = dateAccepted;
   }
 
+  get dateMovedToFinal(): Date {
+    return this.props.dateMovedToFinal;
+  }
+
+  set dateMovedToFinal(dateMovedToFinal: Date) {
+    this.props.dateMovedToFinal = dateMovedToFinal;
+  }
+
   get invoiceItems(): InvoiceItems {
     return this.props.invoiceItems;
   }
@@ -117,6 +125,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return `${paddedNumber}/${creationYear}`;
   }
 
+  get transactionId(): TransactionId {
+    return this.props.transactionId;
+  }
+
   set transactionId(transactionId: TransactionId) {
     this.props.transactionId = transactionId;
   }
@@ -135,6 +147,18 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set revenueRecognitionReference(revenueRecognitionReference: string) {
     this.props.revenueRecognitionReference = revenueRecognitionReference;
+  }
+
+  get cancelledInvoiceReference(): string {
+    return this.props.cancelledInvoiceReference;
+  }
+
+  set cancelledInvoiceReference(cancelledInvoiceReference: string) {
+    this.props.cancelledInvoiceReference = cancelledInvoiceReference;
+
+    if (cancelledInvoiceReference) {
+      this.addDomainEvent(new InvoiceCredited(this.invoiceId, new Date()));
+    }
   }
 
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
@@ -168,7 +192,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       invoiceItems: props.invoiceItems
         ? props.invoiceItems
         : InvoiceItems.create([]),
-      dateCreated: props.dateCreated ? props.dateCreated : new Date()
+      dateCreated: props.dateCreated ? props.dateCreated : new Date(),
     };
 
     const isNewInvoice = !!id === false;
@@ -207,6 +231,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.FINAL;
     this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, paymentId, now));
+  }
+
+  public markAsFinal(): void {
+    const now = new Date();
+    this.props.dateUpdated = now;
+    this.props.dateMovedToFinal = now;
+    this.props.status = InvoiceStatus.FINAL;
+    this.addDomainEvent(new InvoiceFinalizedEvent(this.invoiceId, now));
   }
 
   public getInvoiceTotal(): number {

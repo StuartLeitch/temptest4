@@ -1,11 +1,12 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   PayerMap,
   AddressMap,
   GetAddressUseCase,
-  ConfirmInvoiceUsecase
+  ConfirmInvoiceUsecase,
 } from '@hindawi/shared';
 
-import { Resolvers, PayerType } from '../schema';
+import { Resolvers } from '../schema';
 import { env } from '../../env';
 
 export const payer: Resolvers<any> = {
@@ -13,7 +14,7 @@ export const payer: Resolvers<any> = {
     async confirmInvoice(parent, args, context) {
       const {
         repos,
-        services: { vatService, emailService, logger: loggerService }
+        services: { vatService, emailService, logger: loggerService },
       } = context;
       const { payer: inputPayer } = args;
 
@@ -33,7 +34,7 @@ export const payer: Resolvers<any> = {
         sanctionedCountryNotificationReceiver:
           env.app.sanctionedCountryNotificationReceiver,
         sanctionedCountryNotificationSender:
-          env.app.sanctionedCountryNotificationSender
+          env.app.sanctionedCountryNotificationSender,
       });
       if (maybeUpdatedPayer.isLeft()) {
         throw new Error(
@@ -41,14 +42,14 @@ export const payer: Resolvers<any> = {
         );
       }
       return PayerMap.toPersistence(maybeUpdatedPayer.value.getValue());
-    }
+    },
   },
   Payer: {
     async address(payer: any, args: any, context) {
       const getAddressUseCase = new GetAddressUseCase(context.repos.address);
 
       const address = await getAddressUseCase.execute({
-        billingAddressId: payer.billingAddressId
+        billingAddressId: payer.billingAddressId,
       });
 
       if (address.isLeft()) {
@@ -56,6 +57,6 @@ export const payer: Resolvers<any> = {
       }
 
       return AddressMap.toPersistence(address.value.getValue());
-    }
-  }
+    },
+  },
 };

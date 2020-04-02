@@ -47,7 +47,7 @@ export const contextLoader: MicroframeworkLoader = (
       catalog: new KnexCatalogRepo(db),
       invoice: new KnexInvoiceRepo(db, logger),
       invoiceItem: new KnexInvoiceItemRepo(db, logger),
-      transaction: new KnexTransactionRepo(db),
+      transaction: new KnexTransactionRepo(db, logger),
       payer: new KnexPayerRepo(db),
       payment: new KnexPaymentRepo(db),
       paymentMethod: new KnexPaymentMethodRepo(db, logger),

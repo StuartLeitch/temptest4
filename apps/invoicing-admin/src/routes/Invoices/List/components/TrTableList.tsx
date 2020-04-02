@@ -3,18 +3,19 @@ import React from 'react';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
+import numeral from 'numeral';
 import fromUnixTime from 'date-fns/fromUnixTime';
 
 import {
   Badge,
   // Progress,
-  Avatar,
-  UncontrolledButtonDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem
+  // Avatar,
+  // UncontrolledButtonDropdown,
+  // DropdownToggle,
+  // DropdownMenu,
+  // DropdownItem
 } from '../../../../components';
-import { randomAvatar } from '../../../../utilities';
+// import { randomAvatar } from '../../../../utilities';
 
 /*eslint-disable */
 const INVOICE_STATUS = {
@@ -32,7 +33,7 @@ const INVOICE_STATUS = {
     <Badge pill color='secondary'>
       Draft
     </Badge>
-  )
+  ),
 };
 
 const TrTableInvoicesList = ({ invoices }) => (
@@ -42,23 +43,41 @@ const TrTableInvoicesList = ({ invoices }) => (
         id,
         status,
         referenceNumber,
+        cancelledInvoiceReference,
         customId,
         manuscriptTitle,
         invoiceItem,
         dateIssued,
-        dateCreated
+        dateAccepted,
       }) => (
-        <tr key={id}>
+        <tr
+          key={id}
+          className={cancelledInvoiceReference ? 'table-warning' : ''}
+        >
           <td className='align-middle'>
             <div>{INVOICE_STATUS[status]}</div>
           </td>
           <td className='align-middle'>
             <Link
-              to={`/invoices/details/${id}`}
+              to={
+                cancelledInvoiceReference
+                  ? `/credit-notes/details/${id}`
+                  : `/invoices/details/${id}`
+              }
               className='text-decoration-none'
             >
-              <span className='text-secondary'>
-                <strong>{referenceNumber || ' '}</strong>
+              <span
+                className={
+                  cancelledInvoiceReference
+                    ? 'badge badge-warning'
+                    : 'text-secondary'
+                }
+              >
+                <strong>
+                  {(cancelledInvoiceReference
+                    ? `CN-${referenceNumber}`
+                    : referenceNumber) || ' '}
+                </strong>
               </span>
             </Link>
           </td>
@@ -76,15 +95,20 @@ const TrTableInvoicesList = ({ invoices }) => (
             {dateIssued && format(new Date(dateIssued), 'dd MMMM yyyy')}
           </td>
           <td className='align-middle'>
-            <strong>$</strong>
-            {invoiceItem && invoiceItem.price}
+            <strong
+              className={
+                invoiceItem?.price < 0 ? 'text-danger' : 'text-success'
+              }
+            >
+              {numeral(invoiceItem && invoiceItem.price).format('$0.00')}
+            </strong>
           </td>
           <td className='align-middle text-nowrap'>
             {invoiceItem?.article?.journalTitle}
           </td>
           <td className='align-middle'>{invoiceItem?.article?.title}</td>
           <td className='align-middle text-nowrap'>
-            {dateCreated && format(new Date(dateCreated), 'dd MMMM yyyy')}
+            {dateAccepted && format(new Date(dateAccepted), 'dd MMMM yyyy')}
           </td>
           {/* <td className='align-middle text-right'>
             <UncontrolledButtonDropdown>

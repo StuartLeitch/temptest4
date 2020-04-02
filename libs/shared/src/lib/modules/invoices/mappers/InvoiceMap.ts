@@ -17,7 +17,8 @@ export class InvoiceMap extends Mapper<Invoice> {
         dateAccepted: raw.dateAccepted ? new Date(raw.dateAccepted) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
         erpReference: raw.erpReference,
-        revenueRecognitionReference: raw.revenueRecognitionReference
+        revenueRecognitionReference: raw.revenueRecognitionReference,
+        cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
       },
       new UniqueEntityID(raw.id)
     );
@@ -28,6 +29,11 @@ export class InvoiceMap extends Mapper<Invoice> {
   }
 
   public static toPersistence(invoice: Invoice): any {
+    // console.info(invoice);
+    // console.info('invoice.id', invoice.id.toString());
+    // console.info('invoice.status', invoice.status);
+    // console.info(invoice.transactionId);
+
     return {
       id: invoice.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
@@ -36,8 +42,9 @@ export class InvoiceMap extends Mapper<Invoice> {
       dateCreated: invoice.dateCreated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
-      erpReference: invoice.erpReference,
-      revenueRecognitionReference: invoice.revenueRecognitionReference
+      erpReference: invoice.erpReference ?? null,
+      revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
+      cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
     };
   }
 }

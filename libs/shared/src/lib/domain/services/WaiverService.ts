@@ -23,7 +23,7 @@ export class WaiverService {
     country,
     invoiceId,
     authorEmail,
-    journalId
+    journalId,
   }: WaiverServiceDTO): Promise<Waiver[]> {
     const waiversToApply: WaiverType[] = [];
 
@@ -31,7 +31,7 @@ export class WaiverService {
 
     const activeWaivers = await this.waiverRepo.getWaivers();
     const activeWaiverMap = activeWaivers
-      .filter(w => w.isActive)
+      .filter((w) => w.isActive)
       .reduce((acc, curr) => {
         acc[curr.waiverType] = true;
         return acc;
@@ -70,15 +70,15 @@ export class WaiverService {
     );
 
     if (activeWaiverMap[WaiverType.WAIVED_CHIEF_EDITOR]) {
-      let isChiefEditor = editorRoles.some(e => e.isChiefEditor());
+      const isChiefEditor = editorRoles.some((e) => e.isChiefEditor());
       if (isChiefEditor) {
         waiversToApply.push(WaiverType.WAIVED_CHIEF_EDITOR);
       }
     }
 
     if (activeWaiverMap[WaiverType.WAIVED_EDITOR]) {
-      let isCurrentJournalEditor = editorRoles.some(
-        e => e.journalId.id.toString() === journalId
+      const isCurrentJournalEditor = editorRoles.some(
+        (e) => e.journalId.id.toString() === journalId
       );
       if (isCurrentJournalEditor) {
         waiversToApply.push(WaiverType.WAIVED_EDITOR);
