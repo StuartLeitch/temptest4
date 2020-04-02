@@ -1,9 +1,9 @@
-import { LoggerService } from '../../../domain/services/LoggerService';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import { EventDTO } from '../domain/EventDTO';
 import { Event as EveEvent } from '@hindawi/eve';
 
 export class FilterEventsService {
-  constructor(private s3Service: AWS.S3, private logger: LoggerService) {}
+  constructor(private s3Service: AWS.S3, private logger: LoggerContract) {}
   public async filterEvents(
     events: AWS.SQS.Message[] /* | EveEvent[] */
   ): Promise<EventDTO[]> {
