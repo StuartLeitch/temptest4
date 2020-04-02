@@ -11,7 +11,7 @@ import { InvoiceSentEvent } from './events/invoiceSent';
 import { InvoicePaidEvent } from './events/invoicePaid';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
-import { InvoiceActivated } from './events/invoiceActivated';
+import { InvoiceConfirmed } from './events/invoiceConfirmed';
 import { InvoiceCredited } from './events/invoiceCredited';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
@@ -223,7 +223,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.ACTIVE;
     this.props.dateIssued = new Date();
-    this.addDomainEvent(new InvoiceActivated(this, now));
+    this.addDomainEvent(new InvoiceConfirmed(this, now));
   }
 
   public markAsPaid(paymentId: PaymentId): void {
@@ -238,7 +238,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.dateUpdated = now;
     this.props.dateMovedToFinal = now;
     this.props.status = InvoiceStatus.FINAL;
-    this.addDomainEvent(new InvoiceFinalizedEvent(this.invoiceId, now));
+    this.addDomainEvent(new InvoiceFinalizedEvent(this, now));
   }
 
   public getInvoiceTotal(): number {

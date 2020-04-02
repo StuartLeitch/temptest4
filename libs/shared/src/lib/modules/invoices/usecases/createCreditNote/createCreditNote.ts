@@ -3,6 +3,7 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 import { Invoice, InvoiceStatus } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -101,6 +102,7 @@ export class CreateCreditNoteUsecase
 
       // * set the invoice status to FINAL
       invoice.markAsFinal();
+
       // console.log('Original Invoice:');
       // console.info(invoice);
       await this.invoiceRepo.update(invoice);
@@ -244,7 +246,12 @@ export class CreateCreditNoteUsecase
           waiverTypes,
           draftInvoice.invoiceId
         );
+
+        DomainEvents.dispatchEventsForAggregate(draftInvoice.id);
       }
+
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
+      DomainEvents.dispatchEventsForAggregate(creditNote.id);
 
       return right(Result.ok<Invoice>(creditNote));
     } catch (err) {

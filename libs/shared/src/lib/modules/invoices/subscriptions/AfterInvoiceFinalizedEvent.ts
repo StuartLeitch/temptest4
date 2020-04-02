@@ -1,7 +1,7 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
-import { InvoiceActivated } from '../domain/events/invoiceActivated';
+import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
 import { PublishInvoiceFinalized } from '../usecases/publishInvoiceFinalized';
 
 import { InvoiceItemRepoContract } from '../repos';
@@ -14,7 +14,7 @@ import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getIte
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
-export class AfterInvoiceFinalized implements HandleContract<InvoiceActivated> {
+export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
@@ -32,12 +32,12 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceActivated> {
     // * Register to the domain event
     DomainEvents.register(
       this.onPublishInvoiceFinalized.bind(this),
-      InvoiceActivated.name
+      InvoiceFinalized.name
     );
   }
 
   private async onPublishInvoiceFinalized(
-    event: InvoiceActivated
+    event: InvoiceFinalized
   ): Promise<void> {
     const { invoice } = event;
 
@@ -97,22 +97,5 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceActivated> {
         `[AfterInvoiceFinalized]: Failed to execute onPublishInvoiceFinalized use case AfterInvoiceFinalized. Err: ${err}`
       );
     }
-
-    // try {
-    //   const resp = await this.invoiceToErpUsecase.execute({
-    //     invoiceId: invoice.id.toString(),
-    //   });
-    //   if (resp.isLeft()) {
-    //     throw resp.value;
-    //   } else {
-    //     this.loggerService.info(
-    //       `[AfterInvoiceActivated]: Successfully executed invoiceToErpUsecase use case AfterInvoiceActivated`
-    //     );
-    //   }
-    // } catch (error) {
-    //   this.loggerService.info(
-    //     `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error}`
-    //   );
-    // }
   }
 }

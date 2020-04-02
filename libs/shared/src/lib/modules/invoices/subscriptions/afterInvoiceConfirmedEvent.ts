@@ -1,7 +1,7 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
-import { InvoiceActivated } from '../domain/events/invoiceActivated';
+import { InvoiceConfirmed } from '../domain/events/invoiceConfirmed';
 import { PublishInvoiceConfirmed } from '../usecases/publishInvoiceConfirmed';
 
 import { InvoiceItemRepoContract } from '../repos';
@@ -14,7 +14,7 @@ import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getIte
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
-export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
+export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
@@ -22,7 +22,7 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceActivated: PublishInvoiceConfirmed,
+    private publishInvoiceConfirmed: PublishInvoiceConfirmed,
     private invoiceToErpUsecase: PublishInvoiceToErpUsecase,
     private loggerService: any
   ) {
@@ -32,13 +32,13 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
   setupSubscriptions(): void {
     // * Register to the domain event
     DomainEvents.register(
-      this.onPublishInvoiceActivated.bind(this),
-      InvoiceActivated.name
+      this.onPublishInvoiceConfirmed.bind(this),
+      InvoiceConfirmed.name
     );
   }
 
-  private async onPublishInvoiceActivated(
-    event: InvoiceActivated
+  private async onPublishInvoiceConfirmed(
+    event: InvoiceConfirmed
   ): Promise<void> {
     const { invoice } = event;
 
@@ -82,7 +82,7 @@ export class AfterInvoiceActivated implements HandleContract<InvoiceActivated> {
         );
       }
 
-      await this.publishInvoiceActivated.execute(
+      await this.publishInvoiceConfirmed.execute(
         invoice,
         invoiceItems,
         manuscript,
