@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-// import { environment } from '@env/environment';
+
 import fs from 'fs';
 import path from 'path';
 import format from 'date-fns/format';

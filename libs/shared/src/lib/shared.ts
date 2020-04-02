@@ -228,8 +228,9 @@ export * from './infrastructure/message-queues/payloadBuilder';
 // export * from './infrastructure/frameworks/redux';
 // export * from './infrastructure/state-management/redux';
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
-export * from './domain/services/VATService';
+export * from './domain/services/ExchangeRateService';
 export * from './domain/services/WaiverService';
+export * from './domain/services/VATService';
 
 // * Export Utils
 export * from './utils/FormatUtils';

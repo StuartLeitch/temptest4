@@ -1,14 +1,14 @@
 import { createClient } from 'soap';
 import EuroVat from 'eu-vat';
 
-import { environment } from '@env/environment';
+// import { environment } from '@env/environment';
 
 import { PoliciesRegister } from '../../modules/invoices/domain/policies/PoliciesRegister';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from './../../modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 import { USVATPolicy } from './../../modules/invoices/domain/policies/USVATPolicy';
 import { Address as VATAddress } from '../../modules/invoices/domain/policies/Address';
 
-const { VAT_VALIDATION_SERVICE_ENDPOINT: endpoint } = environment;
+// const { VAT_VALIDATION_SERVICE_ENDPOINT: endpoint } = environment;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
 
 const vat = new EuroVat();
@@ -26,9 +26,11 @@ if (process.env.TENANT_COUNTRY === 'US') {
 policiesRegister.registerPolicy(VATPolicy);
 
 export class VATService {
+  constructor(private clientEndpoint: string) {}
+
   private async createClient() {
     return new Promise((resolve, reject) => {
-      createClient(endpoint, (err, client) => {
+      createClient(this.clientEndpoint, (err, client) => {
         if (err) {
           reject(err);
         }

@@ -23,10 +23,11 @@ import {
   KnexCouponRepo,
   KnexPublisherRepo,
   KnexSentNotificationsRepo,
-  KnexPausedReminderRepo
+  KnexPausedReminderRepo,
+  ExchangeRateService
 } from '@hindawi/shared';
 
-import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
+// import {  } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
 import { CheckoutService } from '../services/checkout';
 // import { AuthService } from '../services/auth';
 import { PayPalService } from '../services/paypal';
@@ -71,7 +72,7 @@ export const contextLoader: MicroframeworkLoader = (
       logger,
       checkoutService: new CheckoutService(),
       // authService: new AuthService({}),
-      vatService: new VATService(),
+      vatService: new VATService(env.app.vatValidationServiceEndpoint),
       waiverService: new WaiverService(repos.waiver, repos.editor),
       emailService: new EmailService(
         env.app.mailingDisabled,
