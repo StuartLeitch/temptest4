@@ -11,7 +11,7 @@ export class FilterEventsService {
     let processedEvents: EventDTO[] = [];
 
     for (const event of events) {
-      const { MessageId, Body } = event;
+      let { MessageId, Body } = event;
       let id = null;
 
       let isLongEvent = false;
@@ -74,6 +74,7 @@ export class FilterEventsService {
       } catch (error) {
         logger.error(`Payload not correct for ${MessageId} `);
         logger.error(error);
+        logger.debug(JSON.stringify(parsedEvent));
       }
     }
 

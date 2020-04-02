@@ -3,6 +3,13 @@ import { Event } from '../../../../modules/event';
 function extractEventData(serializedEvent: string): Event | null {
   try {
     const partial = JSON.parse(serializedEvent.trim());
+    try {
+      const notification = JSON.parse(partial.body);
+      if (notification.Type === 'Notification') {
+        partial.body = notification.Message;
+      }
+    } catch (e) {}
+
     const message: Event = {
       MessageAttributes: partial.messageAttributes,
       MessageId: partial.messageId,
