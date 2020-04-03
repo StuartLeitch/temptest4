@@ -4,12 +4,10 @@ import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import {
   SisifJobTypes,
   JobBuilder,
-  Job,
 } from '../../../infrastructure/message-queues/contracts/Job';
 import {
   SchedulingTime,
   TimerBuilder,
-  TimerType,
 } from '../../../infrastructure/message-queues/contracts/Time';
 
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
