@@ -150,6 +150,30 @@ export type InvoiceVat = {
   rate?: Maybe<Scalars['Float']>,
 };
 
+
+export enum ReminderType {
+  REMINDER_CONFIRMATION = 'REMINDER_CONFIRMATION',
+  SANCTIONED_COUNTRY = 'SANCTIONED_COUNTRY',
+  REMINDER_PAYMENT = 'REMINDER_PAYMENT',
+  INVOICE_CREATED = 'INVOICE_CREATED'
+}
+
+export type RemindersStatus = {
+  __typename?: 'RemindersStatus',
+  confirmation: Scalars['Boolean'],
+  payment: Scalars['Boolean']
+}
+
+export type SentReminder = {
+  __typename?: 'SentReminder',
+  forInvoice: Scalars['ID'],
+  toEmail: Scalars['String']
+  when: Scalars['Date']
+  type: ReminderType
+}
+
+
+
 export type Journal = {
    __typename?: 'Journal',
   journalId?: Maybe<Scalars['ID']>,
@@ -197,6 +221,8 @@ export type Mutation = {
   migrateInvoice?: Maybe<Invoice>,
   migrateEntireInvoice?: Maybe<Scalars['String']>,
   generateCompensatoryEvents?: Maybe<Scalars['String']>,
+  togglePauseConfirmationReminders?: RemindersStatus
+  togglePausePaymentReminders?: RemindersStatus
 };
 
 
@@ -298,6 +324,12 @@ export type MutationGenerateCompensatoryEventsArgs = {
 };
 
 
+export type MutationPauseRemindersArgs = {
+  state: Scalars['Boolean'],
+  invoiceId: Scalars['ID'],
+}
+
+
 export type PaginatedInvoices = {
    __typename?: 'PaginatedInvoices',
   totalCount?: Maybe<Scalars['Int']>,
@@ -397,6 +429,14 @@ export type QueryInvoiceIdByManuscriptCustomIdArgs = {
 export type QueryEchoArgs = {
   value?: Maybe<Scalars['String']>
 };
+
+export type QueryInvoiceSentReminders = {
+  invoiceId: Scalars['ID']
+}
+
+export type QueryInvoiceRemindersStatus = {
+  invoiceId: Scalars['ID']
+}
 
 
 export type Transaction = {
@@ -529,6 +569,8 @@ export type ResolversTypes = {
   MigrateAPC: MigrateApc,
   Name: ResolverTypeWrapper<Scalars['Name']>,
   CreditCardInput: CreditCardInput,
+  RemindersStatus: RemindersStatus,
+  SentReminder: SentReminder
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -701,6 +743,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
   migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token'>>,
   generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, MutationGenerateCompensatoryEventsArgs>,
+  togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, MutationPauseRemindersArgs>,
+  togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, MutationPauseRemindersArgs>
 };
 
 export interface NameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Name'], any> {
@@ -753,6 +797,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, QueryInvoiceIdByManuscriptCustomIdArgs>,
   journals?: Resolver<Maybe<Array<Maybe<ResolversTypes['Journal']>>>, ParentType, ContextType>,
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
+  remindersStatus?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, QueryInvoiceRemindersStatus>,
+  remindersSent?: Resolver<Maybe<Array<ResolversTypes['SentReminder']>>, ParentType, ContextType, QueryInvoiceSentReminders>,
 };
 
 export interface ReferenceNumberScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ReferenceNumber'], any> {
