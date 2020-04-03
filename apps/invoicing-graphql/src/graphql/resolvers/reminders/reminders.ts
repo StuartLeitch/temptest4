@@ -1,7 +1,7 @@
 import {
   GetRemindersPauseStateForInvoiceUsecase,
   GetSentNotificationForInvoiceUsecase,
-  Roles
+  Roles,
 } from '@hindawi/shared';
 
 import { Resolvers, ReminderType } from '../../schema';
@@ -14,10 +14,10 @@ export const reminders: Resolvers<any> = {
       const { invoiceId } = args;
       const {
         repos: { invoice, pausedReminder },
-        services: { logger: loggerService }
+        services: { logger: loggerService },
       } = context;
       const usecaseContext = {
-        roles: [Roles.ADMIN]
+        roles: [Roles.ADMIN],
       };
 
       const usecase = new GetRemindersPauseStateForInvoiceUsecase(
@@ -31,9 +31,11 @@ export const reminders: Resolvers<any> = {
       );
 
       if (maybePauseState.isLeft()) {
+        console.error(maybePauseState.value.errorValue());
         throw new Error(maybePauseState.value.errorValue().message);
       }
 
+      console.info(maybePauseState.value.getValue());
       return maybePauseState.value.getValue();
     },
 
@@ -41,10 +43,10 @@ export const reminders: Resolvers<any> = {
       const { invoiceId } = args;
       const {
         repos: { invoice, sentNotifications },
-        services: { logger: loggerService }
+        services: { logger: loggerService },
       } = context;
       const usecaseContext = {
-        roles: [Roles.ADMIN]
+        roles: [Roles.ADMIN],
       };
 
       const usecase = new GetSentNotificationForInvoiceUsecase(
@@ -54,7 +56,7 @@ export const reminders: Resolvers<any> = {
       );
       const maybeSentNotifications = await usecase.execute(
         {
-          invoiceId
+          invoiceId,
         },
         usecaseContext
       );
@@ -63,24 +65,24 @@ export const reminders: Resolvers<any> = {
         throw new Error(maybeSentNotifications.value.errorValue().message);
       }
 
-      return maybeSentNotifications.value.getValue().map(reminder => ({
+      return maybeSentNotifications.value.getValue().map((reminder) => ({
         type: (reminder.type as unknown) as ReminderType,
         forInvoice: reminder.invoiceId.id.toString(),
         toEmail: reminder.recipientEmail,
-        when: reminder.dateSent
+        when: reminder.dateSent,
       }));
-    }
+    },
   },
   Mutation: {
     async togglePauseConfirmationReminders(parent, args, context) {
       const { invoiceId, state } = args;
       const {
         repos: { invoice, pausedReminder },
-        services: { logger: loggerService }
+        services: { logger: loggerService },
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN]
+        roles: [Roles.ADMIN],
       };
 
       const getPauseStatusUsecase = new GetRemindersPauseStateForInvoiceUsecase(
@@ -111,11 +113,11 @@ export const reminders: Resolvers<any> = {
       const { invoiceId, state } = args;
       const {
         repos: { invoice, pausedReminder },
-        services: { logger: loggerService }
+        services: { logger: loggerService },
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN]
+        roles: [Roles.ADMIN],
       };
 
       const getPauseStatusUsecase = new GetRemindersPauseStateForInvoiceUsecase(
@@ -136,6 +138,6 @@ export const reminders: Resolvers<any> = {
       }
 
       return result.value.getValue();
-    }
-  }
+    },
+  },
 };
