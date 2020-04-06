@@ -59,6 +59,6 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
   }
 
   for await (const event of producer.produce()) {
-    consumer.consume(event);
+    await consumer.consume(event);
   }
 };
