@@ -101,11 +101,22 @@ export class PublishInvoiceToErpUsecase
         }
 
         invoiceItems = resp.value.getValue();
+
+        for (const item of invoiceItems) {
+          const [coupons, waivers] = await Promise.all([
+            this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
+            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
+          ]);
+          item.coupons = coupons;
+          item.waivers = waivers;
+        }
       }
 
       if (invoiceItems.length === 0) {
         throw new Error(`Invoice ${invoice.id} has no invoice items.`);
       }
+
+      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
@@ -161,6 +172,7 @@ export class PublishInvoiceToErpUsecase
         );
         rate = exchangeRate.exchangeRate;
       }
+
       const erpResponse = await this.erpService.registerInvoice({
         invoice,
         payer,

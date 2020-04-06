@@ -167,6 +167,7 @@ export class CreateCreditNoteUsecase
       // * Assign the cancelled invoice reference
       // * This assignment will trigger an INVOICE_CREDITED event
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
+      creditNote.markAsFinal();
 
       // console.log('New Credit Note:');
       // console.info(creditNote);
@@ -199,17 +200,6 @@ export class CreateCreditNoteUsecase
             rawInvoiceItem.price = invoiceItem.price;
             rawInvoiceItem.dateCreated = new Date();
             delete rawInvoiceItem.id;
-
-            // invoiceItem.coupons.forEach(async (c) => {
-            //   rawInvoiceItem.price -= (invoiceItem.price / 100) * c.reduction;
-            // });
-
-            // invoiceItem.waivers.forEach((w) => {
-            //   rawInvoiceItem.price -= (invoiceItem.price / 100) * w.reduction;
-            // });
-
-            // const vat = (rawInvoiceItem.price / 100) * rawInvoiceItem?.vat;
-            // rawInvoiceItem.price += vat;
 
             const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
             draftInvoice.addInvoiceItem(draftInvoiceItem);
@@ -247,6 +237,7 @@ export class CreateCreditNoteUsecase
           draftInvoice.invoiceId
         );
 
+        draftInvoice.generateCreatedEvent();
         DomainEvents.dispatchEventsForAggregate(draftInvoice.id);
       }
 

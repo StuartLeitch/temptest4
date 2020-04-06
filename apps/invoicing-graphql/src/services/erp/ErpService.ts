@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable @typescript-eslint/camelcase */
 import { Connection } from 'jsforce';
 import {
@@ -5,7 +6,7 @@ import {
   ErpServiceContract,
   PayerType,
   InvoiceItem,
-  ErpResponse
+  ErpResponse,
 } from '@hindawi/shared';
 import countryList from 'country-list';
 
@@ -18,7 +19,7 @@ interface ErpFixedValues {
 export const defaultErpFixedValues: ErpFixedValues = {
   tradeDocumentType: 'a650Y000000boz4QAA',
   currencyId: 'a5W0Y000000GnlcUAC',
-  companyId: 'a5T0Y000000TR3pUAG'
+  companyId: 'a5T0Y000000TR3pUAG',
 };
 
 export class ErpService implements ErpServiceContract {
@@ -38,7 +39,7 @@ export class ErpService implements ErpServiceContract {
     const tradeDocumentId = await this.registerTradeDocument(accountId, data);
 
     const tradeItemIds = await Promise.all(
-      items.map(async item =>
+      items.map(async (item) =>
         this.registerInvoiceItem(
           tradeDocumentId,
           data,
@@ -51,7 +52,7 @@ export class ErpService implements ErpServiceContract {
     return {
       accountId,
       tradeDocumentId,
-      tradeItemIds
+      tradeItemIds,
     };
   }
 
@@ -64,19 +65,19 @@ export class ErpService implements ErpServiceContract {
 
     const journalItem = await this.registerJournalItem({
       journal,
-      ...data
+      ...data,
     });
     const journalTags = await this.registerJournalTags({ journal, ...data });
     const journalItemTag = await this.registerJournalItemTag({
       journalItem,
-      ...data
+      ...data,
     });
 
     return {
       journal,
       journalItem,
       journalTags,
-      journalItemTag
+      journalItemTag,
     };
   }
 
@@ -85,7 +86,7 @@ export class ErpService implements ErpServiceContract {
 
     if (!this.connection) {
       this.connection = new Connection({
-        loginUrl
+        loginUrl,
       });
 
       this.loginPromise = this.connection.login(user, password + securityToken);
@@ -118,7 +119,7 @@ export class ErpService implements ErpServiceContract {
       // BillingAddress:{Street: billingAddress.addressLine1},
       s2cor__Country_Code__c: billingAddress.country,
       s2cor__Registration_Number_Type__c: 'VAT Registration Number',
-      s2cor__VAT_Registration_Number__c: payer.VATId
+      s2cor__VAT_Registration_Number__c: payer.VATId,
     };
 
     const existingAccount = await connection
@@ -151,7 +152,7 @@ export class ErpService implements ErpServiceContract {
       .sobject('Contact')
       .select({ Id: true })
       .where({
-        Email: payerEmail
+        Email: payerEmail,
       })
       .execute();
 
@@ -164,7 +165,7 @@ export class ErpService implements ErpServiceContract {
       AccountId: account.id,
       Email: payerEmail,
       FirstName: firstName,
-      LastName: lastName
+      LastName: lastName,
     });
 
     if (!contact.success) {
@@ -188,7 +189,7 @@ export class ErpService implements ErpServiceContract {
       billingAddress,
       journalName,
       vatNote,
-      rate
+      rate,
     } = data;
     const invoiceDate = invoice.dateIssued;
     const fixedValues = this.fixedValues;
@@ -215,14 +216,14 @@ export class ErpService implements ErpServiceContract {
       s2cor__BillingCountry__c: countryList.getName(billingAddress.country),
       s2cor__BillingCity__c: billingAddress.city,
       s2cor__BillingStreet__c: billingAddress.addressLine1,
-      s2cor__Description__c: description
+      s2cor__Description__c: description,
     };
 
     const existingTradeDocument = await connection
       .sobject('s2cor__Sage_INV_Trade_Document__c')
       .find({
         s2cor__Reference__c: referenceNumber,
-        s2cor__Account__c: accountId
+        s2cor__Account__c: accountId,
       })
       .execute();
 
@@ -276,7 +277,7 @@ export class ErpService implements ErpServiceContract {
       s2cor__Discount_Value__c: discountAmount,
       s2cor__Tax_Amount__c:
         (invoiceItem.vat / 100) * invoiceItem.calculatePrice(),
-      s2cor__Tax_Rates__c: invoiceItem.vat.toString()
+      s2cor__Tax_Rates__c: invoiceItem.vat.toString(),
     };
 
     const existingTradeItems = await connection
@@ -284,7 +285,9 @@ export class ErpService implements ErpServiceContract {
       .find({ s2cor__Trade_Document__c: tradeDocumentId });
 
     if (existingTradeItems.length) {
-      const invoiceItemsToDelete = existingTradeItems.map(ii => (ii as any).Id);
+      const invoiceItemsToDelete = existingTradeItems.map(
+        (ii) => (ii as any).Id
+      );
 
       console.log('Deleting invoice items: ', invoiceItemsToDelete);
 
@@ -342,7 +345,7 @@ export class ErpService implements ErpServiceContract {
   private async registerJournal(data: any) {
     const connection = await this.getConnection();
     const {
-      fixedValues: { companyId }
+      fixedValues: { companyId },
     } = this;
     const { invoice, manuscript, publisherCustomValues } = data;
 
@@ -351,6 +354,10 @@ export class ErpService implements ErpServiceContract {
       .select({ Id: true })
       .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
       .execute();
+    this.logger.info(
+      'Existing Tags by Invoice Number: ',
+      existingTagsByInvoiceNumber
+    );
 
     if (existingTagsByInvoiceNumber.length === 0) {
       return null;
@@ -360,13 +367,13 @@ export class ErpService implements ErpServiceContract {
     const journalData = {
       name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       s2cor__Reference__c: journalReference,
-      s2cor__Approval_Status__c: 'Posted',
+      s2cor__Approval_Status__c: 'Unposted',
       s2cor__Date__c: manuscript.datePublished,
       s2cor__Create_Tags__c: false,
       s2cor__Company__c: 'a5T0Y000000TR3pUAG',
       s2cor__Default_Tax_Treatment__c: 'a6B0Y000000fyP2UAI',
       s2cor__Currency__c: 'a5W0Y000000GnlcUAC',
-      s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW'
+      s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW',
     };
 
     const existingJournal = await connection
@@ -374,6 +381,7 @@ export class ErpService implements ErpServiceContract {
       .select({ Id: true })
       .where({ Name: journalData.name })
       .execute();
+    this.logger.info('Existing Journal: ', existingJournal);
 
     let journal: any;
     if (existingJournal.length) {
@@ -400,7 +408,7 @@ export class ErpService implements ErpServiceContract {
       manuscript,
       invoice,
       invoiceTotal,
-      publisherCustomValues
+      publisherCustomValues,
     } = data;
 
     const journalItemData = {
@@ -410,8 +418,8 @@ export class ErpService implements ErpServiceContract {
       s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW',
       s2cor__Amount__c: invoiceTotal,
       s2cor__Date__c: manuscript.datePublished,
-      s2cor__Approval_Status__c: 'Posted',
-      s2cor__Status__c: 'Submitted'
+      s2cor__Approval_Status__c: 'Unposted',
+      s2cor__Status__c: 'Submitted',
     };
 
     const existingJournalItem = await connection
@@ -419,6 +427,7 @@ export class ErpService implements ErpServiceContract {
       .select({ Id: true })
       .where({ Name: journalItemData.Name })
       .execute();
+    this.logger.info('Existing Journal Item: ', existingJournalItem);
 
     let journalItem: any;
     if (existingJournalItem.length) {
@@ -441,7 +450,7 @@ export class ErpService implements ErpServiceContract {
   private async registerJournalTags(data: any) {
     const connection = await this.getConnection();
     const {
-      fixedValues: { companyId }
+      fixedValues: { companyId },
     } = this;
     const { invoice, journal, publisherCustomValues } = data;
 
@@ -449,7 +458,7 @@ export class ErpService implements ErpServiceContract {
     const dimensions = {
       RevenueRecognitionType: 'a4V0Y0000001chdUAA',
       SalesInvoiceNumber: 'a4V0Y0000001chSUAQ',
-      Product: 'a4V0Y0000001chNUAQ'
+      Product: 'a4V0Y0000001chNUAQ',
     };
 
     const existingJournalTags = await connection
@@ -457,17 +466,19 @@ export class ErpService implements ErpServiceContract {
       .select({ Id: true, Name: true })
       .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
       .execute();
+    this.logger.info('Existing Journal Tags: ', existingJournalTags);
 
     const journalTagData = {
       s2cor__Journal__c: journal.id,
       s2cor__Dimension__c: dimensions.RevenueRecognitionType,
-      s2cor__Tag__c: publisherCustomValues.journalTag
+      s2cor__Tag__c: publisherCustomValues.journalTag,
     };
 
     let journalTag: any;
     journalTag = await connection
       .sobject('s2cor__Sage_ACC_Journal_Tag__c')
       .create(journalTagData);
+    this.logger.info('Journal Tag: ', journalTag);
 
     if (!journalTag.success) {
       throw journalTag;
@@ -495,7 +506,7 @@ export class ErpService implements ErpServiceContract {
     const journalItemTagData = {
       s2cor__Journal_Item__c: journalItem.id,
       s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
-      s2cor__Tag__c: publisherCustomValues.journalItemTag
+      s2cor__Tag__c: publisherCustomValues.journalItemTag,
     };
 
     const existingJournalItemTag = await connection
@@ -504,9 +515,11 @@ export class ErpService implements ErpServiceContract {
       .where({
         s2cor__Journal_Item__c: journalItem.id,
         s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
-        s2cor__Tag__c: publisherCustomValues.journalItemTag
+        s2cor__Tag__c: publisherCustomValues.journalItemTag,
       })
       .execute();
+
+    this.logger.info('Existing Journal Item Tag: ', existingJournalItemTag);
 
     let journalItemTag: any;
     if (existingJournalItemTag.length) {

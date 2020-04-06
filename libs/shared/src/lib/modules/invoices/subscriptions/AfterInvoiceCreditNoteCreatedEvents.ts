@@ -1,5 +1,8 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+
+import { InvoiceId } from './../domain/InvoiceId';
 import { InvoiceCreditNoteCreated as InvoiceCreditNoteCreatedEvent } from '../domain/events/invoiceCreditNoteCreated';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos';
@@ -70,13 +73,34 @@ export class AfterInvoiceCreditNoteCreatedEvent
         );
       }
 
-      const payer = await this.payerRepo.getPayerByInvoiceId(
+      // const payer = await this.payerRepo.getPayerByInvoiceId(
+      //   creditNote.invoiceId
+      // );
+      // if (!payer) {
+      //   throw new Error(
+      //     `Credit Note ${creditNote.id.toString()} has no payers.`
+      //   );
+      // }
+
+      let payer = await this.payerRepo.getPayerByInvoiceId(
         creditNote.invoiceId
       );
       if (!payer) {
-        throw new Error(
-          `Credit Note ${creditNote.id.toString()} has no payers.`
-        );
+        if (creditNote.cancelledInvoiceReference) {
+          const invoiceId = InvoiceId.create(
+            new UniqueEntityID(creditNote.cancelledInvoiceReference)
+          ).getValue();
+          payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+          if (!payer) {
+            throw new Error(
+              `Credit Note ${creditNote.id.toString()} has no payers.`
+            );
+          }
+        } else {
+          throw new Error(
+            `Credit Note ${creditNote.id.toString()} has no payers.`
+          );
+        }
       }
 
       const address = await this.addressRepo.findById(payer.billingAddressId);

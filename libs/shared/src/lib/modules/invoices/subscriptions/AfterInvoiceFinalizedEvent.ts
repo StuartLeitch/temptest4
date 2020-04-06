@@ -1,15 +1,17 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 
 import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
 import { PublishInvoiceFinalized } from '../usecases/publishInvoiceFinalized';
 
+import { InvoiceId } from './../domain/InvoiceId';
 import { InvoiceItemRepoContract } from '../repos';
 import { ArticleRepoContract } from '../../manuscripts/repos';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 // import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
-// import { VATService, PayerType } from '@hindawi/shared';
+// import { VATService, PayerType, UniqueEntityID } from '@hindawi/shared';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
@@ -64,9 +66,19 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         invoiceItems = resp.value.getValue();
       }
 
-      const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
+      let payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
       if (!payer) {
-        throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
+        if (invoice.cancelledInvoiceReference) {
+          const invoiceId = InvoiceId.create(
+            new UniqueEntityID(invoice.cancelledInvoiceReference)
+          ).getValue();
+          payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+          if (!payer) {
+            throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
+          }
+        } else {
+          throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
+        }
       }
 
       const address = await this.addressRepo.findById(payer.billingAddressId);

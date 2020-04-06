@@ -102,12 +102,17 @@ export class RetryFailedErpInvoicesUsecase
           errs.push(updatedInvoiceResponse.value.error);
         } else {
           const assignedErpReference = updatedInvoiceResponse.value.getValue();
-          console.log(
-            `Assigned successfully ${
-              assignedErpReference.tradeDocumentId
-            } to invoice ${failedInvoice.invoiceId.id.toString()}`
-          );
-          updatedInvoices.push(assignedErpReference);
+
+          if (assignedErpReference === null) {
+            // simply do nothing yet
+          } else {
+            console.log(
+              `Assigned successfully ${
+                assignedErpReference.tradeDocumentId
+              } to invoice ${failedInvoice.invoiceId.id.toString()}`
+            );
+            updatedInvoices.push(assignedErpReference);
+          }
         }
       }
 

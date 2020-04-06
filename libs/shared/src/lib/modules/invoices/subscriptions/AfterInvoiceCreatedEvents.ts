@@ -35,6 +35,7 @@ export class AfterInvoiceCreatedEvent
           `Invoice ${event.invoiceId.id.toString()} does not exist.`
         );
       }
+
       const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
         event.invoiceId
       );
@@ -64,11 +65,15 @@ export class AfterInvoiceCreatedEvent
         throw new Error(result.value.errorValue().message);
       }
 
-      if (invoice) {
-        // Get all payers interested in this invoice
-        // for payer in payers
-        // Craft and send 'You got an invoice!' email with invoice link included
-      }
+      // if (invoice) {
+      // Get all payers interested in this invoice
+      // for payer in payers
+      // Craft and send 'You got an invoice!' email with invoice link included
+      // }
+
+      console.log(
+        `[AfterInvoiceCreated]: Successfully executed onInvoiceCreatedEvent use case InvoiceCreatedEvent`
+      );
     } catch (err) {
       console.log(
         `[AfterInvoiceCreated]: Failed to execute onInvoiceCreatedEvent subscription AfterInvoiceCreated. Err: ${err}`

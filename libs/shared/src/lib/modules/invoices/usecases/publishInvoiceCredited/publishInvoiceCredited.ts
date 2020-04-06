@@ -33,7 +33,7 @@ export class PublishInvoiceCredited {
       cancelledInvoiceReference: invoice.cancelledInvoiceReference,
       erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
-      referenceNumber: invoice.referenceNumber,
+      referenceNumber: `CN-${invoice.referenceNumber}`,
       invoiceIssueDate: invoice.dateIssued.toISOString(),
       invoiceItems: invoiceItems.map((ii) => ({
         id: ii.id.toString(),

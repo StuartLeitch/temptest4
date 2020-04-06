@@ -108,12 +108,16 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
         } else {
           const assignedErpReference = updatedInvoiceResponse.value.getValue();
 
-          this.loggerService.info(
-            `Invoice ${unrecognizedInvoice.id.toString()} successfully recognized ${
-              (assignedErpReference as any).journal?.id
-            }`
-          );
-          updatedInvoices.push(assignedErpReference);
+          if (assignedErpReference === null) {
+            // simply do nothing yet
+          } else {
+            this.loggerService.info(
+              `Invoice ${unrecognizedInvoice.id.toString()} successfully recognized ${
+                (assignedErpReference as any).journal?.id
+              }`
+            );
+            updatedInvoices.push(assignedErpReference);
+          }
         }
       }
 

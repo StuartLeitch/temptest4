@@ -29,10 +29,13 @@ export class PublishInvoiceFinalized {
     const data = {
       ...EventUtils.createEventObject(),
       invoiceId: invoice.id.toString(),
-      isCreditNote: false,
+      isCreditNote: !!invoice.cancelledInvoiceReference,
       erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
-      referenceNumber: invoice.referenceNumber,
+      referenceNumber:
+        invoice.cancelledInvoiceReference === null
+          ? invoice.referenceNumber
+          : `CN-${invoice.referenceNumber}`,
       invoiceIssueDate: invoice.dateIssued.toISOString(),
       cancelledInvoiceReference: invoice.cancelledInvoiceReference,
       invoiceItems: invoiceItems.map((ii) => ({

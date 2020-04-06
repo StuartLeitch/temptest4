@@ -12,7 +12,7 @@ import { InvoicePaidEvent } from './events/invoicePaid';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
-import { InvoiceCredited } from './events/invoiceCredited';
+import { InvoiceCreditNoteCreated } from './events/invoiceCreditNoteCreated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentId } from '../../payments/domain/PaymentId';
@@ -157,7 +157,9 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.cancelledInvoiceReference = cancelledInvoiceReference;
 
     if (cancelledInvoiceReference) {
-      this.addDomainEvent(new InvoiceCredited(this.invoiceId, new Date()));
+      this.addDomainEvent(
+        new InvoiceCreditNoteCreated(this.invoiceId, new Date())
+      );
     }
   }
 
