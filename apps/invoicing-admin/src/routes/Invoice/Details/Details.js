@@ -65,7 +65,7 @@ import { TimelineMini } from '../../components/Timeline/TimelineMini';
 // import { TrTableMessages } from '../../Apps/ProfileDetails/components/TrTableMessages';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
-import { InvoiceReminders } from '../../components/Invoice/InvoiceReminders';
+import { InvoiceReminders } from '../../components/Invoice/reminders';
 // import { Coupon } from '../../components/Invoice/Coupon';
 
 const INVOICE_QUERY = `
