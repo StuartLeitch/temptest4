@@ -35,6 +35,7 @@ APP=$APP TO=$TO AWS_ENVIRONMENT=$AWS_ENVIRONMENT AWS_REGISTRY=$AWS_REGISTRY CI_C
 
 # printf -- "\nDeploy BackEnd App for ${AWS_ENVIRONMENT} environment\n"
 aws --profile=production elasticbeanstalk update-environment --environment-name dev-reporting-backend --version-label dev-reporting-backend
+aws --profile=production elasticbeanstalk update-environment --environment-name prod-gsw-reporting-backend --version-label dev-reporting-backend
 
 printf -- '\n';
 

@@ -6,6 +6,8 @@ import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constant
 
 class SubmissionDataView extends AbstractEventView
   implements EventViewContract {
+  private insertTrigger = 'after_se_insert';
+  private updateTrigger = 'after_se_update';
   getCreateQuery(): string {
     return `
 CREATE TABLE ${this.getViewName()} (
@@ -29,7 +31,21 @@ CREATE TABLE ${this.getViewName()} (
   public getTriggerQuery(): string {
     return `
 ${this.getTriggerFunction()}
-create trigger after_se_insert after insert on ${REPORTING_TABLES.SUBMISSION}
+DROP TRIGGER IF EXISTS ${this.insertTrigger} on "public".${
+      REPORTING_TABLES.SUBMISSION
+    };
+create trigger ${this.insertTrigger} after insert on ${
+      REPORTING_TABLES.SUBMISSION
+    }
+for each row 
+execute procedure ${this.getTriggerName()}();
+
+DROP TRIGGER IF EXISTS ${this.updateTrigger} on "public".${
+      REPORTING_TABLES.SUBMISSION
+    };
+create trigger ${this.updateTrigger} after update on ${
+      REPORTING_TABLES.SUBMISSION
+    }
 for each row 
 execute procedure ${this.getTriggerName()}();
     `;
@@ -60,7 +76,7 @@ execute procedure ${this.getTriggerName()}();
             WHERE t.rn = 1;
     
         insert into ${this.getViewName()} values(NEW.id,
-          NEW.time,
+          coalesce(NEW.time, cast_to_timestamp(((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'updated'), '1980-01-01'),
           NEW.type,
           NEW.payload ->> 'submissionId'::text,
           ((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'customId'::text,
@@ -71,7 +87,19 @@ execute procedure ${this.getTriggerName()}();
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'sectionId'),
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'version'),
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'id'),
-          _last_version_index) ON CONFLICT (event_id) DO NOTHING;
+          _last_version_index) ON CONFLICT (event_id) DO UPDATE set
+            event_timestamp = excluded.event_timestamp,
+            submission_event = excluded.submission_event,
+            submission_id = excluded.submission_id,
+            manuscript_custom_id = excluded.manuscript_custom_id,
+            article_type = excluded.article_type,
+            journal_id = excluded.journal_id,
+            title = excluded.title,
+            special_issue_id = excluded.special_issue_id,
+            section_id = excluded.section_id,
+            "version" = excluded."version",
+            manuscript_version_id = excluded.manuscript_version_id,
+            last_version_index = excluded.last_version_index;
         RETURN NEW;
     END
     $$
