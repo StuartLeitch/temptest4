@@ -57,6 +57,8 @@ export class ErpService implements ErpServiceContract {
   }
 
   public async registerRevenueRecognition(data: any): Promise<any> {
+    this.logger.info(`registerRevenueRecognition init with`, data);
+
     const journal = await this.registerJournal(data);
 
     if (journal == null) {
@@ -343,6 +345,8 @@ export class ErpService implements ErpServiceContract {
   }
 
   private async registerJournal(data: any) {
+    // this.logger.info(`registerJournal init with`, data);
+
     const connection = await this.getConnection();
     const {
       fixedValues: { companyId },
@@ -354,10 +358,10 @@ export class ErpService implements ErpServiceContract {
       .select({ Id: true })
       .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
       .execute();
-    this.logger.info(
-      'Existing Tags by Invoice Number: ',
-      existingTagsByInvoiceNumber
-    );
+    // this.logger.info(
+    //   'Existing Tags by Invoice Number: ',
+    //   existingTagsByInvoiceNumber
+    // );
 
     if (existingTagsByInvoiceNumber.length === 0) {
       return null;
@@ -375,33 +379,37 @@ export class ErpService implements ErpServiceContract {
       s2cor__Currency__c: 'a5W0Y000000GnlcUAC',
       s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW',
     };
+    // this.logger.info('journalData', journalData);
 
     const existingJournal = await connection
       .sobject('s2cor__Sage_ACC_Journal__c')
       .select({ Id: true })
       .where({ Name: journalData.name })
       .execute();
-    this.logger.info('Existing Journal: ', existingJournal);
+    // this.logger.info('Existing Journal: ', existingJournal);
 
     let journal: any;
     if (existingJournal.length) {
       journal = existingJournal[0];
       journal.id = journal.Id || journal.id;
-      this.logger.info('Journal object reused', journal.id);
+      // this.logger.info('Journal object reused', journal);
     } else {
       journal = await connection
         .sobject('s2cor__Sage_ACC_Journal__c')
         .create(journalData);
+      // this.logger.info('Journal creation:', journal);
       if (!journal.success) {
         throw journal;
       }
-      this.logger.info('Journal object registered: ', journal.id);
+      // this.logger.info('Journal object registered: ', journal);
     }
 
     return journal;
   }
 
   private async registerJournalItem(data: any) {
+    // this.logger.info(`registerJournalItem init with`, data);
+
     const connection = await this.getConnection();
     const {
       journal,
@@ -421,19 +429,20 @@ export class ErpService implements ErpServiceContract {
       s2cor__Approval_Status__c: 'Unposted',
       s2cor__Status__c: 'Submitted',
     };
+    // this.logger.info('Journal Item Data: ', journalItemData);
 
     const existingJournalItem = await connection
       .sobject('s2cor__Sage_ACC_Journal_Item__c')
       .select({ Id: true })
       .where({ Name: journalItemData.Name })
       .execute();
-    this.logger.info('Existing Journal Item: ', existingJournalItem);
+    // this.logger.info('Existing Journal Item: ', existingJournalItem);
 
     let journalItem: any;
     if (existingJournalItem.length) {
       journalItem = existingJournalItem[0];
       journalItem.id = journalItem.Id || journalItem.id;
-      this.logger.info('Journal Item object reused: ', journalItem.id);
+      // this.logger.info('Journal Item object reused: ', journalItem);
     } else {
       journalItem = await connection
         .sobject('s2cor__Sage_ACC_Journal_Item__c')
@@ -441,13 +450,15 @@ export class ErpService implements ErpServiceContract {
       if (!journalItem.success) {
         throw journalItem;
       }
-      this.logger.info('Journal Item object registered: ', journalItem.id);
+      // this.logger.info('Journal Item object registered: ', journalItem);
     }
 
     return journalItem;
   }
 
   private async registerJournalTags(data: any) {
+    // this.logger.info(`registerJournalTags init with`, data);
+
     const connection = await this.getConnection();
     const {
       fixedValues: { companyId },
@@ -460,46 +471,57 @@ export class ErpService implements ErpServiceContract {
       SalesInvoiceNumber: 'a4V0Y0000001chSUAQ',
       Product: 'a4V0Y0000001chNUAQ',
     };
+    // this.logger.info('Dimensions: ', dimensions);
 
     const existingJournalTags = await connection
       .sobject('s2cor__Sage_ACC_Tag__c')
       .select({ Id: true, Name: true })
       .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
       .execute();
-    this.logger.info('Existing Journal Tags: ', existingJournalTags);
+    // this.logger.info('Existing Journal Tags: ', existingJournalTags);
 
     const journalTagData = {
       s2cor__Journal__c: journal.id,
       s2cor__Dimension__c: dimensions.RevenueRecognitionType,
       s2cor__Tag__c: publisherCustomValues.journalTag,
     };
+    // this.logger.info('Journal Tag Data: ', journalTagData);
 
     let journalTag: any;
     journalTag = await connection
       .sobject('s2cor__Sage_ACC_Journal_Tag__c')
       .create(journalTagData);
-    this.logger.info('Journal Tag: ', journalTag);
+    // this.logger.info('Journal Tag: ', journalTag);
 
     if (!journalTag.success) {
       throw journalTag;
     }
-    this.logger.info(
-      `Journal Tag for ${dimensions.RevenueRecognitionType} object registered`,
-      journalTag.id
-    );
+    // this.logger.info(
+    //   `Journal Tag #1 for ${dimensions.RevenueRecognitionType} object registered`,
+    //   journalTag
+    // );
     journalTags.push(journalTag);
+    // this.logger.info(`Journal Tags #1`, journalTags);
 
     journalTagData.s2cor__Tag__c = (existingJournalTags[0] as any).Id;
     journalTagData.s2cor__Dimension__c = dimensions.SalesInvoiceNumber;
     journalTag = await connection
       .sobject('s2cor__Sage_ACC_Journal_Tag__c')
       .create(journalTagData);
+    // this.logger.info(
+    //   `Journal Tag for ${dimensions.SalesInvoiceNumber} object registered`,
+    //   journalTag
+    // );
     journalTags.push(journalTag);
+
+    // this.logger.info(`Journal Tags #2`, journalTags);
 
     return journalTags;
   }
 
   private async registerJournalItemTag(data: any) {
+    // this.logger.info(`registerJournalItemTag init with`, data);
+
     const connection = await this.getConnection();
     const { journalItem, publisherCustomValues } = data;
 
@@ -508,6 +530,7 @@ export class ErpService implements ErpServiceContract {
       s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
       s2cor__Tag__c: publisherCustomValues.journalItemTag,
     };
+    // this.logger.info(`Journal Item Tag Data`, journalItemTagData);
 
     const existingJournalItemTag = await connection
       .sobject('s2cor__Sage_ACC_Journal_Item_Tag__c')
@@ -515,17 +538,23 @@ export class ErpService implements ErpServiceContract {
       .where({
         s2cor__Journal_Item__c: journalItem.id,
         s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
-        s2cor__Tag__c: publisherCustomValues.journalItemTag,
+        // s2cor__Tag__c: publisherCustomValues.journalItemTag,
       })
       .execute();
 
-    this.logger.info('Existing Journal Item Tag: ', existingJournalItemTag);
+    // console.info(existingJournalItemTag);
+    // this.logger.info('Existing Journal Item Tag: ', existingJournalItemTag);
 
     let journalItemTag: any;
     if (existingJournalItemTag.length) {
-      journalItemTag = existingJournalItemTag[0];
-      journalItemTag.id = journalItemTag.Id || journalItemTag.id;
-      this.logger.info('Journal Item Tag object reused: ', journalItemTag.id);
+      const _journalItemTag: any = existingJournalItemTag[0];
+      // _journalItemTag.id = _journalItemTag.Id || _journalItemTag.id;
+      // journalItemTag = _journalItemTag;
+      _journalItemTag.s2cor__Tag__c = publisherCustomValues.journalItemTag;
+      journalItemTag = await connection
+        .sobject('s2cor__Sage_ACC_Journal_Item_Tag__c')
+        .update(_journalItemTag);
+      this.logger.info('Journal Item Tag object updated: ', journalItemTag);
     } else {
       journalItemTag = await connection
         .sobject('s2cor__Sage_ACC_Journal_Item_Tag__c')
@@ -533,10 +562,7 @@ export class ErpService implements ErpServiceContract {
       if (!journalItemTag.success) {
         throw journalItemTag;
       }
-      this.logger.info(
-        'Journal Item Tag object registered: ',
-        journalItemTag.id
-      );
+      this.logger.info('Journal Item Tag object registered: ', journalItemTag);
     }
 
     return journalItemTag;
