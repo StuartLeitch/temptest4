@@ -9,6 +9,7 @@ import { journals } from './journals';
 import { migrateEntireInvoice } from './migrateEntireInvoice';
 import { generateCompensatoryEvents } from './generateCompensatoryEvents';
 import { reminders } from './reminders';
+import { generateMissingReminderJobs } from './generateMissingReminderJobs';
 
 export const resolvers: Resolvers<any> = merge(
   {},
@@ -19,5 +20,6 @@ export const resolvers: Resolvers<any> = merge(
   journals,
   migrateEntireInvoice,
   generateCompensatoryEvents,
-  reminders
+  reminders,
+  generateMissingReminderJobs
 );

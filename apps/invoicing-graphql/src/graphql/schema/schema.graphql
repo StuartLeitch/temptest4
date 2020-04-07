@@ -330,4 +330,5 @@ type Mutation {
     state: Boolean!
   ): RemindersStatus
   togglePausePaymentReminders(invoiceId: ID!, state: Boolean!): RemindersStatus
+  generateMissingReminderJobs: String!
 }

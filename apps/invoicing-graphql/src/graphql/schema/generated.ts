@@ -221,8 +221,9 @@ export type Mutation = {
   migrateInvoice?: Maybe<Invoice>,
   migrateEntireInvoice?: Maybe<Scalars['String']>,
   generateCompensatoryEvents?: Maybe<Scalars['String']>,
-  togglePauseConfirmationReminders?: RemindersStatus
-  togglePausePaymentReminders?: RemindersStatus
+  togglePauseConfirmationReminders?: RemindersStatus,
+  togglePausePaymentReminders?: RemindersStatus,
+  generateMissingReminderJobs?: Maybe<Scalars['String']>
 };
 
 
@@ -744,7 +745,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token'>>,
   generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, MutationGenerateCompensatoryEventsArgs>,
   togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, MutationPauseRemindersArgs>,
-  togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, MutationPauseRemindersArgs>
+  togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, MutationPauseRemindersArgs>,
+  generateMissingReminderJobs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, unknown>
 };
 
 export interface NameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Name'], any> {
