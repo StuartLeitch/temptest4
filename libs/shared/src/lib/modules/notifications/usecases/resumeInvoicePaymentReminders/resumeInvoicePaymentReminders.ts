@@ -2,7 +2,7 @@ import {
   SchedulingTime,
   SisifJobTypes,
   TimerBuilder,
-  JobBuilder
+  JobBuilder,
 } from '@hindawi/sisif';
 
 // * Core Domain
@@ -18,7 +18,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -71,7 +71,6 @@ export class ResumeInvoicePaymentReminderUsecase
     private scheduler: SchedulerContract
   ) {
     this.calculateRemainingDelay = this.calculateRemainingDelay.bind(this);
-    this.shouldResumeReminder = this.shouldResumeReminder.bind(this);
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validatePauseState = this.validatePauseState.bind(this);
     this.shouldScheduleJob = this.shouldScheduleJob.bind(this);
@@ -96,7 +95,6 @@ export class ResumeInvoicePaymentReminderUsecase
         .then(this.getInvoice(context))
         .then(this.getManuscript(context))
         .then(this.getPayer(context))
-        .advanceOrEnd(this.shouldResumeReminder)
         .then(this.resume)
         .advanceOrEnd(this.shouldScheduleJob)
         .then(this.scheduleJob)
@@ -167,8 +165,8 @@ export class ResumeInvoicePaymentReminderUsecase
       );
 
       return maybeResult
-        .map(result => result.getValue())
-        .chain(isPaused => {
+        .map((result) => result.getValue())
+        .chain((isPaused) => {
           if (!isPaused) {
             return left<Errors.PaymentRemindersNotPausedError, DTO>(
               new Errors.PaymentRemindersNotPausedError(invoiceId)
@@ -190,9 +188,9 @@ export class ResumeInvoicePaymentReminderUsecase
       const { invoiceId } = request;
       const maybeResult = await usecase.execute({ invoiceId }, context);
 
-      return maybeResult.map(result => ({
+      return maybeResult.map((result) => ({
         ...request,
-        invoice: result.getValue()
+        invoice: result.getValue(),
       }));
     };
   }
@@ -210,9 +208,9 @@ export class ResumeInvoicePaymentReminderUsecase
       const { invoiceId } = request;
       const maybeResult = await usecase.execute({ invoiceId }, context);
 
-      return maybeResult.map(result => ({
+      return maybeResult.map((result) => ({
         ...request,
-        manuscript: result.getValue()[0]
+        manuscript: result.getValue()[0],
       }));
     };
   }
@@ -227,14 +225,14 @@ export class ResumeInvoicePaymentReminderUsecase
       const { invoiceId } = request;
       const maybeResult = await usecase.execute(
         {
-          invoiceId
+          invoiceId,
         },
         context
       );
 
-      return maybeResult.map(result => ({
+      return maybeResult.map((result) => ({
         ...request,
-        payer: result.getValue()
+        payer: result.getValue(),
       }));
     };
   }
@@ -293,22 +291,14 @@ export class ResumeInvoicePaymentReminderUsecase
     }
   }
 
-  private async shouldResumeReminder(request: CompoundDTO) {
+  private async shouldScheduleJob(request: CompoundDTO) {
     this.loggerService.info(
-      `Determine if the reminders of type ${NotificationType.REMINDER_PAYMENT} should be resumed for invoice with id ${request.invoiceId}`
+      `Determine if the job for reminders of type ${NotificationType.REMINDER_PAYMENT} should be scheduled for invoice with id ${request.invoiceId}`
     );
 
     if (request.invoice.status !== InvoiceStatus.ACTIVE) {
       return right<null, boolean>(false);
     }
-
-    return right<null, boolean>(true);
-  }
-
-  private async shouldScheduleJob(request: CompoundDTO) {
-    this.loggerService.info(
-      `Determine if the job for reminders of type ${NotificationType.REMINDER_PAYMENT} should be scheduled for invoice with id ${request.invoiceId}`
-    );
 
     const elapsedTime =
       new Date().getTime() - request.invoice.dateIssued.getTime();

@@ -2,7 +2,7 @@ import {
   SchedulingTime,
   SisifJobTypes,
   TimerBuilder,
-  JobBuilder
+  JobBuilder,
 } from '@hindawi/sisif';
 
 // * Core Domain
@@ -18,7 +18,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -43,7 +43,7 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
 import {
   STATUS as TransactionStatus,
-  Transaction
+  Transaction,
 } from '../../../transactions/domain/Transaction';
 
 // * Usecase specific
@@ -74,7 +74,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
     private scheduler: SchedulerContract
   ) {
     this.calculateRemainingDelay = this.calculateRemainingDelay.bind(this);
-    this.shouldResumeReminder = this.shouldResumeReminder.bind(this);
+    this.shouldScheduleReminder = this.shouldScheduleReminder.bind(this);
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validatePauseState = this.validatePauseState.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
@@ -98,8 +98,8 @@ export class ResumeInvoiceConfirmationReminderUsecase
         .then(this.getInvoice(context))
         .then(this.getManuscript(context))
         .then(this.getTransaction(context))
-        .advanceOrEnd(this.shouldResumeReminder)
         .then(this.resume)
+        .advanceOrEnd(this.shouldScheduleReminder)
         .then(this.scheduleJob)
         .map(() => Result.ok<void>(null));
 
@@ -168,8 +168,8 @@ export class ResumeInvoiceConfirmationReminderUsecase
       );
 
       return maybeResult
-        .map(result => result.getValue())
-        .chain(isPaused => {
+        .map((result) => result.getValue())
+        .chain((isPaused) => {
           if (!isPaused) {
             return left<Errors.ConfirmationRemindersNotPausedError, DTO>(
               new Errors.ConfirmationRemindersNotPausedError(invoiceId)
@@ -191,9 +191,9 @@ export class ResumeInvoiceConfirmationReminderUsecase
       const { invoiceId } = request;
       const maybeResult = await usecase.execute({ invoiceId }, context);
 
-      return maybeResult.map(result => ({
+      return maybeResult.map((result) => ({
         ...request,
-        invoice: result.getValue()
+        invoice: result.getValue(),
       }));
     };
   }
@@ -211,9 +211,9 @@ export class ResumeInvoiceConfirmationReminderUsecase
       const { invoiceId } = request;
       const maybeResult = await usecase.execute({ invoiceId }, context);
 
-      return maybeResult.map(result => ({
+      return maybeResult.map((result) => ({
         ...request,
-        manuscript: result.getValue()[0]
+        manuscript: result.getValue()[0],
       }));
     };
   }
@@ -244,7 +244,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
         return right<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
           {
             ...request,
-            transaction: result.getValue()
+            transaction: result.getValue(),
           }
         );
       } catch (e) {
@@ -255,19 +255,19 @@ export class ResumeInvoiceConfirmationReminderUsecase
     };
   }
 
-  private async shouldResumeReminder(request: CompoundDTO) {
+  private async shouldScheduleReminder(request: CompoundDTO) {
     this.loggerService.info(
       `Determine if the reminders of type ${NotificationType.REMINDER_CONFIRMATION} should be resumed for invoice with id ${request.invoiceId}`
     );
 
-    if (
-      request.transaction.status === TransactionStatus.ACTIVE ||
-      request.invoice.status === InvoiceStatus.DRAFT
-    ) {
-      return right<null, boolean>(true);
+    if (request.transaction.status !== TransactionStatus.ACTIVE) {
+      return right<null, boolean>(false);
+    }
+    if (request.invoice.status !== InvoiceStatus.DRAFT) {
+      return right<null, boolean>(false);
     }
 
-    return right<null, boolean>(false);
+    return right<null, boolean>(true);
   }
 
   private async resume(
@@ -301,7 +301,7 @@ export class ResumeInvoiceConfirmationReminderUsecase
       authorFirstName,
       authorSurname,
       authorEmail,
-      customId
+      customId,
     } = manuscript;
     const data = PayloadBuilder.invoiceReminder(
       customId,

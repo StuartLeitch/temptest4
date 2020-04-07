@@ -2,7 +2,7 @@ import {
   SchedulingTime,
   SisifJobTypes,
   TimerBuilder,
-  JobBuilder
+  JobBuilder,
 } from '@hindawi/sisif';
 
 // * Core Domain
@@ -18,7 +18,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -97,6 +97,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         .then(this.addPauseSettings(context))
         .then(this.pauseConfirmation(context))
         .then(this.resumeConfirmation(context))
+        .then(this.pausePayment(context))
         .then(this.resumePayment(context))
         .then(this.scheduleAllCreditControl(context))
         .map(() => Result.ok<void>(null));
@@ -151,7 +152,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       const result = await this.pausedReminderRepo.invoiceIdsWithNoPauseSettings();
       const response = {
         ...request,
-        invoiceIds: result.map(id => id.id.toString())
+        invoiceIds: result.map((id) => id.id.toString()),
       };
       return right(response);
     } catch (e) {
@@ -171,7 +172,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.invoiceRepo,
         this.loggerService
       );
-      const results = invoiceIds.map(invoiceId =>
+      const results = invoiceIds.map((invoiceId) =>
         usecase.execute({ invoiceId }, context)
       );
       const aggregated = await AsyncEither.asyncAll(results);
@@ -192,7 +193,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.invoiceRepo,
         this.loggerService
       );
-      const results = invoiceIds.map(invoiceId =>
+      const results = invoiceIds.map((invoiceId) =>
         usecase.execute({ invoiceId }, context)
       );
       const aggregated = await AsyncEither.asyncAll(results);
@@ -210,7 +211,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       const {
         confirmationQueueName: queueName,
         confirmationDelay: reminderDelay,
-        invoiceIds
+        invoiceIds,
       } = request;
       const usecase = new ResumeInvoiceConfirmationReminderUsecase(
         this.pausedReminderRepo,
@@ -221,7 +222,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.loggerService,
         this.scheduler
       );
-      const results = invoiceIds.map(invoiceId =>
+      const results = invoiceIds.map((invoiceId) =>
         usecase.execute({ reminderDelay, invoiceId, queueName }, context)
       );
       const aggregated = await AsyncEither.asyncAll(results);
@@ -242,7 +243,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.invoiceRepo,
         this.loggerService
       );
-      const results = invoiceIds.map(invoiceId =>
+      const results = invoiceIds.map((invoiceId) =>
         usecase.execute({ invoiceId }, context)
       );
       const aggregated = await AsyncEither.asyncAll(results);
@@ -260,7 +261,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       const {
         invoiceIds,
         paymentDelay: reminderDelay,
-        paymentQueueName: queueName
+        paymentQueueName: queueName,
       } = request;
       const usecase = new ResumeInvoicePaymentReminderUsecase(
         this.pausedReminderRepo,
@@ -271,7 +272,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.loggerService,
         this.scheduler
       );
-      const results = invoiceIds.map(invoiceId =>
+      const results = invoiceIds.map((invoiceId) =>
         usecase.execute({ reminderDelay, invoiceId, queueName }, context)
       );
       const aggregated = await AsyncEither.asyncAll(results);
@@ -313,22 +314,22 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   ) {
     return async ({
       invoiceId,
-      manuscript
+      manuscript,
     }: {
       invoiceId: string;
       manuscript: Manuscript;
     }) => {
       const maybePayer = await usecase.execute(
         {
-          invoiceId
+          invoiceId,
         },
         context
       );
 
-      return maybePayer.map(result => ({
+      return maybePayer.map((result) => ({
         invoiceId,
         manuscript,
-        payer: result.getValue()
+        payer: result.getValue(),
       }));
     };
   }
@@ -340,9 +341,9 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     return async (invoiceId: string) => {
       const maybeManuscript = await usecase.execute({ invoiceId }, context);
 
-      return maybeManuscript.map(result => ({
+      return maybeManuscript.map((result) => ({
         invoiceId,
-        manuscript: result.getValue()[0]
+        manuscript: result.getValue()[0],
       }));
     };
   }
@@ -372,7 +373,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   private scheduleJob(jobType: string, queueName: string, delay: number) {
     return async ({
       manuscript,
-      payer
+      payer,
     }: {
       manuscript: Manuscript;
       payer: Payer;
