@@ -12,7 +12,7 @@ Payment details pages used by users to pay invoices for manuscripts.
 
 # Reporting backend
 
-Reporting backend listens to phenom events and saves them in a databased user by Iris.
+Reporting backend listens to phenom events and saves them in a database used by Iris.
 
 # Eve - reporting pull historic events
 
