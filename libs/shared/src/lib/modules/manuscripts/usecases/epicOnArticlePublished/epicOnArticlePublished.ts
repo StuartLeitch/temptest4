@@ -10,7 +10,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
@@ -83,13 +83,13 @@ export class EpicOnArticlePublishedUsecase
       waiverRepo,
       emailService,
       vatService,
-      loggerService
+      loggerService,
     } = this;
     const {
       customId,
       published,
       sanctionedCountryNotificationReceiver,
-      sanctionedCountryNotificationSender
+      sanctionedCountryNotificationSender,
     } = request;
     (manuscriptRepo as any).correlationId = context.correlationId;
     (invoiceRepo as any).correlationId = context.correlationId;
@@ -104,7 +104,7 @@ export class EpicOnArticlePublishedUsecase
     try {
       loggerService.info('Find Manuscript by Custom Id', {
         correlationId: context.correlationId,
-        manuscriptId: manuscriptId.id.toString()
+        manuscriptId: manuscriptId.id.toString(),
       });
       try {
         manuscript = await manuscriptRepo.findByCustomId(manuscriptId);
@@ -114,7 +114,7 @@ export class EpicOnArticlePublishedUsecase
 
       loggerService.info('Mark Manuscript as Published', {
         correlationId: context.correlationId,
-        manuscriptId: manuscriptId.id.toString()
+        manuscriptId: manuscriptId.id.toString(),
       });
       manuscript.markAsPublished(published);
 
@@ -126,7 +126,7 @@ export class EpicOnArticlePublishedUsecase
 
       loggerService.info('Find Invoice Item by Manuscript Id', {
         correlationId: context.correlationId,
-        manuscriptId: manuscriptId.id.toString()
+        manuscriptId: manuscriptId.id.toString(),
       });
       try {
         // * System identifies Invoice Item by Manuscript Id
@@ -141,7 +141,7 @@ export class EpicOnArticlePublishedUsecase
         );
       }
 
-      const [invoiceId] = invoiceItems.map(ii => ii.invoiceId);
+      const [invoiceId] = invoiceItems.map((ii) => ii.invoiceId);
 
       try {
         invoice = await invoiceRepo.getInvoiceById(invoiceId);
@@ -149,7 +149,7 @@ export class EpicOnArticlePublishedUsecase
         return left(new Errors.InvoiceIdRequired());
       }
 
-      invoiceItems.forEach(ii => invoice.addInvoiceItem(ii));
+      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
 
       if (invoice.getInvoiceTotal() === 0) {
         return right(Result.ok<void>());
@@ -161,7 +161,7 @@ export class EpicOnArticlePublishedUsecase
           invoiceId: invoiceId.id.toString(),
           manuscriptIdId: manuscript.manuscriptId.id.toString(),
           sanctionedCountryNotificationReceiver,
-          sanctionedCountryNotificationSender
+          sanctionedCountryNotificationSender,
         });
         emailService
           .autoConfirmMissingCountryNotification(
@@ -175,7 +175,7 @@ export class EpicOnArticlePublishedUsecase
 
       // * create new address
       const newAddress = AddressMap.toDomain({
-        country: manuscript.authorCountry
+        country: manuscript.authorCountry,
         // ? city: city,
         // ? state: state,
         // ? postalCode: raw.postalCode,
@@ -190,7 +190,7 @@ export class EpicOnArticlePublishedUsecase
         email: manuscript.authorEmail,
         addressId: newAddress.addressId.id.toString(),
         organization: ' ',
-        type: PayerType.INDIVIDUAL
+        type: PayerType.INDIVIDUAL,
         // ? vatId: payer.vatRegistrationNumber,
       });
 
@@ -210,16 +210,18 @@ export class EpicOnArticlePublishedUsecase
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {
           payer: {
             ...PayerMap.toPersistence(newPayer),
-            address: AddressMap.toPersistence(newAddress)
+            address: AddressMap.toPersistence(newAddress),
           },
           sanctionedCountryNotificationReceiver,
-          sanctionedCountryNotificationSender
+          sanctionedCountryNotificationSender,
         };
 
         // * Confirm the invoice automagically
         try {
           await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
-        } catch (err) {}
+        } catch (err) {
+          // do nothing yet
+        }
       }
 
       return right(Result.ok<void>());

@@ -3,7 +3,7 @@ const { createQueueService } = require('@hindawi/queue-service');
 
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 
 import { env } from '../env';
@@ -30,7 +30,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
       eventNamespace: env.app.eventNamespace,
       publisherName: env.app.publisherName,
       serviceName: env.app.name,
-      bucketName: env.aws.s3.largeEventBucket
+      bucketName: env.aws.s3.largeEventBucket,
     };
 
     let queue: any;
@@ -53,7 +53,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
 
       queue.registerEventHandler({
         event,
-        handler: handler.bind(context)
+        handler: handler.bind(context),
       });
     });
 
