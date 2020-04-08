@@ -93,7 +93,7 @@ AS SELECT
     jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(name text)
     group by event_id
   ) coupons on coupons.event_id = inv.event_id
-  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed', 'SubmissionWithdrawn', 'SubmissionScreeningRTCd', 'SubmissionQualityCheckRTCd', 'SubmissionRejected') 
+  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed') 
     order by event_timestamp desc limit 1) sd on sd.manuscript_custom_id = inv.manuscript_custom_id
 WITH DATA;
     `;
