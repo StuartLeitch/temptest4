@@ -1,6 +1,6 @@
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import { EventDTO } from '../domain/EventDTO';
-import { Event as EveEvent } from '@hindawi/eve';
+import { Event as EveEvent } from 'libs/eve/src';
 
 export class FilterEventsService {
   constructor(private s3Service: AWS.S3, private logger: LoggerContract) {}

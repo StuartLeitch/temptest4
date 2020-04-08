@@ -10,6 +10,7 @@ import * as create_checker_events_table from './migrations/20200309150525_create
 import * as create_materialized_views from './migrations/create_materialized_views';
 import * as create_journal_to_publisher_table from './migrations/20200311104931_create_journal_to_publisher_table';
 import * as create_superset_helper_functions from './migrations/20200325162543_create_superset_helper_functions';
+import * as add_sub_data_update_trigger from './migrations/20200406150014_add_sub_data_update_trigger';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -18,6 +19,11 @@ interface KnexMigration {
 }
 
 function makeViewObject(viewFileExport: any): KnexMigration {
+  if (!viewFileExport.up || !viewFileExport.down || !viewFileExport.name) {
+    throw new Error(
+      `View object with name:${viewFileExport.name} doesn't implement KnexMigration interface.`
+    );
+  }
   return {
     up: viewFileExport.up,
     down: viewFileExport.down,
@@ -70,7 +76,9 @@ class KnexMigrationSource {
       '20200323252800_add_ea_dates_manuscript_view',
       true
     ),
-    rebuild_materialized_views('20200325122800_add_id_to_reviewers')
+    rebuild_materialized_views('20200325122800_add_id_to_reviewers', true),
+    add_sub_data_update_trigger,
+    rebuild_materialized_views('20200408122800_fix_inv_m_accept_date')
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

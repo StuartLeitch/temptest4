@@ -7,6 +7,7 @@ import submissionView from './SubmissionsView';
 import authorsView from './AuthorsView';
 import invoiceDataView from './InvoicesDataView';
 import articleDataView from './ArticleDataView';
+import submissionDataView from './SubmissionDataView';
 
 class InvoicesView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -15,8 +16,8 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
     inv.reference_number as "invoice_reference_number",
     inv.manuscript_custom_id as "manuscript_custom_id",
-    inv.manuscript_accepted_date as "invoice_created_date",
-    inv.manuscript_accepted_date as "manuscript_accepted_date",
+    inv.invoice_created_date as "invoice_created_date",
+    case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as manuscript_accepted_date,
     case 
     	when inv.status = 'DRAFT' then 'Unpaid'
     	when coalesce(inv.paid_amount, 0) = 0 then 'Unpaid'
@@ -92,6 +93,8 @@ AS SELECT
     jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(name text)
     group by event_id
   ) coupons on coupons.event_id = inv.event_id
+  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed') 
+    order by event_timestamp desc limit 1) sd on sd.manuscript_custom_id = inv.manuscript_custom_id
 WITH DATA;
     `;
   }

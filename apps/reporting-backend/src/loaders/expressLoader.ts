@@ -6,7 +6,7 @@ import {
 import { env } from '../env';
 import { Logger } from '../lib/logger';
 import { ReportingHandlers } from './handlerLoader';
-import { Event } from '@hindawi/eve';
+import { Event } from 'libs/eve/src';
 const logger = new Logger('express:loader');
 
 export const expressLoader: MicroframeworkLoader = (
