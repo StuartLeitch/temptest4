@@ -19,6 +19,11 @@ interface KnexMigration {
 }
 
 function makeViewObject(viewFileExport: any): KnexMigration {
+  if (!viewFileExport.up || !viewFileExport.down || !viewFileExport.name) {
+    throw new Error(
+      `View object with name:${viewFileExport.name} doesn't implement KnexMigration interface.`
+    );
+  }
   return {
     up: viewFileExport.up,
     down: viewFileExport.down,
@@ -71,8 +76,9 @@ class KnexMigrationSource {
       '20200323252800_add_ea_dates_manuscript_view',
       true
     ),
-    rebuild_materialized_views('20200325122800_add_id_to_reviewers'),
-    add_sub_data_update_trigger
+    rebuild_materialized_views('20200325122800_add_id_to_reviewers', true),
+    add_sub_data_update_trigger,
+    rebuild_materialized_views('20200408122800_fix_inv_m_accept_date')
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

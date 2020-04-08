@@ -51,7 +51,7 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
   LEFT JOIN LATERAL (SELECT * FROM ${invoicesView.getViewName()} i where i.manuscript_custom_id = s.manuscript_custom_id limit 1) i on i.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id and sd.submission_event in ('SubmissionQualityCheckPassed', 'SubmissionWithdrawn', 'SubmissionScreeningRTCd', 'SubmissionQualityCheckRTCd', 'SubmissionRejected') 
-    order by updated_date desc limit 1) sd on sd.submission_id = s.submission_id
+    order by event_timestamp desc limit 1) sd on sd.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'screener' limit 1) screener on screener.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id

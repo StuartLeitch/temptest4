@@ -18,3 +18,5 @@ WHERE ${REPORTING_TABLES.SUBMISSION}.id = subquery.id;
 }
 
 export async function down(knex: Knex): Promise<any> {}
+
+export const name = '20200406150014_add_sub_data_update_trigger.ts';
