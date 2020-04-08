@@ -18,7 +18,7 @@ import { MigrateEntireInvoiceDTO } from './migrateEntireInvoiceDTO';
 
 import {
   STATUS as TransactionStatus,
-  Transaction
+  Transaction,
 } from '../../../transactions/domain/Transaction';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -30,6 +30,14 @@ import { ManuscriptId } from '../../domain/ManuscriptId';
 import { Article } from '../../../manuscripts/domain/Article';
 import { ArticleId } from '../../../manuscripts/domain/ArticleId';
 import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
+
+import {
+  addPaymentMethods,
+  addInvoiceItems,
+  addTransactions,
+  addManuscripts,
+  addInvoices,
+} from './testsUtils';
 
 class MockSQSPublishService implements SQSPublishServiceContract {
   messages: PublishMessage[] = [];
@@ -87,7 +95,7 @@ describe('migrate entire invoice usecase', () => {
     );
   });
 
-  it('should publish the 3 invoices events when all data is passed', async () => {
+  it('should publish the 4 invoices events when all data is passed', async () => {
     const request: MigrateEntireInvoiceDTO = {
       invoiceId: '1',
       acceptanceDate: new Date('03-08-2019').toISOString(),
@@ -101,7 +109,7 @@ describe('migrate entire invoice usecase', () => {
         manuscriptId: '1',
         discount: 20,
         price: 220,
-        vat: 20
+        vat: 20,
       },
       payer: {
         email: 'rares.stan@hindawi.com',
@@ -113,14 +121,14 @@ describe('migrate entire invoice usecase', () => {
           countryCode: 'RO',
           addressLine2: null,
           city: 'Iasi',
-          state: null
-        }
-      }
+          state: null,
+        },
+      },
     };
 
     const result = await migrateUsecase.execute(request);
     expect(result.isRight()).toBeTruthy();
-    expect(sqsPublishService.messages.length).toBe(3);
+    expect(sqsPublishService.messages.length).toBe(4);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toBe(
       request.acceptanceDate
@@ -128,7 +136,9 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages[0].data.invoiceId).toBe(
       request.invoiceId
     );
-    expect(sqsPublishService.messages[0].data.referenceNumber).toBeFalsy();
+    expect(sqsPublishService.messages[0].data.referenceNumber).toBe(
+      request.apc.invoiceReference
+    );
     expect(sqsPublishService.messages[0].data.invoiceStatus).toBe('DRAFT');
 
     expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
@@ -150,6 +160,7 @@ describe('migrate entire invoice usecase', () => {
       request.apc.invoiceReference
     );
     expect(sqsPublishService.messages[2].data.invoiceStatus).toBe('FINAL');
+    // console.info(sqsPublishService.messages[3]);
 
     const invoiceId = InvoiceId.create(
       new UniqueEntityID(request.invoiceId)
@@ -179,7 +190,7 @@ describe('migrate entire invoice usecase', () => {
     expect(payer.type).toBe(request.payer.type);
   });
 
-  it('should publish the 3 invoices events when all data is passed and payer is null and payment is 0', async () => {
+  it('should publish the 4 invoices events when all data is passed and payer is null and payment is 0', async () => {
     const request: MigrateEntireInvoiceDTO = {
       invoiceId: '1',
       acceptanceDate: new Date('03-08-2019').toISOString(),
@@ -193,15 +204,15 @@ describe('migrate entire invoice usecase', () => {
         manuscriptId: '1',
         discount: 0,
         price: 0,
-        vat: 0
+        vat: 0,
       },
-      payer: null
+      payer: null,
     };
 
     const result = await migrateUsecase.execute(request);
     console.info(result.value);
     expect(result.isRight()).toBeTruthy();
-    expect(sqsPublishService.messages.length).toBe(3);
+    expect(sqsPublishService.messages.length).toBe(4);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toBe(
       request.acceptanceDate
@@ -209,7 +220,9 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages[0].data.invoiceId).toBe(
       request.invoiceId
     );
-    expect(sqsPublishService.messages[0].data.referenceNumber).toBeFalsy();
+    expect(sqsPublishService.messages[0].data.referenceNumber).toBe(
+      request.apc.invoiceReference
+    );
     expect(sqsPublishService.messages[0].data.invoiceStatus).toBe('DRAFT');
 
     expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
@@ -267,7 +280,7 @@ describe('migrate entire invoice usecase', () => {
         manuscriptId: '1',
         discount: 20,
         price: 220,
-        vat: 20
+        vat: 20,
       },
       payer: {
         email: 'rares.stan@hindawi.com',
@@ -279,9 +292,9 @@ describe('migrate entire invoice usecase', () => {
           countryCode: 'RO',
           addressLine2: null,
           city: 'Iasi',
-          state: null
-        }
-      }
+          state: null,
+        },
+      },
     };
 
     const result = await migrateUsecase.execute(request);
@@ -349,9 +362,9 @@ describe('migrate entire invoice usecase', () => {
         manuscriptId: '1',
         discount: 20,
         price: 220,
-        vat: 20
+        vat: 20,
       },
-      payer: null
+      payer: null,
     };
 
     const result = await migrateUsecase.execute(request);
@@ -403,9 +416,9 @@ describe('migrate entire invoice usecase', () => {
         manuscriptId: '1',
         discount: 20,
         price: 220,
-        vat: 20
+        vat: 20,
       },
-      payer: null
+      payer: null,
     };
 
     const result = await migrateUsecase.execute(request);
@@ -434,169 +447,3 @@ describe('migrate entire invoice usecase', () => {
     );
   });
 });
-
-function addTransactions(transactionRepo: MockTransactionRepo) {
-  const transactionsProps = [
-    {
-      status: TransactionStatus.DRAFT,
-      id: '1'
-    },
-    {
-      status: TransactionStatus.DRAFT,
-      id: '2'
-    },
-    {
-      status: TransactionStatus.DRAFT,
-      id: '3'
-    }
-  ];
-
-  for (const props of transactionsProps) {
-    const transaction = Transaction.create(
-      props,
-      new UniqueEntityID(props.id)
-    ).getValue();
-    transactionRepo.addMockItem(transaction);
-  }
-}
-
-function addInvoices(invoicesRepo: MockInvoiceRepo) {
-  const invoicesProps = [
-    {
-      status: InvoiceStatus.DRAFT,
-      transactionId: TransactionId.create(new UniqueEntityID('1')),
-      charge: 0,
-      id: '1'
-    },
-    {
-      status: InvoiceStatus.DRAFT,
-      transactionId: TransactionId.create(new UniqueEntityID('2')),
-      charge: 0,
-      id: '2'
-    },
-    {
-      status: InvoiceStatus.DRAFT,
-      transactionId: TransactionId.create(new UniqueEntityID('3')),
-      charge: 0,
-      id: '3'
-    },
-    {
-      status: InvoiceStatus.DRAFT,
-      transactionId: TransactionId.create(new UniqueEntityID('3')),
-      charge: 0,
-      id: '4'
-    }
-  ];
-
-  for (const props of invoicesProps) {
-    const invoice = Invoice.create(
-      props,
-      new UniqueEntityID(props.id)
-    ).getValue();
-    invoicesRepo.addMockItem(invoice);
-  }
-}
-
-function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
-  interface InvoiceItemsPropsWithId extends InvoiceItemProps {
-    id: string;
-  }
-
-  const invoiceItemsProps: InvoiceItemsPropsWithId[] = [
-    {
-      invoiceId: InvoiceId.create(new UniqueEntityID('1')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('1')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
-      id: '1'
-    },
-    {
-      invoiceId: InvoiceId.create(new UniqueEntityID('2')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('2')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
-      id: '2'
-    },
-    {
-      invoiceId: InvoiceId.create(new UniqueEntityID('3')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('3')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
-      id: '3'
-    },
-    {
-      invoiceId: InvoiceId.create(new UniqueEntityID('4')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('4')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
-      id: '4'
-    }
-  ];
-
-  for (const props of invoiceItemsProps) {
-    const invoiceItem = InvoiceItem.create(
-      props,
-      new UniqueEntityID(props.id)
-    ).getValue();
-    invoiceItemRepo.addMockItem(invoiceItem);
-  }
-}
-
-function addManuscripts(manuscriptRepo: MockArticleRepo) {
-  const manuscriptsProps = [
-    {
-      journalId: '1',
-      customId: '1',
-      title: 'Test 1',
-      articleType: '1',
-      created: new Date(),
-      id: '1'
-    },
-    {
-      journalId: '2',
-      customId: '2',
-      title: 'Test 2',
-      articleType: '2',
-      created: new Date(),
-      id: '2'
-    },
-    {
-      journalId: '3',
-      customId: '3',
-      title: 'Test 3',
-      articleType: '3',
-      created: new Date(),
-      id: '3'
-    },
-    {
-      journalId: '4',
-      customId: '4',
-      title: 'Test 4',
-      articleType: '4',
-      created: new Date(),
-      id: '4'
-    }
-  ];
-
-  for (const props of manuscriptsProps) {
-    const manuscript = Article.create(
-      props,
-      new UniqueEntityID(props.id)
-    ).getValue();
-    manuscriptRepo.addMockItem(manuscript);
-  }
-}
-
-function addPaymentMethods(paymentMethodRepo: MockPaymentMethodRepo) {
-  const paymentMethodsProps = [
-    {
-      name: 'Migration',
-      isActive: true
-    }
-  ];
-
-  for (const props of paymentMethodsProps) {
-    const paymentMethod = PaymentMethod.create(props).getValue();
-    paymentMethodRepo.addMockItem(paymentMethod);
-  }
-}
