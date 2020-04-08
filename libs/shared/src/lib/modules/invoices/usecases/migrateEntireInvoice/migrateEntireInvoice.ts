@@ -11,7 +11,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
@@ -40,8 +40,8 @@ import { Migration } from '../../../payments/domain/strategies/Migration';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { AddressId } from '../../../addresses/domain/AddressId';
 import { Address } from '../../../addresses/domain/Address';
-import { ManuscriptId } from '../../domain/ManuscriptId';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
@@ -49,19 +49,18 @@ import { InvoiceId } from '../../domain/InvoiceId';
 import { Invoice } from '../../domain/Invoice';
 import {
   STATUS as TransactionStatus,
-  Transaction
+  Transaction,
 } from '../../../transactions/domain/Transaction';
 
 import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
+import { PublishInvoiceFinalized } from '../publishInvoiceFinalized';
 import { PublishInvoicePaid } from '../publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
-  PublishInvoiceCreatedDTO
+  PublishInvoiceCreatedDTO,
 } from '../publishInvoiceCreated';
 
-import { GetArticleDetailsUsecase } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
-import { GetManuscriptByManuscriptIdUsecase } from '../../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
@@ -71,7 +70,7 @@ import { CreateAddressRequestDTO } from '../../../addresses/usecases/createAddre
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
 import {
   CreatePayerRequestDTO,
-  CreatePayerUsecase
+  CreatePayerUsecase,
 } from '../../../payers/usecases/createPayer/createPayer';
 
 // * Usecase specific
@@ -101,7 +100,44 @@ export class MigrateEntireInvoiceUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract
-  ) {}
+  ) {
+    this.addItemsToInvoice = this.addItemsToInvoice.bind(this);
+    this.calculateVatPercentage = this.calculateVatPercentage.bind(this);
+    this.confirmInvoice = this.confirmInvoice.bind(this);
+    this.createAddress = this.createAddress.bind(this);
+    this.createPayer = this.createPayer.bind(this);
+    this.getInvoice = this.getInvoice.bind(this);
+    this.getInvoiceItemsByInvoiceId = this.getInvoiceItemsByInvoiceId.bind(
+      this
+    );
+    this.getInvoicePaymentInfo = this.getInvoicePaymentInfo.bind(this);
+    this.getManuscript = this.getManuscript.bind(this);
+    this.getManuscriptWithInvoice = this.getManuscriptWithInvoice.bind(this);
+    this.getMigrationPaymentMethod = this.getMigrationPaymentMethod.bind(this);
+    this.getPayerByInvoiceId = this.getPayerByInvoiceId.bind(this);
+    this.getTransactionDetails = this.getTransactionDetails.bind(this);
+    this.getTransactionWithAcceptanceDate = this.getTransactionWithAcceptanceDate.bind(
+      this
+    );
+    this.makeMigrationPayment = this.makeMigrationPayment.bind(this);
+    this.saveInvoice = this.saveInvoice.bind(this);
+    this.savePayment = this.savePayment.bind(this);
+    this.sendInvoiceConfirmedEvent = this.sendInvoiceConfirmedEvent.bind(this);
+    this.sendInvoiceCreatedEvent = this.sendInvoiceCreatedEvent.bind(this);
+    this.sendInvoicePayedEvent = this.sendInvoicePayedEvent.bind(this);
+    this.updateInitialInvoice = this.updateInitialInvoice.bind(this);
+    this.updateInvoiceAtQualityPass = this.updateInvoiceAtQualityPass.bind(
+      this
+    );
+    this.updateInvoiceItem = this.updateInvoiceItem.bind(this);
+    this.updateInvoicePayed = this.updateInvoicePayed.bind(this);
+    this.updateManuscript = this.updateManuscript.bind(this);
+    this.updateTransactionDates = this.updateTransactionDates.bind(this);
+    this.updateTransactionDetails = this.updateTransactionDetails.bind(this);
+    this.updateTransactionStatus = this.updateTransactionStatus.bind(this);
+    this.getAddressDetails = this.getAddressDetails.bind(this);
+    this.sendInvoiceFinalizedEvent = this.sendInvoiceFinalizedEvent.bind(this);
+  }
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -109,55 +145,51 @@ export class MigrateEntireInvoiceUsecase
 
   // @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const requestExecution = new AsyncEither<null, DTO>(
-      request
-    ).then(async request => validateRequest(request));
+    const requestExecution = new AsyncEither<null, DTO>(request).then(
+      validateRequest
+    );
 
     const maybeRequest = await requestExecution.execute();
 
     const maybeInitialInvoice = await requestExecution
-      .then(request => this.updateInitialInvoice(request))
-      .then(invoice => this.updateTransactionDates(invoice))
-      .map(() => {})
+      .then(this.updateInitialInvoice)
+      .then(this.updateTransactionDates)
+      .map(() => {
+        return;
+      })
       .execute();
 
     const maybeInvoiceCreated = await requestExecution
       .then(async () => maybeInitialInvoice)
       .then(async () => maybeRequest)
-      .then(request => this.updateInvoiceAtQualityPass(request))
-      .then(request => this.getTransactionWithAcceptanceDate(request))
-      .then(transaction => this.updateTransactionStatus(transaction))
-      .then(invoiceId => this.sendInvoiceCreatedEvent(invoiceId))
+      .then(this.updateInvoiceAtQualityPass)
+      .then(this.getTransactionWithAcceptanceDate)
+      .then(this.updateTransactionStatus)
+      .then(this.sendInvoiceCreatedEvent)
       .execute();
 
     const maybeInvoiceConfirmed = await requestExecution
       .then(async () => maybeInvoiceCreated)
       .then(async () => maybeRequest)
-      .then(request => this.createPayer(request))
-      .then(({ request, payer }) => this.confirmInvoice(payer, request))
-      .then(({ request, payer, invoice }) =>
-        this.sendInvoiceConfirmedEvent(invoice, request, payer)
-      )
+      .then(this.createPayer)
+      .then(this.confirmInvoice)
+      .then(this.sendInvoiceConfirmedEvent)
       .execute();
 
     const maybeInvoicePayed = await requestExecution
       .then(async () => maybeInvoiceConfirmed)
       .then(async () => maybeRequest)
-      .then(request => this.makeMigrationPayment(request))
-      .then(({ request, payment }) => {
-        return this.updateInvoicePayed(payment, request);
-      })
-      .then(({ request, invoice, payment }) => {
-        return this.sendInvoicePayedEvent(invoice, payment, request);
-      })
+      .then(this.makeMigrationPayment)
+      .then(this.updateInvoicePayed)
+      .then(this.sendInvoicePayedEvent)
       .execute();
 
     return flattenEither([
       maybeInvoiceConfirmed,
       maybeInvoiceCreated,
       maybeInitialInvoice,
-      maybeInvoicePayed
-    ]).map(val => Result.ok<void>());
+      maybeInvoicePayed,
+    ]).map(() => Result.ok<void>());
   }
 
   private async getTransactionWithAcceptanceDate(request: DTO) {
@@ -170,13 +202,13 @@ export class MigrateEntireInvoiceUsecase
     const invoiceId = request.invoiceId;
 
     const transactionExecution = new AsyncEither<null, string>(invoiceId)
-      .then(invoiceId => this.getInvoice(invoiceId))
-      .then(invoice => this.getTransactionDetails(invoice.transactionId))
-      .map(transaction => ({
+      .then((invoiceId) => this.getInvoice(invoiceId))
+      .then((invoice) => this.getTransactionDetails(invoice.transactionId))
+      .map((transaction) => ({
         acceptanceDate,
         submissionDate,
         transaction,
-        invoiceId
+        invoiceId,
       }));
     return transactionExecution.execute();
   }
@@ -186,11 +218,11 @@ export class MigrateEntireInvoiceUsecase
   ): Promise<Either<Errors.TransactionError, Transaction>> {
     const usecase = new GetTransactionUsecase(this.transactionRepo);
     const context = {
-      roles: [Roles.ADMIN]
+      roles: [Roles.ADMIN],
     };
     const response = await usecase.execute(
       {
-        transactionId: transactionId.id.toString()
+        transactionId: transactionId.id.toString(),
       },
       context
     );
@@ -210,7 +242,7 @@ export class MigrateEntireInvoiceUsecase
     if (data && data.acceptanceDate) {
       const { acceptanceDate, submissionDate, transaction, invoiceId } = data;
       return await new AsyncEither<null, Transaction>(transaction)
-        .map(transaction => {
+        .map((transaction) => {
           if (transaction.status === TransactionStatus.DRAFT) {
             transaction.props.dateCreated = new Date(submissionDate);
             transaction.props.dateUpdated = new Date(acceptanceDate);
@@ -218,7 +250,7 @@ export class MigrateEntireInvoiceUsecase
           }
           return transaction;
         })
-        .then(transaction => this.updateTransactionDetails(transaction))
+        .then((transaction) => this.updateTransactionDetails(transaction))
         .map(() => invoiceId)
         .execute();
     }
@@ -239,21 +271,21 @@ export class MigrateEntireInvoiceUsecase
 
   private async updateInitialInvoice(request: DTO) {
     return await new AsyncEither<null, DTO>(request)
-      .then(request => this.getInvoice(request.invoiceId))
-      .map(invoice => {
+      .then((request) => this.getInvoice(request.invoiceId))
+      .map((invoice) => {
         invoice.props.dateCreated = new Date(request.submissionDate);
         invoice.props.dateUpdated = new Date(request.submissionDate);
 
         return invoice;
       })
-      .then(invoice => this.saveInvoice(invoice))
+      .then((invoice) => this.saveInvoice(invoice))
       .execute();
   }
 
   private async updateTransactionDates(invoice: Invoice) {
     return await new AsyncEither<null, Invoice>(invoice)
-      .then(invoice => this.getTransactionDetails(invoice.transactionId))
-      .map(transaction => {
+      .then((invoice) => this.getTransactionDetails(invoice.transactionId))
+      .map((transaction) => {
         if (transaction.status === TransactionStatus.DRAFT) {
           transaction.props.dateCreated = invoice.dateCreated;
           transaction.props.dateUpdated = invoice.props.dateUpdated;
@@ -261,7 +293,7 @@ export class MigrateEntireInvoiceUsecase
 
         return transaction;
       })
-      .then(transaction => this.updateTransactionDetails(transaction))
+      .then((transaction) => this.updateTransactionDetails(transaction))
       .execute();
   }
 
@@ -272,13 +304,13 @@ export class MigrateEntireInvoiceUsecase
     if (!payer || !request.acceptanceDate || !request.issueDate) {
       return right<null, { request: DTO; payer: null }>({
         request,
-        payer: null
+        payer: null,
       });
     }
 
     const payerExecution = new AsyncEither<null, DTO>(request)
-      .then(request => this.createAddress(request))
-      .then(address => {
+      .then((request) => this.createAddress(request))
+      .then((address) => {
         const payerRequest: CreatePayerRequestDTO = {
           vatId: payer.vatRegistrationNumber,
           addressId: address.addressId.id.toString(),
@@ -286,12 +318,12 @@ export class MigrateEntireInvoiceUsecase
           invoiceId: invoiceId,
           email: payer.email,
           name: payer.name,
-          type: payer.type
+          type: payer.type,
         };
         return usecase.execute(payerRequest);
       })
-      .map(result => result.getValue())
-      .map(payer => ({ payer, request }));
+      .map((result) => result.getValue())
+      .map((payer) => ({ payer, request }));
     return payerExecution.execute();
   }
 
@@ -302,10 +334,10 @@ export class MigrateEntireInvoiceUsecase
       country: address.countryCode,
       state: address.state,
       city: address.city,
-      postalCode: ''
+      postalCode: '',
     };
     const maybeAddress = await usecase.execute(addressRequest);
-    return maybeAddress.map(result => result.getValue());
+    return maybeAddress.map((result) => result.getValue());
   }
 
   private async sendInvoiceCreatedEvent(
@@ -323,22 +355,22 @@ export class MigrateEntireInvoiceUsecase
     const usecase = new PublishInvoiceCreatedUsecase(this.sqsPublishService);
 
     const execution = new AsyncEither<null, string>(invoiceId)
-      .then(invoiceId => this.getInvoice(invoiceId))
-      .then(invoice => {
+      .then((invoiceId) => this.getInvoice(invoiceId))
+      .then((invoice) => {
         return this.addItemsToInvoice(invoice);
       })
-      .then(invoice => this.getManuscriptWithInvoice(invoice))
+      .then((invoice) => this.getManuscriptWithInvoice(invoice))
       .map(
         ({ invoice, manuscript }) =>
           ({
             invoiceItems: invoice.invoiceItems.currentItems,
             messageTimestamp: invoice.dateAccepted,
             manuscript,
-            invoice
+            invoice,
           } as PublishInvoiceCreatedDTO)
       )
-      .then(async request => {
-        return (await usecase.execute(request)).map(result =>
+      .then(async (request) => {
+        return (await usecase.execute(request)).map((result) =>
           result.getValue()
         );
       });
@@ -349,12 +381,12 @@ export class MigrateEntireInvoiceUsecase
   private async getInvoice(invoiceId: string) {
     const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     const context = {
-      roles: [Roles.PAYER]
+      roles: [Roles.PAYER],
     };
 
     const maybeInvoice = await invoiceUsecase.execute({ invoiceId }, context);
 
-    return maybeInvoice.map(result => result.getValue());
+    return maybeInvoice.map((result) => result.getValue());
   }
 
   private async addItemsToInvoice(invoice: Invoice) {
@@ -364,9 +396,9 @@ export class MigrateEntireInvoiceUsecase
       this.waiverRepo
     );
     const maybeItems = await itemsUsecase.execute({
-      invoiceId: invoice.id.toString()
+      invoiceId: invoice.id.toString(),
     });
-    const maybeInvoiceWithItems = maybeItems.map(result => {
+    const maybeInvoiceWithItems = maybeItems.map((result) => {
       for (const item of result.getValue()) {
         invoice.addInvoiceItem(item);
       }
@@ -383,12 +415,12 @@ export class MigrateEntireInvoiceUsecase
     );
 
     const maybeManuscript = await usecase.execute({
-      invoiceId: invoice.id.toString()
+      invoiceId: invoice.id.toString(),
     });
 
-    return maybeManuscript.map(result => ({
+    return maybeManuscript.map((result) => ({
       manuscript: result.getValue()[0],
-      invoice
+      invoice,
     }));
   }
 
@@ -423,8 +455,8 @@ export class MigrateEntireInvoiceUsecase
     }
 
     return new AsyncEither<null, string>(request.invoiceId)
-      .then(invoiceId => this.getInvoice(invoiceId))
-      .map(invoice => {
+      .then((invoiceId) => this.getInvoice(invoiceId))
+      .map((invoice) => {
         if (request.acceptanceDate) {
           const invoiceNumber = Number.parseInt(
             request.apc.invoiceReference,
@@ -440,9 +472,9 @@ export class MigrateEntireInvoiceUsecase
         }
         return invoice;
       })
-      .then(invoice => this.saveInvoice(invoice))
-      .then(invoice => this.getInvoiceItemsByInvoiceId(invoice.invoiceId))
-      .map(items => {
+      .then((invoice) => this.saveInvoice(invoice))
+      .then((invoice) => this.getInvoiceItemsByInvoiceId(invoice.invoiceId))
+      .map((items) => {
         items[0].props.price = request.apc.price - request.apc.discount;
         if (items[0].props.price < 0) {
           items[0].props.price = 0;
@@ -455,7 +487,7 @@ export class MigrateEntireInvoiceUsecase
 
         return items[0];
       })
-      .then(item => this.updateInvoiceItem(item))
+      .then((item) => this.updateInvoiceItem(item))
       .map(() => request)
       .execute();
   }
@@ -482,19 +514,25 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
-  private async confirmInvoice(payer: Payer, request: DTO) {
+  private async confirmInvoice({
+    payer,
+    request,
+  }: {
+    payer: Payer;
+    request: DTO;
+  }) {
     if (!request.acceptanceDate || !request.issueDate) {
       return right<null, { invoice: null; payer: null; request: DTO }>({
         invoice: null,
         payer: null,
-        request
+        request,
       });
     }
     return new AsyncEither<null, null>(null)
       .then(() => {
         return this.getInvoice(request.invoiceId);
       })
-      .map(invoice => {
+      .map((invoice) => {
         const invoiceNumber = Number.parseInt(
           request.apc.invoiceReference,
           10
@@ -509,12 +547,12 @@ export class MigrateEntireInvoiceUsecase
 
         return invoice;
       })
-      .then(invoice => this.saveInvoice(invoice))
-      .then(async invoice => {
+      .then((invoice) => this.saveInvoice(invoice))
+      .then(async (invoice) => {
         const maybeManuscript = await this.getManuscript(
           request.apc.manuscriptId
         );
-        return maybeManuscript.map(manuscript => ({ manuscript, invoice }));
+        return maybeManuscript.map((manuscript) => ({ manuscript, invoice }));
       })
       .map(({ invoice, manuscript }) => {
         if (payer) {
@@ -534,7 +572,7 @@ export class MigrateEntireInvoiceUsecase
         const maybeSavedManuscript = await this.updateManuscript(manuscript);
         return maybeSavedManuscript.map(() => invoice);
       })
-      .map(invoice => ({ invoice, payer, request }))
+      .map((invoice) => ({ invoice, payer, request }))
       .execute();
   }
 
@@ -560,62 +598,40 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
-  private async sendInvoiceConfirmedEvent(
-    invoice: Invoice,
-    request: DTO,
-    payer: Payer
-  ) {
+  private async sendInvoiceConfirmedEvent({
+    invoice,
+    request,
+    payer,
+  }: {
+    invoice: Invoice;
+    request: DTO;
+    payer: Payer;
+  }) {
     if (!invoice) {
       return right<null, void>(null);
     }
 
-    // const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
-    const manuscriptUsecase = new GetManuscriptByManuscriptIdUsecase(
-      this.manuscriptRepo
-    );
     const usecase = new PublishInvoiceConfirmed(this.sqsPublishService);
-    const addressUsecase = new GetAddressUseCase(this.addressRepo);
     const messageTimestamp = new Date(request.issueDate);
-    // const invoiceItems = invoice.invoiceItems.currentItems;
 
-    return new AsyncEither<null, string>(payer?.billingAddressId?.id.toString())
-      .then(billingAddressId => {
-        if (!billingAddressId) {
-          return Promise.resolve(right<null, null>(null));
-        }
-        return addressUsecase.execute({ billingAddressId });
-      })
-      .map(result => {
-        if (!result) {
-          return null;
-        }
-        return (result as any).getValue() as Address;
-      })
-      .then(async billingAddress => {
-        const context = {
-          roles: [Roles.ADMIN]
-        };
-        // const maybeResponse = await manuscriptUsecase.execute(
-        //   {
-        //     manuscriptId: request.apc.manuscriptId
-        //   },
-        //   context
-        // );
+    return new AsyncEither<null, AddressId>(payer?.billingAddressId)
+      .then(this.getAddressDetails)
+      .then(async (billingAddress) => {
         const maybeResponse = await this.getManuscript(
           request.apc.manuscriptId
         );
-        return maybeResponse.map(manuscript => ({
+        return maybeResponse.map((manuscript) => ({
           manuscript,
-          billingAddress
+          billingAddress,
         }));
       })
-      .then(async data => {
+      .then(async (data) => {
         const maybeItem = await this.getInvoiceItemsByInvoiceId(
           invoice.invoiceId
         );
-        return maybeItem.map((invoiceItems: any) => ({
+        return maybeItem.map((invoiceItems) => ({
           ...data,
-          invoiceItems
+          invoiceItems,
         }));
       })
       .then(async ({ billingAddress, manuscript, invoiceItems }) => {
@@ -654,7 +670,7 @@ export class MigrateEntireInvoiceUsecase
     ) {
       return right<null, { payment: null; request: DTO }>({
         request,
-        payment: null
+        payment: null,
       });
     }
 
@@ -662,7 +678,7 @@ export class MigrateEntireInvoiceUsecase
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(migration);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Migration', new MigrationPayment()]
+      ['Migration', new MigrationPayment()],
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'MigrationPayment'
@@ -672,46 +688,44 @@ export class MigrateEntireInvoiceUsecase
 
     return new AsyncEither<null, null>(null)
       .then(() => this.getMigrationPaymentMethod())
-      .then(async paymentMethod => {
+      .then(async (paymentMethod) => {
         if (!request.payer) {
           return right<null, { paymentMethod: PaymentMethod; payer: null }>({
             paymentMethod,
-            payer: null
+            payer: null,
           });
         }
         const maybePayer = await this.getPayerByInvoiceId(request.invoiceId);
-        return maybePayer.map(payer => ({ paymentMethod, payer }));
+        return maybePayer.map((payer) => ({ paymentMethod, payer }));
       })
       .then(async ({ paymentMethod, payer }) => {
         const paymentMethodId = paymentMethod.paymentMethodId.id.toString();
-        const payerId = !!payer
-          ? ((payer as any).id.toString() as string)
-          : null;
+        const payerId: string = payer ? payer.id.toString() : null;
         if (!request.apc.paymentAmount) {
           return right<null, null>(null);
         }
-        return right<null, any>({
+        return right<null, unknown>({
           amount: request.apc.paymentAmount,
           datePaid: request.paymentDate,
           invoiceId: request.invoiceId,
           foreignPaymentId: '',
           paymentMethodId,
-          payerId
+          payerId,
         });
       })
-      .map(rawPayment => {
+      .map((rawPayment) => {
         if (!rawPayment) {
           return null;
         }
         return PaymentMap.toDomain(rawPayment);
       })
-      .then(payment => {
+      .then((payment) => {
         if (!payment) {
           return Promise.resolve(right<null, null>(null));
         }
         return this.savePayment(payment);
       })
-      .map(payment => ({ payment, request }))
+      .map((payment) => ({ payment, request }))
       .execute();
   }
 
@@ -738,7 +752,13 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
-  private async updateInvoicePayed(payment: Payment, request: DTO) {
+  private async updateInvoicePayed({
+    payment,
+    request,
+  }: {
+    payment: Payment;
+    request: DTO;
+  }) {
     if (!payment && request.apc.price !== request.apc.discount) {
       return right<
         null,
@@ -751,14 +771,14 @@ export class MigrateEntireInvoiceUsecase
     }
     return new AsyncEither<null, null>(null)
       .then(() => this.getInvoice(request.invoiceId))
-      .map(invoice => {
+      .map((invoice) => {
         invoice.props.status = InvoiceStatus.FINAL;
         invoice.props.dateUpdated = new Date(request.paymentDate);
 
         return invoice;
       })
-      .then(invoice => this.saveInvoice(invoice))
-      .map(invoice => ({ invoice, payment, request }))
+      .then((invoice) => this.saveInvoice(invoice))
+      .map((invoice) => ({ invoice, payment, request }))
       .execute();
   }
 
@@ -777,11 +797,15 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
-  private async sendInvoicePayedEvent(
-    invoice: Invoice,
-    payment: Payment,
-    request: DTO
-  ) {
+  private async sendInvoicePayedEvent({
+    invoice,
+    payment,
+    request,
+  }: {
+    invoice: Invoice;
+    payment: Payment;
+    request: DTO;
+  }) {
     if (!invoice) {
       return right<null, null>(null);
     }
@@ -790,54 +814,124 @@ export class MigrateEntireInvoiceUsecase
       return right<null, null>(null);
     }
 
-    // const manuscriptUsecase = new GetArticleDetailsUsecase(this.manuscriptRepo);
-    const manuscriptUsecase = new GetManuscriptByManuscriptIdUsecase(
-      this.manuscriptRepo
-    );
     const usecase = new PublishInvoicePaid(this.sqsPublishService);
     const messageTimestamp = request.paymentDate
       ? new Date(request.paymentDate)
       : invoice.dateIssued;
 
-    return (
-      new AsyncEither<null, string>(request.apc.manuscriptId)
-        // .map(articleId => ({ articleId }))
-        .then(async () => {
-          const context = {
-            roles: [Roles.ADMIN]
-          };
-          const maybeResponse = await this.getManuscript(
+    return new AsyncEither<null, string>(request.apc.manuscriptId)
+      .then(async () => {
+        const maybeResponse = await this.getManuscript(
+          request.apc.manuscriptId
+        );
+
+        return maybeResponse;
+      })
+      .then(async (manuscript) => {
+        const maybePaymentInfo = await this.getInvoicePaymentInfo(
+          invoice.invoiceId
+        );
+        return maybePaymentInfo.map((paymentDetails) => ({
+          paymentDetails,
+          manuscript,
+        }));
+      })
+      .then(async (data) => {
+        const maybeInvoice = await this.getInvoiceItemsByInvoiceId(
+          invoice.invoiceId
+        );
+        return maybeInvoice.map((invoiceItems) => ({
+          ...data,
+          invoiceItems,
+        }));
+      })
+      .then(async ({ paymentDetails, manuscript, invoiceItems }) => {
+        const result = await usecase.execute(
+          invoice,
+          invoiceItems,
+          manuscript,
+          paymentDetails,
+          messageTimestamp
+        );
+        return right<null, void>(result);
+      })
+      .execute();
+  }
+
+  private async getAddressDetails(id: AddressId) {
+    if (!id) {
+      return null;
+    }
+
+    const usecase = new GetAddressUseCase(this.addressRepo);
+    const maybeAddress = await usecase.execute({
+      billingAddressId: id.id.toString(),
+    });
+    return maybeAddress.map((result) => result.getValue());
+  }
+
+  private sendInvoiceFinalizedEvent(context: Context) {
+    const usecase = new PublishInvoiceFinalized(this.sqsPublishService);
+
+    return async (request: DTO) => {
+      const execution = new AsyncEither(request.invoiceId)
+        .then(this.getInvoice)
+        .then(async (invoice) => {
+          const maybeManuscript = await this.getManuscript(
             request.apc.manuscriptId
           );
-
-          return maybeResponse;
+          return maybeManuscript.map((manuscript) => ({ invoice, manuscript }));
         })
-        .then(async manuscript => {
-          const maybePaymentInfo = await this.getInvoicePaymentInfo(
-            invoice.invoiceId
+        .then(async (data) => {
+          const maybeInvoiceItems = await this.getInvoiceItemsByInvoiceId(
+            data.invoice.invoiceId
           );
-          return maybePaymentInfo.map(paymentDetails => ({
-            paymentDetails,
-            manuscript
+
+          return maybeInvoiceItems.map((invoiceItems) => ({
+            ...data,
+            invoiceItems,
           }));
         })
-        .then(async data => {
-          const maybeInvoice = await this.getInvoiceItemsByInvoiceId(
-            invoice.invoiceId
-          );
-          return maybeInvoice.map(invoiceItems => ({ ...data, invoiceItems }));
+        .then(async (data) => {
+          const maybePayer = await this.getPayerByInvoiceId(request.invoiceId);
+
+          return maybePayer.map((payer) => ({ ...data, payer }));
         })
-        .then(async ({ paymentDetails, manuscript, invoiceItems }) => {
-          const result = await usecase.execute(
+        .then(async (data) => {
+          const maybeAddress = await this.getAddressDetails(
+            data.payer.billingAddressId
+          );
+          return maybeAddress.map((address) => ({ ...data, address }));
+        })
+        .then(
+          ({
             invoice,
-            invoiceItems,
             manuscript,
-            paymentDetails,
-            messageTimestamp
-          );
-          return right<null, void>(result);
-        })
-        .execute()
-    );
+            invoiceItems,
+            payer,
+            address,
+          }: {
+            invoice: Invoice;
+            manuscript: Manuscript;
+            invoiceItems: InvoiceItem[];
+            payer: Payer;
+            address: Address;
+          }) => {
+            const messageTimestamp = new Date(
+              request.paymentDate || request.issueDate
+            );
+            return usecase.execute(
+              invoice,
+              invoiceItems,
+              manuscript,
+              payer,
+              address,
+              messageTimestamp
+            );
+          }
+        );
+
+      return execution.execute();
+    };
   }
 }
