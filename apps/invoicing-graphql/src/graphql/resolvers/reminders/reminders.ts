@@ -31,11 +31,9 @@ export const reminders: Resolvers<any> = {
       );
 
       if (maybePauseState.isLeft()) {
-        console.error(maybePauseState.value.errorValue());
         throw new Error(maybePauseState.value.errorValue().message);
       }
 
-      console.info(maybePauseState.value.getValue());
       return maybePauseState.value.getValue();
     },
 

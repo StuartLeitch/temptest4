@@ -1,4 +1,4 @@
-import React, { FunctionComponent, Fragment } from 'react';
+import React, { FunctionComponent } from 'react';
 import Toggle from 'react-toggle';
 
 interface ReminderToggleProps {
@@ -30,7 +30,7 @@ const ReminderToggle: FunctionComponent<ReminderToggleProps> = ({
   onChange,
 }) => {
   return (
-    <Fragment>
+    <>
       <dt className={`col-sm-4 text-lg-right`}>{reminderName}</dt>
       <dd className='col-sm-8 d-flex'>
         <label className='d-flex align-items-middle mb-0 align-items-center'>
@@ -44,7 +44,7 @@ const ReminderToggle: FunctionComponent<ReminderToggleProps> = ({
           />
         </label>
       </dd>
-    </Fragment>
+    </>
   );
 };
 
