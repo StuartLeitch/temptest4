@@ -307,7 +307,9 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages[0].data.invoiceId).toBe(
       request.invoiceId
     );
-    expect(sqsPublishService.messages[0].data.referenceNumber).toBeFalsy();
+    expect(sqsPublishService.messages[0].data.referenceNumber).toBe(
+      request.apc.invoiceReference
+    );
     expect(sqsPublishService.messages[0].data.invoiceStatus).toBe('DRAFT');
 
     expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
@@ -357,7 +359,7 @@ describe('migrate entire invoice usecase', () => {
       issueDate: null,
       erpReference: null,
       apc: {
-        invoiceReference: null,
+        invoiceReference: '00001/2019',
         paymentAmount: 220,
         manuscriptId: '1',
         discount: 20,
@@ -377,7 +379,9 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages[0].data.invoiceId).toBe(
       request.invoiceId
     );
-    expect(sqsPublishService.messages[0].data.referenceNumber).toBeFalsy();
+    expect(sqsPublishService.messages[0].data.referenceNumber).toBe(
+      request.apc.invoiceReference
+    );
     expect(sqsPublishService.messages[0].data.invoiceStatus).toBe('DRAFT');
 
     const invoiceId = InvoiceId.create(
@@ -394,7 +398,7 @@ describe('migrate entire invoice usecase', () => {
 
     expect(invoice.status).toBe('DRAFT');
     expect(invoice.dateIssued).toBeFalsy();
-    expect(invoice.invoiceNumber).toBeFalsy();
+    expect(invoice.invoiceNumber).toBeTruthy();
     expect(invoice.dateCreated.toISOString()).toBe(request.submissionDate);
     expect(invoice.props.dateUpdated.toISOString()).toBe(
       request.acceptanceDate
