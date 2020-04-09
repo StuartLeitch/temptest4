@@ -1,7 +1,7 @@
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 
 class JournalsDataView extends AbstractEventView implements EventViewContract {
@@ -26,9 +26,10 @@ WITH DATA;
 
   postCreateQueries = [
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`,
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id, event_date)`,
     `CREATE INDEX ON ${this.getViewName()} (event_date)`,
     `CREATE INDEX ON ${this.getViewName()} (publisher_name)`,
-    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id, journal_issn)`
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id, journal_issn)`,
   ];
 
   getViewName(): string {

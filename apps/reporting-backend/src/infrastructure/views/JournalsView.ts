@@ -1,6 +1,6 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import journalsDataView from './JournalsDataView';
 
@@ -8,7 +8,7 @@ class JournalsView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS SELECT DISTINCT ON (j1.event_date) j1.event,
+AS SELECT j1.event,
     j1.journal_id,
     j1.journal_issn,
     j1.journal_name,
@@ -18,22 +18,20 @@ AS SELECT DISTINCT ON (j1.event_date) j1.event,
     j1.journal_email,
     j1.event_date,
     j1.event_id
-    FROM ${journalsDataView.getViewName()} j1
+    FROM (select *, row_number() over (partition by journal_id order by event_date desc) as rn from ${journalsDataView.getViewName()} jd) j1
     left join journal_to_publisher publisher on j1.journal_id = publisher.journal_id
-  WHERE j1.event_date = (( SELECT max(j2.event_date) AS max
-            FROM ${journalsDataView.getViewName()} j2
-          WHERE j1.journal_id = j2.journal_id))
-  ORDER BY j1.event_date
+  WHERE rn = 1
 WITH DATA;
     `;
   }
 
   postCreateQueries = [
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id)`,
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_id, event_date)`,
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_code)`,
     `CREATE INDEX ON ${this.getViewName()} USING btree (journal_name)`,
     `CREATE INDEX ON ${this.getViewName()} USING btree (publisher_name)`,
-    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_issn)`
+    `CREATE INDEX ON ${this.getViewName()} USING btree (journal_issn)`,
   ];
 
   getViewName(): string {
