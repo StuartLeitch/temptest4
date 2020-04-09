@@ -1,9 +1,10 @@
 // import * as path from 'path';
-import 'config';
+import config from 'config';
+import _ from 'lodash';
 
 import * as pkg from '../../../package.json';
 import {
-  getOsEnvWithDefault,
+  // getOsEnvWithDefault,
   getOsEnvOptional,
   normalizePort,
   getOsPath,
@@ -11,9 +12,20 @@ import {
   toNumber,
   toArray,
   toFloat,
-  toBool
+  toBool,
   // getOsPaths,
 } from './lib/env';
+
+function customizer(objValue, srcValue) {
+  return objValue || srcValue;
+}
+
+// * Simply merge the process.env object with the config isObject
+// * The keys that are duplicated across the objects are ‘overwritten’
+// * by subsequent objects with the same key.
+if (Object.keys(config).length !== 0) {
+  _.mergeWith(process.env, config, customizer);
+}
 
 /**
  * Load .env file or for tests the .env.test file.
@@ -52,7 +64,7 @@ export const env = {
     banner: toBool(getOsEnv('APP_BANNER')),
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
-      seedsDir: getOsPath('DB_SEEDS_DIR')
+      seedsDir: getOsPath('DB_SEEDS_DIR'),
     },
     sanctionedCountryNotificationReceiver: getOsEnv(
       'SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER'
@@ -66,7 +78,9 @@ export const env = {
     invoicePaymentEmailSenderAddress: getOsEnv(
       'INVOICE_PAYMENT_EMAIL_SENDER_ADDRESS'
     ),
-    invoicePaymentEmailSenderName: getOsEnv('INVOICE_PAYMENT_EMAIL_SENDER_NAME')
+    invoicePaymentEmailSenderName: getOsEnv(
+      'INVOICE_PAYMENT_EMAIL_SENDER_NAME'
+    ),
   },
   log: {
     tenant: getOsEnv('LOG_TENANT'),
@@ -77,66 +91,61 @@ export const env = {
       region: getOsEnv('LOG_CLOUDWATCH_REGION'),
       groupName: getOsEnv('LOG_CLOUDWATCH_GROUP_NAME'),
       accessKey: getOsEnv('LOG_CLOUDWATCH_ACCESS_KEY'),
-      secretAccessKey: getOsEnv('LOG_CLOUDWATCH_SECRET_ACCESS_KEY')
-    }
+      secretAccessKey: getOsEnv('LOG_CLOUDWATCH_SECRET_ACCESS_KEY'),
+    },
   },
   db: {
     host: getOsEnvOptional('DB_HOST'),
     username: getOsEnvOptional('DB_USERNAME'),
     password: getOsEnvOptional('DB_PASSWORD'),
     database: getOsEnv('DB_DATABASE'),
-    logging: getOsEnv('DB_LOGGING')
+    logging: getOsEnv('DB_LOGGING'),
   },
   graphql: {
     enabled: toBool(getOsEnv('GRAPHQL_ENABLED')),
     route: getOsEnv('GRAPHQL_ROUTE'),
-    editor: toBool(getOsEnv('GRAPHQL_EDITOR'))
+    editor: toBool(getOsEnv('GRAPHQL_EDITOR')),
   },
   monitor: {
     enabled: toBool(getOsEnv('MONITOR_ENABLED')),
     route: getOsEnv('MONITOR_ROUTE'),
     username: getOsEnv('MONITOR_USERNAME'),
-    password: getOsEnv('MONITOR_PASSWORD')
+    password: getOsEnv('MONITOR_PASSWORD'),
   },
   aws: {
     enabled: toBool(getOsEnv('AWS_ENABLED')),
     ses: {
       region: getOsEnv('AWS_SES_REGION'),
       accessKey: getOsEnv('AWS_SES_ACCESS_KEY'),
-      secretKey: getOsEnv('AWS_SES_SECRET_KEY')
+      secretKey: getOsEnv('AWS_SES_SECRET_KEY'),
     },
     sns: {
       topic: getOsEnv('AWS_SNS_TOPIC'),
       endpoint: getOsEnv('AWS_SNS_ENDPOINT'),
       sqsRegion: getOsEnv('AWS_SNS_SQS_REGION'),
       sqsAccessKey: getOsEnv('AWS_SNS_SQS_ACCESS_KEY'),
-      sqsSecretKey: getOsEnv('AWS_SNS_SQS_SECRET_KEY')
+      sqsSecretKey: getOsEnv('AWS_SNS_SQS_SECRET_KEY'),
     },
     sqs: {
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
-      endpoint: getOsEnv('AWS_SQS_ENDPOINT')
+      endpoint: getOsEnv('AWS_SQS_ENDPOINT'),
     },
     s3: {
-      largeEventBucket: getOsEnv('PHENOM_LARGE_EVENTS_BUCKET')
-    }
+      largeEventBucket: getOsEnv('PHENOM_LARGE_EVENTS_BUCKET'),
+    },
   },
   scheduler: {
     db: {
       port: toNumber(getOsEnv('SCHEDULER_DB_PORT')),
       password: getOsEnv('SCHEDULER_DB_PASSWORD'),
-      host: getOsEnv('SCHEDULER_DB_HOST')
+      host: getOsEnv('SCHEDULER_DB_HOST'),
     },
     // notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
-    notificationsQueues: toArray(
-      getOsEnvWithDefault('NOTIFICATIONS_QUEUES', 'email-reminders')
-    ),
-    emailRemindersQueue: getOsEnvWithDefault(
-      'EMAIL_REMINDERS_QUEUE',
-      'email-reminders'
-    ),
+    notificationsQueues: toArray(getOsEnv('NOTIFICATIONS_QUEUES')),
+    emailRemindersQueue: getOsEnv('EMAIL_REMINDERS_QUEUE'),
     confirmationReminderDelay: toFloat(
-      getOsEnvWithDefault('CONFIRMATION_REMINDER_DELAY_DAYS', '5')
-    )
+      getOsEnv('CONFIRMATION_REMINDER_DELAY_DAYS')
+    ),
   },
   braintree: {
     merchantAccountId: getOsEnv('BT_MERCHANT_ACCOUNT_ID'),
@@ -144,20 +153,20 @@ export const env = {
     environment: getOsEnv('BT_ENVIRONMENT'),
     merchantId: getOsEnv('BT_MERCHANT_ID'),
     privateKey: getOsEnv('BT_PRIVATE_KEY'),
-    publicKey: getOsEnv('BT_PUBLIC_KEY')
+    publicKey: getOsEnv('BT_PUBLIC_KEY'),
   },
   paypal: {
     environment: getOsEnv('PP_ENVIRONMENT'),
     clientId: getOsEnv('PP_CLIENT_ID'),
-    clientSecret: getOsEnv('PP_CLIENT_SECRET')
+    clientSecret: getOsEnv('PP_CLIENT_SECRET'),
   },
   salesForce: {
     loginUrl: getOsEnv('SAGE_LOGIN_URL'),
     user: getOsEnv('SAGE_USER'),
     password: getOsEnv('SAGE_PASSWORD'),
-    securityToken: getOsEnv('SAGE_SECURITY_TOKEN')
+    securityToken: getOsEnv('SAGE_SECURITY_TOKEN'),
   },
   migration: {
-    token: getOsEnv('MIGRATION_TOKEN')
-  }
+    token: getOsEnv('MIGRATION_TOKEN'),
+  },
 };

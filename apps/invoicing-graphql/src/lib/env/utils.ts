@@ -12,12 +12,9 @@ export function getOsEnvOptional(key: string): string | undefined {
   return process.env[key];
 }
 
-export function getOsEnvWithDefault(
-  key: string,
-  defaultValue: string = ''
-): string {
-  return getOsEnvOptional(key) || defaultValue;
-}
+// export function getOsEnvWithDefault(key: string, defaultValue = ''): string {
+//   return getOsEnvOptional(key) || defaultValue;
+// }
 
 export function getPath(path: string): string {
   return process.env.NODE_ENV === 'production'
@@ -26,7 +23,7 @@ export function getPath(path: string): string {
 }
 
 export function getPaths(paths: string[]): string[] {
-  return paths.map(p => getPath(p));
+  return paths.map((p) => getPath(p));
 }
 
 export function getOsPath(key: string): string {
