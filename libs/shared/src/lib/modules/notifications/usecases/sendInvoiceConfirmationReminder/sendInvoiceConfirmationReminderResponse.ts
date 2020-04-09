@@ -4,6 +4,7 @@ import { AppError } from '../../../../core/logic/AppError';
 import { SendInvoiceConfirmationReminderErrors } from './sendInvoiceConfirmationReminderErrors';
 
 export type SendInvoiceConfirmationReminderResponse = Either<
+  | SendInvoiceConfirmationReminderErrors.CouldNotGetTransactionForInvoiceError
   | SendInvoiceConfirmationReminderErrors.ManuscriptCustomIdRequiredError
   | SendInvoiceConfirmationReminderErrors.RecipientEmailRequiredError
   | SendInvoiceConfirmationReminderErrors.RecipientNameRequiredError

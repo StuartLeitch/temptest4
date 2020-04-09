@@ -101,6 +101,7 @@ export * from './modules/payers/usecases/updatePayer/updatePayer';
 export * from './modules/payers/usecases/getPayer/getPayer';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
+export * from './modules/payers/usecases/getPayerDetailsByInvoiceId';
 
 // * Export Publisher Subdomain
 export * from './modules/publishers/domain/Publisher';
@@ -181,7 +182,20 @@ export * from './modules/notifications/domain/NotificationId';
 export * from './modules/notifications/mappers/NotificationMap';
 export * from './modules/notifications/repos/SentNotificationRepo';
 export * from './modules/notifications/repos/implementations/KnexSentNotificationsRepo';
+export * from './modules/notifications/repos/PausedReminderRepo';
+export * from './modules/notifications/repos/implementations/KnexPausedReminderRepo';
 export * from './modules/notifications/usecases/sendInvoiceConfirmationReminder';
+export * from './modules/notifications/usecases/sendInvoicePaymentReminder';
+export * from './modules/notifications/usecases/getSentNotificationForInvoice';
+export * from './modules/notifications/usecases/sendInvoiceCreditControlReminder';
+export * from './modules/notifications/usecases/areNotificationsPaused';
+export * from './modules/notifications/usecases/pauseInvoiceConfirmationReminders';
+export * from './modules/notifications/usecases/resumeInvoiceConfirmationReminders';
+export * from './modules/notifications/usecases/pauseInvoicePaymentReminders';
+export * from './modules/notifications/usecases/resumeInvoicePaymentReminders';
+export * from './modules/notifications/usecases/getRemindersPauseStateForInvoice';
+export * from './modules/notifications/usecases/addEmptyPauseStateForInvoice';
+export * from './modules/notifications/usecases/scheduleRemindersForExistingInvoices';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
@@ -206,6 +220,8 @@ export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';
 export * from './infrastructure/message-queues/contracts/Time';
 export { EmailService } from './infrastructure/communication-channels';
+export * as QueuePayloads from './infrastructure/message-queues/payloads';
+export * from './infrastructure/message-queues/payloadBuilder';
 
 // ? Should we export this
 // * Redux Stuff

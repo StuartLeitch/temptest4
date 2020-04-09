@@ -134,6 +134,12 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     return found.length !== 0;
   }
 
+  async existsWithId(id: InvoiceId): Promise<boolean> {
+    const match = this._items.filter(i => i.invoiceId.equals(id));
+
+    return match.length !== 0;
+  }
+
   public compareMockItems(a: Invoice, b: Invoice): boolean {
     return a.id.equals(b.id);
   }

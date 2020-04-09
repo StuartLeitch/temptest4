@@ -14,31 +14,46 @@ import {
   Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import { SchedulingTime, TimerBuilder, JobBuilder } from '@hindawi/sisif';
+import {
+  SchedulingTime,
+  SisifJobTypes,
+  TimerBuilder,
+  JobBuilder
+} from '@hindawi/sisif';
 
+import { InvoiceReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
+import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import {
+  STATUS as TransactionStatus,
+  Transaction
+} from '../../../transactions/domain/Transaction';
 
 // * Usecase specific
-import { SendInvoiceConfirmationReminderResponse as Response } from './SendInvoiceConfirmationReminderResponse';
-import { SendInvoiceConfirmationReminderErrors as Errors } from './SendInvoiceConfirmationReminderErrors';
-import { SendInvoiceConfirmationReminderDTO as DTO } from './SendInvoiceConfirmationReminderDTO';
+import { SendInvoiceConfirmationReminderResponse as Response } from './sendInvoiceConfirmationReminderResponse';
+import { SendInvoiceConfirmationReminderErrors as Errors } from './sendInvoiceConfirmationReminderErrors';
+import { SendInvoiceConfirmationReminderDTO as DTO } from './sendInvoiceConfirmationReminderDTO';
 
-interface DTOWithInvoiceId extends DTO {
-  invoiceId: string;
+interface CompoundDTO extends DTO {
+  transaction: Transaction;
+  invoice: Invoice;
+  paused: boolean;
 }
 
 type Context = AuthorizationContext<Roles>;
@@ -50,16 +65,20 @@ export class SendInvoiceConfirmationReminderUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
+    private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private transactionRepo: TransactionRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
+    private loggerService: LoggerContract,
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
-    this.decideOnSideEffects = this.decideOnSideEffects.bind(this);
-    this.performSideEffects = this.performSideEffects.bind(this);
+    this.shouldSendReminder = this.shouldSendReminder.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
+    this.getPauseStatus = this.getPauseStatus.bind(this);
+    this.getTransaction = this.getTransaction.bind(this);
     this.scheduleTask = this.scheduleTask.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
@@ -75,16 +94,23 @@ export class SendInvoiceConfirmationReminderUsecase
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
         .then(this.getInvoice(context))
-        .then(this.decideOnSideEffects(request));
+        .then(this.getPauseStatus(context))
+        .then(this.getTransaction(context))
+        .advanceOrEnd(this.shouldSendReminder)
+        .then(this.sendEmail)
+        .then(this.saveNotification)
+        .then(this.scheduleTask)
+        .map(() => Result.ok(null));
 
-      const maybeResult = await execution.execute();
-      return maybeResult.map(val => Result.ok(val));
+      return execution.execute();
     } catch (e) {
       return left(new AppError.UnexpectedError(e));
     }
   }
 
   private async validateRequest(request: DTO) {
+    this.loggerService.info(`Validate usecase request data`);
+
     if (!request.manuscriptCustomId) {
       return left(new Errors.ManuscriptCustomIdRequiredError());
     }
@@ -103,54 +129,139 @@ export class SendInvoiceConfirmationReminderUsecase
     return right<null, DTO>(request);
   }
 
-  private decideOnSideEffects(request: DTO) {
-    return async (invoice: Invoice) => {
-      if (
-        invoice.status === InvoiceStatus.DRAFT &&
-        invoice.dateAccepted &&
-        !invoice.dateIssued
-      ) {
-        return this.performSideEffects({
-          ...request,
-          invoiceId: invoice.id.toString()
-        });
-      }
-      return right<null, null>(null);
-    };
-  }
-
   private getInvoice(context: Context) {
-    return async ({ manuscriptCustomId }: DTO) => {
+    return async (request: DTO) => {
+      this.loggerService.info(
+        `Get the details of invoice associated with the manuscript with custom id ${request.manuscriptCustomId}`
+      );
+
       const getInvoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
       );
       const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
+      const { manuscriptCustomId } = request;
 
       const execution = new AsyncEither<null, string>(manuscriptCustomId)
         .then(customId => getInvoiceIdUsecase.execute({ customId }, context))
         .map(result => result.getValue())
         .map(invoiceIds => invoiceIds[0].id.toString())
         .then(invoiceId => invoiceUsecase.execute({ invoiceId }, context))
-        .map(result => result.getValue());
+        .map(result => ({
+          ...request,
+          invoice: result.getValue()
+        }));
 
       return execution.execute();
     };
   }
 
-  private async performSideEffects(request: DTOWithInvoiceId) {
-    return new AsyncEither<null, DTO>(request)
-      .then(this.sendEmail)
-      .then(this.saveNotification)
-      .then(this.scheduleTask)
-      .execute();
+  private getPauseStatus(context: Context) {
+    return async (request: DTO & { invoice: Invoice }) => {
+      this.loggerService.info(
+        `Get the paused status of reminders of type ${
+          NotificationType.REMINDER_CONFIRMATION
+        } for invoice with id ${request.invoice.id.toString()}`
+      );
+
+      const usecase = new AreNotificationsPausedUsecase(
+        this.pausedReminderRepo,
+        this.loggerService
+      );
+
+      const { invoice } = request;
+      const invoiceId = invoice.id.toString();
+
+      const maybeResult = await usecase.execute(
+        {
+          notificationType: NotificationType.REMINDER_CONFIRMATION,
+          invoiceId
+        },
+        context
+      );
+
+      return maybeResult.map(result => ({
+        ...request,
+        paused: result.getValue()
+      }));
+    };
+  }
+
+  private getTransaction(context: Context) {
+    return async (request: CompoundDTO) => {
+      this.loggerService.info(
+        `Get transaction details for invoice with id ${request.invoice.id.toString()}`
+      );
+
+      const usecase = new GetTransactionUsecase(this.transactionRepo);
+      const transactionId = request.invoice?.transactionId?.id?.toString();
+      try {
+        const result = await usecase.execute({ transactionId }, context);
+
+        if (result.isFailure) {
+          return left<
+            Errors.CouldNotGetTransactionForInvoiceError,
+            CompoundDTO
+          >(
+            new Errors.CouldNotGetTransactionForInvoiceError(
+              request.invoice.id.toString(),
+              new Error(result.errorValue() as any)
+            )
+          );
+        }
+
+        return right<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
+          {
+            ...request,
+            transaction: result.getValue()
+          }
+        );
+      } catch (e) {
+        return left<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
+          new Errors.CouldNotGetTransactionForInvoiceError(
+            request.invoice.id.toString(),
+            e
+          )
+        );
+      }
+    };
+  }
+
+  private async shouldSendReminder({
+    transaction,
+    invoice,
+    paused
+  }: CompoundDTO) {
+    this.loggerService.info(
+      `Determine if the reminder, of type ${
+        NotificationType.REMINDER_CONFIRMATION
+      }, should be sent and rescheduled, for invoice with id ${invoice.id.toString()}`
+    );
+
+    if (
+      transaction.status === TransactionStatus.ACTIVE &&
+      invoice.status === InvoiceStatus.DRAFT &&
+      invoice.dateAccepted &&
+      !invoice.dateIssued &&
+      !paused
+    ) {
+      return right<null, boolean>(true);
+    }
+
+    return right<null, boolean>(false);
   }
 
   private async sendEmail(
-    request: DTOWithInvoiceId
+    request: CompoundDTO
   ): Promise<Either<Errors.EmailSendingFailure, DTO>> {
+    this.loggerService.info(
+      `Send the reminder email for invoice with id ${request.invoice.id.toString()}, to "${
+        request.recipientEmail
+      }"`
+    );
+
     try {
-      const result = await this.emailService
+      await this.emailService
         .invoiceConfirmationReminder({
           author: {
             email: request.recipientEmail,
@@ -161,7 +272,7 @@ export class SendInvoiceConfirmationReminderUsecase
             name: request.senderName
           },
           articleCustomId: request.manuscriptCustomId,
-          invoiceId: request.invoiceId
+          invoiceId: request.invoice.id.toString()
         })
         .sendEmail();
       return right(request);
@@ -171,11 +282,16 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   private async saveNotification(
-    request: DTOWithInvoiceId
+    request: CompoundDTO
   ): Promise<Either<Errors.NotificationDbSaveError, DTO>> {
+    this.loggerService.info(
+      `Save that a reminder of type ${
+        NotificationType.REMINDER_CONFIRMATION
+      } was sent, for invoice with id ${request.invoice.id.toString()}`
+    );
+
     try {
-      const invoiceUUID = new UniqueEntityID(request.invoiceId);
-      const invoiceId = InvoiceId.create(invoiceUUID).getValue();
+      const invoiceId = request.invoice.invoiceId;
       const notification = Notification.create({
         type: NotificationType.REMINDER_CONFIRMATION,
         recipientEmail: request.recipientEmail,
@@ -192,18 +308,22 @@ export class SendInvoiceConfirmationReminderUsecase
   private async scheduleTask(
     request: DTO
   ): Promise<Either<Errors.RescheduleTaskFailed, void>> {
+    this.loggerService.info(
+      `Reschedule the job for sending a reminder of type ${NotificationType.REMINDER_CONFIRMATION}, in ${request.job.delay} days`
+    );
+
     const { job: jobData } = request;
-    const data = {
+    const data: InvoiceReminderPayload = {
       manuscriptCustomId: request.manuscriptCustomId,
       recipientEmail: request.recipientEmail,
       recipientName: request.recipientName
     };
 
     const timer = TimerBuilder.delayed(jobData.delay, SchedulingTime.Day);
-    const newJob = JobBuilder.basic(jobData.type, data);
+    const newJob = JobBuilder.basic(SisifJobTypes.InvoiceConfirmReminder, data);
 
     try {
-      await this.scheduler.schedule(newJob, jobData.queName, timer);
+      await this.scheduler.schedule(newJob, jobData.queueName, timer);
       return right(null);
     } catch (e) {
       return left(new Errors.RescheduleTaskFailed(e));

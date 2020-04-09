@@ -6,9 +6,12 @@ import { NotificationType, Notification } from '../../domain/Notification';
 import { SentNotificationRepoContract } from '../SentNotificationRepo';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationId } from '../../domain/NotificationId';
+import { NotificationPause } from '../../domain/NotificationPause';
 
 export class MockSentNotificationRepo extends BaseMockRepo<Notification>
   implements SentNotificationRepoContract {
+  private pauses: NotificationPause[];
+
   constructor() {
     super();
   }
@@ -59,7 +62,7 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
     const alreadyExists = await this.exists(notification);
 
     if (alreadyExists) {
-      throw Error('duplicate');
+      throw new Error('duplicate');
     }
 
     this._items.push(cloneDeep(notification));

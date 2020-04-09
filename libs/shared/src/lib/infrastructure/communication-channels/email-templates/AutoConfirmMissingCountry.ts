@@ -1,5 +1,7 @@
+import { EmailContent } from '../EmailProps';
+
 export class AutoConfirmMissingCountryNotificationTemplate {
-  static build(manuscriptCustomId: string, invoiceLink: string) {
+  static build(manuscriptCustomId: string, invoiceLink: string): EmailContent {
     const subject = `[Auto-Confirm Invoice] Country not available when auto-confirming published article`;
     const paragraph = `
       Hello,

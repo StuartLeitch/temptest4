@@ -11,6 +11,7 @@ import {
   UpdateTransactionOnAcceptManuscriptUsecase,
   UpdateTransactionContext,
   VersionCompare,
+  QueuePayloads,
   Roles
 } from '@hindawi/shared';
 
@@ -97,7 +98,7 @@ export const SubmissionQualityCheckPassedHandler = {
       throw result.value.error;
     }
 
-    const jobData = {
+    const jobData: QueuePayloads.InvoiceReminderPayload = {
       recipientName: `${givenNames} ${surname}`,
       manuscriptCustomId: customId,
       recipientEmail: email

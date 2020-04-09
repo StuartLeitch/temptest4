@@ -186,6 +186,25 @@ type PaginatedInvoices {
   invoices: [Invoice]
 }
 
+type RemindersStatus {
+  confirmation: Boolean
+  payment: Boolean
+}
+
+enum ReminderType {
+  REMINDER_CONFIRMATION
+  SANCTIONED_COUNTRY
+  REMINDER_PAYMENT
+  INVOICE_CREATED
+}
+
+type SentReminder {
+  forInvoice: ID
+  type: ReminderType
+  toEmail: String
+  when: Date
+}
+
 input ArticleFilters {
   journalId: [ID]
   customId: [ID]
@@ -246,6 +265,8 @@ type Query {
   invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
   journals: [Journal]
   echo(value: String): String
+  remindersStatus(invoiceId: ID!): RemindersStatus
+  remindersSent(invoiceId: ID!): [SentReminder]
 }
 
 type Mutation {
@@ -304,4 +325,10 @@ type Mutation {
     token: String!
   ): String
   generateCompensatoryEvents(invoiceIds: [String], journalIds: [String]): String
+  togglePauseConfirmationReminders(
+    invoiceId: ID!
+    state: Boolean!
+  ): RemindersStatus
+  togglePausePaymentReminders(invoiceId: ID!, state: Boolean!): RemindersStatus
+  generateMissingReminderJobs: String!
 }

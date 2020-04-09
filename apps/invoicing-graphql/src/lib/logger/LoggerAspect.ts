@@ -15,6 +15,21 @@ import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/
 import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
 import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+import {
+  ScheduleRemindersForExistingInvoicesUsecase,
+  PauseInvoiceConfirmationRemindersUsecase,
+  ResumeInvoiceConfirmationReminderUsecase,
+  GetRemindersPauseStateForInvoiceUsecase,
+  SendInvoiceCreditControlReminderUsecase,
+  SendInvoiceConfirmationReminderUsecase,
+  GetSentNotificationForInvoiceUsecase,
+  AddEmptyPauseStateForInvoiceUsecase,
+  PauseInvoicePaymentRemindersUsecase,
+  ResumeInvoicePaymentReminderUsecase,
+  GetPayerDetailsByInvoiceIdUsecase,
+  SendInvoicePaymentReminderUsecase,
+  AreNotificationsPausedUsecase
+} from '@hindawi/shared';
 
 import { Logger } from './logger';
 const logger = new Logger('Usecase:Aspect');
@@ -36,7 +51,20 @@ const watchList = [
   UpdateTransactionOnAcceptManuscriptUsecase,
   UpdateCatalogItemToCatalogUseCase,
   AssignEditorsToJournalUsecase,
-  AddCatalogItemToCatalogUseCase
+  AddCatalogItemToCatalogUseCase,
+  SendInvoiceCreditControlReminderUsecase,
+  SendInvoiceConfirmationReminderUsecase,
+  SendInvoicePaymentReminderUsecase,
+  PauseInvoiceConfirmationRemindersUsecase,
+  PauseInvoicePaymentRemindersUsecase,
+  ResumeInvoiceConfirmationReminderUsecase,
+  ResumeInvoicePaymentReminderUsecase,
+  GetRemindersPauseStateForInvoiceUsecase,
+  GetSentNotificationForInvoiceUsecase,
+  AreNotificationsPausedUsecase,
+  AddEmptyPauseStateForInvoiceUsecase,
+  ScheduleRemindersForExistingInvoicesUsecase,
+  GetPayerDetailsByInvoiceIdUsecase
 ];
 const aspect = {
   classes: watchList,
@@ -64,7 +92,20 @@ export class LoggerAspect {
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,
-      AddCatalogItemToCatalogUseCase.prototype.execute
+      AddCatalogItemToCatalogUseCase.prototype.execute,
+      SendInvoiceCreditControlReminderUsecase.prototype.execute,
+      SendInvoiceConfirmationReminderUsecase.prototype.execute,
+      SendInvoicePaymentReminderUsecase.prototype.execute,
+      PauseInvoiceConfirmationRemindersUsecase.prototype.execute,
+      PauseInvoicePaymentRemindersUsecase.prototype.execute,
+      ResumeInvoiceConfirmationReminderUsecase.prototype.execute,
+      ResumeInvoicePaymentReminderUsecase.prototype.execute,
+      GetRemindersPauseStateForInvoiceUsecase.prototype.execute,
+      GetSentNotificationForInvoiceUsecase.prototype.execute,
+      AreNotificationsPausedUsecase.prototype.execute,
+      AddEmptyPauseStateForInvoiceUsecase.prototype.execute,
+      ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
+      GetPayerDetailsByInvoiceIdUsecase.prototype.execute
     ]
   })
   invokeBeforeMethod(meta: Metadata) {
@@ -92,7 +133,20 @@ export class LoggerAspect {
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,
-      AddCatalogItemToCatalogUseCase.prototype.execute
+      AddCatalogItemToCatalogUseCase.prototype.execute,
+      SendInvoiceCreditControlReminderUsecase.prototype.execute,
+      SendInvoiceConfirmationReminderUsecase.prototype.execute,
+      SendInvoicePaymentReminderUsecase.prototype.execute,
+      PauseInvoiceConfirmationRemindersUsecase.prototype.execute,
+      PauseInvoicePaymentRemindersUsecase.prototype.execute,
+      ResumeInvoiceConfirmationReminderUsecase.prototype.execute,
+      ResumeInvoicePaymentReminderUsecase.prototype.execute,
+      GetRemindersPauseStateForInvoiceUsecase.prototype.execute,
+      GetSentNotificationForInvoiceUsecase.prototype.execute,
+      AreNotificationsPausedUsecase.prototype.execute,
+      AddEmptyPauseStateForInvoiceUsecase.prototype.execute,
+      ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
+      GetPayerDetailsByInvoiceIdUsecase.prototype.execute
     ]
   })
   async invokeAfterMethod(meta: Metadata) {

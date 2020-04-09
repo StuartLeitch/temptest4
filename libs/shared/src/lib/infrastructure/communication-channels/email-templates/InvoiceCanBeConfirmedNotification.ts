@@ -1,3 +1,5 @@
+import { EmailContent } from '../EmailProps';
+
 import { Manuscript } from '../../../modules/manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../modules/journals/domain/CatalogItem';
 import { InvoiceItem } from '../../../modules/invoices/domain/InvoiceItem';
@@ -14,7 +16,7 @@ interface TemplateData {
 }
 
 export class InvoiceCanBeConfirmedNotificationTemplate {
-  static build(data: TemplateData) {
+  static build(data: TemplateData): EmailContent {
     const {
       bankTransferCopyReceiverAddress,
       catalogItem,

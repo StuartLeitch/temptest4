@@ -1,7 +1,9 @@
 import { SisifJobTypes, JobData } from '@hindawi/sisif';
 import { LoggerContract } from '@hindawi/shared';
 
+import { invoiceCreditControlHandler } from './InvoiceCreditControlReminder';
 import { invoiceConfirmHandler } from './InvoiceConfirmReminder';
+import { invoicePaymentHandler } from './InvoicePaymentReminder';
 import { emptyHandler } from './EmptyHandler';
 
 type SisifHandler = (
@@ -15,10 +17,11 @@ type SisifHandlersRepo = {
 };
 
 const Handlers: SisifHandlersRepo = {
+  [SisifJobTypes.InvoiceCreditControlReminder]: invoiceCreditControlHandler,
   [SisifJobTypes.InvoiceConfirmReminder]: invoiceConfirmHandler,
+  [SisifJobTypes.InvoicePaymentReminder]: invoicePaymentHandler,
   [SisifJobTypes.SanctionedCountryNotification]: emptyHandler,
   [SisifJobTypes.InvoiceCreatedNotification]: emptyHandler,
-  [SisifJobTypes.InvoicePaymentReminder]: emptyHandler,
   default: emptyHandler
 };
 

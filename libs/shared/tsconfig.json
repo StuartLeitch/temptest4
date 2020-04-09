@@ -46,6 +46,7 @@
     "src/lib/infrastructure/database/knex/migrations/20200219153255_add_publisher_table.js",
     "src/lib/infrastructure/database/knex/migrations/20200302105157_add_notification_history_table.js",
     "src/lib/infrastructure/database/knex/migrations/20200313121734_add_cancelled_invoice_reference_to_invoices_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20200326111335_add_dateMovedToFinal_to_invoices_table.js"
+    "src/lib/infrastructure/database/knex/migrations/20200326111335_add_dateMovedToFinal_to_invoices_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20200313134400_add_reminders_pause.js"
   ]
 }

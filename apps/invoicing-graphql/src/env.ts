@@ -59,9 +59,13 @@ export const env = {
     failedErpCronRetryTimeMinutes: toNumber(
       getOsEnv('FAILED_ERP_CRON_RETRY_TIME_MINUTES')
     ),
+    failedErpCronRetryDisabled: toBool(
+      getOsEnv('FAILED_ERP_CRON_RETRY_DISABLED')
+    ),
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     banner: toBool(getOsEnv('APP_BANNER')),
+    tenantName: getOsEnv('TENANT_NAME'),
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR'),
@@ -80,6 +84,12 @@ export const env = {
     ),
     invoicePaymentEmailSenderName: getOsEnv(
       'INVOICE_PAYMENT_EMAIL_SENDER_NAME'
+    ),
+    creditControlReminderSenderEmail: getOsEnv(
+      'CREDIT_CONTROL_REMINDER_SENDER_EMAIL'
+    ),
+    creditControlReminderSenderName: getOsEnv(
+      'CREDIT_CONTROL_REMINDER_SENDER_NAME'
     ),
   },
   log: {
@@ -145,6 +155,10 @@ export const env = {
     emailRemindersQueue: getOsEnv('EMAIL_REMINDERS_QUEUE'),
     confirmationReminderDelay: toFloat(
       getOsEnv('CONFIRMATION_REMINDER_DELAY_DAYS')
+    ),
+    paymentReminderDelay: toFloat(getOsEnv('PAYMENT_REMINDER_DELAY_DAYS')),
+    creditControlReminderDelay: toFloat(
+      getOsEnv('CREDIT_CONTROL_REMINDER_DELAY_DAYS')
     ),
   },
   braintree: {

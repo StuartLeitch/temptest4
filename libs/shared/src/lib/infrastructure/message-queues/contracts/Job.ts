@@ -1,5 +1,6 @@
 export enum SisifJobTypes {
   SanctionedCountryNotification = 'SanctionedCountryNotification',
+  InvoiceCreditControlReminder = 'InvoiceCreditControlReminder',
   InvoiceCreatedNotification = 'InvoiceCreatedNotification',
   InvoiceConfirmReminder = 'InvoiceConfirmReminder',
   InvoicePaymentReminder = 'InvoicePaymentReminder'

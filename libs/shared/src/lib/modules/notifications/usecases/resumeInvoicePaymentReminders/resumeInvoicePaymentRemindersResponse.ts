@@ -1,0 +1,16 @@
+import { Either, Result } from '../../../../core/logic/Result';
+import { AppError } from '../../../../core/logic/AppError';
+
+import { ResumeInvoicePaymentRemindersErrors } from './resumeInvoicePaymentRemindersErrors';
+
+export type ResumeInvoicePaymentRemindersResponse = Either<
+  | ResumeInvoicePaymentRemindersErrors.PaymentRemindersNotPausedError
+  | ResumeInvoicePaymentRemindersErrors.ReminderDelayRequiredError
+  | ResumeInvoicePaymentRemindersErrors.ReminderResumeSaveDbError
+  | ResumeInvoicePaymentRemindersErrors.InvoiceIdRequiredError
+  | ResumeInvoicePaymentRemindersErrors.QueueNameRequiredError
+  | ResumeInvoicePaymentRemindersErrors.InvoiceNotFoundError
+  | ResumeInvoicePaymentRemindersErrors.ScheduleTaskFailed
+  | AppError.UnexpectedError,
+  Result<void>
+>;

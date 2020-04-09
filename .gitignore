@@ -51,3 +51,4 @@ Thumbs.db
 *.env
 tools/scripts/aws/sqs/dlq/failedEvents.json
 tools/scripts/aws/sqs/dlq/delete-message-batch.json
+*.nx-tmp

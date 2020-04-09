@@ -22,7 +22,8 @@ import {
   KnexEditorRepo,
   KnexCouponRepo,
   KnexPublisherRepo,
-  KnexSentNotificationsRepo
+  KnexSentNotificationsRepo,
+  KnexPausedReminderRepo
 } from '@hindawi/shared';
 
 import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
@@ -56,7 +57,8 @@ export const contextLoader: MicroframeworkLoader = (
       editor: new KnexEditorRepo(db),
       coupon: new KnexCouponRepo(db),
       publisher: new KnexPublisherRepo(db),
-      sentNotifications: new KnexSentNotificationsRepo(db)
+      sentNotifications: new KnexSentNotificationsRepo(db),
+      pausedReminder: new KnexPausedReminderRepo(db)
     };
 
     const bullData = {
@@ -71,7 +73,11 @@ export const contextLoader: MicroframeworkLoader = (
       // authService: new AuthService({}),
       vatService: new VATService(),
       waiverService: new WaiverService(repos.waiver, repos.editor),
-      emailService: new EmailService(),
+      emailService: new EmailService(
+        env.app.mailingDisabled,
+        env.app.FERoot,
+        env.app.tenantName
+      ),
       exchangeRateService: new ExchangeRateService(),
       payPalService: new PayPalService(env.paypal),
       erpService: new ErpService(logger, env.salesForce),

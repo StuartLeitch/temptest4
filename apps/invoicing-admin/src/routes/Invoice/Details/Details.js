@@ -8,6 +8,7 @@ import format from 'date-fns/format';
 // import subWeeks from 'date-fns/subWeeks';
 import compareDesc from 'date-fns/compareDesc';
 import { toast } from 'react-toastify';
+import Toggle from 'react-toggle';
 import numeral from 'numeral';
 
 import {
@@ -64,6 +65,7 @@ import { TimelineMini } from '../../components/Timeline/TimelineMini';
 // import { TrTableMessages } from '../../Apps/ProfileDetails/components/TrTableMessages';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
+import { InvoiceReminders } from '../../components/Invoice/reminders';
 // import { Coupon } from '../../components/Invoice/Coupon';
 
 const INVOICE_QUERY = `
@@ -734,6 +736,11 @@ const Details = () => {
                     Payer Details
                   </UncontrolledTabs.NavLink>
                 </NavItem>
+                <NavItem>
+                  <UncontrolledTabs.NavLink tabId='reminders'>
+                    Reminders
+                  </UncontrolledTabs.NavLink>
+                </NavItem>
               </Nav>
               {/* END Pills Nav */}
               <UncontrolledTabs.TabContent>
@@ -1124,6 +1131,9 @@ const Details = () => {
                       </dl>
                     </CardBody>
                   </Card>
+                </TabPane>
+                <TabPane tabId='reminders'>
+                  <InvoiceReminders id={id}></InvoiceReminders>
                 </TabPane>
               </UncontrolledTabs.TabContent>
             </UncontrolledTabs>
