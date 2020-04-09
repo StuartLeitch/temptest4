@@ -27,7 +27,7 @@ function makeViewObject(viewFileExport: any): KnexMigration {
   return {
     up: viewFileExport.up,
     down: viewFileExport.down,
-    name: viewFileExport.name
+    name: viewFileExport.name,
   };
 }
 
@@ -45,7 +45,7 @@ export function rebuild_materialized_views(name: string, skip = false): any {
       }
     },
     down: create_materialized_views.down,
-    name
+    name,
   };
 }
 
@@ -78,7 +78,8 @@ class KnexMigrationSource {
     ),
     rebuild_materialized_views('20200325122800_add_id_to_reviewers', true),
     add_sub_data_update_trigger,
-    rebuild_materialized_views('20200408122800_fix_inv_m_accept_date')
+    rebuild_materialized_views('20200408122800_fix_inv_m_accept_date', true),
+    rebuild_materialized_views('20200409122800_fix_removed_academic_editor'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
