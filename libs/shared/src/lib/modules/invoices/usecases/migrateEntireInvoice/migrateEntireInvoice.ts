@@ -137,6 +137,13 @@ export class MigrateEntireInvoiceUsecase
     this.updateTransactionStatus = this.updateTransactionStatus.bind(this);
     this.getAddressDetails = this.getAddressDetails.bind(this);
     this.sendInvoiceFinalizedEvent = this.sendInvoiceFinalizedEvent.bind(this);
+
+    this.shouldSendInvoicePayedEvent = this.shouldSendInvoicePayedEvent.bind(
+      this
+    );
+    this.shouldUpdateInvoicePayment = this.shouldUpdateInvoicePayment.bind(
+      this
+    );
   }
 
   private async getAccessControlContext(request, context?) {
@@ -180,7 +187,9 @@ export class MigrateEntireInvoiceUsecase
       .then(async () => maybeInvoiceConfirmed)
       .then(async () => maybeRequest)
       .then(this.makeMigrationPayment)
+      .advanceOrEnd(this.shouldUpdateInvoicePayment)
       .then(this.updateInvoicePayed)
+      .advanceOrEnd(this.shouldSendInvoicePayedEvent)
       .then(this.sendInvoicePayedEvent)
       .then(this.sendInvoiceFinalizedEvent(context))
       .map(() => {
@@ -755,6 +764,20 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
+  private async shouldUpdateInvoicePayment({
+    payment,
+    request,
+  }: {
+    payment: Payment;
+    request: DTO;
+  }): Promise<Either<null, boolean>> {
+    if (!payment && request.apc.price !== request.apc.discount) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
   private async updateInvoicePayed({
     payment,
     request,
@@ -772,8 +795,8 @@ export class MigrateEntireInvoiceUsecase
         }
       >({ invoice: null, payment: null, request });
     }
-    return new AsyncEither<null, null>(null)
-      .then(() => this.getInvoice(request.invoiceId))
+    return new AsyncEither<null, string>(request.invoiceId)
+      .then(this.getInvoice)
       .map((invoice) => {
         invoice.props.status = InvoiceStatus.FINAL;
         invoice.props.dateUpdated = new Date(request.paymentDate);
@@ -800,6 +823,26 @@ export class MigrateEntireInvoiceUsecase
     }
   }
 
+  private async shouldSendInvoicePayedEvent({
+    invoice,
+    payment,
+    request,
+  }: {
+    invoice: Invoice;
+    payment: Payment;
+    request: DTO;
+  }): Promise<Either<null, boolean>> {
+    if (!invoice) {
+      return right(false);
+    }
+
+    if (!payment && request.apc.price !== request.apc.discount) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
   private async sendInvoicePayedEvent({
     invoice,
     payment,
@@ -809,14 +852,6 @@ export class MigrateEntireInvoiceUsecase
     payment: Payment;
     request: DTO;
   }) {
-    if (!invoice) {
-      return right<null, object>({});
-    }
-
-    if (!payment && request.apc.price !== request.apc.discount) {
-      return right<null, object>({});
-    }
-
     const usecase = new PublishInvoicePaid(this.sqsPublishService);
     const messageTimestamp = request.paymentDate
       ? new Date(request.paymentDate)
@@ -892,14 +927,6 @@ export class MigrateEntireInvoiceUsecase
       payment: Payment;
       request: DTO;
     }) => {
-      if (!invoice) {
-        return right<null, null>(null);
-      }
-
-      if (!payment && request.apc.price !== request.apc.discount) {
-        return right<null, null>(null);
-      }
-
       const execution = new AsyncEither<null, null>(null)
         .then(async () => {
           const maybeManuscript = await this.getManuscript(
