@@ -144,6 +144,10 @@ export class MigrateEntireInvoiceUsecase
     this.shouldUpdateInvoicePayment = this.shouldUpdateInvoicePayment.bind(
       this
     );
+    this.shouldProcessInvoiceCreated = this.shouldProcessInvoiceCreated.bind(
+      this
+    );
+    this.shouldCreatePayer = this.shouldCreatePayer.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -165,17 +169,21 @@ export class MigrateEntireInvoiceUsecase
         return;
       })
       .execute();
+
     const maybeInvoiceCreated = await requestExecution
       .then(async () => maybeInitialInvoice)
       .then(async () => maybeRequest)
+      .advanceOrEnd(this.shouldProcessInvoiceCreated)
       .then(this.updateInvoiceAtQualityPass)
       .then(this.getTransactionWithAcceptanceDate)
       .then(this.updateTransactionStatus)
       .then(this.sendInvoiceCreatedEvent)
       .execute();
+
     const maybeInvoiceConfirmed = await requestExecution
       .then(async () => maybeInvoiceCreated)
       .then(async () => maybeRequest)
+      .advanceOrEnd(this.shouldCreatePayer)
       .then(this.createPayer)
       .then(this.confirmInvoice)
       .then(this.sendInvoiceConfirmedEvent)
@@ -183,6 +191,7 @@ export class MigrateEntireInvoiceUsecase
         return;
       })
       .execute();
+
     const maybeInvoicePayed = await requestExecution
       .then(async () => maybeInvoiceConfirmed)
       .then(async () => maybeRequest)
@@ -206,10 +215,6 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private async getTransactionWithAcceptanceDate(request: DTO) {
-    if (!request || !request.acceptanceDate) {
-      return right<null, null>(null);
-    }
-
     const acceptanceDate = request.acceptanceDate;
     const submissionDate = request.submissionDate;
     const invoiceId = request.invoiceId;
@@ -252,23 +257,20 @@ export class MigrateEntireInvoiceUsecase
     submissionDate: string;
     invoiceId: string;
   }): Promise<Either<AppError.UnexpectedError, string>> {
-    if (data && data.acceptanceDate) {
-      const { acceptanceDate, submissionDate, transaction, invoiceId } = data;
-      return await new AsyncEither<null, Transaction>(transaction)
-        .map((transaction) => {
-          if (transaction.status === TransactionStatus.DRAFT) {
-            transaction.props.dateCreated = new Date(submissionDate);
-            transaction.props.dateUpdated = new Date(acceptanceDate);
-            transaction.props.status = TransactionStatus.ACTIVE;
-          }
-          return transaction;
-        })
-        .then((transaction) => this.updateTransactionDetails(transaction))
-        .map(() => invoiceId)
-        .execute();
-    }
+    const { acceptanceDate, submissionDate, transaction, invoiceId } = data;
 
-    return right<null, null>(null);
+    return await new AsyncEither<null, Transaction>(transaction)
+      .map((transaction) => {
+        if (transaction.status === TransactionStatus.DRAFT) {
+          transaction.props.dateCreated = new Date(submissionDate);
+          transaction.props.dateUpdated = new Date(acceptanceDate);
+          transaction.props.status = TransactionStatus.ACTIVE;
+        }
+        return transaction;
+      })
+      .then((transaction) => this.updateTransactionDetails(transaction))
+      .map(() => invoiceId)
+      .execute();
   }
 
   private async updateTransactionDetails(transaction: Transaction) {
@@ -310,10 +312,20 @@ export class MigrateEntireInvoiceUsecase
       .execute();
   }
 
+  private async shouldCreatePayer(
+    request: DTO
+  ): Promise<Either<null, boolean>> {
+    if (!request.acceptanceDate || !request.issueDate) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
   private async createPayer(request: DTO) {
     const { payer, invoiceId } = request;
     const usecase = new CreatePayerUsecase(this.payerRepo);
-    if (!payer || !request.acceptanceDate || !request.issueDate) {
+    if (!payer) {
       return right<null, { request: DTO; payer: null }>({
         request,
         payer: null,
@@ -360,10 +372,6 @@ export class MigrateEntireInvoiceUsecase
       void
     >
   > {
-    if (!invoiceId) {
-      return right<null, null>(null);
-    }
-
     const usecase = new PublishInvoiceCreatedUsecase(this.sqsPublishService);
 
     const execution = new AsyncEither<null, string>(invoiceId)
@@ -461,11 +469,17 @@ export class MigrateEntireInvoiceUsecase
     return percentage;
   }
 
-  private async updateInvoiceAtQualityPass(request: DTO) {
+  private async shouldProcessInvoiceCreated(
+    request: DTO
+  ): Promise<Either<null, boolean>> {
     if (!request.acceptanceDate) {
-      return right<null, null>(null);
+      return right(false);
     }
 
+    return right(true);
+  }
+
+  private async updateInvoiceAtQualityPass(request: DTO) {
     return new AsyncEither<null, string>(request.invoiceId)
       .then((invoiceId) => this.getInvoice(invoiceId))
       .map((invoice) => {
