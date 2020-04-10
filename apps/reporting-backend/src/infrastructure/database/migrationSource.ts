@@ -79,7 +79,11 @@ class KnexMigrationSource {
     rebuild_materialized_views('20200325122800_add_id_to_reviewers', true),
     add_sub_data_update_trigger,
     rebuild_materialized_views('20200408122800_fix_inv_m_accept_date', true),
-    rebuild_materialized_views('20200409122800_fix_removed_academic_editor'),
+    rebuild_materialized_views(
+      '20200409122800_fix_removed_academic_editor',
+      true
+    ),
+    rebuild_materialized_views('20200409122800_add_default_date_to_views'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

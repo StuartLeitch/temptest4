@@ -1,13 +1,13 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import {
   REPORTING_TABLES,
-  CHECKER_TEAM_EVENTS
+  CHECKER_TEAM_EVENTS,
 } from 'libs/shared/src/lib/modules/reporting/constants';
 
-const checkerTeamEvents = CHECKER_TEAM_EVENTS.map(e => `'${e}'`);
+const checkerTeamEvents = CHECKER_TEAM_EVENTS.map((e) => `'${e}'`);
 
 class CheckerTeamData extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -15,7 +15,7 @@ class CheckerTeamData extends AbstractEventView implements EventViewContract {
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
     ce.id AS event_id,
-    ce."time" AS event_timestamp,
+    coalesce(ce."time", cast_to_timestamp(checker_team_view.updated), cast_to_timestamp('1980-01-01')) AS event_timestamp,
     ce."type" AS event,
     checker_team_view.id as team_id,
     checker_team_view.name as team_name,
@@ -25,6 +25,7 @@ AS SELECT
     jsonb_to_record(ce.payload) AS checker_team_view (
       name text,
       "type" text,
+      updated text,
       id text
     )
   WHERE
@@ -39,7 +40,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (event, event_timestamp)`,
     `create index on ${this.getViewName()} (event_timestamp)`,
     `create index on ${this.getViewName()} (team_id)`,
-    `create index on ${this.getViewName()} (team_type)`
+    `create index on ${this.getViewName()} (team_type)`,
   ];
 
   getViewName(): string {
