@@ -83,7 +83,11 @@ class KnexMigrationSource {
       '20200409122800_fix_removed_academic_editor',
       true
     ),
-    rebuild_materialized_views('20200409122800_add_default_date_to_views'),
+    rebuild_materialized_views(
+      '20200409122800_add_default_date_to_views',
+      true
+    ),
+    rebuild_materialized_views('20200409122800_fix_invoice_net_amount'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
