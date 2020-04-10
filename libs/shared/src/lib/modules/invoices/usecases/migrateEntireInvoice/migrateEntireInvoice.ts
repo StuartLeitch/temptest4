@@ -75,8 +75,8 @@ import {
 
 // * Usecase specific
 import { MigrateEntireInvoiceResponse as Response } from './migrateEntireInvoiceResponse';
-import { MigrateEntireInvoiceErrors as Errors } from './migrateEntireInvoiceErrors';
 import { MigrateEntireInvoiceDTO as DTO } from './migrateEntireInvoiceDTO';
+import * as Errors from './migrateEntireInvoiceErrors';
 
 import { validateRequest } from './utils';
 import { PublishInvoiceCreatedErrors } from '../publishInvoiceCreated/publishInvoiceCreatedErrors';

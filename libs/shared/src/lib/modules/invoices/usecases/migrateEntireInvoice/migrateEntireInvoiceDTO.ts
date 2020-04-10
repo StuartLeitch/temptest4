@@ -29,6 +29,7 @@ export interface MigrateEntireInvoiceDTO {
   submissionDate?: string;
   paymentDate?: string;
   issueDate?: string;
+  status: string;
 
   erpReference?: string;
   payer: MigratePayer;

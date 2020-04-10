@@ -12,7 +12,7 @@ import { MockInvoiceItemRepo } from '../../repos/mocks/mockInvoiceItemRepo';
 import { MockPayerRepo } from '../../../payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
 
-import { MigrateEntireInvoiceErrors } from './migrateEntireInvoiceErrors';
+import * as MigrateEntireInvoiceErrors from './migrateEntireInvoiceErrors';
 import { MigrateEntireInvoiceUsecase } from './migrateEntireInvoice';
 import { MigrateEntireInvoiceDTO } from './migrateEntireInvoiceDTO';
 
@@ -103,6 +103,7 @@ describe('migrate entire invoice usecase', () => {
       paymentDate: new Date('07-08-2019').toISOString(),
       issueDate: new Date('06-08-2019').toISOString(),
       erpReference: '1234',
+      status: '',
       apc: {
         invoiceReference: '00001/2019',
         paymentAmount: 220,
@@ -198,6 +199,7 @@ describe('migrate entire invoice usecase', () => {
       paymentDate: new Date('07-08-2019').toISOString(),
       issueDate: new Date('06-08-2019').toISOString(),
       erpReference: '1234',
+      status: '',
       apc: {
         invoiceReference: '00001/2019',
         paymentAmount: 0,
@@ -274,6 +276,7 @@ describe('migrate entire invoice usecase', () => {
       paymentDate: null,
       issueDate: new Date('06-08-2019').toISOString(),
       erpReference: '1234',
+      status: '',
       apc: {
         invoiceReference: '00001/2019',
         paymentAmount: null,
@@ -358,6 +361,7 @@ describe('migrate entire invoice usecase', () => {
       paymentDate: null,
       issueDate: null,
       erpReference: null,
+      status: '',
       apc: {
         invoiceReference: '00001/2019',
         paymentAmount: 220,
@@ -414,6 +418,7 @@ describe('migrate entire invoice usecase', () => {
       paymentDate: null,
       issueDate: null,
       erpReference: null,
+      status: '',
       apc: {
         invoiceReference: null,
         paymentAmount: 220,
