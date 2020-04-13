@@ -87,7 +87,8 @@ class KnexMigrationSource {
       '20200409122800_add_default_date_to_views',
       true
     ),
-    rebuild_materialized_views('20200409122800_fix_invoice_net_amount'),
+    rebuild_materialized_views('20200409122800_fix_invoice_net_amount', true),
+    rebuild_materialized_views('20200413093900_fix_academic_editor_dates'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
