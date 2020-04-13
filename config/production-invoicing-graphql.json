@@ -10,6 +10,7 @@
   "AWS_SNS_SQS_REGION": "eu-west-1",
   "AWS_SNS_TOPIC": "phenom",
   "AWS_SQS_QUEUE_NAME": "prod-invoicing-queue",
+  "AWS_S3_ENDPOINT": "",
   "BANK_ACCOUNT_NAME": "Hindawi Limited",
   "BANK_ACCOUNT_NUMBER": "00113905",
   "BANK_ACCOUNT_TYPE": "FGN Current",

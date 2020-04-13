@@ -55,6 +55,7 @@ export const env = {
     FERoot: getOsEnv('FE_ROOT'),
     eventNamespace: getOsEnv('EVENT_NAMESPACE'),
     publisherName: getOsEnv('PUBLISHER_NAME'),
+    defaultMessageAttributes: getOsEnv('DEFAULT_MESSAGE_ATTRIBUTES'),
     vatValidationServiceEndpoint: getOsEnv('VAT_VALIDATION_SERVICE_ENDPOINT'),
     failedErpCronRetryTimeMinutes: toNumber(
       getOsEnv('FAILED_ERP_CRON_RETRY_TIME_MINUTES')
@@ -141,7 +142,9 @@ export const env = {
       endpoint: getOsEnv('AWS_SQS_ENDPOINT'),
     },
     s3: {
+      endpoint: getOsEnv('AWS_S3_ENDPOINT'),
       largeEventBucket: getOsEnv('PHENOM_LARGE_EVENTS_BUCKET'),
+      bucketPrefix: getOsEnv('PHENOM_LARGE_EVENTS_PREFIX'),
     },
   },
   scheduler: {

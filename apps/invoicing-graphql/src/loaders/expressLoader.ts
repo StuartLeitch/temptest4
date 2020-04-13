@@ -1,6 +1,7 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import express from 'express';
 import corsMiddleware from 'cors';
@@ -12,7 +13,7 @@ import {
   GetInvoicePdfUsecase,
   Roles,
   UniqueEntityID,
-  InvoiceId
+  InvoiceId,
   // ManuscriptId,
   // Journal,
   // Name
@@ -117,7 +118,7 @@ export const expressLoader: MicroframeworkLoader = (
                 dataAvailability: 'sds',
                 fundingStatement: 'sdsd',
                 articleType: {
-                  name: 'Research Article'
+                  name: 'Research Article',
                 },
                 authors: [
                   {
@@ -130,8 +131,8 @@ export const expressLoader: MicroframeworkLoader = (
                     aff: 'University of Madrid',
                     country: 'ES',
                     isSubmitting: true,
-                    isCorresponding: true
-                  }
+                    isCorresponding: true,
+                  },
                 ],
                 files: [
                   {
@@ -144,8 +145,8 @@ export const expressLoader: MicroframeworkLoader = (
                     size: 322902,
                     originalName: '02 Revenue Recognition.pdf',
                     providerKey:
-                      '8250aba9-4f34-491b-be13-1edcae7ff4ba/b36c1c6c-c19b-4736-9a80-ccde58c3e7e4'
-                  }
+                      '8250aba9-4f34-491b-be13-1edcae7ff4ba/b36c1c6c-c19b-4736-9a80-ccde58c3e7e4',
+                  },
                 ],
                 editors: [
                   {
@@ -158,8 +159,8 @@ export const expressLoader: MicroframeworkLoader = (
                     givenNames: 'academic',
                     role: {
                       type: 'academicEditor',
-                      label: 'Academic Editor'
-                    }
+                      label: 'Academic Editor',
+                    },
                   },
                   {
                     id: 'bf5a9e26-91f8-4af1-a09c-800de1b5b543',
@@ -171,11 +172,11 @@ export const expressLoader: MicroframeworkLoader = (
                     givenNames: 'chief',
                     role: {
                       type: 'triageEditor',
-                      label: 'Chief Editor'
-                    }
-                  }
-                ]
-              }
+                      label: 'Chief Editor',
+                    },
+                  },
+                ],
+              },
             ],
             date: '2019-11-29T08:56:19.762Z',
             figCount: '000',
@@ -186,21 +187,21 @@ export const expressLoader: MicroframeworkLoader = (
             qc: {
               surname: 'INV',
               givenNames: 'quality_checker',
-              email: 'georgiana.olaru+qc1@hindawi.com'
+              email: 'georgiana.olaru+qc1@hindawi.com',
             },
             qcLeaders: [
               {
                 surname: 'INV2',
                 givenNames: 'team_leade',
-                email: 'georgiana.olaru+tl2@hindawi.com'
-              }
+                email: 'georgiana.olaru+tl2@hindawi.com',
+              },
             ],
             ea: {
               surname: 'Assistant INV',
               givenNames: 'editorial',
-              email: 'georgiana.olaru+ea@hindawi.com'
-            }
-          }
+              email: 'georgiana.olaru+ea@hindawi.com',
+            },
+          },
         });
         res.json({});
       });
@@ -235,7 +236,7 @@ export const expressLoader: MicroframeworkLoader = (
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename=${fileName}`,
-        'Content-Length': file.length
+        'Content-Length': file.length,
       });
       res.end(file);
     });

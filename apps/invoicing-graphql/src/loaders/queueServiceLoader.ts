@@ -20,17 +20,20 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     const context = settings.getData('context');
 
     const config = {
+      region: env.aws.sns.sqsRegion,
       accessKeyId: env.aws.sns.sqsAccessKey,
       secretAccessKey: env.aws.sns.sqsSecretKey,
-      region: env.aws.sns.sqsRegion,
       snsEndpoint: env.aws.sns.endpoint,
       sqsEndpoint: env.aws.sqs.endpoint,
+      s3Endpoint: env.aws.s3.endpoint,
       topicName: env.aws.sns.topic,
       queueName: env.aws.sqs.queueName,
+      bucketName: env.aws.s3.largeEventBucket,
+      bucketPrefix: env.aws.s3.bucketPrefix,
       eventNamespace: env.app.eventNamespace,
       publisherName: env.app.publisherName,
       serviceName: env.app.name,
-      bucketName: env.aws.s3.largeEventBucket,
+      defaultMessageAttributes: env.app.defaultMessageAttributes,
     };
 
     let queue: any;

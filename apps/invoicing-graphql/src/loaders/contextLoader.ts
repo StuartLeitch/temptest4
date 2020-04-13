@@ -1,6 +1,7 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 
 // import { CorrelationID } from '../../../../libs/shared/src/lib/core/domain/CorrelationID';
@@ -23,7 +24,7 @@ import {
   KnexCouponRepo,
   KnexPublisherRepo,
   KnexSentNotificationsRepo,
-  KnexPausedReminderRepo
+  KnexPausedReminderRepo,
 } from '@hindawi/shared';
 
 import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
@@ -58,13 +59,13 @@ export const contextLoader: MicroframeworkLoader = (
       coupon: new KnexCouponRepo(db),
       publisher: new KnexPublisherRepo(db),
       sentNotifications: new KnexSentNotificationsRepo(db),
-      pausedReminder: new KnexPausedReminderRepo(db)
+      pausedReminder: new KnexPausedReminderRepo(db),
     };
 
     const bullData = {
       password: env.scheduler.db.password,
       host: env.scheduler.db.host,
-      port: env.scheduler.db.port
+      port: env.scheduler.db.port,
     };
 
     const services = {
@@ -81,12 +82,12 @@ export const contextLoader: MicroframeworkLoader = (
       exchangeRateService: new ExchangeRateService(),
       payPalService: new PayPalService(env.paypal),
       erpService: new ErpService(logger, env.salesForce),
-      schedulingService: new BullScheduler(bullData, logger)
+      schedulingService: new BullScheduler(bullData, logger),
     };
 
     const context = {
       repos,
-      services
+      services,
     };
 
     settings.setData('context', context);

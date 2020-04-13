@@ -9,6 +9,7 @@
   "AWS_SES_REGION": "eu-west-1",
   "AWS_SNS_SQS_REGION": "eu-west-1",
   "AWS_SNS_TOPIC": "phenom",
+  "AWS_S3_ENDPOINT": "",
   "AWS_SQS_QUEUE_NAME": "dev-invoicing-queue",
   "BANK_ACCOUNT_NAME": "Hindawi Limited",
   "BANK_ACCOUNT_NUMBER": "00113905",
