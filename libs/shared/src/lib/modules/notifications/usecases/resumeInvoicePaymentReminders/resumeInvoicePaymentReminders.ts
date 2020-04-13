@@ -94,8 +94,8 @@ export class ResumeInvoicePaymentReminderUsecase
         .then(this.validatePauseState(context))
         .then(this.getInvoice(context))
         .then(this.getManuscript(context))
-        .then(this.getPayer(context))
         .then(this.resume)
+        .then(this.getPayer(context))
         .advanceOrEnd(this.shouldScheduleJob)
         .then(this.scheduleJob)
         .map(() => Result.ok<void>(null));

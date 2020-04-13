@@ -1,7 +1,7 @@
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 
 class InvoicesDataView extends AbstractEventView implements EventViewContract {
@@ -21,7 +21,7 @@ AS SELECT ie.id as event_id,
     (((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'price'::text)::float AS gross_apc_value,
     COALESCE((((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float, 0) AS vat_percentage,
     COALESCE((ie.payload ->> 'valueWithoutVAT'::text)::float, (ie.payload ->> 'paymentAmount'::text)::float / (1 + (((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float / 100)) AS net_apc,
-    COALESCE((ie.payload ->> 'valueWithVAT'::text)::float, (ie.payload ->> 'valueWithoutVAT'::text)::float * (1 + COALESCE((((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float, 0))) AS net_amount,
+    COALESCE((ie.payload ->> 'valueWithVAT'::text)::float, (ie.payload ->> 'valueWithoutVAT'::text)::float * (1 + COALESCE((((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float / 100, 0))) AS net_amount,
     COALESCE((ie.payload ->> 'paymentAmount'::text)::float, 0) AS paid_amount,
     cast_to_timestamp(ie.payload ->> 'paymentDate'::text) AS payment_date,
     (ie.payload ->> 'foreignPaymentId'::text) AS payment_reference,
@@ -44,7 +44,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (invoice_issue_date)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (event_id)`,
-    `create index on ${this.getViewName()} (event)`
+    `create index on ${this.getViewName()} (event)`,
   ];
 
   getViewName(): string {

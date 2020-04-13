@@ -1,6 +1,6 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 
 import authorsView from './AuthorsView';
@@ -45,7 +45,7 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_corresponding = true limit 1) a on a.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_submitting = true limit 1) a2 on a.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${manuscriptEditorsView.getViewName()} e where e.manuscript_custom_id = s.manuscript_custom_id and e.role_type = 'triageEditor' limit 1) e on e.manuscript_custom_id = s.manuscript_custom_id
-  LEFT JOIN LATERAL (SELECT * FROM ${manuscriptEditorsView.getViewName()} e2 where e2.manuscript_custom_id = s.manuscript_custom_id and e2.role_type = 'academicEditor' order by e2.invited_date desc limit 1) e2 on e2.manuscript_custom_id = s.manuscript_custom_id
+  LEFT JOIN LATERAL (SELECT * FROM ${manuscriptEditorsView.getViewName()} e2 where e2.manuscript_custom_id = s.manuscript_custom_id and e2.role_type = 'academicEditor' order by e2.invited_date desc, e2.accepted_date desc limit 1) e2 on e2.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${manuscriptEditorsView.getViewName()} e3 where e3.manuscript_custom_id = s.manuscript_custom_id and e3.role_type = 'editorialAssistant' limit 1) e3 on e3.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSectionsView.getViewName()} js where js.section_id = s.section_id limit 1) sec on sec.section_id = s.section_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
@@ -71,7 +71,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (version)`,
     `create index on ${this.getViewName()} (journal_id)`,
     `create index on ${this.getViewName()} (journal_name)`,
-    `create index on ${this.getViewName()} (publisher_name)`
+    `create index on ${this.getViewName()} (publisher_name)`,
   ];
 
   getViewName(): string {

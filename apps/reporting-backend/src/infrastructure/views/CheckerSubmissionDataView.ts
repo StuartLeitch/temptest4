@@ -1,13 +1,13 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import {
   REPORTING_TABLES,
-  CHECKER_SUBMISSION_EVENTS
+  CHECKER_SUBMISSION_EVENTS,
 } from 'libs/shared/src/lib/modules/reporting/constants';
 
-const checkerSubmissionEvents = CHECKER_SUBMISSION_EVENTS.map(e => `'${e}'`);
+const checkerSubmissionEvents = CHECKER_SUBMISSION_EVENTS.map((e) => `'${e}'`);
 
 class CheckerSubmissionData extends AbstractEventView
   implements EventViewContract {
@@ -16,7 +16,7 @@ class CheckerSubmissionData extends AbstractEventView
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
     ce.id AS event_id,
-    ce."time" AS event_timestamp,
+    coalesce(ce."time", cast_to_timestamp(checker_view.updated), cast_to_timestamp('1980-01-01')) AS event_timestamp,
     ce."type" AS event,
     checker_view."teamId" as team_id,
     checker_view.id as checker_id,
@@ -33,6 +33,7 @@ AS SELECT
       "surname" text,
       "role" text,
       "submissionId" text,
+      updated text,
       id text,
       "teamId" text,
       "isConfirmed" bool,
@@ -56,7 +57,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (assignation_date)`,
     `create index on ${this.getViewName()} (submission_id, checker_role, assignation_date)`,
     `create index on ${this.getViewName()} (checker_role)`,
-    `create index on ${this.getViewName()} (checker_email)`
+    `create index on ${this.getViewName()} (checker_email)`,
   ];
 
   getViewName(): string {
