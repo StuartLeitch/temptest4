@@ -189,8 +189,8 @@ export class SendInvoiceCreditControlReminderUsecase
       );
 
       const usecase = new GetJournal(this.journalRepo);
-      const execution = new AsyncEither(request)
-        .map((data) => data.manuscript.journalId)
+      const execution = new AsyncEither(request.manuscript)
+        .map((manuscript) => manuscript.journalId)
         .then((journalId) => usecase.execute({ journalId }, context))
         .map((journalResult) => ({
           ...request,

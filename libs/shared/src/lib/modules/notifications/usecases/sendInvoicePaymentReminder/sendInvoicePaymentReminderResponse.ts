@@ -1,10 +1,9 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { SendInvoicePaymentReminderErrors } from './sendInvoicePaymentReminderErrors';
+import * as SendInvoicePaymentReminderErrors from './sendInvoicePaymentReminderErrors';
 
 export type SendInvoicePaymentReminderResponse = Either<
-  | SendInvoicePaymentReminderErrors.ManuscriptCustomIdRequiredError
   | SendInvoicePaymentReminderErrors.RecipientEmailRequiredError
   | SendInvoicePaymentReminderErrors.RecipientNameRequiredError
   | SendInvoicePaymentReminderErrors.SenderEmailRequiredError
