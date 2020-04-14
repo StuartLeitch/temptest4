@@ -1,10 +1,3 @@
-import {
-  SchedulingTime,
-  SisifJobTypes,
-  TimerBuilder,
-  JobBuilder,
-} from '@hindawi/sisif';
-
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -25,6 +18,14 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
+import {
+  SisifJobTypes,
+  JobBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Job';
+import {
+  SchedulingTime,
+  TimerBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Time';
 
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Payer } from '../../../payers/domain/Payer';
