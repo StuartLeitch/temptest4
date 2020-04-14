@@ -1,10 +1,3 @@
-import {
-  SchedulingTime,
-  SisifJobTypes,
-  TimerBuilder,
-  JobBuilder,
-} from '@hindawi/sisif';
-
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -21,10 +14,17 @@ import {
   Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import {
+  SisifJobTypes,
+  JobBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Job';
+import {
+  SchedulingTime,
+  TimerBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Time';
 
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
@@ -48,8 +48,8 @@ import {
 
 // * Usecase specific
 import { ResumeInvoiceConfirmationRemindersResponse as Response } from './resumeInvoiceConfirmationRemindersResponse';
-import { ResumeInvoiceConfirmationRemindersErrors as Errors } from './resumeInvoiceConfirmationRemindersErrors';
 import { ResumeInvoiceConfirmationRemindersDTO as DTO } from './resumeInvoiceConfirmationRemindersDTO';
+import * as Errors from './resumeInvoiceConfirmationRemindersErrors';
 
 interface CompoundDTO extends DTO {
   transaction: Transaction;
@@ -297,14 +297,9 @@ export class ResumeInvoiceConfirmationReminderUsecase
     );
 
     const { reminderDelay, manuscript, queueName, invoice } = request;
-    const {
-      authorFirstName,
-      authorSurname,
-      authorEmail,
-      customId,
-    } = manuscript;
+    const { authorFirstName, authorSurname, authorEmail } = manuscript;
     const data = PayloadBuilder.invoiceReminder(
-      customId,
+      invoice.id.toString(),
       authorEmail,
       authorFirstName,
       authorSurname

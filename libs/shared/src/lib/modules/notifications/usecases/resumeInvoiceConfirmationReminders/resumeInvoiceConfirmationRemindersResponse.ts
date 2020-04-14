@@ -1,7 +1,7 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { ResumeInvoiceConfirmationRemindersErrors } from './resumeInvoiceConfirmationRemindersErrors';
+import * as ResumeInvoiceConfirmationRemindersErrors from './resumeInvoiceConfirmationRemindersErrors';
 
 export type ResumeInvoiceConfirmationRemindersResponse = Either<
   | ResumeInvoiceConfirmationRemindersErrors.CouldNotGetTransactionForInvoiceError
