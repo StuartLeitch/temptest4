@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const { join } = require('path');
 
 const root = join(__dirname);
@@ -8,5 +10,5 @@ module.exports = {
   siteDescription: 'Default Dashboard ready for Development',
   siteCanonicalUrl: 'http://localhost:4200',
   siteKeywords: 'react dashboard seed bootstrap',
-  scssIncludes: []
+  scssIncludes: [],
 };

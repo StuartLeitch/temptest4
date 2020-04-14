@@ -6,6 +6,7 @@ class Config {
   appName: string;
   backendUrl: string;
   gqlRoot: string;
+  feRoot: string;
 
   // * Authentication ========================================================
   authEnabled: boolean;
@@ -25,6 +26,7 @@ class Config {
     this.apiRoot = globalConfig.API_ROOT;
     this.backendUrl = globalConfig.BACKEND_URL;
     this.gqlRoot = globalConfig.GQL_ROOT;
+    this.feRoot = globalConfig.FE_ROOT;
 
     this.authEnabled = globalConfig.AUTH_ENABLED === 'true';
     this.authServerUrl = globalConfig.AUTH_SERVER_URL;

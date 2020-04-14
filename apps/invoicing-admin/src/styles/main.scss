@@ -13,7 +13,9 @@
 @import '~@owczar/dashboard-style--airframe/scss/custom-card-header';
 @import '~@owczar/dashboard-style--airframe/scss/hr-text';
 @import '~@owczar/dashboard-style--airframe/scss/icon-with-badge';
-@import '~@owczar/dashboard-style--airframe/scss/layout';
+// @import '~@owczar/dashboard-style--airframe/scss/layout';
+@import './plugins/custom/layout';
+
 @import '~@owczar/dashboard-style--airframe/scss/navbar';
 @import '~@owczar/dashboard-style--airframe/scss/extended-dropdown';
 @import '~@owczar/dashboard-style--airframe/scss/fullScreen';

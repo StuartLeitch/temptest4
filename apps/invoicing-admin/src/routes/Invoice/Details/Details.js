@@ -8,11 +8,11 @@ import format from 'date-fns/format';
 // import subWeeks from 'date-fns/subWeeks';
 import compareDesc from 'date-fns/compareDesc';
 import { toast } from 'react-toastify';
-import Toggle from 'react-toggle';
+// import Toggle from 'react-toggle';
 import numeral from 'numeral';
 
 import {
-  Accordion,
+  // Accordion,
   Badge,
   Button,
   // ButtonDropdown,
@@ -67,6 +67,8 @@ import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetail
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
 // import { Coupon } from '../../components/Invoice/Coupon';
+
+import Config from '../../../config';
 
 const INVOICE_QUERY = `
 query invoice($id: ID) {
@@ -283,7 +285,7 @@ const Details = () => {
       <Container fluid={true}>
         <HeaderMain
           title={`Invoice #${invoice.referenceNumber}`}
-          className='mb-5 mt-4'
+          className='mb-1 mt-0'
         />
         {/* START Header 1 */}
         <Row>
@@ -747,11 +749,22 @@ const Details = () => {
                 <TabPane tabId='invoice'>
                   <Card body className='border-top-0'>
                     <CardBody>
-                      <CardTitle tag='h6' className='mb-4'>
+                      <CardTitle tag='h6' className='d-flex'>
                         Invoice: Details
-                        <span className='small ml-1 text-muted'>
+                        <a
+                          target='_blank'
+                          href={`${Config.feRoot}/payment-details/${invoice.id}`}
+                          className='ml-auto'
+                        >
+                          {
+                            <span className='font-weight-normal text-underlined text-blue'>
+                              <u>#{invoice.id}</u>
+                            </span>
+                          }
+                        </a>
+                        {/* <span className='small ml-1 text-muted'>
                           #{invoice.id}
-                        </span>
+                        </span> */}
                       </CardTitle>
                       {/* START Form */}
                       <Form
@@ -1143,6 +1156,19 @@ const Details = () => {
             <Card className='mb-3'>
               <CardBody>
                 <CardTitle tag='h6'>Timeline</CardTitle>
+                {invoice?.dateAccepted && (
+                  <TimelineMini
+                    icon='check-circle'
+                    iconClassName='text-pink'
+                    badgeTitle='Accepted'
+                    badgeColor='pink'
+                    date={format(
+                      new Date(invoice?.dateAccepted),
+                      'dd MMMM yyyy'
+                    )}
+                    phrase={'Transaction set to ACTIVE.'}
+                  />
+                )}
                 {invoice?.dateCreated && (
                   <TimelineMini
                     icon='circle'

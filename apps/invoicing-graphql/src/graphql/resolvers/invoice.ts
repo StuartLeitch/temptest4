@@ -60,6 +60,7 @@ export const invoice: Resolvers<any> = {
         status: invoiceDetails.status,
         charge: invoiceDetails.charge,
         dateCreated: invoiceDetails.dateCreated.toISOString(),
+        dateAccepted: invoiceDetails.dateAccepted.toISOString(),
         erpReference: invoiceDetails.erpReference,
         revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,

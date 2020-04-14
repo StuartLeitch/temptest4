@@ -1,9 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const DlRowArticleDetails = props => (
+const DlRowArticleDetails = (props) => (
   <React.Fragment>
     <dl className='row'>
+      <dt className={`col-sm-3 ${props.leftSideClassName}`}>Custom ID</dt>
+      <dd className={`col-sm-9 ${props.rightSideClassName}`}>
+        <strong className='text-black-50'>{props.customId}</strong>
+      </dd>
+
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>Article Title</dt>
       <dd className={`col-sm-9 ${props.rightSideClassName}`}>{props.title}</dd>
       {/* <dt className={`col-sm-3 ${props.leftSideClassName}`}>Article ID</dt> */}
@@ -30,11 +35,11 @@ const DlRowArticleDetails = props => (
 );
 DlRowArticleDetails.propTypes = {
   leftSideClassName: PropTypes.node,
-  rightSideClassName: PropTypes.node
+  rightSideClassName: PropTypes.node,
 };
 DlRowArticleDetails.defaultProps = {
   leftSideClassName: '',
-  rightSideClassName: ''
+  rightSideClassName: '',
 };
 
 export { DlRowArticleDetails };
