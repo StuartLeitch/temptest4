@@ -1,24 +1,40 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AppError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
-import { Invoice } from '../../../invoices/domain/Invoice';
+import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
-import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
-import { WaiverService } from '../../../../domain/services/WaiverService';
-import { EmailService } from '../../../../infrastructure/communication-channels';
+import { JournalId } from '../../../journals/domain/JournalId';
+import { Invoice } from '../../../invoices/domain/Invoice';
 import { Waiver } from '../../../waivers/domain/Waiver';
 import { Transaction } from '../../domain/Transaction';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
+import { CatalogRepoContract } from '../../../journals/repos';
+
+import { EmailService } from '../../../../infrastructure/communication-channels';
+import { WaiverService } from '../../../../domain/services/WaiverService';
+
+import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
+import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
+import {
+  SisifJobTypes,
+  JobBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Job';
+import {
+  SchedulingTime,
+  TimerBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Time';
 
 // * Usecase specifics
 import { UpdateTransactionOnAcceptManuscriptResponse } from './updateTransactionOnAcceptManuscriptResponse';
@@ -26,14 +42,11 @@ import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOn
 import { UpdateTransactionOnAcceptManuscriptDTO } from './updateTransactionOnAcceptManuscriptDTOs';
 // * Authorization Logic
 import {
-  Authorize,
+  UpdateTransactionContext,
   AccessControlledUsecase,
   AccessControlContext,
-  UpdateTransactionContext
+  Authorize,
 } from './updateTransactionOnAcceptManuscriptAuthorizationContext';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { CatalogItem } from '../../../journals/domain/CatalogItem';
-import { JournalId } from '../../../journals/domain/JournalId';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   implements
@@ -55,6 +68,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     private articleRepo: ArticleRepoContract,
     private waiverRepo: WaiverRepoContract,
     private waiverService: WaiverService,
+    private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {}
 
@@ -186,7 +200,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
           country: authorCountry,
           invoiceId: invoice.invoiceId.id.toString(),
           authorEmail: manuscript.authorEmail,
-          journalId: manuscript.journalId
+          journalId: manuscript.journalId,
         });
       } catch (error) {
         console.log('Failed to save waivers', error);
@@ -200,6 +214,29 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       invoice.generateCreatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
+
+      const jobData = PayloadBuilder.invoiceReminder(
+        invoice.id.toString(),
+        manuscript.authorEmail,
+        manuscript.authorFirstName,
+        manuscript.authorSurname
+      );
+
+      const newJob = JobBuilder.basic(
+        SisifJobTypes.InvoiceConfirmReminder,
+        jobData
+      );
+
+      const newTimer = TimerBuilder.delayed(
+        request.confirmationReminder.delay,
+        SchedulingTime.Day
+      );
+
+      this.scheduler.schedule(
+        newJob,
+        request.confirmationReminder.queueName,
+        newTimer
+      );
 
       this.emailService
         .createInvoicePaymentTemplate(

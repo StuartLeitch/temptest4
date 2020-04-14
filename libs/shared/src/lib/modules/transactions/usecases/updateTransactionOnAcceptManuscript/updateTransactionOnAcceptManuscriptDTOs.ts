@@ -11,5 +11,9 @@ export interface UpdateTransactionOnAcceptManuscriptDTO {
     address?: string;
     name?: string;
   };
+  confirmationReminder: {
+    queueName: string;
+    delay: number;
+  };
   bankTransferCopyReceiver?: string;
 }

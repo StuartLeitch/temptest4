@@ -3,7 +3,7 @@ import { AppError } from '../../../../core/logic/AppError';
 
 import { Notification } from '../../domain/Notification';
 
-import { GetSentNotificationForInvoiceErrors } from './getSentNotificationForInvoiceErrors';
+import * as GetSentNotificationForInvoiceErrors from './getSentNotificationForInvoiceErrors';
 
 export type GetSentNotificationForInvoiceResponse = Either<
   | GetSentNotificationForInvoiceErrors.InvoiceNotFoundError

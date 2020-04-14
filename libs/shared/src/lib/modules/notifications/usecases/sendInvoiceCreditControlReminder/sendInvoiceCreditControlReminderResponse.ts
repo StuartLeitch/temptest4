@@ -1,10 +1,9 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { SendInvoiceCreditControlReminderErrors } from './sendInvoiceCreditControlReminderErrors';
+import * as SendInvoiceCreditControlReminderErrors from './sendInvoiceCreditControlReminderErrors';
 
 export type SendInvoiceCreditControlReminderResponse = Either<
-  | SendInvoiceCreditControlReminderErrors.ManuscriptCustomIdRequiredError
   | SendInvoiceCreditControlReminderErrors.RecipientEmailRequiredError
   | SendInvoiceCreditControlReminderErrors.RecipientNameRequiredError
   | SendInvoiceCreditControlReminderErrors.SenderEmailRequiredError

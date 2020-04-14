@@ -16,19 +16,19 @@ export interface CompoundData extends DTO {
 export function constructCreditControlReminderData(
   data: CompoundData
 ): PaymentReminder {
-  const { invoice, journal, manuscriptCustomId } = data;
+  const { invoice, journal, manuscript } = data;
 
   return {
-    manuscriptCustomId,
+    manuscriptCustomId: manuscript.customId,
     catalogItem: journal,
     invoice,
     author: {
       email: data.recipientEmail,
-      name: data.recipientName
+      name: data.recipientName,
     },
     sender: {
       email: data.senderEmail,
-      name: data.senderName
-    }
+      name: data.senderName,
+    },
   };
 }

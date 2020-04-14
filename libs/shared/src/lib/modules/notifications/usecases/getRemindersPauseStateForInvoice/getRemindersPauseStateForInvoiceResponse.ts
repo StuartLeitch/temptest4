@@ -3,7 +3,7 @@ import { AppError } from '../../../../core/logic/AppError';
 
 import { NotificationPause } from '../../domain/NotificationPause';
 
-import { GetRemindersPauseStateForInvoiceErrors } from './getRemindersPauseStateForInvoiceErrors';
+import * as GetRemindersPauseStateForInvoiceErrors from './getRemindersPauseStateForInvoiceErrors';
 
 export type GetRemindersPauseStateForInvoiceResponse = Either<
   | GetRemindersPauseStateForInvoiceErrors.GetRemindersPauseDbError

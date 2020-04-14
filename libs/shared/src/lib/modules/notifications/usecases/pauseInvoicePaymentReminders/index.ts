@@ -1,4 +1,4 @@
+export * as PauseInvoicePaymentRemindersErrors from './pauseInvoicePaymentRemindersErrors';
 export * from './pauseInvoicePaymentRemindersResponse';
-export * from './pauseInvoicePaymentRemindersErrors';
 export * from './pauseInvoicePaymentRemindersDTO';
 export * from './pauseInvoicePaymentReminders';

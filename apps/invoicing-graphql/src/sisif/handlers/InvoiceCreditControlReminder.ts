@@ -3,7 +3,7 @@ import {
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceCreditControlReminderDTO,
   QueuePayloads,
-  Roles
+  Roles,
 } from '@hindawi/shared';
 
 import { Logger } from '../../lib/logger';
@@ -24,11 +24,11 @@ export const invoiceCreditControlHandler = (
       catalog,
       invoice,
       coupon,
-      waiver
+      waiver,
     },
-    services: { emailService, logger }
+    services: { emailService, logger },
   } = appContext;
-  const { manuscriptCustomId, recipientEmail, recipientName } = payload;
+  const { recipientEmail, recipientName, invoiceId } = payload;
 
   const usecase = new SendInvoiceCreditControlReminderUsecase(
     sentNotifications,
@@ -43,18 +43,18 @@ export const invoiceCreditControlHandler = (
     emailService
   );
   const usecaseContext = {
-    roles: [Roles.ADMIN]
+    roles: [Roles.ADMIN],
   };
 
   const request: SendInvoiceCreditControlReminderDTO = {
     senderEmail: env.app.creditControlReminderSenderEmail,
     senderName: env.app.creditControlReminderSenderName,
-    manuscriptCustomId,
     recipientEmail,
-    recipientName
+    recipientName,
+    invoiceId,
   };
 
-  usecase.execute(request, usecaseContext).then(maybeResult => {
+  usecase.execute(request, usecaseContext).then((maybeResult) => {
     if (maybeResult.isLeft()) {
       loggerService.error(maybeResult.value.errorValue().message);
       throw Error(maybeResult.value.errorValue().message);

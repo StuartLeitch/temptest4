@@ -1,10 +1,3 @@
-import {
-  SchedulingTime,
-  SisifJobTypes,
-  TimerBuilder,
-  JobBuilder,
-} from '@hindawi/sisif';
-
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -25,8 +18,16 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
+import {
+  SisifJobTypes,
+  JobBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Job';
+import {
+  SchedulingTime,
+  TimerBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Time';
 
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { Invoice } from '../../../invoices/domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
 
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
@@ -36,7 +37,7 @@ import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
-import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
 import { ResumeInvoiceConfirmationReminderUsecase } from '../resumeInvoiceConfirmationReminders';
 import { PauseInvoiceConfirmationRemindersUsecase } from '../pauseInvoiceConfirmationReminders';
@@ -46,8 +47,8 @@ import { PauseInvoicePaymentRemindersUsecase } from '../pauseInvoicePaymentRemin
 
 // * Usecase specific
 import { ScheduleRemindersForExistingInvoicesResponse as Response } from './scheduleRemindersForExistingInvoicesResponse';
-import { ScheduleRemindersForExistingInvoicesErrors as Errors } from './scheduleRemindersForExistingInvoicesErrors';
 import { ScheduleRemindersForExistingInvoicesDTO as DTO } from './scheduleRemindersForExistingInvoicesDTO';
+import * as Errors from './scheduleRemindersForExistingInvoicesErrors';
 
 interface InvoiceIdsDTO extends DTO {
   invoiceIds: string[];
@@ -70,10 +71,10 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     private loggerService: LoggerContract,
     private scheduler: SchedulerContract
   ) {
-    this.getManuscriptFromUsecase = this.getManuscriptFromUsecase.bind(this);
     this.scheduleOneCreditControl = this.scheduleOneCreditControl.bind(this);
     this.scheduleAllCreditControl = this.scheduleAllCreditControl.bind(this);
     this.getUnscheduledInvoices = this.getUnscheduledInvoices.bind(this);
+    this.getInvoiceFromUsecase = this.getInvoiceFromUsecase.bind(this);
     this.getPayerFromUsecase = this.getPayerFromUsecase.bind(this);
     this.resumeConfirmation = this.resumeConfirmation.bind(this);
     this.pauseConfirmation = this.pauseConfirmation.bind(this);
@@ -260,13 +261,11 @@ export class ScheduleRemindersForExistingInvoicesUsecase
 
       const {
         invoiceIds,
-        paymentDelay: reminderDelay,
         paymentQueueName: queueName,
+        paymentDelay: reminderDelay,
       } = request;
       const usecase = new ResumeInvoicePaymentReminderUsecase(
         this.pausedReminderRepo,
-        this.invoiceItemRepo,
-        this.manuscriptRepo,
         this.invoiceRepo,
         this.payerRepo,
         this.loggerService,
@@ -286,21 +285,19 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       this.loggerService.info(`Scheduling the credit control reminder`);
 
       const { invoiceIds, creditControlDelay, paymentQueueName } = request;
-      const manuscriptUsecase = new GetManuscriptByInvoiceIdUsecase(
-        this.manuscriptRepo,
-        this.invoiceItemRepo
-      );
+      const invoiceUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
       const payerUsecase = new GetPayerDetailsByInvoiceIdUsecase(
         this.payerRepo,
         this.loggerService
       );
       const scheduleForInvoice = this.scheduleOneCreditControl(
-        manuscriptUsecase,
+        invoiceUsecase,
         payerUsecase,
         paymentQueueName,
         creditControlDelay,
         context
       );
+
       const results = invoiceIds.map(scheduleForInvoice);
       const aggregated = await AsyncEither.asyncAll(results);
 
@@ -312,44 +309,37 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     usecase: GetPayerDetailsByInvoiceIdUsecase,
     context: Context
   ) {
-    return async ({
-      invoiceId,
-      manuscript,
-    }: {
+    interface Data {
       invoiceId: string;
-      manuscript: Manuscript;
-    }) => {
-      const maybePayer = await usecase.execute(
-        {
-          invoiceId,
-        },
-        context
-      );
+      invoice: Invoice;
+    }
+    return async (request: Data) => {
+      const { invoiceId } = request;
+      const maybePayer = await usecase.execute({ invoiceId }, context);
 
       return maybePayer.map((result) => ({
-        invoiceId,
-        manuscript,
+        ...request,
         payer: result.getValue(),
       }));
     };
   }
 
-  private getManuscriptFromUsecase(
-    usecase: GetManuscriptByInvoiceIdUsecase,
+  private getInvoiceFromUsecase(
+    usecase: GetInvoiceDetailsUsecase,
     context: Context
   ) {
     return async (invoiceId: string) => {
-      const maybeManuscript = await usecase.execute({ invoiceId }, context);
+      const maybeInvoice = await usecase.execute({ invoiceId }, context);
 
-      return maybeManuscript.map((result) => ({
+      return maybeInvoice.map((result) => ({
         invoiceId,
-        manuscript: result.getValue()[0],
+        invoice: result.getValue(),
       }));
     };
   }
 
   private scheduleOneCreditControl(
-    getManuscriptUsecase: GetManuscriptByInvoiceIdUsecase,
+    getInvoiceUsecase: GetInvoiceDetailsUsecase,
     getPayerUsecase: GetPayerDetailsByInvoiceIdUsecase,
     queueName: string,
     delay: number,
@@ -357,7 +347,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   ) {
     return (invoiceId: string) => {
       const execution = new AsyncEither(invoiceId)
-        .then(this.getManuscriptFromUsecase(getManuscriptUsecase, context))
+        .then(this.getInvoiceFromUsecase(getInvoiceUsecase, context))
         .then(this.getPayerFromUsecase(getPayerUsecase, context))
         .then(
           this.scheduleJob(
@@ -371,15 +361,9 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   }
 
   private scheduleJob(jobType: string, queueName: string, delay: number) {
-    return async ({
-      manuscript,
-      payer,
-    }: {
-      manuscript: Manuscript;
-      payer: Payer;
-    }) => {
+    return async ({ invoice, payer }: { invoice: Invoice; payer: Payer }) => {
       const jobData = PayloadBuilder.invoiceReminder(
-        manuscript.customId,
+        invoice.id.toString(),
         payer.email.value,
         payer.name.value,
         ''
