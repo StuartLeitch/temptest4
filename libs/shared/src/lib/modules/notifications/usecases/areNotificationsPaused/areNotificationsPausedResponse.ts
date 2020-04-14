@@ -1,7 +1,7 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { AreNotificationsPausedErrors } from './areNotificationsPausedErrors';
+import * as AreNotificationsPausedErrors from './areNotificationsPausedErrors';
 
 export type AreNotificationsPausedResponse = Either<
   | AreNotificationsPausedErrors.NotificationTypeRequired

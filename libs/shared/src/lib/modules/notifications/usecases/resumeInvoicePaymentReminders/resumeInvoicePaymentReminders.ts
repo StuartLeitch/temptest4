@@ -27,8 +27,6 @@ import {
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
@@ -61,8 +59,6 @@ export class ResumeInvoicePaymentReminderUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract,

@@ -11,7 +11,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -24,8 +24,8 @@ import { NotificationType } from '../../domain/Notification';
 
 // * Usecase specific
 import { PauseInvoicePaymentRemindersResponse as Response } from './pauseInvoicePaymentRemindersResponse';
-import { PauseInvoicePaymentRemindersErrors as Errors } from './pauseInvoicePaymentRemindersErrors';
 import { PauseInvoicePaymentRemindersDTO as DTO } from './pauseInvoicePaymentRemindersDTO';
+import * as Errors from './pauseInvoicePaymentRemindersErrors';
 
 type Context = AuthorizationContext<Roles>;
 export type PauseInvoicePaymentRemindersContext = Context;

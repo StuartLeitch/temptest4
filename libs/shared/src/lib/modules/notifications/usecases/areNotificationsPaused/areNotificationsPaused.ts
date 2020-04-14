@@ -11,7 +11,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -24,8 +24,8 @@ import { NotificationType } from '../../domain/Notification';
 
 // * Usecase specific
 import { AreNotificationsPausedResponse as Response } from './areNotificationsPausedResponse';
-import { AreNotificationsPausedErrors as Errors } from './areNotificationsPausedErrors';
 import { AreNotificationsPausedDTO as DTO } from './areNotificationsPausedDTO';
+import * as Errors from './areNotificationsPausedErrors';
 
 type TypeToPauseMap = {
   [key in NotificationType]: keyof Omit<NotificationPause, 'invoiceId'>;
@@ -35,7 +35,7 @@ const notificationTypeToPause: TypeToPauseMap = {
   REMINDER_CONFIRMATION: 'confirmation',
   REMINDER_PAYMENT: 'payment',
   SANCTIONED_COUNTRY: null,
-  INVOICE_CREATED: null
+  INVOICE_CREATED: null,
 };
 
 type Context = AuthorizationContext<Roles>;
@@ -65,7 +65,7 @@ export class AreNotificationsPausedUsecase
         .then(this.validateRequest)
         .then(this.fetchNotificationPauses)
         .map(this.getPauseStatus(request))
-        .map(val => Result.ok(val));
+        .map((val) => Result.ok(val));
       return execution.execute();
     } catch (e) {
       return left(new AppError.UnexpectedError(e));

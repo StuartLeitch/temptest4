@@ -1,7 +1,7 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { PauseInvoiceConfirmationRemindersErrors } from './pauseInvoiceConfirmationRemindersErrors';
+import * as PauseInvoiceConfirmationRemindersErrors from './pauseInvoiceConfirmationRemindersErrors';
 
 export type PauseInvoiceConfirmationRemindersResponse = Either<
   | PauseInvoiceConfirmationRemindersErrors.InvoiceIdRequiredError

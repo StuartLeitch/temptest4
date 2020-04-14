@@ -11,7 +11,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -24,8 +24,8 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 // * Usecase specific
 import { AddEmptyPauseStateForInvoiceResponse as Response } from './addEmptyPauseStateForInvoiceResponse';
-import { AddEmptyPauseStateForInvoiceErrors as Errors } from './addEmptyPauseStateForInvoiceErrors';
 import { AddEmptyPauseStateForInvoiceDTO as DTO } from './addEmptyPauseStateForInvoiceDTO';
+import * as Errors from './addEmptyPauseStateForInvoiceErrors';
 
 type Context = AuthorizationContext<Roles>;
 export type AddEmptyPauseStateForInvoiceContext = Context;
@@ -54,7 +54,7 @@ export class AddEmptyPauseStateForInvoiceUsecase
       const execution = new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.addNewPauseInstance)
-        .map(val => Result.ok(val));
+        .map((val) => Result.ok(val));
 
       return execution.execute();
     } catch (e) {

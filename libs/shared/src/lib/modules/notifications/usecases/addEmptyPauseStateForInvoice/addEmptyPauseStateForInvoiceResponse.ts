@@ -3,7 +3,7 @@ import { AppError } from '../../../../core/logic/AppError';
 
 import { NotificationPause } from '../../domain/NotificationPause';
 
-import { AddEmptyPauseStateForInvoiceErrors } from './addEmptyPauseStateForInvoiceErrors';
+import * as AddEmptyPauseStateForInvoiceErrors from './addEmptyPauseStateForInvoiceErrors';
 
 export type AddEmptyPauseStateForInvoiceResponse = Either<
   | AddEmptyPauseStateForInvoiceErrors.InvoiceIdRequiredError

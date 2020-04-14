@@ -11,7 +11,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -19,14 +19,13 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 
+import { NotificationPause } from '../../domain/NotificationPause';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { Notification } from '../../domain/Notification';
 
 // * Usecase specific
 import { GetRemindersPauseStateForInvoiceResponse as Response } from './getRemindersPauseStateForInvoiceResponse';
-import { GetRemindersPauseStateForInvoiceErrors as Errors } from './getRemindersPauseStateForInvoiceErrors';
 import { GetRemindersPauseStateForInvoiceDTO as DTO } from './getRemindersPauseStateForInvoiceDTO';
-import { NotificationPause } from '../../domain/NotificationPause';
+import * as Errors from './getRemindersPauseStateForInvoiceErrors';
 
 type Context = AuthorizationContext<Roles>;
 export type GetRemindersPauseStateForInvoiceContext = Context;
@@ -55,7 +54,7 @@ export class GetRemindersPauseStateForInvoiceUsecase
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
         .then(this.fetchPauseState)
-        .map(notifications => Result.ok(notifications));
+        .map((notifications) => Result.ok(notifications));
 
       return execution.execute();
     } catch (e) {

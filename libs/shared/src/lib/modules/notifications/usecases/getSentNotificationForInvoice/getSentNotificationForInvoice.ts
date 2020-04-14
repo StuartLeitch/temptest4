@@ -11,7 +11,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -24,8 +24,8 @@ import { Notification } from '../../domain/Notification';
 
 // * Usecase specific
 import { GetSentNotificationForInvoiceResponse as Response } from './getSentNotificationForInvoiceResponse';
-import { GetSentNotificationForInvoiceErrors as Errors } from './getSentNotificationForInvoiceErrors';
 import { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationForInvoiceDTO';
+import * as Errors from './getSentNotificationForInvoiceErrors';
 
 type Context = AuthorizationContext<Roles>;
 export type GetSentNotificationForInvoiceContext = Context;
@@ -54,7 +54,7 @@ export class GetSentNotificationForInvoiceUsecase
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
         .then(this.fetchNotifications)
-        .map(notifications => Result.ok(notifications));
+        .map((notifications) => Result.ok(notifications));
 
       return execution.execute();
     } catch (e) {
