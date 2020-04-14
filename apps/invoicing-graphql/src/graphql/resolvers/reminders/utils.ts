@@ -3,7 +3,7 @@ import {
   ResumeInvoiceConfirmationReminderUsecase,
   PauseInvoicePaymentRemindersUsecase,
   ResumeInvoicePaymentReminderUsecase,
-  Roles
+  Roles,
 } from '@hindawi/shared';
 
 import { env } from '../../../env';
@@ -15,10 +15,10 @@ export async function pauseOrResumeConfirmation(
 ) {
   const {
     repos: { pausedReminder, invoiceItem, transaction, manuscript, invoice },
-    services: { logger: loggerService, schedulingService }
+    services: { logger: loggerService, schedulingService },
   } = context;
   const usecaseContext = {
-    roles: [Roles.ADMIN]
+    roles: [Roles.ADMIN],
   };
 
   if (state == true) {
@@ -29,7 +29,7 @@ export async function pauseOrResumeConfirmation(
     );
     return pauseUsecase.execute(
       {
-        invoiceId
+        invoiceId,
       },
       usecaseContext
     );
@@ -47,7 +47,7 @@ export async function pauseOrResumeConfirmation(
       {
         reminderDelay: env.scheduler.confirmationReminderDelay,
         queueName: env.scheduler.emailRemindersQueue,
-        invoiceId
+        invoiceId,
       },
       usecaseContext
     );
@@ -60,11 +60,11 @@ export async function pauseOrResumePayment(
   context
 ) {
   const {
-    repos: { pausedReminder, invoiceItem, manuscript, invoice, payer },
-    services: { logger: loggerService, schedulingService }
+    repos: { pausedReminder, invoice, payer },
+    services: { logger: loggerService, schedulingService },
   } = context;
   const usecaseContext = {
-    roles: [Roles.ADMIN]
+    roles: [Roles.ADMIN],
   };
 
   if (state == true) {
@@ -75,15 +75,13 @@ export async function pauseOrResumePayment(
     );
     return pauseUsecase.execute(
       {
-        invoiceId
+        invoiceId,
       },
       usecaseContext
     );
   } else {
     const resumeUsecase = new ResumeInvoicePaymentReminderUsecase(
       pausedReminder,
-      invoiceItem,
-      manuscript,
       invoice,
       payer,
       loggerService,
@@ -93,7 +91,7 @@ export async function pauseOrResumePayment(
       {
         reminderDelay: env.scheduler.paymentReminderDelay,
         queueName: env.scheduler.emailRemindersQueue,
-        invoiceId
+        invoiceId,
       },
       usecaseContext
     );

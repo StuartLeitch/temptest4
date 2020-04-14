@@ -1,9 +1,9 @@
-import { SisifJobTypes, JobData } from '@hindawi/sisif';
+import { JobData } from '@hindawi/sisif';
 import {
   SendInvoicePaymentReminderUsecase,
   SendInvoicePaymentReminderDTO,
   QueuePayloads,
-  Roles
+  Roles,
 } from '@hindawi/shared';
 
 import { Logger } from '../../lib/logger';
@@ -24,11 +24,11 @@ export const invoicePaymentHandler = (
       catalog,
       invoice,
       coupon,
-      waiver
+      waiver,
     },
-    services: { schedulingService, emailService, logger }
+    services: { schedulingService, emailService, logger },
   } = appContext;
-  const { manuscriptCustomId, recipientEmail, recipientName } = payload;
+  const { recipientEmail, recipientName, invoiceId } = payload;
 
   const usecase = new SendInvoicePaymentReminderUsecase(
     sentNotifications,
@@ -44,22 +44,22 @@ export const invoicePaymentHandler = (
     emailService
   );
   const usecaseContext = {
-    roles: [Roles.ADMIN]
+    roles: [Roles.ADMIN],
   };
 
   const request: SendInvoicePaymentReminderDTO = {
     job: {
       delay: env.scheduler.paymentReminderDelay,
-      queueName: env.scheduler.emailRemindersQueue
+      queueName: env.scheduler.emailRemindersQueue,
     },
     senderEmail: env.app.invoicePaymentEmailSenderAddress,
     senderName: env.app.invoicePaymentEmailSenderName,
-    manuscriptCustomId,
     recipientEmail,
-    recipientName
+    recipientName,
+    invoiceId,
   };
 
-  usecase.execute(request, usecaseContext).then(maybeResult => {
+  usecase.execute(request, usecaseContext).then((maybeResult) => {
     if (maybeResult.isLeft()) {
       loggerService.error(maybeResult.value.errorValue().message);
       throw Error(maybeResult.value.errorValue().message);
