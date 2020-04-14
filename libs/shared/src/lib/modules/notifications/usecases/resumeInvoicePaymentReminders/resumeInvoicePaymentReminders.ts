@@ -1,10 +1,3 @@
-import {
-  SchedulingTime,
-  SisifJobTypes,
-  TimerBuilder,
-  JobBuilder,
-} from '@hindawi/sisif';
-
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -22,6 +15,14 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import {
+  SisifJobTypes,
+  JobBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Job';
+import {
+  SchedulingTime,
+  TimerBuilder,
+} from '../../../../infrastructure/message-queues/contracts/Time';
 
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
@@ -33,23 +34,20 @@ import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
 import { Payer } from '../../../payers/domain/Payer';
 
 // * Usecase specific
 import { ResumeInvoicePaymentRemindersResponse as Response } from './resumeInvoicePaymentRemindersResponse';
-import { ResumeInvoicePaymentRemindersErrors as Errors } from './resumeInvoicePaymentRemindersErrors';
 import { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentRemindersDTO';
+import * as Errors from './resumeInvoicePaymentRemindersErrors';
 
 interface CompoundDTO extends DTO {
-  manuscript: Manuscript;
   invoice: Invoice;
   payer: Payer;
 }
@@ -75,7 +73,6 @@ export class ResumeInvoicePaymentReminderUsecase
     this.validatePauseState = this.validatePauseState.bind(this);
     this.shouldScheduleJob = this.shouldScheduleJob.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
-    this.getManuscript = this.getManuscript.bind(this);
     this.scheduleJob = this.scheduleJob.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
     this.getPayer = this.getPayer.bind(this);
@@ -93,7 +90,6 @@ export class ResumeInvoicePaymentReminderUsecase
         .then(this.validateRequest)
         .then(this.validatePauseState(context))
         .then(this.getInvoice(context))
-        .then(this.getManuscript(context))
         .then(this.resume)
         .then(this.getPayer(context))
         .advanceOrEnd(this.shouldScheduleJob)
@@ -195,26 +191,6 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
-  private getManuscript(context: Context) {
-    return async (request: CompoundDTO) => {
-      this.loggerService.info(
-        `Get details of manuscript associated with invoice with id ${request.invoiceId}`
-      );
-
-      const usecase = new GetManuscriptByInvoiceIdUsecase(
-        this.manuscriptRepo,
-        this.invoiceItemRepo
-      );
-      const { invoiceId } = request;
-      const maybeResult = await usecase.execute({ invoiceId }, context);
-
-      return maybeResult.map((result) => ({
-        ...request,
-        manuscript: result.getValue()[0],
-      }));
-    };
-  }
-
   private getPayer(context: Context) {
     return async (request: CompoundDTO) => {
       const usecase = new GetPayerDetailsByInvoiceIdUsecase(
@@ -263,10 +239,10 @@ export class ResumeInvoicePaymentReminderUsecase
       `Schedule the next job for sending reminders of type ${NotificationType.REMINDER_PAYMENT} for invoice with id ${request.invoiceId}`
     );
 
-    const { reminderDelay, manuscript, queueName, invoice, payer } = request;
+    const { reminderDelay, queueName, invoice, payer } = request;
     const { email, name } = payer;
     const data = PayloadBuilder.invoiceReminder(
-      manuscript.customId,
+      invoice.id.toString(),
       email.value,
       name.value,
       ''

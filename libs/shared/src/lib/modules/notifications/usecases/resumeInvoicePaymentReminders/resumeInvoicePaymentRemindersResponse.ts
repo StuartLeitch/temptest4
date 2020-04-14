@@ -1,7 +1,7 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { ResumeInvoicePaymentRemindersErrors } from './resumeInvoicePaymentRemindersErrors';
+import * as ResumeInvoicePaymentRemindersErrors from './resumeInvoicePaymentRemindersErrors';
 
 export type ResumeInvoicePaymentRemindersResponse = Either<
   | ResumeInvoicePaymentRemindersErrors.PaymentRemindersNotPausedError
