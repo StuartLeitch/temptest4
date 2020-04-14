@@ -15,8 +15,8 @@ import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
 import { InvoiceConfirmed } from '../domain/events/invoiceConfirmed';
 
-import { Manuscript } from '../../manuscripts/domain/Manuscript';
 import { Payer } from '../../payers/domain/Payer';
+import { Invoice } from '../domain/Invoice';
 
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
@@ -101,7 +101,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         );
       }
 
-      await this.scheduleReminders(manuscript, payer);
+      await this.scheduleReminders(invoice, payer);
 
       await this.publishInvoiceConfirmed.execute(
         invoice,
@@ -138,9 +138,9 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     }
   }
 
-  private async scheduleReminders(manuscript: Manuscript, payer: Payer) {
+  private async scheduleReminders(invoice: Invoice, payer: Payer) {
     const jobData = PayloadBuilder.invoiceReminder(
-      manuscript.customId,
+      invoice.id.toString(),
       payer.email.value,
       payer.name.value,
       ''

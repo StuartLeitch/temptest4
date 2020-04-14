@@ -2,17 +2,11 @@
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 import {
-  SchedulingTime,
-  SisifJobTypes,
-  TimerBuilder,
-  JobBuilder
-} from '@hindawi/sisif';
-import {
   UpdateTransactionOnAcceptManuscriptUsecase,
   UpdateTransactionContext,
   VersionCompare,
   QueuePayloads,
-  Roles
+  Roles,
 } from '@hindawi/shared';
 
 import { Logger } from '../../lib/logger';
@@ -41,7 +35,7 @@ export const SubmissionQualityCheckPassedHandler = {
       customId,
       title,
       articleType: { name },
-      authors
+      authors,
     } = manuscripts.find((m: any) => m.version === maxVersion);
 
     const { email, country, surname, givenNames } = authors.find(
@@ -55,9 +49,9 @@ export const SubmissionQualityCheckPassedHandler = {
         invoiceItem: invoiceItemRepo,
         manuscript: manuscriptRepo,
         waiver: waiverRepo,
-        catalog: catalogRepo
+        catalog: catalogRepo,
       },
-      services: { waiverService, emailService, schedulingService }
+      services: { waiverService, emailService, schedulingService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
@@ -70,6 +64,7 @@ export const SubmissionQualityCheckPassedHandler = {
       manuscriptRepo,
       waiverRepo,
       waiverService,
+      schedulingService,
       emailService
     );
 
@@ -87,8 +82,12 @@ export const SubmissionQualityCheckPassedHandler = {
           env.app.invoicePaymentEmailBankTransferCopyReceiver,
         emailSenderInfo: {
           address: env.app.invoicePaymentEmailSenderAddress,
-          name: env.app.invoicePaymentEmailSenderName
-        }
+          name: env.app.invoicePaymentEmailSenderName,
+        },
+        confirmationReminder: {
+          delay: env.scheduler.confirmationReminderDelay,
+          queueName: env.scheduler.emailRemindersQueue,
+        },
       },
       defaultContext
     );
@@ -97,26 +96,5 @@ export const SubmissionQualityCheckPassedHandler = {
       logger.error(result.value.errorValue().message);
       throw result.value.error;
     }
-
-    const jobData: QueuePayloads.InvoiceReminderPayload = {
-      recipientName: `${givenNames} ${surname}`,
-      manuscriptCustomId: customId,
-      recipientEmail: email
-    };
-    const newJob = JobBuilder.basic(
-      SisifJobTypes.InvoiceConfirmReminder,
-      jobData
-    );
-
-    const newTimer = TimerBuilder.delayed(
-      env.scheduler.confirmationReminderDelay,
-      SchedulingTime.Day
-    );
-
-    schedulingService.schedule(
-      newJob,
-      env.scheduler.emailRemindersQueue,
-      newTimer
-    );
-  }
+  },
 };
