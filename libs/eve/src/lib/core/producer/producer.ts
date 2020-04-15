@@ -8,7 +8,7 @@ export interface Producer<T, U> {
   /**
    * Method for getting an async iterator with all the objects from the store.
    */
-  produce(): AsyncGenerator<T[], void, undefined>;
+  produce(): AsyncGenerator<T | T[], void, undefined>;
 
   /**
    * Method for setting the base object from which each instance in the
