@@ -25,6 +25,13 @@ AS SELECT
   case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as accepted_date,
   i.apc,
   i.published_date,
+  i.gross_apc_value as gross_apc,
+  i.discount,
+  i.net_apc,
+  i.paid_amount,
+  i.due_amount,
+  i.coupons,
+  i.waivers,
   CASE
     WHEN s.special_issue_id is NULL THEN 'regular'::text
     ELSE 'special'::text

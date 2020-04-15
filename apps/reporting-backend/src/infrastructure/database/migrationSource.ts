@@ -88,7 +88,13 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views('20200409122800_fix_invoice_net_amount', true),
-    rebuild_materialized_views('20200413093900_fix_academic_editor_dates'),
+    rebuild_materialized_views(
+      '20200413093900_fix_academic_editor_dates',
+      true
+    ),
+    rebuild_materialized_views(
+      '20200415131000_add_invoice_amount_to_manuscripts'
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
