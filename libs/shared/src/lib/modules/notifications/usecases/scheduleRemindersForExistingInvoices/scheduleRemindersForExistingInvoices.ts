@@ -194,9 +194,25 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.invoiceRepo,
         this.loggerService
       );
-      const results = invoiceIds.map((invoiceId) =>
-        usecase.execute({ invoiceId }, context)
-      );
+      const results = invoiceIds.map(async (invoiceId) => {
+        try {
+          const result = await usecase.execute({ invoiceId }, context);
+          if (result.isLeft()) {
+            const e = result.value.errorValue();
+            this.loggerService.error(
+              `When pausing confirmation reminders for invoice {${invoiceId}} got error ${e.message}`,
+              e
+            );
+          }
+          return result;
+        } catch (e) {
+          this.loggerService.error(
+            `When pausing confirmation reminders for invoice {${invoiceId}} got error ${e.message}`,
+            e
+          );
+          return null;
+        }
+      });
       const aggregated = await AsyncEither.asyncAll(results);
 
       return aggregated.map(() => request);
@@ -223,9 +239,28 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.loggerService,
         this.scheduler
       );
-      const results = invoiceIds.map((invoiceId) =>
-        usecase.execute({ reminderDelay, invoiceId, queueName }, context)
-      );
+      const results = invoiceIds.map(async (invoiceId) => {
+        try {
+          const result = await usecase.execute(
+            { reminderDelay, invoiceId, queueName },
+            context
+          );
+          if (result.isLeft()) {
+            const e = result.value.errorValue();
+            this.loggerService.error(
+              `When resuming confirmation reminders for invoice {${invoiceId}} got error ${e.message}`,
+              e
+            );
+          }
+          return result;
+        } catch (e) {
+          this.loggerService.error(
+            `When resuming confirmation reminders for invoice {${invoiceId}} got error ${e.message}`,
+            e
+          );
+          return null;
+        }
+      });
       const aggregated = await AsyncEither.asyncAll(results);
 
       return aggregated.map(() => request);
@@ -244,9 +279,25 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.invoiceRepo,
         this.loggerService
       );
-      const results = invoiceIds.map((invoiceId) =>
-        usecase.execute({ invoiceId }, context)
-      );
+      const results = invoiceIds.map(async (invoiceId) => {
+        try {
+          const result = await usecase.execute({ invoiceId }, context);
+          if (result.isLeft()) {
+            const e = result.value.getValue();
+            this.loggerService.error(
+              `While pausing payment reminders for invoice {${invoiceId}} got error ${e.message}`,
+              e
+            );
+          }
+          return result;
+        } catch (e) {
+          this.loggerService.error(
+            `While pausing payment reminders for invoice {${invoiceId}} got error ${e.message}`,
+            e
+          );
+          return null;
+        }
+      });
       const aggregated = await AsyncEither.asyncAll(results);
 
       return aggregated.map(() => request);
@@ -271,9 +322,28 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         this.loggerService,
         this.scheduler
       );
-      const results = invoiceIds.map((invoiceId) =>
-        usecase.execute({ reminderDelay, invoiceId, queueName }, context)
-      );
+      const results = invoiceIds.map(async (invoiceId) => {
+        try {
+          const result = await usecase.execute(
+            { reminderDelay, invoiceId, queueName },
+            context
+          );
+          if (result.isLeft()) {
+            const e = result.value.errorValue();
+            this.loggerService.error(
+              `While resuming payment reminders for invoice {${invoiceId}} got error ${e.message}`,
+              e
+            );
+          }
+          return result;
+        } catch (e) {
+          this.loggerService.error(
+            `While resuming payment reminders for invoice {${invoiceId}} got error ${e.message}`,
+            e
+          );
+          return null;
+        }
+      });
       const aggregated = await AsyncEither.asyncAll(results);
 
       return aggregated.map(() => request);
@@ -298,7 +368,25 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         context
       );
 
-      const results = invoiceIds.map(scheduleForInvoice);
+      const results = invoiceIds.map(async (invoiceId) => {
+        try {
+          const result = await scheduleForInvoice(invoiceId);
+          if (result.isLeft()) {
+            const e = result.value.errorValue();
+            this.loggerService.error(
+              `While scheduling the credit control reminder for invoice {${invoiceId}} got error ${e.message}`,
+              e
+            );
+          }
+          return result;
+        } catch (e) {
+          this.loggerService.error(
+            `While scheduling the credit control reminder for invoice {${invoiceId}} got error ${e.message}`,
+            e
+          );
+          return null;
+        }
+      });
       const aggregated = await AsyncEither.asyncAll(results);
 
       return aggregated.map(() => request);
