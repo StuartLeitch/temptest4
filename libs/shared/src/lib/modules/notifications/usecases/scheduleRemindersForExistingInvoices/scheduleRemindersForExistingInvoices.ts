@@ -210,7 +210,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
             `When pausing confirmation reminders for invoice {${invoiceId}} got error ${e.message}`,
             e
           );
-          return null;
+          return left(Result.fail(e));
         }
       });
       const aggregated = await AsyncEither.asyncAll(results);
@@ -258,7 +258,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
             `When resuming confirmation reminders for invoice {${invoiceId}} got error ${e.message}`,
             e
           );
-          return null;
+          return left(Result.fail(e));
         }
       });
       const aggregated = await AsyncEither.asyncAll(results);
@@ -295,7 +295,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
             `While pausing payment reminders for invoice {${invoiceId}} got error ${e.message}`,
             e
           );
-          return null;
+          return left(Result.fail(e));
         }
       });
       const aggregated = await AsyncEither.asyncAll(results);
@@ -341,7 +341,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
             `While resuming payment reminders for invoice {${invoiceId}} got error ${e.message}`,
             e
           );
-          return null;
+          return left(Result.fail(e));
         }
       });
       const aggregated = await AsyncEither.asyncAll(results);
@@ -384,7 +384,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
             `While scheduling the credit control reminder for invoice {${invoiceId}} got error ${e.message}`,
             e
           );
-          return null;
+          return left(Result.fail(e));
         }
       });
       const aggregated = await AsyncEither.asyncAll(results);
