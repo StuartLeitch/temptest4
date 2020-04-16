@@ -11,6 +11,7 @@ import * as create_materialized_views from './migrations/create_materialized_vie
 import * as create_journal_to_publisher_table from './migrations/20200311104931_create_journal_to_publisher_table';
 import * as create_superset_helper_functions from './migrations/20200325162543_create_superset_helper_functions';
 import * as add_sub_data_update_trigger from './migrations/20200406150014_add_sub_data_update_trigger';
+import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_index';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -95,6 +96,7 @@ class KnexMigrationSource {
     rebuild_materialized_views(
       '20200415131000_add_invoice_amount_to_manuscripts'
     ),
+    add_sub_data_index,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
