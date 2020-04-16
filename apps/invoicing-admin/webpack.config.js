@@ -30,25 +30,26 @@ module.exports = (nxConfig, context) => {
 
   // console.info(webpackConfig.module.rules[3].oneOf[0].use);
 
-  webpackConfig.module.rules[3].oneOf[3].use[2].options.sassOptions = {
-    includePaths:
-      webpackConfig.module.rules[3].oneOf[3].use[2].options.includePaths,
-    precision: webpackConfig.module.rules[3].oneOf[3].use[2].options.precision,
-    fiber: webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber,
-  };
   delete webpackConfig.module.rules[3].oneOf[3].use[2].options.includePaths;
   delete webpackConfig.module.rules[3].oneOf[3].use[2].options.precision;
   delete webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber;
+  webpackConfig.module.rules[3].oneOf[3].use[2].options.sassOptions = {
+    includePaths:
+      webpackConfig.module.rules[3].oneOf[3].use[2].options.sassOptions.includePaths,
+    precision: webpackConfig.module.rules[3].oneOf[3].use[2].options.precision,
+    fiber: webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber,
+  };
 
+
+  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.includePaths;
+  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.precision;
+  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.fiber;
   webpackConfig.module.rules[3].oneOf[7].use[3].options.sassOptions = {
     includePaths:
       webpackConfig.module.rules[3].oneOf[7].use[3].options.includePaths,
     precision: webpackConfig.module.rules[3].oneOf[7].use[3].options.precision,
     fiber: webpackConfig.module.rules[3].oneOf[7].use[3].options.fiber,
   };
-  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.includePaths;
-  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.precision;
-  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.fiber;
 
   // console.info(webpackConfig.module.rules[3].oneOf[3].use[2]);
   // console.info(webpackConfig.module.rules[3].oneOf[7].use[3]);

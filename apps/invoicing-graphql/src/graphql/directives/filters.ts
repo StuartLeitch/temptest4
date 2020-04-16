@@ -16,7 +16,6 @@ import { SelectionNode } from 'graphql/language/ast';
 
 const _prototypes = new WeakMap;
 
-
 export class FiltersDirective extends SchemaDirectiveVisitor {
   visitObject<TSource, TContext, TArgs>(target: GraphQLObjectType<TSource, TContext, TArgs>) {
     Object.defineProperties(target['_fields'], Object.fromEntries(
