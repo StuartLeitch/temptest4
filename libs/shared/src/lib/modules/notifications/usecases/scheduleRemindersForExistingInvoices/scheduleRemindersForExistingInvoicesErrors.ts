@@ -66,3 +66,43 @@ export class ScheduleCreditControlReminderError extends Result<UseCaseError> {
     });
   }
 }
+
+export class PausingConfirmationReminderError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `While pausing confirmation reminders for invoice {${id}} got error ${err.message}`,
+    });
+  }
+}
+
+export class ResumingConfirmationReminderError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `While resuming confirmation reminders for invoice {${id}} got error ${err.message}`,
+    });
+  }
+}
+
+export class PausingPaymentReminderError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `While pausing payment reminders for invoice {${id}} got error ${err.message}`,
+    });
+  }
+}
+
+export class ResumingPaymentReminderError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `While resuming payment reminders for invoice {${id}} got error ${err.message}`,
+    });
+  }
+}
+
+export class ResumingCreditControlReminderError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `While resuming credit control reminders for invoice {${id}} got error ${err.message}`,
+    });
+  }
+}

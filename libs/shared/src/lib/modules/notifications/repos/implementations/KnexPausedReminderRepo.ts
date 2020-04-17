@@ -13,12 +13,12 @@ import { PausedReminderRepoContract } from '../PausedReminderRepo';
 import {
   mapPauseToPersistance,
   mapPauseToDomain,
-  emptyPause
+  emptyPause,
 } from './knexPausedReminderUtils';
 
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'pauseConfirmation',
-  [NotificationType.REMINDER_PAYMENT]: 'pausePayment'
+  [NotificationType.REMINDER_PAYMENT]: 'pausePayment',
 };
 
 export class KnexPausedReminderRepo
@@ -61,7 +61,7 @@ export class KnexPausedReminderRepo
     await this.db(TABLES.PAUSED_REMINDERS)
       .where('invoiceId', invoiceId.id.toString())
       .update({
-        [notificationTypeToPersistance[type]]: state
+        [notificationTypeToPersistance[type]]: state,
       });
   }
 
@@ -105,7 +105,10 @@ export class KnexPausedReminderRepo
     return !!result;
   }
 
-  async invoiceIdsWithNoPauseSettings(): Promise<InvoiceId[]> {
+  private async invoiceIdsPageWithNoPauseSettings(
+    pageIndex: number,
+    pageSize = 50
+  ): Promise<InvoiceId[]> {
     const invoices = await this.db(TABLES.INVOICES)
       .select('id')
       .leftJoin(
@@ -116,12 +119,35 @@ export class KnexPausedReminderRepo
       )
       .whereNull(`${TABLES.PAUSED_REMINDERS}.invoiceId`)
       .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.FINAL)
-      .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.PENDING);
+      .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.PENDING)
+      .where(`${TABLES.INVOICES}.deleted`, 0)
+      .limit(pageSize)
+      .offset(pageIndex * pageSize);
 
-    return invoices.map(invoice => {
+    return invoices.map((invoice) => {
       const uuid = new UniqueEntityID(invoice.id);
       const invoiceId = InvoiceId.create(uuid).getValue();
       return invoiceId;
     });
+  }
+
+  async *invoiceIdsWithNoPauseSettings(): AsyncGenerator<
+    InvoiceId,
+    void,
+    undefined
+  > {
+    let data = true;
+    let page = 0;
+
+    while (data) {
+      data = false;
+      const results = await this.invoiceIdsPageWithNoPauseSettings(page);
+
+      if (results.length) {
+        yield* results;
+        page += 1;
+        data = true;
+      }
+    }
   }
 }

@@ -9,7 +9,7 @@ import { NotificationType } from '../../domain/Notification';
 
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'confirmation',
-  [NotificationType.REMINDER_PAYMENT]: 'payment'
+  [NotificationType.REMINDER_PAYMENT]: 'payment',
 };
 
 export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
@@ -31,7 +31,9 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
   }
 
   async exists(pause: NotificationPause): Promise<boolean> {
-    const match = this._items.find(item => this.compareMockItems(item, pause));
+    const match = this._items.find((item) =>
+      this.compareMockItems(item, pause)
+    );
 
     return !!match;
   }
@@ -39,7 +41,9 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
   async getNotificationPausedStatus(
     invoiceId: InvoiceId
   ): Promise<NotificationPause> {
-    const found = this._items.find(pause => pause.invoiceId.equals(invoiceId));
+    const found = this._items.find((pause) =>
+      pause.invoiceId.equals(invoiceId)
+    );
 
     if (!found) {
       throw new Error('does not exist');
@@ -52,7 +56,7 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     const pause: NotificationPause = {
       invoiceId,
       confirmation: false,
-      payment: false
+      payment: false,
     };
 
     return this.save(pause);
@@ -63,7 +67,7 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     state: boolean,
     type: NotificationType
   ): Promise<void> {
-    const index = this._items.findIndex(item =>
+    const index = this._items.findIndex((item) =>
       item.invoiceId.equals(invoiceId)
     );
 
@@ -78,8 +82,12 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     this._items[index][notificationTypeToPersistance[type]] = state;
   }
 
-  async invoiceIdsWithNoPauseSettings(): Promise<InvoiceId[]> {
-    return [];
+  async *invoiceIdsWithNoPauseSettings(): AsyncGenerator<
+    InvoiceId,
+    void,
+    undefined
+  > {
+    yield* [];
   }
 
   compareMockItems(a: NotificationPause, b: NotificationPause): boolean {
