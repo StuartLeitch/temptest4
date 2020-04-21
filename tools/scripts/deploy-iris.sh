@@ -35,7 +35,7 @@ docker tag $AWS_REGISTRY/$TO:$CI_COMMIT_SHA $AWS_REGISTRY/$TO:$AWS_ENVIRONMENT
 docker push $AWS_REGISTRY/$TO:$AWS_ENVIRONMENT
 
 # printf -- "\nDeploy BackEnd App for ${AWS_ENVIRONMENT} environment\n"
-# aws --profile=production elasticbeanstalk update-environment --environment-name dev-reporting-backend --version-label dev-reporting-backend
+aws --profile=production elasticbeanstalk update-environment --environment-name dev-reporting-backend --version-label dev-reporting-backend
 
 printf -- '\n';
 
