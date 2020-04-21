@@ -1,13 +1,22 @@
 import { REPORTING_TABLES } from './constants';
-import { EventMappingPolicyContract } from './contracts/EventMappingPolicy';
 import {
   EventMappingRegistryContract,
-  EventMappingResponse
+  EventMappingResponse,
 } from './contracts/EventMappingRegistry';
+import { EventMappingPolicyContract } from './contracts/EventMappingPolicy';
 import { EventDTO } from './domain/EventDTO';
+import {
+  ArticleMappingPolicy,
+  CheckerMappingPolicy,
+  InvoiceMappingPolicy,
+  JournalMappingPolicy,
+  SubmissionMappingPolicy,
+  UserMappingPolicy,
+} from './policies';
 import { DefaultMappingPolicy } from './policies/DefaultMappingPolicy';
 
-export class EventMappingRegistry implements EventMappingRegistryContract {
+export class EventMappingdefaultRegistry
+  implements EventMappingRegistryContract {
   private policies: EventMappingPolicyContract[] = [];
   defaultPolicy: EventMappingPolicyContract = new DefaultMappingPolicy();
 
@@ -15,7 +24,7 @@ export class EventMappingRegistry implements EventMappingRegistryContract {
     const eventMapping = {};
 
     events.forEach((event: EventDTO) => {
-      let policy = this.policies.find(p => p.includesEvent(event.event));
+      let policy = this.policies.find((p) => p.includesEvent(event.event));
       if (!policy) {
         policy = this.defaultPolicy;
       }
@@ -31,7 +40,7 @@ export class EventMappingRegistry implements EventMappingRegistryContract {
     for (let table in eventMapping) {
       response.push({
         table: table as REPORTING_TABLES,
-        events: eventMapping[table]
+        events: eventMapping[table],
       });
     }
     return response;
@@ -41,3 +50,14 @@ export class EventMappingRegistry implements EventMappingRegistryContract {
     this.policies.push(p);
   }
 }
+const emptyRegistry = new EventMappingdefaultRegistry();
+const defaultRegistry = new EventMappingdefaultRegistry();
+
+defaultRegistry.addPolicy(new InvoiceMappingPolicy());
+defaultRegistry.addPolicy(new SubmissionMappingPolicy());
+defaultRegistry.addPolicy(new JournalMappingPolicy());
+defaultRegistry.addPolicy(new UserMappingPolicy());
+defaultRegistry.addPolicy(new ArticleMappingPolicy());
+defaultRegistry.addPolicy(new CheckerMappingPolicy());
+
+export { defaultRegistry, emptyRegistry };

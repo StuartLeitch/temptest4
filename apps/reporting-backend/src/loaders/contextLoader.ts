@@ -1,22 +1,16 @@
+import AWS from 'aws-sdk';
+import { defaultRegistry } from 'libs/shared/src/lib/modules/reporting/EventMappingRegistry';
+import { FilterEventsService } from 'libs/shared/src/lib/modules/reporting/services/FilterEventsService';
+import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
+import { SaveSqsEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveSqsEvents/saveSqsEvents';
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import { KnexEventsRepo } from '../../../../libs/shared/src/lib/modules/reporting/repos/implementation/KnexEventsRepo';
 import { env } from '../env';
-import AWS from 'aws-sdk';
-import { EventMappingRegistry } from 'libs/shared/src/lib/modules/reporting/EventMappingRegistry';
-import {
-  InvoiceMappingPolicy,
-  SubmissionMappingPolicy,
-  JournalMappingPolicy,
-  UserMappingPolicy,
-  ArticleMappingPolicy,
-  CheckerMappingPolicy
-} from 'libs/shared/src/lib/modules/reporting/policies';
-import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
 import { Logger } from '../lib/logger';
-import { FilterEventsService } from 'libs/shared/src/lib/modules/reporting/services/FilterEventsService';
+
 export const contextLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
@@ -24,21 +18,10 @@ export const contextLoader: MicroframeworkLoader = (
     const db = settings.getData('connection');
 
     const repos = {
-      eventsRepo: new KnexEventsRepo(db)
+      eventsRepo: new KnexEventsRepo(db),
     };
 
-    const registry = new EventMappingRegistry();
-
-    registry.addPolicy(new InvoiceMappingPolicy());
-    registry.addPolicy(new SubmissionMappingPolicy());
-    registry.addPolicy(new JournalMappingPolicy());
-    registry.addPolicy(new UserMappingPolicy());
-    registry.addPolicy(new ArticleMappingPolicy());
-    registry.addPolicy(new CheckerMappingPolicy());
-
-    const saveEventsUsecase = new SaveEventsUsecase(repos.eventsRepo, registry);
-
-    const usecases: ReportingUsecases = { saveEventsUsecase };
+    const registry = defaultRegistry;
 
     const config = {
       accessKeyId: env.aws.sns.sqsAccessKey,
@@ -50,21 +33,21 @@ export const contextLoader: MicroframeworkLoader = (
       queueName: env.aws.sqs.queueName,
       eventNamespace: env.app.eventNamespace,
       publisherName: env.app.publisherName,
-      serviceName: env.app.name
+      serviceName: env.app.name,
     };
 
     const s3 = new AWS.S3({
       credentials: {
         secretAccessKey: config.secretAccessKey,
-        accessKeyId: config.accessKeyId
-      }
+        accessKeyId: config.accessKeyId,
+      },
     });
 
     const sqs = new AWS.SQS({
       accessKeyId: config.accessKeyId,
       secretAccessKey: config.secretAccessKey,
       endpoint: config.sqsEndpoint,
-      region: config.region
+      region: config.region,
     });
 
     const filterEventsService = new FilterEventsService(
@@ -74,10 +57,22 @@ export const contextLoader: MicroframeworkLoader = (
 
     const services: ReportingServices = { s3, sqs, filterEventsService };
 
+    const saveEventsUsecase = new SaveEventsUsecase(repos.eventsRepo, registry);
+    const saveSqsEventsUsecase = new SaveSqsEventsUsecase(
+      filterEventsService,
+      saveEventsUsecase,
+      new Logger('saveSqsEvents:usecase')
+    );
+
+    const usecases: ReportingUsecases = {
+      saveEventsUsecase,
+      saveSqsEventsUsecase,
+    };
+
     const context = {
       repos,
       services,
-      usecases
+      usecases,
     };
 
     settings.setData('context', context);
@@ -86,6 +81,7 @@ export const contextLoader: MicroframeworkLoader = (
 
 interface ReportingUsecases {
   saveEventsUsecase: SaveEventsUsecase;
+  saveSqsEventsUsecase: SaveSqsEventsUsecase;
 }
 
 interface ReportingServices {
