@@ -1,7 +1,7 @@
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import submissionView from './SubmissionsView';
 
@@ -20,6 +20,7 @@ AS SELECT
   cast_to_timestamp(editor_view."assignedDate") as assigned_date,
   cast_to_timestamp(editor_view."declinedDate") as declined_date,
   editor_view.country as "country",
+  editor_view.status as "status",
   editor_view."isCorresponding" as is_corresponding,
   editor_view."userId" as user_id,
   editor_view."givenNames" as given_names,
@@ -61,8 +62,12 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, invited_date desc, accepted_date desc)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, role_type)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, role_type, status)`,
     `create index on ${this.getViewName()} (assigned_date)`,
     `create index on ${this.getViewName()} (invited_date)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, invited_date)`,
     `create index on ${this.getViewName()} (removed_date)`,
     `create index on ${this.getViewName()} (accepted_date)`,
     `create index on ${this.getViewName()} (assigned_date)`,
@@ -70,7 +75,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (email)`,
     `create index on ${this.getViewName()} (user_id)`,
     `create index on ${this.getViewName()} (role_type)`,
-    `create index on ${this.getViewName()} (event_id)`
+    `create index on ${this.getViewName()} (event_id)`,
   ];
 
   getViewName(): string {

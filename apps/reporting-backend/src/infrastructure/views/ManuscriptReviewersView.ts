@@ -1,7 +1,7 @@
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import submissionView from './SubmissionsView';
 
@@ -56,6 +56,7 @@ WITH DATA;
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, version)`,
     `create index on ${this.getViewName()} (version)`,
     `create index on ${this.getViewName()} (reviewer_id)`,
     `create index on ${this.getViewName()} (responded_date)`,
@@ -67,7 +68,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (status)`,
     `create index on ${this.getViewName()} (email)`,
     `create index on ${this.getViewName()} (user_id)`,
-    `create index on ${this.getViewName()} (event_id)`
+    `create index on ${this.getViewName()} (event_id)`,
   ];
 
   getViewName(): string {
