@@ -47,7 +47,7 @@ export class FilterEventsService {
             await s3Service
               .getObject({ Bucket, Key })
               .promise()
-              .then(result => result.Body.toString())
+              .then((result) => result.Body.toString())
           );
         } catch (error) {
           logger.error(error);
@@ -55,7 +55,7 @@ export class FilterEventsService {
             'Failed to get event from s3 ' +
               JSON.stringify({
                 MessageId,
-                parsedEvent
+                parsedEvent,
               })
           );
           continue;
@@ -69,7 +69,7 @@ export class FilterEventsService {
           event: parsedEvent.event.split(':').pop(),
           timestamp: parsedEvent.timestamp
             ? new Date(parsedEvent.timestamp)
-            : null
+            : null,
         });
       } catch (error) {
         logger.error(`Payload not correct for ${MessageId} `);
@@ -79,7 +79,7 @@ export class FilterEventsService {
     }
 
     let filteredEvents = processedEvents.filter(
-      e => !!e && e.event && e.id && e.data
+      (e) => !!e && e.event && e.id && e.data
     );
     if (events.length !== filteredEvents.length) {
       //TODO maybe save bad events to s3

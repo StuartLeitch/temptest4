@@ -41,10 +41,10 @@ export class HttpPublishConsumer<T> implements Consumer<T> {
         headers: {
           'x-auth-token': this.token,
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData)
-        }
+          'Content-Length': Buffer.byteLength(postData),
+        },
       };
-      const req = http.request(this.host, options, res => {
+      const req = http.request(this.host, options, (res) => {
         if (res.statusCode === 403) {
           throw new Error('Bad auth token');
         }
@@ -54,20 +54,20 @@ export class HttpPublishConsumer<T> implements Consumer<T> {
         }
         let chunk = [];
         res.setEncoding('utf8');
-        res.on('data', d => {
+        res.on('data', (d) => {
           chunk.push(d);
         });
         res.on('end', () => {
           resolve(chunk);
         });
       });
-      req.on('error', e => reject(e));
+      req.on('error', (e) => reject(e));
       req.write(postData);
       req.end();
     });
   }
   private async wait(ms: number): Promise<void> {
-    return new Promise(res => {
+    return new Promise((res) => {
       setTimeout(() => res(), ms);
     });
   }
