@@ -1,7 +1,7 @@
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import submissionView from './SubmissionsView';
 import authorsView from './AuthorsView';
@@ -19,8 +19,8 @@ AS SELECT
     inv.invoice_created_date as "invoice_created_date",
     case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as manuscript_accepted_date,
     case 
-    	when inv.status = 'DRAFT' then 'Unpaid'
-    	when coalesce(inv.paid_amount, 0) = 0 then 'Unpaid'
+    	when inv.status = 'DRAFT' then null
+    	when coalesce(inv.paid_amount, 0) = 0 then null
     	when inv.status = 'ACTIVE' then 'Partially Paid'
     	when inv.status = 'FINAL' then 'Paid'
     	else 'unknown'
@@ -106,7 +106,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (invoice_id)`,
     `create index on ${this.getViewName()} (publisher_name)`,
     `create index on ${this.getViewName()} (journal_name)`,
-    `create index on ${this.getViewName()} (event_id)`
+    `create index on ${this.getViewName()} (event_id)`,
   ];
 
   getViewName(): string {

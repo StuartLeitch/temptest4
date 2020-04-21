@@ -1,6 +1,6 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 
@@ -114,7 +114,8 @@ execute procedure ${this.getTriggerName()}();
     `create index on ${this.getViewName()} (submission_id)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (article_type)`,
-    `create index on ${this.getViewName()} (journal_id)`
+    `create index on ${this.getViewName()} (journal_id)`,
+    // add index in migration, not here
   ];
 
   getViewName(): string {

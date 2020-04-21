@@ -87,8 +87,8 @@ export class ResumeInvoicePaymentReminderUsecase
         .then(this.validatePauseState(context))
         .then(this.getInvoice(context))
         .then(this.resume)
-        .then(this.getPayer(context))
         .advanceOrEnd(this.shouldScheduleJob)
+        .then(this.getPayer(context))
         .then(this.scheduleJob)
         .map(() => Result.ok<void>(null));
 
@@ -263,18 +263,21 @@ export class ResumeInvoicePaymentReminderUsecase
     }
   }
 
-  private async shouldScheduleJob(request: CompoundDTO) {
+  private async shouldScheduleJob({
+    reminderDelay,
+    invoiceId,
+    invoice,
+  }: DTO & { invoice: Invoice }) {
     this.loggerService.info(
-      `Determine if the job for reminders of type ${NotificationType.REMINDER_PAYMENT} should be scheduled for invoice with id ${request.invoiceId}`
+      `Determine if the job for reminders of type ${NotificationType.REMINDER_PAYMENT} should be scheduled for invoice with id ${invoiceId}`
     );
 
-    if (request.invoice.status !== InvoiceStatus.ACTIVE) {
+    if (invoice.status !== InvoiceStatus.ACTIVE) {
       return right<null, boolean>(false);
     }
 
-    const elapsedTime =
-      new Date().getTime() - request.invoice.dateIssued.getTime();
-    const period = request.reminderDelay * SchedulingTime.Day;
+    const elapsedTime = new Date().getTime() - invoice.dateIssued.getTime();
+    const period = reminderDelay * SchedulingTime.Day;
     const passedPeriods = Math.trunc(elapsedTime / period);
 
     if (passedPeriods >= 3) {
