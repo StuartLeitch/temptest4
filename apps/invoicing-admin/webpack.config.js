@@ -39,7 +39,7 @@ module.exports = (nxConfig, context) => {
   delete webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber;
   webpackConfig.module.rules[3].oneOf[3].use[2].options.sassOptions = {
     includePaths:
-      webpackConfig.module.rules[3].oneOf[3].use[2].options.sassOptions.includePaths,
+      webpackConfig.module.rules[3].oneOf[3].use[2].options.includePaths,
     precision: webpackConfig.module.rules[3].oneOf[3].use[2].options.precision,
     fiber: webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber,
   };
