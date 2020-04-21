@@ -344,6 +344,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   }
 
   private async shouldScheduleCreditControl({
+    creditControlDelay,
     transaction,
     invoice,
   }: InvoiceIdDTO & {
@@ -355,6 +356,13 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     }
 
     if (invoice.status !== InvoiceStatus.ACTIVE) {
+      return right(false);
+    }
+
+    const elapsedTime = new Date().getTime() - invoice.dateIssued.getTime();
+    const originalDelay = creditControlDelay * SchedulingTime.Day;
+
+    if (originalDelay <= elapsedTime) {
       return right(false);
     }
 
@@ -442,9 +450,15 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         payer.name.value,
         ''
       );
+
+      const elapsedTime = new Date().getTime() - invoice.dateIssued.getTime();
+      const originalDelay = creditControlDelay * SchedulingTime.Day;
+      const remainingDaysDelay =
+        (originalDelay - elapsedTime) / SchedulingTime.Day;
+
       const job = JobBuilder.basic(jobType, jobData);
       const timer = TimerBuilder.delayed(
-        creditControlDelay,
+        remainingDaysDelay,
         SchedulingTime.Day
       );
 
@@ -457,12 +471,5 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         );
       }
     };
-  }
-
-  private logError(when: string, id: string, e: { message: string }) {
-    this.loggerService.error(
-      `While ${when} reminders for invoice {${id}} got error ${e.message}`,
-      e
-    );
   }
 }

@@ -291,7 +291,7 @@ export class ResumeInvoicePaymentReminderUsecase
       ''
     );
     const remainingDelay = this.calculateRemainingDelay(
-      invoice.dateAccepted,
+      invoice.dateIssued,
       reminderDelay
     );
     const timer = TimerBuilder.delayed(remainingDelay, SchedulingTime.Day);
@@ -340,14 +340,14 @@ export class ResumeInvoicePaymentReminderUsecase
   }
 
   private calculateRemainingDelay(
-    dateAccepted: Date,
+    dateIssued: Date,
     standardDelay: number
   ): number {
     this.loggerService.info(
       `Calculate the remaining delay until next reminder`
     );
 
-    const elapsedTime = new Date().getTime() - dateAccepted.getTime();
+    const elapsedTime = new Date().getTime() - dateIssued.getTime();
     const period = standardDelay * SchedulingTime.Day;
     const passedPeriods = Math.trunc(elapsedTime / period);
     const nextTime = period * (passedPeriods + 1);
