@@ -2,6 +2,7 @@ import os
 
 LOG_FORMAT = '%(asctime)s:%(levelname)s:%(name)s:%(message)s'
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+SQLLAB_TIMEOUT = int(os.getenv('SQLLAB_TIMEOUT', '120'))
 ENABLE_PROXY_FIX = True
 # Replace this with SecretsManager or SSM Parameter Store.
 
