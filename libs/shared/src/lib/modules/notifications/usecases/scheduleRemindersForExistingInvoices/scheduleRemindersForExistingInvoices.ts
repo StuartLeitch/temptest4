@@ -472,4 +472,11 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       }
     };
   }
+
+  private logError(when: string, id: string, e: { message: string }) {
+    this.loggerService.error(
+      `While ${when} reminders for invoice {${id}} got error ${e.message}`,
+      e
+    );
+  }
 }
