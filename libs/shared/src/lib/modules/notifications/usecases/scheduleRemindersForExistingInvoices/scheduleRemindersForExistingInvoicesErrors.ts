@@ -106,3 +106,13 @@ export class ResumingCreditControlReminderError extends Result<UseCaseError> {
     });
   }
 }
+
+export class CouldNotGetTransactionForInvoiceError extends Result<
+  UseCaseError
+> {
+  constructor(invoiceId: string, err: Error) {
+    super(false, {
+      message: `While getting the transaction for invoice with id {${invoiceId}} an error ocurred: ${err.message}`,
+    });
+  }
+}

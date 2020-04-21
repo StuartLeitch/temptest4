@@ -5,6 +5,7 @@ import * as ScheduleRemindersForExistingInvoicesErrors from './scheduleReminders
 
 export type ScheduleRemindersForExistingInvoicesResponse = Either<
   | ScheduleRemindersForExistingInvoicesErrors.GetInvoiceIdsWithoutPauseSettingsDbError
+  | ScheduleRemindersForExistingInvoicesErrors.CouldNotGetTransactionForInvoiceError
   | ScheduleRemindersForExistingInvoicesErrors.ConfirmationQueueNameRequiredError
   | ScheduleRemindersForExistingInvoicesErrors.ScheduleCreditControlReminderError
   | ScheduleRemindersForExistingInvoicesErrors.ConfirmationDelayRequiredError

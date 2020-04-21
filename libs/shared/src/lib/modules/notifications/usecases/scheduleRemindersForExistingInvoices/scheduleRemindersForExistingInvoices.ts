@@ -27,7 +27,11 @@ import {
   TimerBuilder,
 } from '../../../../infrastructure/message-queues/contracts/Time';
 
-import { Invoice } from '../../../invoices/domain/Invoice';
+import {
+  Transaction,
+  STATUS as TransactionStatus,
+} from '../../../transactions/domain/Transaction';
+import { Invoice, InvoiceStatus } from '../../../invoices/domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
 
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
@@ -39,6 +43,7 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { ResumeInvoiceConfirmationReminderUsecase } from '../resumeInvoiceConfirmationReminders';
 import { PauseInvoiceConfirmationRemindersUsecase } from '../pauseInvoiceConfirmationReminders';
 import { ResumeInvoicePaymentReminderUsecase } from '../resumeInvoicePaymentReminders';
@@ -71,8 +76,12 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     private loggerService: LoggerContract,
     private scheduler: SchedulerContract
   ) {
+    this.shouldScheduleCreditControl = this.shouldScheduleCreditControl.bind(
+      this
+    );
     this.scheduleCreditControl = this.scheduleCreditControl.bind(this);
     this.resumeConfirmation = this.resumeConfirmation.bind(this);
+    this.attachTransaction = this.attachTransaction.bind(this);
     this.pauseConfirmation = this.pauseConfirmation.bind(this);
     this.addPauseSettings = this.addPauseSettings.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
@@ -313,6 +322,8 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       try {
         const execution = new AsyncEither(request)
           .then(this.attachInvoice(context))
+          .then(this.attachTransaction(context))
+          .advanceOrEnd(this.shouldScheduleCreditControl)
           .then(this.attachPayer(context))
           .then(this.scheduleJob(SisifJobTypes.InvoiceCreditControlReminder));
 
@@ -330,6 +341,24 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         );
       }
     };
+  }
+
+  private async shouldScheduleCreditControl({
+    transaction,
+    invoice,
+  }: InvoiceIdDTO & {
+    transaction: Transaction;
+    invoice: Invoice;
+  }): Promise<Either<null, boolean>> {
+    if (transaction.status !== TransactionStatus.ACTIVE) {
+      return right(false);
+    }
+
+    if (invoice.status !== InvoiceStatus.ACTIVE) {
+      return right(false);
+    }
+
+    return right(true);
   }
 
   private attachPayer(context: Context) {
@@ -358,6 +387,47 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         ...request,
         invoice: result.getValue(),
       }));
+    };
+  }
+
+  private attachTransaction(context: Context) {
+    return async (request: InvoiceIdDTO & { invoice: Invoice }) => {
+      this.loggerService.info(
+        `Get transaction details for invoice with id ${request.invoiceId}`
+      );
+
+      const usecase = new GetTransactionUsecase(this.transactionRepo);
+      const transactionId = request.invoice?.transactionId?.id?.toString();
+      try {
+        const result = await usecase.execute({ transactionId }, context);
+
+        if (result.isFailure) {
+          return left<
+            Errors.CouldNotGetTransactionForInvoiceError,
+            InvoiceIdDTO & { invoice: Invoice; transaction: Transaction }
+          >(
+            new Errors.CouldNotGetTransactionForInvoiceError(
+              request.invoiceId,
+              new Error(result.errorValue() as any)
+            )
+          );
+        }
+
+        return right<
+          Errors.CouldNotGetTransactionForInvoiceError,
+          InvoiceIdDTO & { invoice: Invoice; transaction: Transaction }
+        >({
+          ...request,
+          transaction: result.getValue(),
+        });
+      } catch (e) {
+        return left<
+          Errors.CouldNotGetTransactionForInvoiceError,
+          InvoiceIdDTO & { invoice: Invoice; transaction: Transaction }
+        >(
+          new Errors.CouldNotGetTransactionForInvoiceError(request.invoiceId, e)
+        );
+      }
     };
   }
 
