@@ -125,4 +125,6 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
     // finish all tasks
     await Promise.all(tasks);
   }
+
+  process.exit(0);
 };
