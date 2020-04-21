@@ -60,7 +60,6 @@ export const env = {
     username: getOsEnvOptional('DB_USERNAME'),
     password: getOsEnvOptional('DB_PASSWORD'),
     database: getOsEnv('DB_DATABASE'),
-    logging: getOsEnv('DB_LOGGING'),
   },
   workerCount: toNumber(getOsEnvOptional('WORKER_COUNT') || '1'),
 };
