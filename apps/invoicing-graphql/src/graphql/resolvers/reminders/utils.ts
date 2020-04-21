@@ -60,7 +60,7 @@ export async function pauseOrResumePayment(
   context
 ) {
   const {
-    repos: { pausedReminder, invoice, payer },
+    repos: { pausedReminder, transaction, invoice, payer },
     services: { logger: loggerService, schedulingService },
   } = context;
   const usecaseContext = {
@@ -82,6 +82,7 @@ export async function pauseOrResumePayment(
   } else {
     const resumeUsecase = new ResumeInvoicePaymentReminderUsecase(
       pausedReminder,
+      transaction,
       invoice,
       payer,
       loggerService,

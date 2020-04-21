@@ -280,6 +280,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       } = request;
       const usecase = new ResumeInvoicePaymentReminderUsecase(
         this.pausedReminderRepo,
+        this.transactionRepo,
         this.invoiceRepo,
         this.payerRepo,
         this.loggerService,

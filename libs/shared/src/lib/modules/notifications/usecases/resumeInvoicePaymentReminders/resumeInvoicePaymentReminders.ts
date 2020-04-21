@@ -27,14 +27,20 @@ import {
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
+import {
+  Transaction,
+  STATUS as TransactionStatus,
+} from '../../../transactions/domain/Transaction';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
@@ -46,6 +52,7 @@ import { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentR
 import * as Errors from './resumeInvoicePaymentRemindersErrors';
 
 interface CompoundDTO extends DTO {
+  transaction: Transaction;
   invoice: Invoice;
   payer: Payer;
 }
@@ -59,6 +66,7 @@ export class ResumeInvoicePaymentReminderUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
+    private transactionRepo: TransactionRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract,
@@ -69,6 +77,7 @@ export class ResumeInvoicePaymentReminderUsecase
     this.validatePauseState = this.validatePauseState.bind(this);
     this.shouldScheduleJob = this.shouldScheduleJob.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
+    this.getTransaction = this.getTransaction.bind(this);
     this.scheduleJob = this.scheduleJob.bind(this);
     this.getInvoice = this.getInvoice.bind(this);
     this.getPayer = this.getPayer.bind(this);
@@ -86,6 +95,7 @@ export class ResumeInvoicePaymentReminderUsecase
         .then(this.validateRequest)
         .then(this.validatePauseState(context))
         .then(this.getInvoice(context))
+        .then(this.getTransaction(context))
         .then(this.resume)
         .advanceOrEnd(this.shouldScheduleJob)
         .then(this.getPayer(context))
@@ -187,6 +197,43 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
+  private getTransaction(context: Context) {
+    return async (request: CompoundDTO) => {
+      this.loggerService.info(
+        `Get transaction details for invoice with id ${request.invoiceId}`
+      );
+
+      const usecase = new GetTransactionUsecase(this.transactionRepo);
+      const transactionId = request.invoice?.transactionId?.id?.toString();
+      try {
+        const result = await usecase.execute({ transactionId }, context);
+
+        if (result.isFailure) {
+          return left<
+            Errors.CouldNotGetTransactionForInvoiceError,
+            CompoundDTO
+          >(
+            new Errors.CouldNotGetTransactionForInvoiceError(
+              request.invoiceId,
+              new Error(result.errorValue() as any)
+            )
+          );
+        }
+
+        return right<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
+          {
+            ...request,
+            transaction: result.getValue(),
+          }
+        );
+      } catch (e) {
+        return left<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
+          new Errors.CouldNotGetTransactionForInvoiceError(request.invoiceId, e)
+        );
+      }
+    };
+  }
+
   private getPayer(context: Context) {
     return async (request: CompoundDTO) => {
       const usecase = new GetPayerDetailsByInvoiceIdUsecase(
@@ -265,12 +312,17 @@ export class ResumeInvoicePaymentReminderUsecase
 
   private async shouldScheduleJob({
     reminderDelay,
+    transaction,
     invoiceId,
     invoice,
-  }: DTO & { invoice: Invoice }) {
+  }: DTO & { invoice: Invoice; transaction: Transaction }) {
     this.loggerService.info(
       `Determine if the job for reminders of type ${NotificationType.REMINDER_PAYMENT} should be scheduled for invoice with id ${invoiceId}`
     );
+
+    if (transaction.status !== TransactionStatus.ACTIVE) {
+      return right<null, boolean>(false);
+    }
 
     if (invoice.status !== InvoiceStatus.ACTIVE) {
       return right<null, boolean>(false);
