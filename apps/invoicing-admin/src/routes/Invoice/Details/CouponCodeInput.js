@@ -5,7 +5,7 @@ import { FormGroup, Input, FormFeedback } from '../../../components';
 
 const MAX_LENGTH = 10;
 
-const CouponCodeInput = ({ validationCallback }) => {
+const CouponCodeInput = ({ validationCallback, onChangeCallback }) => {
   const [isTouched, setTouched] = useState(false);
   const [isValid, setValid] = useState(false);
 
@@ -24,7 +24,11 @@ const CouponCodeInput = ({ validationCallback }) => {
 
   const onChange = (e) => {
     if (!isTouched) setTouched(true);
-    validateInput(e.target.value);
+
+    const value = e.target.value;
+
+    validateInput(value);
+    onChangeCallback(value);
   };
 
   return (
