@@ -1,25 +1,40 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Container, Row, Col } from './../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
-// import PendingLogging from '../../components/PendingLogging';
 
 import InvoicesList from './List';
-// import ProjectsGrid from './ProjectsGrid';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 import { ParseUtils } from '@utils';
-// import { InvoicesSmHeader } from '../../components/Invoices/InvoicesSmHeader';
+import { useQueryState } from 'react-router-use-location-state';
+import { writeStorage } from '@rehooks/local-storage';
 
-const InvoicesContainer = props => {
-  const [filters, setFilters] = useState({
-    invoiceStatus: new Set(),
-    transactionStatus: new Set(),
-    journalId: [],
-    referenceNumber: null,
-    customId: null
-  });
+// import QueryStateDisplay from './components/QueryStateDisplay';
+
+const InvoicesContainer = (props: any) => {
+  const [invoiceStatus, setInvoiceStatus] = useQueryState('invoiceStatus', []);
+  const [transactionStatus, setTransactionStatus] = useQueryState(
+    'transactionStatus',
+    []
+  );
+  const [journalId, setJournalId] = useQueryState('journalId', []);
+  const [referenceNumber, setReferenceNumber] = useQueryState(
+    'referenceNumber',
+    ''
+  );
+  const [customId, setCustomId] = useQueryState('customId', '');
+
+  const filters = {
+    invoiceStatus,
+    transactionStatus,
+    journalId,
+    referenceNumber,
+    customId,
+  };
+
+  writeStorage('invoicesListFilters', filters);
 
   return (
     <React.Fragment>
@@ -27,7 +42,16 @@ const InvoicesContainer = props => {
         <HeaderMain title='Invoices' className='mb-5 mt-4' />
         <Row>
           <Col lg={3}>
-            <InvoicesLeftNav setFilter={setFilter} />
+            {/* <QueryStateDisplay
+              queryState={{
+                invoiceStatus,
+                transactionStatus,
+                journalId,
+                referenceNumber,
+                customId,
+              }}
+            /> */}
+            <InvoicesLeftNav filters={filters} setFilter={setFilter} />
           </Col>
           <Col lg={9}>
             <InvoicesList filters={filters} />
@@ -45,34 +69,46 @@ const InvoicesContainer = props => {
    */
   function setFilter(key: string, value: boolean | string | any[]) {
     const [name, status] = ParseUtils.parseEvent(key);
-    const newFilters = { ...filters }; // FIXME: USe immutables here
+    // const newFilters = { ...filters }; // FIXME: Use immutables here
     switch (name) {
       case 'invoiceStatus':
-      case 'transactionStatus':
-        newFilters[name] = new Set(filters[name]);
-        if (value) {
-          newFilters[name].add(status);
+        if (invoiceStatus.includes(status)) {
+          setInvoiceStatus(
+            invoiceStatus.filter((s) => s !== status),
+            { method: 'push' }
+          );
         } else {
-          newFilters[name].delete(status);
+          setInvoiceStatus([...invoiceStatus, status], { method: 'push' });
+        }
+        break;
+
+      case 'transactionStatus':
+        if (transactionStatus.includes(status)) {
+          setTransactionStatus(transactionStatus.filter((s) => s !== status));
+        } else {
+          setTransactionStatus([...transactionStatus, status]);
         }
         break;
 
       case 'journalTitle':
-        newFilters.journalId = (value as any[]).map(j => j.journalId);
+        setJournalId((value as any[]).map((j) => j.journalId));
+        // newFilters.journalId = (value as any[]).map((j) => j.journalId);
+        break;
+
+      case 'referenceNumber':
+        setReferenceNumber(value as string);
         break;
 
       default:
         // 'referenceNumber'
         // 'customId'
-        newFilters[name] = value;
+        setCustomId(value as string);
     }
-
-    setFilters(newFilters);
   }
 };
 
 InvoicesContainer.propTypes = {
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
 };
 
 export default InvoicesContainer;

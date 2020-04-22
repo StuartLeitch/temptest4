@@ -59,13 +59,12 @@ export const invoice: Resolvers<any> = {
         invoiceId: invoiceDetails.id.toString(),
         status: invoiceDetails.status,
         charge: invoiceDetails.charge,
-        dateCreated: invoiceDetails.dateCreated.toISOString(),
-        dateAccepted: invoiceDetails.dateAccepted.toISOString(),
+        dateCreated: invoiceDetails?.dateCreated?.toISOString(),
+        dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         erpReference: invoiceDetails.erpReference,
         revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
-        dateIssued:
-          invoiceDetails.dateIssued && invoiceDetails.dateIssued.toISOString(),
+        dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber:
           invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
             ? invoiceDetails.referenceNumber
@@ -95,11 +94,9 @@ export const invoice: Resolvers<any> = {
           invoiceId: invoiceDetails.id.toString(),
           // status: invoiceDetails.status,
           // charge: invoiceDetails.charge,
-          dateCreated: invoiceDetails.dateCreated.toISOString(),
+          dateCreated: invoiceDetails?.dateCreated?.toISOString(),
           dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
-          dateIssued:
-            invoiceDetails.dateIssued &&
-            invoiceDetails.dateIssued.toISOString(),
+          dateIssued: invoiceDetails?.dateIssued?.toISOString(),
           referenceNumber:
             invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
               ? invoiceDetails.referenceNumber
@@ -351,13 +348,11 @@ export const invoice: Resolvers<any> = {
         cancelledInvoiceReference: creditNoteDetails.cancelledInvoiceReference,
         status: creditNoteDetails.status,
         charge: creditNoteDetails.charge,
-        dateCreated: creditNoteDetails.dateCreated.toISOString(),
+        dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
         erpReference: creditNoteDetails.erpReference,
         revenueRecognitionReference:
           creditNoteDetails.revenueRecognitionReference,
-        dateIssued:
-          creditNoteDetails.dateIssued &&
-          creditNoteDetails.dateIssued.toISOString(),
+        dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
         referenceNumber:
           creditNoteDetails.invoiceNumber && creditNoteDetails.dateAccepted
             ? `CN-${creditNoteDetails.referenceNumber}`
@@ -491,7 +486,7 @@ export const invoice: Resolvers<any> = {
       return {
         invoiceId: migratedInvoice.invoiceId.id.toString(),
         referenceNumber: migratedInvoice.invoiceNumber,
-        dateIssued: migratedInvoice.dateIssued.toISOString(),
+        dateIssued: migratedInvoice?.dateIssued?.toISOString(),
         dateAccepted: migratedInvoice?.dateAccepted?.toISOString(),
         // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
         // datePaid: migratedPayment.datePaid.toISOString(),
@@ -546,11 +541,10 @@ export const invoice: Resolvers<any> = {
         cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
         status: creditNote.status,
         charge: creditNote.charge,
-        dateCreated: creditNote.dateCreated.toISOString(),
+        dateCreated: creditNote?.dateCreated?.toISOString(),
         erpReference: creditNote.erpReference,
         revenueRecognitionReference: creditNote.revenueRecognitionReference,
-        dateIssued:
-          creditNote.dateIssued && creditNote.dateIssued.toISOString(),
+        dateIssued: creditNote?.dateIssued?.toISOString(),
         referenceNumber:
           creditNote.invoiceNumber && creditNote.dateAccepted
             ? `CN-${creditNote.referenceNumber}`

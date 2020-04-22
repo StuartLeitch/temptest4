@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import React from 'react';
 import MaskedInput from 'react-text-mask';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -10,16 +12,18 @@ import {
   InputGroupAddon,
   Nav,
   NavItem,
-  NavLink
+  NavLink,
 } from '../../../components';
 import { JournalsSelections } from './JournalsSelections';
 
-const InvoicesLeftNav = props => {
-  const [refNumber, set_refNumber] = useState('');
-  const [customId, set_customId] = useState('');
+const InvoicesLeftNav = (props) => {
+  const invoiceStatus = props?.filters?.invoiceStatus || [];
+  const transactionStatus = props?.filters?.transactionStatus || [];
+  const journalId = props?.filters?.journalId || [];
+  const referenceNumber = props?.filters?.referenceNumber || '';
+  const customId = props?.filters?.customId || '';
 
-  // const [eventTarget, onFilterHandler]: [any, (any) => void] = useState('');
-  const [onFilterHandler] = useDebouncedCallback(eventTarget => {
+  const [onFilterHandler] = useDebouncedCallback((eventTarget: any) => {
     const value =
       eventTarget?.type === 'checkbox'
         ? eventTarget.checked
@@ -27,20 +31,10 @@ const InvoicesLeftNav = props => {
     props.setFilter(eventTarget.name, value);
   }, 300);
 
-  useEffect(() => {
-    onFilterHandler({ name: 'referenceNumber', value: refNumber });
-    // props.setFilter('refNumber', refNumber);
-  }, [refNumber]);
-
-  useEffect(() => {
-    onFilterHandler({ name: 'customId', value: customId });
-    // props.setFilter('customId', customId);
-  }, [customId]);
-
   return (
     <React.Fragment>
       {/* START Invoice Status */}
-      <Nav vertical className='mb-3'>
+      <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='small d-flex px-1'>
             <span>Invoice Status</span>
@@ -49,50 +43,44 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={evt => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler(evt.target)}
             name='invoiceStatus.DRAFT'
+            checked={invoiceStatus.includes('DRAFT')}
             className='text-warning'
             type='checkbox'
             id='invoice-status-draft'
             label='Draft'
             inline
           />
-          {/* <span className='small ml-auto align-self-center'>
-            ({faker.finance.mask()})
-          </span> */}
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
             name='invoiceStatus.ACTIVE'
-            onChange={evt => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler(evt.target)}
+            checked={invoiceStatus.includes('ACTIVE')}
             className='text-primary'
             type='checkbox'
             id='invoice-status-active'
             label='Active'
             inline
           />
-          {/* <span className='small ml-auto align-self-center'>
-            ({faker.finance.mask()})
-          </span> */}
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
             name='invoiceStatus.FINAL'
-            onChange={evt => onFilterHandler(evt.target)}
+            onChange={(evt: any) => onFilterHandler(evt.target)}
+            checked={invoiceStatus.includes('FINAL')}
             className='text-success'
             type='checkbox'
             id='invoice-status-final'
             label='Final'
             inline
           />
-          {/* <span className='small ml-auto align-self-center'>
-            ({faker.finance.mask()})
-          </span> */}
         </NavItem>
       </Nav>
       {/* END Invoice Status */}
       {/* START Transaction Status */}
-      <Nav vertical className='mb-3'>
+      <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='small d-flex px-1'>
             <span>Transaction Status</span>
@@ -101,21 +89,20 @@ const InvoicesLeftNav = props => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={evt => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler(evt.target)}
             name='transactionStatus.DRAFT'
+            checked={transactionStatus.includes('DRAFT')}
             className='text-warning'
             type='checkbox'
             id='checkbox1'
             label='Draft'
             inline
           />
-          {/* <span className='small ml-auto align-self-center'>
-            ({faker.finance.mask()})
-          </span> */}
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={evt => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler(evt.target)}
+            checked={transactionStatus.includes('ACTIVE')}
             name='transactionStatus.ACTIVE'
             className='text-primary'
             type='checkbox'
@@ -123,25 +110,11 @@ const InvoicesLeftNav = props => {
             label='Active'
             inline
           />
-          {/* <span className='small ml-auto align-self-center'>
-            ({faker.finance.mask()})
-          </span> */}
         </NavItem>
-        {/* <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
-            onChange={evt => onFilterHandler(evt.target)}
-            name='transactionStatus.FINAL'
-            className='text-success'
-            type='checkbox'
-            id='checkbox3'
-            label='Final'
-            inline
-          />
-        </NavItem> */}
       </Nav>
       {/* END Transaction Status */}
       {/* START Journal Title */}
-      <Nav vertical className='mb-3'>
+      <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='small d-flex px-1'>
             <span>Journal Title</span>
@@ -149,7 +122,8 @@ const InvoicesLeftNav = props => {
           </NavLink>
         </NavItem>
         <JournalsSelections
-          onChange={selections => {
+          selected={journalId}
+          onChange={(selections: any) => {
             const target = { name: 'journalTitle', value: selections };
             onFilterHandler(target);
           }}
@@ -159,7 +133,7 @@ const InvoicesLeftNav = props => {
       </Nav>
       {/* END Journal Title */}
       {/* START Reference Number */}
-      <Nav vertical className='mb-3'>
+      <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='small d-flex px-1'>
             <span>Reference Number</span>
@@ -179,27 +153,28 @@ const InvoicesLeftNav = props => {
                 /1|2/,
                 /0|9/,
                 /\d/,
-                /\d/
+                /\d/,
               ]}
               className='form-control'
               placeholder='Enter a reference number'
               name='referenceNumber'
               type='input'
-              value={refNumber}
-              onChange={evt => set_refNumber(evt.target.value)}
+              value={referenceNumber}
+              onChange={(evt: any) =>
+                onFilterHandler({
+                  name: 'referenceNumber',
+                  value: evt.target.value,
+                })
+              }
               tag={MaskedInput}
-              id='refNumber'
+              id='referenceNumber'
             />
             <InputGroupAddon addonType='append'>
               <Button
                 color='secondary'
                 outline
-                onClick={evt => {
-                  // const newValue = '';
-                  // document.getElementById('refNumber').value = newValue;
-                  // const target = { name: 'refNumber', value: newValue };
-                  // onFilterHandler(target);
-                  set_refNumber('');
+                onClick={(evt: any) => {
+                  onFilterHandler({ name: 'referenceNumber', value: '' });
                 }}
               >
                 <i className='fa fa-times mr-2'></i>
@@ -211,7 +186,7 @@ const InvoicesLeftNav = props => {
       </Nav>
       {/* END Reference Number */}
       {/* START Custom ID */}
-      <Nav vertical className='mb-3'>
+      <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='small d-flex px-1'>
             <span>Custom ID</span>
@@ -222,7 +197,9 @@ const InvoicesLeftNav = props => {
           <InputGroup>
             <Input
               name='customId'
-              onChange={evt => set_customId(evt.target.value)}
+              onChange={(evt: any) =>
+                onFilterHandler({ name: 'customId', value: evt.target.value })
+              }
               className='form-control'
               placeholder='Enter a custom ID'
               id='customId'
@@ -232,13 +209,9 @@ const InvoicesLeftNav = props => {
               <Button
                 color='secondary'
                 outline
-                onClick={evt => {
-                  // const newValue = '';
-                  // document.getElementById('customId').value = newValue;
-                  // const target = { name: 'customId', value: newValue };
-                  // onFilterHandler(target);
-                  set_customId('');
-                }}
+                onClick={(evt: any) =>
+                  onFilterHandler({ name: 'customId', value: '' })
+                }
               >
                 <i className='fa fa-times mr-2'></i>
                 Clear

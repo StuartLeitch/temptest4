@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+
 import React, { useEffect, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
@@ -9,7 +11,7 @@ import {
   Error,
   ListPagination,
   Spinner,
-  Table
+  Table,
 } from '../../../components';
 
 import { TrTableInvoicesList } from './components/TrTableList';
@@ -108,54 +110,36 @@ fragment creditNoteFragment on Invoice {
 }
 `;
 
-const RecentInvoicesList = props => {
+const RecentInvoicesList = (props) => {
   const paginator = {
     offset: 0,
-    limit: 10
+    limit: 10,
   };
+
   let [pagination, setPagination] = useState(paginator);
 
   const [fetchInvoices, { loading, error, data }] = useManualQuery(
     INVOICES_QUERY
   );
 
-  // let currPaginator = { ...paginator };
   const onPageChanged = (data: any) => {
-    // const filters = {
-    //   invoiceStatus: []
-    // };
-    // if (props.filters.id === 'invoice-status-draft' && props.filters.checked) {
-    //   filters.invoiceStatus = ['DRAFT'];
-    // }
-
-    // currPaginator = {
-    //   offset: data?.currentPage - 1,
-    //   limit: data?.pageLimit
-    // };
-    // setPagination({ ...currPaginator });
     setPagination({
       offset: data?.currentPage - 1,
-      limit: data?.pageLimit
+      limit: data?.pageLimit,
     });
-    // fetchInvoices({
-    //   // variables: { ...filters, ...currPaginator }
-    //   variables: currPaginator
-    // });
   };
 
   useEffect(() => {
     async function fetchData() {
-      // setPagination({ ...paginator });
       await fetchInvoices({
         variables: {
           filters: Filters.collect(props.filters),
-          // ...paginator
-          pagination
-        }
+          pagination,
+        },
       });
     }
     fetchData();
-  }, [props.filters, pagination]);
+  }, [props.filters, pagination, fetchInvoices]);
 
   if (loading)
     return (
@@ -173,9 +157,8 @@ const RecentInvoicesList = props => {
   if (error) return <Error data={error} />;
 
   const offset = pagination.offset * pagination.limit;
-  if ((data?.length ?? 0 > 0) && offset >= data?.length) {
-    // pagination.offset = 0; //({ ...pagination, offset: 0 });
-    pagination = paginator;
+  if (data?.length > 0 && offset >= data?.length) {
+    pagination = Object.assign({}, paginator);
   }
 
   return (

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+const getRollupBabelOptions = require("@nrwl/react/plugins/bundle-babel");
+
 module.exports = (nxConfig, context) => {
   const webpackConfig = {
     ...nxConfig,
@@ -7,8 +11,7 @@ module.exports = (nxConfig, context) => {
     },
   };
 
-  // console.info(webpackConfig.module.rules[0].options.presets);
-  // console.info(webpackConfig.module.rules[0].options.plugins);
+  getRollupBabelOptions(webpackConfig.module.rules[0].options);
 
   // pushing appropriate loaders for fonts and files
   webpackConfig.module.rules.unshift(

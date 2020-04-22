@@ -11,9 +11,9 @@ import AppProviders from "./app/contexts";
 const context = new Context(config);
 const store = makeStore(config, context);
 
-// ReactDOM.render(
-//   <AppProviders store={store}>
-//     <App />
-//   </AppProviders>,
-//   document.getElementById("root"),
-// );
+ReactDOM.render(
+  <AppProviders store={store}>
+    <App />
+  </AppProviders>,
+  document.getElementById("root"),
+);

@@ -1,38 +1,28 @@
 /* eslint-disable no-unused-expressions */
+
 import React, { useState } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import { useQuery, useMutation } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
 import DatePicker from 'react-datepicker';
 import format from 'date-fns/format';
-// import subWeeks from 'date-fns/subWeeks';
 import compareDesc from 'date-fns/compareDesc';
 import { toast } from 'react-toastify';
-// import Toggle from 'react-toggle';
 import numeral from 'numeral';
 
 import {
-  // Accordion,
   Badge,
   Button,
-  // ButtonDropdown,
-  // ButtonGroup,
   ButtonToolbar,
   Card,
   CardBody,
-  // CardGroup,
-  // CardText,
   CardTitle,
   Col,
-  // CardHeader,
-  // CardFooter,
   Container,
-  // CustomInput,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
   ModalDropdown,
-  // FormFeedback,
   Form,
   FormGroup,
   Media,
@@ -41,7 +31,6 @@ import {
   InputGroup,
   InputGroupAddon,
   Row,
-  // FormText,
   ModalHeader,
   ModalBody,
   ModalFooter,
@@ -55,18 +44,11 @@ import {
   UncontrolledTabs,
 } from './../../../components';
 import { HeaderMain } from '../../components/HeaderMain';
-// import { HeaderDemo } from '../../components/HeaderDemo';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 import { TimelineMini } from '../../components/Timeline/TimelineMini';
-// import { CardTextDemo } from '../../components/CardTextDemo';
-// import { TimelineDefault } from '../../components/Timeline/TimelineDefault';
-// import { DlRowContacts } from '../../components/Profile/DlRowContacts';
-// import { DlRowAddress } from '../../components/Profile/DlRowAddress';
-// import { TrTableMessages } from '../../Apps/ProfileDetails/components/TrTableMessages';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
-// import { Coupon } from '../../components/Invoice/Coupon';
 
 import Config from '../../../config';
 
@@ -280,9 +262,47 @@ const Details = () => {
     statusClassName = 'success';
   }
 
+  const queryState = JSON.parse(localStorage.getItem('invoicesListFilters'));
+  const {
+    invoiceStatus,
+    transactionStatus,
+    journalId,
+    referenceNumber,
+    customId,
+  } = queryState;
+
+  // * build the query string out of query state
+  let queryString = '';
+  if (Object.keys(queryState).length) {
+    queryString += '?';
+    queryString += invoiceStatus.reduce(
+      (qs, is) => (qs += `invoiceStatus=${is}&`),
+      ''
+    );
+    queryString += transactionStatus.reduce(
+      (qs, ts) => (qs += `transactionStatus=${ts}&`),
+      ''
+    );
+    queryString += journalId.reduce((qs, ji) => (qs += `journalId=${ji}&`), '');
+
+    if (referenceNumber) {
+      queryString += `referenceNumber=${referenceNumber}&`;
+    }
+
+    if (customId) {
+      queryString += `customId=${customId}&`;
+    }
+  }
+
   return (
     <React.Fragment>
       <Container fluid={true}>
+        <Link
+          to={`/invoices/list${queryString}`}
+          className='text-decoration-none d-block mb-4 mt-0'
+        >
+          <i className='fas fa-angle-left mr-2' /> Back to invoices list
+        </Link>
         <HeaderMain
           title={`Invoice #${invoice.referenceNumber}`}
           className='mb-1 mt-0'
@@ -291,7 +311,6 @@ const Details = () => {
         <Row>
           <Col lg={12}>
             <div className='d-flex mb-3'>
-              {/* <CardTitle tag='h6'>Button Right Toolbar</CardTitle> */}
               <ButtonToolbar className='ml-auto'>
                 <UncontrolledButtonDropdown className='mr-3'>
                   <DropdownToggle
@@ -329,9 +348,7 @@ const Details = () => {
                       </DropdownToggle>
                     }
                     onSave={async () => {
-                      const {
-                        bankTransferPayment,
-                      } = await recordBankTransferPayment({
+                      await recordBankTransferPayment({
                         variables: {
                           invoiceId: invoice?.id,
                           payerId: invoice?.payer?.id,
@@ -385,9 +402,7 @@ const Details = () => {
                       ));
                     }}
                     onSaveAndMarkInvoiceAsFinal={async () => {
-                      const {
-                        bankTransferPayment,
-                      } = await recordBankTransferPayment({
+                      await recordBankTransferPayment({
                         variables: {
                           invoiceId: invoice?.id,
                           payerId: invoice?.payer?.id,
@@ -478,16 +493,13 @@ const Details = () => {
                                 placeholder='Amount...'
                                 id='bothAddon'
                                 onChange={(e) => {
-                                  const { name, value } = e.target;
+                                  const { value } = e.target;
                                   setBankTransferPaymentData({
                                     ...bankTransferPaymentData,
                                     paymentAmount: value,
                                   });
                                 }}
                               />
-                              {/* <InputGroupAddon addonType='append'>
-                                .00
-                              </InputGroupAddon> */}
                             </InputGroup>
                           </Col>
                         </FormGroup>
@@ -508,7 +520,7 @@ const Details = () => {
                             <Input
                               placeholder='Reference'
                               onChange={(e) => {
-                                const { name, value } = e.target;
+                                const { value } = e.target;
                                 setBankTransferPaymentData({
                                   ...bankTransferPaymentData,
                                   paymentReference: value,
@@ -709,15 +721,6 @@ const Details = () => {
             </div>
           </Col>
         </Row>
-        {/* <Row>
-        <Col lg={12}>
-          <HeaderDemo
-            no={1}
-            title='Invoice Details'
-            subTitle='Basic button layout options'
-          />
-        </Col>
-      </Row> */}
         <Row>
           <Col lg={8}>
             <UncontrolledTabs initialActiveTabId='invoice'>
@@ -753,6 +756,7 @@ const Details = () => {
                         Invoice: Details
                         <a
                           target='_blank'
+                          rel='noopener noreferrer'
                           href={`${Config.feRoot}/payment-details/${invoice.id}`}
                           className='ml-auto'
                         >
@@ -1051,7 +1055,10 @@ const Details = () => {
                                 <dd className='col-sm-8 text-inverse'>
                                   <samp>
                                     {invoice?.payer?.name} (
-                                    <a href='#'>{invoice?.payer?.email}</a>)
+                                    <a href={`mailto:${invoice?.payer?.email}`}>
+                                      {invoice?.payer?.email}
+                                    </a>
+                                    ))
                                   </samp>
                                 </dd>
 
@@ -1156,6 +1163,18 @@ const Details = () => {
             <Card className='mb-3'>
               <CardBody>
                 <CardTitle tag='h6'>Timeline</CardTitle>
+                {invoice?.dateCreated && (
+                  <TimelineMini
+                    icon='circle'
+                    badgeTitle='Draft'
+                    badgeColor='secondary'
+                    date={format(
+                      new Date(invoice?.dateCreated),
+                      'dd MMMM yyyy'
+                    )}
+                    phrase={'Invoice enters DRAFT state.'}
+                  />
+                )}
                 {invoice?.dateAccepted && (
                   <TimelineMini
                     icon='check-circle'
@@ -1167,18 +1186,6 @@ const Details = () => {
                       'dd MMMM yyyy'
                     )}
                     phrase={'Transaction set to ACTIVE.'}
-                  />
-                )}
-                {invoice?.dateCreated && (
-                  <TimelineMini
-                    icon='circle'
-                    badgeTitle='Draft'
-                    badgeColor='secondary'
-                    date={format(
-                      new Date(invoice?.dateCreated),
-                      'dd MMMM yyyy'
-                    )}
-                    phrase={'Invoice enters DRAFT state.'}
                   />
                 )}
                 {invoice?.dateIssued && (
