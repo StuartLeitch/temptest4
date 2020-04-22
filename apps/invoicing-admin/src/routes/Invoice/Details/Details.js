@@ -52,12 +52,16 @@ import { InvoiceReminders } from '../../components/Invoice/reminders';
 
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
+import ApplyCouponModal from './ApplyCouponModal';
+
 import {
   INVOICE_QUERY,
   BANK_TRANSFER_MUTATION,
   CREATE_CREDIT_NOTE_MUTATION,
   APPLY_COUPON_MUTATION,
 } from '../graphql';
+
+const APPLY_COUPON_MODAL_TARGET = 'applyCouponModal';
 
 const Details = () => {
   const { id } = useParams();
@@ -95,6 +99,7 @@ const Details = () => {
     return <div>Something Bad Happened</div>;
 
   const { invoice, getPaymentMethods } = data;
+  const { status } = invoice;
 
   const { coupons, waivers, price } = invoice?.invoiceItem;
   let netCharges = price;
@@ -114,10 +119,10 @@ const Details = () => {
   const total = netCharges + vat;
 
   let statusClassName = 'warning';
-  if (invoice.status === 'ACTIVE') {
+  if (status === 'ACTIVE') {
     statusClassName = 'primary';
   }
-  if (invoice.status === 'FINAL') {
+  if (status === 'FINAL') {
     statusClassName = 'success';
   }
 
@@ -178,7 +183,7 @@ const Details = () => {
                     <i
                       className={`fas fa-circle text-${statusClassName} mr-2`}
                     ></i>
-                    {invoice.status}
+                    {status}
                     <i className='fas fa-angle-down ml-2' />
                   </DropdownToggle>
                   <DropdownMenu right>
@@ -197,7 +202,7 @@ const Details = () => {
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledButtonDropdown>
-                {invoice.status === 'ACTIVE' && (
+                {status === 'ACTIVE' && (
                   <ModalDropdown
                     dropdownToggle={
                       <DropdownToggle color='primary' caret>
@@ -393,8 +398,7 @@ const Details = () => {
                   </ModalDropdown>
                 )}
                 {invoice.creditNote === null &&
-                  (invoice.status === 'ACTIVE' ||
-                    invoice.status === 'FINAL') && (
+                  (status === 'ACTIVE' || status === 'FINAL') && (
                     <Button
                       id='modalCreateCreditNote'
                       color='danger'
@@ -539,7 +543,12 @@ const Details = () => {
                     </UncontrolledModal.Close>
                   </ModalFooter>
                 </UncontrolledModal>
-                <Button color='primary' outline disabled>
+                <Button
+                  id={APPLY_COUPON_MODAL_TARGET}
+                  color='primary'
+                  outline
+                  disabled={status !== 'DRAFT'}
+                >
                   Apply Coupon
                 </Button>
               </ButtonToolbar>
@@ -1050,6 +1059,8 @@ const Details = () => {
           </Col>
         </Row>
       </Container>
+
+      <ApplyCouponModal target={APPLY_COUPON_MODAL_TARGET} />
     </React.Fragment>
   );
 };
