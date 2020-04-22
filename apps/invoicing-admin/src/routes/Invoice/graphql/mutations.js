@@ -1,6 +1,6 @@
 export const APPLY_COUPON_MUTATION = `
-    mutation applyCoupons($id: ID!, $state: Boolean!) {
-        togglePausePaymentReminders(invoiceId: $id, couponCode: $couponCode) {
+    mutation applyCoupons($invoiceId: ID!, $couponCode: Boolean!) {
+      applyCoupons(invoiceId: $id, couponCode: $couponCode) {
             reduction
         }
     }
