@@ -136,6 +136,7 @@
         "build": {
           "builder": "@nrwl/web:build",
           "options": {
+            "webpackConfig": "apps/invoicing-web/webpack.config.js",
             "outputPath": "dist/apps/invoicing-web",
             "index": "apps/invoicing-web/src/index.html",
             "main": "apps/invoicing-web/src/main.tsx",
@@ -152,8 +153,7 @@
             "styles": [
               "apps/invoicing-web/src/styles.scss"
             ],
-            "scripts": [],
-            "webpackConfig": "@nrwl/react/plugins/webpack"
+            "scripts": []
           },
           "configurations": {
             "production": {
