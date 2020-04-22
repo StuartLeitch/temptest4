@@ -109,7 +109,7 @@ export class ApplyCouponToInvoiceUsecase
 
       let assignedCoupons = 0;
 
-      for (let invoiceItem of invoiceItems) {
+      for (const invoiceItem of invoiceItems) {
         if (coupon.invoiceItemType !== invoiceItem.type) {
           continue;
         }

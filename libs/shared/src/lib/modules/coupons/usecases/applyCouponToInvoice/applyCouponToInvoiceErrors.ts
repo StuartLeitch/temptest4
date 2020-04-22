@@ -5,14 +5,14 @@ export namespace ApplyCouponToInvoiceErrors {
   export class CouponAlreadyUsedError extends Result<UseCaseError> {
     constructor(couponCode: string) {
       super(false, {
-        message: `Coupon ${couponCode} has been used.`
+        message: `Coupon ${couponCode} has already been used.`
       });
     }
   }
   export class CouponExpiredError extends Result<UseCaseError> {
     constructor(couponCode: string) {
       super(false, {
-        message: `Coupon ${couponCode} expired.`
+        message: `Coupon ${couponCode} is expired.`
       });
     }
   }
@@ -28,7 +28,7 @@ export namespace ApplyCouponToInvoiceErrors {
   export class CouponNotFoundError extends Result<UseCaseError> {
     constructor(couponCode: string) {
       super(false, {
-        message: `Couldn't find an coupon with code ${couponCode}.`
+        message: `Couldn't find a coupon with code ${couponCode}.`
       });
     }
   }
