@@ -1,7 +1,7 @@
 // * Core Domain
 import { LoggerContract } from 'libs/shared/src/lib/infrastructure/logging/Logger';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { right } from '../../../../core/logic/Result';
+import { Result, right } from '../../../../core/logic/Result';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import {
   AccessControlledUsecase,
@@ -9,14 +9,15 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 import { Roles } from '../../../users/domain/enums/Roles';
 import { FilterEventsService } from '../../services/FilterEventsService';
-import { SaveSqsEventsDTO } from './saveSqsEventsDTO';
 import { SaveEventsUsecase } from '../saveEvents/saveEvents';
+import { SaveSqsEventsDTO } from './saveSqsEventsDTO';
+import { SaveSqsEventsResponse } from './saveSqsEventsResponse';
 
 export type SaveSqsEventsContext = AuthorizationContext<Roles>;
 
 export class SaveSqsEventsUsecase
   implements
-    UseCase<SaveSqsEventsDTO, Promise<unknown>, SaveSqsEventsContext>,
+    UseCase<SaveSqsEventsDTO, SaveSqsEventsResponse, SaveSqsEventsContext>,
     AccessControlledUsecase<
       SaveSqsEventsDTO,
       SaveSqsEventsContext,
@@ -35,7 +36,7 @@ export class SaveSqsEventsUsecase
   public async execute(
     request: SaveSqsEventsDTO,
     context?: SaveSqsEventsContext
-  ): Promise<unknown> {
+  ): Promise<SaveSqsEventsResponse> {
     const start = new Date();
     try {
       const filteredEvents = await this.filterEventsService.filterEvents(
@@ -54,6 +55,6 @@ export class SaveSqsEventsUsecase
       this.logger.error(error);
     }
 
-    return right(null);
+    return right(Result.ok());
   }
 }
