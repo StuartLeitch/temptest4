@@ -174,9 +174,8 @@ type PaymentMethod {
 type Coupon {
   reduction: Float
   code: String
+  error: String
 }
-
-union ApplyCouponResult = Coupon | Error
 
 type Waiver {
   reduction: Float
@@ -277,7 +276,7 @@ type Query {
 
 type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
-  applyCoupon(invoiceId: ID, couponCode: String): ApplyCouponResult
+  applyCoupon(invoiceId: ID, couponCode: String): Coupon
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: ID!): Boolean
   setTransactionToActive(customId: ID): Transaction

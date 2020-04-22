@@ -97,7 +97,7 @@ const Details = () => {
     return <div>Something Bad Happened</div>;
 
   const { invoice, getPaymentMethods } = data;
-  const { status } = invoice;
+  const { status, id: invoiceId } = invoice;
 
   const { coupons, waivers, price } = invoice?.invoiceItem;
   let netCharges = price;
@@ -554,7 +554,7 @@ const Details = () => {
                       <CardTitle tag='h6' className='mb-4'>
                         Invoice: Details
                         <span className='small ml-1 text-muted'>
-                          #{invoice.id}
+                          #{invoiceId}
                         </span>
                       </CardTitle>
                       {/* START Form */}
@@ -1011,7 +1011,10 @@ const Details = () => {
         </Row>
       </Container>
 
-      <ApplyCouponModal target={APPLY_COUPON_MODAL_TARGET} />
+      <ApplyCouponModal
+        target={APPLY_COUPON_MODAL_TARGET}
+        invoiceId={invoiceId}
+      />
     </React.Fragment>
   );
 };

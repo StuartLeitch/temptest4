@@ -425,7 +425,6 @@ export const invoice: Resolvers<any> = {
       return PaymentMethodMap.toPersistence(paymentMethod.value.getValue());
     },
   },
-
   Mutation: {
     async applyCoupon(parent, args, context) {
       const {
@@ -446,6 +445,9 @@ export const invoice: Resolvers<any> = {
         couponCode: args.couponCode,
         invoiceId: args.invoiceId,
       });
+
+      console.info(result);
+      console.log(result);
 
       if (result.isLeft()) {
         return { error: result.value.errorValue().message };
