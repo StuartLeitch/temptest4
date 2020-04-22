@@ -7,7 +7,7 @@ import {
   normalizePort,
   getOsEnv,
   toNumber,
-  toBool
+  toBool,
 } from './lib/env';
 import { ConsumerTransport } from './contants';
 
@@ -28,12 +28,12 @@ export const env = {
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     batchSize: toNumber(getOsEnvOptional('BATCH_SIZE') || '100'),
     batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000'),
-    resumeDir: getOsEnvOptional('RESUME_DIR') || '/tmp'
+    resumeDir: getOsEnvOptional('RESUME_DIR') || '/tmp',
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),
     json: toBool(getOsEnvOptional('LOG_JSON')),
-    output: getOsEnv('LOG_OUTPUT')
+    output: getOsEnv('LOG_OUTPUT'),
   },
   aws: {
     sqs: consumerTransport === ConsumerTransport.SQS && {
@@ -41,18 +41,25 @@ export const env = {
       accessKey: getOsEnv('AWS_SQS_ACCESS_KEY'),
       secretKey: getOsEnv('AWS_SQS_SECRET_KEY'),
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
-      region: getOsEnv('AWS_SQS_REGION')
+      region: getOsEnv('AWS_SQS_REGION'),
     },
     s3: {
       apiVersion: getOsEnv('AWS_S3_API_VERSION'),
       bucketName: getOsEnv('AWS_S3_BUCKET_NAME'),
       accessKey: getOsEnv('AWS_S3_ACCESS_KEY'),
       secretKey: getOsEnv('AWS_S3_SECRET_KEY'),
-      region: getOsEnv('AWS_S3_REGION')
-    }
+      region: getOsEnv('AWS_S3_REGION'),
+    },
   },
   consumerHttp: consumerTransport === ConsumerTransport.HTTP && {
     host: getOsEnv('CONSUMER_HOST'),
-    token: getOsEnv('CONSUMER_TOKEN')
-  }
+    token: getOsEnv('CONSUMER_TOKEN'),
+  },
+  db: consumerTransport === ConsumerTransport.POSTGRES && {
+    host: getOsEnvOptional('DB_HOST'),
+    username: getOsEnvOptional('DB_USERNAME'),
+    password: getOsEnvOptional('DB_PASSWORD'),
+    database: getOsEnv('DB_DATABASE'),
+  },
+  workerCount: toNumber(getOsEnvOptional('WORKER_COUNT') || '1'),
 };

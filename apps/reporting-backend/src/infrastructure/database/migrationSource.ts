@@ -94,9 +94,11 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views(
-      '20200415131000_add_invoice_amount_to_manuscripts'
+      '20200415131000_add_invoice_amount_to_manuscripts',
+      true
     ),
     add_sub_data_index,
+    rebuild_materialized_views('20200421151200_fix_manuscript_authors'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
