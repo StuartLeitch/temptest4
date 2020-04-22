@@ -6,7 +6,7 @@ import {Producer} from '../../producer';
 import {Selector} from '../../../selector';
 
 interface Message {
-  Message: any,
+  Message: string,
   MessageId: string,
   MessageAttributes: object,
   ReceiptHandle: string,
@@ -15,12 +15,14 @@ interface Message {
 export class SQSEventProducer implements Producer<Event, void> {
   private defaultValues: Partial<Event> = {};
   private filters: Filter<Event>[] = [];
-  private readonly queueName: string;
-  private readonly sqs: SQS;
 
-  constructor(sqs: SQS, queueName: string) {
+  constructor(
+    private readonly sqs: SQS,
+    private readonly queueName: string,
+    private readonly deleteMessages = true) {
     this.queueName = queueName;
     this.sqs = sqs;
+    this.deleteMessages = deleteMessages;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -52,7 +54,9 @@ export class SQSEventProducer implements Producer<Event, void> {
           Message: message.Message
         });
 
-        await this.removeMessage(queueUrl, message);
+        if (this.deleteMessages) {
+          await this.removeMessage(queueUrl, message);
+        }
       }
     }
   }
@@ -94,7 +98,12 @@ export class SQSEventProducer implements Producer<Event, void> {
   private async receiveMessages(queueUrl: string): Promise<SQS.Message[]> {
     const request: SQS.Types.ReceiveMessageRequest = {QueueUrl: queueUrl, MaxNumberOfMessages: 10};
     const response = await this.sqs.receiveMessage(request).promise();
-    return (response?.$response?.data as SQS.ReceiveMessageResult).Messages ?? [];
+
+    if (!response?.$response?.data || !response?.$response?.data.Messages) {
+      return []
+    }
+
+    return response?.$response?.data.Messages
   }
 
   private extractSQSMessageBody(message: SQS.Message): Message {
