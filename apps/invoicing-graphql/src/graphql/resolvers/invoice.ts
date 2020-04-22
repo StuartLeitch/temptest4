@@ -380,12 +380,14 @@ export const invoice: Resolvers<any> = {
 
       return ArticleMap.toPersistence(article.value.getValue());
     },
+
     async coupons(parent, args, context) {
       const coupons = await context.repos.coupon.getCouponsByInvoiceItemId(
         InvoiceItemId.create(new UniqueEntityID(parent.id))
       );
       return coupons.map(CouponMap.toPersistence);
     },
+
     async waivers(parent, args, context) {
       const waivers = await context.repos.waiver.getWaiversByInvoiceItemId(
         InvoiceItemId.create(new UniqueEntityID(parent.id))
@@ -429,19 +431,22 @@ export const invoice: Resolvers<any> = {
           coupon: couponRepo,
         },
       } = context;
+
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
         invoiceRepo,
         invoiceItemRepo,
         couponRepo
       );
+
       const result = await applyCouponUsecase.execute({
         couponCode: args.couponCode,
         invoiceId: args.invoiceId,
       });
+
       if (result.isLeft()) {
-        console.log(result);
-        throw new Error(result.value.errorValue().message);
+        return { error: result.value.errorValue().message };
       }
+
       return CouponMap.toPersistence(result.value.getValue());
     },
     async migrateInvoice(parent, args, context) {

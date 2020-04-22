@@ -43,162 +43,21 @@ import {
   UncontrolledModal,
   UncontrolledTabs,
 } from './../../../components';
+
 import { HeaderMain } from '../../components/HeaderMain';
-import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 import { TimelineMini } from '../../components/Timeline/TimelineMini';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
 
-import Config from '../../../config';
+import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
-const INVOICE_QUERY = `
-query invoice($id: ID) {
-  invoice(invoiceId: $id) {
-    ...invoiceFragment
-  }
-  getPaymentMethods {
-    ...paymentMethodFragment
-  }
-}
-fragment invoiceFragment on Invoice {
-  id: invoiceId
-  status
-  dateCreated
-  dateIssued
-  dateAccepted
-  referenceNumber
-  erpReference
-  revenueRecognitionReference
-  cancelledInvoiceReference
-  payer {
-    ...payerFragment
-  }
-  payments {
-    ...paymentFragment
-  }
-  invoiceItem {
-    id
-    price
-    type
-    rate
-    vat
-    vatnote
-    dateCreated
-    coupons {
-      ...couponFragment
-    }
-    waivers {
-      ...waiverFragment
-    }
-    article {
-      ...articleFragment
-    }
-  }
-  creditNote {
-    ...creditNoteFragment
-  }
-}
-fragment payerFragment on Payer {
-  id
-  type
-  name
-  email
-  vatId
-  organization
-  address {
-    ...addressFragment
-  }
-}
-fragment paymentFragment on Payment {
-  id
-  foreignPaymentId
-  amount
-  datePaid
-  paymentMethod {
-    ...paymentMethodFragment
-  }
-}
-fragment paymentMethodFragment on PaymentMethod {
-  id
-  name
-  isActive
-}
-fragment addressFragment on Address {
-  city
-  country
-  state
-  postalCode
-  addressLine1
-}
-fragment couponFragment on Coupon {
-  code
-  reduction
-}
-fragment waiverFragment on Waiver {
-  reduction
-  type_id
-}
-fragment articleFragment on Article {
-  id
-  title
-  created
-  articleType
-  authorCountry
-  authorEmail
-  customId
-  journalTitle
-  authorSurname
-  authorFirstName
-  journalTitle
-  datePublished
-}
-fragment creditNoteFragment on Invoice {
-  invoiceId
-  dateCreated
-  cancelledInvoiceReference
-  referenceNumber
-}
-`;
-
-const BANK_TRANSFER_MUTATION = `
-mutation bankTransferPayment (
-  $invoiceId: String!
-  $payerId: String!
-  $paymentMethodId: String!
-  $amount: Float!
-  $paymentReference: String!
-  $datePaid: String!
-  $markInvoiceAsPaid: Boolean
-) {
-  bankTransferPayment(
-    invoiceId: $invoiceId
-    payerId: $payerId
-    paymentMethodId: $paymentMethodId
-    paymentReference: $paymentReference
-    amount: $amount
-    datePaid: $datePaid
-    markInvoiceAsPaid: $markInvoiceAsPaid
-  ) {
-    id
-    foreignPaymentId
-  }
-}
-`;
-
-const CREATE_CREDIT_NOTE_MUTATION = `
-mutation createCreditNote (
-  $invoiceId: String!
-  $createDraft: Boolean!,
-) {
-  createCreditNote(
-    invoiceId: $invoiceId
-    createDraft: $createDraft
-  ) {
-    id
-  }
-}
-`;
+import {
+  INVOICE_QUERY,
+  BANK_TRANSFER_MUTATION,
+  CREATE_CREDIT_NOTE_MUTATION,
+  APPLY_COUPON_MUTATION,
+} from '../graphql';
 
 const Details = () => {
   const { id } = useParams();
@@ -216,6 +75,7 @@ const Details = () => {
     paymentAmount: 0,
     paymentReference: '',
   });
+
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,
@@ -235,7 +95,6 @@ const Details = () => {
     return <div>Something Bad Happened</div>;
 
   const { invoice, getPaymentMethods } = data;
-  // console.info(invoice);
 
   const { coupons, waivers, price } = invoice?.invoiceItem;
   let netCharges = price;
@@ -307,7 +166,6 @@ const Details = () => {
           title={`Invoice #${invoice.referenceNumber}`}
           className='mb-1 mt-0'
         />
-        {/* START Header 1 */}
         <Row>
           <Col lg={12}>
             <div className='d-flex mb-3'>
@@ -533,12 +391,7 @@ const Details = () => {
                       {/* END Form */}
                     </ModalBody>
                   </ModalDropdown>
-                  //   </DropdownMenu>
-                  // </UncontrolledButtonDropdown>
                 )}
-                {/* <Button color='secondary' className='mr-2' outline disabled>
-                  Split Payment
-                </Button> */}
                 {invoice.creditNote === null &&
                   (invoice.status === 'ACTIVE' ||
                     invoice.status === 'FINAL') && (
@@ -553,9 +406,7 @@ const Details = () => {
                 <UncontrolledModal target='modalCreateCreditNote' centered>
                   <ModalHeader tag='h4'>Create Credit Note</ModalHeader>
                   <ModalBody>
-                    {/* START Form */}
                     <Form>
-                      {/* START Input */}
                       <FormGroup row>
                         <Label sm={4}>Issue Date</Label>
                         <Col sm={8}>
@@ -574,32 +425,6 @@ const Details = () => {
                           </InputGroup>
                         </Col>
                       </FormGroup>
-                      {/* END Input */}
-                      {/* START Amount Input */}
-                      {/* <FormGroup row>
-                        <Label for='bothAddon' sm={4}>
-                          Payment Amount
-                        </Label>
-                        <Col sm={8}>
-                          <InputGroup>
-                            <InputGroupAddon addonType='prepend'>
-                              $
-                            </InputGroupAddon>
-                            <Input
-                              placeholder='Amount...'
-                              id='bothAddon'
-                              onChange={e => {
-                                const { name, value } = e.target;
-                                setBankTransferPaymentData({
-                                  ...bankTransferPaymentData,
-                                  paymentAmount: value
-                                });
-                              }}
-                            />
-                          </InputGroup>
-                        </Col>
-                      </FormGroup> */}
-                      {/* END Amount Input */}
                       <FormGroup row>
                         {invoice?.invoiceItem && (
                           <>
@@ -780,7 +605,6 @@ const Details = () => {
                         }}
                       >
                         <div style={{ flex: 1 }} className='mr-2'>
-                          {/* START Input */}
                           <FormGroup row>
                             <Label sm={5}>Invoice Issue Date</Label>
                             <Col sm={7}>
@@ -791,7 +615,6 @@ const Details = () => {
                               />
                             </Col>
                           </FormGroup>
-                          {/* END Input */}
                           <FormGroup row>
                             <Label sm={5}>Date of Supply</Label>
                             <Col sm={7}>
@@ -871,11 +694,9 @@ const Details = () => {
                           </FormGroup>
                         </div>
                       </Form>
-                      {/* END Form */}
 
                       <CardTitle tag='h6' className='mt-5 mb-4'>
                         Invoice: Charges
-                        {/* <span className='small ml-1 text-muted'>#02</span> */}
                       </CardTitle>
                       <Table className='mb-0' responsive>
                         <thead className='thead-light'>
@@ -996,7 +817,6 @@ const Details = () => {
                                 (+{invoice?.invoiceItem?.vat}%)
                               </span>
                             </td>
-                            {/* <td>Really?</td> */}
                             <td className='align-middle text-right text-dark font-weight-bold'>
                               {numeral(vat.toFixed(2)).format('$0.00')}
                             </td>
@@ -1006,7 +826,6 @@ const Details = () => {
                             <td className='align-middle h4 text-uppercase text-dark font-weight-bold'>
                               Total
                             </td>
-                            {/* <td>Really?</td> */}
                             <td className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
                               {numeral(total.toFixed(2)).format('$0.00')}
                             </td>
@@ -1015,9 +834,6 @@ const Details = () => {
                       </Table>
                       <CardTitle tag='h6' className='mt-5 mb-4'>
                         Invoice: Payments
-                        {/* <span className='small ml-1 text-muted'>
-                          #{invoice?.payment?.paymentMethod?.id}
-                        </span> */}
                       </CardTitle>
                       {invoice?.payments?.length === 0 && (
                         <span className='medium text-muted'>
@@ -1159,10 +975,10 @@ const Details = () => {
             </UncontrolledTabs>
           </Col>
           <Col lg={4}>
-            {/* START Card Widget */}
             <Card className='mb-3'>
               <CardBody>
                 <CardTitle tag='h6'>Timeline</CardTitle>
+
                 {invoice?.dateCreated && (
                   <TimelineMini
                     icon='circle'
@@ -1175,19 +991,6 @@ const Details = () => {
                     phrase={'Invoice enters DRAFT state.'}
                   />
                 )}
-                {invoice?.dateAccepted && (
-                  <TimelineMini
-                    icon='check-circle'
-                    iconClassName='text-pink'
-                    badgeTitle='Accepted'
-                    badgeColor='pink'
-                    date={format(
-                      new Date(invoice?.dateAccepted),
-                      'dd MMMM yyyy'
-                    )}
-                    phrase={'Transaction set to ACTIVE.'}
-                  />
-                )}
                 {invoice?.dateIssued && (
                   <TimelineMini
                     icon='times-circle'
@@ -1198,6 +1001,7 @@ const Details = () => {
                     phrase={'Invoice enters ACTIVE state.'}
                   />
                 )}
+
                 {invoice?.payments?.length > 0 && (
                   <TimelineMini
                     icon='check-circle'
@@ -1213,6 +1017,7 @@ const Details = () => {
                     phrase={'Invoice enters FINAL state.'}
                   />
                 )}
+
                 {invoice?.creditNote && (
                   <TimelineMini
                     icon='check-circle'
@@ -1226,6 +1031,7 @@ const Details = () => {
                     phrase={'Credit Note issued.'}
                   />
                 )}
+
                 {invoice?.invoiceItem?.article?.datePublished && (
                   <TimelineMini
                     icon='play-circle'
@@ -1241,7 +1047,6 @@ const Details = () => {
                 )}
               </CardBody>
             </Card>
-            {/* END Card Widget */}
           </Col>
         </Row>
       </Container>

@@ -36,6 +36,7 @@ const Coupon = props => (
     </Media>
   </Media>
 );
+
 Coupon.propTypes = {
   code: PropTypes.string,
   reduction: PropTypes.number,
@@ -45,6 +46,7 @@ Coupon.propTypes = {
   BgIcon: PropTypes.node,
   BgIconClassName: PropTypes.node
 };
+
 Coupon.defaultProps = {
   code: '',
   reduction: 0,

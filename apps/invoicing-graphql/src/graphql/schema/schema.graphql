@@ -6,6 +6,10 @@ scalar Name
 directive @model(id: ID) on OBJECT
 directive @filter(key: Name) on FIELD_DEFINITION
 
+type Error {
+  error: String
+}
+
 enum InvoiceStatus {
   DRAFT
   PENDING
@@ -172,6 +176,8 @@ type Coupon {
   code: String
 }
 
+union ApplyCouponResult = Coupon | Error
+
 type Waiver {
   reduction: Float
   type_id: String
@@ -271,7 +277,7 @@ type Query {
 
 type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
-  applyCoupon(invoiceId: ID, couponCode: String): Coupon
+  applyCoupon(invoiceId: ID, couponCode: String): ApplyCouponResult
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: ID!): Boolean
   setTransactionToActive(customId: ID): Transaction

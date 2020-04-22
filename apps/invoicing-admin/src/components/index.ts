@@ -1,5 +1,4 @@
 import Accordion from './Accordion';
-import Alerts from './Alerts';
 import Avatar, { AvatarAddOn } from './Avatar';
 import Card from './Card';
 import CardHeader from './CardHeader';
@@ -46,7 +45,6 @@ import Wizard from './Wizard';
 
 // Export non overriden Reactstrap components
 export {
-  Alert,
   Badge,
   Breadcrumb,
   BreadcrumbItem,
@@ -122,7 +120,6 @@ export {
 
 export {
   Accordion,
-  // App,
   Avatar,
   AvatarAddOn,
   Card,
