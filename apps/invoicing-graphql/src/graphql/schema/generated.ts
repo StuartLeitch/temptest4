@@ -3,137 +3,24 @@ export type Maybe<T> = T | null;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string,
-  String: string,
-  Boolean: boolean,
-  Int: number,
-  Float: number,
-  ReferenceNumber: any,
-  Date: any,
-  Name: any,
+  ID: string;
+  String: string;
+  Boolean: boolean;
+  Int: number;
+  Float: number;
+  Date: any;
+  ReferenceNumber: any;
+  Name: any;
 };
 
 
 
-export type Address = {
-   __typename?: 'Address',
-  city?: Maybe<Scalars['String']>,
-  country?: Maybe<Scalars['String']>,
-  state?: Maybe<Scalars['String']>,
-  postalCode?: Maybe<Scalars['String']>,
-  addressLine1?: Maybe<Scalars['String']>,
-};
-
-export type AddressInput = {
-  city?: Maybe<Scalars['String']>,
-  country?: Maybe<Scalars['String']>,
-  state?: Maybe<Scalars['String']>,
-  postalCode?: Maybe<Scalars['String']>,
-  addressLine1?: Maybe<Scalars['String']>,
-};
-
-export type Article = {
-   __typename?: 'Article',
-  id?: Maybe<Scalars['String']>,
-  journalId?: Maybe<Scalars['ID']>,
-  journalTitle?: Maybe<Scalars['String']>,
-  customId?: Maybe<Scalars['ID']>,
-  created?: Maybe<Scalars['Date']>,
-  title?: Maybe<Scalars['String']>,
-  articleType?: Maybe<Scalars['String']>,
-  authorEmail?: Maybe<Scalars['String']>,
-  authorCountry?: Maybe<Scalars['String']>,
-  authorSurname?: Maybe<Scalars['String']>,
-  authorFirstName?: Maybe<Scalars['String']>,
-  datePublished?: Maybe<Scalars['Date']>,
-};
-
-export type ArticleFilters = {
-  journalId?: Maybe<Array<Maybe<Scalars['ID']>>>,
-  customId?: Maybe<Array<Maybe<Scalars['ID']>>>,
-};
-
-export type ClientToken = {
-   __typename?: 'ClientToken',
-  token: Scalars['String'],
-};
-
-export type Coupon = {
-   __typename?: 'Coupon',
-  reduction?: Maybe<Scalars['Float']>,
-  code?: Maybe<Scalars['String']>,
-};
-
-export type CreditCardInput = {
-  amount: Scalars['Float'],
-  cardNumber: Scalars['String'],
-  expiration: Scalars['String'],
-  cvv: Scalars['String'],
-  postalCode?: Maybe<Scalars['String']>,
-};
-
-export type CreditNote = {
-   __typename?: 'CreditNote',
-  id: Scalars['String'],
-  cancelledInvoiceReference: Scalars['ID'],
-};
 
 
-export type Invoice = {
-   __typename?: 'Invoice',
-  invoiceId?: Maybe<Scalars['ID']>,
-  dateCreated?: Maybe<Scalars['String']>,
-  dateChanged?: Maybe<Scalars['String']>,
-  dateIssued?: Maybe<Scalars['String']>,
-  dateAccepted?: Maybe<Scalars['String']>,
-  vat?: Maybe<Scalars['Float']>,
-  charge?: Maybe<Scalars['Float']>,
-  status?: Maybe<InvoiceStatus>,
-  payer?: Maybe<Payer>,
-  erpReference?: Maybe<Scalars['String']>,
-  revenueRecognitionReference?: Maybe<Scalars['String']>,
-  referenceNumber?: Maybe<Scalars['ReferenceNumber']>,
-  cancelledInvoiceReference?: Maybe<Scalars['ID']>,
-  invoiceItem?: Maybe<InvoiceItem>,
-  title?: Maybe<Scalars['String']>,
-  price?: Maybe<Scalars['Float']>,
-  customId?: Maybe<Scalars['ID']>,
-  type?: Maybe<Scalars['String']>,
-  payment?: Maybe<Payment>,
-  payments?: Maybe<Array<Maybe<Payment>>>,
-  creditNote?: Maybe<Invoice>,
-};
 
-export type InvoiceFilters = {
-  invoiceStatus?: Maybe<Array<Maybe<InvoiceStatus>>>,
-  transactionStatus?: Maybe<Array<Maybe<TransactionStatus>>>,
-  referenceNumber?: Maybe<Array<Maybe<Scalars['ReferenceNumber']>>>,
-  invoiceItem?: Maybe<InvoiceItemFilters>,
-};
-
-export type InvoiceId = {
-   __typename?: 'InvoiceId',
-  invoiceId?: Maybe<Array<Maybe<Scalars['ID']>>>,
-};
-
-export type InvoiceItem = {
-   __typename?: 'InvoiceItem',
-  id?: Maybe<Scalars['String']>,
-  invoiceId?: Maybe<Scalars['ID']>,
-  manuscriptId?: Maybe<Scalars['ID']>,
-  type?: Maybe<Scalars['String']>,
-  price?: Maybe<Scalars['Float']>,
-  rate?: Maybe<Scalars['Float']>,
-  vat?: Maybe<Scalars['Float']>,
-  vatnote?: Maybe<Scalars['String']>,
-  article?: Maybe<Article>,
-  dateCreated?: Maybe<Scalars['Date']>,
-  coupons?: Maybe<Array<Maybe<Coupon>>>,
-  waivers?: Maybe<Array<Maybe<Waiver>>>,
-};
-
-export type InvoiceItemFilters = {
-  article?: Maybe<ArticleFilters>,
+export type Error = {
+   __typename?: 'Error';
+  error?: Maybe<Scalars['String']>;
 };
 
 export enum InvoiceStatus {
@@ -143,307 +30,26 @@ export enum InvoiceStatus {
   FINAL = 'FINAL'
 }
 
-export type InvoiceVat = {
-   __typename?: 'InvoiceVat',
-  vatPercentage?: Maybe<Scalars['Float']>,
-  vatNote?: Maybe<Scalars['String']>,
-  rate?: Maybe<Scalars['Float']>,
+export type Article = {
+   __typename?: 'Article';
+  id?: Maybe<Scalars['String']>;
+  journalId?: Maybe<Scalars['ID']>;
+  journalTitle?: Maybe<Scalars['String']>;
+  customId?: Maybe<Scalars['ID']>;
+  created?: Maybe<Scalars['Date']>;
+  title?: Maybe<Scalars['String']>;
+  articleType?: Maybe<Scalars['String']>;
+  authorEmail?: Maybe<Scalars['String']>;
+  authorCountry?: Maybe<Scalars['String']>;
+  authorSurname?: Maybe<Scalars['String']>;
+  authorFirstName?: Maybe<Scalars['String']>;
+  datePublished?: Maybe<Scalars['Date']>;
 };
-
-
-export enum ReminderType {
-  REMINDER_CONFIRMATION = 'REMINDER_CONFIRMATION',
-  SANCTIONED_COUNTRY = 'SANCTIONED_COUNTRY',
-  REMINDER_PAYMENT = 'REMINDER_PAYMENT',
-  INVOICE_CREATED = 'INVOICE_CREATED'
-}
-
-export type RemindersStatus = {
-  __typename?: 'RemindersStatus',
-  confirmation: Scalars['Boolean'],
-  payment: Scalars['Boolean']
-}
-
-export type SentReminder = {
-  __typename?: 'SentReminder',
-  forInvoice: Scalars['ID'],
-  toEmail: Scalars['String']
-  when: Scalars['Date']
-  type: ReminderType
-}
-
-
-
-export type Journal = {
-   __typename?: 'Journal',
-  journalId?: Maybe<Scalars['ID']>,
-  journalTitle?: Maybe<Scalars['String']>,
-};
-
-export type MigrateApc = {
-  invoiceReference?: Maybe<Scalars['String']>,
-  paymentAmount?: Maybe<Scalars['Float']>,
-  manuscriptId: Scalars['String'],
-  discount?: Maybe<Scalars['Float']>,
-  price: Scalars['Float'],
-  vat?: Maybe<Scalars['Float']>,
-};
-
-export type MigratePayer = {
-  vatRegistrationNumber?: Maybe<Scalars['String']>,
-  address: MigratePayerAddress,
-  organization?: Maybe<Scalars['String']>,
-  email: Scalars['String'],
-  name: Scalars['String'],
-  type: Scalars['String'],
-};
-
-export type MigratePayerAddress = {
-  addressLine2?: Maybe<Scalars['String']>,
-  addressLine1: Scalars['String'],
-  countryCode: Scalars['String'],
-  state?: Maybe<Scalars['String']>,
-  city: Scalars['String'],
-};
-
-export type Mutation = {
-   __typename?: 'Mutation',
-  confirmInvoice: Payer,
-  applyCoupon?: Maybe<Coupon>,
-  createInvoice?: Maybe<Invoice>,
-  deleteInvoice?: Maybe<Scalars['Boolean']>,
-  setTransactionToActive?: Maybe<Transaction>,
-  creditCardPayment: Payment,
-  bankTransferPayment: Payment,
-  createCreditNote: CreditNote,
-  recordPayPalPayment: Payment,
-  migratePayment: Payment,
-  migrateInvoice?: Maybe<Invoice>,
-  migrateEntireInvoice?: Maybe<Scalars['String']>,
-  generateCompensatoryEvents?: Maybe<Scalars['String']>,
-  togglePauseConfirmationReminders?: RemindersStatus,
-  togglePausePaymentReminders?: RemindersStatus,
-  generateMissingReminderJobs?: Maybe<Scalars['String']>
-};
-
-
-export type MutationConfirmInvoiceArgs = {
-  payer: PayerInput
-};
-
-
-export type MutationApplyCouponArgs = {
-  invoiceId?: Maybe<Scalars['ID']>,
-  couponCode?: Maybe<Scalars['String']>
-};
-
-
-export type MutationCreateInvoiceArgs = {
-  totalAmount?: Maybe<Scalars['Float']>
-};
-
-
-export type MutationDeleteInvoiceArgs = {
-  id: Scalars['ID']
-};
-
-
-export type MutationSetTransactionToActiveArgs = {
-  customId?: Maybe<Scalars['ID']>
-};
-
-
-export type MutationCreditCardPaymentArgs = {
-  invoiceId: Scalars['ID'],
-  payerId: Scalars['String'],
-  paymentMethodId: Scalars['String'],
-  paymentMethodNonce: Scalars['String'],
-  amount: Scalars['Float']
-};
-
-
-export type MutationBankTransferPaymentArgs = {
-  invoiceId: Scalars['String'],
-  payerId: Scalars['String'],
-  paymentMethodId: Scalars['String'],
-  paymentReference: Scalars['String'],
-  amount: Scalars['Float'],
-  datePaid: Scalars['String'],
-  markInvoiceAsPaid?: Maybe<Scalars['Boolean']>
-};
-
-
-export type MutationCreateCreditNoteArgs = {
-  invoiceId: Scalars['String'],
-  createDraft?: Maybe<Scalars['Boolean']>
-};
-
-
-export type MutationRecordPayPalPaymentArgs = {
-  paymentMethodId: Scalars['String'],
-  invoiceId: Scalars['ID'],
-  payerId: Scalars['String'],
-  orderId: Scalars['String']
-};
-
-
-export type MutationMigratePaymentArgs = {
-  invoiceId: Scalars['ID'],
-  payerId: Scalars['String'],
-  amount?: Maybe<Scalars['Float']>,
-  datePaid?: Maybe<Scalars['String']>
-};
-
-
-export type MutationMigrateInvoiceArgs = {
-  invoiceId: Scalars['ID'],
-  vatValue?: Maybe<Scalars['Float']>,
-  invoiceReference?: Maybe<Scalars['Float']>,
-  discount?: Maybe<Scalars['Float']>,
-  APC?: Maybe<Scalars['Float']>,
-  dateIssued?: Maybe<Scalars['String']>,
-  dateAccepted?: Maybe<Scalars['String']>
-};
-
-
-export type MutationMigrateEntireInvoiceArgs = {
-  acceptanceDate?: Maybe<Scalars['String']>,
-  submissionDate: Scalars['String'],
-  paymentDate?: Maybe<Scalars['String']>,
-  issueDate?: Maybe<Scalars['String']>,
-  erpReference?: Maybe<Scalars['String']>,
-  payer?: Maybe<MigratePayer>,
-  invoiceId: Scalars['String'],
-  apc: MigrateApc,
-  token: Scalars['String']
-};
-
-
-export type MutationGenerateCompensatoryEventsArgs = {
-  invoiceIds?: Maybe<Array<Maybe<Scalars['String']>>>,
-  journalIds?: Maybe<Array<Maybe<Scalars['String']>>>
-};
-
-
-export type MutationPauseRemindersArgs = {
-  state: Scalars['Boolean'],
-  invoiceId: Scalars['ID'],
-}
-
-
-export type PaginatedInvoices = {
-   __typename?: 'PaginatedInvoices',
-  totalCount?: Maybe<Scalars['Int']>,
-  invoices?: Maybe<Array<Maybe<Invoice>>>,
-};
-
-export type Pagination = {
-  offset?: Maybe<Scalars['Int']>,
-  limit?: Maybe<Scalars['Int']>,
-};
-
-export type Payer = {
-   __typename?: 'Payer',
-  id?: Maybe<Scalars['String']>,
-  type?: Maybe<PayerType>,
-  name?: Maybe<Scalars['String']>,
-  email?: Maybe<Scalars['String']>,
-  organization?: Maybe<Scalars['String']>,
-  address?: Maybe<Address>,
-  vatId?: Maybe<Scalars['String']>,
-};
-
-export type PayerInput = {
-  id?: Maybe<Scalars['String']>,
-  invoiceId?: Maybe<Scalars['String']>,
-  type?: Maybe<PayerType>,
-  name?: Maybe<Scalars['String']>,
-  email?: Maybe<Scalars['String']>,
-  organization?: Maybe<Scalars['String']>,
-  vatId?: Maybe<Scalars['String']>,
-  address?: Maybe<AddressInput>,
-};
-
-export enum PayerType {
-  INSTITUTION = 'INSTITUTION',
-  INDIVIDUAL = 'INDIVIDUAL'
-}
-
-export type Payment = {
-   __typename?: 'Payment',
-  id: Scalars['String'],
-  invoiceId?: Maybe<Scalars['String']>,
-  payerId?: Maybe<Scalars['String']>,
-  paymentMethodId?: Maybe<Scalars['String']>,
-  foreignPaymentId?: Maybe<Scalars['String']>,
-  paymentProof?: Maybe<Scalars['String']>,
-  amount?: Maybe<Scalars['Float']>,
-  datePaid?: Maybe<Scalars['Date']>,
-  paymentMethod?: Maybe<PaymentMethod>,
-};
-
-export type PaymentMethod = {
-   __typename?: 'PaymentMethod',
-  id: Scalars['String'],
-  name: Scalars['String'],
-  isActive?: Maybe<Scalars['Boolean']>,
-};
-
-export type Query = {
-   __typename?: 'Query',
-  getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>,
-  getClientToken?: Maybe<ClientToken>,
-  invoice?: Maybe<Invoice>,
-  invoiceVat?: Maybe<InvoiceVat>,
-  invoices?: Maybe<PaginatedInvoices>,
-  invoiceIdByManuscriptCustomId?: Maybe<InvoiceId>,
-  journals?: Maybe<Array<Maybe<Journal>>>,
-  echo?: Maybe<Scalars['String']>,
-};
-
-
-export type QueryInvoiceArgs = {
-  invoiceId?: Maybe<Scalars['ID']>
-};
-
-
-export type QueryInvoiceVatArgs = {
-  invoiceId?: Maybe<Scalars['ID']>,
-  country?: Maybe<Scalars['String']>,
-  state?: Maybe<Scalars['String']>,
-  postalCode?: Maybe<Scalars['String']>,
-  payerType?: Maybe<Scalars['String']>
-};
-
-
-export type QueryInvoicesArgs = {
-  filters?: Maybe<InvoiceFilters>,
-  pagination?: Maybe<Pagination>
-};
-
-
-export type QueryInvoiceIdByManuscriptCustomIdArgs = {
-  customId?: Maybe<Scalars['ID']>
-};
-
-
-export type QueryEchoArgs = {
-  value?: Maybe<Scalars['String']>
-};
-
-export type QueryInvoiceSentReminders = {
-  invoiceId: Scalars['ID']
-}
-
-export type QueryInvoiceRemindersStatus = {
-  invoiceId: Scalars['ID']
-}
-
 
 export type Transaction = {
-   __typename?: 'Transaction',
-  id?: Maybe<Scalars['String']>,
-  status?: Maybe<Scalars['String']>,
+   __typename?: 'Transaction';
+  id?: Maybe<Scalars['String']>;
+  status?: Maybe<Scalars['String']>;
 };
 
 export enum TransactionStatus {
@@ -452,22 +58,422 @@ export enum TransactionStatus {
   FINAL = 'FINAL'
 }
 
+export type InvoiceItem = {
+   __typename?: 'InvoiceItem';
+  id?: Maybe<Scalars['String']>;
+  invoiceId?: Maybe<Scalars['ID']>;
+  manuscriptId?: Maybe<Scalars['ID']>;
+  type?: Maybe<Scalars['String']>;
+  price?: Maybe<Scalars['Float']>;
+  rate?: Maybe<Scalars['Float']>;
+  vat?: Maybe<Scalars['Float']>;
+  vatnote?: Maybe<Scalars['String']>;
+  article?: Maybe<Article>;
+  dateCreated?: Maybe<Scalars['Date']>;
+  coupons?: Maybe<Array<Maybe<Coupon>>>;
+  waivers?: Maybe<Array<Maybe<Waiver>>>;
+};
+
+export type Invoice = {
+   __typename?: 'Invoice';
+  invoiceId?: Maybe<Scalars['ID']>;
+  dateCreated?: Maybe<Scalars['String']>;
+  dateChanged?: Maybe<Scalars['String']>;
+  dateIssued?: Maybe<Scalars['String']>;
+  dateAccepted?: Maybe<Scalars['String']>;
+  vat?: Maybe<Scalars['Float']>;
+  charge?: Maybe<Scalars['Float']>;
+  status?: Maybe<InvoiceStatus>;
+  payer?: Maybe<Payer>;
+  erpReference?: Maybe<Scalars['String']>;
+  revenueRecognitionReference?: Maybe<Scalars['String']>;
+  referenceNumber?: Maybe<Scalars['ReferenceNumber']>;
+  cancelledInvoiceReference?: Maybe<Scalars['ID']>;
+  invoiceItem?: Maybe<InvoiceItem>;
+  title?: Maybe<Scalars['String']>;
+  price?: Maybe<Scalars['Float']>;
+  customId?: Maybe<Scalars['ID']>;
+  type?: Maybe<Scalars['String']>;
+  payment?: Maybe<Payment>;
+  payments?: Maybe<Array<Maybe<Payment>>>;
+  creditNote?: Maybe<Invoice>;
+};
+
+export type InvoiceVat = {
+   __typename?: 'InvoiceVat';
+  vatPercentage?: Maybe<Scalars['Float']>;
+  vatNote?: Maybe<Scalars['String']>;
+  rate?: Maybe<Scalars['Float']>;
+};
+
+export type InvoiceId = {
+   __typename?: 'InvoiceId';
+  invoiceId?: Maybe<Array<Maybe<Scalars['ID']>>>;
+};
+
+export type AddressInput = {
+  city?: Maybe<Scalars['String']>;
+  country?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  postalCode?: Maybe<Scalars['String']>;
+  addressLine1?: Maybe<Scalars['String']>;
+};
+
+export type PayerInput = {
+  id?: Maybe<Scalars['String']>;
+  invoiceId?: Maybe<Scalars['String']>;
+  type?: Maybe<PayerType>;
+  name?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  organization?: Maybe<Scalars['String']>;
+  vatId?: Maybe<Scalars['String']>;
+  address?: Maybe<AddressInput>;
+};
+
+export type Journal = {
+   __typename?: 'Journal';
+  journalId?: Maybe<Scalars['ID']>;
+  journalTitle?: Maybe<Scalars['String']>;
+};
+
+export enum PayerType {
+  INSTITUTION = 'INSTITUTION',
+  INDIVIDUAL = 'INDIVIDUAL'
+}
+
+export type Payer = {
+   __typename?: 'Payer';
+  id?: Maybe<Scalars['String']>;
+  type?: Maybe<PayerType>;
+  name?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  organization?: Maybe<Scalars['String']>;
+  address?: Maybe<Address>;
+  vatId?: Maybe<Scalars['String']>;
+};
+
+export type Address = {
+   __typename?: 'Address';
+  city?: Maybe<Scalars['String']>;
+  country?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  postalCode?: Maybe<Scalars['String']>;
+  addressLine1?: Maybe<Scalars['String']>;
+};
+
+export type CreditCardInput = {
+  amount: Scalars['Float'];
+  cardNumber: Scalars['String'];
+  expiration: Scalars['String'];
+  cvv: Scalars['String'];
+  postalCode?: Maybe<Scalars['String']>;
+};
+
+export type Payment = {
+   __typename?: 'Payment';
+  id: Scalars['String'];
+  invoiceId?: Maybe<Scalars['String']>;
+  payerId?: Maybe<Scalars['String']>;
+  paymentMethodId?: Maybe<Scalars['String']>;
+  foreignPaymentId?: Maybe<Scalars['String']>;
+  paymentProof?: Maybe<Scalars['String']>;
+  amount?: Maybe<Scalars['Float']>;
+  datePaid?: Maybe<Scalars['Date']>;
+  paymentMethod?: Maybe<PaymentMethod>;
+};
+
+export type CreditNote = {
+   __typename?: 'CreditNote';
+  id: Scalars['String'];
+  cancelledInvoiceReference: Scalars['ID'];
+};
+
+export type PaymentMethod = {
+   __typename?: 'PaymentMethod';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  isActive?: Maybe<Scalars['Boolean']>;
+};
+
+export type Coupon = {
+   __typename?: 'Coupon';
+  reduction?: Maybe<Scalars['Float']>;
+  code?: Maybe<Scalars['String']>;
+  error?: Maybe<Scalars['String']>;
+};
+
 export type Waiver = {
-   __typename?: 'Waiver',
-  reduction?: Maybe<Scalars['Float']>,
-  type_id?: Maybe<Scalars['String']>,
+   __typename?: 'Waiver';
+  reduction?: Maybe<Scalars['Float']>;
+  type_id?: Maybe<Scalars['String']>;
+};
+
+export type ClientToken = {
+   __typename?: 'ClientToken';
+  token: Scalars['String'];
+};
+
+export type PaginatedInvoices = {
+   __typename?: 'PaginatedInvoices';
+  totalCount?: Maybe<Scalars['Int']>;
+  invoices?: Maybe<Array<Maybe<Invoice>>>;
+};
+
+export type RemindersStatus = {
+   __typename?: 'RemindersStatus';
+  confirmation?: Maybe<Scalars['Boolean']>;
+  payment?: Maybe<Scalars['Boolean']>;
+};
+
+export enum ReminderType {
+  REMINDER_CONFIRMATION = 'REMINDER_CONFIRMATION',
+  SANCTIONED_COUNTRY = 'SANCTIONED_COUNTRY',
+  REMINDER_PAYMENT = 'REMINDER_PAYMENT',
+  INVOICE_CREATED = 'INVOICE_CREATED'
+}
+
+export type SentReminder = {
+   __typename?: 'SentReminder';
+  forInvoice?: Maybe<Scalars['ID']>;
+  type?: Maybe<ReminderType>;
+  toEmail?: Maybe<Scalars['String']>;
+  when?: Maybe<Scalars['Date']>;
+};
+
+export type ArticleFilters = {
+  journalId?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  customId?: Maybe<Array<Maybe<Scalars['ID']>>>;
+};
+
+export type InvoiceItemFilters = {
+  article?: Maybe<ArticleFilters>;
+};
+
+export type InvoiceFilters = {
+  invoiceStatus?: Maybe<Array<Maybe<InvoiceStatus>>>;
+  transactionStatus?: Maybe<Array<Maybe<TransactionStatus>>>;
+  referenceNumber?: Maybe<Array<Maybe<Scalars['ReferenceNumber']>>>;
+  invoiceItem?: Maybe<InvoiceItemFilters>;
+};
+
+export type Pagination = {
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+};
+
+export type MigratePayerAddress = {
+  addressLine2?: Maybe<Scalars['String']>;
+  addressLine1: Scalars['String'];
+  countryCode: Scalars['String'];
+  state?: Maybe<Scalars['String']>;
+  city: Scalars['String'];
+};
+
+export type MigratePayer = {
+  vatRegistrationNumber?: Maybe<Scalars['String']>;
+  address: MigratePayerAddress;
+  organization?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
+  name: Scalars['String'];
+  type: Scalars['String'];
+};
+
+export type MigrateApc = {
+  invoiceReference?: Maybe<Scalars['String']>;
+  paymentAmount?: Maybe<Scalars['Float']>;
+  manuscriptId: Scalars['String'];
+  discount?: Maybe<Scalars['Float']>;
+  price: Scalars['Float'];
+  vat?: Maybe<Scalars['Float']>;
+};
+
+export type Query = {
+   __typename?: 'Query';
+  getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  getClientToken?: Maybe<ClientToken>;
+  invoice?: Maybe<Invoice>;
+  invoiceVat?: Maybe<InvoiceVat>;
+  invoices?: Maybe<PaginatedInvoices>;
+  invoiceIdByManuscriptCustomId?: Maybe<InvoiceId>;
+  journals?: Maybe<Array<Maybe<Journal>>>;
+  echo?: Maybe<Scalars['String']>;
+  remindersStatus?: Maybe<RemindersStatus>;
+  remindersSent?: Maybe<Array<Maybe<SentReminder>>>;
+};
+
+
+export type QueryInvoiceArgs = {
+  invoiceId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryInvoiceVatArgs = {
+  invoiceId?: Maybe<Scalars['ID']>;
+  country?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  postalCode?: Maybe<Scalars['String']>;
+  payerType?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryInvoicesArgs = {
+  filters?: Maybe<InvoiceFilters>;
+  pagination?: Maybe<Pagination>;
+};
+
+
+export type QueryInvoiceIdByManuscriptCustomIdArgs = {
+  customId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryEchoArgs = {
+  value?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryRemindersStatusArgs = {
+  invoiceId: Scalars['ID'];
+};
+
+
+export type QueryRemindersSentArgs = {
+  invoiceId: Scalars['ID'];
+};
+
+export type Mutation = {
+   __typename?: 'Mutation';
+  confirmInvoice: Payer;
+  applyCoupon?: Maybe<Coupon>;
+  createInvoice?: Maybe<Invoice>;
+  deleteInvoice?: Maybe<Scalars['Boolean']>;
+  setTransactionToActive?: Maybe<Transaction>;
+  creditCardPayment: Payment;
+  bankTransferPayment: Payment;
+  createCreditNote: CreditNote;
+  recordPayPalPayment: Payment;
+  migratePayment: Payment;
+  migrateInvoice?: Maybe<Invoice>;
+  migrateEntireInvoice?: Maybe<Scalars['String']>;
+  generateCompensatoryEvents?: Maybe<Scalars['String']>;
+  togglePauseConfirmationReminders?: Maybe<RemindersStatus>;
+  togglePausePaymentReminders?: Maybe<RemindersStatus>;
+  generateMissingReminderJobs: Scalars['String'];
+};
+
+
+export type MutationConfirmInvoiceArgs = {
+  payer: PayerInput;
+};
+
+
+export type MutationApplyCouponArgs = {
+  invoiceId?: Maybe<Scalars['ID']>;
+  couponCode?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationCreateInvoiceArgs = {
+  totalAmount?: Maybe<Scalars['Float']>;
+};
+
+
+export type MutationDeleteInvoiceArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationSetTransactionToActiveArgs = {
+  customId?: Maybe<Scalars['ID']>;
+};
+
+
+export type MutationCreditCardPaymentArgs = {
+  invoiceId: Scalars['ID'];
+  payerId: Scalars['String'];
+  paymentMethodId: Scalars['String'];
+  paymentMethodNonce: Scalars['String'];
+  amount: Scalars['Float'];
+};
+
+
+export type MutationBankTransferPaymentArgs = {
+  invoiceId: Scalars['String'];
+  payerId: Scalars['String'];
+  paymentMethodId: Scalars['String'];
+  paymentReference: Scalars['String'];
+  amount: Scalars['Float'];
+  datePaid: Scalars['String'];
+  markInvoiceAsPaid?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationCreateCreditNoteArgs = {
+  invoiceId: Scalars['String'];
+  createDraft?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationRecordPayPalPaymentArgs = {
+  paymentMethodId: Scalars['String'];
+  invoiceId: Scalars['ID'];
+  payerId: Scalars['String'];
+  orderId: Scalars['String'];
+};
+
+
+export type MutationMigratePaymentArgs = {
+  invoiceId: Scalars['ID'];
+  payerId: Scalars['String'];
+  amount?: Maybe<Scalars['Float']>;
+  datePaid?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationMigrateInvoiceArgs = {
+  invoiceId: Scalars['ID'];
+  vatValue?: Maybe<Scalars['Float']>;
+  invoiceReference?: Maybe<Scalars['Float']>;
+  discount?: Maybe<Scalars['Float']>;
+  APC?: Maybe<Scalars['Float']>;
+  dateIssued?: Maybe<Scalars['String']>;
+  dateAccepted?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationMigrateEntireInvoiceArgs = {
+  acceptanceDate?: Maybe<Scalars['String']>;
+  submissionDate: Scalars['String'];
+  paymentDate?: Maybe<Scalars['String']>;
+  issueDate?: Maybe<Scalars['String']>;
+  erpReference?: Maybe<Scalars['String']>;
+  payer?: Maybe<MigratePayer>;
+  invoiceId: Scalars['String'];
+  apc: MigrateApc;
+  token: Scalars['String'];
+};
+
+
+export type MutationGenerateCompensatoryEventsArgs = {
+  invoiceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+  journalIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type MutationTogglePauseConfirmationRemindersArgs = {
+  invoiceId: Scalars['ID'];
+  state: Scalars['Boolean'];
+};
+
+
+export type MutationTogglePausePaymentRemindersArgs = {
+  invoiceId: Scalars['ID'];
+  state: Scalars['Boolean'];
 };
 
 
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
-
-export type ResolverFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => Promise<TResult> | TResult;
 
 
 export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
@@ -478,6 +484,13 @@ export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
   | StitchingResolver<TResult, TParent, TContext, TArgs>;
+
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Promise<TResult> | TResult;
 
 export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -515,9 +528,9 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   parent: TParent,
   context: TContext,
   info: GraphQLResolveInfo
-) => Maybe<TTypes>;
+) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type isTypeOfResolverFn<T = {}> = (obj: T, info: GraphQLResolveInfo) => boolean;
+export type isTypeOfResolverFn<T = {}> = (obj: T, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
@@ -531,106 +544,120 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Query: ResolverTypeWrapper<{}>,
-  PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
   String: ResolverTypeWrapper<Scalars['String']>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
-  ClientToken: ResolverTypeWrapper<ClientToken>,
-  ID: ResolverTypeWrapper<Scalars['ID']>,
-  Invoice: ResolverTypeWrapper<Invoice>,
-  Float: ResolverTypeWrapper<Scalars['Float']>,
-  InvoiceStatus: InvoiceStatus,
-  Payer: ResolverTypeWrapper<Payer>,
-  PayerType: PayerType,
-  Address: ResolverTypeWrapper<Address>,
-  ReferenceNumber: ResolverTypeWrapper<Scalars['ReferenceNumber']>,
-  InvoiceItem: ResolverTypeWrapper<InvoiceItem>,
-  Article: ResolverTypeWrapper<Article>,
   Date: ResolverTypeWrapper<Scalars['Date']>,
+  ReferenceNumber: ResolverTypeWrapper<Scalars['ReferenceNumber']>,
+  ID: ResolverTypeWrapper<Scalars['ID']>,
+  Name: ResolverTypeWrapper<Scalars['Name']>,
+  Error: ResolverTypeWrapper<Error>,
+  InvoiceStatus: InvoiceStatus,
+  Article: ResolverTypeWrapper<Article>,
+  Transaction: ResolverTypeWrapper<Transaction>,
+  TransactionStatus: TransactionStatus,
+  InvoiceItem: ResolverTypeWrapper<InvoiceItem>,
+  Float: ResolverTypeWrapper<Scalars['Float']>,
+  Invoice: ResolverTypeWrapper<Invoice>,
+  InvoiceVat: ResolverTypeWrapper<InvoiceVat>,
+  InvoiceId: ResolverTypeWrapper<InvoiceId>,
+  AddressInput: AddressInput,
+  PayerInput: PayerInput,
+  Journal: ResolverTypeWrapper<Journal>,
+  PayerType: PayerType,
+  Payer: ResolverTypeWrapper<Payer>,
+  Address: ResolverTypeWrapper<Address>,
+  CreditCardInput: CreditCardInput,
+  Payment: ResolverTypeWrapper<Payment>,
+  CreditNote: ResolverTypeWrapper<CreditNote>,
+  PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
   Coupon: ResolverTypeWrapper<Coupon>,
   Waiver: ResolverTypeWrapper<Waiver>,
-  Payment: ResolverTypeWrapper<Payment>,
-  InvoiceVat: ResolverTypeWrapper<InvoiceVat>,
-  InvoiceFilters: InvoiceFilters,
-  TransactionStatus: TransactionStatus,
-  InvoiceItemFilters: InvoiceItemFilters,
-  ArticleFilters: ArticleFilters,
-  Pagination: Pagination,
-  Int: ResolverTypeWrapper<Scalars['Int']>,
+  ClientToken: ResolverTypeWrapper<ClientToken>,
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>,
-  InvoiceId: ResolverTypeWrapper<InvoiceId>,
-  Journal: ResolverTypeWrapper<Journal>,
-  Mutation: ResolverTypeWrapper<{}>,
-  PayerInput: PayerInput,
-  AddressInput: AddressInput,
-  Transaction: ResolverTypeWrapper<Transaction>,
-  CreditNote: ResolverTypeWrapper<CreditNote>,
-  MigratePayer: MigratePayer,
+  Int: ResolverTypeWrapper<Scalars['Int']>,
+  RemindersStatus: ResolverTypeWrapper<RemindersStatus>,
+  ReminderType: ReminderType,
+  SentReminder: ResolverTypeWrapper<SentReminder>,
+  ArticleFilters: ArticleFilters,
+  InvoiceItemFilters: InvoiceItemFilters,
+  InvoiceFilters: InvoiceFilters,
+  Pagination: Pagination,
   MigratePayerAddress: MigratePayerAddress,
+  MigratePayer: MigratePayer,
   MigrateAPC: MigrateApc,
-  Name: ResolverTypeWrapper<Scalars['Name']>,
-  CreditCardInput: CreditCardInput,
-  RemindersStatus: RemindersStatus,
-  SentReminder: SentReminder
+  Query: ResolverTypeWrapper<{}>,
+  Mutation: ResolverTypeWrapper<{}>,
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Query: {},
-  PaymentMethod: PaymentMethod,
   String: Scalars['String'],
   Boolean: Scalars['Boolean'],
-  ClientToken: ClientToken,
-  ID: Scalars['ID'],
-  Invoice: Invoice,
-  Float: Scalars['Float'],
-  InvoiceStatus: InvoiceStatus,
-  Payer: Payer,
-  PayerType: PayerType,
-  Address: Address,
-  ReferenceNumber: Scalars['ReferenceNumber'],
-  InvoiceItem: InvoiceItem,
-  Article: Article,
   Date: Scalars['Date'],
+  ReferenceNumber: Scalars['ReferenceNumber'],
+  ID: Scalars['ID'],
+  Name: Scalars['Name'],
+  Error: Error,
+  InvoiceStatus: InvoiceStatus,
+  Article: Article,
+  Transaction: Transaction,
+  TransactionStatus: TransactionStatus,
+  InvoiceItem: InvoiceItem,
+  Float: Scalars['Float'],
+  Invoice: Invoice,
+  InvoiceVat: InvoiceVat,
+  InvoiceId: InvoiceId,
+  AddressInput: AddressInput,
+  PayerInput: PayerInput,
+  Journal: Journal,
+  PayerType: PayerType,
+  Payer: Payer,
+  Address: Address,
+  CreditCardInput: CreditCardInput,
+  Payment: Payment,
+  CreditNote: CreditNote,
+  PaymentMethod: PaymentMethod,
   Coupon: Coupon,
   Waiver: Waiver,
-  Payment: Payment,
-  InvoiceVat: InvoiceVat,
-  InvoiceFilters: InvoiceFilters,
-  TransactionStatus: TransactionStatus,
-  InvoiceItemFilters: InvoiceItemFilters,
-  ArticleFilters: ArticleFilters,
-  Pagination: Pagination,
-  Int: Scalars['Int'],
+  ClientToken: ClientToken,
   PaginatedInvoices: PaginatedInvoices,
-  InvoiceId: InvoiceId,
-  Journal: Journal,
-  Mutation: {},
-  PayerInput: PayerInput,
-  AddressInput: AddressInput,
-  Transaction: Transaction,
-  CreditNote: CreditNote,
-  MigratePayer: MigratePayer,
+  Int: Scalars['Int'],
+  RemindersStatus: RemindersStatus,
+  ReminderType: ReminderType,
+  SentReminder: SentReminder,
+  ArticleFilters: ArticleFilters,
+  InvoiceItemFilters: InvoiceItemFilters,
+  InvoiceFilters: InvoiceFilters,
+  Pagination: Pagination,
   MigratePayerAddress: MigratePayerAddress,
+  MigratePayer: MigratePayer,
   MigrateAPC: MigrateApc,
-  Name: Scalars['Name'],
-  CreditCardInput: CreditCardInput,
+  Query: {},
+  Mutation: {},
 };
 
-export type ModelDirectiveArgs = {   id?: Maybe<Scalars['ID']> };
+export type ModelDirectiveArgs = {   id?: Maybe<Scalars['ID']>; };
 
 export type ModelDirectiveResolver<Result, Parent, ContextType = any, Args = ModelDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type FilterDirectiveArgs = {   key?: Maybe<Scalars['Name']> };
+export type FilterDirectiveArgs = {   key?: Maybe<Scalars['Name']>; };
 
 export type FilterDirectiveResolver<Result, Parent, ContextType = any, Args = FilterDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
-  city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  state?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  postalCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
+  name: 'Date'
+}
+
+export interface ReferenceNumberScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ReferenceNumber'], any> {
+  name: 'ReferenceNumber'
+}
+
+export interface NameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Name'], any> {
+  name: 'Name'
+}
+
+export type ErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = {
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -650,26 +677,27 @@ export type ArticleResolvers<ContextType = any, ParentType extends ResolversPare
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
-export type ClientTokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['ClientToken'] = ResolversParentTypes['ClientToken']> = {
-  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = {
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
-export type CouponResolvers<ContextType = any, ParentType extends ResolversParentTypes['Coupon'] = ResolversParentTypes['Coupon']> = {
-  reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
+  manuscriptId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  vatnote?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  article?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType>,
+  dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+  coupons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Coupon']>>>, ParentType, ContextType>,
+  waivers?: Resolver<Maybe<Array<Maybe<ResolversTypes['Waiver']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
-
-export type CreditNoteResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreditNote'] = ResolversParentTypes['CreditNote']> = {
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  cancelledInvoiceReference?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  __isTypeOf?: isTypeOfResolverFn<ParentType>,
-};
-
-export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
-  name: 'Date'
-}
 
 export type InvoiceResolvers<ContextType = any, ParentType extends ResolversParentTypes['Invoice'] = ResolversParentTypes['Invoice']> = {
   invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
@@ -696,27 +724,6 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
-export type InvoiceIdResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceId'] = ResolversParentTypes['InvoiceId']> = {
-  invoiceId?: Resolver<Maybe<Array<Maybe<ResolversTypes['ID']>>>, ParentType, ContextType>,
-  __isTypeOf?: isTypeOfResolverFn<ParentType>,
-};
-
-export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {
-  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
-  manuscriptId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
-  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
-  vatnote?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  article?: Resolver<Maybe<ResolversTypes['Article']>, ParentType, ContextType>,
-  dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
-  coupons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Coupon']>>>, ParentType, ContextType>,
-  waivers?: Resolver<Maybe<Array<Maybe<ResolversTypes['Waiver']>>>, ParentType, ContextType>,
-  __isTypeOf?: isTypeOfResolverFn<ParentType>,
-};
-
 export type InvoiceVatResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceVat'] = ResolversParentTypes['InvoiceVat']> = {
   vatPercentage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   vatNote?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -724,38 +731,14 @@ export type InvoiceVatResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
-export type JournalResolvers<ContextType = any, ParentType extends ResolversParentTypes['Journal'] = ResolversParentTypes['Journal']> = {
-  journalId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
-  journalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+export type InvoiceIdResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceId'] = ResolversParentTypes['InvoiceId']> = {
+  invoiceId?: Resolver<Maybe<Array<Maybe<ResolversTypes['ID']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
-export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
-  applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, MutationApplyCouponArgs>,
-  createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, MutationCreateInvoiceArgs>,
-  deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
-  setTransactionToActive?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, MutationSetTransactionToActiveArgs>,
-  creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentMethodNonce' | 'amount'>>,
-  bankTransferPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationBankTransferPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentReference' | 'amount' | 'datePaid'>>,
-  createCreditNote?: Resolver<ResolversTypes['CreditNote'], ParentType, ContextType, RequireFields<MutationCreateCreditNoteArgs, 'invoiceId'>>,
-  recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'paymentMethodId' | 'invoiceId' | 'payerId' | 'orderId'>>,
-  migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
-  migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
-  migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token'>>,
-  generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, MutationGenerateCompensatoryEventsArgs>,
-  togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, MutationPauseRemindersArgs>,
-  togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, MutationPauseRemindersArgs>,
-  generateMissingReminderJobs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, unknown>
-};
-
-export interface NameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Name'], any> {
-  name: 'Name'
-}
-
-export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {
-  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+export type JournalResolvers<ContextType = any, ParentType extends ResolversParentTypes['Journal'] = ResolversParentTypes['Journal']> = {
+  journalId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
+  journalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -767,6 +750,15 @@ export type PayerResolvers<ContextType = any, ParentType extends ResolversParent
   organization?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   address?: Resolver<Maybe<ResolversTypes['Address']>, ParentType, ContextType>,
   vatId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
+export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
+  city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  state?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  postalCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  addressLine1?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -783,6 +775,12 @@ export type PaymentResolvers<ContextType = any, ParentType extends ResolversPare
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
+export type CreditNoteResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreditNote'] = ResolversParentTypes['CreditNote']> = {
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  cancelledInvoiceReference?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
 export type PaymentMethodResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaymentMethod'] = ResolversParentTypes['PaymentMethod']> = {
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
@@ -790,26 +788,10 @@ export type PaymentMethodResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  getPaymentMethods?: Resolver<Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>, ParentType, ContextType>,
-  getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>,
-  invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, QueryInvoiceArgs>,
-  invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, QueryInvoiceVatArgs>,
-  invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, QueryInvoicesArgs>,
-  invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, QueryInvoiceIdByManuscriptCustomIdArgs>,
-  journals?: Resolver<Maybe<Array<Maybe<ResolversTypes['Journal']>>>, ParentType, ContextType>,
-  echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, QueryEchoArgs>,
-  remindersStatus?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, QueryInvoiceRemindersStatus>,
-  remindersSent?: Resolver<Maybe<Array<ResolversTypes['SentReminder']>>, ParentType, ContextType, QueryInvoiceSentReminders>,
-};
-
-export interface ReferenceNumberScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ReferenceNumber'], any> {
-  name: 'ReferenceNumber'
-}
-
-export type TransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = {
-  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+export type CouponResolvers<ContextType = any, ParentType extends ResolversParentTypes['Coupon'] = ResolversParentTypes['Coupon']> = {
+  reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -819,28 +801,88 @@ export type WaiverResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
+export type ClientTokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['ClientToken'] = ResolversParentTypes['ClientToken']> = {
+  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
+export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {
+  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
+export type RemindersStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemindersStatus'] = ResolversParentTypes['RemindersStatus']> = {
+  confirmation?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
+  payment?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
+export type SentReminderResolvers<ContextType = any, ParentType extends ResolversParentTypes['SentReminder'] = ResolversParentTypes['SentReminder']> = {
+  forInvoice?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
+  type?: Resolver<Maybe<ResolversTypes['ReminderType']>, ParentType, ContextType>,
+  toEmail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  when?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getPaymentMethods?: Resolver<Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>, ParentType, ContextType>,
+  getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>,
+  invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceArgs, never>>,
+  invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, RequireFields<QueryInvoiceVatArgs, never>>,
+  invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, RequireFields<QueryInvoicesArgs, never>>,
+  invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, RequireFields<QueryInvoiceIdByManuscriptCustomIdArgs, never>>,
+  journals?: Resolver<Maybe<Array<Maybe<ResolversTypes['Journal']>>>, ParentType, ContextType>,
+  echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryEchoArgs, never>>,
+  remindersStatus?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<QueryRemindersStatusArgs, 'invoiceId'>>,
+  remindersSent?: Resolver<Maybe<Array<Maybe<ResolversTypes['SentReminder']>>>, ParentType, ContextType, RequireFields<QueryRemindersSentArgs, 'invoiceId'>>,
+};
+
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
+  applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationApplyCouponArgs, never>>,
+  createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationCreateInvoiceArgs, never>>,
+  deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
+  setTransactionToActive?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<MutationSetTransactionToActiveArgs, never>>,
+  creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentMethodNonce' | 'amount'>>,
+  bankTransferPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationBankTransferPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentReference' | 'amount' | 'datePaid'>>,
+  createCreditNote?: Resolver<ResolversTypes['CreditNote'], ParentType, ContextType, RequireFields<MutationCreateCreditNoteArgs, 'invoiceId'>>,
+  recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'paymentMethodId' | 'invoiceId' | 'payerId' | 'orderId'>>,
+  migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
+  migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
+  migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token'>>,
+  generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateCompensatoryEventsArgs, never>>,
+  togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePauseConfirmationRemindersArgs, 'invoiceId' | 'state'>>,
+  togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePausePaymentRemindersArgs, 'invoiceId' | 'state'>>,
+  generateMissingReminderJobs?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+};
+
 export type Resolvers<ContextType = any> = {
-  Address?: AddressResolvers<ContextType>,
-  Article?: ArticleResolvers<ContextType>,
-  ClientToken?: ClientTokenResolvers<ContextType>,
-  Coupon?: CouponResolvers<ContextType>,
-  CreditNote?: CreditNoteResolvers<ContextType>,
   Date?: GraphQLScalarType,
-  Invoice?: InvoiceResolvers<ContextType>,
-  InvoiceId?: InvoiceIdResolvers<ContextType>,
-  InvoiceItem?: InvoiceItemResolvers<ContextType>,
-  InvoiceVat?: InvoiceVatResolvers<ContextType>,
-  Journal?: JournalResolvers<ContextType>,
-  Mutation?: MutationResolvers<ContextType>,
-  Name?: GraphQLScalarType,
-  PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>,
-  Payer?: PayerResolvers<ContextType>,
-  Payment?: PaymentResolvers<ContextType>,
-  PaymentMethod?: PaymentMethodResolvers<ContextType>,
-  Query?: QueryResolvers<ContextType>,
   ReferenceNumber?: GraphQLScalarType,
+  Name?: GraphQLScalarType,
+  Error?: ErrorResolvers<ContextType>,
+  Article?: ArticleResolvers<ContextType>,
   Transaction?: TransactionResolvers<ContextType>,
+  InvoiceItem?: InvoiceItemResolvers<ContextType>,
+  Invoice?: InvoiceResolvers<ContextType>,
+  InvoiceVat?: InvoiceVatResolvers<ContextType>,
+  InvoiceId?: InvoiceIdResolvers<ContextType>,
+  Journal?: JournalResolvers<ContextType>,
+  Payer?: PayerResolvers<ContextType>,
+  Address?: AddressResolvers<ContextType>,
+  Payment?: PaymentResolvers<ContextType>,
+  CreditNote?: CreditNoteResolvers<ContextType>,
+  PaymentMethod?: PaymentMethodResolvers<ContextType>,
+  Coupon?: CouponResolvers<ContextType>,
   Waiver?: WaiverResolvers<ContextType>,
+  ClientToken?: ClientTokenResolvers<ContextType>,
+  PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>,
+  RemindersStatus?: RemindersStatusResolvers<ContextType>,
+  SentReminder?: SentReminderResolvers<ContextType>,
+  Query?: QueryResolvers<ContextType>,
+  Mutation?: MutationResolvers<ContextType>,
 };
 
 
