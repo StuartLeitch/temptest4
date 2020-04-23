@@ -442,9 +442,6 @@ export const invoice: Resolvers<any> = {
         invoiceId: args.invoiceId,
       });
 
-      console.info(result);
-      console.log(result);
-
       if (result.isLeft()) {
         return { error: result.value.errorValue().message };
       }
