@@ -10,9 +10,9 @@ import {
 } from './migrateEntireInvoiceDTO';
 import {
   AllMigrateEntireInvoiceErrors,
-  MigrateEntireInvoiceErrors,
   PayerAddressErrors,
 } from './migrateEntireInvoiceErrors';
+import * as MigrateEntireInvoiceErrors from './migrateEntireInvoiceErrors';
 
 type ValidateMainRequestReturn = Either<
   MigrateEntireInvoiceErrors.InvoiceIdRequired,

@@ -748,7 +748,7 @@ export class MigrateEntireInvoiceUsecase
       })
       .then(async ({ paymentMethod, payer }) => {
         const paymentMethodId = paymentMethod.paymentMethodId.id.toString();
-        const payerId: string = payer ? payer.id.toString() : null;
+        const payerId: string = payer ? payer?.id.toString() : null;
         if (!request.apc.paymentAmount) {
           return right<null, null>(null);
         }
@@ -1074,7 +1074,8 @@ export class MigrateEntireInvoiceUsecase
       try {
         this.waiverRepo.attachWaiversToInvoice(
           [WaiverType.WAIVED_MIGRATION],
-          invoiceId
+          invoiceId,
+          request.invoice.dateIssued
         );
         return right<Errors.AddingMigrationWaiverError, DTO>(request);
       } catch (e) {

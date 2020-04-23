@@ -369,7 +369,7 @@ export type MutationConfirmInvoiceArgs = {
 export type MutationApplyCouponArgs = {
   invoiceId?: Maybe<Scalars['ID']>;
   couponCode?: Maybe<Scalars['String']>;
-};
+}
 
 
 export type MutationCreateInvoiceArgs = {

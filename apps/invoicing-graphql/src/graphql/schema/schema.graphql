@@ -327,6 +327,7 @@ type Mutation {
     invoiceId: String!
     apc: MigrateAPC!
     token: String!
+    status: String!
   ): String
   generateCompensatoryEvents(invoiceIds: [String], journalIds: [String]): String
   togglePauseConfirmationReminders(
