@@ -999,6 +999,7 @@ const Details = () => {
                     phrase={'Invoice enters DRAFT state.'}
                   />
                 )}
+
                 {invoice?.dateIssued && (
                   <TimelineMini
                     icon='times-circle'
