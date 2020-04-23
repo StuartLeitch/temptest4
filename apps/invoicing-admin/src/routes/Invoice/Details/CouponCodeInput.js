@@ -4,15 +4,14 @@ import { func } from 'prop-types';
 import { FormGroup, Input, FormFeedback } from '../../../components';
 
 const MAX_LENGTH = 10;
+const CODE_PATTERN = /^([A-Z0-9]{6,10})$/;
 
 const CouponCodeInput = ({ validationCallback, onChangeCallback }) => {
   const [isTouched, setTouched] = useState(false);
   const [isValid, setValid] = useState(false);
 
   const validateInput = (value) => {
-    const pattern = new RegExp('/^([A-Z0-9]{6,10})$/');
-
-    if (!value.match(/^([A-Z0-9]{6,10})$/)) {
+    if (!value.match(CODE_PATTERN)) {
       setValid(false);
       validationCallback(false);
       return;
@@ -53,6 +52,7 @@ const CouponCodeInput = ({ validationCallback, onChangeCallback }) => {
 
 CouponCodeInput.propTypes = {
   validationCallback: func,
+  onChangeCallback: func,
 };
 
 export default CouponCodeInput;

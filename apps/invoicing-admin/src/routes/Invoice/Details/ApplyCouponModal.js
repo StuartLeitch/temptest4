@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from 'graphql-hooks';
 import { func, string } from 'prop-types';
-
-import { APPLY_COUPON_MUTATION } from '../graphql';
-
 import { Button } from 'reactstrap';
 
 import {
@@ -12,6 +9,8 @@ import {
   ModalBody,
   ModalFooter,
 } from '../../../components';
+
+import { APPLY_COUPON_MUTATION } from '../graphql';
 
 import CouponCodeInput from './CouponCodeInput';
 
