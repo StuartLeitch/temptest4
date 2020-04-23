@@ -54,6 +54,8 @@ import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
 import ApplyCouponModal from './ApplyCouponModal';
 
+import Config from '../../../config';
+
 import {
   INVOICE_QUERY,
   BANK_TRANSFER_MUTATION,
@@ -66,11 +68,14 @@ const Details = () => {
   const { id } = useParams();
   const history = useHistory();
 
-  const { loading, error, data, refetch: invoiceQueryRefetch } = useQuery(INVOICE_QUERY, {
-    variables: {
-      id,
-    },
-  });
+  const { loading, error, data, refetch: invoiceQueryRefetch } = useQuery(
+    INVOICE_QUERY,
+    {
+      variables: {
+        id,
+      },
+    }
+  );
 
   const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
   const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
@@ -590,20 +595,16 @@ const Details = () => {
                         <a
                           target='_blank'
                           rel='noopener noreferrer'
-                          href={`${Config.feRoot}/payment-details/${invoice.id}`}
+                          href={`${Config.feRoot}/payment-details/${invoiceId}`}
                           className='ml-auto'
                         >
                           {
                             <span className='font-weight-normal text-underlined text-blue'>
-                              <u>#{invoice.id}</u>
+                              <u>#{invoiceId}</u>
                             </span>
                           }
                         </a>
-                        {/* <span className='small ml-1 text-muted'>
-                          #{invoice.id}
-                        </span> */}
                       </CardTitle>
-                      {/* START Form */}
                       <Form
                         style={{
                           justifyContent: 'space-between',
