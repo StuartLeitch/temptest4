@@ -119,7 +119,7 @@ export class ApplyCouponToInvoiceUsecase
         );
         if (existingCoupons.some((c) => c.couponId.equals(coupon.couponId))) {
           return left(
-            new ApplyCouponToInvoiceErrors.CouponAlreadyUsedError(
+            new ApplyCouponToInvoiceErrors.CouponAlreadyUsedForInvoiceError(
               request.couponCode
             )
           );

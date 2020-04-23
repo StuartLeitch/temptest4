@@ -66,7 +66,7 @@ const Details = () => {
   const { id } = useParams();
   const history = useHistory();
 
-  const { loading, error, data } = useQuery(INVOICE_QUERY, {
+  const { loading, error, data, refetch: invoiceQueryRefetch } = useQuery(INVOICE_QUERY, {
     variables: {
       id,
     },
@@ -1062,6 +1062,7 @@ const Details = () => {
       <ApplyCouponModal
         target={APPLY_COUPON_MODAL_TARGET}
         invoiceId={invoiceId}
+        onSuccessCallback={invoiceQueryRefetch}
       />
     </React.Fragment>
   );

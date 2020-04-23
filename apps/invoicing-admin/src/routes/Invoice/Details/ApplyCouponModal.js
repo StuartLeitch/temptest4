@@ -35,8 +35,14 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
         },
       });
 
+      console.log(applyCouponResult);
+
       const error = applyCouponResult.data.applyCoupon.error;
-      if (error) setError(error);
+      if (!error) {
+        onSuccessCallback();
+      } else {
+        setError(error);
+      }
     } catch (e) {
       console.log(e);
       setError('An error occured. Please try again.');
@@ -63,7 +69,7 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
       </ModalBody>
 
       <ModalFooter className='justify-content-between'>
-        <span className='medium text-muted text-warning'>{error}</span>
+        <span className='medium text-muted text-warning w-50'>{error}</span>
 
         <div>
           <UncontrolledModal.Close
