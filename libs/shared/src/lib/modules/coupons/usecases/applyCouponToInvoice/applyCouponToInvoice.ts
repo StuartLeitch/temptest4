@@ -17,7 +17,15 @@ import {
   InvoiceRepoContract,
 } from '../../../invoices/repos';
 import { ApplyCouponToInvoiceDTO } from './applyCouponToInvoiceDTO';
-import { ApplyCouponToInvoiceErrors } from './ApplyCouponToInvoiceErrors';
+import {
+  InvoiceNotFoundError,
+  InvoiceStatusInvalidError,
+  CouponNotFoundError,
+  CouponAlreadyUsedError,
+  CouponExpiredError,
+  CouponAlreadyUsedForInvoiceError,
+  CouponInvalidError,
+} from './applyCouponToInvoiceErrors';
 import { ApplyCouponToInvoiceResponse } from './applyCouponToInvoiceResponse';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
 
@@ -54,17 +62,12 @@ export class ApplyCouponToInvoiceUsecase
 
       const invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
       if (!invoice) {
-        return left(
-          new ApplyCouponToInvoiceErrors.InvoiceNotFoundError(request.invoiceId)
-        );
+        return left(new InvoiceNotFoundError(request.invoiceId));
       }
 
       if (invoice.status !== InvoiceStatus.DRAFT) {
         return left(
-          new ApplyCouponToInvoiceErrors.InvoiceStatusInvalidError(
-            request.couponCode,
-            request.invoiceId
-          )
+          new InvoiceStatusInvalidError(request.couponCode, request.invoiceId)
         );
       }
 
@@ -72,28 +75,20 @@ export class ApplyCouponToInvoiceUsecase
         invoiceId
       );
       if (!invoiceItems) {
-        return left(
-          new ApplyCouponToInvoiceErrors.InvoiceNotFoundError(request.invoiceId)
-        );
+        return left(new InvoiceNotFoundError(request.invoiceId));
       }
 
       const coupon = await this.couponRepo.getCouponByCode(couponCode);
 
       if (!coupon) {
-        return left(
-          new ApplyCouponToInvoiceErrors.CouponNotFoundError(request.couponCode)
-        );
+        return left(new CouponNotFoundError(request.couponCode));
       }
 
       if (
         coupon.couponType === CouponType.SINGLE_USE &&
         coupon.redeemCount > 0
       ) {
-        return left(
-          new ApplyCouponToInvoiceErrors.CouponAlreadyUsedError(
-            request.couponCode
-          )
-        );
+        return left(new CouponAlreadyUsedError(request.couponCode));
       }
 
       const now = new Date();
@@ -102,9 +97,7 @@ export class ApplyCouponToInvoiceUsecase
         coupon.couponType === CouponType.MULTIPLE_USE &&
         coupon.expirationDate < now
       ) {
-        return left(
-          new ApplyCouponToInvoiceErrors.CouponExpiredError(request.couponCode)
-        );
+        return left(new CouponExpiredError(request.couponCode));
       }
 
       let assignedCoupons = 0;
@@ -118,11 +111,7 @@ export class ApplyCouponToInvoiceUsecase
           invoiceItem.invoiceItemId
         );
         if (existingCoupons.some((c) => c.couponId.equals(coupon.couponId))) {
-          return left(
-            new ApplyCouponToInvoiceErrors.CouponAlreadyUsedForInvoiceError(
-              request.couponCode
-            )
-          );
+          return left(new CouponAlreadyUsedForInvoiceError(request.couponCode));
         }
 
         await this.couponRepo.assignCouponToInvoiceItem(
@@ -134,10 +123,7 @@ export class ApplyCouponToInvoiceUsecase
 
       if (assignedCoupons === 0) {
         return left(
-          new ApplyCouponToInvoiceErrors.CouponInvalidError(
-            request.couponCode,
-            request.invoiceId
-          )
+          new CouponInvalidError(request.couponCode, request.invoiceId)
         );
       }
 

@@ -26,6 +26,7 @@ export const BANK_TRANSFER_MUTATION = `
             datePaid: $datePaid
             markInvoiceAsPaid: $markInvoiceAsPaid
         ) {
+          id
           foreignPaymentId
         }
     }

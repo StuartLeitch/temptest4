@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
-import { useQuery, useMutation } from 'graphql-hooks';
+import React from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
 import DatePicker from 'react-datepicker';
 import format from 'date-fns/format';
 import numeral from 'numeral';
-// import subWeeks from 'date-fns/subWeeks';
-// import compareDesc from 'date-fns/compareDesc';
-// import { toast } from 'react-toastify';
 
 import {
   Accordion,
@@ -50,197 +47,25 @@ import {
   TabPane,
   UncontrolledButtonDropdown,
   UncontrolledModal,
-  UncontrolledTabs
+  UncontrolledTabs,
 } from './../../../components';
+
 import { HeaderMain } from '../../components/HeaderMain';
-// import { HeaderDemo } from '../../components/HeaderDemo';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 import { TimelineMini } from '../../components/Timeline/TimelineMini';
-// import { CardTextDemo } from '../../components/CardTextDemo';
-// import { TimelineDefault } from '../../components/Timeline/TimelineDefault';
-// import { DlRowContacts } from '../../components/Profile/DlRowContacts';
-// import { DlRowAddress } from '../../components/Profile/DlRowAddress';
-// import { TrTableMessages } from '../../Apps/ProfileDetails/components/TrTableMessages';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
-// import { Coupon } from '../../components/Invoice/Coupon';
 
-const INVOICE_QUERY = `
-query invoice($id: ID) {
-  invoice(invoiceId: $id) {
-    ...invoiceFragment
-  }
-}
-fragment invoiceFragment on Invoice {
-  id: invoiceId
-  status
-  dateCreated
-  dateIssued
-  dateAccepted
-  referenceNumber
-  erpReference
-  revenueRecognitionReference
-  cancelledInvoiceReference
-  payer {
-    ...payerFragment
-  }
-  payments {
-    ...paymentFragment
-  }
-  invoiceItem {
-    id
-    price
-    type
-    rate
-    vat
-    vatnote
-    dateCreated
-    coupons {
-      ...couponFragment
-    }
-    waivers {
-      ...waiverFragment
-    }
-    article {
-      ...articleFragment
-    }
-  }
-  creditNote {
-    ...creditNoteFragment
-  }
-}
-fragment payerFragment on Payer {
-  id
-  type
-  name
-  email
-  vatId
-  organization
-  address {
-    ...addressFragment
-  }
-}
-fragment paymentFragment on Payment {
-  id
-  foreignPaymentId
-  amount
-  datePaid
-  paymentMethod {
-    ...paymentMethodFragment
-  }
-}
-fragment paymentMethodFragment on PaymentMethod {
-  id
-  name
-}
-fragment addressFragment on Address {
-  city
-  country
-  state
-  postalCode
-  addressLine1
-}
-fragment couponFragment on Coupon {
-  code
-  reduction
-}
-fragment waiverFragment on Waiver {
-  reduction
-  type_id
-}
-fragment articleFragment on Article {
-  id
-  title
-  created
-  articleType
-  authorCountry
-  authorEmail
-  customId
-  journalTitle
-  authorSurname
-  authorFirstName
-  journalTitle
-  datePublished
-}
-fragment creditNoteFragment on Invoice {
-  invoiceId
-  dateCreated
-  cancelledInvoiceReference
-  referenceNumber
-}
-`;
-
-const GET_PAYMENT_METHODS_QUERY = `
-query {
-  getPaymentMethods {
-    ...paymentMethodFragment
-  }
-}
-
-fragment paymentMethodFragment on PaymentMethod {
-  id
-  name
-  isActive
-}
-`;
-
-const BANK_TRANSFER_MUTATION = `
-mutation bankTransferPayment (
-  $invoiceId: String!
-  $payerId: String!
-  $paymentMethodId: String!
-  $amount: Float!
-  $paymentReference: String!
-  $datePaid: String!
-  $markInvoiceAsPaid: Boolean
-) {
-  bankTransferPayment(
-    invoiceId: $invoiceId
-    payerId: $payerId
-    paymentMethodId: $paymentMethodId
-    paymentReference: $paymentReference
-    amount: $amount
-    datePaid: $datePaid
-    markInvoiceAsPaid: $markInvoiceAsPaid
-  ) {
-    id
-    foreignPaymentId
-  }
-}
-`;
-
-const CREATE_CREDIT_NOTE_MUTATION = `
-mutation createCreditNote (
-  $invoiceId: String!
-  $createDraft: Boolean!,
-) {
-  createCreditNote(
-    invoiceId: $invoiceId
-    createDraft: $createDraft
-  ) {
-    id
-  }
-}
-`;
+import { INVOICE_QUERY } from '../graphql';
 
 const Details = () => {
-  let { id } = useParams();
-  let history = useHistory();
+  const { id } = useParams();
 
   const { loading, error, data } = useQuery(INVOICE_QUERY, {
     variables: {
-      id
-    }
+      id,
+    },
   });
-  const { data: paymentMethods } = useQuery(GET_PAYMENT_METHODS_QUERY);
-  const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
-  const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
-    paymentDate: new Date(),
-    paymentAmount: 0,
-    paymentReference: ''
-  });
-  const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
-  const [creditNoteData, setCreditNoteData] = useState({});
 
   if (loading)
     return (
@@ -254,32 +79,34 @@ const Details = () => {
 
   if (error) return <div>Something Bad Happened</div>;
 
-  const { getPaymentMethods } = paymentMethods;
   const { invoice } = data;
-  console.info(invoice);
+  const { status: invoiceStatus, id: invoiceId } = invoice;
 
   const { coupons, waivers, price } = invoice?.invoiceItem;
   let netCharges = price;
+
   if (coupons?.length) {
     netCharges -= coupons.reduce(
       (acc, coupon) => acc + (coupon.reduction / 100) * price,
       0
     );
+
   }
   if (waivers?.length) {
     netCharges -= waivers.reduce(
       (acc, waiver) => acc + (waiver.reduction / 100) * price,
       0
     );
+
   }
   const vat = (netCharges / 100) * invoice?.invoiceItem?.vat;
   const total = netCharges + vat;
 
   let statusClassName = 'warning';
-  if (invoice.status === 'ACTIVE') {
+  if (invoiceStatus === 'ACTIVE') {
     statusClassName = 'primary';
   }
-  if (invoice.status === 'FINAL') {
+  if (invoiceStatus === 'FINAL') {
     statusClassName = 'success';
   }
 
@@ -304,7 +131,7 @@ const Details = () => {
                     <i
                       className={`fas fa-circle text-${statusClassName} mr-2`}
                     ></i>
-                    {invoice.status}
+                    {invoiceStatus}
                     <i className='fas fa-angle-down ml-2' />
                   </DropdownToggle>
                   <DropdownMenu right>
@@ -356,7 +183,7 @@ const Details = () => {
                       <CardTitle tag='h6' className='mb-4'>
                         Credit Note: Details
                         <span className='small ml-1 text-muted'>
-                          #{invoice.id}
+                          #{invoiceId}
                         </span>
                       </CardTitle>
                       {/* START Form */}
@@ -365,7 +192,7 @@ const Details = () => {
                           justifyContent: 'space-between',
                           alignItems: 'flex-start',
                           flexDirection: 'row',
-                          display: 'flex'
+                          display: 'flex',
                         }}
                       >
                         <div style={{ flex: 1 }} className='mr-2'>
@@ -463,7 +290,7 @@ const Details = () => {
                             </td>
                           </tr>
                           {invoice?.invoiceItem?.coupons?.length > 0 &&
-                            invoice.invoiceItem.coupons.map(coupon => (
+                            invoice.invoiceItem.coupons.map((coupon) => (
                               <tr>
                                 <td
                                   colSpan='2'
@@ -496,7 +323,7 @@ const Details = () => {
                               </tr>
                             ))}
                           {invoice?.invoiceItem?.waivers?.length > 0 &&
-                            invoice.invoiceItem.waivers.map(waiver => (
+                            invoice.invoiceItem.waivers.map((waiver) => (
                               <tr>
                                 <td
                                   colSpan='2'
@@ -574,7 +401,7 @@ const Details = () => {
                         </span>
                       )}
                       {invoice?.payments?.length > 0 &&
-                        invoice?.payments?.map(payment => {
+                        invoice?.payments?.map((payment) => {
                           const paymentMethod = payment?.paymentMethod?.name;
                           let paymentMethodClassName = '';
                           switch (paymentMethod) {

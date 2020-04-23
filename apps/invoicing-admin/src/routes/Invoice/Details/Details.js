@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 
 import React, { useState } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
 import DatePicker from 'react-datepicker';
@@ -53,6 +53,8 @@ import { InvoiceReminders } from '../../components/Invoice/reminders';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
 import ApplyCouponModal from './ApplyCouponModal';
+import SuccessfulPaymentToast from './SuccessfulPaymentToast';
+import SuccessfulCreditNoteCreatedToast from './SuccessfulCreditNoteCreatedToast';
 
 import Config from '../../../config';
 
@@ -66,7 +68,6 @@ const APPLY_COUPON_MODAL_TARGET = 'applyCouponModal';
 
 const Details = () => {
   const { id } = useParams();
-  const history = useHistory();
 
   const { loading, error, data, refetch: invoiceQueryRefetch } = useQuery(
     INVOICE_QUERY,
@@ -232,41 +233,7 @@ const Details = () => {
                         },
                       });
 
-                      return toast.success(({ closeToast }) => (
-                        <Media>
-                          <Media middle left className='mr-3'>
-                            <i className='fas fa-fw fa-2x fa-check'></i>
-                          </Media>
-                          <Media body>
-                            <Media heading tag='h6'>
-                              Success!
-                            </Media>
-                            <p>
-                              You successfully processed a bank transfer
-                              payment.
-                            </p>
-                            <div className='d-flex mt-2'>
-                              <Button
-                                color='success'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                              >
-                                Got it
-                              </Button>
-                              <Button
-                                color='link'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                                className='ml-2 text-success'
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </Media>
-                        </Media>
-                      ));
+                      return toast.success(SuccessfulPaymentToast);
                     }}
                     onSaveAndMarkInvoiceAsFinal={async () => {
                       await recordBankTransferPayment({
@@ -286,47 +253,13 @@ const Details = () => {
                         },
                       });
 
-                      return toast.success(({ closeToast }) => (
-                        <Media>
-                          <Media middle left className='mr-3'>
-                            <i className='fas fa-fw fa-2x fa-check'></i>
-                          </Media>
-                          <Media body>
-                            <Media heading tag='h6'>
-                              Success!
-                            </Media>
-                            <p>
-                              You successfully processed a bank transfer
-                              payment.
-                            </p>
-                            <div className='d-flex mt-2'>
-                              <Button
-                                color='success'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                              >
-                                Got it
-                              </Button>
-                              <Button
-                                color='link'
-                                onClick={() => {
-                                  closeToast;
-                                }}
-                                className='ml-2 text-success'
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </Media>
-                        </Media>
-                      ));
+                      return toast.success(SuccessfulPaymentToast);
                     }}
                   >
                     <ModalBody>
                       {/* START Form */}
                       <Form>
-                        {/* START Input */}
+                        {/* START Payment Date Input */}
                         <FormGroup row>
                           <Label sm={4}>Payment Date</Label>
                           <Col sm={8}>
@@ -345,7 +278,8 @@ const Details = () => {
                             </InputGroup>
                           </Col>
                         </FormGroup>
-                        {/* END Input */}
+                        {/* END Payment Date Input */}
+
                         {/* START Amount Input */}
                         <FormGroup row>
                           <Label for='bothAddon' sm={4}>
@@ -371,6 +305,7 @@ const Details = () => {
                           </Col>
                         </FormGroup>
                         {/* END Amount Input */}
+
                         <FormGroup row>
                           <Label for='staticText' sm={4}>
                             Payment Method
@@ -379,6 +314,7 @@ const Details = () => {
                             <Input plaintext readOnly value={'Bank Transfer'} />
                           </Col>
                         </FormGroup>
+
                         <FormGroup row>
                           <Label for='staticText' sm={4}>
                             Payment Reference
@@ -401,6 +337,7 @@ const Details = () => {
                     </ModalBody>
                   </ModalDropdown>
                 )}
+
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') && (
                     <Button
@@ -411,6 +348,7 @@ const Details = () => {
                       Create Credit Note
                     </Button>
                   )}
+
                 <UncontrolledModal target='modalCreateCreditNote' centered>
                   <ModalHeader tag='h4'>Create Credit Note</ModalHeader>
                   <ModalBody>
@@ -501,44 +439,7 @@ const Details = () => {
                             },
                           });
 
-                          return toast.success(({ closeToast }) => (
-                            <Media>
-                              <Media middle left className='mr-3'>
-                                <i className='fas fa-fw fa-2x fa-check'></i>
-                              </Media>
-                              <Media body>
-                                <Media heading tag='h6'>
-                                  Success!
-                                </Media>
-                                <p>
-                                  You've successfully created a Credit Note.
-                                </p>
-                                <div className='d-flex mt-2'>
-                                  <Button
-                                    color='success'
-                                    onClick={() => {
-                                      closeToast;
-                                      history.push(
-                                        `/credit-notes/details/${creditNote.id}`
-                                      );
-                                    }}
-                                  >
-                                    See details
-                                  </Button>
-                                  <Button
-                                    color='link'
-                                    onClick={() => {
-                                      closeToast;
-                                      // window.location = `/invoices/details/${creditNote.id}`;
-                                    }}
-                                    className='ml-2 text-success'
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </Media>
-                            </Media>
-                          ));
+                          return toast.success(SuccessfulCreditNoteCreatedToast);
                         }}
                       >
                         <i className='fas fa-check mr-2'></i>
@@ -562,7 +463,6 @@ const Details = () => {
         <Row>
           <Col lg={8}>
             <UncontrolledTabs initialActiveTabId='invoice'>
-              {/* START Pills Nav */}
               <Nav tabs className='flex-column flex-md-row mt-4 mt-lg-0'>
                 <NavItem>
                   <UncontrolledTabs.NavLink tabId='invoice'>
@@ -585,7 +485,7 @@ const Details = () => {
                   </UncontrolledTabs.NavLink>
                 </NavItem>
               </Nav>
-              {/* END Pills Nav */}
+
               <UncontrolledTabs.TabContent>
                 <TabPane tabId='invoice'>
                   <Card body className='border-top-0'>

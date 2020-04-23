@@ -34,8 +34,6 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
         },
       });
 
-      console.log(applyCouponResult);
-
       const error = applyCouponResult.data.applyCoupon.error;
       if (!error) {
         onSuccessCallback();
@@ -43,7 +41,6 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
         setError(error);
       }
     } catch (e) {
-      console.log(e);
       setError('An error occured. Please try again.');
     }
 
