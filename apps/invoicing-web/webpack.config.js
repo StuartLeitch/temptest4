@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-
 const getRollupBabelOptions = require("@nrwl/react/plugins/bundle-babel");
 
 module.exports = (nxConfig, context) => {
