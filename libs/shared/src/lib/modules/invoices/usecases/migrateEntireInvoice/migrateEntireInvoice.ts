@@ -41,6 +41,7 @@ import { TransactionId } from '../../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { AddressId } from '../../../addresses/domain/AddressId';
+import { WaiverType } from '../../../waivers/domain/Waiver';
 import { Address } from '../../../addresses/domain/Address';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
@@ -148,6 +149,13 @@ export class MigrateEntireInvoiceUsecase
       this
     );
     this.shouldCreatePayer = this.shouldCreatePayer.bind(this);
+    this.shouldAddMigrationWaiver = this.shouldAddMigrationWaiver.bind(this);
+    this.addMigrationWaiver = this.addMigrationWaiver.bind(this);
+    this.markInvoiceAsFinal = this.markInvoiceAsFinal.bind(this);
+    this.attachInvoice = this.attachInvoice.bind(this);
+    this.shouldSendInvoiceFinalized = this.shouldSendInvoiceFinalized.bind(
+      this
+    );
   }
 
   private async getAccessControlContext(request, context?) {
@@ -187,6 +195,9 @@ export class MigrateEntireInvoiceUsecase
       .then(this.createPayer)
       .then(this.confirmInvoice)
       .then(this.sendInvoiceConfirmedEvent)
+      .advanceOrEnd(this.shouldAddMigrationWaiver)
+      .then(this.addMigrationWaiver(context))
+      .then(this.markInvoiceAsFinal(context))
       .map(() => {
         return;
       })
@@ -200,6 +211,16 @@ export class MigrateEntireInvoiceUsecase
       .then(this.updateInvoicePayed)
       .advanceOrEnd(this.shouldSendInvoicePayedEvent)
       .then(this.sendInvoicePayedEvent)
+      .map(() => {
+        return;
+      })
+      .execute();
+
+    const maybeInvoiceFinalized = await requestExecution
+      .then(async () => maybeInvoiceConfirmed)
+      .then(async () => maybeRequest)
+      .then(this.attachInvoice(context))
+      .advanceOrEnd(this.shouldSendInvoiceFinalized)
       .then(this.sendInvoiceFinalizedEvent(context))
       .map(() => {
         return;
@@ -208,6 +229,7 @@ export class MigrateEntireInvoiceUsecase
 
     return flattenEither([
       maybeInvoiceConfirmed,
+      maybeInvoiceFinalized,
       maybeInvoiceCreated,
       maybeInitialInvoice,
       maybeInvoicePayed,
@@ -669,7 +691,7 @@ export class MigrateEntireInvoiceUsecase
           billingAddress,
           messageTimestamp
         );
-        return right<null, DTO>(request);
+        return right<null, DTO & { invoice: Invoice }>({ ...request, invoice });
       })
       .execute();
   }
@@ -932,15 +954,7 @@ export class MigrateEntireInvoiceUsecase
   private sendInvoiceFinalizedEvent(context: Context) {
     const usecase = new PublishInvoiceFinalized(this.sqsPublishService);
 
-    return async ({
-      invoice,
-      payment,
-      request,
-    }: {
-      invoice: Invoice;
-      payment: Payment;
-      request: DTO;
-    }) => {
+    return async ({ invoice, request }: { invoice: Invoice; request: DTO }) => {
       const execution = new AsyncEither<null, null>(null)
         .then(async () => {
           const maybeManuscript = await this.getManuscript(
@@ -1013,6 +1027,86 @@ export class MigrateEntireInvoiceUsecase
         );
 
       return execution.execute();
+    };
+  }
+
+  private async shouldAddMigrationWaiver({
+    status,
+  }: DTO & { invoice: Invoice }): Promise<Either<null, boolean>> {
+    const WaivedMtsStatus = {
+      InvitedContribution: 'InvitedContribution',
+      GEWaivedManuscript: 'GEWaivedManuscript',
+      FreeSubjectarea: 'FreeSubjectarea',
+      WaivedCountry: 'WaivedCountry',
+      GrantWaiver: 'GrantWaiver',
+      FreePeriod: 'FreePeriod',
+      WaivedOnce: 'WaivedOnce',
+      FreeTypes: 'FreeTypes',
+      NoPolicy: 'NoPolicy',
+      Waived: 'Waived',
+    };
+
+    if (!(status in WaivedMtsStatus)) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
+  private markInvoiceAsFinal(context: Context) {
+    return async (request: DTO & { invoice: Invoice }) => {
+      const { invoice } = request;
+
+      invoice.status = InvoiceStatus.FINAL;
+
+      return new AsyncEither(invoice)
+        .then(this.saveInvoice)
+        .map(() => request)
+        .execute();
+    };
+  }
+
+  private addMigrationWaiver(context: Context) {
+    return async (request: DTO & { invoice: Invoice }) => {
+      const uuid = new UniqueEntityID(request.invoiceId);
+      const invoiceId = InvoiceId.create(uuid).getValue();
+
+      try {
+        this.waiverRepo.attachWaiversToInvoice(
+          [WaiverType.WAIVED_MIGRATION],
+          invoiceId
+        );
+        return right<Errors.AddingMigrationWaiverError, DTO>(request);
+      } catch (e) {
+        return left<Errors.AddingMigrationWaiverError, DTO>(
+          new Errors.AddingMigrationWaiverError(request.invoiceId, e)
+        );
+      }
+    };
+  }
+
+  private async shouldSendInvoiceFinalized({
+    invoice,
+  }: {
+    request: DTO;
+    invoice: Invoice;
+  }): Promise<Either<null, boolean>> {
+    if (invoice.status !== InvoiceStatus.FINAL) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
+  private attachInvoice(context: Context) {
+    return async (request: DTO) => {
+      return new AsyncEither(request.invoiceId)
+        .then(this.getInvoice)
+        .map((invoice) => ({
+          request,
+          invoice,
+        }))
+        .execute();
     };
   }
 }

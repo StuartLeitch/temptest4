@@ -4,6 +4,7 @@ import { Result } from '../../../../core/logic/Result';
 export type AllMigrateEntireInvoiceErrors =
   | MigrationPaymentMethodNotFound
   | StateIsRequiredForUnitedStates
+  | AddingMigrationWaiverError
   | AddressLine1Required
   | ManuscriptIdRequired
   | PayerAddressRequired
@@ -180,6 +181,14 @@ export class TransactionError extends Result<UseCaseError> {
   constructor(message: string) {
     super(false, {
       message,
+    });
+  }
+}
+
+export class AddingMigrationWaiverError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `While adding the migration waiver for invoice with id {${id}} an error was encountered: ${err.message}. Stack: ${err.stack}`,
     });
   }
 }
