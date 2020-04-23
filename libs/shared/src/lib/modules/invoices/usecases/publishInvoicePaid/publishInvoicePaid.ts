@@ -28,7 +28,10 @@ export class PublishInvoicePaid {
       isCreditNote: false,
       erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
-      valueWithoutVAT: invoiceItems.reduce((acc, curr) => acc + curr.price, 0),
+      valueWithoutVAT: invoiceItems.reduce(
+        (acc, curr) => acc + curr.calculatePrice(),
+        0
+      ),
       invoiceItems: invoiceItems.map((ii) => ({
         id: ii.id.toString(),
         manuscriptCustomId: manuscript.customId,
