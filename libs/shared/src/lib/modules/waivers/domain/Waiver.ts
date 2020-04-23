@@ -4,17 +4,18 @@ import { Result } from '../../../core/logic/Result';
 import {
   Reduction,
   ReductionProps,
-  ReductionType
+  ReductionType,
 } from '../../../domain/reductions/Reduction';
 
 export type WaiverCollection = Waiver[];
 
 export enum WaiverType {
-  WAIVED_COUNTRY = 'WAIVED_COUNTRY',
   WAIVED_CHIEF_EDITOR = 'WAIVED_CHIEF_EDITOR',
+  SANCTIONED_COUNTRY = 'SANCTIONED_COUNTRY',
+  WAIVED_MIGRATION = 'WAIVED_MIGRATION',
   EDITOR_DISCOUNT = 'EDITOR_DISCOUNT',
+  WAIVED_COUNTRY = 'WAIVED_COUNTRY',
   WAIVED_EDITOR = 'WAIVED_EDITOR',
-  SANCTIONED_COUNTRY = 'SANCTIONED_COUNTRY'
 }
 
 export interface WaiverProps extends ReductionProps {

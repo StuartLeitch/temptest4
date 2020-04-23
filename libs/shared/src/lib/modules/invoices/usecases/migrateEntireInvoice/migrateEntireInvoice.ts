@@ -661,7 +661,7 @@ export class MigrateEntireInvoiceUsecase
         }));
       })
       .then(async ({ billingAddress, manuscript, invoiceItems }) => {
-        const result = await usecase.execute(
+        await usecase.execute(
           invoice,
           invoiceItems,
           manuscript,
