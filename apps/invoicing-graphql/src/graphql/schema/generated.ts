@@ -199,7 +199,6 @@ export type Coupon = {
    __typename?: 'Coupon';
   reduction?: Maybe<Scalars['Float']>;
   code?: Maybe<Scalars['String']>;
-  error?: Maybe<Scalars['String']>;
 };
 
 export type Waiver = {
@@ -791,7 +790,6 @@ export type PaymentMethodResolvers<ContextType = any, ParentType extends Resolve
 export type CouponResolvers<ContextType = any, ParentType extends ResolversParentTypes['Coupon'] = ResolversParentTypes['Coupon']> = {
   reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 

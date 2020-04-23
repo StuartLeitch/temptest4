@@ -2,7 +2,6 @@ export const APPLY_COUPON_MUTATION = `
     mutation applyCoupon($invoiceId: ID!, $couponCode: String!) {
       applyCoupon(invoiceId: $invoiceId, couponCode: $couponCode) {
             reduction
-            error
         }
     }
 `;

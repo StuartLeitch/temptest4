@@ -443,7 +443,7 @@ export const invoice: Resolvers<any> = {
       });
 
       if (result.isLeft()) {
-        return { error: result.value.errorValue().message };
+        throw new Error(result.value.errorValue().message);
       }
 
       return CouponMap.toPersistence(result.value.getValue());

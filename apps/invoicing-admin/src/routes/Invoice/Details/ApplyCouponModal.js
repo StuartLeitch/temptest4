@@ -34,7 +34,7 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
         },
       });
 
-      const error = applyCouponResult.data.applyCoupon.error;
+      const error = applyCouponResult?.error?.graphQLErrors[0].message;
       if (!error) {
         onSuccessCallback();
       } else {

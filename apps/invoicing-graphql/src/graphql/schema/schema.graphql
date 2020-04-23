@@ -174,7 +174,6 @@ type PaymentMethod {
 type Coupon {
   reduction: Float
   code: String
-  error: String
 }
 
 type Waiver {
