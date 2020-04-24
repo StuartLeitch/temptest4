@@ -1,3 +1,3 @@
-import List from './List';
+import Container from './Container';
 
-export default List;
+export default Container;
