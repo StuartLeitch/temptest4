@@ -89,10 +89,7 @@ const validateFn = (values: any) => {
       set(errors, "address.postalCode", "Required");
     }
 
-    if (
-      values.address.postalCode.length !== 5 ||
-      !/^\d+$/.test(values.address.postalCode)
-    ) {
+    if (!/^\d{5}$/.test(values.address.postalCode)) {
       set(
         errors,
         "address.postalCode",

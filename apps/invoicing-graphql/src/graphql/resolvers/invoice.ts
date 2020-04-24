@@ -135,10 +135,7 @@ export const invoice: Resolvers<any> = {
     },
 
     async invoiceVat(parent, args, context) {
-      if (
-        args.postalCode &&
-        (args.postalCode.length !== 5 || !/^\d+$/.test(args.postalCode))
-      ) {
+      if (args.postalCode && !/^\d{5}$/.test(args.postalCode)) {
         throw new Error(
           `The postalCode {${args.postalCode}} is invalid, it needs to have 5 numbers.`
         );

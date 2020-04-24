@@ -18,10 +18,7 @@ export class CreateAddress
   ): Promise<CreateAddressResponse> {
     const { postalCode } = request;
     try {
-      if (
-        postalCode &&
-        (postalCode.length !== 5 || !/^\d+$/.test(postalCode))
-      ) {
+      if (postalCode && !/^\d{5}$/.test(postalCode)) {
         return left(
           new CreateAddressErrors.InvalidPostalCode(request.postalCode)
         );
