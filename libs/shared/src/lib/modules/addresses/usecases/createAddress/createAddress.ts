@@ -18,12 +18,7 @@ export class CreateAddress
   ): Promise<CreateAddressResponse> {
     const { postalCode } = request;
     try {
-      if (
-        postalCode &&
-        (postalCode.length !== 5 ||
-          Number.isNaN(Number.parseInt(postalCode, 10)) ||
-          (Number.parseInt(postalCode, 10) + '').length !== 5)
-      ) {
+      if (postalCode && !/^\d{5}$/.test(postalCode)) {
         return left(
           new CreateAddressErrors.InvalidPostalCode(request.postalCode)
         );

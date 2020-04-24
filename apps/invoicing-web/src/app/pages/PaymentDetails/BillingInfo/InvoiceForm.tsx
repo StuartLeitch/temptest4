@@ -56,7 +56,7 @@ const parseErrors = (errors, prefix = "") => {
 };
 
 const imperativeValidation = (formFns, showModal) => () => {
-  formFns.validateForm().then(errors => {
+  formFns.validateForm().then((errors) => {
     const errorFields = parseErrors(errors);
     if (isEmpty(errorFields)) {
       showModal();
@@ -89,11 +89,7 @@ const validateFn = (values: any) => {
       set(errors, "address.postalCode", "Required");
     }
 
-    if (
-      values.address.postalCode.length !== 5 ||
-      Number.isNaN(Number.parseInt(values.address.postalCode, 10)) ||
-      (Number.parseInt(values.address.postalCode, 10) + "").length !== 5
-    ) {
+    if (!/^\d{5}$/.test(values.address.postalCode)) {
       set(
         errors,
         "address.postalCode",
