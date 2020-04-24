@@ -53,6 +53,7 @@ import {
   Transaction,
 } from '../../../transactions/domain/Transaction';
 
+import { PublishInvoiceCreatedErrors } from '../publishInvoiceCreated/publishInvoiceCreatedErrors';
 import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
 import { PublishInvoiceFinalized } from '../publishInvoiceFinalized';
 import { PublishInvoicePaid } from '../publishInvoicePaid';
@@ -80,7 +81,6 @@ import { MigrateEntireInvoiceDTO as DTO } from './migrateEntireInvoiceDTO';
 import * as Errors from './migrateEntireInvoiceErrors';
 
 import { validateRequest } from './utils';
-import { PublishInvoiceCreatedErrors } from '../publishInvoiceCreated/publishInvoiceCreatedErrors';
 
 type Context = AuthorizationContext<Roles>;
 export type MigrateEntireInvoiceContext = Context;
@@ -554,14 +554,27 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private async getInvoiceItemsByInvoiceId(invoiceId: InvoiceId) {
-    try {
-      const items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
-      return right<AppError.UnexpectedError, InvoiceItem[]>(items);
-    } catch (err) {
-      return left<AppError.UnexpectedError, InvoiceItem[]>(
-        new AppError.UnexpectedError(err)
-      );
-    }
+    // try {
+    //   const items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
+    //   return right<AppError.UnexpectedError, InvoiceItem[]>(items);
+    // } catch (err) {
+    //   return left<AppError.UnexpectedError, InvoiceItem[]>(
+    //     new AppError.UnexpectedError(err)
+    //   );
+    // }
+    const usecase = new GetItemsForInvoiceUsecase(
+      this.invoiceItemRepo,
+      this.couponRepo,
+      this.waiverRepo
+    );
+    const context = {
+      roles: [Roles.PAYER],
+    };
+
+    return new AsyncEither(invoiceId.id.toString())
+      .then((invoiceId) => usecase.execute({ invoiceId }, context))
+      .map((result) => result.getValue())
+      .execute();
   }
 
   private async confirmInvoice({

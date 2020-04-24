@@ -450,6 +450,7 @@ export type MutationMigrateEntireInvoiceArgs = {
   invoiceId: Scalars['String'];
   apc: MigrateApc;
   token: Scalars['String'];
+  status: Scalars['String'];
 };
 
 
