@@ -3,7 +3,13 @@ import { Route, Switch, Redirect } from 'react-router';
 
 import { useAuth } from '../contexts/Auth';
 
-// ----------- Pages Imports ---------------
+// Invoicing Admin App
+import InvoicesList from './Invoices/List';
+import InvoiceDetails from './Invoice/Details';
+import CreditNoteDetails from './Invoice/Details/CreditNote';
+import { CouponsList } from './Coupons';
+
+// ----------- Aiframe Pages Imports ---------------
 import ProjectsDashboard from './Dashboards/Projects';
 import InvoicingDashboard from './Dashboards/Invoicing';
 // import Analytics from './Dashboards/Analytics';
@@ -12,20 +18,14 @@ import InvoicingDashboard from './Dashboards/Invoicing';
 import Financial from './Dashboards/Financial';
 // import Stock from './Dashboards/Stock';
 // import Reports from './Dashboards/Reports';
-import InvoicesList from './Invoices/List';
-import InvoiceDetails from './Invoice/Details';
-import CreditNoteDetails from './Invoice/Details/CreditNote';
 // import Widgets from './Widgets';
-
 // import Cards from './Cards/Cards';
 // import CardsHeaders from './Cards/CardsHeaders';
-
 import NavbarOnly from './Layouts/NavbarOnly';
 // import SidebarDefault from './Layouts/SidebarDefault';
 // import SidebarA from './Layouts/SidebarA';
 // import DragAndDropLayout from './Layouts/DragAndDropLayout';
 import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
-
 // import Accordions from './Interface/Accordions';
 // import Alerts from './Interface/Alerts';
 // import Avatars from './Interface/Avatars';
@@ -89,7 +89,6 @@ import Typography from './Interface/Typography';
 // import Users from './Apps/Users';
 // import UsersResults from './Apps/UsersResults';
 // import VideosResults from './Apps/VideosResults';
-
 import ComingSoon from './Pages/ComingSoon';
 import Confirmation from './Pages/Confirmation';
 import Danger from './Pages/Danger';
@@ -121,11 +120,14 @@ export const RoutedContent = () => {
       {/*     Invoices Routes      */}
       <Route path='/invoices/list' exact component={InvoicesList} />
       <Route path='/invoices/details/:id' exact component={InvoiceDetails} />
+      {/* Credit Notes Routes */}
       <Route
         path='/credit-notes/details/:id'
         exact
         component={CreditNoteDetails}
       />
+      {/* Coupons Routes */}
+      <Route path='/coupons/list' exact component={CouponsList} />
       <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
       <PrivateRoute exact path='/dashboards/invoicing'>
         <InvoicingDashboard />
@@ -157,10 +159,11 @@ export const RoutedContent = () => {
       <Route component={Alerts} path='/interface/alerts' />
       <Route component={Avatars} path='/interface/avatars' />
       <Route component={BadgesLabels} path='/interface/badges-and-labels' />
-  <Route component={Breadcrumbs} path='/interface/breadcrumbs' />*/}
+      <Route component={Breadcrumbs} path='/interface/breadcrumbs' />*/}
       <Route component={Buttons} path='/interface/buttons' />
       <Route component={Colors} path='/interface/colors' />
-      {/*<Route component={Dropdowns} path='/interface/dropdowns' />
+      {/*
+      <Route component={Dropdowns} path='/interface/dropdowns' />
       <Route component={Images} path='/interface/images' />
       <Route component={ListGroups} path='/interface/list-groups' />
       <Route component={MediaObjects} path='/interface/media-objects' />
@@ -171,8 +174,9 @@ export const RoutedContent = () => {
       <Route component={TabsPills} path='/interface/tabs-pills' />
       <Route
         component={TooltipPopovers}
-        path='/interface/tooltips-and-popovers'
-/>*/}
+        path='/interface/tooltips-and-popovers'/>
+
+      */}
       <Route component={Typography} path='/interface/typography' />
       {/*<Route component={Notifications} path='/interface/notifications' />
       <Route component={CropImage} path='/interface/crop-image' />
