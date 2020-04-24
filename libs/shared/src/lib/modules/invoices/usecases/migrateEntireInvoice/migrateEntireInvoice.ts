@@ -151,7 +151,9 @@ export class MigrateEntireInvoiceUsecase
     this.shouldCreatePayer = this.shouldCreatePayer.bind(this);
     this.shouldAddMigrationWaiver = this.shouldAddMigrationWaiver.bind(this);
     this.addMigrationWaiver = this.addMigrationWaiver.bind(this);
-    this.markInvoiceAsFinal = this.markInvoiceAsFinal.bind(this);
+    this.markInvoiceAsFinalAfterWaiver = this.markInvoiceAsFinalAfterWaiver.bind(
+      this
+    );
     this.attachInvoice = this.attachInvoice.bind(this);
     this.shouldSendInvoiceFinalized = this.shouldSendInvoiceFinalized.bind(
       this
@@ -197,7 +199,7 @@ export class MigrateEntireInvoiceUsecase
       .then(this.sendInvoiceConfirmedEvent)
       .advanceOrEnd(this.shouldAddMigrationWaiver)
       .then(this.addMigrationWaiver(context))
-      .then(this.markInvoiceAsFinal(context))
+      .then(this.markInvoiceAsFinalAfterWaiver(context))
       .map(() => {
         return;
       })
@@ -836,6 +838,7 @@ export class MigrateEntireInvoiceUsecase
       .map((invoice) => {
         invoice.props.status = InvoiceStatus.FINAL;
         invoice.props.dateUpdated = new Date(request.paymentDate);
+        invoice.dateMovedToFinal = invoice.props.dateUpdated;
 
         return invoice;
       })
@@ -1053,11 +1056,12 @@ export class MigrateEntireInvoiceUsecase
     return right(true);
   }
 
-  private markInvoiceAsFinal(context: Context) {
+  private markInvoiceAsFinalAfterWaiver(context: Context) {
     return async (request: DTO & { invoice: Invoice }) => {
       const { invoice } = request;
 
       invoice.status = InvoiceStatus.FINAL;
+      invoice.dateMovedToFinal = invoice.dateIssued;
 
       return new AsyncEither(invoice)
         .then(this.saveInvoice)
