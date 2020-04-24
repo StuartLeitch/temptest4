@@ -111,8 +111,8 @@ export class ErpService implements ErpServiceContract {
 
     let name =
       payer.type === PayerType.INDIVIDUAL
-        ? `${payer.name.value}`
-        : `${payer.organization.value}`;
+        ? payer.name.value
+        : payer.organization.value;
     name = name.slice(0, 70);
     name += ` ${article.customId}`;
 
@@ -146,7 +146,7 @@ export class ErpService implements ErpServiceContract {
 
     const payerEmail = payer.email.value;
 
-    const names = payer.name.value.split(' ');
+    const names = name.split(' ');
     const firstName = names[0];
     names.shift();
     const lastName = names.join(' ') || '---';
