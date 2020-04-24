@@ -20,9 +20,7 @@ export class CreateAddress
     try {
       if (
         postalCode &&
-        (postalCode.length !== 5 ||
-          Number.isNaN(Number.parseInt(postalCode, 10)) ||
-          (Number.parseInt(postalCode, 10) + '').length !== 5)
+        (postalCode.length !== 5 || !/^\d+$/.test(postalCode))
       ) {
         return left(
           new CreateAddressErrors.InvalidPostalCode(request.postalCode)
