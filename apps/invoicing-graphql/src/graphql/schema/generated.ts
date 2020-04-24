@@ -369,7 +369,7 @@ export type MutationConfirmInvoiceArgs = {
 export type MutationApplyCouponArgs = {
   invoiceId?: Maybe<Scalars['ID']>;
   couponCode?: Maybe<Scalars['String']>;
-};
+}
 
 
 export type MutationCreateInvoiceArgs = {
@@ -450,6 +450,7 @@ export type MutationMigrateEntireInvoiceArgs = {
   invoiceId: Scalars['String'];
   apc: MigrateApc;
   token: Scalars['String'];
+  status: Scalars['String'];
 };
 
 

@@ -1,7 +1,7 @@
 import { Repo } from '../../../infrastructure/Repo';
 import { Waiver, WaiverType } from '../domain/Waiver';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
-import { InvoiceItemId } from '@hindawi/shared';
+import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
 // import {InvoiceItemId} from '../domain/InvoiceItemId';
 // import {TransactionId} from '../../transactions/domain/TransactionId';
 
@@ -12,6 +12,7 @@ export interface WaiverRepoContract extends Repo<Waiver> {
   getWaiverByType(waiverType: WaiverType): Promise<Waiver>;
   attachWaiversToInvoice(
     waivers: WaiverType[],
-    invoiceId: InvoiceId
+    invoiceId: InvoiceId,
+    dateCreated?: Date
   ): Promise<Waiver[]>;
 }

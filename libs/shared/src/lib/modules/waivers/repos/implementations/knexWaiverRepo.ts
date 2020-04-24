@@ -66,7 +66,8 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
 
   async attachWaiversToInvoice(
     waiverTypes: WaiverType[],
-    invoiceId: InvoiceId
+    invoiceId: InvoiceId,
+    dateCreated?: Date
   ): Promise<Waiver[]> {
     if (!waiverTypes.length) {
       return;
@@ -92,10 +93,17 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
 
     const toInsert = waiverTypes
       .filter((w) => !existingWaivers.includes(w))
-      .map((waiverType) => ({
-        invoiceItemId: invoiceItem.id,
-        waiverId: waiverType,
-      }));
+      .map((waiverType) => {
+        const result = {
+          invoiceItemId: invoiceItem.id,
+          waiverId: waiverType,
+        };
+
+        if (dateCreated) {
+          return { ...result, dateCreated };
+        }
+        return result;
+      });
 
     try {
       await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS).insert(toInsert);

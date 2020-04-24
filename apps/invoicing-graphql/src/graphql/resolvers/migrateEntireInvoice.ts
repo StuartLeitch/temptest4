@@ -1,6 +1,6 @@
 import {
+  MigrateEntireInvoiceUsecase,
   MigrateEntireInvoiceDTO,
-  MigrateEntireInvoiceUsecase
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
@@ -21,9 +21,9 @@ export const migrateEntireInvoice: Resolvers<any> = {
           payment,
           coupon,
           waiver,
-          payer
+          payer,
         },
-        qq: sqsQueService
+        qq: sqsQueService,
       } = context;
 
       const migrateUsecase = new MigrateEntireInvoiceUsecase(
@@ -47,8 +47,9 @@ export const migrateEntireInvoice: Resolvers<any> = {
         issueDate: args.issueDate,
         erpReference: args.erpReference,
         invoiceId: args.invoiceId,
+        status: args.status,
         payer: args.payer,
-        apc: args.apc
+        apc: args.apc,
       };
 
       if (args.token !== env.migration.token) {
@@ -69,6 +70,6 @@ export const migrateEntireInvoice: Resolvers<any> = {
       }
 
       return 'migration ok';
-    }
-  }
+    },
+  },
 };

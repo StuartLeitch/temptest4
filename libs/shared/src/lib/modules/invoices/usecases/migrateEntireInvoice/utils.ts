@@ -6,13 +6,13 @@ import {
   MigrateEntireInvoiceDTO,
   MigratePayerAddress,
   MigratePayer,
-  MigrateAPC
+  MigrateAPC,
 } from './migrateEntireInvoiceDTO';
 import {
   AllMigrateEntireInvoiceErrors,
-  MigrateEntireInvoiceErrors,
-  PayerAddressErrors
+  PayerAddressErrors,
 } from './migrateEntireInvoiceErrors';
+import * as MigrateEntireInvoiceErrors from './migrateEntireInvoiceErrors';
 
 type ValidateMainRequestReturn = Either<
   MigrateEntireInvoiceErrors.InvoiceIdRequired,
@@ -43,16 +43,6 @@ type ValidateRequestReturn = Either<
   MigrateEntireInvoiceDTO
 >;
 
-export function validateRequest(
-  request: MigrateEntireInvoiceDTO
-): ValidateRequestReturn {
-  const result = validateMainRequestArguments(request)
-    .chain(() => validatePayer(request))
-    .chain(() => validateAPC(request.apc))
-    .map(() => request);
-  return result;
-}
-
 function validateMainRequestArguments(
   request: MigrateEntireInvoiceDTO
 ): ValidateMainRequestReturn {
@@ -60,6 +50,25 @@ function validateMainRequestArguments(
     return left(new MigrateEntireInvoiceErrors.InvoiceIdRequired());
   }
   return right(request);
+}
+
+function validatePayerAddress(
+  payerAddress: MigratePayerAddress
+): ValidatePayerAddressReturn {
+  if (!payerAddress) {
+    return left(new MigrateEntireInvoiceErrors.PayerAddressRequired());
+  }
+  if (!payerAddress.addressLine1) {
+    return left(new MigrateEntireInvoiceErrors.AddressLine1Required());
+  }
+  if (!payerAddress.city) {
+    return left(new MigrateEntireInvoiceErrors.CityRequired());
+  }
+  if (!payerAddress.countryCode) {
+    return left(new MigrateEntireInvoiceErrors.CountryCodeRequired());
+  }
+
+  return right(payerAddress);
 }
 
 function validatePayer(request: MigrateEntireInvoiceDTO): ValidatePayerReturn {
@@ -100,21 +109,12 @@ function validateAPC(apc: MigrateAPC): ValidateApcReturn {
   return right(apc);
 }
 
-function validatePayerAddress(
-  payerAddress: MigratePayerAddress
-): ValidatePayerAddressReturn {
-  if (!payerAddress) {
-    return left(new MigrateEntireInvoiceErrors.PayerAddressRequired());
-  }
-  if (!payerAddress.addressLine1) {
-    return left(new MigrateEntireInvoiceErrors.AddressLine1Required());
-  }
-  if (!payerAddress.city) {
-    return left(new MigrateEntireInvoiceErrors.CityRequired());
-  }
-  if (!payerAddress.countryCode) {
-    return left(new MigrateEntireInvoiceErrors.CountryCodeRequired());
-  }
-
-  return right(payerAddress);
+export async function validateRequest(
+  request: MigrateEntireInvoiceDTO
+): Promise<ValidateRequestReturn> {
+  const result = validateMainRequestArguments(request)
+    .chain(() => validatePayer(request))
+    .chain(() => validateAPC(request.apc))
+    .map(() => request);
+  return result;
 }
