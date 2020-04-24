@@ -257,7 +257,7 @@ export const RoutedNavbars = () => (
       path='/layouts/sidebar-with-navbar'
     />
     {/* Default Navbar: */}
-    <Route component={DefaultNavbar} />
+    {/* <Route component={DefaultNavbar} /> */}
   </Switch>
 );
 
