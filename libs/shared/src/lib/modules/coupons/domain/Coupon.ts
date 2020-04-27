@@ -8,17 +8,17 @@ import { CouponId } from './CouponId';
 import {
   ReductionProps,
   ReductionType,
-  Reduction
+  Reduction,
 } from '../../../domain/reductions/Reduction';
 
 export enum CouponType {
   SINGLE_USE = 'SINGLE_USE',
-  MULTIPLE_USE = 'MULTIPLE_USE'
+  MULTIPLE_USE = 'MULTIPLE_USE',
 }
 
 export enum CouponStatus {
   ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE'
+  INACTIVE = 'INACTIVE',
 }
 
 export interface CouponProps extends ReductionProps {
@@ -32,6 +32,8 @@ export interface CouponProps extends ReductionProps {
   dateUpdated: Date;
   name: string;
 }
+
+export type CouponCollection = Coupon[];
 
 export class Coupon extends Reduction<CouponProps> {
   private constructor(props: CouponProps, id?: UniqueEntityID) {

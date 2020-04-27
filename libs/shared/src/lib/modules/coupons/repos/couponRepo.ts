@@ -5,6 +5,7 @@ import { CouponCode } from '../domain/CouponCode';
 import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
 
 export interface CouponRepoContract extends Repo<Coupon> {
+  getRecentCoupons(args?: any): Promise<any>;
   getCouponCollection(): Promise<Coupon[]>;
   getCouponsByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Coupon[]>;
   getCouponById(couponId: CouponId): Promise<Coupon>;
