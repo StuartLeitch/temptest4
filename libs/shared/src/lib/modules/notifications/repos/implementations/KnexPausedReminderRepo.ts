@@ -112,7 +112,7 @@ export class KnexPausedReminderRepo
     void,
     undefined
   > {
-    const t1 = new Transform({
+    const mapToInvoiceIdEntity = new Transform({
       objectMode: true,
       transform(invoice, encoding, callback) {
         const uuid = new UniqueEntityID(invoice.id);
@@ -134,7 +134,7 @@ export class KnexPausedReminderRepo
       .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.PENDING)
       .where(`${TABLES.INVOICES}.deleted`, 0)
       .stream({ objectMode: true })
-      .pipe(t1);
+      .pipe(mapToInvoiceIdEntity);
 
     for await (const a of stream) {
       yield a;
