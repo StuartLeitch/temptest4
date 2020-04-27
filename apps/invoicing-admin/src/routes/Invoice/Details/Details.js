@@ -130,7 +130,7 @@ const Details = () => {
     referenceNumber,
     customId,
   } = queryState;
-  const { page } = paginationState;
+  let { page } = paginationState;
 
   // * build the query string out of query state
   let queryString = '';
