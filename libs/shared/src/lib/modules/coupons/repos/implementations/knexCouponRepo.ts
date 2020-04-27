@@ -48,7 +48,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     await db(TABLES.INVOICE_ITEMS_TO_COUPONS).insert({
       invoiceItemId: invoiceItemId.id.toString(),
       couponId: coupon.id.toString(),
-      dateCreated: new Date()
+      dateCreated: new Date(),
     });
     return this.incrementRedeemedCount(coupon);
   }
@@ -68,7 +68,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     const { db } = this;
 
     const updateObject = {
-      ...CouponMap.toPersistence(coupon)
+      ...CouponMap.toPersistence(coupon),
     };
 
     const updated = await db(TABLES.COUPONS)
@@ -102,6 +102,34 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
       aggregator.push(CouponMap.toDomain(t));
       return aggregator;
     }, []);
+  }
+
+  async getRecentCoupons(args?: any): Promise<any> {
+    const { pagination, filters } = args;
+    const { db } = this;
+
+    const couponsRows = db(TABLES.COUPONS);
+    // const getModel = () => db(TABLES.COUPONS)
+
+    // const totalCount = await applyFilters(getModel(), filters).count(
+    //   `${TABLES.INVOICES}.id`
+    // );
+
+    const totalCountQuery = couponsRows.count(`${TABLES.COUPONS}.id`);
+    const totalCount = totalCountQuery[0].count;
+
+    const offset = pagination.offset * pagination.limit;
+
+    const coupons = await couponsRows // applyFilters(getModel(), filters)
+      .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
+      .offset(offset < totalCount ? offset : 0)
+      .limit(pagination.limit)
+      .select([`${TABLES.INVOICES}.*`]);
+
+    return {
+      totalCount,
+      coupons: coupons.map((c) => CouponMap.toDomain(c)),
+    };
   }
 
   async exists(coupon: Coupon): Promise<boolean> {

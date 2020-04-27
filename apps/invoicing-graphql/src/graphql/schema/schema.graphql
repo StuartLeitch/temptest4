@@ -190,6 +190,11 @@ type PaginatedInvoices {
   invoices: [Invoice]
 }
 
+type PaginatedCoupons {
+  totalCount: Int
+  coupons: [Coupon]
+}
+
 type RemindersStatus {
   confirmation: Boolean
   payment: Boolean
@@ -267,6 +272,7 @@ type Query {
     payerType: String
   ): InvoiceVat
   invoices(filters: InvoiceFilters, pagination: Pagination): PaginatedInvoices
+  coupons(pagination: Pagination): PaginatedCoupons 
   invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
   journals: [Journal]
   echo(value: String): String
