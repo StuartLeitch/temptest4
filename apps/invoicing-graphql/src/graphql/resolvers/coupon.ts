@@ -7,7 +7,7 @@ import { GetRecentCouponsUsecase } from './../../../../../libs/shared/src/lib/mo
 
 import { CouponMap } from './../../../../../libs/shared/src/lib/modules/coupons/mappers/CouponMap';
 
-export const invoice: Resolvers<any> = {
+export const coupon: Resolvers<any> = {
   Query: {
     async coupons(parent, args, context) {
       const { repos } = context;
