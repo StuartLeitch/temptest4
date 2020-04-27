@@ -256,6 +256,7 @@ export type InvoiceFilters = {
 };
 
 export type Pagination = {
+  page?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   limit?: Maybe<Scalars['Int']>;
 };
@@ -369,7 +370,7 @@ export type MutationConfirmInvoiceArgs = {
 export type MutationApplyCouponArgs = {
   invoiceId?: Maybe<Scalars['ID']>;
   couponCode?: Maybe<Scalars['String']>;
-}
+};
 
 
 export type MutationCreateInvoiceArgs = {
@@ -850,7 +851,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'paymentMethodId' | 'invoiceId' | 'payerId' | 'orderId'>>,
   migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>,
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>,
-  migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token'>>,
+  migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token' | 'status'>>,
   generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateCompensatoryEventsArgs, never>>,
   togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePauseConfirmationRemindersArgs, 'invoiceId' | 'state'>>,
   togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePausePaymentRemindersArgs, 'invoiceId' | 'state'>>,

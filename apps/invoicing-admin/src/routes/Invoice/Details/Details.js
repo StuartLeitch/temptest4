@@ -132,6 +132,9 @@ const Details = () => {
   }
 
   const queryState = JSON.parse(localStorage.getItem('invoicesListFilters'));
+  const paginationState = JSON.parse(
+    localStorage.getItem('invoicesListPagination')
+  );
   const {
     invoiceStatus,
     transactionStatus,
@@ -139,10 +142,11 @@ const Details = () => {
     referenceNumber,
     customId,
   } = queryState;
+  const { page } = paginationState;
 
   // * build the query string out of query state
   let queryString = '';
-  if (Object.keys(queryState).length) {
+  if (Object.keys(Object.assign({}, queryState, paginationState)).length) {
     queryString += '?';
     queryString += invoiceStatus.reduce(
       (qs, is) => (qs += `invoiceStatus=${is}&`),
@@ -160,6 +164,10 @@ const Details = () => {
 
     if (customId) {
       queryString += `customId=${customId}&`;
+    }
+
+    if (page) {
+      page += `page=${page}&`;
     }
   }
 
@@ -439,7 +447,9 @@ const Details = () => {
                             },
                           });
 
-                          return toast.success(SuccessfulCreditNoteCreatedToast);
+                          return toast.success(
+                            SuccessfulCreditNoteCreatedToast
+                          );
                         }}
                       >
                         <i className='fas fa-check mr-2'></i>

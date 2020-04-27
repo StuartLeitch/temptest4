@@ -224,6 +224,7 @@ input InvoiceFilters {
 }
 
 input Pagination {
+  page: Int
   offset: Int
   limit: Int
 }

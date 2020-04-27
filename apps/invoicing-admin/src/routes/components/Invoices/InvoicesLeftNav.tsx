@@ -36,7 +36,7 @@ const InvoicesLeftNav = (props) => {
       {/* START Invoice Status */}
       <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
-          <NavLink href='#' className='small d-flex px-1'>
+          <NavLink href='#' className='d-flex px-1'>
             <span>Invoice Status</span>
             <i className='fas fa-angle-down align-self-center ml-auto'></i>
           </NavLink>
@@ -82,7 +82,7 @@ const InvoicesLeftNav = (props) => {
       {/* START Transaction Status */}
       <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
-          <NavLink href='#' className='small d-flex px-1'>
+          <NavLink href='#' className='d-flex px-1'>
             <span>Transaction Status</span>
             <i className='fas fa-angle-down align-self-center ml-auto'></i>
           </NavLink>
@@ -116,7 +116,7 @@ const InvoicesLeftNav = (props) => {
       {/* START Journal Title */}
       <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
-          <NavLink href='#' className='small d-flex px-1'>
+          <NavLink href='#' className='d-flex px-1'>
             <span>Journal Title</span>
             <i className='fas fa-angle-down align-self-center ml-auto'></i>
           </NavLink>
@@ -135,7 +135,7 @@ const InvoicesLeftNav = (props) => {
       {/* START Reference Number */}
       <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
-          <NavLink href='#' className='small d-flex px-1'>
+          <NavLink href='#' className='d-flex px-1'>
             <span>Reference Number</span>
             <i className='fas fa-angle-down align-self-center ml-auto'></i>
           </NavLink>
@@ -188,7 +188,7 @@ const InvoicesLeftNav = (props) => {
       {/* START Custom ID */}
       <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
-          <NavLink href='#' className='small d-flex px-1'>
+          <NavLink href='#' className='d-flex px-1'>
             <span>Custom ID</span>
             <i className='fas fa-angle-down align-self-center ml-auto'></i>
           </NavLink>
