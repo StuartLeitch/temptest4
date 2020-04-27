@@ -1,4 +1,3 @@
-import { invoicesTotalCount } from './../../../../invoicing-web/src/app/state/redux/root-reducer';
 import { Roles } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
@@ -22,8 +21,6 @@ export const coupon: Resolvers<any> = {
       }
 
       const couponsList = result.value.getValue();
-
-      console.info(couponsList);
 
       return {
         totalCount: couponsList.totalCount,
