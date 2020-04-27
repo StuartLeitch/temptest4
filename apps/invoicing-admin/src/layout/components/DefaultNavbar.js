@@ -9,7 +9,7 @@ import {
   Navbar,
   Nav,
   NavItem,
-  SidebarTrigger
+  SidebarTrigger,
 } from './../../components';
 
 // import { NavbarActivityFeed } from './NavbarActivityFeed';
@@ -36,7 +36,7 @@ export const DefaultNavbar = () => {
           <BreadcrumbItem className='navbar-text'>
             <a href='#'>Home</a>
           </BreadcrumbItem>
-          {breadcrumbs.map(breadcrumb => {
+          {breadcrumbs.map((breadcrumb, index) => {
             let bc;
             const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
@@ -45,21 +45,16 @@ export const DefaultNavbar = () => {
             } else {
               bc = breadcrumb
                 .replace('-', ' ')
-                .replace(/\b(\w)/g, c => c.toUpperCase());
+                .replace(/\b(\w)/g, (c) => c.toUpperCase());
             }
             return (
-              <BreadcrumbItem active className='navbar-text'>
+              <BreadcrumbItem key={index} active className='navbar-text'>
                 {bc}
               </BreadcrumbItem>
             );
           })}
         </Breadcrumb>
       </Nav>
-      {/* <Nav navbar className='ml-auto'>
-      <NavbarActivityFeed />
-      <NavbarMessages className='ml-2' />
-      <NavbarUser className='ml-2' />
-    </Nav> */}
     </Navbar>
   );
 };

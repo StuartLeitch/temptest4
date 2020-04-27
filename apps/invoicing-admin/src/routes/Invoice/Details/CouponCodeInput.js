@@ -7,6 +7,7 @@ const MAX_LENGTH = 10;
 const CODE_PATTERN = /^([A-Z0-9]{6,10})$/;
 
 const CouponCodeInput = ({ validationCallback, onChangeCallback }) => {
+  const [inputValue, setInputValue] = useState('');
   const [isTouched, setTouched] = useState(false);
   const [isValid, setValid] = useState(false);
 
@@ -25,6 +26,7 @@ const CouponCodeInput = ({ validationCallback, onChangeCallback }) => {
     if (!isTouched) setTouched(true);
 
     const value = e.target.value;
+    setInputValue(value);
 
     validateInput(value);
     onChangeCallback(value);
@@ -33,6 +35,7 @@ const CouponCodeInput = ({ validationCallback, onChangeCallback }) => {
   return (
     <FormGroup className='mb-2 mr-sm-2 mb-sm-0'>
       <Input
+        value={inputValue}
         type='text'
         name='couponCodeInput'
         id='couponCodeInput'
@@ -42,7 +45,7 @@ const CouponCodeInput = ({ validationCallback, onChangeCallback }) => {
         valid={isTouched && isValid}
         invalid={isTouched && !isValid}
       />
-      <FormFeedback className='ml-2 mt-2' invalid>
+      <FormFeedback className='ml-2 mt-2' invalid='true'>
         Code length must be between 6 and 10 characters, including only
         uppercase letters and numbers
       </FormFeedback>

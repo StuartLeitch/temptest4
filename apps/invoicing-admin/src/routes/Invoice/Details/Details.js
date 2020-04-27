@@ -25,22 +25,18 @@ import {
   ModalDropdown,
   Form,
   FormGroup,
-  Media,
   Label,
   Input,
   InputGroup,
   InputGroupAddon,
   Row,
-  ModalHeader,
   ModalBody,
-  ModalFooter,
   Nav,
   NavItem,
   Spinner,
   Table,
   TabPane,
   UncontrolledButtonDropdown,
-  UncontrolledModal,
   UncontrolledTabs,
 } from './../../../components';
 
@@ -53,18 +49,15 @@ import { InvoiceReminders } from '../../components/Invoice/reminders';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
 import ApplyCouponModal from './ApplyCouponModal';
+import CreateCreditNoteModal from './CreateCreditNoteModal';
 import SuccessfulPaymentToast from './SuccessfulPaymentToast';
-import SuccessfulCreditNoteCreatedToast from './SuccessfulCreditNoteCreatedToast';
 
 import Config from '../../../config';
 
-import {
-  INVOICE_QUERY,
-  BANK_TRANSFER_MUTATION,
-  CREATE_CREDIT_NOTE_MUTATION,
-} from '../graphql';
+import { INVOICE_QUERY, BANK_TRANSFER_MUTATION } from '../graphql';
 
 const APPLY_COUPON_MODAL_TARGET = 'applyCouponModal';
+const CREATE_CREDIT_NOTE_MODAL_TARGET = 'createCreditNoteModal';
 
 const Details = () => {
   const { id } = useParams();
@@ -83,11 +76,6 @@ const Details = () => {
     paymentDate: new Date(),
     paymentAmount: 0,
     paymentReference: '',
-  });
-
-  const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
-  const [creditNoteData, setCreditNoteData] = useState({
-    createDraft: false,
   });
 
   if (loading)
@@ -348,120 +336,28 @@ const Details = () => {
 
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') && (
-                    <Button
-                      id='modalCreateCreditNote'
-                      color='danger'
-                      className='mr-2'
-                    >
-                      Create Credit Note
-                    </Button>
+                    <>
+                      <Button
+                        id={CREATE_CREDIT_NOTE_MODAL_TARGET}
+                        color='danger'
+                        className='mr-2'
+                      >
+                        Create Credit Note
+                      </Button>
+
+                      <CreateCreditNoteModal
+                        invoiceItem={invoice?.invoiceItem}
+                        invoiceId={invoiceId}
+                        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
+                        total={total}
+                      />
+                    </>
                   )}
 
-                <UncontrolledModal target='modalCreateCreditNote' centered>
-                  <ModalHeader tag='h4'>Create Credit Note</ModalHeader>
-                  <ModalBody>
-                    <Form>
-                      <FormGroup row>
-                        <Label sm={4}>Issue Date</Label>
-                        <Col sm={8}>
-                          <InputGroup>
-                            <DatePicker
-                              dateFormat='d MMMM yyyy'
-                              customInput={<ButtonInput />}
-                              selected={new Date()}
-                              onChange={(date) => {
-                                // setBankTransferPaymentData({
-                                //   ...bankTransferPaymentData,
-                                //   paymentDate: date
-                                // });
-                              }}
-                            />
-                          </InputGroup>
-                        </Col>
-                      </FormGroup>
-                      <FormGroup row>
-                        {invoice?.invoiceItem && (
-                          <>
-                            <Label for='staticText' sm={4}>
-                              Amount Value
-                            </Label>
-                            <Col sm={8}>
-                              <span className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                                {numeral(total.toFixed(2) * -1).format('$0.00')}
-                              </span>
-                            </Col>
-                          </>
-                        )}
-                      </FormGroup>
-                      <FormGroup row>
-                        <Label for='staticText' sm={4}>
-                          Reason
-                        </Label>
-                        <Col sm={8}>
-                          <Input
-                            type='select'
-                            name='createDraft'
-                            id='draftReason'
-                            onChange={(e) => {
-                              const { value } = e.target;
-                              setCreditNoteData({
-                                ...creditNoteData,
-                                createDraft: !!value,
-                              });
-                            }}
-                          >
-                            <option value='0' selected>
-                              Withdrawn Manuscript
-                            </option>
-                            <option value='1'>Reduction Applied</option>
-                            <option value='0'>Waived Manuscript</option>
-                            <option value='1'>Change Payer Details</option>
-                            <option value='1'>Other</option>
-                          </Input>
-                        </Col>
-                      </FormGroup>
-                    </Form>
-                    {/* END Form */}
-                  </ModalBody>
-                  <ModalFooter>
-                    <UncontrolledModal.Close
-                      color='link'
-                      className='text-primary'
-                    >
-                      <i className='fas fa-close mr-2'></i>
-                      Close
-                    </UncontrolledModal.Close>
-                    <UncontrolledModal.Close
-                      color='link'
-                      className='text-primary'
-                    >
-                      <Button
-                        color='primary'
-                        onClick={async (e) => {
-                          const {
-                            data: { createCreditNote: creditNote },
-                          } = await recordCreditNote({
-                            variables: {
-                              ...creditNoteData,
-                              invoiceId: invoice?.id,
-                            },
-                          });
-
-                          return toast.success(
-                            SuccessfulCreditNoteCreatedToast
-                          );
-                        }}
-                      >
-                        <i className='fas fa-check mr-2'></i>
-                        Save
-                      </Button>
-                    </UncontrolledModal.Close>
-                  </ModalFooter>
-                </UncontrolledModal>
                 <Button
                   id={APPLY_COUPON_MODAL_TARGET}
                   color='primary'
-                  outline
+                  outline={status !== 'DRAFT'}
                   disabled={status !== 'DRAFT'}
                 >
                   Apply Coupon
@@ -654,8 +550,8 @@ const Details = () => {
                             </td>
                           </tr>
                           {invoice?.invoiceItem?.coupons?.length > 0 &&
-                            invoice.invoiceItem.coupons.map((coupon) => (
-                              <tr>
+                            invoice.invoiceItem.coupons.map((coupon, index) => (
+                              <tr key={index}>
                                 <td
                                   colSpan='2'
                                   style={{ borderTop: 'none' }}
