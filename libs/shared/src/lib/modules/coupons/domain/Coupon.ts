@@ -11,9 +11,6 @@ import {
   Reduction
 } from '../../../domain/reductions/Reduction';
 
-// * Coupon Domain Events
-import { CouponCreated } from './events/couponCreated';
-
 export enum CouponType {
   SINGLE_USE = 'SINGLE_USE',
   MULTIPLE_USE = 'MULTIPLE_USE'
