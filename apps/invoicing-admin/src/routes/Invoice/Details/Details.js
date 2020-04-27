@@ -94,22 +94,18 @@ const Details = () => {
   const { invoice, getPaymentMethods } = data;
   const { status, id: invoiceId } = invoice;
 
-  const { coupons, waivers, price } = invoice?.invoiceItem;
-  let netCharges = price;
-  if (coupons?.length) {
-    netCharges -= coupons.reduce(
-      (acc, coupon) => acc + (coupon.reduction / 100) * price,
-      0
-    );
-  }
-  if (waivers?.length) {
-    netCharges -= waivers.reduce(
-      (acc, waiver) => acc + (waiver.reduction / 100) * price,
-      0
-    );
-  }
-  const vat = (netCharges / 100) * invoice?.invoiceItem?.vat;
-  const total = netCharges + vat;
+  // * -> Net charges and final price computing
+  const { vat, coupons, waivers, price } = invoice?.invoiceItem;
+  const reductions = [...coupons, ...waivers];
+  let totalDiscountFromReductions = reductions.reduce(
+    (acc, curr) => acc + curr.reduction,
+    0
+  );
+  totalDiscountFromReductions =
+    totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
+  const finalPrice = price - (price * totalDiscountFromReductions) / 100;
+  const vatAmount = (finalPrice * vat) / 100;
+  // * <-
 
   let statusClassName = 'warning';
   if (status === 'ACTIVE') {
@@ -617,9 +613,8 @@ const Details = () => {
                             <td className='align-middle text-uppercase text-muted font-weight-bold'>
                               Net Charges
                             </td>
-                            {/* <td>Really?</td> */}
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              {numeral(netCharges).format('$0.00')}
+                              {numeral(finalPrice).format('$0.00')}
                             </td>
                           </tr>
                           <tr>
@@ -633,7 +628,7 @@ const Details = () => {
                               </span>
                             </td>
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              {numeral(vat.toFixed(2)).format('$0.00')}
+                              {numeral(vatAmount.toFixed(2)).format('$0.00')}
                             </td>
                           </tr>
                           <tr>
@@ -642,7 +637,7 @@ const Details = () => {
                               Total
                             </td>
                             <td className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                              {numeral(total.toFixed(2)).format('$0.00')}
+                              {numeral(finalPrice.toFixed(2)).format('$0.00')}
                             </td>
                           </tr>
                         </tbody>
