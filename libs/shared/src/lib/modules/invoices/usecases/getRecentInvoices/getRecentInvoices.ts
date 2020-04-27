@@ -3,9 +3,7 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { InvoiceCollection } from '../../domain/Invoice';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
-import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
 
 // * Usecase specifics
 import { GetRecentInvoicesResponse } from './getRecentInvoicesResponse';
