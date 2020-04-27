@@ -16,6 +16,8 @@ import {
   emptyPause,
 } from './knexPausedReminderUtils';
 
+import { Transform, Readable } from 'stream';
+
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'pauseConfirmation',
   [NotificationType.REMINDER_PAYMENT]: 'pausePayment',
@@ -105,11 +107,21 @@ export class KnexPausedReminderRepo
     return !!result;
   }
 
-  private async invoiceIdsPageWithNoPauseSettings(
-    pageIndex: number,
-    pageSize = 50
-  ): Promise<InvoiceId[]> {
-    const invoices = await this.db(TABLES.INVOICES)
+  async *invoiceIdsWithNoPauseSettings(): AsyncGenerator<
+    InvoiceId,
+    void,
+    undefined
+  > {
+    const t1 = new Transform({
+      objectMode: true,
+      transform(invoice, encoding, callback) {
+        const uuid = new UniqueEntityID(invoice.id);
+        const invoiceId = InvoiceId.create(uuid).getValue();
+        callback(null, invoiceId);
+      },
+    });
+
+    const stream = this.db(TABLES.INVOICES)
       .select('id')
       .leftJoin(
         TABLES.PAUSED_REMINDERS,
@@ -121,33 +133,11 @@ export class KnexPausedReminderRepo
       .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.FINAL)
       .whereNot(`${TABLES.INVOICES}.status`, InvoiceStatus.PENDING)
       .where(`${TABLES.INVOICES}.deleted`, 0)
-      .limit(pageSize)
-      .offset(pageIndex * pageSize);
+      .stream({ objectMode: true })
+      .pipe(t1);
 
-    return invoices.map((invoice) => {
-      const uuid = new UniqueEntityID(invoice.id);
-      const invoiceId = InvoiceId.create(uuid).getValue();
-      return invoiceId;
-    });
-  }
-
-  async *invoiceIdsWithNoPauseSettings(): AsyncGenerator<
-    InvoiceId,
-    void,
-    undefined
-  > {
-    let data = true;
-    let page = 0;
-
-    while (data) {
-      data = false;
-      const results = await this.invoiceIdsPageWithNoPauseSettings(page);
-
-      if (results.length) {
-        yield* results;
-        page += 1;
-        data = true;
-      }
+    for await (const a of stream) {
+      yield a;
     }
   }
 }
