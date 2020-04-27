@@ -16,9 +16,10 @@ AS SELECT j1.event,
     j1.is_active,
     j1.journal_code,
     j1.journal_email,
+    j1.apc,
     j1.event_date,
     j1.event_id
-    FROM (select *, row_number() over (partition by journal_id order by event_date desc) as rn from ${journalsDataView.getViewName()} jd) j1
+    FROM (select *, row_number() over (partition by journal_id order by event_date desc nulls last) as rn from ${journalsDataView.getViewName()} jd) j1
     left join journal_to_publisher publisher on j1.journal_id = publisher.journal_id
   WHERE rn = 1
 WITH DATA;

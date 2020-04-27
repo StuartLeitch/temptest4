@@ -1,6 +1,6 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import journalsView from './JournalsView';
 import submissionDataView from './SubmissionDataView';
@@ -18,6 +18,7 @@ AS SELECT
   t.manuscript_custom_id,
   t.submission_event,
   t.article_type,
+  t.apc as journal_apc,
   t.submission_date,
   t.resubmission_date,
   t.special_issue_id,
@@ -52,6 +53,7 @@ FROM (
       s.section_id,
       j.journal_id,
       j.journal_name,
+      j.apc,
       j.publisher_name,
       j.journal_code
       FROM ${submissionDataView.getViewName()} s
@@ -73,7 +75,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (submission_date)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`,
-    `create index on ${this.getViewName()} (journal_name)`
+    `create index on ${this.getViewName()} (journal_name)`,
   ];
 
   getViewName(): string {
