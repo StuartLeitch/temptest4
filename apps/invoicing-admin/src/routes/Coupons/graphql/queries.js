@@ -13,14 +13,12 @@ export const COUPONS_QUERY = `
   }
 
   fragment couponFragment on Coupon {
-    id
     reduction
     type
     code
     dateCreated
     dateUpdated
     expirationDate
-    invoiceItemType
     redeemCount
     status
     name
