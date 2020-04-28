@@ -73,6 +73,8 @@ WITH DATA;
     `create index on ${this.getViewName()} (resubmission_date)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (triage_editor_email)`,
+    `create index on ${this.getViewName()} (final_decision_date)`,
+    `create index on ${this.getViewName()} (final_decision_type)`,
     `create index on ${this.getViewName()} (handling_editor_email)`,
     `create index on ${this.getViewName()} (editorial_assistant_email)`,
     `create index on ${this.getViewName()} (version)`,
