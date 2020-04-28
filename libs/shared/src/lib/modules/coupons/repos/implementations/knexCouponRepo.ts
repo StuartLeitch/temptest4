@@ -105,26 +105,23 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   }
 
   async getRecentCoupons(args?: any): Promise<any> {
-    const { pagination, filters } = args;
+    const { pagination } = args;
     const { db } = this;
 
-    const couponsRows = db(TABLES.COUPONS);
+    const couponsCount = await db(TABLES.COUPONS).count(`${TABLES.COUPONS}.id`);
     // const getModel = () => db(TABLES.COUPONS)
-
     // const totalCount = await applyFilters(getModel(), filters).count(
     //   `${TABLES.INVOICES}.id`
     // );
-
-    const totalCountQuery = couponsRows.count(`${TABLES.COUPONS}.id`);
-    const totalCount = totalCountQuery[0].count;
+    const totalCount = couponsCount[0].count;
 
     const offset = pagination.offset * pagination.limit;
 
-    const coupons = await couponsRows // applyFilters(getModel(), filters)
-      .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
+    const coupons = await db(TABLES.COUPONS) // applyFilters(getModel(), filters)
+      .orderBy(`${TABLES.COUPONS}.dateCreated`, 'desc')
       .offset(offset < totalCount ? offset : 0)
       .limit(pagination.limit)
-      .select([`${TABLES.INVOICES}.*`]);
+      .select([`${TABLES.COUPONS}.*`]);
 
     return {
       totalCount,
