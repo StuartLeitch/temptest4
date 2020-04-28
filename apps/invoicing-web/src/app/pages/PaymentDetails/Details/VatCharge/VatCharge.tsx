@@ -35,9 +35,8 @@ Any such taxes has to be borne by the customer and paid directly to the appropri
 GeoScienceWorld is a not for profit organization and does not allow deductions of any taxes from its invoice amount.`,
 };
 
-const VatCharge: React.FC<Props> = ({ tenant, vat, price, rate, ...rest }) => {
+const VatCharge: React.FC<Props> = ({ tenant, vat, price, ...rest }) => {
   const vatAmount = (price * vat) / 100;
-  const amountInPounds = vatAmount / rate;
   return (
     <Fragment>
       <Flex justifyContent="space-between" mt={2}>
@@ -68,7 +67,6 @@ const VatCharge: React.FC<Props> = ({ tenant, vat, price, rate, ...rest }) => {
 };
 
 VatCharge.defaultProps = {
-  rate: 0,
   tenant: "Hindawi",
 };
 

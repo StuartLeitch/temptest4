@@ -12,9 +12,9 @@ export function getOsEnvOptional(key: string): string | undefined {
   return process.env[key];
 }
 
-// export function getOsEnvWithDefault(key: string, defaultValue = ''): string {
-//   return getOsEnvOptional(key) || defaultValue;
-// }
+export function getOsEnvWithDefault(key: string, defaultValue = ''): string {
+  return getOsEnvOptional(key) || defaultValue;
+}
 
 export function getPath(path: string): string {
   return process.env.NODE_ENV === 'production'

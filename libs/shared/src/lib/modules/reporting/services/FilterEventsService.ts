@@ -26,7 +26,7 @@ export class FilterEventsService {
           throw new Error('Unknown event format');
         }
         id = body.MessageId;
-        logger.debug(id);
+        logger.debug('sqs message id: ' + id);
         isLongEvent =
           body?.MessageAttributes?.['PhenomMessageTooLarge']?.Value === 'Y' ||
           body?.MessageAttributes?.['PhenomMessageTooLarge']?.stringValue ===
@@ -37,6 +37,11 @@ export class FilterEventsService {
         logger.debug(error);
         logger.debug(Body);
         continue;
+      }
+
+      if (parsedEvent.id) {
+        id = parsedEvent.id;
+        logger.debug('Using body.id' + id);
       }
 
       if (isLongEvent) {
