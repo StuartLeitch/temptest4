@@ -12,6 +12,7 @@ export const coupon: Resolvers<any> = {
     async coupons(parent, args, context) {
       const { repos } = context;
       const usecase = new GetRecentCouponsUsecase(repos.coupon);
+
       const usecaseContext = {
         roles: [Roles.ADMIN],
       };
