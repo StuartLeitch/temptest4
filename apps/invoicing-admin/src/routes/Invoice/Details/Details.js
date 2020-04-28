@@ -346,7 +346,7 @@ const Details = () => {
                         invoiceItem={invoice?.invoiceItem}
                         invoiceId={invoiceId}
                         target={CREATE_CREDIT_NOTE_MODAL_TARGET}
-                        total={total}
+                        total={totalCharges}
                       />
                     </>
                   )}
