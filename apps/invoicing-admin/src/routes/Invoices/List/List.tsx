@@ -7,16 +7,12 @@ import { Filters } from '@utils';
 import { useLocalStorage } from '@rehooks/local-storage';
 
 import {
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
   Card,
   CardFooter,
   Error,
   ListPagination,
   Spinner,
   Table,
-  UncontrolledTooltip,
 } from '../../../components';
 
 import { TrTableInvoicesList } from './components/TrTableList';
@@ -164,80 +160,8 @@ const RecentInvoicesList = (props) => {
   //   pagination = Object.assign({}, paginator);
   // }
 
-  const copyToClipboard = (str) => {
-    const el = document.createElement('textarea');
-    el.value = str;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-  };
-
-  const buildURLWithFilters = (filters, pagination) => {
-    const {
-      invoiceStatus,
-      transactionStatus,
-      journalId,
-      referenceNumber,
-      customId,
-    } = filters;
-    const { page } = pagination;
-
-    // * build the query string out of query state
-    let queryString = '';
-    if (Object.keys(Object.assign({}, filters, pagination)).length) {
-      queryString += '?';
-      queryString += invoiceStatus.reduce(
-        (qs, is) => (qs += `invoiceStatus=${is}&`),
-        ''
-      );
-      queryString += transactionStatus.reduce(
-        (qs, ts) => (qs += `transactionStatus=${ts}&`),
-        ''
-      );
-      queryString += journalId.reduce(
-        (qs, ji) => (qs += `journalId=${ji}&`),
-        ''
-      );
-
-      if (referenceNumber) {
-        queryString += `referenceNumber=${referenceNumber}&`;
-      }
-
-      if (customId) {
-        queryString += `customId=${customId}&`;
-      }
-
-      if (page) {
-        queryString += `page=${page}&`;
-      }
-
-      const { protocol, hostname, pathname } = window?.location;
-
-      return `${protocol}://${hostname}${pathname}${queryString}`;
-    }
-  };
-
   return (
     <Card className='mb-0'>
-      <ButtonToolbar className='d-flex justify-content-end'>
-        <ButtonGroup className='mr-2'>
-          <Button
-            color='link'
-            className='text-decoration-none align-self-center'
-            id='tooltipFav'
-            onClick={copyToClipboard(buildURLWithFilters(filters, pagination))}
-          >
-            <i className='text-blue fas fa-fw fa-share-square'></i>
-          </Button>
-          <UncontrolledTooltip placement='bottom' target='tooltipFav'>
-            Share Search Filters
-          </UncontrolledTooltip>
-        </ButtonGroup>
-      </ButtonToolbar>
       {/* START Table */}
       <div className='table-responsive-xl'>
         <Table className='mb-0 table-striped' hover>

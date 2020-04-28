@@ -1,16 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-
-import { Container, Row, Col } from './../../../components';
-
-import { HeaderMain } from '../../components/HeaderMain';
-
-import InvoicesList from './List';
-import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
-import { ParseUtils } from '@utils';
 import { useQueryState } from 'react-router-use-location-state';
 import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
+import { toast } from 'react-toastify';
+
+import { ParseUtils } from '@utils';
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  ButtonGroup,
+  ButtonToolbar,
+  UncontrolledTooltip,
+} from './../../../components';
+import { HeaderMain } from '../../components/HeaderMain';
+import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
+import InvoicesList from './List';
+import { mergeWith } from '../../../utils/mergeWith';
+import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
 
 // import QueryStateDisplay from './components/QueryStateDisplay';
 
@@ -28,48 +37,107 @@ const InvoicesContainer = (props: any) => {
     limit: 10,
   };
 
-  const [filters] = useLocalStorage('invoicesListFilters', defaultFilters);
-
   const [invoiceStatus, setInvoiceStatus] = useQueryState(
     'invoiceStatus',
-    (filters as any).invoiceStatus
+    (defaultFilters as any).invoiceStatus
   );
+  // console.info('invoiceStatus', invoiceStatus);
   const [transactionStatus, setTransactionStatus] = useQueryState(
     'transactionStatus',
-    (filters as any).transactionStatus
+    (defaultFilters as any).transactionStatus
   );
   const [journalId, setJournalId] = useQueryState(
     'journalId',
-    (filters as any).journalId
+    (defaultFilters as any).journalId
   );
   const [referenceNumber, setReferenceNumber] = useQueryState(
     'referenceNumber',
-    (filters as any).referenceNumber
+    (defaultFilters as any).referenceNumber
   );
   const [customId, setCustomId] = useQueryState(
     'customId',
-    (filters as any).customId
+    (defaultFilters as any).customId
   );
 
-  Object.assign(filters, {
+  const [filters] = useLocalStorage('invoicesListFilters', defaultFilters);
+
+  mergeWith(filters, {
     invoiceStatus,
     transactionStatus,
     journalId,
     referenceNumber,
     customId,
   });
+  // console.info('Filters after assign', filters);
+
+  const [page, setPage] = useQueryState(
+    'page',
+    (defaultPagination as any).page
+  );
 
   const [pagination] = useLocalStorage(
     'invoicesListPagination',
     defaultPagination
   );
 
-  const [page, setPage] = useQueryState(
-    'page',
-    (pagination || (defaultPagination as any)).page
-  );
-
   Object.assign(pagination, { page });
+
+  const copyToClipboard = (str) => {
+    const el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  };
+
+  const buildURLWithFilters = (_filters, _pagination) => {
+    const {
+      invoiceStatus,
+      transactionStatus,
+      journalId,
+      referenceNumber,
+      customId,
+    } = _filters;
+    const { page } = _pagination;
+
+    // * build the query string out of query state
+    let queryString = '';
+    if (Object.keys(Object.assign({}, filters, pagination)).length) {
+      queryString += '?';
+      queryString += invoiceStatus.reduce(
+        (qs, is) => (qs += `invoiceStatus=${is}&`),
+        ''
+      );
+      queryString += transactionStatus.reduce(
+        (qs, ts) => (qs += `transactionStatus=${ts}&`),
+        ''
+      );
+      queryString += journalId.reduce(
+        (qs, ji) => (qs += `journalId=${ji}&`),
+        ''
+      );
+
+      if (referenceNumber) {
+        queryString += `referenceNumber=${referenceNumber}&`;
+      }
+
+      if (customId) {
+        queryString += `customId=${customId}&`;
+      }
+
+      if (page) {
+        queryString += `page=${page}&`;
+      }
+
+      const { protocol, hostname, pathname } = window?.location;
+
+      return `${protocol}//${hostname}${pathname}${queryString}`;
+    }
+  };
 
   return (
     <React.Fragment>
@@ -81,6 +149,29 @@ const InvoicesContainer = (props: any) => {
             <InvoicesLeftNav filters={filters} setFilter={setFilter} />
           </Col>
           <Col lg={9}>
+            <ButtonToolbar className='d-flex justify-content-end'>
+              <ButtonGroup className='mr-2'>
+                <Button
+                  color='link'
+                  className='text-decoration-none align-self-center pr-0'
+                  id='tooltipFav'
+                  onClick={() => {
+                    const urlToShare = buildURLWithFilters(filters, pagination);
+                    copyToClipboard(urlToShare);
+                    return toast.success(
+                      <SuccessfulUrlCopiedToClipboardToast
+                        urlToShare={urlToShare}
+                      />
+                    );
+                  }}
+                >
+                  <i className='text-blue fas fa-fw fa-share-square'></i>
+                </Button>
+                <UncontrolledTooltip placement='bottom' target='tooltipFav'>
+                  Share Search Filters
+                </UncontrolledTooltip>
+              </ButtonGroup>
+            </ButtonToolbar>
             <InvoicesList
               filters={filters}
               pagination={pagination}
@@ -106,13 +197,12 @@ const InvoicesContainer = (props: any) => {
 
     switch (name) {
       case 'invoiceStatus':
-        if (invoiceStatus.includes(status)) {
-          newStatus = invoiceStatus.filter((s) => s !== status);
-          setInvoiceStatus(newStatus);
+        if (filters.invoiceStatus.includes(status)) {
+          newStatus = filters.invoiceStatus.filter((s) => s !== status);
         } else {
-          newStatus = [...invoiceStatus, status];
-          setInvoiceStatus(newStatus);
+          newStatus = [...filters.invoiceStatus, status];
         }
+        setInvoiceStatus(newStatus);
         writeStorage('invoicesListFilters', {
           ...filters,
           invoiceStatus: newStatus,
@@ -126,11 +216,13 @@ const InvoicesContainer = (props: any) => {
         break;
 
       case 'transactionStatus':
-        if (transactionStatus.includes(status)) {
-          newTransactionStatus = transactionStatus.filter((s) => s !== status);
+        if (filters.transactionStatus.includes(status)) {
+          newTransactionStatus = filters.transactionStatus.filter(
+            (s) => s !== status
+          );
           setTransactionStatus(newTransactionStatus);
         } else {
-          newTransactionStatus = [...transactionStatus, status];
+          newTransactionStatus = [...filters.transactionStatus, status];
           setTransactionStatus(newTransactionStatus);
         }
         writeStorage('invoicesListFilters', {
