@@ -1,4 +1,3 @@
-import { invoicesTotalCount } from './../../../../invoicing-web/src/app/state/redux/root-reducer';
 import { Roles } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
@@ -12,6 +11,7 @@ export const coupon: Resolvers<any> = {
     async coupons(parent, args, context) {
       const { repos } = context;
       const usecase = new GetRecentCouponsUsecase(repos.coupon);
+
       const usecaseContext = {
         roles: [Roles.ADMIN],
       };
@@ -23,32 +23,12 @@ export const coupon: Resolvers<any> = {
 
       const couponsList = result.value.getValue();
 
-      console.info(couponsList);
+      console.log(couponsList.coupons.map(CouponMap.toPersistence));
 
       return {
         totalCount: couponsList.totalCount,
-        coupons: couponsList.coupons.map((couponDetails) => ({
-          ...CouponMap.toPersistence(couponDetails),
-          couponId: couponDetails.id.toString(),
-        })),
+        coupons: couponsList.coupons.map(CouponMap.toPersistence),
       };
-
-      // return {
-      //   totalCount: invoicesList.totalCount,
-      //   invoices: invoicesList.invoices.map((invoiceDetails) => ({
-      //     ...InvoiceMap.toPersistence(invoiceDetails),
-      //     invoiceId: invoiceDetails.id.toString(),
-      //     // status: invoiceDetails.status,
-      //     // charge: invoiceDetails.charge,
-      //     dateCreated: invoiceDetails?.dateCreated?.toISOString(),
-      //     dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
-      //     dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-      //     referenceNumber:
-      //       invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
-      //         ? invoiceDetails.referenceNumber
-      //         : null,
-      //   })),
-      // };
     },
   },
 };
