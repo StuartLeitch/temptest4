@@ -17,7 +17,12 @@ SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
 # TODO: Implement OAuth2
 
 # TODO: Configure Celery
-
-# TODO: Configure Caching
+if os.getenv('CACHE_TYPE', '') == 'redis':
+  CACHE_CONFIG = {
+    'CACHE_TYPE': 'redis',
+    'CACHE_DEFAULT_TIMEOUT': 60 * 60 * 24, # 1 day default (in secs)
+    'CACHE_KEY_PREFIX': 'superset_results',
+    'CACHE_REDIS_URL': os.getenv('CACHE_REDIS_URL'),
+  }
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
