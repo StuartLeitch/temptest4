@@ -94,7 +94,7 @@ const Details = () => {
   const { invoice, getPaymentMethods } = data;
   const { status, id: invoiceId } = invoice;
 
-  // * -> Net charges and final price computing
+  // * -> Net and total charges computing
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
   let totalDiscountFromReductions = reductions.reduce(
@@ -103,8 +103,9 @@ const Details = () => {
   );
   totalDiscountFromReductions =
     totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
-  const finalPrice = price - (price * totalDiscountFromReductions) / 100;
-  const vatAmount = (finalPrice * vat) / 100;
+  const netCharges = price - (price * totalDiscountFromReductions) / 100;
+  const vatAmount = (netCharges * vat) / 100;
+  const totalCharges = netCharges + vatAmount;
   // * <-
 
   let statusClassName = 'warning';
@@ -614,7 +615,7 @@ const Details = () => {
                               Net Charges
                             </td>
                             <td className='align-middle text-right text-dark font-weight-bold'>
-                              {numeral(finalPrice).format('$0.00')}
+                              {numeral(netCharges).format('$0.00')}
                             </td>
                           </tr>
                           <tr>
@@ -637,7 +638,7 @@ const Details = () => {
                               Total
                             </td>
                             <td className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                              {numeral(finalPrice.toFixed(2)).format('$0.00')}
+                              {numeral(totalCharges.toFixed(2)).format('$0.00')}
                             </td>
                           </tr>
                         </tbody>
