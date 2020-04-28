@@ -1,6 +1,20 @@
 import React from 'react';
+import format from 'date-fns/format';
 
-import { Card, Table, CardFooter } from '../../../components';
+import { Card, Table, CardFooter, Badge } from '../../../components';
+
+const COUPON_STATUS = {
+  ACTIVE: (
+    <Badge pill color='primary'>
+      Active
+    </Badge>
+  ),
+  INACTIVE: (
+    <Badge pill color='danger'>
+      Inactive
+    </Badge>
+  ),
+};
 
 const CouponsList = ({ coupons }) => {
   return (
@@ -9,14 +23,12 @@ const CouponsList = ({ coupons }) => {
         <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
-              <th className='align-middle bt-0'>ID</th>
               <th className='align-middle bt-0'>Name</th>
               <th className='align-middle bt-0'>Type</th>
               <th className='align-middle bt-0'>Code</th>
               <th className='align-middle bt-0'>Reduction</th>
               <th className='align-middle bt-0'>Status</th>
               <th className='align-middle bt-0'>Redeem Count</th>
-              <th className='align-middle bt-0'>Invoice Item Type</th>
               <th className='align-middle bt-0'>Date Created</th>
               <th className='align-middle bt-0'>Date Updated</th>
               <th className='align-middle bt-0'>Expiration Date</th>
@@ -25,14 +37,12 @@ const CouponsList = ({ coupons }) => {
           <tbody>
             {coupons.map((coupon) => {
               const {
-                id,
                 reduction,
                 type,
                 code,
                 dateCreated,
                 dateUpdated,
                 expirationDate,
-                invoiceItemType,
                 redeemCount,
                 status,
                 name,
@@ -40,17 +50,24 @@ const CouponsList = ({ coupons }) => {
 
               return (
                 <tr>
-                  <td className='align-middle bt-0'>{id}</td>
                   <td className='align-middle bt-0'>{name}</td>
                   <td className='align-middle bt-0'>{type}</td>
-                  <td className='align-middle bt-0'>{code}</td>
+                  <td className='align-middle bt-0 font-weight-bold'>{code}</td>
                   <td className='align-middle bt-0'>{reduction}</td>
-                  <td className='align-middle bt-0'>{status}</td>
+                  <td className='align-middle bt-0'>{COUPON_STATUS[status]}</td>
                   <td className='align-middle bt-0'>{redeemCount}</td>
-                  <td className='align-middle bt-0'>{invoiceItemType}</td>
-                  <td className='align-middle bt-0'>{dateCreated}</td>
-                  <td className='align-middle bt-0'>{dateUpdated}</td>
-                  <td className='align-middle bt-0'>{expirationDate}</td>
+                  <td className='align-middle bt-0'>
+                    {dateCreated &&
+                      format(new Date(dateCreated), 'dd MMMM yyyy')}
+                  </td>
+                  <td className='align-middle bt-0'>
+                    {dateUpdated &&
+                      format(new Date(dateUpdated), 'dd MMMM yyyy')}
+                  </td>
+                  <td className='align-middle bt-0'>
+                    {expirationDate &&
+                      format(new Date(expirationDate), 'dd MMMM yyyy')}
+                  </td>
                 </tr>
               );
             })}
