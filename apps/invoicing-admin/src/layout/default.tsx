@@ -7,7 +7,7 @@ import {
   Layout,
   ThemeSelector,
   ThemeProvider,
-  PageConfigConsumer
+  PageConfigConsumer,
 } from '../components';
 
 import AppProviders from '../contexts';
@@ -24,36 +24,36 @@ const favIcons = [
   {
     rel: 'icon',
     type: 'image/x-icon',
-    href: '/assets/images/favicons/favicon.ico'
+    href: '/assets/images/favicons/favicon.ico',
   },
 
   {
     rel: 'apple-touch-icon',
     sizes: '180x180',
-    href: '/assets/images/favicons/apple-touch-icon.png'
+    href: '/assets/images/favicons/apple-touch-icon.png',
   },
 
   {
     rel: 'icon',
     type: 'image/png',
     sizes: '32x32',
-    href: '/assets/images/favicons/favicon-32x32.png'
+    href: '/assets/images/favicons/favicon-32x32.png',
   },
   {
     rel: 'icon',
     type: 'image/png',
     sizes: '16x16',
-    href: '/assets/images/favicons/favicon-16x16.png'
-  }
+    href: '/assets/images/favicons/favicon-16x16.png',
+  },
 ];
 
 const client = new GraphQLClient({
-  url: config.gqlRoot
+  url: config.gqlRoot,
 });
 
 class AppLayout extends React.Component {
   static propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
   };
 
   render() {
@@ -88,7 +88,7 @@ class AppLayout extends React.Component {
           </Layout>
           <ToastContainer
             position='top-right'
-            autoClose={50000}
+            autoClose={5000}
             draggable={false}
             hideProgressBar={true}
           />

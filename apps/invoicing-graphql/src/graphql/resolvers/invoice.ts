@@ -392,11 +392,17 @@ export const invoice: Resolvers<any> = {
   },
   Article: {
     async journalTitle(parent, args, context) {
-      const catalogItem = await context.repos.catalog.getCatalogItemByJournalId(
-        JournalId.create(new UniqueEntityID(parent.journalId)).getValue()
-      );
+      let catalogItem;
 
-      return catalogItem.journalTitle;
+      try {
+        catalogItem = await context.repos.catalog.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(parent.journalId)).getValue()
+        );
+      } catch (e) {
+        return null;
+      }
+
+      return catalogItem?.journalTitle;
     },
   },
   Payment: {

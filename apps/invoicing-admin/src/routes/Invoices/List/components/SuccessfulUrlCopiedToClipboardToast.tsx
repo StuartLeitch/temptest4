@@ -16,11 +16,9 @@ export default ({ urlToShare }) => {
           Info
         </Media>
         <p>
-          The URL{' '}
-          <span className='font-weight-normal text-underlined text-blue'>
-            <u>{urlToShare}</u>
-          </span>{' '}
-          has been copied to your clipboard.
+          <span className='font-weight-bold text-success'>
+            The Search Filters have been copied to your clipboard.
+          </span>
         </p>
         {/* <div className='d-flex mt-2'>
           <Button

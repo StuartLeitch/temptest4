@@ -80,7 +80,7 @@ const InvoicesContainer = (props: any) => {
     defaultPagination
   );
 
-  Object.assign(pagination, { page });
+  Object.assign(pagination, { page, offset: page > 0 ? page - 1 : 0 });
 
   const copyToClipboard = (str) => {
     const el = document.createElement('textarea');
@@ -148,7 +148,7 @@ const InvoicesContainer = (props: any) => {
             {/* <QueryStateDisplay queryState={{ ...filters, ...pagination }} /> */}
             <InvoicesLeftNav filters={filters} setFilter={setFilter} />
           </Col>
-          <Col lg={9}>
+          <Col lg={9} className='mt-n4'>
             <ButtonToolbar className='d-flex justify-content-end'>
               <ButtonGroup className='mr-2'>
                 <Button
@@ -268,6 +268,7 @@ const InvoicesContainer = (props: any) => {
         writeStorage('invoicesListPagination', {
           ...pagination,
           page: value,
+          offset: Number(value) - 1,
         });
         break;
 

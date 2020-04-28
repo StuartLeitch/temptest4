@@ -1,3 +1,4 @@
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 
@@ -5,8 +6,7 @@ import { JournalId } from './../../domain/JournalId';
 import { CatalogRepoContract } from './../catalogRepo';
 import { CatalogMap } from './../../mappers/CatalogMap';
 import { CatalogItem } from './../../domain/CatalogItem';
-import { RepoError } from 'libs/shared/src/lib/infrastructure/RepoError';
-import { UniqueEntityID } from '@hindawi/shared';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {
@@ -29,9 +29,12 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
 
   async exists(catalogItem: CatalogItem): Promise<boolean> {
     try {
-      let c = await this.getCatalogItemById(catalogItem.id);
+      const c = await this.getCatalogItemById(catalogItem.id);
       return !!c;
-    } catch (error) {}
+    } catch (error) {
+      //do nothing yet
+    }
+
     return false;
   }
 
@@ -57,9 +60,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   async getCatalogItemByType(type = 'APC'): Promise<CatalogItem> {
     const { db } = this;
 
-    return await db(TABLES.CATALOG)
-      .where({ type })
-      .first();
+    return await db(TABLES.CATALOG).where({ type }).first();
   }
 
   async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
@@ -72,7 +73,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
     if (!journal) {
       throw RepoError.createEntityNotFoundError(
         'catalogItem',
-        journal.id.toString()
+        journalId.id.toString()
       );
     }
 

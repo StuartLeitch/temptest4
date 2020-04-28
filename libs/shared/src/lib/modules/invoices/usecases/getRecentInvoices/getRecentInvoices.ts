@@ -16,7 +16,7 @@ import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  GetRecentInvoicesAuthenticationContext
+  GetRecentInvoicesAuthenticationContext,
 } from './getRecentInvoicesAuthenticationContext';
 
 export class GetRecentInvoicesUsecase
