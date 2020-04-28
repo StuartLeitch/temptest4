@@ -35,7 +35,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
   );
   totalDiscountFromReductions =
     totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
-  const finalPrice = price - (price * totalDiscountFromReductions) / 100;
+  const finalPrice = price - (price * totalDiscountFromReductions) / 100; // net charges
   const vatNote = vatnote
     .replace(
       "{Vat/Rate}",
@@ -44,7 +44,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
     .replace("{Rate}", rate);
 
   let waiverItems;
-  let totalDiscountFromWaivers = waivers.reduce(
+  const totalDiscountFromWaivers = waivers.reduce(
     (acc, curr) => acc + curr.reduction,
     0,
   );
