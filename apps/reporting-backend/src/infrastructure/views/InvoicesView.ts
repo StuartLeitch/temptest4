@@ -15,6 +15,8 @@ class InvoicesView extends AbstractEventView implements EventViewContract {
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
     inv.reference_number as "invoice_reference_number",
+    original_invoice.reference_number as "credited_invoice_reference_number",
+    inv.is_credit_note,
     inv.manuscript_custom_id as "manuscript_custom_id",
     inv.invoice_created_date as "invoice_created_date",
     case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as manuscript_accepted_date,
@@ -29,9 +31,9 @@ AS SELECT
     inv.invoice_id as "invoice_id",
     inv.status as "invoice_status",
     inv.gross_apc_value as "gross_apc_value",
-    inv.gross_apc_value - net_apc as "discount",
+    inv.gross_apc_value - inv.net_apc as "discount",
     inv.net_apc as "net_apc",
-    inv.net_apc * (vat_percentage / 100) as "vat_amount",
+    inv.net_apc * (inv.vat_percentage / 100) as "vat_amount",
     inv.net_amount as "net_amount",
     inv.net_amount - inv.paid_amount as "due_amount",
     inv.paid_amount as "paid_amount",
@@ -95,12 +97,15 @@ AS SELECT
   ) coupons on coupons.event_id = inv.event_id
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed') 
     order by event_timestamp desc limit 1) sd on sd.manuscript_custom_id = inv.manuscript_custom_id
+  LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 where id2.invoice_id = inv.cancelled_invoice_reference limit 1) original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
 WITH DATA;
     `;
   }
 
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, invoice_created_date)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, invoice_created_date, is_credit_note)`,
     `create index on ${this.getViewName()} (journal_code)`,
     `create index on ${this.getViewName()} (issue_type)`,
     `create index on ${this.getViewName()} (invoice_id)`,

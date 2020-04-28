@@ -56,7 +56,7 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${manuscriptEditorsView.getViewName()} e3 where e3.manuscript_custom_id = s.manuscript_custom_id and e3.role_type = 'editorialAssistant' limit 1) e3 on e3.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSectionsView.getViewName()} js where js.section_id = s.section_id limit 1) sec on sec.section_id = s.section_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
-  LEFT JOIN LATERAL (SELECT * FROM ${invoicesView.getViewName()} i where i.manuscript_custom_id = s.manuscript_custom_id limit 1) i on i.manuscript_custom_id = s.manuscript_custom_id
+  LEFT JOIN LATERAL (SELECT * FROM ${invoicesView.getViewName()} i where i.manuscript_custom_id = s.manuscript_custom_id and i.is_credit_note = false order by i.invoice_created_date desc nulls last limit 1) i on i.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id and sd.submission_event in ('SubmissionQualityCheckPassed', 'SubmissionWithdrawn', 'SubmissionScreeningRTCd', 'SubmissionQualityCheckRTCd', 'SubmissionRejected') 
     order by event_timestamp desc limit 1) sd on sd.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
@@ -73,6 +73,8 @@ WITH DATA;
     `create index on ${this.getViewName()} (resubmission_date)`,
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (triage_editor_email)`,
+    `create index on ${this.getViewName()} (final_decision_date)`,
+    `create index on ${this.getViewName()} (final_decision_type)`,
     `create index on ${this.getViewName()} (handling_editor_email)`,
     `create index on ${this.getViewName()} (editorial_assistant_email)`,
     `create index on ${this.getViewName()} (version)`,

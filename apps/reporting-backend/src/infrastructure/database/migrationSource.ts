@@ -99,7 +99,8 @@ class KnexMigrationSource {
     ),
     add_sub_data_index,
     rebuild_materialized_views('20200421151200_fix_manuscript_authors', true),
-    rebuild_materialized_views('20200427133000_add_manuscript_apc'),
+    rebuild_materialized_views('20200427133000_add_manuscript_apc', true),
+    rebuild_materialized_views('20200427141500_add_credit_note_support'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

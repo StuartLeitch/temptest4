@@ -69,6 +69,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (invited_date)`,
     `create index on ${this.getViewName()} (manuscript_custom_id, invited_date)`,
     `create index on ${this.getViewName()} (removed_date)`,
+    `create index on ${this.getViewName()} (status)`,
     `create index on ${this.getViewName()} (accepted_date)`,
     `create index on ${this.getViewName()} (assigned_date)`,
     `create index on ${this.getViewName()} (declined_date)`,
