@@ -1,10 +1,9 @@
-// import * as path from 'path';
 import config from 'config';
 import _ from 'lodash';
 
 import * as pkg from '../../../package.json';
 import {
-  // getOsEnvWithDefault,
+  getOsEnvWithDefault,
   getOsEnvOptional,
   normalizePort,
   getOsPath,
@@ -28,18 +27,9 @@ if (Object.keys(config).length !== 0) {
 }
 
 /**
- * Load .env file or for tests the .env.test file.
- */
-// dotenv.config({
-//   path: path.join(
-//     process.cwd(),
-//     `.env${process.env.NODE_ENV === 'test' ? '.test' : ''}`
-//   )
-// });
-
-/**
  * Environment variables
  */
+
 export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
@@ -153,7 +143,6 @@ export const env = {
       password: getOsEnv('SCHEDULER_DB_PASSWORD'),
       host: getOsEnv('SCHEDULER_DB_HOST'),
     },
-    // notificationsQueues: getOsEnvArray('NOTIFICATIONS_QUEUES'),
     notificationsQueues: toArray(getOsEnv('NOTIFICATIONS_QUEUES')),
     emailRemindersQueue: getOsEnv('EMAIL_REMINDERS_QUEUE'),
     confirmationReminderDelay: toFloat(

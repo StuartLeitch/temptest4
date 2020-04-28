@@ -41,7 +41,7 @@
   "DOI_NUMBER": "10.2113",
   "EMAIL_REMINDERS_QUEUE": "email-reminders",
   "EVENT_NAMESPACE": "pen",
-  "FAILED_ERP_CRON_RETRY_DISABLED": "false",
+  "FAILED_ERP_CRON_RETRY_DISABLED": "true",
   "FAILED_ERP_CRON_RETRY_TIME_MINUTES": 5,
   "FAVICON_URL": "http://demo-gsw-invoicing-web.eu-west-1.elasticbeanstalk.com/assets/gsw/images/favicon-32x32.png",
   "FE_ROOT": "http://demo.invoicing.gsw.hindawi.com",
