@@ -1,10 +1,11 @@
-import { Roles } from '@hindawi/shared';
-
-import { Resolvers } from '../schema';
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { GetRecentCouponsUsecase } from './../../../../../libs/shared/src/lib/modules/coupons/usecases/getRecentCoupons/getRecentCoupons';
 
 import { CouponMap } from './../../../../../libs/shared/src/lib/modules/coupons/mappers/CouponMap';
+
+import { Resolvers } from '../schema';
 
 export const coupon: Resolvers<any> = {
   Query: {
@@ -22,8 +23,6 @@ export const coupon: Resolvers<any> = {
       }
 
       const couponsList = result.value.getValue();
-
-      console.log(couponsList.coupons.map(CouponMap.toPersistence));
 
       return {
         totalCount: couponsList.totalCount,
