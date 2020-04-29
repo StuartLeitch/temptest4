@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'graphql-hooks';
-import LoadingOverlay from 'react-loading-overlay';
 import DatePicker from 'react-datepicker';
 import format from 'date-fns/format';
 import compareDesc from 'date-fns/compareDesc';
@@ -33,7 +32,6 @@ import {
   ModalBody,
   Nav,
   NavItem,
-  Spinner,
   Table,
   TabPane,
   UncontrolledButtonDropdown,
@@ -45,6 +43,8 @@ import { TimelineMini } from '../../components/Timeline/TimelineMini';
 import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetails';
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
+
+import { PageLoading } from '../../components';
 
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
@@ -78,15 +78,7 @@ const Details = () => {
     paymentReference: '',
   });
 
-  if (loading)
-    return (
-      <LoadingOverlay
-        active={loading}
-        spinner={
-          <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
-        }
-      />
-    );
+  if (loading) return <PageLoading />;
 
   if (error || typeof data === undefined)
     return <div>Something Bad Happened</div>;
