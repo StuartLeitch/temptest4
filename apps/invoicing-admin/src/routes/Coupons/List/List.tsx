@@ -16,7 +16,7 @@ const COUPON_STATUS = {
   ),
 };
 
-const CouponsList = ({ coupons }) => {
+const CouponsList = ({ coupons }: CouponsListProps) => {
   return (
     <div className='table-responsive-xl'>
       <Table className='mb-0 table-striped' hover>
@@ -73,5 +73,21 @@ const CouponsList = ({ coupons }) => {
     </div>
   );
 };
+
+interface CouponsListProps {
+  coupons: [
+    {
+      name: string;
+      type: string;
+      code: string;
+      reduction: number;
+      status: string;
+      redeemCount: number;
+      dateCreated: string;
+      dateUpdated: string;
+      expirationDate: string;
+    }
+  ];
+}
 
 export default CouponsList;
