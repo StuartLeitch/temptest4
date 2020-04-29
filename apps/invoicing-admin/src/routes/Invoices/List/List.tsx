@@ -16,6 +16,7 @@ import {
 } from '../../../components';
 
 import { TrTableInvoicesList } from './components/TrTableList';
+import { Loading } from '../../components';
 
 const INVOICES_QUERY = `
 query fetchInvoices(
@@ -142,15 +143,7 @@ const RecentInvoicesList = (props) => {
 
   if (loading)
     return (
-      <LoadingOverlay
-        active={loading}
-        spinner={
-          <Spinner
-            style={{ width: '12em', height: '12em' }}
-            color='secondary'
-          />
-        }
-      />
+      <Loading />
     );
 
   if (error) return <Error data={error} />;
