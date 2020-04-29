@@ -15,6 +15,7 @@ import {
 } from '../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
+import { PageLoading } from '../../components';
 
 import List from './List';
 import { Loading } from '../../components';
