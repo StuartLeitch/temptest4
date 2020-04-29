@@ -109,10 +109,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     const { db } = this;
 
     const couponsCount = await db(TABLES.COUPONS).count(`${TABLES.COUPONS}.id`);
-    // const getModel = () => db(TABLES.COUPONS)
-    // const totalCount = await applyFilters(getModel(), filters).count(
-    //   `${TABLES.INVOICES}.id`
-    // );
+
     const totalCount = couponsCount[0].count;
 
     const offset = pagination.offset * pagination.limit;
