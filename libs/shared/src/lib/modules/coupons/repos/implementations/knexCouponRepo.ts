@@ -1,3 +1,5 @@
+import { GetRecentCouponsSuccessResponse } from './../../usecases/getRecentCoupons/getRecentCouponsResponse';
+import { GetRecentCouponsDTO } from './../../usecases/getRecentCoupons/getRecentCouponsDTO';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { Coupon } from '../../domain/Coupon';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
