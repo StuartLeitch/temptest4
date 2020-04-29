@@ -21,7 +21,7 @@ import { Loading } from '../../components';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
-const InvoicesContainer = () => {
+const CouponsContainer = () => {
   const [fetchCoupons, { loading, error, data }] = useManualQuery(
     COUPONS_QUERY
   );
@@ -90,4 +90,4 @@ const InvoicesContainer = () => {
   );
 };
 
-export default InvoicesContainer;
+export default CouponsContainer;
