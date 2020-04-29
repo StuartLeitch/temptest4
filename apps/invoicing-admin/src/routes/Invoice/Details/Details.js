@@ -44,7 +44,7 @@ import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetail
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
 
-import { PageLoading } from '../../components';
+import { Loading } from '../../components';
 
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
@@ -78,7 +78,7 @@ const Details = () => {
     paymentReference: '',
   });
 
-  if (loading) return <PageLoading />;
+  if (loading) return <Loading />;
 
   if (error || typeof data === undefined)
     return <div>Something Bad Happened</div>;
