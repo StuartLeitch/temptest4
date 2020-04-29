@@ -96,41 +96,41 @@ const InvoicesContainer = (props: any) => {
 
   const buildURLWithFilters = (_filters, _pagination) => {
     const {
-      invoiceStatus,
-      transactionStatus,
-      journalId,
-      referenceNumber,
-      customId,
+      invoiceStatus: _invoiceStatus,
+      transactionStatus: _transactionStatus,
+      journalId: _journalId,
+      referenceNUmber: _referenceNumber,
+      customId: _customId,
     } = _filters;
-    const { page } = _pagination;
+    const { page: _page } = _pagination;
 
     // * build the query string out of query state
     let queryString = '';
-    if (Object.keys(Object.assign({}, filters, pagination)).length) {
+    if (Object.keys(Object.assign({}, _filters, _pagination)).length) {
       queryString += '?';
-      queryString += invoiceStatus.reduce(
+      queryString += _invoiceStatus.reduce(
         (qs, is) => (qs += `invoiceStatus=${is}&`),
         ''
       );
-      queryString += transactionStatus.reduce(
+      queryString += _transactionStatus.reduce(
         (qs, ts) => (qs += `transactionStatus=${ts}&`),
         ''
       );
-      queryString += journalId.reduce(
+      queryString += _journalId.reduce(
         (qs, ji) => (qs += `journalId=${ji}&`),
         ''
       );
 
-      if (referenceNumber) {
-        queryString += `referenceNumber=${referenceNumber}&`;
+      if (_referenceNumber) {
+        queryString += `referenceNumber=${_referenceNumber}&`;
       }
 
-      if (customId) {
-        queryString += `customId=${customId}&`;
+      if (_customId) {
+        queryString += `customId=${_customId}&`;
       }
 
-      if (page) {
-        queryString += `page=${page}&`;
+      if (_page) {
+        queryString += `page=${_page}&`;
       }
 
       const { protocol, hostname, pathname } = window?.location;
