@@ -1,11 +1,15 @@
+import { GetRecentCouponsDTO } from './../usecases/getRecentCoupons/getRecentCouponsDTO';
 import { Coupon } from '../domain/Coupon';
 import { CouponId } from '../domain/CouponId';
 import { Repo } from '../../../infrastructure/Repo';
 import { CouponCode } from '../domain/CouponCode';
 import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
+import { GetRecentCouponsSuccessResponse } from '../../coupons/usecases/getRecentCoupons/getRecentCouponsResponse';
 
 export interface CouponRepoContract extends Repo<Coupon> {
-  getRecentCoupons(args?: any): Promise<any>;
+  getRecentCoupons(
+    args?: GetRecentCouponsDTO
+  ): Promise<GetRecentCouponsSuccessResponse>;
   getCouponCollection(): Promise<Coupon[]>;
   getCouponsByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Coupon[]>;
   getCouponById(couponId: CouponId): Promise<Coupon>;
