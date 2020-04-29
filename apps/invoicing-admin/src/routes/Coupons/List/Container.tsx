@@ -33,17 +33,21 @@ const InvoicesContainer = () => {
   );
 
   const fetchData = useCallback(
-    async (page) => {
+    async (currentPage) => {
       await fetchCoupons({
         variables: {
-          pagination: { ...defaultPaginationSettings, page, offset: page - 1 },
+          pagination: {
+            ...defaultPaginationSettings,
+            page: currentPage,
+            offset: currentPage - 1,
+          },
         },
       });
     },
     [fetchCoupons]
   );
 
-  const onPageChange = (paginationData) => {
+  const onPageChange = (paginationData: { currentPage: number }) => {
     const { currentPage } = paginationData;
 
     fetchData(currentPage);
