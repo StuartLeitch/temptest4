@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
-import LoadingOverlay from 'react-loading-overlay';
 import { useQueryState } from 'react-router-use-location-state';
 
 import { COUPONS_QUERY } from '../graphql';
@@ -9,7 +8,6 @@ import {
   Container,
   Row,
   Col,
-  Spinner,
   Error,
   ListPagination,
   CardFooter,
@@ -17,6 +15,7 @@ import {
 } from '../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
+import { PageLoading } from '../../components';
 
 import List from './List';
 
@@ -58,18 +57,7 @@ const InvoicesContainer = () => {
     fetchData(page);
   }, [fetchData, page, fetchCoupons]);
 
-  if (loading)
-    return (
-      <LoadingOverlay
-        active={loading}
-        spinner={
-          <Spinner
-            style={{ width: '12em', height: '12em' }}
-            color='secondary'
-          />
-        }
-      />
-    );
+  if (loading) return <PageLoading />;
 
   if (error) return <Error data={error} />;
 
