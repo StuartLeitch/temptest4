@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
 import { useQueryState } from 'react-router-use-location-state';
@@ -14,44 +14,45 @@ import {
   ListPagination,
   CardFooter,
   Card,
-  PageLoader,
 } from '../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
 
 import List from './List';
 
+const defaultPaginationSettings = { page: 1, offset: 0, limit: 5 };
+
 const InvoicesContainer = () => {
   const [fetchCoupons, { loading, error, data }] = useManualQuery(
     COUPONS_QUERY
   );
 
-  const defaultPaginationSettings = { page: 1, offset: 0, limit: 5 };
   const [page, setPageInUrl] = useQueryState(
     'page',
     defaultPaginationSettings.page
   );
 
-  const fetchData = async (page) => {
-    await fetchCoupons({
-      variables: {
-        pagination: { ...defaultPaginationSettings, page, offset: page - 1 },
-      },
-    });
-  };
+  const fetchData = useCallback(
+    async (page) => {
+      await fetchCoupons({
+        variables: {
+          pagination: { ...defaultPaginationSettings, page, offset: page - 1 },
+        },
+      });
+    },
+    [fetchCoupons]
+  );
 
   const onPageChange = (paginationData) => {
-    const { currentPage, totalPages, pageLimit, totalRecords } = paginationData;
+    const { currentPage } = paginationData;
 
     fetchData(currentPage);
     setPageInUrl(currentPage);
   };
 
   useEffect(() => {
-    // begin loading
     fetchData(page);
-    // end loading
-  }, [fetchCoupons]);
+  }, [fetchData, page, fetchCoupons]);
 
   if (loading)
     return (
