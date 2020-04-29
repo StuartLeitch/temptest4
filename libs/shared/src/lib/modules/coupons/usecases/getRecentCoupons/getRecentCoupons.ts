@@ -1,4 +1,3 @@
-import { GetRecentInvoicesAuthenticationContext } from './../../../invoices/usecases/getRecentInvoices/getRecentInvoicesAuthenticationContext';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
@@ -25,7 +24,7 @@ export class GetRecentCouponsUsecase
     >,
     AccessControlledUsecase<
       GetRecentCouponsDTO,
-      GetRecentInvoicesAuthenticationContext,
+      GetRecentCouponsAuthenticationContext,
       AccessControlContext
     > {
   constructor(private couponRepo: CouponRepoContract) {}
@@ -37,11 +36,11 @@ export class GetRecentCouponsUsecase
   @Authorize('coupon:read')
   public async execute(
     request: GetRecentCouponsDTO,
-    context?: GetRecentInvoicesAuthenticationContext
+    context?: GetRecentCouponsAuthenticationContext
   ): Promise<GetRecentCouponsResponse> {
     try {
       const paginatedResult = await this.couponRepo.getRecentCoupons(request);
-      return right(Result.ok<any>(paginatedResult));
+      return right(Result.ok(paginatedResult));
     } catch (err) {
       return left(
         new AppError.UnexpectedError(err, 'Getting recent coupons failed.')

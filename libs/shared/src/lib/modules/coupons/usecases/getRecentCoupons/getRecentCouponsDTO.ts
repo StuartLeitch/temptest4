@@ -3,5 +3,5 @@ export interface GetRecentCouponsDTO {
     offset?: number;
     limit?: number;
   };
-  filters?: {};
+  // filters?: {};
 }

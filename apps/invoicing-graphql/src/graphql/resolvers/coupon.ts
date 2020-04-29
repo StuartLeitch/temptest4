@@ -19,7 +19,7 @@ export const coupon: Resolvers<any> = {
 
       const result = await usecase.execute(args, usecaseContext);
       if (result.isLeft()) {
-        return undefined;
+        throw new Error(result.value.errorValue().message);
       }
 
       const couponsList = result.value.getValue();
