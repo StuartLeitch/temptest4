@@ -46,6 +46,8 @@ import { DlRowArticleDetails } from '../../components/Invoice/DlRowArticleDetail
 import { DlRowPayerDetails } from '../../components/Invoice/DlRowPayerDetails';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
 
+import { Loading } from '../../components';
+
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
 import ApplyCouponModal from './ApplyCouponModal';
@@ -78,15 +80,7 @@ const Details = () => {
     paymentReference: '',
   });
 
-  if (loading)
-    return (
-      <LoadingOverlay
-        active={loading}
-        spinner={
-          <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
-        }
-      />
-    );
+  if (loading) return <Loading />;
 
   if (error || typeof data === undefined)
     return <div>Something Bad Happened</div>;

@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
-import LoadingOverlay from 'react-loading-overlay';
 import { useQueryState } from 'react-router-use-location-state';
 
 import { COUPONS_QUERY } from '../graphql';
@@ -9,7 +8,6 @@ import {
   Container,
   Row,
   Col,
-  Spinner,
   Error,
   ListPagination,
   CardFooter,
@@ -19,8 +17,9 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 
 import List from './List';
+import { Loading } from '../../components';
 
-const defaultPaginationSettings = { page: 1, offset: 0, limit: 5 };
+const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
 const InvoicesContainer = () => {
   const [fetchCoupons, { loading, error, data }] = useManualQuery(
@@ -58,30 +57,19 @@ const InvoicesContainer = () => {
     fetchData(page);
   }, [fetchData, page, fetchCoupons]);
 
-  if (loading)
-    return (
-      <LoadingOverlay
-        active={loading}
-        spinner={
-          <Spinner
-            style={{ width: '12em', height: '12em' }}
-            color='secondary'
-          />
-        }
-      />
-    );
-
-  if (error) return <Error data={error} />;
-
   return (
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain title='Coupons' className='mb-5 mt-4' />
         <Row>
           <Col lg={12}>
-            <Card className='mb-0'>
-              {data && (
-                <>
+            {loading && <Loading loading={loading} />}
+
+            {error && <Error error={error} />}
+
+            {data && (
+              <>
+                <Card className='mb-0'>
                   <List coupons={data.coupons.coupons} />
                   <CardFooter className='d-flex justify-content-center pb-0'>
                     <ListPagination
@@ -92,9 +80,9 @@ const InvoicesContainer = () => {
                       currentPage={page}
                     />
                   </CardFooter>
-                </>
-              )}
-            </Card>
+                </Card>
+              </>
+            )}
           </Col>
         </Row>
       </Container>
