@@ -1,6 +1,10 @@
 import _ from 'lodash';
 
-function customizer(objValue, srcValue) {
+function mergeCustomizer(objValue, srcValue) {
+  return objValue || srcValue;
+}
+
+function overwriteCustomizer(objValue, srcValue) {
   return objValue || srcValue;
 }
 
@@ -9,5 +13,9 @@ function customizer(objValue, srcValue) {
 // * by subsequent objects with the same key.
 
 export function mergeWith(target, source) {
-  return _.mergeWith(target, source, customizer);
+  return _.mergeWith(target, source, mergeCustomizer);
+}
+
+export function overwriteWith(target, source) {
+  return _.mergeWith(target, source, overwriteCustomizer);
 }

@@ -152,7 +152,7 @@ const Details = () => {
     }
 
     if (page) {
-      page += `page=${page}&`;
+      queryString += `page=${page}&`;
     }
   }
 

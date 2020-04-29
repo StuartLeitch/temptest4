@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { useQueryState } from 'react-router-use-location-state';
@@ -18,7 +18,7 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 import InvoicesList from './List';
-import { mergeWith } from '../../../utils/mergeWith';
+// import { mergeWith, overwriteWith } from '../../../utils/mergeWith';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
 
 // import QueryStateDisplay from './components/QueryStateDisplay';
@@ -41,7 +41,6 @@ const InvoicesContainer = (props: any) => {
     'invoiceStatus',
     (defaultFilters as any).invoiceStatus
   );
-  // console.info('invoiceStatus', invoiceStatus);
   const [transactionStatus, setTransactionStatus] = useQueryState(
     'transactionStatus',
     (defaultFilters as any).transactionStatus
@@ -59,28 +58,41 @@ const InvoicesContainer = (props: any) => {
     (defaultFilters as any).customId
   );
 
-  const [filters] = useLocalStorage('invoicesListFilters', defaultFilters);
-
-  mergeWith(filters, {
+  let [filters] = useLocalStorage('invoicesListFilters', defaultFilters);
+  const queryFilters = {
     invoiceStatus,
     transactionStatus,
     journalId,
     referenceNumber,
     customId,
-  });
-  // console.info('Filters after assign', filters);
+  };
+
+  // * When no query strings provided in the URL
+  if (!_.isEqual(defaultFilters, queryFilters)) {
+    filters = Object.assign({}, defaultFilters, queryFilters);
+  }
 
   const [page, setPage] = useQueryState(
     'page',
     (defaultPagination as any).page
   );
 
-  const [pagination] = useLocalStorage(
+  let [pagination] = useLocalStorage(
     'invoicesListPagination',
     defaultPagination
   );
 
-  Object.assign(pagination, { page, offset: page > 0 ? page - 1 : 0 });
+  if (!_.isEqual(defaultPagination, { page, offset: 0, limit: 10 })) {
+    pagination = Object.assign({}, defaultPagination, {
+      page,
+      offset: page > 0 ? page - 1 : 0,
+    });
+  }
+
+  useEffect(() => {
+    writeStorage('invoicesListFilters', filters);
+    writeStorage('invoicesListPagination', pagination);
+  }, []);
 
   const copyToClipboard = (str) => {
     const el = document.createElement('textarea');
