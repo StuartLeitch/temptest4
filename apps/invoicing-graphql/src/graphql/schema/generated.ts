@@ -197,8 +197,17 @@ export type PaymentMethod = {
 
 export type Coupon = {
    __typename?: 'Coupon';
+  id?: Maybe<Scalars['ID']>;
   reduction?: Maybe<Scalars['Float']>;
+  type?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
+  dateCreated?: Maybe<Scalars['Date']>;
+  dateUpdated?: Maybe<Scalars['Date']>;
+  expirationDate?: Maybe<Scalars['Date']>;
+  invoiceItemType?: Maybe<Scalars['String']>;
+  redeemCount?: Maybe<Scalars['Int']>;
+  status?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
 };
 
 export type Waiver = {
@@ -216,6 +225,12 @@ export type PaginatedInvoices = {
    __typename?: 'PaginatedInvoices';
   totalCount?: Maybe<Scalars['Int']>;
   invoices?: Maybe<Array<Maybe<Invoice>>>;
+};
+
+export type PaginatedCoupons = {
+   __typename?: 'PaginatedCoupons';
+  totalCount?: Maybe<Scalars['Int']>;
+  coupons?: Maybe<Array<Maybe<Coupon>>>;
 };
 
 export type RemindersStatus = {
@@ -294,6 +309,7 @@ export type Query = {
   invoice?: Maybe<Invoice>;
   invoiceVat?: Maybe<InvoiceVat>;
   invoices?: Maybe<PaginatedInvoices>;
+  coupons?: Maybe<PaginatedCoupons>;
   invoiceIdByManuscriptCustomId?: Maybe<InvoiceId>;
   journals?: Maybe<Array<Maybe<Journal>>>;
   echo?: Maybe<Scalars['String']>;
@@ -318,6 +334,11 @@ export type QueryInvoiceVatArgs = {
 
 export type QueryInvoicesArgs = {
   filters?: Maybe<InvoiceFilters>;
+  pagination?: Maybe<Pagination>;
+};
+
+
+export type QueryCouponsArgs = {
   pagination?: Maybe<Pagination>;
 };
 
@@ -572,10 +593,11 @@ export type ResolversTypes = {
   CreditNote: ResolverTypeWrapper<CreditNote>,
   PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
   Coupon: ResolverTypeWrapper<Coupon>,
+  Int: ResolverTypeWrapper<Scalars['Int']>,
   Waiver: ResolverTypeWrapper<Waiver>,
   ClientToken: ResolverTypeWrapper<ClientToken>,
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>,
-  Int: ResolverTypeWrapper<Scalars['Int']>,
+  PaginatedCoupons: ResolverTypeWrapper<PaginatedCoupons>,
   RemindersStatus: ResolverTypeWrapper<RemindersStatus>,
   ReminderType: ReminderType,
   SentReminder: ResolverTypeWrapper<SentReminder>,
@@ -619,10 +641,11 @@ export type ResolversParentTypes = {
   CreditNote: CreditNote,
   PaymentMethod: PaymentMethod,
   Coupon: Coupon,
+  Int: Scalars['Int'],
   Waiver: Waiver,
   ClientToken: ClientToken,
   PaginatedInvoices: PaginatedInvoices,
-  Int: Scalars['Int'],
+  PaginatedCoupons: PaginatedCoupons,
   RemindersStatus: RemindersStatus,
   ReminderType: ReminderType,
   SentReminder: SentReminder,
@@ -790,8 +813,17 @@ export type PaymentMethodResolvers<ContextType = any, ParentType extends Resolve
 };
 
 export type CouponResolvers<ContextType = any, ParentType extends ResolversParentTypes['Coupon'] = ResolversParentTypes['Coupon']> = {
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+  dateUpdated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+  expirationDate?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>,
+  invoiceItemType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  redeemCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -809,6 +841,12 @@ export type ClientTokenResolvers<ContextType = any, ParentType extends Resolvers
 export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
+export type PaginatedCouponsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedCoupons'] = ResolversParentTypes['PaginatedCoupons']> = {
+  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  coupons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Coupon']>>>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
@@ -832,6 +870,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceArgs, never>>,
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, RequireFields<QueryInvoiceVatArgs, never>>,
   invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, RequireFields<QueryInvoicesArgs, never>>,
+  coupons?: Resolver<Maybe<ResolversTypes['PaginatedCoupons']>, ParentType, ContextType, RequireFields<QueryCouponsArgs, never>>,
   invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, RequireFields<QueryInvoiceIdByManuscriptCustomIdArgs, never>>,
   journals?: Resolver<Maybe<Array<Maybe<ResolversTypes['Journal']>>>, ParentType, ContextType>,
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryEchoArgs, never>>,
@@ -879,6 +918,7 @@ export type Resolvers<ContextType = any> = {
   Waiver?: WaiverResolvers<ContextType>,
   ClientToken?: ClientTokenResolvers<ContextType>,
   PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>,
+  PaginatedCoupons?: PaginatedCouponsResolvers<ContextType>,
   RemindersStatus?: RemindersStatusResolvers<ContextType>,
   SentReminder?: SentReminderResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,

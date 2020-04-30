@@ -10,6 +10,14 @@ export const SidebarMiddleNav = () => (
     >
       <SidebarMenu.Item title='List' to='/invoices/list' exact />
     </SidebarMenu.Item>
+
+    <SidebarMenu.Item
+      icon={<i className='fas fa-ticket-alt'></i>}
+      title='Coupons'
+    >
+      <SidebarMenu.Item title='List' to='/coupons/list' exact />
+    </SidebarMenu.Item>
+
     {/* <SidebarMenu.Item
       icon={<i className='fas fa-fw fa-home'></i>}
       title='Dashboards'

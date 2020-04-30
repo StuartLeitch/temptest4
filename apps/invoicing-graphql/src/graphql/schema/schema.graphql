@@ -171,9 +171,18 @@ type PaymentMethod {
   isActive: Boolean
 }
 
-type Coupon {
+type Coupon @model(id: "coupons") {
+  id: ID
   reduction: Float
+  type: String
   code: String
+  dateCreated: Date
+  dateUpdated: Date
+  expirationDate: Date
+  invoiceItemType: String
+  redeemCount: Int
+  status: String
+  name: String
 }
 
 type Waiver {
@@ -188,6 +197,11 @@ type ClientToken {
 type PaginatedInvoices {
   totalCount: Int
   invoices: [Invoice]
+}
+
+type PaginatedCoupons {
+  totalCount: Int
+  coupons: [Coupon]
 }
 
 type RemindersStatus {
@@ -267,6 +281,7 @@ type Query {
     payerType: String
   ): InvoiceVat
   invoices(filters: InvoiceFilters, pagination: Pagination): PaginatedInvoices
+  coupons(pagination: Pagination): PaginatedCoupons
   invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
   journals: [Journal]
   echo(value: String): String

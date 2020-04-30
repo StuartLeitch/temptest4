@@ -1,10 +1,34 @@
+import { PaginationArguments } from './../../../core/domain/arguments/arguments';
 import { Coupon } from '../domain/Coupon';
 import { CouponId } from '../domain/CouponId';
 import { Repo } from '../../../infrastructure/Repo';
 import { CouponCode } from '../domain/CouponCode';
 import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
 
+export interface GetRecentCouponsArguments {
+  pagination?: PaginationArguments;
+  // filters: FiltersArguments;
+}
+
+export interface PaginatedCouponsResult {
+  totalCount: number | string;
+  coupons: Coupon[];
+}
+
+export interface GetRecentCouponsArguments {
+  pagination?: PaginationArguments;
+  // filters: FiltersArguments;
+}
+
+export interface PaginatedCouponsResult {
+  totalCount: number;
+  coupons: Coupon[];
+}
+
 export interface CouponRepoContract extends Repo<Coupon> {
+  getRecentCoupons(
+    args?: GetRecentCouponsArguments
+  ): Promise<PaginatedCouponsResult>;
   getCouponCollection(): Promise<Coupon[]>;
   getCouponsByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Coupon[]>;
   getCouponById(couponId: CouponId): Promise<Coupon>;

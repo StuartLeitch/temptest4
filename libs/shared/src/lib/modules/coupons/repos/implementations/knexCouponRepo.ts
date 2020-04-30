@@ -2,7 +2,11 @@ import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { Coupon } from '../../domain/Coupon';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { CouponMap } from '../../mappers/CouponMap';
-import { CouponRepoContract } from '../couponRepo';
+import {
+  CouponRepoContract,
+  PaginatedCouponsResult,
+  GetRecentCouponsArguments,
+} from '../couponRepo';
 import { CouponId } from '../../domain/CouponId';
 import { CouponCode } from '../../domain/CouponCode';
 import { InvoiceItemId } from './../../../invoices/domain/InvoiceItemId';
@@ -48,7 +52,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     await db(TABLES.INVOICE_ITEMS_TO_COUPONS).insert({
       invoiceItemId: invoiceItemId.id.toString(),
       couponId: coupon.id.toString(),
-      dateCreated: new Date()
+      dateCreated: new Date(),
     });
     return this.incrementRedeemedCount(coupon);
   }
@@ -68,7 +72,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
     const { db } = this;
 
     const updateObject = {
-      ...CouponMap.toPersistence(coupon)
+      ...CouponMap.toPersistence(coupon),
     };
 
     const updated = await db(TABLES.COUPONS)
@@ -102,6 +106,29 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
       aggregator.push(CouponMap.toDomain(t));
       return aggregator;
     }, []);
+  }
+
+  async getRecentCoupons(
+    args?: GetRecentCouponsArguments
+  ): Promise<PaginatedCouponsResult> {
+    const { pagination } = args;
+    const { db } = this;
+
+    const couponsCount = await db(TABLES.COUPONS).count(`${TABLES.COUPONS}.id`);
+    const totalCount = couponsCount[0].count;
+
+    const offset = pagination.offset * pagination.limit;
+
+    const coupons = await db(TABLES.COUPONS) // applyFilters(getModel(), filters)
+      .orderBy(`${TABLES.COUPONS}.dateCreated`, 'desc')
+      .offset(offset < totalCount ? offset : 0)
+      .limit(pagination.limit)
+      .select([`${TABLES.COUPONS}.*`]);
+
+    return {
+      totalCount,
+      coupons: coupons.map((c) => CouponMap.toDomain(c)),
+    };
   }
 
   async exists(coupon: Coupon): Promise<boolean> {
