@@ -29,12 +29,15 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { GetSentNotificationForInvoiceUsecase } from '../getSentNotificationForInvoice';
 import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJournal';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+
+import { notificationsSentInLastDelay } from '../usecase-utils';
 
 // * Usecase specific
 import { SendInvoiceCreditControlReminderResponse as Response } from './sendInvoiceCreditControlReminderResponse';
@@ -62,6 +65,10 @@ export class SendInvoiceCreditControlReminderUsecase
     private loggerService: LoggerContract,
     private emailService: EmailService
   ) {
+    this.getPaymentNotificationsSent = this.getPaymentNotificationsSent.bind(
+      this
+    );
+    this.noReminderSentRecently = this.noReminderSentRecently.bind(this);
     this.attachItemsToInvoice = this.attachItemsToInvoice.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
     this.shouldSendEmail = this.shouldSendEmail.bind(this);
@@ -87,7 +94,8 @@ export class SendInvoiceCreditControlReminderUsecase
         .then(this.getManuscript(context))
         .then(this.getCatalogItem(context))
         .then(this.getPauseStatus(context))
-        .advanceOrEnd(this.shouldSendEmail)
+        .then(this.getPaymentNotificationsSent(context))
+        .advanceOrEnd(this.shouldSendEmail, this.noReminderSentRecently)
         .then(this.sendEmail)
         .then(this.saveNotification);
 
@@ -229,6 +237,35 @@ export class SendInvoiceCreditControlReminderUsecase
     };
   }
 
+  private getPaymentNotificationsSent(context: Context) {
+    return async (request: CompoundData) => {
+      this.loggerService.info(
+        `Get the reminders of type ${NotificationType.REMINDER_PAYMENT} already sent for the invoice with id {${request.invoiceId}}`
+      );
+
+      const getNotificationsUsecase = new GetSentNotificationForInvoiceUsecase(
+        this.sentNotificationRepo,
+        this.invoiceRepo,
+        this.loggerService
+      );
+      const filterPayment = (notification: Notification) =>
+        notification.type === NotificationType.REMINDER_PAYMENT;
+      const { invoiceId } = request;
+
+      return new AsyncEither(invoiceId)
+        .then((invoiceId) =>
+          getNotificationsUsecase.execute({ invoiceId }, context)
+        )
+        .map((result) => result.getValue())
+        .map((notifications) => notifications.filter(filterPayment))
+        .map((notificationsSent) => ({
+          ...request,
+          notificationsSent,
+        }))
+        .execute();
+    };
+  }
+
   private async shouldSendEmail({ invoice, paused }: CompoundData) {
     this.loggerService.info(
       `Determine if the reminder, of type ${
@@ -241,6 +278,28 @@ export class SendInvoiceCreditControlReminderUsecase
     }
 
     return right<null, boolean>(false);
+  }
+
+  private async noReminderSentRecently({
+    notificationsSent,
+    creditControlDelay,
+    paymentDelay,
+  }: CompoundData): Promise<Either<null, boolean>> {
+    this.loggerService.info(
+      `Determine if any reminder of type ${NotificationType.REMINDER_PAYMENT} was sent recently and the full delay has not passed yet`
+    );
+
+    const delay = creditControlDelay - 3 * paymentDelay;
+    const recentNotifications = notificationsSentInLastDelay(
+      notificationsSent,
+      delay
+    );
+
+    if (recentNotifications.length > 0) {
+      return right(false);
+    }
+
+    return right(true);
   }
 
   private async sendEmail(

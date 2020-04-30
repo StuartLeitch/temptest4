@@ -1,6 +1,7 @@
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { Invoice } from '../../../invoices/domain/Invoice';
+import { Notification } from '../../domain/Notification';
 
 import {
   PaymentReminderType,
@@ -10,6 +11,7 @@ import {
 import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
 
 export interface CompoundData extends DTO {
+  notificationsSent: Notification[];
   manuscript: Manuscript;
   journal: CatalogItem;
   invoice: Invoice;

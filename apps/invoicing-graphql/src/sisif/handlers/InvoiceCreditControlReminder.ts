@@ -47,8 +47,10 @@ export const invoiceCreditControlHandler = (
   };
 
   const request: SendInvoiceCreditControlReminderDTO = {
+    creditControlDelay: env.scheduler.creditControlReminderDelay,
     senderEmail: env.app.creditControlReminderSenderEmail,
     senderName: env.app.creditControlReminderSenderName,
+    paymentDelay: env.scheduler.paymentReminderDelay,
     recipientEmail,
     recipientName,
     invoiceId,
