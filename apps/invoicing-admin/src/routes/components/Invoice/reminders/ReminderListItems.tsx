@@ -32,7 +32,7 @@ const ReminderListItem: FunctionComponent<ReminderListItemProps> = ({
         <span style={{ textAlign: 'center', flex: '1' }}>{type}</span>
         <span style={{ textAlign: 'center', flex: '1' }}>{toEmail}</span>
         <span style={{ textAlign: 'center', flex: '1' }}>
-          {format(new Date(when), 'dd MMMM yyyy HH:mm')}
+          {format(new Date(new Date(when).toISOString()), 'dd MMMM yyyy HH:mm')}
         </span>
       </div>
     </ListGroupItem>
