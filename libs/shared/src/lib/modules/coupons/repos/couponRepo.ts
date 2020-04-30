@@ -11,7 +11,7 @@ export interface GetRecentCouponsArguments {
 }
 
 export interface PaginatedCouponsResult {
-  totalCount: number;
+  totalCount: number | string;
   coupons: Coupon[];
 }
 
