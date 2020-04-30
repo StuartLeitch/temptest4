@@ -4,7 +4,16 @@ import { CouponId } from '../domain/CouponId';
 import { Repo } from '../../../infrastructure/Repo';
 import { CouponCode } from '../domain/CouponCode';
 import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
-import { GetRecentCouponsSuccessResponse } from '../../coupons/usecases/getRecentCoupons/getRecentCouponsResponse';
+
+export interface GetRecentCouponsArguments {
+  pagination?: PaginationArguments;
+  // filters: FiltersArguments;
+}
+
+export interface PaginatedCouponsResult {
+  totalCount: number;
+  coupons: Coupon[];
+}
 
 export interface GetRecentCouponsArguments {
   pagination?: PaginationArguments;
