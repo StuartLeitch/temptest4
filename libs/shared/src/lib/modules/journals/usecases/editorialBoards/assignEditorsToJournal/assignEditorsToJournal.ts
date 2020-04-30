@@ -3,14 +3,14 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
   AuthorizationContext,
-  Roles
+  Roles,
 } from '@hindawi/shared';
 import { EditorRepoContract } from '../../../repos/editorRepo';
 import {
   left,
   right,
   Result,
-  Either
+  Either,
 } from 'libs/shared/src/lib/core/logic/Result';
 import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
 import { JournalId } from '../../../domain/JournalId';
@@ -63,12 +63,16 @@ export class AssignEditorsToJournalUsecase
     request: AssignEditorsToJournalDTO,
     context?: AssignEditorsToJournalAuthorizationContext
   ): Promise<AssignEditorsToJournalResponse> {
-    let { journalId: journalIdString, allEditors: editors } = request;
-    let allEditors = editors.map(e => ({ ...e, journalId: journalIdString }));
+    const { journalId: journalIdString, allEditors: editors } = request;
+    const allEditors = editors.map((e) => ({
+      ...e,
+      journalId: journalIdString,
+    }));
 
     const journalId = JournalId.create(
       new UniqueEntityID(journalIdString)
     ).getValue();
+
     try {
       const journal = await this.catalogRepo.getCatalogItemByJournalId(
         journalId
@@ -92,12 +96,12 @@ export class AssignEditorsToJournalUsecase
         );
       }
 
-      const currentEditorsIds = currentEditors.map(e => e.id.toString());
+      const currentEditorsIds = currentEditors.map((e) => e.id.toString());
 
       console.log(`Current editor number: ${currentEditorsIds.length}`);
       console.log(`Expected editor number: ${allEditors.length}`);
 
-      const editorsToCreate = allEditors.filter(e => {
+      const editorsToCreate = allEditors.filter((e) => {
         // TODO filter assistants
         const isCreated = currentEditorsIds.includes(e.editorId);
         return !isCreated;
@@ -105,12 +109,12 @@ export class AssignEditorsToJournalUsecase
 
       console.log(
         `Creating ${editorsToCreate.length} editors`,
-        editorsToCreate.map(e => e.email).join(' ')
+        editorsToCreate.map((e) => e.email).join(' ')
       );
 
       const createEditorUsecase = new CreateEditor(this.editorRepo);
-      let createEditorsResponse = await Promise.all(
-        editorsToCreate.map(e => createEditorUsecase.execute(e))
+      const createEditorsResponse = await Promise.all(
+        editorsToCreate.map((e) => createEditorUsecase.execute(e))
       );
 
       const errs = [];

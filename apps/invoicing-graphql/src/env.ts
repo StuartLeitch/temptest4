@@ -132,7 +132,7 @@ export const env = {
       endpoint: getOsEnv('AWS_SQS_ENDPOINT'),
     },
     s3: {
-      endpoint: getOsEnv('AWS_S3_ENDPOINT'),
+      endpoint: getOsEnvOptional('AWS_S3_ENDPOINT'),
       largeEventBucket: getOsEnv('PHENOM_LARGE_EVENTS_BUCKET'),
       bucketPrefix: getOsEnv('PHENOM_LARGE_EVENTS_PREFIX'),
     },
