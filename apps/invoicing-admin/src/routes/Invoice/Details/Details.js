@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'graphql-hooks';
-import LoadingOverlay from 'react-loading-overlay';
 import DatePicker from 'react-datepicker';
 import format from 'date-fns/format';
 import compareDesc from 'date-fns/compareDesc';
@@ -33,7 +32,6 @@ import {
   ModalBody,
   Nav,
   NavItem,
-  Spinner,
   Table,
   TabPane,
   UncontrolledButtonDropdown,
