@@ -15,10 +15,9 @@ import {
 } from '../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
-import { PageLoading } from '../../components';
+import { Loading } from '../../components';
 
 import List from './List';
-import { Loading } from '../../components';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
