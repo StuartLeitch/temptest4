@@ -11,6 +11,8 @@ import manuscriptEditorsView from './ManuscriptEditorsView';
 import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';
 import checkerToSubmissionView from './CheckerToSubmissionView';
+import manuscriptReviewers from './ManuscriptReviewersView';
+import manuscriptReviewsView from './ManuscriptReviewsView';
 
 class ManuscriptsView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -47,7 +49,17 @@ AS SELECT
   screener.checker_name as screener_name,
   screener.checker_email as screener_email,
   quality_checker.checker_name as quality_checker_name,
-  quality_checker.checker_email as quality_checker_email
+  quality_checker.checker_email as quality_checker_email,
+  reviewers.invited_reviewers_count,
+  reviewers.last_reviewer_invitation_date,
+  accepted_reviewers.accepted_reviewers_count,
+  accepted_reviewers.last_reviewer_accepted_date,
+  pending_reviewers.pending_reviewers_count,
+  review_reports.review_reports_count,
+  review_reports.last_review_report_submitted_date,
+  handling_editors.invited_handling_editors_count,
+  handling_editors.last_handling_editor_invited_date,
+  handling_editors.current_handling_editor_accepted_date
 FROM ${submissionView.getViewName()} s 
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_corresponding = true limit 1) a on a.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_submitting = true limit 1) a2 on a2.manuscript_custom_id = s.manuscript_custom_id
@@ -62,6 +74,11 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'screener' limit 1) screener on screener.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id
+  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count, max(invited_date) as last_reviewer_invitation_date from ${manuscriptReviewers.getViewName()} group by manuscript_custom_id, "version") reviewers on reviewers.manuscript_custom_id = s.manuscript_custom_id and reviewers."version" = s."version"
+  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count, max(accepted_date) as last_reviewer_accepted_date from ${manuscriptReviewers.getViewName()} where status = 'accepted' group by manuscript_custom_id, version) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
+  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as pending_reviewers_count from ${manuscriptReviewers.getViewName()} where responded_date is null group by manuscript_custom_id, version) pending_reviewers on pending_reviewers.manuscript_custom_id = s.manuscript_custom_id and pending_reviewers."version" = s."version"
+  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as review_reports_count, max(submitted_date) as last_review_report_submitted_date from ${manuscriptReviewsView.getViewName()} group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
+  LEFT JOIN (select manuscript_custom_id, count(*) as invited_handling_editors_count, max(invited_date) as last_handling_editor_invited_date, max(accepted_date) current_handling_editor_accepted_date from manuscript_editors where role_type = 'academicEditor' group by manuscript_custom_id) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
 WITH DATA;
     `;
   }
@@ -97,5 +114,7 @@ manuscriptsView.addDependency(journalSpecialIssuesView);
 manuscriptsView.addDependency(manuscriptEditorsView);
 manuscriptsView.addDependency(submissionView);
 manuscriptsView.addDependency(checkerToSubmissionView);
+manuscriptsView.addDependency(manuscriptReviewers);
+manuscriptsView.addDependency(manuscriptReviewsView);
 
 export default manuscriptsView;

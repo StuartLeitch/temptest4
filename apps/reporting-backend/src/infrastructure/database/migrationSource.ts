@@ -100,7 +100,10 @@ class KnexMigrationSource {
     add_sub_data_index,
     rebuild_materialized_views('20200421151200_fix_manuscript_authors', true),
     rebuild_materialized_views('20200427133000_add_manuscript_apc', true),
-    rebuild_materialized_views('20200427141500_add_credit_note_support'),
+    rebuild_materialized_views('20200427141500_add_credit_note_support', true),
+    rebuild_materialized_views(
+      '20200430172400_add_editor_reviewers_to_manuscripts'
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
