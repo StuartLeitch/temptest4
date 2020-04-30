@@ -57,32 +57,39 @@ const CouponsContainer = () => {
     fetchData(page);
   }, [fetchData, page, fetchCoupons]);
 
+  const Content = ({ loading, error, data }) => {
+    if (loading) return <Loading />;
+
+    if (error) return <Error error={error} />;
+
+    if (data)
+      return (
+        <>
+          <Card className='mb-0'>
+            <List coupons={data.coupons.coupons} />
+            <CardFooter className='d-flex justify-content-center pb-0'>
+              <ListPagination
+                totalRecords={data.coupons.totalCount}
+                pageNeighbours={1}
+                onPageChanged={onPageChange}
+                pageLimit={defaultPaginationSettings.limit}
+                currentPage={page}
+              />
+            </CardFooter>
+          </Card>
+        </>
+      );
+
+    return <Loading />;
+  };
+
   return (
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain title='Coupons' className='mb-5 mt-4' />
         <Row>
           <Col lg={12}>
-            {loading && <Loading loading={loading} />}
-
-            {error && <Error error={error} />}
-
-            {data && (
-              <>
-                <Card className='mb-0'>
-                  <List coupons={data.coupons.coupons} />
-                  <CardFooter className='d-flex justify-content-center pb-0'>
-                    <ListPagination
-                      totalRecords={data.coupons.totalCount}
-                      pageNeighbours={1}
-                      onPageChanged={onPageChange}
-                      pageLimit={defaultPaginationSettings.limit}
-                      currentPage={page}
-                    />
-                  </CardFooter>
-                </Card>
-              </>
-            )}
+            <Content {...{ loading, error, data }} />
           </Col>
         </Row>
       </Container>

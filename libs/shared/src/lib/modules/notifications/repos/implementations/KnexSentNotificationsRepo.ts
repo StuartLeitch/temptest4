@@ -31,7 +31,8 @@ export class KnexSentNotificationsRepo
   async getNotificationsByInvoiceId(id: InvoiceId): Promise<Notification[]> {
     const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
       .select()
-      .where('invoiceId', id.id.toString());
+      .where('invoiceId', id.id.toString())
+      .orderBy('dateSent', 'desc');
 
     return notifications.map(NotificationMap.toDomain);
   }

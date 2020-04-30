@@ -50,6 +50,8 @@ import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 
+import { notificationsSentInLastDelay } from '../usecase-utils';
+
 // * Usecase specific
 import { SendInvoicePaymentReminderResponse as Response } from './sendInvoicePaymentReminderResponse';
 import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
@@ -81,7 +83,11 @@ export class SendInvoicePaymentReminderUsecase
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
+    this.getPaymentNotificationsSent = this.getPaymentNotificationsSent.bind(
+      this
+    );
     this.sendPaymentReminderEmail = this.sendPaymentReminderEmail.bind(this);
+    this.noReminderSentRecently = this.noReminderSentRecently.bind(this);
     this.attachItemsToInvoice = this.attachItemsToInvoice.bind(this);
     this.bellowEmailMaxCount = this.bellowEmailMaxCount.bind(this);
     this.shouldRescheduleJob = this.shouldRescheduleJob.bind(this);
@@ -110,7 +116,12 @@ export class SendInvoicePaymentReminderUsecase
         .then(this.getManuscript(context))
         .then(this.getCatalogItem(context))
         .then(this.getPauseStatus(context))
-        .advanceOrEnd(this.shouldSendEmail, this.bellowEmailMaxCount)
+        .then(this.getPaymentNotificationsSent(context))
+        .advanceOrEnd(
+          this.shouldSendEmail,
+          this.noReminderSentRecently,
+          this.bellowEmailMaxCount
+        )
         .then(this.sendPaymentReminderEmail)
         .then(this.saveNotification)
         .advanceOrEnd(this.shouldRescheduleJob)
@@ -224,29 +235,68 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private bellowEmailMaxCount({ invoice }: CompoundData) {
+  private getPaymentNotificationsSent(context: Context) {
+    return async (request: CompoundData) => {
+      this.loggerService.info(
+        `Get the reminders of type ${NotificationType.REMINDER_PAYMENT} already sent for the invoice with id {${request.invoiceId}}`
+      );
+
+      const getNotificationsUsecase = new GetSentNotificationForInvoiceUsecase(
+        this.sentNotificationRepo,
+        this.invoiceRepo,
+        this.loggerService
+      );
+      const filterPayment = (notification: Notification) =>
+        notification.type === NotificationType.REMINDER_PAYMENT;
+      const { invoiceId } = request;
+
+      return new AsyncEither(invoiceId)
+        .then((invoiceId) =>
+          getNotificationsUsecase.execute({ invoiceId }, context)
+        )
+        .map((result) => result.getValue())
+        .map((notifications) => notifications.filter(filterPayment))
+        .map((notificationsSent) => ({
+          ...request,
+          notificationsSent,
+        }))
+        .execute();
+    };
+  }
+
+  private async bellowEmailMaxCount({
+    notificationsSent,
+    invoiceId,
+  }: CompoundData): Promise<Either<null, boolean>> {
     this.loggerService.info(
-      `Determine if the reminder of type ${
-        NotificationType.REMINDER_PAYMENT
-      } was sent less than 3 times for invoice with id ${invoice.id.toString()}`
+      `Determine if the reminder of type ${NotificationType.REMINDER_PAYMENT} was sent less than 3 times for invoice with id ${invoiceId}`
     );
 
-    const getNotificationsUsecase = new GetSentNotificationForInvoiceUsecase(
-      this.sentNotificationRepo,
-      this.invoiceRepo,
-      this.loggerService
+    if (!(notificationsSent.length < 3)) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
+  private async noReminderSentRecently({
+    notificationsSent,
+    job: { delay },
+  }: CompoundData): Promise<Either<null, boolean>> {
+    this.loggerService.info(
+      `Determine if any reminder of type ${NotificationType.REMINDER_PAYMENT} was sent recently and the full delay has not passed yet`
     );
-    const filterPayment = (notification: Notification) =>
-      notification.type === NotificationType.REMINDER_PAYMENT;
 
-    const execution = new AsyncEither(invoice.id.toString())
-      .then((invoiceId) => getNotificationsUsecase.execute({ invoiceId }))
-      .map((result) => result.getValue())
-      .map((notifications) => notifications.filter(filterPayment))
-      .map((notifications) => notifications.length)
-      .map((count) => count < 3);
+    const recentNotifications = notificationsSentInLastDelay(
+      notificationsSent,
+      delay
+    );
 
-    return execution.execute();
+    if (recentNotifications.length > 0) {
+      return right(false);
+    }
+
+    return right(true);
   }
 
   private async sendEmail(

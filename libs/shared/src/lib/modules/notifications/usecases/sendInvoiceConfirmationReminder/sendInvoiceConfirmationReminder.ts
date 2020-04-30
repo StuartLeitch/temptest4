@@ -37,6 +37,7 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
+import { GetSentNotificationForInvoiceUsecase } from '../getSentNotificationForInvoice';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 import { NotificationType, Notification } from '../../domain/Notification';
@@ -46,12 +47,15 @@ import {
   Transaction,
 } from '../../../transactions/domain/Transaction';
 
+import { notificationsSentInLastDelay } from '../usecase-utils';
+
 // * Usecase specific
 import { SendInvoiceConfirmationReminderResponse as Response } from './sendInvoiceConfirmationReminderResponse';
 import { SendInvoiceConfirmationReminderDTO as DTO } from './sendInvoiceConfirmationReminderDTO';
 import * as Errors from './sendInvoiceConfirmationReminderErrors';
 
 interface CompoundDTO extends DTO {
+  notificationsSent: Notification[];
   manuscriptCustomId: string;
   transaction: Transaction;
   invoice: Invoice;
@@ -76,6 +80,10 @@ export class SendInvoiceConfirmationReminderUsecase
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
+    this.getConfirmationNotificationsSent = this.getConfirmationNotificationsSent.bind(
+      this
+    );
+    this.noReminderSentRecently = this.noReminderSentRecently.bind(this);
     this.getManuscriptCustomId = this.getManuscriptCustomId.bind(this);
     this.shouldSendReminder = this.shouldSendReminder.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
@@ -100,7 +108,8 @@ export class SendInvoiceConfirmationReminderUsecase
         .then(this.getManuscriptCustomId(context))
         .then(this.getPauseStatus(context))
         .then(this.getTransaction(context))
-        .advanceOrEnd(this.shouldSendReminder)
+        .then(this.getConfirmationNotificationsSent(context))
+        .advanceOrEnd(this.shouldSendReminder, this.noReminderSentRecently)
         .then(this.sendEmail)
         .then(this.saveNotification)
         .then(this.scheduleTask)
@@ -240,6 +249,55 @@ export class SendInvoiceConfirmationReminderUsecase
         );
       }
     };
+  }
+
+  private getConfirmationNotificationsSent(context: Context) {
+    return async (request: CompoundDTO) => {
+      this.loggerService.info(
+        `Get the reminders of type ${NotificationType.REMINDER_CONFIRMATION} already sent for the invoice with id {${request.invoiceId}}`
+      );
+
+      const getNotificationsUsecase = new GetSentNotificationForInvoiceUsecase(
+        this.sentNotificationRepo,
+        this.invoiceRepo,
+        this.loggerService
+      );
+      const filterPayment = (notification: Notification) =>
+        notification.type === NotificationType.REMINDER_CONFIRMATION;
+      const { invoiceId } = request;
+
+      return new AsyncEither(invoiceId)
+        .then((invoiceId) =>
+          getNotificationsUsecase.execute({ invoiceId }, context)
+        )
+        .map((result) => result.getValue())
+        .map((notifications) => notifications.filter(filterPayment))
+        .map((notificationsSent) => ({
+          ...request,
+          notificationsSent,
+        }))
+        .execute();
+    };
+  }
+
+  private async noReminderSentRecently({
+    notificationsSent,
+    job: { delay },
+  }: CompoundDTO): Promise<Either<null, boolean>> {
+    this.loggerService.info(
+      `Determine if any reminder of type ${NotificationType.REMINDER_CONFIRMATION} was sent recently and the full delay has not passed yet`
+    );
+
+    const recentNotifications = notificationsSentInLastDelay(
+      notificationsSent,
+      delay
+    );
+
+    if (recentNotifications.length > 0) {
+      return right(false);
+    }
+
+    return right(true);
   }
 
   private async shouldSendReminder({
