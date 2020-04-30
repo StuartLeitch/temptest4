@@ -1,10 +1,12 @@
-import { GetRecentCouponsSuccessResponse } from './../../usecases/getRecentCoupons/getRecentCouponsResponse';
-import { GetRecentCouponsDTO } from './../../usecases/getRecentCoupons/getRecentCouponsDTO';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { Coupon } from '../../domain/Coupon';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { CouponMap } from '../../mappers/CouponMap';
-import { CouponRepoContract } from '../couponRepo';
+import {
+  CouponRepoContract,
+  PaginatedCouponsResult,
+  GetRecentCouponsArguments,
+} from '../couponRepo';
 import { CouponId } from '../../domain/CouponId';
 import { CouponCode } from '../../domain/CouponCode';
 import { InvoiceItemId } from './../../../invoices/domain/InvoiceItemId';
@@ -107,8 +109,8 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
   }
 
   async getRecentCoupons(
-    args?: GetRecentCouponsDTO
-  ): Promise<GetRecentCouponsSuccessResponse> {
+    args?: GetRecentCouponsArguments
+  ): Promise<PaginatedCouponsResult> {
     const { pagination } = args;
     const { db } = this;
 
