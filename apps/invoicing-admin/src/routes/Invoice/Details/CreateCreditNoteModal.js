@@ -80,7 +80,7 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
                   const { value } = e.target;
                   setCreditNoteData({
                     ...creditNoteData,
-                    createDraft: !!value,
+                    createDraft: !!+value,
                   });
                 }}
               >
