@@ -77,8 +77,8 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count, max(invited_date) as last_reviewer_invitation_date from ${manuscriptReviewers.getViewName()} group by manuscript_custom_id, "version") reviewers on reviewers.manuscript_custom_id = s.manuscript_custom_id and reviewers."version" = s."version"
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count, max(accepted_date) as last_reviewer_accepted_date from ${manuscriptReviewers.getViewName()} where status = 'accepted' group by manuscript_custom_id, version) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as pending_reviewers_count from ${manuscriptReviewers.getViewName()} where responded_date is null group by manuscript_custom_id, version) pending_reviewers on pending_reviewers.manuscript_custom_id = s.manuscript_custom_id and pending_reviewers."version" = s."version"
-  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as review_reports_count, max(submitted_date) as last_review_report_submitted_date from ${manuscriptReviewsView.getViewName()} group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
-  LEFT JOIN (select manuscript_custom_id, count(*) as invited_handling_editors_count, max(invited_date) as last_handling_editor_invited_date, max(accepted_date) current_handling_editor_accepted_date from manuscript_editors where role_type = 'academicEditor' group by manuscript_custom_id) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
+  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as review_reports_count, max(submitted_date) as last_review_report_submitted_date from ${manuscriptReviewsView.getViewName()} where recommendation in ('publish', 'reject', 'minor', 'major') group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
+  LEFT JOIN (select manuscript_custom_id, count(*) as invited_handling_editors_count, max(invited_date) as last_handling_editor_invited_date, max(accepted_date) current_handling_editor_accepted_date from ${manuscriptEditorsView.getViewName()} where role_type = 'academicEditor' group by manuscript_custom_id) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
 WITH DATA;
     `;
   }
@@ -116,5 +116,6 @@ manuscriptsView.addDependency(submissionView);
 manuscriptsView.addDependency(checkerToSubmissionView);
 manuscriptsView.addDependency(manuscriptReviewers);
 manuscriptsView.addDependency(manuscriptReviewsView);
+manuscriptsView.addDependency(manuscriptEditorsView);
 
 export default manuscriptsView;

@@ -102,7 +102,11 @@ class KnexMigrationSource {
     rebuild_materialized_views('20200427133000_add_manuscript_apc', true),
     rebuild_materialized_views('20200427141500_add_credit_note_support', true),
     rebuild_materialized_views(
-      '20200430172400_add_editor_reviewers_to_manuscripts'
+      '20200430172400_add_editor_reviewers_to_manuscripts',
+      true
+    ),
+    rebuild_materialized_views(
+      '20200430172400_add_screening_dates_to_manuscripts'
     ),
   ].map(makeViewObject);
 
