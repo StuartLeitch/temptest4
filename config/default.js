@@ -1,6 +1,6 @@
 module.exports = {
   mailer: {
-    path: `${__dirname}/mailer`
+    path: `${__dirname}/mailer`,
   },
   journal: {
     logo:
@@ -12,6 +12,6 @@ module.exports = {
     address:
       'Hindawi Limited, 3rd Floor, Adam House, 1 Fitzroy Square, London, W1T 5HF, United Kingdom',
     publisher: 'Hindawi Limited',
-    footerText: ''
-  }
+    footerText: '',
+  },
 };

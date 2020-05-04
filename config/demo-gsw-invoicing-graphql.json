@@ -6,7 +6,6 @@
   "APP_SCHEMA": "https",
   "ASSISTANCE_EMAIL": "accounts.receivable@hindawi.com",
   "AWS_ENABLED": true,
-  "AWS_S3_ENDPOINT": "",
   "AWS_SES_REGION": "eu-west-1",
   "AWS_SNS_SQS_REGION": "eu-west-1",
   "BANK_ACCOUNT_NAME": "Hindawi Limited",
