@@ -21,6 +21,8 @@ AS SELECT
   t.apc as journal_apc,
   t.submission_date,
   t.resubmission_date,
+  t.screening_passed_date,
+  t.last_recommendation_date,
   t.special_issue_id,
   t.section_id,
   t.title,
@@ -40,6 +42,8 @@ FROM (
       s.manuscript_custom_id,
       s.submission_event,
       submission_submitted_dates.min as submission_date,
+      screening_passed_dates.max as screening_passed_date,
+      recommendation_dates.max as last_recommendation_date,
       CASE 
         WHEN submission_submitted_dates.count = 1 THEN null
         ELSE submission_submitted_dates.max
@@ -59,6 +63,8 @@ FROM (
       FROM ${submissionDataView.getViewName()} s
       LEFT JOIN ${journalsView.getViewName()} j ON s.journal_id = j.journal_id
       JOIN  (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionSubmitted' group by submission_id) submission_submitted_dates on submission_submitted_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningPassed' group by submission_id) screening_passed_dates on screening_passed_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionAccepted' or submission_event like 'SubmissionRecommendation%' group by submission_id) recommendation_dates on recommendation_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
     ) sd
