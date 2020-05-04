@@ -14,11 +14,16 @@ import { env } from '../../env';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
-const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
-const logger = new Logger(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
+// const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
+const SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED =
+  'SubmissionPeerReviewCycleCheckPassed';
 
-export const SubmissionQualityCheckPassedHandler = {
-  event: SUBMISSION_QUALITY_CHECK_PASSED,
+const logger = new Logger(
+  `PhenomEvent:${SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED}`
+);
+
+export const SubmissionPeerReviewCycleCheckPassed = {
+  event: SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(data: any) {
     logger.info('Incoming Event Data', data);
 

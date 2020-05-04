@@ -1,23 +1,23 @@
-import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
-import { SubmissionQualityCheckPassedHandler } from './SubmissionQualityCheckPassed';
-import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
+import { SubmissionPeerReviewCycleCheckPassed } from './SubmissionPeerReviewCycleCheckPassed';
 import { SubmissionQualityCheckRTCd } from './SubmissionQualityCheckRTCd';
-import { SubmissionRejected } from './SubmissionRejected';
-import { SubmissionWithdrawn } from './SubmissionWithdrawn';
-import { JournalAddedHandler } from './JournalAdded';
-import { JournalUpdatedHandler } from './JournalUpdated';
 import { JournalEditorAssignedHandler } from './JournalEditorAssigned';
+import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
+import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
 import { ArticlePublishedHandler } from './ArticlePublished';
+import { SubmissionWithdrawn } from './SubmissionWithdrawn';
+import { SubmissionRejected } from './SubmissionRejected';
+import { JournalUpdatedHandler } from './JournalUpdated';
+import { JournalAddedHandler } from './JournalAdded';
 
 export {
-  SubmissionSubmittedHandler,
-  SubmissionQualityCheckPassedHandler,
-  SubmissionWithdrawn,
-  SubmissionScreeningRTCd,
-  SubmissionQualityCheckRTCd,
-  SubmissionRejected,
-  JournalAddedHandler,
-  JournalUpdatedHandler,
+  SubmissionPeerReviewCycleCheckPassed,
   JournalEditorAssignedHandler,
-  ArticlePublishedHandler
+  SubmissionQualityCheckRTCd,
+  SubmissionSubmittedHandler,
+  ArticlePublishedHandler,
+  SubmissionScreeningRTCd,
+  JournalUpdatedHandler,
+  JournalAddedHandler,
+  SubmissionWithdrawn,
+  SubmissionRejected,
 };
