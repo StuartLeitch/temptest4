@@ -20,7 +20,7 @@ SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
 if os.getenv('CACHE_TYPE', '') == 'redis':
   CACHE_CONFIG = {
     'CACHE_TYPE': 'redis',
-    'CACHE_DEFAULT_TIMEOUT': 60 * 60 * 24, # 1 day default (in secs)
+    'CACHE_DEFAULT_TIMEOUT': 60 * 60 * 1, # 1 hour default (in secs)
     'CACHE_KEY_PREFIX': 'superset_results',
     'CACHE_REDIS_URL': os.getenv('CACHE_REDIS_URL'),
   }
