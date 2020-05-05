@@ -15,16 +15,6 @@ export interface PaginatedCouponsResult {
   coupons: Coupon[];
 }
 
-export interface GetRecentCouponsArguments {
-  pagination?: PaginationArguments;
-  // filters: FiltersArguments;
-}
-
-export interface PaginatedCouponsResult {
-  totalCount: number;
-  coupons: Coupon[];
-}
-
 export interface CouponRepoContract extends Repo<Coupon> {
   getRecentCoupons(
     args?: GetRecentCouponsArguments
