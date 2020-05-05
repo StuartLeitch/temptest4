@@ -273,7 +273,11 @@ export const invoice: Resolvers<any> = {
         const address = await addressRepo.findById(payer.billingAddressId);
         // * Get the VAT note for the invoice item
         const { template } = vatService.getVATNote(
-          address.country,
+          {
+            postalCode: address.postalCode,
+            countryCode: address.country,
+            stateCode: address.state,
+          },
           payer.type !== PayerType.INSTITUTION
         );
         vatnote = template;

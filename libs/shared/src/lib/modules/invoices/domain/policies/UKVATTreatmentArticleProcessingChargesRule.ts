@@ -93,7 +93,7 @@ export class UKVATTreatmentArticleProcessingChargesRule
     // United Kingdom
     UK: { rate: 20 },
     // United Kingdom
-    GB: { rate: 20 }
+    GB: { rate: 20 },
   };
 
   private VATNote = {
@@ -112,7 +112,7 @@ export class UKVATTreatmentArticleProcessingChargesRule
     TAX_REST_OF_THE_WORLD_TYPE_VALUE: 'a680Y0000000Cv8QAE',
     TAX_EU_AND_UK_TYPE_TEXT: 'Standard Rate UK',
     TAX_TYPE_ZERO_RATE_TEXT: 'Zero Rate UK',
-    TAX_TYPE_EXEMPT_UK_TEXT: 'Exempt UK'
+    TAX_TYPE_EXEMPT_UK_TEXT: 'Exempt UK',
   };
 
   public constructor(
@@ -147,13 +147,13 @@ export class UKVATTreatmentArticleProcessingChargesRule
       tax: {
         treatment: {
           value: '',
-          text: ''
+          text: '',
         },
         type: {
           value: '',
-          text: ''
-        }
-      }
+          text: '',
+        },
+      },
     };
 
     if (!europeanCountriesCodes.includes(this.CountryCode)) {
