@@ -40,7 +40,7 @@ const VatCharge: React.FC<Props> = ({ tenant, vat, price, ...rest }) => {
   return (
     <Fragment>
       <Flex justifyContent="space-between" mt={2}>
-        <Flex justifyContent="flex-start">
+        <Flex justifyContent="flex-start" style={{ width: "80%" }}>
           <Label>VAT</Label>
           <Text>(+{vat}%)</Text>
           <Tooltip
