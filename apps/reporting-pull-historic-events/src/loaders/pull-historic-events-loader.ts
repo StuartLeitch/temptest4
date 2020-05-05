@@ -5,6 +5,7 @@ import {
   S3EventProducer,
   SqsPublishConsumer,
   UsecasePublishConsumer,
+  CounterConsumer,
 } from 'libs/eve/src';
 import { S3, SQS } from 'aws-sdk';
 import Knex from 'knex';
@@ -92,6 +93,9 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
       const sqs = new SQS(sqsConfig);
       consumer = new SqsPublishConsumer<Event>(sqs, sqsConfig.queueName);
       break;
+    case ConsumerTransport.Counter:
+      consumer = new CounterConsumer<Event>(new Logger('consumer:counter'));
+      break;
     default:
       throw new Error('Unknown consumer type');
   }
@@ -105,16 +109,7 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
   } else {
     for await (const event of producer.produce()) {
       // queue task
-      tasks.push(
-        new Promise(async (resolve, reject) => {
-          try {
-            await consumer.consume(event);
-            resolve();
-          } catch (error) {
-            reject(error);
-          }
-        })
-      );
+      tasks.push(consumer.consume(event));
 
       if (tasks.length >= env.workerCount) {
         await Promise.all(tasks);
