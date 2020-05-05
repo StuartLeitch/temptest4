@@ -132,7 +132,10 @@ export class PublishInvoiceCreatedUsecase
   private payloadWithInvoiceData(
     invoice: Invoice,
     payload: InvoiceCreatedMessagePayload
-  ): InvoiceCreatedMessagePayload & { isCreditNote: boolean } {
+  ): InvoiceCreatedMessagePayload & {
+    invoiceAcceptedDate: string;
+    isCreditNote: boolean;
+  } {
     return {
       ...payload,
       referenceNumber: invoice.referenceNumber,
@@ -140,6 +143,7 @@ export class PublishInvoiceCreatedUsecase
       isCreditNote: false,
       invoiceStatus: invoice.status as PhenomInvoiceStatus,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
+      invoiceAcceptedDate: invoice.dateAccepted.toISOString(),
     };
   }
 

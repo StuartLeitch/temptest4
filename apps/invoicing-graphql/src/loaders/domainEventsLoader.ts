@@ -3,7 +3,7 @@
 
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
@@ -40,10 +40,10 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         catalog,
         coupon,
         waiver,
-        publisher
+        publisher,
       },
       services: { erpService, logger: loggerService, schedulingService },
-      qq: queue
+      qq: queue,
     } = context;
 
     const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
@@ -125,7 +125,9 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       coupon,
       waiver,
       manuscript,
-      publishInvoicePaid
+      payer,
+      publishInvoicePaid,
+      loggerService
     );
 
     // tslint:disable-next-line: no-unused-expression

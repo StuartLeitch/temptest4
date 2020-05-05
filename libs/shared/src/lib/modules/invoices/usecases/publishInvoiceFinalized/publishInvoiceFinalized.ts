@@ -1,15 +1,16 @@
 import { InvoiceStatus as PhenomInvoiceStatus } from '@hindawi/phenom-events/src/lib/invoice';
-import { InvoiceConfirmed as InvoiceConfirmedEvent } from '@hindawi/phenom-events';
+// import { InvoiceConfirmed as InvoiceConfirmedEvent } from '@hindawi/phenom-events';
 
+import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 import { AppError } from '../../../../core/logic/AppError';
 import { EventUtils } from '../../../../utils/EventUtils';
 
-import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
-import { Invoice } from '../../domain/Invoice';
-import { InvoiceItem } from '../../domain/InvoiceItem';
-import { Payer } from '../../../payers/domain/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
+import { InvoiceItem } from '../../domain/InvoiceItem';
+import { Payer } from '../../../payers/domain/Payer';
+import { Invoice } from '../../domain/Invoice';
+
 import { CouponMap } from '../../../coupons/mappers/CouponMap';
 import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
 
@@ -32,6 +33,7 @@ export class PublishInvoiceFinalized {
       isCreditNote: !!invoice.cancelledInvoiceReference,
       erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
+      invoiceAcceptedDate: invoice.dateAccepted.toISOString(),
       referenceNumber:
         invoice.cancelledInvoiceReference === null
           ? invoice.referenceNumber
@@ -74,8 +76,6 @@ export class PublishInvoiceFinalized {
         (acc, item) => acc + item.calculatePrice() * (item.vat / 100),
         0
       ),
-      // couponId: coupon.id,
-      // dateApplied: coupon.applied
     };
 
     try {

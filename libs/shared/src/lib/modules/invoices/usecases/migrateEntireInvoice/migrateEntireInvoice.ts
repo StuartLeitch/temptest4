@@ -927,12 +927,19 @@ export class MigrateEntireInvoiceUsecase
           invoiceItems,
         }));
       })
-      .then(async ({ paymentDetails, manuscript, invoiceItems }) => {
+      .then(async (data) => {
+        const maybePayer = await this.getPayerByInvoiceId(
+          invoice.id.toString()
+        );
+        return maybePayer.map((payer) => ({ ...data, payer }));
+      })
+      .then(async ({ paymentDetails, invoiceItems, manuscript, payer }) => {
         await usecase.execute(
           invoice,
           invoiceItems,
           manuscript,
           paymentDetails,
+          payer,
           messageTimestamp
         );
         return right<

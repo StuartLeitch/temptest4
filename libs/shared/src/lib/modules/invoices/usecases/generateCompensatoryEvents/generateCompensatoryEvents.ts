@@ -10,7 +10,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
+  Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
@@ -40,7 +40,7 @@ import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
 import { PublishInvoicePaid } from '../publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
-  PublishInvoiceCreatedDTO
+  PublishInvoiceCreatedDTO,
 } from '../publishInvoiceCreated';
 
 // * Usecase specific
@@ -84,9 +84,9 @@ export class GenerateCompensatoryEventsUsecase
   ): Promise<Response> {
     const requestExecution = new AsyncEither<null, DTO>(request)
       .then(this.verifyInput)
-      .then(request => this.publishInvoiceCreated(request))
-      .then(request => this.publishInvoiceConfirmed(request))
-      .then(request => this.publishInvoicePayed(request))
+      .then((request) => this.publishInvoiceCreated(request))
+      .then((request) => this.publishInvoiceConfirmed(request))
+      .then((request) => this.publishInvoicePayed(request))
       .map(() => Result.ok<void>(null));
 
     return requestExecution.execute();
@@ -105,10 +105,10 @@ export class GenerateCompensatoryEventsUsecase
   private async getInvoiceWithId(invoiceId: string) {
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     const context = {
-      roles: [Roles.PAYER]
+      roles: [Roles.PAYER],
     };
     const maybeResult = await usecase.execute({ invoiceId }, context);
-    return maybeResult.map(result => result.getValue());
+    return maybeResult.map((result) => result.getValue());
   }
 
   private async getInvoiceItemsForInvoiceId(invoiceId: InvoiceId) {
@@ -118,9 +118,9 @@ export class GenerateCompensatoryEventsUsecase
       this.waiverRepo
     );
     const maybeResult = await usecase.execute({
-      invoiceId: invoiceId.id.toString()
+      invoiceId: invoiceId.id.toString(),
     });
-    return maybeResult.map(result => result.getValue());
+    return maybeResult.map((result) => result.getValue());
   }
 
   private async getManuscriptByInvoiceId(invoiceId: InvoiceId) {
@@ -129,9 +129,9 @@ export class GenerateCompensatoryEventsUsecase
       this.invoiceItemRepo
     );
     const maybeResult = await usecase.execute({
-      invoiceId: invoiceId.id.toString()
+      invoiceId: invoiceId.id.toString(),
     });
-    return maybeResult.map(result => result.getValue());
+    return maybeResult.map((result) => result.getValue());
   }
 
   private async getPayerForInvoiceId(invoiceId: InvoiceId) {
@@ -146,9 +146,9 @@ export class GenerateCompensatoryEventsUsecase
   private async getAddressWithId(addressId: AddressId) {
     const usecase = new GetAddressUseCase(this.addressRepo);
     const maybeResult = await usecase.execute({
-      billingAddressId: addressId.id.toString()
+      billingAddressId: addressId.id.toString(),
     });
-    return maybeResult.map(result => result.getValue());
+    return maybeResult.map((result) => result.getValue());
   }
 
   private async getPaymentInfo(invoiceId: InvoiceId) {
@@ -164,22 +164,22 @@ export class GenerateCompensatoryEventsUsecase
     const publishUsecase = new PublishInvoiceCreatedUsecase(this.sqsPublish);
     const execution = new AsyncEither<null, null>(null)
       .then(() => this.getInvoiceWithId(request.invoiceId))
-      .then(async invoice => {
+      .then(async (invoice) => {
         const maybeItems = await this.getInvoiceItemsForInvoiceId(
           invoice.invoiceId
         );
-        return maybeItems.map(invoiceItems => ({ invoice, invoiceItems }));
+        return maybeItems.map((invoiceItems) => ({ invoice, invoiceItems }));
       })
-      .then(async data => {
+      .then(async (data) => {
         const maybeManuscript = await this.getManuscriptByInvoiceId(
           data.invoice.invoiceId
         );
-        return maybeManuscript.map(manuscripts => ({
+        return maybeManuscript.map((manuscripts) => ({
           manuscript: manuscripts[0],
-          ...data
+          ...data,
         }));
       })
-      .map(data => {
+      .map((data) => {
         const { invoice } = data;
         if (!invoice.dateAccepted) {
           return null;
@@ -190,10 +190,10 @@ export class GenerateCompensatoryEventsUsecase
         return {
           ...data,
           invoice,
-          messageTimestamp: invoice.dateAccepted
+          messageTimestamp: invoice.dateAccepted,
         };
       })
-      .then(async publishRequest => {
+      .then(async (publishRequest) => {
         if (!publishRequest) {
           return right<null, null>(null);
         }
@@ -209,28 +209,28 @@ export class GenerateCompensatoryEventsUsecase
 
     const execution = new AsyncEither<null, null>(null)
       .then(() => this.getInvoiceWithId(request.invoiceId))
-      .then(async invoice => {
+      .then(async (invoice) => {
         const maybeResult = await this.getInvoiceItemsForInvoiceId(
           invoice.invoiceId
         );
-        return maybeResult.map(invoiceItems => ({ invoice, invoiceItems }));
+        return maybeResult.map((invoiceItems) => ({ invoice, invoiceItems }));
       })
-      .then(async data => {
+      .then(async (data) => {
         const maybeResult = await this.getManuscriptByInvoiceId(
           data.invoice.invoiceId
         );
-        return maybeResult.map(manuscripts => ({
+        return maybeResult.map((manuscripts) => ({
           ...data,
-          manuscript: manuscripts[0]
+          manuscript: manuscripts[0],
         }));
       })
-      .then(async data => {
+      .then(async (data) => {
         const maybePayer = await this.getPayerForInvoiceId(
           data.invoice.invoiceId
         );
-        return maybePayer.map(payer => ({ ...data, payer }));
+        return maybePayer.map((payer) => ({ ...data, payer }));
       })
-      .then(async data => {
+      .then(async (data) => {
         if (!data.payer) {
           return right<
             null,
@@ -247,9 +247,9 @@ export class GenerateCompensatoryEventsUsecase
         const maybeAddress = await this.getAddressWithId(
           data.payer.billingAddressId
         );
-        return maybeAddress.map(address => ({ ...data, address }));
+        return maybeAddress.map((address) => ({ ...data, address }));
       })
-      .map(data => {
+      .map((data) => {
         const invoice = data.invoice;
         if (
           invoice.status === InvoiceStatus.PENDING ||
@@ -265,7 +265,7 @@ export class GenerateCompensatoryEventsUsecase
 
         return { ...data, invoice };
       })
-      .then(async data => {
+      .then(async (data) => {
         if (!data) {
           return right<null, null>(null);
         }
@@ -294,31 +294,40 @@ export class GenerateCompensatoryEventsUsecase
 
     const execution = new AsyncEither<null, null>(null)
       .then(() => this.getInvoiceWithId(request.invoiceId))
-      .then(async invoice => {
+      .then(async (invoice) => {
         const maybeItems = await this.getInvoiceItemsForInvoiceId(
           invoice.invoiceId
         );
-        return maybeItems.map(invoiceItems => {
-          invoiceItems.forEach(item => invoice.addInvoiceItem(item));
+        return maybeItems.map((invoiceItems) => {
+          invoiceItems.forEach((item) => invoice.addInvoiceItem(item));
           return invoice;
         });
       })
-      .then(async invoice => {
+      .then(async (invoice) => {
         const maybeManuscript = await this.getManuscriptByInvoiceId(
           invoice.invoiceId
         );
-        return maybeManuscript.map(manuscripts => ({
+        return maybeManuscript.map((manuscripts) => ({
           invoice,
-          manuscript: manuscripts[0]
+          manuscript: manuscripts[0],
         }));
       })
-      .then(async data => {
+      .then(async (data) => {
         const maybePaymentInfo = await this.getPaymentInfo(
           data.invoice.invoiceId
         );
-        return maybePaymentInfo.map(paymentInfo => ({ ...data, paymentInfo }));
+        return maybePaymentInfo.map((paymentInfo) => ({
+          ...data,
+          paymentInfo,
+        }));
       })
-      .map(data => {
+      .then(async (data) => {
+        const maybePayerInfo = await this.getPayerForInvoiceId(
+          data.invoice.invoiceId
+        );
+        return maybePayerInfo.map((payer) => ({ ...data, payer }));
+      })
+      .map((data) => {
         const invoice = data.invoice;
         if (
           invoice.status !== InvoiceStatus.FINAL ||
@@ -340,7 +349,7 @@ export class GenerateCompensatoryEventsUsecase
 
         return { ...data, invoice, paymentDate };
       })
-      .then(async data => {
+      .then(async (data) => {
         if (!data) {
           return right<null, null>(null);
         }
@@ -351,6 +360,7 @@ export class GenerateCompensatoryEventsUsecase
             data.invoice.invoiceItems.currentItems,
             data.manuscript,
             data.paymentInfo,
+            data.payer,
             data.paymentDate
           );
           return right<GenericError, void>(result);

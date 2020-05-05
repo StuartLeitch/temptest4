@@ -1,12 +1,16 @@
-import { AppError } from '../../../../core/logic/AppError';
-import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
-import { Invoice } from '../../domain/Invoice';
-import { InvoiceItem } from '../../domain/InvoiceItem';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
-// import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
 import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoiceItem';
+// import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
+
+import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
+import { AppError } from '../../../../core/logic/AppError';
 import { EventUtils } from '../../../../utils/EventUtils';
+
+import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { InvoiceItem } from '../../domain/InvoiceItem';
+import { Payer } from '../../../payers/domain/Payer';
+import { Invoice } from '../../domain/Invoice';
+
 import { CouponMap } from '../../../coupons/mappers/CouponMap';
 import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
 
@@ -19,6 +23,7 @@ export class PublishInvoicePaid {
     invoiceItems: InvoiceItem[],
     manuscript: Manuscript,
     paymentDetails: InvoicePaymentInfo,
+    payer: Payer,
     messageTimestamp?: Date
   ): Promise<any> {
     // const data: InvoicePaidEvent
@@ -28,6 +33,7 @@ export class PublishInvoicePaid {
       isCreditNote: false,
       erpReference: invoice.erpReference,
       invoiceCreatedDate: invoice.dateCreated.toISOString(),
+      invoiceAcceptedDate: invoice.dateAccepted.toISOString(),
       valueWithoutVAT: invoiceItems.reduce(
         (acc, curr) => acc + curr.calculatePrice(),
         0
@@ -47,14 +53,15 @@ export class PublishInvoicePaid {
           : undefined,
       })),
       transactionId: paymentDetails.transactionId,
-      invoiceStatus: paymentDetails.invoiceStatus as any,
+      invoiceStatus: paymentDetails.invoiceStatus,
       referenceNumber: invoice.referenceNumber,
       invoiceIssueDate: paymentDetails.invoiceIssueDate
         ? new Date(paymentDetails.invoiceIssueDate).toISOString()
         : null,
+      organization: payer ? payer.organization?.value.toString() : null,
       payerName: paymentDetails.payerName,
       payerEmail: paymentDetails.payerEmail,
-      payerType: paymentDetails.payerType as any,
+      payerType: paymentDetails.payerType,
       vatRegistrationNumber: paymentDetails.vatRegistrationNumber,
       address: `${paymentDetails.address}, ${paymentDetails.city}, ${paymentDetails.country}`,
       country: paymentDetails.country,
@@ -64,9 +71,6 @@ export class PublishInvoicePaid {
         : null,
       paymentType: paymentDetails.paymentType,
       paymentAmount: paymentDetails.amount,
-      // VAT: "todo"
-      // couponId: coupon.id,
-      // dateApplied: coupon.applied
     };
 
     try {

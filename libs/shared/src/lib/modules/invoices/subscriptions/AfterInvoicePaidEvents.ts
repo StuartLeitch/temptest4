@@ -1,13 +1,18 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
+
 import { InvoicePaidEvent } from '../domain/events/invoicePaid';
-import { InvoiceRepoContract } from '../repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../repos';
+
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
-import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoicePaid } from '../usecases/PublishInvoicePaid';
+import { InvoiceItemRepoContract, InvoiceRepoContract } from '../repos';
+import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
+
+import { GetPayerDetailsByInvoiceIdUsecase } from '../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { PublishInvoicePaid } from '../usecases/PublishInvoicePaid';
 
 export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
   constructor(
@@ -16,7 +21,9 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoicePaid: PublishInvoicePaid
+    private payerRepo: PayerRepoContract,
+    private publishInvoicePaid: PublishInvoicePaid,
+    private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
   }
@@ -32,6 +39,7 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
     try {
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       let invoiceItems = invoice.invoiceItems.currentItems;
+
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
           this.invoiceItemRepo,
@@ -50,9 +58,11 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
 
         invoiceItems = resp.value.getValue();
       }
+
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
+
       if (!manuscript) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
@@ -61,11 +71,25 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         invoice.invoiceId
       );
 
+      const payerUsecase = new GetPayerDetailsByInvoiceIdUsecase(
+        this.payerRepo,
+        this.loggerService
+      );
+      const maybePayerResponse = await payerUsecase.execute({
+        invoiceId: invoice.id.toString(),
+      });
+      if (maybePayerResponse.isLeft()) {
+        throw new Error(`No payer for invoice ${invoice.id.toString()} found`);
+      }
+
+      const payer = maybePayerResponse.value.getValue();
+
       this.publishInvoicePaid.execute(
         invoice,
         invoiceItems,
         manuscript,
-        paymentDetails
+        paymentDetails,
+        payer
       );
       console.log(
         `[AfterInvoicePaid]: Successfully executed onInvoicePaidEvent use case InvoicePaidEvent`
