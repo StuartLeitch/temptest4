@@ -28,7 +28,8 @@ import {
   ResumeInvoicePaymentReminderUsecase,
   GetPayerDetailsByInvoiceIdUsecase,
   SendInvoicePaymentReminderUsecase,
-  AreNotificationsPausedUsecase
+  AreNotificationsPausedUsecase,
+  GetPaymentInfoUsecase,
 } from '@hindawi/shared';
 
 import { Logger } from './logger';
@@ -64,13 +65,14 @@ const watchList = [
   AreNotificationsPausedUsecase,
   AddEmptyPauseStateForInvoiceUsecase,
   ScheduleRemindersForExistingInvoicesUsecase,
-  GetPayerDetailsByInvoiceIdUsecase
+  GetPayerDetailsByInvoiceIdUsecase,
+  GetPaymentInfoUsecase,
 ];
 const aspect = {
   classes: watchList,
   methods: watchList.map((usecaseClass: any) =>
     usecaseClass.prototype.execute.bind(usecaseClass)
-  )
+  ),
 };
 
 export class LoggerAspect {
@@ -105,14 +107,15 @@ export class LoggerAspect {
       AreNotificationsPausedUsecase.prototype.execute,
       AddEmptyPauseStateForInvoiceUsecase.prototype.execute,
       ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
-      GetPayerDetailsByInvoiceIdUsecase.prototype.execute
-    ]
+      GetPayerDetailsByInvoiceIdUsecase.prototype.execute,
+      GetPaymentInfoUsecase.prototype.execute,
+    ],
   })
   invokeBeforeMethod(meta: Metadata) {
     logger.info('beforeExecute', {
       usecaseClassName: meta.className,
       usecaseMethodName: meta.method.name,
-      request: meta.method.args
+      request: meta.method.args,
     });
   }
 
@@ -146,15 +149,16 @@ export class LoggerAspect {
       AreNotificationsPausedUsecase.prototype.execute,
       AddEmptyPauseStateForInvoiceUsecase.prototype.execute,
       ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
-      GetPayerDetailsByInvoiceIdUsecase.prototype.execute
-    ]
+      GetPayerDetailsByInvoiceIdUsecase.prototype.execute,
+      GetPaymentInfoUsecase.prototype.execute,
+    ],
   })
   async invokeAfterMethod(meta: Metadata) {
     const result = await meta.method.result;
     logger.info('afterExecute', {
       usecaseClassName: meta.className,
       usecaseMethodName: meta.method.name,
-      result
+      result,
     });
   }
 }

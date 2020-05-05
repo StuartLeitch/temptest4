@@ -151,6 +151,8 @@ export * from './modules/payments/usecases/migratePayment/migratePaymentDTO';
 export * from './modules/payments/usecases/generateClientToken/generateClientToken';
 export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPayment';
 export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPaymentDTO';
+export * from './modules/payments/usecases/getPaymentInfo/getPaymentInfoDTO';
+export * from './modules/payments/usecases/getPaymentInfo/getPaymentInfo';
 
 export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
