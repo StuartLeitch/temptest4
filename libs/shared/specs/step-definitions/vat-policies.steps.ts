@@ -1,507 +1,116 @@
+import { InvoiceItemMap } from './../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { InvoiceItem } from './../../src/lib/modules/invoices/domain/InvoiceItem';
 import { defineFeature, loadFeature } from 'jest-cucumber';
 
 import {
   Invoice,
   InvoiceStatus
 } from '../../src/lib/modules/invoices/domain/Invoice';
-import { MockInvoiceRepo } from '../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import {
-  GetInvoiceDetailsUsecase,
-  GetInvoiceDetailsContext
-} from '../../src/lib/modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-import { Roles } from '../../src/lib/modules/users/domain/enums/Roles';
 
 import { Payer, PayerType } from '../../src/lib/modules/payers/domain/Payer';
 import { PayerMap } from '../../src/lib/modules/payers/mapper/Payer';
-import { MockPayerRepo } from '../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { InvoiceMap } from './../../src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { PoliciesRegister } from '../../src/lib/modules/invoices/domain/policies/PoliciesRegister';
-import { UKVATTreatmentOfHardCopyPublicationsPolicy } from '../../src/lib/modules/invoices/domain/policies/UKVATHardCopyPolicy';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from '../../src/lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
-import { VATTreatmentPublicationNotOwnedPolicy } from '../../src/lib/modules/invoices/domain/policies/VATTreatmentPublicationNotOwnedPolicy';
 
 const feature = loadFeature('../features/vat-policies.feature', {
   loadRelativePath: true
 });
 
-const defaultContext: GetInvoiceDetailsContext = { roles: [Roles.SUPER_ADMIN] };
-
 defineFeature(feature, test => {
-  const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
-  const mockPayerRepo: MockPayerRepo = new MockPayerRepo();
-  const getInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(
-    mockInvoiceRepo
-  );
-
-  // let result: Result<Invoice>;
   let payer: Payer;
   let invoice: Invoice;
-
-  let HardCopyPolicy: UKVATTreatmentOfHardCopyPublicationsPolicy;
+  let invoiceItem: InvoiceItem;
   let APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy;
-  let PublicationNotOwnedPolicy: VATTreatmentPublicationNotOwnedPolicy;
-
   let policiesRegister: PoliciesRegister;
   let calculateVAT: any;
   let countryCode: string;
-  let netValue: number;
   let invoiceId: string;
+  let manuscriptId: string;
   let payerId: string;
+  let receivedTotalAmount: number;
+
+  function setPayerType(payerType: string) {
+    const types = {
+      individual: {
+        VATRegistered: false,
+        asBusiness: false
+      },
+      institution: {
+        VATRegistered: true,
+        asBusiness: true
+      },
+      nonVatInstitution: {
+        VATRegistered: false,
+        asBusiness: true
+      }
+    }
+    if (!(payerType in types)) {
+      console.error(`Invalid payer type [${payerType}]`);
+      return;
+    }
+    return types[payerType];
+  }
 
   beforeEach(() => {
     payerId = 'test-payer';
     invoiceId = 'test-invoice';
+    manuscriptId = 'test-manuscript';
     payer = PayerMap.toDomain({
       id: payerId,
       invoiceId,
       name: 'foo',
       type: PayerType.INSTITUTION
     });
-    mockPayerRepo.save(payer);
 
     invoice = InvoiceMap.toDomain({
       id: invoiceId,
       status: InvoiceStatus.DRAFT,
       payerId: payer.payerId.id.toString()
     });
-    mockInvoiceRepo.save(invoice);
+
+    invoiceItem = InvoiceItemMap.toDomain({
+      invoiceId,
+      manuscriptId,
+      price: 0,
+      vat: 0
+    });
+
     policiesRegister = new PoliciesRegister();
   });
 
-  afterEach(() => {
-    // do nothing yet
-  });
-
-  test('UK VAT treatment of APC for an UK individual', ({
+  test('UK VAT treatment of APC', ({
     given,
     when,
-    and,
     then
   }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
-
-    and('The payer will pay for an APC', () => {
+    given(/^The Payer is an (\w+) in (\w+)$/, (payerType: string, country: string) => {
       APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-
       policiesRegister.registerPolicy(APCPolicy);
+
+      countryCode = country;
+      const { asBusiness, VATRegistered } = setPayerType(payerType);
+
+      calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
+        { countryCode },
+        asBusiness,
+        VATRegistered
+      ]);
     });
 
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const VATRegistered = false;
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
+    when(/^The payer will pay for an APC of (\d+)$/, async (invoiceNetValue: string) => {
+      const vat = calculateVAT.getVAT();
+      invoiceItem.vat = vat;
 
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
+      invoiceItem.price = Number(invoiceNetValue);
+      invoice.addInvoiceItem(invoiceItem);
+      receivedTotalAmount = invoice.invoiceItems.getItems().reduce((total, eachInvoiceItem) => total + ((eachInvoiceItem.vat + 100) / 100 * eachInvoiceItem.price), 0);
+    });
 
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
-
-        calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-          countryCode,
-          asBusiness,
-          VATRegistered
-        ]);
-
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
-
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
+    then(/^The invoice total amount is (\d+)$/, async (expectedTotalAmount: string) => {
+      expect(receivedTotalAmount).toEqual(Number(expectedTotalAmount));
+    }
     );
   });
-
-  test('UK VAT treatment of APC for an UK institution', ({
-    given,
-    when,
-    and,
-    then
-  }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
-
-    and('The payer will pay for an APC', () => {
-      APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-
-      policiesRegister.registerPolicy(APCPolicy);
-    });
-
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const VATRegistered = true;
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
-
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
-
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
-
-        calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-          countryCode,
-          asBusiness,
-          VATRegistered
-        ]);
-
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
-
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
-    );
-  });
-
-  test('UK VAT treatment of APC for an EU individual', ({
-    given,
-    when,
-    and,
-    then
-  }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
-
-    and('The payer will pay for an APC', () => {
-      APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-
-      policiesRegister.registerPolicy(APCPolicy);
-    });
-
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const VATRegistered = false;
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
-
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
-
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
-
-        calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-          countryCode,
-          asBusiness,
-          VATRegistered
-        ]);
-
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
-
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
-    );
-  });
-
-  test('UK VAT treatment of APC for an EU institution', ({
-    given,
-    when,
-    and,
-    then
-  }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
-
-    and('The payer will pay for an APC', () => {
-      APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-
-      policiesRegister.registerPolicy(APCPolicy);
-    });
-
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const VATRegistered = true;
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
-
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
-
-        calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-          countryCode,
-          asBusiness,
-          VATRegistered
-        ]);
-
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
-
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
-    );
-  });
-
-  test('UK VAT treatment of APC for an Non-EU individual', ({
-    given,
-    when,
-    and,
-    then
-  }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
-
-    and('The payer will pay for an APC', () => {
-      APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-
-      policiesRegister.registerPolicy(APCPolicy);
-    });
-
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const VATRegistered = false;
-
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
-
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
-
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
-
-        calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-          countryCode,
-          asBusiness,
-          VATRegistered
-        ]);
-
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
-
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
-    );
-  });
-
-  test('UK VAT treatment of APC for an Non-EU institution', ({
-    given,
-    when,
-    and,
-    then
-  }) => {
-    given(/^The Payer is in (\w+)$/, (country: string) => {
-      countryCode = country;
-    });
-
-    and('The payer will pay for an APC', () => {
-      APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-
-      policiesRegister.registerPolicy(APCPolicy);
-    });
-
-    when(
-      /^The invoice net value is (\d+)$/,
-      async (invoiceNetValue: string) => {
-        const asBusiness = false;
-        const VATRegistered = true;
-
-        const invoiceResult = await getInvoiceDetailsUsecase.execute(
-          {
-            invoiceId
-          },
-          defaultContext
-        );
-
-        if (invoiceResult.isRight()) {
-          invoice = invoiceResult.value.getValue();
-        }
-
-        netValue = parseInt(invoiceNetValue, 10);
-        // invoice.netAmount = netValue;
-
-        calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-          countryCode,
-          asBusiness,
-          VATRegistered
-        ]);
-
-        const VAT = calculateVAT.getVAT();
-        // invoice.addTax(VAT);
-      }
-    );
-
-    then(
-      /^The invoice total amount is (\d+)$/,
-      async (expectedTotalAmount: string) => {
-        // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-      }
-    );
-  });
-
-  // test('UK VAT treatment of publication not owned by Hindawi', ({
-  //   given,
-  //   when,
-  //   and,
-  //   then
-  // }) => {
-  //   given(/^The Payer is in (\w+)$/, (country: string) => {
-  //     countryCode = country;
-  //   });
-
-  //   and(
-  //     'The payer wants to purchase a publication NOT owned by Hindawi',
-  //     () => {
-  //       PublicationNotOwnedPolicy = new VATTreatmentPublicationNotOwnedPolicy();
-
-  //       policiesRegister.registerPolicy(PublicationNotOwnedPolicy);
-  //     }
-  //   );
-
-  //   when(
-  //     /^The invoice net value is (\d+)$/,
-  //     async (invoiceNetValue: string) => {
-  //       const asBusiness = false;
-  //       const VATRegistered = false;
-  //       const invoiceResult = await getInvoiceDetailsUsecase.execute(
-  //         {
-  //           invoiceId
-  //         },
-  //         defaultContext
-  //       );
-
-  //       if (invoiceResult.isRight()) {
-  //         invoice = invoiceResult.value.getValue();
-  //       }
-  //       netValue = parseInt(invoiceNetValue, 10);
-  //       // invoice.netAmount = netValue;
-
-  //       calculateVAT = policiesRegister.applyPolicy(
-  //         PublicationNotOwnedPolicy.getType(),
-  //         [countryCode, asBusiness, VATRegistered]
-  //       );
-
-  //       const VAT = calculateVAT.getVAT();
-  //       // invoice.addTax(VAT);
-  //     }
-  //   );
-
-  //   then(
-  //     /^The invoice total amount is (\d+)$/,
-  //     async (expectedTotalAmount: string) => {
-  //       // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-  //     }
-  //   );
-  // });
-
-  // test('UK VAT treatment of the supply of hard copy publications', ({
-  //   given,
-  //   when,
-  //   and,
-  //   then
-  // }) => {
-  //   given(/^The Payer is in (\w+)$/, (country: string) => {
-  //     countryCode = country;
-  //   });
-
-  //   and('The payer wants to purchase a hard copy', () => {
-  //     HardCopyPolicy = new UKVATTreatmentOfHardCopyPublicationsPolicy();
-
-  //     policiesRegister.registerPolicy(HardCopyPolicy);
-  //   });
-
-  //   when(
-  //     /^The invoice net value is (\d+)$/,
-  //     async (invoiceNetValue: string) => {
-  //       const asBusiness = false;
-  //       const invoiceResult = await getInvoiceDetailsUsecase.execute(
-  //         {
-  //           invoiceId
-  //         },
-  //         defaultContext
-  //       );
-
-  //       if (invoiceResult.isRight()) {
-  //         invoice = invoiceResult.value.getValue();
-  //       }
-
-  //       netValue = parseInt(invoiceNetValue, 10);
-  //       // invoice.netAmount = netValue;
-
-  //       calculateVAT = policiesRegister.applyPolicy(HardCopyPolicy.getType(), [
-  //         countryCode,
-  //         asBusiness
-  //       ]);
-
-  //       const VAT = calculateVAT.getVAT();
-  //       // invoice.addTax(VAT);
-  //     }
-  //   );
-
-  //   then(
-  //     /^The invoice total amount is (\d+)$/,
-  //     async (expectedTotalAmount: string) => {
-  //       // expect(invoice.totalAmount).toEqual(parseInt(expectedTotalAmount, 10));
-  //     }
-  //   );
-  // });
 });
