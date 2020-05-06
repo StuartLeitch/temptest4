@@ -19,6 +19,7 @@ import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublis
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { AddressId } from '../../../addresses/domain/AddressId';
+import { Address } from '../../../addresses/domain/Address';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
@@ -50,10 +51,40 @@ import { GenerateCompensatoryEventsResponse as Response } from './generateCompen
 import { GenerateCompensatoryEventsDTO as DTO } from './generateCompensatoryEventsDTO';
 import * as Errors from './generateCompensatoryEventsErrors';
 
-class GenericError extends AppError.UnexpectedError {}
-
 type Context = AuthorizationContext<Roles>;
 export type GenerateCompensatoryEventsContext = Context;
+
+interface WithInvoice {
+  invoice: Invoice;
+}
+
+interface WithInvoiceId {
+  invoiceId: string;
+}
+
+interface InvoiceConfirmedData extends DTO {
+  invoiceItems: InvoiceItem[];
+  manuscript: Manuscript;
+  address: Address;
+  invoice: Invoice;
+  payer: Payer;
+}
+
+interface InvoiceCreatedData extends DTO {
+  invoiceItems: InvoiceItem[];
+  manuscript: Manuscript;
+  messageTimestamp: Date;
+  invoice: Invoice;
+}
+
+interface InvoicePayedData extends DTO {
+  paymentInfo: InvoicePaymentInfo;
+  invoiceItems: InvoiceItem[];
+  manuscript: Manuscript;
+  paymentDate: Date;
+  invoice: Invoice;
+  payer: Payer;
+}
 
 export class GenerateCompensatoryEventsUsecase
   implements
@@ -75,24 +106,24 @@ export class GenerateCompensatoryEventsUsecase
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract
   ) {
-    this.getAddressWithId = this.getAddressWithId.bind(this);
-    this.getInvoiceItemsForInvoiceId = this.getInvoiceItemsForInvoiceId.bind(
-      this
-    );
-    this.getInvoiceWithId = this.getInvoiceWithId.bind(this);
-    this.getManuscriptByInvoiceId = this.getManuscriptByInvoiceId.bind(this);
-    this.getPayerForInvoiceId = this.getPayerForInvoiceId.bind(this);
-    this.getPaymentInfo = this.getPaymentInfo.bind(this);
     this.publishInvoiceConfirmed = this.publishInvoiceConfirmed.bind(this);
     this.publishInvoiceCreated = this.publishInvoiceCreated.bind(this);
     this.publishInvoicePayed = this.publishInvoicePayed.bind(this);
-    this.verifyInput = this.verifyInput.bind(this);
-    this.attachInvoice = this.attachInvoice.bind(this);
+    this.shouldSendConfirmed = this.shouldSendConfirmed.bind(this);
+    this.updateInvoiceStatus = this.updateInvoiceStatus.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
-    this.attachManuscript = this.attachManuscript.bind(this);
-    this.attachPayer = this.attachPayer.bind(this);
-    this.attachAddress = this.attachAddress.bind(this);
+    this.sendConfirmedEvent = this.sendConfirmedEvent.bind(this);
+    this.attachPaymentDate = this.attachPaymentDate.bind(this);
     this.attachPaymentInfo = this.attachPaymentInfo.bind(this);
+    this.shouldSendCreated = this.shouldSendCreated.bind(this);
+    this.attachManuscript = this.attachManuscript.bind(this);
+    this.sendCreatedEvent = this.sendCreatedEvent.bind(this);
+    this.shouldSendPayed = this.shouldSendPayed.bind(this);
+    this.sendPayedEvent = this.sendPayedEvent.bind(this);
+    this.attachAddress = this.attachAddress.bind(this);
+    this.attachInvoice = this.attachInvoice.bind(this);
+    this.attachPayer = this.attachPayer.bind(this);
+    this.verifyInput = this.verifyInput.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -116,16 +147,16 @@ export class GenerateCompensatoryEventsUsecase
 
   private async verifyInput(
     request: DTO
-  ): Promise<Either<Errors.InvoiceIdRequired, DTO>> {
+  ): Promise<Either<Errors.InvoiceIdRequiredError, DTO>> {
     if (!request.invoiceId) {
-      return left(new Errors.InvoiceIdRequired());
+      return left(new Errors.InvoiceIdRequiredError());
     }
 
     return right(request);
   }
 
   private attachInvoice(context: Context) {
-    return async <T extends { invoiceId: string }>(request: T) => {
+    return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
 
       return new AsyncEither(request.invoiceId)
@@ -138,16 +169,8 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private getInvoiceWithId(context: Context) {
-    return async (invoiceId: string) => {
-      const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
-      const maybeResult = await usecase.execute({ invoiceId }, context);
-      return maybeResult.map((result) => result.getValue());
-    };
-  }
-
   private attachInvoiceItems(context: Context) {
-    return async <T extends { invoiceId: string }>(request: T) => {
+    return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetItemsForInvoiceUsecase(
         this.invoiceItemRepo,
         this.couponRepo,
@@ -163,20 +186,8 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private async getInvoiceItemsForInvoiceId(invoiceId: InvoiceId) {
-    const usecase = new GetItemsForInvoiceUsecase(
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo
-    );
-    const maybeResult = await usecase.execute({
-      invoiceId: invoiceId.id.toString(),
-    });
-    return maybeResult.map((result) => result.getValue());
-  }
-
   private attachManuscript(context: Context) {
-    return async <T extends { invoiceId: string }>(request: T) => {
+    return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetManuscriptByInvoiceIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
@@ -192,19 +203,8 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private async getManuscriptByInvoiceId(invoiceId: InvoiceId) {
-    const usecase = new GetManuscriptByInvoiceIdUsecase(
-      this.manuscriptRepo,
-      this.invoiceItemRepo
-    );
-    const maybeResult = await usecase.execute({
-      invoiceId: invoiceId.id.toString(),
-    });
-    return maybeResult.map((result) => result.getValue());
-  }
-
   private attachPayer(context: Context) {
-    return async <T extends { invoiceId: string }>(request: T) => {
+    return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetPayerDetailsByInvoiceIdUsecase(
         this.payerRepo,
         this.loggerService
@@ -220,18 +220,16 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private async getPayerForInvoiceId(invoiceId: InvoiceId) {
-    try {
-      const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-      return right<GenericError, Payer>(payer);
-    } catch (err) {
-      return left<GenericError, Payer>(new GenericError(err));
-    }
-  }
-
   private attachAddress(context: Context) {
     return async <T extends { payer: Payer }>(request: T) => {
       const usecase = new GetAddressUseCase(this.addressRepo);
+
+      if (!request.payer) {
+        return right<null, T & { address: Address }>({
+          ...request,
+          address: null,
+        });
+      }
 
       return new AsyncEither(request.payer.billingAddressId.id.toString())
         .then((billingAddressId) =>
@@ -245,16 +243,8 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private async getAddressWithId(addressId: AddressId) {
-    const usecase = new GetAddressUseCase(this.addressRepo);
-    const maybeResult = await usecase.execute({
-      billingAddressId: addressId.id.toString(),
-    });
-    return maybeResult.map((result) => result.getValue());
-  }
-
   private attachPaymentInfo(context: Context) {
-    return async <T extends { invoiceId: string }>(request: T) => {
+    return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetPaymentInfoUsecase(
         this.invoiceRepo,
         this.paymentRepo
@@ -270,228 +260,188 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private async getPaymentInfo(invoiceId: InvoiceId) {
-    try {
-      const payment = await this.invoiceRepo.getInvoicePaymentInfo(invoiceId);
-      return right<GenericError, InvoicePaymentInfo>(payment);
-    } catch (err) {
-      return left<GenericError, InvoicePaymentInfo>(new GenericError(err));
+  private async shouldSendCreated<T extends WithInvoice>(
+    request: T
+  ): Promise<Either<null, boolean>> {
+    if (!request.invoice.dateAccepted) {
+      return right(false);
     }
+
+    return right(true);
+  }
+
+  private async shouldSendConfirmed<T extends WithInvoice>(
+    request: T
+  ): Promise<Either<null, boolean>> {
+    const { invoice } = request;
+    if (
+      invoice.status === InvoiceStatus.PENDING ||
+      invoice.status === InvoiceStatus.DRAFT ||
+      !invoice.dateAccepted ||
+      !invoice.dateIssued
+    ) {
+      return right(false);
+    }
+    return right(true);
+  }
+
+  private async shouldSendPayed<T extends WithInvoice>(
+    request: T
+  ): Promise<Either<null, boolean>> {
+    const { invoice } = request;
+    if (
+      invoice.status !== InvoiceStatus.FINAL ||
+      !invoice.dateAccepted ||
+      !invoice.dateIssued
+    ) {
+      return right(false);
+    }
+    return right(true);
+  }
+
+  private attachPaymentDate(context: Context) {
+    return <T extends WithInvoice & { paymentInfo: InvoicePaymentInfo }>(
+      request: T
+    ) => {
+      const { paymentInfo, invoice } = request;
+      let paymentDate: Date;
+
+      if (!paymentInfo?.paymentDate) {
+        paymentDate = invoice.dateIssued;
+      } else {
+        paymentDate = new Date(paymentInfo.paymentDate);
+      }
+
+      return {
+        ...request,
+        paymentDate,
+      };
+    };
+  }
+
+  private attachMessageTimestamp(dateToUse: string) {
+    return <T extends WithInvoice>(request: T) => {
+      return {
+        ...request,
+        messageTimestamp: request.invoice[dateToUse],
+      };
+    };
+  }
+
+  private sendCreatedEvent(context: Context) {
+    return async <T extends InvoiceCreatedData>(request: T) => {
+      const publishUsecase = new PublishInvoiceCreatedUsecase(this.sqsPublish);
+      return publishUsecase.execute(request, context);
+    };
+  }
+
+  private sendConfirmedEvent(context: Context) {
+    return async <T extends InvoiceConfirmedData>(request: T) => {
+      const publishUsecase = new PublishInvoiceConfirmed(this.sqsPublish);
+      try {
+        const result = await publishUsecase.execute(
+          request.invoice,
+          request.invoiceItems,
+          request.manuscript,
+          request.payer,
+          request.address,
+          request.invoice.dateIssued
+        );
+        return right<Errors.PublishInvoiceConfirmError, void>(result);
+      } catch (err) {
+        return left<Errors.PublishInvoiceConfirmError, void>(
+          new Errors.PublishInvoiceConfirmError(request.invoiceId, err)
+        );
+      }
+    };
+  }
+
+  private sendPayedEvent(context: Context) {
+    return async <T extends InvoicePayedData>(request: T) => {
+      const publishUsecase = new PublishInvoicePaid(this.sqsPublish);
+      try {
+        const result = await publishUsecase.execute(
+          request.invoice,
+          request.invoiceItems,
+          request.manuscript,
+          request.paymentInfo,
+          request.payer,
+          request.paymentDate
+        );
+        return right<Errors.PublishInvoicePayedError, void>(result);
+      } catch (err) {
+        return left<Errors.PublishInvoicePayedError, void>(
+          new Errors.PublishInvoicePayedError(request.invoiceId, err)
+        );
+      }
+    };
+  }
+
+  private updateInvoiceStatus(
+    status: keyof typeof InvoiceStatus,
+    useDate: string,
+    useInvoice = true
+  ) {
+    return <T extends WithInvoice>(request: T) => {
+      const { invoice } = request;
+
+      invoice.props.dateUpdated = useInvoice
+        ? invoice[useDate]
+        : request[useDate];
+      invoice.status = InvoiceStatus[status];
+
+      return {
+        ...request,
+        invoice,
+      };
+    };
   }
 
   private publishInvoiceCreated(context: Context) {
     return async (request: DTO) => {
-      const publishUsecase = new PublishInvoiceCreatedUsecase(this.sqsPublish);
-      const execution = new AsyncEither<null, DTO>(request)
+      return new AsyncEither<null, DTO>(request)
         .then(this.attachInvoice(context))
-        .then(async (data) => {
-          const maybeItems = await this.getInvoiceItemsForInvoiceId(
-            data.invoice.invoiceId
-          );
-          return maybeItems.map((invoiceItems) => ({ ...data, invoiceItems }));
-        })
-        .then(async (data) => {
-          const maybeManuscript = await this.getManuscriptByInvoiceId(
-            data.invoice.invoiceId
-          );
-          return maybeManuscript.map((manuscripts) => ({
-            manuscript: manuscripts[0],
-            ...data,
-          }));
-        })
-        .map((data) => {
-          const { invoice } = data;
-          if (!invoice.dateAccepted) {
-            return null;
-          }
-          invoice.props.dateUpdated = invoice.dateAccepted;
-          invoice.status = InvoiceStatus.DRAFT;
-
-          return {
-            ...data,
-            invoice,
-            messageTimestamp: invoice.dateAccepted,
-          };
-        })
-        .then(async (publishRequest) => {
-          if (!publishRequest) {
-            return right<null, null>(null);
-          }
-
-          return publishUsecase.execute(publishRequest);
-        })
-        .map(() => request);
-      return execution.execute();
+        .advanceOrEnd(this.shouldSendCreated)
+        .then(this.attachInvoiceItems(context))
+        .then(this.attachManuscript(context))
+        .map(this.updateInvoiceStatus('DRAFT', 'dateAccepted'))
+        .map(this.attachMessageTimestamp('dateAccepted'))
+        .then(this.sendCreatedEvent(context))
+        .map(() => request)
+        .execute();
     };
   }
 
   private publishInvoiceConfirmed(context: Context) {
     return async (request: DTO) => {
-      const publishUsecase = new PublishInvoiceConfirmed(this.sqsPublish);
-      const execution = new AsyncEither<null, string>(request.invoiceId)
-        .then(this.getInvoiceWithId(context))
-        .then(async (invoice) => {
-          const maybeResult = await this.getInvoiceItemsForInvoiceId(
-            invoice.invoiceId
-          );
-          return maybeResult.map((invoiceItems) => ({ invoice, invoiceItems }));
-        })
-        .then(async (data) => {
-          const maybeResult = await this.getManuscriptByInvoiceId(
-            data.invoice.invoiceId
-          );
-          return maybeResult.map((manuscripts) => ({
-            ...data,
-            manuscript: manuscripts[0],
-          }));
-        })
-        .then(async (data) => {
-          const maybePayer = await this.getPayerForInvoiceId(
-            data.invoice.invoiceId
-          );
-          return maybePayer.map((payer) => ({ ...data, payer }));
-        })
-        .then(async (data) => {
-          if (!data.payer) {
-            return right<
-              null,
-              {
-                invoiceItems: InvoiceItem[];
-                manuscript: Manuscript;
-                invoice: Invoice;
-                address: null;
-                payer: Payer;
-              }
-            >({ ...data, address: null });
-          }
-
-          const maybeAddress = await this.getAddressWithId(
-            data.payer.billingAddressId
-          );
-          return maybeAddress.map((address) => ({ ...data, address }));
-        })
-        .map((data) => {
-          const invoice = data.invoice;
-          if (
-            invoice.status === InvoiceStatus.PENDING ||
-            invoice.status === InvoiceStatus.DRAFT ||
-            !invoice.dateAccepted ||
-            !invoice.dateIssued
-          ) {
-            return null;
-          }
-
-          invoice.props.dateUpdated = invoice.dateIssued;
-          invoice.status = InvoiceStatus.ACTIVE;
-
-          return { ...data, invoice };
-        })
-        .then(async (data) => {
-          if (!data) {
-            return right<null, null>(null);
-          }
-
-          try {
-            const result = await publishUsecase.execute(
-              data.invoice,
-              data.invoiceItems,
-              data.manuscript,
-              data.payer,
-              data.address,
-              data.invoice.dateIssued
-            );
-            return right<GenericError, void>(result);
-          } catch (err) {
-            return left<GenericError, void>(new GenericError(err));
-          }
-        })
-        .map(() => request);
-
-      return execution.execute();
+      return new AsyncEither<null, DTO>(request)
+        .then(this.attachInvoice(context))
+        .advanceOrEnd(this.shouldSendConfirmed)
+        .then(this.attachInvoiceItems(context))
+        .then(this.attachManuscript(context))
+        .then(this.attachPayer(context))
+        .then(this.attachAddress(context))
+        .map(this.updateInvoiceStatus('ACTIVE', 'dateIssued'))
+        .then(this.sendConfirmedEvent(context))
+        .map(() => request)
+        .execute();
     };
   }
 
   private publishInvoicePayed(context: Context) {
     return async (request: DTO) => {
-      const publishUsecase = new PublishInvoicePaid(this.sqsPublish);
-      const execution = new AsyncEither<null, string>(request.invoiceId)
-        .then(this.getInvoiceWithId(context))
-        .then(async (invoice) => {
-          const maybeItems = await this.getInvoiceItemsForInvoiceId(
-            invoice.invoiceId
-          );
-          return maybeItems.map((invoiceItems) => {
-            invoiceItems.forEach((item) => invoice.addInvoiceItem(item));
-            return invoice;
-          });
-        })
-        .then(async (invoice) => {
-          const maybeManuscript = await this.getManuscriptByInvoiceId(
-            invoice.invoiceId
-          );
-          return maybeManuscript.map((manuscripts) => ({
-            invoice,
-            manuscript: manuscripts[0],
-          }));
-        })
-        .then(async (data) => {
-          const maybePaymentInfo = await this.getPaymentInfo(
-            data.invoice.invoiceId
-          );
-          return maybePaymentInfo.map((paymentInfo) => ({
-            ...data,
-            paymentInfo,
-          }));
-        })
-        .then(async (data) => {
-          const maybePayerInfo = await this.getPayerForInvoiceId(
-            data.invoice.invoiceId
-          );
-          return maybePayerInfo.map((payer) => ({ ...data, payer }));
-        })
-        .map((data) => {
-          const invoice = data.invoice;
-          if (
-            invoice.status !== InvoiceStatus.FINAL ||
-            !invoice.dateAccepted ||
-            !invoice.dateIssued
-          ) {
-            return null;
-          }
-          let paymentDate: Date;
-          if (!data.paymentInfo) {
-            paymentDate = invoice.dateIssued;
-          } else {
-            paymentDate = data.paymentInfo.paymentDate
-              ? new Date(data.paymentInfo.paymentDate)
-              : data.invoice.dateIssued;
-          }
-
-          invoice.props.dateUpdated = paymentDate;
-
-          return { ...data, invoice, paymentDate };
-        })
-        .then(async (data) => {
-          if (!data) {
-            return right<null, null>(null);
-          }
-
-          try {
-            const result = await publishUsecase.execute(
-              data.invoice,
-              data.invoice.invoiceItems.currentItems,
-              data.manuscript,
-              data.paymentInfo,
-              data.payer,
-              data.paymentDate
-            );
-            return right<GenericError, void>(result);
-          } catch (err) {
-            return left<GenericError, void>(new GenericError(err));
-          }
-        })
-        .map(() => request);
-      return execution.execute();
+      return new AsyncEither<null, DTO>(request)
+        .then(this.attachInvoice(context))
+        .advanceOrEnd(this.shouldSendPayed)
+        .then(this.attachInvoiceItems(context))
+        .then(this.attachManuscript(context))
+        .then(this.attachPaymentInfo(context))
+        .then(this.attachPayer(context))
+        .map(this.attachPaymentDate(context))
+        .map(this.updateInvoiceStatus('FINAL', 'paymentDate', false))
+        .then(this.sendPayedEvent(context))
+        .map(() => request)
+        .execute();
     };
   }
 }

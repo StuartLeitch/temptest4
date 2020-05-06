@@ -1,12 +1,17 @@
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Amount } from '../../../../domain/Amount';
+import { Email } from '../../../../domain/Email';
 
 import { PaymentMethodId } from '../../../payments/domain/PaymentMethodId';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 import { InvoiceItemProps, InvoiceItem } from '../../domain/InvoiceItem';
+import { AddressId } from '../../../addresses/domain/AddressId';
 import { CouponCode } from '../../../coupons/domain/CouponCode';
+import { PayerType, Payer } from '../../../payers/domain/Payer';
+import { PayerTitle } from '../../../payers/domain/PayerTitle';
 import { Article } from '../../../manuscripts/domain/Article';
 import { InvoiceStatus, Invoice } from '../../domain/Invoice';
+import { PayerName } from '../../../payers/domain/PayerName';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { Payment } from '../../../payments/domain/Payment';
 import { ManuscriptId } from '../../domain/ManuscriptId';
@@ -29,6 +34,7 @@ import { MockPaymentRepo } from '../../../payments/repos/mocks/mockPaymentRepo';
 import { MockCouponRepo } from '../../../coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from '../../../waivers/repos/mocks/mockWaiverRepo';
 import { MockInvoiceItemRepo } from '../../repos/mocks/mockInvoiceItemRepo';
+import { MockPayerRepo } from '../../../payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
 
 export function addInvoices(invoicesRepo: MockInvoiceRepo) {
@@ -196,11 +202,39 @@ export function addManuscripts(manuscriptRepo: MockArticleRepo) {
   }
 }
 
+export function addPayers(payerRepo: MockPayerRepo) {
+  const payersProps = [
+    {
+      type: PayerType.INDIVIDUAL,
+      name: PayerName.create('Test1').getValue(),
+      invoiceId: InvoiceId.create(new UniqueEntityID('1')).getValue(),
+      title: PayerTitle.create('Mr').getValue(),
+      billingAddressId: AddressId.create(new UniqueEntityID('1')),
+      email: Email.create({ value: 'test@test.com' }).getValue(),
+      id: '1',
+    },
+    {
+      type: PayerType.INDIVIDUAL,
+      name: PayerName.create('Test3').getValue(),
+      invoiceId: InvoiceId.create(new UniqueEntityID('3')).getValue(),
+      title: PayerTitle.create('Mr').getValue(),
+      billingAddressId: AddressId.create(new UniqueEntityID('3')),
+      email: Email.create({ value: 'test@test.com' }).getValue(),
+      id: '3',
+    },
+  ];
+
+  for (const props of payersProps) {
+    const payer = Payer.create(props, new UniqueEntityID(props.id)).getValue();
+    payerRepo.addMockItem(payer);
+  }
+}
+
 export function addPayments(paymentRepo: MockPaymentRepo) {
   const paymentsProps = [
     {
       invoiceId: InvoiceId.create(new UniqueEntityID('1')).getValue(),
-      payerId: PayerId.create(),
+      payerId: PayerId.create(new UniqueEntityID('1')),
       amount: Amount.create(100).getValue(),
       paymentMethodId: PaymentMethodId.create(),
       foreignPaymentId: 'test',

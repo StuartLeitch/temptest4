@@ -12,7 +12,7 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
   }
 
   public async getPaymentById(paymentId: PaymentId): Promise<Payment> {
-    const matches = this._items.filter(p => p.paymentId.equals(paymentId));
+    const matches = this._items.filter((p) => p.paymentId.equals(paymentId));
     if (matches.length !== 0) {
       return matches[0];
     } else {
@@ -25,14 +25,16 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
   }
 
   public async getPaymentByInvoiceId(invoiceId: InvoiceId): Promise<Payment> {
-    const match = this._items.find(item => item.invoiceId === invoiceId);
+    const match = this._items.find((item) => item.invoiceId.equals(invoiceId));
     return match ? match : null;
   }
 
   public async getPaymentsByInvoiceId(
     invoiceId: InvoiceId
   ): Promise<Payment[]> {
-    const match = this._items.filter(item => item.invoiceId === invoiceId);
+    const match = this._items.filter((item) =>
+      item.invoiceId.equals(invoiceId)
+    );
     return match;
   }
 
@@ -40,7 +42,7 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
     const alreadyExists = await this.exists(payment);
 
     if (alreadyExists) {
-      this._items.map(p => {
+      this._items.map((p) => {
         if (this.compareMockItems(p, payment)) {
           return Payment;
         } else {
@@ -56,7 +58,7 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
     const alreadyExists = await this.exists(payment);
 
     if (alreadyExists) {
-      this._items.map(p => {
+      this._items.map((p) => {
         if (this.compareMockItems(p, payment)) {
           return payment;
         } else {
@@ -75,7 +77,7 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
   }
 
   public async exists(payment: Payment): Promise<boolean> {
-    const found = this._items.filter(p => this.compareMockItems(p, payment));
+    const found = this._items.filter((p) => this.compareMockItems(p, payment));
     return found.length !== 0;
   }
 

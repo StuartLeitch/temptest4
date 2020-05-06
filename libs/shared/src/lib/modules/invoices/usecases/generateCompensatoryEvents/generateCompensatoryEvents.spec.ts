@@ -23,6 +23,7 @@ import {
   addPayments,
   addCoupons,
   addWaivers,
+  addPayers,
 } from './testUtils';
 import { Roles } from '../../../users/domain/enums/Roles';
 
@@ -70,6 +71,7 @@ describe('migrate entire invoice usecase', () => {
     addPayments(paymentRepo);
     addCoupons(couponRepo);
     addWaivers(waiverRepo);
+    addPayers(payerRepo);
 
     compensatoryEventsUsecase = new GenerateCompensatoryEventsUsecase(
       invoiceItemRepo,
