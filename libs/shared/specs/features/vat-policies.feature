@@ -8,8 +8,8 @@ Feature: VAT Policies
     Examples:
       | payerCountry | payerType         | invoiceNetValue | invoiceTotalValue |
       | UK           | individual        | 100             | 120               |
-      | UK           | institution       | 100             | 100               |
-      | UK           | nonVatInstitution | 100             | 100               |
+      | UK           | institution       | 100             | 120               |
+      | UK           | nonVatInstitution | 100             | 120               |
       | RO           | individual        | 200             | 240               |
       | RO           | institution       | 200             | 200               |
       | RO           | nonVatInstitution | 200             | 200               |

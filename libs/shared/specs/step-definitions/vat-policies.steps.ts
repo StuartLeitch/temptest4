@@ -79,7 +79,6 @@ defineFeature(feature, test => {
 
     policiesRegister = new PoliciesRegister();
   });
-
   test('UK VAT treatment of APC', ({
     given,
     when,
