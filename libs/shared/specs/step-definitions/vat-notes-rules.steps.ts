@@ -4,7 +4,8 @@ import { PoliciesRegister } from '../../src/lib/modules/invoices/domain/policies
 import { UKVATTreatmentArticleProcessingChargesPolicy } from '../../src/lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 
 const feature = loadFeature('../features/vat-notes-rules.feature', {
-  loadRelativePath: true
+  loadRelativePath: true,
+  tagFilter: '@included'
 });
 
 defineFeature(feature, test => {
@@ -30,10 +31,10 @@ defineFeature(feature, test => {
       const asBusiness = false;
       const VATRegistered = false;
 
-      calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-        countryCode,
-        asBusiness,
-        VATRegistered
+        calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
+        {countryCode},
+        {asBusiness},
+        {VATRegistered}
       ]);
 
       VATNote = calculateVAT.getVATNote();
@@ -259,9 +260,9 @@ defineFeature(feature, test => {
       const VATRegistered = false;
 
       calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-        countryCode,
-        asBusiness,
-        VATRegistered
+        {countryCode},
+        {asBusiness},
+        {VATRegistered}
       ]);
 
       VATNote = calculateVAT.getVATNote();
