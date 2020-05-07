@@ -69,9 +69,14 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${journalSectionsView.getViewName()} js where js.section_id = s.section_id limit 1) sec on sec.section_id = s.section_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
   LEFT JOIN LATERAL (SELECT * FROM ${invoicesView.getViewName()} i where i.manuscript_custom_id = s.manuscript_custom_id and i.is_credit_note = false order by i.invoice_created_date desc nulls last limit 1) i on i.manuscript_custom_id = s.manuscript_custom_id
-  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id and sd.submission_event in ('SubmissionQualityCheckPassed', 'SubmissionWithdrawn', 'SubmissionScreeningRTCd', 'SubmissionQualityCheckRTCd', 'SubmissionRejected') 
+  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id and sd.submission_event in ('SubmissionQualityCheckPassed', 'SubmissionWithdrawn', 'SubmissionScreeningRTCd', 'SubmissionQualityCheckRTCd', 'SubmissionRejected', 'SubmissionScreeningVoid') 
     order by event_timestamp desc limit 1) sd on sd.submission_id = s.submission_id
-  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
+  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.submission_id = s.submission_id and submission_event in (
+    'SubmissionSubmitted', 'SubmissionScreeningReturnedToDraft', 'SubmissionScreeningRTCd', 'SubmissionScreeningVoid', 'SubmissionScreeningPassed', 'SubmissionAcademicEditorInvited', 
+    'SubmissionAcademicEditorAccepted', 'SubmissionReviewerInvited', 'SubmissionReviewerReportSubmitted', 'SubmissionRevisionRequested', 'SubmissionRevisionSubmitted', 
+    'SubmissionRecommendationToPublishMade', 'SubmissionRecommendationToRejectMade', 'SubmissionRejected', 'SubmissionAccepted', 'SubmissionQualityCheckRTCd', 
+    'SubmissionQualityCheckPassed', 'SubmissionWithdrawn'
+  ) order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'screener' limit 1) screener on screener.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count, max(invited_date) as last_reviewer_invitation_date from ${manuscriptReviewers.getViewName()} group by manuscript_custom_id, "version") reviewers on reviewers.manuscript_custom_id = s.manuscript_custom_id and reviewers."version" = s."version"

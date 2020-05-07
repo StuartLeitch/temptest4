@@ -31,6 +31,7 @@ AS SELECT ie.id as event_id,
     (ie.payload ->> 'payerEmail'::text) AS payer_email,
     (ie.payload ->> 'paymentType'::text) AS payment_type,
     (ie.payload ->> 'country'::text) AS payer_country,
+    (ie.payload ->> 'address'::text) AS payer_address,
     COALESCE((ie.payload ->> 'currency'::text), 'USD') as payment_currency
    FROM ${REPORTING_TABLES.INVOICE} ie
 WITH DATA;

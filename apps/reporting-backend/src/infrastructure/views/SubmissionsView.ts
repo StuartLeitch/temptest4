@@ -23,6 +23,8 @@ AS SELECT
   t.resubmission_date,
   t.screening_passed_date,
   t.last_recommendation_date,
+  t.last_revision_submitted,
+  t.last_returned_to_draft_date,
   t.special_issue_id,
   t.section_id,
   t.title,
@@ -44,6 +46,8 @@ FROM (
       submission_submitted_dates.min as submission_date,
       screening_passed_dates.max as screening_passed_date,
       recommendation_dates.max as last_recommendation_date,
+      screening_draft_dates.max as last_revision_submitted,
+      revision_dates.max as last_returned_to_draft_date,
       CASE 
         WHEN submission_submitted_dates.count = 1 THEN null
         ELSE submission_submitted_dates.max
@@ -65,6 +69,8 @@ FROM (
       JOIN  (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionSubmitted' group by submission_id) submission_submitted_dates on submission_submitted_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningPassed' group by submission_id) screening_passed_dates on screening_passed_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionAccepted' or submission_event like 'SubmissionRecommendation%' group by submission_id) recommendation_dates on recommendation_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionRevisionSubmitted' group by submission_id) revision_dates on revision_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningReturnedToDraft' group by submission_id) screening_draft_dates on screening_draft_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
     ) sd

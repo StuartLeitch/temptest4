@@ -44,6 +44,7 @@ AS SELECT
     inv.payer_email as "payer_email",
     inv.payment_type as "payment_type",
     inv.payer_country as "payer_country",
+    inv.payer_address as payer_address,
     inv.payment_currency as "payment_currency",
     waivers.waiver_types as waivers,
     coupons.coupon_names as coupons,
