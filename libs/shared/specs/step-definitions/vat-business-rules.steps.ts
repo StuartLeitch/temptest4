@@ -23,6 +23,7 @@ import { UKVATTreatmentArticleProcessingChargesPolicy } from '../../src/lib/modu
 
 const feature = loadFeature('../features/vat-business-rules.feature', {
   loadRelativePath: true,
+
 });
 
 defineFeature(feature, test => {
@@ -153,24 +154,33 @@ defineFeature(feature, test => {
       expect(VATNote.tax.type.text).toBe(TaxTypeText);
     });
   })
-  test('VAT Check for valid code-country combination', ({ given, when, then }) => {
+  test('VAT Check for valid country valid code', ({ given, when, then }) => {
 
     givenThePayerIsIn(given)
 
     whenThePayerVATCodeIsChecked(when)
 
     then('The VAT code should be valid', async () => {
-      expect(vatResponse.isSuccess).toBe(true);
+      expect(vatResponse.getValue().valid).toBe(true);
     });
   });
-  test('VAT Check for invalid code-country combination', ({ given, when, then, and }) => {
+  test('VAT Check for valid country invalid code', ({ given, when, then }) => {
 
     givenThePayerIsIn(given)
 
     whenThePayerVATCodeIsChecked(when)
 
     then('The VAT code should be invalid', async () => {
-      expect(vatResponse.isFailure).toBe(true);
+      expect(vatResponse.getValue().valid).toBe(false);
+    });
+  });
+  test('VAT Check for invalid code-country combination', ({ given, when, then, and }) => {
+    givenThePayerIsIn(given)
+
+    whenThePayerVATCodeIsChecked(when)
+
+    then('The VAT code should be invalid', async () => {
+      expect(vatResponse.isSuccess).toBe(false);
     });
 
     and(/^The VAT invalid message should be "(.*)"$/, (codeInvalid: string) => {
