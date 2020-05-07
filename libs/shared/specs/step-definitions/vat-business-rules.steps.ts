@@ -1,6 +1,14 @@
+import { defineFeature, loadFeature } from 'jest-cucumber';
 import { InvoiceItemMap } from '../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { InvoiceItem } from '../../src/lib/modules/invoices/domain/InvoiceItem';
-import { defineFeature, loadFeature } from 'jest-cucumber';
+
+import {
+  ValidateVATContext,
+  ValidateVATUsecase
+} from './../../src/lib/modules/invoices/usecases/validateVAT/validateVAT';
+import { VATService } from '../../src/lib/domain/services/VATService';
+
+import { Roles } from './../../src/lib/modules/users/domain/enums/Roles';
 import {
   Invoice,
   InvoiceStatus
@@ -18,17 +26,21 @@ const feature = loadFeature('../features/vat-business-rules.feature', {
 });
 
 defineFeature(feature, test => {
+  const vatService: VATService = new VATService();
+  const validateVATUsecase = new ValidateVATUsecase(vatService);
+  const defaultContext: ValidateVATContext = { roles: [Roles.SUPER_ADMIN] };
   let payer: Payer;
   let invoice: Invoice;
   let invoiceItem: InvoiceItem;
   let APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy;
   let policiesRegister: PoliciesRegister;
   let calculateVAT: any;
-  let VATNote: any;
   let invoiceId: string;
-  let manuscriptId: string;
   let payerId: string;
+  let countryCode: string;
+  let vatResponse: any;
   let receivedTotalAmount: number;
+  let VATNote: any;
 
   function setPayerType(payerType: string) {
     const types = {
@@ -52,38 +64,12 @@ defineFeature(feature, test => {
     return types[payerType];
   }
 
-  beforeEach(() => {
-    payerId = 'test-payer';
-    invoiceId = 'test-invoice';
-    manuscriptId = 'test-manuscript';
-    payer = PayerMap.toDomain({
-      id: payerId,
-      invoiceId,
-      name: 'foo',
-      type: PayerType.INSTITUTION
-    });
-
-    invoice = InvoiceMap.toDomain({
-      id: invoiceId,
-      status: InvoiceStatus.DRAFT,
-      payerId: payer.payerId.id.toString()
-    });
-
-    invoiceItem = InvoiceItemMap.toDomain({
-      invoiceId,
-      manuscriptId,
-      price: 0,
-
-    });
-    policiesRegister = new PoliciesRegister();
-  });
-
   const givenThePayerIsAnIn = (given) => {
     given(/^The Payer is an (\w+) in (\w+)$/, (payerType: string, country: string) => {
       APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
       policiesRegister.registerPolicy(APCPolicy);
 
-      const countryCode = country;
+      countryCode = country;
       const { asBusiness, VATRegistered } = setPayerType(payerType);
 
       calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
@@ -93,7 +79,48 @@ defineFeature(feature, test => {
       ]);
     });
   };
+
+  const givenThePayerIsIn = (given) => {
+    given(/^The Payer is in (\w+)$/, (country: string) => {
+      countryCode = country;
+    });
+  };
+
+  const whenThePayerVATCodeIsChecked = (when) => {
+    when(/^The Payer VAT code (\d+) is checked$/, async (vatNumber: string) => {
+      const result = await validateVATUsecase.execute(
+        {
+          countryCode,
+          vatNumber: vatNumber
+        },
+        defaultContext
+      );
+      vatResponse = result.value;
+    });
+  };
+
+  beforeEach(() => {
+    payerId = 'test-payer';
+    invoiceId = 'test-invoice';
+    payer = PayerMap.toDomain({
+      id: payerId,
+      invoiceId,
+      name: 'foo',
+      type: PayerType.INSTITUTION
+    });
+    invoice = InvoiceMap.toDomain({
+      id: invoiceId,
+      status: InvoiceStatus.DRAFT,
+      payerId: payer.payerId.id.toString()
+    });
+    invoiceItem = InvoiceItemMap.toDomain({
+      invoiceId,
+      manuscriptId: 'test-manuscript'
+    });
+    policiesRegister = new PoliciesRegister();
+  });
   test('UK VAT rates calculation for an APC', ({ given, when, then }) => {
+
     givenThePayerIsAnIn(given)
 
     when(/^The payer will pay for an APC of (\d+)$/, async (invoiceNetValue: string) => {
@@ -109,8 +136,8 @@ defineFeature(feature, test => {
       expect(receivedTotalAmount).toEqual(Number(expectedTotalAmount));
     });
   });
-
   test('UK VAT notes setup for an APC', ({ given, when, then }) => {
+
     givenThePayerIsAnIn(given)
 
     when('The VAT note is generated', () => {
@@ -126,4 +153,28 @@ defineFeature(feature, test => {
       expect(VATNote.tax.type.text).toBe(TaxTypeText);
     });
   })
+  test('VAT Check for valid code-country combination', ({ given, when, then }) => {
+
+    givenThePayerIsIn(given)
+
+    whenThePayerVATCodeIsChecked(when)
+
+    then('The VAT code should be valid', async () => {
+      expect(vatResponse.isSuccess).toBe(true);
+    });
+  });
+  test('VAT Check for invalid code-country combination', ({ given, when, then, and }) => {
+
+    givenThePayerIsIn(given)
+
+    whenThePayerVATCodeIsChecked(when)
+
+    then('The VAT code should be invalid', async () => {
+      expect(vatResponse.isFailure).toBe(true);
+    });
+
+    and(/^The VAT invalid message should be "(.*)"$/, (codeInvalid: string) => {
+      expect(vatResponse.error.message).toBe(codeInvalid);
+    });
+  });
 });

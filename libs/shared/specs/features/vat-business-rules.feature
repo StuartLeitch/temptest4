@@ -14,7 +14,7 @@ Feature: UK VAT Business rules
       | RO           | institution       | 200             | 200               |
       | RO           | nonVatInstitution | 200             | 200               |
       | CH           | individual        | 300             | 300               |
-      | CH           | institution       | 300             | 300               |
+      | CH           | institution       | 300             | 30              |
 
   Scenario Outline: UK VAT notes setup for an APC
     Given The Payer is an <payerType> in <payerCountry>
@@ -32,3 +32,13 @@ Feature: UK VAT Business rules
       | CH           | individual  | Outside the scope of UK VAT as per Article 44 of 2006/112/EC                                                                 | a6B0Y000000fyOyUAI | Worldwide Sale Services | a680Y0000000Cv8QAE | Exempt UK        |
       | CH           | institution | Outside the scope of UK VAT as per Article 44 of 2006/112/EC                                                                 | a6B0Y000000fyOyUAI | Worldwide Sale Services | a680Y0000000Cv8QAE | Exempt UK        |
 
+  Scenario: VAT Check for valid code-country combination
+    Given The Payer is in GB
+    When The Payer VAT code 181094119 is checked
+    Then The VAT code should be valid
+
+  Scenario: VAT Check for invalid code-country combination
+    Given The Payer is in MD
+    When The Payer VAT code 181094119 is checked
+    Then The VAT code should be invalid
+    And The VAT invalid message should be "Invalid Input for {181094119 or MD}."
