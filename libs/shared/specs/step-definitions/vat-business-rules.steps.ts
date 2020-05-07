@@ -1,7 +1,6 @@
-import { InvoiceItemMap } from './../../src/lib/modules/invoices/mappers/InvoiceItemMap';
-import { InvoiceItem } from './../../src/lib/modules/invoices/domain/InvoiceItem';
+import { InvoiceItemMap } from '../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { InvoiceItem } from '../../src/lib/modules/invoices/domain/InvoiceItem';
 import { defineFeature, loadFeature } from 'jest-cucumber';
-
 import {
   Invoice,
   InvoiceStatus
@@ -9,13 +8,13 @@ import {
 
 import { Payer, PayerType } from '../../src/lib/modules/payers/domain/Payer';
 import { PayerMap } from '../../src/lib/modules/payers/mapper/Payer';
-import { InvoiceMap } from './../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { InvoiceMap } from '../../src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { PoliciesRegister } from '../../src/lib/modules/invoices/domain/policies/PoliciesRegister';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from '../../src/lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 
-const feature = loadFeature('../features/vat-policies.feature', {
-  loadRelativePath: true
+const feature = loadFeature('../features/vat-business-rules.feature', {
+  loadRelativePath: true,
 });
 
 defineFeature(feature, test => {
@@ -25,7 +24,7 @@ defineFeature(feature, test => {
   let APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy;
   let policiesRegister: PoliciesRegister;
   let calculateVAT: any;
-  let countryCode: string;
+  let VATNote: any;
   let invoiceId: string;
   let manuscriptId: string;
   let payerId: string;
@@ -74,21 +73,17 @@ defineFeature(feature, test => {
       invoiceId,
       manuscriptId,
       price: 0,
-      vat: 0
-    });
 
+    });
     policiesRegister = new PoliciesRegister();
   });
-  test('UK VAT treatment of APC', ({
-    given,
-    when,
-    then
-  }) => {
+
+  const givenThePayerIsAnIn = (given) => {
     given(/^The Payer is an (\w+) in (\w+)$/, (payerType: string, country: string) => {
       APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
       policiesRegister.registerPolicy(APCPolicy);
 
-      countryCode = country;
+      const countryCode = country;
       const { asBusiness, VATRegistered } = setPayerType(payerType);
 
       calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
@@ -97,6 +92,9 @@ defineFeature(feature, test => {
         VATRegistered
       ]);
     });
+  };
+  test('UK VAT rates calculation for an APC', ({ given, when, then }) => {
+    givenThePayerIsAnIn(given)
 
     when(/^The payer will pay for an APC of (\d+)$/, async (invoiceNetValue: string) => {
       const vat = calculateVAT.getVAT();
@@ -107,9 +105,25 @@ defineFeature(feature, test => {
       receivedTotalAmount = invoice.invoiceItems.getItems().reduce((total, eachInvoiceItem) => total + ((eachInvoiceItem.vat + 100) / 100 * eachInvoiceItem.price), 0);
     });
 
-    then(/^The invoice total amount is (\d+)$/, async (expectedTotalAmount: string) => {
+    then(/^The invoice total amount should be (\d+)$/, async (expectedTotalAmount: string) => {
       expect(receivedTotalAmount).toEqual(Number(expectedTotalAmount));
-    }
-    );
+    });
   });
+
+  test('UK VAT notes setup for an APC', ({ given, when, then }) => {
+    givenThePayerIsAnIn(given)
+
+    when('The VAT note is generated', () => {
+      VATNote = calculateVAT.getVATNote();
+    });
+
+    then('The VAT note should have the following properties', expectedVATNoteProp => {
+      const { NoteTemplate, TaxTreatmentValue, TaxTreatmentText, TaxTypeValue, TaxTypeText } = expectedVATNoteProp[0];
+      expect(VATNote.template).toBe(NoteTemplate);
+      expect(VATNote.tax.treatment.value).toBe(TaxTreatmentValue);
+      expect(VATNote.tax.treatment.text).toBe(TaxTreatmentText);
+      expect(VATNote.tax.type.value).toBe(TaxTypeValue);
+      expect(VATNote.tax.type.text).toBe(TaxTypeText);
+    });
+  })
 });

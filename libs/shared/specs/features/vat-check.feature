@@ -1,5 +1,4 @@
 Feature: VAT Check
-
   Scenario: Valid VAT Check
     Given The Payer is in GB
     And The Payer VAT number is 181094119
