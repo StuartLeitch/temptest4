@@ -2,7 +2,6 @@
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
-import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -18,12 +17,10 @@ import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublis
 
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { AddressId } from '../../../addresses/domain/AddressId';
 import { Address } from '../../../addresses/domain/Address';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
-import { InvoiceId } from '../../domain/InvoiceId';
 import { Invoice } from '../../domain/Invoice';
 
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';

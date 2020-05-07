@@ -1,33 +1,14 @@
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Amount } from '../../../../domain/Amount';
-import { Email } from '../../../../domain/Email';
 
-import { PaymentMethodId } from '../../../payments/domain/PaymentMethodId';
-import { TransactionId } from '../../../transactions/domain/TransactionId';
-import { InvoiceItemProps, InvoiceItem } from '../../domain/InvoiceItem';
-import { AddressId } from '../../../addresses/domain/AddressId';
-import { CouponCode } from '../../../coupons/domain/CouponCode';
-import { PayerType, Payer } from '../../../payers/domain/Payer';
-import { PayerTitle } from '../../../payers/domain/PayerTitle';
-import { Article } from '../../../manuscripts/domain/Article';
-import { InvoiceStatus, Invoice } from '../../domain/Invoice';
-import { PayerName } from '../../../payers/domain/PayerName';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
-import { Payment } from '../../../payments/domain/Payment';
-import { ManuscriptId } from '../../domain/ManuscriptId';
-import { PayerId } from '../../../payers/domain/PayerId';
-import { InvoiceId } from '../../domain/InvoiceId';
-import {
-  CouponStatus,
-  CouponProps,
-  CouponType,
-  Coupon,
-} from '../../../coupons/domain/Coupon';
-import {
-  WaiverProps,
-  WaiverType,
-  Waiver,
-} from '../../../waivers/domain/Waiver';
+
+import { ArticleMap } from '../../../manuscripts/mappers/ArticleMap';
+import { CouponMap } from '../../../coupons/mappers/CouponMap';
+import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
+import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
+import { PaymentMap } from '../../../payments/mapper/Payment';
+import { PayerMap } from '../../../payers/mapper/Payer';
+import { InvoiceMap } from '../../mappers/InvoiceMap';
 
 import { MockArticleRepo } from '../../../manuscripts/repos/mocks/mockArticleRepo';
 import { MockPaymentRepo } from '../../../payments/repos/mocks/mockPaymentRepo';
@@ -40,111 +21,92 @@ import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
 export function addInvoices(invoicesRepo: MockInvoiceRepo) {
   const invoicesProps = [
     {
-      status: InvoiceStatus.FINAL,
-      transactionId: TransactionId.create(new UniqueEntityID('1')),
+      dateAccepted: '2019-10-13',
+      dateCreated: '2018-12-15',
+      dateUpdated: '2019-12-01',
+      dateIssued: '2019-11-01',
+      transactionId: '1',
+      status: 'FINAL',
       charge: 100,
-      dateAccepted: new Date('2019-10-13'),
-      dateCreated: new Date('2018-12-15'),
-      dateIssued: new Date('2019-11-01'),
-      dateUpdated: new Date('2019-12-01'),
       id: '1',
     },
     {
-      status: InvoiceStatus.DRAFT,
-      transactionId: TransactionId.create(new UniqueEntityID('2')),
+      dateCreated: '2018-12-15',
+      dateUpdated: '2018-12-15',
+      transactionId: '2',
+      status: 'DRAFT',
       charge: 150,
-      dateCreated: new Date('2018-12-15'),
-      dateUpdated: new Date('2018-12-15'),
       id: '2',
     },
     {
-      status: InvoiceStatus.ACTIVE,
-      transactionId: TransactionId.create(new UniqueEntityID('1')),
+      dateAccepted: '2019-10-13',
+      dateCreated: '2018-12-15',
+      dateUpdated: '2019-11-01',
+      dateIssued: '2019-11-01',
+      transactionId: '3',
+      status: 'ACTIVE',
       charge: 20,
-      dateAccepted: new Date('2019-10-13'),
-      dateCreated: new Date('2018-12-15'),
-      dateIssued: new Date('2019-11-01'),
-      dateUpdated: new Date('2019-11-01'),
       id: '3',
     },
     {
-      status: InvoiceStatus.PENDING,
-      transactionId: TransactionId.create(new UniqueEntityID('1')),
+      dateAccepted: '2019-10-13',
+      dateCreated: '2018-12-15',
+      dateUpdated: '2019-11-01',
+      dateIssued: '2019-11-01',
+      transactionId: '4',
+      status: 'PENDING',
       charge: 70,
-      dateAccepted: new Date('2019-10-13'),
-      dateCreated: new Date('2018-12-15'),
-      dateIssued: new Date('2019-11-01'),
-      dateUpdated: new Date('2019-11-01'),
       id: '4',
     },
     {
-      status: InvoiceStatus.DRAFT,
-      transactionId: TransactionId.create(new UniqueEntityID('1')),
+      dateAccepted: '2019-10-13',
+      dateCreated: '2018-12-15',
+      dateUpdated: '2019-10-13',
+      transactionId: '5',
+      status: 'DRAFT',
       charge: 80,
-      dateAccepted: new Date('2019-10-13'),
-      dateCreated: new Date('2018-12-15'),
-      dateUpdated: new Date('2019-10-13'),
       id: '5',
     },
   ];
 
   for (const props of invoicesProps) {
-    const invoice = Invoice.create(
-      props,
-      new UniqueEntityID(props.id)
-    ).getValue();
+    const invoice = InvoiceMap.toDomain(props);
+    invoice.props.dateUpdated = new Date(props.dateUpdated);
     invoicesRepo.addMockItem(invoice);
   }
 }
 
 export function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
-  interface InvoiceItemsPropsWithId extends InvoiceItemProps {
-    id: string;
-  }
-
-  const invoiceItemsProps: InvoiceItemsPropsWithId[] = [
+  const invoiceItemsProps = [
     {
-      invoiceId: InvoiceId.create(new UniqueEntityID('1')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('1')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
+      manuscriptId: '1',
+      invoiceId: '1',
       id: '1',
     },
     {
-      invoiceId: InvoiceId.create(new UniqueEntityID('2')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('2')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
+      manuscriptId: '2',
+      invoiceId: '2',
       id: '2',
     },
     {
-      invoiceId: InvoiceId.create(new UniqueEntityID('3')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('3')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
+      manuscriptId: '3',
+      invoiceId: '3',
       id: '3',
     },
     {
-      invoiceId: InvoiceId.create(new UniqueEntityID('4')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('4')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
+      manuscriptId: '4',
+      invoiceId: '4',
       id: '4',
     },
     {
-      invoiceId: InvoiceId.create(new UniqueEntityID('5')).getValue(),
-      manuscriptId: ManuscriptId.create(new UniqueEntityID('5')).getValue(),
-      type: 'APC',
-      dateCreated: new Date(),
+      manuscriptId: '5',
+      invoiceId: '5',
       id: '5',
     },
   ];
 
   for (const props of invoiceItemsProps) {
-    const invoiceItem = InvoiceItem.create(
-      props,
-      new UniqueEntityID(props.id)
-    ).getValue();
+    const invoiceItem = InvoiceItemMap.toDomain(props);
     invoiceItemRepo.addMockItem(invoiceItem);
   }
 }
@@ -152,52 +114,49 @@ export function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
 export function addManuscripts(manuscriptRepo: MockArticleRepo) {
   const manuscriptsProps = [
     {
+      created: new Date(),
+      articleType: '1',
+      title: 'Test 1',
       journalId: '1',
       customId: '1',
-      title: 'Test 1',
-      articleType: '1',
-      created: new Date(),
       id: '1',
     },
     {
+      created: new Date(),
+      articleType: '2',
+      title: 'Test 2',
       journalId: '2',
       customId: '2',
-      title: 'Test 2',
-      articleType: '2',
-      created: new Date(),
       id: '2',
     },
     {
+      created: new Date(),
+      articleType: '3',
+      title: 'Test 3',
       journalId: '3',
       customId: '3',
-      title: 'Test 3',
-      articleType: '3',
-      created: new Date(),
       id: '3',
     },
     {
+      created: new Date(),
+      articleType: '4',
+      title: 'Test 4',
       journalId: '4',
       customId: '4',
-      title: 'Test 4',
-      articleType: '4',
-      created: new Date(),
       id: '4',
     },
     {
+      created: new Date(),
+      articleType: '5',
+      title: 'Test 5',
       journalId: '5',
       customId: '5',
-      title: 'Test 5',
-      articleType: '5',
-      created: new Date(),
       id: '5',
     },
   ];
 
   for (const props of manuscriptsProps) {
-    const manuscript = Article.create(
-      props,
-      new UniqueEntityID(props.id)
-    ).getValue();
+    const manuscript = ArticleMap.toDomain(props);
     manuscriptRepo.addMockItem(manuscript);
   }
 }
@@ -205,27 +164,29 @@ export function addManuscripts(manuscriptRepo: MockArticleRepo) {
 export function addPayers(payerRepo: MockPayerRepo) {
   const payersProps = [
     {
-      type: PayerType.INDIVIDUAL,
-      name: PayerName.create('Test1').getValue(),
-      invoiceId: InvoiceId.create(new UniqueEntityID('1')).getValue(),
-      title: PayerTitle.create('Mr').getValue(),
-      billingAddressId: AddressId.create(new UniqueEntityID('1')),
-      email: Email.create({ value: 'test@test.com' }).getValue(),
+      shippingAddressId: '1',
+      email: 'test@test.com',
+      billingAddressId: '1',
+      type: 'INDIVIDUAL',
+      invoiceId: '1',
+      name: 'Test1',
+      title: 'Mr',
       id: '1',
     },
     {
-      type: PayerType.INDIVIDUAL,
-      name: PayerName.create('Test3').getValue(),
-      invoiceId: InvoiceId.create(new UniqueEntityID('3')).getValue(),
-      title: PayerTitle.create('Mr').getValue(),
-      billingAddressId: AddressId.create(new UniqueEntityID('3')),
-      email: Email.create({ value: 'test@test.com' }).getValue(),
+      shippingAddressId: '3',
+      email: 'test@test.com',
+      billingAddressId: '3',
+      type: 'INDIVIDUAL',
+      invoiceId: '3',
+      name: 'Test3',
+      title: 'Mr',
       id: '3',
     },
   ];
 
   for (const props of payersProps) {
-    const payer = Payer.create(props, new UniqueEntityID(props.id)).getValue();
+    const payer = PayerMap.toDomain(props);
     payerRepo.addMockItem(payer);
   }
 }
@@ -233,36 +194,31 @@ export function addPayers(payerRepo: MockPayerRepo) {
 export function addPayments(paymentRepo: MockPaymentRepo) {
   const paymentsProps = [
     {
-      invoiceId: InvoiceId.create(new UniqueEntityID('1')).getValue(),
-      payerId: PayerId.create(new UniqueEntityID('1')),
-      amount: Amount.create(100).getValue(),
-      paymentMethodId: PaymentMethodId.create(),
       foreignPaymentId: 'test',
-      datePaid: new Date('2019-11-20'),
+      datePaid: '2019-12-01',
+      paymentMethodId: '1',
+      invoiceId: '1',
+      payerId: '1',
+      amount: 100,
     },
   ];
 
   for (const props of paymentsProps) {
-    const payment = Payment.create(props).getValue();
+    const payment = PaymentMap.toDomain(props);
     paymentRepo.addMockItem(payment);
   }
 }
 
-export type CouponPropsForItem = CouponProps & {
-  id: string;
-  invoiceItemId?: string;
-};
-
 export function addCoupons(couponRepo: MockCouponRepo) {
-  const couponsProps: CouponPropsForItem[] = [
+  const couponsProps = [
     {
-      code: CouponCode.create('123456').getValue(),
-      couponType: CouponType.MULTIPLE_USE,
-      status: CouponStatus.ACTIVE,
       dateCreated: new Date(),
       dateUpdated: new Date(),
       invoiceItemType: 'APC',
+      type: 'MULTIPLE_USE',
       invoiceItemId: '1',
+      status: 'ACTIVE',
+      code: '123456',
       name: 'test 1',
       redeemCount: 0,
       reduction: 10,
@@ -270,15 +226,12 @@ export function addCoupons(couponRepo: MockCouponRepo) {
     },
   ];
 
-  for (const couponProps of couponsProps) {
-    const coupon = Coupon.create(
-      couponProps,
-      new UniqueEntityID(couponProps.id)
-    ).getValue();
+  for (const props of couponsProps) {
+    const coupon = CouponMap.toDomain(props);
 
-    if (couponProps.invoiceItemId) {
+    if (props.invoiceItemId) {
       const invoiceItemId = InvoiceItemId.create(
-        new UniqueEntityID(couponProps.invoiceItemId)
+        new UniqueEntityID(props.invoiceItemId)
       );
       couponRepo.addMockCouponToInvoiceItem(coupon, invoiceItemId);
     } else {
@@ -287,15 +240,10 @@ export function addCoupons(couponRepo: MockCouponRepo) {
   }
 }
 
-export type WaiverPropsForItem = WaiverProps & {
-  id: string;
-  invoiceItemId?: string;
-};
-
 export function addWaivers(waiverRepo: MockWaiverRepo) {
-  const waiversProps: WaiverPropsForItem[] = [
+  const waiversProps = [
     {
-      waiverType: WaiverType.EDITOR_DISCOUNT,
+      type_id: 'EDITOR_DISCOUNT',
       invoiceItemId: '1',
       isActive: true,
       reduction: 10,
@@ -303,15 +251,12 @@ export function addWaivers(waiverRepo: MockWaiverRepo) {
     },
   ];
 
-  for (const waiverProps of waiversProps) {
-    const waiver = Waiver.create(
-      waiverProps,
-      new UniqueEntityID(waiverProps.id)
-    ).getValue();
+  for (const props of waiversProps) {
+    const waiver = WaiverMap.toDomain(props);
 
-    if (waiverProps.invoiceItemId) {
+    if (props.invoiceItemId) {
       const invoiceItemId = InvoiceItemId.create(
-        new UniqueEntityID(waiverProps.invoiceItemId)
+        new UniqueEntityID(props.invoiceItemId)
       );
       waiverRepo.addMockWaiverForInvoiceItem(waiver, invoiceItemId);
     } else {
