@@ -15,9 +15,8 @@ export async function down(knex: Knex): Promise<any> {
   return Promise.all(
     [...materializedViewList]
       .reverse()
-      .map(view =>
-        knex.raw(`DROP MATERIALIZED VIEW IF EXISTS ${view.getViewName()}`)
-      )
+      .filter((v) => !!v)
+      .map((view) => knex.raw(view.getDeleteQuery()))
   );
 }
 

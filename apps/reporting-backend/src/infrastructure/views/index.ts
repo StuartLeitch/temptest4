@@ -24,6 +24,7 @@ import manuscriptReviewsView from './ManuscriptReviewsView';
 import manucriptsView from './ManuscriptsView';
 import submissionDataView from './SubmissionDataView';
 import submissionsView from './SubmissionsView';
+import manuscriptsVendorView from './ManuscriptVendorsView';
 
 const logger = new Logger('materializedView');
 
@@ -47,7 +48,8 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     journalSpecialIssuesView,
     journalEditorialBoardView,
     manucriptsView,
-    manuscriptReviewsView
+    manuscriptReviewsView,
+    manuscriptsVendorView,
   ]
 ) as AbstractEventView[];
 
@@ -59,6 +61,10 @@ export async function refreshViews(knex: Knex) {
   const refreshStart = new Date();
   for (const view of materializedViewList) {
     const refreshQuery = view.getRefreshQuery();
+    if (!refreshQuery) {
+      logger.info('Skipping ' + view.getViewName());
+      continue;
+    }
     const queryStart = new Date();
     try {
       await knex.raw(refreshQuery);
