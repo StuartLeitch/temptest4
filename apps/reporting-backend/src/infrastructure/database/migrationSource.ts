@@ -109,7 +109,8 @@ class KnexMigrationSource {
       '20200430172400_add_screening_dates_to_manuscripts',
       true
     ),
-    rebuild_materialized_views('20200507121500_add_inv_payer_address'),
+    rebuild_materialized_views('20200507121500_add_inv_payer_address', true),
+    rebuild_materialized_views('20200511082600_fix_submission_dates'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
