@@ -19,16 +19,20 @@ import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 // * Usecase specific
-import { GetPaymentInfoResponse as Response } from './getPaymentInfoResponse';
-import { GetPaymentInfoDTO as DTO } from './getPaymentInfoDTO';
-import * as Errors from './getPaymentInfoErrors';
+import { GetPaymentsByInvoiceIdResponse as Response } from './getPaymentsByInvoiceIdResponse';
+import { GetPaymentsByInvoiceIdDTO as DTO } from './getPaymentsByInvoiceIdDTO';
+import * as Errors from './getPaymentsByInvoiceIdErrors';
 
-export type GetPaymentInfoContext = AuthorizationContext<Roles>;
+export type GetPaymentsByInvoiceIdContext = AuthorizationContext<Roles>;
 
-export class GetPaymentInfoUsecase
+export class GetPaymentsByInvoiceIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, GetPaymentInfoContext>,
-    AccessControlledUsecase<DTO, GetPaymentInfoContext, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, GetPaymentsByInvoiceIdContext>,
+    AccessControlledUsecase<
+      DTO,
+      GetPaymentsByInvoiceIdContext,
+      AccessControlContext
+    > {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private paymentRepo: PaymentRepoContract
@@ -38,10 +42,10 @@ export class GetPaymentInfoUsecase
     return {};
   }
 
-  @Authorize('invoice:read')
+  @Authorize('payments:read')
   public async execute(
     request: DTO,
-    context?: GetPaymentInfoContext
+    context?: GetPaymentsByInvoiceIdContext
   ): Promise<Response> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
@@ -49,32 +53,26 @@ export class GetPaymentInfoUsecase
 
     try {
       const uuid = new UniqueEntityID(request.invoiceId);
-      const id = InvoiceId.create(uuid).getValue();
+      const invoiceId = InvoiceId.create(uuid).getValue();
 
-      const invoiceExists = await this.invoiceRepo.existsWithId(id);
+      const invoiceExists = await this.invoiceRepo.existsWithId(invoiceId);
 
       if (!invoiceExists) {
         return left(new Errors.InvoiceNotFoundError(request.invoiceId));
       }
 
       try {
-        const payments = await this.paymentRepo.getPaymentsByInvoiceId(id);
-
-        if (payments.length === 0) {
-          return left(new Errors.NoPaymentFoundError(request.invoiceId));
-        }
-      } catch (e) {
-        return left(new Errors.PaymentInfoDbError(request.invoiceId, e));
+        const payments = await this.paymentRepo.getPaymentsByInvoiceId(
+          invoiceId
+        );
+        return right(Result.ok(payments));
+      } catch (err) {
+        return left(
+          new Errors.RetrievingPaymentsDbError(request.invoiceId, err)
+        );
       }
-
-      try {
-        const paymentInfo = await this.invoiceRepo.getInvoicePaymentInfo(id);
-        return right(Result.ok(paymentInfo));
-      } catch (e) {
-        return left(new Errors.PaymentInfoDbError(request.invoiceId, e));
-      }
-    } catch (e) {
-      return left(new AppError.UnexpectedError(e));
+    } catch (err) {
+      return left(new AppError.UnexpectedError(err));
     }
   }
 }
