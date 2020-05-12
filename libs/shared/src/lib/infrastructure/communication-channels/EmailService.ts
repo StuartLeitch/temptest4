@@ -20,7 +20,7 @@ import {
   InvoicePaymentFirstReminderTemplate,
   InvoicePaymentThirdReminderTemplate,
   InvoicePendingNotificationTemplate,
-  ButtonLinkTemplate
+  ButtonLinkTemplate,
 } from './email-templates';
 
 interface ConfirmationReminder {
@@ -118,11 +118,11 @@ export class EmailService {
       invoiceItem,
       invoiceLink,
       manuscript,
-      invoice
+      invoice,
     });
     const receiver: EmailReceiver = {
       email: manuscript.authorEmail,
-      name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`
+      name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
     };
     const emailProps = new EmailPropsBuilder()
       .addSender(`${senderName} <${senderAddress}>`)
@@ -168,7 +168,7 @@ export class EmailService {
     articleCustomId,
     invoiceId,
     sender,
-    author
+    author,
   }: ConfirmationReminder) {
     const publisherName = process.env.TENANT_NAME;
     const invoiceButton = this.createSingleButton(
@@ -182,7 +182,7 @@ export class EmailService {
     );
     const receiver: EmailReceiver = {
       email: author.email,
-      name: author.name
+      name: author.name,
     };
     const emailProps = new EmailPropsBuilder()
       .addSender(`${sender.name} <${sender.email}>`)
@@ -200,9 +200,9 @@ export class EmailService {
   ) {
     const publisherName = process.env.TENANT_NAME;
     const template: PaymentReminderTemplateMapper = {
-      first: data => InvoicePaymentFirstReminderTemplate.build(data),
-      second: data => InvoicePaymentSecondReminderTemplate.build(data),
-      third: data => InvoicePaymentThirdReminderTemplate.build(data)
+      first: (data) => InvoicePaymentFirstReminderTemplate.build(data),
+      second: (data) => InvoicePaymentSecondReminderTemplate.build(data),
+      third: (data) => InvoicePaymentThirdReminderTemplate.build(data),
     };
 
     return template[kind]({
@@ -211,7 +211,7 @@ export class EmailService {
       invoice,
       invoiceButton,
       publisherName,
-      publisherSite: this.journalProps.logoLink
+      publisherSite: this.journalProps.logoLink,
     });
   }
 
@@ -221,7 +221,7 @@ export class EmailService {
   ) {
     const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
-      `/payment-details/${data.invoice.invoiceId}`
+      `/payment-details/${data.invoice.invoiceId.id.toString()}`
     );
 
     const content = this.getEmailDataForInvoicePaymentReminder(
@@ -232,7 +232,7 @@ export class EmailService {
 
     const receiver: EmailReceiver = {
       email: data.author.email,
-      name: data.author.name
+      name: data.author.name,
     };
     const emailProps = new EmailPropsBuilder()
       .addSender(`${data.sender.name} <${data.sender.email}>`)
@@ -246,7 +246,7 @@ export class EmailService {
   public invoiceCreditControlReminder(data: PaymentReminder) {
     const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
-      `/payment-details/${data.invoice.invoiceId}`
+      `/payment-details/${data.invoice.invoiceId.id.toString()}`
     );
 
     const content = InvoiceCreditControlReminderTemplate.build(
@@ -259,7 +259,7 @@ export class EmailService {
     );
     const receiver: EmailReceiver = {
       email: data.author.email,
-      name: data.author.name
+      name: data.author.name,
     };
     const emailProps = new EmailPropsBuilder()
       .addSender(`${data.sender.name} <${data.sender.email}>`)
