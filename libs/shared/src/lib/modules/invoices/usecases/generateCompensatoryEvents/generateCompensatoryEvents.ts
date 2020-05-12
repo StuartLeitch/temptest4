@@ -18,6 +18,7 @@ import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublis
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
+import { Payment } from '../../../payments/domain/Payment';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
@@ -34,14 +35,17 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetPaymentsByInvoiceIdUsecase } from '../../../payments/usecases/getPaymentsByInvoiceId';
 import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 import { GetPaymentInfoUsecase } from '../../../payments/usecases/getPaymentInfo';
 
-import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
-import { PublishInvoicePaid } from '../publishInvoicePaid';
 import { PublishInvoiceCreatedUsecase } from '../publishInvoiceCreated';
+import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
+import { PublishInvoiceFinalized } from '../publishInvoiceFinalized';
+import { PublishInvoiceCredited } from '../publishInvoiceCredited';
+import { PublishInvoicePaid } from '../publishInvoicePaid';
 
 // * Usecase specific
 import { GenerateCompensatoryEventsResponse as Response } from './generateCompensatoryEventsResponse';
@@ -78,7 +82,17 @@ interface InvoicePayedData extends DTO {
   paymentInfo: InvoicePaymentInfo;
   invoiceItems: InvoiceItem[];
   manuscript: Manuscript;
+  payments: Payment[];
   paymentDate: Date;
+  invoice: Invoice;
+  payer: Payer;
+}
+
+interface InvoiceFinalizedData extends DTO {
+  invoiceItems: InvoiceItem[];
+  messageTimestamp: Date;
+  manuscript: Manuscript;
+  address: Address;
   invoice: Invoice;
   payer: Payer;
 }
@@ -121,6 +135,10 @@ export class GenerateCompensatoryEventsUsecase
     this.attachInvoice = this.attachInvoice.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
     this.verifyInput = this.verifyInput.bind(this);
+    this.shouldSendFinalize = this.shouldSendFinalize.bind(this);
+    this.publishInvoiceFinalized = this.publishInvoiceFinalized.bind(this);
+    this.sendFinalizedEvent = this.sendFinalizedEvent.bind(this);
+    this.attachPayments = this.attachPayments.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -137,6 +155,7 @@ export class GenerateCompensatoryEventsUsecase
       .then(this.publishInvoiceCreated(context))
       .then(this.publishInvoiceConfirmed(context))
       .then(this.publishInvoicePayed(context))
+      .then(this.publishInvoiceFinalized(context))
       .map(() => Result.ok<void>(null));
 
     return requestExecution.execute();
@@ -257,6 +276,23 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
+  private attachPayments(context: Context) {
+    return async <T extends WithInvoiceId>(request: T) => {
+      const usecase = new GetPaymentsByInvoiceIdUsecase(
+        this.invoiceRepo,
+        this.paymentRepo
+      );
+
+      return new AsyncEither(request.invoiceId)
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((result) => ({
+          ...request,
+          payments: result.getValue(),
+        }))
+        .execute();
+    };
+  }
+
   private async shouldSendCreated<T extends WithInvoice>(
     request: T
   ): Promise<Either<null, boolean>> {
@@ -286,6 +322,19 @@ export class GenerateCompensatoryEventsUsecase
     request: T
   ): Promise<Either<null, boolean>> {
     const { invoice } = request;
+    if (
+      invoice.status !== InvoiceStatus.FINAL ||
+      !invoice.dateAccepted ||
+      !invoice.dateIssued
+    ) {
+      return right(false);
+    }
+    return right(true);
+  }
+
+  private async shouldSendFinalize<T extends WithInvoice>({
+    invoice,
+  }: T): Promise<Either<null, boolean>> {
     if (
       invoice.status !== InvoiceStatus.FINAL ||
       !invoice.dateAccepted ||
@@ -374,6 +423,27 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
+  private sendFinalizedEvent(context: Context) {
+    return async <T extends InvoiceFinalizedData>(request: T) => {
+      const publishUsecase = new PublishInvoiceFinalized(this.sqsPublish);
+      try {
+        const result = await publishUsecase.execute(
+          request.invoice,
+          request.invoiceItems,
+          request.manuscript,
+          request.payer,
+          request.address,
+          request.messageTimestamp
+        );
+        return right<Errors.PublishInvoiceFinalizedError, void>(result);
+      } catch (err) {
+        return left<Errors.PublishInvoiceFinalizedError, void>(
+          new Errors.PublishInvoiceFinalizedError(request.invoiceId, err)
+        );
+      }
+    };
+  }
+
   private updateInvoiceStatus(
     status: keyof typeof InvoiceStatus,
     useDate: string,
@@ -434,9 +504,26 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachManuscript(context))
         .then(this.attachPaymentInfo(context))
         .then(this.attachPayer(context))
+        .then(this.attachPayments(context))
         .map(this.attachPaymentDate(context))
         .map(this.updateInvoiceStatus('FINAL', 'paymentDate', false))
         .then(this.sendPayedEvent(context))
+        .map(() => request)
+        .execute();
+    };
+  }
+
+  private publishInvoiceFinalized(context: Context) {
+    return async (request: DTO) => {
+      return new AsyncEither<null, DTO>(request)
+        .then(this.attachInvoice(context))
+        .advanceOrEnd(this.shouldSendFinalize)
+        .then(this.attachInvoiceItems(context))
+        .then(this.attachManuscript(context))
+        .then(this.attachPayer(context))
+        .then(this.attachAddress(context))
+        .map(this.attachMessageTimestamp('dateMovedToFinal'))
+        .then(this.sendFinalizedEvent(context))
         .map(() => request)
         .execute();
     };

@@ -95,7 +95,7 @@ describe('migrate entire invoice usecase', () => {
 
     expect(result.isRight()).toBeTruthy();
 
-    expect(sqsPublishService.messages.length).toBe(3);
+    expect(sqsPublishService.messages.length).toBe(4);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
 
