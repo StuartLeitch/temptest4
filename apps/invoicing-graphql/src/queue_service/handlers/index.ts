@@ -1,4 +1,5 @@
 import { SubmissionPeerReviewCycleCheckPassed } from './SubmissionPeerReviewCycleCheckPassed';
+import { SubmissionQualityCheckPassed } from './SubmissionQualityCheckPassed';
 import { SubmissionQualityCheckRTCd } from './SubmissionQualityCheckRTCd';
 import { JournalEditorAssignedHandler } from './JournalEditorAssigned';
 import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
@@ -12,6 +13,7 @@ import { JournalAddedHandler } from './JournalAdded';
 export {
   SubmissionPeerReviewCycleCheckPassed,
   JournalEditorAssignedHandler,
+  SubmissionQualityCheckPassed,
   SubmissionQualityCheckRTCd,
   SubmissionSubmittedHandler,
   ArticlePublishedHandler,

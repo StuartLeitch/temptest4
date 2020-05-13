@@ -1,5 +1,5 @@
 // * Domain imports
-import { SubmissionQualityCheckPassed } from '@hindawi/phenom-events';
+import { SubmissionQualityCheckPassed as SubmissionQualityCheckPassedEvent } from '@hindawi/phenom-events';
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
@@ -14,17 +14,14 @@ import { env } from '../../env';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
-const SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED =
-  'SubmissionPeerReviewCycleCheckPassed';
+const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
 
-const logger = new Logger(
-  `PhenomEvent:${SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED}`
-);
+const logger = new Logger(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
 
-export const SubmissionPeerReviewCycleCheckPassed = {
-  event: SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED,
+export const SubmissionQualityCheckPassed = {
+  event: SUBMISSION_QUALITY_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(
-    data: SubmissionQualityCheckPassed
+    data: SubmissionQualityCheckPassedEvent
   ) {
     logger.info('Incoming Event Data', data);
 
