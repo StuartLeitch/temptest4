@@ -54,6 +54,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (manuscript_custom_id, version)`,
     `create index on ${this.getViewName()} (version)`,
     `create index on ${this.getViewName()} (team_type)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, team_type, submitted_date desc nulls last)`,
     `create index on ${this.getViewName()} (team_member_email)`,
     `create index on ${this.getViewName()} (team_member_email, team_type)`,
     `create index on ${this.getViewName()} (created_date)`,

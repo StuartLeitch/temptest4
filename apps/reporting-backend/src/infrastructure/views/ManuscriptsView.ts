@@ -59,7 +59,9 @@ AS SELECT
   review_reports.last_review_report_submitted_date,
   handling_editors.invited_handling_editors_count,
   handling_editors.last_handling_editor_invited_date,
-  handling_editors.current_handling_editor_accepted_date
+  handling_editors.current_handling_editor_accepted_date,
+  last_editor_recommendation.recommendation last_editor_recommendation,
+  last_editor_recommendation.submitted_date as last_editor_recommendation_submitted_date
 FROM ${submissionView.getViewName()} s 
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_corresponding = true limit 1) a on a.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_submitting = true limit 1) a2 on a2.manuscript_custom_id = s.manuscript_custom_id
@@ -79,6 +81,7 @@ FROM ${submissionView.getViewName()} s
   ) order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'screener' limit 1) screener on screener.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id
+  LEFT JOIN LATERAL (select * from ${manuscriptReviewsView.getViewName()} r where r.manuscript_custom_id = s.manuscript_custom_id and r.team_type = 'editor' order by submitted_date desc nulls last limit 1) last_editor_recommendation on last_editor_recommendation.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count, max(invited_date) as last_reviewer_invitation_date from ${manuscriptReviewers.getViewName()} group by manuscript_custom_id, "version") reviewers on reviewers.manuscript_custom_id = s.manuscript_custom_id and reviewers."version" = s."version"
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count, max(accepted_date) as last_reviewer_accepted_date from ${manuscriptReviewers.getViewName()} where status = 'accepted' group by manuscript_custom_id, version) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as pending_reviewers_count from ${manuscriptReviewers.getViewName()} where responded_date is null group by manuscript_custom_id, version) pending_reviewers on pending_reviewers.manuscript_custom_id = s.manuscript_custom_id and pending_reviewers."version" = s."version"
