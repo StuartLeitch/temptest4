@@ -42,13 +42,15 @@ export * from './modules/transactions/domain/TransactionId';
 export * from './modules/transactions/repos';
 // // export * from './transactions/repos/transactionJsonRepo';
 // export * from './modules/transactions/usecases/getTransactions/getTransactions';
-// export * from './modules/transactions/usecases/getTransaction/getTransaction';
+export * from './modules/transactions/usecases/getTransaction/getTransaction';
 // export * from './modules/transactions/usecases/createTransaction/createTransaction';
 // // export * from './transactions/subscribers/AfterTransactionCreatedEvents';
 export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
 export * from './modules/transactions/usecases/updateTransaction/updateTransaction';
+export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
+export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
