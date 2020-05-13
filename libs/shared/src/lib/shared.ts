@@ -170,12 +170,15 @@ export * from './modules/coupons/usecases/createCoupon/createCoupon';
 export * from './modules/coupons/usecases/createCoupon/createCouponDTO';
 export * from './modules/coupons/usecases/updateCoupon/updateCoupon';
 export * from './modules/coupons/usecases/updateCoupon/updateCouponDTO';
+export * from './modules/coupons/usecases/getRecentCoupons/getRecentCoupons';
+export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCode';
+export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 export { VATService } from './domain/services/VATService';
 export { WaiverService } from './domain/services/WaiverService';
 export * from './domain/services/ErpService';
 
-// export * from './modules/coupons/mappers/CouponMap';
+export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/coupons/repos';
 
 // * Export Notifications Subdomain

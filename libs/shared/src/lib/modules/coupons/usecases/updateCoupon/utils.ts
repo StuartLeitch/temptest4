@@ -22,10 +22,10 @@ type SanityCheckResponse = Either<
 >;
 
 export function updateCoupon({ coupon, request }: UpdateCouponData): Coupon {
-  const { couponType, expirationDate, status } = request;
-  if (couponType) {
-    coupon.couponType = CouponType[couponType];
-    if (couponType === CouponType.SINGLE_USE) {
+  const { type, expirationDate, status, name, reduction } = request;
+  if (type) {
+    coupon.couponType = CouponType[type];
+    if (type === CouponType.SINGLE_USE) {
       coupon.expirationDate = null;
     }
   }
@@ -35,29 +35,41 @@ export function updateCoupon({ coupon, request }: UpdateCouponData): Coupon {
   if (status) {
     coupon.status = CouponStatus[status];
   }
+
+  if (name) {
+    coupon.name = name;
+  }
+
+  if (reduction) {
+    coupon.reduction = reduction;
+  }
+
+  const now = new Date();
+  coupon.dateUpdated = now;
+
   return coupon;
 }
 
 export function sanityChecksRequestParameters(
   request: UpdateCouponDTO
 ): SanityCheckResponse {
-  const { couponType, status, expirationDate, id } = request;
+  const { type, status, expirationDate, id } = request;
   if (!id) {
     return left(new UpdateCouponErrors.IdRequired());
   }
-  if (couponType && !(couponType in CouponType)) {
-    return left(new UpdateCouponErrors.InvalidCouponType(couponType));
+  if (type && !(type in CouponType)) {
+    return left(new UpdateCouponErrors.InvalidCouponType(type));
   }
   if (status && !(status in CouponStatus)) {
     return left(new UpdateCouponErrors.InvalidCouponStatus(status));
   }
-  if (couponType && couponType === CouponType.MULTIPLE_USE && !expirationDate) {
+  if (type && type === CouponType.MULTIPLE_USE && !expirationDate) {
     return left(new UpdateCouponErrors.ExpirationDateRequired());
   }
   if (
-    couponType &&
-    couponType === CouponType.MULTIPLE_USE &&
-    !isExpirationDateValid(new Date(expirationDate), CouponType[couponType])
+    type &&
+    type === CouponType.MULTIPLE_USE &&
+    !isExpirationDateValid(new Date(expirationDate), CouponType[type])
   ) {
     return left(new UpdateCouponErrors.InvalidExpirationDate(expirationDate));
   }

@@ -1,6 +1,8 @@
 export interface UpdateCouponDTO {
   expirationDate?: string;
-  couponType?: string;
+  type?: string;
   status?: string;
   id: string;
+  reduction?: number;
+  name?: string;
 }

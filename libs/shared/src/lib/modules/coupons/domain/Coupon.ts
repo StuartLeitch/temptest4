@@ -52,6 +52,10 @@ export class Coupon extends Reduction<CouponProps> {
     return this.props.reduction;
   }
 
+  public set reduction(newValue: number) {
+    this.props.reduction = newValue;
+  }
+
   public get couponType(): CouponType {
     return this.props.couponType;
   }
@@ -100,8 +104,16 @@ export class Coupon extends Reduction<CouponProps> {
     return this.props.dateUpdated;
   }
 
+  public set dateUpdated(newDate: Date) {
+    this.props.dateUpdated = newDate;
+  }
+
   public get name(): string {
     return this.props.name;
+  }
+
+  public set name(newName: string) {
+    this.props.name = newName;
   }
 
   public static create(

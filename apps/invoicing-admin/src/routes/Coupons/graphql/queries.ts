@@ -1,3 +1,5 @@
+import { COUPON_FRAGMENT } from './../../Coupon/graphql';
+
 export const COUPONS_QUERY = `
   query fetchCoupons(
     $pagination: Pagination
@@ -12,15 +14,5 @@ export const COUPONS_QUERY = `
     }
   }
 
-  fragment couponFragment on Coupon {
-    reduction
-    type
-    code
-    dateCreated
-    dateUpdated
-    expirationDate
-    redeemCount
-    status
-    name
-  }
+  ${COUPON_FRAGMENT}
 `;

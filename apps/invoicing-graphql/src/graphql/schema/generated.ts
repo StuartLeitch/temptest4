@@ -210,6 +210,15 @@ export type Coupon = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type CouponInput = {
+  id: Scalars['ID'];
+  reduction?: Maybe<Scalars['Float']>;
+  type?: Maybe<Scalars['String']>;
+  expirationDate?: Maybe<Scalars['Date']>;
+  status?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+};
+
 export type Waiver = {
    __typename?: 'Waiver';
   reduction?: Maybe<Scalars['Float']>;
@@ -309,6 +318,7 @@ export type Query = {
   invoice?: Maybe<Invoice>;
   invoiceVat?: Maybe<InvoiceVat>;
   invoices?: Maybe<PaginatedInvoices>;
+  coupon?: Maybe<Coupon>;
   coupons?: Maybe<PaginatedCoupons>;
   invoiceIdByManuscriptCustomId?: Maybe<InvoiceId>;
   journals?: Maybe<Array<Maybe<Journal>>>;
@@ -335,6 +345,11 @@ export type QueryInvoiceVatArgs = {
 export type QueryInvoicesArgs = {
   filters?: Maybe<InvoiceFilters>;
   pagination?: Maybe<Pagination>;
+};
+
+
+export type QueryCouponArgs = {
+  couponCode: Scalars['String'];
 };
 
 
@@ -366,6 +381,7 @@ export type Mutation = {
    __typename?: 'Mutation';
   confirmInvoice: Payer;
   applyCoupon?: Maybe<Coupon>;
+  updateCoupon?: Maybe<Coupon>;
   createInvoice?: Maybe<Invoice>;
   deleteInvoice?: Maybe<Scalars['Boolean']>;
   setTransactionToActive?: Maybe<Transaction>;
@@ -391,6 +407,11 @@ export type MutationConfirmInvoiceArgs = {
 export type MutationApplyCouponArgs = {
   invoiceId?: Maybe<Scalars['ID']>;
   couponCode?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateCouponArgs = {
+  coupon?: Maybe<CouponInput>;
 };
 
 
@@ -594,6 +615,7 @@ export type ResolversTypes = {
   PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
   Coupon: ResolverTypeWrapper<Coupon>,
   Int: ResolverTypeWrapper<Scalars['Int']>,
+  CouponInput: CouponInput,
   Waiver: ResolverTypeWrapper<Waiver>,
   ClientToken: ResolverTypeWrapper<ClientToken>,
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>,
@@ -642,6 +664,7 @@ export type ResolversParentTypes = {
   PaymentMethod: PaymentMethod,
   Coupon: Coupon,
   Int: Scalars['Int'],
+  CouponInput: CouponInput,
   Waiver: Waiver,
   ClientToken: ClientToken,
   PaginatedInvoices: PaginatedInvoices,
@@ -870,6 +893,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceArgs, never>>,
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, RequireFields<QueryInvoiceVatArgs, never>>,
   invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, RequireFields<QueryInvoicesArgs, never>>,
+  coupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<QueryCouponArgs, 'couponCode'>>,
   coupons?: Resolver<Maybe<ResolversTypes['PaginatedCoupons']>, ParentType, ContextType, RequireFields<QueryCouponsArgs, never>>,
   invoiceIdByManuscriptCustomId?: Resolver<Maybe<ResolversTypes['InvoiceId']>, ParentType, ContextType, RequireFields<QueryInvoiceIdByManuscriptCustomIdArgs, never>>,
   journals?: Resolver<Maybe<Array<Maybe<ResolversTypes['Journal']>>>, ParentType, ContextType>,
@@ -881,6 +905,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationApplyCouponArgs, never>>,
+  updateCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationUpdateCouponArgs, never>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationCreateInvoiceArgs, never>>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
   setTransactionToActive?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<MutationSetTransactionToActiveArgs, never>>,

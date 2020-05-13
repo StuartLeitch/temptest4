@@ -53,15 +53,19 @@ export class UpdateCouponUsecase
     context?: UpdateCouponContext
   ): Promise<UpdateCouponResponse> {
     const maybeValidInput = sanityChecksRequestParameters(request);
+
     const maybeCouponWithInput = ((await chain(
       [this.getCouponWithInput.bind(this)],
       maybeValidInput
     )) as unknown) as Either<UpdateCouponErrors.InvalidId, UpdateCouponData>;
+
     const maybeUpdatedCoupon = maybeCouponWithInput.map(updateCoupon);
+
     const response = await map(
       [this.saveCoupon.bind(this)],
       maybeUpdatedCoupon
     );
+
     return (response as unknown) as UpdateCouponResponse;
   }
 
@@ -84,6 +88,7 @@ export class UpdateCouponUsecase
 
   private async saveCoupon(coupon: Coupon): Promise<Result<Coupon>> {
     const savedCoupon = await this.couponRepo.update(coupon);
+
     return Result.ok(savedCoupon);
   }
 }

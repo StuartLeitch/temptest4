@@ -12,7 +12,7 @@ import {
 
 import { APPLY_COUPON_MUTATION } from '../graphql';
 
-import CouponCodeInput from './CouponCodeInput';
+import { Code } from '../../Coupon/components/Fields';
 
 const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
   const [inputValue, setInputValue] = useState('');
@@ -58,14 +58,11 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
       </ModalHeader>
 
       <ModalBody>
-        <CouponCodeInput
-          onChangeCallback={setInputValue}
-          validationCallback={setValid}
-        />
+        <Code onChangeCallback={setInputValue} validationCallback={setValid} />
       </ModalBody>
 
       <ModalFooter className='justify-content-between'>
-        <span className='medium text-muted text-warning w-50'>{error}</span>
+        <span className='medium text-muted text-danger w-50'>{error}</span>
 
         <div>
           <UncontrolledModal.Close

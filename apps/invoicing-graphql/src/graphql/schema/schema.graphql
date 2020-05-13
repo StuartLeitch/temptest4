@@ -185,6 +185,15 @@ type Coupon @model(id: "coupons") {
   name: String
 }
 
+input CouponInput {
+  id: ID!
+  reduction: Float
+  type: String
+  expirationDate: Date
+  status: String
+  name: String
+}
+
 type Waiver {
   reduction: Float
   type_id: String
@@ -281,6 +290,7 @@ type Query {
     payerType: String
   ): InvoiceVat
   invoices(filters: InvoiceFilters, pagination: Pagination): PaginatedInvoices
+  coupon(couponCode: String!): Coupon
   coupons(pagination: Pagination): PaginatedCoupons
   invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
   journals: [Journal]
@@ -292,6 +302,7 @@ type Query {
 type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   applyCoupon(invoiceId: ID, couponCode: String): Coupon
+  updateCoupon(coupon: CouponInput): Coupon
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: ID!): Boolean
   setTransactionToActive(customId: ID): Transaction

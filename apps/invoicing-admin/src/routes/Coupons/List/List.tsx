@@ -1,5 +1,7 @@
 import React from 'react';
 import format from 'date-fns/format';
+import { Link } from 'react-router-dom';
+import { CouponType } from '../../Coupon/types';
 
 import { Table, Badge } from '../../../components';
 
@@ -22,7 +24,7 @@ const CouponsList = ({ coupons }: CouponsListProps) => {
       <Table className='mb-0 table-striped' hover>
         <thead>
           <tr>
-            <th className='align-middle bt-0'>Name</th>
+            <th className='align-middle bt-0'>Description</th>
             <th className='align-middle bt-0'>Type</th>
             <th className='align-middle bt-0'>Code</th>
             <th className='align-middle bt-0'>Reduction</th>
@@ -50,9 +52,20 @@ const CouponsList = ({ coupons }: CouponsListProps) => {
             return (
               <tr key={index}>
                 <td className='align-middle bt-0'>{name}</td>
-                <td className='align-middle bt-0'>{type}</td>
-                <td className='align-middle bt-0 font-weight-bold'>{code}</td>
-                <td className='align-middle bt-0'>{reduction}</td>
+                <td className='align-middle bt-0 font-weight-bold'>{type}</td>
+                <td className='align-middle bt-0 font-weight-bold'>
+                  <Link
+                    to={`/coupons/details/${code}`}
+                    className='text-decoration-none'
+                  >
+                    <span className='bg-twitter text-white pl-2 pr-2'>
+                      {code}
+                    </span>
+                  </Link>
+                </td>
+                <td className='align-middle bt-0 font-weight-bold'>
+                  {reduction}%
+                </td>
                 <td className='align-middle bt-0'>{COUPON_STATUS[status]}</td>
                 <td className='align-middle bt-0'>{redeemCount}</td>
                 <td className='align-middle bt-0'>
@@ -75,19 +88,7 @@ const CouponsList = ({ coupons }: CouponsListProps) => {
 };
 
 interface CouponsListProps {
-  coupons: [
-    {
-      name: string;
-      type: string;
-      code: string;
-      reduction: number;
-      status: string;
-      redeemCount: number;
-      dateCreated: string;
-      dateUpdated: string;
-      expirationDate: string;
-    }
-  ];
+  coupons: CouponType[];
 }
 
 export default CouponsList;

@@ -35,7 +35,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
   async getCouponByCode(code: CouponCode): Promise<Coupon> {
     const { db } = this;
-    console.log(TABLES.COUPONS);
+
     const coupon = await db
       .select()
       .from(TABLES.COUPONS)

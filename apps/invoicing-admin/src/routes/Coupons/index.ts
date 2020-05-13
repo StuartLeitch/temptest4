@@ -1,3 +1,3 @@
 import CouponsList from './List';
 
-export { CouponsList };
+export default CouponsList;

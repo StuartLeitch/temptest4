@@ -7,7 +7,8 @@ import { useAuth } from '../contexts/Auth';
 import InvoicesList from './Invoices/List';
 import InvoiceDetails from './Invoice/Details';
 import CreditNoteDetails from './Invoice/Details/CreditNote';
-import { CouponsList } from './Coupons';
+import CouponsList from './Coupons';
+import Coupon from './Coupon';
 
 // ----------- Aiframe Pages Imports ---------------
 import ProjectsDashboard from './Dashboards/Projects';
@@ -128,6 +129,9 @@ export const RoutedContent = () => {
       />
       {/* Coupons Routes */}
       <Route path='/coupons/list' exact component={CouponsList} />
+      <Route path='/coupons/details/:code' exact component={Coupon} />
+      <Route path='/coupons/create' exact component={Coupon} />
+      {/* Layout Routes */}
       <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
       <PrivateRoute exact path='/dashboards/invoicing'>
         <InvoicingDashboard />
