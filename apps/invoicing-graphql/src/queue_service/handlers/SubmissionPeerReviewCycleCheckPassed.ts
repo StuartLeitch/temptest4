@@ -2,10 +2,11 @@
 // * Domain imports
 // import {InvoiceStatus} from '@hindawi/shared';
 import {
+  GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
+  STATUS as TransactionStatus,
   UpdateTransactionContext,
   VersionCompare,
-  QueuePayloads,
   Roles,
 } from '@hindawi/shared';
 
@@ -60,6 +61,27 @@ export const SubmissionPeerReviewCycleCheckPassed = {
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
+
+    const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
+      invoiceItemRepo,
+      transactionRepo,
+      manuscriptRepo,
+      invoiceRepo
+    );
+
+    const maybeTransaction = await getTransactionUsecase.execute(
+      { customId },
+      defaultContext
+    );
+
+    if (maybeTransaction.isLeft()) {
+      logger.error(maybeTransaction.value.errorValue().message);
+      throw maybeTransaction.value.error;
+    }
+
+    if (maybeTransaction.value.getValue().status !== TransactionStatus.DRAFT) {
+      return;
+    }
 
     const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
       catalogRepo,
