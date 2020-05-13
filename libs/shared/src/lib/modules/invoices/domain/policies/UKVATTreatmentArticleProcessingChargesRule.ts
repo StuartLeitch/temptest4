@@ -131,8 +131,11 @@ export class UKVATTreatmentArticleProcessingChargesRule
 
     if (europeanCountriesCodes.includes(this.CountryCode)) {
       //  VATRate = this.VATRules[this.CountryCode].rate;
-      // institutions should have 0 vat
-      if (!this.AsBusiness && !this.VATRegistered) {
+      if (
+        (!this.AsBusiness && !this.VATRegistered) ||
+        this.CountryCode === 'UK' ||
+        this.CountryCode === 'GB'
+      ) {
         VATRate = this.VATRules.UK.rate;
       }
     }
