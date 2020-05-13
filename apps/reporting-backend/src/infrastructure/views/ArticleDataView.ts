@@ -1,6 +1,6 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
@@ -50,7 +50,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (journal_id)`,
     `create index on ${this.getViewName()} (published_date)`,
-    `create index on ${this.getViewName()} (submission_id)`
+    `create index on ${this.getViewName()} (submission_id)`,
   ];
 
   getViewName(): string {
@@ -58,6 +58,6 @@ WITH DATA;
   }
 }
 
-const authorsView = new ArticleDataView();
+const articleData = new ArticleDataView();
 
-export default authorsView;
+export default articleData;

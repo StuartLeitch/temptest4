@@ -10,6 +10,7 @@ class AuthorsView extends AbstractEventView implements EventViewContract {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
+  author_view.id,
   se.manuscript_custom_id as "manuscript_custom_id",
   author_view.email as "email",
   coalesce(c."name", author_view.country) as "country",
@@ -31,6 +32,7 @@ AS SELECT
     JOIN ${submissionView.getViewName()} s on
       s.event_id = se.id) se,
     jsonb_to_recordset(((se.payload -> 'manuscripts') -> se.last_version_index) -> 'authors') as author_view(
+      id text,
       email text,
       country text,
       "userId" text,
@@ -46,6 +48,7 @@ WITH DATA;
   }
 
   postCreateQueries = [
+    `create index on ${this.getViewName()} (id)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (manuscript_custom_id, is_corresponding)`,
     `create index on ${this.getViewName()} (manuscript_custom_id, is_submitting)`,
