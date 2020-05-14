@@ -14,6 +14,6 @@ export function notificationsSentInLastDelay(
 
   return notifications.filter((notification) => {
     const delta = now - notification.dateSent.getTime();
-    return delta >= delayNormalized;
+    return delta < delayNormalized;
   });
 }
