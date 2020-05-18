@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from 'graphql-hooks';
+import { func, string, number, object } from 'prop-types';
 import numeral from 'numeral';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
@@ -24,11 +25,37 @@ import SuccessfulCreditNoteCreatedToast from './SuccessfulCreditNoteCreatedToast
 
 import { CREATE_CREDIT_NOTE_MUTATION } from '../graphql';
 
-export default ({ target, invoiceId, invoiceItem, total }) => {
+const CreateCreditNoteModal = ({
+  target,
+  invoiceId,
+  invoiceItem,
+  total,
+  onSaveCallback,
+}) => {
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,
   });
+
+  const saveCreditNote = async () => {
+    try {
+      const recordCreditNoteResult = await recordCreditNote({
+        variables: {
+          ...creditNoteData,
+          invoiceId,
+        },
+      });
+      const error = recordCreditNoteResult?.error?.graphQLErrors[0].message;
+      if (!error) {
+        onSaveCallback();
+      } else {
+        setError(error);
+      }
+    } catch (e) {
+      setError('An error occurred. Please try again.');
+    }
+    return toast.success(SuccessfulCreditNoteCreatedToast);
+  };
 
   return (
     <UncontrolledModal target={target} centered>
@@ -84,7 +111,7 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
                   });
                 }}
               >
-                <option value='0' selected>
+                <option value='0' defaultValue>
                   Withdrawn Manuscript
                 </option>
                 <option value='1'>Reduction Applied</option>
@@ -103,19 +130,7 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
           Close
         </UncontrolledModal.Close>
         <UncontrolledModal.Close color='link' className='text-primary'>
-          <Button
-            color='primary'
-            onClick={async (e) => {
-              await recordCreditNote({
-                variables: {
-                  ...creditNoteData,
-                  invoiceId,
-                },
-              });
-
-              return toast.success(SuccessfulCreditNoteCreatedToast);
-            }}
-          >
+          <Button color='primary' onClick={saveCreditNote}>
             <i className='fas fa-check mr-2'></i>
             Save
           </Button>
@@ -124,3 +139,13 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
     </UncontrolledModal>
   );
 };
+
+CreateCreditNoteModal.propTypes = {
+  target: string.isRequired,
+  invoiceId: string.isRequired,
+  invoiceItem: object.isRequired,
+  total: number.isRequired,
+  onSuccessCallback: func,
+};
+
+export default CreateCreditNoteModal;
