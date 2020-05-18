@@ -215,9 +215,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const invoices = await db(TABLES.INVOICES)
       .select()
       .whereNot(`deleted`, 1)
-      .where({
-        status: 'ACTIVE',
-      })
+      .whereIn('status', ['ACTIVE', 'FINAL'])
       // filter the credit notes from this list
       .whereNull('cancelledInvoiceReference')
       .whereNull('erpReference');

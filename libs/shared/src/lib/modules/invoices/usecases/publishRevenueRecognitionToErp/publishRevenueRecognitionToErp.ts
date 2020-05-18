@@ -149,7 +149,7 @@ export class PublishRevenueRecognitionToErpUsecase
       }
 
       const invoiceItem = invoice.invoiceItems.getItems().shift();
-      const { coupons, waivers, price, vat } = invoiceItem;
+      const { coupons, waivers, price } = invoiceItem;
       let netCharges = price;
       if (coupons?.length) {
         netCharges -= coupons.reduce(
