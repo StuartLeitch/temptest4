@@ -1,6 +1,6 @@
 if [ "$1" == "-h" ] || [ $# -eq 0 ]; then
     echo "\nScript needs a branch to pull from"
-    echo "Script runs -- deploy-qa.sh -- and -- deploy-dev-admin-frontend.sh -- to deploy on qa environment"
+    echo "Script runs -- deploy-qa.sh -- and -- deploy-dev-admin-frontend.sh -- to deploy on dev environment"
     echo "\nUsage: `basename $0` [git-branch-name]\n"
     exit 0
 fi
