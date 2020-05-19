@@ -185,13 +185,19 @@ type Coupon @model(id: "coupons") {
   name: String
 }
 
+type CouponCode {
+  code: String
+}
+
 input CouponInput {
-  id: ID!
+  id: ID
   reduction: Float
   type: String
   expirationDate: Date
   status: String
   name: String
+  code: String
+  invoiceItemType: String
 }
 
 type Waiver {
@@ -281,6 +287,7 @@ input MigrateAPC {
 type Query {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
+  generateCouponCode: CouponCode
   invoice(invoiceId: ID): Invoice
   invoiceVat(
     invoiceId: ID
@@ -303,6 +310,7 @@ type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   applyCoupon(invoiceId: ID, couponCode: String): Coupon
   updateCoupon(coupon: CouponInput): Coupon
+  createCoupon(coupon: CouponInput): Coupon
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: ID!): Boolean
   setTransactionToActive(customId: ID): Transaction

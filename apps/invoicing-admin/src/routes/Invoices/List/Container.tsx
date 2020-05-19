@@ -160,7 +160,7 @@ const InvoicesContainer = (props: any) => {
             {/* <QueryStateDisplay queryState={{ ...filters, ...pagination }} /> */}
             <InvoicesLeftNav filters={filters} setFilter={setFilter} />
           </Col>
-          <Col lg={9} className='mt-n4'>
+          <Col lg={9} className='mt-n4 mb-5'>
             <ButtonToolbar className='d-flex justify-content-end'>
               <ButtonGroup className='mr-2'>
                 <Button

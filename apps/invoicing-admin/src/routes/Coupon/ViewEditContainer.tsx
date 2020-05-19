@@ -19,26 +19,28 @@ import {
   Error,
 } from '../../components';
 
-import Coupon from './components/Coupon';
+import CouponViewEdit from './components/CouponViewEdit';
 
 import { COUPON_QUERY, COUPON_UPDATE_MUTATION } from './graphql';
 
-import { CouponContext, couponReducerInitialState } from './Context';
+import { CouponEditContext, couponEditInitialState } from './Context';
+
+import { VIEW, EDIT } from './config';
 
 const Content = ({ loading, data, error, mode }) => {
   if (loading) return <Loading />;
 
   if (error) return <Error error={error} />;
 
-  if (data) return <Coupon coupon={data.coupon} mode={mode} />;
+  if (data) return <CouponViewEdit coupon={data.coupon} mode={mode} />;
 
   return <Loading />;
 };
 
-const CouponContainer = () => {
+const ViewEditContainer = () => {
   const { code } = useParams();
   const [updateInProgress, setUpdateInProgress] = useState(false);
-  const [mode, setMode] = useState('VIEW');
+  const [mode, setMode] = useState(VIEW);
 
   const [updateCoupon] = useMutation(COUPON_UPDATE_MUTATION);
   const { loading, error, data, refetch: couponQueryRefetch } = useQuery(
@@ -48,7 +50,7 @@ const CouponContainer = () => {
     }
   );
 
-  const [couponState, setCouponState] = useState(couponReducerInitialState);
+  const [couponState, setCouponState] = useState(couponEditInitialState);
   const couponProviderValue = {
     couponState,
     update: (field, newValue) =>
@@ -76,6 +78,14 @@ const CouponContainer = () => {
         fieldsToUpdate[field] = currentFieldValue;
       }
     });
+
+    // if coupon is changed to MULTIPLE_USE, also add expiration date
+    if (
+      Object.values(fieldsToUpdate).some((value) => value === 'MULTIPLE_USE') &&
+      !fieldsToUpdate['expirationDate']
+    ) {
+      fieldsToUpdate['expirationDate'] = data.coupon.expirationDate;
+    }
 
     try {
       const updateCouponResult = await updateCoupon({
@@ -126,23 +136,21 @@ const CouponContainer = () => {
       <Row>
         <Col lg={8}>
           <Card>
-            <CouponContext.Provider value={couponProviderValue}>
+            <CouponEditContext.Provider value={couponProviderValue}>
               <CardHeader className='mb-3 d-flex align-items-center'>
                 <h5 className='mb-0'>Details</h5>
                 <Toolbar
-                  {...{
-                    saveEditedCoupon,
-                    cancelEdit,
-                    setMode,
-                    updateInProgress,
-                    mode,
-                  }}
+                  onSave={saveEditedCoupon}
+                  onCancel={cancelEdit}
+                  onEdit={() => setMode(EDIT)}
+                  isSaveInProgress={updateInProgress}
+                  mode={mode}
                 />
               </CardHeader>
               <CardBody>
                 <Content {...{ loading, data, error, mode }} />
               </CardBody>
-            </CouponContext.Provider>
+            </CouponEditContext.Provider>
           </Card>
         </Col>
       </Row>
@@ -150,4 +158,4 @@ const CouponContainer = () => {
   );
 };
 
-export default CouponContainer;
+export default ViewEditContainer;

@@ -1,5 +1,10 @@
 import React, { useEffect, useContext } from 'react';
-import { CouponContext } from '../../Context';
+
+import { CouponEditContext, CouponCreateContext } from '../../Context';
+
+import { CouponMode } from '../../types';
+
+import { CREATE } from '../../config';
 
 import {
   FormGroup,
@@ -18,8 +23,11 @@ const TypeSelection = ({
   disabled = false,
   helper = '',
   id,
+  mode,
 }: TypeSelectionProps) => {
-  const { couponState, update } = useContext(CouponContext);
+  const chosenContext =
+    mode === CREATE ? CouponCreateContext : CouponEditContext;
+  const { couponState, update } = useContext(chosenContext);
 
   useEffect(() => {
     update(id, { value, isValid: true });
@@ -72,6 +80,7 @@ interface TypeSelectionProps {
   disabled?: boolean;
   helper?: string;
   id?: string;
+  mode: CouponMode;
 }
 
 export default TypeSelection;

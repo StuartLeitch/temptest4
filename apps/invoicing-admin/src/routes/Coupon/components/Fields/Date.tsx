@@ -2,11 +2,13 @@ import React, { useContext, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import { noop } from 'lodash';
 
-import { CouponContext } from '../../Context';
+import { CouponEditContext, CouponCreateContext } from '../../Context';
 
 import { Button, Label, Col, FormGroup } from '../../../../components';
 
 import { CouponMode } from '../../types';
+
+import { CREATE, VIEW } from '../../config';
 const Date = ({
   stringValue = '',
   label,
@@ -15,13 +17,17 @@ const Date = ({
   filter = noop(),
   mode,
 }: DateProps) => {
-  const { couponState, update } = useContext(CouponContext);
+  const chosenContext =
+    mode === CREATE ? CouponCreateContext : CouponEditContext;
+  const { couponState, update } = useContext(chosenContext);
 
   useEffect(() => {
-    update(id, {
-      value: stringValue ? new window.Date(stringValue).toISOString() : null,
-      isValid: true,
-    });
+    if (mode !== CREATE) {
+      update(id, {
+        value: stringValue ? new window.Date(stringValue).toISOString() : null,
+        isValid: true,
+      });
+    }
   }, []);
 
   const onChange = (newDate) => {
@@ -29,7 +35,8 @@ const Date = ({
   };
 
   const hasValue = stringValue && couponState[id];
-  const canBeEdited = mode === 'EDIT' && !disabled;
+  const isViewModeOn = mode === VIEW;
+  const canBeEdited = !isViewModeOn && !disabled;
 
   return (
     <FormGroup row>

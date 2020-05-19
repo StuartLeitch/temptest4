@@ -1,5 +1,8 @@
-import React, { useContext, useEffect } from 'react';
-import { CouponContext } from '../../Context';
+import React, { useContext, useEffect, useState } from 'react';
+
+import { CouponEditContext, CouponCreateContext } from '../../Context';
+
+import { CREATE } from '../../config';
 
 import {
   FormGroup,
@@ -11,25 +14,37 @@ import {
   FormFeedback,
 } from '../../../../components';
 
+import { CouponMode } from '../../types';
+
 const Reduction = ({
   value,
   disabled = false,
   helper = '',
+  label = 'Reduction',
+  mode,
 }: ReductionProps) => {
+  const [isTouched, setTouched] = useState(false);
+
+  const chosenContext =
+    mode === CREATE ? CouponCreateContext : CouponEditContext;
   const {
     couponState: { reduction },
     update,
-  } = useContext(CouponContext);
+  } = useContext(chosenContext);
 
   useEffect(() => {
-    update('reduction', { value, isValid: true });
+    if (mode !== CREATE) {
+      update('reduction', { value, isValid: true });
+    }
   }, []);
 
   const onChange = (e) => {
-    const inputValue = e.target.value;
-    const validation = /^(100|([1-9][0-9]?(\.[0-9])?))$/; // 0 - 100, two decimals
+    if (!isTouched) setTouched(true);
 
-    const isValid = inputValue.match(validation);
+    const inputValue = e.target.value;
+    const validation = /^(100|([1-9][0-9]?(\.[0-9]{1,2})?))$/; // 0 - 100, two decimals
+
+    const isValid = validation.test(inputValue);
 
     update('reduction', { value: inputValue, isValid });
   };
@@ -37,17 +52,19 @@ const Reduction = ({
   return (
     <FormGroup row>
       <Label className='font-weight-bold' for='reduction' sm={3}>
-        Reduction
+        {label}
       </Label>
       <Col sm={9}>
         <InputGroup>
           <Input
+            className='rounded-right'
             disabled={disabled}
             placeholder='Reduction percentage'
             value={reduction.value}
             id='reduction'
             onChange={onChange}
-            invalid={!reduction.isValid}
+            valid={isTouched && reduction.isValid}
+            invalid={isTouched && !reduction.isValid}
           />
 
           <FormFeedback>
@@ -71,6 +88,8 @@ interface ReductionProps {
   value?: number;
   disabled?: boolean;
   helper?: string;
+  label?: string;
+  mode: CouponMode;
 }
 
 export default Reduction;

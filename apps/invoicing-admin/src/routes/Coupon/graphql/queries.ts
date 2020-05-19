@@ -26,3 +26,11 @@ export const COUPON_QUERY = `
 
   ${COUPON_FRAGMENT}
 `;
+
+export const GENERATE_COUPON_CODE_QUERY = `
+  query generateCouponCode {
+    generateCouponCode {
+      code
+    }
+  }
+`;

@@ -1,5 +1,5 @@
 import { UniqueEntityID } from '../../../../../lib/core/domain/UniqueEntityID';
-import { CouponType } from '../../domain/Coupon';
+import { CouponType, CouponStatus } from '../../domain/Coupon';
 import { CouponCode } from '../..//domain/CouponCode';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -25,6 +25,7 @@ import {
   CouponExpiredError,
   CouponAlreadyUsedForInvoiceError,
   CouponInvalidError,
+  CouponInactiveError,
 } from './applyCouponToInvoiceErrors';
 import { ApplyCouponToInvoiceResponse } from './applyCouponToInvoiceResponse';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
@@ -84,6 +85,10 @@ export class ApplyCouponToInvoiceUsecase
         return left(new CouponNotFoundError(request.couponCode));
       }
 
+      if (coupon.status === CouponStatus.INACTIVE) {
+        return left(new CouponInactiveError(request.couponCode));
+      }
+
       if (
         coupon.couponType === CouponType.SINGLE_USE &&
         coupon.redeemCount > 0
@@ -101,7 +106,6 @@ export class ApplyCouponToInvoiceUsecase
       }
 
       let assignedCoupons = 0;
-
       for (const invoiceItem of invoiceItems) {
         if (coupon.invoiceItemType !== invoiceItem.type) {
           continue;

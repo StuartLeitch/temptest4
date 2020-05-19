@@ -345,7 +345,7 @@ const Details = () => {
 
                 <Button
                   id={APPLY_COUPON_MODAL_TARGET}
-                  color='primary'
+                  color='twitter'
                   outline={status !== 'DRAFT'}
                   disabled={status !== 'DRAFT'}
                 >

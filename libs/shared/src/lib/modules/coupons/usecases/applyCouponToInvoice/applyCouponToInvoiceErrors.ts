@@ -49,6 +49,14 @@ export class CouponInvalidError extends Result<UseCaseError> {
   }
 }
 
+export class CouponInactiveError extends Result<UseCaseError> {
+  constructor(couponCode: string) {
+    super(false, {
+      message: `Coupon ${couponCode} is inactive.`,
+    });
+  }
+}
+
 export class InvoiceStatusInvalidError extends Result<UseCaseError> {
   constructor(couponCode: string, invoiceId: string) {
     super(false, {

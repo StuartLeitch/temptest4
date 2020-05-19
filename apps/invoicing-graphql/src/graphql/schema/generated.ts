@@ -210,13 +210,20 @@ export type Coupon = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type CouponCode = {
+   __typename?: 'CouponCode';
+  code?: Maybe<Scalars['String']>;
+};
+
 export type CouponInput = {
-  id: Scalars['ID'];
+  id?: Maybe<Scalars['ID']>;
   reduction?: Maybe<Scalars['Float']>;
   type?: Maybe<Scalars['String']>;
   expirationDate?: Maybe<Scalars['Date']>;
   status?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+  code?: Maybe<Scalars['String']>;
+  invoiceItemType?: Maybe<Scalars['String']>;
 };
 
 export type Waiver = {
@@ -315,6 +322,7 @@ export type Query = {
    __typename?: 'Query';
   getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
   getClientToken?: Maybe<ClientToken>;
+  generateCouponCode?: Maybe<CouponCode>;
   invoice?: Maybe<Invoice>;
   invoiceVat?: Maybe<InvoiceVat>;
   invoices?: Maybe<PaginatedInvoices>;
@@ -382,6 +390,7 @@ export type Mutation = {
   confirmInvoice: Payer;
   applyCoupon?: Maybe<Coupon>;
   updateCoupon?: Maybe<Coupon>;
+  createCoupon?: Maybe<Coupon>;
   createInvoice?: Maybe<Invoice>;
   deleteInvoice?: Maybe<Scalars['Boolean']>;
   setTransactionToActive?: Maybe<Transaction>;
@@ -411,6 +420,11 @@ export type MutationApplyCouponArgs = {
 
 
 export type MutationUpdateCouponArgs = {
+  coupon?: Maybe<CouponInput>;
+};
+
+
+export type MutationCreateCouponArgs = {
   coupon?: Maybe<CouponInput>;
 };
 
@@ -615,6 +629,7 @@ export type ResolversTypes = {
   PaymentMethod: ResolverTypeWrapper<PaymentMethod>,
   Coupon: ResolverTypeWrapper<Coupon>,
   Int: ResolverTypeWrapper<Scalars['Int']>,
+  CouponCode: ResolverTypeWrapper<CouponCode>,
   CouponInput: CouponInput,
   Waiver: ResolverTypeWrapper<Waiver>,
   ClientToken: ResolverTypeWrapper<ClientToken>,
@@ -664,6 +679,7 @@ export type ResolversParentTypes = {
   PaymentMethod: PaymentMethod,
   Coupon: Coupon,
   Int: Scalars['Int'],
+  CouponCode: CouponCode,
   CouponInput: CouponInput,
   Waiver: Waiver,
   ClientToken: ClientToken,
@@ -850,6 +866,11 @@ export type CouponResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
+export type CouponCodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['CouponCode'] = ResolversParentTypes['CouponCode']> = {
+  code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+};
+
 export type WaiverResolvers<ContextType = any, ParentType extends ResolversParentTypes['Waiver'] = ResolversParentTypes['Waiver']> = {
   reduction?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   type_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -890,6 +911,7 @@ export type SentReminderResolvers<ContextType = any, ParentType extends Resolver
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getPaymentMethods?: Resolver<Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>, ParentType, ContextType>,
   getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>,
+  generateCouponCode?: Resolver<Maybe<ResolversTypes['CouponCode']>, ParentType, ContextType>,
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceArgs, never>>,
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, RequireFields<QueryInvoiceVatArgs, never>>,
   invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, RequireFields<QueryInvoicesArgs, never>>,
@@ -906,6 +928,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>,
   applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationApplyCouponArgs, never>>,
   updateCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationUpdateCouponArgs, never>>,
+  createCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationCreateCouponArgs, never>>,
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationCreateInvoiceArgs, never>>,
   deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>,
   setTransactionToActive?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<MutationSetTransactionToActiveArgs, never>>,
@@ -940,6 +963,7 @@ export type Resolvers<ContextType = any> = {
   CreditNote?: CreditNoteResolvers<ContextType>,
   PaymentMethod?: PaymentMethodResolvers<ContextType>,
   Coupon?: CouponResolvers<ContextType>,
+  CouponCode?: CouponCodeResolvers<ContextType>,
   Waiver?: WaiverResolvers<ContextType>,
   ClientToken?: ClientTokenResolvers<ContextType>,
   PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>,

@@ -175,6 +175,7 @@ export * from './modules/coupons/usecases/updateCoupon/updateCouponDTO';
 export * from './modules/coupons/usecases/getRecentCoupons/getRecentCoupons';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCode';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
+export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 export { VATService } from './domain/services/VATService';
 export { WaiverService } from './domain/services/WaiverService';
