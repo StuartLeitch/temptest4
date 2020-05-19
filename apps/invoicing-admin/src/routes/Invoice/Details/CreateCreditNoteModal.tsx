@@ -48,7 +48,7 @@ const CreateCreditNoteModal = ({
           invoiceId,
         },
       });
-      let error = recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
+      const error = recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
       if (!error) {
         onSaveCallback();
         return toast.success(SuccessfulCreditNoteCreatedToast);
