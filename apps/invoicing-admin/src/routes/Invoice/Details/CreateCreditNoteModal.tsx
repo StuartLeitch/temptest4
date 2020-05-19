@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useMutation } from 'graphql-hooks';
-import { func, string, number, object } from 'prop-types';
 import numeral from 'numeral';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
@@ -31,13 +30,15 @@ const CreateCreditNoteModal = ({
   invoiceItem,
   total,
   onSaveCallback,
-}) => {
+}: CreateCreditNoteModalProps) => {
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,
   });
+  const [, setError] = useState('');
 
   const saveCreditNote = async () => {
+    setError('');
     try {
       const recordCreditNoteResult = await recordCreditNote({
         variables: {
@@ -45,7 +46,7 @@ const CreateCreditNoteModal = ({
           invoiceId,
         },
       });
-      const error = recordCreditNoteResult?.error?.graphQLErrors[0].message;
+      const error = recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
       if (!error) {
         onSaveCallback();
       } else {
@@ -88,7 +89,7 @@ const CreateCreditNoteModal = ({
                 </Label>
                 <Col sm={8}>
                   <span className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                    {numeral(total.toFixed(2) * -1).format('$0.00')}
+                    {numeral(Number(total.toFixed(2)) * -1).format('$0.00')}
                   </span>
                 </Col>
               </>
@@ -103,6 +104,7 @@ const CreateCreditNoteModal = ({
                 type='select'
                 name='createDraft'
                 id='draftReason'
+                defaultValue={0}
                 onChange={(e) => {
                   const { value } = e.target;
                   setCreditNoteData({
@@ -111,9 +113,7 @@ const CreateCreditNoteModal = ({
                   });
                 }}
               >
-                <option value='0' defaultValue>
-                  Withdrawn Manuscript
-                </option>
+                <option value='0'>Withdrawn Manuscript</option>
                 <option value='1'>Reduction Applied</option>
                 <option value='0'>Waived Manuscript</option>
                 <option value='1'>Change Payer Details</option>
@@ -140,12 +140,12 @@ const CreateCreditNoteModal = ({
   );
 };
 
-CreateCreditNoteModal.propTypes = {
-  target: string.isRequired,
-  invoiceId: string.isRequired,
-  invoiceItem: object.isRequired,
-  total: number.isRequired,
-  onSuccessCallback: func,
-};
+interface CreateCreditNoteModalProps {
+  target: string;
+  invoiceId: string;
+  invoiceItem: object;
+  total: number;
+  onSaveCallback(): any;
+}
 
 export default CreateCreditNoteModal;

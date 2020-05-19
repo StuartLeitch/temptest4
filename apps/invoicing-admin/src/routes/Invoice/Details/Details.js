@@ -49,7 +49,7 @@ import { Loading } from '../../components';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
 import ApplyCouponModal from './ApplyCouponModal';
-import CreateCreditNoteModal from './CreateCreditNoteModal';
+import CreateCreditNoteModal from './CreateCreditNoteModal.tsx';
 import SuccessfulPaymentToast from './SuccessfulPaymentToast';
 
 import Config from '../../../config';
