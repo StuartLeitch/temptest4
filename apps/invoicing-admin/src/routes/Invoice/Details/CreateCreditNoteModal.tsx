@@ -35,9 +35,11 @@ const CreateCreditNoteModal = ({
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,
   });
-  const [, setError] = useState('');
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState('');
 
   const saveCreditNote = async () => {
+    setInProgress(true);
     setError('');
     try {
       const recordCreditNoteResult = await recordCreditNote({
@@ -46,16 +48,21 @@ const CreateCreditNoteModal = ({
           invoiceId,
         },
       });
-      const error = recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
+      let error = recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
       if (!error) {
         onSaveCallback();
+        return toast.success(SuccessfulCreditNoteCreatedToast);
       } else {
         setError(error);
       }
     } catch (e) {
       setError('An error occurred. Please try again.');
     }
-    return toast.success(SuccessfulCreditNoteCreatedToast);
+    setInProgress(false);
+  };
+
+  const onModalClose = () => {
+    setError('');
   };
 
   return (
@@ -125,16 +132,23 @@ const CreateCreditNoteModal = ({
         {/* END Form */}
       </ModalBody>
       <ModalFooter>
-        <UncontrolledModal.Close color='link' className='text-primary'>
+        <span className='medium text-muted text-danger w-50'>{error}</span>
+        <UncontrolledModal.Close
+          color='link'
+          className='text-primary'
+          onClose={onModalClose}
+        >
           <i className='fas fa-close mr-2'></i>
           Close
         </UncontrolledModal.Close>
-        <UncontrolledModal.Close color='link' className='text-primary'>
-          <Button color='primary' onClick={saveCreditNote}>
+        <Button color='primary' onClick={saveCreditNote}>
+          {inProgress ? (
+            <i className='fas fa-fw fa-spinner fa-spin mr-2'></i>
+          ) : (
             <i className='fas fa-check mr-2'></i>
-            Save
-          </Button>
-        </UncontrolledModal.Close>
+          )}
+          Save
+        </Button>
       </ModalFooter>
     </UncontrolledModal>
   );
