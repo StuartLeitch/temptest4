@@ -41,6 +41,7 @@ const CreateCreditNoteModal = ({
   const saveCreditNote = async () => {
     setInProgress(true);
     setError('');
+
     try {
       const recordCreditNoteResult = await recordCreditNote({
         variables: {
@@ -48,16 +49,20 @@ const CreateCreditNoteModal = ({
           invoiceId,
         },
       });
-      const error = recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
-      if (!error) {
+
+      const resultError =
+        recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
+
+      if (!resultError) {
         onSaveCallback();
         return toast.success(SuccessfulCreditNoteCreatedToast);
       } else {
-        setError(error);
+        setError(resultError);
       }
     } catch (e) {
       setError('An error occurred. Please try again.');
     }
+
     setInProgress(false);
   };
 
@@ -131,24 +136,28 @@ const CreateCreditNoteModal = ({
         </Form>
         {/* END Form */}
       </ModalBody>
-      <ModalFooter>
+
+      <ModalFooter className='justify-content-between'>
         <span className='medium text-muted text-danger w-50'>{error}</span>
-        <UncontrolledModal.Close
-          color='link'
-          className='text-primary'
-          onClose={onModalClose}
-        >
-          <i className='fas fa-close mr-2'></i>
-          Close
-        </UncontrolledModal.Close>
-        <Button color='primary' onClick={saveCreditNote}>
-          {inProgress ? (
-            <i className='fas fa-fw fa-spinner fa-spin mr-2'></i>
-          ) : (
-            <i className='fas fa-check mr-2'></i>
-          )}
-          Save
-        </Button>
+        <div>
+          <UncontrolledModal.Close
+            color='link'
+            className='text-primary'
+            onClose={onModalClose}
+          >
+            <i className='fas fa-close mr-2'></i>
+            Close
+          </UncontrolledModal.Close>
+
+          <Button color='primary' onClick={saveCreditNote}>
+            {inProgress ? (
+              <i className='fas fa-fw fa-spinner fa-spin mr-2'></i>
+            ) : (
+              <i className='fas fa-check mr-2'></i>
+            )}
+            Save
+          </Button>
+        </div>
       </ModalFooter>
     </UncontrolledModal>
   );
