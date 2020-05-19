@@ -63,7 +63,7 @@ interface WithInvoiceId {
   invoiceId: string;
 }
 
-interface InvoiceConfirmedData extends DTO {
+interface InvoiceConfirmedData {
   invoiceItems: InvoiceItem[];
   manuscript: Manuscript;
   address: Address;
@@ -71,14 +71,14 @@ interface InvoiceConfirmedData extends DTO {
   payer: Payer;
 }
 
-interface InvoiceCreatedData extends DTO {
+interface InvoiceCreatedData {
   invoiceItems: InvoiceItem[];
   manuscript: Manuscript;
   messageTimestamp: Date;
   invoice: Invoice;
 }
 
-interface InvoicePayedData extends DTO {
+interface InvoicePayedData {
   paymentInfo: InvoicePaymentInfo;
   invoiceItems: InvoiceItem[];
   manuscript: Manuscript;
@@ -88,7 +88,7 @@ interface InvoicePayedData extends DTO {
   payer: Payer;
 }
 
-interface InvoiceFinalizedData extends DTO {
+interface InvoiceFinalizedData {
   invoiceItems: InvoiceItem[];
   messageTimestamp: Date;
   manuscript: Manuscript;
@@ -396,7 +396,10 @@ export class GenerateCompensatoryEventsUsecase
         return right<Errors.PublishInvoiceConfirmError, void>(result);
       } catch (err) {
         return left<Errors.PublishInvoiceConfirmError, void>(
-          new Errors.PublishInvoiceConfirmError(request.invoiceId, err)
+          new Errors.PublishInvoiceConfirmError(
+            request.invoice.id.toString(),
+            err
+          )
         );
       }
     };
@@ -417,7 +420,10 @@ export class GenerateCompensatoryEventsUsecase
         return right<Errors.PublishInvoicePayedError, void>(result);
       } catch (err) {
         return left<Errors.PublishInvoicePayedError, void>(
-          new Errors.PublishInvoicePayedError(request.invoiceId, err)
+          new Errors.PublishInvoicePayedError(
+            request.invoice.id.toString(),
+            err
+          )
         );
       }
     };
@@ -438,7 +444,10 @@ export class GenerateCompensatoryEventsUsecase
         return right<Errors.PublishInvoiceFinalizedError, void>(result);
       } catch (err) {
         return left<Errors.PublishInvoiceFinalizedError, void>(
-          new Errors.PublishInvoiceFinalizedError(request.invoiceId, err)
+          new Errors.PublishInvoiceFinalizedError(
+            request.invoice.id.toString(),
+            err
+          )
         );
       }
     };
@@ -497,19 +506,21 @@ export class GenerateCompensatoryEventsUsecase
 
   private publishInvoicePayed(context: Context) {
     return async (request: DTO) => {
-      return new AsyncEither<null, DTO>(request)
-        .then(this.attachInvoice(context))
-        .advanceOrEnd(this.shouldSendPayed)
-        .then(this.attachInvoiceItems(context))
-        .then(this.attachManuscript(context))
-        .then(this.attachPaymentInfo(context))
-        .then(this.attachPayer(context))
-        .then(this.attachPayments(context))
-        .map(this.attachPaymentDate(context))
-        .map(this.updateInvoiceStatus('FINAL', 'paymentDate', false))
-        .then(this.sendPayedEvent(context))
-        .map(() => request)
-        .execute();
+      return (
+        new AsyncEither<null, DTO>(request)
+          .then(this.attachInvoice(context))
+          .advanceOrEnd(this.shouldSendPayed)
+          .then(this.attachInvoiceItems(context))
+          .then(this.attachManuscript(context))
+          .then(this.attachPaymentInfo(context))
+          .then(this.attachPayer(context))
+          .then(this.attachPayments(context))
+          .map(this.attachPaymentDate(context))
+          // .map(this.updateInvoiceStatus('FINAL', 'paymentDate', false))
+          .then(this.sendPayedEvent(context))
+          .map(() => request)
+          .execute()
+      );
     };
   }
 
