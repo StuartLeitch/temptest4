@@ -41,11 +41,14 @@ import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvo
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 import { GetPaymentInfoUsecase } from '../../../payments/usecases/getPaymentInfo';
 
-import { PublishInvoiceCreatedUsecase } from '../publishInvoiceCreated';
 import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
 import { PublishInvoiceFinalized } from '../publishInvoiceFinalized';
 import { PublishInvoiceCredited } from '../publishInvoiceCredited';
 import { PublishInvoicePaid } from '../publishInvoicePaid';
+import {
+  PublishInvoiceCreatedUsecase,
+  PublishInvoiceCreatedDTO,
+} from '../publishInvoiceCreated';
 
 // * Usecase specific
 import { GenerateCompensatoryEventsResponse as Response } from './generateCompensatoryEventsResponse';
@@ -74,7 +77,6 @@ interface InvoiceConfirmedData {
 interface InvoiceCreatedData {
   invoiceItems: InvoiceItem[];
   manuscript: Manuscript;
-  messageTimestamp: Date;
   invoice: Invoice;
 }
 
@@ -90,7 +92,14 @@ interface InvoicePayedData {
 
 interface InvoiceFinalizedData {
   invoiceItems: InvoiceItem[];
-  messageTimestamp: Date;
+  manuscript: Manuscript;
+  address: Address;
+  invoice: Invoice;
+  payer: Payer;
+}
+
+interface InvoiceCreditedData {
+  invoiceItems: InvoiceItem[];
   manuscript: Manuscript;
   address: Address;
   invoice: Invoice;
@@ -139,6 +148,8 @@ export class GenerateCompensatoryEventsUsecase
     this.publishInvoiceFinalized = this.publishInvoiceFinalized.bind(this);
     this.sendFinalizedEvent = this.sendFinalizedEvent.bind(this);
     this.attachPayments = this.attachPayments.bind(this);
+    this.publishInvoiceCredited = this.publishInvoiceCredited.bind(this);
+    this.shouldSendCredited = this.shouldSendCredited.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -155,6 +166,7 @@ export class GenerateCompensatoryEventsUsecase
       .then(this.publishInvoiceCreated(context))
       .then(this.publishInvoiceConfirmed(context))
       .then(this.publishInvoicePayed(context))
+      .then(this.publishInvoiceCredited(context))
       .then(this.publishInvoiceFinalized(context))
       .map(() => Result.ok<void>(null));
 
@@ -293,20 +305,27 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private async shouldSendCreated<T extends WithInvoice>(
-    request: T
-  ): Promise<Either<null, boolean>> {
-    if (!request.invoice.dateAccepted) {
+  private async shouldSendCreated<T extends WithInvoice>({
+    invoice,
+  }: T): Promise<Either<null, boolean>> {
+    if (invoice.cancelledInvoiceReference) {
+      return right(false);
+    }
+
+    if (!invoice.dateAccepted) {
       return right(false);
     }
 
     return right(true);
   }
 
-  private async shouldSendConfirmed<T extends WithInvoice>(
-    request: T
-  ): Promise<Either<null, boolean>> {
-    const { invoice } = request;
+  private async shouldSendConfirmed<T extends WithInvoice>({
+    invoice,
+  }: T): Promise<Either<null, boolean>> {
+    if (invoice.cancelledInvoiceReference) {
+      return right(false);
+    }
+
     if (
       invoice.status === InvoiceStatus.PENDING ||
       invoice.status === InvoiceStatus.DRAFT ||
@@ -318,10 +337,13 @@ export class GenerateCompensatoryEventsUsecase
     return right(true);
   }
 
-  private async shouldSendPayed<T extends WithInvoice>(
-    request: T
-  ): Promise<Either<null, boolean>> {
-    const { invoice } = request;
+  private async shouldSendPayed<T extends WithInvoice>({
+    invoice,
+  }: T): Promise<Either<null, boolean>> {
+    if (invoice.cancelledInvoiceReference) {
+      return right(false);
+    }
+
     if (
       invoice.status !== InvoiceStatus.FINAL ||
       !invoice.dateAccepted ||
@@ -345,6 +367,16 @@ export class GenerateCompensatoryEventsUsecase
     return right(true);
   }
 
+  private async shouldSendCredited<T extends WithInvoice>({
+    invoice,
+  }: T): Promise<Either<null, boolean>> {
+    if (!invoice.cancelledInvoiceReference) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
   private attachPaymentDate(context: Context) {
     return <T extends WithInvoice & { paymentInfo: InvoicePaymentInfo }>(
       request: T
@@ -365,19 +397,14 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachMessageTimestamp(dateToUse: string) {
-    return <T extends WithInvoice>(request: T) => {
-      return {
-        ...request,
-        messageTimestamp: request.invoice[dateToUse],
-      };
-    };
-  }
-
   private sendCreatedEvent(context: Context) {
     return async <T extends InvoiceCreatedData>(request: T) => {
       const publishUsecase = new PublishInvoiceCreatedUsecase(this.sqsPublish);
-      return publishUsecase.execute(request, context);
+      const data: PublishInvoiceCreatedDTO = {
+        ...request,
+        messageTimestamp: request.invoice.dateAccepted,
+      };
+      return publishUsecase.execute(data, context);
     };
   }
 
@@ -439,12 +466,36 @@ export class GenerateCompensatoryEventsUsecase
           request.manuscript,
           request.payer,
           request.address,
-          request.messageTimestamp
+          request.invoice.dateMovedToFinal
         );
         return right<Errors.PublishInvoiceFinalizedError, void>(result);
       } catch (err) {
         return left<Errors.PublishInvoiceFinalizedError, void>(
           new Errors.PublishInvoiceFinalizedError(
+            request.invoice.id.toString(),
+            err
+          )
+        );
+      }
+    };
+  }
+
+  private sendCreditedEvent(context: Context) {
+    return async <T extends InvoiceCreditedData>(request: T) => {
+      const publishUsecase = new PublishInvoiceCredited(this.sqsPublish);
+      try {
+        const result = await publishUsecase.execute(
+          request.invoice,
+          request.invoiceItems,
+          request.manuscript,
+          request.payer,
+          request.address,
+          request.invoice.dateIssued
+        );
+        return right<Errors.PublishInvoiceCreditedError, void>(result);
+      } catch (err) {
+        return left<Errors.PublishInvoiceCreditedError, void>(
+          new Errors.PublishInvoiceCreditedError(
             request.invoice.id.toString(),
             err
           )
@@ -481,7 +532,6 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachInvoiceItems(context))
         .then(this.attachManuscript(context))
         .map(this.updateInvoiceStatus('DRAFT', 'dateAccepted'))
-        .map(this.attachMessageTimestamp('dateAccepted'))
         .then(this.sendCreatedEvent(context))
         .map(() => request)
         .execute();
@@ -506,21 +556,18 @@ export class GenerateCompensatoryEventsUsecase
 
   private publishInvoicePayed(context: Context) {
     return async (request: DTO) => {
-      return (
-        new AsyncEither<null, DTO>(request)
-          .then(this.attachInvoice(context))
-          .advanceOrEnd(this.shouldSendPayed)
-          .then(this.attachInvoiceItems(context))
-          .then(this.attachManuscript(context))
-          .then(this.attachPaymentInfo(context))
-          .then(this.attachPayer(context))
-          .then(this.attachPayments(context))
-          .map(this.attachPaymentDate(context))
-          // .map(this.updateInvoiceStatus('FINAL', 'paymentDate', false))
-          .then(this.sendPayedEvent(context))
-          .map(() => request)
-          .execute()
-      );
+      return new AsyncEither<null, DTO>(request)
+        .then(this.attachInvoice(context))
+        .advanceOrEnd(this.shouldSendPayed)
+        .then(this.attachInvoiceItems(context))
+        .then(this.attachManuscript(context))
+        .then(this.attachPaymentInfo(context))
+        .then(this.attachPayer(context))
+        .then(this.attachPayments(context))
+        .map(this.attachPaymentDate(context))
+        .then(this.sendPayedEvent(context))
+        .map(() => request)
+        .execute();
     };
   }
 
@@ -533,8 +580,23 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachManuscript(context))
         .then(this.attachPayer(context))
         .then(this.attachAddress(context))
-        .map(this.attachMessageTimestamp('dateMovedToFinal'))
         .then(this.sendFinalizedEvent(context))
+        .map(() => request)
+        .execute();
+    };
+  }
+
+  private publishInvoiceCredited(context: Context) {
+    return async (request: DTO) => {
+      return new AsyncEither(request)
+        .then(this.attachInvoice(context))
+        .advanceOrEnd(this.shouldSendCredited)
+        .then(this.attachInvoiceItems(context))
+        .then(this.attachManuscript(context))
+        .then(this.attachPayer(context))
+        .then(this.attachAddress(context))
+        .map(this.updateInvoiceStatus('DRAFT', 'dateCreated'))
+        .then(this.sendCreditedEvent(context))
         .map(() => request)
         .execute();
     };
