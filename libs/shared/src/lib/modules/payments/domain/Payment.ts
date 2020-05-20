@@ -1,15 +1,21 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
-import {File} from '../../../domain/File';
-import {Amount} from '../../../domain/Amount';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
+import { File } from '../../../domain/File';
+import { Amount } from '../../../domain/Amount';
 
 // * Subdomain
-import {InvoiceId} from '../../invoices/domain/InvoiceId';
-import {PayerId} from '../../payers/domain/PayerId';
-import {PaymentId} from './PaymentId';
-import {PaymentMethodId} from './PaymentMethodId';
+import { InvoiceId } from '../../invoices/domain/InvoiceId';
+import { PayerId } from '../../payers/domain/PayerId';
+import { PaymentId } from './PaymentId';
+import { PaymentMethodId } from './PaymentMethodId';
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  FAILED = 'FAILED',
+  COMPLETED = 'FINAL',
+}
 
 interface PaymentProps {
   invoiceId: InvoiceId;
@@ -68,7 +74,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
   ): Result<Payment> {
     const payment = new Payment(
       {
-        ...props
+        ...props,
       },
       id
     );
