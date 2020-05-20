@@ -127,7 +127,12 @@ export class ConfirmInvoiceUsecase
       `Update status for Invoice with id {${payerData?.invoice.id}}`
     );
 
-    if (this.isPayerFromSanctionedCountry(address)) {
+    if (invoice.getInvoiceTotal() === 0) {
+      return (await this.markInvoiceAsFinal(invoice)).map((activeInvoice) => ({
+        ...payerData,
+        invoice: activeInvoice,
+      }));
+    } else if (this.isPayerFromSanctionedCountry(address)) {
       return (await this.markInvoiceAsPending(invoice))
         .map((pendingInvoice) => this.sendEmail(pendingInvoice))
         .map((pendingInvoice) => ({
@@ -135,14 +140,7 @@ export class ConfirmInvoiceUsecase
           invoice: pendingInvoice,
         }));
     } else {
-      if (invoice.getInvoiceTotal() === 0) {
-        return (await this.markInvoiceAsFinal(invoice)).map(
-          (activeInvoice) => ({
-            ...payerData,
-            invoice: activeInvoice,
-          })
-        );
-      } else if (invoice.status !== InvoiceStatus.ACTIVE) {
+      if (invoice.status !== InvoiceStatus.ACTIVE) {
         return (await this.markInvoiceAsActive(invoice)).map(
           (activeInvoice) => ({
             ...payerData,
