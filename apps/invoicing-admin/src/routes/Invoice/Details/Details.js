@@ -552,10 +552,12 @@ const Details = () => {
                                   </span>
                                 </td>
                                 <td className='align-middle text-right text-dark font-weight-bold'>
-                                  &ndash;$
-                                  {(invoice.invoiceItem.price *
-                                    coupon.reduction) /
-                                    100}
+                                  &ndash;
+                                  {numeral(
+                                    (invoice.invoiceItem.price *
+                                      coupon.reduction) /
+                                      100
+                                  ).format('$0.00')}
                                 </td>
                               </tr>
                             ))}
