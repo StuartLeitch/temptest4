@@ -43,17 +43,17 @@ export abstract class WatchedList<T> {
   }
 
   private removeFromNew(item: T): void {
-    this.new = this.new.filter(v => !this.compareItems(v, item));
+    this.new = this.new.filter((v) => !this.compareItems(v, item));
   }
 
   private removeFromCurrent(item: T): void {
     this.currentItems = this.currentItems.filter(
-      v => !this.compareItems(item, v)
+      (v) => !this.compareItems(item, v)
     );
   }
 
   private removeFromRemoved(item: T): void {
-    this.removed = this.removed.filter(v => !this.compareItems(item, v));
+    this.removed = this.removed.filter((v) => !this.compareItems(item, v));
   }
 
   private wasAddedInitially(item: T): boolean {
@@ -91,5 +91,16 @@ export abstract class WatchedList<T> {
     if (!this.isRemovedItem(item)) {
       this.removed.push(item);
     }
+  }
+
+  public map<U>(fn: (i: T) => U): U[] {
+    return this.currentItems.map(fn);
+  }
+
+  public reduce(fn: (acc: T, c: T, i: number, arr: T[]) => T): T;
+  public reduce(fn: (acc: T, c: T, i: number, arr: T[]) => T, start: T): T;
+  public reduce<U>(fn: (acc: U, c: T, i: number, arr: T[]) => U, start: U): U;
+  public reduce<U>(fn: (acc: U, c: T, i: number, arr: T[]) => U, start?: U): U {
+    return this.currentItems.reduce(fn, start);
   }
 }

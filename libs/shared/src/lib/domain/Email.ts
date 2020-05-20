@@ -1,6 +1,6 @@
-import {ValueObject} from '../core/domain/ValueObject';
-import {Result} from '../core/logic/Result';
-import {Guard} from '../core/logic/Guard';
+import { ValueObject } from '../core/domain/ValueObject';
+import { Result } from '../core/logic/Result';
+import { Guard } from '../core/logic/Guard';
 
 interface EmailProps {
   value: string;
@@ -8,6 +8,10 @@ interface EmailProps {
 
 export class Email extends ValueObject<EmailProps> {
   get value(): string {
+    return this.props.value;
+  }
+
+  toString(): string {
     return this.props.value;
   }
 

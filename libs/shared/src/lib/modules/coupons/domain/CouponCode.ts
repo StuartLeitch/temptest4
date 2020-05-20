@@ -26,6 +26,10 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
     return this.props.value;
   }
 
+  toString(): string {
+    return this.props.value;
+  }
+
   private constructor(props: CouponCodeProps) {
     super(props);
   }
