@@ -223,7 +223,7 @@
             invoice.getInvoiceTotal() * vat / 100 %> 
             <% let item = invoice.invoiceItems.currentItems[0] %>
             <% 
-              let reductions = [...item.coupons, ...item.waivers]
+              let reductions = [...item.coupons.getItems(), ...item.waivers]
             %>
             <% if (reductions.length) { %> <% let discount =
               reductions.reduce((acc, curr) => acc + curr.reduction, 0) %>

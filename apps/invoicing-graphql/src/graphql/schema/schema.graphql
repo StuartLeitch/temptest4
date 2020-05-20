@@ -64,6 +64,7 @@ type Invoice @model(id: "invoices") {
   dateChanged: String
   dateIssued: String
   dateAccepted: String
+  dateMovedToFinal: String
   vat: Float
   charge: Float
   status: InvoiceStatus @filter(key: "invoiceStatus")
@@ -80,6 +81,7 @@ type Invoice @model(id: "invoices") {
   payment: Payment
   payments: [Payment]
   creditNote: Invoice
+  transaction: Transaction
 }
 
 type InvoiceVat {

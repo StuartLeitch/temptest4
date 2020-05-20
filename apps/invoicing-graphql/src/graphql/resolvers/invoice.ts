@@ -3,6 +3,7 @@
 
 import {
   PayerMap,
+  TransactionMap,
   InvoiceId,
   JournalId,
   ArticleMap,
@@ -31,6 +32,8 @@ import { PaymentMap } from './../../../../../libs/shared/src/lib/modules/payment
 import { PaymentMethodMap } from './../../../../../libs/shared/src/lib/modules/payments/mapper/PaymentMethod';
 import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 import { GetPaymentMethodByIdUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/getPaymentMethodById/getPaymentMethodById';
+
+import { env } from '../../env';
 
 export const invoice: Resolvers<any> = {
   Query: {
@@ -61,6 +64,7 @@ export const invoice: Resolvers<any> = {
         charge: invoiceDetails.charge,
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
+        dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
         erpReference: invoiceDetails.erpReference,
         revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
@@ -360,6 +364,23 @@ export const invoice: Resolvers<any> = {
         // netAmount: entity.netAmount
       };
     },
+    async transaction(parent: Invoice, args, context) {
+      const {
+        repos: { transaction: transactionRepo },
+      } = context;
+      const invoiceId = InvoiceId.create(
+        new UniqueEntityID(parent.invoiceId)
+      ).getValue();
+
+      const transaction = await transactionRepo.getTransactionByInvoiceId(
+        invoiceId
+      );
+
+      if (!transaction) {
+        return null;
+      }
+      return TransactionMap.toPersistence(transaction);
+    },
   },
   InvoiceItem: {
     async article(parent, args, context) {
@@ -433,18 +454,38 @@ export const invoice: Resolvers<any> = {
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           coupon: couponRepo,
+          transaction: transactionRepo,
+          manuscript: manuscriptRepo,
+          address: addressRepo,
+          payer: payerRepo,
+          waiver: waiverRepo,
         },
+        services: { emailService, vatService, logger: loggerService },
       } = context;
+      const {
+        sanctionedCountryNotificationReceiver,
+        sanctionedCountryNotificationSender,
+      } = env.app;
 
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
         invoiceRepo,
         invoiceItemRepo,
-        couponRepo
+        couponRepo,
+        transactionRepo,
+        manuscriptRepo,
+        addressRepo,
+        payerRepo,
+        waiverRepo,
+        emailService,
+        vatService,
+        loggerService
       );
 
       const result = await applyCouponUsecase.execute({
         couponCode: args.couponCode,
         invoiceId: args.invoiceId,
+        sanctionedCountryNotificationReceiver,
+        sanctionedCountryNotificationSender,
       });
 
       if (result.isLeft()) {

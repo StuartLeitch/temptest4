@@ -1,40 +1,40 @@
-import {defineFeature, loadFeature} from 'jest-cucumber';
+import { defineFeature, loadFeature } from 'jest-cucumber';
 
-import {Result} from '../../src/lib/core/logic/Result';
-import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
-import {Roles} from '../../src/lib/modules/users/domain/enums/Roles';
+import { Result } from '../../src/lib/core/logic/Result';
+import { UniqueEntityID } from '../../src/lib/core/domain/UniqueEntityID';
+import { Roles } from '../../src/lib/modules/users/domain/enums/Roles';
 
 import {
-  Invoice
+  Invoice,
   // STATUS as InvoiceStatus
 } from '../../src/lib/modules/invoices/domain/Invoice';
 import {
   GetTransactionUsecase,
-  GetTransactionContext
+  GetTransactionContext,
 } from '../../src/lib/modules/transactions/usecases/getTransaction/getTransaction';
 import {
   UpdateTransactionUsecase,
-  UpdateTransactionContext
+  UpdateTransactionContext,
 } from '../../src/lib/modules/transactions/usecases/updateTransaction/updateTransaction';
 
-import {MockInvoiceRepo} from '../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import {MockTransactionRepo} from '../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import { MockInvoiceRepo } from '../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockTransactionRepo } from '../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 import {
   Transaction,
-  STATUS as TransactionStatus
+  TransactionStatus,
 } from '../../src/lib/modules/transactions/domain/Transaction';
 // import {TransactionAmount} from '../../lib/transactions/domain/TransactionAmount';
 
 const feature = loadFeature(
   '../features/set-transaction-value-from-apc.feature',
-  {loadRelativePath: true}
+  { loadRelativePath: true }
 );
 
 const defaultContext: UpdateTransactionContext & GetTransactionContext = {
-  roles: [Roles.SUPER_ADMIN]
+  roles: [Roles.SUPER_ADMIN],
 };
 
-defineFeature(feature, test => {
+defineFeature(feature, (test) => {
   // let mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
   let mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
   let result: Result<Transaction>;
@@ -56,7 +56,7 @@ defineFeature(feature, test => {
     transactionId = 'test-transaction';
     const transaction = Transaction.create(
       {
-        status: TransactionStatus.DRAFT
+        status: TransactionStatus.DRAFT,
         // name: PayerName.create('foo').getValue()
       },
       new UniqueEntityID(transactionId)
@@ -73,11 +73,11 @@ defineFeature(feature, test => {
     // mockInvoiceRepo.save(invoice);
   });
 
-  test('Select transaction', ({given, when, then}) => {
+  test('Select transaction', ({ given, when, then }) => {
     given('As System retrieving Transaction Details', async () => {
       const retrievedTransactionResult = await getTransactionUsecase.execute(
         {
-          transactionId
+          transactionId,
         },
         defaultContext
       );

@@ -5,7 +5,7 @@ import { Mapper } from '../../../infrastructure/Mapper';
 import { CatalogItem } from '../domain/CatalogItem';
 import { JournalId } from '../domain/JournalId';
 import { PublisherId } from '../../publishers/domain/PublisherId';
-// import {STATUS as TransactionStatus} from '../domain/Transaction';
+// import {TransactionStatus} from '../domain/Transaction';
 
 export class CatalogMap extends Mapper<CatalogItem> {
   public static toDomain(raw: any): CatalogItem {
@@ -24,7 +24,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
         publisherId: raw.publisherId
           ? PublisherId.create(new UniqueEntityID(raw.publisherId)).getValue()
           : null,
-        issn: raw.issn
+        issn: raw.issn,
         // price: Money.fromInteger({amount: raw.amount, currency: Currencies.USD})
         // dateUpdated: new Date(raw.dateUpdated)
       },
@@ -46,7 +46,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
       currency: catalogItem.currency,
       journalTitle: catalogItem.journalTitle,
       publisherId: catalogItem.publisherId.id.toString(),
-      issn: catalogItem.issn
+      issn: catalogItem.issn,
       // status: catalog.status,
       // amount: catalog.amount.value,
       // dateAdded: catalog.dateAdded,

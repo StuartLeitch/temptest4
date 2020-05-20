@@ -1,34 +1,34 @@
-import {defineFeature, loadFeature} from 'jest-cucumber';
+import { defineFeature, loadFeature } from 'jest-cucumber';
 
-import {UniqueEntityID} from '../../src/lib/core/domain/UniqueEntityID';
-import {Roles} from '../../src/lib/modules/users/domain/enums/Roles';
+import { UniqueEntityID } from '../../src/lib/core/domain/UniqueEntityID';
+import { Roles } from '../../src/lib/modules/users/domain/enums/Roles';
 
-import {Payer} from '../../src/lib/modules/payers/domain/Payer';
-import {PayerName} from '../../src/lib/modules/payers/domain/PayerName';
-import {PayerType} from '../../src/lib/modules/payers/domain/PayerType';
+import { Payer } from '../../src/lib/modules/payers/domain/Payer';
+import { PayerName } from '../../src/lib/modules/payers/domain/PayerName';
+import { PayerType } from '../../src/lib/modules/payers/domain/PayerType';
 import {
   Invoice,
-  InvoiceStatus
+  InvoiceStatus,
 } from '../../src/lib/modules/invoices/domain/Invoice';
 import {
   GetTransactionUsecase,
-  GetTransactionContext
+  GetTransactionContext,
 } from '../../src/lib/modules/transactions/usecases/getTransaction/getTransaction';
 
-import {MockTransactionRepo} from '../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import { MockTransactionRepo } from '../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 import {
   Transaction,
-  STATUS as TransactionStatus
+  TransactionStatus,
 } from '../../src/lib/modules/transactions/domain/Transaction';
-import {TransactionAmount} from '../../src/lib/modules/transactions/domain/TransactionAmount';
+import { TransactionAmount } from '../../src/lib/modules/transactions/domain/TransactionAmount';
 
 const feature = loadFeature('./specs/features/split-transaction.feature', {
-  loadRelativePath: true
+  loadRelativePath: true,
 });
 
-const defaultContext: GetTransactionContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: GetTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
-defineFeature(feature, test => {
+defineFeature(feature, (test) => {
   let mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
 
   let payer1: Payer;
@@ -45,7 +45,7 @@ defineFeature(feature, test => {
     transactionId = 'test-transaction';
     const transaction = Transaction.create(
       {
-        status: TransactionStatus.DRAFT
+        status: TransactionStatus.DRAFT,
       },
       new UniqueEntityID(transactionId)
     ).getValue();
@@ -57,11 +57,11 @@ defineFeature(feature, test => {
     retrievedTransaction.clearInvoices();
   });
 
-  test('Adjust two ways split transaction', ({given, when, and, then}) => {
+  test('Adjust two ways split transaction', ({ given, when, and, then }) => {
     given('As System editing Transaction Details', async () => {
       const retrievedTransactionResult = await getTransactionUsecase.execute(
         {
-          transactionId
+          transactionId,
         },
         defaultContext
       );
@@ -81,7 +81,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo1').getValue(),
           surname: PayerName.create('Bar1').getValue(),
-          type: PayerType.create('FooBar1').getValue()
+          type: PayerType.create('FooBar1').getValue(),
         },
         new UniqueEntityID(payer1Id)
       ).getValue();
@@ -90,7 +90,7 @@ defineFeature(feature, test => {
       const invoice1 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer1.payerId
+          payerId: payer1.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();
@@ -116,7 +116,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo2').getValue(),
           surname: PayerName.create('Bar2').getValue(),
-          type: PayerType.create('FooBar2').getValue()
+          type: PayerType.create('FooBar2').getValue(),
         },
         new UniqueEntityID(payer2Id)
       ).getValue();
@@ -125,7 +125,7 @@ defineFeature(feature, test => {
       const invoice2 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer2.payerId
+          payerId: payer2.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();
@@ -148,11 +148,11 @@ defineFeature(feature, test => {
     );
   });
 
-  test('Adjust three ways split transaction', ({given, when, and, then}) => {
+  test('Adjust three ways split transaction', ({ given, when, and, then }) => {
     given('As System editing Transaction Details', async () => {
       const retrievedTransactionResult = await getTransactionUsecase.execute(
         {
-          transactionId
+          transactionId,
         },
         defaultContext
       );
@@ -172,7 +172,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo1').getValue(),
           surname: PayerName.create('Bar1').getValue(),
-          type: PayerType.create('FooBar1').getValue()
+          type: PayerType.create('FooBar1').getValue(),
         },
         new UniqueEntityID(payer1Id)
       ).getValue();
@@ -181,7 +181,7 @@ defineFeature(feature, test => {
       const invoice1 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer1.payerId
+          payerId: payer1.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();
@@ -207,7 +207,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo2').getValue(),
           surname: PayerName.create('Bar2').getValue(),
-          type: PayerType.create('FooBar2').getValue()
+          type: PayerType.create('FooBar2').getValue(),
         },
         new UniqueEntityID(payer2Id)
       ).getValue();
@@ -216,7 +216,7 @@ defineFeature(feature, test => {
       const invoice2 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer2.payerId
+          payerId: payer2.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();
@@ -226,7 +226,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo3').getValue(),
           surname: PayerName.create('Bar3').getValue(),
-          type: PayerType.create('FooBar3').getValue()
+          type: PayerType.create('FooBar3').getValue(),
         },
         new UniqueEntityID(payer3Id)
       ).getValue();
@@ -235,7 +235,7 @@ defineFeature(feature, test => {
       const invoice3 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer3.payerId
+          payerId: payer3.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();
@@ -264,12 +264,12 @@ defineFeature(feature, test => {
     given,
     when,
     and,
-    then
+    then,
   }) => {
     given('As System editing Transaction Details', async () => {
       const retrievedTransactionResult = await getTransactionUsecase.execute(
         {
-          transactionId
+          transactionId,
         },
         defaultContext
       );
@@ -289,7 +289,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo1').getValue(),
           surname: PayerName.create('Bar1').getValue(),
-          type: PayerType.create('FooBar1').getValue()
+          type: PayerType.create('FooBar1').getValue(),
         },
         new UniqueEntityID(payerId)
       ).getValue();
@@ -299,7 +299,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo2').getValue(),
           surname: PayerName.create('Bar2').getValue(),
-          type: PayerType.create('FooBar2').getValue()
+          type: PayerType.create('FooBar2').getValue(),
         },
         new UniqueEntityID(payerId)
       ).getValue();
@@ -309,7 +309,7 @@ defineFeature(feature, test => {
         {
           name: PayerName.create('Foo3').getValue(),
           surname: PayerName.create('Bar3').getValue(),
-          type: PayerType.create('FooBar3').getValue()
+          type: PayerType.create('FooBar3').getValue(),
         },
         new UniqueEntityID(payerId)
       ).getValue();
@@ -318,7 +318,7 @@ defineFeature(feature, test => {
       const invoice1 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer1.payerId
+          payerId: payer1.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();
@@ -327,7 +327,7 @@ defineFeature(feature, test => {
       const invoice2 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer2.payerId
+          payerId: payer2.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();
@@ -336,7 +336,7 @@ defineFeature(feature, test => {
       const invoice3 = Invoice.create(
         {
           status: InvoiceStatus.DRAFT,
-          payerId: payer3.payerId
+          payerId: payer3.payerId,
         },
         new UniqueEntityID(invoiceId)
       ).getValue();

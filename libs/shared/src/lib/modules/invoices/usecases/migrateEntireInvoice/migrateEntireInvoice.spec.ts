@@ -17,7 +17,7 @@ import { MigrateEntireInvoiceUsecase } from './migrateEntireInvoice';
 import { MigrateEntireInvoiceDTO } from './migrateEntireInvoiceDTO';
 
 import {
-  STATUS as TransactionStatus,
+  TransactionStatus,
   Transaction,
 } from '../../../transactions/domain/Transaction';
 import { TransactionId } from '../../../transactions/domain/TransactionId';

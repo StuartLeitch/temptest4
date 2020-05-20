@@ -163,8 +163,6 @@ export class PublishRevenueRecognitionToErpUsecase
           0
         );
       }
-      // const vatValue = (netCharges / 100) * vat;
-      // const total = netCharges; // + vatValue;
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {

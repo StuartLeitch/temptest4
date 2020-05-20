@@ -1,3 +1,5 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   ScheduleRemindersForExistingInvoicesUsecase,
   Roles,

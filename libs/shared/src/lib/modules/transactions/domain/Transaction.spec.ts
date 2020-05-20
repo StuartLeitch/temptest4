@@ -1,6 +1,6 @@
-import {Result} from '../../../core/logic/Result';
+import { Result } from '../../../core/logic/Result';
 
-import {Transaction, STATUS as TransactionStatus} from './Transaction';
+import { Transaction, TransactionStatus } from './Transaction';
 // import {TransactionAmount} from './TransactionAmount';
 // import {ArticleId} from '../../articles/domain/ArticleId';
 
@@ -18,7 +18,7 @@ describe('Transaction', () => {
       // articleId: ArticleId.create(),
       status: TransactionStatus.DRAFT,
       // dateAdded: new Date(),
-      dateUpdated: new Date()
+      dateUpdated: new Date(),
     });
 
     expect(transactionOrError.isSuccess).toBeTruthy();
@@ -29,7 +29,7 @@ describe('Transaction', () => {
   it('Should be able to set amount', () => {
     // const amount = 100;
     transactionOrError = Transaction.create({
-      status: TransactionStatus.DRAFT
+      status: TransactionStatus.DRAFT,
     });
     transaction = transactionOrError.getValue();
 

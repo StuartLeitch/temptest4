@@ -115,15 +115,8 @@ export class ConfirmInvoiceUsecase
       this.sanctionedCountryPolicy.getType(),
       [country]
     );
-    if (
-      reductions &&
-      reductions.getReduction() &&
-      reductions.getReduction().props.reduction < 0
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+
+    return reductions?.getReduction()?.props.reduction < 0;
   }
 
   private async updateInvoiceStatus(
@@ -301,6 +294,9 @@ export class ConfirmInvoiceUsecase
 
   private async markInvoiceAsActive(invoice: Invoice) {
     invoice.markAsActive();
+
+    await this.invoiceRepo.update(invoice);
+
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );
@@ -318,6 +314,8 @@ export class ConfirmInvoiceUsecase
     );
 
     invoice.markAsFinal();
+
+    await this.invoiceRepo.update(invoice);
 
     return (
       await changeInvoiceStatusUseCase.execute({

@@ -1,16 +1,16 @@
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {MockTransactionRepo} from '../../repos/mocks/mockTransactionRepo';
+import { MockTransactionRepo } from '../../repos/mocks/mockTransactionRepo';
 import {
   Transaction,
   TransactionCollection,
-  STATUS as TransactionStatus
+  TransactionStatus,
 } from '../../domain/Transaction';
 import {
   DeleteTransactionUsecase,
-  DeleteTransactionContext
+  DeleteTransactionContext,
 } from './deleteTransaction';
 
 let usecase: DeleteTransactionUsecase;
@@ -21,7 +21,7 @@ let transactionCollection: TransactionCollection;
 
 let transactionId;
 
-const defaultContext: DeleteTransactionContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: DeleteTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 describe('DeleteTransactionUsecase', () => {
   beforeEach(async () => {
@@ -29,7 +29,7 @@ describe('DeleteTransactionUsecase', () => {
     transactionId = 'test-transaction';
     const transaction = Transaction.create(
       {
-        status: TransactionStatus.DRAFT
+        status: TransactionStatus.DRAFT,
       },
       new UniqueEntityID(transactionId)
     ).getValue();
@@ -39,7 +39,7 @@ describe('DeleteTransactionUsecase', () => {
 
   describe('When NO Transaction ID is provided', () => {
     it('should return an error', async () => {
-      result = await usecase.execute({transactionId: null}, defaultContext);
+      result = await usecase.execute({ transactionId: null }, defaultContext);
 
       expect(result.isFailure).toBeTruthy();
     });
@@ -51,7 +51,7 @@ describe('DeleteTransactionUsecase', () => {
       transactionCollection = await mockTransactionRepo.getTransactionCollection();
       expect(transactionCollection.length).toEqual(1);
 
-      result = await usecase.execute({transactionId}, defaultContext);
+      result = await usecase.execute({ transactionId }, defaultContext);
 
       expect(result.isSuccess).toBeTruthy();
 

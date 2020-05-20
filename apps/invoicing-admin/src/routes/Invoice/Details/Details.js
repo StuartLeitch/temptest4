@@ -119,7 +119,7 @@ const Details = () => {
     referenceNumber,
     customId,
   } = queryState;
-  let { page } = paginationState;
+  const { page } = paginationState;
 
   // * build the query string out of query state
   let queryString = '';
@@ -816,6 +816,20 @@ const Details = () => {
                       invoice?.payments
                         ?.map((i) => new Date(i.datePaid))
                         .sort(compareDesc)[0],
+                      'dd MMMM yyyy'
+                    )}
+                    phrase={'Invoice enters FINAL state.'}
+                  />
+                )}
+
+                {invoice?.dateMovedToFinal && (
+                  <TimelineMini
+                    icon='check-circle'
+                    iconClassName='text-success'
+                    badgeTitle='Finalized'
+                    badgeColor='success'
+                    date={format(
+                      new Date(invoice?.dateMovedToFinal),
                       'dd MMMM yyyy'
                     )}
                     phrase={'Invoice enters FINAL state.'}

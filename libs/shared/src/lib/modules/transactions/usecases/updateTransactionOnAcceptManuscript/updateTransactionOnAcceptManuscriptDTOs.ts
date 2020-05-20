@@ -16,4 +16,6 @@ export interface UpdateTransactionOnAcceptManuscriptDTO {
     delay: number;
   };
   bankTransferCopyReceiver?: string;
+  sanctionedCountryNotificationReceiver?: string;
+  sanctionedCountryNotificationSender?: string;
 }

@@ -1,11 +1,11 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   GenerateCompensatoryEventsUsecase,
-  GetInvoicesIdsUsecase
+  GetInvoicesIdsUsecase,
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
-
-import { env } from '../../env';
 
 export const generateCompensatoryEvents: Resolvers<any> = {
   Mutation: {
@@ -19,9 +19,11 @@ export const generateCompensatoryEvents: Resolvers<any> = {
           invoice,
           coupon,
           waiver,
-          payer
+          payer,
+          payment,
         },
-        qq: sqsQueService
+        services: { logger: loggerService },
+        qq: sqsQueService,
       } = context;
       const usecase = new GenerateCompensatoryEventsUsecase(
         invoiceItem,
@@ -29,14 +31,16 @@ export const generateCompensatoryEvents: Resolvers<any> = {
         manuscript,
         address,
         invoice,
+        payment,
         coupon,
         waiver,
-        payer
+        payer,
+        loggerService
       );
       const getIdsUsecase = new GetInvoicesIdsUsecase(invoice);
       const maybeResult = await getIdsUsecase.execute({
         invoiceIds,
-        journalIds
+        journalIds,
       });
 
       if (maybeResult.isLeft()) {
@@ -53,6 +57,6 @@ export const generateCompensatoryEvents: Resolvers<any> = {
       }
 
       return 'ok';
-    }
-  }
+    },
+  },
 };

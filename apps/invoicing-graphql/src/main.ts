@@ -44,11 +44,11 @@ bootstrapMicroframework({
     expressLoader,
     monitorLoader,
     graphqlLoader,
-    sisifLoader
-  ]
+    sisifLoader,
+  ],
 })
   .then(() => banner(log))
-  .catch(error => {
+  .catch((error) => {
     log.error('Application crashed', error);
     process.exit(1);
   });

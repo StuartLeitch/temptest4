@@ -1,9 +1,11 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 // * Domain imports
 import { SubmissionQualityCheckPassed } from '@hindawi/phenom-events';
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
-  STATUS as TransactionStatus,
+  TransactionStatus,
   UpdateTransactionContext,
   VersionCompare,
   Roles,
@@ -50,14 +52,17 @@ export const SubmissionPeerReviewCycleCheckPassed = {
 
     const {
       repos: {
+        address: addressRepo,
         transaction: transactionRepo,
         invoice: invoiceRepo,
         invoiceItem: invoiceItemRepo,
         manuscript: manuscriptRepo,
         waiver: waiverRepo,
         catalog: catalogRepo,
+        payer: payerRepo,
+        coupon: couponRepo,
       },
-      services: { waiverService, emailService, schedulingService },
+      services: { waiverService, emailService, schedulingService, vatService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
@@ -84,15 +89,20 @@ export const SubmissionPeerReviewCycleCheckPassed = {
     }
 
     const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
+      addressRepo,
       catalogRepo,
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
       manuscriptRepo,
       waiverRepo,
+      payerRepo,
+      couponRepo,
       waiverService,
       schedulingService,
-      emailService
+      emailService,
+      vatService,
+      logger
     );
 
     const result = await updateTransactionOnAcceptManuscript.execute(

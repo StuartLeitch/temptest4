@@ -10,7 +10,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize,
+  // Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';

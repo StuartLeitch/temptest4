@@ -64,3 +64,19 @@ export class InvoiceStatusInvalidError extends Result<UseCaseError> {
     });
   }
 }
+
+export class TransactionNotFoundError extends Result<UseCaseError> {
+  constructor(invoiceId: string) {
+    super(false, {
+      message: `Couldn't find a Transaction for Invoice id {${invoiceId}}.`,
+    });
+  }
+}
+
+export class ManuscriptNotFoundError extends Result<UseCaseError> {
+  constructor(manuscriptId: string) {
+    super(false, {
+      message: `Couldn't find a Manuscript with id {${manuscriptId}}.`,
+    });
+  }
+}

@@ -6,6 +6,7 @@ import {
   CreateCouponUsecase,
   GenerateCouponCodeUsecase,
   GetRecentCouponsUsecase,
+  GetRecentCouponsDTO,
   GetCouponDetailsByCodeUsecase,
   CouponMap,
 } from '@hindawi/shared';
@@ -34,8 +35,7 @@ export const coupon: Resolvers<any> = {
 
       return CouponMap.toPersistence(result.value.getValue());
     },
-
-    async coupons(parent, args, context) {
+    async coupons(parent, args: GetRecentCouponsDTO, context) {
       const { repos } = context;
       const usecase = new GetRecentCouponsUsecase(repos.coupon);
 
@@ -76,10 +76,10 @@ export const coupon: Resolvers<any> = {
 
       const createCouponUsecase = new CreateCouponUsecase(couponRepo);
 
-      const result = await createCouponUsecase.execute({ ...args.coupon });
+      const result = await createCouponUsecase.execute(args.coupon);
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result?.value?.errorValue().message);
       }
 
       return CouponMap.toPersistence(result.value.getValue());
@@ -91,7 +91,7 @@ export const coupon: Resolvers<any> = {
 
       const updateCouponUsecase = new UpdateCouponUsecase(couponRepo);
 
-      const result = await updateCouponUsecase.execute({ ...args.coupon });
+      const result = await updateCouponUsecase.execute(args.coupon);
 
       if (result.isLeft()) {
         throw new Error(result.value.errorValue().message);

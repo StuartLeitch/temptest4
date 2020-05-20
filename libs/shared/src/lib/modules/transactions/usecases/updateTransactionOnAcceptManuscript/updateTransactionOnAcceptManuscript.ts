@@ -15,15 +15,19 @@ import { Invoice } from '../../../invoices/domain/Invoice';
 import { Waiver } from '../../../waivers/domain/Waiver';
 import { Transaction } from '../../domain/Transaction';
 
+import { AddressRepoContract } from './../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
 import { CatalogRepoContract } from '../../../journals/repos';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+import { CouponRepoContract } from '../../../coupons/repos';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { WaiverService } from '../../../../domain/services/WaiverService';
+import { VATService } from '../../../../domain/services/VATService';
 
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
@@ -48,6 +52,12 @@ import {
   Authorize,
 } from './updateTransactionOnAcceptManuscriptAuthorizationContext';
 
+import { AddressMap } from '../../../addresses/mappers/AddressMap';
+import { PayerMap } from '../../../payers/mapper/Payer';
+import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
+import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/confirmInvoiceDTO';
+import { PayerType } from '../../../payers/domain/Payer';
+
 export class UpdateTransactionOnAcceptManuscriptUsecase
   implements
     UseCase<
@@ -61,15 +71,20 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       AccessControlContext
     > {
   constructor(
+    private addressRepo: AddressRepoContract,
     private catalogRepo: CatalogRepoContract,
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private articleRepo: ArticleRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private payerRepo: PayerRepoContract,
+    private couponRepo: CouponRepoContract,
     private waiverService: WaiverService,
     private scheduler: SchedulerContract,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private vatService: VATService,
+    private loggerService: any
   ) {}
 
   private async getAccessControlContext(request, context?) {
@@ -92,6 +107,11 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
     ).getValue();
+
+    const {
+      sanctionedCountryNotificationReceiver,
+      sanctionedCountryNotificationSender,
+    } = request;
 
     try {
       try {
@@ -128,6 +148,8 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
           )
         );
       }
+
+      invoice.addInvoiceItem(invoiceItem);
 
       try {
         // * System looks-up the transaction
@@ -214,6 +236,65 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       invoice.generateCreatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
+
+      const total = invoice.invoiceItems
+        .getItems()
+        .reduce((sum, ii) => sum + ii.calculatePrice(), 0);
+
+      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      if (total <= 0) {
+        // * but we can auto-confirm it
+        const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
+          this.invoiceItemRepo,
+          this.addressRepo,
+          this.invoiceRepo,
+          this.payerRepo,
+          this.couponRepo,
+          this.waiverRepo,
+          this.emailService,
+          this.vatService,
+          this.loggerService
+        );
+
+        // * create new address
+        const newAddress = AddressMap.toDomain({
+          country: manuscript.authorCountry,
+          // ? city: city,
+          // ? state: state,
+          // ? postalCode: raw.postalCode,
+          // ? addressLine1: raw.addressLine1
+        });
+
+        // * create new payer
+        const newPayer = PayerMap.toDomain({
+          // associate payer to the invoice
+          invoiceId: invoice.invoiceId.id.toString(),
+          name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
+          email: manuscript.authorEmail,
+          addressId: newAddress.addressId.id.toString(),
+          organization: ' ',
+          type: PayerType.INDIVIDUAL,
+          // ? vatId: payer.vatRegistrationNumber,
+        });
+
+        const confirmInvoiceArgs: ConfirmInvoiceDTO = {
+          payer: {
+            ...PayerMap.toPersistence(newPayer),
+            address: AddressMap.toPersistence(newAddress),
+          },
+          sanctionedCountryNotificationReceiver,
+          sanctionedCountryNotificationSender,
+        };
+
+        // * Confirm the invoice automagically
+        try {
+          await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
+        } catch (err) {
+          // do nothing yet
+        }
+
+        return right(Result.ok<void>());
+      }
 
       const jobData = PayloadBuilder.invoiceReminder(
         invoice.id.toString(),

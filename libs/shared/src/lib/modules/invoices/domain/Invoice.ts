@@ -88,6 +88,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.props.dateCreated;
   }
 
+  get dateUpdated(): Date {
+    return this.props.dateUpdated;
+  }
+
+  set dateUpdated(dateUpdated: Date) {
+    this.props.dateUpdated = dateUpdated;
+  }
+
   get dateAccepted(): Date {
     return this.props.dateAccepted;
   }
@@ -240,6 +248,9 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.dateUpdated = now;
     this.props.dateMovedToFinal = now;
     this.props.status = InvoiceStatus.FINAL;
+    if (this.props.dateIssued === null) {
+      this.props.dateIssued = new Date();
+    }
     this.addDomainEvent(new InvoiceFinalizedEvent(this, now));
   }
 

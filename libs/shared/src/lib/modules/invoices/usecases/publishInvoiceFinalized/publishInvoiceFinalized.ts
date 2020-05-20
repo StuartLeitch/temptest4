@@ -32,13 +32,13 @@ export class PublishInvoiceFinalized {
       invoiceId: invoice.id.toString(),
       isCreditNote: !!invoice.cancelledInvoiceReference,
       erpReference: invoice.erpReference,
-      invoiceCreatedDate: invoice.dateCreated.toISOString(),
-      invoiceAcceptedDate: invoice.dateAccepted.toISOString(),
+      invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
+      invoiceAcceptedDate: invoice?.dateAccepted?.toISOString(),
       referenceNumber:
         invoice.cancelledInvoiceReference === null
           ? invoice.referenceNumber
           : `CN-${invoice.referenceNumber}`,
-      invoiceIssueDate: invoice.dateIssued.toISOString(),
+      invoiceIssueDate: invoice?.dateIssued?.toISOString(),
       cancelledInvoiceReference: invoice.cancelledInvoiceReference,
       invoiceItems: invoiceItems.map((ii) => ({
         id: ii.id.toString(),
@@ -48,7 +48,7 @@ export class PublishInvoiceFinalized {
         price: ii.price,
         vatPercentage: ii.vat,
         coupons: ii.coupons
-          ? ii.coupons.map((c) => CouponMap.toEvent(c))
+          ? ii.coupons.getItems().map((c) => CouponMap.toEvent(c))
           : undefined,
         waivers: ii.waivers
           ? ii.waivers.map((w) => WaiverMap.toEvent(w))

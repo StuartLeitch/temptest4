@@ -4,7 +4,7 @@ import { RootState } from "typesafe-actions";
 import { InvoiceState } from "./types";
 
 function round(value, precision) {
-  var multiplier = Math.pow(10, precision || 0);
+  const multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
 }
 
@@ -13,15 +13,15 @@ const _getInvoice = (state: RootState): InvoiceState =>
 
 export const invoiceSlice = createSelector(
   _getInvoice,
-  invoiceSlice => invoiceSlice,
+  (invoiceSlice) => invoiceSlice,
 );
 
 export const invoice = createSelector(
   _getInvoice,
-  invoiceSlice => invoiceSlice.invoice,
+  (invoiceSlice) => invoiceSlice.invoice,
 );
 
-export const invoiceCharge = createSelector(_getInvoice, invoiceSlice => {
+export const invoiceCharge = createSelector(_getInvoice, (invoiceSlice) => {
   const { price, vat } = invoiceSlice.invoice.invoiceItem;
   const amount = round(price * ((100 + vat) / 100), 2);
   return amount;
@@ -31,12 +31,12 @@ export const couponError = createSelector(
   (state: RootState) => {
     return state.invoice.invoiceCoupon;
   },
-  ic => ic.error,
+  (ic) => ic.error,
 );
 
 export const invoiceIsPaid = createSelector(
   _getInvoice,
-  invoiceSlice => invoiceSlice.invoice.status === "FINAL",
+  (invoiceSlice) => invoiceSlice.invoice.status === "FINAL",
 );
 
 export const invoiceError = createSelector(

@@ -43,7 +43,7 @@ import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
 import {
-  STATUS as TransactionStatus,
+  TransactionStatus,
   Transaction,
 } from '../../../transactions/domain/Transaction';
 

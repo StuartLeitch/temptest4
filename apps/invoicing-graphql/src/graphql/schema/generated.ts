@@ -81,6 +81,7 @@ export type Invoice = {
   dateChanged?: Maybe<Scalars['String']>;
   dateIssued?: Maybe<Scalars['String']>;
   dateAccepted?: Maybe<Scalars['String']>;
+  dateMovedToFinal?: Maybe<Scalars['String']>;
   vat?: Maybe<Scalars['Float']>;
   charge?: Maybe<Scalars['Float']>;
   status?: Maybe<InvoiceStatus>;
@@ -97,6 +98,7 @@ export type Invoice = {
   payment?: Maybe<Payment>;
   payments?: Maybe<Array<Maybe<Payment>>>;
   creditNote?: Maybe<Invoice>;
+  transaction?: Maybe<Transaction>;
 };
 
 export type InvoiceVat = {
@@ -768,6 +770,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   dateChanged?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   dateIssued?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   dateAccepted?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  dateMovedToFinal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   charge?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>,
   status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>,
@@ -784,6 +787,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   payment?: Resolver<Maybe<ResolversTypes['Payment']>, ParentType, ContextType>,
   payments?: Resolver<Maybe<Array<Maybe<ResolversTypes['Payment']>>>, ParentType, ContextType>,
   creditNote?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType>,
+  transaction?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 

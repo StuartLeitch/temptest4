@@ -49,7 +49,7 @@ import { Payer } from '../../../payers/domain/Payer';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { Invoice } from '../../domain/Invoice';
 import {
-  STATUS as TransactionStatus,
+  TransactionStatus,
   Transaction,
 } from '../../../transactions/domain/Transaction';
 

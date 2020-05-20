@@ -13,7 +13,7 @@ import { Invoice, InvoiceStatus } from '../../domain/Invoice';
 import { ManuscriptId } from '../../domain/ManuscriptId';
 import { InvoiceId } from '../../domain/InvoiceId';
 import {
-  STATUS as TransactionStatus,
+  TransactionStatus,
   Transaction,
 } from '../../../transactions/domain/Transaction';
 

@@ -42,7 +42,7 @@ import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
 import {
-  STATUS as TransactionStatus,
+  TransactionStatus,
   Transaction,
 } from '../../../transactions/domain/Transaction';
 

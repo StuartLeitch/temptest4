@@ -8,6 +8,7 @@ import { InvoiceId } from './InvoiceId';
 import { InvoiceItemId } from './InvoiceItemId';
 import { ManuscriptId } from './ManuscriptId';
 import { Coupon } from '../../coupons/domain/Coupon';
+import { Coupons } from '../../coupons/domain/Coupons';
 import { Reduction } from '../../../domain/reductions/Reduction';
 import { Waiver } from '../../waivers/domain/Waiver';
 
@@ -21,7 +22,8 @@ export interface InvoiceItemProps {
   price?: number;
   dateCreated: Date;
   name?: string;
-  coupons?: Coupon[];
+  coupons?: Coupons;
+  totalNumCoupons?: number;
   waivers?: Waiver[];
 }
 
@@ -70,12 +72,8 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this.props.vat;
   }
 
-  get coupons(): Coupon[] {
+  get coupons(): Coupons {
     return this.props.coupons;
-  }
-
-  set coupons(coupons: Coupon[]) {
-    this.props.coupons = coupons;
   }
 
   get waivers(): Waiver[] {
@@ -86,17 +84,13 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     this.props.waivers = waivers;
   }
 
-  private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
-    super(props, id);
-  }
-
   public static create(
     props: InvoiceItemProps,
     id?: UniqueEntityID
   ): Result<InvoiceItem> {
     const guardArgs: GuardArgument[] = [
       { argument: props.invoiceId, argumentName: 'invoiceId' },
-      { argument: props.manuscriptId, argumentName: 'manuscriptId' }
+      { argument: props.manuscriptId, argumentName: 'manuscriptId' },
     ];
 
     const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
@@ -108,17 +102,36 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     const defaultValues: InvoiceItemProps = {
       ...props,
       type: props.type ? props.type : 'APC',
-      dateCreated: props.dateCreated ? props.dateCreated : new Date()
+      dateCreated: props.dateCreated ? props.dateCreated : new Date(),
+      coupons: props.coupons ? props.coupons : Coupons.create([]),
     };
 
     const invoiceItem = new InvoiceItem(defaultValues, id);
     return Result.ok<InvoiceItem>(invoiceItem);
   }
 
+  private removeCouponIfExists(coupon: Coupon): void {
+    if (this.props.coupons.exists(coupon)) {
+      this.props.coupons.remove(coupon);
+    }
+  }
+
+  public addCoupon(coupon: Coupon): Result<void> {
+    this.removeCouponIfExists(coupon);
+    this.props.coupons.add(coupon);
+    this.props.totalNumCoupons++;
+    // this.addDomainEvent(new InvoiceItemIssued(this, invoiceItem));
+    return Result.ok<void>();
+  }
+
+  private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
+    super(props, id);
+  }
+
   public calculatePrice(withReductions?: Reduction<any>[]) {
     const reductions: Reduction<any>[] = [];
     if (this.coupons) {
-      reductions.push(...this.coupons);
+      reductions.push(...this.coupons.getItems());
     }
     if (this.waivers) {
       reductions.push(...this.waivers);

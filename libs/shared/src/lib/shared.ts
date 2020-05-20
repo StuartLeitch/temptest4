@@ -173,6 +173,7 @@ export * from './modules/coupons/usecases/createCoupon/createCouponDTO';
 export * from './modules/coupons/usecases/updateCoupon/updateCoupon';
 export * from './modules/coupons/usecases/updateCoupon/updateCouponDTO';
 export * from './modules/coupons/usecases/getRecentCoupons/getRecentCoupons';
+export * from './modules/coupons/usecases/getRecentCoupons/GetRecentCouponsDTO';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCode';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
 export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
