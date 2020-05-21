@@ -11,13 +11,13 @@ import './lib/logger/LoggerAspect';
 import { winstonLoader } from './loaders/winstonLoader';
 import { knexLoader } from './loaders/knexLoader';
 import { contextLoader } from './loaders/contextLoader';
-import { queueServiceLoader } from './loaders/queueServiceLoader';
-import { schedulerLoader } from './loaders/schedulerLoader';
-import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
 import { expressLoader } from './loaders/expressLoader';
 import { monitorLoader } from './loaders/monitorLoader';
 import { graphqlLoader } from './loaders/graphqlLoader';
-import { sisifLoader } from './loaders/sisifLoader';
+// import { queueServiceLoader } from './loaders/queueServiceLoader';
+// import { schedulerLoader } from './loaders/schedulerLoader';
+// import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
+// import { sisifLoader } from './loaders/sisifLoader';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -38,13 +38,13 @@ bootstrapMicroframework({
     winstonLoader,
     knexLoader,
     contextLoader,
-    queueServiceLoader,
-    schedulerLoader,
-    domainEventsRegisterLoader,
     expressLoader,
     monitorLoader,
     graphqlLoader,
-    sisifLoader,
+    // queueServiceLoader,
+    // schedulerLoader,
+    // domainEventsRegisterLoader,
+    // sisifLoader,
   ],
 })
   .then(() => banner(log))

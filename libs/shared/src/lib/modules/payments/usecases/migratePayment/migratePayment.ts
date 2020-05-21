@@ -1,26 +1,17 @@
 // * Core Domain
-// import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-// import { chain } from '../../../../core/logic/EitherChain';
-// import { map } from '../../../../core/logic/EitherMap';
-
 // * Usecase specific
-// import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { InvoiceRepoContract } from '../../../invoices/repos';
-// import { PayerId } from '../../../payers/domain/PayerId';
-// import { Amount } from '../../../../domain/Amount';
-// import { Payment } from '../../domain/Payment';
 
 // * Authorization Logic
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
-  // Authorize
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { Payment } from './../../domain/Payment';
@@ -72,7 +63,7 @@ export class MigratePaymentUsecase
       const paymentFactory = new PaymentFactory();
       paymentFactory.registerPayment(migration);
       const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-        ['Migration', new MigrationPayment()]
+        ['Migration', new MigrationPayment()],
       ]);
       const paymentModel: PaymentModel = paymentFactory.create(
         'MigrationPayment'
@@ -98,7 +89,7 @@ export class MigratePaymentUsecase
         datePaid,
         payerId,
         foreignPaymentId: '',
-        paymentMethodId: paymentMethod.paymentMethodId.id.toString()
+        paymentMethodId: paymentMethod.paymentMethodId.id.toString(),
       };
 
       const payment = PaymentMap.toDomain(rawPayment);

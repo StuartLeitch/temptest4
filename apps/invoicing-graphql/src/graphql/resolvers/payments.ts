@@ -1,3 +1,5 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   RecordCreditCardPaymentUsecase,
   RecordBankTransferPaymentUsecase,
@@ -5,7 +7,7 @@ import {
   RecordPayPalPaymentUsecase,
   GetPaymentMethodsUseCase,
   MigratePaymentUsecase,
-  Roles
+  Roles,
 } from '@hindawi/shared';
 import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 
@@ -18,7 +20,7 @@ export const payments: Resolvers<any> = {
     async getPaymentMethods(parent, args, context) {
       const {
         repos: { paymentMethod: paymentMethodRepo },
-        services: { logger: loggerService }
+        services: { logger: loggerService },
       } = context;
       const correlationId = new CorrelationID().toString();
       const usecase = new GetPaymentMethodsUseCase(
@@ -27,7 +29,7 @@ export const payments: Resolvers<any> = {
       );
 
       const result = await usecase.execute(null, {
-        correlationId
+        correlationId,
       });
 
       if (result.isRight()) {
@@ -40,7 +42,7 @@ export const payments: Resolvers<any> = {
       const usecase = new GenerateClientTokenUsecase();
 
       const result = await usecase.execute({
-        merchantAccountId: env.braintree.merchantAccountId
+        merchantAccountId: env.braintree.merchantAccountId,
       });
 
       if (result.isRight()) {
@@ -49,7 +51,7 @@ export const payments: Resolvers<any> = {
       } else {
         throw new Error(`Can't get client token.`);
       }
-    }
+    },
   },
   Mutation: {
     async creditCardPayment(parent, args, context) {
@@ -58,15 +60,15 @@ export const payments: Resolvers<any> = {
           payment: paymentRepo,
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
-          manuscript: manuscriptRepo
-        }
+          manuscript: manuscriptRepo,
+        },
       } = context;
       const {
         invoiceId,
         payerId,
         paymentMethodId,
         paymentMethodNonce,
-        amount
+        amount,
       } = args;
 
       const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
@@ -84,7 +86,7 @@ export const payments: Resolvers<any> = {
           paymentMethodNonce,
           invoiceId,
           amount,
-          payerId
+          payerId,
         },
         usecaseContext
       );
@@ -102,7 +104,8 @@ export const payments: Resolvers<any> = {
         paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
         foreignPaymentId: confirmedPayment.foreignPaymentId,
         amount: confirmedPayment.amount.value,
-        datePaid: confirmedPayment.datePaid.toISOString()
+        datePaid: confirmedPayment.datePaid.toISOString(),
+        status: confirmedPayment.status,
       };
     },
 
@@ -111,7 +114,7 @@ export const payments: Resolvers<any> = {
       const usecaseContext = { roles: [Roles.PAYER] };
       const {
         services: { payPalService },
-        repos: { invoice: invoiceRepo, payment: paymentRepo }
+        repos: { invoice: invoiceRepo, payment: paymentRepo },
       } = context;
 
       const usecase = new RecordPayPalPaymentUsecase(
@@ -125,7 +128,7 @@ export const payments: Resolvers<any> = {
           invoiceId,
           payerId,
           orderId,
-          paymentMethodId
+          paymentMethodId,
         },
         usecaseContext
       );
@@ -142,7 +145,7 @@ export const payments: Resolvers<any> = {
         paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
         foreignPaymentId: confirmedPayment.foreignPaymentId,
         amount: confirmedPayment.amount.value,
-        datePaid: confirmedPayment.datePaid.toISOString()
+        datePaid: confirmedPayment.datePaid.toISOString(),
       };
     },
 
@@ -151,8 +154,8 @@ export const payments: Resolvers<any> = {
         repos: {
           paymentMethod: paymentMethodRepo,
           payment: paymentRepo,
-          invoice: invoiceRepo
-        }
+          invoice: invoiceRepo,
+        },
       } = context;
       const { invoiceId, payerId, amount, datePaid } = args;
 
@@ -168,7 +171,7 @@ export const payments: Resolvers<any> = {
           invoiceId,
           payerId,
           amount,
-          datePaid
+          datePaid,
         },
         usecaseContext
       );
@@ -186,7 +189,7 @@ export const payments: Resolvers<any> = {
         datePaid: migratedPayment.datePaid.toISOString(),
         amount: migratedPayment.amount.value,
         invoiceId: migratedPayment.invoiceId.id.toString(),
-        foreignPaymentId: migratedPayment.foreignPaymentId
+        foreignPaymentId: migratedPayment.foreignPaymentId,
       };
     },
 
@@ -196,8 +199,8 @@ export const payments: Resolvers<any> = {
           payment: paymentRepo,
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
-          manuscript: manuscriptRepo
-        }
+          manuscript: manuscriptRepo,
+        },
       } = context;
       const {
         invoiceId,
@@ -206,7 +209,7 @@ export const payments: Resolvers<any> = {
         paymentReference,
         amount,
         datePaid,
-        markInvoiceAsPaid
+        markInvoiceAsPaid,
       } = args;
 
       const recordBankTransferPaymentUsecase = new RecordBankTransferPaymentUsecase(
@@ -225,7 +228,7 @@ export const payments: Resolvers<any> = {
           paymentReference,
           amount,
           datePaid,
-          markInvoiceAsPaid
+          markInvoiceAsPaid,
         },
         usecaseContext
       );
@@ -243,8 +246,9 @@ export const payments: Resolvers<any> = {
         paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
         foreignPaymentId: confirmedPayment.foreignPaymentId,
         amount: confirmedPayment.amount.value,
-        datePaid: confirmedPayment.datePaid.toISOString()
+        datePaid: confirmedPayment.datePaid.toISOString(),
+        status: confirmedPayment.status,
       };
-    }
-  }
+    },
+  },
 };

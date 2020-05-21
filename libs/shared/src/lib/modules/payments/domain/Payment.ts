@@ -14,7 +14,7 @@ import { PaymentMethodId } from './PaymentMethodId';
 export enum PaymentStatus {
   PENDING = 'PENDING',
   FAILED = 'FAILED',
-  COMPLETED = 'FINAL',
+  COMPLETED = 'COMPLETED',
 }
 
 interface PaymentProps {
@@ -25,6 +25,7 @@ interface PaymentProps {
   foreignPaymentId?: string;
   datePaid?: Date;
   paymentProof?: File;
+  status: PaymentStatus;
 }
 
 export class Payment extends AggregateRoot<PaymentProps> {
@@ -62,6 +63,14 @@ export class Payment extends AggregateRoot<PaymentProps> {
 
   get foreignPaymentId(): string {
     return this.props.foreignPaymentId;
+  }
+
+  get status(): PaymentStatus {
+    return this.props.status;
+  }
+
+  set status(status: PaymentStatus) {
+    this.props.status = status;
   }
 
   private constructor(props: PaymentProps, id?: UniqueEntityID) {
