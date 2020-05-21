@@ -43,6 +43,12 @@ enum TransactionStatus {
   FINAL
 }
 
+enum PaymentStatus {
+  PENDING
+  FAILED
+  COMPLETED
+}
+
 type InvoiceItem @model(id: "invoice_items") {
   id: String
   invoiceId: ID
@@ -152,6 +158,7 @@ input CreditCardInput {
 
 type Payment {
   id: String!
+  status: PaymentStatus
   invoiceId: String
   payerId: String
   paymentMethodId: String

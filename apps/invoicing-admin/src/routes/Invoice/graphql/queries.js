@@ -62,6 +62,7 @@ export const INVOICE_QUERY = `
   }
   fragment paymentFragment on Payment {
     id
+    status
     foreignPaymentId
     amount
     datePaid
