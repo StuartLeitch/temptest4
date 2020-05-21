@@ -49,7 +49,7 @@ import { Loading } from '../../components';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
 
 import ApplyCouponModal from './ApplyCouponModal';
-import CreateCreditNoteModal from './CreateCreditNoteModal';
+import CreateCreditNoteModal from './CreateCreditNoteModal.tsx';
 import SuccessfulPaymentToast from './SuccessfulPaymentToast';
 
 import Config from '../../../config';
@@ -219,7 +219,7 @@ const Details = () => {
                           markInvoiceAsPaid: false,
                         },
                       });
-
+                      invoiceQueryRefetch();
                       return toast.success(SuccessfulPaymentToast);
                     }}
                     onSaveAndMarkInvoiceAsFinal={async () => {
@@ -239,7 +239,7 @@ const Details = () => {
                           markInvoiceAsPaid: true,
                         },
                       });
-
+                      invoiceQueryRefetch();
                       return toast.success(SuccessfulPaymentToast);
                     }}
                   >
@@ -327,24 +327,14 @@ const Details = () => {
 
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') && (
-                    <>
-                      <Button
-                        id={CREATE_CREDIT_NOTE_MODAL_TARGET}
-                        color='danger'
-                        className='mr-2'
-                      >
-                        Create Credit Note
-                      </Button>
-
-                      <CreateCreditNoteModal
-                        invoiceItem={invoice?.invoiceItem}
-                        invoiceId={invoiceId}
-                        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
-                        total={totalCharges}
-                      />
-                    </>
+                    <Button
+                      id={CREATE_CREDIT_NOTE_MODAL_TARGET}
+                      color='danger'
+                      className='mr-2'
+                    >
+                      Create Credit Note
+                    </Button>
                   )}
-
                 <Button
                   id={APPLY_COUPON_MODAL_TARGET}
                   color='twitter'
@@ -564,10 +554,12 @@ const Details = () => {
                                   </span>
                                 </td>
                                 <td className='align-middle text-right text-dark font-weight-bold'>
-                                  &ndash;$
-                                  {(invoice.invoiceItem.price *
-                                    coupon.reduction) /
-                                    100}
+                                  &ndash;
+                                  {numeral(
+                                    (invoice.invoiceItem.price *
+                                      coupon.reduction) /
+                                      100
+                                  ).format('$0.00')}
                                 </td>
                               </tr>
                             ))}
@@ -884,6 +876,13 @@ const Details = () => {
         target={APPLY_COUPON_MODAL_TARGET}
         invoiceId={invoiceId}
         onSuccessCallback={invoiceQueryRefetch}
+      />
+      <CreateCreditNoteModal
+        invoiceItem={invoice?.invoiceItem}
+        invoiceId={invoiceId}
+        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
+        total={totalCharges}
+        onSaveCallback={invoiceQueryRefetch}
       />
     </React.Fragment>
   );
