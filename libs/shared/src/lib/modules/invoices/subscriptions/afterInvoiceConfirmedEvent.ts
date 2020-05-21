@@ -27,7 +27,7 @@ import { InvoiceItemRepoContract } from '../repos';
 
 import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoiceConfirmed } from '../usecases/publishInvoiceConfirmed';
+import { PublishInvoiceConfirmed } from '../usecases/publishEvents/publishInvoiceConfirmed';
 
 export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
   constructor(

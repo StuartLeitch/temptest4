@@ -1,18 +1,18 @@
 import { InvoiceStatus as PhenomInvoiceStatus } from '@hindawi/phenom-events/src/lib/invoice';
 // import { InvoiceConfirmed as InvoiceConfirmedEvent } from '@hindawi/phenom-events';
 
-import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
-import { AppError } from '../../../../core/logic/AppError';
-import { EventUtils } from '../../../../utils/EventUtils';
+import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
+import { AppError } from '../../../../../core/logic/AppError';
+import { EventUtils } from '../../../../../utils/EventUtils';
 
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Address } from '../../../addresses/domain/Address';
-import { InvoiceItem } from '../../domain/InvoiceItem';
-import { Payer } from '../../../payers/domain/Payer';
-import { Invoice } from '../../domain/Invoice';
+import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
+import { Address } from '../../../../addresses/domain/Address';
+import { InvoiceItem } from '../../../domain/InvoiceItem';
+import { Payer } from '../../../../payers/domain/Payer';
+import { Invoice } from '../../../domain/Invoice';
 
-import { CouponMap } from '../../../coupons/mappers/CouponMap';
-import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
+import { CouponMap } from '../../../../coupons/mappers/CouponMap';
+import { WaiverMap } from '../../../../waivers/mappers/WaiverMap';
 
 const INVOICE_FINALIZED = 'InvoiceFinalized';
 

@@ -1,5 +1,5 @@
-import { AppError } from '../../../../core/logic/AppError';
-import { Result, Either } from '../../../../core/logic/Result';
+import { AppError } from '../../../../../core/logic/AppError';
+import { Result, Either } from '../../../../../core/logic/Result';
 
 import { PublishInvoiceCreatedErrors } from './publishInvoiceCreatedErrors';
 

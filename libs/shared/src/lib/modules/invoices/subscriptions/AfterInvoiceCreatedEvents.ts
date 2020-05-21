@@ -6,7 +6,7 @@ import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
 // import { PayerRepoContract } from '../../payers/repos/payerRepo';
 // import { AddressRepoContract } from '../../addresses/repos/addressRepo';
-import { PublishInvoiceCreatedUsecase } from '../usecases/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishInvoiceCreatedUsecase } from '../usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 
 export class AfterInvoiceCreatedEvent
   implements HandleContract<InvoiceCreated> {

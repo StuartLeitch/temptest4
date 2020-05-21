@@ -53,14 +53,14 @@ import {
   Transaction,
 } from '../../../transactions/domain/Transaction';
 
-import { PublishInvoiceCreatedErrors } from '../publishInvoiceCreated/publishInvoiceCreatedErrors';
-import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
-import { PublishInvoiceFinalized } from '../publishInvoiceFinalized';
-import { PublishInvoicePaid } from '../publishInvoicePaid';
+import { PublishInvoiceCreatedErrors } from '../publishEvents/publishInvoiceCreated/publishInvoiceCreatedErrors';
+import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
+import { PublishInvoiceFinalized } from '../publishEvents/publishInvoiceFinalized';
+import { PublishInvoicePaid } from '../publishEvents/publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
   PublishInvoiceCreatedDTO,
-} from '../publishInvoiceCreated';
+} from '../publishEvents/publishInvoiceCreated';
 
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';

@@ -1,18 +1,18 @@
 // * Core Domain
-import { Result, Either, left, right } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { chain } from '../../../../core/logic/EitherChain';
+import { Result, Either, left, right } from '../../../../../core/logic/Result';
+import { AppError } from '../../../../../core/logic/AppError';
+import { UseCase } from '../../../../../core/domain/UseCase';
+import { chain } from '../../../../../core/logic/EitherChain';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+} from '../../../../../domain/authorization/decorators/Authorize';
 
-import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
+import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 
 // * Usecase specific
 import { PublishInvoiceCreatedResponse } from './publishInvoiceCreatedResponse';
@@ -21,11 +21,11 @@ import { PublishInvoiceCreatedDTO } from './publishInvoiceCreatedDTO';
 
 import { InvoiceCreated as InvoiceCreatedMessagePayload } from '@hindawi/phenom-events';
 import { InvoiceStatus as PhenomInvoiceStatus } from '@hindawi/phenom-events/src/lib/invoice';
-import { EventUtils } from '../../../../utils/EventUtils';
+import { EventUtils } from '../../../../../utils/EventUtils';
 
-import { InvoiceItem } from '../../domain/InvoiceItem';
-import { Invoice } from '../../domain/Invoice';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { InvoiceItem } from '../../../domain/InvoiceItem';
+import { Invoice } from '../../../domain/Invoice';
+import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
 
 export type PublishInvoiceCreatedContext = AuthorizationContext<Roles>;
 

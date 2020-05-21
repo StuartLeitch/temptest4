@@ -9,17 +9,17 @@ import {
   InvoiceCosts as PhenomCosts,
 } from '@hindawi/phenom-events/src/lib/invoice';
 
-import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
-import { AppError } from '../../../../core/logic/AppError';
-import { EventUtils } from '../../../../utils/EventUtils';
+import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
+import { AppError } from '../../../../../core/logic/AppError';
+import { EventUtils } from '../../../../../utils/EventUtils';
 
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Address } from '../../../addresses/domain/Address';
-import { InvoiceItem } from '../../domain/InvoiceItem';
-import { Payer } from '../../../payers/domain/Payer';
-import { Invoice } from '../../domain/Invoice';
-import { Coupons } from '../../../coupons/domain/Coupons';
-import { Waiver } from '../../../waivers/domain/Waiver';
+import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
+import { Address } from '../../../../addresses/domain/Address';
+import { InvoiceItem } from '../../../domain/InvoiceItem';
+import { Payer } from '../../../../payers/domain/Payer';
+import { Invoice } from '../../../domain/Invoice';
+import { Coupons } from '../../../../coupons/domain/Coupons';
+import { Waiver } from '../../../../waivers/domain/Waiver';
 
 const INVOICE_CONFIRMED = 'InvoiceConfirmed';
 

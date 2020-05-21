@@ -3,7 +3,7 @@ import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 
 import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
-import { PublishInvoiceFinalized } from '../usecases/publishInvoiceFinalized';
+import { PublishInvoiceFinalized } from '../usecases/publishEvents/publishInvoiceFinalized';
 
 import { InvoiceId } from './../domain/InvoiceId';
 import { InvoiceItemRepoContract } from '../repos';

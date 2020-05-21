@@ -12,7 +12,7 @@ import { WaiverRepoContract } from '../../waivers/repos';
 
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoicePaid } from '../usecases/PublishInvoicePaid';
+import { PublishInvoicePaid } from '../usecases/publishEvents/publishInvoicePaid';
 
 export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
   constructor(

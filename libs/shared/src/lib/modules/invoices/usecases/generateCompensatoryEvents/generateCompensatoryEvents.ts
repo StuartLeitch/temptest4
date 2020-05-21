@@ -41,14 +41,14 @@ import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvo
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 import { GetPaymentInfoUsecase } from '../../../payments/usecases/getPaymentInfo';
 
-import { PublishInvoiceConfirmed } from '../publishInvoiceConfirmed';
-import { PublishInvoiceFinalized } from '../publishInvoiceFinalized';
-import { PublishInvoiceCredited } from '../publishInvoiceCredited';
-import { PublishInvoicePaid } from '../publishInvoicePaid';
+import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
+import { PublishInvoiceFinalized } from '../publishEvents/publishInvoiceFinalized';
+import { PublishInvoiceCredited } from '../publishEvents/publishInvoiceCredited';
+import { PublishInvoicePaid } from '../publishEvents/publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
   PublishInvoiceCreatedDTO,
-} from '../publishInvoiceCreated';
+} from '../publishEvents/publishInvoiceCreated';
 
 // * Usecase specific
 import { GenerateCompensatoryEventsResponse as Response } from './generateCompensatoryEventsResponse';

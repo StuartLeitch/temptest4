@@ -8,7 +8,7 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoiceCredited } from '../usecases/publishInvoiceCredited';
+import { PublishInvoiceCredited } from '../usecases/publishEvents/publishInvoiceCredited';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
