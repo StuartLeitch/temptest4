@@ -326,7 +326,10 @@ const Details = () => {
                 )}
 
                 {invoice.creditNote === null &&
-                  (status === 'ACTIVE' || status === 'FINAL') && (
+                  (status === 'ACTIVE' || status === 'FINAL') &&
+                  invoice.payments.every(
+                    (p) => p.status !== PaymentStatus.PENDING
+                  ) && (
                     <>
                       <Button
                         id={CREATE_CREDIT_NOTE_MODAL_TARGET}
@@ -345,14 +348,16 @@ const Details = () => {
                     </>
                   )}
 
-                <Button
-                  id={APPLY_COUPON_MODAL_TARGET}
-                  color='twitter'
-                  outline={status !== 'DRAFT'}
-                  disabled={status !== 'DRAFT'}
-                >
-                  Apply Coupon
-                </Button>
+                {(status === 'ACTIVE' || status === 'FINAL') && (
+                  <Button
+                    id={APPLY_COUPON_MODAL_TARGET}
+                    color='twitter'
+                    // outline={status !== 'DRAFT'}
+                    // disabled={status !== 'DRAFT'}
+                  >
+                    Apply Coupon
+                  </Button>
+                )}
               </ButtonToolbar>
             </div>
           </Col>
