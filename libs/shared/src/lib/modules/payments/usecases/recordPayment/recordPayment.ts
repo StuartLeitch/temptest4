@@ -1,9 +1,9 @@
+import { BraintreeGateway } from '@hindawi/shared';
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 // * Authorization Logic
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
@@ -11,6 +11,7 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
+  Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
@@ -19,13 +20,14 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 import { PayerId } from '../../../payers/domain/PayerId';
 import { Amount } from '../../../../domain/Amount';
-import { PaymentMap } from '../../mapper/Payment';
+import { Payment } from '../../domain/Payment';
 
 import { RecordPaymentResponse } from './recordPaymentResponse';
 import { RecordPaymentErrors } from './recordPaymentErrors';
 import { RecordPaymentDTO } from './recordPaymentDTO';
 
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
+import { DomainEvents } from 'libs/shared/src/lib/core/domain/events/DomainEvents';
 
 export type RecordPaymentContext = AuthorizationContext<Roles>;
 
@@ -61,11 +63,11 @@ export class RecordPaymentUsecase
         new UniqueEntityID(payload.paymentMethodId)
       ),
       datePaid: payload.datePaid ? new Date(payload.datePaid) : new Date(),
-      markInvoiceAsPaid: !!payload.markInvoiceAsPaid,
+      markInvoiceAsPaid: !!payload.markInvoiceAsPaid
     };
 
     try {
-      const payment = PaymentMap.toDomain(paymentPayload);
+      const payment = Payment.create(paymentPayload).getValue();
 
       const invoice = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(new UniqueEntityID(payload.invoiceId)).getValue()

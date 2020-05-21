@@ -86,8 +86,6 @@ const Details = () => {
   const { invoice, getPaymentMethods } = data;
   const { status, id: invoiceId } = invoice;
 
-  console.info(invoice);
-
   // * -> Net and total charges computing
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
@@ -664,15 +662,6 @@ const Details = () => {
                                 </span>
                               </h6>
                               <Row tag='dl'>
-                                <dt className='col-sm-4'>Status</dt>
-                                <dd className='col-sm-8'>
-                                  <strong>
-                                    <mark className='ml-1 pl-2 pr-2 text-muted'>
-                                      {payment?.status}
-                                    </mark>
-                                  </strong>
-                                </dd>
-
                                 <dt className='col-sm-4'>Payer</dt>
                                 <dd className='col-sm-8 text-inverse'>
                                   <samp>

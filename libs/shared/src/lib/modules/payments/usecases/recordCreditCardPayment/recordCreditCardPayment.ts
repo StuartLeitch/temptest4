@@ -1,6 +1,6 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { left } from '../../../../core/logic/Result';
+import { Result, left, right } from '../../../../core/logic/Result';
 
 // * Authorization Logic
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
@@ -8,13 +8,14 @@ import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
+  Authorize
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
 import { BraintreeGateway } from '../../../payments/infrastructure/gateways/braintree/gateway';
 import {
   InvoiceRepoContract,
-  InvoiceItemRepoContract,
+  InvoiceItemRepoContract
 } from '../../../invoices/repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
@@ -63,10 +64,10 @@ export class RecordCreditCardPaymentUsecase
     );
     const invoiceDetailsResult = await getInvoiceDetailsUsecase.execute(
       {
-        invoiceId: request.invoiceId,
+        invoiceId: request.invoiceId
       },
       {
-        roles: [Roles.PAYER],
+        roles: [Roles.PAYER]
       }
     );
     if (invoiceDetailsResult.isLeft()) {
@@ -83,7 +84,7 @@ export class RecordCreditCardPaymentUsecase
       this.invoiceItemRepo
     );
     const maybeManuscripts = await getManuscriptsByInvoiceIdUsecase.execute({
-      invoiceId: request.invoiceId,
+      invoiceId: request.invoiceId
     });
     if (maybeManuscripts.isLeft()) {
       return maybeManuscripts as any;
@@ -101,7 +102,7 @@ export class RecordCreditCardPaymentUsecase
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Braintree', new BraintreePayment(BraintreeGateway)],
+      ['Braintree', new BraintreePayment(BraintreeGateway)]
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'BraintreePayment'
@@ -122,7 +123,7 @@ export class RecordCreditCardPaymentUsecase
     const payload = {
       ...request,
       foreignPaymentId: payment.transaction.id,
-      markInvoiceAsPaid: true,
+      markInvoiceAsPaid: true
     };
 
     const usecase = new RecordPaymentUsecase(

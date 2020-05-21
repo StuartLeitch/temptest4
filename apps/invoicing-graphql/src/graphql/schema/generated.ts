@@ -58,12 +58,6 @@ export enum TransactionStatus {
   FINAL = 'FINAL'
 }
 
-export enum PaymentStatus {
-  PENDING = 'PENDING',
-  FAILED = 'FAILED',
-  COMPLETED = 'COMPLETED'
-}
-
 export type InvoiceItem = {
    __typename?: 'InvoiceItem';
   id?: Maybe<Scalars['String']>;
@@ -180,7 +174,6 @@ export type CreditCardInput = {
 export type Payment = {
    __typename?: 'Payment';
   id: Scalars['String'];
-  status?: Maybe<PaymentStatus>;
   invoiceId?: Maybe<Scalars['String']>;
   payerId?: Maybe<Scalars['String']>;
   paymentMethodId?: Maybe<Scalars['String']>;
@@ -621,7 +614,6 @@ export type ResolversTypes = {
   Article: ResolverTypeWrapper<Article>,
   Transaction: ResolverTypeWrapper<Transaction>,
   TransactionStatus: TransactionStatus,
-  PaymentStatus: PaymentStatus,
   InvoiceItem: ResolverTypeWrapper<InvoiceItem>,
   Float: ResolverTypeWrapper<Scalars['Float']>,
   Invoice: ResolverTypeWrapper<Invoice>,
@@ -672,7 +664,6 @@ export type ResolversParentTypes = {
   Article: Article,
   Transaction: Transaction,
   TransactionStatus: TransactionStatus,
-  PaymentStatus: PaymentStatus,
   InvoiceItem: InvoiceItem,
   Float: Scalars['Float'],
   Invoice: Invoice,
@@ -840,7 +831,6 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
 
 export type PaymentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  status?: Resolver<Maybe<ResolversTypes['PaymentStatus']>, ParentType, ContextType>,
   invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   payerId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   paymentMethodId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,

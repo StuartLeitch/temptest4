@@ -1,10 +1,22 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
-import { Payment, PaymentStatus } from '../domain/Payment';
+import { Payment } from '../domain/Payment';
 import { PaymentMethodId } from '../domain/PaymentMethodId';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { PayerId } from '../../payers/domain/PayerId';
 import { Amount } from '../../../domain/Amount';
+// import {FilePersistenceDTO} from '../../../infrastructure/mapper/File';
+
+// export interface PaymentPersistenceDTO {
+//   id: string;
+//   payerId: string;
+//   invoiceId: string;
+//   amount: number;
+//   paymentMethodId: string;
+//   foreignPaymentId: string;
+//   datePaid: Date;
+//   paymentProof?: FilePersistenceDTO;
+// }
 
 export class PaymentMap extends Mapper<Payment> {
   public static toDomain(raw: any): Payment {
@@ -21,8 +33,8 @@ export class PaymentMap extends Mapper<Payment> {
           new UniqueEntityID(raw.paymentMethodId)
         ),
         foreignPaymentId: raw.foreignPaymentId,
-        datePaid: raw.datePaid ? new Date(raw.datePaid) : new Date(),
-        status: raw.status ? raw.status : PaymentStatus.COMPLETED,
+        datePaid: raw.datePaid ? new Date(raw.datePaid) : new Date()
+        //  paymentProof: FileMap.toDomain(raw.paymentProof)
       },
       new UniqueEntityID(raw.id)
     );
@@ -40,8 +52,8 @@ export class PaymentMap extends Mapper<Payment> {
       paymentMethodId: payment.paymentMethodId.id.toString(),
       amount: payment.amount.value,
       datePaid: payment.datePaid,
-      foreignPaymentId: payment.foreignPaymentId,
-      status: payment.status,
+      foreignPaymentId: payment.foreignPaymentId
+      // paymentProof: FileMap.toPersistence(payment.paymentProof)
     };
   }
 }
