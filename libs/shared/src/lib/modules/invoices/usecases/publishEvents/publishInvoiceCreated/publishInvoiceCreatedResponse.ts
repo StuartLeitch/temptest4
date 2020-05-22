@@ -1,9 +1,9 @@
-import { AppError } from '../../../../../core/logic/AppError';
 import { Result, Either } from '../../../../../core/logic/Result';
+import { AppError } from '../../../../../core/logic/AppError';
 
-import { PublishInvoiceCreatedErrors } from './publishInvoiceCreatedErrors';
+import * as PublishInvoiceCreatedErrors from './publishInvoiceCreatedErrors';
 
 export type PublishInvoiceCreatedResponse = Either<
-  PublishInvoiceCreatedErrors.InputNotProvided | AppError.UnexpectedError,
+  PublishInvoiceCreatedErrors.InputNotProvidedError | AppError.UnexpectedError,
   Result<void>
 >;
