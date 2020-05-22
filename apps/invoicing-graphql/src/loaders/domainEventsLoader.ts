@@ -6,17 +6,18 @@ import {
   MicroframeworkSettings,
 } from 'microframework-w3tec';
 
+import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishInvoiceCredited } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
+import { PublishInvoicePaid } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/PublishInvoicePaid/publishInvoicePaid';
+import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
+import { PublishInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
+import { PublishInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
+
+import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
-import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
-import { PublishInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceConfirmed';
-import { PublishInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceFinalized';
-import { PublishInvoicePaid } from '../../../../libs/shared/src/lib/modules/invoices/usecases/PublishInvoicePaid/publishInvoicePaid';
-import { PublishInvoiceCredited } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceCredited/publishInvoiceCredited';
-import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceCreated/publishInvoiceCreated';
 // import { AfterManuscriptPublishedEvent } from '../../../../libs/shared/src/lib/modules/manuscripts/subscriptions/AfterManuscriptPublishedEvent';
 
 import { env } from '../env';
@@ -32,15 +33,17 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const context = settings.getData('context');
     const {
       repos: {
-        invoice,
+        paymentMethod,
         invoiceItem,
         manuscript,
-        payer,
+        publisher,
         address,
         catalog,
+        invoice,
+        payment,
         coupon,
         waiver,
-        publisher,
+        payer,
       },
       services: { erpService, logger: loggerService, schedulingService },
       qq: queue,
@@ -108,12 +111,14 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceFinalized(
+      paymentMethod,
       invoiceItem,
+      manuscript,
+      address,
+      payment,
       coupon,
       waiver,
       payer,
-      address,
-      manuscript,
       publishInvoiceFinalized,
       loggerService
     );

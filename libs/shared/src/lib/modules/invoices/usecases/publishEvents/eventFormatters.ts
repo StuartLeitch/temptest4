@@ -1,6 +1,7 @@
 import {
   InvoiceItem as PhenomInvoiceItem,
   CouponApplicableInvoiceItemType,
+  InvoicePayment as PhenomPayment,
   CouponType as PhenomCouponType,
   InvoiceCoupon as PhenomCoupon,
   InvoiceWaiver as PhenomWaiver,
@@ -8,7 +9,9 @@ import {
   InvoicePayer as PhenomPayer,
 } from '@hindawi/phenom-events/src/lib/invoice';
 
+import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 import { Address } from '../../../addresses/domain/Address';
+import { Payment } from '../../../payments/domain/Payment';
 import { Coupons } from '../../../coupons/domain/Coupons';
 import { Waiver } from '../../../waivers/domain/Waiver';
 import { InvoiceItem } from '../../domain/InvoiceItem';
@@ -59,7 +62,10 @@ function itemReduction(item: InvoiceItem): number {
   return (item.price * totalReduction) / 100;
 }
 
-export function formatCosts(invoiceItems: InvoiceItem[]): PhenomCosts {
+export function formatCosts(
+  invoiceItems: InvoiceItem[],
+  payments: Payment[]
+): PhenomCosts {
   const apcItems = invoiceItems.filter((item) => item.type === 'APC');
   const totalPrice = apcItems.reduce((acc, item) => acc + item.price, 0);
   const vatAmount = apcItems.reduce(
@@ -70,13 +76,14 @@ export function formatCosts(invoiceItems: InvoiceItem[]): PhenomCosts {
     (acc, item) => acc + itemReduction(item),
     0
   );
+  const paid = payments.reduce((acc, payment) => acc + payment.amount.value, 0);
 
   return {
+    dueAmount: totalPrice - totalDiscount + vatAmount - paid,
     netAmount: totalPrice - totalDiscount + vatAmount,
-    dueAmount: totalPrice - totalDiscount + vatAmount,
     netApc: totalPrice - totalDiscount,
     grossApc: totalPrice,
-    paidAmount: 0,
+    paidAmount: paid,
     totalDiscount,
     vatAmount,
   };
@@ -95,5 +102,25 @@ export function formatInvoiceItems(
     vatPercentage: invoiceItem.vat,
     coupons: formatCoupons(invoiceItem.coupons),
     waivers: formatWaiver(invoiceItem.waivers),
+  }));
+}
+
+export function formatPayments(
+  payments: Payment[],
+  paymentMethods: PaymentMethod[]
+): PhenomPayment[] {
+  const methods: { [key: string]: PaymentMethod } = paymentMethods.reduce(
+    (acc, method) => {
+      acc[method.id.toString()] = method;
+      return acc;
+    },
+    {}
+  );
+
+  return payments.map((payment) => ({
+    paymentType: methods[payment.paymentMethodId.toString()].name,
+    paymentDate: payment.datePaid.toISOString(),
+    foreignPaymentId: payment.foreignPaymentId,
+    paymentAmount: payment.amount.value,
   }));
 }

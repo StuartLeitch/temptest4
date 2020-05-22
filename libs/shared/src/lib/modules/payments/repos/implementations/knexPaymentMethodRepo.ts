@@ -64,21 +64,21 @@ export class KnexPaymentMethodRepo
     return this.getPaymentMethodById(paymentMethod.paymentMethodId);
   }
 
-  async getPaymentMethods() {
+  async getPaymentMethods(): Promise<PaymentMethod[]> {
     const { db, logger } = this;
 
-    const paymentMethodsSelect = db(TABLES.PAYMENT_METHODS).select();
+    const paymentMethodsSelect = await db(TABLES.PAYMENT_METHODS).select();
 
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
 
     logger.debug('select', {
       correlationId,
-      sql: paymentMethodsSelect.toString()
+      sql: paymentMethodsSelect.toString(),
     });
 
     try {
-      return paymentMethodsSelect;
+      return paymentMethodsSelect.map(PaymentMethodMap.toDomain);
     } catch (e) {
       throw RepoError.fromDBError(e);
     }
@@ -97,7 +97,7 @@ export class KnexPaymentMethodRepo
       throw RepoError.fromDBError(e);
     }
 
-    return paymentMethods.map(paymentMethod =>
+    return paymentMethods.map((paymentMethod) =>
       PaymentMethodMap.toDomain(paymentMethod)
     );
   }
