@@ -1,76 +1,62 @@
-import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoice/invoiceItem';
-// import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
+import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
 
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import { AppError } from '../../../../../core/logic/AppError';
 import { EventUtils } from '../../../../../utils/EventUtils';
 
-import { InvoicePaymentInfo } from '../../../domain/InvoicePaymentInfo';
+import { PaymentMethod } from '../../../../payments/domain/PaymentMethod';
 import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
+import { Address } from '../../../../addresses/domain/Address';
+import { Payment } from '../../../../payments/domain/Payment';
 import { InvoiceItem } from '../../../domain/InvoiceItem';
 import { Payer } from '../../../../payers/domain/Payer';
 import { Invoice } from '../../../domain/Invoice';
 
-import { CouponMap } from '../../../../coupons/mappers/CouponMap';
-import { WaiverMap } from '../../../../waivers/mappers/WaiverMap';
+import {
+  calculateLastPaymentDate,
+  formatInvoiceItems,
+  formatPayments,
+  formatCosts,
+  formatPayer,
+} from '../eventFormatters';
 
 const INVOICE_PAID_EVENT = 'InvoicePaid';
 
 export class PublishInvoicePaid {
   constructor(private publishService: SQSPublishServiceContract) {}
   public async execute(
-    invoice: Invoice,
+    paymentMethods: PaymentMethod[],
     invoiceItems: InvoiceItem[],
+    billingAddress: Address,
     manuscript: Manuscript,
-    paymentDetails: InvoicePaymentInfo,
+    payments: Payment[],
+    invoice: Invoice,
     payer: Payer,
     messageTimestamp?: Date
-  ): Promise<any> {
-    // const data: InvoicePaidEvent
-    const data = {
+  ): Promise<void> {
+    const data: InvoicePaidEvent = {
       ...EventUtils.createEventObject(),
-      invoiceId: invoice.id.toString(),
-      isCreditNote: false,
-      erpReference: invoice.erpReference,
-      invoiceCreatedDate: invoice.dateCreated.toISOString(),
-      invoiceAcceptedDate: invoice.dateAccepted.toISOString(),
-      valueWithoutVAT: invoiceItems.reduce(
-        (acc, curr) => acc + curr.calculatePrice(),
-        0
-      ),
-      invoiceItems: invoiceItems.map((ii) => ({
-        id: ii.id.toString(),
-        manuscriptCustomId: manuscript.customId,
-        manuscriptId: ii.manuscriptId.id.toString(),
-        type: ii.type as InvoiceItemType,
-        price: ii.price,
-        vatPercentage: ii.vat,
-        coupons: ii.coupons
-          ? ii.coupons.getItems().map((c) => CouponMap.toEvent(c))
-          : undefined,
-        waivers: ii.waivers
-          ? ii.waivers.map((w) => WaiverMap.toEvent(w))
-          : undefined,
-      })),
-      transactionId: paymentDetails.transactionId,
-      invoiceStatus: paymentDetails.invoiceStatus,
+
       referenceNumber: invoice.referenceNumber,
-      invoiceIssueDate: paymentDetails.invoiceIssueDate
-        ? new Date(paymentDetails.invoiceIssueDate).toISOString()
-        : null,
-      organization: payer ? payer.organization?.value.toString() : null,
-      payerName: paymentDetails.payerName,
-      payerEmail: paymentDetails.payerEmail,
-      payerType: paymentDetails.payerType,
-      vatRegistrationNumber: paymentDetails.vatRegistrationNumber,
-      address: `${paymentDetails.address}, ${paymentDetails.city}, ${paymentDetails.country}`,
-      country: paymentDetails.country,
-      foreignPaymentId: paymentDetails.foreignPaymentId,
-      paymentDate: paymentDetails.paymentDate
-        ? new Date(paymentDetails.paymentDate).toISOString()
-        : null,
-      paymentType: paymentDetails.paymentType,
-      paymentAmount: paymentDetails.amount,
+      transactionId: invoice.transactionId.toString(),
+      erpReference: invoice.erpReference,
+      invoiceId: invoice.id.toString(),
+      invoiceStatus: invoice.status,
+      isCreditNote: false,
+
+      lastPaymentDate: calculateLastPaymentDate(payments)?.toISOString(),
+      invoiceFinalizedDate: invoice?.dateMovedToFinal?.toISOString(),
+      manuscriptAcceptedDate: invoice?.dateAccepted?.toISOString(),
+      invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
+      invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
+
+      costs: formatCosts(invoiceItems, payments),
+
+      invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
+
+      payer: formatPayer(payer, billingAddress),
+
+      payments: formatPayments(payments, paymentMethods),
     };
 
     try {

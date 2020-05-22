@@ -27,7 +27,7 @@ export class PublishInvoiceConfirmed {
     payer: Payer,
     billingAddress: Address,
     messageTimestamp?: Date
-  ): Promise<any> {
+  ): Promise<void> {
     const data: InvoiceConfirmedEvent = {
       ...EventUtils.createEventObject(),
 

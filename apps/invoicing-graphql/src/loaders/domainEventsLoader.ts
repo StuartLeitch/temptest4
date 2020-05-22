@@ -68,8 +68,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     );
     const publishInvoiceConfirmed = new PublishInvoiceConfirmed(queue);
     const publishInvoiceFinalized = new PublishInvoiceFinalized(queue);
-    const publishInvoicePaid = new PublishInvoicePaid(queue);
     const publishInvoiceCredited = new PublishInvoiceCredited(queue);
+    const publishInvoicePaid = new PublishInvoicePaid(queue);
 
     // Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression
@@ -82,14 +82,17 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceCreditNoteCreatedEvent(
-      invoice,
+      paymentMethod,
       invoiceItem,
+      manuscript,
+      address,
+      invoice,
+      payment,
       coupon,
       waiver,
       payer,
-      manuscript,
-      address,
-      publishInvoiceCredited
+      publishInvoiceCredited,
+      loggerService
     );
 
     // tslint:disable-next-line: no-unused-expression
@@ -125,11 +128,14 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // tslint:disable-next-line: no-unused-expression
     new AfterInvoicePaidEvent(
-      invoice,
+      paymentMethod,
       invoiceItem,
+      manuscript,
+      address,
+      invoice,
+      payment,
       coupon,
       waiver,
-      manuscript,
       payer,
       publishInvoicePaid,
       loggerService

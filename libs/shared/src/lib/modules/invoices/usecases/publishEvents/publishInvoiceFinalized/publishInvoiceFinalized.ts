@@ -13,6 +13,7 @@ import { Payer } from '../../../../payers/domain/Payer';
 import { Invoice } from '../../../domain/Invoice';
 
 import {
+  calculateLastPaymentDate,
   formatInvoiceItems,
   formatPayments,
   formatCosts,
@@ -43,7 +44,7 @@ export class PublishInvoiceFinalized {
       invoiceStatus: invoice.status,
       isCreditNote: false,
 
-      lastPaymentDate: this.calculateLastPaymentDate(payments)?.toISOString(),
+      lastPaymentDate: calculateLastPaymentDate(payments)?.toISOString(),
       invoiceFinalizedDate: invoice?.dateMovedToFinal?.toISOString(),
       manuscriptAcceptedDate: invoice?.dateAccepted?.toISOString(),
       invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
@@ -75,13 +76,5 @@ export class PublishInvoiceFinalized {
     } else {
       return `CN-${invoice.referenceNumber}`;
     }
-  }
-
-  private calculateLastPaymentDate(payments: Payment[]): Date | null {
-    return payments.reduce((acc, payment) => {
-      if (!acc) return payment.datePaid;
-      if (acc < payment.datePaid) return payment.datePaid;
-      return acc;
-    }, null as Date);
   }
 }

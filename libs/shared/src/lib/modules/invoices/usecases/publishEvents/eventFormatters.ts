@@ -124,3 +124,11 @@ export function formatPayments(
     paymentAmount: payment.amount.value,
   }));
 }
+
+export function calculateLastPaymentDate(payments: Payment[]): Date | null {
+  return payments.reduce((acc, payment) => {
+    if (!acc) return payment.datePaid;
+    if (acc < payment.datePaid) return payment.datePaid;
+    return acc;
+  }, null as Date);
+}
