@@ -2,30 +2,37 @@ import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 
-import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
-import { PublishInvoiceFinalized } from '../usecases/publishEvents/publishInvoiceFinalized';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
+import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
 import { InvoiceId } from './../domain/InvoiceId';
-import { InvoiceItemRepoContract } from '../repos';
-import { ArticleRepoContract } from '../../manuscripts/repos';
-import { PayerRepoContract } from '../../payers/repos/payerRepo';
+
+import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
-// import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
-// import { VATService, PayerType, UniqueEntityID } from '@hindawi/shared';
-import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { PaymentRepoContract } from '../../payments/repos/paymentRepo';
+import { PayerRepoContract } from '../../payers/repos/payerRepo';
+import { ArticleRepoContract } from '../../manuscripts/repos';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
+import { InvoiceItemRepoContract } from '../repos';
+
+import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods/GetPaymentMethods';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { PublishInvoiceFinalized } from '../usecases/publishEvents/publishInvoiceFinalized';
+// import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 
 export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
   constructor(
+    private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private addressRepo: AddressRepoContract,
+    private paymentRepo: PaymentRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private addressRepo: AddressRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceFinalized: PublishInvoiceFinalized,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
   }
@@ -93,12 +100,32 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         );
       }
 
+      const paymentMethodsUsecase = new GetPaymentMethodsUseCase(
+        this.paymentMethodRepo,
+        this.loggerService
+      );
+      const paymentMethods = await paymentMethodsUsecase.execute();
+
+      if (paymentMethods.isLeft()) {
+        throw new Error(
+          `Payment methods could not be accessed: ${
+            paymentMethods.value.errorValue().message
+          }`
+        );
+      }
+
+      const payments = await this.paymentRepo.getPaymentsByInvoiceId(
+        invoice.invoiceId
+      );
+
       await this.publishInvoiceFinalized.execute(
-        invoice,
+        paymentMethods.value.getValue(),
         invoiceItems,
+        address,
         manuscript,
-        payer,
-        address
+        payments,
+        invoice,
+        payer
       );
 
       this.loggerService.info(
