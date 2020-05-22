@@ -108,12 +108,8 @@ interface InvoiceCreditedData {
 
 export class GenerateCompensatoryEventsUsecase
   implements
-    UseCase<DTO, Promise<Response>, GenerateCompensatoryEventsContext>,
-    AccessControlledUsecase<
-      DTO,
-      GenerateCompensatoryEventsContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private sqsPublish: SQSPublishServiceContract,
@@ -157,10 +153,7 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: GenerateCompensatoryEventsContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const requestExecution = new AsyncEither<null, DTO>(request)
       .then(this.verifyInput)
       .then(this.publishInvoiceCreated(context))
@@ -404,7 +397,7 @@ export class GenerateCompensatoryEventsUsecase
         ...request,
         messageTimestamp: request.invoice.dateAccepted,
       };
-      return publishUsecase.execute(data, context);
+      return publishUsecase.execute(data);
     };
   }
 

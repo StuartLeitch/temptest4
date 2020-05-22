@@ -53,7 +53,7 @@ import {
   Transaction,
 } from '../../../transactions/domain/Transaction';
 
-import { PublishInvoiceCreatedErrors } from '../publishEvents/publishInvoiceCreated/publishInvoiceCreatedErrors';
+import * as PublishInvoiceCreatedErrors from '../publishEvents/publishInvoiceCreated/publishInvoiceCreatedErrors';
 import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalized } from '../publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaid } from '../publishEvents/publishInvoicePaid';
@@ -392,7 +392,8 @@ export class MigrateEntireInvoiceUsecase
     invoiceId: string
   ): Promise<
     Either<
-      AppError.UnexpectedError | PublishInvoiceCreatedErrors.InputNotProvided,
+      | AppError.UnexpectedError
+      | PublishInvoiceCreatedErrors.InputNotProvidedError,
       void
     >
   > {
