@@ -56,8 +56,8 @@ import {
 } from '../../../transactions/domain/Transaction';
 
 import * as PublishInvoiceCreatedErrors from '../publishEvents/publishInvoiceCreated/publishInvoiceCreatedErrors';
+import { PublishInvoiceFinalizedUsecase } from '../publishEvents/publishInvoiceFinalized';
 import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
-import { PublishInvoiceFinalized } from '../publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaidUsecase } from '../publishEvents/publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
@@ -982,7 +982,7 @@ export class MigrateEntireInvoiceUsecase
       })
       .then(async (data) => {
         const aa = await this.getAddressDetails(data.payer.billingAddressId);
-        return (await aa).map((billingAddress) => ({
+        return aa.map((billingAddress) => ({
           ...data,
           billingAddress,
         }));
@@ -1032,7 +1032,7 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private sendInvoiceFinalizedEvent(context: Context) {
-    const usecase = new PublishInvoiceFinalized(this.sqsPublishService);
+    const usecase = new PublishInvoiceFinalizedUsecase(this.sqsPublishService);
 
     return async ({ invoice, request }: { invoice: Invoice; request: DTO }) => {
       const execution = new AsyncEither<null, null>(null)
@@ -1065,42 +1065,56 @@ export class MigrateEntireInvoiceUsecase
                 invoiceItems: InvoiceItem[];
                 payer: Payer;
                 manuscript: Manuscript;
-                address: Address;
+                billingAddress: Address;
               }
             >({
               ...data,
-              address: null,
+              billingAddress: null,
             });
           }
           const maybeAddress = await this.getAddressDetails(
             data.payer.billingAddressId
           );
-          return maybeAddress.map((address) => ({ ...data, address }));
+          return maybeAddress.map((billingAddress) => ({
+            ...data,
+            billingAddress,
+          }));
+        })
+        .then(async (data) => {
+          const maybePayments = await this.getPaymentsByInvoiceId(
+            invoice.invoiceId
+          );
+          return maybePayments.map((payments) => ({ ...data, payments }));
+        })
+        .then(async (data) => {
+          const maybePaymentMethods = await this.getPaymentMethods();
+          return maybePaymentMethods.map((paymentMethods) => ({
+            ...data,
+            paymentMethods,
+          }));
         })
         .then(
           async ({
-            manuscript,
+            billingAddress,
+            paymentMethods,
             invoiceItems,
+            manuscript,
+            payments,
             payer,
-            address,
-          }: {
-            invoice: Invoice;
-            manuscript: Manuscript;
-            invoiceItems: InvoiceItem[];
-            payer: Payer;
-            address: Address;
           }) => {
             const messageTimestamp = new Date(
               request.paymentDate || request.issueDate
             );
-            await usecase.execute(
-              invoice,
+            await usecase.execute({
+              messageTimestamp,
+              billingAddress,
+              paymentMethods,
               invoiceItems,
               manuscript,
+              invoice,
+              payments,
               payer,
-              address,
-              messageTimestamp
-            );
+            });
 
             return right<null, DTO>(request);
           }

@@ -1,15 +1,21 @@
 import { InvoiceFinalized as InvoiceFinalizedEvent } from '@hindawi/phenom-events';
 
+import { Either, right, left } from '../../../../../core/logic/Result';
+import { UseCase } from '../../../../../core/domain/UseCase';
+
+// * Authorization Logic
+import { AccessControlContext } from '../../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../../users/domain/enums/Roles';
+import {
+  AccessControlledUsecase,
+  AuthorizationContext,
+  Authorize,
+} from '../../../../../domain/authorization/decorators/Authorize';
+
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import { AppError } from '../../../../../core/logic/AppError';
 import { EventUtils } from '../../../../../utils/EventUtils';
 
-import { PaymentMethod } from '../../../../payments/domain/PaymentMethod';
-import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
-import { Address } from '../../../../addresses/domain/Address';
-import { Payment } from '../../../../payments/domain/Payment';
-import { InvoiceItem } from '../../../domain/InvoiceItem';
-import { Payer } from '../../../../payers/domain/Payer';
 import { Invoice } from '../../../domain/Invoice';
 
 import {
@@ -20,20 +26,38 @@ import {
   formatPayer,
 } from '../eventFormatters';
 
+import { PublishInvoiceFinalizedResponse as Response } from './publishInvoiceFinalized.response';
+import { PublishInvoiceFinalizedDTO as DTO } from './publishInvoiceFinalized.dto';
+import * as Errors from './publishInvoiceFinalized.errors';
+
+type Context = AuthorizationContext<Roles>;
+export type PublishInvoiceFinalizedContext = Context;
+
 const INVOICE_FINALIZED = 'InvoiceFinalized';
 
-export class PublishInvoiceFinalized {
+export class PublishInvoiceFinalizedUsecase
+  implements
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private publishService: SQSPublishServiceContract) {}
-  public async execute(
-    paymentMethods: PaymentMethod[],
-    invoiceItems: InvoiceItem[],
-    billingAddress: Address,
-    manuscript: Manuscript,
-    payments: Payment[],
-    invoice: Invoice,
-    payer: Payer,
-    messageTimestamp?: Date
-  ): Promise<void> {
+
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    const validRequest = this.verifyInput(request);
+    if (validRequest.isLeft()) {
+      return validRequest;
+    }
+
+    const {
+      messageTimestamp,
+      paymentMethods,
+      billingAddress,
+      invoiceItems,
+      manuscript,
+      payments,
+      invoice,
+      payer,
+    } = request;
+
     const data: InvoiceFinalizedEvent = {
       ...EventUtils.createEventObject(),
 
@@ -76,5 +100,48 @@ export class PublishInvoiceFinalized {
     } else {
       return `CN-${invoice.referenceNumber}`;
     }
+  }
+
+  private verifyInput(
+    request: DTO
+  ): Either<
+    | Errors.BillingAddressRequiredError
+    | Errors.PaymentMethodsRequiredError
+    | Errors.InvoiceItemsRequiredError
+    | Errors.ManuscriptRequiredError
+    | Errors.PaymentsRequiredError
+    | Errors.InvoiceRequiredError
+    | Errors.PayerRequiredError,
+    void
+  > {
+    if (!request.billingAddress) {
+      return left(new Errors.BillingAddressRequiredError());
+    }
+
+    if (!request.invoice) {
+      return left(new Errors.InvoiceRequiredError());
+    }
+
+    if (!request.invoiceItems) {
+      return left(new Errors.InvoiceItemsRequiredError());
+    }
+
+    if (!request.manuscript) {
+      return left(new Errors.ManuscriptRequiredError());
+    }
+
+    if (!request.payer) {
+      return left(new Errors.PayerRequiredError());
+    }
+
+    if (!request.paymentMethods) {
+      return left(new Errors.PaymentMethodsRequiredError());
+    }
+
+    if (!request.payments) {
+      return left(new Errors.PaymentsRequiredError());
+    }
+
+    return right(null);
   }
 }

@@ -17,8 +17,8 @@ import { WaiverRepoContract } from '../../waivers/repos';
 import { InvoiceItemRepoContract } from '../repos';
 
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods/GetPaymentMethods';
+import { PublishInvoiceFinalizedUsecase } from '../usecases/publishEvents/publishInvoiceFinalized';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoiceFinalized } from '../usecases/publishEvents/publishInvoiceFinalized';
 // import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 
 export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
@@ -31,7 +31,7 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private publishInvoiceFinalized: PublishInvoiceFinalized,
+    private publishInvoiceFinalized: PublishInvoiceFinalizedUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -88,7 +88,9 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         }
       }
 
-      const address = await this.addressRepo.findById(payer.billingAddressId);
+      const billingAddress = await this.addressRepo.findById(
+        payer.billingAddressId
+      );
 
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
@@ -118,15 +120,15 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         invoice.invoiceId
       );
 
-      await this.publishInvoiceFinalized.execute(
-        paymentMethods.value.getValue(),
+      await this.publishInvoiceFinalized.execute({
+        paymentMethods: paymentMethods.value.getValue(),
+        billingAddress,
         invoiceItems,
-        address,
         manuscript,
         payments,
         invoice,
-        payer
-      );
+        payer,
+      });
 
       this.loggerService.info(
         `[AfterInvoiceFinalized]: Successfully executed onPublishInvoiceFinalized use case AfterInvoiceFinalized`

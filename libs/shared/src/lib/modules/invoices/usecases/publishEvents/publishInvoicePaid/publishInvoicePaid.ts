@@ -40,6 +40,11 @@ export class PublishInvoicePaidUsecase
   constructor(private publishService: SQSPublishServiceContract) {}
 
   async execute(request: DTO, context?: Context): Promise<Response> {
+    const validRequest = this.verifyInput(request);
+    if (validRequest.isLeft()) {
+      return validRequest;
+    }
+
     const {
       messageTimestamp,
       billingAddress,
@@ -50,11 +55,6 @@ export class PublishInvoicePaidUsecase
       invoice,
       payer,
     } = request;
-
-    const validRequest = this.verifyInput(request);
-    if (validRequest.isLeft()) {
-      return validRequest;
-    }
 
     const data: InvoicePaidEvent = {
       ...EventUtils.createEventObject(),

@@ -43,8 +43,11 @@ import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvo
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
 import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
-import { PublishInvoiceFinalized } from '../publishEvents/publishInvoiceFinalized';
 import { PublishInvoiceCredited } from '../publishEvents/publishInvoiceCredited';
+import {
+  PublishInvoiceFinalizedUsecase,
+  PublishInvoiceFinalizedDTO,
+} from '../publishEvents/publishInvoiceFinalized';
 import {
   PublishInvoicePaidUsecase,
   PublishInvoicePaidDTO,
@@ -96,9 +99,11 @@ interface InvoicePayedData {
 }
 
 interface InvoiceFinalizedData {
+  paymentMethods: PaymentMethod[];
   invoiceItems: InvoiceItem[];
   billingAddress: Address;
   manuscript: Manuscript;
+  payments: Payment[];
   invoice: Invoice;
   payer: Payer;
 }
@@ -442,25 +447,14 @@ export class GenerateCompensatoryEventsUsecase
 
   private sendFinalizedEvent(context: Context) {
     return async <T extends InvoiceFinalizedData>(request: T) => {
-      const publishUsecase = new PublishInvoiceFinalized(this.sqsPublish);
-      try {
-        const result = await publishUsecase.execute(
-          request.invoice,
-          request.invoiceItems,
-          request.manuscript,
-          request.payer,
-          request.billingAddress,
-          request.invoice.dateMovedToFinal
-        );
-        return right<Errors.PublishInvoiceFinalizedError, void>(result);
-      } catch (err) {
-        return left<Errors.PublishInvoiceFinalizedError, void>(
-          new Errors.PublishInvoiceFinalizedError(
-            request.invoice.id.toString(),
-            err
-          )
-        );
-      }
+      const publishUsecase = new PublishInvoiceFinalizedUsecase(
+        this.sqsPublish
+      );
+      const data: PublishInvoiceFinalizedDTO = {
+        ...request,
+        messageTimestamp: request.invoice.dateMovedToFinal,
+      };
+      return publishUsecase.execute(data, context);
     };
   }
 
@@ -565,6 +559,8 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachManuscript(context))
         .then(this.attachPayer(context))
         .then(this.attachAddress(context))
+        .then(this.attachPayments(context))
+        .then(this.attachPaymentMethods(context))
         .then(this.sendFinalizedEvent(context))
         .map(() => request)
         .execute();
