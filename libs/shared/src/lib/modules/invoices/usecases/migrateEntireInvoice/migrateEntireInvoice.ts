@@ -55,9 +55,9 @@ import {
   Transaction,
 } from '../../../transactions/domain/Transaction';
 
+import { PublishInvoiceConfirmedUsecase } from '../publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../publishEvents/publishInvoiceFinalized';
 import { PublishInvoiceCreatedErrors } from '../publishEvents/publishInvoiceCreated';
-import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
 import { PublishInvoicePaidUsecase } from '../publishEvents/publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
@@ -700,7 +700,7 @@ export class MigrateEntireInvoiceUsecase
       return right<null, object>({});
     }
 
-    const usecase = new PublishInvoiceConfirmed(this.sqsPublishService);
+    const usecase = new PublishInvoiceConfirmedUsecase(this.sqsPublishService);
     const messageTimestamp = new Date(request.issueDate);
 
     return new AsyncEither<null, AddressId>(payer?.billingAddressId)
@@ -724,14 +724,14 @@ export class MigrateEntireInvoiceUsecase
         }));
       })
       .then(async ({ billingAddress, manuscript, invoiceItems }) => {
-        await usecase.execute(
-          invoice,
+        await usecase.execute({
+          messageTimestamp,
+          billingAddress,
           invoiceItems,
           manuscript,
+          invoice,
           payer,
-          billingAddress,
-          messageTimestamp
-        );
+        });
         return right<null, DTO & { invoice: Invoice }>({ ...request, invoice });
       })
       .execute();

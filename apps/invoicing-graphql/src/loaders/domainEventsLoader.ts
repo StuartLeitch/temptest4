@@ -8,9 +8,9 @@ import {
 
 import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-import { PublishInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/PublishInvoicePaid';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
@@ -66,9 +66,9 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
       queue
     );
+    const publishInvoiceConfirmed = new PublishInvoiceConfirmedUsecase(queue);
     const publishInvoiceFinalized = new PublishInvoiceFinalizedUsecase(queue);
     const publishInvoiceCredited = new PublishInvoiceCreditedUsecase(queue);
-    const publishInvoiceConfirmed = new PublishInvoiceConfirmed(queue);
     const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
 
     // Registering Invoice Events

@@ -127,7 +127,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
         payer.billingAddressId
       );
 
-      this.publishInvoiceCredited.execute({
+      const publishResult = await this.publishInvoiceCredited.execute({
         paymentMethods: paymentMethods.value.getValue(),
         invoiceItems,
         billingAddress,
@@ -136,6 +136,10 @@ export class AfterInvoiceCreditNoteCreatedEvent
         creditNote,
         payer,
       });
+
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
 
       console.log(
         `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`

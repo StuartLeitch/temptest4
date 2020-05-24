@@ -42,7 +42,10 @@ import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAdd
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
-import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
+import {
+  PublishInvoiceConfirmedUsecase,
+  PublishInvoiceConfirmedDTO,
+} from '../publishEvents/publishInvoiceConfirmed';
 import {
   PublishInvoiceCreditedUsecase,
   PublishInvoiceCreditedDTO,
@@ -417,25 +420,14 @@ export class GenerateCompensatoryEventsUsecase
 
   private sendConfirmedEvent(context: Context) {
     return async <T extends InvoiceConfirmedData>(request: T) => {
-      const publishUsecase = new PublishInvoiceConfirmed(this.sqsPublish);
-      try {
-        const result = await publishUsecase.execute(
-          request.invoice,
-          request.invoiceItems,
-          request.manuscript,
-          request.payer,
-          request.billingAddress,
-          request.invoice.dateIssued
-        );
-        return right<Errors.PublishInvoiceConfirmError, void>(result);
-      } catch (err) {
-        return left<Errors.PublishInvoiceConfirmError, void>(
-          new Errors.PublishInvoiceConfirmError(
-            request.invoice.id.toString(),
-            err
-          )
-        );
-      }
+      const publishUsecase = new PublishInvoiceConfirmedUsecase(
+        this.sqsPublish
+      );
+      const data: PublishInvoiceConfirmedDTO = {
+        ...request,
+        messageTimestamp: request.invoice.dateIssued,
+      };
+      return publishUsecase.execute(data, context);
     };
   }
 

@@ -120,7 +120,7 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         invoice.invoiceId
       );
 
-      await this.publishInvoiceFinalized.execute({
+      const publishResult = await this.publishInvoiceFinalized.execute({
         paymentMethods: paymentMethods.value.getValue(),
         billingAddress,
         invoiceItems,
@@ -129,6 +129,10 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         invoice,
         payer,
       });
+
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
 
       this.loggerService.info(
         `[AfterInvoiceFinalized]: Successfully executed onPublishInvoiceFinalized use case AfterInvoiceFinalized`

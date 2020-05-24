@@ -110,7 +110,7 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         invoice.invoiceId
       );
 
-      this.publishInvoicePaid.execute({
+      const publishResult = await this.publishInvoicePaid.execute({
         paymentMethods: paymentMethods.value.getValue(),
         invoiceItems,
         billingAddress,
@@ -119,6 +119,9 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         invoice,
         payer,
       });
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
       console.log(
         `[AfterInvoicePaid]: Successfully executed onInvoicePaidEvent use case InvoicePaidEvent`
       );
