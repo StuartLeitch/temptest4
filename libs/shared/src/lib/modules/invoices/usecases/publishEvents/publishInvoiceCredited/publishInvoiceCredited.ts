@@ -1,20 +1,20 @@
 import { InvoiceCreditNoteCreated as InvoiceCreditNoteCreatedEvent } from '@hindawi/phenom-events';
 
 import { Either, right, left } from '../../../../../core/logic/Result';
+import { AppError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
+
+import { EventUtils } from '../../../../../utils/EventUtils';
 
 // * Authorization Logic
 import { AccessControlContext } from '../../../../../domain/authorization/AccessControl';
+import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import { Roles } from '../../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
   Authorize,
 } from '../../../../../domain/authorization/decorators/Authorize';
-
-import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
-import { AppError } from '../../../../../core/logic/AppError';
-import { EventUtils } from '../../../../../utils/EventUtils';
 
 import {
   calculateLastPaymentDate,
@@ -99,9 +99,9 @@ export class PublishInvoiceCreditedUsecase
     | Errors.BillingAddressRequiredError
     | Errors.PaymentMethodsRequiredError
     | Errors.InvoiceItemsRequiredError
+    | Errors.CreditNoteRequiredError
     | Errors.ManuscriptRequiredError
     | Errors.PaymentsRequiredError
-    | Errors.InvoiceRequiredError
     | Errors.PayerRequiredError,
     void
   > {

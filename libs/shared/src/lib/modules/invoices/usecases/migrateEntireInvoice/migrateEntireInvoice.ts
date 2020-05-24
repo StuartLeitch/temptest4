@@ -55,8 +55,8 @@ import {
   Transaction,
 } from '../../../transactions/domain/Transaction';
 
-import * as PublishInvoiceCreatedErrors from '../publishEvents/publishInvoiceCreated/publishInvoiceCreatedErrors';
 import { PublishInvoiceFinalizedUsecase } from '../publishEvents/publishInvoiceFinalized';
+import { PublishInvoiceCreatedErrors } from '../publishEvents/publishInvoiceCreated';
 import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
 import { PublishInvoicePaidUsecase } from '../publishEvents/publishInvoicePaid';
 import {
@@ -399,8 +399,10 @@ export class MigrateEntireInvoiceUsecase
     invoiceId: string
   ): Promise<
     Either<
-      | AppError.UnexpectedError
-      | PublishInvoiceCreatedErrors.InputNotProvidedError,
+      | PublishInvoiceCreatedErrors.InvoiceItemsRequiredError
+      | PublishInvoiceCreatedErrors.ManuscriptRequiredError
+      | PublishInvoiceCreatedErrors.InvoiceRequiredError
+      | AppError.UnexpectedError,
       void
     >
   > {
@@ -422,9 +424,7 @@ export class MigrateEntireInvoiceUsecase
           } as PublishInvoiceCreatedDTO)
       )
       .then(async (request) => {
-        return (await usecase.execute(request)).map((result) =>
-          result.getValue()
-        );
+        return usecase.execute(request);
       });
 
     return execution.execute();

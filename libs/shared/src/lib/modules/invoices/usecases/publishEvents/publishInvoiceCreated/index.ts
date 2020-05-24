@@ -1,4 +1,4 @@
-export * as PublishInvoiceCreatedErrors from './publishInvoiceCreatedErrors';
-export * from './publishInvoiceCreatedResponse';
-export * from './publishInvoiceCreatedDTO';
+export * as PublishInvoiceCreatedErrors from './publishInvoiceCreated.errors';
+export * from './publishInvoiceCreated.response';
+export * from './publishInvoiceCreated.dto';
 export * from './publishInvoiceCreated';

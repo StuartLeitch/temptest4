@@ -411,7 +411,7 @@ export class GenerateCompensatoryEventsUsecase
         ...request,
         messageTimestamp: request.invoice.dateAccepted,
       };
-      return publishUsecase.execute(data);
+      return publishUsecase.execute(data, context);
     };
   }
 
