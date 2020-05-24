@@ -2,6 +2,7 @@ import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublis
 import { LoggerContract, MockLogger } from '../../../../infrastructure/logging';
 import { PublishMessage } from '../../../../domain/services/sqs/PublishMessage';
 
+import { MockPaymentMethodRepo } from '../../../payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from '../../../manuscripts/repos/mocks/mockArticleRepo';
 import { MockAddressRepo } from '../../../addresses/repos/mocks/mockAddressRepo';
 import { MockPaymentRepo } from '../../../payments/repos/mocks/mockPaymentRepo';
@@ -17,6 +18,7 @@ import {
 } from './generateCompensatoryEvents';
 
 import {
+  addPaymentMethods,
   addInvoiceItems,
   addManuscripts,
   addInvoices,
@@ -38,6 +40,7 @@ class MockSQSPublishService implements SQSPublishServiceContract {
 describe('migrate entire invoice usecase', () => {
   let compensatoryEventsUsecase: GenerateCompensatoryEventsUsecase;
   let context: GenerateCompensatoryEventsContext;
+  let paymentMethodRepo: MockPaymentMethodRepo;
   let sqsPublishService: MockSQSPublishService;
   let invoiceItemRepo: MockInvoiceItemRepo;
   let manuscriptRepo: MockArticleRepo;
@@ -51,6 +54,7 @@ describe('migrate entire invoice usecase', () => {
 
   beforeEach(() => {
     sqsPublishService = new MockSQSPublishService();
+    paymentMethodRepo = new MockPaymentMethodRepo();
     invoiceItemRepo = new MockInvoiceItemRepo();
     manuscriptRepo = new MockArticleRepo();
     addressRepo = new MockAddressRepo();
@@ -65,6 +69,7 @@ describe('migrate entire invoice usecase', () => {
     };
     loggerService = new MockLogger();
 
+    addPaymentMethods(paymentMethodRepo);
     addInvoiceItems(invoiceItemRepo);
     addManuscripts(manuscriptRepo);
     addInvoices(invoiceRepo);
@@ -74,6 +79,7 @@ describe('migrate entire invoice usecase', () => {
     addPayers(payerRepo);
 
     compensatoryEventsUsecase = new GenerateCompensatoryEventsUsecase(
+      paymentMethodRepo,
       invoiceItemRepo,
       sqsPublishService,
       manuscriptRepo,

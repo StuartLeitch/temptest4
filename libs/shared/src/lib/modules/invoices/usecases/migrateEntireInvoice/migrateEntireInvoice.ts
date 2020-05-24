@@ -5,6 +5,8 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
 // * Authorization Logic
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
@@ -56,7 +58,7 @@ import {
 import * as PublishInvoiceCreatedErrors from '../publishEvents/publishInvoiceCreated/publishInvoiceCreatedErrors';
 import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalized } from '../publishEvents/publishInvoiceFinalized';
-import { PublishInvoicePaid } from '../publishEvents/publishInvoicePaid';
+import { PublishInvoicePaidUsecase } from '../publishEvents/publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
   PublishInvoiceCreatedDTO,
@@ -64,6 +66,8 @@ import {
 
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
+import { GetPaymentsByInvoiceIdUsecase } from '../../../payments/usecases/getPaymentsByInvoiceId';
+import { GetPaymentMethodsUseCase } from '../../../payments/usecases/getPaymentMethods';
 import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
@@ -100,7 +104,8 @@ export class MigrateEntireInvoiceUsecase
     private paymentRepo: PaymentRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private payerRepo: PayerRepoContract
+    private payerRepo: PayerRepoContract,
+    private loggerService: LoggerContract
   ) {
     this.addItemsToInvoice = this.addItemsToInvoice.bind(this);
     this.calculateVatPercentage = this.calculateVatPercentage.bind(this);
@@ -158,6 +163,8 @@ export class MigrateEntireInvoiceUsecase
     this.shouldSendInvoiceFinalized = this.shouldSendInvoiceFinalized.bind(
       this
     );
+    this.getPaymentsByInvoiceId = this.getPaymentsByInvoiceId.bind(this);
+    this.getPaymentMethods = this.getPaymentMethods.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -570,6 +577,32 @@ export class MigrateEntireInvoiceUsecase
       .execute();
   }
 
+  private async getPaymentsByInvoiceId(invoiceId: InvoiceId) {
+    const usecase = new GetPaymentsByInvoiceIdUsecase(
+      this.invoiceRepo,
+      this.paymentRepo
+    );
+    const context = {
+      roles: [Roles.PAYER],
+    };
+
+    return new AsyncEither(invoiceId.id.toString())
+      .then((invoiceId) => usecase.execute({ invoiceId }, context))
+      .map((result) => result.getValue())
+      .execute();
+  }
+
+  private async getPaymentMethods() {
+    const usecase = new GetPaymentMethodsUseCase(
+      this.paymentMethodRepo,
+      this.loggerService
+    );
+    return new AsyncEither(null)
+      .then(() => usecase.execute())
+      .map((result) => result.getValue())
+      .execute();
+  }
+
   private async confirmInvoice({
     payer,
     request,
@@ -897,7 +930,7 @@ export class MigrateEntireInvoiceUsecase
     payment: Payment;
     request: DTO;
   }) {
-    const usecase = new PublishInvoicePaid(this.sqsPublishService);
+    const usecase = new PublishInvoicePaidUsecase(this.sqsPublishService);
     const messageTimestamp = request.paymentDate
       ? new Date(request.paymentDate)
       : invoice.dateIssued;
@@ -934,24 +967,55 @@ export class MigrateEntireInvoiceUsecase
         );
         return maybePayer.map((payer) => ({ ...data, payer }));
       })
-      .then(async ({ paymentDetails, invoiceItems, manuscript, payer }) => {
-        await usecase.execute(
-          invoice,
+      .then(async (data) => {
+        const maybePayments = await this.getPaymentsByInvoiceId(
+          invoice.invoiceId
+        );
+        return maybePayments.map((payments) => ({ ...data, payments }));
+      })
+      .then(async (data) => {
+        const maybePaymentMethods = await this.getPaymentMethods();
+        return maybePaymentMethods.map((paymentMethods) => ({
+          ...data,
+          paymentMethods,
+        }));
+      })
+      .then(async (data) => {
+        const aa = await this.getAddressDetails(data.payer.billingAddressId);
+        return (await aa).map((billingAddress) => ({
+          ...data,
+          billingAddress,
+        }));
+      })
+      .then(
+        async ({
           invoiceItems,
           manuscript,
-          paymentDetails,
           payer,
-          messageTimestamp
-        );
-        return right<
-          null,
-          {
-            invoice: Invoice;
-            payment: Payment;
-            request: DTO;
-          }
-        >({ request, invoice, payment });
-      })
+          paymentMethods,
+          billingAddress,
+          payments,
+        }) => {
+          await usecase.execute({
+            messageTimestamp,
+            billingAddress,
+            paymentMethods,
+            invoiceItems,
+            manuscript,
+            invoice,
+            payments,
+            payer,
+          });
+          return right<
+            null,
+            {
+              invoice: Invoice;
+              payment: Payment;
+              request: DTO;
+            }
+          >({ request, invoice, payment });
+        }
+      )
       .execute();
   }
 

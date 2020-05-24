@@ -16,8 +16,8 @@ import { WaiverRepoContract } from '../../waivers/repos';
 
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { PublishInvoicePaidUsecase } from '../usecases/publishEvents/publishInvoicePaid';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
-import { PublishInvoicePaid } from '../usecases/publishEvents/publishInvoicePaid';
 
 export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
   constructor(
@@ -30,7 +30,7 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private publishInvoicePaid: PublishInvoicePaid,
+    private publishInvoicePaid: PublishInvoicePaidUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -110,15 +110,15 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         invoice.invoiceId
       );
 
-      this.publishInvoicePaid.execute(
-        paymentMethods.value.getValue(),
+      this.publishInvoicePaid.execute({
+        paymentMethods: paymentMethods.value.getValue(),
         invoiceItems,
         billingAddress,
         manuscript,
         payments,
         invoice,
-        payer
-      );
+        payer,
+      });
       console.log(
         `[AfterInvoicePaid]: Successfully executed onInvoicePaidEvent use case InvoicePaidEvent`
       );

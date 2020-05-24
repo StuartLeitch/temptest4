@@ -15,7 +15,7 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
-import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
+import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
 import { Payment } from '../../../payments/domain/Payment';
@@ -24,6 +24,7 @@ import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
 import { Invoice } from '../../domain/Invoice';
 
+import { PaymentMethodRepoContract } from '../../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { PaymentRepoContract } from '../../../payments/repos/paymentRepo';
@@ -36,15 +37,18 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetPaymentsByInvoiceIdUsecase } from '../../../payments/usecases/getPaymentsByInvoiceId';
+import { GetPaymentMethodsUseCase } from '../../../payments/usecases/getPaymentMethods';
 import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
-import { GetPaymentInfoUsecase } from '../../../payments/usecases/getPaymentInfo';
 
 import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalized } from '../publishEvents/publishInvoiceFinalized';
 import { PublishInvoiceCredited } from '../publishEvents/publishInvoiceCredited';
-import { PublishInvoicePaid } from '../publishEvents/publishInvoicePaid';
+import {
+  PublishInvoicePaidUsecase,
+  PublishInvoicePaidDTO,
+} from '../publishEvents/publishInvoicePaid';
 import {
   PublishInvoiceCreatedUsecase,
   PublishInvoiceCreatedDTO,
@@ -68,8 +72,8 @@ interface WithInvoiceId {
 
 interface InvoiceConfirmedData {
   invoiceItems: InvoiceItem[];
+  billingAddress: Address;
   manuscript: Manuscript;
-  address: Address;
   invoice: Invoice;
   payer: Payer;
 }
@@ -81,8 +85,9 @@ interface InvoiceCreatedData {
 }
 
 interface InvoicePayedData {
-  paymentInfo: InvoicePaymentInfo;
+  paymentMethods: PaymentMethod[];
   invoiceItems: InvoiceItem[];
+  billingAddress: Address;
   manuscript: Manuscript;
   payments: Payment[];
   paymentDate: Date;
@@ -92,16 +97,16 @@ interface InvoicePayedData {
 
 interface InvoiceFinalizedData {
   invoiceItems: InvoiceItem[];
+  billingAddress: Address;
   manuscript: Manuscript;
-  address: Address;
   invoice: Invoice;
   payer: Payer;
 }
 
 interface InvoiceCreditedData {
   invoiceItems: InvoiceItem[];
+  billingAddress: Address;
   manuscript: Manuscript;
-  address: Address;
   invoice: Invoice;
   payer: Payer;
 }
@@ -111,6 +116,7 @@ export class GenerateCompensatoryEventsUsecase
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
+    private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private sqsPublish: SQSPublishServiceContract,
     private manuscriptRepo: ArticleRepoContract,
@@ -130,7 +136,6 @@ export class GenerateCompensatoryEventsUsecase
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
     this.sendConfirmedEvent = this.sendConfirmedEvent.bind(this);
     this.attachPaymentDate = this.attachPaymentDate.bind(this);
-    this.attachPaymentInfo = this.attachPaymentInfo.bind(this);
     this.shouldSendCreated = this.shouldSendCreated.bind(this);
     this.attachManuscript = this.attachManuscript.bind(this);
     this.sendCreatedEvent = this.sendCreatedEvent.bind(this);
@@ -146,6 +151,7 @@ export class GenerateCompensatoryEventsUsecase
     this.attachPayments = this.attachPayments.bind(this);
     this.publishInvoiceCredited = this.publishInvoiceCredited.bind(this);
     this.shouldSendCredited = this.shouldSendCredited.bind(this);
+    this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -246,9 +252,9 @@ export class GenerateCompensatoryEventsUsecase
       const usecase = new GetAddressUseCase(this.addressRepo);
 
       if (!request.payer) {
-        return right<null, T & { address: Address }>({
+        return right<null, T & { billingAddress: Address }>({
           ...request,
-          address: null,
+          billingAddress: null,
         });
       }
 
@@ -258,24 +264,7 @@ export class GenerateCompensatoryEventsUsecase
         )
         .map((result) => ({
           ...request,
-          address: result.getValue(),
-        }))
-        .execute();
-    };
-  }
-
-  private attachPaymentInfo(context: Context) {
-    return async <T extends WithInvoiceId>(request: T) => {
-      const usecase = new GetPaymentInfoUsecase(
-        this.invoiceRepo,
-        this.paymentRepo
-      );
-
-      return new AsyncEither(request.invoiceId)
-        .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => ({
-          ...request,
-          paymentInfo: result.getValue(),
+          billingAddress: result.getValue(),
         }))
         .execute();
     };
@@ -294,6 +283,20 @@ export class GenerateCompensatoryEventsUsecase
           ...request,
           payments: result.getValue(),
         }))
+        .execute();
+    };
+  }
+
+  private attachPaymentMethods(context: Context) {
+    return async <T extends {}>(request: T) => {
+      const usecase = new GetPaymentMethodsUseCase(
+        this.paymentMethodRepo,
+        this.loggerService
+      );
+
+      return new AsyncEither(null)
+        .then(() => usecase.execute(null, context))
+        .map((result) => ({ ...request, paymentMethods: result.getValue() }))
         .execute();
     };
   }
@@ -371,16 +374,17 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   private attachPaymentDate(context: Context) {
-    return <T extends WithInvoice & { paymentInfo: InvoicePaymentInfo }>(
-      request: T
-    ) => {
-      const { paymentInfo, invoice } = request;
+    return <T extends WithInvoice & { payments: Payment[] }>(request: T) => {
+      const { payments, invoice } = request;
       let paymentDate: Date;
 
-      if (!paymentInfo?.paymentDate) {
+      if (payments.length == 0) {
         paymentDate = invoice.dateIssued;
       } else {
-        paymentDate = new Date(paymentInfo.paymentDate);
+        paymentDate = payments.reduce(
+          (acc, payment) => (acc < payment.datePaid ? payment.datePaid : acc),
+          new Date(0)
+        );
       }
 
       return {
@@ -410,7 +414,7 @@ export class GenerateCompensatoryEventsUsecase
           request.invoiceItems,
           request.manuscript,
           request.payer,
-          request.address,
+          request.billingAddress,
           request.invoice.dateIssued
         );
         return right<Errors.PublishInvoiceConfirmError, void>(result);
@@ -427,25 +431,12 @@ export class GenerateCompensatoryEventsUsecase
 
   private sendPayedEvent(context: Context) {
     return async <T extends InvoicePayedData>(request: T) => {
-      const publishUsecase = new PublishInvoicePaid(this.sqsPublish);
-      try {
-        const result = await publishUsecase.execute(
-          request.invoice,
-          request.invoiceItems,
-          request.manuscript,
-          request.paymentInfo,
-          request.payer,
-          request.paymentDate
-        );
-        return right<Errors.PublishInvoicePayedError, void>(result);
-      } catch (err) {
-        return left<Errors.PublishInvoicePayedError, void>(
-          new Errors.PublishInvoicePayedError(
-            request.invoice.id.toString(),
-            err
-          )
-        );
-      }
+      const publishUsecase = new PublishInvoicePaidUsecase(this.sqsPublish);
+      const data: PublishInvoicePaidDTO = {
+        ...request,
+        messageTimestamp: request.paymentDate,
+      };
+      return publishUsecase.execute(data, context);
     };
   }
 
@@ -458,7 +449,7 @@ export class GenerateCompensatoryEventsUsecase
           request.invoiceItems,
           request.manuscript,
           request.payer,
-          request.address,
+          request.billingAddress,
           request.invoice.dateMovedToFinal
         );
         return right<Errors.PublishInvoiceFinalizedError, void>(result);
@@ -482,7 +473,7 @@ export class GenerateCompensatoryEventsUsecase
           request.invoiceItems,
           request.manuscript,
           request.payer,
-          request.address,
+          request.billingAddress,
           request.invoice.dateIssued
         );
         return right<Errors.PublishInvoiceCreditedError, void>(result);
@@ -554,9 +545,10 @@ export class GenerateCompensatoryEventsUsecase
         .advanceOrEnd(this.shouldSendPayed)
         .then(this.attachInvoiceItems(context))
         .then(this.attachManuscript(context))
-        .then(this.attachPaymentInfo(context))
         .then(this.attachPayer(context))
+        .then(this.attachAddress(context))
         .then(this.attachPayments(context))
+        .then(this.attachPaymentMethods(context))
         .map(this.attachPaymentDate(context))
         .then(this.sendPayedEvent(context))
         .map(() => request)

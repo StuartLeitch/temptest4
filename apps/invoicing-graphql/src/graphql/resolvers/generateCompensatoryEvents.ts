@@ -13,6 +13,7 @@ export const generateCompensatoryEvents: Resolvers<any> = {
       const { invoiceIds, journalIds } = args;
       const {
         repos: {
+          paymentMethod,
           invoiceItem,
           manuscript,
           address,
@@ -26,6 +27,7 @@ export const generateCompensatoryEvents: Resolvers<any> = {
         qq: sqsQueService,
       } = context;
       const usecase = new GenerateCompensatoryEventsUsecase(
+        paymentMethod,
         invoiceItem,
         sqsQueService,
         manuscript,

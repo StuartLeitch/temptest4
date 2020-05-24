@@ -2,6 +2,8 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 
+import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
+
 import { ArticleMap } from '../../../manuscripts/mappers/ArticleMap';
 import { CouponMap } from '../../../coupons/mappers/CouponMap';
 import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
@@ -10,6 +12,7 @@ import { PaymentMap } from '../../../payments/mapper/Payment';
 import { PayerMap } from '../../../payers/mapper/Payer';
 import { InvoiceMap } from '../../mappers/InvoiceMap';
 
+import { MockPaymentMethodRepo } from '../../../payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from '../../../manuscripts/repos/mocks/mockArticleRepo';
 import { MockPaymentRepo } from '../../../payments/repos/mocks/mockPaymentRepo';
 import { MockCouponRepo } from '../../../coupons/repos/mocks/mockCouponRepo';
@@ -262,5 +265,19 @@ export function addWaivers(waiverRepo: MockWaiverRepo) {
     } else {
       waiverRepo.addMockItem(waiver);
     }
+  }
+}
+
+export function addPaymentMethods(paymentMethodRepo: MockPaymentMethodRepo) {
+  const paymentMethodsProps = [
+    {
+      name: 'Migration',
+      isActive: true,
+    },
+  ];
+
+  for (const props of paymentMethodsProps) {
+    const paymentMethod = PaymentMethod.create(props).getValue();
+    paymentMethodRepo.addMockItem(paymentMethod);
   }
 }
