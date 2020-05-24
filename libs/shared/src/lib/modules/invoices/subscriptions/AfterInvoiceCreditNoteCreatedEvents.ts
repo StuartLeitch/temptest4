@@ -18,8 +18,8 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
+import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoiceCredited } from '../usecases/publishEvents/publishInvoiceCredited';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
 
 export class AfterInvoiceCreditNoteCreatedEvent
@@ -34,7 +34,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private publishInvoiceCredited: PublishInvoiceCredited,
+    private publishInvoiceCredited: PublishInvoiceCreditedUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -127,15 +127,15 @@ export class AfterInvoiceCreditNoteCreatedEvent
         payer.billingAddressId
       );
 
-      this.publishInvoiceCredited.execute(
-        paymentMethods.value.getValue(),
+      this.publishInvoiceCredited.execute({
+        paymentMethods: paymentMethods.value.getValue(),
         invoiceItems,
         billingAddress,
         manuscript,
         payments,
         creditNote,
-        payer
-      );
+        payer,
+      });
 
       console.log(
         `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`

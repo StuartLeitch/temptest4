@@ -6,8 +6,8 @@ import {
   MicroframeworkSettings,
 } from 'microframework-w3tec';
 
+import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
-import { PublishInvoiceCredited } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
@@ -67,8 +67,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       queue
     );
     const publishInvoiceFinalized = new PublishInvoiceFinalizedUsecase(queue);
+    const publishInvoiceCredited = new PublishInvoiceCreditedUsecase(queue);
     const publishInvoiceConfirmed = new PublishInvoiceConfirmed(queue);
-    const publishInvoiceCredited = new PublishInvoiceCredited(queue);
     const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
 
     // Registering Invoice Events

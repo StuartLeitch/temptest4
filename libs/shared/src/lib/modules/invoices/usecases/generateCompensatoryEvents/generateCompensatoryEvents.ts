@@ -43,7 +43,10 @@ import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvo
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
 import { PublishInvoiceConfirmed } from '../publishEvents/publishInvoiceConfirmed';
-import { PublishInvoiceCredited } from '../publishEvents/publishInvoiceCredited';
+import {
+  PublishInvoiceCreditedUsecase,
+  PublishInvoiceCreditedDTO,
+} from '../publishEvents/publishInvoiceCredited';
 import {
   PublishInvoiceFinalizedUsecase,
   PublishInvoiceFinalizedDTO,
@@ -109,9 +112,11 @@ interface InvoiceFinalizedData {
 }
 
 interface InvoiceCreditedData {
+  paymentMethods: PaymentMethod[];
   invoiceItems: InvoiceItem[];
   billingAddress: Address;
   manuscript: Manuscript;
+  payments: Payment[];
   invoice: Invoice;
   payer: Payer;
 }
@@ -460,25 +465,13 @@ export class GenerateCompensatoryEventsUsecase
 
   private sendCreditedEvent(context: Context) {
     return async <T extends InvoiceCreditedData>(request: T) => {
-      const publishUsecase = new PublishInvoiceCredited(this.sqsPublish);
-      try {
-        const result = await publishUsecase.execute(
-          request.invoice,
-          request.invoiceItems,
-          request.manuscript,
-          request.payer,
-          request.billingAddress,
-          request.invoice.dateIssued
-        );
-        return right<Errors.PublishInvoiceCreditedError, void>(result);
-      } catch (err) {
-        return left<Errors.PublishInvoiceCreditedError, void>(
-          new Errors.PublishInvoiceCreditedError(
-            request.invoice.id.toString(),
-            err
-          )
-        );
-      }
+      const publishUsecase = new PublishInvoiceCreditedUsecase(this.sqsPublish);
+      const data: PublishInvoiceCreditedDTO = {
+        ...request,
+        messageTimestamp: request.invoice.dateIssued,
+        creditNote: request.invoice,
+      };
+      return publishUsecase.execute(data, context);
     };
   }
 
@@ -576,6 +569,8 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachManuscript(context))
         .then(this.attachPayer(context))
         .then(this.attachAddress(context))
+        .then(this.attachPayments(context))
+        .then(this.attachPaymentMethods(context))
         .map(this.updateInvoiceStatus('DRAFT', 'dateCreated'))
         .then(this.sendCreditedEvent(context))
         .map(() => request)

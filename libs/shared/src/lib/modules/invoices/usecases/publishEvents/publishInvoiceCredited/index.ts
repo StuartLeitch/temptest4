@@ -1,3 +1,4 @@
-import { PublishInvoiceCredited } from './publishInvoiceCredited';
-
-export { PublishInvoiceCredited };
+export * as PublishInvoiceCreditedErrors from './publishInvoiceCredited.errors';
+export * from './publishInvoiceCredited.response';
+export * from './publishInvoiceCredited.dto';
+export * from './publishInvoiceCredited';
