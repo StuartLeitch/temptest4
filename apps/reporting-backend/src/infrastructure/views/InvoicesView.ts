@@ -31,21 +31,21 @@ AS SELECT
     inv.invoice_id as "invoice_id",
     inv.status as "invoice_status",
     inv.gross_apc_value as "gross_apc_value",
-    inv.gross_apc_value - inv.net_apc as "discount",
+    inv."discount",
     inv.net_apc as "net_apc",
-    inv.net_apc * (inv.vat_percentage / 100) as "vat_amount",
+    inv."vat_amount",
     inv.net_amount as "net_amount",
-    inv.net_amount - inv.paid_amount as "due_amount",
+    inv."due_amount",
     inv.paid_amount as "paid_amount",
     article_data.published_date,
     inv.payment_date,
-    inv.payment_reference as "payment_reference",
     inv.payer_given_name as "payer_given_name",
     inv.payer_email as "payer_email",
     inv.payment_type as "payment_type",
     inv.payer_country as "payer_country",
     inv.payer_address as payer_address,
     inv.payment_currency as "payment_currency",
+    inv.organization,
     waivers.waiver_types as waivers,
     coupons.coupon_names as coupons,
     inv.event_id as "event_id",
@@ -67,7 +67,7 @@ AS SELECT
     a.aff as "corresponding_author_affiliation" 
   FROM
     ${invoiceDataView.getViewName()} inv
-  JOIN (select event_id from (select event_id, row_number() over (partition by invoice_id ORDER BY case when id.status = 'FINAL' then 1 when id.status = 'ACTIVE' then 2 else 3 end) as rn from ${invoiceDataView.getViewName()} id) i where i.rn = 1) last_invoices
+  JOIN (select event_id from (select event_id, row_number() over (partition by invoice_id ORDER BY case when id.status = 'FINAL' then 1 when id.status = 'ACTIVE' then 2 else 3 end, event_timestamp desc nulls last) as rn from ${invoiceDataView.getViewName()} id) i where i.rn = 1) last_invoices
     ON last_invoices.event_id = inv.event_id
   LEFT JOIN LATERAL (select * from ${articleDataView.getViewName()} a WHERE
       a.manuscript_custom_id = inv.manuscript_custom_id
