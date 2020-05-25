@@ -89,8 +89,9 @@ export class PublishInvoiceFinalizedUsecase
         event: INVOICE_FINALIZED,
         data,
       });
+      return right(null);
     } catch (err) {
-      throw new AppError.UnexpectedError(err.toString());
+      return left(new AppError.UnexpectedError(err.toString()));
     }
   }
 

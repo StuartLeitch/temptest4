@@ -87,7 +87,6 @@ export class PublishInvoicePaidUsecase
         event: INVOICE_PAID_EVENT,
         data,
       });
-
       return right(null);
     } catch (err) {
       return left(new AppError.UnexpectedError(err.toString()));

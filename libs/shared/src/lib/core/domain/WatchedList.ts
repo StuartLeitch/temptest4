@@ -4,6 +4,10 @@ export abstract class WatchedList<T> {
   private new: T[];
   private removed: T[];
 
+  get length(): number {
+    return this.currentItems.length;
+  }
+
   constructor(initialItems?: T[]) {
     this.currentItems = initialItems ? initialItems : [];
     this.initial = initialItems ? initialItems : [];

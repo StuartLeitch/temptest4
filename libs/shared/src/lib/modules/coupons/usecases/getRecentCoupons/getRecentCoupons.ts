@@ -19,7 +19,7 @@ export class GetRecentCouponsUsecase
   implements
     UseCase<
       {},
-      Promise<GenerateCouponCodeResponse>,
+      Promise<GetRecentCouponsResponse>,
       GetRecentCouponsAuthenticationContext
     >,
     AccessControlledUsecase<

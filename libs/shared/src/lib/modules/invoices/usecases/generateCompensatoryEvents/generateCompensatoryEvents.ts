@@ -2,6 +2,7 @@
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -126,16 +127,19 @@ export class GenerateCompensatoryEventsUsecase
 
   // @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const requestExecution = new AsyncEither<null, DTO>(request)
-      .then(this.verifyInput)
-      .then(this.publishInvoiceCreated(context))
-      .then(this.publishInvoiceConfirmed(context))
-      .then(this.publishInvoicePayed(context))
-      .then(this.publishInvoiceCredited(context))
-      .then(this.publishInvoiceFinalized(context))
-      .map(() => Result.ok<void>(null));
-
-    return requestExecution.execute();
+    try {
+      return new AsyncEither<null, DTO>(request)
+        .then(this.verifyInput)
+        .then(this.publishInvoiceCreated(context))
+        .then(this.publishInvoiceConfirmed(context))
+        .then(this.publishInvoicePayed(context))
+        .then(this.publishInvoiceCredited(context))
+        .then(this.publishInvoiceFinalized(context))
+        .map(() => Result.ok<void>(null))
+        .execute();
+    } catch (err) {
+      return left(new AppError.UnexpectedError(err));
+    }
   }
 
   private async verifyInput(

@@ -3,6 +3,7 @@
 import {
   GenerateCompensatoryEventsUsecase,
   GetInvoicesIdsUsecase,
+  Roles,
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
@@ -48,11 +49,14 @@ export const generateCompensatoryEvents: Resolvers<any> = {
       if (maybeResult.isLeft()) {
         throw new Error(maybeResult.value.errorValue().message);
       }
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
 
       const ids = maybeResult.value.getValue();
 
       for await (const invoiceId of ids) {
-        const result = await usecase.execute({ invoiceId });
+        const result = await usecase.execute({ invoiceId }, usecaseContext);
         if (result.isLeft()) {
           throw new Error(result.value.errorValue().message);
         }
