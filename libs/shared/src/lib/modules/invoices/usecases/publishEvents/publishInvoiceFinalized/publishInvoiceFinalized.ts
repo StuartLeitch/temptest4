@@ -62,11 +62,11 @@ export class PublishInvoiceFinalizedUsecase
       ...EventUtils.createEventObject(),
 
       referenceNumber: this.formatReferenceNumber(invoice),
+      isCreditNote: !!invoice.cancelledInvoiceReference,
       transactionId: invoice.transactionId.toString(),
       erpReference: invoice.erpReference,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status,
-      isCreditNote: false,
 
       lastPaymentDate: calculateLastPaymentDate(payments)?.toISOString(),
       invoiceFinalizedDate: invoice?.dateMovedToFinal?.toISOString(),

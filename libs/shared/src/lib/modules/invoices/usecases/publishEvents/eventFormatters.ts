@@ -9,6 +9,8 @@ import {
   InvoicePayer as PhenomPayer,
 } from '@hindawi/phenom-events/src/lib/invoice';
 
+import { Name } from '../../../../domain/Name';
+
 import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 import { Address } from '../../../addresses/domain/Address';
 import { Payment } from '../../../payments/domain/Payment';
@@ -21,9 +23,9 @@ export function formatCoupons(coupons: Coupons): PhenomCoupon[] {
   if (!coupons) return undefined;
   return coupons.map((coupon) => ({
     applicableToInvoiceItemType: coupon.invoiceItemType as CouponApplicableInvoiceItemType,
-    couponExpirationDate: coupon.expirationDate.toISOString(),
-    couponCreatedDate: coupon.dateCreated.toISOString(),
-    couponUpdatedDate: coupon.dateUpdated.toISOString(),
+    couponExpirationDate: coupon?.expirationDate?.toISOString(),
+    couponCreatedDate: coupon?.dateCreated?.toISOString(),
+    couponUpdatedDate: coupon?.dateUpdated?.toISOString(),
     couponType: coupon.couponType as PhenomCouponType,
     couponReduction: coupon.reduction,
     code: coupon.code.toString(),
@@ -39,13 +41,21 @@ export function formatWaiver(waivers: Waiver[]): PhenomWaiver[] {
   }));
 }
 
+function formatOrganization(organization: Name): string {
+  if (!organization || organization.toString() === ' ') {
+    return null;
+  } else {
+    return organization.toString();
+  }
+}
+
 export function formatPayer(
   payer: Payer,
   billingAddress: Address
 ): PhenomPayer {
   return {
     billingAddress: `${billingAddress.addressLine1} ${billingAddress.city} ${billingAddress.country}`,
-    organization: payer.organization.toString(),
+    organization: formatOrganization(payer.organization),
     vatRegistrationNumber: payer.VATId,
     firstName: payer.name.toString(),
     email: payer.email.toString(),
@@ -119,7 +129,7 @@ export function formatPayments(
 
   return payments.map((payment) => ({
     paymentType: methods[payment.paymentMethodId.toString()].name,
-    paymentDate: payment.datePaid.toISOString(),
+    paymentDate: payment?.datePaid?.toISOString(),
     foreignPaymentId: payment.foreignPaymentId,
     paymentAmount: payment.amount.value,
   }));

@@ -65,7 +65,7 @@ export class PublishInvoiceCreditedUsecase
       erpReference: creditNote.erpReference,
       invoiceId: creditNote.id.toString(),
       invoiceStatus: creditNote.status,
-      isCreditNote: false,
+      isCreditNote: true,
 
       lastPaymentDate: calculateLastPaymentDate(payments)?.toISOString(),
       invoiceFinalizedDate: creditNote?.dateMovedToFinal?.toISOString(),

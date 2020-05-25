@@ -20,6 +20,7 @@ import { Address } from '../../../addresses/domain/Address';
 import { Payment } from '../../../payments/domain/Payment';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
+import { Invoice } from '../../domain/Invoice';
 
 import { PaymentMethodRepoContract } from '../../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
@@ -75,6 +76,14 @@ import {
   WithInvoice,
 } from './actionTypes';
 
+function originalInvoiceId(invoice: Invoice): string {
+  if (invoice.cancelledInvoiceReference) {
+    return invoice.cancelledInvoiceReference.toString();
+  } else {
+    return invoice.id.toString();
+  }
+}
+
 type Context = AuthorizationContext<Roles>;
 export type GenerateCompensatoryEventsContext = Context;
 
@@ -128,7 +137,7 @@ export class GenerateCompensatoryEventsUsecase
   // @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      return new AsyncEither<null, DTO>(request)
+      const execution = await new AsyncEither<null, DTO>(request)
         .then(this.verifyInput)
         .then(this.publishInvoiceCreated(context))
         .then(this.publishInvoiceConfirmed(context))
@@ -137,7 +146,9 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.publishInvoiceFinalized(context))
         .map(() => Result.ok<void>(null))
         .execute();
+      return execution;
     } catch (err) {
+      console.log('esti bou');
       return left(new AppError.UnexpectedError(err));
     }
   }
@@ -184,13 +195,14 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   private attachManuscript(context: Context) {
-    return async <T extends WithInvoiceId>(request: T) => {
+    return async <T extends WithInvoice>(request: T) => {
       const usecase = new GetManuscriptByInvoiceIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
       );
+      const id = originalInvoiceId(request.invoice);
 
-      return new AsyncEither(request.invoiceId)
+      return new AsyncEither(id)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
         .map((result) => ({
           ...request,
@@ -201,13 +213,14 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   private attachPayer(context: Context) {
-    return async <T extends WithInvoiceId>(request: T) => {
+    return async <T extends WithInvoice>(request: T) => {
       const usecase = new GetPayerDetailsByInvoiceIdUsecase(
         this.payerRepo,
         this.loggerService
       );
+      const id = originalInvoiceId(request.invoice);
 
-      return new AsyncEither(request.invoiceId)
+      return new AsyncEither(id)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
         .map((result) => ({
           ...request,
@@ -241,13 +254,14 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   private attachPayments(context: Context) {
-    return async <T extends WithInvoiceId>(request: T) => {
+    return async <T extends WithInvoice>(request: T) => {
       const usecase = new GetPaymentsByInvoiceIdUsecase(
         this.invoiceRepo,
         this.paymentRepo
       );
+      const id = originalInvoiceId(request.invoice);
 
-      return new AsyncEither(request.invoiceId)
+      return new AsyncEither(id)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
         .map((result) => ({
           ...request,
