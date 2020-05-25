@@ -15,14 +15,10 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
-import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Address } from '../../../addresses/domain/Address';
 import { Payment } from '../../../payments/domain/Payment';
-import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
-import { Invoice } from '../../domain/Invoice';
 
 import { PaymentMethodRepoContract } from '../../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
@@ -68,61 +64,18 @@ import { GenerateCompensatoryEventsResponse as Response } from './generateCompen
 import { GenerateCompensatoryEventsDTO as DTO } from './generateCompensatoryEventsDTO';
 import * as Errors from './generateCompensatoryEventsErrors';
 
+import {
+  InvoiceConfirmedData,
+  InvoiceFinalizedData,
+  InvoiceCreditedData,
+  InvoiceCreatedData,
+  InvoicePayedData,
+  WithInvoiceId,
+  WithInvoice,
+} from './actionTypes';
+
 type Context = AuthorizationContext<Roles>;
 export type GenerateCompensatoryEventsContext = Context;
-
-interface WithInvoice {
-  invoice: Invoice;
-}
-
-interface WithInvoiceId {
-  invoiceId: string;
-}
-
-interface InvoiceConfirmedData {
-  invoiceItems: InvoiceItem[];
-  billingAddress: Address;
-  manuscript: Manuscript;
-  invoice: Invoice;
-  payer: Payer;
-}
-
-interface InvoiceCreatedData {
-  invoiceItems: InvoiceItem[];
-  manuscript: Manuscript;
-  invoice: Invoice;
-}
-
-interface InvoicePayedData {
-  paymentMethods: PaymentMethod[];
-  invoiceItems: InvoiceItem[];
-  billingAddress: Address;
-  manuscript: Manuscript;
-  payments: Payment[];
-  paymentDate: Date;
-  invoice: Invoice;
-  payer: Payer;
-}
-
-interface InvoiceFinalizedData {
-  paymentMethods: PaymentMethod[];
-  invoiceItems: InvoiceItem[];
-  billingAddress: Address;
-  manuscript: Manuscript;
-  payments: Payment[];
-  invoice: Invoice;
-  payer: Payer;
-}
-
-interface InvoiceCreditedData {
-  paymentMethods: PaymentMethod[];
-  invoiceItems: InvoiceItem[];
-  billingAddress: Address;
-  manuscript: Manuscript;
-  payments: Payment[];
-  invoice: Invoice;
-  payer: Payer;
-}
 
 export class GenerateCompensatoryEventsUsecase
   implements
@@ -142,29 +95,29 @@ export class GenerateCompensatoryEventsUsecase
     private loggerService: LoggerContract
   ) {
     this.publishInvoiceConfirmed = this.publishInvoiceConfirmed.bind(this);
+    this.publishInvoiceFinalized = this.publishInvoiceFinalized.bind(this);
+    this.publishInvoiceCredited = this.publishInvoiceCredited.bind(this);
     this.publishInvoiceCreated = this.publishInvoiceCreated.bind(this);
+    this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
     this.publishInvoicePayed = this.publishInvoicePayed.bind(this);
     this.shouldSendConfirmed = this.shouldSendConfirmed.bind(this);
     this.updateInvoiceStatus = this.updateInvoiceStatus.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
     this.sendConfirmedEvent = this.sendConfirmedEvent.bind(this);
+    this.sendFinalizedEvent = this.sendFinalizedEvent.bind(this);
+    this.shouldSendCredited = this.shouldSendCredited.bind(this);
+    this.shouldSendFinalize = this.shouldSendFinalize.bind(this);
     this.attachPaymentDate = this.attachPaymentDate.bind(this);
     this.shouldSendCreated = this.shouldSendCreated.bind(this);
     this.attachManuscript = this.attachManuscript.bind(this);
     this.sendCreatedEvent = this.sendCreatedEvent.bind(this);
     this.shouldSendPayed = this.shouldSendPayed.bind(this);
+    this.attachPayments = this.attachPayments.bind(this);
     this.sendPayedEvent = this.sendPayedEvent.bind(this);
     this.attachAddress = this.attachAddress.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
     this.verifyInput = this.verifyInput.bind(this);
-    this.shouldSendFinalize = this.shouldSendFinalize.bind(this);
-    this.publishInvoiceFinalized = this.publishInvoiceFinalized.bind(this);
-    this.sendFinalizedEvent = this.sendFinalizedEvent.bind(this);
-    this.attachPayments = this.attachPayments.bind(this);
-    this.publishInvoiceCredited = this.publishInvoiceCredited.bind(this);
-    this.shouldSendCredited = this.shouldSendCredited.bind(this);
-    this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {

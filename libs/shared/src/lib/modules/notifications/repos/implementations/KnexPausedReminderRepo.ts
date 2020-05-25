@@ -16,7 +16,7 @@ import {
   emptyPause,
 } from './knexPausedReminderUtils';
 
-import { Transform, Readable } from 'stream';
+import { Transform } from 'stream';
 
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'pauseConfirmation',
