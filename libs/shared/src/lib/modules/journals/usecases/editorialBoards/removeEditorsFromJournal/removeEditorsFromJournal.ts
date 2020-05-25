@@ -16,36 +16,36 @@ import { EditorRepoContract } from '../../../repos/editorRepo';
 import { JournalId } from '../../../domain/JournalId';
 // import { Editor } from '../../../domain/Editor';
 import { CatalogRepoContract } from '../../../repos';
-import { CreateEditorDTO } from '../createEditor/createEditorDTO';
+import { DeleteEditorDTO } from '../deleteEditor/deleteEditorDTO';
 import { CreateEditor } from '../createEditor/createEditor';
 
-interface AssignEditorsToJournalDTO {
+interface RemoveEditorsFromJournalDTO {
   journalId: string;
 
   // when an editor is added the event contains all the editors previous to the change and the new ones
-  // we have to check which editors are not present and add the entries
-  allEditors: CreateEditorDTO[];
+  // we have to check which editors are not present and remove the entries
+  allEditors: DeleteEditorDTO[];
 }
 
-type AssignEditorsToJournalResponse = Either<
-  AppError.UnexpectedError | Result<any>,
-  Result<void>
+type RemoveEditorsFromJournalResponse = Either<
+  AppError.UnexpectedError | unknown,
+  null
 >;
 
-export type AssignEditorsToJournalAuthorizationContext = AuthorizationContext<
+export type RemoveEditorsFromJournalAuthorizationContext = AuthorizationContext<
   Roles
 >;
 
-export class AssignEditorsToJournalUsecase
+export class RemoveEditorsFromJournalUsecase
   implements
     UseCase<
-      AssignEditorsToJournalDTO,
-      Promise<AssignEditorsToJournalResponse>,
-      AssignEditorsToJournalAuthorizationContext
+      RemoveEditorsFromJournalDTO,
+      Promise<RemoveEditorsFromJournalResponse>,
+      RemoveEditorsFromJournalAuthorizationContext
     >,
     AccessControlledUsecase<
-      AssignEditorsToJournalDTO,
-      AssignEditorsToJournalAuthorizationContext,
+      RemoveEditorsFromJournalDTO,
+      RemoveEditorsFromJournalAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -53,14 +53,15 @@ export class AssignEditorsToJournalUsecase
     private catalogRepo: CatalogRepoContract
   ) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async getAccessControlContext(request, context?) {
     return {};
   }
 
   public async execute(
-    request: AssignEditorsToJournalDTO,
-    context?: AssignEditorsToJournalAuthorizationContext
-  ): Promise<AssignEditorsToJournalResponse> {
+    request: RemoveEditorsFromJournalDTO,
+    context?: RemoveEditorsFromJournalAuthorizationContext
+  ): Promise<RemoveEditorsFromJournalResponse> {
     const { journalId: journalIdString, allEditors: editors } = request;
     const allEditors = editors.map((e) => ({
       ...e,
@@ -99,20 +100,20 @@ export class AssignEditorsToJournalUsecase
       console.log(`Current editor number: ${currentEditorsIds.length}`);
       console.log(`Expected editor number: ${allEditors.length}`);
 
-      const editorsToCreate = allEditors.filter((e) => {
+      const editorsToRemove = allEditors.filter((e) => {
         // TODO filter assistants
         const isCreated = currentEditorsIds.includes(e.editorId);
         return !isCreated;
       });
 
       console.log(
-        `Creating ${editorsToCreate.length} editors`,
-        editorsToCreate.map((e) => e.email).join(' ')
+        `Creating ${editorsToRemove.length} editors`,
+        editorsToRemove.map((e) => e.email).join(' ')
       );
 
       const createEditorUsecase = new CreateEditor(this.editorRepo);
       const createEditorsResponse = await Promise.all(
-        editorsToCreate.map((e) => createEditorUsecase.execute(e))
+        editorsToRemove.map((e) => createEditorUsecase.execute(e))
       );
 
       const errs = [];

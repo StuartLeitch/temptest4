@@ -1,8 +1,10 @@
+/* eslint-disable no-undef */
+
 module.exports = {
   name: 'shared',
   preset: '../../jest.config.js',
   transform: {
-    '^.+\\.[tj]sx?$': 'ts-jest'
+    '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
   reporters: [
@@ -11,10 +13,10 @@ module.exports = {
       'jest-junit',
       {
         outputDirectory: 'coverage/libs/shared',
-        outputName: 'junit.xml'
-      }
-    ]
+        outputName: 'junit.xml',
+      },
+    ],
   ],
   collectCoverage: true,
-  coverageDirectory: '../../coverage/libs/shared'
+  coverageDirectory: '../../coverage/libs/shared',
 };
