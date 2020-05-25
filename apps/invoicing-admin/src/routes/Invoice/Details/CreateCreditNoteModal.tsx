@@ -24,11 +24,51 @@ import SuccessfulCreditNoteCreatedToast from './SuccessfulCreditNoteCreatedToast
 
 import { CREATE_CREDIT_NOTE_MUTATION } from '../graphql';
 
-export default ({ target, invoiceId, invoiceItem, total }) => {
+const CreateCreditNoteModal = ({
+  target,
+  invoiceId,
+  invoiceItem,
+  total,
+  onSaveCallback,
+}: CreateCreditNoteModalProps) => {
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,
   });
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState('');
+
+  const saveCreditNote = async () => {
+    setInProgress(true);
+    setError('');
+
+    try {
+      const recordCreditNoteResult = await recordCreditNote({
+        variables: {
+          ...creditNoteData,
+          invoiceId,
+        },
+      });
+
+      const resultError =
+        recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
+
+      if (!resultError) {
+        onSaveCallback();
+        return toast.success(SuccessfulCreditNoteCreatedToast);
+      } else {
+        setError(resultError);
+      }
+    } catch (e) {
+      setError('An error occurred. Please try again.');
+    }
+
+    setInProgress(false);
+  };
+
+  const onModalClose = () => {
+    setError('');
+  };
 
   return (
     <UncontrolledModal target={target} centered>
@@ -61,7 +101,7 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
                 </Label>
                 <Col sm={8}>
                   <span className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-                    {numeral(total.toFixed(2) * -1).format('$0.00')}
+                    {numeral(Number(total.toFixed(2)) * -1).format('$0.00')}
                   </span>
                 </Col>
               </>
@@ -76,6 +116,7 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
                 type='select'
                 name='createDraft'
                 id='draftReason'
+                defaultValue={0}
                 onChange={(e) => {
                   const { value } = e.target;
                   setCreditNoteData({
@@ -84,9 +125,7 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
                   });
                 }}
               >
-                <option value='0' selected>
-                  Withdrawn Manuscript
-                </option>
+                <option value='0'>Withdrawn Manuscript</option>
                 <option value='1'>Reduction Applied</option>
                 <option value='0'>Waived Manuscript</option>
                 <option value='1'>Change Payer Details</option>
@@ -97,30 +136,39 @@ export default ({ target, invoiceId, invoiceItem, total }) => {
         </Form>
         {/* END Form */}
       </ModalBody>
-      <ModalFooter>
-        <UncontrolledModal.Close color='link' className='text-primary'>
-          <i className='fas fa-close mr-2'></i>
-          Close
-        </UncontrolledModal.Close>
-        <UncontrolledModal.Close color='link' className='text-primary'>
-          <Button
-            color='primary'
-            onClick={async (e) => {
-              await recordCreditNote({
-                variables: {
-                  ...creditNoteData,
-                  invoiceId,
-                },
-              });
 
-              return toast.success(SuccessfulCreditNoteCreatedToast);
-            }}
+      <ModalFooter className='justify-content-between'>
+        <span className='medium text-muted text-danger w-50'>{error}</span>
+        <div>
+          <UncontrolledModal.Close
+            color='link'
+            className='text-primary'
+            onClose={onModalClose}
           >
-            <i className='fas fa-check mr-2'></i>
+            <i className='fas fa-close mr-2'></i>
+            Close
+          </UncontrolledModal.Close>
+
+          <Button color='primary' onClick={saveCreditNote}>
+            {inProgress ? (
+              <i className='fas fa-fw fa-spinner fa-spin mr-2'></i>
+            ) : (
+              <i className='fas fa-check mr-2'></i>
+            )}
             Save
           </Button>
-        </UncontrolledModal.Close>
+        </div>
       </ModalFooter>
     </UncontrolledModal>
   );
 };
+
+interface CreateCreditNoteModalProps {
+  target: string;
+  invoiceId: string;
+  invoiceItem: object;
+  total: number;
+  onSaveCallback(): any;
+}
+
+export default CreateCreditNoteModal;
