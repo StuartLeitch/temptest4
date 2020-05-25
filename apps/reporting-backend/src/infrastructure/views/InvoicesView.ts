@@ -67,7 +67,7 @@ AS SELECT
     a.aff as "corresponding_author_affiliation" 
   FROM
     ${invoiceDataView.getViewName()} inv
-  JOIN (select event_id from (select event_id, row_number() over (partition by invoice_id ORDER BY case when id.status = 'FINAL' then 1 when id.status = 'ACTIVE' then 2 else 3 end, event_timestamp desc nulls last) as rn from ${invoiceDataView.getViewName()} id) i where i.rn = 1) last_invoices
+  JOIN (select event_id from (select event_id, row_number() over (${invoiceDataView.getPartitionQuery()}) as rn from ${invoiceDataView.getViewName()} id) i where i.rn = 1) last_invoices
     ON last_invoices.event_id = inv.event_id
   LEFT JOIN LATERAL (select * from ${articleDataView.getViewName()} a WHERE
       a.manuscript_custom_id = inv.manuscript_custom_id

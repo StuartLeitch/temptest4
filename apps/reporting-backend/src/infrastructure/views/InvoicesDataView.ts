@@ -60,6 +60,10 @@ WITH DATA;
   getViewName(): string {
     return 'invoices_data';
   }
+
+  getPartitionQuery(invoiceDataAlias = 'id'): string {
+    return `partition by ${invoiceDataAlias}.invoice_id ORDER BY case when ${invoiceDataAlias}.status = 'FINAL' then 1 when ${invoiceDataAlias}.status = 'ACTIVE' then 2 else 3 end, ${invoiceDataAlias}.event_timestamp desc nulls last`;
+  }
 }
 
 const invoiceDataView = new InvoicesDataView();

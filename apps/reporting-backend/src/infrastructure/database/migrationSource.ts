@@ -111,8 +111,12 @@ class KnexMigrationSource {
     ),
     rebuild_materialized_views('20200507121500_add_inv_payer_address', true),
     rebuild_materialized_views('20200511082600_fix_submission_dates', true),
-    rebuild_materialized_views('20200513191500_reviews_type_submission_dates', true),
-    rebuild_materialized_views('20200525131500_invoices_costs_changes'),
+    rebuild_materialized_views(
+      '20200513191500_reviews_type_submission_dates',
+      true
+    ),
+    rebuild_materialized_views('20200525131500_invoices_costs_changes', true),
+    rebuild_materialized_views('20200525181500_add_payments_view'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
