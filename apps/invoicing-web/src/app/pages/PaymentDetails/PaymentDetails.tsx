@@ -119,6 +119,8 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     );
   }
 
+  console.info(invoice);
+
   return (
     <Fragment>
       <PaymentHeader articleTitle={invoice.article.title} />
@@ -148,7 +150,8 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
           <InvoicePayment
             ccToken={token}
             methods={paymentMethods}
-            status={invoice.status}
+            invoiceStatus={invoice.status}
+            paymentStatus={invoice?.payments?.map((p) => p.status)}
             error={creditCardPaymentError || payPalPaymentError}
             payByCardSubmit={payByCard}
             payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}

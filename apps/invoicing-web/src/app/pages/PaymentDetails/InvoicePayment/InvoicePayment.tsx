@@ -27,6 +27,8 @@ const PAYMENT_METHODS = {
   bankTransfer: "bankTransfer",
 };
 
+type PaymentStatus = "PENDING" | "FAILED" | "COMPLETED";
+
 interface Props {
   ccToken: string;
   invoice: any;
@@ -34,13 +36,14 @@ interface Props {
   invoiceCharge: number;
   invoiceIsPaid: boolean;
   loading: boolean;
-  status: "DRAFT" | "ACTIVE" | "FINAL" | "PENDING";
+  invoiceStatus: "DRAFT" | "ACTIVE" | "FINAL" | "PENDING";
+  paymentStatus: PaymentStatus[];
   methods: Record<string, string>;
   payByCardSubmit: (data: any) => void;
   payByPayPalSubmit: (data: any) => void;
 }
 
-const validateFn = methods => values => {
+const validateFn = (methods) => (values) => {
   if (methods[values.paymentMethodId] === "Paypal") return {};
 
   const errors: any = {};
@@ -63,7 +66,7 @@ const validateFn = methods => values => {
 
 const calculateTotalToBePaid = (invoice: any) => {
   let netValue = invoice.invoiceItem.price;
-  let { coupons } = invoice.invoiceItem;
+  const { coupons } = invoice.invoiceItem;
   if (coupons && coupons.length) {
     let discount = invoice.invoiceItem.coupons.reduce(
       (acc, curr) => acc + curr.reduction,
@@ -101,7 +104,8 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   loading,
   invoiceCharge,
   invoiceIsPaid,
-  status,
+  invoiceStatus,
+  paymentStatus,
   payByCardSubmit,
   payByPayPalSubmit,
   ccToken,
@@ -120,9 +124,9 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     <Expander
       title="2. Invoice &amp; Payment"
       expanded={
-        status === "ACTIVE" || status === "FINAL" || "PENDING" ? true : false
+        invoiceStatus !== "DRAFT" || !paymentStatus.includes("COMPLETED")
       }
-      disabled={status === "DRAFT"}
+      disabled={invoiceStatus === "DRAFT"}
     >
       {invoiceIsPaid ? (
         <SuccessfulPayment
@@ -131,7 +135,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
           }}
           payerId={invoice.payer.id}
         />
-      ) : status === "PENDING" ? (
+      ) : invoiceStatus === "PENDING" ? (
         <Text my="4" ml="4">
           Your invoice is currently pending. You will be contacted soon by our
           invoicing team. Thank you for your understanding

@@ -62,6 +62,27 @@ export const waiverFragment = gql`
   }
 `;
 
+export const paymentFragment = gql`
+  fragment paymentFragment on Payment {
+    id
+    status
+    foreignPaymentId
+    amount
+    datePaid
+    paymentMethod {
+      ...paymentMethodFragment
+    }
+  }
+`;
+
+export const paymentMethodFragment = gql`
+  fragment paymentMethodFragment on PaymentMethod {
+    id
+    name
+    isActive
+  }
+`;
+
 export const invoiceFragment = gql`
   fragment invoiceFragment on Invoice {
     invoiceId
@@ -72,6 +93,9 @@ export const invoiceFragment = gql`
     referenceNumber
     payer {
       ...payerFragment
+    }
+    payments {
+      ...paymentFragment
     }
     invoiceItem {
       id
@@ -95,4 +119,6 @@ export const invoiceFragment = gql`
   ${couponFragment}
   ${waiverFragment}
   ${articleFragment}
+  ${paymentFragment}
+  ${paymentMethodFragment}
 `;
