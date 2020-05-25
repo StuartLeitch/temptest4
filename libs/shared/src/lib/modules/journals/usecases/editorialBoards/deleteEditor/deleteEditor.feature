@@ -3,7 +3,7 @@ Feature: Delete Editor Usecase
   #And some other stuff
 
   #some comment here if necessary
-  Scenario Outline: Delete
+  Scenario Outline: Delete Editor(s)
     Given There are <start> editors
     When I delete <remove> editors
     Then I should have <left> editors
