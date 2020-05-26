@@ -128,18 +128,14 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
         contacted soon by our invoicing team. Thank you for your understanding.
       </Text>
     );
-  }
-
-  if (paymentStatus.includes("PENDING")) {
+  } else if (paymentStatus.includes("PENDING")) {
     body = (
       <Text my="4" ml="4">
         Your <strong>payment</strong> is currently pending. You will be
         contacted soon by our invoicing team. Thank you for your understanding.
       </Text>
     );
-  }
-
-  if (invoiceIsPaid) {
+  } else if (invoiceIsPaid) {
     body = (
       <SuccessfulPayment
         onViewInvoice={() => {
