@@ -3,7 +3,7 @@
 
 // import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 import { RemoveEditorsFromJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
-// import { JournalEventMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
+import { JournalEventMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
 import { Logger } from '../../lib/logger';
 
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
@@ -34,10 +34,10 @@ function removeEditorEventHandlerFactory(eventName: string): any {
         allEditors: editors,
       });
 
-      if (editorsRemovedResponse.isLeft()) {
-        logger.error(editorsRemovedResponse.value.errorValue().message);
-        throw editorsRemovedResponse.value.error;
-      }
+      // if (editorsRemovedResponse.isLeft()) {
+      //   logger.error(editorsRemovedResponse.value.errorValue().message);
+      //   throw editorsRemovedResponse.value.error;
+      // }
 
       logger.info(`Successfully executed event ${eventName}`);
     } catch (error) {

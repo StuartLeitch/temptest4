@@ -17,7 +17,7 @@ import { JournalId } from '../../../domain/JournalId';
 // import { Editor } from '../../../domain/Editor';
 import { CatalogRepoContract } from '../../../repos';
 import { DeleteEditorDTO } from '../deleteEditor/deleteEditorDTO';
-import { CreateEditor } from '../createEditor/createEditor';
+import { DeleteEditor } from '../deleteEditor/deleteEditor';
 
 interface RemoveEditorsFromJournalDTO {
   journalId: string;
@@ -60,6 +60,7 @@ export class RemoveEditorsFromJournalUsecase
 
   public async execute(
     request: RemoveEditorsFromJournalDTO,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context?: RemoveEditorsFromJournalAuthorizationContext
   ): Promise<RemoveEditorsFromJournalResponse> {
     const { journalId: journalIdString, allEditors: editors } = request;
@@ -97,8 +98,8 @@ export class RemoveEditorsFromJournalUsecase
 
       const currentEditorsIds = currentEditors.map((e) => e.id.toString());
 
-      console.log(`Current editor number: ${currentEditorsIds.length}`);
-      console.log(`Expected editor number: ${allEditors.length}`);
+      // console.log(`Current editors number: ${currentEditorsIds.length}`);
+      // console.log(`Expected editors number: ${allEditors.length}`);
 
       const editorsToRemove = allEditors.filter((e) => {
         // TODO filter assistants
@@ -106,18 +107,18 @@ export class RemoveEditorsFromJournalUsecase
         return !isCreated;
       });
 
-      console.log(
-        `Creating ${editorsToRemove.length} editors`,
-        editorsToRemove.map((e) => e.email).join(' ')
-      );
+      // console.log(
+      //   `Deleting ${editorsToRemove.length} editors`,
+      //   editorsToRemove.map((e) => e.email).join(' ')
+      // );
 
-      const createEditorUsecase = new CreateEditor(this.editorRepo);
-      const createEditorsResponse = await Promise.all(
-        editorsToRemove.map((e) => createEditorUsecase.execute(e))
+      const deleteEditorUsecase = new DeleteEditor(this.editorRepo);
+      const deleteEditorsResponse = await Promise.all(
+        editorsToRemove.map((e) => deleteEditorUsecase.execute(e))
       );
 
       const errs = [];
-      for (const editorResponse of createEditorsResponse) {
+      for (const editorResponse of deleteEditorsResponse) {
         if (editorResponse.isLeft()) {
           errs.push(editorResponse.value);
         }
@@ -127,7 +128,7 @@ export class RemoveEditorsFromJournalUsecase
         return left(new AppError.UnexpectedError(errs));
       }
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

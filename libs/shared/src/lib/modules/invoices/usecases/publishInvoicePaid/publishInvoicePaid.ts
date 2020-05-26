@@ -1,4 +1,4 @@
-import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoiceItem';
+import { InvoiceItemType } from '@hindawi/phenom-events/src/lib/invoice/invoiceItem';
 // import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';

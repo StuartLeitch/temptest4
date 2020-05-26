@@ -2,6 +2,7 @@
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../../core/logic/Result';
 import { AppError } from '../../../../../core/logic/AppError';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 import { EditorRole } from './../../../../../domain/EditorRole';
 import { Email } from './../../../../../domain/Email';
@@ -15,11 +16,10 @@ import { CreateEditorResponse } from './createEditorResponse';
 import {
   AccessControlContext,
   AccessControlledUsecase,
-  CreateEditorAuthorizationContext
+  CreateEditorAuthorizationContext,
 } from './createEditorAuthorizationContext';
 import { JournalId } from '../../../domain/JournalId';
-import { UserId } from '@hindawi/shared';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import { UserId } from '../../../../users/domain/UserId';
 
 export class CreateEditor
   implements
@@ -65,7 +65,7 @@ export class CreateEditor
 
       const editorRoleOrError = EditorRole.create({
         label: request.roleLabel,
-        type: request.roleType
+        type: request.roleType,
       });
       if (editorRoleOrError.isFailure) {
         return left(editorRoleOrError);
@@ -89,7 +89,7 @@ export class CreateEditor
         createdAt: request.createdAt || new Date(),
         journalId,
         userId,
-        updatedAt: request.updatedAt || new Date()
+        updatedAt: request.updatedAt || new Date(),
       };
 
       const editorOrError = Editor.create(
