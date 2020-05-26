@@ -27,10 +27,10 @@ import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
 export function addInvoices(invoicesRepo: MockInvoiceRepo) {
   const invoicesProps = [
     {
-      dateMovedToFinal: '2019-12-01',
+      dateMovedToFinal: '2019-12-03',
       dateAccepted: '2019-10-13',
       dateCreated: '2018-12-15',
-      dateUpdated: '2019-12-01',
+      dateUpdated: '2019-12-03',
       dateIssued: '2019-11-01',
       transactionId: '1',
       status: 'FINAL',
@@ -87,10 +87,10 @@ export function addInvoices(invoicesRepo: MockInvoiceRepo) {
     },
     {
       cancelledInvoiceReference: '6',
-      dateMovedToFinal: '2019-12-01',
+      dateMovedToFinal: '2019-12-03',
       dateAccepted: '2019-10-13',
       dateCreated: '2019-12-01',
-      dateUpdated: '2019-12-01',
+      dateUpdated: '2019-12-03',
       dateIssued: '2019-12-01',
       transactionId: '6',
       status: 'FINAL',

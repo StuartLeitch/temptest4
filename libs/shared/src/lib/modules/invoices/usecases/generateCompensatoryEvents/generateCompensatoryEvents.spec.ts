@@ -121,6 +121,12 @@ describe('migrate entire invoice usecase', () => {
     expect(
       sqsPublishService.messages[2].data.invoiceItems[0].coupons.length
     ).toBe(1);
+
+    expect(sqsPublishService.messages[3].event).toBe('InvoiceFinalized');
+    expect(sqsPublishService.messages[3].timestamp).toContain('2019-12-03');
+    expect(
+      sqsPublishService.messages[3].data.invoiceItems[0].coupons.length
+    ).toBe(1);
   });
 
   it('should not send events if the invoice with provided id is draft and has no acceptance date', async () => {
