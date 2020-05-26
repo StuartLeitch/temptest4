@@ -14,10 +14,10 @@ import { contextLoader } from './loaders/contextLoader';
 import { expressLoader } from './loaders/expressLoader';
 import { monitorLoader } from './loaders/monitorLoader';
 import { graphqlLoader } from './loaders/graphqlLoader';
-// import { queueServiceLoader } from './loaders/queueServiceLoader';
-// import { schedulerLoader } from './loaders/schedulerLoader';
-// import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
-// import { sisifLoader } from './loaders/sisifLoader';
+import { queueServiceLoader } from './loaders/queueServiceLoader';
+import { schedulerLoader } from './loaders/schedulerLoader';
+import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
+import { sisifLoader } from './loaders/sisifLoader';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -41,10 +41,10 @@ bootstrapMicroframework({
     expressLoader,
     monitorLoader,
     graphqlLoader,
-    // queueServiceLoader,
-    // schedulerLoader,
-    // domainEventsRegisterLoader,
-    // sisifLoader,
+    queueServiceLoader,
+    schedulerLoader,
+    domainEventsRegisterLoader,
+    sisifLoader,
   ],
 })
   .then(() => banner(log))

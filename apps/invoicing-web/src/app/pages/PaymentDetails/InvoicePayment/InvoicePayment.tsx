@@ -126,7 +126,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       expanded={
         invoiceStatus !== "DRAFT" || !paymentStatus.includes("COMPLETED")
       }
-      disabled={invoiceStatus === "DRAFT"}
+      disabled={invoiceStatus === "DRAFT" || paymentStatus.includes("PENDING")}
     >
       {invoiceIsPaid ? (
         <SuccessfulPayment
@@ -135,7 +135,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
           }}
           payerId={invoice.payer.id}
         />
-      ) : invoiceStatus === "PENDING" ? (
+      ) : paymentStatus.includes("PENDING") ? (
         <Text my="4" ml="4">
           Your invoice is currently pending. You will be contacted soon by our
           invoicing team. Thank you for your understanding
