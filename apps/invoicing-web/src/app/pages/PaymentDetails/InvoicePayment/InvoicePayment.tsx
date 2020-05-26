@@ -120,6 +120,88 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
 
+  let body = null;
+  if (invoiceStatus === "PENDING") {
+    body = (
+      <Text my="4" ml="4">
+        Your <strong>invoice</strong> is currently pending. You will be
+        contacted soon by our invoicing team. Thank you for your understanding.
+      </Text>
+    );
+  }
+
+  if (paymentStatus.includes("PENDING")) {
+    body = (
+      <Text my="4" ml="4">
+        Your <strong>payment</strong> is currently pending. You will be
+        contacted soon by our invoicing team. Thank you for your understanding.
+      </Text>
+    );
+  }
+
+  if (invoiceIsPaid) {
+    body = (
+      <SuccessfulPayment
+        onViewInvoice={() => {
+          console.info(`./api/invoice/${invoice.payer.id}`);
+        }}
+        payerId={invoice.payer.id}
+      />
+    );
+  } else {
+    body = [
+      <Label key={"invoice-download-link"} my="4" ml="4">
+        Your Invoice
+        <InvoiceDownloadLink payer={invoice.payer} />
+      </Label>,
+      <Formik
+        key={"invoice-payment-form"}
+        validate={validateFn(methods)}
+        initialValues={{
+          paymentMethodId: null,
+          payerId: invoice && invoice.payer && invoice.payer.id,
+          amount: invoiceCharge,
+        }}
+        onSubmit={payByCardSubmit}
+      >
+        {({ setFieldValue, values }) => {
+          return (
+            <Root>
+              <ChoosePayment
+                methods={parsedMethods}
+                setFieldValue={setFieldValue}
+                values={values}
+              />
+              {methods[values.paymentMethodId] === "Credit Card" && (
+                <CreditCardForm
+                  ccToken={ccToken}
+                  payerId={invoice && invoice.payer && invoice.payer.id}
+                  paymentMethodId={values.paymentMethodId}
+                  handleSubmit={payByCardSubmit}
+                  total={calculateTotalToBePaid(invoice)}
+                  loading={loading}
+                />
+              )}
+              {methods[values.paymentMethodId] === "Bank Transfer" && (
+                <BankTransfer />
+              )}
+              {methods[values.paymentMethodId] === "Paypal" && (
+                <Paypal
+                  invoiceReferenceNumber={invoice.referenceNumber}
+                  manuscriptCustomId={invoice.article.customId}
+                  paymentMethodId={values.paymentMethodId}
+                  onSuccess={payByPayPalSubmit}
+                  total={calculateTotalToBePaid(invoice)}
+                />
+              )}
+              {error && <Text type="warning">{error}</Text>}
+            </Root>
+          );
+        }}
+      </Formik>,
+    ];
+  }
+
   return (
     <Expander
       title="2. Invoice &amp; Payment"
@@ -128,71 +210,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       }
       disabled={invoiceStatus === "DRAFT" || paymentStatus.includes("PENDING")}
     >
-      {invoiceIsPaid ? (
-        <SuccessfulPayment
-          onViewInvoice={() => {
-            console.info(`./api/invoice/${invoice.payer.id}`);
-          }}
-          payerId={invoice.payer.id}
-        />
-      ) : paymentStatus.includes("PENDING") ? (
-        <Text my="4" ml="4">
-          Your invoice is currently pending. You will be contacted soon by our
-          invoicing team. Thank you for your understanding
-        </Text>
-      ) : (
-        [
-          <Label key={"invoice-download-link"} my="4" ml="4">
-            Your Invoice
-            <InvoiceDownloadLink payer={invoice.payer} />
-          </Label>,
-          <Formik
-            key={"invoice-payment-form"}
-            validate={validateFn(methods)}
-            initialValues={{
-              paymentMethodId: null,
-              payerId: invoice && invoice.payer && invoice.payer.id,
-              amount: invoiceCharge,
-            }}
-            onSubmit={payByCardSubmit}
-          >
-            {({ setFieldValue, values }) => {
-              return (
-                <Root>
-                  <ChoosePayment
-                    methods={parsedMethods}
-                    setFieldValue={setFieldValue}
-                    values={values}
-                  />
-                  {methods[values.paymentMethodId] === "Credit Card" && (
-                    <CreditCardForm
-                      ccToken={ccToken}
-                      payerId={invoice && invoice.payer && invoice.payer.id}
-                      paymentMethodId={values.paymentMethodId}
-                      handleSubmit={payByCardSubmit}
-                      total={calculateTotalToBePaid(invoice)}
-                      loading={loading}
-                    />
-                  )}
-                  {methods[values.paymentMethodId] === "Bank Transfer" && (
-                    <BankTransfer />
-                  )}
-                  {methods[values.paymentMethodId] === "Paypal" && (
-                    <Paypal
-                      invoiceReferenceNumber={invoice.referenceNumber}
-                      manuscriptCustomId={invoice.article.customId}
-                      paymentMethodId={values.paymentMethodId}
-                      onSuccess={payByPayPalSubmit}
-                      total={calculateTotalToBePaid(invoice)}
-                    />
-                  )}
-                  {error && <Text type="warning">{error}</Text>}
-                </Root>
-              );
-            }}
-          </Formik>,
-        ]
-      )}
+      {body}
     </Expander>
   );
 };
