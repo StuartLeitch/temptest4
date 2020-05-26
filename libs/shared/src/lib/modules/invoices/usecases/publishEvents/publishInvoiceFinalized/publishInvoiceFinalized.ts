@@ -78,9 +78,9 @@ export class PublishInvoiceFinalizedUsecase
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 
-      payer: formatPayer(payer, billingAddress),
+      payer: payer ? formatPayer(payer, billingAddress) : null,
 
-      payments: formatPayments(payments, paymentMethods),
+      payments: payments ? formatPayments(payments, paymentMethods) : null,
     };
 
     try {
@@ -115,9 +115,10 @@ export class PublishInvoiceFinalizedUsecase
     | Errors.PayerRequiredError,
     void
   > {
-    if (!request.billingAddress) {
-      return left(new Errors.BillingAddressRequiredError());
-    }
+    // Commented the checks so that credit notes could be sent
+    // if (!request.payer) {
+    //   return left(new Errors.PayerRequiredError());
+    // }
 
     if (!request.invoice) {
       return left(new Errors.InvoiceRequiredError());
@@ -131,17 +132,17 @@ export class PublishInvoiceFinalizedUsecase
       return left(new Errors.ManuscriptRequiredError());
     }
 
-    if (!request.payer) {
-      return left(new Errors.PayerRequiredError());
+    if (request.payer && !request.billingAddress) {
+      return left(new Errors.BillingAddressRequiredError());
     }
 
     if (!request.paymentMethods) {
       return left(new Errors.PaymentMethodsRequiredError());
     }
 
-    if (!request.payments) {
-      return left(new Errors.PaymentsRequiredError());
-    }
+    // if (!request.payments) {
+    //   return left(new Errors.PaymentsRequiredError());
+    // }
 
     return right(null);
   }

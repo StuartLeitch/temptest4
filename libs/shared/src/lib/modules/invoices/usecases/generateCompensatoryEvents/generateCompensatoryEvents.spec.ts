@@ -18,6 +18,7 @@ import {
 } from './generateCompensatoryEvents';
 
 import {
+  addBillingAddresses,
   addPaymentMethods,
   addInvoiceItems,
   addManuscripts,
@@ -70,6 +71,7 @@ describe('migrate entire invoice usecase', () => {
     loggerService = new MockLogger();
 
     addPaymentMethods(paymentMethodRepo);
+    addBillingAddresses(addressRepo);
     addInvoiceItems(invoiceItemRepo);
     addManuscripts(manuscriptRepo);
     addInvoices(invoiceRepo);

@@ -9,10 +9,10 @@ import { Invoice } from '../../../domain/Invoice';
 export interface PublishInvoiceCreditedDTO {
   paymentMethods: PaymentMethod[];
   invoiceItems: InvoiceItem[];
+  billingAddress?: Address;
   messageTimestamp?: Date;
-  billingAddress: Address;
   manuscript: Manuscript;
+  payments?: Payment[];
   creditNote: Invoice;
-  payments: Payment[];
-  payer: Payer;
+  payer?: Payer;
 }

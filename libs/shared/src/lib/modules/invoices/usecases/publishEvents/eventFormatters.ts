@@ -54,12 +54,14 @@ export function formatPayer(
   billingAddress: Address
 ): PhenomPayer {
   return {
-    billingAddress: `${billingAddress.addressLine1} ${billingAddress.city} ${billingAddress.country}`,
+    billingAddress: billingAddress
+      ? `${billingAddress.addressLine1} ${billingAddress.city} ${billingAddress.country}`
+      : null,
+    countryCode: billingAddress ? billingAddress.country : null,
     organization: formatOrganization(payer.organization),
     vatRegistrationNumber: payer.VATId,
     firstName: payer.name.toString(),
     email: payer.email.toString(),
-    countryCode: billingAddress.country,
     type: payer.type,
     lastName: null,
   };

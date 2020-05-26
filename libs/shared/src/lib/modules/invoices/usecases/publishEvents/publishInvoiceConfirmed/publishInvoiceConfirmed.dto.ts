@@ -6,9 +6,9 @@ import { Invoice } from '../../../domain/Invoice';
 
 export interface PublishInvoiceConfirmedDTO {
   invoiceItems: InvoiceItem[];
-  billingAddress: Address;
+  billingAddress?: Address;
   messageTimestamp?: Date;
   manuscript: Manuscript;
   invoice: Invoice;
-  payer: Payer;
+  payer?: Payer;
 }

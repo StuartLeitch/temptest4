@@ -106,7 +106,12 @@ export class PublishInvoiceCreditedUsecase
     | Errors.PayerRequiredError,
     void
   > {
-    if (!request.billingAddress) {
+    // Currently there are inconsistent invoices in the db, these should also be sent
+    // if (!request.payer) {
+    //   return left(new Errors.PayerRequiredError());
+    // }
+
+    if (request.payer && !request.billingAddress) {
       return left(new Errors.BillingAddressRequiredError());
     }
 
@@ -122,17 +127,13 @@ export class PublishInvoiceCreditedUsecase
       return left(new Errors.ManuscriptRequiredError());
     }
 
-    if (!request.payer) {
-      return left(new Errors.PayerRequiredError());
-    }
-
     if (!request.paymentMethods) {
       return left(new Errors.PaymentMethodsRequiredError());
     }
 
-    if (!request.payments) {
-      return left(new Errors.PaymentsRequiredError());
-    }
+    // if (!request.payments) {
+    //   return left(new Errors.PaymentsRequiredError());
+    // }
 
     return right(null);
   }

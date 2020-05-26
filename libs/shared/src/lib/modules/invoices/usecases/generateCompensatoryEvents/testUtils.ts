@@ -2,9 +2,9 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 
-import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
-
+import { PaymentMethodMap } from '../../../payments/mapper/PaymentMethod';
 import { ArticleMap } from '../../../manuscripts/mappers/ArticleMap';
+import { AddressMap } from '../../../addresses/mappers/AddressMap';
 import { CouponMap } from '../../../coupons/mappers/CouponMap';
 import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
 import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
@@ -14,6 +14,7 @@ import { InvoiceMap } from '../../mappers/InvoiceMap';
 
 import { MockPaymentMethodRepo } from '../../../payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from '../../../manuscripts/repos/mocks/mockArticleRepo';
+import { MockAddressRepo } from '../../../addresses/repos/mocks/mockAddressRepo';
 import { MockPaymentRepo } from '../../../payments/repos/mocks/mockPaymentRepo';
 import { MockCouponRepo } from '../../../coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from '../../../waivers/repos/mocks/mockWaiverRepo';
@@ -273,11 +274,38 @@ export function addPaymentMethods(paymentMethodRepo: MockPaymentMethodRepo) {
     {
       name: 'Migration',
       isActive: true,
+      id: '1',
     },
   ];
 
   for (const props of paymentMethodsProps) {
-    const paymentMethod = PaymentMethod.create(props).getValue();
+    const paymentMethod = PaymentMethodMap.toDomain(props);
     paymentMethodRepo.addMockItem(paymentMethod);
+  }
+}
+
+export function addBillingAddresses(addressRepo: MockAddressRepo) {
+  const addressProps = [
+    {
+      id: '1',
+      city: 'City1',
+      state: 'State1',
+      postalCode: '00567',
+      country: 'US',
+      addressLine1: 'Test address 1',
+    },
+    {
+      id: '3',
+      city: 'City3',
+      state: null,
+      postalCode: null,
+      country: 'RO',
+      addressLine1: 'TestAddress3',
+    },
+  ];
+
+  for (const props of addressProps) {
+    const address = AddressMap.toDomain(props);
+    addressRepo.addMockItem(address);
   }
 }

@@ -72,7 +72,7 @@ export class PublishInvoiceConfirmedUsecase
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 
-      payer: formatPayer(payer, billingAddress),
+      payer: payer ? formatPayer(payer, billingAddress) : null,
     };
 
     try {
@@ -97,7 +97,12 @@ export class PublishInvoiceConfirmedUsecase
     | Errors.PayerRequiredError,
     void
   > {
-    if (!request.billingAddress) {
+    // Currently there are inconsistent invoices in the db, these should also be sent
+    // if (!request.payer) {
+    //   return left(new Errors.PayerRequiredError());
+    // }
+
+    if (request.payer && !request.billingAddress) {
       return left(new Errors.BillingAddressRequiredError());
     }
 
@@ -111,10 +116,6 @@ export class PublishInvoiceConfirmedUsecase
 
     if (!request.manuscript) {
       return left(new Errors.ManuscriptRequiredError());
-    }
-
-    if (!request.payer) {
-      return left(new Errors.PayerRequiredError());
     }
 
     return right(null);

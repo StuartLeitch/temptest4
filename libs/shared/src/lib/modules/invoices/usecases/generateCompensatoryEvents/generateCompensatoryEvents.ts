@@ -109,6 +109,7 @@ export class GenerateCompensatoryEventsUsecase
     this.publishInvoiceCredited = this.publishInvoiceCredited.bind(this);
     this.publishInvoiceCreated = this.publishInvoiceCreated.bind(this);
     this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
+    this.havePaymentsBeenMade = this.havePaymentsBeenMade.bind(this);
     this.publishInvoicePayed = this.publishInvoicePayed.bind(this);
     this.shouldSendConfirmed = this.shouldSendConfirmed.bind(this);
     this.updateInvoiceStatus = this.updateInvoiceStatus.bind(this);
@@ -356,6 +357,20 @@ export class GenerateCompensatoryEventsUsecase
     return right(true);
   }
 
+  private async havePaymentsBeenMade<
+    T extends { payments: Payment[]; payer: Payer }
+  >({ payments, payer }: T): Promise<Either<null, boolean>> {
+    if (!payer) {
+      return right(false);
+    }
+
+    if (!payments || payments.length == 0) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
   private attachPaymentDate(context: Context) {
     return <T extends WithInvoice & { payments: Payment[] }>(request: T) => {
       const { payments, invoice } = request;
@@ -497,6 +512,7 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachPayer(context))
         .then(this.attachAddress(context))
         .then(this.attachPayments(context))
+        .advanceOrEnd(this.havePaymentsBeenMade)
         .then(this.attachPaymentMethods(context))
         .map(this.attachPaymentDate(context))
         .then(this.sendPayedEvent(context))
