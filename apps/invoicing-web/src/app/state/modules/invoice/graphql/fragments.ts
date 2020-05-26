@@ -114,6 +114,9 @@ export const invoiceFragment = gql`
         ...articleFragment
       }
     }
+    transaction {
+      status
+    }
   }
   ${payerFragment}
   ${couponFragment}

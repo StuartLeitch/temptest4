@@ -24,7 +24,6 @@ export const defaultErpFixedValues: ErpFixedValues = {
 
 export class ErpService implements ErpServiceContract {
   private connection: Connection;
-  private loginPromise: Promise<any>;
 
   constructor(
     private readonly logger: any,
@@ -33,6 +32,8 @@ export class ErpService implements ErpServiceContract {
   ) {}
 
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
+    console.info(`registerInvoice init with`, data);
+
     const { items, tradeDocumentItemProduct } = data;
 
     const accountId = await this.registerPayer(data);
@@ -57,7 +58,7 @@ export class ErpService implements ErpServiceContract {
   }
 
   public async registerRevenueRecognition(data: any): Promise<any> {
-    this.logger.info(`registerRevenueRecognition init with`, data);
+    console.info(`registerRevenueRecognition init with`, data);
 
     const journal = await this.registerJournal(data);
 
@@ -91,16 +92,18 @@ export class ErpService implements ErpServiceContract {
         loginUrl,
       });
 
-      this.loginPromise = this.connection.login(user, password + securityToken);
-
-      // tslint:disable-next-line: no-unused-expression
-      this.connection.authorize;
-      await this.loginPromise;
-      // TODO: Log this message in the banner
-      this.logger.info('ERP login successful');
+      try {
+        // tslint:disable-next-line: no-unused-expression
+        this.connection.authorize;
+        await this.connection.login(user, password + securityToken);
+        // TODO: Log this message in the banner
+        console.log('ERP login successful');
+        return this.connection;
+      } catch (err) {
+        this.connection = null;
+        console.error(err);
+      }
     }
-
-    return this.connection;
   }
 
   private async registerPayer(data: Partial<ErpData>): Promise<string> {
@@ -125,11 +128,16 @@ export class ErpService implements ErpServiceContract {
       s2cor__VAT_Registration_Number__c: payer.VATId,
     };
 
-    const existingAccount = await connection
-      .sobject('Account')
-      .select({ id: true })
-      .where({ Name: name })
-      .execute();
+    let existingAccount;
+    try {
+      existingAccount = await connection
+        .sobject('Account')
+        .select({ id: true })
+        .where({ Name: name })
+        .execute();
+    } catch (err) {
+      console.error(err);
+    }
 
     let account;
     if (existingAccount.length) {
@@ -243,7 +251,7 @@ export class ErpService implements ErpServiceContract {
       throw tradeDocument;
     }
 
-    this.logger.info('Trade Document registered: ', tradeDocument.id);
+    console.info('Trade Document registered: ', tradeDocument.id);
 
     return tradeDocument.id;
   }
@@ -346,7 +354,7 @@ export class ErpService implements ErpServiceContract {
   }
 
   private async registerJournal(data: any) {
-    // this.logger.info(`registerJournal init with`, data);
+    // console.info(`registerJournal init with`, data);
 
     const connection = await this.getConnection();
     const {
