@@ -11,6 +11,7 @@ class ManuscriptEditorsView extends AbstractEventView
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
+  editor_view.id as "id",
   se.manuscript_custom_id as "manuscript_custom_id",
   editor_view.email as "email",
   cast_to_timestamp(editor_view."expiredDate") as expired_date,
@@ -40,6 +41,7 @@ AS SELECT
     JOIN ${submissionView.getViewName()} s on
       s.event_id = se.id) se,
     jsonb_to_recordset(((se.payload -> 'manuscripts') -> se.last_version_index) -> 'editors') as editor_view(
+      "id" text,
       "expiredDate" text,
       "invitedDate" text,
       "removedDate" text,
@@ -61,6 +63,7 @@ WITH DATA;
   }
 
   postCreateQueries = [
+    `create index on ${this.getViewName()} (id)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (manuscript_custom_id, invited_date desc, accepted_date desc)`,
     `create index on ${this.getViewName()} (manuscript_custom_id, role_type)`,

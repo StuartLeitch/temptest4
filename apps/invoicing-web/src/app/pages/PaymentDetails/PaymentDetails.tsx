@@ -54,7 +54,7 @@ interface Props {
 }
 
 const payByPayPal = (recordAction, invoice) => {
-  return data => {
+  return (data) => {
     return recordAction({
       paymentMethodId: data.paymentMethodId,
       invoiceId: invoice.invoiceId,
@@ -63,6 +63,12 @@ const payByPayPal = (recordAction, invoice) => {
     });
   };
 };
+
+const InvoiceDetailsError = () => (
+  <Flex mt={20}>
+    <Text>Invoice details are not available.</Text>
+  </Flex>
+);
 
 const PaymentDetails: React.FunctionComponent<Props> = ({
   getInvoiceVAT,
@@ -89,29 +95,77 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   token,
 }) => {
   const { invoiceId } = useParams();
+
+  // * This will only run once
   useEffect(() => {
     getInvoice(invoiceId);
     getPaymentMethods();
     getClientToken();
-  }, []);
+  }, [invoiceId, getInvoice, getPaymentMethods, getClientToken]);
 
   const payByCard = useCallback(
-    values => payWithCard({ invoiceId, ...values }),
-    [invoiceId],
+    (values) => payWithCard({ invoiceId, ...values }),
+    [invoiceId, payWithCard],
   );
 
-  return (function() {
-    if (invoiceError) {
+  const PaymentContent = () => {
+    const invoiceTransactionIsNotDraft = invoice.transaction.status !== "DRAFT";
+
+    if (invoiceTransactionIsNotDraft) {
       return (
-        <Flex flex={2}>
-          <Text type="warning">{invoiceError}</Text>
-        </Flex>
+        <>
+          <PaymentHeader articleTitle={invoice.article.title} />
+          <Root>
+            <FormsContainer>
+              <BillingInfo
+                status={invoice.status}
+                payer={invoice.payer}
+                error={payerError}
+                handleSubmit={updatePayer}
+                loading={payerLoading}
+                applyCoupon={(invoiceId, couponCode) => {
+                  applyCoupon({ invoiceId, couponCode });
+                }}
+                refreshInvoice={(invoiceId) => getInvoice(invoiceId)}
+                couponError={couponError}
+                onVatFieldChange={(country, state, postalCode, payerType) =>
+                  getInvoiceVAT({
+                    postalCode,
+                    invoiceId,
+                    payerType,
+                    country,
+                    state,
+                  })
+                }
+              />
+              <InvoicePayment
+                ccToken={token}
+                methods={paymentMethods}
+                status={invoice.status}
+                error={creditCardPaymentError || payPalPaymentError}
+                payByCardSubmit={payByCard}
+                payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
+                loading={creditCardPaymentLoading || payPalPaymentLoading}
+              />
+            </FormsContainer>
+
+            <Details invoice={invoice} mt={-44} />
+          </Root>
+        </>
       );
+    }
+
+    return <InvoiceDetailsError />;
+  };
+
+  return (function () {
+    if (invoiceError) {
+      return <InvoiceDetailsError />;
     }
 
     if (invoiceLoading) {
       return (
-        <Flex alignItems="center" vertical flex={2}>
+        <Flex alignItems="center" vertical flex={2} mt={20}>
           <Text mb={2}>Fetching invoice&hellip;</Text>
           <Loader size={6} />
         </Flex>
@@ -119,45 +173,12 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     }
 
     return (
-      <Fragment>
-        <PaymentHeader articleTitle={invoice.article.title} />
-        <Root>
-          <FormsContainer>
-            <BillingInfo
-              status={invoice.status}
-              payer={invoice.payer}
-              error={payerError}
-              handleSubmit={updatePayer}
-              loading={payerLoading}
-              applyCoupon={(invoiceId, couponCode) => {
-                applyCoupon({ invoiceId, couponCode });
-              }}
-              couponError={couponError}
-              onVatFieldChange={(country, state, postalCode, payerType) =>
-                getInvoiceVAT({
-                  postalCode,
-                  invoiceId,
-                  payerType,
-                  country,
-                  state,
-                })
-              }
-            />
-            <InvoicePayment
-              ccToken={token}
-              methods={paymentMethods}
-              status={invoice.status}
-              error={creditCardPaymentError || payPalPaymentError}
-              payByCardSubmit={payByCard}
-              payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
-              loading={creditCardPaymentLoading || payPalPaymentLoading}
-            />
-          </FormsContainer>
-
-          <Details invoice={invoice} mt={-44} />
-        </Root>
+      <Flex vertical height="calc(100% - 62px)" justifyContent="space-between">
+        <Flex vertical>
+          <PaymentContent />
+        </Flex>
         <PaymentFooter />
-      </Fragment>
+      </Flex>
     );
   })();
 };
@@ -193,6 +214,7 @@ export default connect(mapStateToProps, {
 })(PaymentDetails);
 
 const Root = styled.div`
+  width: 100%;
   align-items: flex-start;
   display: flex;
   padding: calc(${th("gridUnit")} * 6) calc(${th("gridUnit")} * 8);

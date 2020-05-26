@@ -1,15 +1,12 @@
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {MockTransactionRepo} from '../../repos/mocks/mockTransactionRepo';
-import {
-  Transaction,
-  STATUS as TransactionStatus
-} from '../../domain/Transaction';
+import { MockTransactionRepo } from '../../repos/mocks/mockTransactionRepo';
+import { Transaction, TransactionStatus } from '../../domain/Transaction';
 import {
   UpdateTransactionUsecase,
-  UpdateTransactionContext
+  UpdateTransactionContext,
 } from './updateTransaction';
 
 let usecase: UpdateTransactionUsecase;
@@ -18,7 +15,7 @@ let result: Result<Transaction>;
 
 let transactionId: string;
 
-const defaultContext: UpdateTransactionContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 describe('UpdateTransactionUsecase', () => {
   describe('When NO Transaction ID is provided', () => {
@@ -43,7 +40,7 @@ describe('UpdateTransactionUsecase', () => {
       transactionId = 'test-transaction';
       const transaction = Transaction.create(
         {
-          status: TransactionStatus.DRAFT
+          status: TransactionStatus.DRAFT,
           // surname: PayerName.create('bar').getValue()
         },
         new UniqueEntityID(transactionId)
@@ -57,7 +54,7 @@ describe('UpdateTransactionUsecase', () => {
       it('should fail', async () => {
         result = await usecase.execute(
           {
-            transactionId: null
+            transactionId: null,
           },
           defaultContext
         );
@@ -70,7 +67,7 @@ describe('UpdateTransactionUsecase', () => {
         // arrange
         result = await usecase.execute(
           {
-            transactionId
+            transactionId,
           },
           defaultContext
         );
@@ -89,7 +86,7 @@ describe('UpdateTransactionUsecase', () => {
         result = await usecase.execute(
           {
             transactionId,
-            amount
+            amount,
           },
           defaultContext
         );

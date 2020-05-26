@@ -16,6 +16,10 @@ export class InvoiceMap extends Mapper<Invoice> {
         dateCreated: new Date(raw.dateCreated),
         dateAccepted: raw.dateAccepted ? new Date(raw.dateAccepted) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
+        // dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
+        dateMovedToFinal: raw.dateMovedToFinal
+          ? new Date(raw.dateMovedToFinal)
+          : null,
         erpReference: raw.erpReference,
         revenueRecognitionReference: raw.revenueRecognitionReference,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
@@ -40,8 +44,10 @@ export class InvoiceMap extends Mapper<Invoice> {
       status: invoice.status,
       invoiceNumber: Number.parseInt(invoice.invoiceNumber, 10) || null,
       dateCreated: invoice.dateCreated,
+      // dateUpdated: invoice.dateUpdated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
+      dateMovedToFinal: invoice.dateMovedToFinal,
       erpReference: invoice.erpReference ?? null,
       revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,

@@ -9,13 +9,24 @@ import {
   InputGroup,
 } from '../../../../components';
 
-import { CouponContext } from '../../Context';
+import { CouponEditContext, CouponCreateContext } from '../../Context';
 
-const Name = ({ value = '', disabled = false, helper = '' }: NameProps) => {
+import { CREATE } from '../../config';
+
+import { CouponMode } from '../../types';
+
+const Name = ({
+  value = '',
+  disabled = false,
+  helper = '',
+  mode,
+}: NameProps) => {
+  const chosenContext =
+    mode === CREATE ? CouponCreateContext : CouponEditContext;
   const {
     couponState: { name },
     update,
-  } = useContext(CouponContext);
+  } = useContext(chosenContext);
 
   useEffect(() => {
     update('name', { value, isValid: true });
@@ -29,9 +40,10 @@ const Name = ({ value = '', disabled = false, helper = '' }: NameProps) => {
       <Col sm={9}>
         <InputGroup>
           <Input
+            type='textarea'
             value={name.value}
             disabled={disabled}
-            placeholder='Coupon name'
+            placeholder='Coupon description'
             id='couponName'
             onChange={(e) =>
               update('name', { value: e.target.value, isValid: true })
@@ -55,6 +67,7 @@ interface NameProps {
   value?: string;
   disabled?: boolean;
   helper?: string;
+  mode: CouponMode;
 }
 
 export default Name;

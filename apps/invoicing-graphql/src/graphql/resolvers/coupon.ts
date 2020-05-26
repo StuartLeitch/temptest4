@@ -3,7 +3,10 @@ import {
   Roles,
   GetCouponDetailsByCodeDTO,
   UpdateCouponUsecase,
+  CreateCouponUsecase,
+  GenerateCouponCodeUsecase,
   GetRecentCouponsUsecase,
+  GetRecentCouponsDTO,
   GetCouponDetailsByCodeUsecase,
   CouponMap,
 } from '@hindawi/shared';
@@ -32,8 +35,7 @@ export const coupon: Resolvers<any> = {
 
       return CouponMap.toPersistence(result.value.getValue());
     },
-
-    async coupons(parent, args, context) {
+    async coupons(parent, args: GetRecentCouponsDTO, context) {
       const { repos } = context;
       const usecase = new GetRecentCouponsUsecase(repos.coupon);
 
@@ -53,8 +55,35 @@ export const coupon: Resolvers<any> = {
         coupons: couponsList.coupons.map(CouponMap.toPersistence),
       };
     },
+    async generateCouponCode(parent, args, context) {
+      const { repos } = context;
+      const usecase = new GenerateCouponCodeUsecase(repos.coupon);
+
+      const result = await usecase.execute();
+      if (result.isLeft()) {
+        throw new Error(result.value.errorValue().message);
+      }
+
+      const code = result.value.getValue().value;
+      return { code };
+    },
   },
   Mutation: {
+    async createCoupon(parent, args, context) {
+      const {
+        repos: { coupon: couponRepo },
+      } = context;
+
+      const createCouponUsecase = new CreateCouponUsecase(couponRepo);
+
+      const result = await createCouponUsecase.execute(args.coupon);
+
+      if (result.isLeft()) {
+        throw new Error(result?.value?.errorValue().message);
+      }
+
+      return CouponMap.toPersistence(result.value.getValue());
+    },
     async updateCoupon(parent, args, context) {
       const {
         repos: { coupon: couponRepo },
@@ -62,7 +91,7 @@ export const coupon: Resolvers<any> = {
 
       const updateCouponUsecase = new UpdateCouponUsecase(couponRepo);
 
-      const result = await updateCouponUsecase.execute({ ...args.coupon });
+      const result = await updateCouponUsecase.execute(args.coupon);
 
       if (result.isLeft()) {
         throw new Error(result.value.errorValue().message);

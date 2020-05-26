@@ -18,8 +18,8 @@ import {
 export class GetRecentCouponsUsecase
   implements
     UseCase<
-      GetRecentCouponsDTO,
-      Promise<GetRecentCouponsResponse>,
+      {},
+      Promise<GenerateCouponCodeResponse>,
       GetRecentCouponsAuthenticationContext
     >,
     AccessControlledUsecase<

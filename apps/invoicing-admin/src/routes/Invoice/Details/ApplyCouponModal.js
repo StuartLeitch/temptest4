@@ -22,6 +22,11 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
 
   const [applyCoupon] = useMutation(APPLY_COUPON_MUTATION);
 
+  const onChange = (value, isValid) => {
+    setInputValue(value);
+    setValid(isValid);
+  };
+
   const apply = async () => {
     setInProgress(true);
     setError('');
@@ -58,7 +63,7 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
       </ModalHeader>
 
       <ModalBody>
-        <Code onChangeCallback={setInputValue} validationCallback={setValid} />
+        <Code onChangeCallback={onChange} />
       </ModalBody>
 
       <ModalFooter className='justify-content-between'>

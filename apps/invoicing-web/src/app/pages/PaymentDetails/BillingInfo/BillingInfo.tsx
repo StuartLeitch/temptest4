@@ -19,6 +19,7 @@ interface Props {
     paymentType: string,
   ): any;
   applyCoupon(invoiceId: string, couponCode: string): any;
+  refreshInvoice(invoiceId: string): any;
 }
 
 const BillingInfo: React.FC<Props> = ({
@@ -30,6 +31,7 @@ const BillingInfo: React.FC<Props> = ({
   handleSubmit,
   onVatFieldChange,
   applyCoupon,
+  refreshInvoice,
 }: any) => {
   return (
     <Expander mb={6} flex={2} expanded={true} title="1. Payer details">
@@ -43,6 +45,7 @@ const BillingInfo: React.FC<Props> = ({
             loading={loading}
             handleSubmit={handleSubmit}
             applyCoupon={applyCoupon}
+            refreshInvoice={refreshInvoice}
             couponError={couponError}
             onVatFieldChange={onVatFieldChange}
           />

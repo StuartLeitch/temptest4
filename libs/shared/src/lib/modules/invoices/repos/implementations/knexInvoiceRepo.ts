@@ -21,15 +21,17 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
 
-    const invoice = await db(TABLES.INVOICES)
+    const sql = db(TABLES.INVOICES)
       .select()
       .where('id', invoiceId.id.toString())
       .first();
 
     logger.debug('select', {
       correlationId,
-      sql: invoice.toString(),
+      sql: sql.toString(),
     });
+
+    const invoice = await sql;
 
     if (!invoice) {
       throw RepoError.createEntityNotFoundError(
@@ -215,9 +217,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const invoices = await db(TABLES.INVOICES)
       .select()
       .whereNot(`deleted`, 1)
-      .where({
-        status: 'ACTIVE',
-      })
+      .whereIn('status', ['ACTIVE', 'FINAL'])
       // filter the credit notes from this list
       .whereNull('cancelledInvoiceReference')
       .whereNull('erpReference');

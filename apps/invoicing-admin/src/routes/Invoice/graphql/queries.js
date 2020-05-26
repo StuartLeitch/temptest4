@@ -13,10 +13,14 @@ export const INVOICE_QUERY = `
     dateCreated
     dateIssued
     dateAccepted
+    dateMovedToFinal
     referenceNumber
     erpReference
     revenueRecognitionReference
     cancelledInvoiceReference
+    transaction {
+      ...transactionFragment
+    }
     payer {
       ...payerFragment
     }
@@ -104,5 +108,9 @@ export const INVOICE_QUERY = `
     dateCreated
     cancelledInvoiceReference
     referenceNumber
+  }
+  fragment transactionFragment on Transaction {
+    id
+    status
   }
 `;

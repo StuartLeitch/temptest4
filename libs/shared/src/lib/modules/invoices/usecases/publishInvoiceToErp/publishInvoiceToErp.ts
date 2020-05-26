@@ -118,7 +118,7 @@ export class PublishInvoiceToErpUsecase
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          item.coupons = coupons;
+          coupons.forEach((c) => item.addCoupon(c));
           item.waivers = waivers;
         }
       }

@@ -21,12 +21,12 @@ import { WaiverRepoContract } from './../../../src/lib/domain/reductions/repos/w
 
 import {
   UpdateTransactionContext,
-  UpdateTransactionOnAcceptManuscriptUsecase
+  UpdateTransactionOnAcceptManuscriptUsecase,
 } from '../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 
 import {
   Transaction,
-  STATUS as TransactionStatus
+  TransactionStatus,
 } from '../../../src/lib/modules/transactions/domain/Transaction';
 
 import { TransactionMap } from './../../../src/lib/modules/transactions/mappers/TransactionMap';
@@ -45,7 +45,7 @@ const feature = loadFeature(
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
-defineFeature(feature, test => {
+defineFeature(feature, (test) => {
   const mockTransactionRepo: TransactionRepoContract = new MockTransactionRepo();
   const mockInvoiceRepo: InvoiceRepoContract = new MockInvoiceRepo();
   const mockCatalogRepo: CatalogRepoContract = new MockCatalogRepo();
@@ -79,15 +79,15 @@ defineFeature(feature, test => {
       status: TransactionStatus.DRAFT,
       deleted: 0,
       dateCreated: new Date(),
-      dateUpdated: new Date()
+      dateUpdated: new Date(),
     });
     invoice = InvoiceMap.toDomain({
       status: InvoiceStatus.DRAFT,
-      transactionId: transaction.transactionId
+      transactionId: transaction.transactionId,
     });
     invoiceItem = InvoiceItemMap.toDomain({
       manuscriptId,
-      invoiceId: invoice.invoiceId.id.toString()
+      invoiceId: invoice.invoiceId.id.toString(),
     });
 
     invoice.addInvoiceItem(invoiceItem);
@@ -105,7 +105,7 @@ defineFeature(feature, test => {
       catalogItem = CatalogMap.toDomain({
         journalId,
         type: 'APC',
-        price: 1900
+        price: 1900,
       });
       mockCatalogRepo.save(catalogItem);
     });
@@ -123,7 +123,7 @@ defineFeature(feature, test => {
         articleTypeId,
         authorEmail,
         authorCountry,
-        authorSurname
+        authorSurname,
       });
       mockArticleRepo.save(manuscript);
     });
@@ -132,7 +132,7 @@ defineFeature(feature, test => {
       result = await usecase.execute(
         {
           manuscriptId,
-          journalId
+          journalId,
         },
         defaultContext
       );

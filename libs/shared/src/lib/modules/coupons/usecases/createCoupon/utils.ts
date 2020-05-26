@@ -6,19 +6,29 @@ import { CouponCode } from '../../domain/CouponCode';
 
 import { CouponRepoContract } from '../../repos';
 
-import { CreateCouponErrors } from './createCouponErrors';
+import {
+  ExpirationDateRequiredError,
+  InvalidInvoiceItemTypeError,
+  InvalidExpirationDateError,
+  InvalidCouponCodeError,
+  InvalidCouponTypeError,
+  CouponCodeRequiredError,
+  DuplicateCouponCodeError,
+  InvalidCouponStatusError,
+} from './createCouponErrors';
 import { CreateCouponDTO } from './createCouponDTO';
 
 import { isExpirationDateValid } from '../utils';
 
 type SanityCheckResult = Either<
-  | CreateCouponErrors.ExpirationDateRequired
-  | CreateCouponErrors.InvalidInvoiceItemType
-  | CreateCouponErrors.InvalidExpirationDate
-  | CreateCouponErrors.DuplicateCouponCode
-  | CreateCouponErrors.InvalidCouponStatus
-  | CreateCouponErrors.InvalidCouponCode
-  | CreateCouponErrors.InvalidCouponType
+  | ExpirationDateRequiredError
+  | InvalidInvoiceItemTypeError
+  | InvalidExpirationDateError
+  | DuplicateCouponCodeError
+  | InvalidCouponStatusError
+  | InvalidCouponCodeError
+  | InvalidCouponTypeError
+  | CouponCodeRequiredError
   | AppError.UnexpectedError,
   CreateCouponDTO
 >;
@@ -27,30 +37,41 @@ export async function sanityChecksRequestParameters(
   request: CreateCouponDTO,
   couponRepo: CouponRepoContract
 ): Promise<SanityCheckResult> {
-  const { invoiceItemType, expirationDate, couponType, status, code } = request;
+  const { invoiceItemType, expirationDate, type, status, code } = request;
+
   if (invoiceItemType !== 'APC' && invoiceItemType !== 'PRINT ORDER') {
-    return left(new CreateCouponErrors.InvalidInvoiceItemType(invoiceItemType));
+    return left(new InvalidInvoiceItemTypeError(invoiceItemType));
   }
-  if (!(couponType in CouponType)) {
-    return left(new CreateCouponErrors.InvalidCouponType(couponType));
+
+  if (!(type in CouponType)) {
+    return left(new InvalidCouponTypeError(type));
   }
+
   if (!(status in CouponStatus)) {
-    return left(new CreateCouponErrors.InvalidCouponStatus(status));
+    return left(new InvalidCouponStatusError(status));
   }
+
+  if (!code) {
+    return left(new CouponCodeRequiredError());
+  }
+
   if (code && !CouponCode.isValid(code)) {
-    return left(new CreateCouponErrors.InvalidCouponCode(code));
+    return left(new InvalidCouponCodeError(code));
   }
-  if (couponType && couponType === CouponType.MULTIPLE_USE && !expirationDate) {
-    return left(new CreateCouponErrors.ExpirationDateRequired());
+
+  if (type && type === CouponType.MULTIPLE_USE && !expirationDate) {
+    return left(new ExpirationDateRequiredError());
   }
+
   if (
-    couponType === CouponType.MULTIPLE_USE &&
-    !isExpirationDateValid(new Date(expirationDate), CouponType[couponType])
+    type === CouponType.MULTIPLE_USE &&
+    !isExpirationDateValid(new Date(expirationDate), CouponType[type])
   ) {
-    return left(new CreateCouponErrors.InvalidExpirationDate(expirationDate));
+    return left(new InvalidExpirationDateError(expirationDate));
   }
+
   if (code && (await couponRepo.isCodeUsed(code))) {
-    return left(new CreateCouponErrors.DuplicateCouponCode(code));
+    return left(new DuplicateCouponCodeError(code));
   }
 
   return right(request);

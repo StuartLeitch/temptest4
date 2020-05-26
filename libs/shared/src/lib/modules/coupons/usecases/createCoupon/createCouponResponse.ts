@@ -3,16 +3,16 @@ import { AppError } from '../../../../core/logic/AppError';
 
 import { Coupon } from '../../domain/Coupon';
 
-import { CreateCouponErrors } from './createCouponErrors';
+import * as CreateCouponErrors from './createCouponErrors';
 
 export type CreateCouponResponse = Either<
-  | CreateCouponErrors.ExpirationDateRequired
-  | CreateCouponErrors.InvalidInvoiceItemType
-  | CreateCouponErrors.InvalidExpirationDate
-  | CreateCouponErrors.DuplicateCouponCode
-  | CreateCouponErrors.InvalidCouponStatus
-  | CreateCouponErrors.InvalidCouponCode
-  | CreateCouponErrors.InvalidCouponType
+  | CreateCouponErrors.ExpirationDateRequiredError
+  | CreateCouponErrors.InvalidInvoiceItemTypeError
+  | CreateCouponErrors.InvalidExpirationDateError
+  | CreateCouponErrors.DuplicateCouponCodeError
+  | CreateCouponErrors.InvalidCouponStatusError
+  | CreateCouponErrors.InvalidCouponCodeError
+  | CreateCouponErrors.InvalidCouponTypeError
   | AppError.UnexpectedError,
   Result<Coupon>
 >;

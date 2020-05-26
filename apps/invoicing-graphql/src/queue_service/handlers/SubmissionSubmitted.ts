@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
 // * Domain imports
@@ -8,7 +9,7 @@ import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain
 import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 import {
   CreateTransactionContext,
-  CreateTransactionUsecase
+  CreateTransactionUsecase,
 } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/createTransaction/createTransaction';
 import { CreateManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscript';
 import { CreateManuscriptDTO } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
@@ -40,9 +41,9 @@ export const SubmissionSubmittedHandler = {
           title,
           articleType: { name },
           submissionCreatedDate: created,
-          authors
-        }
-      ]
+          authors,
+        },
+      ],
     } = data;
 
     const { email, country, surname, givenNames } = authors.find(
@@ -58,8 +59,8 @@ export const SubmissionSubmittedHandler = {
         manuscript: manuscriptRepo,
         coupon: couponRepo,
         waiver: waiverRepo,
-        pausedReminder: pausedReminderRepo
-      }
+        pausedReminder: pausedReminderRepo,
+      },
     } = this;
 
     const getManuscriptBySubmissionId: GetManuscriptByManuscriptIdUsecase = new GetManuscriptByManuscriptIdUsecase(
@@ -90,7 +91,7 @@ export const SubmissionSubmittedHandler = {
 
     const alreadyExistingManuscriptResult = await getManuscriptBySubmissionId.execute(
       {
-        manuscriptId: submissionId
+        manuscriptId: submissionId,
       },
       defaultContext
     );
@@ -103,7 +104,7 @@ export const SubmissionSubmittedHandler = {
     if (name in ManuscriptTypeNotInvoiceable) {
       await softDeleteDraftTransactionUsecase.execute(
         {
-          manuscriptId: submissionId
+          manuscriptId: submissionId,
         },
         defaultContext
       );
@@ -115,7 +116,7 @@ export const SubmissionSubmittedHandler = {
       if (name in ManuscriptTypeNotInvoiceable) {
         await softDeleteDraftTransactionUsecase.execute(
           {
-            manuscriptId: submissionId
+            manuscriptId: submissionId,
           },
           defaultContext
         );
@@ -125,7 +126,7 @@ export const SubmissionSubmittedHandler = {
         let invoiceId = null;
         const invoiceIdResult = await getInvoiceIdByManuscriptCustomIdUsecase.execute(
           {
-            customId: alreadyExistingManuscript.customId
+            customId: alreadyExistingManuscript.customId,
           },
           defaultContext
         );
@@ -143,7 +144,7 @@ export const SubmissionSubmittedHandler = {
         let items: any = [];
         const itemsResult = await getItemsForInvoiceUsecase.execute(
           {
-            invoiceId: invoiceId.id.toString()
+            invoiceId: invoiceId.id.toString(),
           },
           defaultContext
         );
@@ -158,7 +159,7 @@ export const SubmissionSubmittedHandler = {
         let journal = null;
         const journalResult = await getJournalUsecase.execute(
           {
-            journalId
+            journalId,
           },
           defaultContext
         );
@@ -177,7 +178,7 @@ export const SubmissionSubmittedHandler = {
 
         const updatedInvoiceItemsResult = await updateInvoiceItemsUsecase.execute(
           {
-            invoiceItems: items
+            invoiceItems: items,
           },
           defaultContext
         );
@@ -205,7 +206,7 @@ export const SubmissionSubmittedHandler = {
           authorEmail: email,
           authorCountry: country,
           authorSurname: surname,
-          authorFirstName: givenNames
+          authorFirstName: givenNames,
         },
         defaultContext
       );
@@ -225,7 +226,7 @@ export const SubmissionSubmittedHandler = {
       const result = await createTransactionUsecase.execute(
         {
           manuscriptId: submissionId,
-          journalId
+          journalId,
         },
         defaultContext
       );
@@ -247,7 +248,7 @@ export const SubmissionSubmittedHandler = {
           authorCountry: country,
           authorSurname: surname,
           authorFirstName: givenNames,
-          created
+          created,
         };
 
         const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(
@@ -269,5 +270,5 @@ export const SubmissionSubmittedHandler = {
         }
       }
     }
-  }
+  },
 };

@@ -5,20 +5,15 @@ import { TypeSelection, Code, Reduction, Name, Date, Redeems } from './Fields';
 
 import { CouponType, CouponMode } from '../types';
 
-import { helpers } from '../config';
+import {
+  helpers,
+  couponTypeOptions,
+  couponStatusOptions,
+  VIEW,
+} from '../config';
 
-const couponTypeOptions = [
-  { id: 'SINGLE_USE', label: 'SINGLE USE' },
-  { id: 'MULTIPLE_USE', label: 'MULTIPLE USE' },
-];
-
-const couponStatusOptions = [
-  { id: 'ACTIVE', label: 'ACTIVE' },
-  { id: 'INACTIVE', label: 'INACTIVE' },
-];
-
-const Coupon = ({ coupon, mode }: CouponProps) => {
-  const areInputsDisabled = mode === 'VIEW';
+const CouponViewEdit = ({ coupon, mode }: CouponViewEditProps) => {
+  const areInputsDisabled = mode === VIEW;
   const {
     name,
     code,
@@ -34,6 +29,7 @@ const Coupon = ({ coupon, mode }: CouponProps) => {
   return (
     <Form>
       <Name
+        mode={mode}
         value={name}
         disabled={areInputsDisabled}
         {...(!areInputsDisabled && { helper: helpers['name'] })}
@@ -47,14 +43,16 @@ const Coupon = ({ coupon, mode }: CouponProps) => {
         name='types'
         types={couponTypeOptions}
         {...(!areInputsDisabled && { helper: helpers['type'] })}
+        mode={mode}
       />
 
-      <Code value={code} disabled withLabel />
+      <Code label='Code' value={code} disabled />
 
       <Reduction
         value={reduction}
         disabled={areInputsDisabled || redeemCount > 0}
         {...(!areInputsDisabled && { helper: helpers['reduction'] })}
+        mode={mode}
       />
       <TypeSelection
         value={status}
@@ -63,6 +61,7 @@ const Coupon = ({ coupon, mode }: CouponProps) => {
         name='status'
         types={couponStatusOptions}
         id='status'
+        mode={mode}
       />
 
       <Redeems value={redeemCount} />
@@ -95,9 +94,9 @@ const Coupon = ({ coupon, mode }: CouponProps) => {
   );
 };
 
-interface CouponProps {
+interface CouponViewEditProps {
   coupon?: CouponType;
   mode: CouponMode;
 }
 
-export default Coupon;
+export default CouponViewEdit;

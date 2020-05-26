@@ -1,11 +1,13 @@
-/* eslint-disable max-len */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 // * Domain imports
-// import {InvoiceStatus} from '@hindawi/shared';
+import { SubmissionQualityCheckPassed } from '@hindawi/phenom-events';
 import {
+  GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
+  TransactionStatus,
   UpdateTransactionContext,
   VersionCompare,
-  QueuePayloads,
   Roles,
 } from '@hindawi/shared';
 
@@ -14,7 +16,6 @@ import { env } from '../../env';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
-// const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
 const SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED =
   'SubmissionPeerReviewCycleCheckPassed';
 
@@ -24,12 +25,14 @@ const logger = new Logger(
 
 export const SubmissionPeerReviewCycleCheckPassed = {
   event: SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED,
-  handler: async function submissionQualityCheckPassedHandler(data: any) {
+  handler: async function submissionQualityCheckPassedHandler(
+    data: SubmissionQualityCheckPassed
+  ) {
     logger.info('Incoming Event Data', data);
 
     const { submissionId, manuscripts } = data;
 
-    const maxVersion = manuscripts.reduce((max, m: any) => {
+    const maxVersion = manuscripts.reduce((max, m) => {
       const version = VersionCompare.versionCompare(m.version, max)
         ? m.version
         : max;
@@ -41,36 +44,65 @@ export const SubmissionPeerReviewCycleCheckPassed = {
       title,
       articleType: { name },
       authors,
-    } = manuscripts.find((m: any) => m.version === maxVersion);
+    } = manuscripts.find((m) => m.version === maxVersion);
 
     const { email, country, surname, givenNames } = authors.find(
-      (a: any) => a.isCorresponding
+      (a) => a.isCorresponding
     );
 
     const {
       repos: {
+        address: addressRepo,
         transaction: transactionRepo,
         invoice: invoiceRepo,
         invoiceItem: invoiceItemRepo,
         manuscript: manuscriptRepo,
         waiver: waiverRepo,
         catalog: catalogRepo,
+        payer: payerRepo,
+        coupon: couponRepo,
       },
-      services: { waiverService, emailService, schedulingService },
+      services: { waiverService, emailService, schedulingService, vatService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
 
+    const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
+      invoiceItemRepo,
+      transactionRepo,
+      manuscriptRepo,
+      invoiceRepo
+    );
+
+    const maybeTransaction = await getTransactionUsecase.execute(
+      { customId },
+      defaultContext
+    );
+
+    if (maybeTransaction.isLeft()) {
+      logger.error(maybeTransaction.value.errorValue().message);
+      throw maybeTransaction.value.error;
+    }
+
+    if (maybeTransaction.value.getValue().status !== TransactionStatus.DRAFT) {
+      return;
+    }
+
     const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
+      addressRepo,
       catalogRepo,
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
       manuscriptRepo,
       waiverRepo,
+      payerRepo,
+      couponRepo,
       waiverService,
       schedulingService,
-      emailService
+      emailService,
+      vatService,
+      logger
     );
 
     const result = await updateTransactionOnAcceptManuscript.execute(

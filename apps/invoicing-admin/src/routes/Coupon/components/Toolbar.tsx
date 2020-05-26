@@ -2,20 +2,28 @@ import React, { useContext } from 'react';
 
 import { Button, ButtonToolbar } from '../../../components';
 
-import { CouponContext } from '../Context';
+import { CouponEditContext, CouponCreateContext } from '../Context';
 
 import { CouponMode } from '../types';
 
+import { VIEW, EDIT, CREATE } from '../config';
+
 export default ({
   mode,
-  saveEditedCoupon,
-  cancelEdit,
-  updateInProgress,
-  setMode,
+  onSave,
+  onCancel,
+  isSaveInProgress,
+  onEdit,
 }: ToolbarProps) => {
-  const isEditModeOn = mode === 'EDIT';
+  const isViewModeOn = mode === VIEW;
+  const isEditModeOn = mode === EDIT;
+  const isCreateModeOn = mode === CREATE;
+  const canBeSaved = isEditModeOn || isCreateModeOn;
 
-  const { couponState } = useContext(CouponContext);
+  const chosenContext = isCreateModeOn
+    ? CouponCreateContext
+    : CouponEditContext;
+  const { couponState } = useContext(chosenContext);
 
   const hasFormErrors = Object.values(couponState).some(
     (field) => !field.isValid
@@ -23,27 +31,22 @@ export default ({
 
   return (
     <ButtonToolbar className='ml-auto'>
-      {!isEditModeOn && (
-        <Button
-          color='success'
-          size='sm'
-          className='mr-2'
-          onClick={() => setMode('EDIT')}
-        >
+      {isViewModeOn && (
+        <Button color='success' size='sm' className='mr-2' onClick={onEdit}>
           <i className='fas fa-edit mr-2'></i>
           EDIT
         </Button>
       )}
 
-      {isEditModeOn && (
+      {canBeSaved && (
         <Button
           color='primary'
           size='sm'
           className='mr-2'
-          onClick={saveEditedCoupon}
+          onClick={onSave}
           disabled={hasFormErrors}
         >
-          {updateInProgress ? (
+          {isSaveInProgress ? (
             <i className='fas fa-fw fa-spinner fa-spin mr-2'></i>
           ) : (
             <i className='fas fa-check mr-2'></i>
@@ -52,8 +55,8 @@ export default ({
         </Button>
       )}
 
-      {isEditModeOn && (
-        <Button color='danger' outline size='sm' onClick={cancelEdit}>
+      {canBeSaved && (
+        <Button color='danger' outline size='sm' onClick={onCancel}>
           Cancel
         </Button>
       )}
@@ -63,8 +66,8 @@ export default ({
 
 interface ToolbarProps {
   mode: CouponMode;
-  updateInProgress: boolean;
-  saveEditedCoupon: Function;
-  setMode: Function;
-  cancelEdit: Function;
+  isSaveInProgress: boolean;
+  onSave: Function;
+  onEdit?: Function;
+  onCancel: Function;
 }

@@ -8,10 +8,7 @@ import { AppError } from '../../../../core/logic/AppError';
 import { CreateTransactionResponse } from './createTransactionResponse';
 import { CreateTransactionErrors } from './createTransactionErrors';
 
-import {
-  Transaction,
-  STATUS as TransactionStatus
-} from '../../domain/Transaction';
+import { Transaction, TransactionStatus } from '../../domain/Transaction';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
 import { TransactionMap } from './../../mappers/TransactionMap';
 // import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
@@ -32,7 +29,7 @@ import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
@@ -94,7 +91,7 @@ ${JSON.stringify(request)}
     ).getValue();
 
     const transactionProps = {
-      status: TransactionStatus.DRAFT
+      status: TransactionStatus.DRAFT,
     };
 
     try {
@@ -109,7 +106,7 @@ ${JSON.stringify(request)}
       // * System creates DRAFT invoice
       const invoiceProps = {
         status: InvoiceStatus.DRAFT,
-        transactionId: transaction.transactionId
+        transactionId: transaction.transactionId,
       };
 
       const invoiceOrError = Invoice.create(invoiceProps);
@@ -122,7 +119,7 @@ ${JSON.stringify(request)}
       const invoiceItemProps = {
         manuscriptId,
         invoiceId: invoice.invoiceId,
-        dateCreated: new Date()
+        dateCreated: new Date(),
       };
 
       const invoiceItemOrError = InvoiceItem.create(invoiceItemProps);
@@ -147,7 +144,7 @@ ${JSON.stringify(request)}
       const reminderPause: NotificationPause = {
         invoiceId: invoice.invoiceId,
         confirmation: false,
-        payment: false
+        payment: false,
       };
 
       // ! If no catalog item found for a given journalId

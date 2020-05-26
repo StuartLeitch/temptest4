@@ -31,6 +31,7 @@ interface Props {
     paymentType: string,
   ): any;
   applyCoupon(invoiceId: string, couponCode: string): any;
+  refreshInvoice(invoiceId: string): any;
 }
 
 const FormTextarea = (field: any) => (
@@ -120,6 +121,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
   handleSubmit,
   onVatFieldChange,
   applyCoupon,
+  refreshInvoice,
 }: any) => {
   const { invoiceId } = useParams();
   const { showModal, hideModal } = useModalActions();
@@ -271,9 +273,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                         size="medium"
                         mb="1"
                         ml="2"
-                        onClick={() => {
-                          applyCoupon(invoiceId, values.coupon);
-                        }}
+                        onClick={() => applyCoupon(invoiceId, values.coupon)}
                       >
                         Apply
                       </Button>

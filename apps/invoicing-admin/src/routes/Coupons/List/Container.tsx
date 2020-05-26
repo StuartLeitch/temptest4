@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
+import { Link } from 'react-router-dom';
 
 import { COUPONS_QUERY } from '../graphql';
 
@@ -12,6 +13,8 @@ import {
   ListPagination,
   CardFooter,
   Card,
+  ButtonToolbar,
+  Button,
 } from '../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
@@ -87,8 +90,18 @@ const CouponsContainer = () => {
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain title='Coupons' className='mb-5 mt-4' />
+        <Col lg={12} className='d-flex mb-3'>
+          <ButtonToolbar className='ml-auto'>
+            <Link to={`/coupons/create`}>
+              <Button color='twitter' className='mr-2'>
+                <i className='fas fa-plus mr-2'></i>
+                Create Coupon
+              </Button>
+            </Link>
+          </ButtonToolbar>
+        </Col>
         <Row>
-          <Col lg={12}>
+          <Col lg={12} className="mb-5">
             <Content {...{ loading, error, data }} />
           </Col>
         </Row>

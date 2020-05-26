@@ -1,3 +1,4 @@
-import Container from './Container';
+import ViewEditContainer from './ViewEditContainer';
+import CreateContainer from './CreateContainer';
 
-export default Container;
+export { ViewEditContainer as CouponDetails, CreateContainer as CouponCreate };

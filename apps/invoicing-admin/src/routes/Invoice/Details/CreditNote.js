@@ -90,14 +90,12 @@ const Details = () => {
       (acc, coupon) => acc + (coupon.reduction / 100) * price,
       0
     );
-
   }
   if (waivers?.length) {
     netCharges -= waivers.reduce(
       (acc, waiver) => acc + (waiver.reduction / 100) * price,
       0
     );
-
   }
   const vat = (netCharges / 100) * invoice?.invoiceItem?.vat;
   const total = netCharges + vat;

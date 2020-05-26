@@ -114,7 +114,7 @@ export class CreateCreditNoteUsecase
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          item.coupons = coupons;
+          coupons.forEach((c) => item.addCoupon(c));
           item.waivers = waivers;
         }
       } catch (err) {
@@ -142,7 +142,7 @@ export class CreateCreditNoteUsecase
           rawInvoiceItem.dateCreated = new Date();
           delete rawInvoiceItem.id;
 
-          invoiceItem.coupons.forEach((c) => {
+          invoiceItem.coupons.getItems().forEach((c) => {
             rawInvoiceItem.price -=
               ((invoiceItem.price * -1) / 100) * c.reduction;
           });
@@ -209,7 +209,7 @@ export class CreateCreditNoteUsecase
             await this.invoiceItemRepo.save(draftInvoiceItem);
 
             // * save coupons
-            invoiceItem.coupons.forEach(async (c) => {
+            invoiceItem.coupons.getItems().forEach(async (c) => {
               await this.couponRepo.assignCouponToInvoiceItem(
                 c,
                 draftInvoiceItem.invoiceItemId

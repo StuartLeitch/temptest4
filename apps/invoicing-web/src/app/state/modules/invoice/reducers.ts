@@ -28,7 +28,10 @@ const invoice = createReducer(initialState)
     payer: action.payload,
   }))
   .handleAction(applyCouponAction.success, (state, action) => {
+    const { reduction } = action.payload;
+
     const newState = { ...state, invoiceItem: { ...state.invoiceItem } };
+
     if (!newState.invoiceItem.coupons) {
       newState.invoiceItem.coupons = [];
     }
@@ -41,8 +44,8 @@ const invoice = createReducer(initialState)
     return newState;
   })
   .handleAction(getInvoiceVat.success, (state, action) => {
-    let invoiceItem = state.invoiceItem || ({} as InvoiceItem);
-    let { payload } = action;
+    const invoiceItem = state.invoiceItem || ({} as InvoiceItem);
+    const { payload } = action;
     return {
       ...state,
       invoiceItem: {

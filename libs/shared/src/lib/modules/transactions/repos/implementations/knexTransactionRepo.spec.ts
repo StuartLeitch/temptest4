@@ -3,15 +3,15 @@ import {
   Transaction,
   TransactionId,
   TransactionMap,
-  STATUS as TransactionStatus
+  TransactionStatus,
 } from '../../../../shared';
 import {
   Knex,
   clearTable,
   makeDb,
-  destroyDb
+  destroyDb,
 } from '../../../../infrastructure/database/knex';
-import {KnexTransactionRepo} from './knexTransactionRepo';
+import { KnexTransactionRepo } from './knexTransactionRepo';
 
 function makeTransactionData(overwrites?: Record<string, any>): Transaction {
   return TransactionMap.toDomain({
@@ -22,7 +22,7 @@ function makeTransactionData(overwrites?: Record<string, any>): Transaction {
     dateCreated: new Date(),
     dateUpdated: new Date(),
     deleted: 0,
-    ...overwrites
+    ...overwrites,
   });
 }
 
@@ -41,7 +41,7 @@ describe('TransactionKnexRepo', () => {
     afterAll(async () => await clearTable(db, 'transactions'));
 
     it('should find the transaction', async () => {
-      const transaction = makeTransactionData({id: 'transaction-1'});
+      const transaction = makeTransactionData({ id: 'transaction-1' });
       await repo.save(transaction);
 
       const foundTransaction = await repo.getTransactionById(
@@ -63,7 +63,9 @@ describe('TransactionKnexRepo', () => {
   describe('CRUD methods', () => {
     beforeEach(() =>
       db('transactions').insert(
-        TransactionMap.toPersistence(makeTransactionData({id: 'transaction-1'}))
+        TransactionMap.toPersistence(
+          makeTransactionData({ id: 'transaction-1' })
+        )
       )
     );
 
@@ -86,7 +88,7 @@ describe('TransactionKnexRepo', () => {
 
       it('should reject promise for unknown transactions', () => {
         const transaction = makeTransactionData({
-          id: 'unknown-transaction'
+          id: 'unknown-transaction',
         });
 
         expect(repo.delete(transaction)).rejects.toThrow();
@@ -95,14 +97,14 @@ describe('TransactionKnexRepo', () => {
 
     describe('.exists()', () => {
       it('should return true for existing transactions', async () => {
-        const transaction = makeTransactionData({id: 'transaction-1'});
+        const transaction = makeTransactionData({ id: 'transaction-1' });
         const result = await repo.exists(transaction);
 
         expect(result).toBe(true);
       });
 
       it('should return false for inexistent transactions', async () => {
-        const transaction = makeTransactionData({id: 'unknown-transaction'});
+        const transaction = makeTransactionData({ id: 'unknown-transaction' });
         const result = await repo.exists(transaction);
 
         expect(result).toBe(false);
@@ -111,14 +113,14 @@ describe('TransactionKnexRepo', () => {
 
     describe('.save()', () => {
       it('should save a new transaction', async () => {
-        const transaction = makeTransactionData({id: 'transaction-2'});
+        const transaction = makeTransactionData({ id: 'transaction-2' });
         const result = await repo.save(transaction);
 
         expect(result).toEqual(transaction);
       });
 
       it('should throw if transaction already exists', async () => {
-        const transaction = makeTransactionData({id: 'transaction-1'});
+        const transaction = makeTransactionData({ id: 'transaction-1' });
         expect(repo.save(transaction)).rejects.toThrow();
       });
     });
@@ -140,7 +142,7 @@ describe('TransactionKnexRepo', () => {
 
       it('should reject promise when transaction does not exist', async () => {
         const transaction = makeTransactionData({
-          id: 'unknown-transaction'
+          id: 'unknown-transaction',
         });
 
         expect(repo.update(transaction)).rejects.toThrow();

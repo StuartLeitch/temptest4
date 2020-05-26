@@ -5,18 +5,18 @@ import { Result } from '../../../core/logic/Result';
 
 // * Subdomain
 import { Invoice } from '../../../modules/invoices/domain/Invoice';
-import { TransactionCreatedEvent } from './events/transactionCreatedEvent';
+// import { TransactionCreatedEvent } from './events/transactionCreatedEvent';
 import { TransactionId } from './TransactionId';
 import { Invoices } from './Invoices';
 
-export enum STATUS {
+export enum TransactionStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
   ACTIVE = 'ACTIVE', // after the Author confirms the list of Payers. An event shall be publicized on the Event Bus.
-  FINAL = 'FINAL' // after all its associated invoices are being set to final. An event shall be publicized on the Event Bus.
+  FINAL = 'FINAL', // after all its associated invoices are being set to final. An event shall be publicized on the Event Bus.
 }
 
 interface TransactionProps {
-  status: STATUS; // TransactionState
+  status: TransactionStatus; // TransactionState
   invoices?: Invoices;
   dateCreated?: Date; // CreateTimestamp
   dateUpdated?: Date; // LastUpdateTimestamp
@@ -38,7 +38,7 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     return TransactionId.create(this.id);
   }
 
-  get status(): STATUS {
+  get status(): TransactionStatus {
     return this.props.status;
   }
 
@@ -90,7 +90,7 @@ export class Transaction extends AggregateRoot<TransactionProps> {
       ...props,
       invoices: props.invoices ? props.invoices : Invoices.create([]),
       totalNumInvoices: props.totalNumInvoices ? props.totalNumInvoices : 0,
-      dateCreated: props.dateCreated ? props.dateCreated : new Date()
+      dateCreated: props.dateCreated ? props.dateCreated : new Date(),
     };
     const transaction = new Transaction(defaultValues, id);
 
@@ -142,14 +142,14 @@ export class Transaction extends AggregateRoot<TransactionProps> {
   public markAsActive(): void {
     const now = new Date();
     this.props.dateUpdated = now;
-    this.props.status = STATUS.ACTIVE;
+    this.props.status = TransactionStatus.ACTIVE;
     // this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
   }
 
   public markAsFinal(): void {
     const now = new Date();
     this.props.dateUpdated = now;
-    this.props.status = STATUS.FINAL;
+    this.props.status = TransactionStatus.FINAL;
     // this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, now));
   }
 }

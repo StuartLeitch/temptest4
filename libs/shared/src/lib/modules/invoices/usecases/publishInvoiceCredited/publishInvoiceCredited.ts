@@ -45,7 +45,7 @@ export class PublishInvoiceCredited {
         price: ii.price,
         vatPercentage: ii.vat,
         coupons: ii.coupons
-          ? ii.coupons.map((c) => CouponMap.toEvent(c))
+          ? ii.coupons.getItems().map((c) => CouponMap.toEvent(c))
           : undefined,
         waivers: ii.waivers
           ? ii.waivers.map((w) => WaiverMap.toEvent(w))

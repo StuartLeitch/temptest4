@@ -9,7 +9,7 @@ import { AccessControlContext } from '../../../../domain/authorization/AccessCon
 import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
@@ -60,9 +60,9 @@ export class GetItemsForInvoiceUsecase
         for (const item of items) {
           const [coupons, waivers] = await Promise.all([
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
-            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId)
+            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          item.coupons = coupons;
+          coupons.forEach((c) => item.addCoupon(c));
           item.waivers = waivers;
         }
       } catch (err) {

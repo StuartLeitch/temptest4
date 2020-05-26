@@ -29,7 +29,7 @@ import {
 
 import {
   Transaction,
-  STATUS as TransactionStatus,
+  TransactionStatus,
 } from '../../../transactions/domain/Transaction';
 import { Invoice, InvoiceStatus } from '../../../invoices/domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';

@@ -7,7 +7,7 @@ import {
   SchedulerContract,
   ListenerContract,
   ScheduleTimer,
-  Job
+  Job,
 } from './Types';
 
 import { TimerMap } from './utils';
@@ -35,7 +35,7 @@ export class BullScheduler implements SchedulerContract, ListenerContract {
     this.connections = {
       default: () => new Redis(this.redisConnection),
       subscriber: new Redis(this.redisConnection),
-      client: new Redis(this.redisConnection)
+      client: new Redis(this.redisConnection),
     };
   }
 
@@ -68,7 +68,7 @@ export class BullScheduler implements SchedulerContract, ListenerContract {
     callback: (data: T) => void
   ): Promise<void> {
     try {
-      await this.createQueue(queueName).process(job => callback(job.data));
+      await this.createQueue(queueName).process((job) => callback(job.data));
       this.loggerService.debug(`Started listening on ${queueName}`);
     } catch (e) {
       this.loggerService.error(
@@ -79,7 +79,13 @@ export class BullScheduler implements SchedulerContract, ListenerContract {
   }
 
   private createQueue(queueName: string, options = {}): Queue.Queue {
-    return new Queue(queueName, { createClient: this.getRedisConnection });
+    return new Queue(queueName, {
+      createClient: this.getRedisConnection,
+      limiter: {
+        duration: 5000,
+        max: 1000,
+      },
+    });
   }
 
   /**

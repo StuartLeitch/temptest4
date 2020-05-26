@@ -29,19 +29,19 @@ export const payer: Resolvers<any> = {
         vatService,
         loggerService
       );
-      const maybeUpdatedPayer = await confirmInvoiceUsecase.execute({
+      const updatedPayer = await confirmInvoiceUsecase.execute({
         payer: inputPayer,
         sanctionedCountryNotificationReceiver:
           env.app.sanctionedCountryNotificationReceiver,
         sanctionedCountryNotificationSender:
           env.app.sanctionedCountryNotificationSender,
       });
-      if (maybeUpdatedPayer.isLeft()) {
-        throw new Error(
-          `Error: ${maybeUpdatedPayer.value.errorValue().message}`
-        );
+
+      if (updatedPayer.isLeft()) {
+        throw new Error(`Error: ${updatedPayer.value.errorValue().message}`);
       }
-      return PayerMap.toPersistence(maybeUpdatedPayer.value.getValue());
+
+      return PayerMap.toPersistence(updatedPayer.value.getValue());
     },
   },
   Payer: {

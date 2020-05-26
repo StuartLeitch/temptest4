@@ -1,21 +1,18 @@
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Roles } from '../../../users/domain/enums/Roles';
 
-import {MockTransactionRepo} from '../../repos/mocks/mockTransactionRepo';
-import {
-  Transaction,
-  STATUS as TransactionStatus
-} from '../../domain/Transaction';
+import { MockTransactionRepo } from '../../repos/mocks/mockTransactionRepo';
+import { Transaction, TransactionStatus } from '../../domain/Transaction';
 // import {TransactionAmount} from '../../domain/TransactionAmount';
-import {GetTransactionUsecase, GetTransactionContext} from './getTransaction';
+import { GetTransactionUsecase, GetTransactionContext } from './getTransaction';
 
 let usecase: GetTransactionUsecase;
 let mockTransactionRepo: MockTransactionRepo;
 let result: Result<Transaction>;
 let transactionId: string;
 
-const defaultContext: GetTransactionContext = {roles: [Roles.SUPER_ADMIN]};
+const defaultContext: GetTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 describe('GetTransactionUsecase', () => {
   describe('When NO Transaction ID is provided', () => {
@@ -39,7 +36,7 @@ describe('GetTransactionUsecase', () => {
 
       transactionId = 'test-transaction';
       const transaction = Transaction.create(
-        {status: TransactionStatus.DRAFT},
+        { status: TransactionStatus.DRAFT },
         new UniqueEntityID(transactionId)
       ).getValue();
       await mockTransactionRepo.save(transaction);
@@ -51,7 +48,7 @@ describe('GetTransactionUsecase', () => {
       it('should fail', async () => {
         result = await usecase.execute(
           {
-            transactionId: null
+            transactionId: null,
           },
           defaultContext
         );
@@ -64,7 +61,7 @@ describe('GetTransactionUsecase', () => {
         // arrange
         result = await usecase.execute(
           {
-            transactionId
+            transactionId,
           },
           defaultContext
         );

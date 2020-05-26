@@ -7,7 +7,7 @@
 // import {
 //   Transaction,
 //   TransactionCollection,
-//   STATUS as TransactionStatus
+//   TransactionStatus
 // } from '../../domain/Transaction';
 // import {
 //   CreateTransactionUsecase,

@@ -101,8 +101,6 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         );
       }
 
-      await this.scheduleReminders(invoice, payer);
-
       await this.publishInvoiceConfirmed.execute(
         invoice,
         invoiceItems,
@@ -114,6 +112,16 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
       this.loggerService.info(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`
       );
+
+      try {
+        await this.scheduleReminders(invoice, payer);
+      } catch (error) {
+        this.loggerService.info(
+          `[AfterInvoiceActivated]: Failed to schedule reminders. Err: ${JSON.stringify(
+            error
+          )}`
+        );
+      }
     } catch (err) {
       this.loggerService.info(
         `[AfterInvoiceActivated]: Failed to execute onPublishInvoiceActivated use case AfterInvoiceActivated. Err: ${err}`

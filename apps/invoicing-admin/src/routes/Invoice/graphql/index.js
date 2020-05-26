@@ -9,7 +9,7 @@ import {
 export {
   // queries
   INVOICE_QUERY,
-  //mutations
+  // mutations
   CREATE_CREDIT_NOTE_MUTATION,
   APPLY_COUPON_MUTATION,
   BANK_TRANSFER_MUTATION,

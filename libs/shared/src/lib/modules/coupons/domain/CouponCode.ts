@@ -31,14 +31,14 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
   }
 
   public static create(value: string): Result<CouponCode> {
-    if (CouponCode.isValid(value)) {
+    if (!CouponCode.isValid(value)) {
       return Result.fail<CouponCode>('Must provide a valid coupon code');
     }
     return Result.ok<CouponCode>(new CouponCode({ value }));
   }
 
   public static isValid(code: string | CouponCode): boolean {
-    const validCodeRegex = /^[A-Z0-9]{6, 10}$/;
+    const validCodeRegex = /^([A-Z0-9]{6,10})$/;
     let rawCode: string;
 
     if (code instanceof CouponCode) {

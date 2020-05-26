@@ -7,21 +7,35 @@ interface Field {
 
 interface ContextProps {
   couponState?: {
-    name: Field;
+    name?: Field;
     reduction: Field;
     type: Field;
     status: Field;
     expirationDate: Field;
+    code?: Field;
   };
   update?: Function;
 }
 
-export const CouponContext = React.createContext<ContextProps>({});
+// EDIT
+export const CouponEditContext = React.createContext<ContextProps>({});
 
-export const couponReducerInitialState = {
+export const couponEditInitialState = {
   name: { value: '', isValid: true },
   reduction: { value: '', isValid: true },
   type: { value: '', isValid: true },
   status: { value: '', isValid: true },
   expirationDate: { value: null, isValid: true },
+};
+
+// CREATE
+export const CouponCreateContext = React.createContext<ContextProps>({});
+
+export const couponCreateInitialState = {
+  name: { value: '', isValid: true },
+  reduction: { value: '', isValid: false },
+  type: { value: '', isValid: true },
+  status: { value: '', isValid: true },
+  expirationDate: { value: null, isValid: true },
+  code: { value: '', isValid: false },
 };
