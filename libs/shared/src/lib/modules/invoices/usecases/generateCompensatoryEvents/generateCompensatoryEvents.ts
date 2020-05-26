@@ -148,7 +148,6 @@ export class GenerateCompensatoryEventsUsecase
         .execute();
       return execution;
     } catch (err) {
-      console.log('esti bou');
       return left(new AppError.UnexpectedError(err));
     }
   }
