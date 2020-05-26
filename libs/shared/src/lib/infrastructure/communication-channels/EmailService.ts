@@ -131,13 +131,6 @@ export class EmailService {
       .buildProps();
     const newJournalTemplate = cloneDeep(this.journalProps);
 
-    if (newJournalTemplate.privacy) {
-      newJournalTemplate.privacy = newJournalTemplate.privacy.replace(
-        '[TO EMAIL]',
-        manuscript.authorEmail
-      );
-    }
-
     return Email.create(emailProps, newJournalTemplate, this.mailingDisabled);
   }
 

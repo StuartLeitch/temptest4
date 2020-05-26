@@ -35,12 +35,18 @@ export class Email {
     tenantProps: JournalProps,
     mailingDisabled: boolean
   ): Email {
+    if (tenantProps.privacy) {
+      tenantProps.privacy = tenantProps.privacy.replace(
+        '[TO EMAIL]',
+        template.toUser.email
+      );
+    }
     const finalTemplate = {
       ...template,
       content: {
         ...template.content,
-        ...tenantProps
-      }
+        ...tenantProps,
+      },
     };
     return new Email(mailingDisabled, finalTemplate);
   }
