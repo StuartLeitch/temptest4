@@ -16,10 +16,8 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
-import { Address } from '../../../addresses/domain/Address';
-import { Payment } from '../../../payments/domain/Payment';
+import { Coupons } from '../../../coupons/domain/Coupons';
 import { InvoiceStatus } from '../../domain/Invoice';
-import { Payer } from '../../../payers/domain/Payer';
 import { Invoice } from '../../domain/Invoice';
 
 import { PaymentMethodRepoContract } from '../../../payments/repos/paymentMethodRepo';
@@ -71,9 +69,13 @@ import {
   InvoiceFinalizedData,
   InvoiceCreditedData,
   InvoiceCreatedData,
+  WithBillingAddress,
   InvoicePayedData,
+  WithInvoiceItems,
   WithInvoiceId,
+  WithPayments,
   WithInvoice,
+  WithPayer,
 } from './actionTypes';
 
 function originalInvoiceId(invoice: Invoice): string {
@@ -106,6 +108,7 @@ export class GenerateCompensatoryEventsUsecase
   ) {
     this.publishInvoiceConfirmed = this.publishInvoiceConfirmed.bind(this);
     this.publishInvoiceFinalized = this.publishInvoiceFinalized.bind(this);
+    this.removeCouponsAndWaivers = this.removeCouponsAndWaivers.bind(this);
     this.publishInvoiceCredited = this.publishInvoiceCredited.bind(this);
     this.publishInvoiceCreated = this.publishInvoiceCreated.bind(this);
     this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
@@ -231,11 +234,11 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   private attachAddress(context: Context) {
-    return async <T extends { payer: Payer }>(request: T) => {
+    return async <T extends WithPayer>(request: T) => {
       const usecase = new GetAddressUseCase(this.addressRepo);
 
       if (!request.payer) {
-        return right<null, T & { billingAddress: Address }>({
+        return right<null, T & WithBillingAddress>({
           ...request,
           billingAddress: null,
         });
@@ -357,9 +360,10 @@ export class GenerateCompensatoryEventsUsecase
     return right(true);
   }
 
-  private async havePaymentsBeenMade<
-    T extends { payments: Payment[]; payer: Payer }
-  >({ payments, payer }: T): Promise<Either<null, boolean>> {
+  private async havePaymentsBeenMade<T extends WithPayer & WithPayments>({
+    payments,
+    payer,
+  }: T): Promise<Either<null, boolean>> {
     if (!payer) {
       return right(false);
     }
@@ -372,7 +376,7 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   private attachPaymentDate(context: Context) {
-    return <T extends WithInvoice & { payments: Payment[] }>(request: T) => {
+    return <T extends WithInvoice & WithPayments>(request: T) => {
       const { payments, invoice } = request;
       let paymentDate: Date;
 
@@ -389,6 +393,18 @@ export class GenerateCompensatoryEventsUsecase
         ...request,
         paymentDate,
       };
+    };
+  }
+
+  private removeCouponsAndWaivers<T extends WithInvoiceItems>(request: T) {
+    const invoiceItems = request.invoiceItems.map((item) => {
+      item.props.coupons = Coupons.create();
+      item.props.waivers = [];
+      return item;
+    });
+    return {
+      ...request,
+      invoiceItems,
     };
   }
 
@@ -480,6 +496,7 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachInvoiceItems(context))
         .then(this.attachManuscript(context))
         .map(this.updateInvoiceStatus('DRAFT', 'dateAccepted'))
+        .map(this.removeCouponsAndWaivers)
         .then(this.sendCreatedEvent(context))
         .map(() => request)
         .execute();

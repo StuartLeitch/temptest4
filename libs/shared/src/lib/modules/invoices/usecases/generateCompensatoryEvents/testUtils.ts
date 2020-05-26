@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/camelcase */
+
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
@@ -25,6 +27,7 @@ import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
 export function addInvoices(invoicesRepo: MockInvoiceRepo) {
   const invoicesProps = [
     {
+      dateMovedToFinal: '2019-12-01',
       dateAccepted: '2019-10-13',
       dateCreated: '2018-12-15',
       dateUpdated: '2019-12-01',
@@ -71,6 +74,29 @@ export function addInvoices(invoicesRepo: MockInvoiceRepo) {
       charge: 80,
       id: '5',
     },
+    {
+      dateMovedToFinal: '2019-12-01',
+      dateAccepted: '2019-10-13',
+      dateCreated: '2018-12-15',
+      dateUpdated: '2019-12-01',
+      dateIssued: '2019-11-01',
+      transactionId: '6',
+      status: 'FINAL',
+      charge: 80,
+      id: '6',
+    },
+    {
+      cancelledInvoiceReference: '6',
+      dateMovedToFinal: '2019-12-01',
+      dateAccepted: '2019-10-13',
+      dateCreated: '2019-12-01',
+      dateUpdated: '2019-12-01',
+      dateIssued: '2019-12-01',
+      transactionId: '6',
+      status: 'FINAL',
+      charge: 80,
+      id: '7',
+    },
   ];
 
   for (const props of invoicesProps) {
@@ -106,6 +132,20 @@ export function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
       manuscriptId: '5',
       invoiceId: '5',
       id: '5',
+    },
+    {
+      manuscriptId: '6',
+      invoiceId: '6',
+      price: 80,
+      id: '6',
+      vat: 20,
+    },
+    {
+      manuscriptId: '6',
+      invoiceId: '7',
+      price: -80,
+      id: '7',
+      vat: 20,
     },
   ];
 
@@ -157,6 +197,14 @@ export function addManuscripts(manuscriptRepo: MockArticleRepo) {
       customId: '5',
       id: '5',
     },
+    {
+      created: new Date(),
+      articleType: '6',
+      title: 'Test 6',
+      journalId: '6',
+      customId: '6',
+      id: '6',
+    },
   ];
 
   for (const props of manuscriptsProps) {
@@ -187,6 +235,16 @@ export function addPayers(payerRepo: MockPayerRepo) {
       title: 'Mr',
       id: '3',
     },
+    {
+      shippingAddressId: '6',
+      email: 'test@test.com',
+      billingAddressId: '6',
+      type: 'INDIVIDUAL',
+      invoiceId: '6',
+      name: 'Test6',
+      title: 'Mr',
+      id: '6',
+    },
   ];
 
   for (const props of payersProps) {
@@ -203,6 +261,14 @@ export function addPayments(paymentRepo: MockPaymentRepo) {
       paymentMethodId: '1',
       invoiceId: '1',
       payerId: '1',
+      amount: 100,
+    },
+    {
+      foreignPaymentId: 'test',
+      datePaid: '2019-12-01',
+      paymentMethodId: '1',
+      invoiceId: '6',
+      payerId: '6',
       amount: 100,
     },
   ];
@@ -301,6 +367,14 @@ export function addBillingAddresses(addressRepo: MockAddressRepo) {
       postalCode: null,
       country: 'RO',
       addressLine1: 'TestAddress3',
+    },
+    {
+      id: '6',
+      city: 'City6',
+      state: null,
+      postalCode: null,
+      country: 'RO',
+      addressLine1: 'TestAddress6',
     },
   ];
 

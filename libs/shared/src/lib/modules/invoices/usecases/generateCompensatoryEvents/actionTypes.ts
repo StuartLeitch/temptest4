@@ -14,6 +14,22 @@ export interface WithInvoiceId {
   invoiceId: string;
 }
 
+export interface WithPayer {
+  payer: Payer;
+}
+
+export interface WithInvoiceItems {
+  invoiceItems: InvoiceItem[];
+}
+
+export interface WithBillingAddress {
+  billingAddress: Address;
+}
+
+export interface WithPayments {
+  payments: Payment[];
+}
+
 export interface InvoiceConfirmedData {
   invoiceItems: InvoiceItem[];
   billingAddress: Address;
