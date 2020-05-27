@@ -327,9 +327,7 @@ const Details = () => {
 
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') &&
-                  invoice.payments.every(
-                    (p) => p.status !== PaymentStatus.PENDING
-                  ) && (
+                  invoice.payments.every((p) => p.status !== 'PENDING') && (
                     <>
                       <Button
                         id={CREATE_CREDIT_NOTE_MODAL_TARGET}
