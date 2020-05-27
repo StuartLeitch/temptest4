@@ -201,10 +201,8 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   return (
     <Expander
       title="2. Invoice &amp; Payment"
-      expanded={
-        invoiceStatus !== "DRAFT" || !paymentStatus.includes("COMPLETED")
-      }
-      disabled={invoiceStatus === "DRAFT" || paymentStatus.includes("PENDING")}
+      expanded={invoiceStatus !== "DRAFT"}
+      disabled={invoiceStatus === "DRAFT"}
     >
       {body}
     </Expander>
