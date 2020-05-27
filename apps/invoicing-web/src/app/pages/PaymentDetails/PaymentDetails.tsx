@@ -142,7 +142,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 ccToken={token}
                 methods={paymentMethods}
                 invoiceStatus={invoice.status}
-                paymentStatus={invoice.payment.map((p) => p.status)}
+                paymentStatus={invoice.payments.map((p) => p.status)}
                 error={creditCardPaymentError || payPalPaymentError}
                 payByCardSubmit={payByCard}
                 payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
