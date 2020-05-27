@@ -346,13 +346,8 @@ const Details = () => {
                     </>
                   )}
 
-                {(status === 'ACTIVE' || status === 'FINAL') && (
-                  <Button
-                    id={APPLY_COUPON_MODAL_TARGET}
-                    color='twitter'
-                    // outline={status !== 'DRAFT'}
-                    // disabled={status !== 'DRAFT'}
-                  >
+                {status === 'DRAFT' && (
+                  <Button id={APPLY_COUPON_MODAL_TARGET} color='twitter'>
                     Apply Coupon
                   </Button>
                 )}
