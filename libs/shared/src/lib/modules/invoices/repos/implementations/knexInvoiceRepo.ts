@@ -1,3 +1,5 @@
+import { Transform } from 'stream';
+
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { Invoice } from '../../domain/Invoice';
@@ -322,15 +324,18 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     return this.getInvoiceById(invoice.invoiceId);
   }
 
-  async getInvoicesIds(
+  async *getInvoicesIds(
     ids: string[],
-    journalIds: string[],
-    page: number
-  ): Promise<string[]> {
-    const { db } = this;
-    const pageSize = 20;
+    journalIds: string[]
+  ): AsyncGenerator<string, void, undefined> {
+    const extractInvoiceId = new Transform({
+      objectMode: true,
+      transform(item, encoding, callback) {
+        callback(null, item.invoiceId);
+      },
+    });
 
-    let query = db(`${TABLES.INVOICES} as i`)
+    let query = this.db(`${TABLES.INVOICES} as i`)
       .join(`${TABLES.INVOICE_ITEMS} as ii`, 'i.id', 'ii.invoiceId')
       .join(`${TABLES.ARTICLES} as a`, 'a.id', 'ii.manuscriptId')
       .join(`${TABLES.CATALOG} as c`, 'c.journalId', 'a.journalId')
@@ -344,11 +349,13 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       query = query.whereIn('c.id', journalIds);
     }
 
-    const finalIds = query
+    const stream = query
       .where('i.deleted', 0)
-      .offset(page * pageSize)
-      .limit(pageSize);
+      .stream({ objectMode: true })
+      .pipe(extractInvoiceId);
 
-    return (await finalIds).map((item) => item.invoiceId);
+    for await (const a of stream) {
+      yield a;
+    }
   }
 }

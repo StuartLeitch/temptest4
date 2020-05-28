@@ -24,3 +24,19 @@ export class PublishInvoicePayedError extends Result<UseCaseError> {
     });
   }
 }
+
+export class PublishInvoiceFinalizedError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `When publishing "InvoiceFinalized" event for invoice with id {${id}} and error ocurred, {${err.message}}: ${err.stack}`,
+    });
+  }
+}
+
+export class PublishInvoiceCreditedError extends Result<UseCaseError> {
+  constructor(id: string, err: Error) {
+    super(false, {
+      message: `When publishing "InvoiceCredited" event for invoice with id {${id}} and error ocurred, {${err.message}}: ${err.stack}`,
+    });
+  }
+}

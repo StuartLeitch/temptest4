@@ -76,7 +76,7 @@ export const coupon: Resolvers<any> = {
 
       const createCouponUsecase = new CreateCouponUsecase(couponRepo);
 
-      const result = await createCouponUsecase.execute(args.coupon);
+      const result = await createCouponUsecase.execute(args.coupon as any);
 
       if (result.isLeft()) {
         throw new Error(result?.value?.errorValue().message);

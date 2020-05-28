@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import {
@@ -7,6 +8,7 @@ import {
   RecordPayPalPaymentUsecase,
   GetPaymentMethodsUseCase,
   MigratePaymentUsecase,
+  PaymentMethodMap,
   Roles,
 } from '@hindawi/shared';
 import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
@@ -33,7 +35,7 @@ export const payments: Resolvers<any> = {
       });
 
       if (result.isRight()) {
-        return result.value.getValue();
+        return result.value.getValue().map(PaymentMethodMap.toPersistence);
       } else {
         throw new Error(`Can't get payments methods.`);
       }

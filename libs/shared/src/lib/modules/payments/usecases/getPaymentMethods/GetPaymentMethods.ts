@@ -1,44 +1,62 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
+import { AppError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 import {
-  PaymentMethodMap,
-  PaymentMethodPersistenceDTO
-} from '../../mapper/PaymentMethod';
-import { GetPaymentMethodsResponse } from './GetPaymentMethodsResponse';
+  AccessControlledUsecase,
+  AuthorizationContext,
+  Authorize,
+} from '../../../../domain/authorization/decorators/Authorize';
+
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
+import { GetPaymentMethodsResponse as Response } from './GetPaymentMethodsResponse';
+import { GetPaymentMethodsDTO as DTO } from './GetPaymentMethodsDTO';
+import * as Errors from './GetPaymentMethodsErrors';
+
+type Context = AuthorizationContext<Roles>;
+export type GetPaymentMethodsContext = Context;
+
 export class GetPaymentMethodsUseCase
-  implements UseCase<undefined, Promise<GetPaymentMethodsResponse>> {
+  implements
+    UseCase<DTO, Promise<Response>>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {}
 
-  public async execute(
-    request?: any,
-    context?: any
-  ): Promise<GetPaymentMethodsResponse> {
-    let paymentMethods: PaymentMethodPersistenceDTO[];
-    // console.info(context);
-    // console.info(this.paymentMethodRepo);
-    (this.paymentMethodRepo as any).correlationId = context.correlationId;
+  private async getAccessControlContext(request, context?) {
+    return {};
+  }
 
-    this.loggerService.debug('GetPaymentMethodsUseCase', { request, context });
-
+  // @Authorize('invoice:read')
+  public async execute(request?: any, context?: any): Promise<Response> {
     try {
-      paymentMethods = (await this.paymentMethodRepo.getPaymentMethods()).map(
-        PaymentMethodMap.toPersistence
-      );
+      (this.paymentMethodRepo as any).correlationId = context.correlationId;
 
       this.loggerService.debug('GetPaymentMethodsUseCase', {
+        request,
         context,
-        data: paymentMethods
       });
 
-      return right(Result.ok<PaymentMethodPersistenceDTO[]>(paymentMethods));
+      try {
+        const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
+
+        this.loggerService.debug('GetPaymentMethodsUseCase', {
+          context,
+          data: paymentMethods,
+        });
+
+        return right(Result.ok(paymentMethods));
+      } catch (err) {
+        return left(new Errors.GetPaymentMethodsDbRequestError(err));
+      }
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

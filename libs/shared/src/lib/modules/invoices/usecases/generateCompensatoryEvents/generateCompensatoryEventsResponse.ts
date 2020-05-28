@@ -4,6 +4,7 @@ import { AppError } from '../../../../core/logic/AppError';
 import * as GenerateCompensatoryEventsErrors from './generateCompensatoryEventsErrors';
 
 export type GenerateCompensatoryEventsResponse = Either<
+  | GenerateCompensatoryEventsErrors.PublishInvoiceFinalizedError
   | GenerateCompensatoryEventsErrors.PublishInvoiceConfirmError
   | GenerateCompensatoryEventsErrors.PublishInvoicePayedError
   | GenerateCompensatoryEventsErrors.InvoiceIdRequiredError

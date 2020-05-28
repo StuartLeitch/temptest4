@@ -20,7 +20,6 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   existsWithId(id: InvoiceId): Promise<boolean>;
   getInvoicesIds(
     ids: string[],
-    journalIds: string[],
-    page: number
-  ): Promise<string[]>;
+    journalIds: string[]
+  ): AsyncGenerator<string, void, undefined>;
 }

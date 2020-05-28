@@ -1,39 +1,31 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
+import { AppError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
+import {
+  AccessControlledUsecase,
+  AuthorizationContext,
+  Authorize,
+} from '../../../../domain/authorization/decorators/Authorize';
 
-import { Invoice } from '../../domain/Invoice';
-import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
-import { GetInvoicesIdsResponse } from './getInvoicesIdsResponse';
-import { GetInvoicesIdsErrors } from './getInvoicesIdsErrors';
-import { GetInvoicesIdsDTO } from './getInvoicesIdsDTO';
+import { GetInvoicesIdsResponse as Response } from './getInvoicesIdsResponse';
+import { GetInvoicesIdsDTO as DTO } from './getInvoicesIdsDTO';
+import * as Errors from './getInvoicesIdsErrors';
 
-export type GetInvoicesIdsContext = AuthorizationContext<Roles>;
+type Context = AuthorizationContext<Roles>;
+export type GetInvoicesIdsContext = Context;
 
 export class GetInvoicesIdsUsecase
   implements
-    UseCase<
-      GetInvoicesIdsDTO,
-      Promise<GetInvoicesIdsResponse>,
-      GetInvoicesIdsContext
-    >,
-    AccessControlledUsecase<
-      GetInvoicesIdsDTO,
-      GetInvoicesIdsContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private invoiceRepo: InvoiceRepoContract) {}
 
   private async getAccessControlContext(request, context?) {
@@ -41,28 +33,22 @@ export class GetInvoicesIdsUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(
-    request: GetInvoicesIdsDTO,
-    context?: GetInvoicesIdsContext
-  ): Promise<GetInvoicesIdsResponse> {
-    return (right(
-      Result.ok(this.getInvoiceIds(request))
-    ) as unknown) as GetInvoicesIdsResponse;
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    try {
+      let generator: AsyncGenerator<string, void, undefined>;
+      try {
+        generator = this.getInvoiceIds(request);
+      } catch (err) {
+        return left(new Errors.FilteringInvoicesDbError(err));
+      }
+      return right(Result.ok(generator));
+    } catch (err) {
+      return left(new AppError.UnexpectedError(err));
+    }
   }
 
-  private async *getInvoiceIds({ invoiceIds, journalIds }: GetInvoicesIdsDTO) {
-    let page = 0;
-    while (true) {
-      const items = await this.invoiceRepo.getInvoicesIds(
-        invoiceIds,
-        journalIds,
-        page
-      );
-      if (!items.length) {
-        break;
-      }
-      page++;
-      yield* items;
-    }
+  private async *getInvoiceIds({ invoiceIds, journalIds }: DTO) {
+    const items = this.invoiceRepo.getInvoicesIds(invoiceIds, journalIds);
+    yield* items;
   }
 }

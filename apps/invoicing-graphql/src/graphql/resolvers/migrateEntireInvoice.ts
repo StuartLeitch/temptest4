@@ -23,6 +23,7 @@ export const migrateEntireInvoice: Resolvers<any> = {
           waiver,
           payer,
         },
+        services: { logger: loggerService },
         qq: sqsQueService,
       } = context;
 
@@ -37,7 +38,8 @@ export const migrateEntireInvoice: Resolvers<any> = {
         payment,
         coupon,
         waiver,
-        payer
+        payer,
+        loggerService
       );
 
       const usecaseRequest: MigrateEntireInvoiceDTO = {

@@ -2,30 +2,37 @@ import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 
-import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
-import { PublishInvoiceFinalized } from '../usecases/publishInvoiceFinalized';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
+import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
 import { InvoiceId } from './../domain/InvoiceId';
-import { InvoiceItemRepoContract } from '../repos';
-import { ArticleRepoContract } from '../../manuscripts/repos';
-import { PayerRepoContract } from '../../payers/repos/payerRepo';
+
+import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
-// import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
-// import { VATService, PayerType, UniqueEntityID } from '@hindawi/shared';
-import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { PaymentRepoContract } from '../../payments/repos/paymentRepo';
+import { PayerRepoContract } from '../../payers/repos/payerRepo';
+import { ArticleRepoContract } from '../../manuscripts/repos';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
+import { InvoiceItemRepoContract } from '../repos';
+
+import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods/GetPaymentMethods';
+import { PublishInvoiceFinalizedUsecase } from '../usecases/publishEvents/publishInvoiceFinalized';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+// import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 
 export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
   constructor(
+    private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private addressRepo: AddressRepoContract,
+    private paymentRepo: PaymentRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private addressRepo: AddressRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceFinalized: PublishInvoiceFinalized,
-    private loggerService: any
+    private publishInvoiceFinalized: PublishInvoiceFinalizedUsecase,
+    private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
   }
@@ -81,7 +88,9 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         }
       }
 
-      const address = await this.addressRepo.findById(payer.billingAddressId);
+      const billingAddress = await this.addressRepo.findById(
+        payer.billingAddressId
+      );
 
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
@@ -93,13 +102,37 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         );
       }
 
-      await this.publishInvoiceFinalized.execute(
-        invoice,
+      const paymentMethodsUsecase = new GetPaymentMethodsUseCase(
+        this.paymentMethodRepo,
+        this.loggerService
+      );
+      const paymentMethods = await paymentMethodsUsecase.execute();
+
+      if (paymentMethods.isLeft()) {
+        throw new Error(
+          `Payment methods could not be accessed: ${
+            paymentMethods.value.errorValue().message
+          }`
+        );
+      }
+
+      const payments = await this.paymentRepo.getPaymentsByInvoiceId(
+        invoice.invoiceId
+      );
+
+      const publishResult = await this.publishInvoiceFinalized.execute({
+        paymentMethods: paymentMethods.value.getValue(),
+        billingAddress,
         invoiceItems,
         manuscript,
+        payments,
+        invoice,
         payer,
-        address
-      );
+      });
+
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
 
       this.loggerService.info(
         `[AfterInvoiceFinalized]: Successfully executed onPublishInvoiceFinalized use case AfterInvoiceFinalized`
