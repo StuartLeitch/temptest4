@@ -29,17 +29,6 @@ import { EmailService } from '../../../../infrastructure/communication-channels'
 import { WaiverService } from '../../../../domain/services/WaiverService';
 import { VATService } from '../../../../domain/services/VATService';
 
-import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
-import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
-import {
-  SisifJobTypes,
-  JobBuilder,
-} from '../../../../infrastructure/message-queues/contracts/Job';
-import {
-  SchedulingTime,
-  TimerBuilder,
-} from '../../../../infrastructure/message-queues/contracts/Time';
-
 // * Usecase specifics
 import { UpdateTransactionOnAcceptManuscriptResponse } from './updateTransactionOnAcceptManuscriptResponse';
 import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
@@ -81,7 +70,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     private payerRepo: PayerRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverService: WaiverService,
-    private scheduler: SchedulerContract,
     private emailService: EmailService,
     private vatService: VATService,
     private loggerService: any
@@ -295,29 +283,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
         return right(Result.ok<void>());
       }
-
-      const jobData = PayloadBuilder.invoiceReminder(
-        invoice.id.toString(),
-        manuscript.authorEmail,
-        manuscript.authorFirstName,
-        manuscript.authorSurname
-      );
-
-      const newJob = JobBuilder.basic(
-        SisifJobTypes.InvoiceConfirmReminder,
-        jobData
-      );
-
-      const newTimer = TimerBuilder.delayed(
-        request.confirmationReminder.delay,
-        SchedulingTime.Day
-      );
-
-      this.scheduler.schedule(
-        newJob,
-        request.confirmationReminder.queueName,
-        newTimer
-      );
 
       this.emailService
         .createInvoicePaymentTemplate(

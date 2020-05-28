@@ -68,8 +68,17 @@ export function formatPayer(
 }
 
 function itemReduction(item: InvoiceItem): number {
-  const couponTotal = item.coupons.reduce((acc, c) => acc + c.reduction, 0);
-  const waiverTotal = item.waivers.reduce((acc, w) => acc + w.reduction, 0);
+  let couponTotal = 0;
+  let waiverTotal = 0;
+
+  if (item.coupons) {
+    couponTotal = item.coupons.reduce((acc, c) => acc + c.reduction, 0);
+  }
+
+  if (item.waivers) {
+    waiverTotal = item.waivers.reduce((acc, w) => acc + w.reduction, 0);
+  }
+
   const totalReduction = Math.min(couponTotal + waiverTotal, 100);
   return (item.price * totalReduction) / 100;
 }

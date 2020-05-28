@@ -38,7 +38,7 @@ export class GetPaymentMethodsUseCase
   // @Authorize('invoice:read')
   public async execute(request?: any, context?: any): Promise<Response> {
     try {
-      (this.paymentMethodRepo as any).correlationId = context.correlationId;
+      // (this.paymentMethodRepo as any).correlationId = context.correlationId;
 
       this.loggerService.debug('GetPaymentMethodsUseCase', {
         request,

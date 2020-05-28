@@ -62,7 +62,7 @@ export const SubmissionPeerReviewCycleCheckPassed = {
         payer: payerRepo,
         coupon: couponRepo,
       },
-      services: { waiverService, emailService, schedulingService, vatService },
+      services: { waiverService, emailService, vatService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
@@ -99,7 +99,6 @@ export const SubmissionPeerReviewCycleCheckPassed = {
       payerRepo,
       couponRepo,
       waiverService,
-      schedulingService,
       emailService,
       vatService,
       logger

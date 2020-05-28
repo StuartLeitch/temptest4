@@ -14,6 +14,8 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { Transaction } from '../../../transactions/domain/Transaction';
+import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
+import { NotificationPause } from '../../../notifications/domain/NotificationPause';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
@@ -44,14 +46,9 @@ export class CreateCreditNoteUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private transactionRepo: TransactionRepoContract,
     private couponRepo: CouponRepoContract,
-    private waiverRepo: WaiverRepoContract
-  ) {
-    this.invoiceRepo = invoiceRepo;
-    this.invoiceItemRepo = invoiceItemRepo;
-    this.transactionRepo = transactionRepo;
-    this.couponRepo = couponRepo;
-    this.waiverRepo = waiverRepo;
-  }
+    private waiverRepo: WaiverRepoContract,
+    private pausedReminderRepo: PausedReminderRepoContract
+  ) {}
 
   private async getAccessControlContext(
     request: CreateCreditNoteRequestDTO,
@@ -230,6 +227,14 @@ export class CreateCreditNoteUsecase
           draftInvoice.invoiceId
         );
         await this.invoiceRepo.update(draftInvoice);
+
+        //* create notificationPause
+        const reminderPause: NotificationPause = {
+          invoiceId: draftInvoice.invoiceId,
+          confirmation: false,
+          payment: false,
+        };
+        await this.pausedReminderRepo.save(reminderPause);
 
         // * save waivers
         await this.waiverRepo.attachWaiversToInvoice(

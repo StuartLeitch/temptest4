@@ -77,7 +77,10 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       invoice,
       invoiceItem,
       manuscript,
-      publishInvoiceCreatedUsecase
+      publishInvoiceCreatedUsecase,
+      schedulingService,
+      env.scheduler.confirmationReminderDelay,
+      env.scheduler.emailRemindersQueue
     );
 
     // tslint:disable-next-line: no-unused-expression

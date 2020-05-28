@@ -59,7 +59,7 @@ export const SubmissionQualityCheckPassed = {
         payer: payerRepo,
         coupon: couponRepo,
       },
-      services: { waiverService, emailService, schedulingService, vatService },
+      services: { waiverService, emailService, vatService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
@@ -96,7 +96,6 @@ export const SubmissionQualityCheckPassed = {
       payerRepo,
       couponRepo,
       waiverService,
-      schedulingService,
       emailService,
       vatService,
       logger

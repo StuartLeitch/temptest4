@@ -51,16 +51,12 @@ export class RecordPaymentUsecase
     context?: RecordPaymentContext
   ): Promise<RecordPaymentResponse> {
     const paymentPayload = {
-      invoiceId: InvoiceId.create(
-        new UniqueEntityID(payload.invoiceId)
-      ).getValue(),
-      amount: Amount.create(payload.amount).getValue(),
-      payerId: PayerId.create(new UniqueEntityID(payload.payerId)),
+      invoiceId: payload.invoiceId,
+      amount: payload.amount,
+      payerId: payload.payerId,
       foreignPaymentId: payload.foreignPaymentId,
-      paymentMethodId: PaymentMethodId.create(
-        new UniqueEntityID(payload.paymentMethodId)
-      ),
-      datePaid: payload.datePaid ? new Date(payload.datePaid) : new Date(),
+      paymentMethodId: payload.paymentMethodId,
+      datePaid: payload.datePaid,
       markInvoiceAsPaid: !!payload.markInvoiceAsPaid,
     };
 
