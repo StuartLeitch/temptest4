@@ -108,7 +108,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     [invoiceId, payWithCard],
   );
 
-  const PaymentContent = () => {
+  const paymentContent = () => {
     const invoiceTransactionIsNotDraft = invoice.transaction.status !== "DRAFT";
 
     if (invoiceTransactionIsNotDraft) {
@@ -175,9 +175,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
 
     return (
       <Flex vertical height="calc(100% - 62px)" justifyContent="space-between">
-        <Flex vertical>
-          <PaymentContent />
-        </Flex>
+        <Flex vertical>{paymentContent()}</Flex>
         <PaymentFooter />
       </Flex>
     );
