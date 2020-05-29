@@ -171,6 +171,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     }
   }
 
+  get invoiceTotal(): number {
+    return this.getInvoiceTotal();
+  }
+
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
     if (this.props.invoiceItems.exists(invoiceItem)) {
       this.props.invoiceItems.remove(invoiceItem);
@@ -183,6 +187,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.totalNumInvoiceItems++;
     // this.addDomainEvent(new InvoiceItemIssued(this, invoiceItem));
     return Result.ok<void>();
+  }
+
+  public addItems(invoiceItems: InvoiceItem[] | InvoiceItems): void {
+    invoiceItems.forEach(this.addInvoiceItem, this);
   }
 
   private constructor(props: InvoiceProps, id?: UniqueEntityID) {
@@ -255,9 +263,16 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceTotal(): number {
-    return this.invoiceItems
-      .getItems()
-      .reduce((acc, item) => acc + item.calculatePrice(), 0);
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return this.invoiceItems.reduce(
+      (acc, item) => acc + item.calculatePrice(),
+      0
+    );
   }
 
   // public getValue(): number {

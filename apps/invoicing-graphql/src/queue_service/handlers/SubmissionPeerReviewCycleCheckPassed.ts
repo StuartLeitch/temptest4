@@ -2,12 +2,12 @@
 /* eslint-disable max-len */
 
 // * Domain imports
-import { SubmissionQualityCheckPassed } from '@hindawi/phenom-events';
+import { SubmissionPeerReviewCycleCheckPassed as SubmissionPeerReviewCycleCheckPassedEvent } from '@hindawi/phenom-events';
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
-  TransactionStatus,
   UpdateTransactionContext,
+  TransactionStatus,
   VersionCompare,
   // QueuePayloads,
   Roles,
@@ -29,7 +29,7 @@ const logger = new Logger(
 export const SubmissionPeerReviewCycleCheckPassed = {
   event: SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(
-    data: SubmissionQualityCheckPassed
+    data: SubmissionPeerReviewCycleCheckPassedEvent
   ) {
     logger.info('Incoming Event Data', data);
 

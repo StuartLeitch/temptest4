@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { createQueueService } = require('@hindawi/queue-service');
+import { createQueueService } from '@hindawi/queue-service';
 
 import {
   MicroframeworkLoader,

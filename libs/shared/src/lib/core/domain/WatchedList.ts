@@ -97,14 +97,26 @@ export abstract class WatchedList<T> {
     }
   }
 
-  public map<U>(fn: (i: T) => U): U[] {
-    return this.currentItems.map(fn);
+  public forEach(fn: (c: T, i: number, arr: T[]) => void, t?: any): void {
+    return this.currentItems.forEach(fn, this);
+  }
+
+  public map<U>(fn: (c: T, i: number, arr: T[]) => U, t?: any): U[] {
+    return this.currentItems.map(fn, t);
+  }
+
+  public filter<S extends T>(
+    fn: (c: T, i: number, arr: T[]) => c is S,
+    t?: any
+  ): S[];
+  public filter(fn: (c: T, i: number, arr: T[]) => unknown, t?: any): T[] {
+    return this.currentItems.filter(fn, t);
   }
 
   public reduce(fn: (acc: T, c: T, i: number, arr: T[]) => T): T;
-  public reduce(fn: (acc: T, c: T, i: number, arr: T[]) => T, start: T): T;
-  public reduce<U>(fn: (acc: U, c: T, i: number, arr: T[]) => U, start: U): U;
-  public reduce<U>(fn: (acc: U, c: T, i: number, arr: T[]) => U, start?: U): U {
-    return this.currentItems.reduce(fn, start);
+  public reduce(fn: (acc: T, c: T, i: number, arr: T[]) => T, base: T): T;
+  public reduce<U>(fn: (acc: U, c: T, i: number, arr: T[]) => U, base: U): U;
+  public reduce<U>(fn: (acc: U, c: T, i: number, arr: T[]) => U, base?: U): U {
+    return this.currentItems.reduce(fn, base);
   }
 }

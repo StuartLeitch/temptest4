@@ -25,6 +25,95 @@ interface Mutation {
 
 class GuardError {}
 
+function allFilters<R>(
+  filters: { (r: R): Promise<Either<unknown, boolean>> }[]
+) {
+  return async (r: R) => {
+    let finalResult = right<unknown, boolean>(true);
+    for (const fn of filters) {
+      const result = await fn(r);
+      finalResult = finalResult.chain((val) =>
+        result.map((resVal) => val && resVal)
+      );
+    }
+    return finalResult;
+  };
+}
+
+function anyFilter<R>(
+  filters: { (r: R): Promise<Either<unknown, boolean>> }[]
+) {
+  return async (r: R) => {
+    let finalResult = right<unknown, boolean>(false);
+    for (const fn of filters) {
+      const result = await fn(r);
+      finalResult = finalResult.chain((val) =>
+        result.map((resVal) => val || resVal)
+      );
+    }
+    return finalResult;
+  };
+}
+
+export function flattenEither<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
+  const response: R[] = [];
+  for (const either of eithers) {
+    if (either.isLeft()) {
+      return (either as unknown) as Either<L, R[]>;
+    }
+    response.push(either.value);
+  }
+
+  return right(response);
+}
+
+export async function asyncFlattenEither<L, R>(
+  eithers: Promise<Either<L, R>>[]
+): Promise<Either<L, R[]>> {
+  return Promise.all(eithers).then(flattenEither);
+}
+
+function advancePastGuard<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    if (val.isLeft()) return val;
+
+    const maybeResult: Either<unknown, unknown> = await fn(val.value);
+
+    if (maybeResult.isRight()) {
+      if (maybeResult.value) {
+        return val;
+      } else {
+        throw new GuardError();
+      }
+    }
+    return maybeResult;
+  };
+}
+
+function emptyMapping<L, R>(val: Either<L, R>) {
+  return async () => val;
+}
+
+function combineAsyncEithers<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    if (val.isLeft()) return val;
+    const execution = await fn(val.value);
+    return execution.execute();
+  };
+}
+
+function doThen<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    return val.chain<L, R>(fn);
+  };
+}
+
+function doMap<L, R>(val: Either<L, R>) {
+  return async (fn: MutationFunction) => {
+    return val.map<R>(fn);
+  };
+}
+
 export class AsyncEither<L = null, R = unknown> {
   private readonly value: R;
   private mutations: Mutation[];
@@ -77,7 +166,7 @@ export class AsyncEither<L = null, R = unknown> {
       guard: advancePastGuard,
       default: emptyMapping,
       then: doThen,
-      map: doMap
+      map: doMap,
     };
     return (objectMapping[type] || objectMapping.default)(val);
   }
@@ -99,93 +188,4 @@ export class AsyncEither<L = null, R = unknown> {
 
     return right(response);
   }
-}
-
-export function flattenEither<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
-  const response: R[] = [];
-  for (const either of eithers) {
-    if (either.isLeft()) {
-      return (either as unknown) as Either<L, R[]>;
-    }
-    response.push(either.value);
-  }
-
-  return right(response);
-}
-
-export async function asyncFlattenEither<L, R>(
-  eithers: Promise<Either<L, R>>[]
-): Promise<Either<L, R[]>> {
-  return Promise.all(eithers).then(flattenEither);
-}
-
-function advancePastGuard<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
-    if (val.isLeft()) return val;
-
-    const maybeResult: Either<unknown, unknown> = await fn(val.value);
-
-    if (maybeResult.isRight()) {
-      if (!!maybeResult.value) {
-        return val;
-      } else {
-        throw new GuardError();
-      }
-    }
-    return maybeResult;
-  };
-}
-
-function emptyMapping<L, R>(val: Either<L, R>) {
-  return async () => val;
-}
-
-function combineAsyncEithers<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
-    if (val.isLeft()) return val;
-    const execution = await fn(val.value);
-    return execution.execute();
-  };
-}
-
-function doThen<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
-    return val.chain<L, R>(fn);
-  };
-}
-
-function doMap<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
-    return val.map<R>(fn);
-  };
-}
-
-function allFilters<R>(
-  filters: { (r: R): Promise<Either<unknown, boolean>> }[]
-) {
-  return async (r: R) => {
-    let finalResult = right<null, boolean>(true);
-    for (const fn of filters) {
-      const result = await fn(r);
-      finalResult = finalResult.chain(val =>
-        result.map(resVal => val && resVal)
-      );
-    }
-    return finalResult;
-  };
-}
-
-function anyFilter<R>(
-  filters: { (r: R): Promise<Either<unknown, boolean>> }[]
-) {
-  return async (r: R) => {
-    let finalResult = right<null, boolean>(false);
-    for (const fn of filters) {
-      const result = await fn(r);
-      finalResult = finalResult.chain(val =>
-        result.map(resVal => val || resVal)
-      );
-    }
-    return finalResult;
-  };
 }

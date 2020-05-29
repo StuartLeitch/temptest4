@@ -128,8 +128,8 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     super(props, id);
   }
 
-  public calculatePrice(withReductions?: Reduction<any>[]) {
-    const reductions: Reduction<any>[] = [];
+  public calculatePrice(withReductions?: Reduction<unknown>[]) {
+    const reductions: Reduction<unknown>[] = [];
     if (this.coupons) {
       reductions.push(...this.coupons.getItems());
     }

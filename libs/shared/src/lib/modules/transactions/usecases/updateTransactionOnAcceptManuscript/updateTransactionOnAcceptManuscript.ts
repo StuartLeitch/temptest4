@@ -46,6 +46,7 @@ import { PayerMap } from '../../../payers/mapper/Payer';
 import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
 import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 import { PayerType } from '../../../payers/domain/Payer';
+import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   implements
@@ -169,65 +170,60 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       transaction.markAsActive();
 
       // * get author details
-      let { authorCountry } = manuscript;
-      if (request.authorCountry) {
-        manuscript.authorCountry = request.authorCountry;
-        authorCountry = request.authorCountry;
-      }
 
-      if (request.customId) {
-        manuscript.customId = request.customId;
-      }
-
-      if (request.title) {
-        manuscript.title = request.title;
-      }
-
-      if (request.articleType) {
-        manuscript.articleType = request.articleType;
-      }
-
-      if (request.authorEmail) {
-        manuscript.authorEmail = request.authorEmail;
-      }
-
-      if (request.authorCountry) {
-        manuscript.authorCountry = request.authorCountry;
-      }
-
-      if (request.authorSurname) {
-        manuscript.authorSurname = request.authorSurname;
-      }
-
-      if (request.authorFirstName) {
-        manuscript.authorFirstName = request.authorFirstName;
-      }
+      manuscript.authorFirstName = request?.authorFirstName;
+      manuscript.authorCountry = request?.authorCountry;
+      manuscript.authorSurname = request?.authorSurname;
+      manuscript.articleType = request?.articleType;
+      manuscript.authorEmail = request?.authorEmail;
+      manuscript.customId = request?.customId;
+      manuscript.title = request?.title;
 
       // * Identify applicable waiver(s)
       // TODO: Handle the case where multiple reductions are applied
       try {
         waivers = await this.waiverService.applyWaivers({
-          country: authorCountry,
           invoiceId: invoice.invoiceId.id.toString(),
           authorEmail: manuscript.authorEmail,
+          country: manuscript.authorCountry,
           journalId: manuscript.journalId,
         });
       } catch (error) {
         console.log('Failed to save waivers', error);
+        return left(
+          new AppError.UnexpectedError(
+            `Failed to save waivers due to error: ${error.message}: ${error.stack}`
+          )
+        );
       }
 
       await this.transactionRepo.update(transaction);
       await this.articleRepo.update(manuscript);
+
       invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
       invoice.dateAccepted = new Date();
+
       await this.invoiceRepo.update(invoice);
 
       invoice.generateCreatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      const total = invoice.invoiceItems
-        .getItems()
-        .reduce((sum, ii) => sum + ii.calculatePrice(), 0);
+      const invoiceItemsUsecase = new GetItemsForInvoiceUsecase(
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo
+      );
+      const itemsWithReductions = await invoiceItemsUsecase.execute(
+        { invoiceId: invoice.id.toString() },
+        context
+      );
+
+      if (itemsWithReductions.isLeft()) {
+        return itemsWithReductions.map(() => Result.ok<void>());
+      }
+
+      invoice.addItems(itemsWithReductions.value.getValue());
+      const total = invoice.invoiceTotal;
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (total <= 0) {
@@ -276,9 +272,15 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
         // * Confirm the invoice automagically
         try {
-          await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
+          const maybeConfirmed = await confirmInvoiceUsecase.execute(
+            confirmInvoiceArgs,
+            context
+          );
+          if (maybeConfirmed.isLeft()) {
+            return maybeConfirmed.map(() => Result.ok<void>());
+          }
         } catch (err) {
-          // do nothing yet
+          return left(new AppError.UnexpectedError(err));
         }
 
         return right(Result.ok<void>());
@@ -298,6 +300,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       return right(Result.ok<void>());
     } catch (err) {
+      console.error(err);
       return left(new AppError.UnexpectedError(err));
     }
   }
