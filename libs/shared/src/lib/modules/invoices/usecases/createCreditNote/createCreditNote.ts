@@ -179,6 +179,7 @@ export class CreateCreditNoteUsecase
         const invoiceProps = {
           ...clonedRawInvoice,
           status: InvoiceStatus.DRAFT,
+          dateMovedToFinal: null,
           invoiceNumber: null,
           erpReference: null,
           dateIssued: null,
@@ -226,6 +227,7 @@ export class CreateCreditNoteUsecase
         draftInvoice = await this.invoiceRepo.assignInvoiceNumber(
           draftInvoice.invoiceId
         );
+        draftInvoice.dateAccepted = creditNote.dateAccepted;
         await this.invoiceRepo.update(draftInvoice);
 
         //* create notificationPause
