@@ -4,6 +4,7 @@ import {
   EpicOnArticlePublishedUsecase,
   EpicOnArticlePublishedDTO,
 } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
+import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
@@ -19,11 +20,15 @@ export const ArticlePublishedHandler = {
 
     const {
       customId,
-      // articleType: { name },
+      articleType: { name },
       // journalId,
       published,
       // title
     } = data;
+
+    if (name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
 
     const {
       repos: {

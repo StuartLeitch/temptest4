@@ -11,6 +11,8 @@ import {
   Roles,
 } from '@hindawi/shared';
 
+import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
+
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
@@ -28,6 +30,10 @@ export const SubmissionQualityCheckPassed = {
     logger.info('Incoming Event Data', data);
 
     const { submissionId, manuscripts } = data;
+
+    if (manuscripts[0]?.articleType?.name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
 
     const maxVersion = manuscripts.reduce((max, m) => {
       const version = VersionCompare.versionCompare(m.version, max)
@@ -59,7 +65,7 @@ export const SubmissionQualityCheckPassed = {
         payer: payerRepo,
         coupon: couponRepo,
       },
-      services: { waiverService, emailService, vatService },
+      services: { waiverService, emailService, vatService, schedulingService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();

@@ -1,4 +1,5 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+/* eslint-disable max-len */
 
 // * Domain imports
 import { SubmissionQualityCheckPassed } from '@hindawi/phenom-events';
@@ -8,8 +9,10 @@ import {
   TransactionStatus,
   UpdateTransactionContext,
   VersionCompare,
+  // QueuePayloads,
   Roles,
 } from '@hindawi/shared';
+import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 
 import { Logger } from '../../lib/logger';
 import { env } from '../../env';
@@ -32,7 +35,11 @@ export const SubmissionPeerReviewCycleCheckPassed = {
 
     const { submissionId, manuscripts } = data;
 
-    const maxVersion = manuscripts.reduce((max, m) => {
+    if (manuscripts[0]?.articleType?.name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
+
+    const maxVersion = manuscripts.reduce((max, m: any) => {
       const version = VersionCompare.versionCompare(m.version, max)
         ? m.version
         : max;
@@ -62,7 +69,7 @@ export const SubmissionPeerReviewCycleCheckPassed = {
         payer: payerRepo,
         coupon: couponRepo,
       },
-      services: { waiverService, emailService, vatService },
+      services: { waiverService, emailService, vatService, schedulingService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
