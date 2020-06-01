@@ -1,9 +1,10 @@
-import { CatalogMap } from './../../../mappers/CatalogMap';
 import { defineFeature, loadFeature } from 'jest-cucumber';
 
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+
 import { EditorCollection } from '../../../domain/Editor';
 import { EditorMap } from '../../../mappers/EditorMap';
+import { CatalogMap } from './../../../mappers/CatalogMap';
 import { JournalId } from '../../../domain/JournalId';
 import { EditorId } from '../../../domain/EditorId';
 import { MockEditorRepo } from '../../../repos/mocks/mockEditorRepo';

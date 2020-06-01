@@ -14,10 +14,10 @@ import {
 } from '@hindawi/shared';
 import { EditorRepoContract } from '../../../repos/editorRepo';
 import { JournalId } from '../../../domain/JournalId';
-// import { Editor } from '../../../domain/Editor';
+import { EditorMap } from '../../../mappers/EditorMap';
 import { CatalogRepoContract } from '../../../repos';
 import { DeleteEditorDTO } from '../deleteEditor/deleteEditorDTO';
-import { DeleteEditor } from '../deleteEditor/deleteEditor';
+// import { DeleteEditor } from '../deleteEditor/deleteEditor';
 
 interface RemoveEditorsFromJournalDTO {
   journalId: string;
@@ -85,42 +85,41 @@ export class RemoveEditorsFromJournalUsecase
         );
       }
 
-      const currentEditors = await this.editorRepo.getEditorsByJournalId(
-        journalId
-      );
-      if (!currentEditors) {
-        return left(
-          new AppError.UnexpectedError(
-            `Could not get editors for journalId: ${journalId.id.toString()}.`
-          )
-        );
-      }
+      // const currentEditors = await this.editorRepo.getEditorsByJournalId(
+      //   journalId
+      // );
+      // if (!currentEditors) {
+      //   return left(
+      //     new AppError.UnexpectedError(
+      //       `Could not get editors for journalId: ${journalId.id.toString()}.`
+      //     )
+      //   );
+      // }
 
-      const currentEditorsIds = currentEditors.map((e) => e.id.toString());
+      // const currentEditorsIds = currentEditors.map((e) => e.id.toString());
 
       // console.log(`Current editors number: ${currentEditorsIds.length}`);
       // console.log(`Expected editors number: ${allEditors.length}`);
 
-      const editorsToRemove = allEditors.filter((e) => {
-        // TODO filter assistants
-        const isCreated = currentEditorsIds.includes(e.editorId);
-        return !isCreated;
-      });
+      // const editorsToRemove = allEditors.filter((e) => {
+      //   // TODO filter assistants
+      //   const isCreated = currentEditorsIds.includes(e.editorId);
+      //   return !isCreated;
+      // });
 
       // console.log(
       //   `Deleting ${editorsToRemove.length} editors`,
       //   editorsToRemove.map((e) => e.email).join(' ')
       // );
 
-      const deleteEditorUsecase = new DeleteEditor(this.editorRepo);
       const deleteEditorsResponse = await Promise.all(
-        editorsToRemove.map((e) => deleteEditorUsecase.execute(e))
+        allEditors.map((e) => this.editorRepo.delete(EditorMap.toDomain(e)))
       );
 
       const errs = [];
       for (const editorResponse of deleteEditorsResponse) {
-        if (editorResponse.isLeft()) {
-          errs.push(editorResponse.value);
+        if (typeof editorResponse !== 'undefined') {
+          errs.push('Editor delete error.');
         }
       }
 

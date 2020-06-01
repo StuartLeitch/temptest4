@@ -28,11 +28,11 @@ import {
 } from '@hindawi/shared';
 
 import { ExchangeRateService } from '../../../../libs/shared/src/lib/domain/services/ExchangeRateService';
+import { LoggerBuilder } from './../../../../libs/shared/src/lib/infrastructure/logging/LoggerBuilder';
 import { CheckoutService } from '../services/checkout';
 // import { AuthService } from '../services/auth';
 import { PayPalService } from '../services/paypal';
 import { ErpService } from '../services/erp';
-import { Logger } from '../lib/logger';
 
 import { env } from '../env';
 import { BullScheduler } from '@hindawi/sisif';
@@ -42,19 +42,19 @@ export const contextLoader: MicroframeworkLoader = (
 ) => {
   if (settings) {
     const db = settings.getData('connection');
-    const logger = new Logger();
+    const loggerBuilder = new LoggerBuilder();
 
     const repos = {
       address: new KnexAddressRepo(db),
       catalog: new KnexCatalogRepo(db),
-      invoice: new KnexInvoiceRepo(db, logger),
-      invoiceItem: new KnexInvoiceItemRepo(db, logger),
-      transaction: new KnexTransactionRepo(db, logger),
+      invoice: new KnexInvoiceRepo(db, loggerBuilder.getLogger()),
+      invoiceItem: new KnexInvoiceItemRepo(db, loggerBuilder.getLogger()),
+      transaction: new KnexTransactionRepo(db, loggerBuilder.getLogger()),
       payer: new KnexPayerRepo(db),
       payment: new KnexPaymentRepo(db),
-      paymentMethod: new KnexPaymentMethodRepo(db, logger),
+      paymentMethod: new KnexPaymentMethodRepo(db, loggerBuilder.getLogger()),
       waiver: new KnexWaiverRepo(db),
-      manuscript: new KnexArticleRepo(db, logger),
+      manuscript: new KnexArticleRepo(db, loggerBuilder.getLogger()),
       editor: new KnexEditorRepo(db),
       coupon: new KnexCouponRepo(db),
       publisher: new KnexPublisherRepo(db),
@@ -69,7 +69,7 @@ export const contextLoader: MicroframeworkLoader = (
     };
 
     const services = {
-      logger,
+      logger: loggerBuilder.getLogger(),
       checkoutService: new CheckoutService(),
       // authService: new AuthService({}),
       vatService: new VATService(),

@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { beforeMethod, afterMethod, Metadata } from 'aspect.js';
 
 import { EpicOnArticlePublishedUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
@@ -32,7 +33,7 @@ import {
   GetPaymentInfoUsecase,
 } from '@hindawi/shared';
 
-import { Logger } from './logger';
+import { Logger } from '../../../../../libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 const logger = new Logger('Usecase:Aspect');
 
 const watchList = [

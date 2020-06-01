@@ -24,7 +24,9 @@ export class EditorMap extends Mapper<Editor> {
         createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
         updatedAt: raw.updatedAt
           ? new Date(raw.updatedAt)
-          : new Date(raw.createdAt),
+          : raw.createdAt
+          ? new Date(raw.createdAt)
+          : null,
         role: EditorRole.create({
           label: raw.roleLabel,
           type: raw.roleType,
@@ -58,7 +60,7 @@ export class EditorMap extends Mapper<Editor> {
       email: raw.email,
       name: raw.givenNames,
       createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
-      updatedAt: raw.updatedAt ? new Date(raw.creatupdatedAtedAt) : null,
+      updatedAt: raw.updatedAt ? new Date(raw.updatedAt) : null,
       roleLabel: raw.role && raw.role.label,
       roleType: raw.role && raw.role.type,
     };

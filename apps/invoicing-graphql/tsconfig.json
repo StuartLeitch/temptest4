@@ -7,5 +7,8 @@
     "resolveJsonModule": true,
     "types": ["node", "jest", "express"]
   },
-  "include": ["**/*.ts"]
+  "include": [
+    "**/*.ts",
+    "../../libs/shared/src/lib/infrastructure/logging/implementations/Logger.ts"
+  ]
 }

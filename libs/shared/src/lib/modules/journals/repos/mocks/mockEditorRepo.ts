@@ -21,7 +21,7 @@ export class MockEditorRepo extends BaseMockRepo<Editor>
   }
 
   public async getEditorsByJournalId(journalId: JournalId): Promise<Editor[]> {
-    const match = this._items.filter((i) => i.journalId.equals(journalId));
+    const match = this._items.filter((e) => e.journalId.equals(journalId));
     return match ? match : null;
   }
 

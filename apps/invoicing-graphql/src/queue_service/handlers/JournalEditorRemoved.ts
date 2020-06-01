@@ -1,43 +1,103 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
-// import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
+// import { UniqueEntityID } from '../../../../../libs/shared/src/lib/core/domain/UniqueEntityID';
+import { GetEditorsByJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
+import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 import { RemoveEditorsFromJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
-import { JournalEventMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
-import { Logger } from '../../lib/logger';
+// import { DeleteEditor } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/deleteEditor/deleteEditor';
+// import { JournalId } from './../../../../../libs/shared/src/lib/modules/journals/domain/JournalId';
+
+import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
+// import { JournalEventMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
 
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
-const logger = new Logger(`PhenomEvent:${JOURNAL_EDITOR_REMOVED}`);
-// const JOURNAL_SECTION_SPECIAL_ISSUE_EDITOR_ASSIGNED =
-//   'JournalSectionSpecialIssueEditorAssigned';
-// const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
-// const JOURNAL_SPECIAL_ISSUE_EDITOR_ASSIGNED =
-//   'JournalSpecialIssueEditorAssigned';
 
 function removeEditorEventHandlerFactory(eventName: string): any {
   return async function (data: any) {
-    logger.info(`Incoming Event Data`, data);
     const {
       repos: { catalog: catalogRepo, editor: editorRepo },
+      // tslint:disable-next-line: no-shadowed-variable
+      services: { logger },
     } = this;
+    logger.setScope(`PhenomEvent:${JOURNAL_EDITOR_REMOVED}`);
+
+    logger.info(`Incoming Event Data`, data);
+
+    const getEditorsByJournal = new GetEditorsByJournalUsecase(
+      editorRepo,
+      catalogRepo
+    );
 
     const removeEditorsFromJournal = new RemoveEditorsFromJournalUsecase(
       editorRepo,
       catalogRepo
     );
 
+    const assignEditorsToJournal = new AssignEditorsToJournalUsecase(
+      editorRepo,
+      catalogRepo
+    );
+
     try {
       const journalId = data.id;
-      const editors = JournalEventMap.extractEditors(data);
-      const editorsRemovedResponse = await removeEditorsFromJournal.execute({
+      const eventEditors = [];
+
+      if (data.editors && Array.isArray(data.editors)) {
+        eventEditors.push(...data.editors);
+      }
+
+      // parsing Journal Section Editors
+      if (data?.sections && Array.isArray(data.sections)) {
+        for (const section of data.sections) {
+          // section.editors
+          if (Array.isArray(section.editors)) {
+            eventEditors.push(...section.editors);
+          }
+        }
+      }
+
+      const allEditors = eventEditors.filter(
+        (ee) => ee.roleType !== 'editorialAssistant'
+      );
+
+      const maybeCurrentEditors = await getEditorsByJournal.execute({
         journalId,
-        allEditors: editors,
+      });
+      const currentEditorsResponse = maybeCurrentEditors.value;
+
+      if (maybeCurrentEditors.isLeft()) {
+        const err = currentEditorsResponse;
+        logger.error(err);
+        throw err;
+      }
+
+      const currentEditors = (currentEditorsResponse as any).map(
+        EditorMap.toPersistence
+      );
+
+      const maybeEditorsRemoved = await removeEditorsFromJournal.execute({
+        journalId,
+        allEditors: currentEditors,
       });
 
-      // if (editorsRemovedResponse.isLeft()) {
-      //   logger.error(editorsRemovedResponse.value.errorValue().message);
-      //   throw editorsRemovedResponse.value.error;
-      // }
+      const editorsRemovedResponse = maybeEditorsRemoved.value;
+
+      if (maybeEditorsRemoved.isLeft()) {
+        logger.error(editorsRemovedResponse);
+        throw editorsRemovedResponse;
+      }
+
+      const maybeAddEditorsToJournal = await assignEditorsToJournal.execute({
+        journalId,
+        allEditors,
+      });
+
+      const addEditorsToJournalResponse = maybeAddEditorsToJournal.value;
+      if (maybeAddEditorsToJournal.isLeft()) {
+        logger.error(addEditorsToJournalResponse);
+        throw addEditorsToJournalResponse;
+      }
 
       logger.info(`Successfully executed event ${eventName}`);
     } catch (error) {

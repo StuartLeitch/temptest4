@@ -12,6 +12,6 @@ Feature: Remove Editors From Journal Usecase
     And I should have <left> editors in the system
 
     Examples:
-      | journalId | journalStart | start | remove | left | journalLeft |
-      | foo       | 7            | 12    | 2      | 10   | 5           |
-      | foo       | 5            | 12    | 0      | 12   | 5           |
+      | journalId | start | journalStart | remove | left | journalLeft |
+      | foo       | 12    | 7            | 2      | 10   | 5           |
+      | foo       | 12    | 5            | 0      | 12   | 5           |
