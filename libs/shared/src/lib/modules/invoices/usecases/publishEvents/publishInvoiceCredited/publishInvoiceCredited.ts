@@ -59,7 +59,7 @@ export class PublishInvoiceCreditedUsecase
     const data: InvoiceCreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 
-      cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
+      creditNoteForInvoice: creditNote.cancelledInvoiceReference,
       referenceNumber: `CN-${creditNote.referenceNumber}`,
       transactionId: creditNote.transactionId.toString(),
       erpReference: creditNote.erpReference,
@@ -73,14 +73,14 @@ export class PublishInvoiceCreditedUsecase
       invoiceCreatedDate: creditNote?.dateCreated?.toISOString(),
       invoiceIssuedDate: creditNote?.dateIssued?.toISOString(),
 
-      costs: formatCosts(invoiceItems, payments),
+      costs: formatCosts(invoiceItems, payments, creditNote),
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 
       payer: formatPayer(payer, billingAddress),
 
       payments: formatPayments(payments, paymentMethods),
-    } as any;
+    };
 
     try {
       await this.publishService.publishMessage({
