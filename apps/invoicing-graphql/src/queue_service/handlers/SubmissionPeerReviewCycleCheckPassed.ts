@@ -11,7 +11,6 @@ import {
   Roles,
 } from '@hindawi/shared';
 
-import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
@@ -19,15 +18,16 @@ const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 const SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED =
   'SubmissionPeerReviewCycleCheckPassed';
 
-const logger = new Logger(
-  `PhenomEvent:${SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED}`
-);
-
 export const SubmissionPeerReviewCycleCheckPassed = {
   event: SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(
     data: SubmissionQualityCheckPassed
-  ) {
+  ): Promise<unknown> {
+    const {
+      services: { logger },
+    } = this;
+
+    logger.setScope(`PhenomEvent:${SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED}`);
     logger.info('Incoming Event Data', data);
 
     const { submissionId, manuscripts } = data;
@@ -64,8 +64,6 @@ export const SubmissionPeerReviewCycleCheckPassed = {
       },
       services: { waiverService, emailService, schedulingService, vatService },
     } = this;
-
-    // catalogRepo.getCatalogItemByJournalId();
 
     const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
       invoiceItemRepo,

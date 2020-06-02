@@ -1,15 +1,11 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
-// import { UniqueEntityID } from '../../../../../libs/shared/src/lib/core/domain/UniqueEntityID';
 import { GetEditorsByJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
 import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 import { RemoveEditorsFromJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
-// import { DeleteEditor } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/deleteEditor/deleteEditor';
-// import { JournalId } from './../../../../../libs/shared/src/lib/modules/journals/domain/JournalId';
 
 import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
-// import { JournalEventMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
 
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
 

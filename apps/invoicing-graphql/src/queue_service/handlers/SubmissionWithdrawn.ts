@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
 // * Domain imports
@@ -5,17 +7,20 @@ import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain
 
 import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import { SoftDeleteDraftTransactionAuthorizationContext } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionAuthorizationContext';
-import { Logger } from '../../lib/logger';
 
 const SUBMISSION_WITHDRAWN = 'SubmissionWithdrawn';
 const defaultContext: SoftDeleteDraftTransactionAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN]
+  roles: [Roles.SUPER_ADMIN],
 };
-const logger = new Logger(`PhenomEvent:${SUBMISSION_WITHDRAWN}`);
 
 export const SubmissionWithdrawn = {
   event: SUBMISSION_WITHDRAWN,
   handler: async function submissionWithdrawnHandler(data: any) {
+    const {
+      services: { logger },
+    } = this;
+
+    logger.setScope(`PhenomEvent:${SUBMISSION_WITHDRAWN}`);
     logger.info('Incoming Event Data', data);
 
     const { submissionId } = data;
@@ -25,8 +30,8 @@ export const SubmissionWithdrawn = {
         transaction: transactionRepo,
         invoiceItem: invoiceItemRepo,
         invoice: invoiceRepo,
-        manuscript: manuscriptRepo
-      }
+        manuscript: manuscriptRepo,
+      },
     } = this;
 
     const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
@@ -38,7 +43,7 @@ export const SubmissionWithdrawn = {
 
     const result = await softDeleteDraftTransactionUsecase.execute(
       {
-        manuscriptId: submissionId
+        manuscriptId: submissionId,
       },
       defaultContext
     );
@@ -47,5 +52,5 @@ export const SubmissionWithdrawn = {
       logger.error(result.value.errorValue().message);
       throw result.value.error;
     }
-  }
+  },
 };

@@ -26,11 +26,15 @@ import { Logger } from '../../lib/logger';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
-const logger = new Logger(`PhenomEvent:${SUBMISSION_SUBMITTED}`);
 
 export const SubmissionSubmittedHandler = {
   event: SUBMISSION_SUBMITTED,
   handler: async function submissionSubmittedHandler(data: any) {
+    const {
+      services: { logger },
+    } = this;
+
+    logger.setScope(`PhenomEvent:${SUBMISSION_SUBMITTED}`);
     logger.info(`Incoming Event Data`, data);
 
     const {

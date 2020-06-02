@@ -1,28 +1,32 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 // * Domain imports
 import { SubmissionQualityCheckPassed as SubmissionQualityCheckPassedEvent } from '@hindawi/phenom-events';
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
-  STATUS as TransactionStatus,
+  TransactionStatus,
   UpdateTransactionContext,
   VersionCompare,
   Roles,
 } from '@hindawi/shared';
 
-import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
 
-const logger = new Logger(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
-
 export const SubmissionQualityCheckPassed = {
   event: SUBMISSION_QUALITY_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(
     data: SubmissionQualityCheckPassedEvent
-  ) {
+  ): Promise<unknown> {
+    const {
+      services: { logger },
+    } = this;
+
+    logger.setScope(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
     logger.info('Incoming Event Data', data);
 
     const { submissionId, manuscripts } = data;
@@ -53,8 +57,11 @@ export const SubmissionQualityCheckPassed = {
         manuscript: manuscriptRepo,
         waiver: waiverRepo,
         catalog: catalogRepo,
+        address: addressRepo,
+        payer: payerRepo,
+        coupon: couponRepo,
       },
-      services: { waiverService, emailService, schedulingService },
+      services: { waiverService, emailService, schedulingService, vatService },
     } = this;
 
     // catalogRepo.getCatalogItemByJournalId();
@@ -81,15 +88,20 @@ export const SubmissionQualityCheckPassed = {
     }
 
     const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
+      addressRepo,
       catalogRepo,
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
       manuscriptRepo,
       waiverRepo,
+      payerRepo,
+      couponRepo,
       waiverService,
       schedulingService,
-      emailService
+      emailService,
+      vatService,
+      logger
     );
 
     const result = await updateTransactionOnAcceptManuscript.execute(

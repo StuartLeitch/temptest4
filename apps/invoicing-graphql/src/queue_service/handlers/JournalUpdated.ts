@@ -1,19 +1,23 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   UpdateCatalogItemToCatalogUseCase,
-  UpdateCatalogItemToCatalogUseCaseRequestDTO
+  UpdateCatalogItemToCatalogUseCaseRequestDTO,
 } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
-import { Logger } from '../../lib/logger';
 
 const JOURNAL_UPDATED = 'JournalUpdated';
-const logger = new Logger(`PhenomEvent:${JOURNAL_UPDATED}`);
 
 export const JournalUpdatedHandler = {
   event: JOURNAL_UPDATED,
   async handler(data: any) {
-    logger.info(`Incoming Event Data`, data);
     const {
-      repos: { catalog: catalogRepo }
+      repos: { catalog: catalogRepo },
+      services: { logger },
     } = this;
+
+    logger.setScope(`PhenomEvent:${JOURNAL_UPDATED}`);
+    logger.info(`Incoming Event Data`, data);
 
     const addJournalUsecase = new UpdateCatalogItemToCatalogUseCase(
       catalogRepo
@@ -28,12 +32,12 @@ export const JournalUpdatedHandler = {
       issn: data.issn,
       journalTitle: data.name,
       isActive: data.isActive,
-      journalId: data.id
+      journalId: data.id,
     } as UpdateCatalogItemToCatalogUseCaseRequestDTO);
 
     if (result.isLeft()) {
       logger.error(result.value.errorValue().message);
       throw result.value.error;
     }
-  }
+  },
 };

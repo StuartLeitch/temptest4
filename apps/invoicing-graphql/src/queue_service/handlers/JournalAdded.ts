@@ -1,18 +1,22 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
 import { AddCatalogItemToCatalogUseCaseRequestDTO } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogDTOs';
 
-import { Logger } from '../../lib/logger';
-
 const JOURNAL_ADDED = 'JournalAdded';
-const logger = new Logger(`PhenomEvent:${JOURNAL_ADDED}`);
 
 export const JournalAddedHandler = {
   event: JOURNAL_ADDED,
   async handler(data: any) {
-    logger.info(`Incoming Event Data`, data);
     const {
-      repos: { catalog: catalogRepo, publisher: publisherRepo }
+      repos: { catalog: catalogRepo, publisher: publisherRepo },
+      services: { logger },
     } = this;
+
+    logger.setScope(`PhenomEvent:${JOURNAL_ADDED}`);
+
+    logger.info(`Incoming Event Data`, data);
 
     const addJournalUsecase = new AddCatalogItemToCatalogUseCase(
       catalogRepo,
@@ -28,7 +32,7 @@ export const JournalAddedHandler = {
         issn: data.issn,
         journalTitle: data.name,
         isActive: data.isActive,
-        journalId: data.id
+        journalId: data.id,
       } as AddCatalogItemToCatalogUseCaseRequestDTO);
 
       if (result.isLeft()) {
@@ -39,5 +43,5 @@ export const JournalAddedHandler = {
       logger.error(error.message);
       throw error;
     }
-  }
+  },
 };
