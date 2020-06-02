@@ -7,7 +7,6 @@ import submissionView from './SubmissionsView';
 import authorsView from './AuthorsView';
 import invoiceDataView from './InvoicesDataView';
 import articleDataView from './ArticleDataView';
-import submissionDataView from './SubmissionDataView';
 
 class InvoicesView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -19,7 +18,7 @@ AS SELECT
     inv.is_credit_note,
     inv.manuscript_custom_id as "manuscript_custom_id",
     inv.invoice_created_date as "invoice_created_date",
-    case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as manuscript_accepted_date,
+    inv.manuscript_accepted_date,
     case 
     	when inv.status = 'DRAFT' then null
     	when coalesce(inv.paid_amount, 0) = 0 then null
@@ -47,7 +46,7 @@ AS SELECT
     inv.payment_currency as "payment_currency",
     inv.organization,
     waivers.waiver_types as waivers,
-    coupons.coupon_names as coupons,
+    coupons.coupon_codes as coupons,
     inv.event_id as "event_id",
     s.title as "manuscript_title",
     s.article_type as "manuscript_article_type",
@@ -85,19 +84,17 @@ AS SELECT
     LIMIT 1) a on
     a.manuscript_custom_id = inv.manuscript_custom_id
   LEFT JOIN (
-    select id as event_id, STRING_AGG(type_id, ', ') as waiver_types
+    select id as event_id, STRING_AGG("waiverType", ', ') as waiver_types
     from ${REPORTING_TABLES.INVOICE} ie,
-    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'waivers') as waivers(type_id text)
+    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'waivers') as waivers("waiverType" text)
     group by event_id
   ) waivers on waivers.event_id = inv.event_id
   LEFT JOIN (
-    select id as event_id, STRING_AGG(name, ', ') as coupon_names
+    select id as event_id, STRING_AGG(code, ', ') as coupon_codes
     from ${REPORTING_TABLES.INVOICE} ie,
-    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(name text)
+    jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(code text)
     group by event_id
   ) coupons on coupons.event_id = inv.event_id
-  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed') 
-    order by event_timestamp desc limit 1) sd on sd.manuscript_custom_id = inv.manuscript_custom_id
   LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 where id2.invoice_id = inv.cancelled_invoice_reference limit 1) original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
 WITH DATA;
     `;
