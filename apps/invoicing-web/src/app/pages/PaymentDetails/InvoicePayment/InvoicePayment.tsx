@@ -65,7 +65,7 @@ const validateFn = (methods) => (values) => {
   return errors;
 };
 
-const calculateTotalToBePaid = (invoice: any) => {
+const calculateTotalToBePaid = (invoice: any): number => {
   const initialAPC = invoice.invoiceItem.price;
   let netValue = invoice.invoiceItem.price;
   const { coupons, waivers } = invoice.invoiceItem;
@@ -84,7 +84,7 @@ const calculateTotalToBePaid = (invoice: any) => {
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
 
-  return FormatUtils.formatPrice(netValue + vat);
+  return Number.parseFloat(FormatUtils.formatPrice(netValue + vat));
 };
 
 const InvoiceDownloadLink = ({ payer }) => {
