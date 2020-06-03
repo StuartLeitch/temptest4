@@ -3,7 +3,7 @@ import { AppError } from '../../../.././core/logic/AppError';
 import { Coupon } from '../../domain/Coupon';
 
 export interface GetRecentCouponsSuccessResponse {
-  totalCount: number;
+  totalCount: string | number;
   coupons: Coupon[];
 }
 

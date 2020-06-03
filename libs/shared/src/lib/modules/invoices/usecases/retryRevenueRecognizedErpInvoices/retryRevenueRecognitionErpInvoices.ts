@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   AuthorizationContext,

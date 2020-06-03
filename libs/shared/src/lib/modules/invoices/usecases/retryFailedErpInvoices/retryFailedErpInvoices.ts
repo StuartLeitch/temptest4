@@ -32,12 +32,12 @@ export type RetryFailedErpInvoicesContext = AuthorizationContext<Roles>;
 export class RetryFailedErpInvoicesUsecase
   implements
     UseCase<
-      {},
+      Record<string, unknown>,
       Promise<RetryFailedErpInvoicesResponse>,
       RetryFailedErpInvoicesContext
     >,
     AccessControlledUsecase<
-      {},
+      Record<string, unknown>,
       RetryFailedErpInvoicesContext,
       AccessControlContext
     > {
@@ -95,13 +95,19 @@ export class RetryFailedErpInvoicesUsecase
       const errs = [];
 
       for (const failedInvoice of failedErpInvoices) {
-        const updatedInvoiceResponse = await this.publishToErpUsecase.execute({
-          invoiceId: failedInvoice.invoiceId.id.toString(),
-        });
-        if (updatedInvoiceResponse.isLeft()) {
-          errs.push(updatedInvoiceResponse.value.error);
+        const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
+          {
+            invoiceId: failedInvoice.invoiceId.id.toString(),
+          }
+        );
+
+        const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
+
+        if (maybeUpdatedInvoiceResponse.isLeft()) {
+          return left(updatedInvoiceResponse);
+          break;
         } else {
-          const assignedErpReference = updatedInvoiceResponse.value.getValue();
+          const assignedErpReference = updatedInvoiceResponse;
 
           if (assignedErpReference === null) {
             // simply do nothing yet

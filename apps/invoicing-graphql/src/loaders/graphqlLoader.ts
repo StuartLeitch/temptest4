@@ -4,17 +4,16 @@
 
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import { ApolloServer } from 'apollo-server-express';
 
 import { env } from '../env';
-import { getErrorCode, getErrorMessage, handlingErrors } from '../lib/graphql';
+import { getErrorCode, getErrorMessage } from '../lib/graphql';
 
 // import {Context} from '../context';
 import { typeDefs } from '../graphql/schema';
 import { resolvers } from '../graphql/resolvers';
-import directives from '../graphql/directives';
 
 export const graphqlLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -26,22 +25,19 @@ export const graphqlLoader: MicroframeworkLoader = (
     const graphqlServer = new ApolloServer({
       typeDefs,
       resolvers,
-      schemaDirectives: {
-        filters: directives.FiltersDirective
-      },
       context: () => context,
       playground: env.graphql.editor,
-      formatError: error => ({
+      formatError: (error) => ({
         code: getErrorCode(error.message),
         message: getErrorMessage(error.message),
-        path: error.path
-      })
+        path: error.path,
+      }),
     });
 
     // Add graphql layer to the express app
     graphqlServer.applyMiddleware({
       app: expressApp,
-      path: env.graphql.route
+      path: env.graphql.route,
     });
   }
 };

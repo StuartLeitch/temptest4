@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable @typescript-eslint/camelcase */
+
 import { Connection } from 'jsforce';
 import {
   ErpData,
@@ -31,8 +32,30 @@ export class ErpService implements ErpServiceContract {
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
+  private async getConnection(): Promise<Connection> {
+    const { user, password, securityToken, loginUrl } = this.config;
+
+    if (!this.connection) {
+      this.connection = new Connection({
+        loginUrl,
+      });
+
+      try {
+        // tslint:disable-next-line: no-unused-expression
+        this.connection.authorize;
+        await this.connection.login(user, password + securityToken);
+        // TODO: Log this message in the banner
+        console.log('ERP login successful');
+        return this.connection;
+      } catch (err) {
+        this.connection = null;
+        throw err;
+      }
+    }
+  }
+
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
-    console.info(`registerInvoice init with`, data);
+    // console.info(`registerInvoice init with`, data);
 
     const { items, tradeDocumentItemProduct } = data;
 
@@ -49,6 +72,10 @@ export class ErpService implements ErpServiceContract {
         )
       )
     );
+
+    if (this.connection) {
+      await this.connection.logout(() => console.log('ERP logout.'));
+    }
 
     return {
       accountId,
@@ -84,31 +111,13 @@ export class ErpService implements ErpServiceContract {
     };
   }
 
-  private async getConnection(): Promise<Connection> {
-    const { user, password, securityToken, loginUrl } = this.config;
-
-    if (!this.connection) {
-      this.connection = new Connection({
-        loginUrl,
-      });
-
-      try {
-        // tslint:disable-next-line: no-unused-expression
-        this.connection.authorize;
-        await this.connection.login(user, password + securityToken);
-        // TODO: Log this message in the banner
-        console.log('ERP login successful');
-        return this.connection;
-      } catch (err) {
-        this.connection = null;
-        console.error(err);
-      }
-    }
-  }
-
   private async registerPayer(data: Partial<ErpData>): Promise<string> {
     this.logger.info('Register payer');
     const connection = await this.getConnection();
+
+    if (!connection) {
+      throw new Error('Failed login. No connection to ERP service.');
+    }
 
     const { article, payer, billingAddress } = data;
 
@@ -193,6 +202,12 @@ export class ErpService implements ErpServiceContract {
     data: Partial<ErpData>
   ): Promise<string> {
     const connection = await this.getConnection();
+
+    if (!connection) {
+      console.log('Failed login. No connection to ERP service.');
+      return;
+    }
+
     const {
       invoice,
       article,
@@ -357,6 +372,12 @@ export class ErpService implements ErpServiceContract {
     // console.info(`registerJournal init with`, data);
 
     const connection = await this.getConnection();
+
+    if (!connection) {
+      console.log('Failed login. No connection to ERP service.');
+      return;
+    }
+
     const {
       fixedValues: { companyId },
     } = this;
@@ -420,6 +441,12 @@ export class ErpService implements ErpServiceContract {
     // this.logger.info(`registerJournalItem init with`, data);
 
     const connection = await this.getConnection();
+
+    if (!connection) {
+      console.log('Failed login. No connection to ERP service.');
+      return;
+    }
+
     const {
       journal,
       manuscript,
@@ -469,6 +496,12 @@ export class ErpService implements ErpServiceContract {
     // this.logger.info(`registerJournalTags init with`, data);
 
     const connection = await this.getConnection();
+
+    if (!connection) {
+      console.log('Failed login. No connection to ERP service.');
+      return;
+    }
+
     const {
       fixedValues: { companyId },
     } = this;
@@ -532,6 +565,12 @@ export class ErpService implements ErpServiceContract {
     // this.logger.info(`registerJournalItemTag init with`, data);
 
     const connection = await this.getConnection();
+
+    if (!connection) {
+      console.log('Failed login. No connection to ERP service.');
+      return;
+    }
+
     const { journalItem, publisherCustomValues } = data;
 
     const journalItemTagData = {
