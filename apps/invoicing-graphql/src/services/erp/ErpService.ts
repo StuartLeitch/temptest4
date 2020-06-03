@@ -35,6 +35,9 @@ export class ErpService implements ErpServiceContract {
   private async getConnection(): Promise<Connection> {
     const { user, password, securityToken, loginUrl } = this.config;
 
+    // console.info('getConnection called!...');
+    // console.info('EVAL=', !this.connection);
+
     if (!this.connection) {
       this.connection = new Connection({
         loginUrl,
@@ -42,7 +45,7 @@ export class ErpService implements ErpServiceContract {
 
       try {
         // tslint:disable-next-line: no-unused-expression
-        this.connection.authorize;
+        // this.connection.authorize;
         await this.connection.login(user, password + securityToken);
         // TODO: Log this message in the banner
         console.log('ERP login successful');
@@ -52,6 +55,8 @@ export class ErpService implements ErpServiceContract {
         throw err;
       }
     }
+
+    return this.connection;
   }
 
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
@@ -75,6 +80,7 @@ export class ErpService implements ErpServiceContract {
 
     if (this.connection) {
       await this.connection.logout(() => console.log('ERP logout.'));
+      this.connection = null;
     }
 
     return {
@@ -102,6 +108,11 @@ export class ErpService implements ErpServiceContract {
       journalItem,
       ...data,
     });
+
+    if (this.connection) {
+      await this.connection.logout(() => console.log('ERP logout.'));
+      this.connection = null;
+    }
 
     return {
       journal,
@@ -201,6 +212,7 @@ export class ErpService implements ErpServiceContract {
     accountId: string,
     data: Partial<ErpData>
   ): Promise<string> {
+    this.logger.info('Register TradeDocument');
     const connection = await this.getConnection();
 
     if (!connection) {

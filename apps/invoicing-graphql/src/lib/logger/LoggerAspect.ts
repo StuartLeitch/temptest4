@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import { beforeMethod, afterMethod, Metadata } from 'aspect.js';
 
-import { EpicOnArticlePublishedUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
-import { GetPaymentMethodsUseCase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
+// import { EpicOnArticlePublishedUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
+// import { GetPaymentMethodsUseCase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
 import { CreateTransactionUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/createTransaction/createTransaction';
 import { CreateManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscript';
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
@@ -32,7 +35,7 @@ import {
   GetPaymentInfoUsecase,
 } from '@hindawi/shared';
 
-import { Logger } from './logger';
+import { Logger } from './Logger';
 const logger = new Logger('Usecase:Aspect');
 
 const watchList = [
