@@ -11,6 +11,7 @@ import {
   Icon,
   th,
 } from "@hindawi/react-components";
+import { FormatUtils } from "@hindawi/invoicing-web/app/utils/format";
 
 import { config } from "../../../../config";
 import Paypal from "./Paypal";
@@ -82,7 +83,8 @@ const calculateTotalToBePaid = (invoice: any) => {
 
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
-  return netValue + vat;
+
+  return FormatUtils.formatPrice(netValue + vat);
 };
 
 const InvoiceDownloadLink = ({ payer }) => {
