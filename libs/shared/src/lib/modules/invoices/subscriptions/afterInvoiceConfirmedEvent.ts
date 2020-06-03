@@ -25,9 +25,9 @@ import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 import { InvoiceItemRepoContract } from '../repos';
 
+import { PublishInvoiceConfirmedUsecase } from '../usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoiceConfirmed } from '../usecases/publishInvoiceConfirmed';
 
 export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
   constructor(
@@ -37,7 +37,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceConfirmed: PublishInvoiceConfirmed,
+    private publishInvoiceConfirmed: PublishInvoiceConfirmedUsecase,
     private invoiceToErpUsecase: PublishInvoiceToErpUsecase,
     private scheduler: SchedulerContract,
     private loggerService: LoggerContract,
@@ -89,7 +89,9 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
       }
 
-      const address = await this.addressRepo.findById(payer.billingAddressId);
+      const billingAddress = await this.addressRepo.findById(
+        payer.billingAddressId
+      );
 
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
@@ -101,13 +103,17 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         );
       }
 
-      await this.publishInvoiceConfirmed.execute(
-        invoice,
+      const publishResult = await this.publishInvoiceConfirmed.execute({
+        billingAddress,
         invoiceItems,
         manuscript,
+        invoice,
         payer,
-        address
-      );
+      });
+
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
 
       this.loggerService.info(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`

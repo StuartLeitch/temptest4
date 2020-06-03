@@ -2,6 +2,7 @@ import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublis
 import { LoggerContract, MockLogger } from '../../../../infrastructure/logging';
 import { PublishMessage } from '../../../../domain/services/sqs/PublishMessage';
 
+import { MockPaymentMethodRepo } from '../../../payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from '../../../manuscripts/repos/mocks/mockArticleRepo';
 import { MockAddressRepo } from '../../../addresses/repos/mocks/mockAddressRepo';
 import { MockPaymentRepo } from '../../../payments/repos/mocks/mockPaymentRepo';
@@ -17,6 +18,8 @@ import {
 } from './generateCompensatoryEvents';
 
 import {
+  addBillingAddresses,
+  addPaymentMethods,
   addInvoiceItems,
   addManuscripts,
   addInvoices,
@@ -38,6 +41,7 @@ class MockSQSPublishService implements SQSPublishServiceContract {
 describe('migrate entire invoice usecase', () => {
   let compensatoryEventsUsecase: GenerateCompensatoryEventsUsecase;
   let context: GenerateCompensatoryEventsContext;
+  let paymentMethodRepo: MockPaymentMethodRepo;
   let sqsPublishService: MockSQSPublishService;
   let invoiceItemRepo: MockInvoiceItemRepo;
   let manuscriptRepo: MockArticleRepo;
@@ -51,6 +55,7 @@ describe('migrate entire invoice usecase', () => {
 
   beforeEach(() => {
     sqsPublishService = new MockSQSPublishService();
+    paymentMethodRepo = new MockPaymentMethodRepo();
     invoiceItemRepo = new MockInvoiceItemRepo();
     manuscriptRepo = new MockArticleRepo();
     addressRepo = new MockAddressRepo();
@@ -65,6 +70,8 @@ describe('migrate entire invoice usecase', () => {
     };
     loggerService = new MockLogger();
 
+    addPaymentMethods(paymentMethodRepo);
+    addBillingAddresses(addressRepo);
     addInvoiceItems(invoiceItemRepo);
     addManuscripts(manuscriptRepo);
     addInvoices(invoiceRepo);
@@ -74,6 +81,7 @@ describe('migrate entire invoice usecase', () => {
     addPayers(payerRepo);
 
     compensatoryEventsUsecase = new GenerateCompensatoryEventsUsecase(
+      paymentMethodRepo,
       invoiceItemRepo,
       sqsPublishService,
       manuscriptRepo,
@@ -95,15 +103,34 @@ describe('migrate entire invoice usecase', () => {
 
     expect(result.isRight()).toBeTruthy();
 
-    expect(sqsPublishService.messages.length).toBe(3);
+    expect(sqsPublishService.messages.length).toBe(4);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
+    expect(
+      sqsPublishService.messages[0].data.invoiceItems[0].coupons.length
+    ).toBe(0);
+    expect(sqsPublishService.messages[0].data.isCreditNote).toBeFalsy();
 
     expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
     expect(sqsPublishService.messages[1].timestamp).toContain('2019-11-01');
+    expect(
+      sqsPublishService.messages[1].data.invoiceItems[0].coupons.length
+    ).toBe(1);
+    expect(sqsPublishService.messages[1].data.isCreditNote).toBeFalsy();
 
     expect(sqsPublishService.messages[2].event).toBe('InvoicePaid');
     expect(sqsPublishService.messages[2].timestamp).toContain('2019-12-01');
+    expect(
+      sqsPublishService.messages[2].data.invoiceItems[0].coupons.length
+    ).toBe(1);
+    expect(sqsPublishService.messages[2].data.isCreditNote).toBeFalsy();
+
+    expect(sqsPublishService.messages[3].event).toBe('InvoiceFinalized');
+    expect(sqsPublishService.messages[3].timestamp).toContain('2019-12-03');
+    expect(
+      sqsPublishService.messages[3].data.invoiceItems[0].coupons.length
+    ).toBe(1);
+    expect(sqsPublishService.messages[3].data.isCreditNote).toBeFalsy();
   });
 
   it('should not send events if the invoice with provided id is draft and has no acceptance date', async () => {
@@ -128,9 +155,11 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages.length).toBe(2);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
+    expect(sqsPublishService.messages[0].data.isCreditNote).toBeFalsy();
 
     expect(sqsPublishService.messages[1].event).toBe('InvoiceConfirmed');
     expect(sqsPublishService.messages[1].timestamp).toContain('2019-11-01');
+    expect(sqsPublishService.messages[1].data.isCreditNote).toBeFalsy();
   });
 
   it('should send 1 event if the invoice with provided id is pending', async () => {
@@ -144,6 +173,7 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages.length).toBe(1);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
+    expect(sqsPublishService.messages[0].data.isCreditNote).toBeFalsy();
   });
 
   it('should send 1 event if the invoice with provided id is draft with acceptance date', async () => {
@@ -157,14 +187,30 @@ describe('migrate entire invoice usecase', () => {
     expect(sqsPublishService.messages.length).toBe(1);
     expect(sqsPublishService.messages[0].event).toBe('InvoiceCreated');
     expect(sqsPublishService.messages[0].timestamp).toContain('2019-10-13');
+    expect(sqsPublishService.messages[0].data.isCreditNote).toBeFalsy();
   });
 
-  // it('should have the discounted value sent in invoice payed event', async () => {
-  //   const result = await compensatoryEventsUsecase.execute({ invoiceId: '1' }, context);
+  it('should send 2 events if the invoice provided is a credit note', async () => {
+    const result = await compensatoryEventsUsecase.execute(
+      { invoiceId: '7' },
+      context
+    );
 
-  //   expect(result.isRight()).toBeTruthy();
+    expect(result.isRight()).toBeTruthy();
 
-  //   expect(sqsPublishService.messages[2].event).toBe('InvoicePaid');
-  //   console.info(sqsPublishService.messages[2]);
-  // });
+    expect(sqsPublishService.messages.length).toBe(2);
+
+    expect(sqsPublishService.messages[0].event).toBe(
+      'InvoiceCreditNoteCreated'
+    );
+    expect(sqsPublishService.messages[0].timestamp).toContain('2019-12-01');
+    expect(sqsPublishService.messages[0].data.isCreditNote).toBeTruthy();
+    expect(sqsPublishService.messages[0].data.cancelledInvoiceReference).toBe(
+      '6'
+    );
+
+    expect(sqsPublishService.messages[1].event).toBe('InvoiceFinalized');
+    expect(sqsPublishService.messages[1].timestamp).toContain('2019-12-03');
+    expect(sqsPublishService.messages[1].data.isCreditNote).toBeTruthy();
+  });
 });

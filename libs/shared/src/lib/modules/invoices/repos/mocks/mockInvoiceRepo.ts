@@ -144,14 +144,11 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     return a.id.equals(b.id);
   }
 
-  public async getInvoicesIds(
+  public async *getInvoicesIds(
     ids: string[],
-    journalIds: string[],
-    page: number
-  ): Promise<string[]> {
-    return this._items
-      .filter((item) => ids.includes(item.id.toString()))
-      .map((item) => item.id.toString());
+    journalIds: string[]
+  ): AsyncGenerator<string, void, undefined> {
+    yield* this._items.map((item) => item.id.toString());
   }
 
   async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {

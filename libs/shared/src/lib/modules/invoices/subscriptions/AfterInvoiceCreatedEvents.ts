@@ -6,7 +6,18 @@ import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
 // import { PayerRepoContract } from '../../payers/repos/payerRepo';
 // import { AddressRepoContract } from '../../addresses/repos/addressRepo';
-import { PublishInvoiceCreatedUsecase } from '../usecases/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishInvoiceCreatedUsecase } from '../usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+
+import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
+import {
+  SisifJobTypes,
+  JobBuilder,
+} from '../../../infrastructure/message-queues/contracts/Job';
+import {
+  SchedulingTime,
+  TimerBuilder,
+} from '../../../infrastructure/message-queues/contracts/Time';
+import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
 
 export class AfterInvoiceCreatedEvent
   implements HandleContract<InvoiceCreated> {
@@ -14,7 +25,10 @@ export class AfterInvoiceCreatedEvent
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceCreated: PublishInvoiceCreatedUsecase
+    private publishInvoiceCreated: PublishInvoiceCreatedUsecase,
+    private scheduler: SchedulerContract,
+    private confirmationReminderDelay: number,
+    private confirmationReminderQueueName: string
   ) {
     this.setupSubscriptions();
   }
@@ -64,6 +78,30 @@ export class AfterInvoiceCreatedEvent
       if (result.isLeft()) {
         throw new Error(result.value.errorValue().message);
       }
+
+      //* schedule new job
+      const jobData = PayloadBuilder.invoiceReminder(
+        invoice.id.toString(),
+        manuscript.authorEmail,
+        manuscript.authorFirstName,
+        manuscript.authorSurname
+      );
+
+      const newJob = JobBuilder.basic(
+        SisifJobTypes.InvoiceConfirmReminder,
+        jobData
+      );
+
+      const newTimer = TimerBuilder.delayed(
+        this.confirmationReminderDelay,
+        SchedulingTime.Day
+      );
+
+      this.scheduler.schedule(
+        newJob,
+        this.confirmationReminderQueueName,
+        newTimer
+      );
 
       // if (invoice) {
       // Get all payers interested in this invoice

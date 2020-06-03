@@ -4,25 +4,33 @@ import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { InvoicePaidEvent } from '../domain/events/invoicePaid';
 
+import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
-import { InvoiceItemRepoContract, InvoiceRepoContract } from '../repos';
+import { AddressRepoContract } from '../../addresses/repos/addressRepo';
+import { PaymentRepoContract } from '../../payments/repos/paymentRepo';
+import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../payers/repos/payerRepo';
+import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoicePaid } from '../usecases/PublishInvoicePaid';
+import { PublishInvoicePaidUsecase } from '../usecases/publishEvents/publishInvoicePaid';
+import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
 
 export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
   constructor(
-    private invoiceRepo: InvoiceRepoContract,
+    private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private addressRepo: AddressRepoContract,
+    private invoiceRepo: InvoiceRepoContract,
+    private paymentRepo: PaymentRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
     private payerRepo: PayerRepoContract,
-    private publishInvoicePaid: PublishInvoicePaid,
+    private publishInvoicePaid: PublishInvoicePaidUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -67,10 +75,6 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
-      const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(
-        invoice.invoiceId
-      );
-
       const payerUsecase = new GetPayerDetailsByInvoiceIdUsecase(
         this.payerRepo,
         this.loggerService
@@ -82,15 +86,42 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
         throw new Error(`No payer for invoice ${invoice.id.toString()} found`);
       }
 
+      const paymentMethodsUsecase = new GetPaymentMethodsUseCase(
+        this.paymentMethodRepo,
+        this.loggerService
+      );
+      const paymentMethods = await paymentMethodsUsecase.execute();
+
+      if (paymentMethods.isLeft()) {
+        throw new Error(
+          `Payment methods could not be accessed: ${
+            paymentMethods.value.errorValue().message
+          }`
+        );
+      }
+
       const payer = maybePayerResponse.value.getValue();
 
-      this.publishInvoicePaid.execute(
-        invoice,
-        invoiceItems,
-        manuscript,
-        paymentDetails,
-        payer
+      const billingAddress = await this.addressRepo.findById(
+        payer.billingAddressId
       );
+
+      const payments = await this.paymentRepo.getPaymentsByInvoiceId(
+        invoice.invoiceId
+      );
+
+      const publishResult = await this.publishInvoicePaid.execute({
+        paymentMethods: paymentMethods.value.getValue(),
+        invoiceItems,
+        billingAddress,
+        manuscript,
+        payments,
+        invoice,
+        payer,
+      });
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
       console.log(
         `[AfterInvoicePaid]: Successfully executed onInvoicePaidEvent use case InvoicePaidEvent`
       );

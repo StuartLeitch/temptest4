@@ -4,6 +4,7 @@
 
 // * Domain imports
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
+import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 
 import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import { SoftDeleteDraftTransactionAuthorizationContext } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionAuthorizationContext';
@@ -23,7 +24,14 @@ export const SubmissionWithdrawn = {
     logger.setScope(`PhenomEvent:${SUBMISSION_WITHDRAWN}`);
     logger.info('Incoming Event Data', data);
 
-    const { submissionId } = data;
+    const {
+      submissionId,
+      manuscripts: [
+        {
+          articleType: { name },
+        },
+      ],
+    } = data;
 
     const {
       repos: {
@@ -33,6 +41,10 @@ export const SubmissionWithdrawn = {
         manuscript: manuscriptRepo,
       },
     } = this;
+
+    if (name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
 
     const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
       transactionRepo,

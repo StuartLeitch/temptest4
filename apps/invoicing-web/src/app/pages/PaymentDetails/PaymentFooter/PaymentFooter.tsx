@@ -8,6 +8,7 @@ import { th } from "@hindawi/react-components";
 interface Props {}
 
 const Root = styled.div`
+  width: calc(100% - ${th("gridUnit")} * 8 * 2);
   border-top: 1px solid ${th("colors.furniture")};
 
   padding-bottom: calc(${th("gridUnit")} * 3);
@@ -30,7 +31,7 @@ const Root = styled.div`
   }
 `;
 
-const PaymentFooter: React.FC<Props> = props => {
+const PaymentFooter: React.FC<Props> = (props) => {
   return (
     <Root>
       <a target="_blank" rel="noopener noreferrer" href={config.footerHomeLink}>

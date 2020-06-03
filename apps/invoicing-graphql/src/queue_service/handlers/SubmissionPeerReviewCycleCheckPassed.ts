@@ -1,15 +1,18 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+/* eslint-disable max-len */
 
 // * Domain imports
-import { SubmissionQualityCheckPassed } from '@hindawi/phenom-events';
+import { SubmissionPeerReviewCycleCheckPassed as SubmissionPeerReviewCycleCheckPassedEvent } from '@hindawi/phenom-events';
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
-  TransactionStatus,
   UpdateTransactionContext,
+  TransactionStatus,
   VersionCompare,
+  // QueuePayloads,
   Roles,
 } from '@hindawi/shared';
+import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 
 import { env } from '../../env';
 
@@ -21,7 +24,7 @@ const SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED =
 export const SubmissionPeerReviewCycleCheckPassed = {
   event: SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(
-    data: SubmissionQualityCheckPassed
+    data: SubmissionPeerReviewCycleCheckPassedEvent
   ): Promise<unknown> {
     const {
       services: { logger },
@@ -32,7 +35,11 @@ export const SubmissionPeerReviewCycleCheckPassed = {
 
     const { submissionId, manuscripts } = data;
 
-    const maxVersion = manuscripts.reduce((max, m) => {
+    if (manuscripts[0]?.articleType?.name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
+
+    const maxVersion = manuscripts.reduce((max, m: any) => {
       const version = VersionCompare.versionCompare(m.version, max)
         ? m.version
         : max;
@@ -62,7 +69,7 @@ export const SubmissionPeerReviewCycleCheckPassed = {
         payer: payerRepo,
         coupon: couponRepo,
       },
-      services: { waiverService, emailService, schedulingService, vatService },
+      services: { waiverService, emailService, vatService, schedulingService },
     } = this;
 
     const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
@@ -97,7 +104,6 @@ export const SubmissionPeerReviewCycleCheckPassed = {
       payerRepo,
       couponRepo,
       waiverService,
-      schedulingService,
       emailService,
       vatService,
       logger

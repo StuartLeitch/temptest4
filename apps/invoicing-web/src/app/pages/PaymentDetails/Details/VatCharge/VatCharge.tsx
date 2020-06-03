@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { LayoutProps, SpaceProps, FlexProps } from "styled-system";
 import Tooltip from "antd/lib/tooltip";
-import Icon from "antd/lib/icon";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 import { Flex, Label, Text } from "@hindawi/react-components";
 import { FormatUtils } from "@hindawi/invoicing-web/app/utils/format";
@@ -54,10 +54,7 @@ const VatCharge: React.FC<Props> = ({ tenant, vat, price, ...rest }) => {
               fontSize: "14px",
             }}
           >
-            <Icon
-              style={{ position: "relative", left: "5px" }}
-              type="exclamation-circle"
-            />
+            <InfoCircleOutlined style={{ color: "#333" }} />
           </Tooltip>
         </Flex>
         <Text>${FormatUtils.formatPrice(vatAmount)}</Text>

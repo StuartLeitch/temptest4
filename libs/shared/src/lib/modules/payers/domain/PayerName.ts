@@ -1,5 +1,5 @@
-import {ValueObject} from '../../../core/domain/ValueObject';
-import {Result} from '../../../core/logic/Result';
+import { ValueObject } from '../../../core/domain/ValueObject';
+import { Result } from '../../../core/logic/Result';
 
 interface PayerNameProps {
   value: string;
@@ -7,6 +7,10 @@ interface PayerNameProps {
 
 export class PayerName extends ValueObject<PayerNameProps> {
   get value(): string {
+    return this.props.value;
+  }
+
+  toString(): string {
     return this.props.value;
   }
 
@@ -18,7 +22,7 @@ export class PayerName extends ValueObject<PayerNameProps> {
     if (!!name === false || name.length === 0) {
       return Result.fail<PayerName>('Must provide a payer name');
     } else {
-      return Result.ok<PayerName>(new PayerName({value: name}));
+      return Result.ok<PayerName>(new PayerName({ value: name }));
     }
   }
 }

@@ -5,6 +5,7 @@ import {
   EpicOnArticlePublishedUsecase,
   EpicOnArticlePublishedDTO,
 } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
+import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 import { env } from '../../env';
 
@@ -22,7 +23,15 @@ export const ArticlePublishedHandler = {
     logger.setScope(`PhenomEvent:${ARTICLE_PUBLISHED}`);
     logger.info(`Incoming Event Data`, { correlationId, data });
 
-    const { customId, published } = data;
+    const {
+      customId,
+      articleType: { name },
+      published,
+    } = data;
+
+    if (name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
 
     const {
       repos: {

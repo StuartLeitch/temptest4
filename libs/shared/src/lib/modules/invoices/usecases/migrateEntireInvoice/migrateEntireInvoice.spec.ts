@@ -1,6 +1,8 @@
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 import { PublishMessage } from '../../../../domain/services/sqs/PublishMessage';
 
+import { MockLogger } from '../../../../infrastructure/logging/MockLogger';
+
 import { MockPaymentMethodRepo } from '../../../payments/repos/mocks/mockPaymentMethodRepo';
 import { MockTransactionRepo } from '../../../transactions/repos/mocks/mockTransactionRepo';
 import { MockArticleRepo } from '../../../manuscripts/repos/mocks/mockArticleRepo';
@@ -91,7 +93,8 @@ describe('migrate entire invoice usecase', () => {
       paymentRepo,
       couponRepo,
       waiverRepo,
-      payerRepo
+      payerRepo,
+      new MockLogger()
     );
   });
 

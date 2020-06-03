@@ -86,6 +86,8 @@ const Details = () => {
   const { invoice, getPaymentMethods } = data;
   const { status, id: invoiceId } = invoice;
 
+  console.info(invoice);
+
   // * -> Net and total charges computing
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
@@ -324,23 +326,31 @@ const Details = () => {
                 )}
 
                 {invoice.creditNote === null &&
-                  (status === 'ACTIVE' || status === 'FINAL') && (
-                    <Button
-                      id={CREATE_CREDIT_NOTE_MODAL_TARGET}
-                      color='danger'
-                      className='mr-2'
-                    >
-                      Create Credit Note
-                    </Button>
+                  (status === 'ACTIVE' || status === 'FINAL') &&
+                  invoice.payments.every((p) => p.status !== 'PENDING') && (
+                    <>
+                      <Button
+                        id={CREATE_CREDIT_NOTE_MODAL_TARGET}
+                        color='danger'
+                        className='mr-2'
+                      >
+                        Create Credit Note
+                      </Button>
+
+                      <CreateCreditNoteModal
+                        invoiceItem={invoice?.invoiceItem}
+                        invoiceId={invoiceId}
+                        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
+                        total={totalCharges}
+                      />
+                    </>
                   )}
-                <Button
-                  id={APPLY_COUPON_MODAL_TARGET}
-                  color='twitter'
-                  outline={status !== 'DRAFT'}
-                  disabled={status !== 'DRAFT'}
-                >
-                  Apply Coupon
-                </Button>
+
+                {status === 'DRAFT' && (
+                  <Button id={APPLY_COUPON_MODAL_TARGET} color='twitter'>
+                    Apply Coupon
+                  </Button>
+                )}
               </ButtonToolbar>
             </div>
           </Col>
@@ -662,6 +672,15 @@ const Details = () => {
                                 </span>
                               </h6>
                               <Row tag='dl'>
+                                <dt className='col-sm-4'>Status</dt>
+                                <dd className='col-sm-8'>
+                                  <strong>
+                                    <mark className='pl-2 pr-2 text-info'>
+                                      {payment?.status}
+                                    </mark>
+                                  </strong>
+                                </dd>
+
                                 <dt className='col-sm-4'>Payer</dt>
                                 <dd className='col-sm-8 text-inverse'>
                                   <samp>

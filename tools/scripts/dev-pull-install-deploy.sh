@@ -13,6 +13,7 @@ prefix="\n${GREEN}========>${NC}"
 suffix="${GREEN}<========${NC}\n"
 
 echo "${prefix} Git checkout & pull from branch  --- $1 --- ${suffix}"
+git remote update --prune
 git checkout $1
 git pull
 
@@ -29,9 +30,9 @@ echo "${prefix} Run deploy-qa.sh script ${suffix}"
 
 
 set -e
-Echo "${prefix} Login to AWS -production- for deploy of Admin app ${suffix}"
+echo "${prefix} Login to AWS -production- for deploy of Admin app ${suffix}"
 aws --profile=production ecr get-login --no-include-email | sh
- 
+
 set +e
 echo "${prefix} Run ./tools/scripts/deploy-dev-admin-frontend.sh script ${suffix}"
 ./tools/scripts/deploy-dev-admin-frontend.sh

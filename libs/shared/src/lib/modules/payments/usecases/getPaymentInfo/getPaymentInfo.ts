@@ -57,10 +57,14 @@ export class GetPaymentInfoUsecase
         return left(new Errors.InvoiceNotFoundError(request.invoiceId));
       }
 
-      const payments = await this.paymentRepo.getPaymentsByInvoiceId(id);
+      try {
+        const payments = await this.paymentRepo.getPaymentsByInvoiceId(id);
 
-      if (payments.length === 0) {
-        return left(new Errors.NoPaymentFoundError(request.invoiceId));
+        if (payments.length === 0) {
+          return left(new Errors.NoPaymentFoundError(request.invoiceId));
+        }
+      } catch (e) {
+        return left(new Errors.PaymentInfoDbError(request.invoiceId, e));
       }
 
       try {
