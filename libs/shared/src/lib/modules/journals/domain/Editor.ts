@@ -15,8 +15,8 @@ import { EditorId } from './EditorId';
 import { UserId } from '../../users/domain/UserId';
 import { JournalId } from './JournalId';
 
-// So far it's the only role that is assigned to chief editor
-// should have a discound of 100%, rest of the roles being 50%
+// * So far it's the only role that is assigned to chief editor
+// * Should have a discount of 100%, rest of the roles being 50%
 const CHIEF_EDITOR_ROLE = 'triageEditor';
 
 export interface EditorProps {

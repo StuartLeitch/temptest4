@@ -36,11 +36,12 @@ const feature = loadFeature('./journalEditorRemoved.feature', {
 });
 
 defineFeature(feature, (test) => {
+  console.info(this);
+
   let mockLogger: MockLogger;
   let mockEditorRepo: MockEditorRepo;
   let mockCatalogRepo: MockCatalogRepo;
 
-  let eventHandler: (data: any) => void;
   let context = {};
   let eventData = null;
   let journalId = null;
@@ -67,8 +68,12 @@ defineFeature(feature, (test) => {
   });
 
   test('Journal Editor Removed', ({ given, and, when, then }) => {
+    // given('a background step', () => {
+    //   console.info()
+    // });
+
     given(
-      /^There are (\d+) editors in the Journal ([\w-]+)$/,
+      /^There are "(\d+)" editors in the Journal "([\w-]+)"$/,
       async (editorsLength: number, testJournalId: string) => {
         journalId = testJournalId;
 
@@ -97,34 +102,33 @@ defineFeature(feature, (test) => {
       }
     );
 
-    when('JournalEditorRemoved event is being published', async () => {
-      // just wait for the right moment
-    });
-
     and(
-      /^The journal id from event data is ([\w-]+)$/,
-      async (eventJournalId: string) => {
-        eventData = { id: eventJournalId };
-      }
-    );
-
-    and(
-      /^All editors list from event data contains (\d+) entries only$/,
+      /^All editors list from event data contains "(\d+)" entries only$/,
       async (eventEditorsLength: number) => {
         const eventEditors = getRandom(journalEditors, +eventEditorsLength);
-        eventData.editors = eventEditors.map(EditorMap.toPersistence);
-
-        // * All magic happens here!
-        try {
-          await handler.call(context, eventData);
-        } catch (err) {
-          console.error(err);
-        }
+        eventData = {
+          editors: eventEditors.map(EditorMap.toPersistence),
+        };
       }
     );
 
+    and(
+      /^The journal id from event data is "([\w-]+)"$/,
+      async (eventJournalId: string) => {
+        eventData.id = eventJournalId;
+      }
+    );
+
+    when('JournalEditorRemoved event is being published', async () => {
+      try {
+        await handler.call(context, eventData);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
     then(
-      /^The journal ([\w-]+) should have only (\d+) editors left$/,
+      /^The journal "([\w-]+)" should have only "(\d+)" editors left$/,
       async (eventJournalId: string, expectedEditorsLeft: number) => {
         const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorCollection();
         expect(editorCollectionAfter.length).toBe(+expectedEditorsLeft);
