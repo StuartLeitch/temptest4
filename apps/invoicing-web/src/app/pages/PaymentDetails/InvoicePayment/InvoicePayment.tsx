@@ -84,7 +84,7 @@ const calculateTotalToBePaid = (invoice: any): number => {
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
 
-  return Number.parseFloat(FormatUtils.formatPrice(netValue + vat));
+  return Math.round((netValue + vat + Number.EPSILON) * 100) / 100;
 };
 
 const InvoiceDownloadLink = ({ payer }) => {
