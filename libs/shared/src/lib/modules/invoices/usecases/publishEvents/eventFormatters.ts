@@ -18,6 +18,7 @@ import { Coupons } from '../../../coupons/domain/Coupons';
 import { Waiver } from '../../../waivers/domain/Waiver';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Payer } from '../../../payers/domain/Payer';
+import { Invoice } from '../../domain/Invoice';
 
 export function formatCoupons(coupons: Coupons): PhenomCoupon[] {
   if (!coupons) return undefined;
@@ -83,14 +84,20 @@ function itemReduction(item: InvoiceItem): number {
   return (item.price * totalReduction) / 100;
 }
 
+function calculateVatForItem(item: InvoiceItem): number {
+  const reductions = itemReduction(item);
+  return ((item.price - reductions) * item.vat) / 100;
+}
+
 export function formatCosts(
   invoiceItems: InvoiceItem[],
-  payments: Payment[]
+  payments: Payment[],
+  invoice: Invoice
 ): PhenomCosts {
   const apcItems = invoiceItems.filter((item) => item.type === 'APC');
   const totalPrice = apcItems.reduce((acc, item) => acc + item.price, 0);
   const vatAmount = apcItems.reduce(
-    (acc, item) => acc + (item.price * item.vat) / 100,
+    (acc, item) => acc + calculateVatForItem(item),
     0
   );
   const totalDiscount = apcItems.reduce(
@@ -98,9 +105,10 @@ export function formatCosts(
     0
   );
   const paid = payments.reduce((acc, payment) => acc + payment.amount.value, 0);
+  const dueAmount = totalPrice - totalDiscount + vatAmount - paid;
 
   return {
-    dueAmount: totalPrice - totalDiscount + vatAmount - paid,
+    dueAmount: invoice.cancelledInvoiceReference ? 0 : dueAmount,
     netAmount: totalPrice - totalDiscount + vatAmount,
     netApc: totalPrice - totalDiscount,
     grossApc: totalPrice,

@@ -15,24 +15,28 @@ AS SELECT ie.id as event_id,
     ie.payload ->> 'invoiceId'::text AS invoice_id,
     ie.payload ->> 'invoiceStatus'::text AS status,
     cast_to_timestamp(ie.payload ->> 'invoiceCreatedDate'::text) AS invoice_created_date,
-    cast_to_timestamp(ie.payload ->> 'invoiceIssueDate'::text) AS invoice_issue_date,
+    cast_to_timestamp(ie.payload ->> 'invoiceIssuedDate'::text) AS invoice_issue_date,
+    cast_to_timestamp(ie.payload ->> 'manuscriptAcceptedDate'::text) AS manuscript_accepted_date,
     cast_to_timestamp(ie.payload ->> 'updated'::text) AS updated_date,
     ie.payload ->> 'referenceNumber'::text AS reference_number,
     coalesce((ie.payload ->> 'isCreditNote'::text)::boolean, false) AS is_credit_note,
     ie.payload ->> 'cancelledInvoiceReference'::text AS cancelled_invoice_reference,
-    (((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'price'::text)::float AS gross_apc_value,
+    ((ie.payload -> 'costs' -> 'grossApc')::text)::float as gross_apc_value,
     COALESCE((((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float, 0) AS vat_percentage,
-    COALESCE((ie.payload ->> 'valueWithoutVAT'::text)::float, (ie.payload ->> 'paymentAmount'::text)::float / (1 + (((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float / 100)) AS net_apc,
-    COALESCE((ie.payload ->> 'valueWithVAT'::text)::float, (ie.payload ->> 'valueWithoutVAT'::text)::float * (1 + COALESCE((((ie.payload -> 'invoiceItems'::text) -> 0) ->> 'vatPercentage'::text)::float / 100, 0))) AS net_amount,
-    COALESCE((ie.payload ->> 'paymentAmount'::text)::float, 0) AS paid_amount,
-    cast_to_timestamp(ie.payload ->> 'paymentDate'::text) AS payment_date,
-    (ie.payload ->> 'foreignPaymentId'::text) AS payment_reference,
-    (ie.payload ->> 'payerName'::text) AS payer_given_name,
-    (ie.payload ->> 'payerEmail'::text) AS payer_email,
-    (ie.payload ->> 'paymentType'::text) AS payment_type,
-    (ie.payload ->> 'country'::text) AS payer_country,
-    (ie.payload ->> 'address'::text) AS payer_address,
-    COALESCE((ie.payload ->> 'currency'::text), 'USD') as payment_currency
+    ((ie.payload -> 'costs' -> 'netApc')::text)::float as net_apc,
+    ((ie.payload -> 'costs' -> 'netAmount')::text)::float as net_amount,
+    ((ie.payload -> 'costs' -> 'vatAmount')::text)::float as vat_amount,
+    ((ie.payload -> 'costs' -> 'totalDiscount')::text)::float as discount,
+    ((ie.payload -> 'costs' -> 'dueAmount')::text)::float as due_amount,
+    ((ie.payload -> 'costs' -> 'paidAmount')::text)::float as paid_amount,
+    cast_to_timestamp(ie.payload ->> 'lastPaymentDate'::text) AS payment_date,
+    COALESCE((ie.payload ->> 'currency'::text), 'USD') as payment_currency,
+    (ie.payload -> 'payments' -> 0 ->> 'paymentType'::text) AS payment_type,
+    CONCAT((ie.payload -> 'payer' ->> 'firstName'::text), ' ', (ie.payload -> 'payer' ->> 'lastName'::text))  AS payer_given_name,
+    (ie.payload -> 'payer' ->> 'email'::text) AS payer_email,
+    (ie.payload -> 'payer' ->> 'countryCode'::text) AS payer_country,
+    (ie.payload -> 'payer' ->> 'billingAddress'::text) AS payer_address,
+    (ie.payload -> 'payer' ->> 'organization'::text) as organization
    FROM ${REPORTING_TABLES.INVOICE} ie
 WITH DATA;
     `;
@@ -54,6 +58,10 @@ WITH DATA;
 
   getViewName(): string {
     return 'invoices_data';
+  }
+
+  getPartitionQuery(invoiceDataAlias = 'id'): string {
+    return `partition by ${invoiceDataAlias}.invoice_id ORDER BY case when ${invoiceDataAlias}.status = 'FINAL' then 1 when ${invoiceDataAlias}.status = 'ACTIVE' then 2 else 3 end, ${invoiceDataAlias}.event_timestamp desc nulls last`;
   }
 }
 

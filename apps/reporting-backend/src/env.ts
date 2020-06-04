@@ -47,14 +47,10 @@ export const env = {
     logging: getOsEnv('DB_LOGGING')
   },
   aws: {
-    sns: {
-      topic: getOsEnv('AWS_SNS_TOPIC'),
-      endpoint: getOsEnv('AWS_SNS_ENDPOINT'),
-      sqsRegion: getOsEnv('AWS_SNS_SQS_REGION'),
-      sqsAccessKey: getOsEnv('AWS_SNS_SQS_ACCESS_KEY'),
-      sqsSecretKey: getOsEnv('AWS_SNS_SQS_SECRET_KEY')
-    },
+    region: getOsEnv('AWS_SNS_SQS_REGION'),
     sqs: {
+      sqsSecretKey: getOsEnv('AWS_SNS_SQS_SECRET_KEY'),
+      sqsAccessKey: getOsEnv('AWS_SNS_SQS_ACCESS_KEY'),
       disabled: toBool(getOsEnvOptional('AWS_SQS_DISABLED')),
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
       endpoint: getOsEnv('AWS_SQS_ENDPOINT')

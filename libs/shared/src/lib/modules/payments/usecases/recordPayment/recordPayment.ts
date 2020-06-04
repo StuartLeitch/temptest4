@@ -66,13 +66,14 @@ export class RecordPaymentUsecase
       const invoice = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(new UniqueEntityID(payload.invoiceId)).getValue()
       );
-      const invoiceTotal = invoice.getInvoiceTotal();
 
-      if (payment.amount.value < invoiceTotal) {
-        return left(
-          new RecordPaymentErrors.InvalidPaymentAmount(payload.amount)
-        );
-      }
+      // const invoiceTotal = invoice.getInvoiceTotal();
+
+      // if (payment.amount.value < invoiceTotal) {
+      //   return left(
+      //     new RecordPaymentErrors.InvalidPaymentAmount(payload.amount)
+      //   );
+      // }
 
       if (payload.markInvoiceAsPaid) {
         invoice.markAsPaid(payment.paymentId);

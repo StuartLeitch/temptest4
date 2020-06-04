@@ -57,7 +57,7 @@ export class PublishInvoiceCreatedUsecase
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
       lastPaymentDate: null,
 
-      costs: formatCosts(invoiceItems, []),
+      costs: formatCosts(invoiceItems, [], invoice),
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
     };

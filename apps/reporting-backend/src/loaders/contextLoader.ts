@@ -24,12 +24,10 @@ export const contextLoader: MicroframeworkLoader = (
     const registry = defaultRegistry;
 
     const config = {
-      accessKeyId: env.aws.sns.sqsAccessKey,
-      secretAccessKey: env.aws.sns.sqsSecretKey,
-      region: env.aws.sns.sqsRegion,
-      snsEndpoint: env.aws.sns.endpoint,
+      accessKeyId: env.aws.sqs.sqsAccessKey,
+      secretAccessKey: env.aws.sqs.sqsSecretKey,
+      region: env.aws.region,
       sqsEndpoint: env.aws.sqs.endpoint,
-      topicName: env.aws.sns.topic,
       queueName: env.aws.sqs.queueName,
       eventNamespace: env.app.eventNamespace,
       publisherName: env.app.publisherName,

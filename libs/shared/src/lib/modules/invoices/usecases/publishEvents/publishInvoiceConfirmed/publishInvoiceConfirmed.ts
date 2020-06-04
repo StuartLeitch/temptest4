@@ -68,7 +68,7 @@ export class PublishInvoiceConfirmedUsecase
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
       lastPaymentDate: null,
 
-      costs: formatCosts(invoiceItems, []),
+      costs: formatCosts(invoiceItems, [], invoice),
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 

@@ -11,6 +11,7 @@ import {
   Icon,
   th,
 } from "@hindawi/react-components";
+import { FormatUtils } from "@hindawi/invoicing-web/app/utils/format";
 
 import { config } from "../../../../config";
 import Paypal from "./Paypal";
@@ -64,20 +65,26 @@ const validateFn = (methods) => (values) => {
   return errors;
 };
 
-const calculateTotalToBePaid = (invoice: any) => {
+const calculateTotalToBePaid = (invoice: any): number => {
+  const initialAPC = invoice.invoiceItem.price;
   let netValue = invoice.invoiceItem.price;
-  const { coupons } = invoice.invoiceItem;
-  if (coupons && coupons.length) {
-    let discount = invoice.invoiceItem.coupons.reduce(
-      (acc, curr) => acc + curr.reduction,
-      0,
-    );
-    discount = discount > 100 ? 100 : discount;
-    netValue = netValue - (discount * netValue) / 100;
+  const { coupons, waivers } = invoice.invoiceItem;
+  let reductions = [];
+  if (waivers) {
+    reductions = reductions.concat(...waivers);
   }
+  if (coupons && coupons.length) {
+    reductions = reductions.concat(...coupons);
+  }
+
+  let discount = reductions.reduce((acc, curr) => acc + curr.reduction, 0);
+  discount = discount > 100 ? 100 : discount;
+  netValue = netValue - (discount * initialAPC) / 100;
+
   const vatPercent = invoice.invoiceItem.vat;
   const vat = (netValue * vatPercent) / 100;
-  return netValue + vat;
+
+  return Math.round((netValue + vat + Number.EPSILON) * 100) / 100;
 };
 
 const InvoiceDownloadLink = ({ payer }) => {
