@@ -124,7 +124,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       setIntervalAsync(
         processJobsQueue,
         failedErpCronRetryTimeMinutes === 0
-          ? 10000
+          ? 15000
           : failedErpCronRetryTimeMinutes * 60 * 1000
       );
     }

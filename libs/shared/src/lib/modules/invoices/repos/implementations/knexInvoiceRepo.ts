@@ -214,23 +214,31 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   }
 
   async getFailedErpInvoices(): Promise<Invoice[]> {
-    const { db } = this;
+    const { db, logger } = this;
 
-    const invoices = await db(TABLES.INVOICES)
+    const sql = db(TABLES.INVOICES)
       .select()
-      .whereNot(`deleted`, 1)
-      .whereIn('status', ['ACTIVE', 'FINAL'])
-      // filter the credit notes from this list
-      .whereNull('cancelledInvoiceReference')
-      .whereNull('erpReference');
+      .where(function () {
+        this.whereNot('deleted', 1)
+          .whereIn('status', ['ACTIVE', 'FINAL'])
+          .whereNull('cancelledInvoiceReference')
+          .whereNull('erpReference')
+          .where('erpReference', '<>', 'NON_INVOICEABLE');
+      });
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
 
     return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
   async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
-    const { db } = this;
+    const { db, logger } = this;
 
-    const invoices = await db(TABLES.INVOICES)
+    const sql = db(TABLES.INVOICES)
       .select(
         'invoices.id as invoiceId',
         'invoices.transactionId as transactionId',
@@ -241,12 +249,20 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .from('invoices')
       .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
       .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-      .whereNot(`invoices.deleted`, 1)
-      .whereNull('invoices.revenueRecognitionReference')
-      // filter the credit notes from this list
-      .whereNull('invoices.cancelledInvoiceReference')
-      .whereNotNull('invoices.erpReference')
-      .whereNotNull('articles.datePublished');
+      .where(function () {
+        this.whereNotNull('articles.datePublished')
+          .whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.erpReference')
+          .where('invoices.erpReference', '<>', 'NON_INVOICEABLE');
+      });
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
 
     return invoices.map((i) =>
       InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()

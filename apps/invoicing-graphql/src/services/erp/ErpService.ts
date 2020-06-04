@@ -91,8 +91,6 @@ export class ErpService implements ErpServiceContract {
   }
 
   public async registerRevenueRecognition(data: any): Promise<any> {
-    console.info(`registerRevenueRecognition init with`, data);
-
     const journal = await this.registerJournal(data);
 
     if (journal == null) {

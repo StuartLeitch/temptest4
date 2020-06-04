@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   AuthorizationContext,
   Roles,
@@ -21,6 +23,7 @@ import { CatalogRepoContract } from '../../../journals/repos';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 import { PublisherRepoContract } from '../../../publishers/repos';
+import { LoggerContract } from './../../../../infrastructure/logging/Logger';
 
 export type RetryFailedErpInvoicesResponse = Either<
   AppError.UnexpectedError,
@@ -53,7 +56,7 @@ export class RetryFailedErpInvoicesUsecase
     private catalogRepo: CatalogRepoContract,
     private erpService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {
     this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
       this.invoiceRepo,
@@ -76,11 +79,12 @@ export class RetryFailedErpInvoicesUsecase
 
   // @Authorize('zzz:zzz')
   public async execute(
-    request?: {},
+    request?: Record<string, unknown>,
     context?: RetryFailedErpInvoicesContext
   ): Promise<RetryFailedErpInvoicesResponse> {
     try {
       const failedErpInvoices = await this.invoiceRepo.getFailedErpInvoices();
+
       const updatedInvoices: ErpResponse[] = [];
 
       if (failedErpInvoices.length === 0) {
@@ -105,20 +109,18 @@ export class RetryFailedErpInvoicesUsecase
 
         if (maybeUpdatedInvoiceResponse.isLeft()) {
           return left(updatedInvoiceResponse);
-          break;
-        } else {
-          const assignedErpReference = updatedInvoiceResponse;
+        }
+        const assignedErpReference = updatedInvoiceResponse;
 
-          if (assignedErpReference === null) {
-            // simply do nothing yet
-          } else {
-            console.log(
-              `Assigned successfully ${
-                assignedErpReference.tradeDocumentId
-              } to invoice ${failedInvoice.invoiceId.id.toString()}`
-            );
-            updatedInvoices.push(assignedErpReference);
-          }
+        if (assignedErpReference === null) {
+          // simply do nothing yet
+        } else {
+          console.log(
+            `Assigned successfully ${
+              assignedErpReference.tradeDocumentId
+            } to invoice ${failedInvoice.invoiceId.id.toString()}`
+          );
+          updatedInvoices.push(assignedErpReference);
         }
       }
 
