@@ -63,20 +63,18 @@ defineFeature(feature, (test) => {
   });
 
   const givenAJournalWithEditors = (given, and) => {
-    given(/^There is a Journal having id (\w+)$/, async (journalId: string) => {
-      await mockCatalogRepo.save(
-        CatalogMap.toDomain({
-          journalId,
-          type: 'mock',
-          amount: 666,
-        })
-      );
-    });
+    given(
+      /^There is a Journal having id (\w+) with (\d+) editors$/,
+      async (journalId: string, journalStartEditors: number) => {
+        await mockCatalogRepo.save(
+          CatalogMap.toDomain({
+            journalId,
+            type: 'mock',
+            amount: 666,
+          })
+        );
 
-    and(
-      /^There are (\d+) editors in the Journal (\w+)$/,
-      async (journalStart: string, journalId: string) => {
-        journalCount = +journalStart;
+        journalCount = +journalStartEditors;
         [...new Array(journalCount)].map(async (curr: any, idx: number) => {
           const editor = await mockEditorRepo.save(
             EditorMap.toDomain({
@@ -106,7 +104,6 @@ defineFeature(feature, (test) => {
               roleLabel: `${idx}-role-label`,
             })
           );
-          // editorsIds.push(editor.id.toString());
         }
       );
     });
@@ -141,7 +138,7 @@ defineFeature(feature, (test) => {
 
     then(
       /^I should have (\d+) editors in Journal (\w+)$/,
-      async (journalLeft: string, journalId: string) => {
+      async (journalLeft: number, journalId: string) => {
         const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorsByJournalId(
           JournalId.create(new UniqueEntityID(journalId)).getValue()
         );
@@ -149,7 +146,7 @@ defineFeature(feature, (test) => {
       }
     );
 
-    and(/^I should have (\d+) editors in the system$/, async (left: string) => {
+    and(/^I should have (\d+) editors in the system$/, async (left: number) => {
       const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorCollection();
       expect(editorCollectionAfter.length).toEqual(+left);
     });

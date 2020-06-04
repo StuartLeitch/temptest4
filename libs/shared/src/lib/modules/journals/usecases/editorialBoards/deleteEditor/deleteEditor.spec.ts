@@ -44,7 +44,7 @@ describe('Delete Editor UseCase', () => {
     expect(editorCollectionBefore.length).toEqual(INITIAL);
 
     result = await usecase.execute(
-      EditorMap.toPersistence(last),
+      { editorId: last.editorId.id.toString() },
       defaultContext
     );
 

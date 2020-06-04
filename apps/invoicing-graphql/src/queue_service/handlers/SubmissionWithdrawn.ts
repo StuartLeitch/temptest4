@@ -2,6 +2,8 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
+import { SubmissionWithdrawn as SubmissionWithdrawnPayload } from '@hindawi/phenom-events';
+
 // * Domain imports
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
@@ -16,8 +18,16 @@ const defaultContext: SoftDeleteDraftTransactionAuthorizationContext = {
 
 export const SubmissionWithdrawn = {
   event: SUBMISSION_WITHDRAWN,
-  handler: async function submissionWithdrawnHandler(data: any) {
+  handler: async function submissionWithdrawnHandler(
+    data: SubmissionWithdrawnPayload
+  ) {
     const {
+      repos: {
+        transaction: transactionRepo,
+        invoiceItem: invoiceItemRepo,
+        invoice: invoiceRepo,
+        manuscript: manuscriptRepo,
+      },
       services: { logger },
     } = this;
 
@@ -32,15 +42,6 @@ export const SubmissionWithdrawn = {
         },
       ],
     } = data;
-
-    const {
-      repos: {
-        transaction: transactionRepo,
-        invoiceItem: invoiceItemRepo,
-        invoice: invoiceRepo,
-        manuscript: manuscriptRepo,
-      },
-    } = this;
 
     if (name in ManuscriptTypeNotInvoiceable) {
       return;

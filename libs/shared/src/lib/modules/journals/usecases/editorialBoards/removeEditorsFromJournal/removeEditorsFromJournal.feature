@@ -1,17 +1,15 @@
 Feature: Remove Editors From Journal Usecase
-  #Provide some context
-  #And some other stuff
+  # The system is able to remove Editors attached to a certain Journal
+  # through RemoveEditorsFromJournal usecase
 
-  #some comment here if necessary
   Scenario Outline: Remove Editors from Journal
-    Given There is a Journal having id <journalId>
-    And There are <journalStart> editors in the Journal <journalId>
-    And There are <start> editors in the system
-    When I delete <remove> editors from Journal <journalId>
-    Then I should have <journalLeft> editors in Journal <journalId>
-    And I should have <left> editors in the system
+    Given There is a Journal having id <journalId> with <journalStartEditors> editors
+    And There are <systemStartEditors> editors in the system
+    When I delete <journalRemoveEditors> editors from Journal <journalId>
+    Then I should have <journalLeftEditors> editors in Journal <journalId>
+    And I should have <systemLeftEditors> editors in the system
 
     Examples:
-      | journalId | start | journalStart | remove | left | journalLeft |
-      | foo       | 12    | 7            | 2      | 10   | 5           |
-      | foo       | 12    | 5            | 0      | 12   | 5           |
+      | journalId | journalStartEditors | systemStartEditors | journalRemoveEditors | journalLeftEditors | systemLeftEditors |
+      | foo       | 7                   | 12                 | 2                    | 5                  | 10                |
+      | foo       | 5                   | 12                 | 0                    | 5                  | 12                |

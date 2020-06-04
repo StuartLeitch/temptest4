@@ -1,6 +1,8 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
+import { JournalEditorRemoved } from '@hindawi/phenom-events';
+
 import { GetEditorsByJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
 import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 import { RemoveEditorsFromJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
@@ -9,15 +11,14 @@ import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/m
 
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
 
-function removeEditorEventHandlerFactory(eventName: string): any {
-  return async function (data: any) {
+function removeEditorEventHandlerFactory(eventName: string) {
+  return async function (data: JournalEditorRemoved) {
     const {
       repos: { catalog: catalogRepo, editor: editorRepo },
-      // tslint:disable-next-line: no-shadowed-variable
       services: { logger },
     } = this;
-    logger.setScope(`PhenomEvent:${JOURNAL_EDITOR_REMOVED}`);
 
+    logger.setScope(`PhenomEvent:${JOURNAL_EDITOR_REMOVED}`);
     logger.info(`Incoming Event Data`, data);
 
     const getEditorsByJournal = new GetEditorsByJournalUsecase(

@@ -25,7 +25,18 @@ export const SubmissionQualityCheckPassed = {
     data: SubmissionQualityCheckPassedEvent
   ): Promise<unknown> {
     const {
-      services: { logger },
+      repos: {
+        address: addressRepo,
+        transaction: transactionRepo,
+        invoice: invoiceRepo,
+        invoiceItem: invoiceItemRepo,
+        manuscript: manuscriptRepo,
+        waiver: waiverRepo,
+        catalog: catalogRepo,
+        payer: payerRepo,
+        coupon: couponRepo,
+      },
+      services: { waiverService, emailService, vatService, logger },
     } = this;
 
     logger.setScope(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
@@ -54,23 +65,6 @@ export const SubmissionQualityCheckPassed = {
     const { email, country, surname, givenNames } = authors.find(
       (a) => a.isCorresponding
     );
-
-    const {
-      repos: {
-        address: addressRepo,
-        transaction: transactionRepo,
-        invoice: invoiceRepo,
-        invoiceItem: invoiceItemRepo,
-        manuscript: manuscriptRepo,
-        waiver: waiverRepo,
-        catalog: catalogRepo,
-        payer: payerRepo,
-        coupon: couponRepo,
-      },
-      services: { waiverService, emailService, vatService },
-    } = this;
-
-    // catalogRepo.getCatalogItemByJournalId();
 
     const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
       invoiceItemRepo,

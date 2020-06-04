@@ -1,10 +1,8 @@
 Feature: Journal Editor Removed Event Handler
-  # Provide some context
-  # And some other stuff
+  # On Phenom JournalEditorRemoved event
+  # It should replace the list of editors attached to that journal
+  # with the new list provided by event data
 
-  # some comment here if necessary
-  Background:
-    Given a background step
   Scenario: Journal Editor Removed
     Given There are "10" editors in the Journal "foo-journal"
     And All editors list from event data contains "7" entries only

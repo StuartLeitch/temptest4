@@ -2,9 +2,8 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
+import { SubmissionSubmitted } from '@hindawi/phenom-events';
 // * Domain imports
-// import {InvoiceStatus} from '@hindawi/shared';
-
 import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
@@ -22,15 +21,25 @@ import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/s
 import { GetItemsForInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetJournal } from './../../../../../libs/shared/src/lib/modules/journals/usecases/journals/getJournal/getJournal';
 
-import { Logger } from '../../lib/logger';
-
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 export const SubmissionSubmittedHandler = {
   event: SUBMISSION_SUBMITTED,
-  handler: async function submissionSubmittedHandler(data: any) {
+  handler: async function submissionSubmittedHandler(
+    data: SubmissionSubmitted
+  ) {
     const {
+      repos: {
+        transaction: transactionRepo,
+        invoice: invoiceRepo,
+        invoiceItem: invoiceItemRepo,
+        catalog: catalogRepo,
+        manuscript: manuscriptRepo,
+        coupon: couponRepo,
+        waiver: waiverRepo,
+        pausedReminder: pausedReminderRepo,
+      },
       services: { logger },
     } = this;
 
@@ -54,19 +63,6 @@ export const SubmissionSubmittedHandler = {
     const { email, country, surname, givenNames } = authors.find(
       (a: any) => a.isCorresponding
     );
-
-    const {
-      repos: {
-        transaction: transactionRepo,
-        invoice: invoiceRepo,
-        invoiceItem: invoiceItemRepo,
-        catalog: catalogRepo,
-        manuscript: manuscriptRepo,
-        coupon: couponRepo,
-        waiver: waiverRepo,
-        pausedReminder: pausedReminderRepo,
-      },
-    } = this;
 
     const getManuscriptBySubmissionId: GetManuscriptByManuscriptIdUsecase = new GetManuscriptByManuscriptIdUsecase(
       manuscriptRepo
@@ -253,7 +249,7 @@ export const SubmissionSubmittedHandler = {
           authorCountry: country,
           authorSurname: surname,
           authorFirstName: givenNames,
-          created,
+          created: new Date(created),
         };
 
         const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(

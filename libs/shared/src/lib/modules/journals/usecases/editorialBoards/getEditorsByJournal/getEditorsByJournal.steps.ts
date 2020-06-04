@@ -47,7 +47,6 @@ defineFeature(feature, (test) => {
   let mockCatalogRepo: MockCatalogRepo;
   let usecase: GetEditorsByJournalUsecase;
   let journalEditorsIds: string[] = [];
-  let journalCount = 0;
 
   beforeEach(() => {
     mockEditorRepo = new MockEditorRepo();
@@ -61,8 +60,8 @@ defineFeature(feature, (test) => {
 
   const givenAJournalWithEditors = (given, and) => {
     given(
-      /^There is a Journal having id ([\w-]+)$/,
-      async (journalId: string) => {
+      /^There is a Journal with id "([\w-]+)" and "(\d+)" editors$/,
+      async (journalId: string, journalStart: number) => {
         await mockCatalogRepo.save(
           CatalogMap.toDomain({
             journalId,
@@ -70,14 +69,8 @@ defineFeature(feature, (test) => {
             amount: 666,
           })
         );
-      }
-    );
 
-    and(
-      /^There are (\d+) editors in the Journal ([\w-]+)$/,
-      async (journalStart: string, journalId: string) => {
-        journalCount = +journalStart;
-        [...new Array(journalCount)].map(async (curr: any, idx: number) => {
+        [...new Array(+journalStart)].map(async (curr: any, idx: number) => {
           const editor = await mockEditorRepo.save(
             EditorMap.toDomain({
               editorId: `${journalId}-${idx}-editor`,
@@ -98,7 +91,7 @@ defineFeature(feature, (test) => {
     givenAJournalWithEditors(given, and);
 
     when(
-      /^I ask for the whole list of editors from Journal ([\w-]+)$/,
+      /^I ask for the whole list of editors from Journal "([\w-]+)"$/,
       async (journalId: string) => {
         await usecase.execute(
           {
@@ -110,7 +103,7 @@ defineFeature(feature, (test) => {
     );
 
     then(
-      /^I should receive (\d+) editors of Journal ([\w-]+)$/,
+      /^I should receive "(\d+)" editors of Journal "([\w-]+)"$/,
       async (count: number, journalId: string) => {
         const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorsByJournalId(
           JournalId.create(new UniqueEntityID(journalId)).getValue()

@@ -15,7 +15,16 @@ export const ArticlePublishedHandler = {
   event: ARTICLE_PUBLISHED,
   async handler(data: ArticlePublishedEventPayload): Promise<void> {
     const {
-      services: { logger },
+      repos: {
+        invoice: invoiceRepo,
+        invoiceItem: invoiceItemRepo,
+        manuscript: manuscriptRepo,
+        payer: payerRepo,
+        address: addressRepo,
+        coupon: couponRepo,
+        waiver: waiverRepo,
+      },
+      services: { emailService, vatService, logger },
     } = this;
 
     const correlationId = new CorrelationID().toString();
@@ -33,18 +42,6 @@ export const ArticlePublishedHandler = {
       return;
     }
 
-    const {
-      repos: {
-        invoice: invoiceRepo,
-        invoiceItem: invoiceItemRepo,
-        manuscript: manuscriptRepo,
-        payer: payerRepo,
-        address: addressRepo,
-        coupon: couponRepo,
-        waiver: waiverRepo,
-      },
-      services: { emailService, vatService },
-    } = this;
     const {
       sanctionedCountryNotificationReceiver,
       sanctionedCountryNotificationSender,

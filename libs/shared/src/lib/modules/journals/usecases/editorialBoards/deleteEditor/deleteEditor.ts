@@ -2,7 +2,7 @@
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { left, right } from '../../../../../core/logic/Either';
 import { AppError } from '../../../../../core/logic/AppError';
-// import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 // import { EditorRole } from '../../../../../domain/EditorRole';
 // import { Email } from '../../../../../domain/Email';
@@ -10,6 +10,7 @@ import { AppError } from '../../../../../core/logic/AppError';
 
 import { EditorRepoContract } from '../../../repos/editorRepo';
 import { Editor } from '../../../domain/Editor';
+import { EditorId } from '../../../domain/EditorId';
 import { EditorMap } from '../../../mappers/EditorMap';
 
 import { DeleteEditorDTO } from './deleteEditorDTO';
@@ -48,8 +49,12 @@ export class DeleteEditor
   ): Promise<DeleteEditorResponse> {
     let editor: Editor;
 
+    const { editorId } = request;
+
     try {
-      editor = EditorMap.toDomain(request);
+      editor = await this.editorRepo.getEditorById(
+        EditorId.create(new UniqueEntityID(editorId)).getValue()
+      );
 
       // * This is where all the magic happens
       await this.editorRepo.delete(editor);

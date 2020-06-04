@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import { JournalUpdated } from '@hindawi/phenom-events';
 import {
   UpdateCatalogItemToCatalogUseCase,
   UpdateCatalogItemToCatalogUseCaseRequestDTO,
@@ -10,7 +11,7 @@ const JOURNAL_UPDATED = 'JournalUpdated';
 
 export const JournalUpdatedHandler = {
   event: JOURNAL_UPDATED,
-  async handler(data: any) {
+  async handler(data: JournalUpdated) {
     const {
       repos: { catalog: catalogRepo },
       services: { logger },

@@ -9,7 +9,6 @@ import {
   UpdateTransactionContext,
   TransactionStatus,
   VersionCompare,
-  // QueuePayloads,
   Roles,
 } from '@hindawi/shared';
 import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
@@ -27,7 +26,18 @@ export const SubmissionPeerReviewCycleCheckPassed = {
     data: SubmissionPeerReviewCycleCheckPassedEvent
   ): Promise<unknown> {
     const {
-      services: { logger },
+      repos: {
+        address: addressRepo,
+        transaction: transactionRepo,
+        invoice: invoiceRepo,
+        invoiceItem: invoiceItemRepo,
+        manuscript: manuscriptRepo,
+        waiver: waiverRepo,
+        catalog: catalogRepo,
+        payer: payerRepo,
+        coupon: couponRepo,
+      },
+      services: { waiverService, emailService, vatService, logger },
     } = this;
 
     logger.setScope(`PhenomEvent:${SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED}`);
@@ -56,21 +66,6 @@ export const SubmissionPeerReviewCycleCheckPassed = {
     const { email, country, surname, givenNames } = authors.find(
       (a) => a.isCorresponding
     );
-
-    const {
-      repos: {
-        address: addressRepo,
-        transaction: transactionRepo,
-        invoice: invoiceRepo,
-        invoiceItem: invoiceItemRepo,
-        manuscript: manuscriptRepo,
-        waiver: waiverRepo,
-        catalog: catalogRepo,
-        payer: payerRepo,
-        coupon: couponRepo,
-      },
-      services: { waiverService, emailService, vatService, schedulingService },
-    } = this;
 
     const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
       invoiceItemRepo,

@@ -80,7 +80,7 @@ defineFeature(feature, (test) => {
           EditorId.create(new UniqueEntityID(editorId)).getValue()
         );
         await usecase.execute(
-          EditorMap.toPersistence(randomEditor),
+          { editorId: randomEditor.editorId.id.toString() },
           defaultContext
         );
       });
