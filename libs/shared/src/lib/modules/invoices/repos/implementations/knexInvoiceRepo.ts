@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { Transform } from 'stream';
 
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -74,30 +76,17 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const totalCount = await applyFilters(getModel(), filters).count(
       `${TABLES.INVOICES}.id`
     );
-    // const draftCount = await filtered(
-    //   getModel(),
-    //   getModel().whereIn(`${TABLES.INVOICES}.status`, ['DRAFT'])
-    // ).count(`${TABLES.INVOICES}.id`);
 
     const offset = pagination.offset * pagination.limit;
-    // console.info(
-    //   'limit = %s, offset = %s, totalCount = %s',
-    //   pagination.limit,
-    //   offset,
-    //   totalCount[0]
-    // );
+
     const invoices = await applyFilters(getModel(), filters)
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.INVOICES}.*`]);
 
-    // console.info(invoices);
-    // console.info(invoices.map(i => InvoiceMap.toDomain(i)));
-
     return {
       totalCount: totalCount[0]['count'],
-      // draftCount: draftCount[0]['count'],
       invoices: invoices.map((i) => InvoiceMap.toDomain(i)),
     };
   }
@@ -222,8 +211,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
         this.whereNot('deleted', 1)
           .whereIn('status', ['ACTIVE', 'FINAL'])
           .whereNull('cancelledInvoiceReference')
-          .whereNull('erpReference')
-          .where('erpReference', '<>', 'NON_INVOICEABLE');
+          .whereNull('erpReference');
       });
 
     logger.debug('select', {
@@ -254,8 +242,7 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
           .whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.erpReference')
-          .where('invoices.erpReference', '<>', 'NON_INVOICEABLE');
+          .whereNull('invoices.erpReference');
       });
 
     logger.debug('select', {
