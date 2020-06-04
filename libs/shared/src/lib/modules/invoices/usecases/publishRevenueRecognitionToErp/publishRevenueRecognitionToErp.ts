@@ -166,6 +166,8 @@ export class PublishRevenueRecognitionToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {
+        invoice.erpReference = 'NON_INVOICEABLE';
+        await this.invoiceRepo.update(invoice);
         return right(Result.ok<any>(null));
       }
 

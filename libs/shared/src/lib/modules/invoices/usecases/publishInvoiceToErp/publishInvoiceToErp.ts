@@ -16,7 +16,7 @@ import {
   GetItemsForInvoiceUsecase,
 } from '@hindawi/shared';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { right, Result, left } from '../../../../core/logic/Result';
+import { right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
@@ -73,7 +73,7 @@ export class PublishInvoiceToErpUsecase
   ): Promise<PublishInvoiceToErpResponse> {
     // this.loggerService.info('PublishInvoiceToERP Request', request);
     if (process.env.ERP_DISABLED === 'true') {
-      return right(Result.ok<any>(null));
+      return right(null);
     }
 
     let invoice: Invoice;
@@ -135,7 +135,9 @@ export class PublishInvoiceToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
-        return right(Result.ok<any>(null));
+        invoice.erpReference = 'NON_INVOICEABLE';
+        await this.invoiceRepo.update(invoice);
+        return right(null);
       }
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
@@ -206,30 +208,33 @@ export class PublishInvoiceToErpUsecase
       }
       // this.loggerService.info('PublishInvoiceToERP rate', rate);
 
-      const erpResponse = await this.erpService.registerInvoice({
-        invoice,
-        payer,
-        items: invoiceItems,
-        article: manuscript as any,
-        billingAddress: address,
-        journalName: catalog.journalTitle,
-        vatNote,
-        rate,
-        tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-      });
-      // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
+      try {
+        const erpResponse = await this.erpService.registerInvoice({
+          invoice,
+          payer,
+          items: invoiceItems,
+          article: manuscript as any,
+          billingAddress: address,
+          journalName: catalog.journalTitle,
+          vatNote,
+          rate,
+          tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
+        });
+        // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
 
-      this.loggerService.info(
-        `Updating invoice ${invoice.id.toString()}: erpReference -> ${
-          erpResponse.tradeDocumentId
-        }`
-      );
-      invoice.erpReference = erpResponse.tradeDocumentId;
+        this.loggerService.info(
+          `Updating invoice ${invoice.id.toString()}: erpReference -> ${
+            erpResponse.tradeDocumentId
+          }`
+        );
+        invoice.erpReference = erpResponse.tradeDocumentId;
 
-      // this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
-      await this.invoiceRepo.update(invoice);
-
-      return right(Result.ok<any>(erpResponse));
+        // this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
+        await this.invoiceRepo.update(invoice);
+        return right(erpResponse);
+      } catch (err) {
+        return left(err);
+      }
     } catch (err) {
       return left(new AppError.UnexpectedError(err));
     }

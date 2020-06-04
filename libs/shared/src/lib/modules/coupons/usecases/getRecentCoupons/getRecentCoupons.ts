@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
@@ -18,7 +19,7 @@ import {
 export class GetRecentCouponsUsecase
   implements
     UseCase<
-      {},
+      Record<string, unknown>,
       Promise<GetRecentCouponsResponse>,
       GetRecentCouponsAuthenticationContext
     >,
@@ -29,7 +30,7 @@ export class GetRecentCouponsUsecase
     > {
   constructor(private couponRepo: CouponRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
+  private async getAccessControlContext() {
     return {};
   }
 

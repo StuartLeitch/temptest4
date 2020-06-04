@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   Roles,
@@ -51,7 +52,7 @@ export const coupon: Resolvers<any> = {
       const couponsList = result.value.getValue();
 
       return {
-        totalCount: couponsList.totalCount,
+        totalCount: +couponsList.totalCount,
         coupons: couponsList.coupons.map(CouponMap.toPersistence),
       };
     },

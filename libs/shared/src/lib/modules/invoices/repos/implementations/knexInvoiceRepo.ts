@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { Transform } from 'stream';
 
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -74,30 +76,17 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const totalCount = await applyFilters(getModel(), filters).count(
       `${TABLES.INVOICES}.id`
     );
-    // const draftCount = await filtered(
-    //   getModel(),
-    //   getModel().whereIn(`${TABLES.INVOICES}.status`, ['DRAFT'])
-    // ).count(`${TABLES.INVOICES}.id`);
 
     const offset = pagination.offset * pagination.limit;
-    // console.info(
-    //   'limit = %s, offset = %s, totalCount = %s',
-    //   pagination.limit,
-    //   offset,
-    //   totalCount[0]
-    // );
+
     const invoices = await applyFilters(getModel(), filters)
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.INVOICES}.*`]);
 
-    // console.info(invoices);
-    // console.info(invoices.map(i => InvoiceMap.toDomain(i)));
-
     return {
       totalCount: totalCount[0]['count'],
-      // draftCount: draftCount[0]['count'],
       invoices: invoices.map((i) => InvoiceMap.toDomain(i)),
     };
   }
@@ -214,23 +203,30 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
   }
 
   async getFailedErpInvoices(): Promise<Invoice[]> {
-    const { db } = this;
+    const { db, logger } = this;
 
-    const invoices = await db(TABLES.INVOICES)
+    const sql = db(TABLES.INVOICES)
       .select()
-      .whereNot(`deleted`, 1)
-      .whereIn('status', ['ACTIVE', 'FINAL'])
-      // filter the credit notes from this list
-      .whereNull('cancelledInvoiceReference')
-      .whereNull('erpReference');
+      .where(function () {
+        this.whereNot('deleted', 1)
+          .whereIn('status', ['ACTIVE', 'FINAL'])
+          .whereNull('cancelledInvoiceReference')
+          .whereNull('erpReference');
+      });
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
 
     return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
   async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
-    const { db } = this;
+    const { db, logger } = this;
 
-    const invoices = await db(TABLES.INVOICES)
+    const sql = db(TABLES.INVOICES)
       .select(
         'invoices.id as invoiceId',
         'invoices.transactionId as transactionId',
@@ -241,12 +237,19 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .from('invoices')
       .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
       .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-      .whereNot(`invoices.deleted`, 1)
-      .whereNull('invoices.revenueRecognitionReference')
-      // filter the credit notes from this list
-      .whereNull('invoices.cancelledInvoiceReference')
-      .whereNotNull('invoices.erpReference')
-      .whereNotNull('articles.datePublished');
+      .where(function () {
+        this.whereNotNull('articles.datePublished')
+          .whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.erpReference');
+      });
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
 
     return invoices.map((i) =>
       InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
