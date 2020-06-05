@@ -72,6 +72,8 @@ export const generateCompensatoryEvents: Resolvers<any> = {
         throw errors;
       }
 
+      console.log('finish regeneration');
+      loggerService.debug('Finish Regeneration');
       return 'ok';
     },
   },
