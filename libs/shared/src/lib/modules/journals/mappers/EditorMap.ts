@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+
 import { EditorRole } from '../../../domain/EditorRole';
 import { Email } from '../../../domain/Email';
 import { Name } from '../../../domain/Name';
@@ -13,7 +16,7 @@ export class EditorMap extends Mapper<Editor> {
     const editorOrError = Editor.create(
       {
         journalId: JournalId.create(
-          new UniqueEntityID(raw.journalId)
+          new UniqueEntityID(raw?.journalId)
         ).getValue(),
         userId: UserId.create(new UniqueEntityID(raw.userId)),
         email: Email.create({ value: raw.email }).getValue(),
@@ -21,11 +24,13 @@ export class EditorMap extends Mapper<Editor> {
         createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
         updatedAt: raw.updatedAt
           ? new Date(raw.updatedAt)
-          : new Date(raw.createdAt),
+          : raw.createdAt
+          ? new Date(raw.createdAt)
+          : null,
         role: EditorRole.create({
           label: raw.roleLabel,
-          type: raw.roleType
-        }).getValue()
+          type: raw.roleType,
+        }).getValue(),
       },
       new UniqueEntityID(raw.id)
     );
@@ -43,7 +48,7 @@ export class EditorMap extends Mapper<Editor> {
       roleLabel: editor.role.label,
       roleType: editor.role.type,
       createdAt: editor.createdAt,
-      updatedAt: editor.updatedAt
+      updatedAt: editor.updatedAt,
     };
   }
 
@@ -55,9 +60,9 @@ export class EditorMap extends Mapper<Editor> {
       email: raw.email,
       name: raw.givenNames,
       createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
-      updatedAt: raw.updatedAt ? new Date(raw.creatupdatedAtedAt) : null,
+      updatedAt: raw.updatedAt ? new Date(raw.updatedAt) : null,
       roleLabel: raw.role && raw.role.label,
-      roleType: raw.role && raw.role.type
+      roleType: raw.role && raw.role.type,
     };
   }
 }

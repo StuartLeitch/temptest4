@@ -27,11 +27,10 @@ export class JournalEventMap {
     }
 
     // Removed section editors/special issue editors
-
     for (const editor of editorsToParse) {
       const editorId = editor.id;
       const isScheduled = scheduledEditorMap[editorId];
-      if (!isScheduled && editor.role.type !== 'editorialAssistant') {
+      if (!isScheduled && editor?.role?.type !== 'editorialAssistant') {
         scheduledEditors.push(EditorMap.fromEventToDTO(editor));
         scheduledEditorMap[editorId] = true;
       }

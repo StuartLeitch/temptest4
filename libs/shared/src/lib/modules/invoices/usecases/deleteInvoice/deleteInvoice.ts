@@ -1,19 +1,19 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import {Invoice /* , STATUS as InvoiceStatus*/} from '../../domain/Invoice';
-import {InvoiceId} from '../../domain/InvoiceId';
-import {InvoiceRepoContract} from '../../repos/invoiceRepo';
+import { Invoice /* , STATUS as InvoiceStatus*/ } from '../../domain/Invoice';
+import { InvoiceId } from '../../domain/InvoiceId';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 
 export interface DeleteInvoiceRequestDTO {
   invoiceId: string;
@@ -38,7 +38,7 @@ export class DeleteInvoiceUsecase
   private async getInvoice(
     request: DeleteInvoiceRequestDTO
   ): Promise<Result<Invoice>> {
-    const {invoiceId} = request;
+    const { invoiceId } = request;
 
     if (!invoiceId) {
       return Result.fail<Invoice>(`Invalid invoice id=${invoiceId}`);

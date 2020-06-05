@@ -2,6 +2,7 @@ import { SubmissionPeerReviewCycleCheckPassed } from './SubmissionPeerReviewCycl
 import { SubmissionQualityCheckPassed } from './SubmissionQualityCheckPassed';
 import { SubmissionQualityCheckRTCd } from './SubmissionQualityCheckRTCd';
 import { JournalEditorAssignedHandler } from './JournalEditorAssigned';
+import { JournalSectionEditorAssignedHandler } from './JournalSectionEditorAssigned';
 import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
 import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
 import { ArticlePublishedHandler } from './ArticlePublished';
@@ -13,6 +14,7 @@ import { JournalAddedHandler } from './JournalAdded';
 export {
   SubmissionPeerReviewCycleCheckPassed,
   JournalEditorAssignedHandler,
+  JournalSectionEditorAssignedHandler,
   SubmissionQualityCheckPassed,
   SubmissionQualityCheckRTCd,
   SubmissionSubmittedHandler,

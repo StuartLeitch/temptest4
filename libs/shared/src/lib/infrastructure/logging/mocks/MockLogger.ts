@@ -1,7 +1,7 @@
-import { LoggerContract } from './Logger';
+import { LoggerContract } from '../Logger';
 
 export class MockLogger implements LoggerContract {
-  constructor(private useConsole = false) {}
+  constructor(private useConsole = false, private scope = 'TEST_LOGGER') {}
 
   debug(message: string, ...args: any[]): void {
     if (this.useConsole) {
@@ -10,7 +10,7 @@ export class MockLogger implements LoggerContract {
   }
   info(message: string, ...args: any[]): void {
     if (this.useConsole) {
-      console.info(message);
+      console.info(message, args);
     }
   }
   warn(message: string, ...args: any[]): void {
@@ -22,5 +22,9 @@ export class MockLogger implements LoggerContract {
     if (this.useConsole) {
       console.error(message);
     }
+  }
+
+  setScope(scope?: string): void {
+    this.scope = scope;
   }
 }

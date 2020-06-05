@@ -1,4 +1,11 @@
-import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
+import { UseCase } from '../../../../../core/domain/UseCase';
+// import { UseCaseError } from '../../../../../core/logic/UseCaseError';
+import { AppError } from '../../../../../core/logic/AppError';
+import { right, Result, Either, left } from '../../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -6,20 +13,11 @@ import {
   Roles,
 } from '@hindawi/shared';
 import { EditorRepoContract } from '../../../repos/editorRepo';
-import {
-  left,
-  right,
-  Result,
-  Either,
-} from 'libs/shared/src/lib/core/logic/Result';
-import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
 import { JournalId } from '../../../domain/JournalId';
-import { Editor } from '../../../domain/Editor';
+// import { Editor } from '../../../domain/Editor';
 import { CatalogRepoContract } from '../../../repos';
 import { CreateEditorDTO } from '../createEditor/createEditorDTO';
 import { CreateEditor } from '../createEditor/createEditor';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
-import { UseCaseError } from '../../../../../core/logic/UseCaseError';
 
 interface AssignEditorsToJournalDTO {
   journalId: string;

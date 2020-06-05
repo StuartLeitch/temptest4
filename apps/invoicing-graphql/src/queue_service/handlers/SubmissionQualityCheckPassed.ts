@@ -13,20 +13,33 @@ import {
 
 import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 
-import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
 
-const logger = new Logger(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
-
 export const SubmissionQualityCheckPassed = {
   event: SUBMISSION_QUALITY_CHECK_PASSED,
   handler: async function submissionQualityCheckPassedHandler(
     data: SubmissionQualityCheckPassedEvent
-  ) {
+  ): Promise<unknown> {
+    const {
+      repos: {
+        address: addressRepo,
+        transaction: transactionRepo,
+        invoice: invoiceRepo,
+        invoiceItem: invoiceItemRepo,
+        manuscript: manuscriptRepo,
+        waiver: waiverRepo,
+        catalog: catalogRepo,
+        payer: payerRepo,
+        coupon: couponRepo,
+      },
+      services: { waiverService, emailService, vatService, logger },
+    } = this;
+
+    logger.setScope(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
     logger.info('Incoming Event Data', data);
 
     const { submissionId, manuscripts } = data;
@@ -52,23 +65,6 @@ export const SubmissionQualityCheckPassed = {
     const { email, country, surname, givenNames } = authors.find(
       (a) => a.isCorresponding
     );
-
-    const {
-      repos: {
-        address: addressRepo,
-        transaction: transactionRepo,
-        invoice: invoiceRepo,
-        invoiceItem: invoiceItemRepo,
-        manuscript: manuscriptRepo,
-        waiver: waiverRepo,
-        catalog: catalogRepo,
-        payer: payerRepo,
-        coupon: couponRepo,
-      },
-      services: { waiverService, emailService, vatService, schedulingService },
-    } = this;
-
-    // catalogRepo.getCatalogItemByJournalId();
 
     const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
       invoiceItemRepo,

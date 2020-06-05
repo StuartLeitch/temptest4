@@ -1,16 +1,16 @@
-import {MockEditorRepo} from '../../../repos/mocks/mockEditorRepo';
-import {EditorCollection} from '../../../domain/Editor';
+import { MockEditorRepo } from '../../../repos/mocks/mockEditorRepo';
+import { EditorCollection } from '../../../domain/Editor';
 
 // * Usecases imports
 import {
   Roles,
-  CreateEditorAuthorizationContext
+  CreateEditorAuthorizationContext,
 } from './createEditorAuthorizationContext';
-import {CreateEditor} from './createEditor';
-import {CreateEditorResponse} from './createEditorResponse';
+import { CreateEditor } from './createEditor';
+import { CreateEditorResponse } from './createEditorResponse';
 
 const defaultContext: CreateEditorAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN]
+  roles: [Roles.SUPER_ADMIN],
 };
 
 let usecase: CreateEditor;
@@ -30,11 +30,13 @@ describe('Create Editor UseCase', () => {
 
     result = await usecase.execute(
       {
+        userId: 'foo-user',
+        editorId: 'foo-editor',
         journalId: 'foo-journal',
         name: 'foo-editor-name',
         email: 'foo@editor.com',
         roleType: 'foo-role-type',
-        roleLabel: 'foo-role-label'
+        roleLabel: 'foo-role-label',
       },
       defaultContext
     );

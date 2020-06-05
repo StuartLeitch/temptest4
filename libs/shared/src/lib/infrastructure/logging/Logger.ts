@@ -3,4 +3,9 @@ export interface LoggerContract {
   info(message: string, ...args: any[]): void;
   warn(message: string, ...args: any[]): void;
   error(message: string, ...args: any[]): void;
+  setScope(scope: string): void;
+}
+
+export interface LoggerBuilderContract {
+  setScope(scope: string): void;
 }

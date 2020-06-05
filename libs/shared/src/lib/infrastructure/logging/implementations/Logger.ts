@@ -1,3 +1,5 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import * as path from 'path';
 import * as winston from 'winston';
 
@@ -17,7 +19,6 @@ import { LoggerContract } from '@hindawi/shared';
 export class Logger implements LoggerContract {
   public static DEFAULT_SCOPE = 'Invoicing/Backend';
   private scope: string;
-  // private correlationId: string;
 
   private static parsePathToScope(filePath: string): string {
     if (filePath.indexOf(path.sep) >= 0) {
@@ -31,9 +32,12 @@ export class Logger implements LoggerContract {
     return filePath;
   }
 
-  constructor(scope?: string, correlationId?: string) {
-    this.scope = Logger.parsePathToScope(scope ? scope : Logger.DEFAULT_SCOPE);
-    // this.correlationId = correlationId ?? 'uncorrelated';
+  public setScope(scope?: string): void {
+    this.scope = Logger.parsePathToScope(scope);
+  }
+
+  constructor() {
+    this.scope = Logger.DEFAULT_SCOPE;
   }
 
   public debug(message: string, ...args: any[]): void {

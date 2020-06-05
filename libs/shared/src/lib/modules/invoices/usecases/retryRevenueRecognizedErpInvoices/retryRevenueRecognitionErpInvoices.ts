@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   AuthorizationContext,
   Roles,
@@ -35,12 +36,12 @@ export type RetryRevenueRecognitionErpInvoicesContext = AuthorizationContext<
 export class RetryRevenueRecognitionErpInvoicesUsecase
   implements
     UseCase<
-      {},
+      Record<string, unknown>,
       Promise<RetryRevenueRecognitionErpInvoicesResponse>,
       RetryRevenueRecognitionErpInvoicesContext
     >,
     AccessControlledUsecase<
-      {},
+      Record<string, unknown>,
       RetryRevenueRecognitionErpInvoicesContext,
       AccessControlContext
     > {

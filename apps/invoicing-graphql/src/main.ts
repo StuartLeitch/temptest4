@@ -27,7 +27,7 @@ import { sisifLoader } from './loaders/sisifLoader';
  * The basic layer of this app is express. For further information visit
  * the 'README.md' file.
  */
-const log = new Logger(__filename);
+const log = new Logger(/*__filename*/);
 
 bootstrapMicroframework({
   /**

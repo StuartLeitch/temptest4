@@ -19,8 +19,9 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
       .select()
       .where('email', editorEmail);
 
-    return editors.map(editor => EditorMap.toDomain(editor));
+    return editors.map((editor) => EditorMap.toDomain(editor));
   }
+
   async getEditorById(editorId: EditorId): Promise<Editor> {
     const { db } = this;
 
@@ -74,5 +75,19 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
       .where('journalId', journalId.id.toString());
 
     return editors.map(EditorMap.toDomain);
+  }
+
+  async delete(editor: Editor): Promise<unknown> {
+    const { db } = this;
+
+    const deletedRows = await db(TABLES.EDITORS)
+      .where('id', editor.id.toString())
+      .update({ ...EditorMap.toPersistence(editor), deleted: 1 });
+
+    if (!deletedRows) {
+      throw RepoError.createEntityNotFoundError('editor', editor.id.toString());
+    }
+
+    return deletedRows;
   }
 }

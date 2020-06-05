@@ -1,4 +1,5 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import { ArticlePublished as ArticlePublishedEventPayload } from '@hindawi/phenom-events';
 import {
   EpicOnArticlePublishedUsecase,
@@ -6,30 +7,13 @@ import {
 } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
 import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
-import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 const ARTICLE_PUBLISHED = 'ArticlePublished';
-const logger = new Logger(`PhenomEvent:${ARTICLE_PUBLISHED}`);
 
 export const ArticlePublishedHandler = {
   event: ARTICLE_PUBLISHED,
-  async handler(data: ArticlePublishedEventPayload) {
-    const correlationId = new CorrelationID().toString();
-    logger.info(`Incoming Event Data`, { correlationId, data });
-
-    const {
-      customId,
-      articleType: { name },
-      // journalId,
-      published,
-      // title
-    } = data;
-
-    if (name in ManuscriptTypeNotInvoiceable) {
-      return;
-    }
-
+  async handler(data: ArticlePublishedEventPayload): Promise<void> {
     const {
       repos: {
         invoice: invoiceRepo,
@@ -40,8 +24,24 @@ export const ArticlePublishedHandler = {
         coupon: couponRepo,
         waiver: waiverRepo,
       },
-      services: { emailService, vatService, logger: loggerService },
+      services: { emailService, vatService, logger },
     } = this;
+
+    const correlationId = new CorrelationID().toString();
+
+    logger.setScope(`PhenomEvent:${ARTICLE_PUBLISHED}`);
+    logger.info(`Incoming Event Data`, { correlationId, data });
+
+    const {
+      customId,
+      articleType: { name },
+      published,
+    } = data;
+
+    if (name in ManuscriptTypeNotInvoiceable) {
+      return;
+    }
+
     const {
       sanctionedCountryNotificationReceiver,
       sanctionedCountryNotificationSender,
@@ -57,7 +57,7 @@ export const ArticlePublishedHandler = {
       waiverRepo,
       emailService,
       vatService,
-      loggerService
+      logger
     );
 
     const args: EpicOnArticlePublishedDTO = {
@@ -71,6 +71,7 @@ export const ArticlePublishedHandler = {
       correlationId,
       roles: [],
     });
+
     if (result.isLeft()) {
       logger.error(result.value.errorValue().message, { correlationId });
       throw result.value.error;

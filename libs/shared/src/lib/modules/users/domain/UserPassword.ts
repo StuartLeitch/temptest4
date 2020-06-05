@@ -1,6 +1,6 @@
-import {ValueObject} from '../../../core/domain/ValueObject';
-import {Result} from '../../../core/logic/Result';
-import {Guard} from '../../../core/logic/Guard';
+import { ValueObject } from '../../../core/domain/ValueObject';
+import { Result } from '../../../core/logic/Result';
+import { Guard } from '../../../core/logic/Guard';
 
 // import * as bcrypt from 'bcrypt-nodejs';
 
@@ -57,7 +57,7 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
   }
 
   public getHashedValue(): Promise<string> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (this.isAlreadyHashed()) {
         return resolve(this.props.value);
       } else {
@@ -85,7 +85,7 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
       return Result.ok<UserPassword>(
         new UserPassword({
           value: props.value,
-          hashed: !!props.hashed === true
+          hashed: !!props.hashed === true,
         })
       );
     }

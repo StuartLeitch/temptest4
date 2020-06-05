@@ -16,7 +16,7 @@ export class Guard {
       if (result.succeeded === false) return result;
     }
 
-    return {succeeded: true};
+    return { succeeded: true };
   }
 
   public static greaterThan(
@@ -24,10 +24,10 @@ export class Guard {
     actualValue: number
   ): GuardResult {
     return actualValue > minValue
-      ? {succeeded: true}
+      ? { succeeded: true }
       : {
           succeeded: false,
-          message: `Number given {${actualValue}} is not greater than {${minValue}}`
+          message: `Number given {${actualValue}} is not greater than {${minValue}}`,
         };
   }
 
@@ -38,35 +38,35 @@ export class Guard {
     if (argument === null || argument === undefined) {
       return {
         succeeded: false,
-        message: `${argumentName} is null or undefined`
+        message: `${argumentName} is null or undefined`,
       };
     } else {
-      return {succeeded: true};
+      return { succeeded: true };
     }
   }
 
   public static againstAtLeast(numChars: number, text: string): GuardResult {
     return text.length >= numChars
-      ? {succeeded: true}
+      ? { succeeded: true }
       : {
           succeeded: false,
-          message: `Text is not at least ${numChars} chars.`
+          message: `Text is not at least ${numChars} chars.`,
         };
   }
 
   public static againstAtMost(numChars: number, text: string): GuardResult {
     return text.length <= numChars
-      ? {succeeded: true}
+      ? { succeeded: true }
       : {
           succeeded: false,
-          message: `Text is greater than ${numChars} chars.`
+          message: `Text is greater than ${numChars} chars.`,
         };
   }
 
   public static againstNullOrUndefinedBulk(
     args: GuardArgumentCollection
   ): GuardResult {
-    for (let arg of args) {
+    for (const arg of args) {
       const result = this.againstNullOrUndefined(
         arg.argument,
         arg.argumentName
@@ -74,7 +74,7 @@ export class Guard {
       if (!result.succeeded) return result;
     }
 
-    return {succeeded: true, message: ''};
+    return { succeeded: true, message: '' };
   }
 
   public static isOneOf(
@@ -90,13 +90,13 @@ export class Guard {
     }
 
     if (isValid) {
-      return {succeeded: true};
+      return { succeeded: true };
     } else {
       return {
         succeeded: false,
         message: `${argumentName} isn't oneOf the correct types in ${JSON.stringify(
           validValues
-        )}. Got "${value}".`
+        )}. Got "${value}".`,
       };
     }
   }
@@ -111,10 +111,10 @@ export class Guard {
     if (!isInRange) {
       return {
         succeeded: false,
-        message: `${argumentName} is not within range ${min} to ${max}.`
+        message: `${argumentName} is not within range ${min} to ${max}.`,
       };
     } else {
-      return {succeeded: true};
+      return { succeeded: true };
     }
   }
 
@@ -125,7 +125,7 @@ export class Guard {
     argumentName: string
   ): GuardResult {
     let failingResult;
-    for (let num of numbers) {
+    for (const num of numbers) {
       const numIsInRangeResult = this.inRange(num, min, max, argumentName);
       if (!numIsInRangeResult.succeeded) failingResult = numIsInRangeResult;
     }
@@ -133,10 +133,10 @@ export class Guard {
     if (failingResult) {
       return {
         succeeded: false,
-        message: `${argumentName} is not within the range.`
+        message: `${argumentName} is not within the range.`,
       };
     } else {
-      return {succeeded: true};
+      return { succeeded: true };
     }
   }
 
@@ -148,12 +148,12 @@ export class Guard {
     if (!emailRegex.test(email)) {
       return {
         succeeded: false,
-        message: `${email} is an invalid email address.`
+        message: `${email} is an invalid email address.`,
       };
     }
 
     return {
-      succeeded: true
+      succeeded: true,
     };
   }
 }
