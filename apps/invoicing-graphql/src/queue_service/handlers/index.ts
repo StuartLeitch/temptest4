@@ -1,8 +1,10 @@
 import { SubmissionPeerReviewCycleCheckPassed } from './SubmissionPeerReviewCycleCheckPassed';
 import { SubmissionQualityCheckPassed } from './SubmissionQualityCheckPassed';
 import { SubmissionQualityCheckRTCd } from './SubmissionQualityCheckRTCd';
-import { JournalEditorAssignedHandler } from './JournalEditorAssigned';
-import { JournalSectionEditorAssignedHandler } from './JournalSectionEditorAssigned';
+import {
+  JournalEditorAssignedHandler,
+  JournalSectionEditorAssignedHandler,
+} from './JournalEditorAssigned';
 import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
 import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
 import { ArticlePublishedHandler } from './ArticlePublished';

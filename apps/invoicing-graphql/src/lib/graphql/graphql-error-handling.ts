@@ -5,7 +5,8 @@ import { env } from '../../env';
 import { Logger } from '../../lib/logger';
 
 // This feature is a copy from https://github.com/kadirahq/graphql-errors
-const logger = new Logger('app:errors');
+const logger = new Logger();
+logger.setScope('app:errors');
 
 // Mark field/type/schema
 export const Processed = Symbol();
@@ -86,7 +87,7 @@ const maskSchema = (schema, fn) => {
 };
 
 // Changes the default error handler function
-export const setDefaultHandler = handlerFn => {
+export const setDefaultHandler = (handlerFn) => {
   defaultHandler = handlerFn;
 };
 

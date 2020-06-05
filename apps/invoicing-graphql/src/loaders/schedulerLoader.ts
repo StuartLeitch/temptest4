@@ -16,7 +16,8 @@ import { RetryRevenueRecognitionErpInvoicesUsecase } from '../../../../libs/shar
 import { env } from '../env';
 import { Logger } from '../lib/logger';
 
-const logger = new Logger('scheduler:loader');
+const logger = new Logger();
+logger.setScope('scheduler:loader');
 
 export const schedulerLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
