@@ -116,7 +116,8 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views('20200525131500_invoices_costs_changes', true),
-    rebuild_materialized_views('20200525181500_add_payments_view'),
+    rebuild_materialized_views('20200525181500_add_payments_view', true),
+    rebuild_materialized_views('20200605121500_add_material_checks_dates'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
