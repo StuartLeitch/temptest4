@@ -1,10 +1,10 @@
 module.exports = {
   default: [
-    'integration-tests/features/**/*.feature',
+    '--require libs/shared/src/lib/modules/journals/usecases/boom/*.feature',
     '--require-module ts-node/register',
-    '--require integration-tests/step-definitions/**/*.ts',
+    // '--require libs/shared/src/lib/modules/journals/usecases/**/*.steps.ts',
     '--format progress-bar',
-    '--format cucumber-pretty',
+    // '--format cucumber-pretty',
     `--format-options '{"snippetInterface": "synchronous"}'`,
   ].join(' '),
 };
