@@ -10,7 +10,8 @@ import { Logger } from '../lib/logger';
 
 import * as eventHandlers from '../queue_service/handlers';
 
-const logger = new Logger(__filename);
+const logger = new Logger();
+logger.setScope(__filename);
 
 export const queueServiceLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined

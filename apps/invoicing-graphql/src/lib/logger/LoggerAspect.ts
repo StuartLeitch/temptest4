@@ -35,8 +35,9 @@ import {
   GetPaymentInfoUsecase,
 } from '@hindawi/shared';
 
-import { Logger } from './Logger';
-const logger = new Logger('Usecase:Aspect');
+import { Logger } from '../../../../../libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+const logger = new Logger();
+logger.setScope('Usecase:Aspect');
 
 const watchList = [
   // GetPaymentMethodsUseCase,

@@ -24,7 +24,8 @@ import { env } from '../env';
 import { Logger } from '../lib/logger';
 
 // This feature is a copy from https://github.com/kadirahq/graphql-errors
-const logger = new Logger('domain:events');
+const logger = new Logger();
+logger.setScope('Domain:events');
 
 export const domainEventsRegisterLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
