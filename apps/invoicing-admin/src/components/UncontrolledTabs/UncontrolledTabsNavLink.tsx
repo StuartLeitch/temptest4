@@ -8,7 +8,7 @@ import { Consumer } from './context';
 
 const UncontrolledTabsNavLink = props => (
   <Consumer>
-    {value => (
+    {(value:Value) => (
       <NavLink
         {..._.omit(props, ['tabId'])}
         onClick={() => {
@@ -23,5 +23,10 @@ const UncontrolledTabsNavLink = props => (
 UncontrolledTabsNavLink.propTypes = {
   tabId: PropTypes.string.isRequired
 };
+
+interface Value {
+  activeTabId: number;
+  setActiveTabId(tabId: number): void;
+}
 
 export { UncontrolledTabsNavLink };

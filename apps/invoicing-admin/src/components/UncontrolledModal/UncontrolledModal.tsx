@@ -5,10 +5,22 @@ import { Modal } from 'reactstrap';
 
 import { Provider } from './context';
 
-class UncontrolledModal extends React.Component {
+interface UncontrolledModalProps {
+  centered?: boolean;
+  target: string;
+}
+
+interface UncontrolledModalState {
+  isOpen: boolean;
+}
+
+class UncontrolledModal extends React.Component<UncontrolledModalProps, UncontrolledModalState> {
   static propTypes = {
     target: PropTypes.string.isRequired
   };
+  static Close: any;
+  boundClickEventHandler: () => void;
+  triggerElement: Element;
 
   constructor(props) {
     super(props);

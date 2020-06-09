@@ -1,9 +1,9 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { Button, Media } from './../../../components';
+import { Button, Media } from '../../../../components';
 
-export default ({ closeToast }) => {
+const SuccessfulCreditNoteCreatedToast =  ({ closeToast }) => {
   const history = useHistory();
 
   return (
@@ -41,3 +41,5 @@ export default ({ closeToast }) => {
     </Media>
   );
 };
+
+export default SuccessfulCreditNoteCreatedToast;

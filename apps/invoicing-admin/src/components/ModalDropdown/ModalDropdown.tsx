@@ -11,11 +11,9 @@ import {
   DropdownItem,
   Modal,
   ModalHeader,
-  ModalBody,
   ModalFooter,
   UncontrolledButtonDropdown,
-  UncontrolledModal
-} from '../';
+} from '..';
 
 export const ModalDropdown = ({
   className,
@@ -24,7 +22,7 @@ export const ModalDropdown = ({
   onSaveAndMarkInvoiceAsFinal,
   children,
   ...otherProps
-}) => {
+}: ModalDropdownProps) => {
   const [modalState, setModalState] = useState({
     open: false,
     options: [
@@ -34,11 +32,11 @@ export const ModalDropdown = ({
   });
   const classes = classNames(className, 'extended-dropdown');
 
-  const onClose = () => setModalState({ open: false });
+  const onClose = () => setModalState({ ...modalState, open: false });
   const onChange = event => {
     const role = event.target.getAttribute('role');
     if (role === 'menuitem') {
-      setModalState({ open: true });
+      setModalState({ ...modalState, open: true });
     }
   };
 
@@ -113,6 +111,14 @@ ModalDropdown.propTypes = {
   dropdownToggle: PropTypes.any,
   onSave: PropTypes.func
 };
+
+interface ModalDropdownProps {
+  children: any;
+  className?: string;
+  dropdownToggle: any;
+  onSave(): void;
+  onSaveAndMarkInvoiceAsFinal(): void;
+}
 
 // export class Demo extends React.Component<{}, {}> {
 //   state = {

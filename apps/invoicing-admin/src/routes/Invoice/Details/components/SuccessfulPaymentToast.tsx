@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Media } from './../../../components';
+import { Button, Media } from '../../../../components';
 
 export default ({ closeToast }) => (
   <Media>

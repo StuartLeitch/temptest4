@@ -3,7 +3,7 @@ import { useMutation } from 'graphql-hooks';
 import numeral from 'numeral';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
-
+import { InvoiceItem } from '../types';
 import {
   UncontrolledModal,
   ModalHeader,
@@ -16,13 +16,13 @@ import {
   Button,
   Col,
   Input,
-} from '../../../components';
+} from '../../../../components';
 
-import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput';
+import { ButtonInput } from '../../../Forms/DatePicker/components/ButtonInput';
 
 import SuccessfulCreditNoteCreatedToast from './SuccessfulCreditNoteCreatedToast';
 
-import { CREATE_CREDIT_NOTE_MUTATION } from '../graphql';
+import { CREATE_CREDIT_NOTE_MUTATION } from '../../graphql';
 
 const CreateCreditNoteModal = ({
   target,
@@ -52,6 +52,7 @@ const CreateCreditNoteModal = ({
 
       const resultError =
         recordCreditNoteResult?.error?.graphQLErrors[0]['message'];
+
 
       if (!resultError) {
         onSaveCallback();
@@ -166,9 +167,9 @@ const CreateCreditNoteModal = ({
 interface CreateCreditNoteModalProps {
   target: string;
   invoiceId: string;
-  invoiceItem: object;
+  invoiceItem: InvoiceItem;
   total: number;
-  onSaveCallback(): any;
+  onSaveCallback(): void;
 }
 
 export default CreateCreditNoteModal;

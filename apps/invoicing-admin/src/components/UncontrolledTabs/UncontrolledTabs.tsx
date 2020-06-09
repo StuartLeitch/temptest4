@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 
 import { Provider } from './context';
 
-class UncontrolledTabs extends React.Component {
+class UncontrolledTabs extends React.Component<{initialActiveTabId: string}, {activeTabId: string}> {
   static propTypes = {
     children: PropTypes.node.isRequired,
     initialActiveTabId: PropTypes.string
   };
+  static NavLink: any;
+  static TabContent: any;
 
   constructor(props) {
     super(props);

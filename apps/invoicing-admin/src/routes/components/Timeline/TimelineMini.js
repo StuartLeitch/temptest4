@@ -52,7 +52,9 @@ TimelineMini.propTypes = {
   icon: PropTypes.string,
   iconClassName: PropTypes.string,
   badgeColor: PropTypes.string,
-  badgeTitle: PropTypes.string
+  badgeTitle: PropTypes.string,
+  date: PropTypes.string,
+  phrase: PropTypes.string
 };
 
 TimelineMini.defaultProps = {

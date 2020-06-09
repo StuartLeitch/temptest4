@@ -8,13 +8,13 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-} from '../../../components';
+} from '../../../../components';
 
-import { APPLY_COUPON_MUTATION } from '../graphql';
+import { APPLY_COUPON_MUTATION } from '../../graphql';
 
-import { Code } from '../../Coupon/components/Fields';
+import { Code } from '../../../Coupon/components/Fields';
 
-const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
+const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }: ApplyCouponModalProps) => {
   const [inputValue, setInputValue] = useState('');
   const [isInputValid, setValid] = useState(false);
   const [inProgress, setInProgress] = useState(false);
@@ -46,7 +46,7 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
         setError(error);
       }
     } catch (e) {
-      setError('An error occured. Please try again.');
+      setError('An error occurred. Please try again.');
     }
 
     setInProgress(false);
@@ -92,6 +92,12 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }) => {
     </UncontrolledModal>
   );
 };
+
+interface ApplyCouponModalProps {
+  invoiceId: string;
+  target: string;
+  onSuccessCallback(): void;
+}
 
 ApplyCouponModal.propTypes = {
   target: string.isRequired,
