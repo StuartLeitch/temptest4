@@ -57,7 +57,7 @@ AS SELECT
          ELSE 'regular'
     END as "issue_type",
     s.submission_date as "manuscript_submission_date",
-    CASE WHEN inv.gross_apc_value = 0 THEN 'free'
+    CASE WHEN inv.net_amount = 0 THEN 'free'
          ELSE 'paid'
     END as "apc",
     CONCAT(a.given_names, ' ', a.surname) as "corresponding_author_name",
