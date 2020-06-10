@@ -12,6 +12,7 @@ import * as create_journal_to_publisher_table from './migrations/20200311104931_
 import * as create_superset_helper_functions from './migrations/20200325162543_create_superset_helper_functions';
 import * as add_sub_data_update_trigger from './migrations/20200406150014_add_sub_data_update_trigger';
 import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_index';
+import * as add_acceptance_rates_table from './migrations/20200610141941_add_acceptance_rates_table';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -127,6 +128,7 @@ class KnexMigrationSource {
     ),
     rebuild_materialized_views('20200609153500_add_void_manuscripts', true),
     rebuild_materialized_views('20200610131500_add_vendor_full_access'),
+    add_acceptance_rates_table,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
