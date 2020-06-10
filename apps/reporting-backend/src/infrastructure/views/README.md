@@ -52,3 +52,10 @@ This will create the dependency tree which is used when refreshing views.
 4. Add dependencies on other views
 5. Add view in [index.ts](materializedViewList.ts)
 6. Create database migration (Described in point 3 from `Adding new fields to an existing view` section above)
+
+# Allowing RBAC through superset
+
+Vendor views (note: non-materialized) are used to control access to charts/dashboards in superset.
+Ex: manuscript_vendors are used to restrict vendors to only in progress manuscripts. If you create a chart with the datasource `manuscripts` vendors `will not` be able see it. If you create a chart with the datasource `manuscript_vendors`, vendors `will` be able to see it.
+
+The view `manuscript_vendors_full_access` will only be used for filter charts (you should be able to filter by a manuscript type that has no entries in progress for a certain value).

@@ -125,7 +125,8 @@ class KnexMigrationSource {
       '20200609151800_fix_invoices_ref_number_n_apc',
       true
     ),
-    rebuild_materialized_views('20200609153500_add_void_manuscripts'),
+    rebuild_materialized_views('20200609153500_add_void_manuscripts', true),
+    rebuild_materialized_views('20200610131500_add_vendor_full_access'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

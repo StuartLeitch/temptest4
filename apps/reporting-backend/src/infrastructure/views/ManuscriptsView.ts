@@ -25,7 +25,7 @@ AS SELECT
   sd.event_timestamp as final_decision_date,
   sd.submission_event as final_decision_type,
   case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as accepted_date,
-  i.apc,
+  coalesce(i.apc, 'free') as apc,
   i.published_date,
   coalesce(i.gross_apc_value, s.journal_apc::float) as gross_apc,
   i.discount,
