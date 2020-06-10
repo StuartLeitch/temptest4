@@ -1,4 +1,5 @@
-import { defineFeature, loadFeature } from 'jest-cucumber';
+import { expect } from 'chai';
+import { Given, When, Then, BeforeAll, AfterAll } from 'cucumber';
 
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
@@ -34,82 +35,70 @@ function getRandom(arr: string[], n: number) {
   return result;
 }
 
-const feature = loadFeature('./getEditorsByJournal.feature', {
-  loadRelativePath: true,
+const defaultContext: GetEditorsByJournalAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
+
+let mockEditorRepo: MockEditorRepo;
+let mockCatalogRepo: MockCatalogRepo;
+let usecase: GetEditorsByJournalUsecase;
+let journalEditorsIds: string[] = [];
+
+BeforeAll(function () {
+  mockEditorRepo = new MockEditorRepo();
+  mockCatalogRepo = new MockCatalogRepo();
+  usecase = new GetEditorsByJournalUsecase(mockEditorRepo, mockCatalogRepo);
 });
 
-defineFeature(feature, (test) => {
-  const defaultContext: GetEditorsByJournalAuthorizationContext = {
-    roles: [Roles.SUPER_ADMIN],
-  };
-
-  let mockEditorRepo: MockEditorRepo;
-  let mockCatalogRepo: MockCatalogRepo;
-  let usecase: GetEditorsByJournalUsecase;
-  let journalEditorsIds: string[] = [];
-
-  beforeEach(() => {
-    mockEditorRepo = new MockEditorRepo();
-    mockCatalogRepo = new MockCatalogRepo();
-    usecase = new GetEditorsByJournalUsecase(mockEditorRepo, mockCatalogRepo);
-  });
-
-  afterEach(() => {
-    journalEditorsIds = [];
-  });
-
-  const givenAJournalWithEditors = (given, and) => {
-    given(
-      /^There is a Journal with id "([\w-]+)" and "(\d+)" editors$/,
-      async (journalId: string, journalStart: number) => {
-        await mockCatalogRepo.save(
-          CatalogMap.toDomain({
-            journalId,
-            type: 'mock',
-            amount: 666,
-          })
-        );
-
-        [...new Array(+journalStart)].map(async (curr: any, idx: number) => {
-          const editor = await mockEditorRepo.save(
-            EditorMap.toDomain({
-              editorId: `${journalId}-${idx}-editor`,
-              journalId: `${journalId}`,
-              name: `${idx}-editor-name`,
-              email: `email${idx}@editor.com`,
-              roleType: `${idx}-role-type`,
-              roleLabel: `${idx}-role-label`,
-            })
-          );
-          journalEditorsIds.push(editor.id.toString());
-        });
-      }
-    );
-  };
-
-  test('Get Editors By Journal', ({ given, and, when, then }) => {
-    givenAJournalWithEditors(given, and);
-
-    when(
-      /^I ask for the whole list of editors from Journal "([\w-]+)"$/,
-      async (journalId: string) => {
-        await usecase.execute(
-          {
-            journalId,
-          },
-          defaultContext
-        );
-      }
-    );
-
-    then(
-      /^I should receive "(\d+)" editors of Journal "([\w-]+)"$/,
-      async (count: number, journalId: string) => {
-        const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorsByJournalId(
-          JournalId.create(new UniqueEntityID(journalId)).getValue()
-        );
-        expect(editorCollectionAfter.length).toEqual(+count);
-      }
-    );
-  });
+AfterAll(function () {
+  journalEditorsIds = [];
 });
+
+Given(
+  /^There is a Journal with id "([\w-]+)" and (\d+) editors$/,
+  async (journalId: string, journalStart: number) => {
+    await mockCatalogRepo.save(
+      CatalogMap.toDomain({
+        journalId,
+        type: 'mock',
+        amount: 666,
+      })
+    );
+
+    [...new Array(+journalStart)].map(async (curr: any, idx: number) => {
+      const editor = await mockEditorRepo.save(
+        EditorMap.toDomain({
+          editorId: `${journalId}-${idx}-editor`,
+          journalId: `${journalId}`,
+          name: `${idx}-editor-name`,
+          email: `email${idx}@editor.com`,
+          roleType: `${idx}-role-type`,
+          roleLabel: `${idx}-role-label`,
+        })
+      );
+      journalEditorsIds.push(editor.id.toString());
+    });
+  }
+);
+
+When(
+  /^I ask for the whole list of editors from Journal "([\w-]+)"$/,
+  async (journalId: string) => {
+    await usecase.execute(
+      {
+        journalId,
+      },
+      defaultContext
+    );
+  }
+);
+
+Then(
+  /^I should receive (\d+) editors of Journal "([\w-]+)"$/,
+  async (count: number, journalId: string) => {
+    const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorsByJournalId(
+      JournalId.create(new UniqueEntityID(journalId)).getValue()
+    );
+    expect(editorCollectionAfter.length).to.equal(count);
+  }
+);
