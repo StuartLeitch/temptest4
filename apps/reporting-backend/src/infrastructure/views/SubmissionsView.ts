@@ -23,11 +23,15 @@ AS SELECT
   t.resubmission_date,
   t.screening_passed_date,
   t.last_recommendation_date,
+  t.void_date,
+  t.is_void,
   t.last_revision_submitted,
   t.last_returned_to_draft_date,
   t.last_returned_to_editor_date,
   t.sent_to_quality_check_date,
   t.sent_to_materials_check_date,
+  t.last_materials_check_files_requested_date,
+  t.last_materials_check_files_submitted_date,
   t.first_decision_date,
   t.special_issue_id,
   t.section_id,
@@ -56,6 +60,10 @@ FROM (
       submission_accepted_dates.max as sent_to_quality_check_date,
       peer_review_dates.max as sent_to_materials_check_date,
       revision_requested_dates.min as first_decision_date,
+      materials_check_files_requested_dates.max as last_materials_check_files_requested_date,
+      materials_check_files_submitted_dates.max as last_materials_check_files_submitted_date,
+      void_dates.max as void_date,
+      void_dates.max is not null as is_void,
       CASE 
         WHEN submission_submitted_dates.count = 1 THEN null
         ELSE submission_submitted_dates.max
@@ -82,7 +90,10 @@ FROM (
       LEFT JOIN (SELECT submission_id, version, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionReturnedToAcademicEditor' group by submission_id, version) returned_to_editor_dates on returned_to_editor_dates.submission_id = s.submission_id and s.version = returned_to_editor_dates.version
       LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionAccepted' group by submission_id) submission_accepted_dates on submission_accepted_dates.submission_id = s.submission_id 
       LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionPeerReviewCycleCheckPassed' group by submission_id) peer_review_dates on peer_review_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckFilesRequested' group by submission_id) materials_check_files_requested_dates on materials_check_files_requested_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityChecksSubmitted' group by submission_id) materials_check_files_submitted_dates on materials_check_files_submitted_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionRevisionRequested' group by submission_id) revision_requested_dates on revision_requested_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningVoid' group by submission_id) void_dates on void_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
     ) sd

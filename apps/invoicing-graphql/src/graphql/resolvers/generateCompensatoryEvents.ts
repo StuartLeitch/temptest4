@@ -1,4 +1,5 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import {
   GenerateCompensatoryEventsUsecase,
@@ -55,13 +56,24 @@ export const generateCompensatoryEvents: Resolvers<any> = {
 
       const ids = maybeResult.value.getValue();
 
+      const errors = [];
+
       for await (const invoiceId of ids) {
         const result = await usecase.execute({ invoiceId }, usecaseContext);
         if (result.isLeft()) {
-          throw new Error(result.value.errorValue().message);
+          errors.push(result.value.errorValue());
+          // throw new Error(result.value.errorValue().message);
         }
       }
 
+      if (errors.length) {
+        console.error(errors);
+        loggerService.error('Errors have ocurred', ...errors);
+        throw errors;
+      }
+
+      console.log('finish regeneration');
+      loggerService.debug('Finish Regeneration');
       return 'ok';
     },
   },

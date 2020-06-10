@@ -44,7 +44,7 @@ AS SELECT
   concat(a.given_names, ' ', a.surname) as corresponding_author, a.email as corresponding_author_email, a.country as corresponding_author_country, a.aff as corresponding_author_affiliation,
   concat(a2.given_names, ' ', a2.surname) as submitting_author, a2.email as submitting_author_email, a2.country as submitting_author_country, a2.aff as submitting_author_affiliation,
   concat(e.given_names, ' ', e.surname) as triage_editor, e.email as triage_editor_email, e.country as triage_editor_country, e.aff as triage_editor_affiliation,
-  concat(e2.given_names, ' ', e2.surname) as handling_editor, e2.email as handling_editor_email, e2.country as handling_editor_country, e2.aff as handling_editor_affiliation, e2.accepted_date as handling_editor_accepted_date, e2.invited_date as handling_editor_invited_date,
+  concat(e2.given_names, ' ', e2.surname) as handling_editor, e2.email as handling_editor_email, e2.country as handling_editor_country, e2.aff as handling_editor_affiliation, e2.invited_date as handling_editor_invited_date,
   concat(e3.given_names, ' ', e3.surname) as editorial_assistant, e3.email as editorial_assistant_email, e3.country as editorial_assistant_country, e3.aff as editorial_assistant_affiliation,
   screener.checker_name as screener_name,
   screener.checker_email as screener_email,
