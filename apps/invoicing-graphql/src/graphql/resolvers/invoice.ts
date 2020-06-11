@@ -557,6 +557,7 @@ export const invoice: Resolvers<any> = {
           pausedReminder: pausedReminderRepo,
           // manuscript: manuscriptRepo
         },
+        services: { waiverService },
       } = context;
 
       const { invoiceId, createDraft } = args;
@@ -569,7 +570,8 @@ export const invoice: Resolvers<any> = {
         transactionRepo,
         couponRepo,
         waiverRepo,
-        pausedReminderRepo
+        pausedReminderRepo,
+        waiverService
       );
       const usecaseContext = { roles: [Roles.ADMIN] };
 

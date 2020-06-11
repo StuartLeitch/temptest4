@@ -10,9 +10,11 @@ export interface WaiverRepoContract extends Repo<Waiver> {
   getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]>;
   getWaiversByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Waiver[]>;
   getWaiverByType(waiverType: WaiverType): Promise<Waiver>;
-  attachWaiversToInvoice(
-    waivers: WaiverType[],
+  getWaiversByTypes(waiverTypes: WaiverType[]): Promise<Waiver[]>;
+  removeInvoiceWaivers(invoiceId: InvoiceId): void;
+  attachWaiverToInvoice(
+    waivers: WaiverType,
     invoiceId: InvoiceId,
     dateCreated?: Date
-  ): Promise<Waiver[]>;
+  ): Promise<Waiver>;
 }

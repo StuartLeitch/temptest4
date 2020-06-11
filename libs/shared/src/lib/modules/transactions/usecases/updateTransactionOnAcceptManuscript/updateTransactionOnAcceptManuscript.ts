@@ -89,7 +89,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     let invoice: Invoice;
     let invoiceItem: InvoiceItem;
     let manuscript: Manuscript;
-    let waivers: Waiver[];
     let catalogItem: CatalogItem;
 
     // * get a proper ManuscriptId
@@ -179,20 +178,19 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       manuscript.customId = request?.customId;
       manuscript.title = request?.title;
 
-      // * Identify applicable waiver(s)
-      // TODO: Handle the case where multiple reductions are applied
+      // * Identify applicable waiver
       try {
-        waivers = await this.waiverService.applyWaivers({
+        await this.waiverService.applyWaiver({
           invoiceId: invoice.invoiceId.id.toString(),
           authorEmail: manuscript.authorEmail,
           country: manuscript.authorCountry,
           journalId: manuscript.journalId,
         });
       } catch (error) {
-        console.log('Failed to save waivers', error);
+        console.log('Failed to save waiver', error);
         return left(
           new AppError.UnexpectedError(
-            `Failed to save waivers due to error: ${error.message}: ${error.stack}`
+            `Failed to save waiver due to error: ${error.message}: ${error.stack}`
           )
         );
       }
