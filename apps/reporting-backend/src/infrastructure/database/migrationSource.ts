@@ -127,8 +127,9 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views('20200609153500_add_void_manuscripts', true),
-    rebuild_materialized_views('20200610131500_add_vendor_full_access'),
+    rebuild_materialized_views('20200610131500_add_vendor_full_access', true),
     add_acceptance_rates_table,
+    rebuild_materialized_views('20200611121000_fix_manuscripts_apc'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
