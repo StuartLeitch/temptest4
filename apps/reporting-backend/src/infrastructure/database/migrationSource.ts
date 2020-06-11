@@ -131,7 +131,11 @@ class KnexMigrationSource {
     add_acceptance_rates_table,
     rebuild_materialized_views('20200611121000_fix_manuscripts_apc', true),
     rebuild_materialized_views(
-      '20200611121000_add_manuscripts_refresh_concurrency'
+      '20200611121000_add_manuscripts_refresh_concurrency',
+      true
+    ),
+    rebuild_materialized_views(
+      '20200611131000_add_acceptance_rates_fields_to_views'
     ),
   ].map(makeViewObject);
 

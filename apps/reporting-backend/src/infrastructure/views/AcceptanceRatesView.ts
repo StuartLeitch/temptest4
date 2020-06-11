@@ -8,7 +8,7 @@ import {
  */
 class AcceptanceRatesView extends AbstractEventView
   implements EventViewContract {
-  getCreateQuery(): string {
+  public getCreateQuery(): string {
     return `
 CREATE TABLE ${this.getViewName()} (
   journal_id text,
@@ -27,7 +27,7 @@ CREATE TABLE ${this.getViewName()} (
     // add index in migration, not here
   ];
 
-  getSelectQuery(): string {
+  public getSelectQuery(): string {
     const startDate = `2019-01-01`;
     return `
 SELECT
@@ -90,7 +90,15 @@ LEFT JOIN LATERAL (
 `;
   }
 
-  getAvgSelect(identifier = 'avg') {
+  public getDeleteQuery(): string {
+    return `drop table ${acceptanceRatesView.getViewName()} cascade`;
+  }
+
+  public getViewName(): string {
+    return 'acceptance_rates';
+  }
+
+  private getAvgSelect(identifier = 'avg') {
     return `avg(
       CASE WHEN m.accepted_date IS NOT NULL THEN
         1
@@ -101,16 +109,8 @@ LEFT JOIN LATERAL (
       END) as ${identifier}`;
   }
 
-  getDateFilter(argDate = 'month') {
+  private getDateFilter(argDate = 'month') {
     return `submission_date > ${argDate} - interval '16 month' AND submission_date < ${argDate} - interval '8 month'`;
-  }
-
-  getViewName(): string {
-    return 'acceptance_rates';
-  }
-
-  getDeleteQuery(): string {
-    return `drop table ${acceptanceRatesView.getViewName()} cascade`;
   }
 }
 
