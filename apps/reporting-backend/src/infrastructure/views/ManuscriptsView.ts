@@ -98,6 +98,7 @@ WITH DATA;
   postCreateQueries = [
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (submission_id)`,
+    `create UNIQUE index on ${this.getViewName()} (submission_id)`,
     `create index on ${this.getViewName()} (submission_date)`,
     `create index on ${this.getViewName()} (resubmission_date)`,
     `create index on ${this.getViewName()} (article_type)`,
@@ -111,6 +112,10 @@ WITH DATA;
     `create index on ${this.getViewName()} (journal_name)`,
     `create index on ${this.getViewName()} (publisher_name)`,
   ];
+
+  getRefreshQuery() {
+    return `REFRESH MATERIALIZED VIEW CONCURRENTLY ${this.getViewName()};`;
+  }
 
   getViewName(): string {
     return 'manuscripts';
