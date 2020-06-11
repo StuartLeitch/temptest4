@@ -3,7 +3,7 @@ import { Card, CardBody, CardTitle } from '../../../../components';
 import { DlRowArticleDetails } from '../../../components/Invoice/DlRowArticleDetails';
 import { Invoice } from '../types';
 
-const ArticleDetailsTab = ({ invoice } : ArticleDetailsTabProps) => (
+const ArticleDetailsTab: React.FC<ArticleDetailsTabProps> = ({ invoice }) => (
   <Card body className='border-top-0'>
     <CardBody>
       <CardTitle tag='h6' className='mb-4'>

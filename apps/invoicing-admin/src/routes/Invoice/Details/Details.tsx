@@ -37,7 +37,7 @@ import AddPaymentModal from './components/AddPaymentModal';
 const APPLY_COUPON_MODAL_TARGET = 'applyCouponModal';
 const CREATE_CREDIT_NOTE_MODAL_TARGET = 'createCreditNoteModal';
 
-const Details = () => {
+const Details: React.FC = () => {
   const { id } = useParams();
 
   const { loading, error, data, refetch: invoiceQueryRefetch } = useQuery(

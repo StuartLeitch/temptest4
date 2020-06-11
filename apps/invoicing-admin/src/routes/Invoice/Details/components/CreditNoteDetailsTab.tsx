@@ -19,13 +19,13 @@ import {
   Table,
 } from '../../../../components';
 
-const CreditNoteDetailsTab = ({
+const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
   invoiceId,
   invoice,
   netCharges,
   vat,
   total
-}: CreditNoteDetailsTabProps) => {
+}) => {
 
   const creditNoteDetails = () => (
     <>

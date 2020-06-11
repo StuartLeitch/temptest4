@@ -16,21 +16,6 @@ import InvoicingDashboard from './Dashboards/Invoicing';
 import Financial from './Dashboards/Financial';
 import NavbarOnly from './Layouts/NavbarOnly';
 import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
-import Buttons from './Interface/Buttons';
-import Colors from './Interface/Colors';
-import Typography from './Interface/Typography';
-
-import ComingSoon from './Pages/ComingSoon';
-import Confirmation from './Pages/Confirmation';
-import Danger from './Pages/Danger';
-import Error404 from './Pages/Error404';
-import ForgotPassword from './Pages/ForgotPassword';
-import LockScreen from './Pages/LockScreen';
-import Login from './Pages/Login';
-import Register from './Pages/Register';
-import Success from './Pages/Success';
-import Timeline from './Pages/Timeline';
-import Invoice from './Pages/Invoice';
 import PendingLogging from './components/PendingLogging';
 
 // ----------- Layout Imports ---------------
@@ -65,20 +50,6 @@ export const RoutedContent = () => {
       </PrivateRoute>
 
       <Route path='/dashboards/financial' exact component={Financial} />
-      <Route component={Buttons} path='/interface/buttons' />
-      <Route component={Colors} path='/interface/colors' />
-      <Route component={Typography} path='/interface/typography' />
-      <Route component={ComingSoon} path='/pages/coming-soon' />
-      <Route component={Confirmation} path='/pages/confirmation' />
-      <Route component={Danger} path='/pages/danger' />
-      <Route component={Error404} path='/pages/error-404' />
-      <Route component={ForgotPassword} path='/pages/forgot-password' />
-      <Route component={LockScreen} path='/pages/lock-screen' />
-      <Route component={Login} path='/pages/login' />
-      <Route component={Register} path='/pages/register' />
-      <Route component={Success} path='/pages/success' />
-      <Route component={Timeline} path='/pages/timeline' />
-      <Route component={Invoice} path='/pages/invoice' />
       {/*    404    */}
       <Redirect to='/pages/error-404' />
     </Switch>

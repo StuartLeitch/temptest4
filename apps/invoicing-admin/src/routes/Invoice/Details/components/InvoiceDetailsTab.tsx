@@ -21,13 +21,13 @@ import {
 
 import Config from '../../../../config';
 
-const InvoiceDetailsTab = ({
+const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
   invoiceId,
   invoice,
   netCharges,
   vatAmount,
   totalCharges
-}: InvoiceDetailsTabProps) => {
+}) => {
 
   const invoiceDetails = () => (
     <>

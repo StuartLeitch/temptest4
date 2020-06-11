@@ -20,11 +20,11 @@ import {
 
 import { BANK_TRANSFER_MUTATION } from '../../graphql';
 
-const AddPaymentModal = ({
+const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
   invoice,
   getPaymentMethods,
   onSuccessCallback
-}: AddPaymentModalProps) => {
+}) => {
   const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
   const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
     paymentDate: new Date(),

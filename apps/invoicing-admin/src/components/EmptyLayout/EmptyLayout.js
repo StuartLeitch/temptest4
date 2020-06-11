@@ -17,7 +17,7 @@ class EmptyLayout extends React.Component {
         this.props.pageConfig.setElementsVisibility({
             navbarHidden: true,
             sidebarHidden: true,
-            footerHidden: true 
+            footerHidden: true
         });
     }
 
@@ -25,7 +25,7 @@ class EmptyLayout extends React.Component {
         this.props.pageConfig.setElementsVisibility({
             navbarHidden: false,
             sidebarHidden: false,
-            footerHidden: false 
+            footerHidden: false
         });
     }
 

@@ -6,7 +6,7 @@ import Code from './Code';
 
 import { CREATE } from '../../config';
 
-const CreateCode = ({ label = '' }: CreateCodeProps) => {
+const CreateCode: React.FC<CreateCodeProps> = ({ label = '' }) => {
   const chosenContext = CouponCreateContext;
   const { update } = useContext(chosenContext);
 

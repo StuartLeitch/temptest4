@@ -24,13 +24,13 @@ import SuccessfulCreditNoteCreatedToast from './SuccessfulCreditNoteCreatedToast
 
 import { CREATE_CREDIT_NOTE_MUTATION } from '../../graphql';
 
-const CreateCreditNoteModal = ({
+const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
   target,
   invoiceId,
   invoiceItem,
   total,
   onSaveCallback,
-}: CreateCreditNoteModalProps) => {
+}) => {
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,

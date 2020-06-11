@@ -3,7 +3,10 @@ import { useHistory } from 'react-router-dom';
 
 import { Button, Media } from '../../../../components';
 
-const SuccessfulCreditNoteCreatedToast =  ({ closeToast }) => {
+const SuccessfulCreditNoteCreatedToast: React.FC<SuccessfulCreditNoteCreatedToastProps> =  ({
+  closeToast,
+  creditNote
+}) => {
   const history = useHistory();
 
   return (
@@ -40,6 +43,13 @@ const SuccessfulCreditNoteCreatedToast =  ({ closeToast }) => {
       </Media>
     </Media>
   );
+};
+
+interface SuccessfulCreditNoteCreatedToastProps {
+  creditNote?: {
+    id: string;
+  };
+  closeToast(): void;
 };
 
 export default SuccessfulCreditNoteCreatedToast;

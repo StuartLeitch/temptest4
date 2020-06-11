@@ -24,7 +24,9 @@ const Progress = (props) => {
 Progress.propTypes = {
     slim: PropTypes.bool,
     className: PropTypes.string,
-    children: PropTypes.node
+    children: PropTypes.node,
+    value: PropTypes.string,
+    style: PropTypes.object
 };
 
 export { Progress };

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button, Media } from '../../../../components';
 
-export default ({ closeToast }) => (
+const SuccessfulPaymentToast: React.FC<SuccessfulPaymentToastProps> = ({ closeToast }) => (
   <Media>
     <Media middle left className='mr-3'>
       <i className='fas fa-fw fa-2x fa-check'></i>
@@ -34,3 +34,9 @@ export default ({ closeToast }) => (
     </Media>
   </Media>
 );
+
+interface SuccessfulPaymentToastProps {
+  closeToast(): void;
+};
+
+export default SuccessfulPaymentToast;

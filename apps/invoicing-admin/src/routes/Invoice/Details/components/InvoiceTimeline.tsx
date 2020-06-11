@@ -5,7 +5,7 @@ import format from 'date-fns/format';
 import compareDesc from 'date-fns/compareDesc';
 import { Invoice } from '../types';
 
-const InvoiceTimeline = ( {invoice} : InvoiceTimelineProps) => (
+const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ( {invoice}) => (
   <Card className='mb-3'>
     <CardBody>
       <CardTitle tag='h6'>Timeline</CardTitle>

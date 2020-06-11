@@ -14,7 +14,7 @@ import { APPLY_COUPON_MUTATION } from '../../graphql';
 
 import { Code } from '../../../Coupon/components/Fields';
 
-const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }: ApplyCouponModalProps) => {
+const ApplyCouponModal: React.FC<ApplyCouponModalProps> = ({ target, onSuccessCallback, invoiceId }) => {
   const [inputValue, setInputValue] = useState('');
   const [isInputValid, setValid] = useState(false);
   const [inProgress, setInProgress] = useState(false);
@@ -40,6 +40,7 @@ const ApplyCouponModal = ({ target, onSuccessCallback, invoiceId }: ApplyCouponM
       });
 
       const error = applyCouponResult?.error?.graphQLErrors[0].message;
+      console.log('****', error)
       if (!error) {
         onSuccessCallback();
       } else {

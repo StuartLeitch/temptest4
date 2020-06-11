@@ -4,13 +4,7 @@ import classNames from 'classnames';
 
 import { Nav as BsNav } from 'reactstrap';
 
-interface NavProps {
-  accent?: boolean;
-  className: string;
-  [propName: string]: any;
-}
-
-const Nav = ({ accent, className, ...otherProps }: NavProps) => (
+const Nav: React.FC<NavProps> = ({ accent, className, ...otherProps }) => (
   <BsNav
     className={
         classNames(className, 'nav', { 'nav-accent': accent })
@@ -26,5 +20,11 @@ Nav.propTypes = {
 Nav.defaultProps = {
     accent: false
 };
+
+interface NavProps {
+  accent?: boolean;
+  className?: string;
+  [propName: string]: any;
+}
 
 export { Nav };

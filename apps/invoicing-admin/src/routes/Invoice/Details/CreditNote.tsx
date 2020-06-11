@@ -31,7 +31,7 @@ import CreditNoteDetailsTab from './components/CreditNoteDetailsTab';
 import ArticleDetailsTab from './components/ArticleDetailsTab';
 import PayerDetailsTab from './components/PayerDetailsTab';
 
-const Details = () => {
+const Details: React.FC = () => {
   const { id } = useParams();
 
   const { loading, error, data } = useQuery(INVOICE_QUERY, {
