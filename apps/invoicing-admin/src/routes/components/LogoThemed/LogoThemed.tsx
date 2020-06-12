@@ -30,7 +30,7 @@ const getLogoUrlBackground = (style, color) => {
   }
 };
 
-const LogoThemed = ({ checkBackground, className, ...otherProps }) => (
+const LogoThemed: React.FC<LogoThemedProps> = ({ checkBackground, className, ...otherProps }) => (
   <ThemeConsumer>
     {({ style, color }: {style: string; color: string}) => (
       <img
@@ -49,6 +49,11 @@ const LogoThemed = ({ checkBackground, className, ...otherProps }) => (
 LogoThemed.propTypes = {
   checkBackground: PropTypes.bool,
   className: PropTypes.string
+};
+
+interface LogoThemedProps {
+  checkBackground?: boolean;
+  className?: string;
 };
 
 export { LogoThemed };

@@ -19,11 +19,11 @@ import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
 import PendingLogging from './components/PendingLogging';
 
 // ----------- Layout Imports ---------------
-import { DefaultNavbar } from './../layout/components/DefaultNavbar';
-import { DefaultSidebar } from './../layout/components/DefaultSidebar';
+import { DefaultNavbar } from '../layout/components/DefaultNavbar';
+import { DefaultSidebar } from '../layout/components/DefaultSidebar';
 
-import { SidebarANavbar } from './../layout/components/SidebarANavbar';
-import { SidebarASidebar } from './../layout/components/SidebarASidebar';
+import { SidebarANavbar } from '../layout/components/SidebarANavbar';
+import { SidebarASidebar } from '../layout/components/SidebarASidebar';
 
 //------ Route Definitions --------
 export const RoutedContent = () => {

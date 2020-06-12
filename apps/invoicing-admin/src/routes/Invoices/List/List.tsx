@@ -1,5 +1,3 @@
-/* eslint-disable prefer-const */
-
 import React, { useEffect } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { Filters } from '@utils';
@@ -18,7 +16,7 @@ import { Loading } from '../../components';
 
 import { INVOICES_QUERY, } from './graphql';
 
-const RecentInvoicesList = (props) => {
+const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   const { pagination: defaultPaginator } = props;
 
   const [pagination] = useLocalStorage(
@@ -54,11 +52,6 @@ const RecentInvoicesList = (props) => {
 
   if (error) return <Error data={error} />;
 
-  // const offset = pagination.offset * pagination.limit;
-  // if (data?.length > 0 && offset >= data?.length) {
-  //   pagination = Object.assign({}, paginator);
-  // }
-
   return (
     <Card className='mb-0'>
       {/* START Table */}
@@ -66,7 +59,6 @@ const RecentInvoicesList = (props) => {
         <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
-              {/* <th className='align-middle bt-0'>#</th> */}
               <th className='align-middle bt-0'>Status</th>
               <th className='align-middle bt-0'>Reference</th>
               <th className='align-middle bt-0'>Manuscript Custom ID</th>
@@ -75,7 +67,6 @@ const RecentInvoicesList = (props) => {
               <th className='align-middle bt-0'>Journal Title</th>
               <th className='align-middle bt-0'>Manuscript Title</th>
               <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
-              {/* <th className='align-middle bt-0 text-right'>Actions</th> */}
             </tr>
           </thead>
           <tbody>
@@ -95,6 +86,22 @@ const RecentInvoicesList = (props) => {
       </CardFooter>
     </Card>
   );
+};
+
+interface RecentInvoicesListProps {
+  pagination: {
+    page: number;
+    offset: number;
+    limit: number;
+  };
+  filters: {
+    invoiceStatus: string[];
+    transactionStatus: string[];
+    journalId: string[];
+    referenceNumber: string;
+    customId: string;
+  };
+  setPage(key: string, value: string | boolean | any[]): void;
 };
 
 export default RecentInvoicesList;

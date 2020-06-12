@@ -15,14 +15,14 @@ import {
   UncontrolledButtonDropdown,
 } from '..';
 
-export const ModalDropdown = ({
+export const ModalDropdown: React.FC<ModalDropdownProps> = ({
   className,
   dropdownToggle,
   onSave,
   onSaveAndMarkInvoiceAsFinal,
   children,
   ...otherProps
-}: ModalDropdownProps) => {
+}) => {
   const [modalState, setModalState] = useState({
     open: false,
     options: [
@@ -60,16 +60,6 @@ export const ModalDropdown = ({
             <i className='fas fa-times mr-2'></i>
             Cancel
           </Button>
-          {/* <Button
-            color='primary'
-            onClick={() => {
-              onClose();
-              onSave();
-            }}
-          >
-            <i className='fas fa-check mr-2'></i>
-            Save
-          </Button> */}
           <ButtonToolbar className='ml-auto'>
             <UncontrolledButtonDropdown className='mr-3'>
               <DropdownToggle color='primary' caret>
@@ -119,42 +109,3 @@ interface ModalDropdownProps {
   onSave(): void;
   onSaveAndMarkInvoiceAsFinal(): void;
 }
-
-// export class Demo extends React.Component<{}, {}> {
-//   state = {
-//     options: [
-//       { text: 'doNothing', value: 'doNothing' },
-//       { text: 'openModal', value: 'openModal' }
-//     ],
-//     open: false
-//   };
-
-//   onClose = () => setModalState({ open: false });
-//   onChange = selected => {
-//     // if the correct one is selected then...
-//     // this.setState({open: true});
-//   };
-
-//   render() {
-//     return (
-//       <div>
-//         <Dropdown
-//           fluid
-//           selection
-//           options={modalState.options}
-//           onChange={onChange}
-//           defaultValue={modalState.options[0].value}
-//         />
-
-//         <Modal open={modalState.open} onClose={onClose}>
-//           <Modal.Header>Select a Photo</Modal.Header>
-//           <Modal.Content image>
-//             <Modal.Description>
-//               <p>Some contents.</p>
-//             </Modal.Description>
-//           </Modal.Content>
-//         </Modal>
-//       </div>
-//     );
-//   }
-// }

@@ -69,6 +69,6 @@ interface NavbarProps {
   color?: string;
   dark?: boolean;
   light?: boolean;
-  expand?: string;
+  expand?: string | boolean;
 };
 export { Navbar };

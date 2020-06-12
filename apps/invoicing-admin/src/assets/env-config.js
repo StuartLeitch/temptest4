@@ -1,8 +1,8 @@
 window._env_ = {
   APP_NAME: 'Invoicing Admin',
-  BACKEND_URL: 'http://localhost',
-  GQL_ROOT: 'http://localhost/graphql',
-  API_ROOT: 'http://localhost/api',
+  BACKEND_URL: 'http://localhost:4000',
+  GQL_ROOT: 'http://localhost:4000/graphql',
+  API_ROOT: 'http://localhost:4000/api',
   FE_ROOT: 'https://demo.invoicing.hindawi.com',
 
   AUTH_ENABLED: 'false',

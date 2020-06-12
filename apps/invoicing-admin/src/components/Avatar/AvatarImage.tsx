@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { Avatar } from './Avatar';
 import { AvatarFont } from './AvatarFont';
 
-class AvatarImage extends React.PureComponent {
+class AvatarImage extends React.PureComponent<AvatarImageProps, AvatarImageState> {
     static propTypes = {
         src: PropTypes.string.isRequired,
         placeholder: PropTypes.node,
@@ -21,7 +21,7 @@ class AvatarImage extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        
+
         this.state = {
             imgLoaded: false
         };
@@ -53,5 +53,17 @@ class AvatarImage extends React.PureComponent {
         )
     }
 }
+
+interface AvatarImageProps {
+  addOns?: ReactNode[];
+  src: string;
+  placeholder?: ReactNode;
+  alt?: string;
+  className?: string;
+};
+
+interface AvatarImageState {
+  imgLoaded: boolean;
+};
 
 export { AvatarImage };
