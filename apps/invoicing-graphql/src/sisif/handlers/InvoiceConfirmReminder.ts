@@ -1,8 +1,11 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { JobData } from '@hindawi/sisif';
 import {
   SendInvoiceConfirmationReminderUsecase,
   SendInvoiceConfirmationReminderDTO,
-  QueuePayloads,
+  InvoiceReminderPayload,
   Roles,
 } from '@hindawi/shared';
 
@@ -11,7 +14,7 @@ import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 export const invoiceConfirmHandler = (
-  payload: JobData<QueuePayloads.InvoiceReminderPayload>,
+  payload: JobData<InvoiceReminderPayload>,
   appContext: any,
   loggerService: Logger
 ) => {

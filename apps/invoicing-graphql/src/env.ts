@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import * as pkg from '../../../package.json';
 import {
-  getOsEnvWithDefault,
+  // getOsEnvWithDefault,
   getOsEnvOptional,
   normalizePort,
   getOsPath,
@@ -82,6 +82,14 @@ export const env = {
     creditControlReminderSenderName: getOsEnv(
       'CREDIT_CONTROL_REMINDER_SENDER_NAME'
     ),
+  },
+  loaders: {
+    winstonEnabled: toBool(getOsEnvOptional('WINSTON_LOADER_ENABLED')),
+    knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
+    contextEnabled: toBool(getOsEnvOptional('CONTEXT_LOADER_ENABLED')),
+    expressEnabled: toBool(getOsEnvOptional('EXPRESS_LOADER_ENABLED')),
+    monitorEnabled: toBool(getOsEnvOptional('MONITOR_LOADER_ENABLED')),
+    erpEnabled: toBool(getOsEnvOptional('ERP_LOADER_ENABLED')),
   },
   log: {
     tenant: getOsEnv('LOG_TENANT'),
