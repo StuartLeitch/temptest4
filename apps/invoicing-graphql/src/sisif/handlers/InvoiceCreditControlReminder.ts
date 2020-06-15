@@ -5,7 +5,7 @@ import { JobData } from '@hindawi/sisif';
 import {
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceCreditControlReminderDTO,
-  InvoiceReminderPayload,
+  QueuePayloads,
   Roles,
 } from '@hindawi/shared';
 
@@ -14,7 +14,7 @@ import { Logger } from '../../lib/logger';
 import { env } from '../../env';
 
 export const invoiceCreditControlHandler = (
-  payload: JobData<InvoiceReminderPayload>,
+  payload: JobData<QueuePayloads.InvoiceReminderPayload>,
   appContext: any,
   loggerService: Logger
 ) => {

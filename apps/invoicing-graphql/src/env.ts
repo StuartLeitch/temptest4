@@ -89,6 +89,15 @@ export const env = {
     contextEnabled: toBool(getOsEnvOptional('CONTEXT_LOADER_ENABLED')),
     expressEnabled: toBool(getOsEnvOptional('EXPRESS_LOADER_ENABLED')),
     monitorEnabled: toBool(getOsEnvOptional('MONITOR_LOADER_ENABLED')),
+    graphqlEnabled: toBool(getOsEnvOptional('GRAPHQL_LOADER_ENABLED')),
+    queueServiceEnabled: toBool(
+      getOsEnvOptional('QUEUE_SERVICE_LOADER_ENABLED')
+    ),
+    schedulerEnabled: toBool(getOsEnvOptional('SCHEDULER_LOADER_ENABLED')),
+    domainEventsRegisterEnabled: toBool(
+      getOsEnvOptional('DOMAIN_EVENTS_REGISTER_LOADER_ENABLED')
+    ),
+    sisifEnabled: toBool(getOsEnvOptional('SISIF_LOADER_ENABLED')),
     erpEnabled: toBool(getOsEnvOptional('ERP_LOADER_ENABLED')),
   },
   log: {

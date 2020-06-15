@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-// import * as ES6Promise from 'es6-promise';
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { banner } from './lib/banner';
@@ -7,9 +6,6 @@ import { Logger } from './lib/logger';
 import './lib/logger/LoggerAspect';
 
 import { env } from './env';
-// console.info(env);
-
-// ES6Promise.polyfill();
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -22,39 +18,49 @@ import { env } from './env';
 const log = new Logger();
 
 async function main() {
-  let winstonLoader;
-  let contextLoader;
-  let knexLoader;
-  let expressLoader;
-  let erpLoader;
-
   /**
    * Loaders
    */
+  const loaders = [
+    // winstonLoader,
+    // knexLoader,
+    // contextLoader,
+    // expressLoader,
+    // monitorLoader,
+    // graphqlLoader,
+    // queueServiceLoader,
+    // schedulerLoader,
+    // domainEventsRegisterLoader,
+    // sisifLoader,
+    // erpLoader,
+  ];
 
   if (env.loaders.winstonEnabled) {
-    const winstonImport = await import(
+    const { winstonLoader } = await import(
       /* webpackChunkName: "winstonLoader" */ './loaders/winstonLoader'
     );
-    winstonLoader = winstonImport.winstonLoader;
+    loaders.push(winstonLoader);
   }
 
-  // if (env.loaders.knexEnabled) {
-  //   knexLoader = await import(
-  //     /* webpackChunkName: "knexLoader" */ './loaders/knexLoader'
-  //   );
-  // }
+  if (env.loaders.knexEnabled) {
+    const { knexLoader } = await import(
+      /* webpackChunkName: "knexLoader" */ './loaders/knexLoader'
+    );
+    loaders.push(knexLoader);
+  }
 
   if (env.loaders.contextEnabled) {
-    contextLoader = await import(
+    const { contextLoader } = await import(
       /* webpackChunkName: "contextLoader" */ './loaders/contextLoader'
     );
+    loaders.push(contextLoader);
   }
 
   if (env.loaders.expressEnabled) {
-    expressLoader = await import(
+    const { expressLoader } = await import(
       /* webpackChunkName: "expressLoader" */ './loaders/expressLoader'
     );
+    loaders.push(expressLoader);
   }
 
   // import { monitorLoader } from './loaders/monitorLoader';
@@ -65,37 +71,20 @@ async function main() {
   // import { sisifLoader } from './loaders/sisifLoader';
 
   if (env.loaders.erpEnabled) {
-    erpLoader = await import(
+    const { erpLoader } = await import(
       /* webpackChunkName: "erpLoader" */ './loaders/erpLoader'
     );
+    loaders.push(erpLoader);
   }
-
-  console.info(winstonLoader);
-  process.exit(0);
-  // console.info(contextLoader);
-  // console.info(expressLoader);
-  // console.info(erpLoader);
 
   await bootstrapMicroframework({
     /**
      * Loader is a place where you can configure all your modules during microframework
      * bootstrap process. All loaders are executed one by one in a sequential order.
      */
-    loaders: [
-      winstonLoader,
-      // knexLoader,
-      contextLoader,
-      expressLoader,
-      // monitorLoader,
-      // graphqlLoader,
-      // queueServiceLoader,
-      // schedulerLoader,
-      // domainEventsRegisterLoader,
-      // sisifLoader,
-      erpLoader,
-    ],
+    loaders,
   })
-    // .then(() => banner(log))
+    .then(() => banner(log))
     .catch((error) => {
       log.error('Application crashed', error);
       process.exit(1);
