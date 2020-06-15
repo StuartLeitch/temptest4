@@ -5,10 +5,10 @@ import { SidebarMobileFluid } from './SidebarMobileFluid';
 import { SidebarShowSlim } from './SidebarShowSlim';
 import { SidebarHideSlim } from './SidebarHideSlim';
 
-(Sidebar as any).Section = SidebarSection;
-(Sidebar as any).Close = SidebarClose;
-(Sidebar as any).MobileFluid = SidebarMobileFluid;
-(Sidebar as any).ShowSlim = SidebarShowSlim;
-(Sidebar as any).HideSlim = SidebarHideSlim;
+Sidebar.Section = SidebarSection;
+Sidebar.Close = SidebarClose;
+Sidebar.MobileFluid = SidebarMobileFluid;
+Sidebar.ShowSlim = SidebarShowSlim;
+Sidebar.HideSlim = SidebarHideSlim;
 
 export default Sidebar;

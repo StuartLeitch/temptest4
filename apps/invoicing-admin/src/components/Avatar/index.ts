@@ -5,8 +5,8 @@ import { AvatarImage } from './AvatarImage';
 import { AvatarAddonBadge } from './AvatarAddonBadge';
 import { AvatarAddonIcon } from './AvatarAddonIcon';
 
-(Avatar as any).Font = AvatarFont;
-(Avatar as any).Image = AvatarImage;
+Avatar.Font = AvatarFont;
+Avatar.Image = AvatarImage;
 
 const AvatarAddOn = {
   Icon: AvatarAddonIcon,

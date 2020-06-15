@@ -1,6 +1,12 @@
 import React from 'react';
 
-const PageConfigContext = React.createContext({});
+interface ConfigProps {
+  sidebarHidden?: boolean;
+  navbarHidden?: boolean;
+  [key: string]: any;
+}
+
+const PageConfigContext = React.createContext<ConfigProps>({});
 
 export {
     PageConfigContext

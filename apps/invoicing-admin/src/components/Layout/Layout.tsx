@@ -82,7 +82,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
       const { screenSize } = this.state;
       let currentScreenSize;
 
-      _.forOwn(responsiveBreakpoints, (value, key) => {
+      _.forOwn(responsiveBreakpoints, (value: any, key) => {
         const queryParts = [
           `${_.isUndefined(value.min) ? '' : `(min-width: ${value.min}px)`}`,
           `${_.isUndefined(value.max) ? '' : `(max-width: ${value.max}px)`}`
@@ -183,7 +183,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
     // eslint-disable-next-line react/no-find-dom-node
     const containerElement = ReactDOM.findDOMNode(this.containerRef.current);
     if (containerElement) {
-      const navbarElements = containerElement.querySelectorAll(
+      const navbarElements = (containerElement as Element).querySelectorAll(
         ':scope .layout__navbar'
       );
 
@@ -283,7 +283,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
   }
 }
 
-const routedLayout = withRouter(Layout);
+const routedLayout: any = withRouter(Layout);
 
 interface LayoutProps {
   children: ReactNode;
@@ -292,9 +292,6 @@ interface LayoutProps {
     pathname: string;
   }
   favIcons?: any;
-  Navbar: any;
-  Sidebar: any;
-  Content: any;
 };
 
 interface LayoutState {

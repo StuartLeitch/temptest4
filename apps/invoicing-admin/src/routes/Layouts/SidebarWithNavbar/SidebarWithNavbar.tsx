@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { Container } from '../../../components';
 
-export const SidebarWithNavbar: React.FC = () => (
+export const SidebarWithNavbar: React.FC & { Navbar?: any, Sidebar?: any} = () => (
   <Container>
     <p className='mb-4 mt-3'>
       Welcome to the <b>&quot;Airframe&quot;</b> Admin Dashboard Theme based on{' '}

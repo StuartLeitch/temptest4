@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import _ from 'lodash';
 
-const Avatar: React.FC<AvatarProps> = (props) => {
+const Avatar: React.FC<AvatarProps> & { Image?: any, Font?: any } =
+  (props) => {
     const avatarClass = classNames(
         'avatar',
         `avatar--${ props.size }`,

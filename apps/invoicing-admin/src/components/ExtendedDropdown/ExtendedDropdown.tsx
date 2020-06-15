@@ -2,10 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { DropdownMenu } from 'reactstrap';
-import { ExtendedDropdownSection } from './ExtendedDropdownSection';
-import { ExtendedDropdownLink } from './ExtendedDropdownLink';
 
-export const ExtendedDropdown: React.FC<ExtendedDropdownProps> = (
+export const ExtendedDropdown: React.FC<ExtendedDropdownProps> & {Section?: any, Link?: any} = (
   {
     className,
     ...otherProps
@@ -18,10 +16,6 @@ export const ExtendedDropdown: React.FC<ExtendedDropdownProps> = (
         <DropdownMenu className={ classes } { ...otherProps } />
     );
 }
-
-
-ExtendedDropdown.Section = ExtendedDropdownSection;
-ExtendedDropdown.Link = ExtendedDropdownLink;
 
 ExtendedDropdown.propTypes = {
     className: PropTypes.string,

@@ -19,6 +19,8 @@ export class NestedDropdown extends React.Component<NestedDropdownProps, { openI
       tag: UncontrolledDropdown
   };
 
+  static Submenu: (props: any) => JSX.Element;
+
   constructor(props: NestedDropdownProps) {
       super(props);
 

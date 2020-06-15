@@ -6,7 +6,7 @@ import {
     DefaultSidebar
 } from '../../../layout/components/DefaultSidebar';
 
-(SidebarWithNavbar as any).Navbar = SidebarWithNavbarNavbar;
-(SidebarWithNavbar as any).Sidebar = DefaultSidebar;
+SidebarWithNavbar.Navbar = SidebarWithNavbarNavbar;
+SidebarWithNavbar.Sidebar = DefaultSidebar;
 
 export default SidebarWithNavbar;

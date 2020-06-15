@@ -1,6 +1,6 @@
 import { NestedDropdown } from './NestedDropdown';
 import { NestedDropdownSubmenu } from './NestedDropdownSubmenu';
 
-(NestedDropdown as any).Submenu = NestedDropdownSubmenu;
+NestedDropdown.Submenu = NestedDropdownSubmenu;
 
 export default NestedDropdown;
