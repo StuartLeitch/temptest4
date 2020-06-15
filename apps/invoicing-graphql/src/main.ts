@@ -9,15 +9,16 @@ import './lib/logger/LoggerAspect';
  * Loaders
  */
 import { winstonLoader } from './loaders/winstonLoader';
-import { knexLoader } from './loaders/knexLoader';
+// import { knexLoader } from './loaders/knexLoader';
 import { contextLoader } from './loaders/contextLoader';
 import { expressLoader } from './loaders/expressLoader';
-import { monitorLoader } from './loaders/monitorLoader';
-import { graphqlLoader } from './loaders/graphqlLoader';
-import { queueServiceLoader } from './loaders/queueServiceLoader';
-import { schedulerLoader } from './loaders/schedulerLoader';
-import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
-import { sisifLoader } from './loaders/sisifLoader';
+// import { monitorLoader } from './loaders/monitorLoader';
+// import { graphqlLoader } from './loaders/graphqlLoader';
+// import { queueServiceLoader } from './loaders/queueServiceLoader';
+// import { schedulerLoader } from './loaders/schedulerLoader';
+// import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
+// import { sisifLoader } from './loaders/sisifLoader';
+import { erpLoader } from './loaders/erpLoader';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -36,15 +37,16 @@ bootstrapMicroframework({
    */
   loaders: [
     winstonLoader,
-    knexLoader,
+    // knexLoader,
     contextLoader,
     expressLoader,
-    monitorLoader,
-    graphqlLoader,
-    queueServiceLoader,
-    schedulerLoader,
-    domainEventsRegisterLoader,
-    sisifLoader,
+    // monitorLoader,
+    // graphqlLoader,
+    // queueServiceLoader,
+    // schedulerLoader,
+    // domainEventsRegisterLoader,
+    // sisifLoader,
+    erpLoader,
   ],
 })
   .then(() => banner(log))

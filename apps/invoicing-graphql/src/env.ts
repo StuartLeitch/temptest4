@@ -172,6 +172,14 @@ export const env = {
     password: getOsEnv('SAGE_PASSWORD'),
     securityToken: getOsEnv('SAGE_SECURITY_TOKEN'),
   },
+  netSuite: {
+    account: getOsEnv('NETSUITE_ACCOUNT'),
+    endpoint: getOsEnv('NETSUITE_REST_ENDPOINT'),
+    consumerKey: getOsEnv('NETSUITE_CONSUMER_KEY'),
+    consumerSecret: getOsEnv('NETSUITE_CONSUMER_SECRET'),
+    tokenId: getOsEnv('NETSUITE_TOKEN_ID'),
+    tokenSecret: getOsEnv('NETSUITE_TOKEN_SECRET'),
+  },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),
   },
