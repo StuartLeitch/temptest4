@@ -1,13 +1,15 @@
 import {
+  Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from './decorators/Authorize';
-import {AccessControlContext} from './AccessControl';
-import {Roles} from '../../modules/users/domain/enums/Roles';
+import { AccessControlContext } from './AccessControl';
+import { Roles } from '../../modules/users/domain/enums/Roles';
 
 export {
-  Roles,
+  Authorize,
   AuthorizationContext,
   AccessControlledUsecase,
-  AccessControlContext
+  AccessControlContext,
+  Roles,
 };

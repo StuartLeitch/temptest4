@@ -1,4 +1,5 @@
-export * as SendInvoicePaymentReminderErrors from './sendInvoicePaymentReminderErrors';
+import * as SendInvoicePaymentReminderErrors from './sendInvoicePaymentReminderErrors';
+export { SendInvoicePaymentReminderErrors };
 export * from './sendInvoicePaymentReminderResponse';
 export * from './sendInvoicePaymentReminderDTO';
 export * from './sendInvoicePaymentReminder';

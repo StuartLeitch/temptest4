@@ -1,19 +1,15 @@
 // * Core Domain
-import { Result, Either, left, right } from '../../../../core/logic/Result';
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { AppError } from '../../../../core/logic/AppError';
+import { Result } from '../../../../core/logic/Result';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { chain } from '../../../../core/logic/EitherChain';
-import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlContext,
+  Roles,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { PayerType } from '../../../payers/domain/Payer';
@@ -62,7 +58,7 @@ export class ApplyVatToInvoiceUsecase
       {
         countryCode: country,
         stateCode: state,
-        postalCode
+        postalCode,
       },
       payerType !== PayerType.INSTITUTION
     );
@@ -83,7 +79,7 @@ export class ApplyVatToInvoiceUsecase
       this.waiverRepo
     );
     return await getItemsForInvoiceUsecase.execute({
-      invoiceId
+      invoiceId,
     });
   }
 
@@ -100,8 +96,8 @@ export class ApplyVatToInvoiceUsecase
   ) {
     return invoiceItemsResult
       .getValue()
-      .filter(item => item.type === 'APC')
-      .map(apcItem => {
+      .filter((item) => item.type === 'APC')
+      .map((apcItem) => {
         apcItem.vat = vat;
         return apcItem;
       });

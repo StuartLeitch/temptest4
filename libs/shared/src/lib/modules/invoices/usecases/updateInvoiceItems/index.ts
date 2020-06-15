@@ -3,7 +3,7 @@ import { UpdateInvoiceItemsErrors } from './updateInvoiceItemsErrors';
 import { UpdateInvoiceItemsDTO } from './updateInvoiceItemsDTO';
 import {
   UpdateInvoiceItemsContext,
-  UpdateInvoiceItemsUsecase
+  UpdateInvoiceItemsUsecase,
 } from './updateInvoiceItems';
 
 export {
@@ -11,5 +11,5 @@ export {
   UpdateInvoiceItemsContext,
   UpdateInvoiceItemsUsecase,
   UpdateInvoiceItemsErrors,
-  UpdateInvoiceItemsDTO
+  UpdateInvoiceItemsDTO,
 };

@@ -12,7 +12,7 @@ import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../../invoices/domain/Invoice';
-import { Waiver } from '../../../waivers/domain/Waiver';
+// import { Waiver } from '../../../waivers/domain/Waiver';
 import { Transaction } from '../../domain/Transaction';
 
 import { AddressRepoContract } from './../../../addresses/repos/addressRepo';
@@ -169,7 +169,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       transaction.markAsActive();
 
       // * get author details
-
       manuscript.authorFirstName = request?.authorFirstName;
       manuscript.authorCountry = request?.authorCountry;
       manuscript.authorSurname = request?.authorSurname;
