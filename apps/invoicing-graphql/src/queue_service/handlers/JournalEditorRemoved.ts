@@ -10,6 +10,7 @@ import { RemoveEditorsFromJournalUsecase } from '../../../../../libs/shared/src/
 import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
 
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
+const JOURNAL_SECTION_EDITOR_REMOVED = 'JournalSectionEditorRemoved';
 
 function removeEditorEventHandlerFactory(eventName: string) {
   return async function (data: JournalEditorRemoved) {
@@ -18,7 +19,7 @@ function removeEditorEventHandlerFactory(eventName: string) {
       services: { logger },
     } = this;
 
-    logger.setScope(`PhenomEvent:${JOURNAL_EDITOR_REMOVED}`);
+    logger.setScope(`PhenomEvent:${eventName}`);
     logger.info(`Incoming Event Data`, data);
 
     const getEditorsByJournal = new GetEditorsByJournalUsecase(
@@ -107,4 +108,9 @@ function removeEditorEventHandlerFactory(eventName: string) {
 export const JournalEditorRemovedHandler = {
   event: JOURNAL_EDITOR_REMOVED,
   handler: removeEditorEventHandlerFactory(JOURNAL_EDITOR_REMOVED),
+};
+
+export const JournalSectionEditorRemovedHandler = {
+  event: JOURNAL_SECTION_EDITOR_REMOVED,
+  handler: removeEditorEventHandlerFactory(JOURNAL_SECTION_EDITOR_REMOVED),
 };

@@ -6,6 +6,8 @@ import { AppError } from '../../../../core/logic/AppError';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 import { Invoice, InvoiceStatus } from '../../domain/Invoice';
+import { Waiver } from '../../../../modules/waivers/domain/Waiver';
+import { WaiverService } from '../../../../domain/services/WaiverService';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceMap } from '../../mappers/InvoiceMap';
 import { InvoiceItem } from '../../domain/InvoiceItem';
@@ -47,7 +49,8 @@ export class CreateCreditNoteUsecase
     private transactionRepo: TransactionRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private pausedReminderRepo: PausedReminderRepoContract
+    private pausedReminderRepo: PausedReminderRepoContract,
+    private waiverService: WaiverService
   ) {}
 
   private async getAccessControlContext(
@@ -190,7 +193,7 @@ export class CreateCreditNoteUsecase
 
         // This is where all the magic happens
         let draftInvoice = InvoiceMap.toDomain(invoiceProps);
-        let waiverTypes = [];
+        const waivers: Waiver[] = [];
         if (items.length) {
           items.forEach(async (invoiceItem) => {
             const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
@@ -214,10 +217,7 @@ export class CreateCreditNoteUsecase
               );
             });
 
-            waiverTypes = invoiceItem.waivers.reduce((acc, w) => {
-              acc.push(w.waiverType);
-              return acc;
-            }, []);
+            waivers.push(...invoiceItem.waivers);
           });
         }
 
@@ -239,9 +239,9 @@ export class CreateCreditNoteUsecase
         await this.pausedReminderRepo.save(reminderPause);
 
         // * save waivers
-        await this.waiverRepo.attachWaiversToInvoice(
-          waiverTypes,
-          draftInvoice.invoiceId
+        await this.waiverService.applyHighestReductionWaiver(
+          draftInvoice.invoiceId,
+          waivers
         );
 
         draftInvoice.generateCreatedEvent();

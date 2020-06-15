@@ -52,3 +52,21 @@ This will create the dependency tree which is used when refreshing views.
 4. Add dependencies on other views
 5. Add view in [index.ts](materializedViewList.ts)
 6. Create database migration (Described in point 3 from `Adding new fields to an existing view` section above)
+
+# Allowing RBAC through superset
+
+Vendor views (note: non-materialized) are used to control access to charts/dashboards in superset.
+Ex: manuscript_vendors are used to restrict vendors to only in progress manuscripts. If you create a chart with the datasource `manuscripts` vendors `will not` be able see it. If you create a chart with the datasource `manuscript_vendors`, vendors `will` be able to see it.
+
+The view `manuscript_vendors_full_access` will only be used for filter charts (you should be able to filter by a manuscript type that has no entries in progress for a certain value).
+
+# Solving circular dependecies
+
+Making a materialized view depend on another will cause a runtime exception. This can be avoid by using tables and controlling the refresh flow manually.
+
+## Acceptance rates
+
+In order to calculate acceptance rates we need to use the manuscripts view. Later in the development of the acceptance rates feature we will add a forecasted revenue field to manuscripts view (net_apc * journal_acceptance_rate_of_submission_month). The order of refreshing should be:
+
+`manuscripts -> acceptance_rates (TODO need to implement table refresh cron) -> manuscripts`
+
