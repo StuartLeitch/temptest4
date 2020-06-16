@@ -99,7 +99,6 @@ export * from './modules/payers/domain/PayerTitle';
 export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/repos/implementations/knexPayerRepo';
 export * from './modules/payers/mapper/Payer';
-export * from './modules/payers/usecases/updatePayer/updatePayer';
 export * from './modules/payers/usecases/getPayer/getPayer';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
