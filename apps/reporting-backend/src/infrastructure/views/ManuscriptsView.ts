@@ -44,7 +44,8 @@ AS SELECT
     when sd.event_timestamp is null 
       then coalesce(individual_ar.journal_rate, global_ar.journal_rate) * coalesce(i.net_apc, s.journal_apc::float) 
     else i.net_apc
-  end as expected_apc,
+  end as current_expected_revenue,
+  coalesce(individual_ar.journal_rate, global_ar.journal_rate) * coalesce(i.net_apc, s.journal_apc::float) as raw_expected_revenue,
   CASE
     WHEN s.special_issue_id is NULL THEN 'regular'::text
     ELSE 'special'::text
