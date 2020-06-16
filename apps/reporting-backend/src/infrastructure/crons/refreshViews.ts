@@ -1,5 +1,5 @@
 import Knex from 'knex';
-import { Logger } from '@hindawi/shared';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 import { materializedViewList } from '../views';
 import { differenceInSeconds } from '../../utils/utils';
 
