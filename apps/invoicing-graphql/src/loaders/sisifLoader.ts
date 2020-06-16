@@ -27,7 +27,6 @@ function jobHandlerDispatcher(context: any, loggerService: LoggerContract) {
           Got error ${e.message}
         `
       );
-      throw e;
     }
   };
 }
