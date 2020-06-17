@@ -8,6 +8,7 @@ import {
 import invoiceDataView from './InvoicesDataView';
 import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';
+import paymentsView from './PaymentsView';
 
 class InvoicesView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -47,6 +48,7 @@ AS SELECT
     inv.payer_address as payer_address,
     inv.payment_currency as "payment_currency",
     inv.organization,
+    payments.payment_reference,
     waivers.waiver_types as waivers,
     coupons.coupon_codes as coupons,
     inv.event_id as "event_id",
@@ -99,6 +101,11 @@ AS SELECT
     jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(code text)
     group by event_id
   ) coupons on coupons.event_id = inv.event_id
+  LEFT JOIN (
+    select invoice_id, STRING_AGG(payment_reference, ', ') as payment_reference
+    from ${paymentsView.getViewName()}
+    group by invoice_id
+  ) payments on payments.invoice_id = inv.invoice_id
   LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 where id2.invoice_id = inv.cancelled_invoice_reference limit 1) original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
 WITH DATA;
     `;

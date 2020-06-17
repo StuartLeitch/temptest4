@@ -138,7 +138,11 @@ class KnexMigrationSource {
       '20200611131000_add_acceptance_rates_fields_to_views',
       true
     ),
-    rebuild_materialized_views('20200616152900_fix_inv_man_accepted_date'),
+    rebuild_materialized_views(
+      '20200616152900_fix_inv_man_accepted_date',
+      true
+    ),
+    rebuild_materialized_views('20200617123100_add_inv_payment_ref'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
