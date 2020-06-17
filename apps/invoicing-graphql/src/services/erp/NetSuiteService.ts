@@ -1,5 +1,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+
 import {
   ErpServiceContract,
   ErpData,
@@ -9,16 +11,44 @@ import {
 import { Connection } from './netsuite/Connection';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
 
-export class NetSuiteService implements ErpServiceContract {
-  public static create(config: any): Connection {
-    return new Connection({ config: new ConnectionConfig(config.connection) });
+export class NetSuiteService {
+  private constructor(private connection: Connection) {}
+
+  public static create(config: any): any {
+    const connection = new Connection({
+      config: new ConnectionConfig(config.connection),
+    });
+    const service = new NetSuiteService(connection);
+
+    return service;
   }
 
-  public registerInvoice(data: ErpData): Promise<ErpResponse> {
+  public async registerCustomer(data: ErpData): Promise<ErpResponse> {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    const requestOpts = {
+      url: `${config.endpoint}record/v1/customer`,
+      method: 'POST',
+    };
+
+    const res = await axios({
+      ...requestOpts,
+      headers: oauth.toHeader(oauth.authorize(requestOpts, token)),
+      data: {
+        companyName: 'Hindawi Corporation',
+        email: 'donald.trump@hindawi.com',
+      },
+    } as AxiosRequestConfig);
+
+    console.info(res.data);
+
     return null;
   }
 
-  public registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
+  public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
+    // ? Do nothing yet
     return null;
   }
 }

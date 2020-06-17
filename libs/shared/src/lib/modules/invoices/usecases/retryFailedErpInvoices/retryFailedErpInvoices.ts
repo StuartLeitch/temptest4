@@ -55,6 +55,7 @@ export class RetryFailedErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private erpService: ErpServiceContract,
+    private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {
@@ -68,6 +69,7 @@ export class RetryFailedErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.erpService,
+      this.netSuiteService,
       this.publisherRepo,
       this.loggerService
     );

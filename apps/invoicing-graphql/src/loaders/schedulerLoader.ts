@@ -36,7 +36,10 @@ export const schedulerLoader: MicroframeworkLoader = async (
         waiver,
         publisher,
       },
-      services: { erpService, logger: loggerService },
+      services: {
+        erp: { sage: erpService, netsuite: netSuiteService },
+        logger: loggerService,
+      },
     } = context;
     const {
       failedErpCronRetryTimeMinutes,
@@ -53,6 +56,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       manuscript,
       catalog,
       erpService,
+      netSuiteService,
       publisher,
       loggerService
     );

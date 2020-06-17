@@ -7,15 +7,6 @@ export class ConnectionConfig {
   private tokenSecret = '';
 
   constructor(options: any) {
-    Object.assign(
-      this,
-      { ...options },
-      {
-        endpoint: options.endpoint.replace(
-          '{NETSUITE_ACCOUNT}',
-          options.account
-        ),
-      }
-    );
+    Object.assign(this, options);
   }
 }

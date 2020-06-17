@@ -58,6 +58,7 @@ export class PublishInvoiceToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private erpService: ErpServiceContract,
+    private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: any
   ) {}
@@ -209,7 +210,7 @@ export class PublishInvoiceToErpUsecase
       // this.loggerService.info('PublishInvoiceToERP rate', rate);
 
       try {
-        const erpResponse = await this.erpService.registerInvoice({
+        const erpData = {
           invoice,
           payer,
           items: invoiceItems,
@@ -219,7 +220,10 @@ export class PublishInvoiceToErpUsecase
           vatNote,
           rate,
           tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-        });
+        };
+
+        await this.netSuiteService.registerInvoice(erpData);
+        const erpResponse = await this.erpService.registerInvoice(erpData);
         // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
 
         this.loggerService.info(

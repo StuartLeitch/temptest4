@@ -6,11 +6,11 @@ import OAuth from 'oauth-1.0a';
 
 export class Connection {
   public config: any;
+  public oauth: any;
+  public token: any;
   public state: string;
   public threadId: any;
 
-  private oauth: any;
-  private token: any;
   private connectCalled: boolean;
 
   constructor(options: any) {
