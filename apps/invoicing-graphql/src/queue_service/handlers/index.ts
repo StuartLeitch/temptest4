@@ -5,6 +5,10 @@ import {
   JournalEditorAssignedHandler,
   JournalSectionEditorAssignedHandler,
 } from './JournalEditorAssigned';
+import {
+  JournalEditorRemovedHandler,
+  JournalSectionEditorRemovedHandler,
+} from './JournalEditorRemoved';
 import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
 import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
 import { ArticlePublishedHandler } from './ArticlePublished';
@@ -16,7 +20,9 @@ import { JournalAddedHandler } from './JournalAdded';
 export {
   SubmissionPeerReviewCycleCheckPassed,
   JournalEditorAssignedHandler,
+  JournalEditorRemovedHandler,
   JournalSectionEditorAssignedHandler,
+  JournalSectionEditorRemovedHandler,
   SubmissionQualityCheckPassed,
   SubmissionQualityCheckRTCd,
   SubmissionSubmittedHandler,

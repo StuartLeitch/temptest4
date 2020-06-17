@@ -32,7 +32,9 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
         '=',
         `${TABLES.WAIVERS}.type_id`
       )
-      .where({ [`${TABLES.INVOICE_ITEMS}.id`]: invoiceItemId.id.toString() });
+      .where({
+        [`${TABLES.INVOICE_ITEMS}.id`]: invoiceItemId.id.toString(),
+      });
 
     return waivers.map((w) => WaiverMap.toDomain(w));
   }
@@ -41,7 +43,9 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     const waivers = await this.db
       .select()
       .from(TABLES.INVOICE_ITEMS)
-      .where({ [`${TABLES.INVOICE_ITEMS}.invoiceId`]: invoiceId.id.toString() })
+      .where({
+        [`${TABLES.INVOICE_ITEMS}.invoiceId`]: invoiceId.id.toString(),
+      })
       .join(
         TABLES.INVOICE_ITEMS_TO_WAIVERS,
         `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.invoiceItemId`,
@@ -64,15 +68,11 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     return waivers.map((w) => WaiverMap.toDomain(w));
   }
 
-  async attachWaiversToInvoice(
-    waiverTypes: WaiverType[],
+  async attachWaiverToInvoice(
+    waiverType: WaiverType,
     invoiceId: InvoiceId,
     dateCreated?: Date
-  ): Promise<Waiver[]> {
-    if (!waiverTypes.length) {
-      return;
-    }
-
+  ): Promise<Waiver> {
     const invoiceItem = await this.db
       .select()
       .from(TABLES.INVOICE_ITEMS)
@@ -88,22 +88,14 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
       );
     }
 
-    const _existingWaivers = await this.getWaiversByInvoiceId(invoiceId);
-    const existingWaivers = _existingWaivers.map((w) => w.waiverType);
+    let toInsert: any = {
+      invoiceItemId: invoiceItem.id,
+      waiverId: waiverType,
+    };
 
-    const toInsert = waiverTypes
-      .filter((w) => !existingWaivers.includes(w))
-      .map((waiverType) => {
-        const result = {
-          invoiceItemId: invoiceItem.id,
-          waiverId: waiverType,
-        };
-
-        if (dateCreated) {
-          return { ...result, dateCreated };
-        }
-        return result;
-      });
+    if (dateCreated) {
+      toInsert = { ...toInsert, dateCreated };
+    }
 
     try {
       await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS).insert(toInsert);
@@ -111,7 +103,32 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
       throw RepoError.fromDBError(e);
     }
 
-    return this.getWaiversByTypes(waiverTypes);
+    return await this.getWaiversByTypes([waiverType])[0];
+  }
+
+  async removeInvoiceWaivers(invoiceId: InvoiceId) {
+    const invoiceItems = await this.db
+      .select('id')
+      .from(TABLES.INVOICE_ITEMS)
+      .where({
+        [`${TABLES.INVOICE_ITEMS}.invoiceId`]: invoiceId.id.toString(),
+      });
+    const invoiceItemIds = invoiceItems.map((item) => item['id']);
+
+    if (!invoiceItemIds.length) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice',
+        invoiceId.id.toString()
+      );
+    }
+
+    try {
+      await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS)
+        .whereIn('invoiceItemId', invoiceItemIds)
+        .del();
+    } catch (e) {
+      throw RepoError.fromDBError(e);
+    }
   }
 
   async getWaiversByTypes(waiverTypes: WaiverType[]): Promise<Waiver[]> {

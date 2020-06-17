@@ -1,5 +1,5 @@
 import { env } from '../env';
-import { Logger } from '../lib/logger';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 
 export function banner(log: Logger): void {
   log.info(`App is ready on ${env.app.port}`);

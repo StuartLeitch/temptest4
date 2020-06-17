@@ -1167,8 +1167,8 @@ export class MigrateEntireInvoiceUsecase
       const invoiceId = InvoiceId.create(uuid).getValue();
 
       try {
-        this.waiverRepo.attachWaiversToInvoice(
-          [WaiverType.WAIVED_MIGRATION],
+        this.waiverRepo.attachWaiverToInvoice(
+          WaiverType.WAIVED_MIGRATION,
           invoiceId,
           request.invoice.dateIssued
         );

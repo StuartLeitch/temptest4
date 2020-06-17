@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 import { defaultRegistry } from 'libs/shared/src/lib/modules/reporting/EventMappingRegistry';
 import { FilterEventsService } from 'libs/shared/src/lib/modules/reporting/services/FilterEventsService';
 import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
@@ -9,7 +10,6 @@ import {
 } from 'microframework-w3tec';
 import { KnexEventsRepo } from '../../../../libs/shared/src/lib/modules/reporting/repos/implementation/KnexEventsRepo';
 import { env } from '../env';
-import { Logger } from '../lib/logger';
 
 export const contextLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined

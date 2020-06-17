@@ -1,10 +1,10 @@
 import express from 'express';
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import { env } from '../env';
-import { Logger } from '../lib/logger';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 import { ReportingHandlers } from './handlerLoader';
 import { Event } from 'libs/eve/src';
 const logger = new Logger('express:loader');

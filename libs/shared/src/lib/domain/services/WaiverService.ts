@@ -19,12 +19,12 @@ export class WaiverService {
     private waiverRepo: WaiverRepoContract,
     private editorRepo: EditorRepoContract
   ) {}
-  public async applyWaivers({
+  public async applyWaiver({
     country,
     invoiceId,
     authorEmail,
     journalId,
-  }: WaiverServiceDTO): Promise<Waiver[]> {
+  }: WaiverServiceDTO): Promise<Waiver> {
     const waiversToApply: WaiverType[] = [];
 
     const reductionsPoliciesRegister = new ReductionsPoliciesRegister();
@@ -90,10 +90,46 @@ export class WaiverService {
         waiversToApply.push(WaiverType.EDITOR_DISCOUNT);
       }
     }
-    console.log('Applied waivers', ...waiversToApply, 'to invoice', invoiceId);
-    return this.waiverRepo.attachWaiversToInvoice(
-      waiversToApply,
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+
+    const invoiceIdObject = InvoiceId.create(
+      new UniqueEntityID(invoiceId)
+    ).getValue();
+
+    const applicableWaivers = await this.waiverRepo.getWaiversByTypes(
+      waiversToApply
+    );
+    return this.applyHighestReductionWaiver(invoiceIdObject, applicableWaivers);
+  }
+
+  public async applyHighestReductionWaiver(
+    invoiceId: InvoiceId,
+    applicableWaivers: Waiver[]
+  ): Promise<Waiver> {
+    if (!applicableWaivers.length) {
+      return;
+    }
+    const existingWaivers = await this.waiverRepo.getWaiversByInvoiceId(
+      invoiceId
+    );
+
+    const highestReductionWaiver = applicableWaivers.sort(
+      (a, b) => b.reduction - a.reduction
+    )[0];
+
+    if (existingWaivers.length > 0) {
+      if (
+        existingWaivers[0].props.reduction >
+        highestReductionWaiver.props.reduction
+      ) {
+        return existingWaivers[0];
+      } else {
+        this.waiverRepo.removeInvoiceWaivers(invoiceId);
+      }
+    }
+
+    return this.waiverRepo.attachWaiverToInvoice(
+      highestReductionWaiver.waiverType,
+      invoiceId
     );
   }
 }

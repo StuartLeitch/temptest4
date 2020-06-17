@@ -36,8 +36,12 @@ export class Logger implements LoggerContract {
     this.scope = Logger.parsePathToScope(scope);
   }
 
-  constructor() {
-    this.scope = Logger.DEFAULT_SCOPE;
+  constructor(scope?: string) {
+    if (!scope) {
+      this.scope = Logger.DEFAULT_SCOPE;
+    } else {
+      this.setScope(scope);
+    }
   }
 
   public debug(message: string, ...args: any[]): void {
