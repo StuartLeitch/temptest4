@@ -28,18 +28,15 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()} AS
   lead_guest_editor.email as lead_guest_editor_email,
   lead_guest_editor.aff as lead_guest_editor_affiliation,
   lead_guest_editor.country as lead_guest_editor_country,
-  editors_counts.active_editors_count, 
-  editors_counts.pending_editors_count, 
-  editors_counts.declined_editors_count
+  editors_counts.editor_count
   FROM ${journalSpecialIssuesDataView.getViewName()} si_data
   LEFT JOIN LATERAL (
     SELECT 
       special_issue_id,
-      sum(case when status = 'active' then 1 else 0 end) as active_editors_count, 
-      sum(case when status = 'pending' then 1 else 0 end) as pending_editors_count, 
-      sum(case when status = 'declined' then 1 else 0 end) as declined_editors_count
+      count(*) as editor_count
     FROM ${journalEditorialBoardView.getViewName()} jeb
       WHERE jeb.special_issue_id = si_data.special_issue_id
+        AND role_type = 'academicEditor'
     GROUP BY special_issue_id
   ) editors_counts on editors_counts.special_issue_id = si_data.special_issue_id
   LEFT JOIN LATERAL (
