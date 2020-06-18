@@ -3,7 +3,10 @@ const common = [
   // '--require-module @babel/register', // Load Babel module
   '--require-module ts-node/register', // Load TypeScript module
   '--require ./libs/shared/src/lib/modules/journals/usecases/editorialBoards/**/*.steps.ts', // Load step definitions
-  '--require ./apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts', // Load step definitions
+  '--require ./apps/invoicing-graphql/tests/eventHandlers/*.steps.ts', // Load step definitions
+  '--require ./libs/shared/specs/new-step-definitions/**/*.steps.ts', // Load step definitions
+  '--require ./libs/shared/specs/new-step-definitions/*.steps.ts', // Load step definitions
+
   // '--format progress-bar', // Load custom formatter
   '--format node_modules/cucumber-pretty', // Load custom formatter
   // '--format json', // Load custom formatter
