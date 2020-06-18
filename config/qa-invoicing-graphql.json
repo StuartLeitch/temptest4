@@ -57,7 +57,7 @@
   "LOG_CLOUDWATCH_REGION": "eu-west-1",
   "LOG_JSON": true,
   "LOG_LEVEL": "debug",
-  "LOG_OUTPUT": "demo",
+  "LOG_OUTPUT": "dev",
   "LOG_TENANT": "hindawi",
   "MONITOR_ROUTE": "/monitor",
   "NOTIFICATIONS_QUEUES": "email-reminders",
