@@ -29,7 +29,8 @@ services:
     key:
       files:
         - package-lock.json
-      paths: -node_modules
+    paths:
+      - node_modules
 
 before_script:
   # docker login asks for the password to be passed through stdin for security
