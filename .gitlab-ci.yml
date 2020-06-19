@@ -42,7 +42,7 @@ Install Dependencies:
   image: node:latest
   <<: *cache
   script:
-    - npm ci
+    - npm install
 
 Test:
   interruptible: true
