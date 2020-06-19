@@ -14,7 +14,7 @@
     "test": "nx test:unit && nx test:usecases && nx test:eventHandlers",
     "test:usecases": "TS_NODE_PROJECT=\"libs/shared/tsconfig.spec.json\" ./node_modules/.bin/cucumber-js ./libs/shared/src/lib/modules/journals/usecases/editorialBoards/**/*.feature",
     "test:eventHandlers": "TS_NODE_PROJECT=\"libs/shared/tsconfig.spec.json\" ./node_modules/.bin/cucumber-js ./apps/invoicing-graphql/tests/eventHandlers/*.feature",
-    "test:shared": "TS_NODE_PROJECT=\"libs/shared/tsconfig.spec.json\" ./node_modules/.bin/cucumber-js ./libs/shared/specs/new-features/**/*.feature",
+    "test:shared": "TS_NODE_PROJECT=\"libs/shared/tsconfig.spec.json\" ./node_modules/.bin/cucumber-js ./libs/shared/specs/new-features/",
     "lint": "nx workspace-lint && nx lint",
     "e2e": "nx e2e",
     "affected:apps": "nx affected:apps",

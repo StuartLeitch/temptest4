@@ -10,7 +10,6 @@ export interface AccessControlContext {
 }
 
 const userOwnsEntity = (context: AccessControlContext): boolean => {
-  console.log('Contect', context);
   return context.entityOwnerId === context.userId;
 };
 
