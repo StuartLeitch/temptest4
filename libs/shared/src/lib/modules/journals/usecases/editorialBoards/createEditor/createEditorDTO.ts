@@ -3,7 +3,10 @@ export interface CreateEditorDTO {
   editorId: string;
   journalId: string;
   name: string;
+  givenNames?: string;
+  surname?: string;
   email: string;
+  role?: any;
   roleLabel: string;
   roleType: string;
   createdAt?: Date;

@@ -24,6 +24,13 @@ variables:
 services:
   - docker:$DOCKER_VERSION-dind
 
+.cache: &cache
+  cache:
+    key:
+      files:
+        - package-lock.json
+      paths: -node_modules
+
 before_script:
   # docker login asks for the password to be passed through stdin for security
   # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
@@ -32,15 +39,9 @@ before_script:
 Install Dependencies:
   stage: setup
   image: node:latest
-  cache:
-    key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
-    paths:
-      - node_modules/
+  <<: *cache
   script:
     - npm ci
-  only:
-    changes:
-      - package-lock.json
 
 Test:
   interruptible: true
@@ -50,11 +51,7 @@ Test:
   before_script:
     - apt-get update
     - apt-get -y install imagemagick graphicsmagick
-  cache:
-    key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
-    paths:
-      - node_modules/
-    policy: pull
+  <<: *cache
   script:
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
     - npm run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage
@@ -78,11 +75,7 @@ Build:
   interruptible: true
   stage: build
   image: node:latest
-  cache:
-    key: $CI_COMMIT_REF_SLUG-$CI_PROJECT_DIR
-    paths:
-      - node_modules/
-    policy: pull
+  <<: *cache
   script:
     - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
     - npm run affected:build -- ${AFFECTED_ARGS} --parallel --exclude=shared,react-components --configuration production

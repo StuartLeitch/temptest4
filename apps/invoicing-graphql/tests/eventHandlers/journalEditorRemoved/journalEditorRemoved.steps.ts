@@ -1,15 +1,17 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import { Editor } from '@hindawi/phenom-events/src/lib/editor';
+// import { MemberStatuses } from '@hindawi/phenom-events/src/lib/memberStatuses';
 import { defineFeature, loadFeature } from 'jest-cucumber';
 
-import { EditorCollection } from '../../../../libs/shared/src/lib/modules/journals/domain/Editor';
-import { EditorMap } from '../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
-import { CatalogMap } from '../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
-import { MockLogger } from '../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
-import { MockEditorRepo } from './../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
-import { MockCatalogRepo } from './../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import { EditorCollection } from '../../../../../libs/shared/src/lib/modules/journals/domain/Editor';
+import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
+import { CatalogMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
+import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
+import { MockEditorRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
+import { MockCatalogRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 
-import { JournalEditorRemovedHandler } from '../../src/queue_service/handlers/JournalEditorRemoved';
+import { JournalEditorRemovedHandler } from '../../../src/queue_service/handlers/JournalEditorRemoved';
 
 function getRandom(arr: string[], n: number) {
   const result = new Array(n);
@@ -36,8 +38,6 @@ const feature = loadFeature('./journalEditorRemoved.feature', {
 });
 
 defineFeature(feature, (test) => {
-  console.info(this);
-
   let mockLogger: MockLogger;
   let mockEditorRepo: MockEditorRepo;
   let mockCatalogRepo: MockCatalogRepo;
@@ -86,16 +86,34 @@ defineFeature(feature, (test) => {
         );
 
         [...new Array(+editorsLength)].map(async (curr: any, idx: number) => {
-          const rawEditor = {
-            editorId: `${testJournalId}-${idx}-editor`,
-            journalId: `${testJournalId}`,
-            name: `${idx}-editor-name`,
+          const rawEditor: Editor = {
+            id: `${testJournalId}-${idx}-editor`,
+            orcidId: '',
+            userId: '',
+            givenNames: `${idx}-editor-name`,
+            surname: `${idx}-editor-surname`,
             email: `email${idx}@editor.com`,
-            roleType: `${idx}-role-type`,
-            roleLabel: `${idx}-role-label`,
+            status: 'pending' as any,
+            role: {
+              type: `${idx}-role-type`,
+              label: `${idx}-role-label`,
+            },
+            invitedDate: '',
+            declinedDate: '',
+            acceptedDate: '',
+            expiredDate: '',
+            assignedDate: '',
+            removedDate: '',
           };
 
-          const editor = EditorMap.toDomain(rawEditor);
+          const editor = EditorMap.toDomain({
+            ...rawEditor,
+            journalId,
+            name: `${rawEditor.givenNames} ${rawEditor.surname}`,
+            roleType: rawEditor.role?.type,
+            roleLabel: rawEditor.role?.label,
+          });
+
           await mockEditorRepo.save(editor);
           journalEditors.push(editor);
         });
