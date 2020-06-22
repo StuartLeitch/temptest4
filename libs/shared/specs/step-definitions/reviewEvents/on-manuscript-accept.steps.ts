@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, BeforeAll } from 'cucumber';
 
 import { Roles } from '../../../src/lib/modules/users/domain/enums/Roles';
 import { Invoice } from '../../../src/lib/modules/invoices/domain/Invoice';
@@ -7,6 +7,10 @@ import { InvoiceItem } from '../../../src/lib/modules/invoices/domain/InvoiceIte
 import { InvoiceStatus } from '../../../src/lib/modules/invoices/domain/Invoice';
 import { CatalogItem } from './../../../src/lib/modules/journals/domain/CatalogItem';
 import { Article } from '../../../src/lib/modules/manuscripts/domain/Article';
+import {
+  Waiver,
+  WaiverType,
+} from '../../../src/lib/modules/waivers/domain/Waiver';
 import {
   Transaction,
   TransactionStatus,
@@ -27,6 +31,7 @@ import { InvoiceItemMap } from './../../../src/lib/modules/invoices/mappers/Invo
 import { TransactionMap } from './../../../src/lib/modules/transactions/mappers/TransactionMap';
 import { CatalogMap } from './../../../src/lib/modules/journals/mappers/CatalogMap';
 import { ArticleMap } from '../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import { WaiverMap } from '../../../src/lib/modules/waivers/mappers/WaiverMap';
 
 import { MockTransactionRepo } from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 import { MockArticleRepo } from '../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
@@ -41,7 +46,7 @@ import { MockAddressRepo } from './../../../src/lib/modules/addresses/repos/mock
 
 import { WaiverService } from '../../../src/lib/domain/services/WaiverService';
 import { EmailService } from './../../../src/lib/infrastructure/communication-channels/EmailService';
-import { VATService } from '../../../../../libs/shared/src/lib/shared';
+import { VATService } from '../../../../../libs/shared/src/lib/domain/services/VATService';
 
 import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
@@ -94,11 +99,12 @@ let invoiceItem: InvoiceItem;
 let catalogItem: CatalogItem;
 let manuscript: Article;
 let result: any;
+let waiver: Waiver;
 
 const manuscriptId = 'manuscript-id';
 const journalId = 'journal-id';
 
-Before(function () {
+BeforeAll(function () {
   transaction = TransactionMap.toDomain({
     status: TransactionStatus.DRAFT,
     deleted: 0,
@@ -107,23 +113,29 @@ Before(function () {
   });
   invoice = InvoiceMap.toDomain({
     status: InvoiceStatus.DRAFT,
-    transactionId: transaction.transactionId,
+    transactionId: transaction.transactionId.id.toString(),
   });
   invoiceItem = InvoiceItemMap.toDomain({
     manuscriptId,
     invoiceId: invoice.invoiceId.id.toString(),
   });
+  waiver = WaiverMap.toDomain({
+    type_id: 'WAIVED_COUNTRY',
+    reduction: 100,
+    isActive: true,
+  });
 
   invoice.addInvoiceItem(invoiceItem);
   transaction.addInvoice(invoice);
 
+  mockWaiverRepo.save(waiver);
   mockTransactionRepo.save(transaction);
   mockInvoiceRepo.save(invoice);
   mockInvoiceItemRepo.save(invoiceItem);
 });
 
 Given('Invoicing listening to events emitted by Review', async function () {
-  console.log('aaa');
+  return;
 });
 
 Given(/^The APC Catalog Item has a price of (\d+)$/, async function (
@@ -133,6 +145,7 @@ Given(/^The APC Catalog Item has a price of (\d+)$/, async function (
     journalId,
     type: 'APC',
     price: price,
+    journalTile: 'manuscript-title1',
   });
   mockCatalogRepo.save(catalogItem);
 });
@@ -151,6 +164,7 @@ Given('The Author is from a Waived Country', async function () {
     authorEmail,
     authorCountry,
     authorSurname,
+    journalId: journalId,
   });
   mockArticleRepo.save(manuscript);
 });
@@ -163,7 +177,11 @@ When('A manuscript accept event is published', async function () {
         queueName: 'test',
         delay: 0.001,
       },
-      // journalId,
+      emailSenderInfo: {
+        address: manuscript.authorEmail,
+        name: manuscript.authorSurname,
+      },
+      authorCountry: 'MD',
     },
     defaultContext
   );
@@ -176,7 +194,6 @@ Then(
 
     const transactions = await mockTransactionRepo.getTransactionCollection();
     const [associatedTransaction] = transactions;
-
     expect(associatedTransaction.status).to.equal(TransactionStatus.ACTIVE);
   }
 );
@@ -186,7 +203,6 @@ Then(
   async () => {
     const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
     const [associatedInvoiceItem] = invoiceItems;
-
     expect(associatedInvoiceItem.price).to.equal(950);
   }
 );

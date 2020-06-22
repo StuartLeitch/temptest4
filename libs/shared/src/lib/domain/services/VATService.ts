@@ -1,14 +1,12 @@
 import { createClient } from 'soap';
 import EuroVat from 'eu-vat';
 
-import { environment } from '@env/environment';
-
 import { PoliciesRegister } from '../../modules/invoices/domain/policies/PoliciesRegister';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from './../../modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 import { USVATPolicy } from './../../modules/invoices/domain/policies/USVATPolicy';
 import { Address as VATAddress } from '../../modules/invoices/domain/policies/Address';
 
-const { VAT_VALIDATION_SERVICE_ENDPOINT: endpoint } = environment;
+const endpoint = process.env.VAT_VALIDATION_SERVICE_ENDPOINT;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
 
 const vat = new EuroVat();
@@ -51,7 +49,7 @@ export class VATService {
 
   public async checkVAT({
     countryCode,
-    vatNumber
+    vatNumber,
   }: {
     countryCode: string;
     vatNumber: string;
@@ -89,7 +87,7 @@ export class VATService {
     const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
       address,
       !individualConfirmed,
-      individualConfirmed ? false : true
+      individualConfirmed ? false : true,
     ]);
 
     const VAT = calculateVAT.getVAT();
@@ -100,7 +98,7 @@ export class VATService {
     const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
       address,
       !individualConfirmed,
-      individualConfirmed ? false : true
+      individualConfirmed ? false : true,
     ]);
 
     const VATNote = calculateVAT.getVATNote();
