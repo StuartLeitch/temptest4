@@ -2,9 +2,34 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
-    "types": ["jest", "node"]
+    "module": "commonjs"
+    // "types": ["jest", "node"],
+    // "rootDir": ".",
+    // "sourceMap": true,
+    // "declaration": false,
+    // "moduleResolution": "node",
+    // "emitDecoratorMetadata": true,
+    // "resolveJsonModule": true,
+    // "experimentalDecorators": true,
+    // "importHelpers": true,
+    // "target": "es2015",
+    // "downlevelIteration": true,
+    // "typeRoots": ["node_modules/@types"],
+    // "lib": ["es2015", "es2017", "dom"],
+    // "skipLibCheck": true,
+    // "skipDefaultLibCheck": true,
+    // "baseUrl": ".",
+    // "paths": {
+    //   "@env/environment": [
+    //     "../../apps/invoicing-graphql/src/environments/environment.ts"
+    //   ],
+    //   "@hindawi/shared": ["src/index.ts"],
+    //   "@hindawi/eve": ["src/index.ts"],
+    //   "@hindawi/infrastructure": ["src/lib/infrastructure/index.ts"],
+    //   "@utils": ["src/lib/utils/index.ts"]
+    // }
   },
+
   "include": [
     "**/*.spec.ts",
     "**/*.spec.tsx",
