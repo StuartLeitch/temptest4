@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button, Media } from '../../../components';
 
-export default ({ closeToast, error }) => (
+const ErrorToast: React.FC<ErrorToastProps> = ({ closeToast, error }) => (
   <Media>
     <Media middle left className='mr-3'>
       <i className='fas fa-fw fa-2x fa-close'></i>
@@ -14,7 +14,7 @@ export default ({ closeToast, error }) => (
       <p>
         {error
           ? error
-          : 'Something has occured while trying to save the Coupon. Please try again.'}
+          : 'Something has occurred while trying to save the Coupon. Please try again.'}
       </p>
       <div className='d-flex mt-2'>
         <Button
@@ -38,3 +38,10 @@ export default ({ closeToast, error }) => (
     </Media>
   </Media>
 );
+
+interface ErrorToastProps {
+  error: string;
+  closeToast(): void;
+}
+
+export default ErrorToast;

@@ -11,12 +11,11 @@ import {
     Dot,
     Rectangle,
     Polygon
-} from './../../../components/recharts';
+} from '../../../components/recharts';
 
-import colors from './../../../colors';
+import colors from '../../../colors';
 
 const generateDot = ({ diameter, fill, stroke }) =>
-    /* eslint-disable */
     ({ cx, cy }) => (
         <Dot
             cx={ cx }
@@ -29,10 +28,8 @@ const generateDot = ({ diameter, fill, stroke }) =>
             fillOpacity={ 1 }
         />
     )
-    /* eslint-enable */
 
 const generateSquare = ({ height, fill, stroke }) =>
-    /* eslint-disable */
     ({ cx, cy }) => (
         <Rectangle
             x={ cx - height / 2 }
@@ -46,10 +43,8 @@ const generateSquare = ({ height, fill, stroke }) =>
             height={ height }
         />
     );
-    /* eslint-enable */
 
 const generateTriangle = ({height, fill, stroke}) =>
-    // eslint-disable-next-line react/prop-types
     ({ cx, cy }) => {
         const halfSide = height / Math.sqrt(3);
         const points = [

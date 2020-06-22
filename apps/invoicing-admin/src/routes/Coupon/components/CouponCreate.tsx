@@ -7,7 +7,7 @@ import { couponTypeOptions, couponStatusOptions } from '../config';
 
 import { CREATE } from '../config';
 
-const CouponCreate = () => {
+const CouponCreate: React.FC = () => {
   return (
     <Form>
       <Name mode={CREATE} />

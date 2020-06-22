@@ -1,16 +1,16 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 
 import { Provider } from './ThemeContext';
 
-export class ThemeProvider extends React.Component {
+export class ThemeProvider extends React.Component<ThemeProviderProps, ThemeProviderState> {
   static propTypes = {
     children: PropTypes.node,
     initialStyle: PropTypes.string,
     initialColor: PropTypes.string
   };
 
-  constructor(props: any) {
+  constructor(props: ThemeProviderProps) {
     super(props);
 
     this.state = {
@@ -49,3 +49,14 @@ export class ThemeProvider extends React.Component {
     );
   }
 }
+
+interface ThemeProviderProps {
+  children?: ReactNode;
+  initialStyle?: string;
+  initialColor?: string
+};
+
+interface ThemeProviderState {
+  style: string;
+  color: string;
+};

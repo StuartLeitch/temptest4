@@ -26,7 +26,7 @@ import { CouponCreateContext, couponCreateInitialState } from './Context';
 
 import { CREATE } from './config';
 
-const ViewEditContainer = () => {
+const ViewEditContainer: React.FC = () => {
   const history = useHistory();
   const [saveInProgress, setSaveInProgress] = useState(false);
 

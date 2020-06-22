@@ -18,7 +18,7 @@ const COUPON_STATUS = {
   ),
 };
 
-const CouponsList = ({ coupons }: CouponsListProps) => {
+const CouponsList: React.FC<CouponsListProps> = ({ coupons }) => {
   return (
     <div className='table-responsive-xl'>
       <Table className='mb-0 table-striped' hover>
