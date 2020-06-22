@@ -23,13 +23,13 @@ export class NetSuiteService {
     return service;
   }
 
-  public async registerCustomer(data: ErpData): Promise<ErpResponse> {
+  public async registerInvoice(data: ErpData): Promise<ErpResponse> {
     const {
       connection: { config, oauth, token },
     } = this;
 
     const requestOpts = {
-      url: `${config.endpoint}record/v1/customer`,
+      url: `${config.endpoint}record/v1/invoice`,
       method: 'POST',
     };
 
