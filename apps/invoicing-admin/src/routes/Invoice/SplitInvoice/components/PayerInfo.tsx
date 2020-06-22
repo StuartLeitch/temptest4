@@ -31,9 +31,14 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
     }
   });
 
-  const isInsertedAmountValid = (amount) => {
+  const isInsertedAmountValid = amount => {
     const validation = /^(([1-9][0-9]*(\.[0-9]{1,2})?))$/;
     return validation.test(amount as string) && amount <= invoiceValue;
+  };
+
+  const isEmailValid = email => {
+    const validation = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return validation.test(email);
   }
 
   useEffect(() => {
@@ -48,7 +53,7 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
       },
       'email': {
         isTouched: fields.email.isTouched,
-        isValid: !!email
+        isValid: isEmailValid(email)
       }
     });
   }, [fullName, email, amountToPay]);
@@ -57,7 +62,7 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
     setFields({...fields, [field]: {
       ...fields[field],
       isTouched: true
-    }})
+    }});
     onChange(field, value);
   };
 
@@ -94,7 +99,7 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
             invalid={fields['email'].isTouched && !fields['email'].isValid}
           />
           <FormFeedback>
-            Required
+            Email address is invalid
           </FormFeedback>
         </FormGroup>
       </Col>

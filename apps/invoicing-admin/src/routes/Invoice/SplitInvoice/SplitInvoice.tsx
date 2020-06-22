@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'graphql-hooks';
+import numeral from 'numeral';
 import LoadingOverlay from 'react-loading-overlay';
 import {
   Button,
@@ -22,7 +23,7 @@ const SplitInvoice: React.FC = () => {
   const [payers, setPayers] = useState({});
   const [invoiceValue, setInvoiceValue] = useState(0);
   const [isTotalAmountReached, setIsTotalAmountReached] = useState(true);
-  const [isFormValid, setIsFormValid] = useState(true);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [payerId, setPayerId] = useState(0);
 
   const { id } = useParams();
@@ -45,7 +46,7 @@ const SplitInvoice: React.FC = () => {
 
       setInvoiceValue(totalCharges);
       setPayers({...payers,
-        [payerId]: { fullName, email: authorEmail, amountToPay: totalCharges.toString() }
+        [payerId]: { fullName, email: authorEmail, amountToPay: totalCharges.toFixed(2) }
       });
       setPayerId(payerId + 1);
     }
@@ -73,7 +74,7 @@ const SplitInvoice: React.FC = () => {
   };
 
   const splitEqually = () => {
-    const individualAmount = (invoiceValue / Object.values(payers).length).toFixed(2);
+    const individualAmount = (invoiceValue / Object.values(payers).length).toString();
 
     const newPayers = {...payers};
     Object.values(newPayers).map((payer: Payer) => payer.amountToPay = individualAmount);
@@ -88,7 +89,7 @@ const SplitInvoice: React.FC = () => {
       email: '',
       amountToPay: ''
     }});
-    setIsFormValid(false);
+    setIsFormInvalid(true);
     setPayerId(payerId + 1);
   };
 
@@ -111,7 +112,12 @@ const SplitInvoice: React.FC = () => {
 
   const isInsertedAmountValid = (amount) => {
     const validation = /^(([1-9][0-9]*(\.[0-9]{1,2})?))$/;
-    return validation.test(amount) && amount <= invoiceValue;
+    return validation.test(parseFloat(amount).toFixed(2)) && amount <= invoiceValue;
+  }
+
+  const isEmailValid = email => {
+    const validation = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return validation.test(email);
   }
 
   const hasEmptyFields = ({ fullName, email, amountToPay }) => !fullName || !email || !amountToPay
@@ -121,21 +127,16 @@ const SplitInvoice: React.FC = () => {
       (acc: number, payer: Payer) => acc + parseFloat(payer.amountToPay || '0'), 0
     );
 
-    console.log(totalInsertedAmount, invoiceValue)
-
-    if (Math.round(totalInsertedAmount) !== invoiceValue) {
-      setIsFormValid(false);
+    if (totalInsertedAmount !== invoiceValue) {
+      setIsFormInvalid(true);
       setIsTotalAmountReached(false);
     } else {
-      setIsTotalAmountReached(true);
-      Object.values(payers).forEach((payer: Payer) => {
-        if (hasEmptyFields(payer) || !isInsertedAmountValid(payer.amountToPay)) {
-          setIsFormValid(false);
-        }
-         else {
-          setIsFormValid(true);
-        }
+      const isInvalid = Object.values(payers).some((payer: Payer) => {
+        const { amountToPay, email } = payer;
+        return hasEmptyFields(payer) || !isInsertedAmountValid(amountToPay) || !isEmailValid(email)
       });
+      setIsFormInvalid(isInvalid);
+      setIsTotalAmountReached(true);
     }
   };
 
@@ -161,7 +162,16 @@ const SplitInvoice: React.FC = () => {
           <i className='fas fa-angle-left mr-2' /> Back to invoice
       </Link>
 
-      <HeaderMain title='Split invoice' className='mb-1 mt-0' />
+      <HeaderMain title='Split invoice' className='mb-3 mt-0' />
+
+      <Row className='h6'>
+        <Col>
+          Amount to pay:
+          <span className='text-success font-weight-bold'>
+            {` ${numeral(invoiceValue.toFixed(2)).format('$0.00')}`}
+          </span>
+        </Col>
+      </Row>
 
       <Row className='mb-3'>
         <Col className='align-self-end'>
@@ -198,7 +208,11 @@ const SplitInvoice: React.FC = () => {
                 </Row>
                 <Row>
                   <PayerInfo
-                    payer={payers[key]}
+                    payer={{
+                      ...payers[key],
+                      amountToPay: payers[key].amountToPay ?
+                        parseFloat(payers[key].amountToPay).toFixed(2) : ''
+                    }}
                     onChange={(field, value) => update(key, field, value)}
                     invoiceValue={invoiceValue}
                   />
@@ -210,7 +224,7 @@ const SplitInvoice: React.FC = () => {
         <Col className='mt-3 mb-4'>
           <Row>
            <Button className='mr-3' onClick={() => splitEqually()}>Split Equally</Button>
-            <Button disabled={!isFormValid || !isTotalAmountReached} type='submit'>
+            <Button disabled={isFormInvalid || !isTotalAmountReached} type='submit'>
               Confirm & Send Invoices
             </Button>
           </Row>
