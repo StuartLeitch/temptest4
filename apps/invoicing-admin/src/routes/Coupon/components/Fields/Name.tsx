@@ -15,12 +15,12 @@ import { CREATE } from '../../config';
 
 import { CouponMode } from '../../types';
 
-const Name = ({
+const Name: React.FC<NameProps> = ({
   value = '',
   disabled = false,
   helper = '',
   mode,
-}: NameProps) => {
+}) => {
   const chosenContext =
     mode === CREATE ? CouponCreateContext : CouponEditContext;
   const {

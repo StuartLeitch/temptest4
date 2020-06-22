@@ -1,8 +1,5 @@
-/* eslint-disable prefer-const */
-
 import React, { useEffect } from 'react';
 import { useManualQuery } from 'graphql-hooks';
-import LoadingOverlay from 'react-loading-overlay';
 import { Filters } from '@utils';
 import { useLocalStorage } from '@rehooks/local-storage';
 
@@ -11,109 +8,16 @@ import {
   CardFooter,
   Error,
   ListPagination,
-  Spinner,
   Table,
 } from '../../../components';
 
 import { TrTableInvoicesList } from './components/TrTableList';
 import { Loading } from '../../components';
 
-const INVOICES_QUERY = `
-query fetchInvoices(
-  $filters: InvoiceFilters,
-  $pagination: Pagination
-) {
-  invoices(
-    filters: $filters
-    pagination: $pagination
-  ) {
-    totalCount
-    invoices {
-      ...invoiceFragment
-    }
-  }
-}
-fragment invoiceFragment on Invoice {
-  id: invoiceId
-  status
-  dateCreated
-  dateIssued
-  dateAccepted
-  referenceNumber
-  cancelledInvoiceReference
-  payer {
-    ...payerFragment
-  }
-  invoiceItem {
-    id
-    price
-    rate
-    vat
-    vatnote
-    dateCreated
-    coupons {
-      ...couponFragment
-    }
-    waivers {
-      ...waiverFragment
-    }
-    article {
-      ...articleFragment
-    }
-  }
-  creditNote {
-    ...creditNoteFragment
-  }
-}
-fragment payerFragment on Payer {
-  id
-  type
-  name
-  email
-  vatId
-  organization
-  address {
-    ...addressFragment
-  }
-}
-fragment addressFragment on Address {
-  city
-  country
-  state
-  postalCode
-  addressLine1
-}
-fragment couponFragment on Coupon {
-  code
-  reduction
-}
-fragment waiverFragment on Waiver {
-  reduction
-  type_id
-}
-fragment articleFragment on Article {
-  id
-  title
-  created
-  articleType
-  authorCountry
-  authorEmail
-  customId
-  journalTitle
-  authorSurname
-  authorFirstName
-  journalTitle
-}
-fragment creditNoteFragment on Invoice {
-  invoiceId
-  dateCreated
-  cancelledInvoiceReference
-  referenceNumber
-}
-`;
+import { INVOICES_QUERY, } from './graphql';
 
-const RecentInvoicesList = (props) => {
-  const { filters, pagination: defaultPaginator } = props;
+const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
+  const { pagination: defaultPaginator } = props;
 
   const [pagination] = useLocalStorage(
     'invoicesListPagination',
@@ -148,11 +52,6 @@ const RecentInvoicesList = (props) => {
 
   if (error) return <Error data={error} />;
 
-  // const offset = pagination.offset * pagination.limit;
-  // if (data?.length > 0 && offset >= data?.length) {
-  //   pagination = Object.assign({}, paginator);
-  // }
-
   return (
     <Card className='mb-0'>
       {/* START Table */}
@@ -160,7 +59,6 @@ const RecentInvoicesList = (props) => {
         <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
-              {/* <th className='align-middle bt-0'>#</th> */}
               <th className='align-middle bt-0'>Status</th>
               <th className='align-middle bt-0'>Reference</th>
               <th className='align-middle bt-0'>Manuscript Custom ID</th>
@@ -169,7 +67,6 @@ const RecentInvoicesList = (props) => {
               <th className='align-middle bt-0'>Journal Title</th>
               <th className='align-middle bt-0'>Manuscript Title</th>
               <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
-              {/* <th className='align-middle bt-0 text-right'>Actions</th> */}
             </tr>
           </thead>
           <tbody>
@@ -189,6 +86,22 @@ const RecentInvoicesList = (props) => {
       </CardFooter>
     </Card>
   );
+};
+
+interface RecentInvoicesListProps {
+  pagination: {
+    page: number;
+    offset: number;
+    limit: number;
+  };
+  filters: {
+    invoiceStatus: string[];
+    transactionStatus: string[];
+    journalId: string[];
+    referenceNumber: string;
+    customId: string;
+  };
+  setPage(key: string, value: string | boolean | any[]): void;
 };
 
 export default RecentInvoicesList;

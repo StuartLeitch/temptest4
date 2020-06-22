@@ -16,13 +16,13 @@ import {
 
 import { CouponMode } from '../../types';
 
-const Reduction = ({
+const Reduction: React.FC<ReductionProps> = ({
   value,
   disabled = false,
   helper = '',
   label = 'Reduction',
   mode,
-}: ReductionProps) => {
+}) => {
   const [isTouched, setTouched] = useState(false);
 
   const chosenContext =
