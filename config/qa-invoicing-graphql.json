@@ -38,7 +38,7 @@
   "DB_LOGGING": true,
   "DB_MIGRATIONS_DIR": "/migrations",
   "DB_SEEDS_DIR": "/seeds",
-  "DEFAULT_MESSAGE_ATTRIBUTES": "{\"type\": \"phenom\"}",
+  "DEFAULT_MESSAGE_ATTRIBUTES": "{\"type\": \"qa\"}",
   "DOI_NUMBER": "10.1155",
   "EMAIL_REMINDERS_QUEUE": "email-reminders",
   "EVENT_NAMESPACE": "pen",
