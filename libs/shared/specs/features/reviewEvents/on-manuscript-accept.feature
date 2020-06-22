@@ -6,4 +6,4 @@ Feature: On Manuscript Accept
         And The Author is from a Waived Country
         When A manuscript accept event is published
         Then The Transaction associated with the manuscript should be ACTIVE
-        And The Invoice Item associated with the manuscript should have the price of 950
+        And The Invoice Item associated with the manuscript should have the price of 0
