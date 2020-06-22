@@ -55,7 +55,7 @@ const Details: React.FC = () => {
     return <div>Something Bad Happened</div>;
 
   const { invoice, getPaymentMethods } = data;
-  const { status, id: invoiceId } = invoice;
+  const { status, id: invoiceId, transaction } = invoice;
 
   console.info(invoice);
 
@@ -193,6 +193,13 @@ const Details: React.FC = () => {
                     Apply Coupon
                   </Button>
                 )}
+
+                {transaction.status === 'ACTIVE' && status === 'DRAFT' && (
+                  <Link to={`/invoices/split-invoice/${invoiceId}`}>
+                    <Button color='twitter' className='ml-2'>Split Invoice</Button>
+                  </Link>
+                )}
+
               </ButtonToolbar>
             </div>
           </Col>
