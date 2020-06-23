@@ -1,24 +1,20 @@
-import { Manuscript } from './../../../src/lib/modules/manuscripts/domain/Manuscript';
-// import { transactions } from './../../../../../apps/invoicing-graphql/src/graphql/resolvers/transactions';
 import { expect } from 'chai';
 import { Given, When, Then, BeforeAll } from 'cucumber';
 
-import { Result } from '../../../src/lib/core/logic/Result';
 import { Roles } from '../../../src/lib/modules/users/domain/enums/Roles';
 
 import { Invoice } from '../../../src/lib/modules/invoices/domain/Invoice';
 import { InvoiceItem } from '../../../src/lib/modules/invoices/domain/InvoiceItem';
 import { InvoiceStatus } from '../../../src/lib/modules/invoices/domain/Invoice';
-import { InvoiceId } from '../../../src/lib/modules/invoices/domain/InvoiceId';
 import { InvoiceMap } from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceItemMap } from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { Manuscript } from './../../../src/lib/modules/manuscripts/domain/Manuscript';
 import { SoftDeleteDraftTransactionUsecase } from '../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import { DeleteTransactionContext } from '../../../src/lib/modules/transactions/usecases/deleteTransaction/deleteTransaction';
 import {
   Transaction,
   TransactionStatus,
 } from '../../../src/lib/modules/transactions/domain/Transaction';
-import { TransactionId } from '../../../src/lib/modules/transactions/domain/TransactionId';
 import { TransactionMap } from './../../../src/lib/modules/transactions/mappers/TransactionMap';
 import { MockTransactionRepo } from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
@@ -73,7 +69,6 @@ BeforeAll(function () {
   const title = 'manuscript-title1';
   const articleTypeId = 'article-type-id';
   const authorEmail = 'author@email.com';
-  const authorCountry = 'MD';
   const authorSurname = 'Author Surname';
   const journalId = 'journal-id1';
 
@@ -82,7 +77,6 @@ BeforeAll(function () {
     title,
     articleTypeId,
     authorEmail,
-    authorCountry,
     authorSurname,
     journalId: journalId,
   });

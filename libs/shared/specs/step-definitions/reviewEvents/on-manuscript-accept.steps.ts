@@ -7,10 +7,7 @@ import { InvoiceItem } from '../../../src/lib/modules/invoices/domain/InvoiceIte
 import { InvoiceStatus } from '../../../src/lib/modules/invoices/domain/Invoice';
 import { CatalogItem } from './../../../src/lib/modules/journals/domain/CatalogItem';
 import { Article } from '../../../src/lib/modules/manuscripts/domain/Article';
-import {
-  Waiver,
-  WaiverType,
-} from '../../../src/lib/modules/waivers/domain/Waiver';
+import { Waiver } from '../../../src/lib/modules/waivers/domain/Waiver';
 import {
   Transaction,
   TransactionStatus,
@@ -144,8 +141,9 @@ Given(/^The APC Catalog Item has a price of (\d+)$/, async function (
   catalogItem = CatalogMap.toDomain({
     journalId,
     type: 'APC',
-    price: price,
-    journalTile: 'manuscript-title',
+    amount: price,
+    currency: 'USD',
+    journalTitle: 'manuscript-title',
   });
   mockCatalogRepo.save(catalogItem);
 });
