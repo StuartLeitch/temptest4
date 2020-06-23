@@ -11,30 +11,30 @@ import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/lo
 import { MockEditorRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
 import { MockCatalogRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 
-import { JournalEditorRemovedHandler } from '../../../src/queue_service/handlers/JournalEditorRemoved';
-import * as JournalEditorRemovedData from './JournalEditorRemoved_2.json';
+import { JournalUpdatedHandler } from '../../../src/queue_service/handlers/JournalUpdated';
+import * as JournalUpdatedData from './JournalUpdated.json';
 
-function getRandom(arr: string[], n: number) {
-  const result = new Array(n);
-  let len = arr.length;
-  const taken = new Array(len);
+// function getRandom(arr: string[], n: number) {
+//   const result = new Array(n);
+//   let len = arr.length;
+//   const taken = new Array(len);
 
-  if (n > len) {
-    throw new RangeError('getRandom: more elements taken than available');
-  }
+//   if (n > len) {
+//     throw new RangeError('getRandom: more elements taken than available');
+//   }
 
-  while (n--) {
-    const x = Math.floor(Math.random() * len);
-    result[n] = arr[x in taken ? taken[x] : x];
-    taken[x] = --len in taken ? taken[len] : len;
-  }
+//   while (n--) {
+//     const x = Math.floor(Math.random() * len);
+//     result[n] = arr[x in taken ? taken[x] : x];
+//     taken[x] = --len in taken ? taken[len] : len;
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
-const { handler } = JournalEditorRemovedHandler;
+const { handler } = JournalUpdatedHandler;
 
-const feature = loadFeature('./journalEditorRemoved.feature', {
+const feature = loadFeature('./journalUpdated.feature', {
   loadRelativePath: true,
 });
 
@@ -80,8 +80,8 @@ defineFeature(feature, (test) => {
 
         await mockCatalogRepo.save(
           CatalogMap.toDomain({
-            // journalId,
-            journalId: JournalEditorRemovedData.id,
+            journalId,
+            // journalId: JournalEditorRemovedData.id,
             type: 'mock',
             amount: 666,
           })
