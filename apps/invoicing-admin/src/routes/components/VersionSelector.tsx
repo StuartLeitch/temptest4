@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import fetch from 'node-fetch';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -13,7 +13,7 @@ import {
 
 const SERVICE_URL = 'http://dashboards.webkom.co:8000';
 
-export class VersionSelector extends React.Component {
+export class VersionSelector extends React.Component<VersionSelectorProps, VersionSelectorState> {
   static propTypes = {
     dashboard: PropTypes.string,
     down: PropTypes.bool,
@@ -23,7 +23,7 @@ export class VersionSelector extends React.Component {
     sidebar: PropTypes.bool
   };
 
-  constructor(props) {
+  constructor(props: VersionSelectorProps) {
     super(props);
 
     this.state = {
@@ -52,7 +52,7 @@ export class VersionSelector extends React.Component {
     this.fetchVersions();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: VersionSelectorProps) {
     if (prevProps.dashboard !== this.props.dashboard) {
       this.fetchVersions();
     }
@@ -131,3 +131,22 @@ export class VersionSelector extends React.Component {
     );
   }
 }
+
+interface VersionSelectorProps {
+  dashboard?: string;
+  down?: boolean;
+  compact?: boolean;
+  className?: string;
+  sidebar?: boolean;
+  render(currentVersion: Version): ReactNode | null;
+};
+
+interface Version {
+  [key: string]: string;
+};
+
+interface VersionSelectorState {
+  versions: Version[] | [];
+  isError: boolean;
+  render(currentVersion: Version): ReactNode | null;
+};

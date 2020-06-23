@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import _ from 'lodash';
 
-const Avatar = (props) => {
+const Avatar: React.FC<AvatarProps> & { Image?: any, Font?: any } =
+  (props) => {
     const avatarClass = classNames(
         'avatar',
         `avatar--${ props.size }`,
         props.className
     );
     const addOnsdArr = React.Children.toArray(props.addOns);
-    const badge = _.find(addOnsdArr, (avatarAddOn) =>
+    const badge = _.find(addOnsdArr, (avatarAddOn: any) =>
         avatarAddOn.type.addOnId === "avatar--badge");
-    const icons = _.filter(addOnsdArr, (avatarAddOn) =>
+    const icons = _.filter(addOnsdArr, (avatarAddOn: any) =>
         avatarAddOn.type.addOnId === "avatar--icon");
-    const isNested = _.reduce(addOnsdArr, (acc, avatarAddOn) =>
+    const isNested = _.reduce(addOnsdArr, (acc, avatarAddOn: any) =>
         acc || !!avatarAddOn.props.small, false);
 
     return (
@@ -48,7 +49,7 @@ const Avatar = (props) => {
                                 </div>
                             )
                     }
-                })() 
+                })()
             }
             <div className='avatar__content'>
                 { props.children }
@@ -56,6 +57,7 @@ const Avatar = (props) => {
         </div>
     );
 };
+
 Avatar.propTypes = {
     size: PropTypes.string,
     children: PropTypes.node.isRequired,
@@ -66,6 +68,17 @@ Avatar.propTypes = {
 Avatar.defaultProps = {
     size: "md",
     style: {}
+};
+
+interface AvatarProps {
+  addOns?: ReactNode;
+  children: ReactNode;
+  src?: string;
+  placeholder?: ReactNode;
+  alt?: string;
+  className?: string;
+  size?: string;
+  style?: any;
 };
 
 export { Avatar };

@@ -19,13 +19,13 @@ import { GENERATE_COUPON_CODE_QUERY } from '../../graphql/queries';
 const MAX_LENGTH = 10;
 const CODE_PATTERN = /^([A-Z0-9]{6,10})$/;
 
-const Code = ({
+const Code: React.FC<CodeProps> = ({
   onChangeCallback,
   label = '',
   disabled = false,
   value = '',
   mode,
-}: CodeProps) => {
+}) => {
   const [inputValue, setInputValue] = useState(value);
   const [isTouched, setTouched] = useState(false);
   const [isValid, setValid] = useState(false);
@@ -119,10 +119,10 @@ const Code = ({
 
 interface CodeProps {
   value?: string;
-  onChangeCallback?: Function;
   label?: string;
   disabled?: boolean;
   mode?: CouponMode;
+  onChangeCallback?(value: string, isValid: boolean): void;
 }
 
 export default Code;

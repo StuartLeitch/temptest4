@@ -16,14 +16,9 @@ fragment journalFragment on Journal {
 }
 `;
 
-export const JournalsSelections = (props) => {
-  const { /*loading, error,*/ data } = useQuery(JOURNALS_QUERY);
-  // console.info(props.defaultSelected);
-  // const defaultSelected = data?.journals.filter((j: any) => {
-  //   console.info(j.journalId);
-  //   return props.defaultSelected.includes(j.journalId);
-  // });
-  // console.info(defaultSelected);
+export const JournalsSelections: React.FC<JournalSelectionsProps> = props => {
+  const { data } = useQuery(JOURNALS_QUERY);
+
   return (
     <Typeahead
       {...props}
@@ -38,4 +33,12 @@ export const JournalsSelections = (props) => {
       placeholder='Enter a journal title&hellip;'
     />
   );
+};
+
+interface Journal {
+  journalId: string;
+};
+interface JournalSelectionsProps {
+  selected: Journal[];
+  onChange(selections: Journal[]): void;
 };
