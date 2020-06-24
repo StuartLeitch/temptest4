@@ -23,8 +23,9 @@ const SplitInvoice: React.FC = () => {
   const [payers, setPayers] = useState({});
   const [invoiceValue, setInvoiceValue] = useState(0);
   const [isTotalAmountReached, setIsTotalAmountReached] = useState(true);
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
-  const [payerId, setPayerId] = useState(0);
+  const [isFormInvalid, setIsFormInvalid] = useState(true);
+  const [isAmountEquallySplit, setIsAmountEquallySplit] = useState(true);
+  const [payerId, setPayerId] = useState(2);
 
   const { id } = useParams();
 
@@ -43,14 +44,20 @@ const SplitInvoice: React.FC = () => {
       const fullName = `${authorFirstName} ${authorSurname}`;
 
       const totalCharges = getTotalCharges();
+      const splitCharges = (totalCharges / 2).toFixed(2);
 
       setInvoiceValue(totalCharges);
       setPayers({...payers,
-        [payerId]: { fullName, email: authorEmail, amountToPay: totalCharges.toFixed(2) }
-      });
-      setPayerId(payerId + 1);
+        0: { fullName, email: authorEmail, amountToPay: splitCharges },
+        1: { fullName: '', email: '', amountToPay: splitCharges }
+        }
+      );
     }
   }, [data]);
+
+  useEffect(() => {
+    validateForm();
+  }, [payers, isAmountEquallySplit]);
 
   const getTotalCharges = () => {
     const { vat, coupons, waivers, price } = data.invoice?.invoiceItem;
@@ -74,40 +81,43 @@ const SplitInvoice: React.FC = () => {
   };
 
   const splitEqually = () => {
-    const individualAmount = (invoiceValue / Object.values(payers).length).toString();
+    const individualAmount = (invoiceValue / Object.values(payers).length).toFixed(2);
 
     const newPayers = {...payers};
     Object.values(newPayers).map((payer: Payer) => payer.amountToPay = individualAmount);
 
     setPayers(newPayers);
-    validateForm(newPayers);
+    setIsAmountEquallySplit(true);
   };
 
   const addPayer = () => {
-    setPayers({...payers, [payerId]: {
+    const newPayers = {...payers, [payerId]: {
       fullName: '',
       email: '',
       amountToPay: ''
-    }});
+    }}
+    setPayers(newPayers);
     setIsFormInvalid(true);
     setPayerId(payerId + 1);
   };
 
   const removePayer = key => {
     const newPayers = {...payers};
+    const amountRemainsEquallySplit = !newPayers[key];
+    setIsAmountEquallySplit(amountRemainsEquallySplit);
     delete newPayers[key];
 
     setPayers(newPayers);
-    validateForm(newPayers);
   };
 
   const update = (key: string, field: string, value: string) => {
     const newPayers = {...payers};
-
+    if(field === 'amountToPay') {
+      setIsAmountEquallySplit(false);
+    }
     newPayers[key] = {...payers[key], [field]: value};
 
     setPayers(newPayers);
-    validateForm(newPayers);
   };
 
   const isInsertedAmountValid = (amount) => {
@@ -122,12 +132,12 @@ const SplitInvoice: React.FC = () => {
 
   const hasEmptyFields = ({ fullName, email, amountToPay }) => !fullName || !email || !amountToPay
 
-  const validateForm = payers => {
+  const validateForm = () => {
     const totalInsertedAmount = Object.values(payers as Payers).reduce(
       (acc: number, payer: Payer) => acc + parseFloat(payer.amountToPay || '0'), 0
     );
 
-    if (totalInsertedAmount !== invoiceValue) {
+    if (!isAmountEquallySplit && (totalInsertedAmount !== invoiceValue)) {
       setIsFormInvalid(true);
       setIsTotalAmountReached(false);
     } else {
@@ -162,12 +172,12 @@ const SplitInvoice: React.FC = () => {
           <i className='fas fa-angle-left mr-2' /> Back to invoice
       </Link>
 
-      <HeaderMain title='Split invoice' className='mb-3 mt-0' />
+      <HeaderMain title='Split invoice' className='mb-2 mt-0' />
 
       <Row className='h6'>
-        <Col>
+        <Col className='align-middle h4 text-dark font-weight-bold'>
           Amount to pay:
-          <span className='text-success font-weight-bold'>
+          <span className='text-success'>
             {` ${numeral(invoiceValue.toFixed(2)).format('$0.00')}`}
           </span>
         </Col>
@@ -175,10 +185,10 @@ const SplitInvoice: React.FC = () => {
 
       <Row className='mb-3'>
         <Col className='align-self-end'>
-          Define the payers and amount
+          Define the payer and the amount for each invoice
         </Col>
         <Col className='text-right'>
-          <Button color='secondary' onClick={addPayer}>
+          <Button color='outline-secondary' onClick={addPayer}>
             Add Payer
           </Button>
         </Col>
@@ -194,9 +204,11 @@ const SplitInvoice: React.FC = () => {
               <CardBody className='pt-0'>
                 <Row>
                   <Col className='text-right'>
-                    <Button color='link' className='p-0' onClick={() => removePayer(key)}>
-                      <i className='fas fa-times'></i>
-                    </Button>
+                    {index > 1 &&
+                      <Button color='link' className='p-0' onClick={() => removePayer(key)}>
+                        <i className='fas fa-times'></i>
+                      </Button>
+                    }
                   </Col>
                 </Row>
                 <Row>
@@ -208,11 +220,7 @@ const SplitInvoice: React.FC = () => {
                 </Row>
                 <Row>
                   <PayerInfo
-                    payer={{
-                      ...payers[key],
-                      amountToPay: payers[key].amountToPay ?
-                        parseFloat(payers[key].amountToPay).toFixed(2) : ''
-                    }}
+                    payer={{...payers[key]}}
                     onChange={(field, value) => update(key, field, value)}
                     invoiceValue={invoiceValue}
                   />
@@ -223,8 +231,8 @@ const SplitInvoice: React.FC = () => {
         })}
         <Col className='mt-3 mb-4'>
           <Row>
-           <Button className='mr-3' onClick={() => splitEqually()}>Split Equally</Button>
-            <Button disabled={isFormInvalid || !isTotalAmountReached} type='submit'>
+           <Button color='outline-secondary link' className='mr-2' onClick={() => splitEqually()}>Split Equally</Button>
+            <Button color='primary' disabled={isFormInvalid || !isTotalAmountReached} type='submit'>
               Confirm & Send Invoices
             </Button>
           </Row>

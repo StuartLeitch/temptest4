@@ -33,7 +33,7 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
 
   const isInsertedAmountValid = amount => {
     const validation = /^(([1-9][0-9]*(\.[0-9]{1,2})?))$/;
-    return validation.test(amount as string) && amount <= invoiceValue;
+    return validation.test(amount) && amount <= invoiceValue;
   };
 
   const isEmailValid = email => {

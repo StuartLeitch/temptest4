@@ -196,7 +196,7 @@ const Details: React.FC = () => {
 
                 {transaction.status === 'ACTIVE' && status === 'DRAFT' && (
                   <Link to={`/invoices/split-invoice/${invoiceId}`}>
-                    <Button color='twitter' className='ml-2'>Split Invoice</Button>
+                    <Button color="secondary" className='ml-2'>Split Invoice</Button>
                   </Link>
                 )}
 
