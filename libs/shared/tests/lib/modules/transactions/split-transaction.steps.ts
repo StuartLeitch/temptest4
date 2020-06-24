@@ -1,153 +1,119 @@
-// import { defineFeature, loadFeature } from 'jest-cucumber';
+// import { expect } from 'chai';
+// import { Given, When, Then, Before, After } from 'cucumber';
 
-// import { UniqueEntityID } from '../../src/lib/core/domain/UniqueEntityID';
-// import { Roles } from '../../src/lib/modules/users/domain/enums/Roles';
+// import { UniqueEntityID } from '../../../../src/lib/core/domain/UniqueEntityID';
+// import { Roles } from '../../../../src/lib/modules/users/domain/enums/Roles';
 
-// import { Payer } from '../../src/lib/modules/payers/domain/Payer';
-// import { PayerName } from '../../src/lib/modules/payers/domain/PayerName';
-// import { PayerType } from '../../src/lib/modules/payers/domain/PayerType';
+// import { Payer } from '../../../../src/lib/modules/payers/domain/Payer';
+// import { PayerName } from '../../../../src/lib/modules/payers/domain/PayerName';
+// import { PayerType } from '../../../../src/lib/modules/payers/domain/PayerType';
 // import {
 //   Invoice,
 //   InvoiceStatus,
-// } from '../../src/lib/modules/invoices/domain/Invoice';
+// } from '../../../../src/lib/modules/invoices/domain/Invoice';
 // import {
 //   GetTransactionUsecase,
 //   GetTransactionContext,
-// } from '../../src/lib/modules/transactions/usecases/getTransaction/getTransaction';
+// } from '../../../../src/lib/modules/transactions/usecases/getTransaction/getTransaction';
 
-// import { MockTransactionRepo } from '../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+// import { MockTransactionRepo } from '../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 // import {
 //   Transaction,
 //   TransactionStatus,
-// } from '../../src/lib/modules/transactions/domain/Transaction';
-// import { TransactionAmount } from '../../src/lib/modules/transactions/domain/TransactionAmount';
-
-// const feature = loadFeature('./specs/features/split-transaction.feature', {
-//   loadRelativePath: true,
-// });
+// } from '../../../../src/lib/modules/transactions/domain/Transaction';
+// import { TransactionAmount } from '../../../../src/lib/modules/transactions/domain/TransactionAmount';
 
 // const defaultContext: GetTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
-// defineFeature(feature, (test) => {
-//   let mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
+// const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
 
-//   let payer1: Payer;
-//   let payer2: Payer;
-//   let transactionId: string;
-//   let invoiceId: string;
+// let payer1: Payer;
+// let payer2: Payer;
+// let transactionId: string;
+// let invoiceId: string;
 
-//   let getTransactionUsecase: GetTransactionUsecase = new GetTransactionUsecase(
-//     mockTransactionRepo
+// const getTransactionUsecase: GetTransactionUsecase = new GetTransactionUsecase(
+//   mockTransactionRepo
+// );
+// let retrievedTransaction: Transaction;
+
+// Before(() => {
+//   transactionId = 'test-transaction';
+//   const transaction = Transaction.create(
+//     {
+//       status: TransactionStatus.DRAFT,
+//     },
+//     new UniqueEntityID(transactionId)
+//   ).getValue();
+
+//   mockTransactionRepo.save(transaction);
+// });
+// After(() => {
+//   retrievedTransaction.clearInvoices();
+// });
+
+// Given('As System editing Transaction Details', async () => {
+//   const retrievedTransactionResult = await getTransactionUsecase.execute(
+//     {
+//       transactionId,
+//     },
+//     defaultContext
 //   );
-//   let retrievedTransaction: Transaction;
+//   console.log('Retrieved transaction', retrievedTransactionResult);
+//   retrievedTransaction = retrievedTransactionResult.getValue();
+// });
 
-//   beforeEach(() => {
-//     transactionId = 'test-transaction';
-//     const transaction = Transaction.create(
-//       {
-//         status: TransactionStatus.DRAFT,
-//       },
-//       new UniqueEntityID(transactionId)
-//     ).getValue();
+// When(/^Transaction value is (\d+)$/, (transactionAmount: string) => {
+//   retrievedTransaction.amount = TransactionAmount.create(
+//     parseInt(transactionAmount, 10)
+//   ).getValue();
+// });
 
-//     mockTransactionRepo.save(transaction);
-//   });
+// When(/^I add a new Payer with the id "([\w-]+)"$/, async (payerId: string) => {
+//   payer1 = Payer.create(
+//     {
+//       name: PayerName.create('Foo1').getValue(),
+//       surname: PayerName.create('Bar1').getValue(),
+//       type: PayerType.create('FooBar1').getValue(),
+//     },
+//     new UniqueEntityID(payer1Id)
+//   ).getValue();
+//   invoiceId = 'test-invoice1';
+//   const invoice1 = Invoice.create(
+//     {
+//       status: InvoiceStatus.DRAFT,
+//       payerId: payer1.payerId,
+//     },
+//     new UniqueEntityID(invoiceId)
+//   ).getValue();
+//   retrievedTransaction.addInvoice(invoice1);
+// });
 
-//   afterEach(() => {
-//     retrievedTransaction.clearInvoices();
-//   });
-
-//   test('Adjust two ways split transaction', ({ given, when, and, then }) => {
-//     given('As System editing Transaction Details', async () => {
-//       const retrievedTransactionResult = await getTransactionUsecase.execute(
-//         {
-//           transactionId,
-//         },
-//         defaultContext
-//       );
-
-//       retrievedTransaction = retrievedTransactionResult.getValue();
-//     });
-
-//     when(/^Transaction value is (\d+)$/, (transactionAmount: string) => {
-//       retrievedTransaction.amount = TransactionAmount.create(
-//         parseInt(transactionAmount, 10)
-//       ).getValue();
-//     });
-
-//     and('I add a new Payer', async () => {
-//       const payer1Id = 'test-payer1';
-//       payer1 = Payer.create(
-//         {
-//           name: PayerName.create('Foo1').getValue(),
-//           surname: PayerName.create('Bar1').getValue(),
-//           type: PayerType.create('FooBar1').getValue(),
-//         },
-//         new UniqueEntityID(payer1Id)
-//       ).getValue();
-
-//       invoiceId = 'test-invoice1';
-//       const invoice1 = Invoice.create(
-//         {
-//           status: InvoiceStatus.DRAFT,
-//           payerId: payer1.payerId,
-//         },
-//         new UniqueEntityID(invoiceId)
-//       ).getValue();
-
-//       retrievedTransaction.addInvoice(invoice1);
-//     });
-
-//     then(
-//       /^the new draft Invoice value should be (\d+)$/,
-//       async (draftInvoiceValue: string) => {
-//         expect(retrievedTransaction.invoices.length).toEqual(1);
-//         const [associatedInvoice] = retrievedTransaction.invoices;
-
-//         expect(associatedInvoice.netAmount).toEqual(
-//           parseInt(draftInvoiceValue, 10)
-//         );
-//       }
+// Then(
+//   /^the new draft Invoice value should be (\d+)$/,
+//   async (draftInvoiceValue: string) => {
+//     expect(retrievedTransaction.invoices.length).toEqual(1);
+//     const [associatedInvoice] = retrievedTransaction.invoices;
+//     expect(associatedInvoice.netAmount).toEqual(
+//       parseInt(draftInvoiceValue, 10)
 //     );
+//   }
+// );
 
-//     when('I add a new Payer', async () => {
-//       const payer2Id = 'test-payer2';
-//       payer2 = Payer.create(
-//         {
-//           name: PayerName.create('Foo2').getValue(),
-//           surname: PayerName.create('Bar2').getValue(),
-//           type: PayerType.create('FooBar2').getValue(),
-//         },
-//         new UniqueEntityID(payer2Id)
-//       ).getValue();
+// Then('Another new draft Invoice should be created', () => {
+// expect(retrievedTransaction.invoices.length).toEqual(2);
+// });
 
-//       invoiceId = 'test-invoice2';
-//       const invoice2 = Invoice.create(
-//         {
-//           status: InvoiceStatus.DRAFT,
-//           payerId: payer2.payerId,
-//         },
-//         new UniqueEntityID(invoiceId)
-//       ).getValue();
+// Then(
+//   /^Both invoices should have value of (\d+)$/,
+//   (splitInvoicesValue: string) => {
+//     const [invoice1, invoice2] = retrievedTransaction.invoices;
+//     expect(invoice1.netAmount).toEqual(parseInt(splitInvoicesValue, 10));
+//     expect(invoice2.netAmount).toEqual(parseInt(splitInvoicesValue, 10));
+//   }
+// );
 
-//       retrievedTransaction.addInvoice(invoice2);
-//     });
-
-//     then('Another new draft Invoice should be created', () => {
-//       expect(retrievedTransaction.invoices.length).toEqual(2);
-//     });
-
-//     and(
-//       /^Both invoices should have value of (\d+)$/,
-//       (splitInvoicesValue: string) => {
-//         const [invoice1, invoice2] = retrievedTransaction.invoices;
-
-//         expect(invoice1.netAmount).toEqual(parseInt(splitInvoicesValue, 10));
-//         expect(invoice2.netAmount).toEqual(parseInt(splitInvoicesValue, 10));
-//       }
-//     );
-//   });
-
+// defineFeature(feature, (test) => {
 //   test('Adjust three ways split transaction', ({ given, when, and, then }) => {
 //     given('As System editing Transaction Details', async () => {
 //       const retrievedTransactionResult = await getTransactionUsecase.execute(

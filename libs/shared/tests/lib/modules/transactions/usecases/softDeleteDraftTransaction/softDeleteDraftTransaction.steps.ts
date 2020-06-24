@@ -1,28 +1,28 @@
 import { expect } from 'chai';
 import { Given, When, Then, BeforeAll } from 'cucumber';
 
-import { Roles } from '../../../src/lib/modules/users/domain/enums/Roles';
+import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
-import { Invoice } from '../../../src/lib/modules/invoices/domain/Invoice';
-import { InvoiceItem } from '../../../src/lib/modules/invoices/domain/InvoiceItem';
-import { InvoiceStatus } from '../../../src/lib/modules/invoices/domain/Invoice';
-import { InvoiceMap } from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
-import { InvoiceItemMap } from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
-import { Manuscript } from './../../../src/lib/modules/manuscripts/domain/Manuscript';
-import { SoftDeleteDraftTransactionUsecase } from '../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
-import { DeleteTransactionContext } from '../../../src/lib/modules/transactions/usecases/deleteTransaction/deleteTransaction';
+import { Invoice } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
+import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { Manuscript } from '../../../../../../src/lib/modules/manuscripts/domain/Manuscript';
+import { SoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+import { DeleteTransactionContext } from '../../../../../../src/lib/modules/transactions/usecases/deleteTransaction/deleteTransaction';
 import {
   Transaction,
   TransactionStatus,
-} from '../../../src/lib/modules/transactions/domain/Transaction';
-import { TransactionMap } from './../../../src/lib/modules/transactions/mappers/TransactionMap';
-import { MockTransactionRepo } from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+} from '../../../../../../src/lib/modules/transactions/domain/Transaction';
+import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
+import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
-import { MockInvoiceRepo } from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockInvoiceItemRepo } from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { ArticleRepoContract } from '../../../src/lib/modules/manuscripts/repos/articleRepo';
-import { MockArticleRepo } from '../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { ArticleMap } from '../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscripts/repos/articleRepo';
+import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
 
 const defaultContext: DeleteTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 

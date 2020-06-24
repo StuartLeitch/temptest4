@@ -1,13 +1,13 @@
 # Feature: Split Transaction
 
-#   Scenario: Adjust two ways split transaction
-#     Given As System editing Transaction Details
-#     When Transaction value is 100
-#     And I add a new Payer
-#     Then the new draft Invoice value should be 100
-#     When I add a new Payer
-#     Then Another new draft Invoice should be created
-#     And Both invoices should have value of 50
+#     Scenario: Adjust two ways split transaction
+#         Given As System editing Transaction Details
+#         When Transaction value is 100
+#         And I add a new Payer with the id "payer1"
+#         Then the new draft Invoice value should be 100
+#         When I add a new Payer with the id "payer2"
+#         Then Another new draft Invoice should be created
+#         And Both invoices should have value of 50
 
 #   Scenario: Adjust three ways split transaction
 #     Given As System editing Transaction Details

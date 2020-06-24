@@ -1,53 +1,53 @@
 import { expect } from 'chai';
 import { Given, When, Then, BeforeAll } from 'cucumber';
 
-import { Roles } from '../../../src/lib/modules/users/domain/enums/Roles';
-import { Invoice } from '../../../src/lib/modules/invoices/domain/Invoice';
-import { InvoiceItem } from '../../../src/lib/modules/invoices/domain/InvoiceItem';
-import { InvoiceStatus } from '../../../src/lib/modules/invoices/domain/Invoice';
-import { CatalogItem } from './../../../src/lib/modules/journals/domain/CatalogItem';
-import { Article } from '../../../src/lib/modules/manuscripts/domain/Article';
-import { Waiver } from '../../../src/lib/modules/waivers/domain/Waiver';
+import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
+import { Invoice } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
+import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import { CatalogItem } from '../../../../../../src/lib/modules/journals/domain/CatalogItem';
+import { Article } from '../../../../../../src/lib/modules/manuscripts/domain/Article';
+import { Waiver } from '../../../../../../src/lib/modules/waivers/domain/Waiver';
 import {
   Transaction,
   TransactionStatus,
-} from '../../../src/lib/modules/transactions/domain/Transaction';
+} from '../../../../../../src/lib/modules/transactions/domain/Transaction';
 
-import { ArticleRepoContract } from '../../../src/lib/modules/manuscripts/repos/articleRepo';
-import { TransactionRepoContract } from './../../../src/lib/modules/transactions/repos/transactionRepo';
-import { InvoiceItemRepoContract } from './../../../src/lib/modules/invoices/repos/invoiceItemRepo';
-import { InvoiceRepoContract } from './../../../src/lib/modules/invoices/repos/invoiceRepo';
-import { CatalogRepoContract } from './../../../src/lib/modules/journals/repos/catalogRepo';
-import { WaiverRepoContract } from '../../../src/lib/modules/waivers/repos/waiverRepo';
-import { EditorRepoContract } from './../../../src/lib/modules/journals/repos/editorRepo';
-import { PayerRepoContract } from './../../../src/lib/modules/payers/repos/payerRepo';
-import { CouponRepoContract } from './../../../src/lib/modules/coupons/repos/couponRepo';
+import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscripts/repos/articleRepo';
+import { TransactionRepoContract } from '../../../../../../src/lib/modules/transactions/repos/transactionRepo';
+import { InvoiceItemRepoContract } from '../../../../../../src/lib/modules/invoices/repos/invoiceItemRepo';
+import { InvoiceRepoContract } from '../../../../../../src/lib/modules/invoices/repos/invoiceRepo';
+import { CatalogRepoContract } from '../../../../../../src/lib/modules/journals/repos/catalogRepo';
+import { WaiverRepoContract } from '../../../../../../src/lib/modules/waivers/repos/waiverRepo';
+import { EditorRepoContract } from '../../../../../../src/lib/modules/journals/repos/editorRepo';
+import { PayerRepoContract } from '../../../../../../src/lib/modules/payers/repos/payerRepo';
+import { CouponRepoContract } from '../../../../../../src/lib/modules/coupons/repos/couponRepo';
 
-import { InvoiceMap } from './../../../src/lib/modules/invoices/mappers/InvoiceMap';
-import { InvoiceItemMap } from './../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
-import { TransactionMap } from './../../../src/lib/modules/transactions/mappers/TransactionMap';
-import { CatalogMap } from './../../../src/lib/modules/journals/mappers/CatalogMap';
-import { ArticleMap } from '../../../src/lib/modules/manuscripts/mappers/ArticleMap';
-import { WaiverMap } from '../../../src/lib/modules/waivers/mappers/WaiverMap';
+import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
+import { CatalogMap } from '../../../../../../src/lib/modules/journals/mappers/CatalogMap';
+import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import { WaiverMap } from '../../../../../../src/lib/modules/waivers/mappers/WaiverMap';
 
-import { MockTransactionRepo } from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
-import { MockArticleRepo } from '../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { MockInvoiceRepo } from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockCatalogRepo } from '../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
-import { MockEditorRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
-import { MockInvoiceItemRepo } from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockWaiverRepo } from '../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { MockCouponRepo } from './../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
-import { MockPayerRepo } from './../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
-import { MockAddressRepo } from './../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
+import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import { MockEditorRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
+import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
+import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
 
-import { WaiverService } from '../../../src/lib/domain/services/WaiverService';
-import { EmailService } from './../../../src/lib/infrastructure/communication-channels/EmailService';
-import { VATService } from '../../../../../libs/shared/src/lib/domain/services/VATService';
+import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
+import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
+import { VATService } from '../../../../../../src/lib/domain/services/VATService';
 
-import { UpdateTransactionContext } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
-import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
-import { AddressRepoContract } from '../../../src/lib/modules/addresses/repos/addressRepo';
+import { UpdateTransactionContext } from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
+import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
+import { AddressRepoContract } from '../../../../../../src/lib/modules/addresses/repos/addressRepo';
 
 const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 

@@ -1,28 +1,28 @@
 import { expect } from 'chai';
 import { Given, When, Then, BeforeAll } from 'cucumber';
 
-import { Roles } from '../../../src/lib/modules/users/domain/enums/Roles';
+import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
 // * Domain imports
-import { InvoiceStatus } from '../../../src/lib/modules/invoices/domain/Invoice';
-import { InvoiceId } from './../../../src/lib/modules/invoices/domain/InvoiceId';
-import { TransactionId } from './../../../src/lib/modules/transactions/domain/TransactionId';
-import { TransactionStatus } from '../../../src/lib/modules/transactions/domain/Transaction';
-import { CatalogMap } from './../../../src/lib/modules/journals/mappers/CatalogMap';
+import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
+import { TransactionId } from '../../../../../../src/lib/modules/transactions/domain/TransactionId';
+import { TransactionStatus } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
+import { CatalogMap } from '../../../../../../src/lib/modules/journals/mappers/CatalogMap';
 
 // * Usecases imports
 import {
   CreateTransactionContext,
   CreateTransactionUsecase,
-} from '../../../src/lib/modules/transactions/usecases/createTransaction/createTransaction';
-import { CreateTransactionResponse } from './../../../src/lib/modules/transactions/usecases/createTransaction/createTransactionResponse';
+} from '../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransaction';
+import { CreateTransactionResponse } from '../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransactionResponse';
 
 // * Mock repos imports
-import { MockTransactionRepo } from '../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
-import { MockInvoiceRepo } from '../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockInvoiceItemRepo } from './../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockCatalogRepo } from './../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
-import { MockPausedReminderRepo } from '../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
+import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
 
 const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
