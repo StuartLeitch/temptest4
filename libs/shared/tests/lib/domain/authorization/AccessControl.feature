@@ -1,4 +1,6 @@
 Feature: Authorization
+  Users are allowed/denied to perform some actions
+  depending on the role he has
 
   Scenario Outline: Create Invoice (as Owner)
     Given A Transaction that I own

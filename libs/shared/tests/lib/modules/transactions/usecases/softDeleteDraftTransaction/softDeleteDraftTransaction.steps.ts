@@ -38,7 +38,8 @@ const usecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactio
   mockArticleRepo
 );
 
-const manuscriptId = 'manuscript-id';
+let manuscriptId;
+let journalId;
 
 let result: any;
 let transaction: Transaction;
@@ -46,38 +47,15 @@ let invoice: Invoice;
 let invoiceItem: InvoiceItem;
 let manuscript: Manuscript;
 
-BeforeAll(function () {
-  transaction = TransactionMap.toDomain({
-    status: TransactionStatus.DRAFT,
-  });
-  invoice = InvoiceMap.toDomain({
-    status: InvoiceStatus.DRAFT,
-    transactionId: transaction.transactionId.id.toString(),
-  });
-  invoiceItem = InvoiceItemMap.toDomain({
-    manuscriptId,
-    invoiceId: invoice.invoiceId.id.toString(),
-  });
-
-  invoice.addInvoiceItem(invoiceItem);
-  transaction.addInvoice(invoice);
-
-  mockTransactionRepo.save(transaction);
-  mockInvoiceRepo.save(invoice);
-  mockInvoiceItemRepo.save(invoiceItem);
-
-  const title = 'manuscript-title1';
-  const articleTypeId = 'article-type-id';
-  const authorEmail = 'author@email.com';
-  const authorSurname = 'Author Surname';
-  const journalId = 'journal-id1';
+Given(/^A journal "([\w-]+)" with a manuscript "([\w-]+)"$/, async function (
+  journalTestId: string,
+  manuscriptTestId: string
+) {
+  journalId = journalTestId;
+  manuscriptId = manuscriptTestId;
 
   manuscript = ArticleMap.toDomain({
     id: manuscriptId,
-    title,
-    articleTypeId,
-    authorEmail,
-    authorSurname,
     journalId: journalId,
   });
 
@@ -85,20 +63,41 @@ BeforeAll(function () {
 });
 
 Given(
-  'Invoicing listening to reject events emitted by Review',
-  async function () {
-    return;
+  /^A Invoice with a DRAFT Transaction and a Invoice Item tied to the manuscript "([\w-]+)"$/,
+  async function (manuscriptTestId: string) {
+    transaction = TransactionMap.toDomain({
+      status: TransactionStatus.DRAFT,
+    });
+
+    invoice = InvoiceMap.toDomain({
+      status: InvoiceStatus.DRAFT,
+      transactionId: transaction.transactionId.id.toString(),
+    });
+    invoiceItem = InvoiceItemMap.toDomain({
+      manuscriptId: manuscriptTestId,
+      invoiceId: invoice.invoiceId.id.toString(),
+    });
+
+    invoice.addInvoiceItem(invoiceItem);
+    transaction.addInvoice(invoice);
+
+    mockTransactionRepo.save(transaction);
+    mockInvoiceRepo.save(invoice);
+    mockInvoiceItemRepo.save(invoiceItem);
   }
 );
 
-When('A manuscript reject event is published', async () => {
-  result = await usecase.execute(
-    {
-      manuscriptId,
-    },
-    defaultContext
-  );
-});
+When(
+  /^SoftDeleteDraftTransactionUsecase is executed for manuscript "([\w-]+)"$/,
+  async (manuscriptTestId: string) => {
+    result = await usecase.execute(
+      {
+        manuscriptId: manuscriptTestId,
+      },
+      defaultContext
+    );
+  }
+);
 
 Then(
   'The DRAFT Transaction associated with the manuscript should be soft deleted',

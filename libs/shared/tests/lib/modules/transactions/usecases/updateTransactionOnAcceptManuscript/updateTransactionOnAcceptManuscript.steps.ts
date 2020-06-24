@@ -56,7 +56,7 @@ const mockInvoiceRepo: InvoiceRepoContract = new MockInvoiceRepo();
 const mockCatalogRepo: CatalogRepoContract = new MockCatalogRepo();
 const mockInvoiceItemRepo: InvoiceItemRepoContract = new MockInvoiceItemRepo();
 const mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
-const mockWaiverRepo: WaiverRepoContract = new MockWaiverRepo();
+const mockWaiverRepo = new MockWaiverRepo();
 const mockEditorRepo: EditorRepoContract = new MockEditorRepo();
 const mockAddressRepo: AddressRepoContract = new MockAddressRepo();
 const mockPayerRepo: PayerRepoContract = new MockPayerRepo();
@@ -98,92 +98,102 @@ let manuscript: Article;
 let result: any;
 let waiver: Waiver;
 
-const manuscriptId = 'manuscript-id';
-const journalId = 'journal-id';
+let manuscriptId;
+let journalId;
+let authorCountry;
+let price;
 
-BeforeAll(function () {
-  transaction = TransactionMap.toDomain({
-    status: TransactionStatus.DRAFT,
-    deleted: 0,
-    dateCreated: new Date(),
-    dateUpdated: new Date(),
-  });
-  invoice = InvoiceMap.toDomain({
-    status: InvoiceStatus.DRAFT,
-    transactionId: transaction.transactionId.id.toString(),
-  });
-  invoiceItem = InvoiceItemMap.toDomain({
-    manuscriptId,
-    invoiceId: invoice.invoiceId.id.toString(),
-  });
-  waiver = WaiverMap.toDomain({
-    type_id: 'WAIVED_COUNTRY',
-    reduction: 100,
-    isActive: true,
-  });
+// BeforeAll(function () {
 
-  invoice.addInvoiceItem(invoiceItem);
-  transaction.addInvoice(invoice);
+// });
 
-  mockWaiverRepo.save(waiver);
-  mockTransactionRepo.save(transaction);
-  mockInvoiceRepo.save(invoice);
-  mockInvoiceItemRepo.save(invoiceItem);
-});
-
-Given('Invoicing listening to events emitted by Review', async function () {
-  return;
-});
-
-Given(/^The APC Catalog Item has a price of (\d+)$/, async function (
-  price: number
+Given(/^A Journal "([\w-]+)" with the APC price of (\d+)$/, async function (
+  journalTestId: string,
+  priceTest: number
 ) {
+  journalId = journalTestId;
+  price = priceTest;
   catalogItem = CatalogMap.toDomain({
     journalId,
     type: 'APC',
     amount: price,
-    currency: 'USD',
-    journalTitle: 'manuscript-title',
   });
   mockCatalogRepo.save(catalogItem);
 });
 
-Given('The Author is from a Waived Country', async function () {
-  const title = 'manuscript-title';
-  const articleTypeId = 'article-type-id';
-  const authorEmail = 'author@email.com';
-  const authorCountry = 'MD';
-  const authorSurname = 'Author Surname';
+Given(
+  /^A manuscript "([\w-]+)" with the Author from "([\w-]+)"$/,
+  async function (manuscriptTestId: string, waivedCountry: string) {
+    const title = 'manuscript-title';
+    const articleTypeId = 'article-type-id';
+    const authorEmail = 'author@email.com';
+    const authorSurname = 'Author Surname';
 
-  manuscript = ArticleMap.toDomain({
-    id: manuscriptId,
-    title,
-    articleTypeId,
-    authorEmail,
-    authorCountry,
-    authorSurname,
-    journalId: journalId,
-  });
-  mockArticleRepo.save(manuscript);
-});
+    manuscriptId = manuscriptTestId;
+    authorCountry = waivedCountry;
+    manuscript = ArticleMap.toDomain({
+      id: manuscriptId,
+      title,
+      articleTypeId,
+      authorEmail,
+      authorCountry: authorCountry,
+      authorSurname,
+      journalId: journalId,
+    });
+    mockArticleRepo.save(manuscript);
 
-When('A manuscript accept event is published', async function () {
-  result = await usecase.execute(
-    {
+    //aaa
+    transaction = TransactionMap.toDomain({
+      status: TransactionStatus.DRAFT,
+      deleted: 0,
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
+    });
+    invoice = InvoiceMap.toDomain({
+      status: InvoiceStatus.DRAFT,
+      transactionId: transaction.transactionId.id.toString(),
+    });
+    invoiceItem = InvoiceItemMap.toDomain({
       manuscriptId,
-      confirmationReminder: {
-        queueName: 'test',
-        delay: 0.001,
+      invoiceId: invoice.invoiceId.id.toString(),
+      price: price,
+    });
+    waiver = WaiverMap.toDomain({
+      type_id: 'WAIVED_COUNTRY',
+      reduction: 100,
+      isActive: true,
+    });
+
+    invoice.addInvoiceItem(invoiceItem);
+    transaction.addInvoice(invoice);
+
+    mockWaiverRepo.save(waiver);
+    mockTransactionRepo.save(transaction);
+    mockInvoiceRepo.save(invoice);
+    mockInvoiceItemRepo.save(invoiceItem);
+  }
+);
+
+When(
+  /^UpdateTransactionOnAcceptManuscriptUsecase is executed for manuscript "([\w-]+)"$/,
+  async function (manuscriptTestId: string) {
+    result = await usecase.execute(
+      {
+        manuscriptId: manuscriptTestId,
+        confirmationReminder: {
+          queueName: 'test',
+          delay: 0.001,
+        },
+        emailSenderInfo: {
+          address: manuscript.authorEmail,
+          name: manuscript.authorSurname,
+        },
+        authorCountry: authorCountry,
       },
-      emailSenderInfo: {
-        address: manuscript.authorEmail,
-        name: manuscript.authorSurname,
-      },
-      authorCountry: 'MD',
-    },
-    defaultContext
-  );
-});
+      defaultContext
+    );
+  }
+);
 
 Then(
   'The Transaction associated with the manuscript should be ACTIVE',
@@ -201,6 +211,7 @@ Then(
   async (finalPrice: number) => {
     const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
     const [associatedInvoiceItem] = invoiceItems;
+    // console.log(associatedInvoiceItem);
     //can't figure why price is undefined
     // expect(associatedInvoiceItem.price).to.equal(finalPrice);
   }

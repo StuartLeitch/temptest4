@@ -33,10 +33,9 @@ const mockCatalogRepo: MockCatalogRepo = new MockCatalogRepo();
 const mockPausedReminderRepo = new MockPausedReminderRepo();
 let result: CreateTransactionResponse;
 
-const manuscriptId = 'manuscript-id';
-const journalId = 'journal-id';
-const price = 666;
-
+let journalId;
+let manuscriptId;
+let price;
 let transactionId: TransactionId;
 let invoiceId: InvoiceId;
 
@@ -47,29 +46,35 @@ const usecase: CreateTransactionUsecase = new CreateTransactionUsecase(
   mockCatalogRepo,
   mockPausedReminderRepo
 );
-BeforeAll(function () {
-  const catalogItem = CatalogMap.toDomain({
-    journalId,
-    type: 'APC',
-    amount: price,
-    journalTile: 'manuscript-title',
-  });
-  mockCatalogRepo.save(catalogItem);
-});
 
-Given('Invoicing listening to submit events emitted by Review', () => {
-  return;
-});
-
-When('A manuscript submit event is published', async () => {
-  result = await usecase.execute(
-    {
-      manuscriptId,
+Given(
+  /^A journal "([\w-]+)" with the APC of (\d+)$/,
+  (journalTestId: string, priceTest: number) => {
+    journalId = journalTestId;
+    price = priceTest;
+    const catalogItem = CatalogMap.toDomain({
       journalId,
-    },
-    defaultContext
-  );
-});
+      type: 'APC',
+      amount: price,
+      // journalTile: 'manuscript-title',
+    });
+    mockCatalogRepo.save(catalogItem);
+  }
+);
+
+When(
+  /^CreateTransactionUsecase is executed for manuscript "([\w-]+)"$/,
+  async (manuscriptTestId: string) => {
+    manuscriptId = manuscriptTestId;
+    result = await usecase.execute(
+      {
+        manuscriptId,
+        journalId,
+      },
+      defaultContext
+    );
+  }
+);
 
 Then('A DRAFT Transaction should be created', async () => {
   expect(result.value.isSuccess).to.equal(true);
@@ -101,11 +106,14 @@ Then('An Invoice Item should be created', async () => {
   );
 });
 
-Then('The Invoice Item should have a price attached', async () => {
-  const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
-  expect(lastSavedInvoiceItems.length).to.equal(1);
-  expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).to.equal(
-    invoiceId.id.toString()
-  );
-  expect(lastSavedInvoiceItems[0].price).to.equal(price);
-});
+Then(
+  /^The Invoice Item should have a price attached equal to (\d+)$/,
+  async (invoiceItemTestPrice: number) => {
+    const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+    expect(lastSavedInvoiceItems.length).to.equal(1);
+    expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).to.equal(
+      invoiceId.id.toString()
+    );
+    expect(lastSavedInvoiceItems[0].price).to.equal(invoiceItemTestPrice);
+  }
+);
