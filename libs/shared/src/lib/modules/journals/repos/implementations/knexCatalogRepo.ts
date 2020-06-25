@@ -81,12 +81,17 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
   }
 
   async updateCatalogItem(catalogItem: CatalogItem): Promise<CatalogItem> {
-    const { db } = this;
+    const { db, logger } = this;
 
-    const updated = await db(TABLES.CATALOG)
+    const updatedSQL = db(TABLES.CATALOG)
       .where({ id: catalogItem.id.toString() })
       .update(CatalogMap.toPersistence(catalogItem));
 
+    logger.debug('updateCatalogItem', {
+      sql: updatedSQL.toString(),
+    });
+
+    const updated = await updatedSQL;
     if (!updated) {
       throw RepoError.createEntityNotFoundError(
         'invoice',
