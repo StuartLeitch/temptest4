@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, BeforeAll } from 'cucumber';
+import { Given, When, Then } from 'cucumber';
 
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
