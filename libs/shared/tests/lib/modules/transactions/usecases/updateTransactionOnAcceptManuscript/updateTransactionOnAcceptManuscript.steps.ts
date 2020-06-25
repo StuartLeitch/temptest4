@@ -100,7 +100,6 @@ let waiver: Waiver;
 
 let manuscriptId;
 let journalId;
-let authorCountry;
 let price;
 
 // BeforeAll(function () {
@@ -122,27 +121,24 @@ Given(/^A Journal "([\w-]+)" with the APC price of (\d+)$/, async function (
 });
 
 Given(
-  /^A manuscript "([\w-]+)" with the Author from "([\w-]+)"$/,
-  async function (manuscriptTestId: string, waivedCountry: string) {
+  /^A manuscript "([\w-]+)" which passed the review process$/,
+  async function (manuscriptTestId: string) {
     const title = 'manuscript-title';
     const articleTypeId = 'article-type-id';
     const authorEmail = 'author@email.com';
     const authorSurname = 'Author Surname';
 
     manuscriptId = manuscriptTestId;
-    authorCountry = waivedCountry;
     manuscript = ArticleMap.toDomain({
       id: manuscriptId,
       title,
       articleTypeId,
       authorEmail,
-      authorCountry: authorCountry,
       authorSurname,
       journalId: journalId,
     });
     mockArticleRepo.save(manuscript);
 
-    //aaa
     transaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT,
       deleted: 0,
@@ -188,7 +184,6 @@ When(
           address: manuscript.authorEmail,
           name: manuscript.authorSurname,
         },
-        authorCountry: authorCountry,
       },
       defaultContext
     );
@@ -211,8 +206,6 @@ Then(
   async (finalPrice: number) => {
     const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
     const [associatedInvoiceItem] = invoiceItems;
-    // console.log(associatedInvoiceItem);
-    //can't figure why price is undefined
-    // expect(associatedInvoiceItem.price).to.equal(finalPrice);
+    expect(associatedInvoiceItem.price).to.equal(finalPrice);
   }
 );
