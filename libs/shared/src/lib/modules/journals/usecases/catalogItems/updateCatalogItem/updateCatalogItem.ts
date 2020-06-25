@@ -39,8 +39,19 @@ export class UpdateCatalogItemToCatalogUseCase
   public async execute(
     request: UpdateCatalogItemToCatalogUseCaseRequestDTO
   ): Promise<UpdateCatalogItemToCatalogUseCaseResponse> {
+    // const foo = {
+    //   amount: 1339,
+    //   created: '2020-06-25T04:57:07.247Z',
+    //   updated: '2020-06-25T07:04:37.286Z',
+    //   currency: 'USD',
+    //   issn: '1234-9832',
+    //   journalTitle: "bunch of stars - se - it don't work in screening",
+    //   isActive: true,
+    //   journalId: '16abc826-e86a-44c2-aaa2-d8b4049dfcba',
+    // };
+
     const {
-      type,
+      // type,
       amount,
       created,
       currency,
@@ -71,7 +82,7 @@ export class UpdateCatalogItemToCatalogUseCase
 
       const updatedCatalogItem = CatalogMap.toDomain({
         id: journalId.id.toString(),
-        type,
+        // type,
         apc: amount,
         created: created ? new Date(created) : null,
         updated: updated ? new Date(updated) : null,

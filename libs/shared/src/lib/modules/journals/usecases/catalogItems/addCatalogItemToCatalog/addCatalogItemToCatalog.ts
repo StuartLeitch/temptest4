@@ -29,7 +29,7 @@ export class AddCatalogItemToCatalogUseCase
     request: AddCatalogItemToCatalogUseCaseRequestDTO
   ): Promise<AddCatalogItemToCatalogUseCaseResponse> {
     const {
-      type,
+      // type,
       amount,
       created,
       currency,
@@ -37,7 +37,7 @@ export class AddCatalogItemToCatalogUseCase
       issn,
       journalId,
       journalTitle,
-      updated
+      updated,
     } = request;
 
     let catalogItem: CatalogItem;
@@ -58,7 +58,8 @@ export class AddCatalogItemToCatalogUseCase
       }
 
       catalogItem = CatalogMap.toDomain({
-        type,
+        id: journalId.id.toString(),
+        // type,
         amount,
         created,
         updated,
@@ -67,7 +68,7 @@ export class AddCatalogItemToCatalogUseCase
         issn,
         journalId,
         journalTitle,
-        publisherId: publisher.publisherId.id.toString()
+        publisherId: publisher.publisherId.id.toString(),
       });
 
       // This is where all the magic happens
