@@ -82,9 +82,6 @@ export class UpdateCatalogItemToCatalogUseCase
         journalTitle,
       });
 
-      // console.log('updatedCatalogItem');
-      // console.info(updatedCatalogItem);
-
       // * This is where all the magic happens
       await this.catalogRepo.updateCatalogItem(updatedCatalogItem);
 
