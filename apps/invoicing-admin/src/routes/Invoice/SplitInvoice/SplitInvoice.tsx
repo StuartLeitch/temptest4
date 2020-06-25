@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'graphql-hooks';
 import numeral from 'numeral';
+import { toast } from 'react-toastify';
 import LoadingOverlay from 'react-loading-overlay';
 import {
   Button,
@@ -22,8 +23,8 @@ const SplitInvoice: React.FC = () => {
 
   const [payers, setPayers] = useState({});
   const [invoiceValue, setInvoiceValue] = useState(0);
-  const [isTotalAmountReached, setIsTotalAmountReached] = useState(true);
-  const [isFormInvalid, setIsFormInvalid] = useState(true);
+  const [isTotalAmountReachedError, setIsTotalAmountReachedError] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isAmountEquallySplit, setIsAmountEquallySplit] = useState(true);
   const [payerId, setPayerId] = useState(2);
 
@@ -54,10 +55,6 @@ const SplitInvoice: React.FC = () => {
       );
     }
   }, [data]);
-
-  useEffect(() => {
-    validateForm();
-  }, [payers, isAmountEquallySplit]);
 
   const getTotalCharges = () => {
     const { vat, coupons, waivers, price } = data.invoice?.invoiceItem;
@@ -97,7 +94,7 @@ const SplitInvoice: React.FC = () => {
       amountToPay: ''
     }}
     setPayers(newPayers);
-    setIsFormInvalid(true);
+    setIsFormInvalid(false);
     setPayerId(payerId + 1);
   };
 
@@ -139,16 +136,27 @@ const SplitInvoice: React.FC = () => {
 
     if (!isAmountEquallySplit && (totalInsertedAmount !== invoiceValue)) {
       setIsFormInvalid(true);
-      setIsTotalAmountReached(false);
+      setIsTotalAmountReachedError(true);
     } else {
       const isInvalid = Object.values(payers).some((payer: Payer) => {
         const { amountToPay, email } = payer;
         return hasEmptyFields(payer) || !isInsertedAmountValid(amountToPay) || !isEmailValid(email)
       });
       setIsFormInvalid(isInvalid);
-      setIsTotalAmountReached(true);
+      setIsTotalAmountReachedError(false);
     }
   };
+
+  const displayToastError = () => {
+    setIsTotalAmountReachedError(false);
+    return toast.error(ErrorToast);
+  }
+
+  const ErrorToast = () => (
+    <div>
+      <p>Total amount needs to match invoice value</p>
+    </div>
+  );
 
   if (loading)
     return (
@@ -165,6 +173,7 @@ const SplitInvoice: React.FC = () => {
 
   return (
     <Container fluid={true}>
+      {isTotalAmountReachedError && displayToastError()}
       <Link
         to={`/invoices/details/${id}`}
         className='text-decoration-none d-block mb-4 mt-0'
@@ -196,7 +205,8 @@ const SplitInvoice: React.FC = () => {
 
       <Form onSubmit={e => {
         e.preventDefault();
-        splitInvoice();
+        validateForm();
+        // splitInvoice();
       }}>
         {Object.keys(payers).map((key, index) => {
           return (
@@ -223,6 +233,7 @@ const SplitInvoice: React.FC = () => {
                     payer={{...payers[key]}}
                     onChange={(field, value) => update(key, field, value)}
                     invoiceValue={invoiceValue}
+                    isFormInvalid={isFormInvalid}
                   />
                 </Row>
               </CardBody>
@@ -232,16 +243,9 @@ const SplitInvoice: React.FC = () => {
         <Col className='mt-3 mb-4'>
           <Row>
            <Button color='outline-secondary link' className='mr-2' onClick={() => splitEqually()}>Split Equally</Button>
-            <Button color='primary' disabled={isFormInvalid || !isTotalAmountReached} type='submit'>
+            <Button color='primary' type='submit'>
               Confirm & Send Invoices
             </Button>
-          </Row>
-          <Row>
-            {!isTotalAmountReached &&
-              <div className='text-danger'>
-                Total amount needs to match invoice value
-              </div>
-              }
           </Row>
         </Col>
       </Form>

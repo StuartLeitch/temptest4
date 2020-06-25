@@ -11,22 +11,20 @@ import {
 const PayerInfo: React.FC<PayerInfoProps> = ({
   payer,
   onChange,
-  invoiceValue
+  invoiceValue,
+  isFormInvalid
 }) => {
 
   const { fullName, email, amountToPay } = payer;
 
   const [fields, setFields] = useState({
     fullName: {
-      isTouched: false,
       isValid: true
     },
     email: {
-      isTouched: false,
       isValid: true
     },
     amountToPay: {
-      isTouched: false,
       isValid: true
     }
   });
@@ -44,27 +42,16 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
   useEffect(() => {
     setFields({
       'amountToPay': {
-        isTouched: fields.amountToPay.isTouched,
         isValid: isInsertedAmountValid(amountToPay)
       },
       'fullName': {
-        isTouched: fields.fullName.isTouched,
         isValid: !!fullName
       },
       'email': {
-        isTouched: fields.email.isTouched,
         isValid: isEmailValid(email)
       }
     });
   }, [fullName, email, amountToPay]);
-
-  const handleChange = (field: string, value: string) => {
-    setFields({...fields, [field]: {
-      ...fields[field],
-      isTouched: true
-    }});
-    onChange(field, value);
-  };
 
   return (
     <>
@@ -77,8 +64,8 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
             value={fullName}
             placeholder='Full Name'
             id='fullName'
-            onChange={e => handleChange('fullName', e.target.value)}
-            invalid={fields['fullName'].isTouched && !fields['fullName'].isValid}
+            onChange={e => onChange('fullName', e.target.value)}
+            invalid={isFormInvalid && !fields['fullName'].isValid}
           />
           <FormFeedback>
             Required
@@ -95,8 +82,8 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
             value={email}
             placeholder='Email address'
             id='email'
-            onChange={e => handleChange('email', e.target.value)}
-            invalid={fields['email'].isTouched && !fields['email'].isValid}
+            onChange={e => onChange('email', e.target.value)}
+            invalid={isFormInvalid && !fields['email'].isValid}
           />
           <FormFeedback>
             Email address is invalid
@@ -117,8 +104,8 @@ const PayerInfo: React.FC<PayerInfoProps> = ({
               value={amountToPay}
               placeholder='Amount to Pay'
               id='amountToPay'
-              onChange={e => handleChange('amountToPay', e.target.value)}
-              invalid={fields['amountToPay'].isTouched && !fields['amountToPay'].isValid}
+              onChange={e => onChange('amountToPay', e.target.value)}
+              invalid={isFormInvalid && !fields['amountToPay'].isValid}
             />
             <FormFeedback>
               Inserted amount should be a number smaller than invoice value, accepting one to two
@@ -138,6 +125,7 @@ interface PayerInfoProps {
     amountToPay: number;
   };
   invoiceValue: number;
+  isFormInvalid: boolean;
   onChange(field: string, value: string): void;
 }
 
