@@ -32,7 +32,7 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
       const c = await this.getCatalogItemById(catalogItem.id);
       return !!c;
     } catch (error) {
-      //do nothing yet
+      // ! do nothing yet
     }
 
     return false;

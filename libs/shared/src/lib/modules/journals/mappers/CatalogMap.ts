@@ -12,7 +12,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
     const catalogOrError = CatalogItem.create(
       {
         type: raw.type,
-        amount: raw.amount,
+        amount: raw.apc,
         journalId: JournalId.create(
           new UniqueEntityID(raw.journalId)
         ).getValue(),
@@ -20,13 +20,11 @@ export class CatalogMap extends Mapper<CatalogItem> {
         updated: raw.updated ? new Date(raw.updated) : null,
         currency: raw.currency,
         isActive: !!raw.isActive,
-        journalTitle: raw.journalTitle,
+        journalTitle: raw.name,
         publisherId: raw.publisherId
           ? PublisherId.create(new UniqueEntityID(raw.publisherId)).getValue()
           : null,
         issn: raw.issn,
-        // price: Money.fromInteger({amount: raw.amount, currency: Currencies.USD})
-        // dateUpdated: new Date(raw.dateUpdated)
       },
       new UniqueEntityID(raw.id)
     );
@@ -37,7 +35,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
   public static toPersistence(catalogItem: CatalogItem): any {
     return {
       id: catalogItem.id.toString(),
-      type: catalogItem.type,
+      type: catalogItem.type || 'APC',
       amount: catalogItem.amount,
       journalId: catalogItem.journalId.id.toString(),
       created: catalogItem.created,
@@ -47,10 +45,6 @@ export class CatalogMap extends Mapper<CatalogItem> {
       journalTitle: catalogItem.journalTitle,
       publisherId: catalogItem.publisherId.id.toString(),
       issn: catalogItem.issn,
-      // status: catalog.status,
-      // amount: catalog.amount.value,
-      // dateAdded: catalog.dateAdded,
-      // dateUpdated: catalog.dateUpdated
     };
   }
 }
