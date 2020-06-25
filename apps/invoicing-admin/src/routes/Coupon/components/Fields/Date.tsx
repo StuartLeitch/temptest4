@@ -9,14 +9,14 @@ import { Button, Label, Col, FormGroup } from '../../../../components';
 import { CouponMode } from '../../types';
 
 import { CREATE, VIEW } from '../../config';
-const Date = ({
+const Date: React.FC<DateProps> = ({
   stringValue = '',
   label,
   disabled = false,
   id,
   filter = noop(),
   mode,
-}: DateProps) => {
+}) => {
   const chosenContext =
     mode === CREATE ? CouponCreateContext : CouponEditContext;
   const { couponState, update } = useContext(chosenContext);
@@ -74,7 +74,7 @@ const Pick = ({ value = '', onClick = noop() }: PickProps) => {
 interface PickProps {
   value?: string;
   disabled?: boolean;
-  onClick?: Function | void;
+  onClick?: void;
 }
 
 interface DateProps {
@@ -82,7 +82,7 @@ interface DateProps {
   disabled?: boolean;
   stringValue?: string;
   id?: string;
-  filter?: Function | void;
+  filter?: (date: number) => boolean | void;
   mode: CouponMode;
 }
 

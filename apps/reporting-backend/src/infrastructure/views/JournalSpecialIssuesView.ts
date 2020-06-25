@@ -1,58 +1,57 @@
-import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
-import uniqueJournalsView from './JournalsView';
-import journalSectionsView from './JournalSectionsView';
+import journalEditorialBoardView from './JournalEditorialBoardView';
+import journalSpecialIssuesDataView from './JournalSpecialIssuesDataView';
 
 class JournalSpecialIssuesView extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
-    CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-    AS SELECT 
-      j.journal_id,
-      journal_name,
-      j.journal_issn,
-      j.journal_code,
-      j.event_date,
-      special_issues_view.id as special_issue_id,
-      special_issues_view.name as special_issue_name,
-      special_issues_view."customId" as special_issue_custom_id,
-      null as section_id,
-      null as section_name,
-      special_issues_view.editors as editors_json
-    FROM 
-      ${REPORTING_TABLES.JOURNAL} je 
-      join ${uniqueJournalsView.getViewName()} j on je.id = j.event_id,
-      lateral jsonb_to_recordset(je.payload -> 'specialIssues') as special_issues_view(id text, name text, created timestamp, updated timestamp, "customId" text, editors jsonb)
-    UNION ALL
+CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()} AS
+  SELECT 
+  si_data.journal_id,
+  si_data.journal_name,
+  si_data.journal_issn,
+  si_data.journal_code,
+  si_data.event_date,
+  si_data.special_issue_id,
+  si_data.special_issue_name,
+  si_data.special_issue_custom_id,
+  si_data.closed_date,
+  si_data.open_date,
+  si_data.status,
+  si_data.section_id,
+  si_data.section_name,
+  concat(lead_guest_editor.given_names, ' ', lead_guest_editor.surname) as lead_guest_editor_name,
+  lead_guest_editor.email as lead_guest_editor_email,
+  lead_guest_editor.aff as lead_guest_editor_affiliation,
+  lead_guest_editor.country as lead_guest_editor_country,
+  editors_counts.editor_count
+  FROM ${journalSpecialIssuesDataView.getViewName()} si_data
+  LEFT JOIN LATERAL (
     SELECT 
-      j.journal_id,
-      journal_name,
-      j.journal_issn,
-      j.journal_code,
-      j.event_date,
-      special_issues_view.id as special_issue_id,
-      special_issues_view.name as special_issue_name,
-      special_issues_view."customId" as special_issue_custom_id,
-      j.section_id,
-      j.section_name,
-      special_issues_view.editors as editors_json
-    FROM ${journalSectionsView.getViewName()} j,
-    LATERAL jsonb_to_recordset(j.special_issues_json) as special_issues_view(id text, name text, created timestamp, updated timestamp, "customId" text, editors jsonb)
-  WITH DATA
+      special_issue_id,
+      count(*) as editor_count
+    FROM ${journalEditorialBoardView.getViewName()} jeb
+      WHERE jeb.special_issue_id = si_data.special_issue_id
+        AND role_type = 'academicEditor'
+    GROUP BY special_issue_id
+  ) editors_counts on editors_counts.special_issue_id = si_data.special_issue_id
+  LEFT JOIN LATERAL (
+    SELECT *    
+    FROM ${journalEditorialBoardView.getViewName()} jeb
+      WHERE jeb.special_issue_id = si_data.special_issue_id
+        AND role_type = 'triageEditor'
+    ORDER BY accepted_date desc nulls last, invited_date desc nulls last
+    LIMIT 1
+  ) lead_guest_editor on lead_guest_editor.special_issue_id = si_data.special_issue_id
+WITH DATA
     `;
   }
 
-  postCreateQueries = [
-    `CREATE INDEX ON ${this.getViewName()} (journal_id)`,
-    `CREATE INDEX ON ${this.getViewName()} (event_date)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_code)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_name)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_issn)`
-  ];
+  postCreateQueries = [...journalSpecialIssuesDataView.postCreateQueries];
 
   getViewName(): string {
     return 'journal_special_issues';
@@ -60,6 +59,7 @@ class JournalSpecialIssuesView extends AbstractEventView
 }
 
 const journalSpecialIssuesView = new JournalSpecialIssuesView();
-journalSpecialIssuesView.addDependency(uniqueJournalsView);
-journalSpecialIssuesView.addDependency(journalSectionsView);
+journalSpecialIssuesView.addDependency(journalSpecialIssuesDataView);
+journalSpecialIssuesView.addDependency(journalEditorialBoardView);
+
 export default journalSpecialIssuesView;

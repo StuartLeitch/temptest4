@@ -6,7 +6,7 @@ import {
 import authorsView from './AuthorsView';
 import invoicesView from './InvoicesView';
 import journalSectionsView from './JournalSectionsView';
-import journalSpecialIssuesView from './JournalSpecialIssuesView';
+import journalSpecialIssuesView from './JournalSpecialIssuesDataView';
 import manuscriptEditorsView from './ManuscriptEditorsView';
 import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';

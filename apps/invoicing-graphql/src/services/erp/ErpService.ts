@@ -251,7 +251,9 @@ export class ErpService implements ErpServiceContract {
       s2cor__Legal_Note__c: this.getVatNote(vatNote, items, rate),
       s2cor__BillingCountry__c: countryList.getName(billingAddress.country),
       s2cor__BillingCity__c: billingAddress.city,
-      s2cor__BillingStreet__c: billingAddress.addressLine1,
+      s2cor__BillingStreet__c: billingAddress?.addressLine1
+        ? billingAddress?.addressLine1.substr(0, 255)
+        : '',
       s2cor__Description__c: description,
     };
 

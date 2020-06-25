@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import LoadingOverlay from 'react-loading-overlay';
 
 import { Spinner } from '../../../components';
 
 // can be either used as a HOC or individual component
-export default ({ loading = true, children = null }) => (
+const Loading: React.FC<LoadingProps> = ({ loading = true, children = null }) => (
   <LoadingOverlay
     active={loading}
     spinner={
@@ -17,3 +17,10 @@ export default ({ loading = true, children = null }) => (
     {children}
   </LoadingOverlay>
 );
+
+interface LoadingProps {
+  loading?: boolean;
+  children?: ReactNode;
+};
+
+export default Loading;

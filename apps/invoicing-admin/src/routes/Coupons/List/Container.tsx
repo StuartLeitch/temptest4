@@ -24,7 +24,7 @@ import List from './List';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
-const CouponsContainer = () => {
+const CouponsContainer: React.FC = () => {
   const [fetchCoupons, { loading, error, data }] = useManualQuery(
     COUPONS_QUERY
   );
