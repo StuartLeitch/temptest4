@@ -8,6 +8,7 @@ import { Address as VATAddress } from '../../modules/invoices/domain/policies/Ad
 
 const endpoint = process.env.VAT_VALIDATION_SERVICE_ENDPOINT;
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
+const MS_UNAVAILABLE = 'soap:Server: MS_UNAVAILABLE';
 
 const vat = new EuroVat();
 const policiesRegister = new PoliciesRegister();
@@ -69,7 +70,11 @@ export class VATService {
       let error: Error;
       switch (err.message) {
         case INVALID_INPUT:
-          error = new Error('Invalid Input');
+          error = new Error('INVALID_INPUT');
+          break;
+        case MS_UNAVAILABLE:
+          error = new Error('MS_UNAVAILABLE');
+          break;
       }
 
       return error;

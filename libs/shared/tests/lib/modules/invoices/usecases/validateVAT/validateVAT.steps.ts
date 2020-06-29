@@ -1,3 +1,4 @@
+import { ValidateVATErrors } from './../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
 import { expect } from 'chai';
 import { Given, When, Then, Before } from 'cucumber';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
@@ -175,7 +176,14 @@ When(/^The Payer VAT code (\d+) is checked$/, async (vatNumber: string) => {
 });
 
 Then('The VAT code should be valid', async () => {
-  expect(vatResponse.getValue().valid).to.equal(true);
+  if (
+    vatResponse.error &&
+    vatResponse.error.message === 'Service is currently unavailable'
+  ) {
+    expect(vatResponse.isSuccess).to.equal(false);
+  } else {
+    expect(vatResponse.getValue().valid).to.equal(true);
+  }
 });
 
 Then('The VAT code should be invalid', async () => {
