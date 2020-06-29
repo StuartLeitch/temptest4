@@ -13,6 +13,7 @@ import * as create_superset_helper_functions from './migrations/20200325162543_c
 import * as add_sub_data_update_trigger from './migrations/20200406150014_add_sub_data_update_trigger';
 import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_index';
 import * as add_acceptance_rates_table from './migrations/20200610141941_add_acceptance_rates_table';
+import * as create_syndication_events_table from './migrations/20200629123541_add_syndication_events_table';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -144,6 +145,7 @@ class KnexMigrationSource {
     ),
     rebuild_materialized_views('20200617123100_add_inv_payment_ref', true),
     rebuild_materialized_views('20200618150700_add_special_issue_view'),
+    create_syndication_events_table,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
