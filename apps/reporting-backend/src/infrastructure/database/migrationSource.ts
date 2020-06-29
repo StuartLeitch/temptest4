@@ -144,8 +144,11 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views('20200617123100_add_inv_payment_ref', true),
-    rebuild_materialized_views('20200618150700_add_special_issue_view'),
+    rebuild_materialized_views('20200618150700_add_special_issue_view', true),
     create_syndication_events_table,
+    rebuild_materialized_views(
+      '20200629131100_m_published_date_from_article_data'
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
