@@ -11,12 +11,12 @@ Feature: Invoice Item Repo
 
     Scenario: Test InvoiceItem.delete() method
         Given a invoice item with the id "foo-invoiceItem"
-        When we call delete for "foo-invoiceItem"
+        When we call delete for the invoice item "foo-invoiceItem"
         Then delete soft deletes the invoice item "foo-invoiceItem"
 
     Scenario: Test InvoiceItem.update() method
         Given a invoice item with the id "foo-invoiceItem"
-        When we call update for "foo-invoiceItem"
+        When we call update for invoice item "foo-invoiceItem"
         Then update modifies the invoice item "foo-invoiceItem"
 
     Scenario Outline: Test InvoiceItem.exists()

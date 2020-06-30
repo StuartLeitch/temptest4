@@ -64,15 +64,18 @@ Then('getInvoiceItemById returns null', async () => {
   expect(foundInvoiceItem).to.equal(null);
 });
 
-When(/^we call delete for "([\w-]+)"$/, async (invoiceItemId: string) => {
-  const invoiceItemIdObj = InvoiceItemId.create(
-    new UniqueEntityID(invoiceItemId)
-  );
-  foundInvoiceItem = await mockInvoiceItemRepo.getInvoiceItemById(
-    invoiceItemIdObj
-  );
-  await mockInvoiceItemRepo.delete(foundInvoiceItem);
-});
+When(
+  /^we call delete for the invoice item "([\w-]+)"$/,
+  async (invoiceItemId: string) => {
+    const invoiceItemIdObj = InvoiceItemId.create(
+      new UniqueEntityID(invoiceItemId)
+    );
+    foundInvoiceItem = await mockInvoiceItemRepo.getInvoiceItemById(
+      invoiceItemIdObj
+    );
+    await mockInvoiceItemRepo.delete(foundInvoiceItem);
+  }
+);
 
 Then(
   /^delete soft deletes the invoice item "([\w-]+)"$/,
@@ -87,17 +90,20 @@ Then(
   }
 );
 
-When(/^we call update for "([\w-]+)"$/, async (invoiceItemId: string) => {
-  const invoiceItemIdObj = InvoiceItemId.create(
-    new UniqueEntityID(invoiceItemId)
-  );
-  foundInvoiceItem = await mockInvoiceItemRepo.getInvoiceItemById(
-    invoiceItemIdObj
-  );
-  const invoiceItemPrice = 0;
-  foundInvoiceItem.price = invoiceItemPrice;
-  await mockInvoiceItemRepo.update(foundInvoiceItem);
-});
+When(
+  /^we call update for invoice item "([\w-]+)"$/,
+  async (invoiceItemId: string) => {
+    const invoiceItemIdObj = InvoiceItemId.create(
+      new UniqueEntityID(invoiceItemId)
+    );
+    foundInvoiceItem = await mockInvoiceItemRepo.getInvoiceItemById(
+      invoiceItemIdObj
+    );
+    const invoiceItemPrice = 0;
+    foundInvoiceItem.price = invoiceItemPrice;
+    await mockInvoiceItemRepo.update(foundInvoiceItem);
+  }
+);
 
 Then(
   /^update modifies the invoice item "([\w-]+)"$/,
