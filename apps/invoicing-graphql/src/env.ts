@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import * as pkg from '../../../package.json';
 import {
-  getOsEnvWithDefault,
+  // getOsEnvWithDefault,
   getOsEnvOptional,
   normalizePort,
   getOsPath,

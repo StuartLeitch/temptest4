@@ -58,7 +58,7 @@ export class AddCatalogItemToCatalogUseCase
       }
 
       catalogItem = CatalogMap.toDomain({
-        id: journalId.id.toString(),
+        id: journalId,
         // type,
         amount,
         created,
@@ -71,7 +71,7 @@ export class AddCatalogItemToCatalogUseCase
         publisherId: publisher.publisherId.id.toString(),
       });
 
-      // This is where all the magic happens
+      // * This is where all the magic happens
       await this.catalogRepo.save(catalogItem);
 
       return right(Result.ok<CatalogItem>(catalogItem));

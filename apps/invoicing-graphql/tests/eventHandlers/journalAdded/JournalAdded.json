@@ -1,0 +1,48 @@
+{
+  "id": "6e2f132e-762e-460b-bbe6-02ef2c931cbc",
+  "created": "2020-06-23T13:22:19.709Z",
+  "updated": "2020-06-23T13:23:15.527Z",
+  "name": "Razvan CM Inactive 1",
+  "publisherName": null,
+  "code": "RCMI1",
+  "email": "razvan.ariciuc+a10@hindawi.com",
+  "issn": "GDSGWE213",
+  "apc": 2314,
+  "isActive": true,
+  "activationDate": "2020-06-23T00:00:00.000Z",
+  "sections": [],
+  "specialIssues": [],
+  "articleTypes": [
+    {
+      "name": "Corrigendum"
+    },
+    {
+      "name": "Retraction"
+    },
+    {
+      "name": "Expression of Concern"
+    },
+    {
+      "name": "Case Series"
+    },
+    {
+      "name": "Editorial"
+    },
+    {
+      "name": "Research Article"
+    },
+    {
+      "name": "Erratum"
+    },
+    {
+      "name": "Case Report"
+    },
+    {
+      "name": "Letter to the Editor"
+    },
+    {
+      "name": "Review Article"
+    }
+  ],
+  "editors": []
+}
