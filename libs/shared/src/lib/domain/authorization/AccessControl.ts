@@ -1,6 +1,6 @@
-import {AccessControlPlus} from 'accesscontrol-plus';
+import { AccessControlPlus } from 'accesscontrol-plus';
 
-import {Roles} from '../../modules/users/domain/enums/Roles';
+import { Roles } from '../../modules/users/domain/enums/Roles';
 
 export interface AccessControlContext {
   userId?: string;
@@ -9,8 +9,9 @@ export interface AccessControlContext {
   entityTenantId?: string;
 }
 
-const userOwnsEntity = (context: AccessControlContext): boolean =>
-  context.entityOwnerId === context.userId;
+const userOwnsEntity = (context: AccessControlContext): boolean => {
+  return context.entityOwnerId === context.userId;
+};
 
 const tenantMatches = (context: AccessControlContext): boolean =>
   context.entityTenantId === context.userTenantId;
@@ -30,16 +31,16 @@ accessControl
       .action('read')
     .resource('payer')
       .action('update')
-    // .where(userOwnsEntity)
+  // .where(userOwnsEntity)
   .grant(Roles.AUTHOR)
     .inherits(Roles.CUSTOMER)
   .grant(Roles.ADMIN)
     .inherits(Roles.CUSTOMER)
     .resource('*')
-    .action('*')
+      .action('*')
     .where(tenantMatches)
   .grant(Roles.SUPER_ADMIN)
     .resource('*')
-    .action('*');
+      .action('*');
 
-export {accessControl};
+export { accessControl };

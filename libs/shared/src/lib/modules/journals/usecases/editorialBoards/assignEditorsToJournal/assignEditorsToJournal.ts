@@ -96,8 +96,8 @@ export class AssignEditorsToJournalUsecase
 
       const currentEditorsIds = currentEditors.map((e) => e.id.toString());
 
-      console.log(`Current editor number: ${currentEditorsIds.length}`);
-      console.log(`Expected editor number: ${allEditors.length}`);
+      // console.log(`Current editor number: ${currentEditorsIds.length}`);
+      // console.log(`Expected editor number: ${allEditors.length}`);
 
       const editorsToCreate = allEditors.filter((e) => {
         // TODO filter assistants
@@ -105,10 +105,10 @@ export class AssignEditorsToJournalUsecase
         return !isCreated;
       });
 
-      console.log(
-        `Creating ${editorsToCreate.length} editors`,
-        editorsToCreate.map((e) => e.email).join(' ')
-      );
+      // console.log(
+      //   `Creating ${editorsToCreate.length} editors`,
+      //   editorsToCreate.map((e) => e.email).join(' ')
+      // );
 
       const createEditorUsecase = new CreateEditor(this.editorRepo);
       const createEditorsResponse = await Promise.all(

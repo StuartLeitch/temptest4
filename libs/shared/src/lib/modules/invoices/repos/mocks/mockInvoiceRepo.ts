@@ -88,7 +88,14 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
   }
 
   public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
-    return null;
+    let invoice = await this.getInvoiceById(invoiceId);
+    if (invoice.invoiceNumber) {
+      console.log('Invoice number already set');
+      return invoice;
+    }
+    invoice.invoiceNumber = String(this._items.length);
+    invoice = await this.save(invoice);
+    return invoice;
   }
 
   public async save(invoice: Invoice): Promise<Invoice> {

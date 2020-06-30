@@ -48,7 +48,6 @@ export * from './modules/transactions/usecases/getTransaction/getTransaction';
 export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
-export * from './modules/transactions/usecases/updateTransaction/updateTransaction';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
 
