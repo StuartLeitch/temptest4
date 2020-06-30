@@ -18,12 +18,9 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 import InvoicesList from './List';
-// import { mergeWith, overwriteWith } from '../../../utils/mergeWith';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
 
-// import QueryStateDisplay from './components/QueryStateDisplay';
-
-const InvoicesContainer = (props: any) => {
+const InvoicesContainer: React.FC = () => {
   const defaultFilters = {
     invoiceStatus: [],
     transactionStatus: [],
@@ -157,7 +154,6 @@ const InvoicesContainer = (props: any) => {
         <HeaderMain title='Invoices' className='mb-5 mt-4' />
         <Row>
           <Col lg={3}>
-            {/* <QueryStateDisplay queryState={{ ...filters, ...pagination }} /> */}
             <InvoicesLeftNav filters={filters} setFilter={setFilter} />
           </Col>
           <Col lg={9} className='mt-n4 mb-5'>
@@ -171,9 +167,7 @@ const InvoicesContainer = (props: any) => {
                     const urlToShare = buildURLWithFilters(filters, pagination);
                     copyToClipboard(urlToShare);
                     return toast.success(
-                      <SuccessfulUrlCopiedToClipboardToast
-                        urlToShare={urlToShare}
-                      />
+                      <SuccessfulUrlCopiedToClipboardToast />
                     );
                   }}
                 >

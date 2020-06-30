@@ -1,12 +1,14 @@
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
+import articleDataView from './ArticleDataView';
+import authorsView from './AuthorsView';
 import {
   AbstractEventView,
   EventViewContract,
 } from './contracts/EventViewContract';
-import submissionView from './SubmissionsView';
-import authorsView from './AuthorsView';
 import invoiceDataView from './InvoicesDataView';
-import articleDataView from './ArticleDataView';
+import submissionDataView from './SubmissionDataView';
+import submissionView from './SubmissionsView';
+import paymentsView from './PaymentsView';
 
 class InvoicesView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -18,7 +20,9 @@ AS SELECT
     inv.is_credit_note,
     inv.manuscript_custom_id as "manuscript_custom_id",
     inv.invoice_created_date as "invoice_created_date",
-    inv.manuscript_accepted_date,
+    inv.manuscript_accepted_date as "invoice_sent_date",
+    inv.invoice_issue_date as "invoice_issue_date",
+    coalesce(sd.event_timestamp, inv.manuscript_accepted_date) as manuscript_accepted_date,
     case 
     	when inv.status = 'DRAFT' then null
     	when coalesce(inv.paid_amount, 0) = 0 then null
@@ -26,7 +30,6 @@ AS SELECT
     	when inv.status = 'FINAL' then 'Paid'
     	else 'unknown'
     end as payment_status,
-    inv.invoice_issue_date as "invoice_issue_date",
     inv.invoice_id as "invoice_id",
     inv.status as "invoice_status",
     inv.gross_apc_value as "gross_apc_value",
@@ -45,6 +48,7 @@ AS SELECT
     inv.payer_address as payer_address,
     inv.payment_currency as "payment_currency",
     inv.organization,
+    payments.payment_reference,
     waivers.waiver_types as waivers,
     coupons.coupon_codes as coupons,
     inv.event_id as "event_id",
@@ -89,12 +93,19 @@ AS SELECT
     jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'waivers') as waivers("waiverType" text)
     group by event_id
   ) waivers on waivers.event_id = inv.event_id
+  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed') 
+    order by event_timestamp desc nulls last limit 1) sd on sd.manuscript_custom_id = inv.manuscript_custom_id
   LEFT JOIN (
     select id as event_id, STRING_AGG(code, ', ') as coupon_codes
     from ${REPORTING_TABLES.INVOICE} ie,
     jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'coupons') as coupons(code text)
     group by event_id
   ) coupons on coupons.event_id = inv.event_id
+  LEFT JOIN (
+    select invoice_id, STRING_AGG(payment_reference, ', ') as payment_reference
+    from ${paymentsView.getViewName()}
+    group by invoice_id
+  ) payments on payments.invoice_id = inv.invoice_id
   LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 where id2.invoice_id = inv.cancelled_invoice_reference limit 1) original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
 WITH DATA;
     `;

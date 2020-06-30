@@ -77,16 +77,19 @@ export class MockWaiverRepo extends BaseMockRepo<Waiver>
   public async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
     const invoiceIdValue = invoiceId.id.toString();
     const invoiceItemIds = this.invoiceToInvoiceItemMapper[invoiceIdValue];
-    const waiversIds: UniqueEntityID[] = [];
-    invoiceItemIds.map((id) =>
-      waiversIds.push(...this.invoiceItemToWaiverMapper[id])
-    );
-    const waivers: Waiver[] = [];
-    for (let index = 0; index < waiversIds.length; index++) {
-      const waiver = await this.getWaiverById(waiversIds[index]);
-      waivers.push(waiver);
+    if (invoiceItemIds) {
+      const waiversIds: UniqueEntityID[] = [];
+      invoiceItemIds.map((id) =>
+        waiversIds.push(...this.invoiceItemToWaiverMapper[id])
+      );
+      const waivers: Waiver[] = [];
+      for (let index = 0; index < waiversIds.length; index++) {
+        const waiver = await this.getWaiverById(waiversIds[index]);
+        waivers.push(waiver);
+      }
+      return waivers;
     }
-    return waivers;
+    return [];
   }
 
   public async getWaiversByInvoiceItemId(

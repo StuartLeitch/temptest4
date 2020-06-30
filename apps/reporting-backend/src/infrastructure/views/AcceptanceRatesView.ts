@@ -90,6 +90,15 @@ LEFT JOIN LATERAL (
 `;
   }
 
+  getRefreshQuery() {
+    return `
+BEGIN;
+DELETE FROM ${this.getViewName()};
+INSERT INTO ${this.getViewName()} ${this.getSelectQuery()};
+COMMIT;    
+`;
+  }
+
   public getDeleteQuery(): string {
     return `drop table ${acceptanceRatesView.getViewName()} cascade`;
   }

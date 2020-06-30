@@ -4,7 +4,7 @@
 2. Make minikube use docker local repo
    `eval $(minikube docker-env)`
 3. Build sisif test:
-   `npm run build sisif-test`
+   `yarn run build sisif-test`
 4. Build image version (look at sisif/Chart.yaml -> version should be the same version you are building)
    `docker build -f dist/apps/sisif-test/Dockerfile -t sisif:0.2.12 .`
 5. Install the helm charts below

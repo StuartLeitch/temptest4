@@ -1,34 +1,19 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result, left, right} from '../../../../core/logic/Result';
-// import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result, left, right } from '../../../../core/logic/Result';
 
-import {AppError} from '../../../../core/logic/AppError';
-
-// import {UpdateTransactionOnAcceptManuscriptResponse} from './updateTransactionOnAcceptManuscriptResponse';
-import {ValidateVATResponse} from './validateVATResponse';
-import {ValidateVATErrors} from './validateVATErrors';
-
-// import {Invoice} from '../../../invoices/domain/Invoice';
-// import {CatalogItem} from './../../../catalogs/domain/CatalogItem';
-// import {InvoiceItem} from '../../../invoices/domain/InvoiceItem';
-// import {TransactionRepoContract} from '../../repos/transactionRepo';
-// import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
-// import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
-import {VATService} from '../../../../domain/services/VATService';
-// import {Transaction} from '../../domain/Transaction';
-// import {Article} from '../../../articles/domain/Article';
-// import {ArticleRepoContract} from './../../../articles/repos/articleRepo';
-// import {ManuscriptId} from './../../../invoices/domain/ManuscriptId';
-// import {CatalogRepoContract} from './../../../catalogs/repos/catalogRepo';
+import { AppError } from '../../../../core/logic/AppError';
+import { ValidateVATResponse } from './validateVATResponse';
+import { ValidateVATErrors } from './validateVATErrors';
+import { VATService } from '../../../../domain/services/VATService';
 
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+import { Roles } from '../../../users/domain/enums/Roles';
 
 export interface ValidateVATRequestDTO {
   vatNumber: string;
@@ -62,21 +47,24 @@ export class ValidateVATUsecase
     request: ValidateVATRequestDTO,
     context?: ValidateVATContext
   ): Promise<ValidateVATResponse> {
-    const {vatNumber, countryCode} = request;
+    const { vatNumber, countryCode } = request;
 
     try {
       // * validate VAT number against country code
       const vatResponse = await this.vatService.checkVAT({
         vatNumber,
-        countryCode
+        countryCode,
       });
-
       if (vatResponse instanceof Error) {
-        return left(
-          new ValidateVATErrors.InvalidInputError(vatNumber, countryCode)
-        );
+        switch (vatResponse.message) {
+          case 'INVALID_INPUT':
+            return left(
+              new ValidateVATErrors.InvalidInputError(vatNumber, countryCode)
+            );
+          case 'MS_UNAVAILABLE':
+            return left(new ValidateVATErrors.ServiceUnavailableError());
+        }
       }
-
       return right(Result.ok<any>(vatResponse));
     } catch (err) {
       return left(new AppError.UnexpectedError(err));

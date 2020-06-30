@@ -17,8 +17,8 @@ git remote update --prune
 git checkout $1
 git pull
 
-echo "${prefix} Run NPM install ${suffix}"
-npm install
+echo "${prefix} Run yarn install ${suffix}"
+yarn install
 
 
 echo "${prefix} Login to AWS -dev- for deploy of Payer app ${suffix}"

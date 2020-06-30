@@ -7,9 +7,9 @@ export TO="${AWS_ENVIRONMENT}-${APP}"
 export TIMESTAMP=$(date +'%d_%m_%Y_%R')
 export CI_COMMIT_SHA="${USER}_${TIMESTAMP/:/_}"
 
-_=$(command -v npm);
+_=$(command -v yarn);
 if [ "$?" != "0" ]; then
-  printf -- "You don\'t seem to have NPM installed.\n";
+  printf -- "You don\'t seem to have yarn installed.\n";
   # printf -- 'Get it: https://www.docker.com/community-edition\n';
   printf -- "Exiting with code 127...\n";
   exit 127;
@@ -27,7 +27,7 @@ CURR_DIR="$(dirname $0)"
 #!/bin/sh
 
 printf -- "\nBuild BackEnd App for ${AWS_ENVIRONMENT} environment\n"
-npm run build reporting-backend --configuration=production
+yarn run build reporting-backend --configuration=production
 
 printf -- "\nDockerize BackEnd App for ${AWS_ENVIRONMENT} environment\n"
 aws --profile=production ecr get-login --no-include-email | sh

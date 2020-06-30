@@ -1,4 +1,5 @@
-import { defineFeature, loadFeature } from 'jest-cucumber';
+import { expect } from 'chai';
+import { Given, When, Then, Before, After } from 'cucumber';
 
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
@@ -34,121 +35,127 @@ function getRandom(arr: string[], n: number) {
   return result;
 }
 
-const feature = loadFeature('./removeEditorsFromJournal.feature', {
-  loadRelativePath: true,
+const defaultContext: RemoveEditorsFromJournalAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
+
+let mockEditorRepo: MockEditorRepo;
+let mockCatalogRepo: MockCatalogRepo;
+let usecase: RemoveEditorsFromJournalUsecase;
+let journalEditorsIds: string[] = [];
+let journalCount = 0;
+
+Before(function () {
+  mockEditorRepo = new MockEditorRepo();
+  mockCatalogRepo = new MockCatalogRepo();
+  usecase = new RemoveEditorsFromJournalUsecase(
+    mockEditorRepo,
+    mockCatalogRepo
+  );
 });
 
-defineFeature(feature, (test) => {
-  const defaultContext: RemoveEditorsFromJournalAuthorizationContext = {
-    roles: [Roles.SUPER_ADMIN],
-  };
+After(function () {
+  journalEditorsIds = [];
+  mockEditorRepo.clear();
+  mockCatalogRepo.clear();
+});
 
-  let mockEditorRepo: MockEditorRepo;
-  let mockCatalogRepo: MockCatalogRepo;
-  let usecase: RemoveEditorsFromJournalUsecase;
-  let journalEditorsIds: string[] = [];
-  let journalCount = 0;
+Given(
+  'There is a total of {int} editors in the system',
+  async (start: number) => {
+    [...new Array(Number(start))].map(async (curr: any, idx: number) => {
+      const editor = await mockEditorRepo.save(
+        EditorMap.toDomain({
+          editorId: `${idx}-editor`,
+          journalId: `${idx}-journal`,
+          name: `${idx}-editor-name`,
+          email: `email${idx}@editor.com`,
+          roleType: `${idx}-role-type`,
+          roleLabel: `${idx}-role-label`,
+        })
+      );
+      journalEditorsIds.push(editor.id.toString());
+    });
+  }
+);
 
-  beforeEach(() => {
-    mockEditorRepo = new MockEditorRepo();
-    mockCatalogRepo = new MockCatalogRepo();
-    usecase = new RemoveEditorsFromJournalUsecase(
-      mockEditorRepo,
-      mockCatalogRepo
+Given(
+  /^There is a Journal having id "([\w-]+)" with (\d+) editors$/,
+  async function (journalId: string, journalStartEditors: number) {
+    await mockCatalogRepo.save(
+      CatalogMap.toDomain({
+        journalId,
+        type: 'mock',
+        amount: 666,
+      })
     );
-  });
 
-  afterEach(() => {
+    journalCount = +journalStartEditors;
+
+    for (let idx = 0; idx < journalCount; idx++) {
+      const editorId = EditorId.create(
+        new UniqueEntityID(journalEditorsIds[idx])
+      ).getValue();
+      const editor = await mockEditorRepo.getEditorById(editorId);
+      await mockEditorRepo.delete(editor);
+    }
+
     journalEditorsIds = [];
-  });
 
-  const givenAJournalWithEditors = (given, and) => {
-    given(
-      /^There is a Journal having id (\w+) with (\d+) editors$/,
-      async (journalId: string, journalStartEditors: number) => {
-        await mockCatalogRepo.save(
-          CatalogMap.toDomain({
-            journalId,
-            type: 'mock',
-            amount: 666,
+    await Promise.all(
+      [...new Array(journalCount)].map(async (curr: any, idx: number) => {
+        const editor = await mockEditorRepo.save(
+          EditorMap.toDomain({
+            editorId: `${journalId}-${idx}-editor`,
+            journalId: `${journalId}`,
+            name: `${idx}-editor-name`,
+            email: `email${idx}@editor.com`,
+            roleType: `${idx}-role-type`,
+            roleLabel: `${idx}-role-label`,
           })
         );
-
-        journalCount = +journalStartEditors;
-        [...new Array(journalCount)].map(async (curr: any, idx: number) => {
-          const editor = await mockEditorRepo.save(
-            EditorMap.toDomain({
-              editorId: `${journalId}-${idx}-editor`,
-              journalId: `${journalId}`,
-              name: `${idx}-editor-name`,
-              email: `email${idx}@editor.com`,
-              roleType: `${idx}-role-type`,
-              roleLabel: `${idx}-role-label`,
-            })
-          );
-          journalEditorsIds.push(editor.id.toString());
-        });
-      }
+        journalEditorsIds.push(editor.id.toString());
+      })
     );
+  }
+);
 
-    and(/^There are (\d+) editors in the system$/, async (start: string) => {
-      [...new Array(Number(start) - journalCount)].map(
-        async (curr: any, idx: number) => {
-          await mockEditorRepo.save(
-            EditorMap.toDomain({
-              editorId: `${idx}-editor`,
-              journalId: `${idx}-journal`,
-              name: `${idx}-editor-name`,
-              email: `email${idx}@editor.com`,
-              roleType: `${idx}-role-type`,
-              roleLabel: `${idx}-role-label`,
-            })
-          );
-        }
-      );
-    });
-  };
-
-  test('Remove Editors from Journal', ({ given, and, when, then }) => {
-    givenAJournalWithEditors(given, and);
-
-    when(
-      /^I delete (\d+) editors from Journal (\w+)$/,
-      async (remove: string, journalId: string) => {
-        const randomEditorsIds = getRandom(journalEditorsIds, +remove);
-
-        const randomEditors = await Promise.all(
-          randomEditorsIds.map(
-            async (editorId: string) =>
-              await mockEditorRepo.getEditorById(
-                EditorId.create(new UniqueEntityID(editorId)).getValue()
-              )
+When(
+  /^I delete (\d+) editors from Journal "([\w-]+)"$/,
+  async (remove: number, journalId: string) => {
+    const randomEditorsIds = getRandom(journalEditorsIds, +remove);
+    const randomEditors = await Promise.all(
+      randomEditorsIds.map(
+        async (editorId: string) =>
+          await mockEditorRepo.getEditorById(
+            EditorId.create(new UniqueEntityID(editorId)).getValue()
           )
-        );
-
-        await usecase.execute(
-          {
-            journalId,
-            allEditors: randomEditors.map((re) => EditorMap.toPersistence(re)),
-          },
-          defaultContext
-        );
-      }
+      )
     );
 
-    then(
-      /^I should have (\d+) editors in Journal (\w+)$/,
-      async (journalLeft: number, journalId: string) => {
-        const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorsByJournalId(
-          JournalId.create(new UniqueEntityID(journalId)).getValue()
-        );
-        expect(editorCollectionAfter.length).toEqual(+journalLeft);
-      }
+    await usecase.execute(
+      {
+        journalId,
+        allEditors: randomEditors.map((re) => EditorMap.toPersistence(re)),
+      },
+      defaultContext
+    );
+  }
+);
+
+Then(
+  /^I should have (\d+) editors in Journal "([\w-]+)"$/,
+  async (journalLeft: number, journalId: string) => {
+    const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorsByJournalId(
+      JournalId.create(new UniqueEntityID(journalId)).getValue()
     );
 
-    and(/^I should have (\d+) editors in the system$/, async (left: number) => {
-      const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorCollection();
-      expect(editorCollectionAfter.length).toEqual(+left);
-    });
-  });
+    expect(editorCollectionAfter.length).to.equal(+journalLeft);
+  }
+);
+
+Then('I should have {int} editors in the system', async (left: number) => {
+  const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorCollection();
+
+  expect(editorCollectionAfter.length).to.equal(left);
 });

@@ -7,7 +7,7 @@ import { Card, CardBody, Button, FormGroup, CustomInput } from 'reactstrap';
 import './../../styles/components/theme-selector.scss';
 import { Consumer } from './ThemeContext';
 
-class ThemeSelector extends React.Component {
+class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorState> {
   static propTypes = {
     style: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
@@ -149,5 +149,25 @@ const ContextThemeSelector = props => (
     {themeState => <ThemeSelector {...themeState} {...props} />}
   </Consumer>
 );
+
+interface Option {
+  name: string;
+  value: string;
+};
+
+interface ThemeSelectorProps {
+  style: string;
+  color: string;
+  styleOptions?: Option[];
+  styleDisabled?: boolean;
+  colorOptions?: Option[];
+  onChangeTheme?(key: { [key in "color" | "style"]?: string }): void;
+};
+
+interface ThemeSelectorState {
+  isActive: boolean;
+  initialStyle: string;
+  initialColor: string;
+};
 
 export { ContextThemeSelector as ThemeSelector };

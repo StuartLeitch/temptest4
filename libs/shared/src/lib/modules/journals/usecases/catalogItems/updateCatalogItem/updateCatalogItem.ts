@@ -48,7 +48,7 @@ export class UpdateCatalogItemToCatalogUseCase
       issn,
       journalId,
       journalTitle,
-      updated
+      updated,
     } = request;
 
     try {
@@ -79,7 +79,8 @@ export class UpdateCatalogItemToCatalogUseCase
           isActive,
           issn,
           journalId: journalIdValueObject,
-          journalTitle
+          journalTitle,
+          publisherId: catalogItem.publisherId,
         },
         catalogItem.id
       );

@@ -19,7 +19,7 @@ const range = (from: number, to: number, step = 1) => {
   return _range;
 };
 
-export class ListPagination extends Component {
+export class ListPagination extends Component<ListPaginationProps, ListPaginationState> {
   static propTypes = {
     onPageChanged: PropTypes.func,
     totalRecords: PropTypes.number,
@@ -34,7 +34,7 @@ export class ListPagination extends Component {
   pageNeighbours: number;
   totalPages: number;
 
-  constructor(props: any) {
+  constructor(props: ListPaginationProps) {
     super(props);
 
     const {
@@ -55,10 +55,6 @@ export class ListPagination extends Component {
     this.totalPages = Math.ceil(this.totalRecords / this.pageLimit);
 
     this.state = { currentPage };
-  }
-
-  componentDidMount() {
-    // this.gotoPage(1);
   }
 
   gotoPage = page => {
@@ -195,3 +191,16 @@ export class ListPagination extends Component {
     );
   }
 }
+
+interface ListPaginationProps {
+  totalRecords?: number;
+  pageLimit?: number;
+  pageNeighbours?: number;
+  totalPages?: number;
+  currentPage?: number
+  onPageChanged(arg1: any, arg2: any): void;
+};
+
+interface ListPaginationState {
+  currentPage: number;
+};

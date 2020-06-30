@@ -85,33 +85,6 @@ export class RemoveEditorsFromJournalUsecase
         );
       }
 
-      // const currentEditors = await this.editorRepo.getEditorsByJournalId(
-      //   journalId
-      // );
-      // if (!currentEditors) {
-      //   return left(
-      //     new AppError.UnexpectedError(
-      //       `Could not get editors for journalId: ${journalId.id.toString()}.`
-      //     )
-      //   );
-      // }
-
-      // const currentEditorsIds = currentEditors.map((e) => e.id.toString());
-
-      // console.log(`Current editors number: ${currentEditorsIds.length}`);
-      // console.log(`Expected editors number: ${allEditors.length}`);
-
-      // const editorsToRemove = allEditors.filter((e) => {
-      //   // TODO filter assistants
-      //   const isCreated = currentEditorsIds.includes(e.editorId);
-      //   return !isCreated;
-      // });
-
-      // console.log(
-      //   `Deleting ${editorsToRemove.length} editors`,
-      //   editorsToRemove.map((e) => e.email).join(' ')
-      // );
-
       const deleteEditorsResponse = await Promise.all(
         allEditors.map((e) => this.editorRepo.delete(EditorMap.toDomain(e)))
       );
