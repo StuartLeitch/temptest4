@@ -24,13 +24,7 @@ if [ "$?" != "0" ]; then
   exit 127;
 fi;
 
-# aws cli v2
-aws ecr get-login-password \
-    --region $AWS_REGION \
-  | docker login \
-    --username AWS \
-    --password-stdin $AWS_REGISTRY
-
 CURR_DIR="$(dirname $0)"
+./$CURR_DIR/docker-login.sh
 ./$CURR_DIR/dockerize-builder.sh
 ./$CURR_DIR/dockerize-apps.sh
