@@ -62,6 +62,7 @@ Build:
   interruptible: true
   stage: build
   when: manual
+  allow_failure: false
   script:
     - cd $HOME
     - yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production
