@@ -1,28 +1,24 @@
-/* eslint-disable @typescript-eslint/camelcase */
+import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEntityID';
+import { InvoiceItemId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItemId';
+import { PaymentMethodMap } from '../../../../../../src/lib/modules/payments/mapper/PaymentMethod';
+import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import { AddressMap } from '../../../../../../src/lib/modules/addresses/mappers/AddressMap';
+import { CouponMap } from '../../../../../../src/lib/modules/coupons/mappers/CouponMap';
+import { WaiverMap } from '../../../../../../src/lib/modules/waivers/mappers/WaiverMap';
+import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { PaymentMap } from '../../../../../../src/lib/modules/payments/mapper/Payment';
+import { PayerMap } from '../../../../../../src/lib/modules/payers/mapper/Payer';
+import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-
-import { InvoiceItemId } from '../../domain/InvoiceItemId';
-
-import { PaymentMethodMap } from '../../../payments/mapper/PaymentMethod';
-import { ArticleMap } from '../../../manuscripts/mappers/ArticleMap';
-import { AddressMap } from '../../../addresses/mappers/AddressMap';
-import { CouponMap } from '../../../coupons/mappers/CouponMap';
-import { WaiverMap } from '../../../waivers/mappers/WaiverMap';
-import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
-import { PaymentMap } from '../../../payments/mapper/Payment';
-import { PayerMap } from '../../../payers/mapper/Payer';
-import { InvoiceMap } from '../../mappers/InvoiceMap';
-
-import { MockPaymentMethodRepo } from '../../../payments/repos/mocks/mockPaymentMethodRepo';
-import { MockArticleRepo } from '../../../manuscripts/repos/mocks/mockArticleRepo';
-import { MockAddressRepo } from '../../../addresses/repos/mocks/mockAddressRepo';
-import { MockPaymentRepo } from '../../../payments/repos/mocks/mockPaymentRepo';
-import { MockCouponRepo } from '../../../coupons/repos/mocks/mockCouponRepo';
-import { MockWaiverRepo } from '../../../waivers/repos/mocks/mockWaiverRepo';
-import { MockInvoiceItemRepo } from '../../repos/mocks/mockInvoiceItemRepo';
-import { MockPayerRepo } from '../../../payers/repos/mocks/mockPayerRepo';
-import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
+import { MockPaymentMethodRepo } from '../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
+import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
+import { MockPaymentRepo } from '../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentRepo';
+import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 
 export function addInvoices(invoicesRepo: MockInvoiceRepo) {
   const invoicesProps = [
