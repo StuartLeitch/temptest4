@@ -1,5 +1,5 @@
-import { DomainEvents } from './../../../../../../src/lib/core/domain/events/DomainEvents';
-import { HandleContract } from './../../../../../../src/lib/core/domain/events/contracts/Handle';
+import { HandleContract } from '../../contracts/Handle';
+import { DomainEvents } from '../../DomainEvents';
 import { MockCouponCreatedEvent } from '../events/mockCouponCreatedEvent';
 import { MockCouponUpdatedEvent } from '../events/mockCouponUpdatedEvent';
 import { MockCouponAppliedEvent } from '../events/mockCouponAppliedEvent';

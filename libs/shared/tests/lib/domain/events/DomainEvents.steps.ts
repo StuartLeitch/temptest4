@@ -5,10 +5,10 @@ import * as sinon from 'sinon';
 import { UniqueEntityID } from './../../../../src/lib/core/domain/UniqueEntityID';
 import { DomainEvents } from './../../../../src/lib/core/domain/events/DomainEvents';
 
-import { MockCouponAggregateRoot } from './mocks/domain/mockCouponAggregateRoot';
-import { MockCouponAggregateRootId } from './mocks/domain/mockCouponAggregateRootId';
-import { MockCouponCreatedEvent } from './mocks/events/mockCouponCreatedEvent';
-import { MockCouponPublish } from './mocks/services/mockCouponPublish';
+import { MockCouponCreatedEvent } from './../../../../src/lib/core/domain/events/mocks/events/mockCouponCreatedEvent';
+import { MockCouponAggregateRoot } from './../../../../src/lib/core/domain/events/mocks/domain/mockCouponAggregateRoot';
+import { MockCouponAggregateRootId } from './../../../../src/lib/core/domain/events/mocks/domain/mockCouponAggregateRootId';
+import { MockCouponPublish } from './../../../../src/lib/core/domain/events/mocks/services/mockCouponPublish';
 
 let publish: MockCouponPublish;
 let coupon: MockCouponAggregateRoot;

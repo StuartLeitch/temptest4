@@ -1,5 +1,5 @@
-import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEntityID';
-import { AggregateRoot } from '../../../../../../../shared/src/lib/core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../UniqueEntityID';
+import { AggregateRoot } from '../../../../../../../../shared/src/lib/core/domain/AggregateRoot';
 
 import { MockCouponCreatedEvent } from '../events/mockCouponCreatedEvent';
 import { MockCouponUpdatedEvent } from '../events/mockCouponUpdatedEvent';
