@@ -1,23 +1,10 @@
-# Use an official Node runtime as a parent image
-FROM node:12.14.0-alpine
+ARG BUILD_IMAGE
+FROM ${BUILD_IMAGE} as build
 
-ENV PHANTOMJS_VERSION 2.1.1
+FROM node:12-alpine
 
-RUN apk add g++ make python
-RUN apk add --update --no-cache curl
-RUN curl -Ls "https://github.com/dustinblackman/phantomized/releases/download/${PHANTOMJS_VERSION}/dockerized-phantomjs.tar.gz" | tar xz -C / && \
-  curl -k -Ls https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64.tar.bz2 | tar -jxvf - -C /
-RUN cp phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
-RUN rm -fR phantomjs-${PHANTOMJS_VERSION}-linux-x86_64
-
-RUN apk add --no-cache git
-
-# Copy package.json to the working directory
-COPY package.json .
-COPY yarn.lock .
-
-# Install any needed packages specified in package.json
-RUN yarn install --production
+COPY --from=build /home/app/node_modules ./node_modules
+COPY --from=build /usr/local/bin/phantomjs /usr/local/bin/phantomjs
 
 # Copying the rest of the code to the working directory
 COPY config/ ./config/
