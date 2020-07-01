@@ -1,8 +1,8 @@
-import {MockCouponCreatedEvent} from '../events/mockCouponCreatedEvent';
-import {MockCouponUpdatedEvent} from '../events/mockCouponUpdatedEvent';
-import {MockCouponAppliedEvent} from '../events/mockCouponAppliedEvent';
-import {HandleContract} from '../../../contracts/Handle';
-import {DomainEvents} from '../../../DomainEvents';
+import { DomainEvents } from './../../../../../../src/lib/core/domain/events/DomainEvents';
+import { HandleContract } from './../../../../../../src/lib/core/domain/events/contracts/Handle';
+import { MockCouponCreatedEvent } from '../events/mockCouponCreatedEvent';
+import { MockCouponUpdatedEvent } from '../events/mockCouponUpdatedEvent';
+import { MockCouponAppliedEvent } from '../events/mockCouponAppliedEvent';
 
 export class MockCouponPublish
   implements
