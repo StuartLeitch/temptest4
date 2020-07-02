@@ -1,71 +1,53 @@
-# do not use "$NODE_VERSION" here, if you want this to work in the future
-image: docker:$DOCKER_VERSION
+image:
+  name: $BUILD_IMAGE
 
 stages:
   - setup
   - test
   - build
-  # - package
+  - package
   # - deploy
 
 variables:
-  AFFECTED_ARGS: "--base=remotes/origin/develop"
-  DOCKER_TLS_CERTDIR: "/certs"
+  AFFECTED_ARGS: '--base=remotes/origin/develop'
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ''
   DOCKER_DRIVER: overlay2
-  DOCKER_VERSION: 18.09.0
   NODE_VERSION: 14.4.0
-  REGION: "eu-west-1"
-  AWS_REGISTRY: "918602980697.dkr.ecr.eu-west-1.amazonaws.com"
-  BT_ENVIRONMENT: "sandbox"
-  BT_MERCHANT_ID: "test-merchant-id"
-  BT_PUBLIC_KEY: "test-public-key"
-  BT_PRIVATE_KEY: "test-private-key"
-  VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
-
-services:
-  - docker:$DOCKER_VERSION-dind
-
-.cache: &cache
-  key:
-    files:
-      - yarn.lock
-  paths:
-    - node_modules/
-
-before_script:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash
-  # Make available in the current terminal
-  - export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  LATEST_BUILD_IMAGE: $CI_REGISTRY_IMAGE:latest
+  AWS_REGION: 'eu-west-1'
+  AWS_REGISTRY: '918602980697.dkr.ecr.eu-west-1.amazonaws.com'
+  BT_ENVIRONMENT: 'sandbox'
+  BT_MERCHANT_ID: 'test-merchant-id'
+  BT_PUBLIC_KEY: 'test-public-key'
+  BT_PRIVATE_KEY: 'test-private-key'
+  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
+  AFFECTED_APPS: 'invoicing-admin,invoicing-graphql,invoicing-web,shared'
 
 Install Dependencies:
+  interruptible: true
+  allow_failure: false
   stage: setup
-  image: node:$NODE_VERSION
-  cache:
-    <<: *cache
-    policy: pull-push
+  services:
+    - name: docker:dind
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
+  image: docker
   script:
-    - yarn install
-  rules:
-    - changes:
-        - yarn.lock
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - ./tools/scripts/dockerize-builder.sh
 
 Test:
   interruptible: true
   allow_failure: true
   stage: test
-  image: node:$NODE_VERSION
-  before_script:
-    - apt-get update
-    - apt-get -y install imagemagick graphicsmagick
-    - curl -o- -L https://yarnpkg.com/install.sh | bash
-    - export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-  cache:
-    <<: *cache
-    policy: pull
+  # before_script: added to dockerfile.build
+  #   - apt-get update
+  #   - apt-get -y install imagemagick graphicsmagick
   script:
-    - yarn install
-    - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
-    - yarn run affected:test -- ${AFFECTED_ARGS} --parallel --code-coverage
+    - cd $HOME
+    - yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --code-coverage
     - yarn run ci:coverage
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
@@ -75,55 +57,49 @@ Test:
       junit:
         - coverage/apps/**/junit.xml
         - coverage/libs/**/junit.xml
-  only:
-    - develop
-    - master
-    - /^FM-\d+/
-  # dependencies:
-  #   - install
 
 Build:
   interruptible: true
   stage: build
-  image: node:$NODE_VERSION
-  cache:
-    <<: *cache
-    policy: pull
+  when: manual
+  allow_failure: false
   script:
-    - yarn install
-    - export AFFECTED_ARGS=$(./tools/scripts/affected.sh)
-    - yarn run affected:build -- ${AFFECTED_ARGS} --parallel --exclude=shared,react-components --configuration production
-    - mkdir .ci_status
-    - echo $(yarn run affected:apps -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1) > .ci_status/affected_apps
-    - echo $(yarn run affected:libs -- ${AFFECTED_ARGS} --plain 2>&1 | tail -1) > .ci_status/affected_libs
+    - cd $HOME
+    - yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production
+    # artifacts can't be uploaded outside $CI_PROJECT_DIR
+    - mkdir $CI_PROJECT_DIR/.ci_status
+    - echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps
+    - cp -r dist $CI_PROJECT_DIR
   artifacts:
     paths:
       - .ci_status
       - dist
   only:
     - develop
-# Package Images:
-#   interruptible: true
-#   stage: package
-#   image: docker:$DOCKER_VERSION
-#   before_script:
-#     - apk add --no-cache curl jq python py-pip
-#     - pip install awscli
-#     - $(aws ecr get-login --no-include-email --region "${REGION}")
-#   script:
-#     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-#     - export AFFECTED_LIBS=$(cat .ci_status/affected_libs)
-#     # - env
-#     - ./tools/scripts/dockerize.sh
-#   dependencies:
-#     - Build
-#   artifacts:
-#     paths:
-#       - .ci_status
-#       - dist
-#   only:
-#     - develop
 
+Package Images:
+  interruptible: true
+  stage: package
+  image: docker
+  when: manual
+  before_script:
+    - apk add --no-cache aws-cli
+  services:
+    - name: docker:dind
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
+  script:
+    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+    - ./tools/scripts/docker-login.sh
+    - ./tools/scripts/dockerize-apps.sh
+  dependencies:
+    - Build
+  artifacts:
+    paths:
+      - .ci_status
+      - dist
+  only:
+    - develop
 # Deploy to Dev:
 #   stage: deploy
 #   image: docker:$DOCKER_VERSION
