@@ -74,8 +74,8 @@ Build:
     paths:
       - .ci_status
       - dist
-  # only:
-  #   - develop
+  only:
+    - develop
 
 Package Images:
   interruptible: true
@@ -98,9 +98,8 @@ Package Images:
     paths:
       - .ci_status
       - dist
-#   only:
-#     - develop
-
+  only:
+    - develop
 # Deploy to Dev:
 #   stage: deploy
 #   image: docker:$DOCKER_VERSION
