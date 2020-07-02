@@ -1,9 +1,9 @@
-import {AggregateRoot} from '../../../../AggregateRoot';
-import {UniqueEntityID} from '../../../../UniqueEntityID';
+import { UniqueEntityID } from '../../../UniqueEntityID';
+import { AggregateRoot } from '../../../../../../../../shared/src/lib/core/domain/AggregateRoot';
 
-import {MockCouponCreatedEvent} from '../events/mockCouponCreatedEvent';
-import {MockCouponUpdatedEvent} from '../events/mockCouponUpdatedEvent';
-import {MockCouponAppliedEvent} from '../events/mockCouponAppliedEvent';
+import { MockCouponCreatedEvent } from '../events/mockCouponCreatedEvent';
+import { MockCouponUpdatedEvent } from '../events/mockCouponUpdatedEvent';
+import { MockCouponAppliedEvent } from '../events/mockCouponAppliedEvent';
 
 export class MockCouponAggregateRoot extends AggregateRoot<{}> {
   private constructor(props: {}, id?: UniqueEntityID) {

@@ -1,5 +1,5 @@
-import {DomainEventContract} from '../../../contracts/DomainEvent';
-import {UniqueEntityID} from '../../../../UniqueEntityID';
+import { DomainEventContract } from '../../contracts/DomainEvent';
+import { UniqueEntityID } from '../../../UniqueEntityID';
 
 export class MockCouponCreatedEvent implements DomainEventContract {
   dateTimeOccurred: Date;

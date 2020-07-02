@@ -1,3 +1,3 @@
-import {UniqueEntityID} from '../../../../UniqueEntityID';
+import { UniqueEntityID } from '../../../UniqueEntityID';
 
 export const MockCouponAggregateRootId = new UniqueEntityID('666');
