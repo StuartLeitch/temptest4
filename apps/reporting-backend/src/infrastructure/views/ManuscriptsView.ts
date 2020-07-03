@@ -15,6 +15,7 @@ import manuscriptReviewers from './ManuscriptReviewersView';
 import manuscriptReviewsView from './ManuscriptReviewsView';
 import acceptanceRatesView from './AcceptanceRatesView';
 import articleData from './ArticleDataView';
+import { DELETED_MANUSCRIPTS_TABLE } from 'libs/shared/src/lib/modules/reporting/constants';
 
 class ManuscriptsView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -22,6 +23,7 @@ class ManuscriptsView extends AbstractEventView implements EventViewContract {
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
   s.*,
+  deleted_manuscripts.manuscript_custom_id is not null as deleted,
   last_sd.submission_event as last_event_type,
   last_sd.event_timestamp as last_event_date,
   sd.event_timestamp as final_decision_date,
@@ -105,6 +107,9 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (select * from ${articleData.getViewName()} a WHERE
       a.manuscript_custom_id = s.manuscript_custom_id
     LIMIT 1) article_data on article_data.manuscript_custom_id = s.manuscript_custom_id
+  LEFT JOIN LATERAL (select * from ${DELETED_MANUSCRIPTS_TABLE} d WHERE
+    d.manuscript_custom_id = s.manuscript_custom_id
+  LIMIT 1) deleted_manuscripts on deleted_manuscripts.manuscript_custom_id = s.manuscript_custom_id
 WITH DATA;
     `;
   }

@@ -14,6 +14,7 @@ import * as add_sub_data_update_trigger from './migrations/20200406150014_add_su
 import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_index';
 import * as add_acceptance_rates_table from './migrations/20200610141941_add_acceptance_rates_table';
 import * as create_syndication_events_table from './migrations/20200629123541_add_syndication_events_table';
+import * as add_deleted_manuscripts_table from './migrations/20200703082115_add_deleted_manuscripts_table';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -147,7 +148,12 @@ class KnexMigrationSource {
     rebuild_materialized_views('20200618150700_add_special_issue_view', true),
     create_syndication_events_table,
     rebuild_materialized_views(
-      '20200629131100_m_published_date_from_article_data'
+      '20200629131100_m_published_date_from_article_data',
+      true
+    ),
+    add_deleted_manuscripts_table,
+    rebuild_materialized_views(
+      '20200703082515_add_deleted_to_manuscripts_view'
     ),
   ].map(makeViewObject);
 
