@@ -2,9 +2,7 @@
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // * Core Domain
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Either, left, right } from '../../../../core/logic/Either';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { AppError } from '../../../../core/logic/AppError';
@@ -28,18 +26,25 @@ import {
   InvoiceRepoContract,
 } from '../../../invoices/repos';
 
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Invoice } from '../../../invoices/domain/Invoice';
+import { Payer } from '../../../payers/domain/Payer';
 
 import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { CreatePaymentUsecase, CreatePaymentDTO } from '../createPayment';
 
+import { PaymentDTO } from '../../domain/strategies/behaviors';
 import {
-  PaymentStrategyFactory,
   PaymentStrategySelectionData,
+  PaymentStrategyFactory,
 } from '../../domain/strategies/payment-strategy-factory';
-import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
+import {
+  PaymentStrategy,
+  PaymentDetails,
+} from '../../domain/strategies/payment-strategy';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
@@ -56,6 +61,22 @@ interface WithInvoice {
 interface SelectionData {
   payerIdentification?: string;
   paymentReference?: string;
+}
+
+interface PaymentData {
+  payerIdentification?: string;
+  paymentReference?: string;
+  strategy: PaymentStrategy;
+  manuscript: Manuscript;
+  invoice: Invoice;
+  payer: Payer;
+}
+
+interface WithPayment {
+  paymentDetails: PaymentDetails;
+  datePaid?: string;
+  invoice: Invoice;
+  payer: Payer;
 }
 
 export class RecordPaymentUsecase
@@ -78,22 +99,24 @@ export class RecordPaymentUsecase
     this.validateRequest = this.validateRequest.bind(this);
     this.attachStrategy = this.attachStrategy.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
+    this.createPayment = this.createPayment.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
+    this.savePayment = this.savePayment.bind(this);
   }
 
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const execution = new AsyncEither(request)
+      return new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.attachInvoice(context))
         .then(this.attachInvoiceItems(context))
         .then(this.attachPayer(context))
         .then(this.attachManuscript(context))
-        .map(this.attachStrategy)
+        .then(this.attachStrategy)
+        .then(this.createPayment)
+        .then(this.savePayment(context))
+        .map((data) => data.payment)
         .execute();
-
-      return null;
-      return execution;
     } catch (e) {
       return left(this.newUnexpectedError(e, request.invoiceId));
     }
@@ -173,17 +196,67 @@ export class RecordPaymentUsecase
     };
   }
 
-  private attachStrategy<T extends SelectionData>(request: T) {
+  private async attachStrategy<T extends SelectionData>(
+    request: T
+  ): Promise<Either<void, T & { strategy: PaymentStrategy }>> {
     const { payerIdentification, paymentReference } = request;
     const data: PaymentStrategySelectionData = {
       payerIdentification,
       paymentReference,
     };
-    const strategy = this.strategyFactory.selectStrategy(data);
+    const strategy = await this.strategyFactory.selectStrategy(data);
 
-    return {
+    return right({
       ...request,
       strategy,
+    });
+  }
+
+  private async createPayment<T extends PaymentData>(request: T) {
+    const {
+      payerIdentification,
+      paymentReference,
+      manuscript,
+      strategy,
+      invoice,
+    } = request;
+    const makePaymentData: PaymentDTO = {
+      invoiceReferenceNumber: invoice.referenceNumber,
+      discountAmount: invoice.invoiceDiscountTotal,
+      manuscriptCustomId: manuscript.customId,
+      invoiceTotal: invoice.invoiceTotal,
+      netAmount: invoice.invoiceNetTotal,
+      vatAmount: invoice.invoiceVatTotal,
+      invoiceId: invoice.id.toString(),
+      payerIdentification,
+      paymentReference,
+    };
+
+    return new AsyncEither(makePaymentData)
+      .then((data) => strategy.makePayment(data))
+      .map((paymentDetails) => ({ ...request, paymentDetails }))
+      .execute();
+  }
+
+  private savePayment(context: Context) {
+    return async <T extends WithPayment>(request: T) => {
+      const usecase = new CreatePaymentUsecase(this.paymentRepo);
+      const { paymentDetails, invoice, payer, datePaid } = request;
+
+      const dto: CreatePaymentDTO = {
+        paymentMethodId: paymentDetails.paymentMethodId.toString(),
+        foreignPaymentId: paymentDetails.foreignPaymentId.id,
+        invoiceId: invoice.id.toString(),
+        status: paymentDetails.status,
+        amount: invoice.invoiceTotal,
+        payerId: payer.id.toString(),
+        datePaid,
+      };
+
+      return new AsyncEither(dto)
+        .then((data) => usecase.execute(data, context))
+        .map((payment) => ({ ...request, payment }))
+        .execute();
     };
   }
 

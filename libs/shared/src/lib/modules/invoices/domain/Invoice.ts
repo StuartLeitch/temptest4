@@ -184,6 +184,18 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.getInvoiceTotal();
   }
 
+  get invoiceNetTotal(): number {
+    return this.getInvoiceNetTotal();
+  }
+
+  get invoiceVatTotal(): number {
+    return this.getInvoiceVatTotal();
+  }
+
+  get invoiceDiscountTotal(): number {
+    return this.getInvoiceDiscountTotal();
+  }
+
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
     if (this.props.invoiceItems.exists(invoiceItem)) {
       this.props.invoiceItems.remove(invoiceItem);
@@ -279,7 +291,46 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     }
 
     return this.invoiceItems.reduce(
-      (acc, item) => acc + item.calculatePrice(),
+      (acc, item) => acc + item.calculateTotalPrice(),
+      0
+    );
+  }
+
+  public getInvoiceDiscountTotal(): number {
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return this.invoiceItems.reduce(
+      (acc, item) => acc + item.calculateDiscount(),
+      0
+    );
+  }
+
+  public getInvoiceVatTotal(): number {
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return this.invoiceItems.reduce(
+      (acc, item) => acc + item.calculateVat(),
+      0
+    );
+  }
+
+  public getInvoiceNetTotal(): number {
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return this.invoiceItems.reduce(
+      (acc, item) => acc + item.calculateNetPrice(),
       0
     );
   }

@@ -8,6 +8,7 @@ export interface PaymentDTO {
   invoiceReferenceNumber: string;
   payerIdentification: string;
   manuscriptCustomId: string;
+  paymentReference: string;
   discountAmount: number;
   invoiceTotal: number;
   invoiceId: string;

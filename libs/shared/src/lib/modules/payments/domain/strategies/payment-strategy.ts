@@ -9,7 +9,7 @@ import { PaymentStatus } from '../Payment';
 
 import { PaymentBehavior, PaymentDTO } from './behaviors';
 
-interface PaymentDetails {
+export interface PaymentDetails {
   foreignPaymentId: ExternalOrderId;
   paymentMethodId: PaymentMethodId;
   status: PaymentStatus;

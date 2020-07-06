@@ -1,9 +1,9 @@
 export interface CreatePaymentDTO {
   foreignPaymentId: string;
   paymentMethodId: string;
+  datePaid?: string;
   invoiceId: string;
   payerId: string;
-  datePaid?: Date;
   amount: number;
   status: string;
 }
