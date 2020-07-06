@@ -17,3 +17,9 @@ export class UnsuccessfulOrderRetrieval extends ServiceError {
     super(message, 'PayPal.getOrder');
   }
 }
+
+export class UnsuccessfulOrderCapture extends ServiceError {
+  constructor(message: string) {
+    super(message, 'PayPalService.captureOrder');
+  }
+}

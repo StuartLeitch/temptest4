@@ -1,13 +1,14 @@
-import { StrategyError } from '../../../../../../core/logic/strategy-error';
-import { Either } from '../../../../../../core/logic/Either';
+import { StrategyError } from '../../../../../../../core/logic/strategy-error';
+import { Either } from '../../../../../../../core/logic/Either';
 
-import { ExternalOrderId } from '../../../../../../domain/external-order-id';
 import {
   PayPalServiceContract,
   PayPalOrderRequest,
-} from '../../../../../../domain/services/payment/paypal-service';
+} from '../../../../../../../domain/services/payment/paypal-service';
 
-import { PaymentBehavior, PaymentDTO } from '../payment-behavior';
+import { ExternalOrderId } from '../../../../../domain/external-order-id';
+
+import { PaymentBehavior, PaymentDTO } from '../../payment-behavior';
 
 export class PayPalPaymentBehavior extends PaymentBehavior {
   constructor(private paypalService: PayPalServiceContract) {

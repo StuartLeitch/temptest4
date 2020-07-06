@@ -2,7 +2,7 @@ import { StrategyError } from '../../../../../core/logic/strategy-error';
 import { Behavior } from '../../../../../core/logic/strategy';
 import { Either } from '../../../../../core/logic/Either';
 
-import { ExternalOrderId } from '../../../../../domain/external-order-id';
+import { ExternalOrderId } from '../../../domain/external-order-id';
 
 export interface PaymentDTO {
   invoiceReferenceNumber: string;

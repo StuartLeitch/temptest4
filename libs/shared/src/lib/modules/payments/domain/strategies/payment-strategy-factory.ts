@@ -8,6 +8,8 @@ import { PaymentMethodRepoContract } from '../../repos';
 
 import { PaymentStrategy } from './payment-strategy';
 import {
+  BraintreeCaptureMoneyBehavior,
+  PayPalCaptureMoneyBehavior,
   BraintreePaymentBehavior,
   PayPalPaymentBehavior,
 } from './behaviors/implementations';
@@ -30,7 +32,9 @@ class PaymentStrategyFactory
   implements
     StrategyFactory<PaymentStrategy, StrategySelection, SelectionData> {
   constructor(
+    private braintreeCapture: BraintreeCaptureMoneyBehavior,
     private braintreePayment: BraintreePaymentBehavior,
+    private paypalCapture: PayPalCaptureMoneyBehavior,
     private paypalPayment: PayPalPaymentBehavior,
     private paymentMethodRepo: PaymentMethodRepoContract
   ) {}
@@ -70,14 +74,20 @@ class PaymentStrategyFactory
     [StrategySelection.Braintree]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.CreditCard);
       return new PaymentStrategy(
-        id,
+        this.braintreeCapture,
         this.braintreePayment,
+        id,
         PaymentStatus.COMPLETED
       );
     },
     [StrategySelection.PayPal]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.PayPal);
-      return new PaymentStrategy(id, this.paypalPayment, PaymentStatus.CREATED);
+      return new PaymentStrategy(
+        this.paypalCapture,
+        this.paypalPayment,
+        id,
+        PaymentStatus.CREATED
+      );
     },
     [StrategySelection.BankTransfer]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.BankTransfer);

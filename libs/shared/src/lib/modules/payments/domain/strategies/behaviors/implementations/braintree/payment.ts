@@ -1,13 +1,14 @@
-import { StrategyError } from '../../../../../../core/logic/strategy-error';
-import { Either } from '../../../../../../core/logic/Either';
+import { StrategyError } from '../../../../../../../core/logic/strategy-error';
+import { Either } from '../../../../../../../core/logic/Either';
 
-import { ExternalOrderId } from '../../../../../../domain/external-order-id';
 import {
   BraintreeTransactionRequest,
   BraintreeServiceContract,
-} from '../../../../../../domain/services/payment/braintree-service';
+} from '../../../../../../../domain/services/payment/braintree-service';
 
-import { PaymentBehavior, PaymentDTO } from '../payment-behavior';
+import { ExternalOrderId } from '../../../../../domain/external-order-id';
+
+import { PaymentBehavior, PaymentDTO } from '../../payment-behavior';
 
 export class BraintreePaymentBehavior extends PaymentBehavior {
   constructor(private braintreeService: BraintreeServiceContract) {

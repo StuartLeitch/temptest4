@@ -14,19 +14,32 @@ import {
 } from '../../../../domain/authorization/decorators/Authorize';
 
 import { PaymentStatus, Payment } from '../../domain/Payment';
+import { PaymentProof } from '../../domain/payment-proof';
 
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 
+import {
+  PaymentStrategySelection,
+  PaymentStrategyFactory,
+} from '../../domain/strategies/payment-strategy-factory';
+
 import { PayPalPaymentApprovedResponse as Response } from './paypal-payment-approved.response';
 import { PayPalPaymentApprovedDTO as DTO } from './paypal-payment-approved.dto';
 import * as Errors from './paypal-payment-approved.errors';
 
-interface WithInvoiceIdAndOrderId {
+interface WithOrderId {
   payPalOrderId: string;
+}
+
+interface WithInvoiceIdAndOrderId extends WithOrderId {
   invoiceId: string;
+}
+
+interface WithProof {
+  paymentProof: PaymentProof;
 }
 
 interface WithPayment {
@@ -42,12 +55,14 @@ export class PayPalPaymentApprovedUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
-    private paymentRepo: PaymentRepoContract
+    private paymentRepo: PaymentRepoContract,
+    private strategyFactory: PaymentStrategyFactory
   ) {
     this.updatePaymentStatus = this.updatePaymentStatus.bind(this);
     this.savePaymentChanges = this.savePaymentChanges.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.attachPayment = this.attachPayment.bind(this);
+    this.captureMoney = this.captureMoney.bind(this);
   }
 
   private async getAccessControlContext(request, context?) {
@@ -59,6 +74,7 @@ export class PayPalPaymentApprovedUsecase
     try {
       return new AsyncEither(request)
         .then(this.validateRequest)
+        .then(this.captureMoney)
         .then(this.attachPayment(context))
         .map(this.updatePaymentStatus)
         .then(this.savePaymentChanges)
@@ -84,6 +100,17 @@ export class PayPalPaymentApprovedUsecase
     return right(request);
   }
 
+  private async captureMoney<T extends WithOrderId>(request: T) {
+    const paypalStrategy = await this.strategyFactory.getStrategy(
+      PaymentStrategySelection.PayPal
+    );
+
+    return new AsyncEither(request.payPalOrderId)
+      .then((orderId) => paypalStrategy.captureMoney({ orderId }))
+      .map((paymentProof) => ({ ...request, paymentProof }))
+      .execute();
+  }
+
   private attachPayment(context: Context) {
     return async <T extends WithInvoiceIdAndOrderId>(request: T) => {
       const usecase = new GetPaymentsByInvoiceIdUsecase(
@@ -104,7 +131,8 @@ export class PayPalPaymentApprovedUsecase
     };
   }
 
-  private updatePaymentStatus<T extends WithPayment>(request: T) {
+  private updatePaymentStatus<T extends WithPayment & WithProof>(request: T) {
+    request.payment.paymentProof = request.paymentProof;
     request.payment.status = PaymentStatus.PENDING;
 
     return request;

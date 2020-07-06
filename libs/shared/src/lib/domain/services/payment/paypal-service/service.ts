@@ -43,6 +43,7 @@ interface Service {
   ): Promise<
     Either<UnsuccessfulOrderRetrieval | UnexpectedError, OrderResponse>
   >;
+  captureMoney(orderId: string): Promise<Either<unknown, unknown>>;
 }
 
 export {

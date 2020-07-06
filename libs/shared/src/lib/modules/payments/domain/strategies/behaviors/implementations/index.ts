@@ -1,2 +1,2 @@
-export * from './braintree-payment-behavior';
-export * from './paypal-payment-behavior';
+export * from './braintree';
+export * from './paypal';

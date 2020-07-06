@@ -8,8 +8,9 @@ import { Amount } from '../../../domain/Amount';
 // * Subdomain
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { PayerId } from '../../payers/domain/PayerId';
-import { PaymentId } from './PaymentId';
 import { PaymentMethodId } from './PaymentMethodId';
+import { PaymentProof } from './payment-proof';
+import { PaymentId } from './PaymentId';
 
 export enum PaymentStatus {
   COMPLETED = 'COMPLETED',
@@ -27,7 +28,7 @@ export interface PaymentProps {
   paymentMethodId?: PaymentMethodId;
   foreignPaymentId?: string;
   datePaid?: Date;
-  paymentProof?: File;
+  paymentProof?: PaymentProof;
   status: PaymentStatus;
 }
 
@@ -52,8 +53,12 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return this.props.paymentMethodId;
   }
 
-  get paymentProof(): File {
+  get paymentProof(): PaymentProof {
     return this.props.paymentProof;
+  }
+
+  set paymentProof(paymentProof: PaymentProof) {
+    this.props.paymentProof = paymentProof;
   }
 
   get amount(): Amount {

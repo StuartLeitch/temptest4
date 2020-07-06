@@ -45,6 +45,7 @@ export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscri
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
+export * from './modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
@@ -75,6 +76,12 @@ export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice
 export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
+export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
+export * from './modules/invoices/usecases/migrateInvoice/migrateInvoice';
+export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
+export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
+export * from './modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceConfirmed/publishInvoiceConfirmed';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
@@ -134,6 +141,8 @@ export * from './modules/journals/usecases/journals/getJournal/getJournal';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 export * from './modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
 export * from './modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
+export * from './modules/journals/usecases/journals/getJournalList/getJournalList';
+// export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
@@ -169,6 +178,7 @@ export * from './modules/payments/usecases/paypalProcessFinished/paypal-process-
 export * from './modules/payments/usecases/paypalProcessFinished/paypal-process-finished.dto';
 export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id';
 export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id.dto';
+export * from './modules/payments/usecases/getPaymentMethodById/getPaymentMethodById';
 
 export * from './modules/payments/domain/contracts/PaymentModel';
 export * from './modules/payments/domain/strategies/PaymentFactory';
@@ -192,6 +202,8 @@ export * from './modules/coupons/usecases/getRecentCoupons/getRecentCouponsDTO';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCode';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
 export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
+export * from './modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
+
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 
 export * from './modules/coupons/mappers/CouponMap';
@@ -254,6 +266,9 @@ export * from './domain/services/SQSPublishService';
 // * Domain Types
 export * from './domain/PaymentClientToken';
 export * from './domain/external-order-id';
+export * from './modules/payments/domain/payment-proof';
+
+export * from './core/domain/CorrelationID';
 
 // ? Should we export this
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';

@@ -2,12 +2,17 @@ import { StrategyError } from '../../../../core/logic/strategy-error';
 import { Behavior, Strategy } from '../../../../core/logic/strategy';
 import { Either } from '../../../../core/logic/Either';
 
-import { ExternalOrderId } from '../../../../domain/external-order-id';
-
+import { ExternalOrderId } from '../../domain/external-order-id';
 import { PaymentMethodId } from '../PaymentMethodId';
+import { PaymentProof } from '../payment-proof';
 import { PaymentStatus } from '../Payment';
 
-import { PaymentBehavior, PaymentDTO } from './behaviors';
+import {
+  CaptureMoneyBehavior,
+  CaptureMoneyDTO,
+  PaymentBehavior,
+  PaymentDTO,
+} from './behaviors';
 
 export interface PaymentDetails {
   foreignPaymentId: ExternalOrderId;
@@ -28,8 +33,9 @@ export class PaymentStrategy implements Strategy {
   }
 
   constructor(
-    private paymentMethod: PaymentMethodId,
+    private captureBehavior: CaptureMoneyBehavior,
     private payBehavior: PaymentBehavior,
+    private paymentMethod: PaymentMethodId,
     private status: PaymentStatus
   ) {
     this.behaviors.push(payBehavior);
@@ -45,5 +51,11 @@ export class PaymentStrategy implements Strategy {
       status: this.status,
       foreignPaymentId,
     }));
+  }
+
+  async captureMoney(
+    request: CaptureMoneyDTO
+  ): Promise<Either<StrategyError, PaymentProof>> {
+    return this.captureBehavior.captureMoney(request);
   }
 }
