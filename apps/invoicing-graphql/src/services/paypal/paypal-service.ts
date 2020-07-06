@@ -182,10 +182,10 @@ export class PayPalService implements ServiceContract {
   ): Promise<
     Either<Errors.UnsuccessfulOrderCapture | Errors.UnexpectedError, unknown>
   > {
-    let response: Response<OrderResponse>;
+    let response: Response<PayPalOrderResponse>;
 
     try {
-      response = await this.httpClient.execute<OrderResponse>(
+      response = await this.httpClient.execute<PayPalOrderResponse>(
         this.captureOrderRequest(orderId)
       );
     } catch (e) {
@@ -202,10 +202,7 @@ export class PayPalService implements ServiceContract {
       );
     }
 
-    console.log('----------------------------------------------');
-    console.info(response.result);
-
-    return right(response.result);
+    return right(response.result.purchase_units[0].payments.captures[0].id);
   }
 
   private createOrderRequest(payload: PayPalOrderRequest): OrdersCreateRequest {

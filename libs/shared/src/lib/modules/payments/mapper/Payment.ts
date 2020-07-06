@@ -47,7 +47,7 @@ export class PaymentMap extends Mapper<Payment> {
       datePaid: payment.datePaid,
       foreignPaymentId: payment.foreignPaymentId,
       status: payment.status,
-      paymentProof: payment?.paymentProof?.toString(),
+      paymentProof: payment.paymentProof?.toString(),
     };
   }
 }

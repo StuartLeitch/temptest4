@@ -28,6 +28,10 @@ export class PaymentProof extends ValueObject<PaymentProofProps> {
     });
   }
 
+  public toString(): string {
+    return this.id;
+  }
+
   private constructor(props: PaymentProofProps) {
     super(props);
   }
