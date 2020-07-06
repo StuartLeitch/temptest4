@@ -19,9 +19,3 @@ export class InvoiceIdRequiredError extends UseCaseError {
     super(`Invoice id is required.`);
   }
 }
-
-export class PayerIdentificationRequiredError extends UseCaseError {
-  constructor() {
-    super(`Payer identification is required`);
-  }
-}

@@ -35,7 +35,11 @@ import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceD
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
 
-import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
+import {
+  PaymentStrategyFactory,
+  PaymentStrategySelectionData,
+} from '../../domain/strategies/payment-strategy-factory';
+import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
@@ -47,6 +51,11 @@ interface WithInvoiceId {
 
 interface WithInvoice {
   invoice: Invoice;
+}
+
+interface SelectionData {
+  payerIdentification?: string;
+  paymentReference?: string;
 }
 
 export class RecordPaymentUsecase
@@ -65,7 +74,9 @@ export class RecordPaymentUsecase
     private logger: LoggerContract
   ) {
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
+    this.attachManuscript = this.attachManuscript.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
+    this.attachStrategy = this.attachStrategy.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
   }
@@ -77,6 +88,8 @@ export class RecordPaymentUsecase
         .then(this.attachInvoice(context))
         .then(this.attachInvoiceItems(context))
         .then(this.attachPayer(context))
+        .then(this.attachManuscript(context))
+        .map(this.attachStrategy)
         .execute();
 
       return null;
@@ -88,17 +101,9 @@ export class RecordPaymentUsecase
 
   private async validateRequest<T extends DTO>(
     request: T
-  ): Promise<
-    Either<
-      Errors.PayerIdentificationRequiredError | Errors.InvoiceIdRequiredError,
-      T
-    >
-  > {
+  ): Promise<Either<Errors.InvoiceIdRequiredError, T>> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
-    }
-    if (!request.payerIdentification) {
-      return left(new Errors.PayerIdentificationRequiredError());
     }
 
     return right(request);
@@ -150,6 +155,35 @@ export class RecordPaymentUsecase
         .map((result) => result.getValue())
         .map((payer) => ({ ...request, payer }))
         .execute();
+    };
+  }
+
+  private attachManuscript(context: Context) {
+    return async <T extends WithInvoiceId>(request: T) => {
+      const usecase = new GetManuscriptByInvoiceIdUsecase(
+        this.manuscriptRepo,
+        this.invoiceItemRepo
+      );
+
+      return new AsyncEither(request.invoiceId)
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((result) => result.getValue()[0])
+        .map((manuscript) => ({ ...request, manuscript }))
+        .execute();
+    };
+  }
+
+  private attachStrategy<T extends SelectionData>(request: T) {
+    const { payerIdentification, paymentReference } = request;
+    const data: PaymentStrategySelectionData = {
+      payerIdentification,
+      paymentReference,
+    };
+    const strategy = this.strategyFactory.selectStrategy(data);
+
+    return {
+      ...request,
+      strategy,
     };
   }
 

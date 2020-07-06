@@ -1,4 +1,5 @@
 export interface RecordPaymentDTO {
-  payerIdentification: string;
+  payerIdentification?: string;
+  paymentReference?: string;
   invoiceId: string;
 }
