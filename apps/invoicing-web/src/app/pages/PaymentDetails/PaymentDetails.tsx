@@ -43,6 +43,7 @@ interface Props {
   couponError: string;
   paymentMethods: Record<string, string>;
   token: string;
+  retrievePayPalOrderId: string;
   getInvoice(id: string): any;
   getInvoiceVAT(invoiceVATRequest: InvoiceVATDTO): any;
   applyCoupon(applyCouponDTO: ApplyCouponDTO): any;
@@ -51,16 +52,29 @@ interface Props {
   payWithCard(payload: any): any;
   getPaymentMethods(): any;
   getClientToken(): any;
+  createPayPalOrder(): any;
 }
 
 const payByPayPal = (recordAction, invoice) => {
   return (data) => {
     return recordAction({
-      paymentMethodId: data.paymentMethodId,
       invoiceId: invoice.invoiceId,
-      payPalOrderId: data.orderID,
-      payerId: invoice.payer.id,
     });
+  };
+};
+
+const createPayPalOrderAction = (createAction, invoice, getAction) => {
+  return async () => {
+    const a = await createAction({
+      invoiceId: invoice.invoiceId,
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    console.info(a);
+    console.info(getAction());
+
+    return getAction();
   };
 };
 
@@ -76,6 +90,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   applyCoupon,
   couponError,
   getClientToken,
+  createPayPalOrder,
   invoice,
   invoiceError,
   invoiceLoading,
@@ -93,6 +108,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   payPalPaymentLoading,
   paymentMethods,
   token,
+  retrievePayPalOrderId,
 }) => {
   const { invoiceId } = useParams();
 
@@ -138,10 +154,18 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                   })
                 }
               />
+              <h1>
+                blabla: {retrievePayPalOrderId ? retrievePayPalOrderId : "nu e"}
+              </h1>
               <InvoicePayment
                 ccToken={token}
                 methods={paymentMethods}
                 invoiceStatus={invoice.status}
+                createPayPalOrder={createPayPalOrderAction(
+                  createPayPalOrder,
+                  invoice,
+                  () => retrievePayPalOrderId,
+                )}
                 paymentStatus={invoice.payments.map((p) => p.status)}
                 error={creditCardPaymentError || payPalPaymentError}
                 payByCardSubmit={payByCard}
@@ -197,6 +221,7 @@ const mapStateToProps = (state: RootState) => ({
   creditCardPaymentLoading: paymentSelectors.recordCreditCardPaymentLoading(
     state,
   ),
+  retrievePayPalOrderId: paymentSelectors.getPayPalOrderId(state),
   payPalPaymentError: paymentSelectors.recordPayPalPaymentError(state),
   payPalPaymentLoading: paymentSelectors.recordPayPalPaymentLoading(state),
 });
@@ -204,6 +229,7 @@ const mapStateToProps = (state: RootState) => ({
 export default connect(mapStateToProps, {
   getInvoiceVAT: invoiceActions.getInvoiceVat.request,
   recordPayPalPayment: paymentActions.recordPayPalPayment.request,
+  createPayPalOrder: paymentActions.createPayPalOrder.request,
   getPaymentMethods: paymentActions.getPaymentMethods.request,
   getClientToken: paymentActions.getClientToken.request,
   payWithCard: paymentActions.recordCardPayment.request,

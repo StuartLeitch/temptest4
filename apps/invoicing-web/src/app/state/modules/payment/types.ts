@@ -31,12 +31,10 @@ export interface PaymentMethod {
 
 export interface PaymentsSlice {
   methods: PaymentMethod[];
+  payPalOrderId: string;
   token: string;
 }
 
 export interface PayPalPayment {
-  paymentMethodId: string;
-  payPalOrderId: string;
   invoiceId: string;
-  payerId: string;
 }

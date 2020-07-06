@@ -111,8 +111,8 @@ export const payments: Resolvers<Context> = {
       };
     },
 
-    async recordPayPalPayment(parent, args, context) {
-      const { invoiceId, payerId, orderId, paymentMethodId } = args;
+    async createPayPalOrder(parent, args, context) {
+      const { invoiceId } = args;
       const usecaseContext = { roles: [Roles.PAYER] };
       const {
         repos: {
@@ -160,12 +160,7 @@ export const payments: Resolvers<Context> = {
       const confirmedPayment = result.value;
 
       return {
-        id: confirmedPayment.paymentId.id.toString(),
-        invoiceId: confirmedPayment.invoiceId.id.toString(),
-        paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
-        foreignPaymentId: confirmedPayment.foreignPaymentId,
-        amount: confirmedPayment.amount.value,
-        datePaid: confirmedPayment.datePaid.toISOString(),
+        id: confirmedPayment.foreignPaymentId,
       };
     },
 

@@ -13,7 +13,7 @@ export type Scalars = {
   Name: any;
 };
 
-
+type EmptyObject = Record<string, unknown>;
 
 
 
@@ -191,6 +191,11 @@ export type Payment = {
   datePaid?: Maybe<Scalars['Date']>;
   paymentMethod?: Maybe<PaymentMethod>;
 };
+
+export type PayPalOrderId = {
+  __typename?: 'PayPalOrderId';
+  id: Scalars['String'];
+}
 
 export type CreditNote = {
   __typename?: 'CreditNote';
@@ -407,7 +412,7 @@ export type Mutation = {
   creditCardPayment: Payment;
   bankTransferPayment: Payment;
   createCreditNote: CreditNote;
-  recordPayPalPayment: Payment;
+  createPayPalOrder: PayPalOrderId;
   migratePayment: Payment;
   migrateInvoice?: Maybe<Invoice>;
   migrateEntireInvoice?: Maybe<Scalars['String']>;
@@ -480,11 +485,8 @@ export type MutationCreateCreditNoteArgs = {
 };
 
 
-export type MutationRecordPayPalPaymentArgs = {
-  paymentMethodId: Scalars['String'];
+export type MutationCreatePayPalOrderArgs = {
   invoiceId: Scalars['ID'];
-  payerId: Scalars['String'];
-  orderId: Scalars['String'];
 };
 
 
@@ -549,7 +551,7 @@ export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
 
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+export type Resolver<TResult, TParent = EmptyObject, TContext = EmptyObject, TArgs = EmptyObject> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
   | StitchingResolver<TResult, TParent, TContext, TArgs>;
 
@@ -588,21 +590,21 @@ export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, 
   | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
   | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
 
-export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+export type SubscriptionResolver<TResult, TKey extends string, TParent = EmptyObject, TContext = EmptyObject, TArgs = EmptyObject> =
   | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
-export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
+export type TypeResolveFn<TTypes, TParent = EmptyObject, TContext = EmptyObject> = (
   parent: TParent,
   context: TContext,
   info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type isTypeOfResolverFn<T = {}> = (obj: T, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
+export type isTypeOfResolverFn<T = EmptyObject> = (obj: T, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
-export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+export type DirectiveResolverFn<TResult = EmptyObject, TParent = EmptyObject, TContext = EmptyObject, TArgs = EmptyObject> = (
   next: NextResolverFn<TResult>,
   parent: TParent,
   args: TArgs,
@@ -657,8 +659,9 @@ export type ResolversTypes = {
   MigratePayerAddress: MigratePayerAddress;
   MigratePayer: MigratePayer;
   MigrateAPC: MigrateApc;
-  Query: ResolverTypeWrapper<{}>;
-  Mutation: ResolverTypeWrapper<{}>;
+  Query: ResolverTypeWrapper<EmptyObject>;
+  Mutation: ResolverTypeWrapper<EmptyObject>;
+  PayPalOrderId: ResolverTypeWrapper<PayPalOrderId>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -708,8 +711,8 @@ export type ResolversParentTypes = {
   MigratePayerAddress: MigratePayerAddress;
   MigratePayer: MigratePayer;
   MigrateAPC: MigrateApc;
-  Query: {};
-  Mutation: {};
+  Query: EmptyObject;
+  Mutation: EmptyObject;
 };
 
 export type ModelDirectiveArgs = {   id?: Maybe<Scalars['ID']>; };
@@ -951,7 +954,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentMethodNonce' | 'amount'>>;
   bankTransferPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationBankTransferPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentReference' | 'amount' | 'datePaid'>>;
   createCreditNote?: Resolver<ResolversTypes['CreditNote'], ParentType, ContextType, RequireFields<MutationCreateCreditNoteArgs, 'invoiceId'>>;
-  recordPayPalPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'paymentMethodId' | 'invoiceId' | 'payerId' | 'orderId'>>;
+  createPayPalOrder?: Resolver<ResolversTypes['PayPalOrderId'], ParentType, ContextType, RequireFields<MutationCreatePayPalOrderArgs, 'invoiceId'>>;
   migratePayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>>;
   migrateInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>>;
   migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token' | 'status'>>;

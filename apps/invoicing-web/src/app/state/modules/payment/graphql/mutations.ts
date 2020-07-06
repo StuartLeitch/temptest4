@@ -22,18 +22,16 @@ export const creditCardPayment: ASTNode = gql`
 `;
 
 export const recordPayPalPayment: ASTNode = gql`
-  mutation recordPayPalPayment(
-    $paymentMethodId: String!
-    $invoiceId: ID!
-    $payerId: String!
-    $orderId: String!
-  ) {
-    recordPayPalPayment(
-      paymentMethodId: $paymentMethodId
-      invoiceId: $invoiceId
-      payerId: $payerId
-      orderId: $orderId
-    ) {
+  mutation recordPayPalPayment($invoiceId: ID!) {
+    recordPayPalPayment(invoiceId: $invoiceId) {
+      id
+    }
+  }
+`;
+
+export const createPayPalOrder: ASTNode = gql`
+  mutation createPayPalOrder($invoiceId: ID!) {
+    createPayPalOrder(invoiceId: $invoiceId) {
       id
     }
   }

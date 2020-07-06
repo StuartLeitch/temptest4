@@ -1,8 +1,8 @@
 import { PayPalRequest } from './request';
 
 export interface Response<T> {
-  statusCode: string;
   headers: Record<string, unknown>;
+  statusCode: number;
   result: T;
 }
 

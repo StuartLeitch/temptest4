@@ -170,6 +170,10 @@ type Payment {
   paymentMethod: PaymentMethod
 }
 
+type PayPalOrderId {
+  id: String!
+}
+
 type CreditNote {
   id: String!
   cancelledInvoiceReference: ID!
@@ -341,12 +345,7 @@ type Mutation {
     markInvoiceAsPaid: Boolean
   ): Payment!
   createCreditNote(invoiceId: String!, createDraft: Boolean): CreditNote!
-  recordPayPalPayment(
-    paymentMethodId: String!
-    invoiceId: ID!
-    payerId: String!
-    orderId: String!
-  ): Payment!
+  createPayPalOrder(invoiceId: ID!): PayPalOrderId!
   migratePayment(
     invoiceId: ID!
     payerId: String!
