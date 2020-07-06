@@ -12,9 +12,10 @@ import { PaymentId } from './PaymentId';
 import { PaymentMethodId } from './PaymentMethodId';
 
 export enum PaymentStatus {
+  COMPLETED = 'COMPLETED',
+  CREATED = 'CREATED',
   PENDING = 'PENDING',
   FAILED = 'FAILED',
-  COMPLETED = 'COMPLETED',
 }
 
 interface PaymentProps {
