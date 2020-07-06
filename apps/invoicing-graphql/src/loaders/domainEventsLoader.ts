@@ -52,8 +52,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         erp: { sage: erpService, netsuite: netSuiteService },
         logger: loggerService,
         schedulingService,
+        qq: queue,
       },
-      qq: queue,
     } = context;
 
     const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(

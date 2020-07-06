@@ -2,7 +2,10 @@
 
 import { BullScheduler } from '@hindawi/sisif';
 import {
+  BraintreeCaptureMoneyBehavior,
+  PayPalCaptureMoneyBehavior,
   PaymentMethodRepoContract,
+  SQSPublishServiceContract,
   BraintreePaymentBehavior,
   PaymentStrategyFactory,
   PayPalPaymentBehavior,
@@ -33,6 +36,7 @@ export interface Services {
   exchangeRateService: ExchangeRateService;
   schedulingService: BullScheduler;
   paymentStrategyFactory: PaymentStrategyFactory;
+  qq: SQSPublishServiceContract;
   erp: {
     sage: ErpService;
     netsuite: NetSuiteService;
@@ -56,9 +60,15 @@ function buildPaymentStrategyFactory(
   const braintreePaymentBehavior = new BraintreePaymentBehavior(
     braintreeService
   );
+  const paypalCaptureBehavior = new PayPalCaptureMoneyBehavior(paypalService);
+  const braintreeCaptureBehavior = new BraintreeCaptureMoneyBehavior(
+    braintreeService
+  );
 
   return new PaymentStrategyFactory(
+    braintreeCaptureBehavior,
     braintreePaymentBehavior,
+    paypalCaptureBehavior,
     payPalPaymentBehavior,
     paymentMethodRepo
   );
@@ -86,5 +96,6 @@ export function buildServices(
       loggerBuilder
     ),
     erp: null,
+    qq: null,
   };
 }

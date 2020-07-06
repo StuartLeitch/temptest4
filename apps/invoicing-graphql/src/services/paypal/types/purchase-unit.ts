@@ -209,18 +209,18 @@ interface Payment {
 }
 
 export interface PayPalPurchaseUnit {
-  amount: AmountWithBreakdown;
   reference_id?: string;
+  amount: AmountWithBreakdown;
   description?: string;
-  payee?: Payee;
-  payment_instruction?: PaymentInstruction;
-  custom_id?: string;
-  invoice_id?: string;
-  id?: string;
+  payee: Payee;
+  payment_instruction: PaymentInstruction;
+  custom_id: string;
+  invoice_id: string;
+  id: string;
   soft_descriptor?: string;
-  items?: Array<Item>;
+  items: Array<Item>;
   shipping?: ShippingDetail;
-  payments?: Payment;
+  payments: Payment;
 }
 
 export interface PayPalPurchaseUnitRequest {

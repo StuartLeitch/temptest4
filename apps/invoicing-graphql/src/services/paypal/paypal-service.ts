@@ -1,3 +1,5 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import * as checkoutNodeJsSDK from '@paypal/checkout-server-sdk';
 
 import {
@@ -14,6 +16,7 @@ import {
 } from '@hindawi/shared';
 
 import {
+  OrdersCaptureRequest,
   PayPalOrderResponse,
   OrdersCreateRequest,
   PayPalOrderRequest,
@@ -23,7 +26,6 @@ import {
   ResponsePrefer,
   ItemCategory,
   PayPalIntent,
-  UserAction,
   Response,
 } from './types';
 
@@ -96,13 +98,14 @@ export class PayPalService implements ServiceContract {
           },
           items: [
             {
+              description: `Article Processing charges for manuscript ${request.manuscriptCustomId}`,
               name: `Article Processing charges for manuscript ${request.manuscriptCustomId}`,
+              category: ItemCategory.DIGITAL_GOODS,
               quantity: '1',
               unit_amount: {
                 value: request.netAmount.toString(),
                 currency_code: 'USD',
               },
-              category: ItemCategory.DIGITAL_GOODS,
               tax: {
                 value: request.vatAmount.toString(),
                 currency_code: 'USD',
@@ -111,9 +114,6 @@ export class PayPalService implements ServiceContract {
           ],
         },
       ],
-      application_context: {
-        user_action: UserAction.PAY_NOW,
-      },
     };
 
     let response: Response<PayPalOrderResponse>;
@@ -177,6 +177,37 @@ export class PayPalService implements ServiceContract {
     return right(orderDetails);
   }
 
+  async captureMoney(
+    orderId: string
+  ): Promise<
+    Either<Errors.UnsuccessfulOrderCapture | Errors.UnexpectedError, unknown>
+  > {
+    let response: Response<OrderResponse>;
+
+    try {
+      response = await this.httpClient.execute<OrderResponse>(
+        this.captureOrderRequest(orderId)
+      );
+    } catch (e) {
+      this.logger.error(`Error on paypal capture order`, e);
+      return left(new Errors.UnexpectedError(e));
+    }
+
+    if (response.statusCode >= 300) {
+      this.logger.error(
+        `Error on paypal get order with message: ${response.result.toString()}`
+      );
+      return left(
+        new Errors.UnsuccessfulOrderCapture(response.result.toString())
+      );
+    }
+
+    console.log('----------------------------------------------');
+    console.info(response.result);
+
+    return right(response.result);
+  }
+
   private createOrderRequest(payload: PayPalOrderRequest): OrdersCreateRequest {
     const newRequest: OrdersCreateRequest = new checkoutNodeJsSDK.orders.OrdersCreateRequest();
 
@@ -190,6 +221,17 @@ export class PayPalService implements ServiceContract {
     const newRequest: OrdersGetRequest = new checkoutNodeJsSDK.orders.OrdersGetRequest(
       orderId
     );
+
+    return newRequest;
+  }
+
+  private captureOrderRequest(orderId: string): OrdersCaptureRequest {
+    const newRequest: OrdersCaptureRequest = new checkoutNodeJsSDK.orders.OrdersCaptureRequest(
+      orderId
+    );
+
+    newRequest.prefer(ResponsePrefer.REPRESENTATION);
+    newRequest.requestBody({});
 
     return newRequest;
   }

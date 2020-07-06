@@ -21,7 +21,6 @@ export const contextLoader: MicroframeworkLoader = (
     const context: Context = {
       services,
       repos,
-      qq: null,
     };
 
     settings.setData('context', context);

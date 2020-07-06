@@ -10,9 +10,9 @@ import {
   MigratePaymentUsecase,
   RecordPaymentUsecase,
   PaymentMethodMap,
+  CorrelationID,
   Roles,
 } from '@hindawi/shared';
-import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 
 import { env } from '../../env';
 
@@ -164,11 +164,13 @@ export const payments: Resolvers<Context> = {
 
       const {
         repos: { payment: paymentRepo, invoice: invoiceRepo },
+        services: { paymentStrategyFactory },
       } = context;
 
       const usecase = new PayPalPaymentApprovedUsecase(
         invoiceRepo,
-        paymentRepo
+        paymentRepo,
+        paymentStrategyFactory
       );
       const usecaseContext = { roles: [Roles.PAYER] };
       try {

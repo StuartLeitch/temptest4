@@ -1,10 +1,7 @@
-import { SQSPublishServiceContract } from '@hindawi/shared';
-
 import { Services } from './service.builder';
 import { Repos } from './repo.builder';
 
 export interface Context {
-  qq: SQSPublishServiceContract;
   services: Services;
   repos: Repos;
 }
