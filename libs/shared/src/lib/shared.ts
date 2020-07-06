@@ -88,11 +88,9 @@ export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 export * from './modules/invoices/subscriptions/AfterInvoicePaidEvents';
-export * from './modules/invoices/subscriptions/AfterInvoiceSentEvents';
 export * from './modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
-// // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 // export * from './modules/invoices/dtos/InvoiceDTO';
 
 export * from './modules/invoices/mappers/InvoiceMap';

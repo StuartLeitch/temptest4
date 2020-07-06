@@ -70,20 +70,8 @@ export const payments: Resolvers<Context> = {
         },
         services: { paymentStrategyFactory, logger },
       } = context;
-      const {
-        invoiceId,
-        payerId,
-        paymentMethodId,
-        paymentMethodNonce,
-        amount,
-      } = args;
+      const { paymentMethodNonce, invoiceId } = args;
 
-      // const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
-      //   paymentRepo,
-      //   invoiceRepo,
-      //   manuscriptRepo,
-      //   invoiceItemRepo
-      // );
       const usecase = new RecordPaymentUsecase(
         paymentStrategyFactory,
         invoiceItemRepo,
@@ -96,18 +84,6 @@ export const payments: Resolvers<Context> = {
         logger
       );
       const usecaseContext = { roles: [Roles.PAYER] };
-
-      // const result = await recordCreditCardPaymentUsecase.execute(
-      //   {
-      //     merchantAccountId: env.braintree.merchantAccountId,
-      //     paymentMethodId,
-      //     paymentMethodNonce,
-      //     invoiceId,
-      //     amount,
-      //     payerId,
-      //   },
-      //   usecaseContext
-      // );
 
       const result = await usecase.execute(
         {
