@@ -64,27 +64,27 @@ export const expressLoader: MicroframeworkLoader = (
     //   });
     // });
 
-    app.post('/api/checkout', async (req, res) => {
-      const { checkoutService } = context;
+    // app.post('/api/checkout', async (req, res) => {
+    //   const { checkoutService } = context;
 
-      const payment = req.body;
+    //   const payment = req.body;
 
-      const transaction = await checkoutService.pay(payment);
+    //   const transaction = await checkoutService.pay(payment);
 
-      const useCase = new RecordPaymentUsecase(
-        context.repos.payment,
-        context.repos.invoice
-      );
+    //   const useCase = new RecordPaymentUsecase(
+    //     context.repos.payment,
+    //     context.repos.invoice
+    //   );
 
-      const resultEither = await useCase.execute(transaction);
+    //   const resultEither = await useCase.execute(transaction);
 
-      if (resultEither.isLeft()) {
-        console.log(resultEither.value.errorValue());
-        return res.status(500);
-      }
+    //   if (resultEither.isLeft()) {
+    //     console.log(resultEither.value.errorValue());
+    //     return res.status(500);
+    //   }
 
-      return resultEither.value.getValue();
-    });
+    //   return resultEither.value.getValue();
+    // });
 
     // app.get('/api/jwt-test', auth.enforce(), (req, res) => {
     //   res.status(200).json(req.auth);

@@ -28,7 +28,7 @@ const PAYMENT_METHODS = {
   bankTransfer: "bankTransfer",
 };
 
-type PaymentStatus = "PENDING" | "FAILED" | "COMPLETED";
+type PaymentStatus = "CREATED" | "PENDING" | "FAILED" | "COMPLETED";
 
 interface Props {
   ccToken: string;

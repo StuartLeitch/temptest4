@@ -7,20 +7,27 @@ const formatAlterTableEnumSql = (tableName, columnName, enums) => {
     `ALTER TABLE ${tableName} DROP CONSTRAINT IF EXISTS ${constraintName};`,
     `ALTER TABLE ${tableName} ADD CONSTRAINT ${constraintName} CHECK (${columnName} = ANY (ARRAY['${enums.join(
       "'::text, '"
-    )}'::text]));`
+    )}'::text]));`,
   ].join('\n');
 };
 
 module.exports.up = async function (knex) {
   return await knex.raw(
     formatAlterTableEnumSql('payments', 'status', [
-      'PENDING', 'FAILED', 'COMPLETED', 'CREATED'
+      'PENDING',
+      'FAILED',
+      'COMPLETED',
+      'CREATED',
     ])
   );
 };
 
-module.exports.down = function (knex) {
+module.exports.down = async function (knex) {
   return await knex.raw(
-    formatAlterTableEnumSql('payments', 'status', ['PENDING', 'FAILED', 'COMPLETED'])
+    formatAlterTableEnumSql('payments', 'status', [
+      'PENDING',
+      'FAILED',
+      'COMPLETED',
+    ])
   );
 };

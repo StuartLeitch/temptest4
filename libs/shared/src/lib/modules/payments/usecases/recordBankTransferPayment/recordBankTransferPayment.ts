@@ -104,11 +104,13 @@ export class RecordBankTransferPaymentUsecase
       foreignPaymentId: request.paymentReference,
     };
 
-    const usecase = new RecordPaymentUsecase(
-      this.paymentRepo,
-      this.invoiceRepo
-    );
+    // const usecase = new RecordPaymentUsecase(
+    //   this.paymentRepo,
+    //   this.invoiceRepo
+    // );
 
-    return await usecase.execute(payload);
+    // return await usecase.execute(payload);
+
+    return null;
   }
 }
