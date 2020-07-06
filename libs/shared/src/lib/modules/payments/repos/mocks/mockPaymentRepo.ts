@@ -54,6 +54,21 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
     return payment;
   }
 
+  async getPaymentByForeignId(foreignPaymentId: string): Promise<Payment> {
+    const result = this._items.find(
+      (item) => item.foreignPaymentId === foreignPaymentId
+    );
+
+    if (!result) {
+      throw RepoError.createEntityNotFoundError(
+        'payment by foreignPaymentId',
+        foreignPaymentId
+      );
+    }
+
+    return result;
+  }
+
   public async updatePayment(payment: Payment): Promise<Payment> {
     const alreadyExists = await this.exists(payment);
 

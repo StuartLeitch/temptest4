@@ -66,8 +66,9 @@ export class CreatePaymentUsecase
       const result = await new AsyncEither(request)
         .then(this.validateRequired)
         .then(this.createPayment)
-        .map(this.setAndDispatchEvents)
         .then(this.savePayment)
+        .map(this.setAndDispatchEvents)
+        .map((request) => request.payment)
         .execute();
       return result;
     } catch (err) {
@@ -139,12 +140,10 @@ export class CreatePaymentUsecase
     return request;
   }
 
-  private async savePayment<T extends WithPayment>(
-    request: T
-  ): Promise<Either<Errors.PaymentSavingDbError, Payment>> {
+  private async savePayment<T extends WithPayment>(request: T) {
     try {
-      const result = await this.paymentRepo.save(request.payment);
-      return right(result);
+      const payment = await this.paymentRepo.save(request.payment);
+      return right({ ...request, payment });
     } catch (e) {
       return left(new Errors.PaymentSavingDbError(e));
     }

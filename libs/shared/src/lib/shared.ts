@@ -167,6 +167,8 @@ export * from './modules/payments/usecases/paypalPaymentApproved/paypal-payment-
 export * from './modules/payments/usecases/paypalPaymentApproved/paypal-payment-approved.dto';
 export * from './modules/payments/usecases/paypalProcessFinished/paypal-process-finished';
 export * from './modules/payments/usecases/paypalProcessFinished/paypal-process-finished.dto';
+export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id';
+export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id.dto';
 
 export * from './modules/payments/domain/contracts/PaymentModel';
 export * from './modules/payments/domain/strategies/PaymentFactory';
