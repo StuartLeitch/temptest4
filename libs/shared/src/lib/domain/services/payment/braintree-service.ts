@@ -1,12 +1,5 @@
-import { PaymentClientToken } from '../../../domain/PaymentClientToken';
-
-interface TransactionResult {
-  success: boolean;
-  transaction: {
-    status: string;
-    type: string;
-  };
-}
+import { PaymentClientToken } from '../../PaymentClientToken';
+import { ExternalOrderId } from '../../external-order-id';
 
 interface TransactionRequest {
   invoiceReferenceNumber: string;
@@ -16,12 +9,11 @@ interface TransactionRequest {
 }
 
 interface Service {
-  createTransaction(request: TransactionRequest): Promise<TransactionResult>;
+  createTransaction(request: TransactionRequest): Promise<ExternalOrderId>;
   generateClientToken(): Promise<PaymentClientToken>;
 }
 
 export {
   TransactionRequest as BraintreeTransactionRequest,
-  TransactionResult as BraintreeTransactionResult,
-  Service as BraintreeService,
+  Service as BraintreeServiceContract,
 };

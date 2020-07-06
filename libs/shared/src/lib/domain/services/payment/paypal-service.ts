@@ -1,4 +1,4 @@
-import { PaymentClientToken } from '../../../domain/PaymentClientToken';
+import { ExternalOrderId } from '../../external-order-id';
 
 import { PayPalOrder } from './paypal-types';
 
@@ -9,9 +9,8 @@ interface OrderRequest {
 }
 
 interface Service {
-  fetchAccessToken: Promise<any>;
+  createOrder(request: OrderRequest): Promise<ExternalOrderId>;
   getOrder(orderId: string): Promise<PayPalOrder>;
-  createOrder(request: OrderRequest): Promise<PayPalOrder>;
 }
 
-export { Service as PayPalService };
+export { OrderRequest as PayPalOrderRequest, Service as PayPalServiceContract };
