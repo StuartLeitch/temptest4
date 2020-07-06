@@ -1,11 +1,16 @@
 import { Behavior } from '../../../../../core/logic/strategy';
 
+import { ExternalOrderId } from '../../../../../domain/external-order-id';
+
+export interface PaymentDTO {
+  invoiceReferenceNumber: string;
+  payerIdentification: string;
+  manuscriptCustomId: string;
+  invoiceTotal: number;
+}
+
 export abstract class PayBehavior implements Behavior {
-  private _type = Symbol.for('@PayBehavior');
+  readonly type = Symbol.for('@PayBehavior');
 
-  get type(): symbol {
-    return this._type;
-  }
-
-  abstract pay(): Promise<unknown>;
+  abstract makePayment(request: PaymentDTO): Promise<ExternalOrderId>;
 }

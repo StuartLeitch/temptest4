@@ -1,7 +1,16 @@
 import { Behavior } from '../../../../core/logic/strategy';
 import { Strategy } from '../../../../core/logic/strategy';
 
-import { PayBehavior } from './behaviors';
+import { ExternalOrderId } from '../../../../domain/external-order-id';
+
+import { PaymentMethodId } from '../PaymentMethodId';
+
+import { PayBehavior, PaymentDTO } from './behaviors';
+
+interface PaymentDetails {
+  foreignPaymentId: ExternalOrderId;
+  paymentMethodId: PaymentMethodId;
+}
 
 export class PaymentStrategy implements Strategy {
   private _type = Symbol.for('@PaymentStrategy');
@@ -15,11 +24,19 @@ export class PaymentStrategy implements Strategy {
     return this.behaviors.map((b) => b.type);
   }
 
-  constructor(private payBehavior: PayBehavior) {
+  constructor(
+    private paymentMethod: PaymentMethodId,
+    private payBehavior: PayBehavior
+  ) {
     this.behaviors.push(payBehavior);
   }
 
-  pay(): Promise<unknown> {
-    return this.payBehavior.pay();
+  async makePayment(request: PaymentDTO): Promise<PaymentDetails> {
+    const foreignPaymentId = await this.payBehavior.makePayment(request);
+
+    return {
+      paymentMethodId: this.paymentMethod,
+      foreignPaymentId,
+    };
   }
 }
