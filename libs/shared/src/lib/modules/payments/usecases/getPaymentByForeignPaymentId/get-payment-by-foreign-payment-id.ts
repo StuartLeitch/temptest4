@@ -13,6 +13,8 @@ import {
   Authorize,
 } from '../../../../domain/authorization/decorators/Authorize';
 
+import { Payment } from '../../domain/Payment';
+
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { GetPaymentByForeignPaymentIdResponse as Response } from './get-payment-by-foreign-payment-id.response';
@@ -63,7 +65,9 @@ export class GetPaymentByForeignPaymentIdUsecase
     return right(request);
   }
 
-  private async attachPayment<T extends WithForeignId>(request: T) {
+  private async attachPayment<T extends WithForeignId>(
+    request: T
+  ): Promise<Either<Errors.DbCommunicationError, T & { payment: Payment }>> {
     try {
       const payment = await this.paymentRepo.getPaymentByForeignId(
         request.foreignPaymentId

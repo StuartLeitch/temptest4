@@ -53,5 +53,5 @@ const Paypal: React.FunctionComponent<Props> = ({
 };
 
 export default scriptLoader(
-  `https://www.paypal.com/sdk/js?intent=authorize&client-id=${CLIENT[ENV]}`,
+  `https://www.paypal.com/sdk/js?client-id=${CLIENT[ENV]}`,
 )(Paypal);

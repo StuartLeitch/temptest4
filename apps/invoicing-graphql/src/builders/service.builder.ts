@@ -1,3 +1,5 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import { BullScheduler } from '@hindawi/sisif';
 import {
   PaymentMethodRepoContract,
@@ -5,16 +7,15 @@ import {
   PaymentStrategyFactory,
   PayPalPaymentBehavior,
   ExchangeRateService,
+  LoggerContract,
   LoggerBuilder,
   WaiverService,
   EmailService,
   VATService,
-  LoggerContract,
 } from '@hindawi/shared';
 
 import {
   BraintreeService,
-  CheckoutService,
   NetSuiteService,
   PayPalService,
   ErpService,
@@ -26,7 +27,6 @@ import { Repos } from './repo.builder';
 
 export interface Services {
   logger: LoggerContract;
-  checkoutService: CheckoutService;
   vatService: VATService;
   waiverService: WaiverService;
   emailService: EmailService;
@@ -72,7 +72,6 @@ export function buildServices(
 
   return {
     logger: loggerBuilder.getLogger(),
-    checkoutService: new CheckoutService(),
     vatService: new VATService(),
     waiverService: new WaiverService(repos.waiver, repos.editor),
     emailService: new EmailService(

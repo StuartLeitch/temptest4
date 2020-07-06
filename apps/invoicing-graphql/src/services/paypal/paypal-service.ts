@@ -66,7 +66,7 @@ export class PayPalService implements ServiceContract {
     >
   > {
     const newOrder: PayPalOrderRequest = {
-      intent: PayPalIntent.AUTHORIZE,
+      intent: PayPalIntent.CAPTURE,
       purchase_units: [
         {
           description: `${request.manuscriptCustomId} Article Processing charges`,
