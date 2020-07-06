@@ -4,6 +4,7 @@ import { Either } from '../../../../core/logic/Either';
 import * as Errors from './paypal-process-finished.errors';
 
 export type PayPalProcessFinishedResponse = Either<
+  | Errors.PayPalOrderStatusRequiredError
   | Errors.UpdatePaymentStatusDbError
   | Errors.OrderIdRequiredError
   | UnexpectedError,

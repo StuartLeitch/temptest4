@@ -6,6 +6,12 @@ export class OrderIdRequiredError extends UseCaseError {
   }
 }
 
+export class PayPalOrderStatusRequiredError extends UseCaseError {
+  constructor() {
+    super(`PayPal order status is required`);
+  }
+}
+
 export class UpdatePaymentStatusDbError extends UseCaseError {
   constructor(err: Error) {
     super(
