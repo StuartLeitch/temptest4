@@ -1,8 +1,11 @@
 import {
   TransactionRequest,
+  ValidatedResponse,
   BraintreeGateway,
   GatewayConfig,
+  ClientToken,
   Environment,
+  Transaction,
 } from 'braintree';
 
 import {
@@ -63,15 +66,22 @@ class Service implements ServiceContract {
       },
     };
 
-    const res = await this.gateway.transaction.sale(a);
-    if (!res.success) {
-      this.logger.error(
-        `Error on braintree transaction.sale, with message: ${res.message}`
-      );
-      return left(new Errors.UnsuccessfulSale(res.message));
+    let result: ValidatedResponse<Transaction>;
+
+    try {
+      result = await this.gateway.transaction.sale(a);
+    } catch (e) {
+      return left(new Errors.UnexpectedError(e));
     }
 
-    return right(ExternalOrderId.create(res.transaction.id));
+    if (!result.success) {
+      this.logger.error(
+        `Error on braintree transaction.sale, with message: ${result.message}`
+      );
+      return left(new Errors.UnsuccessfulSale(result.message));
+    }
+
+    return right(ExternalOrderId.create(result.transaction.id));
   }
 
   async generateClientToken(): Promise<
@@ -80,8 +90,24 @@ class Service implements ServiceContract {
       PaymentClientToken
     >
   > {
-    // this.gateway.clientToken.generate();
-    return null;
+    let result: ValidatedResponse<ClientToken>;
+
+    try {
+      result = await this.gateway.clientToken.generate({
+        merchantAccountId: this.merchantAccountId,
+      });
+    } catch (e) {
+      return left(new Errors.UnexpectedError(e));
+    }
+
+    if (!result.success) {
+      this.logger.error(
+        `Error on braintree clientToken.generate, with message: ${result.message}`
+      );
+      return left(new Errors.UnsuccessfulTokenGeneration(result.message));
+    }
+
+    return right(PaymentClientToken.create(result.clientToken).getValue());
   }
 }
 

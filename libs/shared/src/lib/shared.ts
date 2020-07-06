@@ -216,7 +216,6 @@ export * from './infrastructure/message-queues/payloadBuilder';
 // * Services Contracts
 export * from './domain/services/payment/braintree-service';
 export * from './domain/services/payment/paypal-service';
-export * from './domain/services/payment/paypal-types';
 
 // * Domain Types
 export * from './domain/PaymentClientToken';

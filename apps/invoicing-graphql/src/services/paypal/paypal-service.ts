@@ -1,6 +1,29 @@
 import * as checkoutNodeJsSDK from '@paypal/checkout-server-sdk';
 
-import { PayPalEnvironment, PayPalHttpClient, PayPalRequest } from './types';
+import {
+  PayPalServiceContract as ServiceContract,
+  PayPalOrderResponse as OrderResponse,
+  PayPalOrderRequest as OrderRequest,
+  PayPalOrderStatus as OrderStatus,
+  ExternalOrderId,
+  Either,
+  right,
+  left,
+} from '@hindawi/shared';
+
+import {
+  PayPalOrderResponse,
+  PayPalOrderRequest,
+  OrdersCreateRequest,
+  PayPalEnvironment,
+  PayPalHttpClient,
+  OrdersGetRequest,
+  ResponsePrefer,
+  ItemCategory,
+  PayPalIntent,
+  UserAction,
+  Response,
+} from './types';
 
 export interface PayPalServiceData {
   clientSecret: string;
@@ -8,7 +31,7 @@ export interface PayPalServiceData {
   clientId: string;
 }
 
-export class PayPalService implements PayPalHttpClient {
+export class PayPalService implements ServiceContract {
   private httpClient: PayPalHttpClient;
 
   constructor(connData: PayPalServiceData) {
@@ -32,19 +55,116 @@ export class PayPalService implements PayPalHttpClient {
     }
   }
 
-  async execute(request: PayPalRequest): Promise<any> {
-    return this.httpClient.execute(request);
+  async createOrder(
+    request: OrderRequest
+  ): Promise<Either<unknown, ExternalOrderId>> {
+    const newOrder: PayPalOrderRequest = {
+      intent: PayPalIntent.AUTHORIZE,
+      purchase_units: [
+        {
+          description: `${request.manuscriptCustomId} Article Processing charges`,
+          invoice_id: request.invoiceReferenceNumber,
+          custom_id: request.invoiceId,
+          amount: {
+            value: request.paymentTotal.toString(),
+            currency_code: 'USD',
+            breakdown: {
+              item_total: {
+                value: request.netAmount.toString(),
+                currency_code: 'USD',
+              },
+              tax_total: request.vatAmount
+                ? {
+                    value: request.vatAmount.toString(),
+                    currency_code: 'USD',
+                  }
+                : undefined,
+              discount: request.discountAmount
+                ? {
+                    value: request.discountAmount.toString(),
+                    currency_code: 'USD',
+                  }
+                : undefined,
+            },
+          },
+          items: [
+            {
+              name: `Article Processing charges for manuscript ${request.manuscriptCustomId}`,
+              quantity: '1',
+              unit_amount: {
+                value: request.netAmount.toString(),
+                currency_code: 'USD',
+              },
+              category: ItemCategory.DIGITAL_GOODS,
+              tax: {
+                value: request.vatAmount.toString(),
+                currency_code: 'USD',
+              },
+            },
+          ],
+        },
+      ],
+      application_context: {
+        user_action: UserAction.PAY_NOW,
+      },
+    };
+
+    let response: Response<PayPalOrderResponse>;
+
+    try {
+      response = await this.httpClient.execute<PayPalOrderResponse>(
+        this.createOrderRequest(newOrder)
+      );
+    } catch (e) {
+      return left(e);
+    }
+
+    if (response.statusCode[0] !== '2') {
+      return left(null);
+    }
+
+    return right(ExternalOrderId.create(response.result.id));
   }
 
-  fetchAccessToken(): Promise<any> {
-    return this.httpClient.fetchAccessToken();
+  async getOrder(orderId: string): Promise<Either<unknown, OrderResponse>> {
+    let response: Response<PayPalOrderResponse>;
+
+    try {
+      response = await this.httpClient.execute<PayPalOrderResponse>(
+        this.getOrderRequest(orderId)
+      );
+    } catch (e) {
+      return left(e);
+    }
+
+    if (response.statusCode[0] !== '2') {
+      return left(null);
+    }
+
+    const order = response.result;
+    const orderDetails: OrderResponse = {
+      totalPayed: Number.parseFloat(order.purchase_units[0].amount.value),
+      invoiceReferenceNumber: order.purchase_units[0].custom_id,
+      status: (order.status as unknown) as OrderStatus,
+    };
+
+    return right(orderDetails);
   }
 
-  getTimeout(): number {
-    return this.httpClient.getTimeout();
+  private createOrderRequest(payload: PayPalOrderRequest): OrdersCreateRequest {
+    const newRequest: OrdersCreateRequest = checkoutNodeJsSDK.orders.OrdersCreateRequest();
+
+    newRequest.prefer(ResponsePrefer.REPRESENTATION);
+    newRequest.requestBody(payload);
+
+    return newRequest;
   }
 
-  getUserAgent(): string {
-    return this.httpClient.getUserAgent();
+  private getOrderRequest(orderId: string): OrdersGetRequest {
+    const newRequest: OrdersGetRequest = checkoutNodeJsSDK.orders.OrdersGetRequest(
+      orderId
+    );
+
+    return newRequest;
   }
 }

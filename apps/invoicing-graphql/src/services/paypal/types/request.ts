@@ -6,3 +6,8 @@ export interface PayPalRequest {
   path: string;
   verb: Verb;
 }
+
+export enum ResponsePrefer {
+  REPRESENTATION = 'return=representation',
+  MINIMAL = 'return=minimal',
+}

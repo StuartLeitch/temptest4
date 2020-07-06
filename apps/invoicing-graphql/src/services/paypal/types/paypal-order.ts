@@ -1,13 +1,11 @@
+import { PayPalLinkDescription as LinkDescription } from './link-description';
+import {
+  PayPalPurchaseUnit as PurchaseUnit,
+  PayPalPurchaseUnitRequest,
+} from './purchase-unit';
+import { PayPalAddress as Address } from './address';
 import { PayPalIntent as Intent } from './intent';
 import { PayPalStatus as Status } from './status';
-import { PayPalPurchaseUnit as PurchaseUnit } from './purchase-unit';
-import { PayPalLinkDescription as LinkDescription } from './link-description';
-import { PayPalAddress as Address } from './address';
-
-export interface PayPalOrder {
-  intent: Intent;
-  purchase_units: [];
-}
 
 enum CardBrand {
   VISA = 'VISA',
@@ -90,7 +88,46 @@ interface Payer {
   address: Address;
 }
 
-export interface PayPalCreateOrderResponse {
+enum ShippingPreference {
+  SET_PROVIDED_ADDRESS = 'SET_PROVIDED_ADDRESS',
+  GET_FROM_FILE = 'GET_FROM_FILE',
+  NO_SHIPPING = 'NO_SHIPPING',
+}
+
+export enum UserAction {
+  CONTINUE = 'CONTINUE',
+  PAY_NOW = 'PAY_NOW',
+}
+
+enum PayeePreferredPaymentSource {
+  IMMEDIATE_PAYMENT_REQUIRED = 'IMMEDIATE_PAYMENT_REQUIRED',
+  UNRESTRICTED = 'UNRESTRICTED',
+}
+
+interface PaymentMethod {
+  payer_selected?: string;
+  payee_preferred?: PayeePreferredPaymentSource;
+}
+
+interface OrderApplicationContext {
+  brand_name?: string;
+  locale?: string;
+  landing_page?: string;
+  shipping_preference?: ShippingPreference;
+  user_action?: UserAction;
+  payment_method?: PaymentMethod;
+  return_url?: string;
+  cancel_url?: string;
+}
+
+export interface PayPalOrderRequest {
+  intent: Intent;
+  payer?: Payer;
+  purchase_units: Array<PayPalPurchaseUnitRequest>;
+  application_context?: OrderApplicationContext;
+}
+
+export interface PayPalOrderResponse {
   create_time: string;
   update_time: string;
   id: string;

@@ -35,7 +35,7 @@ enum DisbursementMode {
   DELAYED = 'DELAYED',
 }
 
-enum ItemCategory {
+export enum ItemCategory {
   PHYSICAL_GOODS = 'PHYSICAL_GOODS',
   DIGITAL_GOODS = 'DIGITAL_GOODS',
 }
