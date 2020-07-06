@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // * Core Domain
 import { Either, left, right } from '../../../../core/logic/Either';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
-import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
@@ -65,7 +65,7 @@ export class PayPalPaymentApprovedUsecase
         .map(() => null)
         .execute();
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 

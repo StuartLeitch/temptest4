@@ -4,8 +4,8 @@
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Either, left, right } from '../../../../core/logic/Either';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
-import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import {
@@ -63,14 +63,15 @@ export class CreatePaymentUsecase
   @Authorize('payments:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      return new AsyncEither(request)
+      const result = await new AsyncEither(request)
         .then(this.validateRequired)
         .then(this.createPayment)
         .map(this.setAndDispatchEvents)
         .then(this.savePayment)
         .execute();
+      return result;
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 

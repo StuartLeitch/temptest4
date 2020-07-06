@@ -26,3 +26,12 @@ export namespace AppError {
     }
   }
 }
+
+export class UnexpectedError extends UseCaseError {
+  constructor(err: Error, msg?: string) {
+    const customMsg = msg ? `Error additional message: ${msg}` : '';
+    super(
+      `${customMsg} \n An unexpected error ocurred: ${err.message}, with stack: ${err.stack}`
+    );
+  }
+}

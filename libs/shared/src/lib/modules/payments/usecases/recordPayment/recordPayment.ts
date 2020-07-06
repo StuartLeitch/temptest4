@@ -4,8 +4,8 @@
 // * Core Domain
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { Either, left, right } from '../../../../core/logic/Either';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
-import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -26,10 +26,6 @@ import {
   InvoiceRepoContract,
 } from '../../../invoices/repos';
 
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Invoice } from '../../../invoices/domain/Invoice';
-import { Payer } from '../../../payers/domain/Payer';
-
 import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
@@ -41,43 +37,19 @@ import {
   PaymentStrategySelectionData,
   PaymentStrategyFactory,
 } from '../../domain/strategies/payment-strategy-factory';
+import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
+
 import {
-  PaymentStrategy,
-  PaymentDetails,
-} from '../../domain/strategies/payment-strategy';
+  SelectionData,
+  WithInvoiceId,
+  PaymentData,
+  WithInvoice,
+  WithPayment,
+} from './helper-types';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
-
-interface WithInvoiceId {
-  invoiceId: string;
-}
-
-interface WithInvoice {
-  invoice: Invoice;
-}
-
-interface SelectionData {
-  payerIdentification?: string;
-  paymentReference?: string;
-}
-
-interface PaymentData {
-  payerIdentification?: string;
-  paymentReference?: string;
-  strategy: PaymentStrategy;
-  manuscript: Manuscript;
-  invoice: Invoice;
-  payer: Payer;
-}
-
-interface WithPayment {
-  paymentDetails: PaymentDetails;
-  datePaid?: string;
-  invoice: Invoice;
-  payer: Payer;
-}
 
 export class RecordPaymentUsecase
   implements
@@ -106,7 +78,7 @@ export class RecordPaymentUsecase
 
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      return new AsyncEither(request)
+      const result = await new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.attachInvoice(context))
         .then(this.attachInvoiceItems(context))
@@ -117,6 +89,7 @@ export class RecordPaymentUsecase
         .then(this.savePayment(context))
         .map((data) => data.payment)
         .execute();
+      return result;
     } catch (e) {
       return left(this.newUnexpectedError(e, request.invoiceId));
     }
@@ -260,8 +233,8 @@ export class RecordPaymentUsecase
     };
   }
 
-  private newUnexpectedError(e: Error, id: string): AppError.UnexpectedError {
-    return new AppError.UnexpectedError(
+  private newUnexpectedError(e: Error, id: string): UnexpectedError {
+    return new UnexpectedError(
       e,
       `Recording payment for invoice with id {${id}}`
     );

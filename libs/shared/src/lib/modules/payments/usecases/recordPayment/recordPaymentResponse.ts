@@ -1,4 +1,4 @@
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Either } from '../../../../core/logic/Result';
 
 import { Payment } from '../../../payments/domain/Payment';
@@ -8,6 +8,6 @@ export type RecordPaymentResponse = Either<
   | Errors.InvoiceTotalLessThanZeroError
   | Errors.InvoiceIdRequiredError
   | Errors.InvoiceNotFountError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Payment
 >;

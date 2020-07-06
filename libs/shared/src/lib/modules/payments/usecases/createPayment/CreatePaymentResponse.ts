@@ -1,4 +1,4 @@
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Either } from '../../../../core/logic/Result';
 
 import { Payment } from './../../domain/Payment';
@@ -14,6 +14,6 @@ export type CreatePaymentResponse = Either<
   | Errors.PaymentSavingDbError
   | Errors.AmountRequiredError
   | Errors.StatusRequiredError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Payment
 >;
