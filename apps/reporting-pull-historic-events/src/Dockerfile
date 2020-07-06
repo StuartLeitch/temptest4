@@ -21,7 +21,7 @@ RUN yarn install --frozen-lockfile --production
 FROM node:14-alpine
 
 COPY --from=build /home/app/node_modules ./node_modules
-
+COPY package.json .
 # Copying the rest of the code to the working directory
 COPY config/ ./config/
 COPY dist/apps/reporting-pull-historic-events .

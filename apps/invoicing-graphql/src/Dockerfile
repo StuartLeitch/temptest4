@@ -22,6 +22,7 @@ FROM node:14-alpine
 
 COPY --from=build /home/app/node_modules ./node_modules
 COPY --from=build /usr/local/bin/phantomjs /usr/local/bin/phantomjs
+COPY package.json .
 
 # Copying the rest of the code to the working directory
 COPY config/ ./config/
