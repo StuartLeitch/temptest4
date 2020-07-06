@@ -200,6 +200,7 @@
     "@storybook/addon-notes": "5.3.19",
     "@storybook/react": "5.3.19",
     "@testing-library/react": "10.4.7",
+    "@types/braintree": "^2.22.3",
     "@types/bull": "3.14.0",
     "@types/chai": "4.2.11",
     "@types/color": "3.0.1",
