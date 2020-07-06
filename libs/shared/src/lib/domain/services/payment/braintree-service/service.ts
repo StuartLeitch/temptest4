@@ -1,7 +1,8 @@
 import { Either } from '../../../../core/logic/Either';
 
 import { PaymentClientToken } from '../../../PaymentClientToken';
-import { ExternalOrderId } from '../../../external-order-id';
+
+import { ExternalOrderId } from '../../../../modules/payments/domain/external-order-id';
 
 import {
   UnsuccessfulTokenGeneration,

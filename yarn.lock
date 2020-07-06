@@ -5872,6 +5872,13 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/braintree@^2.22.3":
+  version "2.22.3"
+  resolved "https://registry.yarnpkg.com/@types/braintree/-/braintree-2.22.3.tgz#8f8daee23de47c4eacb5f0f56b16b327145446be"
+  integrity sha512-WXt9ouR+2szl+Iyqouv5Di2opZTM9M3LURquXdHp2dkW9dWGXT3bgHmoW4SHN+mrscDQKWeQXzUfcn9o1hGl/g==
+  dependencies:
+    "@types/node" "*"
+
 "@types/bull@3.14.0":
   version "3.14.0"
   resolved "https://registry.yarnpkg.com/@types/bull/-/bull-3.14.0.tgz#60741d3f5006bd4e17b02ff036e6ecef7ac47a6e"

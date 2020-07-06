@@ -99,7 +99,9 @@ export class CreateCreditNoteUsecase
 
       // * check invoice status
       if (invoice.status === InvoiceStatus.DRAFT) {
-        return left(Result.ok<void>());
+        return left(
+          new CreateCreditNoteErrors.InvoiceIsDraftError(request.invoiceId)
+        );
       }
 
       // * set the invoice status to FINAL

@@ -1,6 +1,6 @@
 import { Either } from '../../../../core/logic/Either';
 
-import { ExternalOrderId } from '../../../external-order-id';
+import { ExternalOrderId } from '../../../../modules/payments/domain/external-order-id';
 
 import {
   UnsuccessfulOrderRetrieval,
