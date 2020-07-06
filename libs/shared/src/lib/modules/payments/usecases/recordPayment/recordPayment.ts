@@ -1,86 +1,162 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, left, right } from '../../../../core/logic/Either';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { AppError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../domain/authorization';
 
 // * Usecase specific
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { InvoiceRepoContract } from '../../../invoices/repos';
-import { PaymentRepoContract } from '../../repos/paymentRepo';
-import { PaymentMap } from '../../mapper/Payment';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
+import { PaymentRepoContract } from '../../repos';
+import {
+  InvoiceItemRepoContract,
+  InvoiceRepoContract,
+} from '../../../invoices/repos';
 
-import { RecordPaymentResponse } from './recordPaymentResponse';
-import { RecordPaymentDTO } from './recordPaymentDTO';
+import { Invoice } from '../../../invoices/domain/Invoice';
+
+import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
+
+import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
+
+import { RecordPaymentResponse as Response } from './recordPaymentResponse';
+import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
+import * as Errors from './recordPaymentErrors';
+
+interface WithInvoiceId {
+  invoiceId: string;
+}
+
+interface WithInvoice {
+  invoice: Invoice;
+}
 
 export class RecordPaymentUsecase
   implements
-    UseCase<
-      RecordPaymentDTO,
-      Promise<RecordPaymentResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      RecordPaymentDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
+    private strategyFactory: PaymentStrategyFactory,
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
     private paymentRepo: PaymentRepoContract,
-    private invoiceRepo: InvoiceRepoContract
-  ) {}
+    private invoiceRepo: InvoiceRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
+    private payerRepo: PayerRepoContract,
+    private logger: LoggerContract
+  ) {
+    this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
+    this.validateRequest = this.validateRequest.bind(this);
+    this.attachInvoice = this.attachInvoice.bind(this);
+    this.attachPayer = this.attachPayer.bind(this);
+  }
 
-  public async execute(
-    payload: RecordPaymentDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<RecordPaymentResponse> {
-    const paymentPayload = {
-      invoiceId: payload.invoiceId,
-      amount: payload.amount,
-      payerId: payload.payerId,
-      foreignPaymentId: payload.foreignPaymentId,
-      paymentMethodId: payload.paymentMethodId,
-      datePaid: payload.datePaid,
-      markInvoiceAsPaid: !!payload.markInvoiceAsPaid,
-    };
-
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const payment = PaymentMap.toDomain(paymentPayload);
+      const execution = new AsyncEither(request)
+        .then(this.validateRequest)
+        .then(this.attachInvoice(context))
+        .then(this.attachInvoiceItems(context))
+        .then(this.attachPayer(context))
+        .execute();
 
-      const invoice = await this.invoiceRepo.getInvoiceById(
-        InvoiceId.create(new UniqueEntityID(payload.invoiceId)).getValue()
+      return null;
+      return execution;
+    } catch (e) {
+      return left(this.newUnexpectedError(e, request.invoiceId));
+    }
+  }
+
+  private async validateRequest<T extends DTO>(
+    request: T
+  ): Promise<
+    Either<
+      Errors.PayerIdentificationRequiredError | Errors.InvoiceIdRequiredError,
+      T
+    >
+  > {
+    if (!request.invoiceId) {
+      return left(new Errors.InvoiceIdRequiredError());
+    }
+    if (!request.payerIdentification) {
+      return left(new Errors.PayerIdentificationRequiredError());
+    }
+
+    return right(request);
+  }
+
+  private attachInvoice(context: Context) {
+    return async <T extends WithInvoiceId>(request: T) => {
+      const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
+
+      return new AsyncEither(request.invoiceId)
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((result) => result.getValue())
+        .map((invoice) => ({
+          ...request,
+          invoice,
+        }))
+        .execute();
+    };
+  }
+
+  private attachInvoiceItems(context: Context) {
+    return async <T extends WithInvoice>(request: T) => {
+      const usecase = new GetItemsForInvoiceUsecase(
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo
       );
 
-      // const invoiceTotal = invoice.getInvoiceTotal();
+      return new AsyncEither(request.invoice.id.toString())
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((result) => result.getValue())
+        .map((items) => {
+          request.invoice.addItems(items);
+          return request;
+        })
+        .execute();
+    };
+  }
 
-      // if (payment.amount.value < invoiceTotal) {
-      //   return left(
-      //     new RecordPaymentErrors.InvalidPaymentAmount(payload.amount)
-      //   );
-      // }
+  private attachPayer(context: Context) {
+    return async <T extends WithInvoiceId>(request: T) => {
+      const usecase = new GetPayerDetailsByInvoiceIdUsecase(
+        this.payerRepo,
+        this.logger
+      );
 
-      if (payload.markInvoiceAsPaid) {
-        invoice.markAsPaid(payment.paymentId);
-      }
+      return new AsyncEither(request.invoiceId)
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((result) => result.getValue())
+        .map((payer) => ({ ...request, payer }))
+        .execute();
+    };
+  }
 
-      await this.paymentRepo.save(payment);
-      await this.invoiceRepo.update(invoice);
-
-      DomainEvents.dispatchEventsForAggregate(invoice.id);
-
-      return right(Result.ok(payment));
-    } catch (e) {
-      return left(new AppError.UnexpectedError(e));
-    }
+  private newUnexpectedError(e: Error, id: string): AppError.UnexpectedError {
+    return new AppError.UnexpectedError(
+      e,
+      `Recording payment for invoice with id {${id}}`
+    );
   }
 }

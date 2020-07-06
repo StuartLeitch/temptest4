@@ -14,11 +14,11 @@ import {
 
 import {
   PayPalOrderResponse,
-  PayPalOrderRequest,
   OrdersCreateRequest,
+  PayPalOrderRequest,
   PayPalEnvironment,
-  PayPalHttpClient,
   OrdersGetRequest,
+  PayPalHttpClient,
   ResponsePrefer,
   ItemCategory,
   PayPalIntent,

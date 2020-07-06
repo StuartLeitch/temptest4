@@ -8,7 +8,11 @@ export interface PaymentDTO {
   invoiceReferenceNumber: string;
   payerIdentification: string;
   manuscriptCustomId: string;
+  discountAmount: number;
   invoiceTotal: number;
+  invoiceId: string;
+  netAmount: number;
+  vatAmount: number;
 }
 
 export abstract class PaymentBehavior implements Behavior {

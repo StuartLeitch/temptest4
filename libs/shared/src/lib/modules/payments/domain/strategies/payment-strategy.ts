@@ -5,12 +5,14 @@ import { Either } from '../../../../core/logic/Either';
 import { ExternalOrderId } from '../../../../domain/external-order-id';
 
 import { PaymentMethodId } from '../PaymentMethodId';
+import { PaymentStatus } from '../Payment';
 
 import { PaymentBehavior, PaymentDTO } from './behaviors';
 
 interface PaymentDetails {
   foreignPaymentId: ExternalOrderId;
   paymentMethodId: PaymentMethodId;
+  status: PaymentStatus;
 }
 
 export class PaymentStrategy implements Strategy {
@@ -27,7 +29,8 @@ export class PaymentStrategy implements Strategy {
 
   constructor(
     private paymentMethod: PaymentMethodId,
-    private payBehavior: PaymentBehavior
+    private payBehavior: PaymentBehavior,
+    private status: PaymentStatus
   ) {
     this.behaviors.push(payBehavior);
   }
@@ -39,6 +42,7 @@ export class PaymentStrategy implements Strategy {
 
     return maybeForeignPaymentId.map((foreignPaymentId) => ({
       paymentMethodId: this.paymentMethod,
+      status: this.status,
       foreignPaymentId,
     }));
   }

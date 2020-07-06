@@ -20,7 +20,11 @@ export class PayPalPaymentBehavior extends PaymentBehavior {
     const transactionData: PayPalOrderRequest = {
       invoiceReferenceNumber: request.invoiceReferenceNumber,
       manuscriptCustomId: request.manuscriptCustomId,
+      discountAmount: request.discountAmount,
       paymentTotal: request.invoiceTotal,
+      invoiceId: request.invoiceId,
+      netAmount: request.netAmount,
+      vatAmount: request.vatAmount,
     };
 
     return this.paypalService.createOrder(transactionData);

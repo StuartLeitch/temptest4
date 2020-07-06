@@ -2,6 +2,7 @@ import { StrategyFactory } from '../../../../core/logic/strategy/strategy-factor
 
 import { PaymentMethodNames } from '../PaymentMethod';
 import { PaymentMethodId } from '../PaymentMethodId';
+import { PaymentStatus } from '../Payment';
 
 import { PaymentMethodRepoContract } from '../../repos';
 
@@ -68,11 +69,15 @@ class PaymentStrategyFactory
   private builders: Builders = {
     [StrategySelection.Braintree]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.CreditCard);
-      return new PaymentStrategy(id, this.braintreePayment);
+      return new PaymentStrategy(
+        id,
+        this.braintreePayment,
+        PaymentStatus.COMPLETED
+      );
     },
     [StrategySelection.PayPal]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.PayPal);
-      return new PaymentStrategy(id, this.paypalPayment);
+      return new PaymentStrategy(id, this.paypalPayment, PaymentStatus.CREATED);
     },
     [StrategySelection.BankTransfer]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.BankTransfer);
