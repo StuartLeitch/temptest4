@@ -152,6 +152,8 @@ export * from './modules/payments/domain/Payment';
 export * from './modules/payments/domain/PaymentId';
 export { PaymentMethod } from './modules/payments/domain/PaymentMethod';
 export * from './modules/payments/domain/PaymentMethodId';
+export * from './modules/payments/domain/external-order-id';
+export * from './modules/payments/domain/payment-proof';
 
 export * from './modules/payments/mapper/Payment';
 export * from './modules/payments/mapper/PaymentMethod';
@@ -265,8 +267,6 @@ export * from './domain/services/SQSPublishService';
 
 // * Domain Types
 export * from './domain/PaymentClientToken';
-export * from './domain/external-order-id';
-export * from './modules/payments/domain/payment-proof';
 
 export * from './core/domain/CorrelationID';
 
