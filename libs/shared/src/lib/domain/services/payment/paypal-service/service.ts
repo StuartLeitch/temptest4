@@ -1,4 +1,6 @@
-import { ExternalOrderId } from '../../external-order-id';
+import { Either } from '../../../../core/logic/Either';
+
+import { ExternalOrderId } from '../../../external-order-id';
 
 import { PayPalOrder } from './paypal-types';
 
@@ -9,8 +11,8 @@ interface OrderRequest {
 }
 
 interface Service {
-  createOrder(request: OrderRequest): Promise<ExternalOrderId>;
-  getOrder(orderId: string): Promise<PayPalOrder>;
+  createOrder(request: OrderRequest): Promise<Either<unknown, ExternalOrderId>>;
+  getOrder(orderId: string): Promise<Either<unknown, PayPalOrder>>;
 }
 
 export { OrderRequest as PayPalOrderRequest, Service as PayPalServiceContract };

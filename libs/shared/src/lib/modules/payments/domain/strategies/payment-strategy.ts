@@ -1,11 +1,12 @@
-import { Behavior } from '../../../../core/logic/strategy';
-import { Strategy } from '../../../../core/logic/strategy';
+import { StrategyError } from '../../../../core/logic/strategy-error';
+import { Behavior, Strategy } from '../../../../core/logic/strategy';
+import { Either } from '../../../../core/logic/Either';
 
 import { ExternalOrderId } from '../../../../domain/external-order-id';
 
 import { PaymentMethodId } from '../PaymentMethodId';
 
-import { PayBehavior, PaymentDTO } from './behaviors';
+import { PaymentBehavior, PaymentDTO } from './behaviors';
 
 interface PaymentDetails {
   foreignPaymentId: ExternalOrderId;
@@ -26,17 +27,19 @@ export class PaymentStrategy implements Strategy {
 
   constructor(
     private paymentMethod: PaymentMethodId,
-    private payBehavior: PayBehavior
+    private payBehavior: PaymentBehavior
   ) {
     this.behaviors.push(payBehavior);
   }
 
-  async makePayment(request: PaymentDTO): Promise<PaymentDetails> {
-    const foreignPaymentId = await this.payBehavior.makePayment(request);
+  async makePayment(
+    request: PaymentDTO
+  ): Promise<Either<StrategyError, PaymentDetails>> {
+    const maybeForeignPaymentId = await this.payBehavior.makePayment(request);
 
-    return {
+    return maybeForeignPaymentId.map((foreignPaymentId) => ({
       paymentMethodId: this.paymentMethod,
       foreignPaymentId,
-    };
+    }));
   }
 }
