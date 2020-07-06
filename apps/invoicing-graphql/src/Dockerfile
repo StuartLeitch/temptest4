@@ -26,7 +26,7 @@ COPY --from=build /usr/local/bin/phantomjs /usr/local/bin/phantomjs
 # Copying the rest of the code to the working directory
 COPY config/ ./config/
 COPY dist/apps/invoicing-graphql .
-COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
+COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ /migrations/
 
 # Make port 3000 available to the world outside this container
 EXPOSE 3000
