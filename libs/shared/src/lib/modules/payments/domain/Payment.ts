@@ -18,6 +18,8 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
 }
 
+import { PaymentCompleted } from './events';
+
 export interface PaymentProps {
   invoiceId: InvoiceId;
   payerId: PayerId;
@@ -90,5 +92,11 @@ export class Payment extends AggregateRoot<PaymentProps> {
     );
 
     return Result.ok<Payment>(payment);
+  }
+
+  public movedToCompleted(): void {
+    if (this.status === PaymentStatus.COMPLETED) {
+      this.addDomainEvent(new PaymentCompleted(this));
+    }
   }
 }

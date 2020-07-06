@@ -28,9 +28,9 @@ accessControl
   .resource('payments')
   .action('read')
   // .where(userOwnsEntity)
-    .resource('payment')
-      .action('create')
-    // .where(userOwnsEntity)
+  .resource('payment')
+  .action('create')
+  // .where(userOwnsEntity)
   .grant(Roles.AUTHOR)
   .inherits(Roles.CUSTOMER)
   .grant(Roles.ADMIN)
@@ -40,6 +40,9 @@ accessControl
   .where(tenantMatches)
   .grant(Roles.SUPER_ADMIN)
   .resource('*')
-  .action('*');
+  .action('*')
+  .grant(Roles.EVENT_HANDLER)
+  .resource('invoice')
+  .action('read');
 
 export { accessControl };

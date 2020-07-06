@@ -248,7 +248,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return Result.ok<Invoice>(invoice);
   }
 
-  public generateCreatedEvent() {
+  public generateCreatedEvent(): void {
     const now = new Date();
     this.addDomainEvent(new InvoiceCreated(this, now));
   }

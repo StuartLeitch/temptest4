@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // * Core Domain
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Either, left, right } from '../../../../core/logic/Either';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
@@ -40,11 +41,16 @@ interface WithPayment {
   payment: Payment;
 }
 
+interface DomainEventsDispatchData extends WithPayment {
+  status: string;
+}
+
 export class CreatePaymentUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private paymentRepo: PaymentRepoContract) {
+    this.setAndDispatchEvents = this.setAndDispatchEvents.bind(this);
     this.validateRequired = this.validateRequired.bind(this);
     this.createPayment = this.createPayment.bind(this);
     this.savePayment = this.savePayment.bind(this);
@@ -60,6 +66,7 @@ export class CreatePaymentUsecase
       return new AsyncEither(request)
         .then(this.validateRequired)
         .then(this.createPayment)
+        .map(this.setAndDispatchEvents)
         .then(this.savePayment)
         .execute();
     } catch (err) {
@@ -117,6 +124,18 @@ export class CreatePaymentUsecase
     } catch (e) {
       return left(new Errors.PaymentCreationError(e));
     }
+  }
+
+  private setAndDispatchEvents<T extends DomainEventsDispatchData>(request: T) {
+    const { payment, status } = request;
+
+    if (status === PaymentStatus.COMPLETED) {
+      payment.movedToCompleted();
+    }
+
+    DomainEvents.dispatchEventsForAggregate(payment.id);
+
+    return request;
   }
 
   private async savePayment<T extends WithPayment>(

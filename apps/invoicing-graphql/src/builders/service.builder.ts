@@ -15,6 +15,7 @@ import {
 import {
   BraintreeService,
   CheckoutService,
+  NetSuiteService,
   PayPalService,
   ErpService,
 } from '../services';
@@ -30,9 +31,12 @@ export interface Services {
   waiverService: WaiverService;
   emailService: EmailService;
   exchangeRateService: ExchangeRateService;
-  erpService: ErpService;
   schedulingService: BullScheduler;
   paymentStrategyFactory: PaymentStrategyFactory;
+  erp: {
+    sage: ErpService;
+    netsuite: NetSuiteService;
+  };
 }
 
 function buildPaymentStrategyFactory(
@@ -77,11 +81,11 @@ export function buildServices(
       env.app.tenantName
     ),
     exchangeRateService: new ExchangeRateService(),
-    erpService: new ErpService(loggerBuilder.getLogger(), env.salesForce),
     schedulingService: new BullScheduler(bullData, loggerBuilder.getLogger()),
     paymentStrategyFactory: buildPaymentStrategyFactory(
       repos.paymentMethod,
       loggerBuilder
     ),
+    erp: null,
   };
 }
