@@ -4,6 +4,7 @@
 import { BraintreeGateway } from '../../../../../libs/shared/src/lib/modules/payments/infrastructure/gateways/braintree/gateway';
 import {
   RecordBankTransferPaymentUsecase,
+  PayPalPaymentApprovedUsecase,
   GenerateClientTokenUsecase,
   GetPaymentMethodsUseCase,
   MigratePaymentUsecase,
@@ -127,12 +128,6 @@ export const payments: Resolvers<Context> = {
         services: { paymentStrategyFactory, logger },
       } = context;
 
-      // const usecase = new RecordPayPalPaymentUsecase(
-      //   paymentRepo,
-      //   invoiceRepo,
-      //   payPalService
-      // );
-
       const usecase = new RecordPaymentUsecase(
         paymentStrategyFactory,
         invoiceItemRepo,
@@ -162,6 +157,35 @@ export const payments: Resolvers<Context> = {
       return {
         id: confirmedPayment.foreignPaymentId,
       };
+    },
+
+    async recordPayPalPayment(parent, args, context) {
+      const { invoiceId, orderId } = args;
+
+      const {
+        repos: { payment: paymentRepo, invoice: invoiceRepo },
+      } = context;
+
+      const usecase = new PayPalPaymentApprovedUsecase(
+        invoiceRepo,
+        paymentRepo
+      );
+      const usecaseContext = { roles: [Roles.PAYER] };
+      try {
+        const result = await usecase.execute(
+          { invoiceId, payPalOrderId: orderId },
+          usecaseContext
+        );
+
+        if (result.isLeft()) {
+          throw result.value;
+        }
+
+        return invoiceId;
+      } catch (e) {
+        console.info(e);
+        throw e;
+      }
     },
 
     async migratePayment(parent, args, context) {

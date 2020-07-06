@@ -60,7 +60,7 @@ export class CreatePaymentUsecase
     return {};
   }
 
-  @Authorize('payment:create')
+  @Authorize('payments:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       return new AsyncEither(request)

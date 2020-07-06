@@ -11,11 +11,6 @@ export const getPaymentMethods = createSelector(_getPayments, (p) =>
 
 export const getToken = createSelector(_getPayments, (p) => p.payment.token);
 
-export const getPayPalOrderId = createSelector(
-  _getPayments,
-  (p) => p.payment.payPalOrderId,
-);
-
 export const paymentMethodsLoading = createSelector(
   _getPayments,
   (p) => p.getMethodsLoading.loading,
@@ -44,14 +39,4 @@ export const recordPayPalPaymentLoading = createSelector(
 export const recordPayPalPaymentError = createSelector(
   _getPayments,
   (p) => p.recordPayPalPaymentLoading.error,
-);
-
-export const createPayPalOrderLoading = createSelector(
-  _getPayments,
-  (p) => p.createPayPalOrderLoading.loading,
-);
-
-export const createPayPalOrderError = createSelector(
-  _getPayments,
-  (p) => p.createPayPalOrderLoading.error,
 );

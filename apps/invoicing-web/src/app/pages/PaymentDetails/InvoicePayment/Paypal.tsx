@@ -36,19 +36,12 @@ const Paypal: React.FunctionComponent<Props> = ({
         .Buttons({
           createOrder: async (data, actions) => {
             const a = await createPayPalOrder();
-            console.log(a);
-            return null;
+            return a;
           },
           onApprove: async (data, actions) => {
-            // const order = await actions.order.capture();
-            // const payment = {
-            //   paid: true,
-            //   cancelled: false,
-            //   payerID: data.payerID,
-            //   orderID: data.orderID,
-            // };
+            console.log(data);
             // onSuccess(payment);
-            // onSuccess();
+            onSuccess({ orderId: data.orderID });
           },
           onError,
           onCancel,
@@ -60,5 +53,5 @@ const Paypal: React.FunctionComponent<Props> = ({
 };
 
 export default scriptLoader(
-  `https://www.paypal.com/sdk/js?client-id=${CLIENT[ENV]}`,
+  `https://www.paypal.com/sdk/js?intent=authorize&client-id=${CLIENT[ENV]}`,
 )(Paypal);

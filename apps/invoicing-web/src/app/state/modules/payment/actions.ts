@@ -32,9 +32,3 @@ export const recordPayPalPayment = createAsyncAction(
   "payment/RECORD_PAY_PAL_SUCCESS",
   "payment/RECORD_PAY_PAL_ERROR",
 )<PayPalPayment, string, string>();
-
-export const createPayPalOrder = createAsyncAction(
-  "payment/CREATE_PAY_PAL_ORDER_REQUEST",
-  "payment/CREATE_PAY_PAL_ORDER_SUCCESS",
-  "payment/CREATE_PAY_PAL_ORDER_ERROR",
-)<PayPalPayment, string, string>();

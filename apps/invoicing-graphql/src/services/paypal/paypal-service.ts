@@ -123,15 +123,11 @@ export class PayPalService implements ServiceContract {
         this.createOrderRequest(newOrder)
       );
     } catch (e) {
-      console.log('---------------------------------------------');
-      console.info(e);
       this.logger.error(`Error on paypal create order`, e);
       return left(new Errors.UnexpectedError(e));
     }
 
     if (response.statusCode >= 300) {
-      console.log('---------------------------------------------');
-      console.info(response);
       this.logger.error(
         `Error on paypal create order with message: ${response.result.toString()}`
       );

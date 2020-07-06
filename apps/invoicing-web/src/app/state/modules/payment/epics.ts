@@ -18,7 +18,6 @@ import {
   getPaymentMethods,
   getClientToken,
   recordCardPayment,
-  createPayPalOrder,
 } from "./actions";
 import { getInvoice } from "./../invoice/actions";
 import { invoice } from "./../invoice/selectors";
@@ -90,9 +89,10 @@ const recordPayPalPaymentEpic: RootEpic = (
   return action$.pipe(
     filter(isActionOf(recordPayPalPayment.request)),
     switchMap((action) => {
-      const { invoiceId } = action.payload;
+      const { invoiceId, orderId } = action.payload;
       return graphqlAdapter.send(mutations.recordPayPalPayment, {
         invoiceId,
+        orderId,
       });
     }),
     withLatestFrom(state$.pipe(map(invoice))),
@@ -106,28 +106,9 @@ const recordPayPalPaymentEpic: RootEpic = (
   );
 };
 
-const createPayPalOrderEpic: RootEpic = (
-  action$,
-  state$,
-  { graphqlAdapter },
-) => {
-  return action$.pipe(
-    filter(isActionOf(createPayPalOrder.request)),
-    switchMap((action) => {
-      const { invoiceId } = action.payload;
-      return graphqlAdapter.send(mutations.createPayPalOrder, { invoiceId });
-    }),
-    map((r) => {
-      return createPayPalOrder.success(r.data.createPayPalOrder.id);
-    }),
-    catchError((err) => of(createPayPalOrder.failure(err.message))),
-  );
-};
-
 export default [
   recordPayPalPaymentEpic,
   getPaymentsMethodsEpic,
   getClientTokenEpic,
   creditCardPaymentEpic,
-  createPayPalOrderEpic,
 ];

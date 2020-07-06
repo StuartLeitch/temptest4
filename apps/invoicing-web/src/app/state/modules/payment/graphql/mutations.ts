@@ -22,18 +22,8 @@ export const creditCardPayment: ASTNode = gql`
 `;
 
 export const recordPayPalPayment: ASTNode = gql`
-  mutation recordPayPalPayment($invoiceId: ID!) {
-    recordPayPalPayment(invoiceId: $invoiceId) {
-      id
-    }
-  }
-`;
-
-export const createPayPalOrder: ASTNode = gql`
-  mutation createPayPalOrder($invoiceId: ID!) {
-    createPayPalOrder(invoiceId: $invoiceId) {
-      id
-    }
+  mutation recordPayPalPayment($invoiceId: ID!, $orderId: ID!) {
+    recordPayPalPayment(invoiceId: $invoiceId, orderId: $orderId)
   }
 `;
 

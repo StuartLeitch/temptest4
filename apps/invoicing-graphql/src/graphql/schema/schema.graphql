@@ -346,6 +346,7 @@ type Mutation {
   ): Payment!
   createCreditNote(invoiceId: String!, createDraft: Boolean): CreditNote!
   createPayPalOrder(invoiceId: ID!): PayPalOrderId!
+  recordPayPalPayment(invoiceId: ID!, orderId: ID!): ID!
   migratePayment(
     invoiceId: ID!
     payerId: String!

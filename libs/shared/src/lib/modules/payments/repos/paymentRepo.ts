@@ -8,4 +8,5 @@ export interface PaymentRepoContract extends Repo<Payment> {
   getPaymentByInvoiceId(invoiceId: InvoiceId): Promise<Payment>;
   getPaymentsByInvoiceId(invoiceId: InvoiceId): Promise<Payment[]>;
   // getPaymentCollection(params: string[]): Promise<Payment[]>;
+  updatePayment(payment: Payment): Promise<Payment>;
 }
