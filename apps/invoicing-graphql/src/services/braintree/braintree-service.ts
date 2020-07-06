@@ -51,7 +51,7 @@ class Service implements ServiceContract {
     paymentMethodNonce,
     paymentTotal,
   }: SaleRequest): Promise<
-    Either<Errors.UnexpectedError | Errors.UnsuccessfulSale, ExternalOrderId>
+    Either<Errors.UnsuccessfulSale | Errors.UnexpectedError, ExternalOrderId>
   > {
     const a: TransactionRequest = {
       paymentMethodNonce,
@@ -86,7 +86,7 @@ class Service implements ServiceContract {
 
   async generateClientToken(): Promise<
     Either<
-      Errors.UnexpectedError | Errors.UnsuccessfulTokenGeneration,
+      Errors.UnsuccessfulTokenGeneration | Errors.UnexpectedError,
       PaymentClientToken
     >
   > {

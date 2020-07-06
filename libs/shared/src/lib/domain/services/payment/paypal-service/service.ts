@@ -2,6 +2,12 @@ import { Either } from '../../../../core/logic/Either';
 
 import { ExternalOrderId } from '../../../external-order-id';
 
+import {
+  UnsuccessfulOrderRetrieval,
+  UnsuccessfulOrderCreation,
+  UnexpectedError,
+} from './errors';
+
 interface OrderRequest {
   invoiceReferenceNumber: string;
   manuscriptCustomId: string;
@@ -27,8 +33,16 @@ interface OrderResponse {
 }
 
 interface Service {
-  createOrder(request: OrderRequest): Promise<Either<unknown, ExternalOrderId>>;
-  getOrder(orderId: string): Promise<Either<unknown, OrderResponse>>;
+  createOrder(
+    request: OrderRequest
+  ): Promise<
+    Either<UnsuccessfulOrderCreation | UnexpectedError, ExternalOrderId>
+  >;
+  getOrder(
+    orderId: string
+  ): Promise<
+    Either<UnsuccessfulOrderRetrieval | UnexpectedError, OrderResponse>
+  >;
 }
 
 export {

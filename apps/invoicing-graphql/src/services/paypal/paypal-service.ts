@@ -5,6 +5,7 @@ import {
   PayPalOrderResponse as OrderResponse,
   PayPalOrderRequest as OrderRequest,
   PayPalOrderStatus as OrderStatus,
+  PayPalServiceErrors as Errors,
   ExternalOrderId,
   Either,
   right,
@@ -57,7 +58,12 @@ export class PayPalService implements ServiceContract {
 
   async createOrder(
     request: OrderRequest
-  ): Promise<Either<unknown, ExternalOrderId>> {
+  ): Promise<
+    Either<
+      Errors.UnsuccessfulOrderCreation | Errors.UnexpectedError,
+      ExternalOrderId
+    >
+  > {
     const newOrder: PayPalOrderRequest = {
       intent: PayPalIntent.AUTHORIZE,
       purchase_units: [
@@ -116,17 +122,26 @@ export class PayPalService implements ServiceContract {
         this.createOrderRequest(newOrder)
       );
     } catch (e) {
-      return left(e);
+      return left(new Errors.UnexpectedError(e));
     }
 
     if (response.statusCode[0] !== '2') {
-      return left(null);
+      return left(
+        new Errors.UnsuccessfulOrderCreation(response.result.toString())
+      );
     }
 
     return right(ExternalOrderId.create(response.result.id));
   }
 
-  async getOrder(orderId: string): Promise<Either<unknown, OrderResponse>> {
+  async getOrder(
+    orderId: string
+  ): Promise<
+    Either<
+      Errors.UnsuccessfulOrderRetrieval | Errors.UnexpectedError,
+      OrderResponse
+    >
+  > {
     let response: Response<PayPalOrderResponse>;
 
     try {
@@ -134,11 +149,13 @@ export class PayPalService implements ServiceContract {
         this.getOrderRequest(orderId)
       );
     } catch (e) {
-      return left(e);
+      return left(new Errors.UnexpectedError(e));
     }
 
     if (response.statusCode[0] !== '2') {
-      return left(null);
+      return left(
+        new Errors.UnsuccessfulOrderRetrieval(response.result.toString())
+      );
     }
 
     const order = response.result;

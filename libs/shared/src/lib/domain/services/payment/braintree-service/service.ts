@@ -3,7 +3,11 @@ import { Either } from '../../../../core/logic/Either';
 import { PaymentClientToken } from '../../../PaymentClientToken';
 import { ExternalOrderId } from '../../../external-order-id';
 
-import * as Errors from './errors';
+import {
+  UnsuccessfulTokenGeneration,
+  UnsuccessfulSale,
+  UnexpectedError,
+} from './errors';
 
 interface TransactionRequest {
   invoiceReferenceNumber: string;
@@ -15,19 +19,13 @@ interface TransactionRequest {
 interface ServiceContract {
   createTransaction(
     request: TransactionRequest
-  ): Promise<
-    Either<Errors.UnexpectedError | Errors.UnsuccessfulSale, ExternalOrderId>
-  >;
+  ): Promise<Either<UnsuccessfulSale | UnexpectedError, ExternalOrderId>>;
   generateClientToken(): Promise<
-    Either<
-      Errors.UnexpectedError | Errors.UnsuccessfulTokenGeneration,
-      PaymentClientToken
-    >
+    Either<UnsuccessfulTokenGeneration | UnexpectedError, PaymentClientToken>
   >;
 }
 
 export {
   TransactionRequest as BraintreeTransactionRequest,
   ServiceContract as BraintreeServiceContract,
-  Errors as BraintreeServiceErrors,
 };
