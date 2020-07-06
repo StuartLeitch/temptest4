@@ -7,6 +7,7 @@ import {
   PayPalOrderStatus as OrderStatus,
   PayPalServiceErrors as Errors,
   ExternalOrderId,
+  LoggerContract,
   Either,
   right,
   left,
@@ -35,7 +36,7 @@ export interface PayPalServiceData {
 export class PayPalService implements ServiceContract {
   private httpClient: PayPalHttpClient;
 
-  constructor(connData: PayPalServiceData) {
+  constructor(connData: PayPalServiceData, private logger: LoggerContract) {
     this.httpClient = new checkoutNodeJsSDK.core.PayPalHttpClient(
       this.createEnvironment(connData)
     );
@@ -122,10 +123,14 @@ export class PayPalService implements ServiceContract {
         this.createOrderRequest(newOrder)
       );
     } catch (e) {
+      this.logger.error(`Error on paypal create order`, e);
       return left(new Errors.UnexpectedError(e));
     }
 
     if (response.statusCode[0] !== '2') {
+      this.logger.error(
+        `Error on paypal create order with message: ${response.result.toString()}`
+      );
       return left(
         new Errors.UnsuccessfulOrderCreation(response.result.toString())
       );
@@ -149,10 +154,14 @@ export class PayPalService implements ServiceContract {
         this.getOrderRequest(orderId)
       );
     } catch (e) {
+      this.logger.error(`Error on paypal get order`, e);
       return left(new Errors.UnexpectedError(e));
     }
 
     if (response.statusCode[0] !== '2') {
+      this.logger.error(
+        `Error on paypal get order with message: ${response.result.toString()}`
+      );
       return left(
         new Errors.UnsuccessfulOrderRetrieval(response.result.toString())
       );

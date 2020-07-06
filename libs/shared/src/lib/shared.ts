@@ -144,6 +144,8 @@ export * from './modules/payments/usecases/getPaymentInfo/getPaymentInfo';
 export * from './modules/payments/usecases/getPaymentsByInvoiceId/getPaymentsByInvoiceIdDTO';
 export * from './modules/payments/usecases/getPaymentsByInvoiceId/getPaymentsByInvoiceId';
 
+export * from './modules/payments/domain/strategies/behaviors/implementations';
+export * from './modules/payments/domain/strategies/payment-strategy-factory';
 export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
 export * from './modules/payments/usecases/createPayment/CreatePayment';
@@ -209,9 +211,12 @@ import * as QueuePayloads from './infrastructure/message-queues/payloads';
 export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';
 
+export * from './infrastructure/logging/LoggerBuilder';
+
 // * Services Contracts
 export * from './domain/services/payment/braintree-service';
 export * from './domain/services/payment/paypal-service';
+export * from './domain/services/ExchangeRateService';
 
 // * Domain Types
 export * from './domain/PaymentClientToken';

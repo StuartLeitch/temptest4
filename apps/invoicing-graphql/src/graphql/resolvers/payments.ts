@@ -3,12 +3,11 @@
 
 import { BraintreeGateway } from '../../../../../libs/shared/src/lib/modules/payments/infrastructure/gateways/braintree/gateway';
 import {
-  RecordCreditCardPaymentUsecase,
   RecordBankTransferPaymentUsecase,
   GenerateClientTokenUsecase,
-  RecordPayPalPaymentUsecase,
   GetPaymentMethodsUseCase,
   MigratePaymentUsecase,
+  RecordPaymentUsecase,
   PaymentMethodMap,
   Roles,
 } from '@hindawi/shared';
@@ -17,8 +16,9 @@ import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/Co
 import { env } from '../../env';
 
 import { Resolvers } from '../schema';
+import { Context } from '../../builders';
 
-export const payments: Resolvers<any> = {
+export const payments: Resolvers<Context> = {
   Query: {
     async getPaymentMethods(parent, args, context) {
       const {
@@ -64,7 +64,11 @@ export const payments: Resolvers<any> = {
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           manuscript: manuscriptRepo,
+          coupon: couponRepo,
+          waiver: waiverRepo,
+          payer: payerRepo,
         },
+        services: { paymentStrategyFactory, logger },
       } = context;
       const {
         invoiceId,
@@ -74,33 +78,51 @@ export const payments: Resolvers<any> = {
         amount,
       } = args;
 
-      const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
+      // const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
+      //   paymentRepo,
+      //   invoiceRepo,
+      //   manuscriptRepo,
+      //   invoiceItemRepo
+      // );
+      const usecase = new RecordPaymentUsecase(
+        paymentStrategyFactory,
+        invoiceItemRepo,
+        manuscriptRepo,
         paymentRepo,
         invoiceRepo,
-        manuscriptRepo,
-        invoiceItemRepo,
-        BraintreeGateway
+        couponRepo,
+        waiverRepo,
+        payerRepo,
+        logger
       );
       const usecaseContext = { roles: [Roles.PAYER] };
 
-      const result = await recordCreditCardPaymentUsecase.execute(
+      // const result = await recordCreditCardPaymentUsecase.execute(
+      //   {
+      //     merchantAccountId: env.braintree.merchantAccountId,
+      //     paymentMethodId,
+      //     paymentMethodNonce,
+      //     invoiceId,
+      //     amount,
+      //     payerId,
+      //   },
+      //   usecaseContext
+      // );
+
+      const result = await usecase.execute(
         {
-          merchantAccountId: env.braintree.merchantAccountId,
-          paymentMethodId,
-          paymentMethodNonce,
+          payerIdentification: paymentMethodNonce,
           invoiceId,
-          amount,
-          payerId,
         },
         usecaseContext
       );
 
       if (result.isLeft()) {
-        console.log(result.value.errorValue());
+        console.log(result.value.message);
         return null;
       }
 
-      const confirmedPayment = result.value.getValue();
+      const confirmedPayment = result.value;
 
       return {
         id: confirmedPayment.paymentId.id.toString(),
@@ -117,31 +139,49 @@ export const payments: Resolvers<any> = {
       const { invoiceId, payerId, orderId, paymentMethodId } = args;
       const usecaseContext = { roles: [Roles.PAYER] };
       const {
-        services: { payPalService },
-        repos: { invoice: invoiceRepo, payment: paymentRepo },
+        repos: {
+          payment: paymentRepo,
+          invoice: invoiceRepo,
+          invoiceItem: invoiceItemRepo,
+          manuscript: manuscriptRepo,
+          coupon: couponRepo,
+          waiver: waiverRepo,
+          payer: payerRepo,
+        },
+        services: { paymentStrategyFactory, logger },
       } = context;
 
-      const usecase = new RecordPayPalPaymentUsecase(
+      // const usecase = new RecordPayPalPaymentUsecase(
+      //   paymentRepo,
+      //   invoiceRepo,
+      //   payPalService
+      // );
+
+      const usecase = new RecordPaymentUsecase(
+        paymentStrategyFactory,
+        invoiceItemRepo,
+        manuscriptRepo,
         paymentRepo,
         invoiceRepo,
-        payPalService
+        couponRepo,
+        waiverRepo,
+        payerRepo,
+        logger
       );
 
       const result = await usecase.execute(
         {
           invoiceId,
-          payerId,
-          orderId,
-          paymentMethodId,
         },
         usecaseContext
       );
 
       if (result.isLeft()) {
+        console.log(result.value.message);
         return null;
       }
 
-      const confirmedPayment = result.value.getValue();
+      const confirmedPayment = result.value;
 
       return {
         id: confirmedPayment.paymentId.id.toString(),
@@ -242,7 +282,7 @@ export const payments: Resolvers<any> = {
         return null;
       }
 
-      const confirmedPayment = result.value.getValue();
+      const confirmedPayment = (result as any).value.getValue();
 
       return {
         id: confirmedPayment.paymentId.id.toString(),

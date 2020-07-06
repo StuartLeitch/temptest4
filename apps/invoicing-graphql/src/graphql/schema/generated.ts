@@ -61,7 +61,8 @@ export enum TransactionStatus {
 export enum PaymentStatus {
   PENDING = 'PENDING',
   FAILED = 'FAILED',
-  COMPLETED = 'COMPLETED'
+  COMPLETED = 'COMPLETED',
+  CREATED = 'CREATED'
 }
 
 export type InvoiceItem = {

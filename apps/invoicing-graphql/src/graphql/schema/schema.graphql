@@ -47,6 +47,7 @@ enum PaymentStatus {
   PENDING
   FAILED
   COMPLETED
+  CREATED
 }
 
 type InvoiceItem @model(id: "invoice_items") {
