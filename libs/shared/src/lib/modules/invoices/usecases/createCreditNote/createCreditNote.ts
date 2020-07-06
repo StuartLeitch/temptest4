@@ -126,7 +126,7 @@ export class CreateCreditNoteUsecase
           // new GetItemsForInvoiceErrors.InvoiceNotFoundError(
           //   invoiceId.id.toString()
           // )
-          new Error('Bad Invoice Items!')
+          new AppError.UnexpectedError('Bad Invoice Items!')
         );
       }
 
