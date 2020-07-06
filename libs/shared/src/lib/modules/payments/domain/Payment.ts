@@ -18,7 +18,7 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
 }
 
-interface PaymentProps {
+export interface PaymentProps {
   invoiceId: InvoiceId;
   payerId: PayerId;
   amount: Amount;
