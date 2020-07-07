@@ -2,11 +2,19 @@ const common = [
   // '--require ./libs/shared/src/lib/modules/journals/usecases/boom/boom.feature', // Specify our feature files
   // '--require-module @babel/register', // Load Babel module
   '--require-module ts-node/register', // Load TypeScript module
-  '--require ./libs/shared/src/lib/modules/journals/usecases/editorialBoards/**/*.steps.ts', // Load step definitions
-  '--require ./apps/invoicing-graphql/tests/eventHandlers/*.steps.ts', // Load step definitions
-  '--require ./libs/shared/tests/**/*.steps.ts', // Load step definitions
-  '--require ./libs/shared/tests/*.steps.ts', // Load step definitions
+  '--require-module tsconfig-paths/register', // Load TypeScript module
+  // '--require ./libs/shared/src/lib/modules/journals/usecases/editorialBoards/**/*.steps.ts', // Load step definitions
+  // '--require ./apps/invoicing-graphql/tests/eventHandlers/*.steps.ts', // Load step definitions
+  // '--require ./libs/shared/tests/**/*.steps.ts', // Load step definitions
 
+  // `--format ${
+  //   process.env.CI || !process.stdout.isTTY ? 'progress' : 'progress-bar'
+  // }`,
+  // '--format rerun:@rerun.txt',
+  // '--format usage:usage.txt',
+  // '--format junit:junit.xml',
+  '--format json:report/cucumber_report.json',
+  // '--format node_modules/cucumber-junit-formatter:coverage/libs/shared/junit.xml', // Load custom formatter
   // '--format progress-bar', // Load custom formatter
   '--format node_modules/cucumber-pretty', // Load custom formatter
   // '--format json', // Load custom formatter

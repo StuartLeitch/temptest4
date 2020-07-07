@@ -1,0 +1,262 @@
+[
+  {
+    "description": "    On Phenom JournalEditorAssigned event\n    It should add a list of editors to that journal\n    with the new list provided by event data",
+    "keyword": "Feature",
+    "name": "Journal Editor Assigend Event Handler",
+    "line": 1,
+    "id": "journal-editor-assigend-event-handler",
+    "tags": [],
+    "uri": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.feature",
+    "elements": [
+      {
+        "id": "journal-editor-assigend-event-handler;journal-editor-assigned",
+        "keyword": "Scenario",
+        "line": 6,
+        "name": "Journal Editor Assigned",
+        "tags": [],
+        "type": "scenario",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:50"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1000000
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:46"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "There is a Journal \"foo-journal\"",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "The journal id from the JournalEditorAssigned event data is \"foo-journal\"",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:84"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 9,
+            "name": "All editors list from event data contains 10 entries",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:93"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "\"JournalEditorAssigned\" event is being published",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:101"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "The journal \"foo-journal\" should have only 10 editors assigned",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:109"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1000000
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:62"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:66"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "  On Phenom JournalEditorRemoved event\n  It should replace the list of editors attached to that journal\n  with the new list provided by event data",
+    "keyword": "Feature",
+    "name": "Journal Editor Removed Event Handler",
+    "line": 1,
+    "id": "journal-editor-removed-event-handler",
+    "tags": [],
+    "uri": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature",
+    "elements": [
+      {
+        "id": "journal-editor-removed-event-handler;journal-editor-removed",
+        "keyword": "Scenario",
+        "line": 6,
+        "name": "Journal Editor Removed",
+        "tags": [],
+        "type": "scenario",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:50"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:46"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "There are 10 editors in the Journal \"foo-journal\"",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:66"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "All editors list from event data contains 7 entries only",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:98"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 9,
+            "name": "The journal id from event data is \"foo-journal\"",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:108"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "\"JournalEditorRemoved\" event is being published",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:115"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2000000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 11,
+            "name": "The journal \"foo-journal\" should have only 7 editors left",
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:123"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1000000
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:62"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "match": {
+              "location": "apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:66"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

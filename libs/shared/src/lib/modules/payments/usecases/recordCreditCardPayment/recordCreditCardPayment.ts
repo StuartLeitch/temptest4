@@ -51,7 +51,8 @@ export class RecordCreditCardPaymentUsecase
     private paymentRepo: PaymentRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private paymentGateway: any
   ) {}
 
   public async execute(
@@ -101,7 +102,7 @@ export class RecordCreditCardPaymentUsecase
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Braintree', new BraintreePayment(BraintreeGateway)],
+      ['Braintree', new BraintreePayment(this.paymentGateway)],
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'BraintreePayment'

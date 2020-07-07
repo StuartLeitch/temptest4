@@ -58,6 +58,15 @@
             ]
           }
         },
+        "cucumber": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json",
+            "features": "apps/invoicing-graphql/tests/**/*.feature",
+            "steps": "apps/invoicing-graphql/tests/**/*.steps.ts",
+            "coverage": true
+          }
+        },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {

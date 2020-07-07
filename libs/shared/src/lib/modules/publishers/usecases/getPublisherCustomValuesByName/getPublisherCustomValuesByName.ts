@@ -8,12 +8,12 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import {
   Authorize,
   AuthorizationContext,
-  AccessControlledUsecase
+  AccessControlledUsecase,
 } from '../../../../domain/authorization/decorators/Authorize';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import { Roles } from '../../../users/domain/enums/Roles';
 
-import { RepoErrorCode } from 'libs/shared/src/lib/infrastructure/RepoError';
+import { RepoErrorCode } from '../../../../infrastructure/RepoError';
 
 import { PublisherRepoContract } from '../../repos';
 

@@ -119,8 +119,10 @@ export * from './modules/publishers/usecases/getPublisherDetailsByName';
 export { CatalogItem } from './modules/journals/domain/CatalogItem';
 export * from './modules/journals/domain/JournalId';
 export * from './modules/journals/domain/Journal';
+export * from './modules/journals/domain/Editor';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
+export * from './modules/journals/mappers/EditorMap';
 export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 
@@ -222,7 +224,7 @@ export * from './modules/users/mappers/UserMap';
 // ? Should we export this
 // * Infra
 // export * from './infra/http/app';
-export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
+// export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
 export { SchedulerContract } from './infrastructure/scheduler/Scheduler';
 export { ListenerContract } from './infrastructure/listener/Listener';
 export * from './infrastructure/logging';

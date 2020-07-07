@@ -4,8 +4,8 @@ export class BatchUtils {
     batchSize: number,
     timeout: number
   ): (batch: T[]) => any {
-    let intervalHandler: NodeJS.Timeout;
-    let batch: T[] = [];
+    let intervalHandler: ReturnType<typeof setTimeout>;
+    const batch: T[] = [];
 
     function cleanBatch() {
       while (batch.length) {
@@ -13,7 +13,7 @@ export class BatchUtils {
       }
     }
 
-    return function(objectList) {
+    return function (objectList) {
       if (!intervalHandler) {
         intervalHandler = setInterval(cleanBatch, timeout);
       }
@@ -33,8 +33,8 @@ export class BatchUtils {
     batchSize: number,
     timeout: number
   ): (generator: AsyncGenerator<T, any, unknown>) => Promise<void> {
-    return async generator => {
-      let intervalHandler: NodeJS.Timeout;
+    return async (generator) => {
+      let intervalHandler: ReturnType<typeof setTimeout>;
       const batch: T[] = [];
 
       function clearBatch() {
