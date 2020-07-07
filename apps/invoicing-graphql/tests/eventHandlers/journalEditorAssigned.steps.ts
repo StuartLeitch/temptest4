@@ -45,7 +45,6 @@ async function generateMockEditor(editorsLength: number) {
 }
 
 const { handler } = JournalEditorAssignedHandler;
-console.log(handler);
 
 Before(function () {
   mockLogger = new MockLogger();

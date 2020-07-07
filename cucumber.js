@@ -13,10 +13,10 @@ const common = [
   // '--format rerun:@rerun.txt',
   // '--format usage:usage.txt',
   // '--format junit:junit.xml',
-  '--format json:report/cucumber_report.json',
+  // '--format json:report/cucumber_report.json',
   // '--format node_modules/cucumber-junit-formatter:coverage/libs/shared/junit.xml', // Load custom formatter
   // '--format progress-bar', // Load custom formatter
-  '--format node_modules/cucumber-pretty', // Load custom formatter
+  // '--format node_modules/cucumber-pretty', // Load custom formatter
   // '--format json', // Load custom formatter
   `--format-options '{"snippetInterface": "synchronous"}'`, // Custom formatting
 ].join(' ');

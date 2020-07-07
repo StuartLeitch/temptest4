@@ -32,9 +32,9 @@ function createTimestamp(options, context) {
   var timestampLogger = logger.createChild('Timestamp');
   return rxjs_1.from(subprocess).pipe(
     operators_1.map(function () {
-      if (runCoverage) {
-        console.log('Coverage Report:');
-      }
+      // if (runCoverage) {
+      //   console.log('Coverage Report:');
+      // }
       // execa_1(path_1.join('tools', 'scripts', 'cucumber-report.sh'), {
       //   shell: true,
       // }).stdout.pipe(process.stdout);

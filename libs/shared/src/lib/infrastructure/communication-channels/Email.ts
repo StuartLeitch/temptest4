@@ -35,7 +35,7 @@ export class Email {
     tenantProps: JournalProps,
     mailingDisabled: boolean
   ): Email {
-    if (tenantProps.privacy) {
+    if (tenantProps?.privacy) {
       tenantProps.privacy = tenantProps.privacy.replace(
         '[TO EMAIL]',
         template.toUser.email

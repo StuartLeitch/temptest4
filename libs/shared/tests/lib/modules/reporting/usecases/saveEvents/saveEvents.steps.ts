@@ -12,7 +12,7 @@ import {
   InvoiceMappingPolicy,
   SubmissionMappingPolicy,
   JournalMappingPolicy,
-  UserMappingPolicy
+  UserMappingPolicy,
 } from './../../../../../../src/lib/modules/reporting/policies';
 
 let mockEventsRepo: MockEventsRepo;
@@ -21,7 +21,7 @@ let mockEvents: EventDTO[];
 
 let useCase: SaveEventsUsecase;
 
-Before(function() {
+Before(function () {
   mockEventsRepo = new MockEventsRepo();
   registry = new EventMappingdefaultRegistry();
 
@@ -33,59 +33,62 @@ Before(function() {
   useCase = new SaveEventsUsecase(mockEventsRepo, registry);
 });
 
-Given('There is a list of events: {string}, {string}, {string}, {string}, {string}, {string}', function(
-  submissionSubmitted: string,
-  journalAdded: string,
-  invoicePaid: string,
-  userAdded: string,
-  randomDump: string,
-  randomDump2: string
-) {
-  mockEvents = [
-    {
-      id: '1',
-      event: submissionSubmitted,
-      data: { id: '', created: new Date() },
-      timestamp: new Date()
-    },
-    {
-      id: '2',
-      event: journalAdded,
-      data: {},
-      timestamp: new Date()
-    },
-    {
-      id: '3',
-      event: invoicePaid,
-      data: {},
-      timestamp: new Date()
-    },
-    {
-      id: '4',
-      event: userAdded,
-      data: {},
-      timestamp: new Date()
-    },
-    {
-      id: '5',
-      event: randomDump,
-      data: {},
-      timestamp: new Date()
-    },
-    {
-      id: '6',
-      event: randomDump2,
-      data: {},
-      timestamp: new Date()
-    },
-  ]
-});
+Given(
+  'There is a list of events: {string}, {string}, {string}, {string}, {string}, {string}',
+  function (
+    submissionSubmitted: string,
+    journalAdded: string,
+    invoicePaid: string,
+    userAdded: string,
+    randomDump: string,
+    randomDump2: string
+  ) {
+    mockEvents = [
+      {
+        id: '1',
+        event: submissionSubmitted,
+        data: { id: '', created: new Date() },
+        timestamp: new Date(),
+      },
+      {
+        id: '2',
+        event: journalAdded,
+        data: {},
+        timestamp: new Date(),
+      },
+      {
+        id: '3',
+        event: invoicePaid,
+        data: {},
+        timestamp: new Date(),
+      },
+      {
+        id: '4',
+        event: userAdded,
+        data: {},
+        timestamp: new Date(),
+      },
+      {
+        id: '5',
+        event: randomDump,
+        data: {},
+        timestamp: new Date(),
+      },
+      {
+        id: '6',
+        event: randomDump2,
+        data: {},
+        timestamp: new Date(),
+      },
+    ];
+  }
+);
 
-When('I try to save the events', function() {
+When('I try to save the events', function () {
   useCase.execute({ events: mockEvents });
 });
 
-Then('The events are', function() {
+Then('The events are saved and correctly mapped', function () {
   const eventMap = mockEventsRepo.getEventMap();
 
   expect(eventMap[REPORTING_TABLES.INVOICE].length).to.equal(1);

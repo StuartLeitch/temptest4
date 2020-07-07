@@ -78,10 +78,10 @@ export class CreateTransactionUsecase
   ): Promise<CreateTransactionResponse> {
     let catalogItem: CatalogItem;
 
-    console.log(`
-[CreateTransactionUsecase Request Data]:
-${JSON.stringify(request)}
-    `);
+    //     console.log(`
+    // [CreateTransactionUsecase Request Data]:
+    // ${JSON.stringify(request)}
+    //     `);
 
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
@@ -159,10 +159,10 @@ ${JSON.stringify(request)}
         await this.transactionRepo.save(transaction);
         await this.pausedReminderRepo.save(reminderPause);
 
-        console.log(`
-[CreateTransactionUsecase Result Data]:
-${JSON.stringify(TransactionMap.toPersistence(transaction))}
-      `);
+        //         console.log(`
+        // [CreateTransactionUsecase Result Data]:
+        // ${JSON.stringify(TransactionMap.toPersistence(transaction))}
+        //       `);
 
         return right(Result.ok<Transaction>(transaction));
       } else {

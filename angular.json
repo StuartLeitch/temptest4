@@ -64,7 +64,7 @@
             "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json",
             "features": "apps/invoicing-graphql/tests/**/*.feature",
             "steps": "apps/invoicing-graphql/tests/**/*.steps.ts",
-            "coverage": true
+            "coverage": false
           }
         },
         "test": {
@@ -95,6 +95,15 @@
               "**/node_modules/**",
               "!libs/shared/**"
             ]
+          }
+        },
+        "cucumber": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json",
+            "features": "libs/shared/tests/lib/**/*.feature",
+            "steps": "libs/shared/tests/lib/**/*.steps.ts",
+            "coverage": false
           }
         },
         "test": {
