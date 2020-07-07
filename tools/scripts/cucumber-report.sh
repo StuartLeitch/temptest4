@@ -2,4 +2,4 @@
 
 set -ex
 
-node ./tools/scripts/cucumber/report.js
+node ./tools/scripts/cucumber/report.js $1

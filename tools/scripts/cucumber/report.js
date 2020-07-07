@@ -2,13 +2,15 @@
 
 const reporter = require('cucumber-html-reporter');
 
+const reportPath = process.argv[2];
+
 const options = {
   theme: 'bootstrap',
-  jsonFile: 'report/cucumber_report.json',
-  output: 'report/cucumber_report.html',
+  jsonFile: `${reportPath}/cucumber_report.json`,
+  output: `${reportPath}/cucumber_report.html`,
   reportSuiteAsScenarios: true,
   scenarioTimestamp: true,
-  launchReport: true,
+  launchReport: false,
   metadata: {
     'App Version': '0.3.2',
     'Test Environment': 'STAGING',
