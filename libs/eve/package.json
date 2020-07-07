@@ -17,6 +17,7 @@
   },
   "homepage": "https://gitlab.com/hindawi/phenom/tree/develop/libs/eve#readme",
   "dependencies": {
-    "aws-sdk": "^2.610.0"
+    "aws-sdk": "^2.610.0",
+    "lodash": "^4.17.15"
   }
 }
