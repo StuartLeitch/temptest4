@@ -202,6 +202,19 @@ export class PayPalService implements ServiceContract {
       );
     }
 
+    console.log(
+      'result ------------------------------------------------------------'
+    );
+    console.info(response.result);
+    console.log(
+      'purchase unit ------------------------------------------------------------'
+    );
+    console.info(response.result.purchase_units[0]);
+    console.log(
+      'payments ------------------------------------------------------------'
+    );
+    console.info(response.result.purchase_units[0].payments);
+
     return right(response.result.purchase_units[0].payments.captures[0].id);
   }
 

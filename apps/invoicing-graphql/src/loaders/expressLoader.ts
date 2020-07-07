@@ -76,6 +76,7 @@ export const expressLoader: MicroframeworkLoader = (
       console.info(req.body);
       console.info(req.params);
       console.log('------------------------------');
+      return res.status(200);
     });
 
     // Run application to listen on given port
