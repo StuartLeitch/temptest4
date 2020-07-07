@@ -16,7 +16,6 @@ import {
 
 import { PaymentStatus, Payment } from '../../domain/Payment';
 
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { GetPaymentByForeignPaymentIdUsecase } from '../getPaymentByForeignPaymentId';
@@ -25,12 +24,12 @@ import { PayPalProcessFinishedResponse as Response } from './paypal-process-fini
 import { PayPalProcessFinishedDTO as DTO } from './paypal-process-finished.dto';
 import * as Errors from './paypal-process-finished.errors';
 
-interface WithOrderId {
-  orderId: string;
+interface WithPayPalOrderId {
+  payPalOrderId: string;
 }
 
-interface WithOrderStatus {
-  payPalOrderStatus: string;
+interface WithPayPalEvent {
+  payPalEvent: string;
 }
 
 interface WithPayment {
@@ -44,10 +43,7 @@ export class PayPalProcessFinishedUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(
-    private invoiceRepo: InvoiceRepoContract,
-    private paymentRepo: PaymentRepoContract
-  ) {
+  constructor(private paymentRepo: PaymentRepoContract) {
     this.setAndDispatchEvents = this.setAndDispatchEvents.bind(this);
     this.updatePaymentStatus = this.updatePaymentStatus.bind(this);
     this.savePaymentChanges = this.savePaymentChanges.bind(this);
@@ -84,26 +80,31 @@ export class PayPalProcessFinishedUsecase
       T
     >
   > {
-    if (!request.orderId) {
+    if (!request.payPalOrderId) {
       return left(new Errors.OrderIdRequiredError());
     }
 
-    if (!request.payPalOrderStatus) {
+    if (!request.payPalEvent) {
       return left(new Errors.PayPalOrderStatusRequiredError());
     }
 
     return right(request);
   }
 
-  private updatePaymentStatus<T extends WithOrderStatus & WithPayment>(
+  private updatePaymentStatus<T extends WithPayPalEvent & WithPayment>(
     request: T
   ) {
     let paymentStatus: PaymentStatus;
 
-    if (request.payPalOrderStatus === 'completed') {
+    if (request.payPalEvent === 'PAYMENT.CAPTURE.COMPLETED') {
       paymentStatus = PaymentStatus.COMPLETED;
-    } else if (request.payPalOrderStatus === 'reverted') {
+    } else if (
+      request.payPalEvent === 'PAYMENT.CAPTURE.REVERSED' ||
+      request.payPalEvent === 'PAYMENT.CAPTURE.DENIED'
+    ) {
       paymentStatus = PaymentStatus.FAILED;
+    } else {
+      return request;
     }
 
     request.payment.status = paymentStatus;
@@ -112,10 +113,10 @@ export class PayPalProcessFinishedUsecase
   }
 
   private attachPayment(context: Context) {
-    return async <T extends WithOrderId>(request: T) => {
+    return async <T extends WithPayPalOrderId>(request: T) => {
       const usecase = new GetPaymentByForeignPaymentIdUsecase(this.paymentRepo);
 
-      return new AsyncEither(request.orderId)
+      return new AsyncEither(request.payPalOrderId)
         .then((foreignPaymentId) =>
           usecase.execute({ foreignPaymentId }, context)
         )

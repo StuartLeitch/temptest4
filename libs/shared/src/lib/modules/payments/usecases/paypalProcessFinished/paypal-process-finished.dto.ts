@@ -1,4 +1,4 @@
 export interface PayPalProcessFinishedDTO {
-  payPalOrderStatus: string;
-  orderId: string;
+  payPalOrderId: string;
+  payPalEvent: string;
 }

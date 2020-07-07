@@ -19,6 +19,7 @@ import {
 import { Context } from '../builders';
 
 import { env } from '../env';
+import { request } from 'http';
 
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -66,16 +67,37 @@ export const expressLoader: MicroframeworkLoader = (
     });
 
     app.post('/api/payments/process-finished', async (req, res) => {
+      const data = req.body;
       const {
-        repos: { invoice, payment },
+        repos: { payment },
+        services: { logger },
       } = context;
       const authContext = { roles: [Roles.PAYER] };
-      const usecase = new PayPalProcessFinishedUsecase(invoice, payment);
+      const usecase = new PayPalProcessFinishedUsecase(payment);
 
-      console.log('------------------------------');
-      console.info(req.body);
-      console.info(req.params);
-      console.log('------------------------------');
+      try {
+        const result = await usecase.execute(
+          { payPalEvent: data.event_type, payPalOrderId: data.resource.id },
+          authContext
+        );
+
+        if (result.isLeft()) {
+          logger.error(
+            `Handling PayPal event finished with error ${
+              result.value.message
+            }. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
+            result.value
+          );
+        }
+      } catch (e) {
+        logger.error(
+          `While handling PayPal event an error ocurred {${
+            e.message
+          }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
+          e
+        );
+      }
+
       return res.status(200);
     });
 
