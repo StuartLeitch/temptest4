@@ -1,15 +1,15 @@
 'use strict';
 
 exports.__esModule = true;
-exports.createTimestamp = void 0;
+exports.createCucumber = void 0;
 var architect_1 = require('@angular-devkit/architect');
 var rxjs_1 = require('rxjs');
 var execa_1 = require('execa');
 var path_1 = require('path');
 var operators_1 = require('rxjs/operators');
 var core_1 = require('@angular-devkit/core');
-var fs_1 = require('fs');
-var dateFormat = require('dateformat');
+// var fs_1 = require('fs');
+// var dateFormat = require('dateformat');
 function createCucumber(options, context) {
   var path = options.path,
     format = options.format,
@@ -60,7 +60,7 @@ function createCucumber(options, context) {
       return { success: true };
     }),
     operators_1.tap(function () {
-      //  return timestampLogger.info('Timestamp created');
+      return cucumberLogger.info('Cucumber report created');
     }),
     operators_1.catchError(function (e) {
       console.error(e);
