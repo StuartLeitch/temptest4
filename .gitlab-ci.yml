@@ -47,7 +47,7 @@ Test:
   #   - apt-get -y install imagemagick graphicsmagick
   script:
     - cd $HOME
-    - yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --code-coverage
+    - yarn run nx run-many --target=cucumber --projects=$AFFECTED_APPS --configuration=production --code-coverage
     - yarn run ci:coverage
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
