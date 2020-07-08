@@ -1,14 +1,11 @@
 ┌─────────────────────────────────────────────────────────────────────────────┬──────────┬───────────────────────────────────────────────────────────────────────────────┐
 │ Pattern / Text                                                              │ Duration │ Location                                                                      │
 ├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
-│ /^There is a Journal "([\w-]+)"$/                                           │ 4.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:69  │
-│   There is a Journal "foo-journal"                                          │ 4ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.feature:7    │
+│ /^There is a Journal "([\w-]+)"$/                                           │ 5.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:69  │
+│   There is a Journal "foo-journal"                                          │ 5ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.feature:7    │
 ├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
 │ /^All editors list from event data contains (\d+) entries$/                 │ 4.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:92  │
 │   All editors list from event data contains 10 entries                      │ 4ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.feature:9    │
-├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
-│ /^There are (\d+) editors in the Journal "([\w-]+)"$/                       │ 3.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:66   │
-│   There are 10 editors in the Journal "foo-journal"                         │ 3ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:7     │
 ├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
 │ "JournalEditorRemoved" event is being published                             │ 3.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:115  │
 │   "JournalEditorRemoved" event is being published                           │ 3ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:10    │
@@ -19,15 +16,18 @@
 │ /^The journal "([\w-]+)" should have only (\d+) editors assigned$/          │ 2.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:108 │
 │   The journal "foo-journal" should have only 10 editors assigned            │ 2ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.feature:11   │
 ├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
-│ /^The journal "([\w-]+)" should have only (\d+) editors left$/              │ 2.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:123  │
-│   The journal "foo-journal" should have only 7 editors left                 │ 2ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:11    │
+│ /^The journal id from event data is "([\w-]+)"$/                            │ 2.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:108  │
+│   The journal id from event data is "foo-journal"                           │ 2ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:9     │
 ├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
-│ /^The journal id from the JournalEditorAssigned event data is "([\w-]+)"$/  │ 1.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:83  │
-│   The journal id from the JournalEditorAssigned event data is "foo-journal" │ 1ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.feature:8    │
+│ /^There are (\d+) editors in the Journal "([\w-]+)"$/                       │ 1.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:66   │
+│   There are 10 editors in the Journal "foo-journal"                         │ 1ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:7     │
 ├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
 │ /^All editors list from event data contains (\d+) entries only$/            │ 1.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:98   │
 │   All editors list from event data contains 7 entries only                  │ 1ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:8     │
 ├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
-│ /^The journal id from event data is "([\w-]+)"$/                            │ 1.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:108  │
-│   The journal id from event data is "foo-journal"                           │ 1ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:9     │
+│ /^The journal "([\w-]+)" should have only (\d+) editors left$/              │ 1.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.steps.ts:123  │
+│   The journal "foo-journal" should have only 7 editors left                 │ 1ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorRemoved.feature:11    │
+├─────────────────────────────────────────────────────────────────────────────┼──────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ /^The journal id from the JournalEditorAssigned event data is "([\w-]+)"$/  │ 0.00ms   │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.steps.ts:83  │
+│   The journal id from the JournalEditorAssigned event data is "foo-journal" │ 0ms      │ apps/invoicing-graphql/tests/eventHandlers/journalEditorAssigned.feature:8    │
 └─────────────────────────────────────────────────────────────────────────────┴──────────┴───────────────────────────────────────────────────────────────────────────────┘

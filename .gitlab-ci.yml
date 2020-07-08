@@ -55,9 +55,9 @@ Test:
     paths:
       - report/
     reports:
-      junit:
-        - coverage/apps/**/junit.xml
-        - coverage/libs/**/junit.xml
+      cucumber:
+        - report/apps/**/usage.txt
+        - report/libs/**/usage.txt
 
 Build:
   interruptible: true
