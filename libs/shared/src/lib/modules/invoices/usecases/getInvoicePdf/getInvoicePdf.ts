@@ -35,11 +35,14 @@ import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAdd
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
-import { InvoicePayload } from '../../../../domain/services/PdfGenerator/PdfGenerator';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { pdfGeneratorService } from '../../../../domain/services';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
+
+import {
+  pdfGeneratorService,
+  InvoicePayload
+} from '../../../../domain/services/PdfGenerator';
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 

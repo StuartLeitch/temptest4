@@ -8,6 +8,8 @@ import { createQueueService } from '@hindawi/queue-service';
 // const endpoint = AWS_SNS_ENDPOINT || process.env.AWS_SNS_ENDPOINT;
 // const topic = AWS_SNS_TOPIC || process.env.AWS_SNS_TOPIC;
 
+console.log('BOOOHOOO');
+
 const sqsConnection = createQueueService(); // creates a new client
 
 export { sqsConnection };

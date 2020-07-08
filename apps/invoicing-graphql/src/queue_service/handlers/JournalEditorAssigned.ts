@@ -1,8 +1,10 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
-import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
-import { JournalEventMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/JournalEventMap';
+import {
+  AssignEditorsToJournalUsecase,
+  JournalEventMap,
+} from '@hindawi/shared';
 
 const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
 const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
