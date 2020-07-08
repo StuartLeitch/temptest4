@@ -7,6 +7,7 @@ import * as Errors from './CreatePaymentErrors';
 export type CreatePaymentResponse = Either<
   | Errors.ForeignPaymentIdRequiredError
   | Errors.PaymentMethodIdRequiredError
+  | Errors.IsFinalPaymentRequiredError
   | Errors.StatusInvalidValueError
   | Errors.InvoiceIdRequiredError
   | Errors.PaymentCreationError

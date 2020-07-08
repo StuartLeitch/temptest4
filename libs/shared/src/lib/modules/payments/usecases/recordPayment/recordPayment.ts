@@ -219,6 +219,7 @@ export class RecordPaymentUsecase
       const dto: CreatePaymentDTO = {
         paymentMethodId: paymentDetails.paymentMethodId.toString(),
         foreignPaymentId: paymentDetails.foreignPaymentId.id,
+        isFinalPayment: request.isFinalPayment ?? true,
         invoiceId: invoice.id.toString(),
         status: paymentDetails.status,
         amount: invoice.invoiceTotal,

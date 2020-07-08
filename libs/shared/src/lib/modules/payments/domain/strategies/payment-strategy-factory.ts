@@ -2,13 +2,14 @@ import { StrategyFactory } from '../../../../core/logic/strategy/strategy-factor
 
 import { PaymentMethodNames } from '../PaymentMethod';
 import { PaymentMethodId } from '../PaymentMethodId';
-import { PaymentStatus } from '../Payment';
 
 import { PaymentMethodRepoContract } from '../../repos';
 
 import { PaymentStrategy } from './payment-strategy';
 import {
+  BankTransferCaptureMoneyBehavior,
   BraintreeCaptureMoneyBehavior,
+  BankTransferPaymentBehavior,
   PayPalCaptureMoneyBehavior,
   BraintreePaymentBehavior,
   PayPalPaymentBehavior,
@@ -32,6 +33,8 @@ class PaymentStrategyFactory
   implements
     StrategyFactory<PaymentStrategy, StrategySelection, SelectionData> {
   constructor(
+    private bankTransferCapture: BankTransferCaptureMoneyBehavior,
+    private bankTransferPayment: BankTransferPaymentBehavior,
     private braintreeCapture: BraintreeCaptureMoneyBehavior,
     private braintreePayment: BraintreePaymentBehavior,
     private paypalCapture: PayPalCaptureMoneyBehavior,
@@ -76,22 +79,20 @@ class PaymentStrategyFactory
       return new PaymentStrategy(
         this.braintreeCapture,
         this.braintreePayment,
-        id,
-        PaymentStatus.COMPLETED
+        id
       );
     },
     [StrategySelection.PayPal]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.PayPal);
-      return new PaymentStrategy(
-        this.paypalCapture,
-        this.paypalPayment,
-        id,
-        PaymentStatus.CREATED
-      );
+      return new PaymentStrategy(this.paypalCapture, this.paypalPayment, id);
     },
     [StrategySelection.BankTransfer]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.BankTransfer);
-      return null;
+      return new PaymentStrategy(
+        this.bankTransferCapture,
+        this.bankTransferPayment,
+        id
+      );
     },
     [StrategySelection.Migration]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.Migration);

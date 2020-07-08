@@ -31,6 +31,7 @@ import * as Errors from './CreatePaymentErrors';
 type ValidationErrors =
   | Errors.ForeignPaymentIdRequiredError
   | Errors.PaymentMethodIdRequiredError
+  | Errors.IsFinalPaymentRequiredError
   | Errors.StatusInvalidValueError
   | Errors.InvoiceIdRequiredError
   | Errors.PayerIdRequiredError
@@ -42,6 +43,7 @@ interface WithPayment {
 }
 
 interface DomainEventsDispatchData extends WithPayment {
+  isFinalPayment: boolean;
   status: string;
 }
 
@@ -97,6 +99,9 @@ export class CreatePaymentUsecase
     if (!request.status) {
       return left(new Errors.StatusRequiredError());
     }
+    if (!request.isFinalPayment) {
+      return left(new Errors.IsFinalPaymentRequiredError());
+    }
     if (!(request.status in PaymentStatus)) {
       return left(new Errors.StatusInvalidValueError(request.status));
     }
@@ -129,10 +134,10 @@ export class CreatePaymentUsecase
   }
 
   private setAndDispatchEvents<T extends DomainEventsDispatchData>(request: T) {
-    const { payment, status } = request;
+    const { payment, status, isFinalPayment } = request;
 
     if (status === PaymentStatus.COMPLETED) {
-      payment.movedToCompleted();
+      payment.movedToCompleted(isFinalPayment);
     }
 
     DomainEvents.dispatchEventsForAggregate(payment.id);

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
+
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { Result } from '../../../core/logic/Result';
-import { File } from '../../../domain/File';
 import { Amount } from '../../../domain/Amount';
 
 // * Subdomain
@@ -99,9 +100,9 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return Result.ok<Payment>(payment);
   }
 
-  public movedToCompleted(): void {
+  public movedToCompleted(isFinal: boolean = true): void {
     if (this.status === PaymentStatus.COMPLETED) {
-      this.addDomainEvent(new PaymentCompleted(this));
+      this.addDomainEvent(new PaymentCompleted(this, isFinal));
     }
   }
 }

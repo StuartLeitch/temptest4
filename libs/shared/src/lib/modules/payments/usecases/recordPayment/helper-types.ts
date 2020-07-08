@@ -31,6 +31,7 @@ export interface PaymentData {
 
 export interface WithPayment {
   paymentDetails: PaymentDetails;
+  isFinalPayment?: boolean;
   datePaid?: string;
   invoice: Invoice;
   payer: Payer;

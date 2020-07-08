@@ -35,8 +35,7 @@ export class PaymentStrategy implements Strategy {
   constructor(
     private captureBehavior: CaptureMoneyBehavior,
     private payBehavior: PaymentBehavior,
-    private paymentMethod: PaymentMethodId,
-    private status: PaymentStatus
+    private paymentMethod: PaymentMethodId
   ) {
     this.behaviors.push(payBehavior);
   }
@@ -44,12 +43,12 @@ export class PaymentStrategy implements Strategy {
   async makePayment(
     request: PaymentDTO
   ): Promise<Either<StrategyError, PaymentDetails>> {
-    const maybeForeignPaymentId = await this.payBehavior.makePayment(request);
+    const maybePayment = await this.payBehavior.makePayment(request);
 
-    return maybeForeignPaymentId.map((foreignPaymentId) => ({
+    return maybePayment.map(({ foreignPaymentId, status }) => ({
       paymentMethodId: this.paymentMethod,
-      status: this.status,
       foreignPaymentId,
+      status,
     }));
   }
 

@@ -2,7 +2,9 @@
 
 import { BullScheduler } from '@hindawi/sisif';
 import {
+  BankTransferCaptureMoneyBehavior,
   BraintreeCaptureMoneyBehavior,
+  BankTransferPaymentBehavior,
   PayPalCaptureMoneyBehavior,
   PaymentMethodRepoContract,
   SQSPublishServiceContract,
@@ -56,16 +58,20 @@ function buildPaymentStrategyFactory(
     loggerBuilder.getLogger()
   );
 
+  const bankTransferCaptureBehavior = new BankTransferCaptureMoneyBehavior();
+  const bankTransferPaymentBehavior = new BankTransferPaymentBehavior();
+  const paypalCaptureBehavior = new PayPalCaptureMoneyBehavior(paypalService);
   const payPalPaymentBehavior = new PayPalPaymentBehavior(paypalService);
-  const braintreePaymentBehavior = new BraintreePaymentBehavior(
+  const braintreeCaptureBehavior = new BraintreeCaptureMoneyBehavior(
     braintreeService
   );
-  const paypalCaptureBehavior = new PayPalCaptureMoneyBehavior(paypalService);
-  const braintreeCaptureBehavior = new BraintreeCaptureMoneyBehavior(
+  const braintreePaymentBehavior = new BraintreePaymentBehavior(
     braintreeService
   );
 
   return new PaymentStrategyFactory(
+    bankTransferCaptureBehavior,
+    bankTransferPaymentBehavior,
     braintreeCaptureBehavior,
     braintreePaymentBehavior,
     paypalCaptureBehavior,

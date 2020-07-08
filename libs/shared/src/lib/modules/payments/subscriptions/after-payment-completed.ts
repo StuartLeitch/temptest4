@@ -40,18 +40,20 @@ export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
     } else {
       const invoice = maybeInvoice.value.getValue();
 
-      invoice.markAsFinal();
+      if (event.isFinal) {
+        invoice.markAsFinal();
 
-      try {
-        await this.invoiceRepo.update(invoice);
-
-        DomainEvents.dispatchEventsForAggregate(invoice.id);
-      } catch (e) {
-        this.logger.error(
-          `While saving the invoice status an error ocurred`,
-          e
-        );
+        try {
+          await this.invoiceRepo.update(invoice);
+        } catch (e) {
+          this.logger.error(
+            `While saving the invoice status an error ocurred`,
+            e
+          );
+        }
       }
+
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
     }
   }
 }

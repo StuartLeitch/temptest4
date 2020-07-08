@@ -36,6 +36,12 @@ export class StatusRequiredError extends UseCaseError {
   }
 }
 
+export class IsFinalPaymentRequiredError extends UseCaseError {
+  constructor() {
+    super('Is Final Payment is required');
+  }
+}
+
 export class StatusInvalidValueError extends UseCaseError {
   constructor(value: string) {
     super(

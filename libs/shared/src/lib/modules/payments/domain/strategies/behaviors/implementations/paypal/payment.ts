@@ -1,4 +1,5 @@
 import { StrategyError } from '../../../../../../../core/logic/strategy-error';
+import { AsyncEither } from '../../../../../../../core/logic/AsyncEither';
 import { Either } from '../../../../../../../core/logic/Either';
 
 import {
@@ -6,9 +7,13 @@ import {
   PayPalOrderRequest,
 } from '../../../../../../../domain/services/payment/paypal-service';
 
-import { ExternalOrderId } from '../../../../../domain/external-order-id';
+import { PaymentStatus } from '../../../../Payment';
 
-import { PaymentBehavior, PaymentDTO } from '../../payment-behavior';
+import {
+  PaymentBehavior,
+  PaymentResponse,
+  PaymentDTO,
+} from '../../payment-behavior';
 
 export class PayPalPaymentBehavior extends PaymentBehavior {
   constructor(private paypalService: PayPalServiceContract) {
@@ -17,7 +22,7 @@ export class PayPalPaymentBehavior extends PaymentBehavior {
 
   async makePayment(
     request: PaymentDTO
-  ): Promise<Either<StrategyError, ExternalOrderId>> {
+  ): Promise<Either<StrategyError, PaymentResponse>> {
     const transactionData: PayPalOrderRequest = {
       invoiceReferenceNumber: request.invoiceReferenceNumber,
       manuscriptCustomId: request.manuscriptCustomId,
@@ -28,6 +33,12 @@ export class PayPalPaymentBehavior extends PaymentBehavior {
       vatAmount: request.vatAmount,
     };
 
-    return this.paypalService.createOrder(transactionData);
+    return new AsyncEither(transactionData)
+      .then((data) => this.paypalService.createOrder(data))
+      .map((foreignPaymentId) => ({
+        status: PaymentStatus.CREATED,
+        foreignPaymentId,
+      }))
+      .execute();
   }
 }

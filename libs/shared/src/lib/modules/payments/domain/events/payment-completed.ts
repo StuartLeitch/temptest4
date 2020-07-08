@@ -4,12 +4,13 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Payment } from '../Payment';
 
 export class PaymentCompleted implements DomainEventContract {
-  public dateTimeOccurred: Date;
-  public payment: Payment;
+  public readonly dateTimeOccurred: Date;
 
-  constructor(payment: Payment) {
+  constructor(
+    public readonly payment: Payment,
+    public readonly isFinal: boolean
+  ) {
     this.dateTimeOccurred = new Date();
-    this.payment = payment;
   }
 
   getAggregateId(): UniqueEntityID {
