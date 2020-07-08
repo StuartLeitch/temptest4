@@ -2,6 +2,7 @@ import { Command } from './app/contracts';
 import { BuildManifestsCommand } from './app/commands/build-manifests';
 
 const commandMap: { [key: string]: Command } = {};
+
 commandMap['build-manifests'] = new BuildManifestsCommand();
 
 async function run() {
