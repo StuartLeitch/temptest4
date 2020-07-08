@@ -17,13 +17,10 @@ function createCucumber(options, context) {
     runCoverage = options.coverage,
     workspaceRoot = context.workspaceRoot,
     logger = context.logger;
-  // console.info(workspaceRoot);
-  // console.info(path);
+
   var fullPath = `${core_1.getSystemPath(
     core_1.normalize(workspaceRoot)
   )}/${path}`;
-  // console.info(noapte);
-  // var writeFileObservable = rxjs_1.bindNodeCallback(fs_1.writeFile);
   var subprocess = execa_1(
     path_1.join('node_modules', '.bin', 'cucumber-js'),
     [
@@ -32,6 +29,8 @@ function createCucumber(options, context) {
       supportEntryPath,
       '--format',
       `${format}:${fullPath}/cucumber_report.json`,
+      '--format',
+      `usage:${fullPath}/usage.txt`,
     ],
     { env: { TS_NODE_PROJECT: options.tsConfig } }
   );
@@ -49,6 +48,13 @@ function createCucumber(options, context) {
             shell: true,
           }
         ).stdout.pipe(process.stdout);
+
+        // execa_1(
+        //   path_1.join('tools', 'scripts', 'generate-coverage.sh', fullPath),
+        //   {
+        //     shell: true,
+        //   }
+        // ).stdout.pipe(process.stdout);
       }
 
       return { success: true };
