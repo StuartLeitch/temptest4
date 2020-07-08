@@ -47,7 +47,6 @@ Test:
   #   - apt-get -y install imagemagick graphicsmagick
   script:
     - cd $HOME
-    - mkdir report
     - chmod +x -r report
     - yarn run nx run-many --target=cucumber --projects=$AFFECTED_APPS --configuration=production
     - yarn run ci:coverage
