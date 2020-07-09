@@ -639,7 +639,7 @@
             "outputPath": "dist/apps/invoicing-infrastructure",
             "main": "apps/invoicing-infrastructure/src/main.ts",
             "tsConfig": "apps/invoicing-infrastructure/tsconfig.app.json",
-            "assets": ["apps/invoicing-infrastructure/src/app"]
+            "assets": []
           },
           "configurations": {
             "production": {

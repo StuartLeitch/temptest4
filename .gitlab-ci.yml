@@ -6,7 +6,7 @@ stages:
   - test
   - build
   - package
-  # - deploy
+  - deploy
 
 variables:
   AFFECTED_ARGS: '--base=remotes/origin/develop'
@@ -17,13 +17,12 @@ variables:
   BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   LATEST_BUILD_IMAGE: $CI_REGISTRY_IMAGE:latest
   AWS_REGION: 'eu-west-1'
-  AWS_REGISTRY: '918602980697.dkr.ecr.eu-west-1.amazonaws.com'
   BT_ENVIRONMENT: 'sandbox'
   BT_MERCHANT_ID: 'test-merchant-id'
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
-  AFFECTED_APPS: 'invoicing-admin,invoicing-graphql,invoicing-web,shared'
+  AFFECTED_APPS: 'invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
   interruptible: true
@@ -74,13 +73,18 @@ Build:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
+  # only:
+  #   - develop
 
-Package Images:
+Package Images:dev:
   interruptible: true
+  allow_failure: false
   stage: package
   image: docker
+  variables:
+    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
   when: manual
   before_script:
     - apk add --no-cache aws-cli
@@ -98,25 +102,38 @@ Package Images:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
-# Deploy to Dev:
-#   stage: deploy
-#   image: docker:$DOCKER_VERSION
-#   dependencies:
-#     - Package Images
-#   when: manual
-#   only:
-#     - develop
-#   before_script:
-#     - apk add --no-cache curl jq python py-pip
-#     - pip install awscli
-#     - $(aws ecr get-login --no-include-email --region "${REGION}")
-#   script:
-#     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-#     - export AFFECTED_LIBS=$(cat .ci_status/affected_libs)
-#     - ./tools/scripts/deploy.sh
+  # only:
+  #   - develop
 
+Deploy:dev:
+  stage: deploy
+  allow_failure: false
+  dependencies:
+    - Package Images:dev
+  when: manual
+  variables:
+    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
+    TENANT: hindawi
+    NODE_ENV: dev
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+  before_script:
+    - apk add --no-cache aws-cli
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin
+  script:
+    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+    - aws eks --region eu-west-1 update-kubeconfig --name hindawi-dev
+    - kubectl config set-context --current --namespace=dev
+    - cd $HOME
+    - ./tools/deploy-ci.sh
+    - cp -r dist-k8s $CI_PROJECT_DIR
+  artifacts:
+    paths:
+      - dist-k8s
+  # only:
+  #   - develop
 # Pages:
 #   interruptible: true
 #   stage: deploy
