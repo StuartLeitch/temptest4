@@ -54,10 +54,10 @@ Test:
   artifacts:
     paths:
       - report/
-    reports:
-      cucumber:
-        - report/apps/**/usage.txt
-        - report/libs/**/usage.txt
+    # reports:
+    #   cucumber:
+    #     - report/apps/**/usage.txt
+    #     - report/libs/**/usage.txt
 
 Build:
   interruptible: true
