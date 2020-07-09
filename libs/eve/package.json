@@ -1,6 +1,6 @@
 {
   "name": "@hindawi/eve",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "eve library for importing exporting events",
   "main": "index.js",
   "scripts": {
