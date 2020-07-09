@@ -9,6 +9,8 @@ export enum REPORTING_TABLES {
   DEFAULT = 'dump_events',
 }
 
+export const DELETED_MANUSCRIPTS_TABLE = 'deleted_manuscripts';
+
 export const CHECKER_TEAM_EVENTS = ['CheckerTeamCreated', 'CheckerTeamUpdated'];
 
 export const CHECKER_SUBMISSION_EVENTS = [
