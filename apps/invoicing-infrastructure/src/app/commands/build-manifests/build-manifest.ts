@@ -51,7 +51,10 @@ export class BuildManifestsCommand implements Command {
     for (const app of env.apps) {
       let appProps: WithAwsSecretsServiceProps;
       try {
-        appProps = masterConfig[app][env.tenant][env.environment];
+        appProps = masterConfig[env.tenant][env.environment][app];
+        if (!appProps) {
+          throw new Error('Not found configuration for app');
+        }
       } catch (error) {
         // maybe throw
         console.error(
@@ -60,9 +63,10 @@ export class BuildManifestsCommand implements Command {
         // todo delete contiune, this should exit with error
         continue;
       }
-      console.log(app, appProps);
+
       await HindawiServiceChart.withAwsSecrets(rootConstruct, app, appProps);
     }
     rootConstruct.synth();
+    console.log(`Successfuly built: ${env.apps}`);
   }
 }

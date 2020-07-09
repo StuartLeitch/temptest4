@@ -7,6 +7,7 @@ const values: WithAwsSecretsServiceProps = {
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {
+      ...defaultValues.serviceProps.envVars,
       AUTH_ENABLED: 'false',
       AUTH_SERVER_CLIENT_ID: 'invoicing',
       AUTH_SERVER_REALM: 'Hindawi',

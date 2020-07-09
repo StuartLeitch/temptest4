@@ -4,15 +4,21 @@ import { WithAwsSecretsServiceProps } from '@hindawi/phenom-charts';
 
 // `import { values as ${env}${invoicingAdmin}Values } from 'apps/${app}/chart/${tenant}/${env}'`
 import { values as devInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/dev';
+import { values as devInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/dev';
+import { values as devInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/dev';
+import { values as devReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/dev';
 
 const masterConfig: {
-  [app: string]: {
-    [tenant: string]: { [env: string]: WithAwsSecretsServiceProps };
+  [tenant: string]: {
+    [env: string]: { [app: string]: WithAwsSecretsServiceProps };
   };
 } = {
-  [App.admin]: {
-    [Tenant.hindawi]: {
-      dev: devInvoicingAdminValues,
+  [Tenant.hindawi]: {
+    dev: {
+      [App.admin]: devInvoicingAdminValues,
+      [App.graphql]: devInvoicingGraphqlValues,
+      [App.web]: devInvoicingWebValues,
+      [App.reporting]: devReportingBackendValues,
     },
   },
 };
