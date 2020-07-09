@@ -2,12 +2,15 @@ import { StrategyError } from '../../../../core/logic/strategy-error';
 import { Behavior, Strategy } from '../../../../core/logic/strategy';
 import { Either } from '../../../../core/logic/Either';
 
-import { ExternalOrderId } from '../../domain/external-order-id';
+import { PaymentClientToken } from '../../../../domain/PaymentClientToken';
+
+import { ExternalOrderId } from '../external-order-id';
 import { PaymentMethodId } from '../PaymentMethodId';
 import { PaymentProof } from '../payment-proof';
 import { PaymentStatus } from '../Payment';
 
 import {
+  CreateClientTokenBehavior,
   CaptureMoneyBehavior,
   CaptureMoneyDTO,
   PaymentBehavior,
@@ -33,6 +36,7 @@ export class PaymentStrategy implements Strategy {
   }
 
   constructor(
+    private clientTokenBehavior: CreateClientTokenBehavior,
     private captureBehavior: CaptureMoneyBehavior,
     private payBehavior: PaymentBehavior,
     private paymentMethod: PaymentMethodId
@@ -56,5 +60,11 @@ export class PaymentStrategy implements Strategy {
     request: CaptureMoneyDTO
   ): Promise<Either<StrategyError, PaymentProof>> {
     return this.captureBehavior.captureMoney(request);
+  }
+
+  async createClientToken(): Promise<
+    Either<StrategyError, PaymentClientToken>
+  > {
+    return this.clientTokenBehavior.createClientToken();
   }
 }

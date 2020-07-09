@@ -71,7 +71,7 @@ export class RecordPaymentUsecase
     this.validateRequest = this.validateRequest.bind(this);
     this.attachStrategy = this.attachStrategy.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
-    this.createPayment = this.createPayment.bind(this);
+    this.pay = this.pay.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
     this.savePayment = this.savePayment.bind(this);
   }
@@ -85,7 +85,7 @@ export class RecordPaymentUsecase
         .then(this.attachPayer(context))
         .then(this.attachManuscript(context))
         .then(this.attachStrategy)
-        .then(this.createPayment)
+        .then(this.pay)
         .then(this.savePayment(context))
         .map((data) => data.payment)
         .execute();
@@ -185,7 +185,7 @@ export class RecordPaymentUsecase
     });
   }
 
-  private async createPayment<T extends PaymentData>(request: T) {
+  private async pay<T extends PaymentData>(request: T) {
     const {
       payerIdentification,
       paymentReference,
@@ -214,7 +214,7 @@ export class RecordPaymentUsecase
   private savePayment(context: Context) {
     return async <T extends WithPayment>(request: T) => {
       const usecase = new CreatePaymentUsecase(this.paymentRepo);
-      const { paymentDetails, invoice, payer, datePaid } = request;
+      const { paymentDetails, datePaid, invoice, amount, payer } = request;
 
       const dto: CreatePaymentDTO = {
         paymentMethodId: paymentDetails.paymentMethodId.toString(),
@@ -222,7 +222,7 @@ export class RecordPaymentUsecase
         isFinalPayment: request.isFinalPayment ?? true,
         invoiceId: invoice.id.toString(),
         status: paymentDetails.status,
-        amount: invoice.invoiceTotal,
+        amount: amount ?? invoice.invoiceTotal,
         payerId: payer.id.toString(),
         datePaid,
       };

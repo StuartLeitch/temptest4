@@ -18,6 +18,6 @@ export class PayPalCaptureMoneyBehavior extends CaptureMoneyBehavior {
   async captureMoney(
     request: CaptureMoneyDTO
   ): Promise<Either<StrategyError, PaymentProof>> {
-    return this.paypalService.captureMoney(request.orderId) as any;
+    return this.paypalService.captureMoney(request.orderId);
   }
 }

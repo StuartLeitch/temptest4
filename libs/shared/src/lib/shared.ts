@@ -163,11 +163,7 @@ export * from './modules/payments/repos';
 export * from './modules/payments/usecases/recordPayment/recordPayment';
 export * from './modules/payments/usecases/recordPayment/recordPaymentDTO';
 export * from './modules/payments/usecases/getPaymentMethodByName/getPaymentMethodByName';
-export * from './modules/payments/usecases/migratePayment/migratePayment';
-export * from './modules/payments/usecases/migratePayment/migratePaymentDTO';
 export * from './modules/payments/usecases/generateClientToken/generateClientToken';
-export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPayment';
-export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPaymentDTO';
 export * from './modules/payments/usecases/getPaymentInfo/getPaymentInfoDTO';
 export * from './modules/payments/usecases/getPaymentInfo/getPaymentInfo';
 export * from './modules/payments/usecases/getPaymentsByInvoiceId/getPaymentsByInvoiceIdDTO';
@@ -182,11 +178,6 @@ export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-paym
 export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id.dto';
 export * from './modules/payments/usecases/getPaymentMethodById/getPaymentMethodById';
 
-export * from './modules/payments/domain/contracts/PaymentModel';
-export * from './modules/payments/domain/strategies/PaymentFactory';
-export * from './modules/payments/domain/strategies/PaymentStrategy';
-export * from './modules/payments/domain/strategies/CreditCardPayment';
-export * from './modules/payments/domain/strategies/CreditCard';
 export * from './modules/payments/domain/strategies/behaviors/implementations';
 export * from './modules/payments/domain/strategies/payment-strategy-factory';
 

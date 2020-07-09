@@ -7,7 +7,10 @@ import { PaymentMethodRepoContract } from '../../repos';
 
 import { PaymentStrategy } from './payment-strategy';
 import {
+  BankTransferCreateClientTokenBehavior,
+  BraintreeCreateClientTokenBehavior,
   BankTransferCaptureMoneyBehavior,
+  PayPalCreateClientTokenBehavior,
   BraintreeCaptureMoneyBehavior,
   BankTransferPaymentBehavior,
   PayPalCaptureMoneyBehavior,
@@ -33,10 +36,13 @@ class PaymentStrategyFactory
   implements
     StrategyFactory<PaymentStrategy, StrategySelection, SelectionData> {
   constructor(
+    private bankTransferClientToken: BankTransferCreateClientTokenBehavior,
     private bankTransferCapture: BankTransferCaptureMoneyBehavior,
     private bankTransferPayment: BankTransferPaymentBehavior,
+    private braintreeClientToken: BraintreeCreateClientTokenBehavior,
     private braintreeCapture: BraintreeCaptureMoneyBehavior,
     private braintreePayment: BraintreePaymentBehavior,
+    private paypalClientToken: PayPalCreateClientTokenBehavior,
     private paypalCapture: PayPalCaptureMoneyBehavior,
     private paypalPayment: PayPalPaymentBehavior,
     private paymentMethodRepo: PaymentMethodRepoContract
@@ -77,6 +83,7 @@ class PaymentStrategyFactory
     [StrategySelection.Braintree]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.CreditCard);
       return new PaymentStrategy(
+        this.braintreeClientToken,
         this.braintreeCapture,
         this.braintreePayment,
         id
@@ -84,11 +91,17 @@ class PaymentStrategyFactory
     },
     [StrategySelection.PayPal]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.PayPal);
-      return new PaymentStrategy(this.paypalCapture, this.paypalPayment, id);
+      return new PaymentStrategy(
+        this.paypalClientToken,
+        this.paypalCapture,
+        this.paypalPayment,
+        id
+      );
     },
     [StrategySelection.BankTransfer]: async () => {
       const id = await this.getPaymentMethodId(PaymentMethodNames.BankTransfer);
       return new PaymentStrategy(
+        this.bankTransferClientToken,
         this.bankTransferCapture,
         this.bankTransferPayment,
         id

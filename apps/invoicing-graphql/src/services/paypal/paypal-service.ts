@@ -10,6 +10,7 @@ import {
   PayPalServiceErrors as Errors,
   ExternalOrderId,
   LoggerContract,
+  PaymentProof,
   Either,
   right,
   left,
@@ -180,7 +181,10 @@ export class PayPalService implements ServiceContract {
   async captureMoney(
     orderId: string
   ): Promise<
-    Either<Errors.UnsuccessfulOrderCapture | Errors.UnexpectedError, unknown>
+    Either<
+      Errors.UnsuccessfulOrderCapture | Errors.UnexpectedError,
+      PaymentProof
+    >
   > {
     let response: Response<PayPalOrderResponse>;
 
@@ -202,7 +206,11 @@ export class PayPalService implements ServiceContract {
       );
     }
 
-    return right(response.result.purchase_units[0].payments.captures[0].id);
+    return right(
+      PaymentProof.create(
+        response.result.purchase_units[0].payments.captures[0].id
+      )
+    );
   }
 
   private createOrderRequest(payload: PayPalOrderRequest): OrdersCreateRequest {

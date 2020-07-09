@@ -2,7 +2,10 @@
 
 import { BullScheduler } from '@hindawi/sisif';
 import {
+  BankTransferCreateClientTokenBehavior,
+  BraintreeCreateClientTokenBehavior,
   BankTransferCaptureMoneyBehavior,
+  PayPalCreateClientTokenBehavior,
   BraintreeCaptureMoneyBehavior,
   BankTransferPaymentBehavior,
   PayPalCaptureMoneyBehavior,
@@ -58,24 +61,28 @@ function buildPaymentStrategyFactory(
     loggerBuilder.getLogger()
   );
 
-  const bankTransferCaptureBehavior = new BankTransferCaptureMoneyBehavior();
-  const bankTransferPaymentBehavior = new BankTransferPaymentBehavior();
-  const paypalCaptureBehavior = new PayPalCaptureMoneyBehavior(paypalService);
-  const payPalPaymentBehavior = new PayPalPaymentBehavior(paypalService);
-  const braintreeCaptureBehavior = new BraintreeCaptureMoneyBehavior(
-    braintreeService
-  );
-  const braintreePaymentBehavior = new BraintreePaymentBehavior(
+  const bankTransferClientToken = new BankTransferCreateClientTokenBehavior();
+  const bankTransferCapture = new BankTransferCaptureMoneyBehavior();
+  const bankTransferPayment = new BankTransferPaymentBehavior();
+  const paypalClientToken = new PayPalCreateClientTokenBehavior(paypalService);
+  const paypalCapture = new PayPalCaptureMoneyBehavior(paypalService);
+  const payPalPayment = new PayPalPaymentBehavior(paypalService);
+  const braintreeCapture = new BraintreeCaptureMoneyBehavior(braintreeService);
+  const braintreePayment = new BraintreePaymentBehavior(braintreeService);
+  const braintreeClientToken = new BraintreeCreateClientTokenBehavior(
     braintreeService
   );
 
   return new PaymentStrategyFactory(
-    bankTransferCaptureBehavior,
-    bankTransferPaymentBehavior,
-    braintreeCaptureBehavior,
-    braintreePaymentBehavior,
-    paypalCaptureBehavior,
-    payPalPaymentBehavior,
+    bankTransferClientToken,
+    bankTransferCapture,
+    bankTransferPayment,
+    braintreeClientToken,
+    braintreeCapture,
+    braintreePayment,
+    paypalClientToken,
+    paypalCapture,
+    payPalPayment,
     paymentMethodRepo
   );
 }
