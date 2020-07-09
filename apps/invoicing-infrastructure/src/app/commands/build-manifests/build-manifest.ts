@@ -1,12 +1,14 @@
+import {
+  HindawiServiceChart,
+  WithAwsSecretsServiceProps,
+} from '@hindawi/phenom-charts';
 import { App as Cdk8sApp } from 'cdk8s';
+import url from 'url';
+
 import { Command } from '../../contracts';
 import { getOsEnv } from '../../env';
 import { App } from '../../types';
 import { masterConfig } from './config.gen';
-import {
-  WithAwsSecretsServiceProps,
-  HindawiServiceChart,
-} from '@hindawi/phenom-charts';
 
 function makeAppEnum(app: string): App | null {
   switch (app) {
@@ -26,12 +28,16 @@ interface EnvProps {
   tenant: string;
   environment: string;
   apps: App[];
+  tag: string;
+  awsRegistry: string;
 }
 
 export class BuildManifestsCommand implements Command {
   private parseEnv(): EnvProps {
     let tenant: string = getOsEnv('TENANT');
     let environment: string = getOsEnv('NODE_ENV');
+    let tag: string = getOsEnv('CI_COMMIT_SHA');
+    let awsRegistry: string = getOsEnv('AWS_REGISTRY');
     let apps: App[] = getOsEnv('AFFECTED_APPS')
       .split(',')
       .map((a) => a.trim())
@@ -42,6 +48,8 @@ export class BuildManifestsCommand implements Command {
       tenant,
       environment,
       apps,
+      tag,
+      awsRegistry,
     };
   }
 
@@ -52,6 +60,8 @@ export class BuildManifestsCommand implements Command {
       let appProps: WithAwsSecretsServiceProps;
       try {
         appProps = masterConfig[env.tenant][env.environment][app];
+        appProps.serviceProps.image.repository = `${env.awsRegistry}/${app}`;
+        appProps.serviceProps.image.tag = env.tag;
         if (!appProps) {
           throw new Error('Not found configuration for app');
         }
