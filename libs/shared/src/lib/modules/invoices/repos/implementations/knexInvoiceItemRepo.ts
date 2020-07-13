@@ -36,14 +36,26 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
 
-    const invoiceItems = await db(TABLES.INVOICE_ITEMS)
+    const sql = db(TABLES.INVOICE_ITEMS)
       .select()
       .where('manuscriptId', manuscriptId.id.toString());
 
     logger.debug('select', {
       correlationId,
-      sql: invoiceItems.toString()
+      sql: sql.toString(),
     });
+
+    let invoiceItems;
+    try {
+      invoiceItems = await sql;
+    } catch (e) {
+      throw RepoError.createEntityNotFoundError(
+        'manuscriptId',
+        typeof manuscriptId === 'string'
+          ? manuscriptId
+          : manuscriptId.id.toString()
+      );
+    }
 
     return invoiceItems.map(InvoiceItemMap.toDomain);
   }
@@ -57,7 +69,7 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
         dateCreated: invoiceItem.dateCreated,
         invoiceId: invoiceItem.invoiceId.id.toString(),
         vat: invoiceItem.vat,
-        price: invoiceItem.price
+        price: invoiceItem.price,
       });
 
     if (!updated) {
@@ -131,6 +143,6 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
       );
     }
 
-    return items.map(item => InvoiceItemMap.toDomain(item));
+    return items.map((item) => InvoiceItemMap.toDomain(item));
   }
 }

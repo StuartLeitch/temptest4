@@ -39,6 +39,7 @@ async function main() {
     const { winstonLoader } = await import(
       /* webpackChunkName: "winstonLoader" */ './loaders/winstonLoader'
     );
+    log.info('Winston logging initiated ✔️');
     loaders.push(winstonLoader);
   }
 
@@ -46,6 +47,7 @@ async function main() {
     const { knexLoader } = await import(
       /* webpackChunkName: "knexLoader" */ './loaders/knexLoader'
     );
+    log.info('Knex Query Builder initiated ✔️');
     loaders.push(knexLoader);
   }
 
@@ -53,6 +55,7 @@ async function main() {
     const { contextLoader } = await import(
       /* webpackChunkName: "contextLoader" */ './loaders/contextLoader'
     );
+    log.info('Context state object initiated ✔️');
     loaders.push(contextLoader);
   }
 
@@ -60,22 +63,52 @@ async function main() {
     const { expressLoader } = await import(
       /* webpackChunkName: "expressLoader" */ './loaders/expressLoader'
     );
+    log.info('Express Server initiated ✔️');
     loaders.push(expressLoader);
   }
 
-  // import { monitorLoader } from './loaders/monitorLoader';
-  // import { graphqlLoader } from './loaders/graphqlLoader';
-  // import { queueServiceLoader } from './loaders/queueServiceLoader';
-  // import { schedulerLoader } from './loaders/schedulerLoader';
-  // import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
-  // import { sisifLoader } from './loaders/sisifLoader';
+  if (env.loaders.monitorEnabled) {
+    const { monitorLoader } = await import(
+      /* webpackChunkName: "monitorLoader" */ './loaders/monitorLoader'
+    );
+    log.info('Express Monitor initiated ✔️');
+    loaders.push(monitorLoader);
+  }
+
+  if (env.loaders.graphqlEnabled) {
+    const { graphqlLoader } = await import(
+      /* webpackChunkName: "graphqlLoader" */ './loaders/graphqlLoader'
+    );
+    log.info('GraphQL Server initiated ✔️');
+    loaders.push(graphqlLoader);
+  }
 
   if (env.loaders.erpEnabled) {
     const { erpLoader } = await import(
       /* webpackChunkName: "erpLoader" */ './loaders/erpLoader'
     );
+    log.info('ERP Sage integration initiated ✔️');
     loaders.push(erpLoader);
   }
+
+  if (env.loaders.queueServiceEnabled) {
+    const { queueServiceLoader } = await import(
+      /* webpackChunkName: "queueServiceLoader" */ './loaders/queueServiceLoader'
+    );
+    log.info('Queue Service initiated ✔️');
+    loaders.push(queueServiceLoader);
+  }
+
+  // import { schedulerLoader } from './loaders/schedulerLoader';
+  if (env.loaders.domainEventsRegisterEnabled) {
+    // import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
+    const { domainEventsRegisterLoader } = await import(
+      /* webpackChunkName: "domainEventsRegisterLoader" */ './loaders/domainEventsLoader'
+    );
+    log.info('Domain Events initiated ✔️');
+    loaders.push(domainEventsRegisterLoader);
+  }
+  // import { sisifLoader } from './loaders/sisifLoader';
 
   await bootstrapMicroframework({
     /**

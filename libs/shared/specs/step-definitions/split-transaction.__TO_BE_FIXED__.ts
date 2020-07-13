@@ -29,14 +29,14 @@ const feature = loadFeature('./specs/features/split-transaction.feature', {
 const defaultContext: GetTransactionContext = { roles: [Roles.SUPER_ADMIN] };
 
 defineFeature(feature, (test) => {
-  let mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
+  const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
 
   let payer1: Payer;
   let payer2: Payer;
   let transactionId: string;
   let invoiceId: string;
 
-  let getTransactionUsecase: GetTransactionUsecase = new GetTransactionUsecase(
+  const getTransactionUsecase: GetTransactionUsecase = new GetTransactionUsecase(
     mockTransactionRepo
   );
   let retrievedTransaction: Transaction;

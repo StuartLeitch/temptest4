@@ -32,6 +32,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context = settings.getData('context');
+
     const {
       repos: {
         paymentMethod,

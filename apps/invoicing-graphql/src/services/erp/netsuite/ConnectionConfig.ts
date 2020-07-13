@@ -6,7 +6,7 @@ export class ConnectionConfig {
   private tokenId = '';
   private tokenSecret = '';
 
-  constructor(options: any) {
+  constructor(options: unknown) {
     Object.assign(this, options);
   }
 }

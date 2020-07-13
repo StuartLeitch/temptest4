@@ -263,7 +263,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );

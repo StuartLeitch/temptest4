@@ -38,8 +38,6 @@ export const erpLoader: MicroframeworkLoader = async (
       netsuite: netSuiteService,
     };
 
-    await netSuiteService.registerInvoice({});
-
     // settings.onShutdown(() => erpConnection.destroy());
   }
 };
