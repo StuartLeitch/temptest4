@@ -1,5 +1,3 @@
-export interface Event {
-  MessageAttributes: object;
-  MessageId: string;
-  Message: string;
-}
+import { RawEvent } from 'libs/shared/src/lib/infrastructure/RawEvent';
+
+export type Event = RawEvent;
