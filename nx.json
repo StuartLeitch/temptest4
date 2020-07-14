@@ -43,6 +43,9 @@
     },
     "sisif-test": {
       "tags": []
+    },
+    "invoicing-infrastructure": {
+      "tags": []
     }
   }
 }

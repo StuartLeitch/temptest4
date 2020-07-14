@@ -8,6 +8,7 @@
 
 # compiled output
 dist/
+dist-k8s/
 /tmp
 /out-tsc
 
