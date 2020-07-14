@@ -21,19 +21,7 @@ async function main() {
   /**
    * Loaders
    */
-  const loaders = [
-    // winstonLoader,
-    // knexLoader,
-    // contextLoader,
-    // expressLoader,
-    // monitorLoader,
-    // graphqlLoader,
-    // queueServiceLoader,
-    // schedulerLoader,
-    // domainEventsRegisterLoader,
-    // sisifLoader,
-    // erpLoader,
-  ];
+  const loaders = [];
 
   if (env.loaders.winstonEnabled) {
     const { winstonLoader } = await import(
@@ -99,7 +87,15 @@ async function main() {
     loaders.push(queueServiceLoader);
   }
 
-  // import { schedulerLoader } from './loaders/schedulerLoader';
+  if (env.loaders.schedulerEnabled) {
+    // import { schedulerLoader } from './loaders/schedulerLoader';
+    const { schedulerLoader } = await import(
+      /* webpackChunkName: "schedulerLoader" */ './loaders/schedulerLoader'
+    );
+    log.info('Scheduler initiated ✔️');
+    loaders.push(schedulerLoader);
+  }
+
   if (env.loaders.domainEventsRegisterEnabled) {
     // import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
     const { domainEventsRegisterLoader } = await import(
@@ -108,7 +104,14 @@ async function main() {
     log.info('Domain Events initiated ✔️');
     loaders.push(domainEventsRegisterLoader);
   }
-  // import { sisifLoader } from './loaders/sisifLoader';
+  if (env.loaders.sisifEnabled) {
+    // import { sisifLoader } from './loaders/sisifLoader';
+    const { sisifLoader } = await import(
+      /* webpackChunkName: "sisifLoader" */ './loaders/sisifLoader'
+    );
+    log.info('Sisif service initiated ✔️');
+    loaders.push(sisifLoader);
+  }
 
   await bootstrapMicroframework({
     /**
