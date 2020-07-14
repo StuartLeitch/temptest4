@@ -8,7 +8,7 @@ import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoiceSentEvent } from './events/invoiceSent';
-import { InvoicePaidEvent } from './events/invoicePaid';
+import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
@@ -265,11 +265,13 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.addDomainEvent(new InvoiceConfirmed(this, now));
   }
 
-  public markAsPaid(paymentId: PaymentId): void {
+  public paymentAdded(paymentId: PaymentId): void {
     const now = new Date();
     this.props.dateUpdated = now;
-    this.props.status = InvoiceStatus.FINAL;
-    this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, paymentId, now));
+    // this.props.status = InvoiceStatus.FINAL;
+    this.addDomainEvent(
+      new InvoicePaymentAddedEvent(this.invoiceId, paymentId, now)
+    );
   }
 
   public markAsFinal(): void {

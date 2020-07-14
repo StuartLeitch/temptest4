@@ -67,6 +67,7 @@ export const expressLoader: MicroframeworkLoader = (
     });
 
     app.post('/api/payments/process-finished', async (req, res) => {
+      // TODO: Add validation on event
       const data = req.body;
       const {
         repos: { payment },

@@ -26,10 +26,12 @@ export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
   }
 
   private async onPaymentCompleted(event: PaymentCompleted): Promise<void> {
-    const invoiceId = event.payment.invoiceId.toString();
     const usecaseContext = { roles: [Roles.EVENT_HANDLER] };
+    const invoiceId = event.payment.invoiceId.toString();
+    const paymentId = event.payment.paymentId;
 
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
+
     const maybeInvoice = await usecase.execute({ invoiceId }, usecaseContext);
 
     if (maybeInvoice.isLeft()) {
@@ -39,6 +41,8 @@ export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
       );
     } else {
       const invoice = maybeInvoice.value.getValue();
+
+      invoice.paymentAdded(paymentId);
 
       if (event.isFinal) {
         invoice.markAsFinal();

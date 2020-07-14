@@ -220,9 +220,9 @@ export class RecordPaymentUsecase
         paymentMethodId: paymentDetails.paymentMethodId.toString(),
         foreignPaymentId: paymentDetails.foreignPaymentId.id,
         isFinalPayment: request.isFinalPayment ?? true,
+        amount: amount ?? invoice.invoiceTotal,
         invoiceId: invoice.id.toString(),
         status: paymentDetails.status,
-        amount: amount ?? invoice.invoiceTotal,
         payerId: payer.id.toString(),
         datePaid,
       };
