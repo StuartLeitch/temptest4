@@ -22,8 +22,8 @@ variables:
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
-  AFFECTED_APPS: 'invoicing-graphql,reporting-backend'
-  # AFFECTED_APPS: 'invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
+  # AFFECTED_APPS: 'invoicing-graphql'
+  AFFECTED_APPS: 'invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
   interruptible: true
@@ -40,7 +40,7 @@ Install Dependencies:
 
 Test:
   interruptible: true
-  allow_failure: true
+  allow_failure: false
   stage: test
   # before_script: added to dockerfile.build
   #   - apt-get update
@@ -61,7 +61,6 @@ Test:
 Build:
   interruptible: true
   stage: build
-  when: manual
   allow_failure: false
   script:
     - cd $HOME
@@ -74,8 +73,8 @@ Build:
     paths:
       - .ci_status
       - dist
-  # only:
-  #   - develop
+  only:
+    - develop
 
 Package Images:dev:
   interruptible: true
@@ -94,8 +93,8 @@ Package Images:dev:
       entrypoint: ['env', '-u', 'DOCKER_HOST']
       command: ['dockerd-entrypoint.sh']
   script:
+    - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-    - ./tools/scripts/docker-login.sh
     - ./tools/scripts/dockerize-apps.sh
   dependencies:
     - Build
@@ -103,8 +102,8 @@ Package Images:dev:
     paths:
       - .ci_status
       - dist
-  # only:
-  #   - develop
+  only:
+    - develop
 
 Deploy:dev:
   stage: deploy
@@ -118,23 +117,26 @@ Deploy:dev:
     TENANT: hindawi
     NODE_ENV: dev
     AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
   before_script:
-    - apk add --no-cache aws-cli
+    - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
   script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - aws eks --region eu-west-1 update-kubeconfig --name hindawi-dev
     - kubectl config set-context --current --namespace=dev
     - cd $HOME
-    - ./tools/deploy-ci.sh
+    - ./tools/scripts/deploy-ci.sh
     - cp -r dist-k8s $CI_PROJECT_DIR
   artifacts:
     paths:
       - dist-k8s
-  # only:
-  #   - develop
+  only:
+    - develop
 # Pages:
 #   interruptible: true
 #   stage: deploy
