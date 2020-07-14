@@ -72,6 +72,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       catalog,
       publisher,
       erpService,
+      netSuiteService,
       loggerService
     );
 

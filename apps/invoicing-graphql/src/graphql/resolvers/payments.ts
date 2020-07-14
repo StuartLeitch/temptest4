@@ -79,7 +79,7 @@ export const payments: Resolvers<any> = {
         invoiceRepo,
         manuscriptRepo,
         invoiceItemRepo,
-        paymentGateway: BraintreeGateway,
+        BraintreeGateway
       );
       const usecaseContext = { roles: [Roles.PAYER] };
 

@@ -1,13 +1,11 @@
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../../domain/authorization/AccessControl';
+  AuthorizationContext,
+  AccessControlContext,
+} from '../../../../../domain/authorization/context';
 import { Roles } from '../../../../users/domain/enums/Roles';
 
 export { Authorize, Roles, AccessControlledUsecase, AccessControlContext };
 
-export type GetJournalListAuthenticationContext = AuthorizationContext<
-  Roles
->;
+export type GetJournalListAuthenticationContext = AuthorizationContext<Roles>;

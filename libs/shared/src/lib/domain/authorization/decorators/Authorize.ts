@@ -1,7 +1,8 @@
-import {Result} from '../../../core/logic/Result';
-import {accessControl, AccessControlContext} from '../AccessControl';
+import { Result } from '../../../core/logic/Result';
+import { accessControl, AccessControlContext } from '../AccessControl';
 
 export type Authorization = 'Authorization';
+// export type AccessControlContext = AccessControlContext;
 
 export interface AuthorizationContext<T = string> {
   roles: T[];
@@ -22,8 +23,8 @@ export const Authorize = <R, C extends AuthorizationContext>(
   propertyDescriptor: PropertyDescriptor
 ): PropertyDescriptor => {
   const method = propertyDescriptor.value;
-  propertyDescriptor.value = async function(request: R, context: C) {
-    const {roles} = context;
+  propertyDescriptor.value = async function (request: R, context: C) {
+    const { roles } = context;
     const accessControlContext = await (_target as any).getAccessControlContext(
       request,
       context,
