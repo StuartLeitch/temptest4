@@ -1,7 +1,7 @@
-import {DomainEventContract} from './events/contracts/DomainEvent';
-import {DomainEvents} from './events/DomainEvents';
-import {Entity} from './Entity';
-import {UniqueEntityID} from './UniqueEntityID';
+import { DomainEventContract } from './events/contracts/DomainEvent';
+import { DomainEvents } from './events/DomainEvents';
+import { Entity } from './Entity';
+import { UniqueEntityID } from './UniqueEntityID';
 
 export abstract class AggregateRoot<T> extends Entity<T> {
   private _domainEvents: DomainEventContract[] = [];
@@ -33,11 +33,11 @@ export abstract class AggregateRoot<T> extends Entity<T> {
     const domainEventClass = Reflect.getPrototypeOf(domainEvent);
 
     // tslint:disable-next-line:no-console
-    console.info(
-      `[Domain Event Created]:`,
-      thisClass.constructor.name,
-      '==>',
-      domainEventClass.constructor.name
-    );
+    // console.info(
+    //   `[Domain Event Created]:`,
+    //   thisClass.constructor.name,
+    //   '==>',
+    //   domainEventClass.constructor.name
+    // );
   }
 }

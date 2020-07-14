@@ -15,7 +15,7 @@ import {
   InputGroup,
 } from '../../../../components';
 
-const TypeSelection = ({
+const TypeSelection: React.FC<TypeSelectionProps> = ({
   value,
   label,
   name,
@@ -24,7 +24,7 @@ const TypeSelection = ({
   helper = '',
   id,
   mode,
-}: TypeSelectionProps) => {
+}) => {
   const chosenContext =
     mode === CREATE ? CouponCreateContext : CouponEditContext;
   const { couponState, update } = useContext(chosenContext);

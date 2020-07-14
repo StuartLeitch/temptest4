@@ -62,10 +62,17 @@ export const invoicePaymentHandler = (
     invoiceId,
   };
 
-  usecase.execute(request, usecaseContext).then((maybeResult) => {
-    if (maybeResult.isLeft()) {
-      loggerService.error(maybeResult.value.errorValue().message);
-      throw Error(maybeResult.value.errorValue().message);
-    }
-  });
+  usecase
+    .execute(request, usecaseContext)
+    .then((maybeResult) => {
+      if (maybeResult.isLeft()) {
+        loggerService.error(
+          maybeResult.value.errorValue().message,
+          maybeResult.value.errorValue()
+        );
+      }
+    })
+    .catch((err) => {
+      loggerService.error(err.message, err);
+    });
 };

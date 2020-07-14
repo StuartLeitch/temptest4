@@ -1,28 +1,33 @@
-# Use an official Node runtime as a parent image
-FROM node:12.14.0-alpine
+FROM node:14-alpine as build
+RUN apk add --no-cache git \
+  && apk add g++ make python \
+  && apk add --update --no-cache curl
 
 ENV PHANTOMJS_VERSION 2.1.1
+RUN curl -Ls "https://github.com/dustinblackman/phantomized/releases/download/${PHANTOMJS_VERSION}/dockerized-phantomjs.tar.gz" | tar xz -C / \
+  && curl -k -Ls https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64.tar.bz2 | tar -jxvf - -C / \
+  && cp phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs 
 
-RUN apk add g++ make python
-RUN apk add --update --no-cache curl
-RUN curl -Ls "https://github.com/dustinblackman/phantomized/releases/download/${PHANTOMJS_VERSION}/dockerized-phantomjs.tar.gz" | tar xz -C / && \
-  curl -k -Ls https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64.tar.bz2 | tar -jxvf - -C /
-RUN cp phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
-RUN rm -fR phantomjs-${PHANTOMJS_VERSION}-linux-x86_64
+ENV HOME "/home/app"
 
-RUN apk add --no-cache git
+WORKDIR ${HOME}
 
 # Copy package.json to the working directory
-COPY package.json .
-COPY package-lock.json .
+COPY package.json yarn.lock ./
 
 # Install any needed packages specified in package.json
-RUN npm ci --only=production
+RUN yarn install --frozen-lockfile --production
+
+FROM node:14-alpine
+
+COPY --from=build /home/app/node_modules ./node_modules
+COPY --from=build /usr/local/bin/phantomjs /usr/local/bin/phantomjs
+COPY package.json .
 
 # Copying the rest of the code to the working directory
 COPY config/ ./config/
 COPY dist/apps/invoicing-graphql .
-COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
+COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ /migrations/
 
 # Make port 3000 available to the world outside this container
 EXPOSE 3000

@@ -1,8 +1,7 @@
 Feature: Delete Editor Usecase
-  #Provide some context
-  #And some other stuff
+  Blah blah blah
 
-  #some comment here if necessary
+  # more scenario blah blah
   Scenario Outline: Delete Editor(s)
     Given There are <start> editors
     When I delete <remove> editors

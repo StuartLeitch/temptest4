@@ -58,6 +58,17 @@
             ]
           }
         },
+        "cucumber": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json",
+            "features": "apps/invoicing-graphql/tests/**/*.feature",
+            "steps": "apps/invoicing-graphql/tests/**/*.steps.ts",
+            "path": "report/apps/invoicing-graphql",
+            "format": "json",
+            "coverage": true
+          }
+        },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
@@ -86,6 +97,16 @@
               "**/node_modules/**",
               "!libs/shared/**"
             ]
+          }
+        },
+        "cucumber": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json",
+            "features": "libs/shared/tests/lib/**/*.feature",
+            "steps": "libs/shared/tests/lib/**/*.steps.ts",
+            "format": "json:report/libs/shared/cucumber_report.json",
+            "coverage": false
           }
         },
         "test": {
@@ -621,6 +642,60 @@
           "options": {
             "jestConfig": "apps/sisif-test/jest.config.js",
             "tsConfig": "apps/sisif-test/tsconfig.spec.json",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "invoicing-infrastructure": {
+      "root": "apps/invoicing-infrastructure",
+      "sourceRoot": "apps/invoicing-infrastructure/src",
+      "projectType": "application",
+      "prefix": "invoicing-infrastructure",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/invoicing-infrastructure",
+            "main": "apps/invoicing-infrastructure/src/main.ts",
+            "tsConfig": "apps/invoicing-infrastructure/tsconfig.app.json",
+            "assets": []
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "invoicing-infrastructure:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "config": "apps/invoicing-infrastructure/.eslintrc",
+            "tsConfig": [
+              "apps/invoicing-infrastructure/tsconfig.app.json",
+              "apps/invoicing-infrastructure/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/invoicing-infrastructure/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/invoicing-infrastructure/jest.config.js",
+            "tsConfig": "apps/invoicing-infrastructure/tsconfig.spec.json",
             "passWithNoTests": true
           }
         }

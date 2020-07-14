@@ -7,9 +7,9 @@ export TO="${AWS_ENVIRONMENT}-gsw-${APP}"
 export TIMESTAMP=$(date +'%d_%m_%Y_%R')
 export CI_COMMIT_SHA="${USER}_${TIMESTAMP/:/_}"
 
-_=$(command -v npm);
+_=$(command -v yarn);
 if [ "$?" != "0" ]; then
-  printf -- "You don\'t seem to have NPM installed.\n";
+  printf -- "You don\'t seem to have yarn installed.\n";
   # printf -- 'Get it: https://www.docker.com/community-edition\n';
   printf -- "Exiting with code 127...\n";
   exit 127;

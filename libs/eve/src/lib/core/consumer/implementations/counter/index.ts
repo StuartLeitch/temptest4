@@ -1,5 +1,5 @@
 import { Consumer } from '../../consumer';
-import { LoggerContract } from '@hindawi/shared';
+import { LoggerContract } from 'libs/shared/src/lib/infrastructure/logging/Logger';
 
 export class CounterConsumer<T> implements Consumer<T> {
   private count = 0;

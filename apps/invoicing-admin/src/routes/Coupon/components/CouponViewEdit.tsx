@@ -12,7 +12,7 @@ import {
   VIEW,
 } from '../config';
 
-const CouponViewEdit = ({ coupon, mode }: CouponViewEditProps) => {
+const CouponViewEdit: React.FC<CouponViewEditProps> = ({ coupon, mode }) => {
   const areInputsDisabled = mode === VIEW;
   const {
     name,

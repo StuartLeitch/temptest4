@@ -90,10 +90,10 @@ export class S3EventProducer implements Producer<Event, string> {
       const { isTruncated, objects } = await this.listObjects(lastKey);
       const keys = objects.map(obj => obj.Key);
 
-      for (let k of keys.filter(this.checkSelectors.bind(this))) {
-        yield k;
+      for (const key of keys.filter(this.checkSelectors.bind(this))) {
+        yield key;
         if (this.resumeService) {
-          await this.resumeService.saveKey(k);
+          await this.resumeService.saveKey(key);
         }
       }
 
@@ -102,7 +102,9 @@ export class S3EventProducer implements Producer<Event, string> {
       }
       lastKey = keys[keys.length - 1];
     }
-    this.resumeService.clear();
+    if (this.resumeService) {
+      await this.resumeService.clear();
+    }
   }
 
   private async getS3Object(key: string): Promise<null | string> {

@@ -11,8 +11,8 @@ This monorepo is managed with Nx. Visit the [Nx Documentation](https://nx.dev) t
 ## Development
 
 ```bash
-npm start invoicing-graphql    # starts server localy
-npm start invoicing-web        # starts frontend dev server localy
+yarn start invoicing-graphql    # starts server localy
+yarn start invoicing-web        # starts frontend dev server localy
 ```
 
 ### Start infrastructure localy
@@ -24,16 +24,16 @@ npm start invoicing-web        # starts frontend dev server localy
 
 This starts a docker compose stack with:
 
-| service | port | URL | comments |
-|---------|------|-----|----------|
-| postgres | `5432` | `N/A` | postgres server. Credentials: user = pass = database = "postgres" |
-| adminer | `8080` | [`localhost:8080`](http://localhost:8080) | UI for managing postgres db |
-| SQS | `9325` | [`localhost:9325`](http://localhost:9325) (UI) | AWS SQS running localy |
-|     | `9324` | [`localhost:9324`](http://localhost:9324) (SQS endpoint) |  |
-| nginx | `8001` | [`localhost:8001/`](http://localhost:8001/) | Web app |
-|       |        | [`localhost:8001/adminer`](http://localhost:8001/adminer) | Adminer runs here |
-|       |        | [`localhost:8001/api`](http://localhost:8001/api) | API root |
-|       |        | [`localhost:8001/graphql`](http://localhost:8001/graphql) | Grahql entrypoint |
+| service  | port   | URL                                                       | comments                                                          |
+| -------- | ------ | --------------------------------------------------------- | ----------------------------------------------------------------- |
+| postgres | `5432` | `N/A`                                                     | postgres server. Credentials: user = pass = database = "postgres" |
+| adminer  | `8080` | [`localhost:8080`](http://localhost:8080)                 | UI for managing postgres db                                       |
+| SQS      | `9325` | [`localhost:9325`](http://localhost:9325) (UI)            | AWS SQS running localy                                            |
+|          | `9324` | [`localhost:9324`](http://localhost:9324) (SQS endpoint)  |                                                                   |
+| nginx    | `8001` | [`localhost:8001/`](http://localhost:8001/)               | Web app                                                           |
+|          |        | [`localhost:8001/adminer`](http://localhost:8001/adminer) | Adminer runs here                                                 |
+|          |        | [`localhost:8001/api`](http://localhost:8001/api)         | API root                                                          |
+|          |        | [`localhost:8001/graphql`](http://localhost:8001/graphql) | Grahql entrypoint                                                 |
 
 **Note:**
 The nginx container uses the host network and reverse proxies to:

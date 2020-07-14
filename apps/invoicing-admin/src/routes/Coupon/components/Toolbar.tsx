@@ -8,13 +8,13 @@ import { CouponMode } from '../types';
 
 import { VIEW, EDIT, CREATE } from '../config';
 
-export default ({
+const Toolbar: React.FC<ToolbarProps> = ({
   mode,
   onSave,
   onCancel,
   isSaveInProgress,
   onEdit,
-}: ToolbarProps) => {
+}) => {
   const isViewModeOn = mode === VIEW;
   const isEditModeOn = mode === EDIT;
   const isCreateModeOn = mode === CREATE;
@@ -67,7 +67,9 @@ export default ({
 interface ToolbarProps {
   mode: CouponMode;
   isSaveInProgress: boolean;
-  onSave: Function;
-  onEdit?: Function;
-  onCancel: Function;
+  onSave(): void;
+  onEdit?(): void;
+  onCancel(): void;
 }
+
+export default Toolbar;

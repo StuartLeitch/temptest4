@@ -26,7 +26,7 @@ import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceD
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 
 import { Braintree } from './../../domain/strategies/Braintree';
-import { BraintreePayment } from '../../domain/strategies/BraintreePayment';
+import { BraintreePayment } from '../../domain/strategies/BrainTreePayment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 import { PaymentModel } from './../../domain/contracts/PaymentModel';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
@@ -51,7 +51,8 @@ export class RecordCreditCardPaymentUsecase
     private paymentRepo: PaymentRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private paymentGateway: any
   ) {}
 
   public async execute(
@@ -101,7 +102,7 @@ export class RecordCreditCardPaymentUsecase
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Braintree', new BraintreePayment(BraintreeGateway)],
+      ['Braintree', new BraintreePayment(this.paymentGateway)],
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'BraintreePayment'

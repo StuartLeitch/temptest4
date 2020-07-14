@@ -1,10 +1,7 @@
-import 'reflect-metadata';
-
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { banner } from './lib/banner';
-import { Logger } from './lib/logger';
-
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 /**
  * Loaders
  */
@@ -37,11 +34,11 @@ bootstrapMicroframework({
     handlerLoader,
     queueServiceLoader,
     expressLoader,
-    cronLoader
-  ]
+    cronLoader,
+  ],
 })
   .then(() => banner(log))
-  .catch(error => {
+  .catch((error) => {
     console.log(error);
     log.error(`Application crashed: ${error}`);
     process.exit(1);

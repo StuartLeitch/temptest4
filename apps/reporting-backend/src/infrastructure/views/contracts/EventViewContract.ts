@@ -14,7 +14,7 @@ export abstract class AbstractEventView implements WithDependencies {
   abstract getCreateQuery(): string;
 
   getDeleteQuery(): string {
-    return `DROP MATERIALIZED VIEW IF EXISTS ${this.getViewName()}`;
+    return `DROP MATERIALIZED VIEW IF EXISTS ${this.getViewName()} CASCADE`;
   }
 
   getRefreshQuery(): string {

@@ -14,10 +14,10 @@ RUN rm -fR phantomjs-${PHANTOMJS_VERSION}-linux-x86_64
 
 # Copy package.json to the working directory
 COPY package.json .
-COPY package-lock.json .
+COPY yarn.lock .
 
 # Install any needed packages specified in package.json
-RUN npm ci --only=production
+RUN yarn install --production
 
 # Copying the rest of the code to the working directory
 COPY config/ ./config/

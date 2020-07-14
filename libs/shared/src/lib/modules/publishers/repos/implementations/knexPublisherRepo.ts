@@ -1,3 +1,4 @@
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
@@ -8,7 +9,6 @@ import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
 import { PublisherId } from '../../domain/PublisherId';
 import { Publisher } from '../../domain/Publisher';
 import { PublisherMap } from '../../mappers/PublisherMap';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
   implements PublisherRepoContract {
@@ -20,7 +20,7 @@ export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
       tradeDocumentItem: '',
       journalReference: '',
       journalItemTag: '',
-      journalTag: ''
+      journalTag: '',
     };
     const data = await this.db(TABLES.PUBLISHER_CUSTOM_VALUES)
       .select('name', 'value')
@@ -58,7 +58,7 @@ export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
       dateUpdated: publisher.dateUpdated,
       name: publisher.name,
       id: publisher.id,
-      customValues
+      customValues,
     };
 
     return PublisherMap.toDomain(props);
@@ -82,7 +82,7 @@ export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
       dateUpdated: publisher.dateUpdated,
       name: publisher.name,
       id: publisher.id,
-      customValues
+      customValues,
     };
 
     return PublisherMap.toDomain(props);

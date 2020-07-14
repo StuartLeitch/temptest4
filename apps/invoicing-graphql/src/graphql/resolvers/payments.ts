@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import { BraintreeGateway } from '../../../../../libs/shared/src/lib/modules/payments/infrastructure/gateways/braintree/gateway';
 import {
   RecordCreditCardPaymentUsecase,
   RecordBankTransferPaymentUsecase,
@@ -77,7 +78,8 @@ export const payments: Resolvers<any> = {
         paymentRepo,
         invoiceRepo,
         manuscriptRepo,
-        invoiceItemRepo
+        invoiceItemRepo,
+        paymentGateway: BraintreeGateway,
       );
       const usecaseContext = { roles: [Roles.PAYER] };
 

@@ -48,7 +48,7 @@ export * from './modules/transactions/usecases/getTransaction/getTransaction';
 export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
-export * from './modules/transactions/usecases/updateTransaction/updateTransaction';
+export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
 
@@ -99,7 +99,6 @@ export * from './modules/payers/domain/PayerTitle';
 export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/repos/implementations/knexPayerRepo';
 export * from './modules/payers/mapper/Payer';
-export * from './modules/payers/usecases/updatePayer/updatePayer';
 export * from './modules/payers/usecases/getPayer/getPayer';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetailsDTO';
@@ -120,8 +119,10 @@ export * from './modules/publishers/usecases/getPublisherDetailsByName';
 export { CatalogItem } from './modules/journals/domain/CatalogItem';
 export * from './modules/journals/domain/JournalId';
 export * from './modules/journals/domain/Journal';
+export * from './modules/journals/domain/Editor';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
+export * from './modules/journals/mappers/EditorMap';
 export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 
@@ -223,10 +224,10 @@ export * from './modules/users/mappers/UserMap';
 // ? Should we export this
 // * Infra
 // export * from './infra/http/app';
-export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
+// export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
 export { SchedulerContract } from './infrastructure/scheduler/Scheduler';
 export { ListenerContract } from './infrastructure/listener/Listener';
-export { LoggerContract } from './infrastructure/logging/Logger';
+export * from './infrastructure/logging';
 export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';
 export * from './infrastructure/message-queues/contracts/Time';

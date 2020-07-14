@@ -1,6 +1,7 @@
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { RawEvent as EveEvent } from '../../../infrastructure/RawEvent';
+
 import { EventDTO } from '../domain/EventDTO';
-import { Event as EveEvent } from 'libs/eve/src';
 
 export class FilterEventsService {
   constructor(private s3Service: AWS.S3, private logger: LoggerContract) {}
@@ -8,10 +9,10 @@ export class FilterEventsService {
     events: AWS.SQS.Message[] /* | EveEvent[] */
   ): Promise<EventDTO[]> {
     const { s3Service, logger } = this;
-    let processedEvents: EventDTO[] = [];
+    const processedEvents: EventDTO[] = [];
 
     for (const event of events) {
-      let { MessageId, Body } = event;
+      const { MessageId, Body } = event;
       let id = null;
 
       let isLongEvent = false;
@@ -83,7 +84,7 @@ export class FilterEventsService {
       }
     }
 
-    let filteredEvents = processedEvents.filter(
+    const filteredEvents = processedEvents.filter(
       (e) => !!e && e.event && e.id && e.data
     );
     if (events.length !== filteredEvents.length) {

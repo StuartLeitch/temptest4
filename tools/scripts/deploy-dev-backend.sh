@@ -1,7 +1,7 @@
 #!/bin/sh
 
 printf -- "\nBuild BackEnd App for ${AWS_ENVIRONMENT} environment\n"
-npm run build invoicing-graphql --configuration=production
+yarn run build invoicing-graphql --configuration=production
 
 printf -- "\nDockerize BackEnd App for ${AWS_ENVIRONMENT} environment\n"
 aws --profile=dev ecr get-login --no-include-email | sh

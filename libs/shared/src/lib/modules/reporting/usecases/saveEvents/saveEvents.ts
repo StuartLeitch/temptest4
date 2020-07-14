@@ -5,13 +5,13 @@ import { right, left } from '../../../../core/logic/Result';
 import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 import { Roles } from '../../../users/domain/enums/Roles';
 import { EventMap } from '../../mappers/EventMap';
 import { EventsRepoContract } from '../../repos/EventsRepo';
 
-import { SaveEventsDTO } from './SaveEventsDTO';
+import { SaveEventsDTO } from './saveEventsDTO';
 import { SaveEventsResponse } from './saveEventsResponse';
 import { EventMappingRegistryContract } from '../../contracts/EventMappingRegistry';
 
@@ -44,13 +44,13 @@ export class SaveEventsUsecase
         return right(null);
       }
       await Promise.all(
-        this.policyRegistry.mapEvents(request.events).map(mapping => {
-          const persistenceEvents = mapping.events.map(raw => {
+        this.policyRegistry.mapEvents(request.events).map((mapping) => {
+          const persistenceEvents = mapping.events.map((raw) => {
             return EventMap.toDomain({
               id: raw.id,
               time: raw.timestamp,
               type: raw.event,
-              payload: JSON.stringify(raw.data)
+              payload: JSON.stringify(raw.data),
             });
           });
           return this.eventsRepo.upsertEvents(mapping.table, persistenceEvents);
@@ -60,7 +60,7 @@ export class SaveEventsUsecase
       console.log(error.message);
       console.log(
         'Failed to save events',
-        request.events.map(e => ({ id: e.id, event: e.event }))
+        request.events.map((e) => ({ id: e.id, event: e.event }))
       );
       return left(error);
     }

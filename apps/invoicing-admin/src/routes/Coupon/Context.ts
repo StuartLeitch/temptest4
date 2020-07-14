@@ -14,7 +14,7 @@ interface ContextProps {
     expirationDate: Field;
     code?: Field;
   };
-  update?: Function;
+  update?(field: string, {value: string, isValid: boolean}): void;
 }
 
 // EDIT

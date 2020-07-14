@@ -1,18 +1,23 @@
+import { CronJob } from 'cron';
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
-import { CronJob } from 'cron';
-
 import { env } from '../env';
-import { refreshViews } from '../infrastructure/views';
+import { refreshViews, refreshAcceptanceRates } from '../infrastructure/crons';
 
 export const cronLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
   const db = settings.getData('connection');
-  var refreshViewJob = new CronJob(env.app.viewRefreshCron, async () => {
+
+  const refreshViewJob = new CronJob(env.app.viewRefreshCron, async () => {
     refreshViews(db);
   });
   refreshViewJob.start();
+
+  const acceptanceRatesJob = new CronJob(env.app.acceptanceRatesCron, () => {
+    refreshAcceptanceRates(db);
+  });
+  acceptanceRatesJob.start();
 };

@@ -1,9 +1,4 @@
-import Knex from 'knex';
-
 import { OrderUtils } from '../../../../../libs/shared/src/lib/utils/Order';
-import { Logger } from '../../lib/logger';
-import { differenceInSeconds } from '../../utils/utils';
-
 import articleDataView from './ArticleDataView';
 import authorsView from './AuthorsView';
 import checkerSubmissionData from './CheckerSubmissionDataView';
@@ -16,19 +11,19 @@ import invoicesView from './InvoicesView';
 import journalEditorialBoardView from './JournalEditorialBoardView';
 import journalsDataView from './JournalsDataView';
 import journalSectionsView from './JournalSectionsView';
+import journalSpecialIssuesDataView from './JournalSpecialIssuesDataView';
 import journalSpecialIssuesView from './JournalSpecialIssuesView';
 import journalsView from './JournalsView';
 import manuscriptEditors from './ManuscriptEditorsView';
 import manuscriptReviewers from './ManuscriptReviewersView';
 import manuscriptReviewsView from './ManuscriptReviewsView';
+import ManuscriptsUsersView from './ManuscriptUsersView';
 import manucriptsView from './ManuscriptsView';
 import manuscriptVendorsFullAccessView from './ManuscriptVendorsFullAccessView';
 import manuscriptsVendorView from './ManuscriptVendorsView';
 import paymentsView from './PaymentsView';
 import submissionDataView from './SubmissionDataView';
 import submissionsView from './SubmissionsView';
-
-const logger = new Logger('materializedView');
 
 export const materializedViewList: AbstractEventView[] = OrderUtils.orderDependencies(
   [
@@ -48,40 +43,19 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     manuscriptEditors,
     manuscriptReviewers,
     journalSectionsView,
+    journalSpecialIssuesDataView,
     journalSpecialIssuesView,
     journalEditorialBoardView,
     manucriptsView,
     manuscriptReviewsView,
     manuscriptsVendorView,
     manuscriptVendorsFullAccessView,
+    ManuscriptsUsersView,
   ]
 ) as AbstractEventView[];
 
 if (materializedViewList === null) {
   throw Error('Circle dependency found, could not compile views.');
-}
-
-export async function refreshViews(knex: Knex) {
-  const refreshStart = new Date();
-  for (const view of materializedViewList) {
-    const refreshQuery = view.getRefreshQuery();
-    if (!refreshQuery) {
-      logger.info('Skipping ' + view.getViewName());
-      continue;
-    }
-    const queryStart = new Date();
-    try {
-      await knex.raw(refreshQuery);
-      logger.info(
-        `${refreshQuery} took ${differenceInSeconds(queryStart)} seconds`
-      );
-    } catch (error) {
-      logger.error(error);
-    }
-  }
-  logger.info(
-    `Refreshing views took ${differenceInSeconds(refreshStart)} seconds`
-  );
 }
 
 export { submissionDataView };

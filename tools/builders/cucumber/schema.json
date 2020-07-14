@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "title": "Cucumber",
+  "description": "Execute Cucumber tests",
+  "properties": {
+    "command": {
+      "type": "string"
+    },
+    "tsConfig": {
+      "type": "string",
+      "description": "TS node project to be passed to Cucumber."
+    },
+    "features": {
+      "type": "string",
+      "description": "Glob of Cucumber feature files."
+    }
+  },
+  "required": [
+    "tsConfig",
+    "features"
+  ]
+}

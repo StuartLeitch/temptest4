@@ -6,7 +6,7 @@ import {
 import authorsView from './AuthorsView';
 import invoicesView from './InvoicesView';
 import journalSectionsView from './JournalSectionsView';
-import journalSpecialIssuesView from './JournalSpecialIssuesView';
+import journalSpecialIssuesView from './JournalSpecialIssuesDataView';
 import manuscriptEditorsView from './ManuscriptEditorsView';
 import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';
@@ -14,6 +14,8 @@ import checkerToSubmissionView from './CheckerToSubmissionView';
 import manuscriptReviewers from './ManuscriptReviewersView';
 import manuscriptReviewsView from './ManuscriptReviewsView';
 import acceptanceRatesView from './AcceptanceRatesView';
+import articleData from './ArticleDataView';
+import { DELETED_MANUSCRIPTS_TABLE } from 'libs/shared/src/lib/modules/reporting/constants';
 
 class ManuscriptsView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -21,6 +23,7 @@ class ManuscriptsView extends AbstractEventView implements EventViewContract {
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
   s.*,
+  deleted_manuscripts.manuscript_custom_id is not null as deleted,
   last_sd.submission_event as last_event_type,
   last_sd.event_timestamp as last_event_date,
   sd.event_timestamp as final_decision_date,
@@ -31,7 +34,7 @@ AS SELECT
     when s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') then 'free'
     else 'paid'
   end as apc,
-  i.published_date,
+  article_data.published_date,
   coalesce(i.gross_apc_value, s.journal_apc::float) as gross_apc,
   i.discount,
   i.net_apc,
@@ -44,7 +47,8 @@ AS SELECT
     when sd.event_timestamp is null 
       then coalesce(individual_ar.journal_rate, global_ar.journal_rate) * coalesce(i.net_apc, s.journal_apc::float) 
     else i.net_apc
-  end as expected_apc,
+  end as current_expected_revenue,
+  coalesce(individual_ar.journal_rate, global_ar.journal_rate) * coalesce(i.net_apc, s.journal_apc::float) as raw_expected_revenue,
   CASE
     WHEN s.special_issue_id is NULL THEN 'regular'::text
     ELSE 'special'::text
@@ -71,6 +75,7 @@ AS SELECT
   handling_editors.invited_handling_editors_count,
   handling_editors.last_handling_editor_invited_date,
   handling_editors.current_handling_editor_accepted_date,
+  handling_editors.last_handling_editor_declined_date,
   last_editor_recommendation.recommendation last_editor_recommendation,
   last_editor_recommendation.submitted_date as last_editor_recommendation_submitted_date
 FROM ${submissionView.getViewName()} s
@@ -97,9 +102,15 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count, max(accepted_date) as last_reviewer_accepted_date from ${manuscriptReviewers.getViewName()} where status = 'accepted' group by manuscript_custom_id, version) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as pending_reviewers_count from ${manuscriptReviewers.getViewName()} where responded_date is null group by manuscript_custom_id, version) pending_reviewers on pending_reviewers.manuscript_custom_id = s.manuscript_custom_id and pending_reviewers."version" = s."version"
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as review_reports_count, max(submitted_date) as last_review_report_submitted_date from ${manuscriptReviewsView.getViewName()} where recommendation in ('publish', 'reject', 'minor', 'major') group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
-  LEFT JOIN (SELECT manuscript_custom_id, count(*) as invited_handling_editors_count, max(invited_date) as last_handling_editor_invited_date, max(accepted_date) current_handling_editor_accepted_date from ${manuscriptEditorsView.getViewName()} where role_type = 'academicEditor' group by manuscript_custom_id) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
+  LEFT JOIN (SELECT manuscript_custom_id, count(*) as invited_handling_editors_count, max(invited_date) as last_handling_editor_invited_date, max(accepted_date) current_handling_editor_accepted_date, max(declined_date) as last_handling_editor_declined_date from ${manuscriptEditorsView.getViewName()} where role_type = 'academicEditor' group by manuscript_custom_id) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN (SELECT journal_id, "month", avg(journal_rate) as journal_rate from ${acceptanceRatesView.getViewName()} group by journal_id, "month") individual_ar on individual_ar."month" = to_char(s.submission_date, 'YYYY-MM-01')::date and s.journal_id = individual_ar.journal_id
   LEFT JOIN (SELECT "month", avg(journal_rate) as journal_rate from ${acceptanceRatesView.getViewName()} where journal_rate is not null group by "month") global_ar on global_ar."month" = to_char(s.submission_date, 'YYYY-MM-01')::date
+  LEFT JOIN LATERAL (select * from ${articleData.getViewName()} a WHERE
+      a.manuscript_custom_id = s.manuscript_custom_id
+    LIMIT 1) article_data on article_data.manuscript_custom_id = s.manuscript_custom_id
+  LEFT JOIN LATERAL (select * from ${DELETED_MANUSCRIPTS_TABLE} d WHERE
+    d.manuscript_custom_id = s.manuscript_custom_id
+  LIMIT 1) deleted_manuscripts on deleted_manuscripts.manuscript_custom_id = s.manuscript_custom_id
 WITH DATA;
     `;
   }
@@ -142,5 +153,6 @@ manuscriptsView.addDependency(checkerToSubmissionView);
 manuscriptsView.addDependency(manuscriptReviewers);
 manuscriptsView.addDependency(manuscriptReviewsView);
 manuscriptsView.addDependency(manuscriptEditorsView);
+manuscriptsView.addDependency(articleData);
 
 export default manuscriptsView;

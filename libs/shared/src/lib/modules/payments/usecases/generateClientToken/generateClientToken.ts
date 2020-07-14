@@ -8,13 +8,13 @@ import { AccessControlContext } from '../../../../domain/authorization/AccessCon
 import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
+  AuthorizationContext,
 } from '../../../../domain/authorization/decorators/Authorize';
 
 // * Usecase specific
 import { BraintreeGateway } from './../../infrastructure/gateways/braintree/gateway';
 import { Braintree } from './../../domain/strategies/Braintree';
-import { BraintreePayment } from '../../domain/strategies/BraintreePayment';
+import { BraintreePayment } from '../../domain/strategies/BrainTreePayment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 // import { PaymentModel } from './../../domain/contracts/PaymentModel';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
