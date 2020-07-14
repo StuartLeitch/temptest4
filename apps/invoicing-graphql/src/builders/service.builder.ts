@@ -50,10 +50,14 @@ export interface Services {
 
 function buildPaymentStrategyFactory(
   paymentMethodRepo: PaymentMethodRepoContract,
-  loggerBuilder: LoggerBuilder
+  loggerBuilder: LoggerBuilder,
+  repos: Repos
 ) {
   const paypalService = new PayPalService(
     env.paypal,
+    repos.paymentMethod,
+    repos.invoice,
+    repos.payment,
     loggerBuilder.getLogger()
   );
   const braintreeService = new BraintreeService(
@@ -106,7 +110,8 @@ export function buildServices(
     schedulingService: new BullScheduler(bullData, loggerBuilder.getLogger()),
     paymentStrategyFactory: buildPaymentStrategyFactory(
       repos.paymentMethod,
-      loggerBuilder
+      loggerBuilder,
+      repos
     ),
     erp: null,
     qq: null,

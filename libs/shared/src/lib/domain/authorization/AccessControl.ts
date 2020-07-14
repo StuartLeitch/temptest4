@@ -48,6 +48,9 @@ accessControl
   .action('*')
   .grant(Roles.EVENT_HANDLER)
   .resource('invoice')
+  .action('read')
+  .grant(Roles.SERVICE)
+  .resource('payments')
   .action('read');
 
 export { accessControl };
