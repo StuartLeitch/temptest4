@@ -172,9 +172,9 @@ export class NetSuiteService {
       entity: {
         id: customerId,
       },
-      // cseg1: {
-      //   id: '1',
-      // },
+      cseg1: {
+        id: '1',
+      },
       item: {
         items: [
           {
@@ -253,7 +253,7 @@ export class NetSuiteService {
     const { creditAccountId, debitAccountId } = data;
 
     const journalRequestOpts = {
-      url: `${config.endpoint}record/v1/journal`,
+      url: `${config.endpoint}record/v1/journalentry`,
       method: 'POST',
     };
 
