@@ -3,7 +3,7 @@ import {
   AccessControlledUsecase,
   AuthorizationContext,
   AccessControlContext,
-} from '../../../../domain/authorization/context';
+} from '../../../../domain/authorization';
 import { Roles } from '../../../users/domain/enums/Roles';
 
 export { Authorize, Roles, AccessControlledUsecase, AccessControlContext };

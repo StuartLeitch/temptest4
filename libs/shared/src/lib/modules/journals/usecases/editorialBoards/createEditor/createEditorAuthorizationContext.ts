@@ -2,8 +2,8 @@ import {
   AccessControlledUsecase,
   AuthorizationContext,
   AccessControlContext,
-  Roles
-} from '../../../../../domain/authorization/context';
+  Roles,
+} from '../../../../../domain/authorization';
 
-export {Roles, AccessControlledUsecase, AccessControlContext};
+export { Roles, AccessControlledUsecase, AccessControlContext };
 export type CreateEditorAuthorizationContext = AuthorizationContext<Roles>;
