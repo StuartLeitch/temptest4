@@ -109,8 +109,9 @@ export class NetSuiteService {
 
     if (data?.payer?.type !== 'INSTITUTION') {
       createCustomerPayload.isPerson = true;
-      createCustomerPayload.firstName = payer?.name.toString();
-      createCustomerPayload.lastName = payer?.name.toString();
+      const [firstName, ...lastNames] = payer?.name.split(' ');
+      createCustomerPayload.firstName = firstName;
+      createCustomerPayload.lastName = lastNames.join(' ');
     } else {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = payer?.name.toString();
@@ -171,9 +172,9 @@ export class NetSuiteService {
       entity: {
         id: customerId,
       },
-      cseg1: {
-        id: '1',
-      },
+      // cseg1: {
+      //   id: '1',
+      // },
       item: {
         items: [
           {
