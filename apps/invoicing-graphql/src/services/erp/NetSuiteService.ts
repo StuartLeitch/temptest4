@@ -250,7 +250,7 @@ export class NetSuiteService {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditAccountId, debitAccountId } = data;
+    const { invoiceTotal, creditAccountId, debitAccountId } = data;
 
     const journalRequestOpts = {
       url: `${config.endpoint}record/v1/journalentry`,
@@ -269,13 +269,13 @@ export class NetSuiteService {
             account: {
               id: debitAccountId,
             },
-            debit: 10,
+            debit: invoiceTotal,
           },
           {
             account: {
               id: creditAccountId,
             },
-            credit: 10,
+            credit: invoiceTotal,
           },
         ],
       },
