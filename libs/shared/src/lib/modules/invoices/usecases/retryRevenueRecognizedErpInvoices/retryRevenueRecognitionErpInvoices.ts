@@ -57,6 +57,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
     private erpService: ErpServiceContract,
+    private netSuiteService: ErpServiceContract,
     private loggerService: any
   ) {
     this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
@@ -70,6 +71,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       this.catalogRepo,
       this.publisherRepo,
       this.erpService,
+      this.netSuiteService,
       this.loggerService
     );
   }

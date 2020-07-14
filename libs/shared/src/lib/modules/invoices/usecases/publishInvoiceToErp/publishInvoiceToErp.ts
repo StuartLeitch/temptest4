@@ -222,7 +222,13 @@ export class PublishInvoiceToErpUsecase
           tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
         };
 
-        await this.netSuiteService.registerInvoice(erpData);
+        const netSuiteResponse = await this.netSuiteService.registerInvoice(
+          erpData
+        );
+        this.loggerService.info(
+          `Updating invoice ${invoice.id.toString()}: netSuiteReference -> ${netSuiteResponse}`
+        );
+
         const erpResponse = await this.erpService.registerInvoice(erpData);
         // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
 
