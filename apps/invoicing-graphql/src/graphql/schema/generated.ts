@@ -409,8 +409,6 @@ export type Mutation = {
   createCreditNote: CreditNote;
   createPayPalOrder: PayPalOrderId;
   recordPayPalPayment: Scalars['ID'];
-  migratePayment: Payment;
-  migrateInvoice?: Maybe<Invoice>;
   migrateEntireInvoice?: Maybe<Scalars['String']>;
   generateCompensatoryEvents?: Maybe<Scalars['String']>;
   togglePauseConfirmationReminders?: Maybe<RemindersStatus>;
@@ -477,23 +475,6 @@ export type MutationCreatePayPalOrderArgs = {
 export type MutationRecordPayPalPaymentArgs = {
   invoiceId: Scalars['ID'];
   orderId: Scalars['ID'];
-};
-
-export type MutationMigratePaymentArgs = {
-  invoiceId: Scalars['ID'];
-  payerId: Scalars['String'];
-  amount?: Maybe<Scalars['Float']>;
-  datePaid?: Maybe<Scalars['String']>;
-};
-
-export type MutationMigrateInvoiceArgs = {
-  invoiceId: Scalars['ID'];
-  vatValue?: Maybe<Scalars['Float']>;
-  invoiceReference?: Maybe<Scalars['Float']>;
-  discount?: Maybe<Scalars['Float']>;
-  APC?: Maybe<Scalars['Float']>;
-  dateIssued?: Maybe<Scalars['String']>;
-  dateAccepted?: Maybe<Scalars['String']>;
 };
 
 export type MutationMigrateEntireInvoiceArgs = {
@@ -1385,18 +1366,6 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationRecordPayPalPaymentArgs, 'invoiceId' | 'orderId'>
-  >;
-  migratePayment?: Resolver<
-    ResolversTypes['Payment'],
-    ParentType,
-    ContextType,
-    RequireFields<MutationMigratePaymentArgs, 'invoiceId' | 'payerId'>
-  >;
-  migrateInvoice?: Resolver<
-    Maybe<ResolversTypes['Invoice']>,
-    ParentType,
-    ContextType,
-    RequireFields<MutationMigrateInvoiceArgs, 'invoiceId'>
   >;
   migrateEntireInvoice?: Resolver<
     Maybe<ResolversTypes['String']>,

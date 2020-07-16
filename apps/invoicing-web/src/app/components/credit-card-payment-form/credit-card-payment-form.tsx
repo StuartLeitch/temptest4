@@ -1,5 +1,5 @@
 import * as React from "react";
-import Form, { FormComponentProps } from "antd/lib/form";
+import Form from "antd/lib/form";
 // import Icon from "antd/es/icon";
 import Input from "antd/lib/input";
 import Button from "antd/lib/button";
@@ -13,11 +13,16 @@ interface Props {
   onSubmit?(step: number, formValues: any): void;
 }
 
-const CreditCardForm: React.FC<Props> = ({ cardDetails, onChange, onSubmit }) => {
+const CreditCardForm: React.FC<Props> = ({
+  cardDetails,
+  onChange,
+  onSubmit,
+}) => {
   const [focused, setFocus] = React.useState<FOCUS_TYPE | undefined>(undefined);
-  const handleFocus = React.useCallback(event => setFocus(event.target.name as FOCUS_TYPE), [
-    setFocus,
-  ]);
+  const handleFocus = React.useCallback(
+    (event) => setFocus(event.target.name as FOCUS_TYPE),
+    [setFocus],
+  );
   const handleBlur = React.useCallback(() => setFocus(undefined), [setFocus]);
 
   const handleSubmit = (e: any) => {

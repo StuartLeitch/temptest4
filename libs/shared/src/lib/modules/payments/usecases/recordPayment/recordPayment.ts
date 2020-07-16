@@ -194,6 +194,7 @@ export class RecordPaymentUsecase
       invoice,
     } = request;
     const makePaymentData: PaymentDTO = {
+      netAmountBeforeDiscount: invoice.netTotalBeforeDiscount,
       invoiceReferenceNumber: invoice.referenceNumber,
       discountAmount: invoice.invoiceDiscountTotal,
       manuscriptCustomId: manuscript.customId,

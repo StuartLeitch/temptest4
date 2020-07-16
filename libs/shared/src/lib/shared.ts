@@ -26,11 +26,12 @@ export * from './modules/manuscripts/domain/ManuscriptTypes';
 export * from './modules/manuscripts/repos';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetailsDTO';
-export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
 export * from './modules/manuscripts/usecases/createManuscript/createManuscript';
 export * from './modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
 export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptIdDTO';
+export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
+export * from './modules/manuscripts/usecases/editManuscript/editManuscriptDTO';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -46,6 +47,9 @@ export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscri
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
 export * from './modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
+export * from './modules/transactions/usecases/createTransaction/createTransaction';
+export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTOs';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
@@ -77,7 +81,6 @@ export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
 export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
-export * from './modules/invoices/usecases/migrateInvoice/migrateInvoice';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
@@ -142,6 +145,11 @@ export * from './modules/journals/usecases/editorialBoards/assignEditorsToJourna
 export * from './modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
 export * from './modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
 export * from './modules/journals/usecases/journals/getJournalList/getJournalList';
+export * from './modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
+export * from './modules/journals/usecases/journals/getJournal/getJournal';
+export * from './modules/journals/usecases/journals/getJournal/getJournalDTO';
+export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
+export * from './modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
 // export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 
 // * Export User Subdomain
@@ -150,7 +158,7 @@ export { Roles } from './modules/users/domain/enums/Roles';
 // * Export Payments Subdomain
 export * from './modules/payments/domain/Payment';
 export * from './modules/payments/domain/PaymentId';
-export { PaymentMethod } from './modules/payments/domain/PaymentMethod';
+export * from './modules/payments/domain/PaymentMethod';
 export * from './modules/payments/domain/PaymentMethodId';
 export * from './modules/payments/domain/external-order-id';
 export * from './modules/payments/domain/payment-proof';
@@ -249,6 +257,7 @@ export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';
 
 export * from './infrastructure/logging/LoggerBuilder';
+export * from './infrastructure/logging/implementations/Logger';
 
 // * Services Contracts
 export * from './domain/services/payment/braintree-service';

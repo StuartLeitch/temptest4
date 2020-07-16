@@ -24,6 +24,7 @@ export class PayPalPaymentBehavior extends PaymentBehavior {
     request: PaymentDTO
   ): Promise<Either<StrategyError, PaymentResponse>> {
     const transactionData: PayPalOrderRequest = {
+      netAmountBeforeDiscount: request.netAmountBeforeDiscount,
       invoiceReferenceNumber: request.invoiceReferenceNumber,
       manuscriptCustomId: request.manuscriptCustomId,
       discountAmount: request.discountAmount,

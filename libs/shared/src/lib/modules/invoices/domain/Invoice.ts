@@ -26,6 +26,10 @@ export enum InvoiceStatus {
   FINAL = 'FINAL', // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
 }
 
+function twoDigitPrecision(n: number): number {
+  return Number.parseFloat(n.toFixed(2));
+}
+
 interface InvoiceProps {
   status: InvoiceStatus;
   invoiceNumber?: string;
@@ -196,6 +200,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.getInvoiceDiscountTotal();
   }
 
+  get netTotalBeforeDiscount(): number {
+    return this.getInvoiceNetTotalBeforeDiscount();
+  }
+
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
     if (this.props.invoiceItems.exists(invoiceItem)) {
       this.props.invoiceItems.remove(invoiceItem);
@@ -292,9 +300,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       );
     }
 
-    return this.invoiceItems.reduce(
-      (acc, item) => acc + item.calculateTotalPrice(),
-      0
+    return twoDigitPrecision(
+      this.invoiceItems.reduce(
+        (acc, item) => acc + item.calculateTotalPrice(),
+        0
+      )
     );
   }
 
@@ -305,9 +315,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       );
     }
 
-    return this.invoiceItems.reduce(
-      (acc, item) => acc + item.calculateDiscount(),
-      0
+    return twoDigitPrecision(
+      this.invoiceItems.reduce((acc, item) => acc + item.calculateDiscount(), 0)
+    );
+  }
+
+  public getInvoiceNetTotalBeforeDiscount(): number {
+    return twoDigitPrecision(
+      this.getInvoiceNetTotal() + this.getInvoiceDiscountTotal()
     );
   }
 
@@ -318,9 +333,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       );
     }
 
-    return this.invoiceItems.reduce(
-      (acc, item) => acc + item.calculateVat(),
-      0
+    return twoDigitPrecision(
+      this.invoiceItems.reduce((acc, item) => acc + item.calculateVat(), 0)
     );
   }
 
@@ -331,9 +345,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       );
     }
 
-    return this.invoiceItems.reduce(
-      (acc, item) => acc + item.calculateNetPrice(),
-      0
+    return twoDigitPrecision(
+      this.invoiceItems.reduce((acc, item) => acc + item.calculateNetPrice(), 0)
     );
   }
 

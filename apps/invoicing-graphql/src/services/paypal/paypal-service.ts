@@ -15,6 +15,7 @@ import {
   PaymentMethodRepoContract,
   InvoiceRepoContract,
   PaymentRepoContract,
+  PaymentMethodNames,
   ExternalOrderId,
   PaymentMethodId,
   LoggerContract,
@@ -71,8 +72,18 @@ export class PayPalService implements ServiceContract {
       this.createEnvironment(connData)
     );
 
+    this.attachOrderIdForExistingPayment = this.attachOrderIdForExistingPayment.bind(
+      this
+    );
     this.attachExistingPayment = this.attachExistingPayment.bind(this);
     this.attachPayPalMethodId = this.attachPayPalMethodId.bind(this);
+    this.captureOrderRequest = this.captureOrderRequest.bind(this);
+    this.createOrderInPayPal = this.createOrderInPayPal.bind(this);
+    this.createOrderRequest = this.createOrderRequest.bind(this);
+    this.getOrderRequest = this.getOrderRequest.bind(this);
+    this.captureMoney = this.captureMoney.bind(this);
+    this.createOrder = this.createOrder.bind(this);
+    this.getOrder = this.getOrder.bind(this);
   }
 
   private createEnvironment({
@@ -228,7 +239,7 @@ export class PayPalService implements ServiceContract {
             currency_code: 'USD',
             breakdown: {
               item_total: {
-                value: request.netAmount.toString(),
+                value: request.netAmountBeforeDiscount.toString(),
                 currency_code: 'USD',
               },
               tax_total: request.vatAmount
@@ -252,7 +263,7 @@ export class PayPalService implements ServiceContract {
               category: ItemCategory.DIGITAL_GOODS,
               quantity: '1',
               unit_amount: {
-                value: request.netAmount.toString(),
+                value: request.netAmountBeforeDiscount.toString(),
                 currency_code: 'USD',
               },
               tax: {
@@ -298,6 +309,7 @@ export class PayPalService implements ServiceContract {
     return new AsyncEither(request)
       .then(this.attachPayPalMethodId(usecaseContext))
       .then(this.attachExistingPayment(usecaseContext))
+      .advanceOrEnd(async (data) => right(!!data.payment))
       .map((data) => ({
         ...request,
         orderId: ExternalOrderId.create(data.payment.foreignPaymentId),
@@ -335,7 +347,9 @@ export class PayPalService implements ServiceContract {
 
     return async <T>(request: T) => {
       return new AsyncEither({})
-        .then(() => usecase.execute({ name: 'PayPal' }, context))
+        .then(() =>
+          usecase.execute({ name: PaymentMethodNames.PayPal }, context)
+        )
         .map((response) => response.getValue())
         .map((paymentMethod) => ({
           ...request,

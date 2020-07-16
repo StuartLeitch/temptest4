@@ -6,6 +6,7 @@ import { ExternalOrderId } from '../../../domain/external-order-id';
 import { PaymentStatus } from '../../../domain/Payment';
 
 export interface PaymentDTO {
+  netAmountBeforeDiscount: number;
   invoiceReferenceNumber: string;
   payerIdentification: string;
   manuscriptCustomId: string;

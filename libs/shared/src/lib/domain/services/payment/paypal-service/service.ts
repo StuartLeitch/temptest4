@@ -11,6 +11,7 @@ import {
 } from './errors';
 
 interface OrderRequest {
+  netAmountBeforeDiscount: number;
   invoiceReferenceNumber: string;
   manuscriptCustomId: string;
   discountAmount: number;
