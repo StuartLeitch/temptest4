@@ -1,34 +1,32 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
 
-import {Transaction} from '../../domain/Transaction';
-import {TransactionRepoContract} from '../../repos/transactionRepo';
+import { Transaction } from '../../domain/Transaction';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
 
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface SearchTransactionsRequestDTO {
   params: string[];
 }
-
-export type SearchTransactionsContext = AuthorizationContext<Roles>;
 
 export class SearchTransactions
   implements
     UseCase<
       SearchTransactionsRequestDTO,
       Result<Transaction[]>,
-      SearchTransactionsContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       SearchTransactionsRequestDTO,
-      SearchTransactionsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   private transactionRepo: TransactionRepoContract;
@@ -64,7 +62,7 @@ export class SearchTransactions
   public async execute(
     request: SearchTransactionsRequestDTO
   ): Promise<Result<Transaction[]>> {
-    const {params} = request;
+    const { params } = request;
 
     try {
       // * System searches for transactions matching query params

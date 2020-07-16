@@ -1,17 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
-  Authorize,
-  AuthorizationContext,
   AccessControlledUsecase,
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { RepoErrorCode } from '../../../../infrastructure/RepoError';
 
@@ -22,18 +21,16 @@ import { GetPublisherDetailsByNameResponse } from './getPublisherDetailsByNameRe
 import { GetPublisherDetailsByNameErrors } from './getPublisherDetailsByNameErrors';
 import { GetPublisherDetailsByNameDTO } from './getPublisherDetailsByNameDTO';
 
-export type GetPublisherDetailsByNameContext = AuthorizationContext<Roles>;
-
 export class GetPublisherDetailsByNameUsecase
   implements
     UseCase<
       GetPublisherDetailsByNameDTO,
       Promise<GetPublisherDetailsByNameResponse>,
-      GetPublisherDetailsByNameContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetPublisherDetailsByNameDTO,
-      GetPublisherDetailsByNameContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private publisherRepo: PublisherRepoContract) {}
@@ -45,7 +42,7 @@ export class GetPublisherDetailsByNameUsecase
   // @Authorize('invoice:read')
   public async execute(
     request: GetPublisherDetailsByNameDTO,
-    context?: GetPublisherDetailsByNameContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetPublisherDetailsByNameResponse> {
     try {
       const { publisherName: name } = request;

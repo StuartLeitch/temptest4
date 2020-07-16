@@ -4,25 +4,26 @@
 
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 // * Domain imports
-import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
-
-import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 import {
-  CreateTransactionContext,
+  UsecaseAuthorizationContext,
+  Roles,
+  ManuscriptTypeNotInvoiceable,
   CreateTransactionUsecase,
-} from '../../../../../libs/shared/src/lib/modules/transactions/usecases/createTransaction/createTransaction';
-import { CreateManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscript';
-import { CreateManuscriptDTO } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
-import { GetManuscriptByManuscriptIdUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
-import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
-import { EditManuscriptUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/editManuscript/editManuscript';
-import { UpdateInvoiceItemsUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/updateInvoiceItems/updateInvoiceItems';
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
-import { GetItemsForInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { GetJournal } from './../../../../../libs/shared/src/lib/modules/journals/usecases/journals/getJournal/getJournal';
+  CreateManuscriptUsecase,
+  CreateManuscriptDTO,
+  GetManuscriptByManuscriptIdUsecase,
+  SoftDeleteDraftTransactionUsecase,
+  EditManuscriptUsecase,
+  UpdateInvoiceItemsUsecase,
+  GetInvoiceIdByManuscriptCustomIdUsecase,
+  GetItemsForInvoiceUsecase,
+  GetJournal,
+} from '@hindawi/shared';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
-const defaultContext: CreateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 export const SubmissionSubmittedHandler = {
   event: SUBMISSION_SUBMITTED,

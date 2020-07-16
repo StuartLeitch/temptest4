@@ -1,34 +1,26 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Result, right } from '../../../../core/logic/Result';
 
-import { AppError } from '../../../../core/logic/AppError';
-import { AddPayerToInvoiceErrors } from './addPayerToInvoiceErrors';
-import { AddPayerToInvoiceResponse } from './addPayerToInvoiceResponse';
-import { AddPayerToInvoiceDTO } from './addPayerToInvoiceDTO';
-
-import { Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
-
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-// import {PayerId} from '../../../payers/domain/PayerId';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
+
+import { AddPayerToInvoiceResponse } from './addPayerToInvoiceResponse';
+import { AddPayerToInvoiceDTO } from './addPayerToInvoiceDTO';
+
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+
 import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { WaiverService } from '../../../../domain/services/WaiverService';
 import { VATService } from './../../../../domain/services/VATService';
-import { WaiverCollection } from '../../../waivers/domain/Waiver';
 import { PayerRepoContract } from './../../../payers/repos/payerRepo';
-import { Payer } from './../../../payers/domain/Payer';
-import { PayerMap } from './../../../payers/mapper/Payer';
-
-export type AddPayerToInvoiceContext = AuthorizationContext<Roles>;
 
 /**
  * @deprecated do not use, will break stuff
@@ -38,11 +30,11 @@ export class AddPayerToInvoiceUsecase
     UseCase<
       AddPayerToInvoiceDTO,
       Promise<AddPayerToInvoiceResponse>,
-      AddPayerToInvoiceContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       AddPayerToInvoiceDTO,
-      AddPayerToInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -60,12 +52,8 @@ export class AddPayerToInvoiceUsecase
   @Authorize('invoice:update')
   public async execute(
     request: AddPayerToInvoiceDTO,
-    context?: AddPayerToInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AddPayerToInvoiceResponse> {
-    let invoice: Invoice;
-    let payer: Payer;
-    let waivers: WaiverCollection;
-
     // * get a proper InvoiceId
     // const invoiceId = InvoiceId.create(
     //   new UniqueEntityID(request.invoiceId)

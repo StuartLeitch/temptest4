@@ -9,12 +9,10 @@ import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 // * Authorization Logic
 import {
-  // Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { CatalogRepoContract } from '../../../journals/repos';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
@@ -33,20 +31,16 @@ import { SetTransactionToActiveByCustomIdResponse } from './setTransactionToActi
 import { SetTransactionToActiveByCustomIdErrors } from './setTransactionToActiveByCustomIdErrors';
 import { SetTransactionToActiveByCustomIdDTO } from './setTransactionToActiveByCustomIdDTO';
 
-export type SetTransactionToActiveByCustomIdContext = AuthorizationContext<
-  Roles
->;
-
 export class SetTransactionToActiveByCustomIdUsecase
   implements
     UseCase<
       SetTransactionToActiveByCustomIdDTO,
       Promise<SetTransactionToActiveByCustomIdResponse>,
-      SetTransactionToActiveByCustomIdContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       SetTransactionToActiveByCustomIdDTO,
-      SetTransactionToActiveByCustomIdContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -63,7 +57,7 @@ export class SetTransactionToActiveByCustomIdUsecase
 
   public async execute(
     request: SetTransactionToActiveByCustomIdDTO,
-    context?: SetTransactionToActiveByCustomIdContext
+    context?: UsecaseAuthorizationContext
   ): Promise<SetTransactionToActiveByCustomIdResponse> {
     let transaction: Transaction;
     let invoice: Invoice;

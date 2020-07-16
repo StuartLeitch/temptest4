@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -8,12 +9,14 @@ import { Manuscript } from '../../domain/Manuscript';
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
 
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
+  UsecaseAuthorizationContext,
   AccessControlContext,
-  MarkManuscriptAsPublishedAuthorizationContext
-} from './markManuscriptAsPublishedContext';
+} from '../../../../domain/authorization';
+
 import { MarkManuscriptAsPublishedDTO } from './markManuscriptAsPublishedDTO';
 import { MarkManuscriptAsPublishedResponse } from './markManuscriptAsPublishedResponse';
 import { MarkManuscriptAsPublishedErrors } from './markManuscriptAsPublishedErrors';
@@ -23,18 +26,18 @@ export class MarkManuscriptAsPublishedUsecase
     UseCase<
       MarkManuscriptAsPublishedDTO,
       Promise<MarkManuscriptAsPublishedResponse>,
-      MarkManuscriptAsPublishedAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       MarkManuscriptAsPublishedDTO,
-      MarkManuscriptAsPublishedAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private manuscriptRepo: ManuscriptRepoContract) {}
 
   private async getAccessControlContext(
     request: MarkManuscriptAsPublishedDTO,
-    context?: MarkManuscriptAsPublishedAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
@@ -42,7 +45,7 @@ export class MarkManuscriptAsPublishedUsecase
   @Authorize('write:manuscript')
   public async execute(
     request: MarkManuscriptAsPublishedDTO,
-    context?: MarkManuscriptAsPublishedAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<MarkManuscriptAsPublishedResponse> {
     let manuscript: Manuscript;
 

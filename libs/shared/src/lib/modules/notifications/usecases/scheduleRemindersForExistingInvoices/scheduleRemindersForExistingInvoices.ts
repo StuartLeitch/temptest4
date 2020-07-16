@@ -1,18 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -59,13 +58,14 @@ interface InvoiceIdDTO extends DTO {
   invoiceId: string;
 }
 
-type Context = AuthorizationContext<Roles>;
-export type ScheduleRemindersForExistingInvoicesContext = Context;
-
 export class ScheduleRemindersForExistingInvoicesUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -98,7 +98,10 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       const validation = await new AsyncEither(request)
         .then(this.validateRequest)
@@ -167,7 +170,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     return right(request);
   }
 
-  private addPauseSettings(context: Context) {
+  private addPauseSettings(context: UsecaseAuthorizationContext) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Adding the default pause settings for selected invoices`
@@ -185,7 +188,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private pauseConfirmation(context: Context) {
+  private pauseConfirmation(context: UsecaseAuthorizationContext) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Pausing the confirmation reminders for the selected invoice ids`
@@ -211,7 +214,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private resumeConfirmation(context: Context) {
+  private resumeConfirmation(context: UsecaseAuthorizationContext) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Resume the confirmation reminders for the selected invoice ids`
@@ -249,7 +252,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private pausePayment(context: Context) {
+  private pausePayment(context: UsecaseAuthorizationContext) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Pausing the payment reminders for the selected invoice ids`
@@ -276,7 +279,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private resumePayment(context: Context) {
+  private resumePayment(context: UsecaseAuthorizationContext) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Resuming the payment reminders for the selected invoice ids`
@@ -313,7 +316,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private scheduleCreditControl(context: Context) {
+  private scheduleCreditControl(context: UsecaseAuthorizationContext) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(`Scheduling the credit control reminder`);
 
@@ -369,7 +372,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     return right(true);
   }
 
-  private attachPayer(context: Context) {
+  private attachPayer(context: UsecaseAuthorizationContext) {
     const usecase = new GetPayerDetailsByInvoiceIdUsecase(
       this.payerRepo,
       this.loggerService
@@ -385,7 +388,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private attachInvoice(context: Context) {
+  private attachInvoice(context: UsecaseAuthorizationContext) {
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     return async (request: InvoiceIdDTO) => {
       const { invoiceId } = request;
@@ -398,7 +401,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private attachTransaction(context: Context) {
+  private attachTransaction(context: UsecaseAuthorizationContext) {
     return async (request: InvoiceIdDTO & { invoice: Invoice }) => {
       this.loggerService.info(
         `Get transaction details for invoice with id ${request.invoiceId}`

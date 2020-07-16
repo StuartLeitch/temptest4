@@ -1,26 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 import { AppError } from '../../../../core/logic/AppError';
-import { CreatePayerErrors } from './createPayerErrors';
 import { CreatePayerResponse } from './createPayerResponse';
 
 import { PayerRepoContract } from '../../repos/payerRepo';
 import { PayerMap } from '../../mapper/Payer';
-import { Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 
+// * Authorization Logic
 import {
-  Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
-import { Payer, PayerType } from '../../domain/Payer';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
+
+import { Payer } from '../../domain/Payer';
 
 export interface CreatePayerRequestDTO {
   invoiceId: string;
@@ -32,18 +29,16 @@ export interface CreatePayerRequestDTO {
   addressId?: string;
 }
 
-export type CreatePayerContext = AuthorizationContext<Roles>;
-
 export class CreatePayerUsecase
   implements
     UseCase<
       CreatePayerRequestDTO,
       Promise<CreatePayerResponse>,
-      CreatePayerContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       CreatePayerRequestDTO,
-      CreatePayerContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private payerRepo: PayerRepoContract) {}
@@ -56,7 +51,7 @@ export class CreatePayerUsecase
   // @Authorize('payer:create')
   public async execute(
     request: CreatePayerRequestDTO,
-    context?: CreatePayerContext
+    context?: UsecaseAuthorizationContext
   ): Promise<CreatePayerResponse> {
     const {
       name,
@@ -65,7 +60,7 @@ export class CreatePayerUsecase
       invoiceId,
       addressId,
       vatId,
-      organization
+      organization,
     } = request;
 
     let payer: Payer;
@@ -78,7 +73,7 @@ export class CreatePayerUsecase
         type,
         addressId,
         vatId,
-        organization
+        organization,
       });
 
       await this.payerRepo.save(payer);

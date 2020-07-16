@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -5,13 +7,12 @@ import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlledUsecase,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -22,18 +23,16 @@ import { GetInvoiceDetailsResponse } from './getInvoiceDetailsResponse';
 import { GetInvoiceDetailsErrors } from './getInvoiceDetailsErrors';
 import { GetInvoiceDetailsDTO } from './getInvoiceDetailsDTO';
 
-export type GetInvoiceDetailsContext = AuthorizationContext<Roles>;
-
 export class GetInvoiceDetailsUsecase
   implements
     UseCase<
       GetInvoiceDetailsDTO,
       Promise<GetInvoiceDetailsResponse>,
-      GetInvoiceDetailsContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetInvoiceDetailsDTO,
-      GetInvoiceDetailsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private invoiceRepo: InvoiceRepoContract) {}
@@ -45,7 +44,7 @@ export class GetInvoiceDetailsUsecase
   @Authorize('invoice:read')
   public async execute(
     request: GetInvoiceDetailsDTO,
-    context?: GetInvoiceDetailsContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetInvoiceDetailsResponse> {
     let invoice: Invoice;
 

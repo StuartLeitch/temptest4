@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { CouponRepoContract } from '../../repos/couponRepo';
-
-import { GetRecentCouponsResponse } from './getRecentCouponsResponse';
-
-import { GetRecentCouponsDTO } from './getRecentCouponsDTO';
-
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  GetRecentCouponsAuthenticationContext,
-} from './getRecentCouponsAuthenticationContext';
+} from '../../../../domain/authorization';
+
+import { CouponRepoContract } from '../../repos/couponRepo';
+import { GetRecentCouponsResponse } from './getRecentCouponsResponse';
+import { GetRecentCouponsDTO } from './getRecentCouponsDTO';
 
 export class GetRecentCouponsUsecase
   implements
     UseCase<
       Record<string, unknown>,
       Promise<GetRecentCouponsResponse>,
-      GetRecentCouponsAuthenticationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetRecentCouponsDTO,
-      GetRecentCouponsAuthenticationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private couponRepo: CouponRepoContract) {}
@@ -37,7 +37,7 @@ export class GetRecentCouponsUsecase
   @Authorize('coupon:read')
   public async execute(
     request: GetRecentCouponsDTO,
-    context?: GetRecentCouponsAuthenticationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetRecentCouponsResponse> {
     try {
       const paginatedResult = await this.couponRepo.getRecentCoupons(request);

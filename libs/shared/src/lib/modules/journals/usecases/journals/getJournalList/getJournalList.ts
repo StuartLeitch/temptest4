@@ -1,7 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../../core/logic/Result';
 import { AppError } from '../../../../../core/logic/AppError';
+
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../../domain/authorization';
+import {
+  Authorize,
+  AccessControlledUsecase,
+  AccessControlContext,
+} from '../../../../../domain/authorization';
 
 import { CatalogItem } from '../../../domain/CatalogItem';
 import { CatalogRepoContract } from '../../../repos/catalogRepo';
@@ -10,24 +20,16 @@ import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { GetJournalListResponse } from './getJournalListResponse';
 import { GetJournalListDTO } from './getJournalListDTO';
 
-// * Authorization Logic
-import {
-  Authorize,
-  AccessControlledUsecase,
-  AccessControlContext,
-  GetJournalListAuthenticationContext
-} from './getJournalListAuthenticationContext';
-
 export class GetJournalListUsecase
   implements
     UseCase<
       GetJournalListDTO,
       Promise<GetJournalListResponse>,
-      GetJournalListAuthenticationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetJournalListDTO,
-      GetJournalListAuthenticationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private journalRepo: CatalogRepoContract) {}
@@ -39,16 +41,14 @@ export class GetJournalListUsecase
   @Authorize('journal:read')
   public async execute(
     request: GetJournalListDTO,
-    context?: GetJournalListAuthenticationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetJournalListResponse> {
     try {
       const result = await this.journalRepo.getCatalogCollection();
       return right(Result.ok<CatalogItem[]>(result));
     } catch (err) {
       return left(
-        new AppError.UnexpectedError(
-          err, 'Getting journal list failed'
-        )
+        new AppError.UnexpectedError(err, 'Getting journal list failed')
       );
     }
   }

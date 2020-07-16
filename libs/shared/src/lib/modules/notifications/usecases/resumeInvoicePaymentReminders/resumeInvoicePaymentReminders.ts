@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -6,13 +8,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import {
@@ -57,13 +57,14 @@ interface CompoundDTO extends DTO {
   payer: Payer;
 }
 
-type Context = AuthorizationContext<Roles>;
-export type ResumeInvoicePaymentReminderContext = Context;
-
 export class ResumeInvoicePaymentReminderUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private transactionRepo: TransactionRepoContract,
@@ -89,7 +90,10 @@ export class ResumeInvoicePaymentReminderUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       const execution = new AsyncEither(request)
         .then(this.validateRequest)
@@ -150,7 +154,7 @@ export class ResumeInvoicePaymentReminderUsecase
     return await this.invoiceRepo.existsWithId(invoiceId);
   }
 
-  private validatePauseState(context: Context) {
+  private validatePauseState(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       this.loggerService.info(
         `Validate the state of the reminders of type ${NotificationType.REMINDER_PAYMENT} for invoice with id ${request.invoiceId}`
@@ -180,7 +184,7 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
-  private getInvoice(context: Context) {
+  private getInvoice(context: UsecaseAuthorizationContext) {
     return async (request: CompoundDTO) => {
       this.loggerService.info(
         `Get details of invoice with id ${request.invoiceId}`
@@ -197,7 +201,7 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
-  private getTransaction(context: Context) {
+  private getTransaction(context: UsecaseAuthorizationContext) {
     return async (request: CompoundDTO) => {
       this.loggerService.info(
         `Get transaction details for invoice with id ${request.invoiceId}`
@@ -234,7 +238,7 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
-  private getPayer(context: Context) {
+  private getPayer(context: UsecaseAuthorizationContext) {
     return async (request: CompoundDTO) => {
       const usecase = new GetPayerDetailsByInvoiceIdUsecase(
         this.payerRepo,

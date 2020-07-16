@@ -1,36 +1,34 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import {Transaction} from '../../domain/Transaction';
-import {TransactionId} from '../../domain/TransactionId';
-import {TransactionRepoContract} from '../../repos/transactionRepo';
+import { Transaction } from '../../domain/Transaction';
+import { TransactionId } from '../../domain/TransactionId';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface GetTransactionRequestDTO {
   transactionId?: string;
 }
-
-export type GetTransactionContext = AuthorizationContext<Roles>;
 
 export class GetTransactionUsecase
   implements
     UseCase<
       GetTransactionRequestDTO,
       Result<Transaction>,
-      GetTransactionContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetTransactionRequestDTO,
-      GetTransactionContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private transactionRepo: TransactionRepoContract) {
@@ -40,7 +38,7 @@ export class GetTransactionUsecase
   private async getTransaction(
     request: GetTransactionRequestDTO
   ): Promise<Result<Transaction>> {
-    const {transactionId} = request;
+    const { transactionId } = request;
 
     if (!transactionId) {
       return Result.fail<Transaction>(
@@ -68,7 +66,7 @@ export class GetTransactionUsecase
   @Authorize('transaction:read')
   public async execute(
     request: GetTransactionRequestDTO,
-    context?: GetTransactionContext
+    context?: UsecaseAuthorizationContext
   ): Promise<Result<Transaction>> {
     // if ('transactionId' in request) {
     //   const transactionOrError = await this.getTransaction(request);

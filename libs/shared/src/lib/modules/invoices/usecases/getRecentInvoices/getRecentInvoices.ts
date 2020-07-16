@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
@@ -7,26 +9,26 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specifics
 import { GetRecentInvoicesResponse } from './getRecentInvoicesResponse';
-// import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
 import { GetRecentInvoicesDTO } from './getRecentInvoicesDTO';
+
 // * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  GetRecentInvoicesAuthenticationContext,
-} from './getRecentInvoicesAuthenticationContext';
+} from '../../../../domain/authorization';
 
 export class GetRecentInvoicesUsecase
   implements
     UseCase<
       GetRecentInvoicesDTO,
       Promise<GetRecentInvoicesResponse>,
-      GetRecentInvoicesAuthenticationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetRecentInvoicesDTO,
-      GetRecentInvoicesAuthenticationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private invoiceRepo: InvoiceRepoContract) {}
@@ -38,7 +40,7 @@ export class GetRecentInvoicesUsecase
   @Authorize('invoice:read')
   public async execute(
     request: GetRecentInvoicesDTO,
-    context?: GetRecentInvoicesAuthenticationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetRecentInvoicesResponse> {
     // TODO: add proper DDD types to the paginated result
     try {

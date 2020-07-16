@@ -1,13 +1,7 @@
 import { AccessControlPlus } from 'accesscontrol-plus';
 
 import { Roles } from '../../modules/users/domain/enums/Roles';
-
-interface AccessControlContext {
-  userId?: string;
-  userTenantId?: string;
-  entityOwnerId?: string;
-  entityTenantId?: string;
-}
+import { AccessControlContext } from './AccessControlContext';
 
 const userOwnsEntity = (context: AccessControlContext): boolean => {
   return context.entityOwnerId === context.userId;
@@ -45,4 +39,4 @@ accessControl
   .resource('*')
   .action('*');
 
-export { accessControl, AccessControlContext };
+export { accessControl };

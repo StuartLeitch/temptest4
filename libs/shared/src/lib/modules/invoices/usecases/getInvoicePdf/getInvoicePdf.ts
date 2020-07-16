@@ -7,12 +7,11 @@ import { chain } from '../../../../core/logic/EitherChain';
 import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import streamToPromise from 'stream-to-promise';
@@ -47,21 +46,19 @@ import { PayerType } from '../../../payers/domain/Payer';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-export type GetInvoicePdfContext = AuthorizationContext<Roles>;
-
 export class GetInvoicePdfUsecase
   implements
     UseCase<
       GetInvoicePdfDTO,
       Promise<GetInvoicePdfResponse>,
-      GetInvoicePdfContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetInvoicePdfDTO,
-      GetInvoicePdfContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
-  authorizationContext: AuthorizationContext<Roles>;
+  authorizationContext: UsecaseAuthorizationContext;
 
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -77,7 +74,7 @@ export class GetInvoicePdfUsecase
   // @Authorize('payer:read')
   public async execute(
     request: GetInvoicePdfDTO,
-    context?: GetInvoicePdfContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetInvoicePdfResponse> {
     this.authorizationContext = context;
     const { payerId } = request;

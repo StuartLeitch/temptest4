@@ -21,12 +21,14 @@ import { NotificationPause } from '../../../notifications/domain/NotificationPau
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  CreateCreditNoteAuthorizationContext,
-} from './createCreditNoteAuthorizationContext';
+} from '../../../../domain/authorization';
+
 import { CreateCreditNoteRequestDTO } from './createCreditNoteDTO';
 import { CreateCreditNoteResponse } from './createCreditNoteResponse';
 import { CreateCreditNoteErrors } from './createCreditNoteErrors';
@@ -36,11 +38,11 @@ export class CreateCreditNoteUsecase
     UseCase<
       CreateCreditNoteRequestDTO,
       Promise<CreateCreditNoteResponse>,
-      CreateCreditNoteAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       CreateCreditNoteRequestDTO,
-      CreateCreditNoteAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -55,7 +57,7 @@ export class CreateCreditNoteUsecase
 
   private async getAccessControlContext(
     request: CreateCreditNoteRequestDTO,
-    context?: CreateCreditNoteAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
@@ -63,7 +65,7 @@ export class CreateCreditNoteUsecase
   @Authorize('create:invoice')
   public async execute(
     request: CreateCreditNoteRequestDTO,
-    context?: CreateCreditNoteAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<CreateCreditNoteResponse> {
     let transaction: Transaction;
     let invoice: Invoice;

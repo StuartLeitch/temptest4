@@ -1,25 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { chain } from '../../../../core/logic/EitherChain';
-import { map } from '../../../../core/logic/EitherMap';
 import { Result, left, right, Either } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
-  Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { ArticleRepoContract } from '../../repos/articleRepo';
-import { ArticleId } from '../../domain/ArticleId';
 
-import { InvoiceItem } from '../../.././invoices/domain/InvoiceItem';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 
 // * Usecase specific
@@ -30,18 +28,16 @@ import { GetManuscriptByInvoiceIdDTO } from './getManuscriptByInvoiceIdDTO';
 // import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { Manuscript } from '../../domain/Manuscript';
 
-export type GetManuscriptByInvoiceIdContext = AuthorizationContext<Roles>;
-
 export class GetManuscriptByInvoiceIdUsecase
   implements
     UseCase<
       GetManuscriptByInvoiceIdDTO,
       Promise<GetManuscriptByInvoiceIdResponse>,
-      GetManuscriptByInvoiceIdContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetManuscriptByInvoiceIdDTO,
-      GetManuscriptByInvoiceIdContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -55,7 +51,7 @@ export class GetManuscriptByInvoiceIdUsecase
 
   public async execute(
     request: GetManuscriptByInvoiceIdDTO,
-    context?: GetManuscriptByInvoiceIdContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetManuscriptByInvoiceIdResponse> {
     const maybeInvoiceId = this.sanitizeInput(request).map(
       ({ invoiceId }) => invoiceId
@@ -63,12 +59,12 @@ export class GetManuscriptByInvoiceIdUsecase
     const maybeManuscripts = await chain(
       [
         this.getInvoiceItems.bind(this),
-        this.getManuscriptsForInvoiceItems.bind(this)
+        this.getManuscriptsForInvoiceItems.bind(this),
       ],
       maybeInvoiceId
     );
 
-    return (maybeManuscripts.map(manuscripts =>
+    return (maybeManuscripts.map((manuscripts) =>
       Result.ok(manuscripts)
     ) as unknown) as GetManuscriptByInvoiceIdResponse;
   }
@@ -89,7 +85,7 @@ export class GetManuscriptByInvoiceIdUsecase
       this.convertInvoiceId
     );
 
-    return maybeInvoiceId.map(invoiceId => ({ invoiceId }));
+    return maybeInvoiceId.map((invoiceId) => ({ invoiceId }));
   }
 
   private convertUuid(
@@ -133,7 +129,9 @@ export class GetManuscriptByInvoiceIdUsecase
   }
 
   private async getManuscriptsForInvoiceItems(invoiceItems: InvoiceItem[]) {
-    const APCs = invoiceItems.filter(invoiceItem => invoiceItem.type === 'APC');
+    const APCs = invoiceItems.filter(
+      (invoiceItem) => invoiceItem.type === 'APC'
+    );
     const manuscripts: Manuscript[] = [];
 
     try {

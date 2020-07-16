@@ -1,14 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { chain } from '../../../../core/logic/EitherChain';
 import { Either, Result, right } from '../../../../core/logic/Result';
+
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  Roles,
+  AccessControlContext,
+} from '../../../../domain/authorization';
+
 import { PoliciesRegister } from '../../../../domain/reductions/policies/PoliciesRegister';
 import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
 import { VATService } from '../../../../domain/services/VATService';
@@ -24,7 +29,7 @@ import {
   CreatePayerRequestDTO,
   CreatePayerUsecase,
 } from '../../../payers/usecases/createPayer/createPayer';
-import { Roles } from '../../../users/domain/enums/Roles';
+
 // * Usecase specific
 import { Invoice, InvoiceStatus } from '../../domain/Invoice';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
@@ -35,8 +40,6 @@ import { ConfirmInvoiceDTO, PayerInput } from './confirmInvoiceDTO';
 import { ConfirmInvoiceResponse } from './confirmInvoiceResponse';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
-
-export type ConfirmInvoiceContext = AuthorizationContext<Roles>;
 
 interface PayerDataDomain {
   address: Address;
@@ -49,14 +52,14 @@ export class ConfirmInvoiceUsecase
     UseCase<
       ConfirmInvoiceDTO,
       Promise<ConfirmInvoiceResponse>,
-      ConfirmInvoiceContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       ConfirmInvoiceDTO,
-      ConfirmInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
-  authorizationContext: AuthorizationContext<Roles>;
+  authorizationContext: UsecaseAuthorizationContext;
   sanctionedCountryPolicy: SanctionedCountryPolicy;
   reductionsPoliciesRegister: PoliciesRegister;
   receiverEmail: string;
@@ -85,7 +88,7 @@ export class ConfirmInvoiceUsecase
   // @Authorize('payer:read')
   public async execute(
     request: ConfirmInvoiceDTO,
-    context?: ConfirmInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<ConfirmInvoiceResponse> {
     const {
       payer: payerInput,

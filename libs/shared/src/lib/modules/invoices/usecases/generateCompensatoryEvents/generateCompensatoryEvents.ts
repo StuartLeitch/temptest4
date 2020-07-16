@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -6,13 +8,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
@@ -86,13 +86,14 @@ function originalInvoiceId(invoice: Invoice): string {
   }
 }
 
-type Context = AuthorizationContext<Roles>;
-export type GenerateCompensatoryEventsContext = Context;
-
 export class GenerateCompensatoryEventsUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -139,7 +140,10 @@ export class GenerateCompensatoryEventsUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       const execution = await new AsyncEither<null, DTO>(request)
         .then(this.verifyInput)
@@ -166,7 +170,7 @@ export class GenerateCompensatoryEventsUsecase
     return right(request);
   }
 
-  private attachInvoice(context: Context) {
+  private attachInvoice(context: UsecaseAuthorizationContext) {
     return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
 
@@ -180,7 +184,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachInvoiceItems(context: Context) {
+  private attachInvoiceItems(context: UsecaseAuthorizationContext) {
     return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetItemsForInvoiceUsecase(
         this.invoiceItemRepo,
@@ -197,7 +201,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachManuscript(context: Context) {
+  private attachManuscript(context: UsecaseAuthorizationContext) {
     return async <T extends WithInvoice>(request: T) => {
       const usecase = new GetManuscriptByInvoiceIdUsecase(
         this.manuscriptRepo,
@@ -215,7 +219,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachPayer(context: Context) {
+  private attachPayer(context: UsecaseAuthorizationContext) {
     return async <T extends WithInvoice>(request: T) => {
       const usecase = new GetPayerDetailsByInvoiceIdUsecase(
         this.payerRepo,
@@ -233,7 +237,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachAddress(context: Context) {
+  private attachAddress(context: UsecaseAuthorizationContext) {
     return async <T extends WithPayer>(request: T) => {
       const usecase = new GetAddressUseCase(this.addressRepo);
 
@@ -256,7 +260,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachPayments(context: Context) {
+  private attachPayments(context: UsecaseAuthorizationContext) {
     return async <T extends WithInvoice>(request: T) => {
       const usecase = new GetPaymentsByInvoiceIdUsecase(
         this.invoiceRepo,
@@ -274,8 +278,8 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachPaymentMethods(context: Context) {
-    return async <T extends {}>(request: T) => {
+  private attachPaymentMethods(context: UsecaseAuthorizationContext) {
+    return async <T extends Record<string, any>>(request: T) => {
       const usecase = new GetPaymentMethodsUseCase(
         this.paymentMethodRepo,
         this.loggerService
@@ -375,7 +379,7 @@ export class GenerateCompensatoryEventsUsecase
     return right(true);
   }
 
-  private attachPaymentDate(context: Context) {
+  private attachPaymentDate(context: UsecaseAuthorizationContext) {
     return <T extends WithInvoice & WithPayments>(request: T) => {
       const { payments, invoice } = request;
       let paymentDate: Date;
@@ -408,7 +412,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private sendCreatedEvent(context: Context) {
+  private sendCreatedEvent(context: UsecaseAuthorizationContext) {
     return async <T extends InvoiceCreatedData>(request: T) => {
       const publishUsecase = new PublishInvoiceCreatedUsecase(this.sqsPublish);
       const data: PublishInvoiceCreatedDTO = {
@@ -419,7 +423,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private sendConfirmedEvent(context: Context) {
+  private sendConfirmedEvent(context: UsecaseAuthorizationContext) {
     return async <T extends InvoiceConfirmedData>(request: T) => {
       const publishUsecase = new PublishInvoiceConfirmedUsecase(
         this.sqsPublish
@@ -432,7 +436,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private sendPayedEvent(context: Context) {
+  private sendPayedEvent(context: UsecaseAuthorizationContext) {
     return async <T extends InvoicePayedData>(request: T) => {
       const publishUsecase = new PublishInvoicePaidUsecase(this.sqsPublish);
       const data: PublishInvoicePaidDTO = {
@@ -443,7 +447,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private sendFinalizedEvent(context: Context) {
+  private sendFinalizedEvent(context: UsecaseAuthorizationContext) {
     return async <T extends InvoiceFinalizedData>(request: T) => {
       const publishUsecase = new PublishInvoiceFinalizedUsecase(
         this.sqsPublish
@@ -456,7 +460,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private sendCreditedEvent(context: Context) {
+  private sendCreditedEvent(context: UsecaseAuthorizationContext) {
     return async <T extends InvoiceCreditedData>(request: T) => {
       const publishUsecase = new PublishInvoiceCreditedUsecase(this.sqsPublish);
       const data: PublishInvoiceCreditedDTO = {
@@ -488,7 +492,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private publishInvoiceCreated(context: Context) {
+  private publishInvoiceCreated(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       return new AsyncEither<null, DTO>(request)
         .then(this.attachInvoice(context))
@@ -503,7 +507,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private publishInvoiceConfirmed(context: Context) {
+  private publishInvoiceConfirmed(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       return new AsyncEither<null, DTO>(request)
         .then(this.attachInvoice(context))
@@ -519,7 +523,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private publishInvoicePayed(context: Context) {
+  private publishInvoicePayed(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       return new AsyncEither<null, DTO>(request)
         .then(this.attachInvoice(context))
@@ -538,7 +542,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private publishInvoiceFinalized(context: Context) {
+  private publishInvoiceFinalized(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       return new AsyncEither<null, DTO>(request)
         .then(this.attachInvoice(context))
@@ -555,7 +559,7 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private publishInvoiceCredited(context: Context) {
+  private publishInvoiceCredited(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       return new AsyncEither(request)
         .then(this.attachInvoice(context))

@@ -5,10 +5,9 @@ import { chain } from '../../../../core/logic/EitherChain';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
-  AuthorizationContext,
   AccessControlContext,
-  Roles,
 } from '../../../../domain/authorization';
 
 // * Usecase specific
@@ -27,18 +26,16 @@ import { VATService } from '../../../../domain/services/VATService';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-export type ApplyVatToInvoiceContext = AuthorizationContext<Roles>;
-
 export class ApplyVatToInvoiceUsecase
   implements
     UseCase<
       ApplyVatToInvoiceDTO,
       Promise<ApplyVatToInvoiceResponse>,
-      ApplyVatToInvoiceContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       ApplyVatToInvoiceDTO,
-      ApplyVatToInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -51,7 +48,7 @@ export class ApplyVatToInvoiceUsecase
   // @Authorize('payer:read')
   public async execute(
     request: ApplyVatToInvoiceDTO,
-    context?: ApplyVatToInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<ApplyVatToInvoiceResponse> {
     const { postalCode, payerType, invoiceId, country, state } = request;
     const vat = this.vatService.calculateVAT(

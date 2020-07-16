@@ -1,38 +1,31 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
-import {
-  AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 
 import { Address } from '../../domain/Address';
 import { AddressId } from '../../domain/AddressId';
-import { AddressMap } from '../../mappers/AddressMap';
 import { GetAddressResponse } from './getAddressResponse';
 import { AddressRepoContract } from '../../repos/addressRepo';
 import { GetAddressRequestDTO } from './getAddressRequestDTO';
-
-type Context = AuthorizationContext<Roles>;
-export type GetAddressUseCaseContext = Context;
 
 export class GetAddressUseCase
   implements
     UseCase<
       GetAddressRequestDTO,
       Promise<GetAddressResponse>,
-      GetAddressUseCaseContext
+      UsecaseAuthorizationContext
     > {
   constructor(private addressRepo: AddressRepoContract) {}
 
   public async execute(
     request: GetAddressRequestDTO,
-    context?: Context
+    context?: UsecaseAuthorizationContext
   ): Promise<GetAddressResponse> {
     try {
       const addressId = AddressId.create(

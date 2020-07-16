@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-// import {TextUtils} from '../../../../utils/TextUtils';
 
 import { AppError } from '../../../../core/logic/AppError';
 import { CreateTransactionResponse } from './createTransactionResponse';
@@ -10,10 +11,6 @@ import { CreateTransactionErrors } from './createTransactionErrors';
 
 import { Transaction, TransactionStatus } from '../../domain/Transaction';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { TransactionMap } from './../../mappers/TransactionMap';
-// import {ArticleRepoContract} from '../../../articles/repos/articleRepo';
-// import {Article} from '../../../articles/domain/Article';
-// import {ArticleId} from '../../../articles/domain/ArticleId';
 import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
 import { NotificationPause } from '../../../notifications/domain/NotificationPause';
 import { Invoice, InvoiceStatus } from './../../../invoices/domain/Invoice';
@@ -26,13 +23,13 @@ import { JournalId } from './../../../journals/domain/JournalId';
 import { CatalogItem } from './../../../journals/domain/CatalogItem';
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface CreateTransactionRequestDTO {
   manuscriptId?: string;
@@ -45,18 +42,16 @@ export interface CreateTransactionRequestDTO {
   authorSurname?: string;
 }
 
-export type CreateTransactionContext = AuthorizationContext<Roles>;
-
 export class CreateTransactionUsecase
   implements
     UseCase<
       CreateTransactionRequestDTO,
       Promise<CreateTransactionResponse>,
-      CreateTransactionContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       CreateTransactionRequestDTO,
-      CreateTransactionContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -74,7 +69,7 @@ export class CreateTransactionUsecase
   @Authorize('transaction:create')
   public async execute(
     request: CreateTransactionRequestDTO,
-    context?: CreateTransactionContext
+    context?: UsecaseAuthorizationContext
   ): Promise<CreateTransactionResponse> {
     let catalogItem: CatalogItem;
 

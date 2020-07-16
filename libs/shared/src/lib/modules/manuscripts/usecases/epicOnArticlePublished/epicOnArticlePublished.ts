@@ -5,13 +5,12 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
   AuthorizationContext,
-  // Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  Roles,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';

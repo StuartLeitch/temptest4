@@ -5,13 +5,12 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  AccessControlledUsecase,
-  AuthorizationContext,
   Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlledUsecase,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { Invoice } from '../../../invoices/domain/Invoice';
@@ -32,13 +31,14 @@ import { GetTransactionDetailsByManuscriptCustomIdResponse as Response } from '.
 import { GetTransactionDetailsByManuscriptCustomIdDTO as DTO } from './getTransactionDetailsByManuscriptCustomId.dto';
 import * as Errors from './getTransactionDetailsByManuscriptCustomId.errors';
 
-type Context = AuthorizationContext<Roles>;
-export type GetTransactionDetailsByManuscriptCustomIdContext = Context;
-
 export class GetTransactionDetailsByManuscriptCustomIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private transactionRepo: TransactionRepoContract,
@@ -57,7 +57,10 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
   }
 
   @Authorize('transaction:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       return new AsyncEither(request)
         .then(this.verifyInput)
@@ -81,7 +84,7 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
     return right(request);
   }
 
-  private attachInvoiceId(context: Context) {
+  private attachInvoiceId(context: UsecaseAuthorizationContext) {
     return async <T extends { customId: string }>(request: T) => {
       const usecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         this.manuscriptRepo,
@@ -98,7 +101,7 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
     };
   }
 
-  private attachInvoice(context: Context) {
+  private attachInvoice(context: UsecaseAuthorizationContext) {
     return async <T extends { invoiceId: InvoiceId }>(request: T) => {
       const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
 
@@ -112,7 +115,7 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
     };
   }
 
-  private getTransaction(context: Context) {
+  private getTransaction(context: UsecaseAuthorizationContext) {
     return async (id: TransactionId) => {
       const usecase = new GetTransactionUsecase(this.transactionRepo);
 
@@ -133,7 +136,7 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
     };
   }
 
-  private attachTransaction(context: Context) {
+  private attachTransaction(context: UsecaseAuthorizationContext) {
     return async <T extends { invoice: Invoice }>(request: T) => {
       return new AsyncEither(request.invoice.transactionId)
         .then(this.getTransaction(context))

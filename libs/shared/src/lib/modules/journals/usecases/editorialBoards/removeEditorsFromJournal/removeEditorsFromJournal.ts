@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { UseCase } from '../../../../../core/domain/UseCase';
@@ -6,18 +7,18 @@ import { AppError } from '../../../../../core/logic/AppError';
 import { right, Result, Either, left } from '../../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
+// * Authorization Logic
 import {
   AccessControlledUsecase,
+  UsecaseAuthorizationContext,
   AccessControlContext,
-  AuthorizationContext,
-  Roles,
-} from '@hindawi/shared';
+} from '../../../../../domain/authorization';
+
 import { EditorRepoContract } from '../../../repos/editorRepo';
 import { JournalId } from '../../../domain/JournalId';
 import { EditorMap } from '../../../mappers/EditorMap';
 import { CatalogRepoContract } from '../../../repos';
 import { DeleteEditorDTO } from '../deleteEditor/deleteEditorDTO';
-// import { DeleteEditor } from '../deleteEditor/deleteEditor';
 
 interface RemoveEditorsFromJournalDTO {
   journalId: string;
@@ -32,20 +33,16 @@ type RemoveEditorsFromJournalResponse = Either<
   null
 >;
 
-export type RemoveEditorsFromJournalAuthorizationContext = AuthorizationContext<
-  Roles
->;
-
 export class RemoveEditorsFromJournalUsecase
   implements
     UseCase<
       RemoveEditorsFromJournalDTO,
       Promise<RemoveEditorsFromJournalResponse>,
-      RemoveEditorsFromJournalAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       RemoveEditorsFromJournalDTO,
-      RemoveEditorsFromJournalAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -53,15 +50,13 @@ export class RemoveEditorsFromJournalUsecase
     private catalogRepo: CatalogRepoContract
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async getAccessControlContext(request, context?) {
     return {};
   }
 
   public async execute(
     request: RemoveEditorsFromJournalDTO,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context?: RemoveEditorsFromJournalAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<RemoveEditorsFromJournalResponse> {
     const { journalId: journalIdString, allEditors: editors } = request;
     const allEditors = editors.map((e) => ({

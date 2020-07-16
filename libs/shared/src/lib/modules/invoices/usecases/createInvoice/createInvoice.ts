@@ -1,35 +1,38 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result, right, left} from '../../../../core/logic/Result';
-import {AppError} from '../../../../core/logic/AppError';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result, right, left } from '../../../../core/logic/Result';
+import { AppError } from '../../../../core/logic/AppError';
 
-import {Invoice, InvoiceStatus} from '../../domain/Invoice';
-import {InvoiceRepoContract} from '../../repos/invoiceRepo';
-import {TransactionRepoContract} from '../../../transactions/repos/transactionRepo';
-import {Transaction} from '../../../transactions/domain/Transaction';
-import {TransactionId} from '../../../transactions/domain/TransactionId';
+import { Invoice, InvoiceStatus } from '../../domain/Invoice';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
+import { Transaction } from '../../../transactions/domain/Transaction';
+import { TransactionId } from '../../../transactions/domain/TransactionId';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  CreateInvoiceAuthorizationContext
-} from './createInvoiceAuthorizationContext';
-import {CreateInvoiceRequestDTO} from './createInvoiceDTO';
-import {CreateInvoiceResponse} from './createInvoiceResponse';
-import {CreateInvoiceErrors} from './createInvoiceErrors';
+} from '../../../../domain/authorization';
+import { CreateInvoiceRequestDTO } from './createInvoiceDTO';
+import { CreateInvoiceResponse } from './createInvoiceResponse';
+import { CreateInvoiceErrors } from './createInvoiceErrors';
 
 export class CreateInvoiceUsecase
   implements
     UseCase<
       CreateInvoiceRequestDTO,
       Promise<CreateInvoiceResponse>,
-      CreateInvoiceAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       CreateInvoiceRequestDTO,
-      CreateInvoiceAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -42,7 +45,7 @@ export class CreateInvoiceUsecase
 
   private async getAccessControlContext(
     request: CreateInvoiceRequestDTO,
-    context?: CreateInvoiceAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
@@ -50,7 +53,7 @@ export class CreateInvoiceUsecase
   @Authorize('create:invoice')
   public async execute(
     request: CreateInvoiceRequestDTO,
-    context?: CreateInvoiceAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<CreateInvoiceResponse> {
     let transaction: Transaction;
 
@@ -74,7 +77,7 @@ export class CreateInvoiceUsecase
       }
 
       const invoiceProps = {
-        status: InvoiceStatus.DRAFT
+        status: InvoiceStatus.DRAFT,
       } as any; // TODO: should reference the real invoice props, as in its domain
       if (transactionId) {
         invoiceProps.transactionId = transactionId;

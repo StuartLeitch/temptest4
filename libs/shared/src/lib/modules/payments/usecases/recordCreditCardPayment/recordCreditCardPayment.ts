@@ -3,15 +3,14 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { left } from '../../../../core/logic/Result';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  Roles,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
-import { BraintreeGateway } from '../../../payments/infrastructure/gateways/braintree/gateway';
 import {
   InvoiceRepoContract,
   InvoiceItemRepoContract,
@@ -33,18 +32,16 @@ import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
 import { RecordPaymentUsecase } from '../recordPayment';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 
-export type RecordCreditCardPaymentContext = AuthorizationContext<Roles>;
-
 export class RecordCreditCardPaymentUsecase
   implements
     UseCase<
       RecordCreditCardPaymentDTO,
       Promise<RecordCreditCardPaymentResponse>,
-      RecordCreditCardPaymentContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       RecordCreditCardPaymentDTO,
-      RecordCreditCardPaymentContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -57,7 +54,7 @@ export class RecordCreditCardPaymentUsecase
 
   public async execute(
     request: RecordCreditCardPaymentDTO,
-    context?: RecordCreditCardPaymentContext
+    context?: UsecaseAuthorizationContext
   ): Promise<RecordCreditCardPaymentResponse> {
     const getInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(
       this.invoiceRepo

@@ -2,16 +2,13 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
-// import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
-  // Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlledUsecase,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -24,20 +21,16 @@ import { GetInvoiceIdByManuscriptCustomIdResponse } from './getInvoiceIdByManusc
 import { GetInvoiceIdByManuscriptCustomIdErrors } from './getInvoiceIdByManuscriptCustomIdErrors';
 import { GetInvoiceIdByManuscriptCustomIdDTO } from './getInvoiceIdByManuscriptCustomIdDTO';
 
-export type GetInvoiceIdByManuscriptCustomIdContext = AuthorizationContext<
-  Roles
->;
-
 export class GetInvoiceIdByManuscriptCustomIdUsecase
   implements
     UseCase<
       GetInvoiceIdByManuscriptCustomIdDTO,
       Promise<GetInvoiceIdByManuscriptCustomIdResponse>,
-      GetInvoiceIdByManuscriptCustomIdContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetInvoiceIdByManuscriptCustomIdDTO,
-      GetInvoiceIdByManuscriptCustomIdContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -51,7 +44,7 @@ export class GetInvoiceIdByManuscriptCustomIdUsecase
 
   public async execute(
     request: GetInvoiceIdByManuscriptCustomIdDTO,
-    context?: GetInvoiceIdByManuscriptCustomIdContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetInvoiceIdByManuscriptCustomIdResponse> {
     const { customId } = request;
 
@@ -84,7 +77,7 @@ export class GetInvoiceIdByManuscriptCustomIdUsecase
         );
       }
 
-      const invoiceIds = invoiceItems.map(ii => ii.invoiceId);
+      const invoiceIds = invoiceItems.map((ii) => ii.invoiceId);
 
       return right(Result.ok<InvoiceId[]>(invoiceIds));
     } catch (err) {
