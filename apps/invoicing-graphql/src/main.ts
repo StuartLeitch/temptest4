@@ -24,9 +24,25 @@ async function main() {
   const loaders = [];
 
   if (env.loaders.winstonEnabled) {
+    const protocol = await import('winston');
     const { winstonLoader } = await import(
       /* webpackChunkName: "winstonLoader" */ './loaders/winstonLoader'
     );
+
+    protocol.add(
+      new protocol.transports.Console({
+        level: env.log.level,
+        handleExceptions: true,
+        format:
+          env.node !== 'development'
+            ? protocol.format.combine(protocol.format.json())
+            : protocol.format.combine(
+                protocol.format.colorize(),
+                protocol.format.simple()
+              ),
+      })
+    );
+    log.setProtocol(protocol);
     log.info('Winston logging initiated ✔️');
     loaders.push(winstonLoader);
   }

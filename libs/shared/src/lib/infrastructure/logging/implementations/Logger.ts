@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import * as path from 'path';
-import * as winston from 'winston';
+// import winston from 'winston';
 
 import { LoggerContract } from '@hindawi/shared';
 
@@ -19,6 +20,7 @@ import { LoggerContract } from '@hindawi/shared';
 export class Logger implements LoggerContract {
   public static DEFAULT_SCOPE = 'Invoicing/Backend';
   private scope: string;
+  private protocol: any;
 
   private static parsePathToScope(filePath: string): string {
     if (filePath.indexOf(path.sep) >= 0) {
@@ -36,9 +38,14 @@ export class Logger implements LoggerContract {
     this.scope = Logger.parsePathToScope(scope);
   }
 
+  public setProtocol(protocol: any): void {
+    this.protocol = protocol;
+  }
+
   constructor(scope?: string) {
     if (!scope) {
       this.scope = Logger.DEFAULT_SCOPE;
+      this.protocol = console;
     } else {
       this.setScope(scope);
     }
@@ -61,8 +68,8 @@ export class Logger implements LoggerContract {
   }
 
   private log(level: string, message: string, args: any[]): void {
-    if (winston) {
-      winston[level](`${this.formatScope()} ${message}`, ...args);
+    if (this.protocol) {
+      this.protocol[level](`${this.formatScope()} ${message}`, ...args);
     }
   }
 

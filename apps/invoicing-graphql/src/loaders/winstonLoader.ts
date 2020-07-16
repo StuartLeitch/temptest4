@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
-import { configure, format, transports } from 'winston';
+import winston from 'winston';
 import WinstonCloudWatch from 'winston-cloudwatch';
 
 import { MessageFormat } from '../lib/logger/MessageFormat';
@@ -15,9 +17,9 @@ export const winstonLoader: MicroframeworkLoader = (
     level,
     output,
     tenant,
-    cloudwatch: { region, groupName, accessKey, secretAccessKey }
+    cloudwatch: { region, groupName, accessKey, secretAccessKey },
   } = env.log;
-  console.log(
+  winston.info(
     `CloudWatch log stream is: ${output}-backend-${groupName}-${tenant}`
   );
   const cloudwatchConfig: any = {
@@ -28,20 +30,8 @@ export const winstonLoader: MicroframeworkLoader = (
     awsSecretKey: secretAccessKey,
     awsRegion: region,
     jsonMessage: false,
-    messageFormatter: MessageFormat.formatter
+    messageFormatter: MessageFormat.formatter,
   };
 
-  configure({
-    transports: [
-      new transports.Console({
-        level: env.log.level,
-        handleExceptions: true,
-        format:
-          env.node !== 'development'
-            ? format.combine(format.json())
-            : format.combine(format.colorize(), format.simple())
-      }),
-      new WinstonCloudWatch(cloudwatchConfig)
-    ]
-  });
+  winston.add(new WinstonCloudWatch(cloudwatchConfig));
 };
