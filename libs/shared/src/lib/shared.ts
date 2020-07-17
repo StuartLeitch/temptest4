@@ -111,6 +111,9 @@ export * from './modules/journals/mappers/EditorMap';
 export * from './modules/journals/mappers/JournalEventMap';
 export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 export * from './modules/journals/usecases/journals/getJournal/getJournal';
+export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
+export * from './modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
+export * from './modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
