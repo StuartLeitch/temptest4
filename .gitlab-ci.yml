@@ -47,16 +47,17 @@ Test:
   #   - apt-get -y install imagemagick graphicsmagick
   script:
     - cd $HOME
-    - yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --code-coverage
+    - chmod -R +x report
+    - yarn run nx run-many --target=cucumber --projects=$AFFECTED_APPS --configuration=production
     - yarn run ci:coverage
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
-      - coverage/
-    reports:
-      junit:
-        - coverage/apps/**/junit.xml
-        - coverage/libs/**/junit.xml
+      - report/
+    # reports:
+    #   cucumber:
+    #     - report/apps/**/usage.txt
+    #     - report/libs/**/usage.txt
 
 Build:
   interruptible: true

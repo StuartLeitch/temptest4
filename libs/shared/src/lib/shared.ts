@@ -108,6 +108,7 @@ export * from './modules/journals/domain/Editor';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
 export * from './modules/journals/mappers/EditorMap';
+export * from './modules/journals/mappers/JournalEventMap';
 export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 export * from './modules/journals/usecases/journals/getJournal/getJournal';
 
@@ -159,9 +160,6 @@ export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetail
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
 export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
-export { VATService } from './domain/services/VATService';
-export { WaiverService } from './domain/services/WaiverService';
-export * from './domain/services/ErpService';
 
 export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/coupons/repos';
@@ -214,8 +212,9 @@ export * from './infrastructure/message-queues/payloadBuilder';
 
 // ? Should we export this
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
-export * from './domain/services/VATService';
-export * from './domain/services/WaiverService';
+export { VATService } from './domain/services/VATService';
+export { WaiverService } from './domain/services/WaiverService';
+export * from './domain/services/ErpService';
 
 // * Export Utils
 export * from './utils/FormatUtils';
