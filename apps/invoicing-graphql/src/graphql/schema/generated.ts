@@ -511,6 +511,7 @@ export type MutationMigrateEntireInvoiceArgs = {
   submissionDate: Scalars['String'];
   paymentDate?: Maybe<Scalars['String']>;
   issueDate?: Maybe<Scalars['String']>;
+  revenueRecognitionReference?: Maybe<Scalars['String']>;
   erpReference?: Maybe<Scalars['String']>;
   payer?: Maybe<MigratePayer>;
   invoiceId: Scalars['String'];

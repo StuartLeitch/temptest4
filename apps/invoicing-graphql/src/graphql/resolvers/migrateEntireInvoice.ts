@@ -48,6 +48,7 @@ export const migrateEntireInvoice: Resolvers<any> = {
         submissionDate: args.submissionDate,
         paymentDate: args.paymentDate,
         issueDate: args.issueDate,
+        revenueRecognitionReference: args.revenueRecognitionReference,
         erpReference: args.erpReference,
         invoiceId: args.invoiceId,
         status: args.status,
