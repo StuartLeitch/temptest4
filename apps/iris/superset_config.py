@@ -2,13 +2,14 @@ import os
 from flask_appbuilder.security.manager import AUTH_OID
 from security import OIDCSecurityManager
 
-AUTH_TYPE = AUTH_OID
-OIDC_CLIENT_SECRETS = os.path.join(os.getenv('OIDC_CLIENT_SECRETS_PATH', os.getcwd()), 'config.json')
-OIDC_ID_TOKEN_COOKIE_SECURE = False
-OIDC_REQUIRE_VERIFIED_EMAIL = False
-AUTH_USER_REGISTRATION = True
-AUTH_USER_REGISTRATION_ROLE = 'Gamma'
-CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
+if os.getenv('OIDC_CLIENT_SECRETS_PATH', '') != '':
+  AUTH_TYPE = AUTH_OID
+  OIDC_CLIENT_SECRETS = os.path.join(os.getenv('OIDC_CLIENT_SECRETS_PATH', os.getcwd()), 'config.json')
+  OIDC_ID_TOKEN_COOKIE_SECURE = False
+  OIDC_REQUIRE_VERIFIED_EMAIL = False
+  AUTH_USER_REGISTRATION = True
+  AUTH_USER_REGISTRATION_ROLE = 'Public'
+  CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
 
 LOG_FORMAT = '%(asctime)s:%(levelname)s:%(name)s:%(message)s'
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')

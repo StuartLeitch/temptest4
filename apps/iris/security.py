@@ -24,7 +24,7 @@ class AuthOIDCView(AuthOIDView):
         info = oidc.user_getinfo(
           ['preferred_username', 'given_name', 'family_name', 'email'])
         user = sm.add_user(info.get('preferred_username'), info.get(
-          'given_name'), info.get('family_name'), info.get('email'), sm.find_role('Gamma')) # maybe don't add gamma role
+          'given_name'), info.get('family_name'), info.get('email'), sm.find_role('Public')) # maybe don't add gamma role
 
       login_user(user, remember=False)
       return redirect(self.appbuilder.get_url_for_index)
