@@ -34,6 +34,7 @@ report.*.json
 /.sass-cache
 /connect.lock
 coverage/
+/report
 /.nyc_output
 /libpeerconnection.log
 npm-debug.log
