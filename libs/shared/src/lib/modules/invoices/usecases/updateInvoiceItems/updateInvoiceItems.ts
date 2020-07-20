@@ -4,13 +4,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { UpdateInvoiceItemsResponse } from './updateInvoiceItemsResponse';
@@ -19,18 +17,16 @@ import { UpdateInvoiceItemsDTO } from './updateInvoiceItemsDTO';
 
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 
-export type UpdateInvoiceItemsContext = AuthorizationContext<Roles>;
-
 export class UpdateInvoiceItemsUsecase
   implements
     UseCase<
       UpdateInvoiceItemsDTO,
       Promise<UpdateInvoiceItemsResponse>,
-      UpdateInvoiceItemsContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       UpdateInvoiceItemsDTO,
-      UpdateInvoiceItemsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private invoiceItemRepo: InvoiceItemRepoContract) {}
@@ -38,10 +34,10 @@ export class UpdateInvoiceItemsUsecase
   // @Authorize('payer:read')
   public async execute(
     request: UpdateInvoiceItemsDTO,
-    context?: UpdateInvoiceItemsContext
+    context?: UsecaseAuthorizationContext
   ): Promise<UpdateInvoiceItemsResponse> {
     try {
-      request.invoiceItems.forEach(async item => {
+      request.invoiceItems.forEach(async (item) => {
         if (!(await this.invoiceItemRepo.exists(item))) {
           throw new UpdateInvoiceItemsErrors.InvoiceItemNotFound(
             item.id.toString()

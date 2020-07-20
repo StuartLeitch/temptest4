@@ -1,19 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { Manuscript } from '../../domain/Manuscript';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
-
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  EditManuscriptAuthorizationContext
-} from './editManuscriptAuthorizationContext';
+} from '../../../../domain/authorization';
+
+import { Manuscript } from '../../domain/Manuscript';
+import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
+import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
 import { EditManuscriptDTO } from './editManuscriptDTO';
 import { EditManuscriptResponse } from './editManuscriptResponse';
 import { EditManuscriptErrors } from './editManuscriptErrors';
@@ -23,18 +26,18 @@ export class EditManuscriptUsecase
     UseCase<
       EditManuscriptDTO,
       Promise<EditManuscriptResponse>,
-      EditManuscriptAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       EditManuscriptDTO,
-      EditManuscriptAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private manuscriptRepo: ManuscriptRepoContract) {}
 
   private async getAccessControlContext(
     request: EditManuscriptDTO,
-    context?: EditManuscriptAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
@@ -42,7 +45,7 @@ export class EditManuscriptUsecase
   @Authorize('edit:manuscript')
   public async execute(
     request: EditManuscriptDTO,
-    context?: EditManuscriptAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<EditManuscriptResponse> {
     let manuscript: Manuscript;
 

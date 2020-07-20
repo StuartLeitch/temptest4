@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
@@ -7,31 +9,29 @@ import { ValidateVATResponse } from './validateVATResponse';
 import { ValidateVATErrors } from './validateVATErrors';
 import { VATService } from '../../../../domain/services/VATService';
 
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface ValidateVATRequestDTO {
   vatNumber: string;
   countryCode: string;
 }
 
-export type ValidateVATContext = AuthorizationContext<Roles>;
-
 export class ValidateVATUsecase
   implements
     UseCase<
       ValidateVATRequestDTO,
       Promise<ValidateVATResponse>,
-      ValidateVATContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       ValidateVATRequestDTO,
-      ValidateVATContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private vatService: VATService) {
@@ -45,7 +45,7 @@ export class ValidateVATUsecase
   @Authorize('validate:vatnumber')
   public async execute(
     request: ValidateVATRequestDTO,
-    context?: ValidateVATContext
+    context?: UsecaseAuthorizationContext
   ): Promise<ValidateVATResponse> {
     const { vatNumber, countryCode } = request;
 

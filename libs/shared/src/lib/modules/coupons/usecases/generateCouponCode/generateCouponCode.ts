@@ -1,29 +1,29 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 
-import { CouponRepoContract } from '../../repos/couponRepo';
-
-import { GenerateCouponCodeResponse } from './generateCouponCodeResponse';
-
-import { CouponCode } from '../../domain/CouponCode';
-
+// * Authorization Logic
 import {
   AccessControlledUsecase,
+  UsecaseAuthorizationContext,
   AccessControlContext,
-  GenerateCouponCodeAuthenticationContext,
-} from './generateCouponCodeAuthenticationContext';
+} from '../../../../domain/authorization';
+
+import { CouponRepoContract } from '../../repos/couponRepo';
+import { CouponCode } from '../../domain/CouponCode';
+import { GenerateCouponCodeResponse } from './generateCouponCodeResponse';
 
 export class GenerateCouponCodeUsecase
   implements
     UseCase<
-      {},
+      Record<string, unknown>,
       Promise<GenerateCouponCodeResponse>,
-      GenerateCouponCodeAuthenticationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
-      {},
-      GenerateCouponCodeAuthenticationContext,
+      Record<string, unknown>,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private couponRepo: CouponRepoContract) {}
@@ -34,7 +34,7 @@ export class GenerateCouponCodeUsecase
 
   public async execute(
     request?,
-    context?: GenerateCouponCodeAuthenticationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GenerateCouponCodeResponse> {
     try {
       const found = false;

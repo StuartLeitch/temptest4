@@ -1,18 +1,15 @@
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { InvoiceReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
@@ -63,13 +60,14 @@ import {
   CompoundData,
 } from './utils';
 
-type Context = AuthorizationContext<Roles>;
-export type SendInvoicePaymentReminderContext = Context;
-
 export class SendInvoicePaymentReminderUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -107,7 +105,10 @@ export class SendInvoicePaymentReminderUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       const execution = new AsyncEither(request)
         .then(this.validateRequest)
@@ -154,7 +155,7 @@ export class SendInvoicePaymentReminderUsecase
     return right<null, DTO>(request);
   }
 
-  private getInvoice(context: Context) {
+  private getInvoice(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       this.loggerService.info(
         `Get the details of invoice with id ${request.invoiceId}`
@@ -173,7 +174,7 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private attachItemsToInvoice(context: Context) {
+  private attachItemsToInvoice(context: UsecaseAuthorizationContext) {
     const usecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
       this.couponRepo,
@@ -197,7 +198,7 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private getManuscript(context: Context) {
+  private getManuscript(context: UsecaseAuthorizationContext) {
     return async (request: DTO & { invoice: Invoice }) => {
       this.loggerService.info(
         `Get manuscript for invoice with id ${request.invoiceId}`
@@ -215,7 +216,7 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private getCatalogItem(context: Context) {
+  private getCatalogItem(context: UsecaseAuthorizationContext) {
     return async (
       request: DTO & { invoice: Invoice; manuscript: Manuscript }
     ) => {
@@ -235,7 +236,7 @@ export class SendInvoicePaymentReminderUsecase
     };
   }
 
-  private getPaymentNotificationsSent(context: Context) {
+  private getPaymentNotificationsSent(context: UsecaseAuthorizationContext) {
     return async (request: CompoundData) => {
       this.loggerService.info(
         `Get the reminders of type ${NotificationType.REMINDER_PAYMENT} already sent for the invoice with id {${request.invoiceId}}`
@@ -338,7 +339,7 @@ export class SendInvoicePaymentReminderUsecase
     return this.sendEmail(request, numberToTemplateMapper[emailNum]);
   }
 
-  private getPauseStatus(context: Context) {
+  private getPauseStatus(context: UsecaseAuthorizationContext) {
     return async (request: CompoundData) => {
       this.loggerService.info(
         `Get the paused status of reminders of type ${

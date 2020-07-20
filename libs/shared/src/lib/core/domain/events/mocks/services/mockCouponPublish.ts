@@ -26,10 +26,10 @@ export class MockCouponPublish
    */
 
   handleCouponCreatedEvent(event: MockCouponCreatedEvent): void {
-    console.log('A coupon was created!');
+    // console.log('A coupon was created!');
   }
 
   handleUpdatedEvent(event: MockCouponUpdatedEvent): void {
-    console.log('A coupon was updated!');
+    // console.log('A coupon was updated!');
   }
 }

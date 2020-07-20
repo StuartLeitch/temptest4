@@ -1,6 +1,7 @@
-import { ValidateVATErrors } from './../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
 import { expect } from 'chai';
 import { Given, When, Then, Before } from 'cucumber';
+
+// import { ValidateVATErrors } from './../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
 

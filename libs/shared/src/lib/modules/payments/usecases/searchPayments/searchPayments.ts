@@ -1,29 +1,33 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
 
-import {Payment} from '../../domain/Payment';
-import {PaymentRepoContract} from '../../repos/paymentRepo';
+import { Payment } from '../../domain/Payment';
+import { PaymentRepoContract } from '../../repos/paymentRepo';
 
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface SearchPaymentsRequestDTO {
   params: string[];
 }
 
-export type SearchPaymentsContext = AuthorizationContext<Roles>;
 export class SearchPayments
   implements
-    UseCase<SearchPaymentsRequestDTO, Result<Payment[]>, SearchPaymentsContext>,
+    UseCase<
+      SearchPaymentsRequestDTO,
+      Result<Payment[]>,
+      UsecaseAuthorizationContext
+    >,
     AccessControlledUsecase<
       SearchPaymentsRequestDTO,
-      SearchPaymentsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   private paymentRepo: PaymentRepoContract;
@@ -54,7 +58,7 @@ export class SearchPayments
   public async execute(
     request: SearchPaymentsRequestDTO
   ): Promise<Result<Payment[]>> {
-    const {params} = request;
+    const { params } = request;
 
     try {
       // * System searches for payments matching query params

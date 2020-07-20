@@ -3,9 +3,9 @@
 // * Domain imports
 import { SubmissionQualityCheckPassed as SubmissionQualityCheckPassedEvent } from '@hindawi/phenom-events';
 import {
+  UsecaseAuthorizationContext,
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
-  UpdateTransactionContext,
   TransactionStatus,
   VersionCompare,
   Roles,
@@ -15,7 +15,9 @@ import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/l
 
 import { env } from '../../env';
 
-const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 const SUBMISSION_QUALITY_CHECK_PASSED = 'SubmissionQualityCheckPassed';
 

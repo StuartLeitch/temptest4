@@ -17,38 +17,32 @@ export * from './modules/addresses/usecases/getAddress/getAddress';
 export * from './modules/addresses/mappers/AddressMap';
 export * from './modules/addresses/repos/implementations/knexAddressRepo';
 export * from './modules/addresses/mappers/AddressMap';
-// export * from './modules/manuscripts/domain/ArticleIdMap';
 
 // * Export Article Subdomain
 export * from './modules/manuscripts/domain/Article';
-// export * from './modules/articles/dtos/ArticleDTO';
 export * from './modules/manuscripts/mappers/ArticleMap';
 export * from './modules/manuscripts/domain/ArticleId';
-// export * from './modules/articles/domain/Price';
-// export * from './modules/articles/domain/PriceId';
-// export * from './modules/articles/domain/PriceValue';
+export * from './modules/manuscripts/domain/ManuscriptTypes';
 export * from './modules/manuscripts/repos';
-// export * from './modules/articles/mappers/ArticleMap';
-// export * from './modules/articles/repos/priceRepo';
-// export * from './modules/articles/mappers/PriceMap';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetailsDTO';
+export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
+export * from './modules/manuscripts/usecases/createManuscript/createManuscript';
+export * from './modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
+export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
+export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptIdDTO';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
 export * from './modules/transactions/domain/TransactionId';
-// export * from './modules/transactions/domain/TransactionAmount';
-// // export * from './transactions/domain/events/transactionCreatedEvent';
 export * from './modules/transactions/repos';
-// // export * from './transactions/repos/transactionJsonRepo';
-// export * from './modules/transactions/usecases/getTransactions/getTransactions';
 export * from './modules/transactions/usecases/getTransaction/getTransaction';
-// export * from './modules/transactions/usecases/createTransaction/createTransaction';
-// // export * from './transactions/subscribers/AfterTransactionCreatedEvents';
+export * from './modules/transactions/usecases/createTransaction/createTransaction';
+export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+
 export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
-export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
 
@@ -58,7 +52,8 @@ export * from './modules/invoices/domain/InvoiceId';
 export * from './modules/invoices/domain/InvoiceItem';
 export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
-// // export * from './invoices/domain/events/invoiceSentEvent';
+
+export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDTO';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
@@ -74,22 +69,12 @@ export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-// export * from './invoices/usecases/sendInvoice/sendInvoice';
-// // export * from './invoices/subscribers/AfterInvoiceSentEvents';
 export * from './modules/invoices/mappers/InvoiceMap';
-// export * from './modules/invoices/dtos/InvoiceDTO';
 export * from './modules/invoices/mappers/InvoiceItemMap';
 
 export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
-
-// export {
-//   PoliciesRegister as InvoicePoliciesRegister
-// } from './modules/invoices/domain/policies/PoliciesRegister';
-// export * from './modules/invoices/domain/policies/UKVATHardCopyPolicy';
-// export * from './modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
-// export * from './modules/invoices/domain/policies/VATTreatmentPublicationNotOwnedPolicy';
 
 // * Export Payer Subdomain
 export * from './modules/payers/domain/Payer';
@@ -119,12 +104,18 @@ export * from './modules/publishers/usecases/getPublisherDetailsByName';
 export { CatalogItem } from './modules/journals/domain/CatalogItem';
 export * from './modules/journals/domain/JournalId';
 export * from './modules/journals/domain/Journal';
+export * from './modules/journals/domain/Editor';
 export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
+export * from './modules/journals/mappers/EditorMap';
+export * from './modules/journals/mappers/JournalEventMap';
 export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
-// export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
+export * from './modules/journals/usecases/journals/getJournal/getJournal';
+export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
+export * from './modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
+export * from './modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
 
-// // * Export User Subdomain
+// * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
 
 // * Export Payments Subdomain
@@ -162,13 +153,6 @@ export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
 export * from './modules/payments/usecases/createPayment/CreatePayment';
 
 // * Export Waiver, Coupon Subdomain
-// export * from './domain/reductions/ReductionFactory';
-// export * from './domain/reductions/Coupon';
-// export {
-//   PoliciesRegister as ReductionsPoliciesRegister
-// } from './domain/reductions/policies/PoliciesRegister';
-// export * from './domain/reductions/policies/WaivedCountryPolicy';
-// export * from './domain/reductions/policies/SanctionedCountryPolicy';
 export * from './modules/coupons/usecases/createCoupon/createCoupon';
 export * from './modules/coupons/usecases/createCoupon/createCouponDTO';
 export * from './modules/coupons/usecases/updateCoupon/updateCoupon';
@@ -179,9 +163,6 @@ export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetail
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
 export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
-export { VATService } from './domain/services/VATService';
-export { WaiverService } from './domain/services/WaiverService';
-export * from './domain/services/ErpService';
 
 export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/coupons/repos';
@@ -221,8 +202,6 @@ export * from './modules/users/mappers/UserMap';
 
 // ? Should we export this
 // * Infra
-// export * from './infra/http/app';
-export { BraintreeGateway } from './modules/payments/infrastructure/gateways/braintree/gateway';
 export { SchedulerContract } from './infrastructure/scheduler/Scheduler';
 export { ListenerContract } from './infrastructure/listener/Listener';
 export * from './infrastructure/logging';
@@ -230,16 +209,15 @@ export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';
 export * from './infrastructure/message-queues/contracts/Time';
 export { EmailService } from './infrastructure/communication-channels';
-export * as QueuePayloads from './infrastructure/message-queues/payloads';
+import * as QueuePayloads from './infrastructure/message-queues/payloads';
+export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';
 
 // ? Should we export this
-// * Redux Stuff
-// export * from './infrastructure/frameworks/redux';
-// export * from './infrastructure/state-management/redux';
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
-export * from './domain/services/VATService';
-export * from './domain/services/WaiverService';
+export { VATService } from './domain/services/VATService';
+export { WaiverService } from './domain/services/WaiverService';
+export * from './domain/services/ErpService';
 
 // * Export Utils
 export * from './utils/FormatUtils';

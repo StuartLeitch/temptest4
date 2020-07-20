@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -6,12 +8,10 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
-  Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { PublisherRepoContract } from '../../repos/publisherRepo';
 
@@ -21,18 +21,16 @@ import { GetPublisherCustomValuesErrors } from './getPublisherCustomValuesErrors
 import { GetPublisherCustomValuesDTO } from './getPublisherCustomValuesDTO';
 import { PublisherId } from '../../domain/PublisherId';
 
-export type GetPublisherCustomValuesContext = AuthorizationContext<Roles>;
-
 export class GetPublisherCustomValuesUsecase
   implements
     UseCase<
       GetPublisherCustomValuesDTO,
       Promise<GetPublisherCustomValuesResponse>,
-      GetPublisherCustomValuesContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetPublisherCustomValuesDTO,
-      GetPublisherCustomValuesContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private publisherRepo: PublisherRepoContract) {}
@@ -44,7 +42,7 @@ export class GetPublisherCustomValuesUsecase
   // @Authorize('invoice:read')
   public async execute(
     request: GetPublisherCustomValuesDTO,
-    context?: GetPublisherCustomValuesContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetPublisherCustomValuesResponse> {
     try {
       const id = PublisherId.create(

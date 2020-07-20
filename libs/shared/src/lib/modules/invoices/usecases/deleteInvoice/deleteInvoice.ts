@@ -1,32 +1,36 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import { Invoice /* , STATUS as InvoiceStatus*/ } from '../../domain/Invoice';
+import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface DeleteInvoiceRequestDTO {
   invoiceId: string;
 }
 
-export type DeleteInvoiceContext = AuthorizationContext<Roles>;
-
 export class DeleteInvoiceUsecase
   implements
-    UseCase<DeleteInvoiceRequestDTO, Result<unknown>, DeleteInvoiceContext>,
+    UseCase<
+      DeleteInvoiceRequestDTO,
+      Result<unknown>,
+      UsecaseAuthorizationContext
+    >,
     AccessControlledUsecase<
       DeleteInvoiceRequestDTO,
-      DeleteInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   private invoiceRepo: InvoiceRepoContract;
@@ -63,7 +67,7 @@ export class DeleteInvoiceUsecase
   @Authorize('invoice:delete')
   public async execute(
     request: DeleteInvoiceRequestDTO,
-    context?: DeleteInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<Result<unknown>> {
     try {
       // * System looks-up the invoice

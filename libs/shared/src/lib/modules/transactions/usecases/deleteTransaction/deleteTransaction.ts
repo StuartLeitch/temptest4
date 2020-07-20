@@ -1,36 +1,36 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import {Transaction} from '../../domain/Transaction';
-import {TransactionId} from '../../domain/TransactionId';
-import {TransactionRepoContract} from '../../repos/transactionRepo';
+import { Transaction } from '../../domain/Transaction';
+import { TransactionId } from '../../domain/TransactionId';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
 
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface DeleteTransactionRequestDTO {
   transactionId: string;
 }
-
-export type DeleteTransactionContext = AuthorizationContext<Roles>;
 
 export class DeleteTransactionUsecase
   implements
     UseCase<
       DeleteTransactionRequestDTO,
       Result<unknown>,
-      DeleteTransactionContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       DeleteTransactionRequestDTO,
-      DeleteTransactionContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   private transactionRepo: TransactionRepoContract;
@@ -42,7 +42,7 @@ export class DeleteTransactionUsecase
   private async getTransaction(
     request: DeleteTransactionRequestDTO
   ): Promise<Result<Transaction>> {
-    const {transactionId} = request;
+    const { transactionId } = request;
     if (!transactionId) {
       return Result.fail<Transaction>(
         `Invalid Transaction ID=${transactionId}`
@@ -70,7 +70,7 @@ export class DeleteTransactionUsecase
   @Authorize('transaction:delete')
   public async execute(
     request: DeleteTransactionRequestDTO,
-    context?: DeleteTransactionContext
+    context?: UsecaseAuthorizationContext
   ): Promise<Result<unknown>> {
     try {
       // * System deletes transaction

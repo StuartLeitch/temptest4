@@ -1,39 +1,42 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 import { Manuscript } from '../../domain/Manuscript';
 import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  CreateManuscriptAuthorizationContext
-} from './createManuscriptAuthorizationContext';
+} from '../../../../domain/authorization';
+
 import { CreateManuscriptDTO } from './createManuscriptDTO';
 import { CreateManuscriptResponse } from './createManuscriptResponse';
-import { CreateManuscriptErrors } from './createManuscriptErrors';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class CreateManuscriptUsecase
   implements
     UseCase<
       CreateManuscriptDTO,
       Promise<CreateManuscriptResponse>,
-      CreateManuscriptAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       CreateManuscriptDTO,
-      CreateManuscriptAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private manuscriptRepo: ManuscriptRepoContract) {}
 
   private async getAccessControlContext(
     request: CreateManuscriptDTO,
-    context?: CreateManuscriptAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
@@ -41,7 +44,7 @@ export class CreateManuscriptUsecase
   @Authorize('create:manuscript')
   public async execute(
     request: CreateManuscriptDTO,
-    context?: CreateManuscriptAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<CreateManuscriptResponse> {
     let manuscript: Manuscript;
 

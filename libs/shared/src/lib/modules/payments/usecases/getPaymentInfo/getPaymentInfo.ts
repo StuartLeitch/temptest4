@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, right, left } from '../../../../core/logic/Result';
@@ -5,13 +7,12 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  AccessControlledUsecase,
-  AuthorizationContext,
   Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlledUsecase,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
@@ -23,12 +24,14 @@ import { GetPaymentInfoResponse as Response } from './getPaymentInfoResponse';
 import { GetPaymentInfoDTO as DTO } from './getPaymentInfoDTO';
 import * as Errors from './getPaymentInfoErrors';
 
-export type GetPaymentInfoContext = AuthorizationContext<Roles>;
-
 export class GetPaymentInfoUsecase
   implements
-    UseCase<DTO, Promise<Response>, GetPaymentInfoContext>,
-    AccessControlledUsecase<DTO, GetPaymentInfoContext, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private paymentRepo: PaymentRepoContract
@@ -41,7 +44,7 @@ export class GetPaymentInfoUsecase
   @Authorize('invoice:read')
   public async execute(
     request: DTO,
-    context?: GetPaymentInfoContext
+    context?: UsecaseAuthorizationContext
   ): Promise<Response> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());

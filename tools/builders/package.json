@@ -1,0 +1,22 @@
+{
+  "name": "@hindawi/cucumberjs-runner",
+  "version": "0.1.0",
+  "description": "",
+  "main": "command/index.js",
+  "builders": "builders.json",
+  "scripts": {
+    "build": "../../node_modules/.bin/tsc cucumber/*.ts",
+    "test": "TS_NODE_PROJECT=\"../../../libs/shared/tsconfig.spec.json\" ../../../node_modules/.bin/cucumber-js ../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/**/*.feature"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^14.0.14",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.6"
+  },
+  "dependencies": {
+    "@angular-devkit/architect": "0.1000.1"
+  }
+}

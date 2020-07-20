@@ -1,23 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
-import {
-  AuthorizationContext,
-  Roles,
-  AccessControlledUsecase,
-  AccessControlContext,
-  // Authorize,
-  InvoiceItemRepoContract,
-  PayerRepoContract,
-  ArticleRepoContract,
-  InvoiceRepoContract,
-  VATService,
-  PayerType,
-  GetItemsForInvoiceUsecase,
-} from '@hindawi/shared';
+
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
+
+// * Authorization Logic
+import {
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
+
+import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
+import { VATService } from '../../../../domain/services/VATService';
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -28,24 +25,27 @@ import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../domain/Invoice';
 import { PublisherRepoContract } from '../../../publishers/repos';
-// import { GetPublisherCustomValuesUsecase } from '../../../publishers/usecases/getPublisherCustomValues';
+import { InvoiceRepoContract } from './../../repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
+import { PayerRepoContract } from './../../../payers/repos/payerRepo';
+import { PayerType } from './../../../payers/domain/Payer';
+import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 
 export interface PublishInvoiceToErpRequestDTO {
   invoiceId?: string;
 }
-
-export type PublishInvoiceToErpContext = AuthorizationContext<Roles>;
 
 export class PublishInvoiceToErpUsecase
   implements
     UseCase<
       PublishInvoiceToErpRequestDTO,
       Promise<PublishInvoiceToErpResponse>,
-      PublishInvoiceToErpContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       PublishInvoiceToErpRequestDTO,
-      PublishInvoiceToErpContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -58,6 +58,7 @@ export class PublishInvoiceToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private erpService: ErpServiceContract,
+    private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: any
   ) {}
@@ -69,7 +70,7 @@ export class PublishInvoiceToErpUsecase
   // @Authorize('zzz:zzz')
   public async execute(
     request: PublishInvoiceToErpRequestDTO,
-    context?: PublishInvoiceToErpContext
+    context?: UsecaseAuthorizationContext
   ): Promise<PublishInvoiceToErpResponse> {
     // this.loggerService.info('PublishInvoiceToERP Request', request);
     if (process.env.ERP_DISABLED === 'true') {
@@ -209,7 +210,7 @@ export class PublishInvoiceToErpUsecase
       // this.loggerService.info('PublishInvoiceToERP rate', rate);
 
       try {
-        const erpResponse = await this.erpService.registerInvoice({
+        const erpData = {
           invoice,
           payer,
           items: invoiceItems,
@@ -219,7 +220,16 @@ export class PublishInvoiceToErpUsecase
           vatNote,
           rate,
           tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-        });
+        };
+
+        const netSuiteResponse = await this.netSuiteService.registerInvoice(
+          erpData
+        );
+        this.loggerService.info(
+          `Updating invoice ${invoice.id.toString()}: netSuiteReference -> ${netSuiteResponse}`
+        );
+
+        const erpResponse = await this.erpService.registerInvoice(erpData);
         // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
 
         this.loggerService.info(

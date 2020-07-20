@@ -1,14 +1,17 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
+
 import { expect } from 'chai';
 import { Given, When, Then, Before, After } from 'cucumber';
 
-import { EditorCollection } from '../../../../libs/shared/src/lib/modules/journals/domain/Editor';
-import { EditorMap } from '../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
-import { CatalogMap } from '../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
-import { MockLogger } from '../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
-import { MockEditorRepo } from '../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
-import { MockCatalogRepo } from '../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import {
+  EditorCollection,
+  EditorMap,
+  CatalogMap,
+  MockLogger,
+  MockEditorRepo,
+  MockCatalogRepo,
+} from '@hindawi/shared';
 
 import { JournalEditorAssignedHandler } from '../../src/queue_service/handlers/JournalEditorAssigned';
 

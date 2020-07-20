@@ -1,6 +1,6 @@
-import { PdfGeneratorService } from './PdfGenerator';
+import { PdfGeneratorService, InvoicePayload } from './PdfGenerator';
 
-export { PdfGeneratorService };
+export { PdfGeneratorService, InvoicePayload };
 
 export const pdfGeneratorService = new PdfGeneratorService();
 

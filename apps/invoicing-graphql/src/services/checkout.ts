@@ -1,11 +1,13 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   PaymentStrategy,
   CreditCardPayment,
   PaymentFactory,
-  CreditCard
+  CreditCard,
 } from '@hindawi/shared';
 // tslint:disable-next-line
-import {BraintreeGateway} from '@hindawi/shared';
+import { BraintreeGateway } from '../../../../libs/shared/src/lib/modules/payments/infrastructure/gateways/braintree/gateway';
 
 export class CheckoutService {
   public async pay(payment: any): Promise<any> {
@@ -16,7 +18,7 @@ export class CheckoutService {
     paymentFactory.registerPayment(creditCard);
     const paymentMethod = paymentFactory.create('CreditCardPayment');
     const paymentStrategy = new PaymentStrategy([
-      ['CreditCard', new CreditCardPayment(BraintreeGateway)]
+      ['CreditCard', new CreditCardPayment(BraintreeGateway)],
     ]);
 
     const braintreePayment: any = await paymentStrategy.makePayment(

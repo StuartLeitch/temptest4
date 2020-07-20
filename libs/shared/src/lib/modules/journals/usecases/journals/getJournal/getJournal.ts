@@ -1,8 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { Result, left, right } from '../../../../../core/logic/Result';
 import { AppError } from '../../../../../core/logic/AppError';
+
+// * Authorization Logic
+import {
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../../domain/authorization';
 
 import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { CatalogItem } from '../../../domain/CatalogItem';
@@ -11,22 +20,17 @@ import { JournalId } from '../../../domain/JournalId';
 import { GetJournalDTO } from './getJournalDTO';
 import { GetJournalResponse } from './getJournalResponse';
 import { GetJournalErrors } from './getJournalErrors';
-import {
-  GetJournalAuthorizationContext,
-  AccessControlContext,
-  AccessControlledUsecase
-} from './getJournalAuthorizationContext';
 
 export class GetJournal
   implements
     UseCase<
       GetJournalDTO,
       Promise<GetJournalResponse>,
-      GetJournalAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetJournalDTO,
-      GetJournalAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private journalRepo: CatalogRepoContract) {}
@@ -37,7 +41,7 @@ export class GetJournal
 
   public async execute(
     request: GetJournalDTO,
-    context?: GetJournalAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetJournalResponse> {
     let journal: CatalogItem;
 

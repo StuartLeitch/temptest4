@@ -4,9 +4,9 @@
 // * Domain imports
 import { SubmissionPeerReviewCycleCheckPassed as SubmissionPeerReviewCycleCheckPassedEvent } from '@hindawi/phenom-events';
 import {
+  UsecaseAuthorizationContext,
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
-  UpdateTransactionContext,
   TransactionStatus,
   VersionCompare,
   Roles,
@@ -15,7 +15,9 @@ import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/l
 
 import { env } from '../../env';
 
-const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 const SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED =
   'SubmissionPeerReviewCycleCheckPassed';

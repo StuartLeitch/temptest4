@@ -1,17 +1,17 @@
-import { CouponMap } from './../../mappers/CouponMap';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
-import { Result, left, right } from '../../../../core/logic/Result';
+import { Result, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
@@ -31,18 +31,16 @@ import {
 
 import { sanityChecksRequestParameters } from './utils';
 
-export type CreateCouponContext = AuthorizationContext<Roles>;
-
 export class CreateCouponUsecase
   implements
     UseCase<
       CreateCouponDTO,
       Promise<CreateCouponResponse>,
-      CreateCouponContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       CreateCouponDTO,
-      CreateCouponContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private couponRepo: CouponRepoContract) {}
@@ -50,7 +48,7 @@ export class CreateCouponUsecase
   // @Authorize('coupon:create')
   public async execute(
     request: CreateCouponDTO,
-    context?: CreateCouponContext
+    context?: UsecaseAuthorizationContext
   ): Promise<CreateCouponResponse> {
     try {
       const maybeSaneRequest = await sanityChecksRequestParameters(

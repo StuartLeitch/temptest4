@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -6,39 +8,31 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
-import { PayerId } from '../../../payers/domain/PayerId';
-import { Amount } from '../../../../domain/Amount';
 import { PaymentMap } from '../../mapper/Payment';
 
 import { RecordPaymentResponse } from './recordPaymentResponse';
-import { RecordPaymentErrors } from './recordPaymentErrors';
 import { RecordPaymentDTO } from './recordPaymentDTO';
-
-import { PaymentMethodId } from '../../domain/PaymentMethodId';
-
-export type RecordPaymentContext = AuthorizationContext<Roles>;
 
 export class RecordPaymentUsecase
   implements
     UseCase<
       RecordPaymentDTO,
       Promise<RecordPaymentResponse>,
-      RecordPaymentContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       RecordPaymentDTO,
-      RecordPaymentContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -48,7 +42,7 @@ export class RecordPaymentUsecase
 
   public async execute(
     payload: RecordPaymentDTO,
-    context?: RecordPaymentContext
+    context?: UsecaseAuthorizationContext
   ): Promise<RecordPaymentResponse> {
     const paymentPayload = {
       invoiceId: payload.invoiceId,

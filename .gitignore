@@ -14,6 +14,7 @@ dist-k8s/
 
 # dependencies
 **/node_modules
+/.yarn
 
 # IDEs and editors
 /.idea
@@ -33,6 +34,8 @@ report.*.json
 /.sass-cache
 /connect.lock
 coverage/
+/report
+/.nyc_output
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log

@@ -4,8 +4,6 @@ import { InvoiceCreated } from '../domain/events/invoiceCreated';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
-// import { PayerRepoContract } from '../../payers/repos/payerRepo';
-// import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PublishInvoiceCreatedUsecase } from '../usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 
 import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';

@@ -1,19 +1,14 @@
 // * Core Domain
-import { Result, Either, left, right } from '../../../../core/logic/Result';
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { AppError } from '../../../../core/logic/AppError';
+import { Result } from '../../../../core/logic/Result';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { chain } from '../../../../core/logic/EitherChain';
-import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { PayerType } from '../../../payers/domain/Payer';
@@ -31,18 +26,16 @@ import { VATService } from '../../../../domain/services/VATService';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-export type ApplyVatToInvoiceContext = AuthorizationContext<Roles>;
-
 export class ApplyVatToInvoiceUsecase
   implements
     UseCase<
       ApplyVatToInvoiceDTO,
       Promise<ApplyVatToInvoiceResponse>,
-      ApplyVatToInvoiceContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       ApplyVatToInvoiceDTO,
-      ApplyVatToInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -55,14 +48,14 @@ export class ApplyVatToInvoiceUsecase
   // @Authorize('payer:read')
   public async execute(
     request: ApplyVatToInvoiceDTO,
-    context?: ApplyVatToInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<ApplyVatToInvoiceResponse> {
     const { postalCode, payerType, invoiceId, country, state } = request;
     const vat = this.vatService.calculateVAT(
       {
         countryCode: country,
         stateCode: state,
-        postalCode
+        postalCode,
       },
       payerType !== PayerType.INSTITUTION
     );
@@ -83,7 +76,7 @@ export class ApplyVatToInvoiceUsecase
       this.waiverRepo
     );
     return await getItemsForInvoiceUsecase.execute({
-      invoiceId
+      invoiceId,
     });
   }
 
@@ -100,8 +93,8 @@ export class ApplyVatToInvoiceUsecase
   ) {
     return invoiceItemsResult
       .getValue()
-      .filter(item => item.type === 'APC')
-      .map(apcItem => {
+      .filter((item) => item.type === 'APC')
+      .map((apcItem) => {
         apcItem.vat = vat;
         return apcItem;
       });

@@ -32,6 +32,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context = settings.getData('context');
+
     const {
       repos: {
         paymentMethod,
@@ -46,7 +47,11 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         waiver,
         payer,
       },
-      services: { erpService, logger: loggerService, schedulingService },
+      services: {
+        erp: { sage: erpService, netsuite: netSuiteService },
+        logger: loggerService,
+        schedulingService,
+      },
       qq: queue,
     } = context;
 
@@ -60,6 +65,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       catalog,
       erpService,
+      netSuiteService,
       publisher,
       loggerService
     );

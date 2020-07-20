@@ -36,7 +36,7 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
     this.setupSubscriptions();
   }
 
-  setupSubscriptions() {
+  setupSubscriptions(): void {
     DomainEvents.register(
       this.onInvoicePaidEvent.bind(this),
       InvoicePaidEvent.name

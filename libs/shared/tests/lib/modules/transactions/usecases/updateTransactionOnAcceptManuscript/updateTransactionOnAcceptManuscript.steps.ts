@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, BeforeAll } from 'cucumber';
+import { Given, When, Then } from 'cucumber';
 
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 import { Invoice } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
@@ -18,7 +18,7 @@ import { TransactionRepoContract } from '../../../../../../src/lib/modules/trans
 import { InvoiceItemRepoContract } from '../../../../../../src/lib/modules/invoices/repos/invoiceItemRepo';
 import { InvoiceRepoContract } from '../../../../../../src/lib/modules/invoices/repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../../../src/lib/modules/journals/repos/catalogRepo';
-import { WaiverRepoContract } from '../../../../../../src/lib/modules/waivers/repos/waiverRepo';
+// import { WaiverRepoContract } from '../../../../../../src/lib/modules/waivers/repos/waiverRepo';
 import { EditorRepoContract } from '../../../../../../src/lib/modules/journals/repos/editorRepo';
 import { PayerRepoContract } from '../../../../../../src/lib/modules/payers/repos/payerRepo';
 import { CouponRepoContract } from '../../../../../../src/lib/modules/coupons/repos/couponRepo';
@@ -106,19 +106,19 @@ let price;
 
 // });
 
-Given(/^A Journal "([\w-]+)" with the APC price of (\d+)$/, async function (
-  journalTestId: string,
-  priceTest: number
-) {
-  journalId = journalTestId;
-  price = priceTest;
-  catalogItem = CatalogMap.toDomain({
-    journalId,
-    type: 'APC',
-    amount: price,
-  });
-  mockCatalogRepo.save(catalogItem);
-});
+Given(
+  /^A Journal "([\w-]+)" with the APC price of (\d+)$/,
+  async (journalTestId: string, priceTest: number) => {
+    journalId = journalTestId;
+    price = priceTest;
+    catalogItem = CatalogMap.toDomain({
+      journalId,
+      type: 'APC',
+      amount: price,
+    });
+    mockCatalogRepo.save(catalogItem);
+  }
+);
 
 Given(
   /^A manuscript "([\w-]+)" which passed the review process$/,
@@ -202,7 +202,7 @@ Then(
 );
 
 Then(
-  /^The Invoice Item associated with the manuscript should have the price of (\d+)$/,
+  'The Invoice Item associated with the manuscript should have the price of {int}',
   async (finalPrice: number) => {
     const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
     const [associatedInvoiceItem] = invoiceItems;

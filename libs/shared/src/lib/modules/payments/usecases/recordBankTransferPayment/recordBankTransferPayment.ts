@@ -1,20 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left } from '../../../../core/logic/Result';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  Roles,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import {
   InvoiceRepoContract,
-  InvoiceItemRepoContract
+  InvoiceItemRepoContract,
 } from '../../../invoices/repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
@@ -33,18 +34,16 @@ import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
 import { RecordPaymentUsecase } from '../recordPayment';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 
-export type RecordBankTransferPaymentContext = AuthorizationContext<Roles>;
-
 export class RecordBankTransferPaymentUsecase
   implements
     UseCase<
       RecordBankTransferPaymentDTO,
       Promise<RecordBankTransferPaymentResponse>,
-      RecordBankTransferPaymentContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       RecordBankTransferPaymentDTO,
-      RecordBankTransferPaymentContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -56,17 +55,17 @@ export class RecordBankTransferPaymentUsecase
 
   public async execute(
     request: RecordBankTransferPaymentDTO,
-    context?: RecordBankTransferPaymentContext
+    context?: UsecaseAuthorizationContext
   ): Promise<RecordBankTransferPaymentResponse> {
     const getInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(
       this.invoiceRepo
     );
     const invoiceDetailsResult = await getInvoiceDetailsUsecase.execute(
       {
-        invoiceId: request.invoiceId
+        invoiceId: request.invoiceId,
       },
       {
-        roles: [Roles.PAYER]
+        roles: [Roles.PAYER],
       }
     );
     if (invoiceDetailsResult.isLeft()) {
@@ -83,7 +82,7 @@ export class RecordBankTransferPaymentUsecase
       this.invoiceItemRepo
     );
     const maybeManuscripts = await getManuscriptsByInvoiceIdUsecase.execute({
-      invoiceId: request.invoiceId
+      invoiceId: request.invoiceId,
     });
     if (maybeManuscripts.isLeft()) {
       return maybeManuscripts as any;
@@ -94,7 +93,7 @@ export class RecordBankTransferPaymentUsecase
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(bankTransfer);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['BankTransfer', new BankTransferPayment()]
+      ['BankTransfer', new BankTransferPayment()],
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'BankTransferPayment'
@@ -102,7 +101,7 @@ export class RecordBankTransferPaymentUsecase
 
     const payload = {
       ...request,
-      foreignPaymentId: request.paymentReference
+      foreignPaymentId: request.paymentReference,
     };
 
     const usecase = new RecordPaymentUsecase(

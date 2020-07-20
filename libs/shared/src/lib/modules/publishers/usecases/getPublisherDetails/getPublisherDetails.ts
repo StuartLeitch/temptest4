@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -6,12 +8,10 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
-  Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { PublisherRepoContract } from '../../repos';
 
@@ -21,18 +21,16 @@ import { GetPublisherDetailsErrors } from './getPublisherDetailsErrors';
 import { GetPublisherDetailsDTO } from './getPublisherDetailsDTO';
 import { PublisherId } from '../../domain/PublisherId';
 
-export type GetPublisherDetailsContext = AuthorizationContext<Roles>;
-
 export class GetPublisherDetailsUsecase
   implements
     UseCase<
       GetPublisherDetailsDTO,
       Promise<GetPublisherDetailsResponse>,
-      GetPublisherDetailsContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetPublisherDetailsDTO,
-      GetPublisherDetailsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private publisherRepo: PublisherRepoContract) {}
@@ -44,7 +42,7 @@ export class GetPublisherDetailsUsecase
   // @Authorize('invoice:read')
   public async execute(
     request: GetPublisherDetailsDTO,
-    context?: GetPublisherDetailsContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetPublisherDetailsResponse> {
     try {
       const id = PublisherId.create(

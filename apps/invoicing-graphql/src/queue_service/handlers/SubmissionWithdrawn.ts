@@ -3,16 +3,16 @@
 /* eslint-disable max-len */
 
 import { SubmissionWithdrawn as SubmissionWithdrawnPayload } from '@hindawi/phenom-events';
-
 // * Domain imports
-import { Roles } from './../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
-import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
-
-import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
-import { SoftDeleteDraftTransactionAuthorizationContext } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionAuthorizationContext';
+import {
+  UsecaseAuthorizationContext,
+  Roles,
+  ManuscriptTypeNotInvoiceable,
+  SoftDeleteDraftTransactionUsecase,
+} from '@hindawi/shared';
 
 const SUBMISSION_WITHDRAWN = 'SubmissionWithdrawn';
-const defaultContext: SoftDeleteDraftTransactionAuthorizationContext = {
+const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 

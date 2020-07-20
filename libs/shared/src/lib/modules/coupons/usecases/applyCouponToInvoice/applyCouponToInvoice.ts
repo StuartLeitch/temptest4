@@ -1,15 +1,17 @@
-import { AnyStyledComponent } from 'styled-components';
 import { UniqueEntityID } from '../../../../../lib/core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { left, right, Result } from '../../../../core/logic/Result';
 
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+// * Authorization Logic
+
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlContext,
+  Roles,
+} from '../../../../domain/authorization';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { VATService } from '../../../../domain/services/VATService';
@@ -34,14 +36,10 @@ import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/con
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
-import { Roles } from '../../../users/domain/enums/Roles';
+
 import { TransactionStatus } from '../../../transactions/domain/Transaction';
-import {
-  GetTransactionUsecase,
-  GetTransactionContext,
-} from '../../../transactions/usecases/getTransaction/getTransaction';
+import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { GetManuscriptByManuscriptIdUsecase } from './../../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
-import { GetManuscriptByManuscriptIdAuthorizationContext } from './../../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptAuthorizationContext';
 import { Coupon, CouponType, CouponStatus } from '../../domain/Coupon';
 import { CouponCode } from '../../domain/CouponCode';
 
@@ -58,18 +56,16 @@ import {
 } from './applyCouponToInvoiceErrors';
 import { ApplyCouponToInvoiceResponse } from './applyCouponToInvoiceResponse';
 
-export type ApplyCouponToInvoiceContext = AuthorizationContext<Roles>;
-
 export class ApplyCouponToInvoiceUsecase
   implements
     UseCase<
       ApplyCouponToInvoiceDTO,
       Promise<ApplyCouponToInvoiceResponse>,
-      ApplyCouponToInvoiceContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       ApplyCouponToInvoiceDTO,
-      ApplyCouponToInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -88,7 +84,7 @@ export class ApplyCouponToInvoiceUsecase
 
   public async execute(
     request: ApplyCouponToInvoiceDTO,
-    context?: ApplyCouponToInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<ApplyCouponToInvoiceResponse> {
     const {
       // manuscriptRepo,
@@ -257,7 +253,7 @@ export class ApplyCouponToInvoiceUsecase
 
     const result = await usecase.execute({ transactionId }, {
       roles: [Roles.SUPER_ADMIN],
-    } as GetTransactionContext);
+    } as UsecaseAuthorizationContext);
 
     if (result.isFailure) {
       return new Error(result.error as any);
@@ -279,7 +275,7 @@ export class ApplyCouponToInvoiceUsecase
       { manuscriptId: manuscriptId?.id?.toString() },
       {
         roles: [Roles.SUPER_ADMIN],
-      } as GetManuscriptByManuscriptIdAuthorizationContext
+      } as UsecaseAuthorizationContext
     );
 
     if (result.value.isFailure) {
@@ -289,7 +285,7 @@ export class ApplyCouponToInvoiceUsecase
     return result.value.getValue();
   }
 
-  private async getInvoice(request: any) {
+  private async getInvoice(request: Record<string, any>) {
     const { invoiceRepo } = this;
 
     const invoiceId = InvoiceId.create(

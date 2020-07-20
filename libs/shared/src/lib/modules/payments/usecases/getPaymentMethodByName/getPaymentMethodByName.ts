@@ -1,39 +1,34 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
-import { PaymentMethodId } from '../../domain/PaymentMethodId';
-import { PaymentMethod } from '../../domain/PaymentMethod';
 
 // * Usecase specific
 import { GetPaymentMethodByNameResponse } from './getPaymentMethodByNameResponse';
 import { GetPaymentMethodByNameErrors } from './getPaymentMethodByNameErrors';
 import { GetPaymentMethodByNameDTO } from './getPaymentMethodByNameDTO';
 
-export type GetPaymentMethodByNameContext = AuthorizationContext<Roles>;
-
 export class GetPaymentMethodByNameUsecase
   implements
     UseCase<
       GetPaymentMethodByNameDTO,
       Promise<GetPaymentMethodByNameResponse>,
-      GetPaymentMethodByNameContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetPaymentMethodByNameDTO,
-      GetPaymentMethodByNameContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private paymentMethodRepo: PaymentMethodRepoContract) {}
@@ -45,7 +40,7 @@ export class GetPaymentMethodByNameUsecase
   // @Authorize('payment-method:read')
   public async execute(
     request: GetPaymentMethodByNameDTO,
-    context?: GetPaymentMethodByNameContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetPaymentMethodByNameResponse> {
     const searchedName = request.name;
 
@@ -57,7 +52,7 @@ export class GetPaymentMethodByNameUsecase
       try {
         const paymentMethods = await this.paymentMethodRepo.getPaymentMethodCollection();
         const methodsWithName = paymentMethods.filter(
-          method => method.name.indexOf(searchedName) > -1
+          (method) => method.name.indexOf(searchedName) > -1
         );
 
         if (methodsWithName.length === 0) {

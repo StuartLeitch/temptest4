@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -6,13 +8,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -27,13 +27,14 @@ import { GetSentNotificationForInvoiceResponse as Response } from './getSentNoti
 import { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationForInvoiceDTO';
 import * as Errors from './getSentNotificationForInvoiceErrors';
 
-type Context = AuthorizationContext<Roles>;
-export type GetSentNotificationForInvoiceContext = Context;
-
 export class GetSentNotificationForInvoiceUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -49,7 +50,10 @@ export class GetSentNotificationForInvoiceUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)

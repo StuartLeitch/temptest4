@@ -1,13 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import {
-  AuthorizationContext,
-  Roles,
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
-  ErpResponse,
-} from '@hindawi/shared';
+} from '../../../../domain/authorization';
+import { ErpResponse } from './../../../../domain/services/ErpService';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
@@ -29,20 +29,16 @@ export type RetryRevenueRecognitionErpInvoicesResponse = Either<
   Result<ErpResponse[]>
 >;
 
-export type RetryRevenueRecognitionErpInvoicesContext = AuthorizationContext<
-  Roles
->;
-
 export class RetryRevenueRecognitionErpInvoicesUsecase
   implements
     UseCase<
       Record<string, unknown>,
       Promise<RetryRevenueRecognitionErpInvoicesResponse>,
-      RetryRevenueRecognitionErpInvoicesContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       Record<string, unknown>,
-      RetryRevenueRecognitionErpInvoicesContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   private publishRevenueRecognitionToErpUsecase: PublishRevenueRecognitionToErpUsecase;
@@ -57,6 +53,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
     private erpService: ErpServiceContract,
+    private netSuiteService: ErpServiceContract,
     private loggerService: any
   ) {
     this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
@@ -70,18 +67,19 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       this.catalogRepo,
       this.publisherRepo,
       this.erpService,
+      this.netSuiteService,
       this.loggerService
     );
   }
 
-  private async getAccessControlContext(request: any, context?: any) {
+  private async getAccessControlContext(_request: any, _context?: any) {
     return {};
   }
 
   // @Authorize('zzz:zzz')
   public async execute(
-    request?: any,
-    context?: RetryRevenueRecognitionErpInvoicesContext
+    request?: Record<string, unknown>,
+    context?: UsecaseAuthorizationContext
   ): Promise<RetryRevenueRecognitionErpInvoicesResponse> {
     try {
       const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedErpInvoices();

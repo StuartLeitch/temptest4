@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
@@ -5,13 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
-  // Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { Invoice } from './../../domain/Invoice';
@@ -25,18 +25,16 @@ import { MigrateInvoiceDTO } from './migrateInvoiceDTO';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
 
-export type MigrateInvoiceContext = AuthorizationContext<Roles>;
-
 export class MigrateInvoiceUsecase
   implements
     UseCase<
       MigrateInvoiceDTO,
       Promise<MigrateInvoiceResponse>,
-      MigrateInvoiceContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       MigrateInvoiceDTO,
-      MigrateInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -46,7 +44,7 @@ export class MigrateInvoiceUsecase
 
   public async execute(
     request: MigrateInvoiceDTO,
-    context?: MigrateInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<MigrateInvoiceResponse> {
     let invoice: Invoice;
     let invoiceItem: InvoiceItem;

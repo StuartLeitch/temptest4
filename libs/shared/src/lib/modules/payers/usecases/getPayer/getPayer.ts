@@ -1,32 +1,32 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import {Payer} from '../../domain/Payer';
-import {PayerId} from '../../domain/PayerId';
-import {PayerRepoContract} from '../../repos/payerRepo';
+import { Payer } from '../../domain/Payer';
+import { PayerId } from '../../domain/PayerId';
+import { PayerRepoContract } from '../../repos/payerRepo';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface GetPayerRequestDTO {
   payerId?: string;
 }
 
-export type GetPayerContext = AuthorizationContext<Roles>;
-
 export class GetPayerUsecase
   implements
-    UseCase<GetPayerRequestDTO, Result<Payer>, GetPayerContext>,
+    UseCase<GetPayerRequestDTO, Result<Payer>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
       GetPayerRequestDTO,
-      GetPayerContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private payerRepo: PayerRepoContract) {
@@ -34,7 +34,7 @@ export class GetPayerUsecase
   }
 
   private async getPayer(request: GetPayerRequestDTO): Promise<Result<Payer>> {
-    const {payerId} = request;
+    const { payerId } = request;
 
     if (!payerId) {
       return Result.fail<Payer>(`Invalid payer id=${payerId}`);
@@ -59,7 +59,7 @@ export class GetPayerUsecase
   @Authorize('payer:read')
   public async execute(
     request: GetPayerRequestDTO,
-    context?: GetPayerContext
+    context?: UsecaseAuthorizationContext
   ): Promise<Result<Payer>> {
     try {
       // * System looks-up the payer

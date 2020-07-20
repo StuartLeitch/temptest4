@@ -1,29 +1,35 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
-import { LoggerContract } from 'libs/shared/src/lib/infrastructure/logging/Logger';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right } from '../../../../core/logic/Result';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+
+// * Authorization Logic
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
-import { Roles } from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
+
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { FilterEventsService } from '../../services/FilterEventsService';
 import { SaveEventsUsecase } from '../saveEvents/saveEvents';
 import { SaveSqsEventsDTO } from './saveSqsEventsDTO';
 import { SaveSqsEventsResponse } from './saveSqsEventsResponse';
 
-export type SaveSqsEventsContext = AuthorizationContext<Roles>;
-
 export class SaveSqsEventsUsecase
   implements
-    UseCase<SaveSqsEventsDTO, SaveSqsEventsResponse, SaveSqsEventsContext>,
+    UseCase<
+      SaveSqsEventsDTO,
+      SaveSqsEventsResponse,
+      UsecaseAuthorizationContext
+    >,
     AccessControlledUsecase<
       SaveSqsEventsDTO,
-      SaveSqsEventsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
-  authorizationContext: AuthorizationContext<Roles>;
+  authorizationContext: UsecaseAuthorizationContext;
 
   constructor(
     private filterEventsService: FilterEventsService,
@@ -35,7 +41,7 @@ export class SaveSqsEventsUsecase
 
   public async execute(
     request: SaveSqsEventsDTO,
-    context?: SaveSqsEventsContext
+    context?: UsecaseAuthorizationContext
   ): Promise<SaveSqsEventsResponse> {
     const start = new Date();
     try {

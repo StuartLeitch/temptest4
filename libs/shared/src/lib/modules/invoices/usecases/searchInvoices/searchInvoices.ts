@@ -1,30 +1,34 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
 
-import {Invoice /*, STATUS as InvoiceStatus */} from '../../domain/Invoice';
-import {InvoiceRepoContract} from '../../repos/invoiceRepo';
+import { Invoice } from '../../domain/Invoice';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
+// * Authorization Logic
 import {
   Authorize,
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import {AccessControlContext} from '../../../../domain/authorization/AccessControl';
-import {Roles} from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 export interface SearchInvoicesRequestDTO {
   params: string[];
 }
 
-export type SearchInvoicesContext = AuthorizationContext<Roles>;
-
 export class SearchInvoices
   implements
-    UseCase<SearchInvoicesRequestDTO, Result<Invoice[]>, SearchInvoicesContext>,
+    UseCase<
+      SearchInvoicesRequestDTO,
+      Result<Invoice[]>,
+      UsecaseAuthorizationContext
+    >,
     AccessControlledUsecase<
       SearchInvoicesRequestDTO,
-      SearchInvoicesContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   private invoiceRepo: InvoiceRepoContract;
@@ -55,7 +59,7 @@ export class SearchInvoices
   public async execute(
     request: SearchInvoicesRequestDTO
   ): Promise<Result<Invoice[]>> {
-    const {params} = request;
+    const { params } = request;
     try {
       // * System searches for invoice matching query params
       const invoicesOrError = await this.searchInvoices(params);

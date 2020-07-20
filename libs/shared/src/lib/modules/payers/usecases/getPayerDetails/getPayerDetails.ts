@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -5,13 +7,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { PayerRepoContract } from '../../repos/payerRepo';
 import { PayerId } from '../../domain/PayerId';
@@ -22,25 +22,23 @@ import { GetPayerDetailsResponse } from './getPayerDetailsResponse';
 import { GetPayerDetailsErrors } from './getPayerDetailsErrors';
 import { GetPayerDetailsDTO } from './getPayerDetailsDTO';
 
-export type GetPayerDetailsContext = AuthorizationContext<Roles>;
-
 export class GetPayerDetailsUsecase
   implements
     UseCase<
       GetPayerDetailsDTO,
       Promise<GetPayerDetailsResponse>,
-      GetPayerDetailsContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetPayerDetailsDTO,
-      GetPayerDetailsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private payerRepo: PayerRepoContract) {}
 
   public async execute(
     request: GetPayerDetailsDTO,
-    context?: GetPayerDetailsContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetPayerDetailsResponse> {
     let payer: Payer;
 

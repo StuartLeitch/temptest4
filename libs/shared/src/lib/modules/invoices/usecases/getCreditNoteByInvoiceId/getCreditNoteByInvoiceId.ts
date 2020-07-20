@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -6,17 +8,13 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
-  // Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
-// import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-// import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
@@ -24,18 +22,16 @@ import { GetCreditNoteByInvoiceIdResponse } from './getCreditNoteByInvoiceIdResp
 import { GetCreditNoteByInvoiceIdErrors } from './getCreditNoteByInvoiceIdErrors';
 import { GetCreditNoteByInvoiceIdDTO } from './getCreditNoteByInvoiceIdDTO';
 
-export type GetCreditNoteByInvoiceIdContext = AuthorizationContext<Roles>;
-
 export class GetCreditNoteByInvoiceIdUsecase
   implements
     UseCase<
       GetCreditNoteByInvoiceIdDTO,
       Promise<GetCreditNoteByInvoiceIdResponse>,
-      GetCreditNoteByInvoiceIdContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetCreditNoteByInvoiceIdDTO,
-      GetCreditNoteByInvoiceIdContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -49,7 +45,7 @@ export class GetCreditNoteByInvoiceIdUsecase
 
   public async execute(
     request: GetCreditNoteByInvoiceIdDTO,
-    context?: GetCreditNoteByInvoiceIdContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetCreditNoteByInvoiceIdResponse> {
     const { invoiceId } = request;
 
