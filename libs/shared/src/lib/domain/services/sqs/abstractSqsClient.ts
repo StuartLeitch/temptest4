@@ -2,8 +2,6 @@ import { QueueService } from '@hindawi/queue-service';
 
 import { PublishMessage } from './PublishMessage';
 
-console.log('BOOOHOOO 2');
-
 export abstract class AbstractSQSClient {
   constructor(protected queueService: QueueService, private foo = 666) {}
 
