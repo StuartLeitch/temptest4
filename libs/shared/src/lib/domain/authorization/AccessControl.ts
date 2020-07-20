@@ -31,6 +31,8 @@ accessControl
       .action('read')
     .resource('payer')
       .action('update')
+    .resource('payments')
+      .action('read')
   // .where(userOwnsEntity)
   .grant(Roles.AUTHOR)
     .inherits(Roles.CUSTOMER)

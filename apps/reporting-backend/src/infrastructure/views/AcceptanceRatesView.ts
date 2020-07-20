@@ -2,12 +2,22 @@ import {
   AbstractEventView,
   EventViewContract,
 } from './contracts/EventViewContract';
+import { env } from '../../env';
 
 /**
  * AcceptanceRatesView is a table, unlike most views. It shouldn't be exported in the dependecy sorted array.
  */
 class AcceptanceRatesView extends AbstractEventView
   implements EventViewContract {
+  private startDateMonths: string;
+  private endDateMonths: string;
+
+  constructor(startDateMonths = '16', endDateMonths = '8') {
+    super();
+    this.startDateMonths = startDateMonths;
+    this.endDateMonths = endDateMonths;
+  }
+
   public getCreateQuery(): string {
     return `
 CREATE TABLE ${this.getViewName()} (
@@ -119,10 +129,22 @@ COMMIT;
   }
 
   private getDateFilter(argDate = 'month') {
-    return `submission_date > ${argDate} - interval '16 month' AND submission_date < ${argDate} - interval '8 month'`;
+    return `submission_date > ${argDate} - interval '${this.startDateMonths} month' AND submission_date < ${argDate} - interval '${this.endDateMonths} month'`;
   }
 }
 
-const acceptanceRatesView = new AcceptanceRatesView();
+if (
+  Number(env.app.relativeStartAcceptanceRateMonths) <
+  Number(env.app.relativeEndAcceptanceRateMonths)
+) {
+  throw new Error(
+    `Acceptance rate arguments error: start ${env.app.relativeStartAcceptanceRateMonths} months, end ${env.app.relativeEndAcceptanceRateMonths} months`
+  );
+}
+
+const acceptanceRatesView = new AcceptanceRatesView(
+  env.app.relativeStartAcceptanceRateMonths,
+  env.app.relativeEndAcceptanceRateMonths
+);
 
 export default acceptanceRatesView;

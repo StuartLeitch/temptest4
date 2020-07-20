@@ -8,11 +8,12 @@
 
 # compiled output
 dist/
+dist-k8s/
 /tmp
 /out-tsc
 
 # dependencies
-/node_modules
+**/node_modules
 
 # IDEs and editors
 /.idea
