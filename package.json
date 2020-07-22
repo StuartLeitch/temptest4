@@ -252,6 +252,7 @@
     "firebase": "7.16.1",
     "gluegun": "4.3.1",
     "gm": "1.23.1",
+    "is-eu-member": "^1.0.5",
     "istanbul-combine": "0.3.0",
     "jest": "26.1.0",
     "jest-cucumber": "2.0.11",

@@ -40,6 +40,7 @@ interface InvoiceProps {
   charge?: number;
   totalNumInvoiceItems?: number;
   erpReference?: string;
+  nsReference?: string;
   revenueRecognitionReference?: string;
   cancelledInvoiceReference?: string;
   vatnote?: string;
@@ -155,6 +156,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set revenueRecognitionReference(revenueRecognitionReference: string) {
     this.props.revenueRecognitionReference = revenueRecognitionReference;
+  }
+
+  get nsReference(): string {
+    return this.props.nsReference;
+  }
+
+  set nsReference(nsReference: string) {
+    this.props.nsReference = nsReference;
   }
 
   get cancelledInvoiceReference(): string {

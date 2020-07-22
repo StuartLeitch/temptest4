@@ -16420,6 +16420,11 @@ is-dom@^1.0.9:
     is-object "^1.0.1"
     is-window "^1.0.2"
 
+is-eu-member@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/is-eu-member/-/is-eu-member-1.0.5.tgz#485aea58488c171769806c8ec6683f149fb6caf2"
+  integrity sha512-qKcwcu7oWmxNP19piu8Bdmg2UwlqVpHaLSoWxgdKVQRc6T9HiGi5Z/C2zJK9/g+0YJ72pwQiPaS5BPVrpqpxTA==
+
 is-expression@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/is-expression/-/is-expression-3.0.0.tgz#39acaa6be7fd1f3471dc42c7416e61c24317ac9f"

@@ -55,6 +55,13 @@ export class NetSuiteService {
     return revenueRecognition;
   }
 
+  public async registerCreditNote(data: ErpData): Promise<ErpResponse> {
+    console.log('registerCreditNote Data:');
+    console.info(data);
+
+    return null;
+  }
+
   private async queryCustomer(data: any) {
     const {
       connection: { config, oauth, token },
@@ -150,6 +157,9 @@ export class NetSuiteService {
       rate,
       // tradeDocumentItemProduct,
       customerId,
+      customSegmentId,
+      itemId,
+      taxRateId,
     } = data;
     // console.info(item);
     // console.info(invoice);
@@ -165,7 +175,7 @@ export class NetSuiteService {
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
-        new Date(invoice.dateMovedToFinal),
+        new Date(invoice.dateCreated),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
       tranId: `${invoice.invoiceNumber}/${format(new Date(), 'yyyy')}`,
@@ -173,7 +183,7 @@ export class NetSuiteService {
         id: customerId,
       },
       cseg1: {
-        id: '1',
+        id: customSegmentId,
       },
       item: {
         items: [
@@ -188,10 +198,10 @@ export class NetSuiteService {
             excludeFromRateRequest: false,
             printItems: false,
             item: {
-              id: '23',
+              id: itemId,
             },
             taxCode: {
-              id: '7',
+              taxRateId,
             },
           },
         ],
