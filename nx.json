@@ -46,6 +46,13 @@
     },
     "invoicing-infrastructure": {
       "tags": []
+    },
+    "giugiuc": {
+      "tags": []
+    },
+    "giugiuc-e2e": {
+      "tags": [],
+      "implicitDependencies": ["giugiuc"]
     }
   }
 }
