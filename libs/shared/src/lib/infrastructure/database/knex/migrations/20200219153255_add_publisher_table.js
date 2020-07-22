@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-undef */
+
 const uuid = require('uuid/v4');
 
 module.exports.up = async function (knex) {
