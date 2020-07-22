@@ -67,7 +67,6 @@
     "@angular-devkit/core" "10.0.3"
     rxjs "6.5.5"
 
-<<<<<<< HEAD
 "@angular-devkit/architect@0.1000.4":
   version "0.1000.4"
   resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1000.4.tgz#2effe58361bea2a77d11671743568ab4d50b1554"
@@ -80,12 +79,6 @@
   version "0.1000.4"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-0.1000.4.tgz#447ebfc16afaa7638099e2f183144ebdc0e2a1a4"
   integrity sha512-jAl2xsj1g4RdQ4MBLSZ8Dsj3MUKjYKK+e73DxVHSTo0166T1p/7gdgSehLHWVlavJLDVM+fjYdt4kP12Z7FBjQ==
-=======
-"@angular-devkit/build-angular@0.1000.3", "@angular-devkit/build-angular@>=0.1000.0 < 0.1100.0":
-  version "0.1000.3"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-0.1000.3.tgz#c5af97a1868adb2d0be9cb97e5d8b3c3c8428d4d"
-  integrity sha512-r3KJj39AwkYYzbixSM095l4fOGvhyByr0XvmAEu0l5dGGdL4tNXywvgXkNhEVRDo0jZYpTMegiTqzOik/9YCDw==
->>>>>>> Making it work...trying
   dependencies:
     "@angular-devkit/architect" "0.1000.4"
     "@angular-devkit/build-optimizer" "0.1000.4"
@@ -153,7 +146,6 @@
     webpack-subresource-integrity "1.4.1"
     worker-plugin "4.0.3"
 
-<<<<<<< HEAD
 "@angular-devkit/build-angular@>=0.1000.0 < 0.1100.0":
   version "0.1000.3"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-0.1000.3.tgz#c5af97a1868adb2d0be9cb97e5d8b3c3c8428d4d"
@@ -225,8 +217,6 @@
     webpack-subresource-integrity "1.4.1"
     worker-plugin "4.0.3"
 
-=======
->>>>>>> Making it work...trying
 "@angular-devkit/build-optimizer@0.1000.3", "@angular-devkit/build-optimizer@~0.1000.0":
   version "0.1000.3"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-optimizer/-/build-optimizer-0.1000.3.tgz#05f7a853a5907ad3381a598896a2e053e47e925d"
@@ -237,7 +227,6 @@
     tslib "2.0.0"
     webpack-sources "1.4.3"
 
-<<<<<<< HEAD
 "@angular-devkit/build-optimizer@0.1000.4":
   version "0.1000.4"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-optimizer/-/build-optimizer-0.1000.4.tgz#bdeb610b042533dbbc3c14c52f81f2f67bfb6513"
@@ -248,8 +237,6 @@
     tslib "2.0.0"
     webpack-sources "1.4.3"
 
-=======
->>>>>>> Making it work...trying
 "@angular-devkit/build-webpack@0.1000.3", "@angular-devkit/build-webpack@~0.1000.0":
   version "0.1000.3"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-webpack/-/build-webpack-0.1000.3.tgz#2709ccfc5201c2be9301551ef1d815c6aafedfbc"
@@ -259,7 +246,6 @@
     "@angular-devkit/core" "10.0.3"
     rxjs "6.5.5"
 
-<<<<<<< HEAD
 "@angular-devkit/build-webpack@0.1000.4":
   version "0.1000.4"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-webpack/-/build-webpack-0.1000.4.tgz#781e7d67dbc80932e933010fea96339e10a7eec8"
@@ -269,8 +255,6 @@
     "@angular-devkit/core" "10.0.4"
     rxjs "6.5.5"
 
-=======
->>>>>>> Making it work...trying
 "@angular-devkit/core@10.0.3", "@angular-devkit/core@^10.0.0", "@angular-devkit/core@~10.0.0":
   version "10.0.3"
   resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-10.0.3.tgz#7654766c9f2d3c510beaad8bca3e2a71643c6b8e"
@@ -282,7 +266,6 @@
     rxjs "6.5.5"
     source-map "0.7.3"
 
-<<<<<<< HEAD
 "@angular-devkit/core@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-10.0.4.tgz#105df3e7a7df56005f3637121ef010dd3849f5eb"
@@ -304,9 +287,6 @@
     rxjs "6.5.5"
 
 "@angular-devkit/schematics@~10.0.0":
-=======
-"@angular-devkit/schematics@10.0.3", "@angular-devkit/schematics@~10.0.0":
->>>>>>> Making it work...trying
   version "10.0.3"
   resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-10.0.3.tgz#84e1a337692ba36cbae145b5e678592878df722f"
   integrity sha512-TjA2ZSPCgUK9l4FiRTIQY7DceXMAvNzOMWffy9o3kv2HPtxG9kuBrQXk++Z99zpylK0cAsugV7t/5ANpUkrIiA==
@@ -315,7 +295,6 @@
     ora "4.0.4"
     rxjs "6.5.5"
 
-<<<<<<< HEAD
 "@angular/cli@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-10.0.4.tgz#5c13500f3135e43b9e6e53534fdfbc283abb83cc"
@@ -326,18 +305,6 @@
     "@angular-devkit/schematics" "10.0.4"
     "@schematics/angular" "10.0.4"
     "@schematics/update" "0.1000.4"
-=======
-"@angular/cli@10.0.3":
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-10.0.3.tgz#0b8c5e263deaa63d05b6efda790a2000b8a24a85"
-  integrity sha512-ONK8YG20KuakQetY0lPKDAOA3uBoLurdpSfFspFkcECyDimwJYSEydi3FUnCxEexeoKvrQWcol+q+u9YPoHCyg==
-  dependencies:
-    "@angular-devkit/architect" "0.1000.3"
-    "@angular-devkit/core" "10.0.3"
-    "@angular-devkit/schematics" "10.0.3"
-    "@schematics/angular" "10.0.3"
-    "@schematics/update" "0.1000.3"
->>>>>>> Making it work...trying
     "@yarnpkg/lockfile" "1.1.0"
     ansi-colors "4.1.1"
     debug "4.1.1"
@@ -460,17 +427,10 @@
   dependencies:
     "@babel/highlight" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/compat-data@^7.10.1", "@babel/compat-data@^7.10.3", "@babel/compat-data@^7.9.6":
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.10.3.tgz#9af3e033f36e8e2d6e47570db91e64a846f5d382"
   integrity sha512-BDIfJ9uNZuI0LajPfoYV28lX8kyCPMHY6uY4WH1lJdcicmAfxCK5ASzaeV0D/wsUaRH/cLk+amuxtC37sZ8TUg==
-=======
-"@babel/compat-data@^7.10.4", "@babel/compat-data@^7.9.6":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.10.5.tgz#d38425e67ea96b1480a3f50404d1bf85676301a6"
-  integrity sha512-mPVoWNzIpYJHbWje0if7Ck36bpbtTvIxOi9+6WSK9wjGEXearAqlwBoTQvVjsAY2VIwgcs8V940geY3okzRCEw==
->>>>>>> Making it work...trying
   dependencies:
     browserslist "^4.12.0"
     invariant "^2.2.4"
@@ -581,7 +541,6 @@
     lodash "^4.17.13"
     source-map "^0.5.0"
 
-<<<<<<< HEAD
 "@babel/generator@^7.10.3", "@babel/generator@^7.4.0", "@babel/generator@^7.4.4", "@babel/generator@^7.5.0", "@babel/generator@^7.7.7", "@babel/generator@^7.9.6":
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.10.3.tgz#32b9a0d963a71d7a54f5f6c15659c3dbc2a523a5"
@@ -596,12 +555,6 @@
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.10.4.tgz#e49eeed9fe114b62fa5b181856a43a5e32f5f243"
   integrity sha512-toLIHUIAgcQygFZRAQcsLQV3CBuX6yOIru1kJk/qqqvcRmZrYe6WavZTSG+bB8MxhnL9YPf+pKQfuiP161q7ng==
-=======
-"@babel/generator@^7.10.5", "@babel/generator@^7.4.0", "@babel/generator@^7.4.4", "@babel/generator@^7.5.0", "@babel/generator@^7.7.7", "@babel/generator@^7.9.6":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.10.5.tgz#1b903554bc8c583ee8d25f1e8969732e6b829a69"
-  integrity sha512-3vXxr3FEW7E7lJZiWQ3bM4+v/Vyr9C+hpolQ8BGFr9Y8Ri2tFLWTixmwKBafDujO1WVah4fhZBeU1bieKdghig==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/types" "^7.10.5"
     jsesc "^2.5.1"
@@ -639,7 +592,6 @@
     "@babel/helper-annotate-as-pure" "^7.10.4"
     "@babel/types" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/helper-compilation-targets@^7.10.2", "@babel/helper-compilation-targets@^7.9.6":
   version "7.10.2"
   resolved "https://registry.yarnpkg.com/@babel/helper-compilation-targets/-/helper-compilation-targets-7.10.2.tgz#a17d9723b6e2c750299d2a14d4637c76936d8285"
@@ -652,9 +604,6 @@
     semver "^5.5.0"
 
 "@babel/helper-compilation-targets@^7.10.4":
-=======
-"@babel/helper-compilation-targets@^7.10.4", "@babel/helper-compilation-targets@^7.9.6":
->>>>>>> Making it work...trying
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/helper-compilation-targets/-/helper-compilation-targets-7.10.4.tgz#804ae8e3f04376607cc791b9d47d540276332bd2"
   integrity sha512-a3rYhlsGV0UHNDvrtOXBg8/OpfV0OKTkxKPzIplS1zpx7CygDcWWxckxZeDd3gzPzC4kUT0A4nVFDK0wGMh4MQ==
@@ -823,7 +772,6 @@
     "@babel/traverse" "^7.10.4"
     "@babel/types" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/helpers@^7.10.1", "@babel/helpers@^7.4.4", "@babel/helpers@^7.7.4", "@babel/helpers@^7.9.6":
   version "7.10.1"
   resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.10.1.tgz#a6827b7cb975c9d9cef5fd61d919f60d8844a973"
@@ -837,12 +785,6 @@
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.10.3.tgz#c633bb34adf07c5c13156692f5922c81ec53f28d"
   integrity sha512-Ih9B/u7AtgEnySE2L2F0Xm0GaM729XqqLfHkalTsbjXGyqmf/6M0Cu0WpvqueUlW+xk88BHw9Nkpj49naU+vWw==
-=======
-"@babel/helpers@^7.10.4", "@babel/helpers@^7.4.4", "@babel/helpers@^7.7.4", "@babel/helpers@^7.9.6":
-  version "7.10.4"
-  resolved "https://registry.yarnpkg.com/@babel/helpers/-/helpers-7.10.4.tgz#2abeb0d721aff7c0a97376b9e1f6f65d7a475044"
-  integrity sha512-L2gX/XeUONeEbI78dXSrJzGdz4GQ+ZTA/aazfUsFaWjSe95kiCuOZ5HsXvkiw3iwF+mFHSRUfJU8t6YavocdXA==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/template" "^7.10.4"
     "@babel/traverse" "^7.10.4"
@@ -857,7 +799,6 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-<<<<<<< HEAD
 "@babel/parser@7.10.3", "@babel/parser@^7.0.0", "@babel/parser@^7.1.0", "@babel/parser@^7.1.6", "@babel/parser@^7.10.3", "@babel/parser@^7.4.2", "@babel/parser@^7.4.3", "@babel/parser@^7.4.5", "@babel/parser@^7.6.0", "@babel/parser@^7.7.7", "@babel/parser@^7.8.6", "@babel/parser@^7.9.6":
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.10.3.tgz#7e71d892b0d6e7d04a1af4c3c79d72c1f10f5315"
@@ -876,12 +817,6 @@
     "@babel/helper-plugin-utils" "^7.10.3"
     "@babel/helper-remap-async-to-generator" "^7.10.3"
     "@babel/plugin-syntax-async-generators" "^7.8.0"
-=======
-"@babel/parser@7.10.5", "@babel/parser@^7.0.0", "@babel/parser@^7.1.0", "@babel/parser@^7.1.6", "@babel/parser@^7.10.4", "@babel/parser@^7.10.5", "@babel/parser@^7.4.2", "@babel/parser@^7.4.3", "@babel/parser@^7.4.5", "@babel/parser@^7.6.0", "@babel/parser@^7.7.7", "@babel/parser@^7.8.6", "@babel/parser@^7.9.6":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.10.5.tgz#e7c6bf5a7deff957cec9f04b551e2762909d826b"
-  integrity sha512-wfryxy4bE1UivvQKSQDU4/X6dr+i8bctjUjj8Zyt3DQy7NtPizJXT8M52nqpNKL+nq2PW8lxk4ZqLj0fD4B4hQ==
->>>>>>> Making it work...trying
 
 "@babel/plugin-proposal-async-generator-functions@^7.10.4", "@babel/plugin-proposal-async-generator-functions@^7.2.0", "@babel/plugin-proposal-async-generator-functions@^7.8.3":
   version "7.10.5"
@@ -1188,7 +1123,6 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/plugin-transform-classes@^7.0.0", "@babel/plugin-transform-classes@^7.10.3", "@babel/plugin-transform-classes@^7.4.4", "@babel/plugin-transform-classes@^7.9.5":
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-classes/-/plugin-transform-classes-7.10.3.tgz#8d9a656bc3d01f3ff69e1fccb354b0f9d72ac544"
@@ -1204,9 +1138,6 @@
     globals "^11.1.0"
 
 "@babel/plugin-transform-classes@^7.10.4":
-=======
-"@babel/plugin-transform-classes@^7.0.0", "@babel/plugin-transform-classes@^7.10.4", "@babel/plugin-transform-classes@^7.4.4", "@babel/plugin-transform-classes@^7.9.5":
->>>>>>> Making it work...trying
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-classes/-/plugin-transform-classes-7.10.4.tgz#405136af2b3e218bc4a1926228bc917ab1a0adc7"
   integrity sha512-2oZ9qLjt161dn1ZE0Ms66xBncQH4In8Sqw1YWgBUZuGVJJS5c0OFZXL6dP2MRHrkU/eKhWg8CzFJhRQl50rQxA==
@@ -1227,7 +1158,6 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/plugin-transform-destructuring@^7.0.0", "@babel/plugin-transform-destructuring@^7.10.1", "@babel/plugin-transform-destructuring@^7.4.4", "@babel/plugin-transform-destructuring@^7.9.5":
   version "7.10.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-destructuring/-/plugin-transform-destructuring-7.10.1.tgz#abd58e51337815ca3a22a336b85f62b998e71907"
@@ -1236,9 +1166,6 @@
     "@babel/helper-plugin-utils" "^7.10.1"
 
 "@babel/plugin-transform-destructuring@^7.10.4":
-=======
-"@babel/plugin-transform-destructuring@^7.0.0", "@babel/plugin-transform-destructuring@^7.10.4", "@babel/plugin-transform-destructuring@^7.4.4", "@babel/plugin-transform-destructuring@^7.9.5":
->>>>>>> Making it work...trying
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-destructuring/-/plugin-transform-destructuring-7.10.4.tgz#70ddd2b3d1bea83d01509e9bb25ddb3a74fc85e5"
   integrity sha512-+WmfvyfsyF603iPa6825mq6Qrb7uLjTOsa3XOFzlYcYDHSS4QmpOWOL0NNBY5qMbvrcf3tq0Cw+v4lxswOBpgA==
@@ -1305,7 +1232,6 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/plugin-transform-modules-amd@^7.10.1", "@babel/plugin-transform-modules-amd@^7.2.0", "@babel/plugin-transform-modules-amd@^7.9.6":
   version "7.10.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-amd/-/plugin-transform-modules-amd-7.10.1.tgz#65950e8e05797ebd2fe532b96e19fc5482a1d52a"
@@ -1319,12 +1245,6 @@
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-amd/-/plugin-transform-modules-amd-7.10.4.tgz#cb407c68b862e4c1d13a2fc738c7ec5ed75fc520"
   integrity sha512-3Fw+H3WLUrTlzi3zMiZWp3AR4xadAEMv6XRCYnd5jAlLM61Rn+CRJaZMaNvIpcJpQ3vs1kyifYvEVPFfoSkKOA==
-=======
-"@babel/plugin-transform-modules-amd@^7.10.4", "@babel/plugin-transform-modules-amd@^7.2.0", "@babel/plugin-transform-modules-amd@^7.9.6":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-amd/-/plugin-transform-modules-amd-7.10.5.tgz#1b9cddaf05d9e88b3aad339cb3e445c4f020a9b1"
-  integrity sha512-elm5uruNio7CTLFItVC/rIzKLfQ17+fX7EVz5W0TMgIHFo1zY0Ozzx+lgwhL4plzl8OzVn6Qasx5DeEFyoNiRw==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/helper-module-transforms" "^7.10.5"
     "@babel/helper-plugin-utils" "^7.10.4"
@@ -1340,7 +1260,6 @@
     "@babel/helper-simple-access" "^7.8.3"
     babel-plugin-dynamic-import-node "^2.3.3"
 
-<<<<<<< HEAD
 "@babel/plugin-transform-modules-commonjs@^7.0.0", "@babel/plugin-transform-modules-commonjs@^7.10.1", "@babel/plugin-transform-modules-commonjs@^7.4.4", "@babel/plugin-transform-modules-commonjs@^7.9.6":
   version "7.10.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-commonjs/-/plugin-transform-modules-commonjs-7.10.1.tgz#d5ff4b4413ed97ffded99961056e1fb980fb9301"
@@ -1352,9 +1271,6 @@
     babel-plugin-dynamic-import-node "^2.3.3"
 
 "@babel/plugin-transform-modules-commonjs@^7.10.4":
-=======
-"@babel/plugin-transform-modules-commonjs@^7.0.0", "@babel/plugin-transform-modules-commonjs@^7.10.4", "@babel/plugin-transform-modules-commonjs@^7.4.4", "@babel/plugin-transform-modules-commonjs@^7.9.6":
->>>>>>> Making it work...trying
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-commonjs/-/plugin-transform-modules-commonjs-7.10.4.tgz#66667c3eeda1ebf7896d41f1f16b17105a2fbca0"
   integrity sha512-Xj7Uq5o80HDLlW64rVfDBhao6OX89HKUmb+9vWYaLXBZOma4gA6tw4Ni1O5qVDoZWUV0fxMYA0aYzOawz0l+1w==
@@ -1364,7 +1280,6 @@
     "@babel/helper-simple-access" "^7.10.4"
     babel-plugin-dynamic-import-node "^2.3.3"
 
-<<<<<<< HEAD
 "@babel/plugin-transform-modules-systemjs@^7.10.3", "@babel/plugin-transform-modules-systemjs@^7.4.4", "@babel/plugin-transform-modules-systemjs@^7.9.6":
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-systemjs/-/plugin-transform-modules-systemjs-7.10.3.tgz#004ae727b122b7b146b150d50cba5ffbff4ac56b"
@@ -1379,12 +1294,6 @@
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-systemjs/-/plugin-transform-modules-systemjs-7.10.4.tgz#8f576afd943ac2f789b35ded0a6312f929c633f9"
   integrity sha512-Tb28LlfxrTiOTGtZFsvkjpyjCl9IoaRI52AEU/VIwOwvDQWtbNJsAqTXzh+5R7i74e/OZHH2c2w2fsOqAfnQYQ==
-=======
-"@babel/plugin-transform-modules-systemjs@^7.10.4", "@babel/plugin-transform-modules-systemjs@^7.4.4", "@babel/plugin-transform-modules-systemjs@^7.9.6":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-modules-systemjs/-/plugin-transform-modules-systemjs-7.10.5.tgz#6270099c854066681bae9e05f87e1b9cadbe8c85"
-  integrity sha512-f4RLO/OL14/FP1AEbcsWMzpbUz6tssRaeQg11RH1BP/XnPpRoVwgeYViMFacnkaw4k4wjRSjn3ip1Uw9TaXuMw==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/helper-hoist-variables" "^7.10.4"
     "@babel/helper-module-transforms" "^7.10.5"
@@ -1421,7 +1330,6 @@
     "@babel/helper-plugin-utils" "^7.10.4"
     "@babel/helper-replace-supers" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/plugin-transform-parameters@^7.0.0", "@babel/plugin-transform-parameters@^7.10.1", "@babel/plugin-transform-parameters@^7.4.4", "@babel/plugin-transform-parameters@^7.9.5":
   version "7.10.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-parameters/-/plugin-transform-parameters-7.10.1.tgz#b25938a3c5fae0354144a720b07b32766f683ddd"
@@ -1434,12 +1342,6 @@
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-parameters/-/plugin-transform-parameters-7.10.4.tgz#7b4d137c87ea7adc2a0f3ebf53266871daa6fced"
   integrity sha512-RurVtZ/D5nYfEg0iVERXYKEgDFeesHrHfx8RT05Sq57ucj2eOYAP6eu5fynL4Adju4I/mP/I6SO0DqNWAXjfLQ==
-=======
-"@babel/plugin-transform-parameters@^7.0.0", "@babel/plugin-transform-parameters@^7.10.4", "@babel/plugin-transform-parameters@^7.4.4", "@babel/plugin-transform-parameters@^7.9.5":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-parameters/-/plugin-transform-parameters-7.10.5.tgz#59d339d58d0b1950435f4043e74e2510005e2c4a"
-  integrity sha512-xPHwUj5RdFV8l1wuYiu5S9fqWGM2DrYc24TMvUiRrPVm+SM3XeqU9BcokQX/kEUe+p2RBwy+yoiR1w/Blq6ubw==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/helper-get-function-arity" "^7.10.4"
     "@babel/helper-plugin-utils" "^7.10.4"
@@ -1951,7 +1853,6 @@
     "@babel/parser" "^7.10.4"
     "@babel/types" "^7.10.4"
 
-<<<<<<< HEAD
 "@babel/traverse@7.10.3", "@babel/traverse@^7.0.0", "@babel/traverse@^7.1.0", "@babel/traverse@^7.10.1", "@babel/traverse@^7.10.3", "@babel/traverse@^7.4.3", "@babel/traverse@^7.4.5", "@babel/traverse@^7.7.4", "@babel/traverse@^7.9.6":
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.10.3.tgz#0b01731794aa7b77b214bcd96661f18281155d7e"
@@ -1971,12 +1872,6 @@
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.10.4.tgz#e642e5395a3b09cc95c8e74a27432b484b697818"
   integrity sha512-aSy7p5THgSYm4YyxNGz6jZpXf+Ok40QF3aA2LyIONkDHpAcJzDUqlCKXv6peqYUs2gmic849C/t2HKw2a2K20Q==
-=======
-"@babel/traverse@7.10.5", "@babel/traverse@^7.0.0", "@babel/traverse@^7.1.0", "@babel/traverse@^7.10.4", "@babel/traverse@^7.10.5", "@babel/traverse@^7.4.3", "@babel/traverse@^7.4.5", "@babel/traverse@^7.7.4", "@babel/traverse@^7.9.6":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.10.5.tgz#77ce464f5b258be265af618d8fddf0536f20b564"
-  integrity sha512-yc/fyv2gUjPqzTz0WHeRJH2pv7jA9kA7mBX2tXl/x5iOE81uaVPuGPtaYk7wmkx4b67mQ7NqI8rmT2pF47KYKQ==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/code-frame" "^7.10.4"
     "@babel/generator" "^7.10.5"
@@ -1997,17 +1892,10 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
-<<<<<<< HEAD
 "@babel/types@7.10.3", "@babel/types@^7.0.0", "@babel/types@^7.10.1", "@babel/types@^7.10.3", "@babel/types@^7.3.0", "@babel/types@^7.3.3", "@babel/types@^7.4.0", "@babel/types@^7.4.4", "@babel/types@^7.6.0", "@babel/types@^7.7.4", "@babel/types@^7.8.6", "@babel/types@^7.9.5", "@babel/types@^7.9.6":
   version "7.10.3"
   resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.10.3.tgz#6535e3b79fea86a6b09e012ea8528f935099de8e"
   integrity sha512-nZxaJhBXBQ8HVoIcGsf9qWep3Oh3jCENK54V4mRF7qaJabVsAYdbTtmSD8WmAp1R6ytPiu5apMwSXyxB1WlaBA==
-=======
-"@babel/types@7.10.5", "@babel/types@^7.0.0", "@babel/types@^7.10.4", "@babel/types@^7.10.5", "@babel/types@^7.3.0", "@babel/types@^7.3.3", "@babel/types@^7.4.0", "@babel/types@^7.4.4", "@babel/types@^7.6.0", "@babel/types@^7.7.4", "@babel/types@^7.8.6", "@babel/types@^7.9.5", "@babel/types@^7.9.6":
-  version "7.10.5"
-  resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.10.5.tgz#d88ae7e2fde86bfbfe851d4d81afa70a997b5d15"
-  integrity sha512-ixV66KWfCI6GKoA/2H9v6bQdbfXEwwpOdQ8cRvb4F+eyvhlaHxWFMQB4+3d9QFJXZsiiiqVrewNV0DFEQpyT4Q==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/helper-validator-identifier" "^7.10.4"
     lodash "^4.17.19"
@@ -2794,7 +2682,6 @@
     valid-url "1.0.9"
     websocket "1.0.31"
 
-<<<<<<< HEAD
 "@graphql-tools/utils@6.0.11", "@graphql-tools/utils@^6.0.0":
   version "6.0.11"
   resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-6.0.11.tgz#c394201c992dbc8f3644b9ad71411fdd55832f2d"
@@ -2804,9 +2691,6 @@
     camel-case "4.1.1"
 
 "@graphql-tools/utils@6.0.14":
-=======
-"@graphql-tools/utils@6.0.14", "@graphql-tools/utils@^6.0.0":
->>>>>>> Making it work...trying
   version "6.0.14"
   resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-6.0.14.tgz#20f90dee8e898acc0a46e62bbd53af01ac1f102e"
   integrity sha512-2VCOJtbVOde5m553JJE8NhP/eYR63Zqo/YdSlhZkpTGmWXg0sJKIIJ0c1eozCm+JSVMu3P08BatgnEC7DIl92A==
@@ -3845,7 +3729,6 @@
     rxjs "6.5.5"
     webpack-sources "1.4.3"
 
-<<<<<<< HEAD
 "@ngtools/webpack@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-10.0.4.tgz#25c0a932319f8a26cbc849f4d13587f179fdc494"
@@ -3856,8 +3739,6 @@
     rxjs "6.5.5"
     webpack-sources "1.4.3"
 
-=======
->>>>>>> Making it work...trying
 "@nodelib/fs.scandir@2.1.3":
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.3.tgz#3a582bdb53804c6ba6d146579c46e52130cf4a3b"
@@ -3938,37 +3819,21 @@
     node-gyp "^6.1.0"
     read-package-json-fast "^1.1.3"
 
-<<<<<<< HEAD
 "@nrwl/cli@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/cli/-/cli-10.0.4.tgz#eabf01b9a6a6c987b40d43c31a1a75f64443d76c"
   integrity sha512-8J5XOQhV5l3Ffe7CzQf5HuPnPDaYRfp95y+oq4GcWHYgnyfRlyPOzoj/Ym2/a3SL7rRVcufiS1+eQl7Jz49C0Q==
   dependencies:
     "@nrwl/tao" "10.0.4"
-=======
-"@nrwl/cli@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/cli/-/cli-10.0.2.tgz#b3b5766054adefe81bbeab81acef85f2fa451054"
-  integrity sha512-ALnLAdH2gEjp8qz+IfgCwX830UMaXnjJB+/M55YSSVw1HM7UIRQ4wGDyOD3AsFRxospcuyVeLXIIBJkHfDwqgw==
-  dependencies:
-    "@nrwl/tao" "10.0.2"
->>>>>>> Making it work...trying
     chalk "2.4.2"
     tmp "0.0.33"
     yargs "^11.0.0"
     yargs-parser "10.0.0"
 
-<<<<<<< HEAD
 "@nrwl/cypress@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/cypress/-/cypress-10.0.4.tgz#60125a97ddb7f917e6c73fe171a249c514f3bc47"
   integrity sha512-5LZCTQQl53363HGpYmlcoH3yxugb6e8zfspOLXP08I21Xz90FlU+dFL8hHBpDtvSKYQ91dfALmg9Lwk5N4Z/1g==
-=======
-"@nrwl/cypress@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/cypress/-/cypress-10.0.2.tgz#f63c9bc62fdb271711a6da645fa4750344a36eec"
-  integrity sha512-9wGHaLdlW3K/k5qvo4/Wl6iE75JatLlKqJ8uDY0Aq/T/qUZWDby+lQ5E2jdoIj4H2vEsgeBPelUIsBAdN+WPAg==
->>>>>>> Making it work...trying
   dependencies:
     "@angular-devkit/architect" "~0.1000.0"
     "@angular-devkit/core" "~10.0.0"
@@ -3979,7 +3844,6 @@
     tsconfig-paths-webpack-plugin "3.2.0"
     webpack-node-externals "1.7.2"
 
-<<<<<<< HEAD
 "@nrwl/eslint-plugin-nx@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/eslint-plugin-nx/-/eslint-plugin-nx-10.0.4.tgz#9167f486a2328e4c301c2954b097084a4fd52d49"
@@ -4000,34 +3864,11 @@
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/jest/-/jest-10.0.4.tgz#90fcea6a11bb3929aedb2c67a85da5fdad78b8fa"
   integrity sha512-O/XtIAgWAxA4mYBmf59KY2KTjbYqYheoZaKGcT2B7NTUXmDnKml7HEiFNyDgha4TUMcSqJlTMa9vXKe3DEhUug==
-=======
-"@nrwl/eslint-plugin-nx@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/eslint-plugin-nx/-/eslint-plugin-nx-10.0.2.tgz#1f55c9588894502c90f87d9ab37dae0769f45e65"
-  integrity sha512-9LfTLUtj8OJkzV4c9Bj3/Wta5JsWC3lJrh9DnZ4/OIIvesobEKGzhwGtMiJf1+kCb5Hjjid9QtvZhBSkNTqyYA==
-  dependencies:
-    "@typescript-eslint/experimental-utils" "^2.19.2"
-
-"@nrwl/express@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/express/-/express-10.0.2.tgz#692c8b144cbacb2717a6e5f3b61cdc20ede061a5"
-  integrity sha512-PLf7DC3fGoCt+3ByN0vVW0HfmBrM3XkUryhnEHNMPqIYO1zq3qJrfxSOETCW69HnD2SjnEP75MegRhaxYCHZug==
-  dependencies:
-    "@angular-devkit/schematics" "~10.0.0"
-    "@nrwl/jest" "10.0.2"
-    "@nrwl/node" "10.0.2"
-
-"@nrwl/jest@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/jest/-/jest-10.0.2.tgz#03f4769918909a0f886886b7e3ee7b2bb0d46ffe"
-  integrity sha512-/aQZCCy6dklxrEgxWFeKn3/I/ruzDmILc3JinD3btHnwVLNYAXPs7JHm3wMidYmngZ1p922tl3wKwcGoVlsK8Q==
->>>>>>> Making it work...trying
   dependencies:
     "@angular-devkit/architect" "~0.1000.0"
     "@angular-devkit/core" "~10.0.0"
     "@angular-devkit/schematics" "~10.0.0"
 
-<<<<<<< HEAD
 "@nrwl/linter@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/linter/-/linter-10.0.4.tgz#746fae9d966e4c7779aa56a31b5e95222333ffac"
@@ -4050,42 +3891,13 @@
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/node/-/node-10.0.4.tgz#5ad9f5c0a2c0e0d5da6090075c6b1f4aef6e33e3"
   integrity sha512-u3WOlhJdePzVTxkYJaK+i8qVkYqYvQzHmHAx4OwXDbKXXGKylTzLflj5JxAgfjxy6jVqJBrBWDlKoNm1KEgwBw==
-=======
-"@nrwl/linter@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/linter/-/linter-10.0.2.tgz#4575fc96a2f7acead4e80dba0c65b40c59099f5c"
-  integrity sha512-UlQ9BtpzL26z7BLmkFcQFwXLhkR5Itkxn9beGGJbWuUsNd1qJNghREUh2CSA9qbsljpsig2+Sj8/n0rcc1ceZA==
-  dependencies:
-    "@angular-devkit/architect" "~0.1000.0"
-
-"@nrwl/next@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/next/-/next-10.0.2.tgz#372d17f61fa101b488bf3f5ce7fcaa05bcb1bb85"
-  integrity sha512-SGqZx2BdsSVHrTGyGIYc70xRAINUkwOK0Aa0tYpnzg9V3hKuLty1NCWuU6YDhwFedzDo5PQ1MKSb3V17Jp2tCQ==
-  dependencies:
-    "@angular-devkit/schematics" "~10.0.0"
-    "@nrwl/react" "10.0.2"
-    "@nrwl/web" "10.0.2"
-    "@svgr/webpack" "^4.3.3"
-    url-loader "^2.2.0"
-
-"@nrwl/node@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/node/-/node-10.0.2.tgz#a5cb662d3cc6bdcec4da8e2b4bb1a6dbf78a636b"
-  integrity sha512-NeVI9i4ui76w217VTEObr/b+f3kkgbt3B/z5KhYCMdtAGHAuGaapFBWe/4AOxam82oDRA2iVIiREx3VUtx7WNA==
->>>>>>> Making it work...trying
   dependencies:
     "@angular-devkit/architect" "~0.1000.0"
     "@angular-devkit/build-webpack" "~0.1000.0"
     "@angular-devkit/core" "~10.0.0"
     "@angular-devkit/schematics" "~10.0.0"
-<<<<<<< HEAD
     "@nrwl/jest" "10.0.4"
     "@nrwl/linter" "10.0.4"
-=======
-    "@nrwl/jest" "10.0.2"
-    "@nrwl/linter" "10.0.2"
->>>>>>> Making it work...trying
     circular-dependency-plugin "5.2.0"
     copy-webpack-plugin "5.1.1"
     fork-ts-checker-webpack-plugin "^3.1.1"
@@ -4104,30 +3916,17 @@
   resolved "https://registry.yarnpkg.com/@nrwl/nx/-/nx-7.8.7.tgz#a85dc5ab30d33ac6cc2234bbc51e229ad85b9b9b"
   integrity sha512-a/pOozIT86IIWue6MSwN2EKO4grJ8My7QMl+g535/vrDg75riyBTkWF+nX6VM/JjGz40Y5nFZaX94924cZWt5g==
 
-<<<<<<< HEAD
 "@nrwl/react@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/react/-/react-10.0.4.tgz#9aea8977a77cea238fced584227fc6173ff00a90"
   integrity sha512-fqCYpuysiF7qF4qyQTvl4BdFAuCVMRFEta7L3nXjcrLTwTsfNrIv47yhTaVcD9xDwA6yc9Li/w+1ZOMf124FqQ==
-=======
-"@nrwl/react@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/react/-/react-10.0.2.tgz#cdc9e1a26ebc16e88187a074d51be0fa05f975e2"
-  integrity sha512-j1ETWxq8Hf6q2qvldPAvmbUt5KRqkEYfYMRsIkSG0CqVXo6w9VxMJeTYdEoVp5pzDLNoeKh78ptwekThLq81xQ==
->>>>>>> Making it work...trying
   dependencies:
     "@angular-devkit/schematics" "~10.0.0"
     "@babel/core" "7.9.6"
     "@babel/preset-react" "7.9.4"
-<<<<<<< HEAD
     "@nrwl/cypress" "10.0.4"
     "@nrwl/jest" "10.0.4"
     "@nrwl/web" "10.0.4"
-=======
-    "@nrwl/cypress" "10.0.2"
-    "@nrwl/jest" "10.0.2"
-    "@nrwl/web" "10.0.2"
->>>>>>> Making it work...trying
     "@svgr/webpack" "^5.2.0"
     confusing-browser-globals "^1.0.9"
     eslint-plugin-import "^2.20.1"
@@ -4136,17 +3935,10 @@
     eslint-plugin-react-hooks "^2.4.0"
     url-loader "^3.0.0"
 
-<<<<<<< HEAD
 "@nrwl/tao@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/tao/-/tao-10.0.4.tgz#21c570043ac415072c931bb5986d984c0894ca19"
   integrity sha512-BBS9uD2oruhrlzDUKl+kC3chgoioytawGx6VuQxJ3BJHQnE7NEZfn9nQqvlFIUfsDVrh8po8sskyEHLPR2lk2Q==
-=======
-"@nrwl/tao@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/tao/-/tao-10.0.2.tgz#2dcc11360edf9f851ff530a4ca1fd2d61b395f5c"
-  integrity sha512-A2jsEPVrKlKYctvfA4hSM5ouvn++7Hn6TFTF+bRkAJ/2jLv4CyX0gS9/KR+5efA0FDF+U5eIsvcl1/G5BR2byg==
->>>>>>> Making it work...trying
   dependencies:
     "@angular-devkit/architect" "~0.1000.0"
     "@angular-devkit/core" "~10.0.0"
@@ -4155,17 +3947,10 @@
     minimist "^1.2.0"
     strip-json-comments "2.0.1"
 
-<<<<<<< HEAD
 "@nrwl/web@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/web/-/web-10.0.4.tgz#5231ca537d5a5b9f0ce72a5648a7f7c4a66e00dc"
   integrity sha512-FTQIsTHY/C+lM8kbn91375lbmjpUZWd+WXp74PYtgTHnq4FMXrhgWklwWSVJiyXwUja9dcSXdTjCNptXuQHcng==
-=======
-"@nrwl/web@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/web/-/web-10.0.2.tgz#f714e53318b0cf977135d7b583dfd5a103d569c8"
-  integrity sha512-OLb+lEg44c8kIKFKswxxBgUZJwmGfkdULygpizfSL/IBO/cfa63cn9SqDlDmCrd+9LGZka4bGrTEdK63t4l7aQ==
->>>>>>> Making it work...trying
   dependencies:
     "@angular-devkit/architect" "~0.1000.0"
     "@angular-devkit/build-optimizer" "~0.1000.0"
@@ -4178,15 +3963,9 @@
     "@babel/plugin-transform-regenerator" "7.8.7"
     "@babel/preset-env" "7.9.6"
     "@babel/preset-typescript" "7.9.0"
-<<<<<<< HEAD
     "@nrwl/cypress" "10.0.4"
     "@nrwl/jest" "10.0.4"
     "@nrwl/linter" "10.0.4"
-=======
-    "@nrwl/cypress" "10.0.2"
-    "@nrwl/jest" "10.0.2"
-    "@nrwl/linter" "10.0.2"
->>>>>>> Making it work...trying
     "@rollup/plugin-babel" "5.0.2"
     "@rollup/plugin-commonjs" "11.0.2"
     "@rollup/plugin-image" "2.0.4"
@@ -4257,7 +4036,6 @@
     webpack-subresource-integrity "1.1.0-rc.5"
     worker-plugin "3.2.0"
 
-<<<<<<< HEAD
 "@nrwl/workspace@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@nrwl/workspace/-/workspace-10.0.4.tgz#52637fa2c47ed0e5b94ee5c427f8accd19ee9d80"
@@ -4266,16 +4044,6 @@
     "@angular-devkit/core" "~10.0.0"
     "@angular-devkit/schematics" "~10.0.0"
     "@nrwl/cli" "10.0.4"
-=======
-"@nrwl/workspace@10.0.2":
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/workspace/-/workspace-10.0.2.tgz#731e3461a9982ee38d2df6af3d42dacc96c2175d"
-  integrity sha512-kdOJS+hfQu8yRokGO4/co4Zni0i4jNX/nxCwjkc9pnOtsK5diPD/K2Pp8oZY/5A+nhl/TnluY+S3OARsozdnTg==
-  dependencies:
-    "@angular-devkit/core" "~10.0.0"
-    "@angular-devkit/schematics" "~10.0.0"
-    "@nrwl/cli" "10.0.2"
->>>>>>> Making it work...trying
     axios "0.19.2"
     chalk "2.4.2"
     cosmiconfig "4.0.0"
@@ -5764,16 +5532,12 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-<<<<<<< HEAD
 "@types/node@*":
   version "14.0.14"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.14.tgz#24a0b5959f16ac141aeb0c5b3cd7a15b7c64cbce"
   integrity sha512-syUgf67ZQpaJj01/tRTknkMNoBBLWJOBODF0Zm4NrXmiSuxjymFrxnTu1QVYRubhVkRcZLYZG8STTwJRdVm/WQ==
 
 "@types/node@14.0.24":
-=======
-"@types/node@*", "@types/node@14.0.24":
->>>>>>> Making it work...trying
   version "14.0.24"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.24.tgz#b0f86f58564fa02a28b68f8b55d4cdec42e3b9d6"
   integrity sha512-btt/oNOiDWcSuI721MdL8VQGnjsKjlTMdrKyTcLCKeQp/n4AAMFJ961wMbp+09y8WuGPClDEv07RIItdXKIXAA==
@@ -6772,11 +6536,7 @@ ajv@6.10.2:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-<<<<<<< HEAD
 ajv@6.12.2, ajv@^6.1.0, ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.0, ajv@^6.12.2, ajv@^6.5.5:
-=======
-ajv@6.12.2:
->>>>>>> Making it work...trying
   version "6.12.2"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.2.tgz#c629c5eced17baf314437918d2da88c99d5958cd"
   integrity sha512-k+V+hzjm5q/Mr8ef/1Y9goCmlsK4I6Sm74teeyGvFk1XrOsbsKLjEdrvny42CZ+a8sXbk8KWpY/bDwS+FLL2UQ==
@@ -6786,11 +6546,7 @@ ajv@6.12.2:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-<<<<<<< HEAD
 ajv@6.12.3:
-=======
-ajv@^6.1.0, ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.0, ajv@^6.12.2, ajv@^6.5.5:
->>>>>>> Making it work...trying
   version "6.12.3"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.3.tgz#18c5af38a111ddeb4f2697bd78d68abc1cabd706"
   integrity sha512-4K0cK3L1hsqk9xIb2z9vs/XU+PGJZ9PNpJRDS9YLzmNdX6jmVPfamLvTJr0aDAusnHyCHO6MjzlkAsgtqp9teA==
@@ -7697,7 +7453,6 @@ available-typed-arrays@^1.0.0, available-typed-arrays@^1.0.2:
   dependencies:
     array-filter "^1.0.0"
 
-<<<<<<< HEAD
 aws-sdk@2.718.0:
   version "2.718.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.718.0.tgz#f659e022602cd93c66f043364810d04e3cbb0241"
@@ -7732,12 +7487,6 @@ aws-sdk@^2.699.0:
   version "2.709.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.709.0.tgz#33b0c0fe8b9420c65610545394be047ac2d93c8f"
   integrity sha512-F3sKXsCiutj9RglVXdqb/XJ3Ko3G+pX081Nf1YjVJpLydwE2v16FGxrLqE5pqyWMDeUf5nZHnBoMuOYD8ip+Kw==
-=======
-aws-sdk@2.717.0, aws-sdk@^2.443.0, aws-sdk@^2.553.0, aws-sdk@^2.699.0:
-  version "2.717.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.717.0.tgz#be68dab4d9016944814ced76580459c4738763ed"
-  integrity sha512-UTDDXF3kUqhaSMAMe6YcOdp3qK7KMikDIAH5SgUPgTUqC4NRSBmLKPdKkXT0ZwAaEOf9QnD1nAV8+WmVRUX+hw==
->>>>>>> Making it work...trying
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -11913,17 +11662,10 @@ dotenv@^6.2.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.2.0.tgz#941c0410535d942c8becf28d3f357dbd9d476064"
   integrity sha512-HygQCKUBSFl8wKQZBSemMywRWcEDNidvNbjGVyZu3nbZ8qq9ubiPoGLMdRDpfSrpkkm9BXYFkpKxxFX38o/76w==
 
-<<<<<<< HEAD
 downshift@6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/downshift/-/downshift-6.0.2.tgz#72df65d74cc8414757c5686478e5cfddb09dffd8"
   integrity sha512-vQgd00VPOpXIgyq0AcaXKMPip+QRL/9kngiVfc1aZU1fWk9vnoJ0pcI2wYO4fxDx+6aNWPaQKcToxg0X+CUAjw==
-=======
-downshift@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/downshift/-/downshift-6.0.0.tgz#0b7bafbea9900f04ae3b2a8a837c816f715bce07"
-  integrity sha512-1/TA3PekTn0K9Bwk0qLqr1EJRPK8hl+AiS6bEl8jrXwUqBnyheFeBG2UXptpwlVbfKU1Ojjhspc/mv+ByfZn2w==
->>>>>>> Making it work...trying
   dependencies:
     "@babel/runtime" "^7.10.2"
     compute-scroll-into-view "^1.0.14"
@@ -12422,11 +12164,7 @@ eslint-module-utils@^2.6.0:
     debug "^2.6.9"
     pkg-dir "^2.0.0"
 
-<<<<<<< HEAD
 eslint-plugin-cypress@^2.11.1:
-=======
-eslint-plugin-cypress@^2.10.3:
->>>>>>> Making it work...trying
   version "2.11.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-cypress/-/eslint-plugin-cypress-2.11.1.tgz#a945e2774b88211e2c706a059d431e262b5c2862"
   integrity sha512-MxMYoReSO5+IZMGgpBZHHSx64zYPSPTpXDwsgW7ChlJTF/sA+obqRbHplxD6sBStE+g4Mi0LCLkG4t9liu//mQ==
@@ -15501,11 +15239,7 @@ inquirer@7.1.0:
     strip-ansi "^6.0.0"
     through "^2.3.6"
 
-<<<<<<< HEAD
 inquirer@7.3.2:
-=======
-inquirer@7.3.2, inquirer@^7.0.0:
->>>>>>> Making it work...trying
   version "7.3.2"
   resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-7.3.2.tgz#25245d2e32dc9f33dbe26eeaada231daa66e9c7c"
   integrity sha512-DF4osh1FM6l0RJc5YWYhSDB6TawiBRlbV9Cox8MWlidU218Tb7fm3lQTULyUJDfJ0tjbzl0W4q651mrCCEM55w==
@@ -18365,15 +18099,9 @@ less@3.11.1:
     source-map "~0.6.0"
 
 less@^3.11.1:
-<<<<<<< HEAD
   version "3.11.3"
   resolved "https://registry.yarnpkg.com/less/-/less-3.11.3.tgz#2d853954fcfe0169a8af869620bcaa16563dcc1c"
   integrity sha512-VkZiTDdtNEzXA3LgjQiC3D7/ejleBPFVvq+aRI9mIj+Zhmif5TvFPM244bT4rzkvOCvJ9q4zAztok1M7Nygagw==
-=======
-  version "3.12.2"
-  resolved "https://registry.yarnpkg.com/less/-/less-3.12.2.tgz#157e6dd32a68869df8859314ad38e70211af3ab4"
-  integrity sha512-+1V2PCMFkL+OIj2/HrtrvZw0BC0sYLMICJfbQjuj/K8CEnlrFX6R5cKKgzzttsZDHyxQNL1jqMREjKN3ja/E3Q==
->>>>>>> Making it work...trying
   dependencies:
     tslib "^1.10.0"
   optionalDependencies:
@@ -18829,11 +18557,7 @@ lodash.upperfirst@^4.3.1:
   resolved "https://registry.yarnpkg.com/lodash.upperfirst/-/lodash.upperfirst-4.3.1.tgz#1365edf431480481ef0d1c68957a5ed99d49f7ce"
   integrity sha1-E2Xt9DFIBIHvDRxolXpe2Z1J984=
 
-<<<<<<< HEAD
 lodash@4.17.19, lodash@^4.17.16, lodash@^4.17.19:
-=======
-lodash@4.17.19, "lodash@>=3.5 <5", lodash@^4.0.1, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.16, lodash@^4.17.19, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@~4.17.4:
->>>>>>> Making it work...trying
   version "4.17.19"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
   integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
@@ -20594,25 +20318,10 @@ open@6.4.0, open@^6.3.0, open@^6.4.0:
   dependencies:
     is-wsl "^1.1.0"
 
-<<<<<<< HEAD
 open@7.0.4, open@^7.0.0:
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/open/-/open-7.0.4.tgz#c28a9d315e5c98340bf979fdcb2e58664aa10d83"
   integrity sha512-brSA+/yq+b08Hsr4c8fsEW2CRzk1BmfN3SAK/5VCHQ9bdoZJ4qa/+AfR0xHjlbbZUyPkUHs1b8x1RqdyZdkVqQ==
-=======
-open@7.0.4:
-  version "7.0.4"
-  resolved "https://registry.yarnpkg.com/open/-/open-7.0.4.tgz#c28a9d315e5c98340bf979fdcb2e58664aa10d83"
-  integrity sha512-brSA+/yq+b08Hsr4c8fsEW2CRzk1BmfN3SAK/5VCHQ9bdoZJ4qa/+AfR0xHjlbbZUyPkUHs1b8x1RqdyZdkVqQ==
-  dependencies:
-    is-docker "^2.0.0"
-    is-wsl "^2.1.1"
-
-open@^7.0.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/open/-/open-7.1.0.tgz#68865f7d3cb238520fa1225a63cf28bcf8368a1c"
-  integrity sha512-lLPI5KgOwEYCDKXf4np7y1PBEkj7HYIyP2DY8mVDRnx0VIIu6bNrRB0R66TuO7Mack6EnTNLm4uvcl1UoklTpA==
->>>>>>> Making it work...trying
   dependencies:
     is-docker "^2.0.0"
     is-wsl "^2.1.1"
@@ -20668,31 +20377,10 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
-<<<<<<< HEAD
 ora@4.0.4, ora@^4.0.0:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/ora/-/ora-4.0.4.tgz#e8da697cc5b6a47266655bf68e0fb588d29a545d"
   integrity sha512-77iGeVU1cIdRhgFzCK8aw1fbtT1B/iZAvWjS+l/o1x0RShMgxHUZaD2yDpWsNCPwXg9z1ZA78Kbdvr8kBmG/Ww==
-=======
-ora@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/ora/-/ora-4.0.4.tgz#e8da697cc5b6a47266655bf68e0fb588d29a545d"
-  integrity sha512-77iGeVU1cIdRhgFzCK8aw1fbtT1B/iZAvWjS+l/o1x0RShMgxHUZaD2yDpWsNCPwXg9z1ZA78Kbdvr8kBmG/Ww==
-  dependencies:
-    chalk "^3.0.0"
-    cli-cursor "^3.1.0"
-    cli-spinners "^2.2.0"
-    is-interactive "^1.0.0"
-    log-symbols "^3.0.0"
-    mute-stream "0.0.8"
-    strip-ansi "^6.0.0"
-    wcwidth "^1.0.1"
-
-ora@^4.0.0:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/ora/-/ora-4.0.5.tgz#7410b5cc2d99fa637fd5099bbb9f02bfbb5a361e"
-  integrity sha512-jCDgm9DqvRcNIAEv2wZPrh7E5PcQiDUnbnWbAfu4NGAE2ZNqPFbDixmWldy1YG2QfLeQhuiu6/h5VRrk6cG50w==
->>>>>>> Making it work...trying
   dependencies:
     chalk "^3.0.0"
     cli-cursor "^3.1.0"
@@ -25087,11 +24775,7 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   dependencies:
     aproba "^1.1.1"
 
-<<<<<<< HEAD
 rxjs@6.5.5, rxjs@^6.3.3, rxjs@^6.4.0, rxjs@^6.5.3, rxjs@^6.5.4:
-=======
-rxjs@6.5.5:
->>>>>>> Making it work...trying
   version "6.5.5"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.5.tgz#c5c884e3094c8cfee31bf27eb87e54ccfc87f9ec"
   integrity sha512-WfQI+1gohdf0Dai/Bbmk5L5ItH5tYqm3ki2c5GdWhKjalzjg93N3avFjVStyZZz+A2Em+ZxKH5bNghw9UeylGQ==
@@ -29683,7 +29367,6 @@ yargs@^13.3.0, yargs@^13.3.2:
     y18n "^4.0.0"
     yargs-parser "^13.1.2"
 
-<<<<<<< HEAD
 yargs@^15.0.2:
   version "15.4.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-15.4.0.tgz#53949fb768309bac1843de9b17b80051e9805ec2"
@@ -29718,8 +29401,6 @@ yargs@^15.3.1:
     y18n "^4.0.0"
     yargs-parser "^18.1.1"
 
-=======
->>>>>>> Making it work...trying
 yargs@~3.10.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-3.10.0.tgz#f7ee7bd857dd7c1d2d38c0e74efbd681d1431fd1"
