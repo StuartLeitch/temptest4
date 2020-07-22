@@ -6,13 +6,12 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
-  AuthorizationContext,
+  AccessControlContext,
   Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+} from '../../../../domain/authorization';
 
 import { PaymentStatus, Payment } from '../../domain/Payment';
 
@@ -36,8 +35,7 @@ interface WithPayment {
   payment: Payment;
 }
 
-type Context = AuthorizationContext<Roles>;
-export type PayPalProcessFinishedContext = Context;
+type Context = UsecaseAuthorizationContext;
 
 export class PayPalProcessFinishedUsecase
   implements

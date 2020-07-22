@@ -8,10 +8,9 @@ import {
   PayPalOrderRequest as OrderRequest,
   PayPalOrderStatus as OrderStatus,
   PayPalServiceErrors as Errors,
-  GetPaymentsByInvoiceIdContext,
   GetPaymentsByInvoiceIdUsecase,
-  GetPaymentMethodByNameContext,
   GetPaymentMethodByNameUsecase,
+  UsecaseAuthorizationContext,
   PaymentMethodRepoContract,
   InvoiceRepoContract,
   PaymentRepoContract,
@@ -317,7 +316,7 @@ export class PayPalService implements ServiceContract {
       .execute();
   }
 
-  private attachExistingPayment(context: GetPaymentsByInvoiceIdContext) {
+  private attachExistingPayment(context: UsecaseAuthorizationContext) {
     const usecase = new GetPaymentsByInvoiceIdUsecase(
       this.invoiceRepo,
       this.paymentRepo
@@ -342,7 +341,7 @@ export class PayPalService implements ServiceContract {
     };
   }
 
-  private attachPayPalMethodId(context: GetPaymentMethodByNameContext) {
+  private attachPayPalMethodId(context: UsecaseAuthorizationContext) {
     const usecase = new GetPaymentMethodByNameUsecase(this.paymentMethodRepo);
 
     return async <T>(request: T) => {

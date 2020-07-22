@@ -5,13 +5,12 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
-  AuthorizationContext,
+  AccessControlContext,
   Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+} from '../../../../domain/authorization';
 
 import { Payment } from '../../domain/Payment';
 
@@ -25,8 +24,7 @@ interface WithForeignId {
   foreignPaymentId: string;
 }
 
-type Context = AuthorizationContext<Roles>;
-export type GetPaymentByForeignPaymentIdContext = Context;
+type Context = UsecaseAuthorizationContext;
 
 export class GetPaymentByForeignPaymentIdUsecase
   implements

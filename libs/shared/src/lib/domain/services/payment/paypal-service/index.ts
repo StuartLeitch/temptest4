@@ -1,2 +1,4 @@
-export * as PayPalServiceErrors from './errors';
+import * as PayPalServiceErrors from './errors';
+
+export { PayPalServiceErrors };
 export * from './service';

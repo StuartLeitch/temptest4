@@ -1,2 +1,4 @@
-export * as BraintreeServiceErrors from './errors';
+import * as BraintreeServiceErrors from './errors';
+
+export { BraintreeServiceErrors };
 export * from './service';

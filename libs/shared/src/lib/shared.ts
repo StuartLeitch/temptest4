@@ -208,6 +208,7 @@ export * from './modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvo
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 
 export * from './modules/coupons/mappers/CouponMap';
+export * from './modules/waivers/mappers/WaiverMap';
 export * from './modules/coupons/repos';
 
 // * Export Notifications Subdomain

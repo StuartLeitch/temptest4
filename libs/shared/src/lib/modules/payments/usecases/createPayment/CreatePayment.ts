@@ -9,12 +9,11 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import {
-  UsecaseAuthorizationContext as Context,
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
-import { Roles } from '../../../users/domain/enums/Roles';
 
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
@@ -46,6 +45,8 @@ interface DomainEventsDispatchData extends WithPayment {
   isFinalPayment: boolean;
   status: string;
 }
+
+type Context = UsecaseAuthorizationContext;
 
 export class CreatePaymentUsecase
   implements
