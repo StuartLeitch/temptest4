@@ -26,11 +26,20 @@ export class NetSuiteService {
 
   public async registerInvoice(data: ErpData): Promise<ErpResponse> {
     // console.log('ERP Data:');
+    // console.info(data);
+    const { payer } = data;
 
     let customerId;
     const customerAlreadyExists = await this.queryCustomer(data);
 
     if (customerAlreadyExists) {
+      if (
+        (customerAlreadyExists.isperson === 'T' &&
+          payer.type === 'INSTITUTION') ||
+        (customerAlreadyExists.isperson === 'F' && payer.type !== 'INSTITUTION')
+      ) {
+        customerId = await this.createCustomer(data);
+      }
       customerId = customerAlreadyExists.id;
     } else {
       customerId = await this.createCustomer(data);
@@ -40,8 +49,8 @@ export class NetSuiteService {
   }
 
   public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
-    console.log('registerRevenueRecognition Data:');
-    console.info(data);
+    // console.log('registerRevenueRecognition Data:');
+    // console.info(data);
 
     const debitAccountId = '1'; // this.queryAccount(data);
     const creditAccountId = '213'; // this.queryAccount(data);
@@ -56,8 +65,8 @@ export class NetSuiteService {
   }
 
   public async registerCreditNote(data: ErpData): Promise<ErpResponse> {
-    console.log('registerCreditNote Data:');
-    console.info(data);
+    // console.log('registerCreditNote Data:');
+    // console.info(data);
 
     return null;
   }
@@ -75,7 +84,7 @@ export class NetSuiteService {
     };
 
     const queryCustomerRequest = {
-      q: `SELECT id, companyName, email, dateCreated FROM customer WHERE email = '${payer?.email?.toString()}'`,
+      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${payer?.email?.toString()}'`,
     };
 
     try {
@@ -114,14 +123,15 @@ export class NetSuiteService {
       email: payer?.email.toString(),
     };
 
-    if (data?.payer?.type !== 'INSTITUTION') {
+    if (payer?.type !== 'INSTITUTION') {
       createCustomerPayload.isPerson = true;
-      const [firstName, ...lastNames] = payer?.name.split(' ');
+      const [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
       createCustomerPayload.lastName = lastNames.join(' ');
     } else {
       createCustomerPayload.isPerson = false;
-      createCustomerPayload.companyName = payer?.name.toString();
+      createCustomerPayload.companyName =
+        payer?.organization || payer?.name.toString();
     }
 
     try {
@@ -154,7 +164,7 @@ export class NetSuiteService {
       // billingAddress,
       // journalName,
       // vatNote,
-      rate,
+      // rate,
       // tradeDocumentItemProduct,
       customerId,
       customSegmentId,
@@ -182,9 +192,6 @@ export class NetSuiteService {
       entity: {
         id: customerId,
       },
-      cseg1: {
-        id: customSegmentId,
-      },
       item: {
         items: [
           {
@@ -193,7 +200,7 @@ export class NetSuiteService {
               article.customId
             }/${format(new Date(), 'yyyy')}`,
             quantity: 1.0,
-            rate,
+            rate: item.price,
             taxRate1: item.rate,
             excludeFromRateRequest: false,
             printItems: false,
@@ -201,12 +208,18 @@ export class NetSuiteService {
               id: itemId,
             },
             taxCode: {
-              taxRateId,
+              id: taxRateId,
             },
           },
         ],
       },
     };
+
+    if (customSegmentId !== '0') {
+      createInvoicePayload.cseg1 = {
+        id: customSegmentId,
+      };
+    }
 
     try {
       const res = await axios({

@@ -74,7 +74,7 @@ export class PublishInvoiceToErpUsecase
     request: PublishInvoiceToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishInvoiceToErpResponse> {
-    // this.loggerService.info('PublishInvoiceToERP Request', request);
+    this.loggerService.info('PublishInvoiceToERP Request', request);
     if (process.env.ERP_DISABLED === 'true') {
       return right(null);
     }
@@ -177,10 +177,10 @@ export class PublishInvoiceToErpUsecase
       if (!publisherCustomValues) {
         throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
       }
-      this.loggerService.info(
-        'PublishInvoiceToERP publisher data',
-        publisherCustomValues
-      );
+      // this.loggerService.info(
+      //   'PublishInvoiceToERP publisher data',
+      //   publisherCustomValues
+      // );
 
       const vatService = new VATService();
       const vatNote = vatService.getVATNote(
@@ -244,12 +244,13 @@ export class PublishInvoiceToErpUsecase
         const netSuiteResponse = await this.netSuiteService.registerInvoice(
           erpData
         );
+        // console.info(netSuiteResponse);
         this.loggerService.info(
           `Updating invoice ${invoice.id.toString()}: netSuiteReference -> ${JSON.stringify(
             netSuiteResponse
           )}`
         );
-        // invoice.nsReference = 'giuguc'; // netSuiteResponse; // .tradeDocumentId;
+        invoice.nsReference = JSON.stringify(netSuiteResponse); // netSuiteResponse; // .tradeDocumentId;
 
         const erpResponse = await this.erpService.registerInvoice(erpData);
         // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
