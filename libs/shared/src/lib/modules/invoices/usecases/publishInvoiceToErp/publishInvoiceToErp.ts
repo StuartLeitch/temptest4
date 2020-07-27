@@ -59,7 +59,7 @@ export class PublishInvoiceToErpUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: any
@@ -252,7 +252,7 @@ export class PublishInvoiceToErpUsecase
         );
         invoice.nsReference = JSON.stringify(netSuiteResponse); // netSuiteResponse; // .tradeDocumentId;
 
-        const erpResponse = await this.erpService.registerInvoice(erpData);
+        const erpResponse = await this.sageService.registerInvoice(erpData);
         // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
 
         this.loggerService.info(

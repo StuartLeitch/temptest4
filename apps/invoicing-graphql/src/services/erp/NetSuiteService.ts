@@ -3,6 +3,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
 
+import { ErpServiceContract, PayerType } from '@hindawi/shared';
+
 import {
   // ErpServiceContract,
   ErpData,
@@ -12,7 +14,7 @@ import {
 import { Connection } from './netsuite/Connection';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
 
-export class NetSuiteService {
+export class NetSuiteService implements ErpServiceContract {
   private constructor(private connection: Connection) {}
 
   public static create(config: Record<string, unknown>): NetSuiteService {
@@ -35,12 +37,14 @@ export class NetSuiteService {
     if (customerAlreadyExists) {
       if (
         (customerAlreadyExists.isperson === 'T' &&
-          payer.type === 'INSTITUTION') ||
-        (customerAlreadyExists.isperson === 'F' && payer.type !== 'INSTITUTION')
+          payer.type === PayerType.INSTITUTION) ||
+        (customerAlreadyExists.isperson === 'F' &&
+          payer.type !== PayerType.INSTITUTION)
       ) {
         customerId = await this.createCustomer(data);
+      } else {
+        customerId = customerAlreadyExists.id;
       }
-      customerId = customerAlreadyExists.id;
     } else {
       customerId = await this.createCustomer(data);
     }
@@ -123,7 +127,7 @@ export class NetSuiteService {
       email: payer?.email.toString(),
     };
 
-    if (payer?.type !== 'INSTITUTION') {
+    if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;

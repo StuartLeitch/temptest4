@@ -52,7 +52,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private loggerService: any
   ) {
@@ -66,7 +66,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.publisherRepo,
-      this.erpService,
+      this.sageService,
       this.netSuiteService,
       this.loggerService
     );
