@@ -58,7 +58,7 @@
             ]
           }
         },
-        "cucumber": {
+        "test": {
           "builder": "./tools/builders:cucumber",
           "options": {
             "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json",
@@ -69,7 +69,7 @@
             "coverage": true
           }
         },
-        "test": {
+        "jest": {
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "apps/invoicing-graphql/jest.config.js",
@@ -99,7 +99,7 @@
             ]
           }
         },
-        "cucumber": {
+        "test": {
           "builder": "./tools/builders:cucumber",
           "options": {
             "tsConfig": "apps/invoicing-graphql/tsconfig.spec.json",
@@ -110,7 +110,7 @@
             "coverage": true
           }
         },
-        "test": {
+        "jest": {
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/shared/jest.config.js",
