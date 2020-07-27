@@ -4,8 +4,8 @@ export AWS_REGISTRY="918602980697.dkr.ecr.eu-west-1.amazonaws.com"
 export AWS_ENVIRONMENT="demo"
 export APP="invoicing-graphql"
 export TO="${AWS_ENVIRONMENT}-gsw-${APP}"
-export TIMESTAMP=$(date +'%d_%m_%Y_%R')
-export CI_COMMIT_SHA="${USER}_${TIMESTAMP/:/_}"
+export TIMESTAMP=$(date +'%d_%m_%Y_%H_%M')
+export CI_COMMIT_SHA="${USER}_${TIMESTAMP}"
 
 _=$(command -v yarn);
 if [ "$?" != "0" ]; then

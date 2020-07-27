@@ -1,8 +1,8 @@
 #!/bin/sh
 
 AWS_REGISTRY="918602980697.dkr.ecr.eu-west-1.amazonaws.com"
-TIMESTAMP=$(date +'%d_%m_%Y_%R')
-CI_COMMIT_SHA="${USER}_${TIMESTAMP/:/_}"
+TIMESTAMP=$(date +'%d_%m_%Y_%H_%M')
+CI_COMMIT_SHA="${USER}_${TIMESTAMP}"
 
 # AFFECTED_APPS="demo-invoicing-graphql demo-invoicing-web"
 AWS_ENVIRONMENT="dev"

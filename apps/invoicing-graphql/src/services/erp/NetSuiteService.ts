@@ -135,7 +135,7 @@ export class NetSuiteService implements ErpServiceContract {
     } else {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName =
-        payer?.organization || payer?.name.toString();
+        payer?.organization.toString() || payer?.name.toString();
     }
 
     try {
