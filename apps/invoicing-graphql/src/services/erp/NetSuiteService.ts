@@ -136,6 +136,7 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName =
         payer?.organization.toString() || payer?.name.toString();
+      createCustomerPayload.vatRegNumber = payer.VATId;
     }
 
     try {
