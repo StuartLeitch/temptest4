@@ -2,7 +2,7 @@ module.exports = {
   name: 'eve',
   preset: '../../jest.config.js',
   transform: {
-    '^.+\\.[tj]sx?$': 'ts-jest'
+    '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
   reporters: [
@@ -10,11 +10,11 @@ module.exports = {
     [
       'jest-junit',
       {
-        outputDirectory: 'coverage/libs/shared',
-        outputName: 'junit.xml'
-      }
-    ]
+        outputDirectory: 'coverage/libs/eve',
+        outputName: 'junit.xml',
+      },
+    ],
   ],
   collectCoverage: true,
-  coverageDirectory: '../../coverage/libs/eve'
+  coverageDirectory: '../../coverage/libs/eve',
 };

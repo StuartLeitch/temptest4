@@ -58,7 +58,7 @@ export class PublishRevenueRecognitionToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private loggerService: any
   ) {}
@@ -165,18 +165,18 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
-      const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
-        {
-          invoice,
-          manuscript,
-          invoiceTotal: netCharges,
-        }
-      );
-      this.loggerService.info(
-        `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${netSuiteResponse}`
-      );
+      // const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
+      //   {
+      //     invoice,
+      //     manuscript,
+      //     invoiceTotal: netCharges,
+      //   }
+      // );
+      // this.loggerService.info(
+      //   `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${netSuiteResponse}`
+      // );
 
-      const erpResponse = await this.erpService.registerRevenueRecognition({
+      const erpResponse = await this.sageService.registerRevenueRecognition({
         invoice,
         manuscript,
         invoiceTotal: netCharges,

@@ -23,7 +23,7 @@ export const defaultErpFixedValues: ErpFixedValues = {
   companyId: 'a5T0Y000000TR3pUAG',
 };
 
-export class ErpService implements ErpServiceContract {
+export class SageService implements ErpServiceContract {
   private connection: Connection;
 
   constructor(

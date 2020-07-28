@@ -10,6 +10,10 @@ module.exports = (nxConfig, context) => {
     },
   };
 
+  webpackConfig.module.rules[0].options.presets = ["@nrwl/web/babel"];
+  webpackConfig.module.rules[0].options.babelrcRoots = ["*"];
+  webpackConfig.module.rules[0].options.plugins = [];
+
   getRollupBabelOptions(webpackConfig.module.rules[0].options);
 
   // pushing appropriate loaders for fonts and files

@@ -1,5 +1,11 @@
 import { Consumer } from '../../consumer';
-import { UseCase } from 'libs/shared/src/lib/core/domain/UseCase';
+
+interface UseCase<IRequest, IResponse, IContext = any> {
+  execute(
+    request?: IRequest,
+    context?: IContext
+  ): Promise<IResponse> | IResponse;
+}
 
 export class UsecasePublishConsumer<T> implements Consumer<T> {
   constructor(private consumeEventsUsecase: UseCase<T[], unknown, unknown>) {}

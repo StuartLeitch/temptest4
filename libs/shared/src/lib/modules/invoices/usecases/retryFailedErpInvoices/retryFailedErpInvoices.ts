@@ -53,7 +53,7 @@ export class RetryFailedErpInvoicesUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
@@ -67,7 +67,7 @@ export class RetryFailedErpInvoicesUsecase
       this.addressRepo,
       this.manuscriptRepo,
       this.catalogRepo,
-      this.erpService,
+      this.sageService,
       this.netSuiteService,
       this.publisherRepo,
       this.loggerService

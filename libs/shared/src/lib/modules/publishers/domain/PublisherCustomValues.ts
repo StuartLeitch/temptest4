@@ -4,4 +4,6 @@ export interface PublisherCustomValues {
   journalReference: string;
   journalItemTag: string;
   journalTag: string;
+  customSegmentId?: string;
+  itemId?: string;
 }
