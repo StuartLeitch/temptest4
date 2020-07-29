@@ -160,7 +160,8 @@ class KnexMigrationSource {
       '20200703084515_add_manuscript_users_view',
       true
     ),
-    rebuild_materialized_views('20200703091515_add_last_editor_declined_date'),
+    rebuild_materialized_views('20200703091515_add_last_editor_declined_date', true),
+    rebuild_materialized_views('20200703091515_add_screening_paused_dates'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

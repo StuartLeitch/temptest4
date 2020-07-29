@@ -65,6 +65,7 @@ AS SELECT
   screener.checker_email as screener_email,
   quality_checker.checker_name as quality_checker_name,
   quality_checker.checker_email as quality_checker_email,
+  coalesce(s.screening_paused_date, '01-01-1900'::TIMESTAMP) > coalesce(s.screening_unpaused_date, '01-01-1901'::TIMESTAMP) as is_paused,
   reviewers.invited_reviewers_count,
   reviewers.last_reviewer_invitation_date,
   accepted_reviewers.accepted_reviewers_count,
