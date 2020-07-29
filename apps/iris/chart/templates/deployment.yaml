@@ -50,7 +50,7 @@ spec:
       initContainers:
         - name: db-migration
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ['bash', '-c', "superset db upgrade",'bash', '-c', "superset init"]
+          command: ['bash', '-c', "superset db upgrade && superset init"]
           {{- if index $hasFeature "envVars" }}
           env:
             {{- range $key, $value := .Values.envVars }}
