@@ -34,6 +34,7 @@ AS SELECT
   t.last_materials_check_files_submitted_date,
   t.screening_paused_date,
   t.screening_unpaused_date,
+  t.accepted_date,
   t.first_decision_date,
   t.special_issue_id,
   t.section_id,
@@ -66,6 +67,7 @@ FROM (
       materials_check_files_submitted_dates.max as last_materials_check_files_submitted_date,
       paused_dates.max as screening_paused_date,
       unpaused_dates.max as screening_unpaused_date,
+      accepted_dates.min as accepted_date,
       void_dates.max as void_date,
       void_dates.max is not null as is_void,
       CASE 
@@ -100,6 +102,7 @@ FROM (
       LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningVoid' group by submission_id) void_dates on void_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningPaused' group by submission_id) paused_dates on paused_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningUnpaused' group by submission_id) unpaused_dates on unpaused_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, min(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event in ('SubmissionQualityCheckPassed', 'SubmissionPeerReviewCycleCheckPassed') group by submission_id) accepted_dates on accepted_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
     ) sd

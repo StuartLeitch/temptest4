@@ -28,7 +28,6 @@ AS SELECT
   last_sd.event_timestamp as last_event_date,
   sd.event_timestamp as final_decision_date,
   sd.submission_event as final_decision_type,
-  case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as accepted_date,
   case 
     when i.apc is not null then i.apc
     when s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') then 'free'
