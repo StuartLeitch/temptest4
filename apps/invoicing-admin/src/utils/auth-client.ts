@@ -3,20 +3,20 @@ import Keycloak from 'keycloak-js';
 import config from '../config';
 
 class _AuthClient {
-  private kc: Keycloak.KeycloakInstance<'native'>;
+  private kc: Keycloak.KeycloakInstance;
   public authState: any = {
     isAuthenticated: false,
-    user: null
+    user: null,
   };
 
   constructor() {
     const kcConfig = {
       url: config.authServerUrl,
       realm: config.authServerRealm,
-      clientId: config.authServerClientId
+      clientId: config.authServerClientId,
     };
 
-    this.kc = Keycloak<'native'>(kcConfig);
+    this.kc = Keycloak(kcConfig);
     this.kc.onAuthSuccess = () => this.handleAuthSuccess();
     this.kc.onAuthError = () => this.handleAuthError();
   }
@@ -52,7 +52,7 @@ class _AuthClient {
     const kcOptions = {
       onLoad: 'check-sso',
       // onLoad: "login-required",
-      promiseType: 'native'
+      promiseType: 'native',
       // silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
       // pkceMethod: "S256",
     };
@@ -74,7 +74,7 @@ class _AuthClient {
         token: kc.token,
         picture: data.picture,
         profile: data.profile,
-        roles: data.resource_access['invoicing-admin'].roles
+        roles: data.resource_access['invoicing-admin'].roles,
       };
     }
 

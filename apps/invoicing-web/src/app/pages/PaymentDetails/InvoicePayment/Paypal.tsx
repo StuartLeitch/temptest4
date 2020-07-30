@@ -34,6 +34,10 @@ const Paypal: React.FunctionComponent<Props> = ({
       isScriptLoaded &&
       (window as any).paypal
         .Buttons({
+          style: {
+            layout: "horizontal",
+            label: "pay",
+          },
           createOrder: async (data, actions) => {
             const a = await createPayPalOrder();
             return a;

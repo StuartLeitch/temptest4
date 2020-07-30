@@ -26,7 +26,7 @@ import {
   BraintreeService,
   NetSuiteService,
   PayPalService,
-  ErpService,
+  SageService,
 } from '../services';
 
 import { env } from '../env';
@@ -43,7 +43,7 @@ export interface Services {
   paymentStrategyFactory: PaymentStrategyFactory;
   qq: SQSPublishServiceContract;
   erp: {
-    sage: ErpService;
+    sage: SageService;
     netsuite: NetSuiteService;
   };
 }

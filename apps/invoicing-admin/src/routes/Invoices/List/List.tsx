@@ -14,7 +14,7 @@ import {
 import { TrTableInvoicesList } from './components/TrTableList';
 import { Loading } from '../../components';
 
-import { INVOICES_QUERY, } from './graphql';
+import { INVOICES_QUERY } from './graphql';
 
 const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   const { pagination: defaultPaginator } = props;
@@ -45,12 +45,9 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
     fetchData();
   }, [props.filters, pagination, fetchInvoices]);
 
-  if (loading)
-    return (
-      <Loading />
-    );
+  if (loading) return <Loading />;
 
-  if (error) return <Error data={error} />;
+  if (error) return <Error data={error as any} />;
 
   return (
     <Card className='mb-0'>
@@ -102,6 +99,6 @@ interface RecentInvoicesListProps {
     customId: string;
   };
   setPage(key: string, value: string | boolean | any[]): void;
-};
+}
 
 export default RecentInvoicesList;

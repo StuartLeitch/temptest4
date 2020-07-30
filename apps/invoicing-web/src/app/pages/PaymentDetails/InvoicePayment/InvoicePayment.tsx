@@ -11,7 +11,6 @@ import {
   Icon,
   th,
 } from "@hindawi/react-components";
-import { FormatUtils } from "@hindawi/invoicing-web/app/utils/format";
 
 import { config } from "../../../../config";
 import Paypal from "./Paypal";
@@ -20,13 +19,7 @@ import ChoosePayment from "./ChoosePayment";
 import CreditCardForm from "./CreditCardForm";
 import SuccessfulPayment from "./SuccessfulPayment";
 
-import { invoiceSelectors, invoiceTypes } from "../../../state/modules/invoice";
-
-const PAYMENT_METHODS = {
-  paypal: "paypal",
-  creditCard: "creditCard",
-  bankTransfer: "bankTransfer",
-};
+import { invoiceSelectors } from "../../../state/modules/invoice";
 
 type PaymentStatus = "CREATED" | "PENDING" | "FAILED" | "COMPLETED";
 

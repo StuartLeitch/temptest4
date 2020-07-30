@@ -17,7 +17,7 @@ import config from '../../config';
 const findChildByType = (children, targetType) => {
   let result;
 
-  React.Children.forEach(children, child => {
+  React.Children.forEach(children, (child) => {
     if (child.type.layoutPartName === targetType.layoutPartName) {
       result = child;
     }
@@ -28,7 +28,7 @@ const findChildByType = (children, targetType) => {
 const findChildrenByType = (children, targetType) => {
   return _.filter(
     React.Children.toArray(children),
-    child => child.type.layoutPartName === targetType.layoutPartName
+    (child) => (child as any).type.layoutPartName === targetType.layoutPartName
   );
 };
 
@@ -37,7 +37,7 @@ const responsiveBreakpoints = {
   sm: { min: 576, max: 767.8 },
   md: { min: 768, max: 991.8 },
   lg: { min: 992, max: 1199.8 },
-  xl: { min: 1200 }
+  xl: { min: 1200 },
 };
 
 class Layout extends React.Component<LayoutProps, LayoutState> {
@@ -48,7 +48,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
     favIcons: PropTypes.array,
     Navbar: PropTypes.any,
     Sidebar: PropTypes.any,
-    Content: PropTypes.any
+    Content: PropTypes.any,
   };
   lastLgSidebarCollapsed: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
@@ -68,7 +68,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
 
       pageTitle: null,
       pageDescription: config.siteDescription,
-      pageKeywords: config.siteKeywords
+      pageKeywords: config.siteKeywords,
     };
 
     this.lastLgSidebarCollapsed = false;
@@ -85,7 +85,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
       _.forOwn(responsiveBreakpoints, (value: any, key) => {
         const queryParts = [
           `${_.isUndefined(value.min) ? '' : `(min-width: ${value.min}px)`}`,
-          `${_.isUndefined(value.max) ? '' : `(max-width: ${value.max}px)`}`
+          `${_.isUndefined(value.max) ? '' : `(max-width: ${value.max}px)`}`,
         ];
         const query = _.compact(queryParts).join(' and ');
 
@@ -133,11 +133,11 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
         const styleUpdate = this.state.sidebarCollapsed
           ? {
               overflowY: 'auto',
-              touchAction: 'auto'
+              touchAction: 'auto',
             }
           : {
               overflowY: 'hidden',
-              touchAction: 'none'
+              touchAction: 'none',
             };
         Object.assign(this.bodyElement.style, styleUpdate);
         Object.assign(this.documentElement.style, styleUpdate);
@@ -189,9 +189,9 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
 
       // Calculate and update style.top of each navbar
       let totalNavbarsHeight = 0;
-      navbarElements.forEach(navbarElement => {
+      navbarElements.forEach((navbarElement) => {
         const navbarBox = navbarElement.getBoundingClientRect();
-        navbarElement.style.top = `${totalNavbarsHeight}px`;
+        (navbarElement as HTMLElement).style.top = `${totalNavbarsHeight}px`;
         totalNavbarsHeight += navbarBox.height;
       });
     }
@@ -199,7 +199,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
 
   toggleSidebar() {
     this.setState({
-      sidebarCollapsed: !this.state.sidebarCollapsed
+      sidebarCollapsed: !this.state.sidebarCollapsed,
     });
   }
 
@@ -233,9 +233,9 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
 
           toggleSidebar: this.toggleSidebar.bind(this),
           setElementsVisibility: this.setElementsVisibility.bind(this),
-          changeMeta: metaData => {
+          changeMeta: (metaData) => {
             this.setState(metaData);
-          }
+          },
         }}
       >
         <Helmet>
@@ -251,7 +251,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
           ))}
         </Helmet>
         <ThemeClass>
-          {themeClass => (
+          {(themeClass) => (
             <div
               className={classNames(layoutClass, themeClass)}
               ref={this.containerRef}
@@ -265,7 +265,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
                     (this.state.screenSize === 'lg' ||
                       this.state.screenSize === 'xl'),
                   sidebarCollapsed:
-                    !this.props.sidebarSlim && this.state.sidebarCollapsed
+                    !this.props.sidebarSlim && this.state.sidebarCollapsed,
                 })}
 
               <div className='layout__wrap'>
@@ -290,9 +290,9 @@ interface LayoutProps {
   sidebarSlim?: boolean;
   location?: {
     pathname: string;
-  }
+  };
   favIcons?: any;
-};
+}
 
 interface LayoutState {
   sidebarHidden: boolean;
@@ -304,6 +304,6 @@ interface LayoutState {
   pageTitle: string | null;
   pageDescription: string;
   pageKeywords: string;
-};
+}
 
 export { routedLayout as Layout };

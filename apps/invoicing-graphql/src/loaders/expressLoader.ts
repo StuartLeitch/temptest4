@@ -19,7 +19,6 @@ import {
 import { Context } from '../builders';
 
 import { env } from '../env';
-import { request } from 'http';
 
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -75,6 +74,10 @@ export const expressLoader: MicroframeworkLoader = (
       } = context;
       const authContext = { roles: [Roles.PAYER] };
       const usecase = new PayPalProcessFinishedUsecase(payment);
+
+      console.log('-------paypal event------');
+      console.log(JSON.stringify(data, null, 2));
+      console.log('-------------------------');
 
       try {
         const result = await usecase.execute(
