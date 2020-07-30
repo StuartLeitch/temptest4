@@ -194,7 +194,8 @@ export class PublishRevenueRecognitionToErpUsecase
 
       return right(Result.ok<any>(erpResponse));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      console.log(err);
+      return left(new AppError.UnexpectedError(err, err.toString()));
     }
   }
 }

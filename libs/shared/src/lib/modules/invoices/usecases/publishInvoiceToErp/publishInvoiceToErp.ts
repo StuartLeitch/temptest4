@@ -269,7 +269,8 @@ export class PublishInvoiceToErpUsecase
         return left(err);
       }
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      console.log(err);
+      return left(new AppError.UnexpectedError(err, err.toString()));
     }
   }
 }
