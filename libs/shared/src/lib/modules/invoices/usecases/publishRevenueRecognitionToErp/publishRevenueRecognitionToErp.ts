@@ -179,6 +179,7 @@ export class PublishRevenueRecognitionToErpUsecase
       const erpResponse = await this.sageService.registerRevenueRecognition({
         invoice,
         manuscript,
+        customSegmentId: publisherCustomValues?.customSegmentId,
         invoiceTotal: netCharges,
         publisherCustomValues,
       });

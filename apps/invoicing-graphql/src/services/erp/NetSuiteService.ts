@@ -29,6 +29,13 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerInvoice(data: ErpData): Promise<ErpResponse> {
     // console.log('ERP Data:');
     // console.info(data);
+
+    const customerId = await this.getCustomerId(data);
+
+    return this.createInvoice({ ...data, customerId });
+  }
+
+  private async getCustomerId(data: ErpData) {
     const { payer } = data;
 
     let customerId;
@@ -49,18 +56,43 @@ export class NetSuiteService implements ErpServiceContract {
       customerId = await this.createCustomer(data);
     }
 
-    return this.createInvoice({ ...data, customerId });
+    return customerId;
   }
 
   public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
     // console.log('registerRevenueRecognition Data:');
     // console.info(data);
+    const { customSegmentId } = data;
+    const customerId = await this.getCustomerId(data);
 
-    const debitAccountId = '1'; // this.queryAccount(data);
-    const creditAccountId = '213'; // this.queryAccount(data);
+    /**
+     * * Hindawi will be accounts: debit id "376", credit id: "401"
+     * * Partnerships will be accounts: debit id "377", credit id: "402"
+     **/
+    const idMap = {
+      Hindawi: {
+        debit: 376,
+        credit: 401,
+      },
+      Partnership: {
+        debit: 377,
+        credit: 402,
+      },
+    };
+
+    let creditAccountId;
+    let debitAccountId;
+    if (customSegmentId !== '0') {
+      creditAccountId = idMap.Partnership.credit;
+      debitAccountId = idMap.Partnership.debit;
+    } else {
+      creditAccountId = idMap.Hindawi.credit;
+      debitAccountId = idMap.Hindawi.debit;
+    }
 
     const revenueRecognition = await this.createRevenueRecognition({
       ...data,
+      customerId,
       creditAccountId,
       debitAccountId,
     });
@@ -278,7 +310,15 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { invoiceTotal, creditAccountId, debitAccountId } = data;
+    const {
+      invoice,
+      // manuscript,
+      invoiceTotal,
+      creditAccountId,
+      debitAccountId,
+      customerId,
+      customSegmentId,
+    } = data;
 
     const journalRequestOpts = {
       url: `${config.endpoint}record/v1/journalentry`,
@@ -287,19 +327,25 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
+      memo: `${invoice.referenceNumber}`,
+      entity: {
+        id: customerId,
+      },
       createdDate: format(
         new Date(data.invoice.dateCreated),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ), // '2020-07-01T14:09:00Z',
+      ),
       line: {
         items: [
           {
+            memo: `${invoice.referenceNumber}`,
             account: {
               id: debitAccountId,
             },
             debit: invoiceTotal,
           },
           {
+            memo: `${invoice.referenceNumber}`,
             account: {
               id: creditAccountId,
             },
@@ -309,6 +355,12 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
+    if (customSegmentId !== '0') {
+      createJournalPayload.cseg1 = {
+        id: customSegmentId,
+      };
+    }
+
     try {
       const res = await axios({
         ...journalRequestOpts,
@@ -317,7 +369,44 @@ export class NetSuiteService implements ErpServiceContract {
       } as AxiosRequestConfig);
 
       const journalId = res?.headers?.location?.split('/').pop();
+      await this.patchInvoice({ ...data, journalId });
       return journalId;
+    } catch (err) {
+      console.error(err);
+      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
+      return { err } as unknown;
+    }
+  }
+
+  private async patchInvoice(data: any) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+    const { invoice, journalId } = data;
+
+    const invoiceRequestOpts = {
+      url: `${
+        config.endpoint
+      }record/v1/invoice/${invoice.invoiceId.id.toString()}`,
+      method: 'PATCH',
+    };
+
+    const patchInvoicePayload: Record<string, unknown> = {
+      custbody_bbs_revenue_journal: {
+        id: journalId,
+        refName: `Journal #${journalId}`,
+      },
+    };
+
+    try {
+      await axios({
+        ...invoiceRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(invoiceRequestOpts, token)),
+        data: patchInvoicePayload,
+      } as AxiosRequestConfig);
+
+      // const journalId = res?.headers?.location?.split('/').pop();
+      // return journalId;
     } catch (err) {
       console.error(err);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
