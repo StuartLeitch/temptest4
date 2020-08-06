@@ -3,22 +3,30 @@
 import corsMiddleware from 'cors';
 import express from 'express';
 import {
-  MicroframeworkLoader,
   MicroframeworkSettings,
+  MicroframeworkLoader,
 } from 'microframework-w3tec';
 
 import {
   PayPalProcessFinishedUsecase,
-  RecordPaymentUsecase,
   GetInvoicePdfUsecase,
   Roles,
-  UniqueEntityID,
-  InvoiceId,
 } from '@hindawi/shared';
 
 import { Context } from '../builders';
+import {
+  PayPalWebhookResponse,
+  PayPalPaymentCapture,
+} from '../services/paypal/types/webhooks';
 
 import { env } from '../env';
+
+function extractOrderId(data: PayPalPaymentCapture): string {
+  const orderLink = data.links.find((link) => link.href.indexOf('orders') > -1);
+  const linkPathSplitted = orderLink.href.split('/');
+  const orderId = linkPathSplitted[linkPathSplitted.length - 1];
+  return orderId;
+}
 
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -67,7 +75,7 @@ export const expressLoader: MicroframeworkLoader = (
 
     app.post('/api/payments/process-finished', async (req, res) => {
       // TODO: Add validation on event
-      const data = req.body;
+      const data: PayPalWebhookResponse<PayPalPaymentCapture> = req.body;
       const {
         repos: { payment },
         services: { logger },
@@ -81,7 +89,10 @@ export const expressLoader: MicroframeworkLoader = (
 
       try {
         const result = await usecase.execute(
-          { payPalEvent: data.event_type, payPalOrderId: data.resource.id },
+          {
+            payPalOrderId: extractOrderId(data.resource),
+            payPalEvent: data.event_type,
+          },
           authContext
         );
 
@@ -92,6 +103,7 @@ export const expressLoader: MicroframeworkLoader = (
             }. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
             result.value
           );
+          return res.status(500);
         }
       } catch (e) {
         logger.error(
@@ -100,6 +112,7 @@ export const expressLoader: MicroframeworkLoader = (
           }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
           e
         );
+        return res.status(500);
       }
 
       return res.status(200);

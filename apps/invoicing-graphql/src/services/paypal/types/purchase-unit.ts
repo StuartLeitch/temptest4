@@ -1,48 +1,23 @@
 import { PayPalLinkDescription as LinkDescription } from './link-description';
+import { DisbursementMode } from './disbursement-mode';
+import { SellerProtection } from './seller-protection';
 import { PayPalAddress as Address } from './address';
-
-interface Money {
-  currency_code: string;
-  value: string;
-}
-
-interface AmountBreakdown {
-  shipping_discount?: Money;
-  item_total?: Money;
-  tax_total?: Money;
-  insurance?: Money;
-  shipping?: Money;
-  handling?: Money;
-  discount?: Money;
-}
-
-interface AmountWithBreakdown extends Money {
-  breakdown?: AmountBreakdown;
-}
-
-interface PayeeBase {
-  email_address: string;
-  merchant_id: string;
-}
+import { ExchangeRate } from './exchange-rate';
+import {
+  SellerReceivableBreakdown,
+  AmountWithBreakdown,
+  PlatformFee,
+  Money,
+} from './money';
 
 interface Payee {
   email_address: string;
   merchant_id: string;
 }
 
-enum DisbursementMode {
-  INSTANT = 'INSTANT',
-  DELAYED = 'DELAYED',
-}
-
 export enum ItemCategory {
   PHYSICAL_GOODS = 'PHYSICAL_GOODS',
   DIGITAL_GOODS = 'DIGITAL_GOODS',
-}
-
-interface PlatformFee {
-  amount: Money;
-  payee?: PayeeBase;
 }
 
 interface PaymentInstruction {
@@ -80,22 +55,6 @@ enum AuthorizationReason {
   PENDING_REVIEW = 'PENDING_REVIEW',
 }
 
-enum SellerProtectionStatus {
-  PARTIALLY_ELIGIBLE = 'PARTIALLY_ELIGIBLE',
-  NOT_ELIGIBLE = 'NOT_ELIGIBLE',
-  ELIGIBLE = 'ELIGIBLE',
-}
-
-enum DisputeCategory {
-  UNAUTHORIZED_TRANSACTION = 'UNAUTHORIZED_TRANSACTION',
-  ITEM_NOT_RECEIVED = 'ITEM_NOT_RECEIVED',
-}
-
-interface SellerProtection {
-  dispute_categories?: Array<DisputeCategory>;
-  status?: SellerProtectionStatus;
-}
-
 interface AuthorizationWithData {
   status?: AuthorizationStatus;
   status_details?: { reason?: AuthorizationReason };
@@ -130,21 +89,6 @@ enum CaptureStatusDetails {
   REFUNDED = 'REFUNDED',
   ECHECK = 'ECHECK',
   OTHER = 'OTHER',
-}
-
-interface ExchangeRate {
-  source_currency?: string;
-  target_currency?: string;
-  value?: string;
-}
-
-interface SellerReceivableBreakdown {
-  gross_amount: Money;
-  paypal_fee?: Money;
-  net_amount?: Money;
-  receivable_amount?: Money;
-  exchange_rate?: ExchangeRate;
-  platform_fees?: Array<PlatformFee>;
 }
 
 interface Capture {
