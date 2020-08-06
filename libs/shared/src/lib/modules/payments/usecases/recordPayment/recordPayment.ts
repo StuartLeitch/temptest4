@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 // * Core Domain
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { Either, left, right } from '../../../../core/logic/Either';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -30,6 +29,7 @@ import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsFo
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 import { CreatePaymentUsecase, CreatePaymentDTO } from '../createPayment';
 
 import { PaymentDTO } from '../../domain/strategies/behaviors';
@@ -45,11 +45,13 @@ import {
   PaymentData,
   WithInvoice,
   WithPayment,
+  WithForeignPaymentId,
 } from './helper-types';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
+import { PaymentStatus } from '../../domain/Payment';
 
 export class RecordPaymentUsecase
   implements
@@ -66,14 +68,15 @@ export class RecordPaymentUsecase
     private payerRepo: PayerRepoContract,
     private logger: LoggerContract
   ) {
+    this.attachPaymentIfExists = this.attachPaymentIfExists.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
     this.attachManuscript = this.attachManuscript.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.attachStrategy = this.attachStrategy.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
-    this.pay = this.pay.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
     this.savePayment = this.savePayment.bind(this);
+    this.pay = this.pay.bind(this);
   }
 
   public async execute(request: DTO, context?: Context): Promise<Response> {
@@ -212,6 +215,41 @@ export class RecordPaymentUsecase
       .execute();
   }
 
+  private attachPaymentIfExists(context: Context) {
+    const usecase = new GetPaymentsByInvoiceIdUsecase(
+      this.invoiceRepo,
+      this.paymentRepo
+    );
+
+    return async <T extends WithForeignPaymentId & WithInvoiceId>(
+      request: T
+    ) => {
+      return new AsyncEither(request.invoiceId)
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((result) => result.getValue())
+        .map((payments) => {
+          return payments
+            .filter((payment) => payment.status === PaymentStatus.CREATED)
+            .filter(
+              (payment) => payment.foreignPaymentId === request.foreignPaymentId
+            );
+        })
+        .map((payments) => {
+          if (payments.length === 0) {
+            return null;
+          } else {
+            return payments[0];
+          }
+        })
+        .map((existingPayment) => ({
+          ...request,
+          payment: existingPayment,
+          existingPayment,
+        }))
+        .execute();
+    };
+  }
+
   private savePayment(context: Context) {
     return async <T extends WithPayment>(request: T) => {
       const usecase = new CreatePaymentUsecase(this.paymentRepo);
@@ -229,6 +267,14 @@ export class RecordPaymentUsecase
       };
 
       return new AsyncEither(dto)
+        .then(this.attachPaymentIfExists(context))
+        .advanceOrEnd(async (data) => {
+          if (data.payment) {
+            return right(false);
+          }
+
+          return right(true);
+        })
         .then((data) => usecase.execute(data, context))
         .map((payment) => ({ ...request, payment }))
         .execute();

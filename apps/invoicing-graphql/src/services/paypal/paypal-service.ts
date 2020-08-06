@@ -74,12 +74,12 @@ export class PayPalService implements ServiceContract {
     this.attachOrderIdForExistingPayment = this.attachOrderIdForExistingPayment.bind(
       this
     );
-    this.attachExistingPayment = this.attachExistingPayment.bind(this);
+    this.newCaptureOrderRequest = this.newCaptureOrderRequest.bind(this);
+    this.attachReusablePayment = this.attachReusablePayment.bind(this);
+    this.newCreateOrderRequest = this.newCreateOrderRequest.bind(this);
     this.attachPayPalMethodId = this.attachPayPalMethodId.bind(this);
-    this.captureOrderRequest = this.captureOrderRequest.bind(this);
-    this.createOrderInPayPal = this.createOrderInPayPal.bind(this);
-    this.createOrderRequest = this.createOrderRequest.bind(this);
-    this.getOrderRequest = this.getOrderRequest.bind(this);
+    this.newGetOrderRequest = this.newGetOrderRequest.bind(this);
+    this.sendOrderToPayPal = this.sendOrderToPayPal.bind(this);
     this.captureMoney = this.captureMoney.bind(this);
     this.createOrder = this.createOrder.bind(this);
     this.getOrder = this.getOrder.bind(this);
@@ -111,7 +111,7 @@ export class PayPalService implements ServiceContract {
     const execution = await new AsyncEither(request)
       .then(this.attachOrderIdForExistingPayment)
       .advanceOrEnd(async (data) => right(!data.orderId))
-      .then(this.createOrderInPayPal)
+      .then(this.sendOrderToPayPal)
       .execute();
 
     return execution.map((data) => data.orderId);
@@ -129,7 +129,7 @@ export class PayPalService implements ServiceContract {
 
     try {
       response = await this.httpClient.execute<PayPalOrderResponse>(
-        this.getOrderRequest(orderId)
+        this.newGetOrderRequest(orderId)
       );
     } catch (e) {
       this.logger.error(`Error on paypal get order`, e);
@@ -167,7 +167,7 @@ export class PayPalService implements ServiceContract {
 
     try {
       response = await this.httpClient.execute<PayPalOrderResponse>(
-        this.captureOrderRequest(orderId)
+        this.newCaptureOrderRequest(orderId)
       );
     } catch (e) {
       this.logger.error(`Error on paypal capture order`, e);
@@ -190,7 +190,9 @@ export class PayPalService implements ServiceContract {
     );
   }
 
-  private createOrderRequest(payload: PayPalOrderRequest): OrdersCreateRequest {
+  private newCreateOrderRequest(
+    payload: PayPalOrderRequest
+  ): OrdersCreateRequest {
     const newRequest: OrdersCreateRequest = new checkoutNodeJsSDK.orders.OrdersCreateRequest();
 
     newRequest.prefer(ResponsePrefer.REPRESENTATION);
@@ -199,7 +201,7 @@ export class PayPalService implements ServiceContract {
     return newRequest;
   }
 
-  private getOrderRequest(orderId: string): OrdersGetRequest {
+  private newGetOrderRequest(orderId: string): OrdersGetRequest {
     const newRequest: OrdersGetRequest = new checkoutNodeJsSDK.orders.OrdersGetRequest(
       orderId
     );
@@ -207,7 +209,7 @@ export class PayPalService implements ServiceContract {
     return newRequest;
   }
 
-  private captureOrderRequest(orderId: string): OrdersCaptureRequest {
+  private newCaptureOrderRequest(orderId: string): OrdersCaptureRequest {
     const newRequest: OrdersCaptureRequest = new checkoutNodeJsSDK.orders.OrdersCaptureRequest(
       orderId
     );
@@ -218,7 +220,7 @@ export class PayPalService implements ServiceContract {
     return newRequest;
   }
 
-  private async createOrderInPayPal(
+  private async sendOrderToPayPal(
     request: OrderRequest
   ): Promise<
     Either<
@@ -279,7 +281,7 @@ export class PayPalService implements ServiceContract {
 
     try {
       response = await this.httpClient.execute<PayPalOrderResponse>(
-        this.createOrderRequest(newOrder)
+        this.newCreateOrderRequest(newOrder)
       );
     } catch (e) {
       this.logger.error(`Error on paypal create order`, e);
@@ -307,7 +309,7 @@ export class PayPalService implements ServiceContract {
 
     return new AsyncEither(request)
       .then(this.attachPayPalMethodId(usecaseContext))
-      .then(this.attachExistingPayment(usecaseContext))
+      .then(this.attachReusablePayment(usecaseContext))
       .advanceOrEnd(async (data) => right(!!data.payment))
       .map((data) => ({
         ...request,
@@ -316,7 +318,7 @@ export class PayPalService implements ServiceContract {
       .execute();
   }
 
-  private attachExistingPayment(context: UsecaseAuthorizationContext) {
+  private attachReusablePayment(context: UsecaseAuthorizationContext) {
     const usecase = new GetPaymentsByInvoiceIdUsecase(
       this.invoiceRepo,
       this.paymentRepo

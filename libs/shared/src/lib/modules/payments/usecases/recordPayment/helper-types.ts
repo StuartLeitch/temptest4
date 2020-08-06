@@ -37,3 +37,7 @@ export interface WithPayment {
   amount?: number;
   payer: Payer;
 }
+
+export interface WithForeignPaymentId {
+  foreignPaymentId: string;
+}
