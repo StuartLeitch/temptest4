@@ -51,7 +51,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
           />
         )}
 
-      {invoice?.dateMovedToFinal && (
+      {(invoice?.dateMovedToFinal || invoice?.status === 'FINAL') && (
         <TimelineMini
           icon='check-circle'
           iconClassName='text-success'
