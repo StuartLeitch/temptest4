@@ -21,6 +21,7 @@ import { WaiverRepoContract } from '../../waivers/repos';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
+import { PublishCreditNoteToErpUsecase } from '../usecases/publishCreditNoteToErp/publishCreditNoteToErp';
 
 export class AfterInvoiceCreditNoteCreatedEvent
   implements HandleContract<InvoiceCreditNoteCreatedEvent> {
@@ -35,6 +36,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase,
+    private publishCreditNoteToErp: PublishCreditNoteToErpUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -141,9 +143,15 @@ export class AfterInvoiceCreditNoteCreatedEvent
         throw publishResult.value.errorValue();
       }
 
-      console.log(
+      this.loggerService.info(
         `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`
       );
+
+      const publishToErpResult = await this.publishCreditNoteToErp.execute({
+        creditNoteId: creditNote.id.toString(),
+      });
+
+      this.loggerService.info('[PublishCreditNoteToERP]:', publishToErpResult);
     } catch (err) {
       console.log(
         `[AfterInvoiceCreditNoteCreated]: Failed to execute onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent. Err: ${err}`

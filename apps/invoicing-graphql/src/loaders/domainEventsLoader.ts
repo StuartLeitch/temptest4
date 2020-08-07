@@ -11,6 +11,7 @@ import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/mo
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
+import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
@@ -70,6 +71,21 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       loggerService
     );
 
+    const publishCreditNoteToErp = new PublishCreditNoteToErpUsecase(
+      invoice,
+      invoiceItem,
+      coupon,
+      waiver,
+      payer,
+      address,
+      manuscript,
+      catalog,
+      erpService,
+      netSuiteService,
+      publisher,
+      loggerService
+    );
+
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
       queue
     );
@@ -102,6 +118,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoiceCredited,
+      publishCreditNoteToErp,
       loggerService
     );
 

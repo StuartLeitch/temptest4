@@ -104,7 +104,10 @@ export class NetSuiteService implements ErpServiceContract {
     // console.log('registerCreditNote Data:');
     // console.info(data);
 
-    return null;
+    const creditNoteId = await this.transformCreditNote(data);
+    const creditNote = await this.patchCreditNote({ ...data, creditNoteId });
+
+    return creditNote;
   }
 
   private async queryCustomer(data: any) {
@@ -407,6 +410,106 @@ export class NetSuiteService implements ErpServiceContract {
 
       // const journalId = res?.headers?.location?.split('/').pop();
       // return journalId;
+    } catch (err) {
+      console.error(err);
+      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
+      return { err } as unknown;
+    }
+  }
+
+  private async transformCreditNote(data: any) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+    const { creditNote } = data;
+
+    const creditNoteTransformOpts = {
+      url: `${
+        config.endpoint
+      }record/v1/invoice/${creditNote.id.toString()}/!transform/creditmemo`,
+      method: 'POST',
+    };
+
+    try {
+      const res = await axios({
+        ...creditNoteTransformOpts,
+        headers: oauth.toHeader(
+          oauth.authorize(creditNoteTransformOpts, token)
+        ),
+        data: {},
+      } as AxiosRequestConfig);
+
+      return res?.headers?.location?.split('/').pop();
+    } catch (err) {
+      console.error(err);
+      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
+      return { err } as unknown;
+    }
+  }
+
+  private async patchCreditNote(data: any) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+    const { creditNote } = data;
+
+    const creditNoteTransformOpts = {
+      url: `${
+        config.endpoint
+      }record/v1/invoice/${creditNote.id.toString()}/!transform/creditmemo`,
+      method: 'POST',
+    };
+
+    const createCreditNotePayload: Record<string, any> = {
+      // createdDate: format(
+      //   new Date(invoice.dateCreated),
+      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      // ), // '2020-07-01T14:09:00Z',
+      // saleseffectivedate: format(
+      //   new Date(invoice.dateCreated),
+      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      // ), // '2020-07-01T12:00:12.857Z',
+      // tranId: `${invoice.invoiceNumber}/${format(new Date(), 'yyyy')}`,
+      // entity: {
+      //   id: customerId,
+      // },
+      // item: {
+      //   items: [
+      //     {
+      //       amount: item.price,
+      //       description: `${article.title} - Article Processing Charges for ${
+      //         article.customId
+      //       }/${format(new Date(), 'yyyy')}`,
+      //       quantity: 1.0,
+      //       rate: item.price,
+      //       taxRate1: item.rate,
+      //       excludeFromRateRequest: false,
+      //       printItems: false,
+      //       item: {
+      //         id: itemId,
+      //       },
+      //       taxCode: {
+      //         id: taxRateId,
+      //       },
+      //     },
+      //   ],
+      // },
+    };
+
+    // if (customSegmentId !== '0') {
+    //   createInvoicePayload.cseg1 = {
+    //     id: customSegmentId,
+    //   };
+    // }
+
+    try {
+      const res = await axios({
+        ...creditNoteRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(creditNoteRequestOpts, token)),
+        data: createCreditNotePayload,
+      } as AxiosRequestConfig);
+
+      return res?.headers?.location?.split('/').pop();
     } catch (err) {
       console.error(err);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
