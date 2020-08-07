@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -6,13 +8,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -26,13 +26,14 @@ import { GetPayerDetailsByInvoiceIdResponse as Response } from './getPayerDetail
 import { GetPayerDetailsByInvoiceIdErrors as Errors } from './getPayerDetailsByInvoiceIdErrors';
 import { GetPayerDetailsByInvoiceIdDTO as DTO } from './getPayerDetailsByInvoiceIdDTO';
 
-type Context = AuthorizationContext<Roles>;
-export type GetPayerDetailsByInvoiceIdContext = Context;
-
 export class GetPayerDetailsByInvoiceIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract
@@ -46,12 +47,15 @@ export class GetPayerDetailsByInvoiceIdUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       const execution = new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.fetchPayer)
-        .map(payer => Result.ok<Payer>(payer));
+        .map((payer) => Result.ok<Payer>(payer));
 
       return execution.execute();
     } catch (e) {

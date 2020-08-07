@@ -1,18 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { InvoiceReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
@@ -62,13 +61,14 @@ interface CompoundDTO extends DTO {
   paused: boolean;
 }
 
-type Context = AuthorizationContext<Roles>;
-export type SendInvoiceConfirmationReminderContext = Context;
-
 export class SendInvoiceConfirmationReminderUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -100,7 +100,10 @@ export class SendInvoiceConfirmationReminderUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     try {
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
@@ -142,7 +145,7 @@ export class SendInvoiceConfirmationReminderUsecase
     return right<null, DTO>(request);
   }
 
-  private getInvoice(context: Context) {
+  private getInvoice(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       this.loggerService.info(
         `Get the details of invoice with id {${request.invoiceId}}`
@@ -162,7 +165,7 @@ export class SendInvoiceConfirmationReminderUsecase
     };
   }
 
-  private getManuscriptCustomId(context: Context) {
+  private getManuscriptCustomId(context: UsecaseAuthorizationContext) {
     return async (request: CompoundDTO) => {
       const usecase = new GetManuscriptByInvoiceIdUsecase(
         this.manuscriptRepo,
@@ -180,7 +183,7 @@ export class SendInvoiceConfirmationReminderUsecase
     };
   }
 
-  private getPauseStatus(context: Context) {
+  private getPauseStatus(context: UsecaseAuthorizationContext) {
     return async (request: DTO & { invoice: Invoice }) => {
       this.loggerService.info(
         `Get the paused status of reminders of type ${
@@ -211,7 +214,7 @@ export class SendInvoiceConfirmationReminderUsecase
     };
   }
 
-  private getTransaction(context: Context) {
+  private getTransaction(context: UsecaseAuthorizationContext) {
     return async (request: CompoundDTO) => {
       this.loggerService.info(
         `Get transaction details for invoice with id ${request.invoice.id.toString()}`
@@ -251,7 +254,9 @@ export class SendInvoiceConfirmationReminderUsecase
     };
   }
 
-  private getConfirmationNotificationsSent(context: Context) {
+  private getConfirmationNotificationsSent(
+    context: UsecaseAuthorizationContext
+  ) {
     return async (request: CompoundDTO) => {
       this.loggerService.info(
         `Get the reminders of type ${NotificationType.REMINDER_CONFIRMATION} already sent for the invoice with id {${request.invoiceId}}`

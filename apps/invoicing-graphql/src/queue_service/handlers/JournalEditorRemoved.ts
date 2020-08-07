@@ -3,11 +3,12 @@
 
 import { JournalEditorRemoved } from '@hindawi/phenom-events';
 
-import { GetEditorsByJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
-import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
-import { RemoveEditorsFromJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
-
-import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
+import {
+  GetEditorsByJournalUsecase,
+  AssignEditorsToJournalUsecase,
+  RemoveEditorsFromJournalUsecase,
+  EditorMap,
+} from '@hindawi/shared';
 
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
 const JOURNAL_SECTION_EDITOR_REMOVED = 'JournalSectionEditorRemoved';

@@ -8,13 +8,12 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  Roles,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
@@ -86,13 +85,14 @@ import * as Errors from './migrateEntireInvoiceErrors';
 
 import { validateRequest } from './utils';
 
-type Context = AuthorizationContext<Roles>;
-export type MigrateEntireInvoiceContext = Context;
-
 export class MigrateEntireInvoiceUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private sqsPublishService: SQSPublishServiceContract,
@@ -172,7 +172,10 @@ export class MigrateEntireInvoiceUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
+  public async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     const requestExecution = new AsyncEither<null, DTO>(request).then(
       validateRequest
     );
@@ -276,7 +279,7 @@ export class MigrateEntireInvoiceUsecase
       context
     );
     if (response.isFailure) {
-      const errorMessage = (response.errorValue() as unknown) as string;
+      const errorMessage = (response.errorValue() as any) as string;
       return left(new Errors.TransactionError(errorMessage));
     }
     return right(response.getValue());
@@ -630,7 +633,9 @@ export class MigrateEntireInvoiceUsecase
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
         invoice.props.dateUpdated = new Date(request.issueDate);
         invoice.props.dateIssued = new Date(request.issueDate);
-        invoice.props.erpReference = request.erpReference;
+        invoice.props.revenueRecognitionReference =
+          request.revenueRecognitionReference || null;
+        invoice.props.erpReference = request.erpReference || null;
         invoice.props.invoiceNumber = invoiceNumber;
         invoice.payerId = payer ? payer.payerId : null;
 
@@ -697,7 +702,7 @@ export class MigrateEntireInvoiceUsecase
     payer: Payer;
   }) {
     if (!invoice) {
-      return right<null, object>({});
+      return right<null, Record<string, any>>({});
     }
 
     const usecase = new PublishInvoiceConfirmedUsecase(this.sqsPublishService);
@@ -793,7 +798,7 @@ export class MigrateEntireInvoiceUsecase
         if (!request.apc.paymentAmount) {
           return right<null, null>(null);
         }
-        return right<null, unknown>({
+        return right<null, any>({
           amount: request.apc.paymentAmount,
           datePaid: request.paymentDate,
           invoiceId: request.invoiceId,
@@ -1031,7 +1036,7 @@ export class MigrateEntireInvoiceUsecase
     return maybeAddress.map((result) => result.getValue());
   }
 
-  private sendInvoiceFinalizedEvent(context: Context) {
+  private sendInvoiceFinalizedEvent(context: UsecaseAuthorizationContext) {
     const usecase = new PublishInvoiceFinalizedUsecase(this.sqsPublishService);
 
     return async ({ invoice, request }: { invoice: Invoice; request: DTO }) => {
@@ -1147,7 +1152,7 @@ export class MigrateEntireInvoiceUsecase
     return right(true);
   }
 
-  private markInvoiceAsFinalAfterWaiver(context: Context) {
+  private markInvoiceAsFinalAfterWaiver(context: UsecaseAuthorizationContext) {
     return async (request: DTO & { invoice: Invoice }) => {
       const { invoice } = request;
 
@@ -1161,7 +1166,7 @@ export class MigrateEntireInvoiceUsecase
     };
   }
 
-  private addMigrationWaiver(context: Context) {
+  private addMigrationWaiver(context: UsecaseAuthorizationContext) {
     return async (request: DTO & { invoice: Invoice }) => {
       const uuid = new UniqueEntityID(request.invoiceId);
       const invoiceId = InvoiceId.create(uuid).getValue();
@@ -1194,7 +1199,7 @@ export class MigrateEntireInvoiceUsecase
     return right(true);
   }
 
-  private attachInvoice(context: Context) {
+  private attachInvoice(context: UsecaseAuthorizationContext) {
     return async (request: DTO) => {
       return new AsyncEither(request.invoiceId)
         .then(this.getInvoice)

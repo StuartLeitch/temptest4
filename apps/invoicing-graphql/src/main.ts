@@ -5,19 +5,7 @@ import { banner } from './lib/banner';
 import { Logger } from './lib/logger';
 import './lib/logger/LoggerAspect';
 
-/**
- * Loaders
- */
-import { winstonLoader } from './loaders/winstonLoader';
-import { knexLoader } from './loaders/knexLoader';
-import { contextLoader } from './loaders/contextLoader';
-import { expressLoader } from './loaders/expressLoader';
-import { monitorLoader } from './loaders/monitorLoader';
-import { graphqlLoader } from './loaders/graphqlLoader';
-import { queueServiceLoader } from './loaders/queueServiceLoader';
-import { schedulerLoader } from './loaders/schedulerLoader';
-import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
-import { sisifLoader } from './loaders/sisifLoader';
+import { env } from './env';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -27,28 +15,132 @@ import { sisifLoader } from './loaders/sisifLoader';
  * The basic layer of this app is express. For further information visit
  * the 'README.md' file.
  */
-const log = new Logger(/*__filename*/);
+const log = new Logger();
 
-bootstrapMicroframework({
+async function main() {
   /**
-   * Loader is a place where you can configure all your modules during microframework
-   * bootstrap process. All loaders are executed one by one in a sequential order.
+   * Loaders
    */
-  loaders: [
-    winstonLoader,
-    knexLoader,
-    contextLoader,
-    expressLoader,
-    monitorLoader,
-    graphqlLoader,
-    queueServiceLoader,
-    schedulerLoader,
-    domainEventsRegisterLoader,
-    sisifLoader,
-  ],
-})
-  .then(() => banner(log))
-  .catch((error) => {
-    log.error('Application crashed', error);
-    process.exit(1);
-  });
+  const loaders = [];
+
+  if (env.loaders.winstonEnabled) {
+    const protocol = await import('winston');
+    const { winstonLoader } = await import(
+      /* webpackChunkName: "winstonLoader" */ './loaders/winstonLoader'
+    );
+
+    protocol.add(
+      new protocol.transports.Console({
+        level: env.log.level,
+        handleExceptions: true,
+        format:
+          env.node !== 'development'
+            ? protocol.format.combine(protocol.format.json())
+            : protocol.format.combine(
+                protocol.format.colorize(),
+                protocol.format.simple()
+              ),
+      })
+    );
+    log.setProtocol(protocol);
+    log.info('Winston logging initiated ✔️');
+    loaders.push(winstonLoader);
+  }
+
+  if (env.loaders.knexEnabled) {
+    const { knexLoader } = await import(
+      /* webpackChunkName: "knexLoader" */ './loaders/knexLoader'
+    );
+    log.info('Knex Query Builder initiated ✔️');
+    loaders.push(knexLoader);
+  }
+
+  if (env.loaders.contextEnabled) {
+    const { contextLoader } = await import(
+      /* webpackChunkName: "contextLoader" */ './loaders/contextLoader'
+    );
+    log.info('Context state object initiated ✔️');
+    loaders.push(contextLoader);
+  }
+
+  if (env.loaders.expressEnabled) {
+    const { expressLoader } = await import(
+      /* webpackChunkName: "expressLoader" */ './loaders/expressLoader'
+    );
+    log.info('Express Server initiated ✔️');
+    loaders.push(expressLoader);
+  }
+
+  if (env.loaders.monitorEnabled) {
+    const { monitorLoader } = await import(
+      /* webpackChunkName: "monitorLoader" */ './loaders/monitorLoader'
+    );
+    log.info('Express Monitor initiated ✔️');
+    loaders.push(monitorLoader);
+  }
+
+  if (env.loaders.graphqlEnabled) {
+    const { graphqlLoader } = await import(
+      /* webpackChunkName: "graphqlLoader" */ './loaders/graphqlLoader'
+    );
+    log.info('GraphQL Server initiated ✔️');
+    loaders.push(graphqlLoader);
+  }
+
+  if (env.loaders.erpEnabled) {
+    const { erpLoader } = await import(
+      /* webpackChunkName: "erpLoader" */ './loaders/erpLoader'
+    );
+    log.info('ERP Sage integration initiated ✔️');
+    loaders.push(erpLoader);
+  }
+
+  if (env.loaders.queueServiceEnabled) {
+    const { queueServiceLoader } = await import(
+      /* webpackChunkName: "queueServiceLoader" */ './loaders/queueServiceLoader'
+    );
+    log.info('Queue Service initiated ✔️');
+    loaders.push(queueServiceLoader);
+  }
+
+  if (env.loaders.schedulerEnabled) {
+    // import { schedulerLoader } from './loaders/schedulerLoader';
+    const { schedulerLoader } = await import(
+      /* webpackChunkName: "schedulerLoader" */ './loaders/schedulerLoader'
+    );
+    log.info('Scheduler initiated ✔️');
+    loaders.push(schedulerLoader);
+  }
+
+  if (env.loaders.domainEventsRegisterEnabled) {
+    // import { domainEventsRegisterLoader } from './loaders/domainEventsLoader';
+    const { domainEventsRegisterLoader } = await import(
+      /* webpackChunkName: "domainEventsRegisterLoader" */ './loaders/domainEventsLoader'
+    );
+    log.info('Domain Events initiated ✔️');
+    loaders.push(domainEventsRegisterLoader);
+  }
+  if (env.loaders.sisifEnabled) {
+    // import { sisifLoader } from './loaders/sisifLoader';
+    const { sisifLoader } = await import(
+      /* webpackChunkName: "sisifLoader" */ './loaders/sisifLoader'
+    );
+    log.info('Sisif service initiated ✔️');
+    loaders.push(sisifLoader);
+  }
+
+  await bootstrapMicroframework({
+    /**
+     * Loader is a place where you can configure all your modules during microframework
+     * bootstrap process. All loaders are executed one by one in a sequential order.
+     */
+    loaders,
+  })
+    .then(() => banner(log))
+    .catch((error) => {
+      log.error('Application crashed', error);
+      process.exit(1);
+    });
+}
+
+main();

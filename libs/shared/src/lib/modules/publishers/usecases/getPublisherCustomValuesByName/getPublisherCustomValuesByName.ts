@@ -1,19 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
-  Authorize,
-  AuthorizationContext,
-  AccessControlledUsecase
-} from '../../../../domain/authorization/decorators/Authorize';
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
-import { RepoErrorCode } from 'libs/shared/src/lib/infrastructure/RepoError';
+import { RepoErrorCode } from '../../../../infrastructure/RepoError';
 
 import { PublisherRepoContract } from '../../repos';
 
@@ -22,18 +21,16 @@ import { GetPublisherCustomValuesByNameResponse } from './getPublisherCustomValu
 import { GetPublisherCustomValuesByNameErrors } from './getPublisherCustomValuesByNameErrors';
 import { GetPublisherCustomValuesByNameDTO } from './getPublisherCustomValuesByNameDTO';
 
-export type GetPublisherCustomValuesByNameContext = AuthorizationContext<Roles>;
-
 export class GetPublisherCustomValuesByNameUsecase
   implements
     UseCase<
       GetPublisherCustomValuesByNameDTO,
       Promise<GetPublisherCustomValuesByNameResponse>,
-      GetPublisherCustomValuesByNameContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetPublisherCustomValuesByNameDTO,
-      GetPublisherCustomValuesByNameContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private publisherRepo: PublisherRepoContract) {}
@@ -45,7 +42,7 @@ export class GetPublisherCustomValuesByNameUsecase
   // @Authorize('invoice:read')
   public async execute(
     request: GetPublisherCustomValuesByNameDTO,
-    context?: GetPublisherCustomValuesByNameContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetPublisherCustomValuesByNameResponse> {
     try {
       const { publisherName: name } = request;

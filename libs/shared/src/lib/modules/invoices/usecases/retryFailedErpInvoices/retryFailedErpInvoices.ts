@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import {
-  AuthorizationContext,
-  Roles,
-  AccessControlledUsecase,
-  AccessControlContext,
-  ErpResponse,
-} from '@hindawi/shared';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
+
+// * Authorization Logic
+import {
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
+import { ErpResponse } from './../../../../domain/services/ErpService';
 
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
@@ -30,18 +31,16 @@ export type RetryFailedErpInvoicesResponse = Either<
   Result<ErpResponse[]>
 >;
 
-export type RetryFailedErpInvoicesContext = AuthorizationContext<Roles>;
-
 export class RetryFailedErpInvoicesUsecase
   implements
     UseCase<
       Record<string, unknown>,
       Promise<RetryFailedErpInvoicesResponse>,
-      RetryFailedErpInvoicesContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       Record<string, unknown>,
-      RetryFailedErpInvoicesContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   private publishToErpUsecase: PublishInvoiceToErpUsecase;
@@ -54,7 +53,8 @@ export class RetryFailedErpInvoicesUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
+    private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {
@@ -67,7 +67,8 @@ export class RetryFailedErpInvoicesUsecase
       this.addressRepo,
       this.manuscriptRepo,
       this.catalogRepo,
-      this.erpService,
+      this.sageService,
+      this.netSuiteService,
       this.publisherRepo,
       this.loggerService
     );
@@ -80,7 +81,7 @@ export class RetryFailedErpInvoicesUsecase
   // @Authorize('zzz:zzz')
   public async execute(
     request?: Record<string, unknown>,
-    context?: RetryFailedErpInvoicesContext
+    context?: UsecaseAuthorizationContext
   ): Promise<RetryFailedErpInvoicesResponse> {
     try {
       const failedErpInvoices = await this.invoiceRepo.getFailedErpInvoices();
@@ -125,12 +126,14 @@ export class RetryFailedErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        return left(new AppError.UnexpectedError(errs));
+        console.log(JSON.stringify(errs, null, 2));
+        return left(new AppError.UnexpectedError(errs, JSON.stringify(errs)));
       }
 
       return right(Result.ok<ErpResponse[]>(updatedInvoices));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      console.log(err);
+      return left(new AppError.UnexpectedError(err, err.toString()));
     }
   }
 }

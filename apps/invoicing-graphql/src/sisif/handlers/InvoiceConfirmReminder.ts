@@ -1,3 +1,6 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import { JobData } from '@hindawi/sisif';
 import {
   SendInvoiceConfirmationReminderUsecase,

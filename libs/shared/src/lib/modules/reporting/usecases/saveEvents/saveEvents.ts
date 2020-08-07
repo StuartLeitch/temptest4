@@ -2,30 +2,33 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, left } from '../../../../core/logic/Result';
 
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
+// * Authorization Logic
 import {
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
-import { Roles } from '../../../users/domain/enums/Roles';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
+
 import { EventMap } from '../../mappers/EventMap';
 import { EventsRepoContract } from '../../repos/EventsRepo';
 
-import { SaveEventsDTO } from './SaveEventsDTO';
+import { SaveEventsDTO } from './saveEventsDTO';
 import { SaveEventsResponse } from './saveEventsResponse';
 import { EventMappingRegistryContract } from '../../contracts/EventMappingRegistry';
 
-export type SaveEventsContext = AuthorizationContext<Roles>;
-
 export class SaveEventsUsecase
   implements
-    UseCase<SaveEventsDTO, Promise<SaveEventsResponse>, SaveEventsContext>,
+    UseCase<
+      SaveEventsDTO,
+      Promise<SaveEventsResponse>,
+      UsecaseAuthorizationContext
+    >,
     AccessControlledUsecase<
       SaveEventsDTO,
-      SaveEventsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
-  authorizationContext: AuthorizationContext<Roles>;
+  authorizationContext: UsecaseAuthorizationContext;
 
   constructor(
     private eventsRepo: EventsRepoContract,
@@ -36,7 +39,7 @@ export class SaveEventsUsecase
 
   public async execute(
     request: SaveEventsDTO,
-    context?: SaveEventsContext
+    context?: UsecaseAuthorizationContext
   ): Promise<SaveEventsResponse> {
     try {
       if (request.events.length === 0) {
@@ -44,13 +47,13 @@ export class SaveEventsUsecase
         return right(null);
       }
       await Promise.all(
-        this.policyRegistry.mapEvents(request.events).map(mapping => {
-          const persistenceEvents = mapping.events.map(raw => {
+        this.policyRegistry.mapEvents(request.events).map((mapping) => {
+          const persistenceEvents = mapping.events.map((raw) => {
             return EventMap.toDomain({
               id: raw.id,
               time: raw.timestamp,
               type: raw.event,
-              payload: JSON.stringify(raw.data)
+              payload: JSON.stringify(raw.data),
             });
           });
           return this.eventsRepo.upsertEvents(mapping.table, persistenceEvents);
@@ -60,7 +63,7 @@ export class SaveEventsUsecase
       console.log(error.message);
       console.log(
         'Failed to save events',
-        request.events.map(e => ({ id: e.id, event: e.event }))
+        request.events.map((e) => ({ id: e.id, event: e.event }))
       );
       return left(error);
     }

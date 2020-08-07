@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, right, left } from '../../../../core/logic/Result';
@@ -5,13 +6,12 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  AccessControlledUsecase,
-  AuthorizationContext,
   Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  AccessControlledUsecase,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
@@ -23,14 +23,12 @@ import { GetPaymentsByInvoiceIdResponse as Response } from './getPaymentsByInvoi
 import { GetPaymentsByInvoiceIdDTO as DTO } from './getPaymentsByInvoiceIdDTO';
 import * as Errors from './getPaymentsByInvoiceIdErrors';
 
-export type GetPaymentsByInvoiceIdContext = AuthorizationContext<Roles>;
-
 export class GetPaymentsByInvoiceIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, GetPaymentsByInvoiceIdContext>,
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
       DTO,
-      GetPaymentsByInvoiceIdContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -45,7 +43,7 @@ export class GetPaymentsByInvoiceIdUsecase
   @Authorize('payments:read')
   public async execute(
     request: DTO,
-    context?: GetPaymentsByInvoiceIdContext
+    context?: UsecaseAuthorizationContext
   ): Promise<Response> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());

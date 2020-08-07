@@ -48,7 +48,7 @@ export class KnexArticleRepo
 
     logger.debug('select', {
       correlationId,
-      sql: articleDataQuery.toString()
+      sql: articleDataQuery.toString(),
     });
 
     let articleData;

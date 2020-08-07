@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
@@ -5,13 +7,11 @@ import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
@@ -22,18 +22,16 @@ import { GetPaymentMethodByIdResponse } from './getPaymentMethodByIdResponse';
 import { GetPaymentMethodByIdErrors } from './getPaymentMethodByIdErrors';
 import { GetPaymentMethodByIdDTO } from './getPaymentMethodByIdDTO';
 
-export type GetPaymentMethodByIdContext = AuthorizationContext<Roles>;
-
 export class GetPaymentMethodByIdUsecase
   implements
     UseCase<
       GetPaymentMethodByIdDTO,
       Promise<GetPaymentMethodByIdResponse>,
-      GetPaymentMethodByIdContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetPaymentMethodByIdDTO,
-      GetPaymentMethodByIdContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private paymentMethodRepo: PaymentMethodRepoContract) {}
@@ -45,7 +43,7 @@ export class GetPaymentMethodByIdUsecase
   // @Authorize('payment-method:read')
   public async execute(
     request: GetPaymentMethodByIdDTO,
-    context?: GetPaymentMethodByIdContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetPaymentMethodByIdResponse> {
     const paymentMethodId = request.paymentMethodId;
 

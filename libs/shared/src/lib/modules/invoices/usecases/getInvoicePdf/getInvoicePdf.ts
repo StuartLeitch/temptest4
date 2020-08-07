@@ -7,12 +7,11 @@ import { chain } from '../../../../core/logic/EitherChain';
 import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import streamToPromise from 'stream-to-promise';
@@ -35,33 +34,34 @@ import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAdd
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
-import { InvoicePayload } from '../../../../domain/services/PdfGenerator/PdfGenerator';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { pdfGeneratorService } from '../../../../domain/services';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
+
+import {
+  pdfGeneratorService,
+  InvoicePayload
+} from '../../../../domain/services/PdfGenerator';
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
-import { PayerType } from 'libs/shared/src/lib/modules/payers/domain/Payer';
+import { PayerType } from '../../../payers/domain/Payer';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
-
-export type GetInvoicePdfContext = AuthorizationContext<Roles>;
 
 export class GetInvoicePdfUsecase
   implements
     UseCase<
       GetInvoicePdfDTO,
       Promise<GetInvoicePdfResponse>,
-      GetInvoicePdfContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetInvoicePdfDTO,
-      GetInvoicePdfContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
-  authorizationContext: AuthorizationContext<Roles>;
+  authorizationContext: UsecaseAuthorizationContext;
 
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -77,7 +77,7 @@ export class GetInvoicePdfUsecase
   // @Authorize('payer:read')
   public async execute(
     request: GetInvoicePdfDTO,
-    context?: GetInvoicePdfContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetInvoicePdfResponse> {
     this.authorizationContext = context;
     const { payerId } = request;
@@ -87,7 +87,7 @@ export class GetInvoicePdfUsecase
       article: null,
       invoice: null,
       author: null,
-      payer: null
+      payer: null,
     };
 
     const payloadEither = await chain(
@@ -96,14 +96,14 @@ export class GetInvoicePdfUsecase
         this.getPayloadWithAddress.bind(this),
         this.getPayloadWithInvoice.bind(this),
         this.getPayloadWithArticle.bind(this),
-        this.getPayloadWithAuthor.bind(this)
+        this.getPayloadWithAuthor.bind(this),
       ],
       emptyPayload
     );
 
     const payloadWithJournal = await map(
       [
-        async payload => {
+        async (payload) => {
           const catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
             JournalId.create(
               new UniqueEntityID(payload.article.props.journalId)
@@ -116,7 +116,7 @@ export class GetInvoicePdfUsecase
           }
 
           return payload;
-        }
+        },
       ],
       payloadEither
     );
@@ -128,12 +128,12 @@ export class GetInvoicePdfUsecase
 
     const payloadWithVatNote = await map(
       [
-        async payload => {
+        async (payload) => {
           const { template } = vatService.getVATNote(
             {
               postalCode: payload.address.postalCode,
               countryCode: payload.address.country,
-              stateCode: payload.address.state
+              stateCode: payload.address.state,
             },
             payload.payer.type !== PayerType.INSTITUTION
           );
@@ -150,7 +150,7 @@ export class GetInvoicePdfUsecase
           payload.invoice.props.vatnote = template;
 
           return payload;
-        }
+        },
       ],
       payloadWithJournal
     );
@@ -161,7 +161,7 @@ export class GetInvoicePdfUsecase
 
     const pdfEither: any = await map([streamToPromise], pdfStreamEither);
 
-    return this.addFileNameToResponse(payloadEither, pdfEither).map(pdf =>
+    return this.addFileNameToResponse(payloadEither, pdfEither).map((pdf) =>
       Result.ok(pdf)
     ) as GetInvoicePdfResponse;
   }
@@ -185,15 +185,16 @@ export class GetInvoicePdfUsecase
     payloadEither: Either<any, InvoicePayload>,
     pdfEither: Either<any, Buffer>
   ) {
-    return payloadEither.chain<any, Buffer | PdfResponse>(payload => {
-      return pdfEither.map<PdfResponse>(pdf => {
+    return payloadEither.chain<any, Buffer | PdfResponse>((payload) => {
+      return pdfEither.map<PdfResponse>((pdf) => {
         const date = payload.invoice.dateCreated;
-        const parsedDate = `${date.getUTCFullYear()}-${date.getUTCMonth() +
-          1}-${date.getUTCDate()}`;
+        const parsedDate = `${date.getUTCFullYear()}-${
+          date.getUTCMonth() + 1
+        }-${date.getUTCDate()}`;
 
         return {
           fileName: `${payload.invoice.id}-${parsedDate}.pdf`,
-          file: pdf
+          file: pdf,
         };
       });
     });
@@ -206,9 +207,9 @@ export class GetInvoicePdfUsecase
         { payerId },
         this.authorizationContext
       );
-      return payerEither.map(payerResult => ({
+      return payerEither.map((payerResult) => ({
         ...payload,
-        payer: payerResult.getValue()
+        payer: payerResult.getValue(),
       }));
     };
   }
@@ -217,12 +218,12 @@ export class GetInvoicePdfUsecase
     const { billingAddressId } = payload.payer;
     const usecase = new GetAddressUseCase(this.addressRepo);
     const addressEither = await usecase.execute({
-      billingAddressId: billingAddressId.id.toString()
+      billingAddressId: billingAddressId.id.toString(),
     });
 
-    return addressEither.map(addressResult => ({
+    return addressEither.map((addressResult) => ({
       ...payload,
-      address: addressResult.getValue()
+      address: addressResult.getValue(),
     }));
   }
 
@@ -243,8 +244,8 @@ export class GetInvoicePdfUsecase
     const invoice = invoiceResult.getValue();
     const itemsEither = await this.getInvoiceItems(invoiceId);
     const invoiceEither = itemsEither
-      .map(itemsResult =>
-        itemsResult.getValue().map(item => invoice.addInvoiceItem(item))
+      .map((itemsResult) =>
+        itemsResult.getValue().map((item) => invoice.addInvoiceItem(item))
       )
       .map(() => Result.ok(invoice));
     return invoiceEither;
@@ -262,15 +263,15 @@ export class GetInvoicePdfUsecase
       invoiceEither
     );
 
-    return invoiceWithItems.map(invoiceResult => ({
+    return invoiceWithItems.map((invoiceResult) => ({
       ...payload,
-      invoice: invoiceResult.getValue()
+      invoice: invoiceResult.getValue(),
     }));
   }
 
   private getArticleId(invoice: Invoice): Either<string, string> {
     const apcItems = invoice.invoiceItems.currentItems.filter(
-      item => item.type === 'APC'
+      (item) => item.type === 'APC'
     );
     if (apcItems.length > 0) {
       return right(apcItems[0].manuscriptId.id.toString());
@@ -288,14 +289,14 @@ export class GetInvoicePdfUsecase
         { articleId: articleIdEither.value },
         this.authorizationContext
       );
-      return articleEither.map(articleResult => ({
+      return articleEither.map((articleResult) => ({
         ...payload,
-        article: articleResult.getValue()
+        article: articleResult.getValue(),
       }));
     } else {
       return left<AppError.UnexpectedError, InvoicePayload>(
         Result.fail({
-          message: `no APC found for the invoice with id ${payload.invoice.id.toString()}`
+          message: `no APC found for the invoice with id ${payload.invoice.id.toString()}`,
         })
       );
     }
@@ -308,9 +309,9 @@ export class GetInvoicePdfUsecase
       { article },
       this.authorizationContext
     );
-    return authorEither.map(authorResult => ({
+    return authorEither.map((authorResult) => ({
       ...payload,
-      author: authorResult.getValue()
+      author: authorResult.getValue(),
     }));
   }
 }

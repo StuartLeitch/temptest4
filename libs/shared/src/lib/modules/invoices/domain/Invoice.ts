@@ -40,6 +40,7 @@ interface InvoiceProps {
   charge?: number;
   totalNumInvoiceItems?: number;
   erpReference?: string;
+  nsReference?: string;
   revenueRecognitionReference?: string;
   cancelledInvoiceReference?: string;
   vatnote?: string;
@@ -157,6 +158,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.revenueRecognitionReference = revenueRecognitionReference;
   }
 
+  get nsReference(): string {
+    return this.props.nsReference;
+  }
+
+  set nsReference(nsReference: string) {
+    this.props.nsReference = nsReference;
+  }
+
   get cancelledInvoiceReference(): string {
     return this.props.cancelledInvoiceReference;
   }
@@ -263,7 +272,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );

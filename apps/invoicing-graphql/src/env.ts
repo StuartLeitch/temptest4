@@ -83,6 +83,23 @@ export const env = {
       'CREDIT_CONTROL_REMINDER_SENDER_NAME'
     ),
   },
+  loaders: {
+    winstonEnabled: toBool(getOsEnvOptional('WINSTON_LOADER_ENABLED')),
+    knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
+    contextEnabled: toBool(getOsEnvOptional('CONTEXT_LOADER_ENABLED')),
+    expressEnabled: toBool(getOsEnvOptional('EXPRESS_LOADER_ENABLED')),
+    monitorEnabled: toBool(getOsEnvOptional('MONITOR_LOADER_ENABLED')),
+    graphqlEnabled: toBool(getOsEnvOptional('GRAPHQL_LOADER_ENABLED')),
+    queueServiceEnabled: toBool(
+      getOsEnvOptional('QUEUE_SERVICE_LOADER_ENABLED')
+    ),
+    schedulerEnabled: toBool(getOsEnvOptional('SCHEDULER_LOADER_ENABLED')),
+    domainEventsRegisterEnabled: toBool(
+      getOsEnvOptional('DOMAIN_EVENTS_REGISTER_LOADER_ENABLED')
+    ),
+    sisifEnabled: toBool(getOsEnvOptional('SISIF_LOADER_ENABLED')),
+    erpEnabled: toBool(getOsEnvOptional('ERP_LOADER_ENABLED')),
+  },
   log: {
     tenant: getOsEnv('LOG_TENANT'),
     level: getOsEnv('LOG_LEVEL'),
@@ -171,6 +188,14 @@ export const env = {
     user: getOsEnv('SAGE_USER'),
     password: getOsEnv('SAGE_PASSWORD'),
     securityToken: getOsEnv('SAGE_SECURITY_TOKEN'),
+  },
+  netSuite: {
+    account: getOsEnv('NETSUITE_REALM'),
+    endpoint: getOsEnv('NETSUITE_REST_ENDPOINT'),
+    consumerKey: getOsEnv('NETSUITE_CONSUMER_KEY'),
+    consumerSecret: getOsEnv('NETSUITE_CONSUMER_SECRET'),
+    tokenId: getOsEnv('NETSUITE_TOKEN_ID'),
+    tokenSecret: getOsEnv('NETSUITE_TOKEN_SECRET'),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),

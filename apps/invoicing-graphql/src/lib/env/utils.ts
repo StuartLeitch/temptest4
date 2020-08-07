@@ -17,9 +17,7 @@ export function getOsEnvWithDefault(key: string, defaultValue = ''): string {
 }
 
 export function getPath(path: string): string {
-  return process.env.NODE_ENV === 'production'
-    ? join(process.cwd(), `${path.replace('src/', 'dist/').slice(0, -3)}.js`)
-    : join(process.cwd(), path);
+  return join(process.cwd(), path);
 }
 
 export function getPaths(paths: string[]): string[] {

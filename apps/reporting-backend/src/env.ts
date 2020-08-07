@@ -29,9 +29,10 @@ export const env = {
     viewRefreshCron: getOsEnvOptional('VIEW_CRON') || everyDayCron,
     acceptanceRatesCron:
       getOsEnvOptional('ACCEPTANCE_RATES_CRON') || everySatAnd1stOfMonthCron,
-    dirs: {
-      migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
-    },
+    relativeStartAcceptanceRateMonths:
+      getOsEnvOptional('RELATIVE_START_ACCEPTANCE_RATE_MONTHS') || '16',
+    relativeEndAcceptanceRateMonths:
+      getOsEnvOptional('RELATIVE_END_ACCEPTANCE_RATE_MONTHS') || '8',
     batchSize: toNumber(getOsEnvOptional('BATCH_SIZE') || '100'),
     batchTimeout: toNumber(getOsEnvOptional('BATCH_TIMEOUT') || '10000'),
     isRestEnabled,

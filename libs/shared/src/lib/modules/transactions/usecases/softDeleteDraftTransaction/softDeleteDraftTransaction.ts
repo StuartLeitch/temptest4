@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
@@ -15,12 +17,15 @@ import { Manuscript } from './../../../manuscripts/domain/Manuscript';
 import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
 
 import { SoftDeleteDraftTransactionRequestDTO } from './softDeleteDraftTransactionDTOs';
+
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  SoftDeleteDraftTransactionAuthorizationContext
-} from './softDeleteDraftTransactionAuthorizationContext';
+} from '../../../../domain/authorization';
+
 import { SoftDeleteDraftTransactionErrors } from './softDeleteDraftTransactionErrors';
 import { SoftDeleteDraftTransactionResponse } from './softDeleteDraftTransactionResponse';
 
@@ -29,11 +34,11 @@ export class SoftDeleteDraftTransactionUsecase
     UseCase<
       SoftDeleteDraftTransactionRequestDTO,
       Promise<SoftDeleteDraftTransactionResponse>,
-      SoftDeleteDraftTransactionAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       SoftDeleteDraftTransactionRequestDTO,
-      SoftDeleteDraftTransactionAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -50,7 +55,7 @@ export class SoftDeleteDraftTransactionUsecase
   @Authorize('transaction:delete')
   public async execute(
     request: SoftDeleteDraftTransactionRequestDTO,
-    context?: SoftDeleteDraftTransactionAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<SoftDeleteDraftTransactionResponse> {
     let invoiceItem: InvoiceItem;
     let invoice: Invoice;

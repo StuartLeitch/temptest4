@@ -10,6 +10,8 @@ import CreditNoteDetails from './Invoice/Details/CreditNote';
 import CouponsList from './Coupons';
 import { CouponDetails, CouponCreate } from './Coupon';
 
+import SplitInvoice from './Invoice/SplitInvoice';
+
 // ----------- Aiframe Pages Imports ---------------
 import ProjectsDashboard from './Dashboards/Projects';
 import InvoicingDashboard from './Dashboards/Invoicing';
@@ -33,6 +35,8 @@ export const RoutedContent = () => {
       {/*     Invoices Routes      */}
       <Route path='/invoices/list' exact component={InvoicesList} />
       <Route path='/invoices/details/:id' exact component={InvoiceDetails} />
+
+      <Route path='/invoices/split-invoice/:id' exact component={SplitInvoice} />
       {/* Credit Notes Routes */}
       <Route
         path='/credit-notes/details/:id'

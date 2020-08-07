@@ -366,6 +366,7 @@ type Mutation {
     submissionDate: String!
     paymentDate: String
     issueDate: String
+    revenueRecognitionReference: String
     erpReference: String
     payer: MigratePayer
     invoiceId: String!

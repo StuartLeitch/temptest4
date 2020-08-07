@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -5,12 +7,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
@@ -23,18 +24,16 @@ import { InvoiceId } from '../../domain/InvoiceId';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-export type GetItemsForInvoiceContext = AuthorizationContext<Roles>;
-
 export class GetItemsForInvoiceUsecase
   implements
     UseCase<
       GetItemsForInvoiceDTO,
       Promise<GetItemsForInvoiceResponse>,
-      GetItemsForInvoiceContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetItemsForInvoiceDTO,
-      GetItemsForInvoiceContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -46,7 +45,7 @@ export class GetItemsForInvoiceUsecase
   // @Authorize('invoice:read')
   public async execute(
     request: GetItemsForInvoiceDTO,
-    context?: GetItemsForInvoiceContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetItemsForInvoiceResponse> {
     let items: InvoiceItem[];
 

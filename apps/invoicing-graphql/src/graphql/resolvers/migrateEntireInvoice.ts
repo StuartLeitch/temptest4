@@ -1,6 +1,7 @@
 import {
   MigrateEntireInvoiceUsecase,
   MigrateEntireInvoiceDTO,
+  Roles,
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
@@ -47,6 +48,7 @@ export const migrateEntireInvoice: Resolvers<any> = {
         submissionDate: args.submissionDate,
         paymentDate: args.paymentDate,
         issueDate: args.issueDate,
+        revenueRecognitionReference: args.revenueRecognitionReference,
         erpReference: args.erpReference,
         invoiceId: args.invoiceId,
         status: args.status,
@@ -59,8 +61,15 @@ export const migrateEntireInvoice: Resolvers<any> = {
         return null;
       }
 
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
       try {
-        const maybeResult = await migrateUsecase.execute(usecaseRequest);
+        const maybeResult = await migrateUsecase.execute(
+          usecaseRequest,
+          usecaseContext
+        );
 
         if (maybeResult.isLeft()) {
           console.log(maybeResult.value);

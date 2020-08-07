@@ -31,6 +31,7 @@ export interface MigrateEntireInvoiceDTO {
   issueDate?: string;
   status: string;
 
+  revenueRecognitionReference?: string;
   erpReference?: string;
   payer: MigratePayer;
   invoiceId: string;

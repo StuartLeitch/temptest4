@@ -1,17 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { UseCase } from '../../../../../core/domain/UseCase';
-// import { UseCaseError } from '../../../../../core/logic/UseCaseError';
 import { AppError } from '../../../../../core/logic/AppError';
 import { right, Result, Either, left } from '../../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
+// * Authorization Logic
 import {
+  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
-  AuthorizationContext,
-  Roles,
-} from '@hindawi/shared';
+} from '../../../../../domain/authorization';
+
 import { EditorRepoContract } from '../../../repos/editorRepo';
 import { JournalId } from '../../../domain/JournalId';
 // import { Editor } from '../../../domain/Editor';
@@ -28,12 +29,8 @@ interface AssignEditorsToJournalDTO {
 }
 
 type AssignEditorsToJournalResponse = Either<
-  AppError.UnexpectedError | Result<any>,
+  AppError.UnexpectedError | Result<Record<string, unknown>>,
   Result<void>
->;
-
-export type AssignEditorsToJournalAuthorizationContext = AuthorizationContext<
-  Roles
 >;
 
 export class AssignEditorsToJournalUsecase
@@ -41,11 +38,11 @@ export class AssignEditorsToJournalUsecase
     UseCase<
       AssignEditorsToJournalDTO,
       Promise<AssignEditorsToJournalResponse>,
-      AssignEditorsToJournalAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       AssignEditorsToJournalDTO,
-      AssignEditorsToJournalAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -59,7 +56,7 @@ export class AssignEditorsToJournalUsecase
 
   public async execute(
     request: AssignEditorsToJournalDTO,
-    context?: AssignEditorsToJournalAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AssignEditorsToJournalResponse> {
     const { journalId: journalIdString, allEditors: editors } = request;
     const allEditors = editors.map((e) => ({
@@ -96,8 +93,8 @@ export class AssignEditorsToJournalUsecase
 
       const currentEditorsIds = currentEditors.map((e) => e.id.toString());
 
-      console.log(`Current editor number: ${currentEditorsIds.length}`);
-      console.log(`Expected editor number: ${allEditors.length}`);
+      // console.log(`Current editor number: ${currentEditorsIds.length}`);
+      // console.log(`Expected editor number: ${allEditors.length}`);
 
       const editorsToCreate = allEditors.filter((e) => {
         // TODO filter assistants
@@ -105,10 +102,10 @@ export class AssignEditorsToJournalUsecase
         return !isCreated;
       });
 
-      console.log(
-        `Creating ${editorsToCreate.length} editors`,
-        editorsToCreate.map((e) => e.email).join(' ')
-      );
+      // console.log(
+      //   `Creating ${editorsToCreate.length} editors`,
+      //   editorsToCreate.map((e) => e.email).join(' ')
+      // );
 
       const createEditorUsecase = new CreateEditor(this.editorRepo);
       const createEditorsResponse = await Promise.all(

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
@@ -5,13 +7,12 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
+// * Authorization Logic
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
@@ -19,13 +20,14 @@ import { GetPaymentMethodsResponse as Response } from './GetPaymentMethodsRespon
 import { GetPaymentMethodsDTO as DTO } from './GetPaymentMethodsDTO';
 import * as Errors from './GetPaymentMethodsErrors';
 
-type Context = AuthorizationContext<Roles>;
-export type GetPaymentMethodsContext = Context;
-
 export class GetPaymentMethodsUseCase
   implements
     UseCase<DTO, Promise<Response>>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private loggerService: LoggerContract

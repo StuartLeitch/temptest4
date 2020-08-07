@@ -1,5 +1,5 @@
 export interface Event {
-  MessageAttributes: object;
+  MessageAttributes: Record<string, any>;
   MessageId: string;
   Message: string;
 }

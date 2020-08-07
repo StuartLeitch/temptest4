@@ -1,5 +1,12 @@
 import { Consumer } from '../../consumer';
-import { LoggerContract } from '@hindawi/shared';
+
+export interface LoggerContract {
+  debug(message: string, ...args: any[]): void;
+  info(message: string, ...args: any[]): void;
+  warn(message: string, ...args: any[]): void;
+  error(message: string, ...args: any[]): void;
+  setScope(scope: string): void;
+}
 
 export class CounterConsumer<T> implements Consumer<T> {
   private count = 0;

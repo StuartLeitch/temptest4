@@ -1,6 +1,6 @@
-import {QueueService} from '@hindawi/queue-service';
+import { QueueService } from '@hindawi/queue-service';
 
-import {PublishMessage} from './PublishMessage';
+import { PublishMessage } from './PublishMessage';
 
 export abstract class AbstractSQSClient {
   constructor(protected queueService: QueueService, private foo = 666) {}
@@ -12,7 +12,7 @@ export abstract class AbstractSQSClient {
   public async testConnection(): Promise<unknown> {
     const res = await this.queueService.publishMessage({
       event: 'test',
-      data: {connected: true}
+      data: { connected: true },
     });
 
     return res;

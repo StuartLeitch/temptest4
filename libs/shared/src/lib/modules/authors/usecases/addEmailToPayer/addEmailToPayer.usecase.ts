@@ -1,29 +1,27 @@
-import {UseCase} from '../../../../core/domain/UseCase';
-import {Result} from '../../../../core/logic/Result';
-import {Email} from '../../../../domain/Email';
-import {Payer} from '../../../payers/domain/Payer';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
+import { Email } from '../../../../domain/Email';
 
-import {AuthorizationContext} from '../../../../domain/authorization/decorators/Authorize';
-import {Roles} from '../../../users/domain/enums/Roles';
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 
 export interface AddEmailToPayerUseCaseRequestDTO {
   payerId: string;
 }
-
-export type AddEmailToPayerContext = AuthorizationContext<Roles>;
 
 export class AddEmailToPayerUseCase
   implements
     UseCase<
       AddEmailToPayerUseCaseRequestDTO,
       Result<Email>,
-      AddEmailToPayerContext
+      UsecaseAuthorizationContext
     > {
   // @Authorize([Roles.ADMIN, Roles.SUPER_ADMIN, Roles.CUSTOMER])
   public async execute(
     request: AddEmailToPayerUseCaseRequestDTO
   ): Promise<Result<Email>> {
-    let email: Email;
+    const email: Email = null;
 
     try {
       // const payerOrError = await this.getPayer(request);

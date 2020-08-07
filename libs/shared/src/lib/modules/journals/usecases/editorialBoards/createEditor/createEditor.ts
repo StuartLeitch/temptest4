@@ -1,8 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../../core/logic/Result';
 import { AppError } from '../../../../../core/logic/AppError';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+
+// * Authorization Logic
+import {
+  AccessControlledUsecase,
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../../domain/authorization';
 
 import { EditorRole } from './../../../../../domain/EditorRole';
 import { Email } from './../../../../../domain/Email';
@@ -13,11 +22,6 @@ import { Editor, EditorProps } from '../../../domain/Editor';
 
 import { CreateEditorDTO } from './createEditorDTO';
 import { CreateEditorResponse } from './createEditorResponse';
-import {
-  AccessControlContext,
-  AccessControlledUsecase,
-  CreateEditorAuthorizationContext,
-} from './createEditorAuthorizationContext';
 import { JournalId } from '../../../domain/JournalId';
 import { UserId } from '../../../../users/domain/UserId';
 
@@ -26,11 +30,11 @@ export class CreateEditor
     UseCase<
       CreateEditorDTO,
       Promise<CreateEditorResponse>,
-      CreateEditorAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       CreateEditorDTO,
-      CreateEditorAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private editorRepo: EditorRepoContract) {}
@@ -41,7 +45,7 @@ export class CreateEditor
 
   public async execute(
     request: CreateEditorDTO,
-    context?: CreateEditorAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<CreateEditorResponse> {
     let editor: Editor;
     let editorRole: EditorRole;

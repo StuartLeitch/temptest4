@@ -1,26 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import { UseCase } from '../../../../core/domain/UseCase';
 import { AppError } from '../../../../core/logic/AppError';
 import { right, Result, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
-// import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
-
+// * Authorization Logic
 import {
-  AuthorizationContext,
-  Roles,
   AccessControlledUsecase,
+  UsecaseAuthorizationContext,
   AccessControlContext,
-  // Authorize,
-  // PayerRepoContract,
-  // ArticleRepoContract,
-  InvoiceRepoContract,
-  // VATService,
-  // PayerType,
-  GetItemsForInvoiceUsecase,
-} from '@hindawi/shared';
-// import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+} from '../../../../domain/authorization';
+
+import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { Invoice } from '../../domain/Invoice';
@@ -29,30 +22,30 @@ import { Payer } from '../../../payers/domain/Payer';
 import { Address } from '../../../addresses/domain/Address';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
+import { InvoiceRepoContract } from './../../repos/invoiceRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { PublisherRepoContract } from '../../../publishers/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
+import { GetItemsForInvoiceUsecase } from './../getItemsForInvoice/getItemsForInvoice';
 import { PublishRevenueRecognitionToErpResponse } from './publishRevenueRecognitionToErpResponse';
 
 export interface PublishRevenueRecognitionToErpRequestDTO {
   invoiceId?: string;
 }
 
-export type PublishRevenueRecognitionToErpContext = AuthorizationContext<Roles>;
-
 export class PublishRevenueRecognitionToErpUsecase
   implements
     UseCase<
       PublishRevenueRecognitionToErpRequestDTO,
       Promise<PublishRevenueRecognitionToErpResponse>,
-      PublishRevenueRecognitionToErpContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       PublishRevenueRecognitionToErpRequestDTO,
-      PublishRevenueRecognitionToErpContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -65,7 +58,8 @@ export class PublishRevenueRecognitionToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
+    private netSuiteService: ErpServiceContract,
     private loggerService: any
   ) {}
 
@@ -76,7 +70,7 @@ export class PublishRevenueRecognitionToErpUsecase
   // @Authorize('zzz:zzz')
   public async execute(
     request: PublishRevenueRecognitionToErpRequestDTO,
-    context?: PublishRevenueRecognitionToErpContext
+    context?: UsecaseAuthorizationContext
   ): Promise<PublishRevenueRecognitionToErpResponse> {
     // TODO Looks very hackish, to be changed later
     if (process.env.ERP_DISABLED === 'true') {
@@ -171,7 +165,18 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
-      const erpResponse = await this.erpService.registerRevenueRecognition({
+      // const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
+      //   {
+      //     invoice,
+      //     manuscript,
+      //     invoiceTotal: netCharges,
+      //   }
+      // );
+      // this.loggerService.info(
+      //   `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${netSuiteResponse}`
+      // );
+
+      const erpResponse = await this.sageService.registerRevenueRecognition({
         invoice,
         manuscript,
         invoiceTotal: netCharges,
@@ -189,7 +194,8 @@ export class PublishRevenueRecognitionToErpUsecase
 
       return right(Result.ok<any>(erpResponse));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      console.log(err);
+      return left(new AppError.UnexpectedError(err, err.toString()));
     }
   }
 }

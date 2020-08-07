@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { InvoicePaid as InvoicePaidEvent } from '@hindawi/phenom-events';
 
 import { Either, right, left } from '../../../../../core/logic/Result';
@@ -7,15 +9,14 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 import { EventUtils } from '../../../../../utils/EventUtils';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../../domain/authorization/AccessControl';
-import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
-import { Roles } from '../../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize,
-} from '../../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  Roles,
+  AccessControlContext,
+} from '../../../../../domain/authorization';
 
+import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import {
   calculateLastPaymentDate,
   formatInvoiceItems,
@@ -28,18 +29,22 @@ import { PublishInvoicePaidResponse as Response } from './publishInvoicePaid.res
 import { PublishInvoicePaidDTO as DTO } from './publishInvoicePaid.dto';
 import * as Errors from './publishInvoicePaid.errors';
 
-type Context = AuthorizationContext<Roles>;
-export type PublishInvoicePaidContext = Context;
-
 const INVOICE_PAID_EVENT = 'InvoicePaid';
 
 export class PublishInvoicePaidUsecase
   implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
+    AccessControlledUsecase<
+      DTO,
+      UsecaseAuthorizationContext,
+      AccessControlContext
+    > {
   constructor(private publishService: SQSPublishServiceContract) {}
 
-  async execute(request: DTO, context?: Context): Promise<Response> {
+  async execute(
+    request: DTO,
+    context?: UsecaseAuthorizationContext
+  ): Promise<Response> {
     const validRequest = this.verifyInput(request);
     if (validRequest.isLeft()) {
       return validRequest;

@@ -12,6 +12,7 @@ import {
   JournalMappingPolicy,
   SubmissionMappingPolicy,
   UserMappingPolicy,
+  SyndicationMappingPolicy,
 } from './policies';
 import { DefaultMappingPolicy } from './policies/DefaultMappingPolicy';
 
@@ -59,5 +60,6 @@ defaultRegistry.addPolicy(new JournalMappingPolicy());
 defaultRegistry.addPolicy(new UserMappingPolicy());
 defaultRegistry.addPolicy(new ArticleMappingPolicy());
 defaultRegistry.addPolicy(new CheckerMappingPolicy());
+defaultRegistry.addPolicy(new SyndicationMappingPolicy());
 
 export { defaultRegistry, emptyRegistry };

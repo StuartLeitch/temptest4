@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -12,7 +13,6 @@ import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../../invoices/domain/Invoice';
-import { Waiver } from '../../../waivers/domain/Waiver';
 import { Transaction } from '../../domain/Transaction';
 
 import { AddressRepoContract } from './../../../addresses/repos/addressRepo';
@@ -33,13 +33,14 @@ import { VATService } from '../../../../domain/services/VATService';
 import { UpdateTransactionOnAcceptManuscriptResponse } from './updateTransactionOnAcceptManuscriptResponse';
 import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
 import { UpdateTransactionOnAcceptManuscriptDTO } from './updateTransactionOnAcceptManuscriptDTOs';
+
 // * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  UpdateTransactionContext,
+  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  Authorize,
-} from './updateTransactionOnAcceptManuscriptAuthorizationContext';
+} from '../../../../domain/authorization';
 
 import { AddressMap } from '../../../addresses/mappers/AddressMap';
 import { PayerMap } from '../../../payers/mapper/Payer';
@@ -53,11 +54,11 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     UseCase<
       UpdateTransactionOnAcceptManuscriptDTO,
       Promise<UpdateTransactionOnAcceptManuscriptResponse>,
-      UpdateTransactionContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       UpdateTransactionOnAcceptManuscriptDTO,
-      UpdateTransactionContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -83,7 +84,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
   @Authorize('transaction:update')
   public async execute(
     request: UpdateTransactionOnAcceptManuscriptDTO,
-    context?: UpdateTransactionContext
+    context?: UsecaseAuthorizationContext
   ): Promise<UpdateTransactionOnAcceptManuscriptResponse> {
     let transaction: Transaction;
     let invoice: Invoice;
@@ -169,7 +170,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       transaction.markAsActive();
 
       // * get author details
-
       manuscript.authorFirstName = request?.authorFirstName;
       manuscript.authorCountry = request?.authorCountry;
       manuscript.authorSurname = request?.authorSurname;

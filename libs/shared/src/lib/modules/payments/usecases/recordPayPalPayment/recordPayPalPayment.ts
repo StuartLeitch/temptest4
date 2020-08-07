@@ -1,18 +1,17 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 // * Core Domain
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, left, right, Either } from '../../../../core/logic/Result';
+import { left, right, Either } from '../../../../core/logic/Result';
 import { chain } from '../../../../core/logic/EitherChain';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { InvoiceRepoContract } from '../../../invoices/repos';
@@ -24,23 +23,19 @@ import { RecordPayPalPaymentDTO } from './recordPayPalPaymentDTO';
 
 import { RecordPaymentUsecase } from '../recordPayment/recordPayment';
 import { RecordPaymentDTO } from '../recordPayment/recordPaymentDTO';
-import { PaymentMethodRepoContract } from '../../repos';
-import { GetPaymentMethodByNameUsecase } from '../getPaymentMethodByName/getPaymentMethodByName';
 
 const checkoutNodeJsSDK = require('@paypal/checkout-server-sdk');
-
-export type RecordPayPalPaymentContext = AuthorizationContext<Roles>;
 
 export class RecordPayPalPaymentUsecase
   implements
     UseCase<
       RecordPayPalPaymentDTO,
       Promise<RecordPayPalPaymentResponse>,
-      RecordPayPalPaymentContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       RecordPayPalPaymentDTO,
-      RecordPayPalPaymentContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -51,7 +46,7 @@ export class RecordPayPalPaymentUsecase
 
   public async execute(
     request: RecordPayPalPaymentDTO,
-    context?: RecordPayPalPaymentContext
+    context?: UsecaseAuthorizationContext
   ): Promise<RecordPayPalPaymentResponse> {
     const payloadEither: Either<
       any,
@@ -63,7 +58,7 @@ export class RecordPayPalPaymentUsecase
     );
 
     const paymentEither: any = await chain(
-      [payload => usecase.execute(payload)],
+      [(payload) => usecase.execute(payload)],
       payloadEither
     );
     return paymentEither as RecordPayPalPaymentResponse;
@@ -79,7 +74,7 @@ export class RecordPayPalPaymentUsecase
       [
         this.getPayloadWithPayPalForeignPaymentId.bind(this, request.orderId),
         this.getPayloadWithInvoiceID.bind(this, request.invoiceId),
-        this.getPayloadWithPayerId.bind(this, request.payerId)
+        this.getPayloadWithPayerId.bind(this, request.payerId),
       ],
       partialPayloadEither
     );
@@ -94,7 +89,7 @@ export class RecordPayPalPaymentUsecase
       invoiceId: null,
       datePaid: null,
       payerId: null,
-      amount: null
+      amount: null,
     };
   }
 
@@ -130,7 +125,7 @@ export class RecordPayPalPaymentUsecase
     payload: RecordPaymentDTO
   ) {
     const allDetailsEither = await this.getPayPalOrderDetails(payPalOrderId);
-    const payPalDetails = allDetailsEither.map(details => {
+    const payPalDetails = allDetailsEither.map((details) => {
       const totalPaid = this.calculateTotalPaid(details);
       const datePaid = this.getDateOfPayment(details);
       return { totalPayed: totalPaid, datePaid };
@@ -138,7 +133,7 @@ export class RecordPayPalPaymentUsecase
     return payPalDetails.map(({ totalPayed, datePaid }) => ({
       ...payload,
       amount: totalPayed,
-      datePaid
+      datePaid,
     }));
   }
 

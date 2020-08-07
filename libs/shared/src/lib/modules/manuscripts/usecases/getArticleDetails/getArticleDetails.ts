@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -5,13 +7,11 @@ import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { ArticleRepoContract } from '../../repos/articleRepo';
 import { Article } from '../../domain/Article';
@@ -23,18 +23,16 @@ import { GetArticleDetailsDTO } from './getArticleDetailsDTO';
 
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 
-export type GetArticleDetailsContext = AuthorizationContext<Roles>;
-
 export class GetArticleDetailsUsecase
   implements
     UseCase<
       GetArticleDetailsDTO,
       Promise<GetArticleDetailsResponse>,
-      GetArticleDetailsContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetArticleDetailsDTO,
-      GetArticleDetailsContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private articleRepo: ArticleRepoContract) {}
@@ -42,7 +40,7 @@ export class GetArticleDetailsUsecase
   // @Authorize('article:read')
   public async execute(
     request: GetArticleDetailsDTO,
-    context?: GetArticleDetailsContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetArticleDetailsResponse> {
     let article: Article;
 

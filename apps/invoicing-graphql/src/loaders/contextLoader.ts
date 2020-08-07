@@ -32,7 +32,6 @@ import { LoggerBuilder } from './../../../../libs/shared/src/lib/infrastructure/
 import { CheckoutService } from '../services/checkout';
 // import { AuthService } from '../services/auth';
 import { PayPalService } from '../services/paypal';
-import { ErpService } from '../services/erp';
 
 import { env } from '../env';
 import { BullScheduler } from '@hindawi/sisif';
@@ -81,7 +80,6 @@ export const contextLoader: MicroframeworkLoader = (
       ),
       exchangeRateService: new ExchangeRateService(),
       payPalService: new PayPalService(env.paypal),
-      erpService: new ErpService(loggerBuilder.getLogger(), env.salesForce),
       schedulingService: new BullScheduler(bullData, loggerBuilder.getLogger()),
     };
 

@@ -1,19 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, left, right, Either } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { map } from '../../../../core/logic/EitherMap';
 import { chain } from '../../../../core/logic/EitherChain';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-  Authorize
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
@@ -28,21 +27,19 @@ import { Coupon } from '../../domain/Coupon';
 import {
   sanityChecksRequestParameters,
   UpdateCouponData,
-  updateCoupon
+  updateCoupon,
 } from './utils';
-
-export type UpdateCouponContext = AuthorizationContext<Roles>;
 
 export class UpdateCouponUsecase
   implements
     UseCase<
       UpdateCouponDTO,
       Promise<UpdateCouponResponse>,
-      UpdateCouponContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       UpdateCouponDTO,
-      UpdateCouponContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private couponRepo: CouponRepoContract) {}
@@ -50,7 +47,7 @@ export class UpdateCouponUsecase
   // @Authorize('coupon:update')
   public async execute(
     request: UpdateCouponDTO,
-    context?: UpdateCouponContext
+    context?: UsecaseAuthorizationContext
   ): Promise<UpdateCouponResponse> {
     const maybeValidInput = sanityChecksRequestParameters(request);
 

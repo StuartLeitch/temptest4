@@ -1,6 +1,8 @@
-import Knex from 'knex';
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { AbstractBaseDBRepo } from 'libs/shared/src/lib/infrastructure/AbstractBaseDBRepo';
+// import Knex from 'knex';
+// import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+
 import { Event } from '../../domain/Event';
 import { EventsRepoContract } from '../EventsRepo';
 

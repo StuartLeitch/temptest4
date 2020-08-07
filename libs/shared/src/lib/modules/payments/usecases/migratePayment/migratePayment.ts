@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
@@ -7,12 +9,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { InvoiceRepoContract } from '../../../invoices/repos';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 import { Payment } from './../../domain/Payment';
 import { PaymentMap } from './../../mapper/Payment';
@@ -30,18 +31,16 @@ import { MigratePaymentDTO } from './migratePaymentDTO';
 import { PaymentMethodRepoContract } from '../../repos';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
-export type MigratePaymentContext = AuthorizationContext<Roles>;
-
 export class MigratePaymentUsecase
   implements
     UseCase<
       MigratePaymentDTO,
       Promise<MigratePaymentResponse>,
-      MigratePaymentContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       MigratePaymentDTO,
-      MigratePaymentContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
@@ -52,7 +51,7 @@ export class MigratePaymentUsecase
 
   public async execute(
     request: MigratePaymentDTO,
-    context?: MigratePaymentContext
+    context?: UsecaseAuthorizationContext
   ): Promise<MigratePaymentResponse> {
     const { invoiceId, payerId, amount, datePaid } = request;
 

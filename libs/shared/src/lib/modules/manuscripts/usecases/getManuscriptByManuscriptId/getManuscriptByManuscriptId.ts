@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -8,12 +9,14 @@ import { Manuscript } from '../../domain/Manuscript';
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
 
+// * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
   AccessControlContext,
-  GetManuscriptByManuscriptIdAuthorizationContext
-} from './getManuscriptAuthorizationContext';
+} from '../../../../domain/authorization';
+
 import { GetManuscriptByManuscriptIdDTO } from './getManuscriptByManuscriptIdDTO';
 import { GetManuscriptByManuscriptIdResponse } from './getManuscriptByManuscriptIdResponse';
 import { GetManuscriptByManuscriptIdErrors } from './getManuscriptByManuscriptIdErrors';
@@ -23,18 +26,18 @@ export class GetManuscriptByManuscriptIdUsecase
     UseCase<
       GetManuscriptByManuscriptIdDTO,
       Promise<GetManuscriptByManuscriptIdResponse>,
-      GetManuscriptByManuscriptIdAuthorizationContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       GetManuscriptByManuscriptIdDTO,
-      GetManuscriptByManuscriptIdAuthorizationContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(private manuscriptRepo: ManuscriptRepoContract) {}
 
   private async getAccessControlContext(
     request: GetManuscriptByManuscriptIdDTO,
-    context?: GetManuscriptByManuscriptIdAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
   }
@@ -42,7 +45,7 @@ export class GetManuscriptByManuscriptIdUsecase
   @Authorize('read:manuscript')
   public async execute(
     request: GetManuscriptByManuscriptIdDTO,
-    context?: GetManuscriptByManuscriptIdAuthorizationContext
+    context?: UsecaseAuthorizationContext
   ): Promise<GetManuscriptByManuscriptIdResponse> {
     let manuscript: Manuscript;
 

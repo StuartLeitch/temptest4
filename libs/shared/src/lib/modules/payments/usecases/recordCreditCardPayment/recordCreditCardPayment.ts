@@ -3,15 +3,14 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { left } from '../../../../core/logic/Result';
 
 // * Authorization Logic
-import { AccessControlContext } from '../../../../domain/authorization/AccessControl';
-import { Roles } from '../../../users/domain/enums/Roles';
 import {
   AccessControlledUsecase,
-  AuthorizationContext,
-} from '../../../../domain/authorization/decorators/Authorize';
+  UsecaseAuthorizationContext,
+  Roles,
+  AccessControlContext,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
-import { BraintreeGateway } from '../../../payments/infrastructure/gateways/braintree/gateway';
 import {
   InvoiceRepoContract,
   InvoiceItemRepoContract,
@@ -26,37 +25,36 @@ import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceD
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 
 import { Braintree } from './../../domain/strategies/Braintree';
-import { BraintreePayment } from '../../domain/strategies/BraintreePayment';
+import { BraintreePayment } from '../../domain/strategies/BrainTreePayment';
 import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
 import { PaymentModel } from './../../domain/contracts/PaymentModel';
 import { PaymentStrategy } from './../../domain/strategies/PaymentStrategy';
 import { RecordPaymentUsecase } from '../recordPayment';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 
-export type RecordCreditCardPaymentContext = AuthorizationContext<Roles>;
-
 export class RecordCreditCardPaymentUsecase
   implements
     UseCase<
       RecordCreditCardPaymentDTO,
       Promise<RecordCreditCardPaymentResponse>,
-      RecordCreditCardPaymentContext
+      UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
       RecordCreditCardPaymentDTO,
-      RecordCreditCardPaymentContext,
+      UsecaseAuthorizationContext,
       AccessControlContext
     > {
   constructor(
     private paymentRepo: PaymentRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private paymentGateway: any
   ) {}
 
   public async execute(
     request: RecordCreditCardPaymentDTO,
-    context?: RecordCreditCardPaymentContext
+    context?: UsecaseAuthorizationContext
   ): Promise<RecordCreditCardPaymentResponse> {
     const getInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(
       this.invoiceRepo
@@ -101,7 +99,7 @@ export class RecordCreditCardPaymentUsecase
     const paymentFactory = new PaymentFactory();
     paymentFactory.registerPayment(braintree);
     const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Braintree', new BraintreePayment(BraintreeGateway)],
+      ['Braintree', new BraintreePayment(this.paymentGateway)],
     ]);
     const paymentModel: PaymentModel = paymentFactory.create(
       'BraintreePayment'
