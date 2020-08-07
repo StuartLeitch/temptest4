@@ -45,10 +45,10 @@ export class Logger implements LoggerContract {
   constructor(scope?: string) {
     if (!scope) {
       this.scope = Logger.DEFAULT_SCOPE;
-      this.protocol = console;
     } else {
       this.setScope(scope);
     }
+    this.protocol = console;
   }
 
   public debug(message: string, ...args: any[]): void {
