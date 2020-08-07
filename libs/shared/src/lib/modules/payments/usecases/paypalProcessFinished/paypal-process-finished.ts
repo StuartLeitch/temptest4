@@ -59,6 +59,7 @@ export class PayPalProcessFinishedUsecase
       const result = await new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.attachPayment(context))
+        .advanceOrEnd(this.shouldUpdatePaymentStatus)
         .map(this.updatePaymentStatus)
         .then(this.savePaymentChanges)
         .map(this.setAndDispatchEvents)
@@ -89,6 +90,14 @@ export class PayPalProcessFinishedUsecase
     return right(request);
   }
 
+  private async shouldUpdatePaymentStatus<T extends WithPayment>(request: T) {
+    if (request.payment.status === PaymentStatus.COMPLETED) {
+      return right(false);
+    }
+
+    return right(true);
+  }
+
   private updatePaymentStatus<T extends WithPayPalEvent & WithPayment>(
     request: T
   ) {
@@ -97,6 +106,7 @@ export class PayPalProcessFinishedUsecase
     if (request.payPalEvent === 'PAYMENT.CAPTURE.COMPLETED') {
       paymentStatus = PaymentStatus.COMPLETED;
     } else if (
+      request.payPalEvent === 'PAYMENT.CAPTURE.REFUNDED' ||
       request.payPalEvent === 'PAYMENT.CAPTURE.REVERSED' ||
       request.payPalEvent === 'PAYMENT.CAPTURE.DENIED'
     ) {
@@ -125,7 +135,7 @@ export class PayPalProcessFinishedUsecase
 
   private async savePaymentChanges<T extends WithPayment>(request: T) {
     try {
-      const payment = this.paymentRepo.updatePayment(request.payment);
+      const payment = await this.paymentRepo.updatePayment(request.payment);
 
       return right({ ...request, payment });
     } catch (e) {

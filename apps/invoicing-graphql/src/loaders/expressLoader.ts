@@ -83,10 +83,6 @@ export const expressLoader: MicroframeworkLoader = (
       const authContext = { roles: [Roles.PAYER] };
       const usecase = new PayPalProcessFinishedUsecase(payment);
 
-      console.log('-------paypal event------');
-      console.log(JSON.stringify(data, null, 2));
-      console.log('-------------------------');
-
       try {
         const result = await usecase.execute(
           {
@@ -103,7 +99,9 @@ export const expressLoader: MicroframeworkLoader = (
             }. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
             result.value
           );
-          return res.status(500);
+          res.status(500);
+        } else {
+          res.status(200);
         }
       } catch (e) {
         logger.error(
@@ -112,10 +110,10 @@ export const expressLoader: MicroframeworkLoader = (
           }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
           e
         );
-        return res.status(500);
+        res.status(500);
       }
 
-      return res.status(200);
+      res.send();
     });
 
     // Run application to listen on given port

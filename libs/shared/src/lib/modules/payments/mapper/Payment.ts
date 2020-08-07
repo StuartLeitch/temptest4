@@ -10,7 +10,7 @@ import { PayerId } from '../../payers/domain/PayerId';
 
 export class PaymentMap extends Mapper<Payment> {
   public static toDomain(raw: any): Payment {
-    const invoiceOrError = Payment.create(
+    const paymentOrError = Payment.create(
       {
         payerId: raw.payerId
           ? PayerId.create(new UniqueEntityID(raw.payerId))
@@ -32,9 +32,9 @@ export class PaymentMap extends Mapper<Payment> {
       new UniqueEntityID(raw.id)
     );
 
-    invoiceOrError.isFailure ? console.log(invoiceOrError) : '';
+    paymentOrError.isFailure ? console.log(paymentOrError) : '';
 
-    return invoiceOrError.isSuccess ? invoiceOrError.getValue() : null;
+    return paymentOrError.isSuccess ? paymentOrError.getValue() : null;
   }
 
   public static toPersistence(payment: Payment): any {
