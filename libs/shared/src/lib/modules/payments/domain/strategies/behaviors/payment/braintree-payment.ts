@@ -1,21 +1,21 @@
-import { StrategyError } from '../../../../../../../core/logic/strategy-error';
-import { AsyncEither } from '../../../../../../../core/logic/AsyncEither';
-import { Either } from '../../../../../../../core/logic/Either';
+import { StrategyError } from '../../../../../../core/logic/strategy-error';
+import { AsyncEither } from '../../../../../../core/logic/AsyncEither';
+import { Either } from '../../../../../../core/logic/Either';
 
 import {
   BraintreeTransactionRequest,
   BraintreeServiceContract,
-} from '../../../../../../../domain/services/payment/braintree-service';
+} from '../../../../../../domain/services/payment/braintree-service';
 
-import { PaymentStatus } from '../../../../Payment';
+import { PaymentStatus } from '../../../Payment';
 
 import {
   PaymentBehavior,
   PaymentResponse,
   PaymentDTO,
-} from '../../payment-behavior';
+} from './payment-behavior';
 
-export class BraintreePaymentBehavior extends PaymentBehavior {
+export class BraintreePayment extends PaymentBehavior {
   constructor(private braintreeService: BraintreeServiceContract) {
     super();
   }

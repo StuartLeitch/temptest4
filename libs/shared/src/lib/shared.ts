@@ -186,7 +186,9 @@ export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-paym
 export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id.dto';
 export * from './modules/payments/usecases/getPaymentMethodById/getPaymentMethodById';
 
-export * from './modules/payments/domain/strategies/behaviors/implementations';
+export * from './modules/payments/domain/strategies/behaviors/capture-money/implementations';
+export * from './modules/payments/domain/strategies/behaviors/client-token/implementations';
+export * from './modules/payments/domain/strategies/behaviors/payment/implementations';
 export * from './modules/payments/domain/strategies/payment-strategy-factory';
 
 export * from './modules/payments/domain/events/payment-completed';

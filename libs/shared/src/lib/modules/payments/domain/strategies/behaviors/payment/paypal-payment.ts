@@ -1,21 +1,21 @@
-import { StrategyError } from '../../../../../../../core/logic/strategy-error';
-import { AsyncEither } from '../../../../../../../core/logic/AsyncEither';
-import { Either } from '../../../../../../../core/logic/Either';
+import { StrategyError } from '../../../../../../core/logic/strategy-error';
+import { AsyncEither } from '../../../../../../core/logic/AsyncEither';
+import { Either } from '../../../../../../core/logic/Either';
 
 import {
   PayPalServiceContract,
   PayPalOrderRequest,
-} from '../../../../../../../domain/services/payment/paypal-service';
+} from '../../../../../../domain/services/payment/paypal-service';
 
-import { PaymentStatus } from '../../../../Payment';
+import { PaymentStatus } from '../../../Payment';
 
 import {
   PaymentBehavior,
   PaymentResponse,
   PaymentDTO,
-} from '../../payment-behavior';
+} from './payment-behavior';
 
-export class PayPalPaymentBehavior extends PaymentBehavior {
+export class PayPalPayment extends PaymentBehavior {
   constructor(private paypalService: PayPalServiceContract) {
     super();
   }

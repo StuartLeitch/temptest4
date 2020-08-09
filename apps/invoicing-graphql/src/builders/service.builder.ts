@@ -2,21 +2,19 @@
 
 import { BullScheduler } from '@hindawi/sisif';
 import {
-  BankTransferCreateClientTokenBehavior,
-  BraintreeCreateClientTokenBehavior,
-  BankTransferCaptureMoneyBehavior,
-  PayPalCreateClientTokenBehavior,
-  BraintreeCaptureMoneyBehavior,
-  BankTransferPaymentBehavior,
-  PayPalCaptureMoneyBehavior,
   PaymentMethodRepoContract,
   SQSPublishServiceContract,
-  BraintreePaymentBehavior,
   PaymentStrategyFactory,
-  PayPalPaymentBehavior,
+  BraintreeClientToken,
   ExchangeRateService,
+  PayPalCaptureMoney,
+  EmptyCaptureMoney,
+  BraintreePayment,
+  EmptyClientToken,
+  IdentityPayment,
   LoggerContract,
   LoggerBuilder,
+  PayPalPayment,
   WaiverService,
   EmailService,
   VATService,
@@ -65,27 +63,21 @@ function buildPaymentStrategyFactory(
     loggerBuilder.getLogger()
   );
 
-  const bankTransferClientToken = new BankTransferCreateClientTokenBehavior();
-  const bankTransferCapture = new BankTransferCaptureMoneyBehavior();
-  const bankTransferPayment = new BankTransferPaymentBehavior();
-  const paypalClientToken = new PayPalCreateClientTokenBehavior(paypalService);
-  const paypalCapture = new PayPalCaptureMoneyBehavior(paypalService);
-  const payPalPayment = new PayPalPaymentBehavior(paypalService);
-  const braintreeCapture = new BraintreeCaptureMoneyBehavior(braintreeService);
-  const braintreePayment = new BraintreePaymentBehavior(braintreeService);
-  const braintreeClientToken = new BraintreeCreateClientTokenBehavior(
-    braintreeService
-  );
+  const braintreeClientToken = new BraintreeClientToken(braintreeService);
+  const braintreePayment = new BraintreePayment(braintreeService);
+  const paypalCapture = new PayPalCaptureMoney(paypalService);
+  const payPalPayment = new PayPalPayment(paypalService);
+  const emptyClientToken = new EmptyClientToken();
+  const identityPayment = new IdentityPayment();
+  const emptyCapture = new EmptyCaptureMoney();
 
   return new PaymentStrategyFactory(
-    bankTransferClientToken,
-    bankTransferCapture,
-    bankTransferPayment,
     braintreeClientToken,
-    braintreeCapture,
     braintreePayment,
-    paypalClientToken,
+    emptyClientToken,
     paypalCapture,
+    identityPayment,
+    emptyCapture,
     payPalPayment,
     paymentMethodRepo
   );

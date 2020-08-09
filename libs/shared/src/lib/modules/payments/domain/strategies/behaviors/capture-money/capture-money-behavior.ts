@@ -1,8 +1,8 @@
-import { StrategyError } from '../../../../../core/logic/strategy-error';
-import { Behavior } from '../../../../../core/logic/strategy';
-import { Either } from '../../../../../core/logic/Either';
+import { StrategyError } from '../../../../../../core/logic/strategy-error';
+import { Behavior } from '../../../../../../core/logic/strategy';
+import { Either } from '../../../../../../core/logic/Either';
 
-import { PaymentProof } from '../../payment-proof';
+import { PaymentProof } from '../../../payment-proof';
 
 export interface CaptureMoneyDTO {
   orderId: string;

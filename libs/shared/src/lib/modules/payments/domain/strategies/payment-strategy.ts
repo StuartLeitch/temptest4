@@ -10,8 +10,8 @@ import { PaymentProof } from '../payment-proof';
 import { PaymentStatus } from '../Payment';
 
 import {
-  CreateClientTokenBehavior,
   CaptureMoneyBehavior,
+  ClientTokenBehavior,
   CaptureMoneyDTO,
   PaymentBehavior,
   PaymentDTO,
@@ -36,7 +36,7 @@ export class PaymentStrategy implements Strategy {
   }
 
   constructor(
-    private clientTokenBehavior: CreateClientTokenBehavior,
+    private clientTokenBehavior: ClientTokenBehavior,
     private captureBehavior: CaptureMoneyBehavior,
     private payBehavior: PaymentBehavior,
     private paymentMethod: PaymentMethodId
