@@ -105,9 +105,9 @@ export class NetSuiteService implements ErpServiceContract {
     // console.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
-    const creditNote = await this.patchCreditNote({ ...data, creditNoteId });
+    // const creditNote = await this.patchCreditNote({ ...data, creditNoteId });
 
-    return creditNote;
+    return creditNoteId;
   }
 
   private async queryCustomer(data: any) {
@@ -453,14 +453,12 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { creditNote } = data;
 
-    const creditNoteTransformOpts = {
-      url: `${
-        config.endpoint
-      }record/v1/invoice/${creditNote.id.toString()}/!transform/creditmemo`,
-      method: 'POST',
+    const creditNoteRequestOpts = {
+      url: `${config.endpoint}record/v1/creditmemo/${creditNote.id.toString()}`,
+      method: 'PATCH',
     };
 
-    const createCreditNotePayload: Record<string, any> = {
+    const patchCreditNotePayload: Record<string, any> = {
       // createdDate: format(
       //   new Date(invoice.dateCreated),
       //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -469,7 +467,8 @@ export class NetSuiteService implements ErpServiceContract {
       //   new Date(invoice.dateCreated),
       //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       // ), // '2020-07-01T12:00:12.857Z',
-      // tranId: `${invoice.invoiceNumber}/${format(new Date(), 'yyyy')}`,
+      tranId: `CN-${creditNote.invoiceNumber}/${format(new Date(), 'yyyy')}`,
+
       // entity: {
       //   id: customerId,
       // },
@@ -506,7 +505,7 @@ export class NetSuiteService implements ErpServiceContract {
       const res = await axios({
         ...creditNoteRequestOpts,
         headers: oauth.toHeader(oauth.authorize(creditNoteRequestOpts, token)),
-        data: createCreditNotePayload,
+        data: patchCreditNotePayload,
       } as AxiosRequestConfig);
 
       return res?.headers?.location?.split('/').pop();
