@@ -5,7 +5,7 @@ import format from 'date-fns/format';
 import compareDesc from 'date-fns/compareDesc';
 import { Invoice } from '../types';
 
-const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ( {invoice}) => (
+const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
   <Card className='mb-3'>
     <CardBody>
       <CardTitle tag='h6'>Timeline</CardTitle>
@@ -15,10 +15,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ( {invoice}) => (
           icon='circle'
           badgeTitle='Draft'
           badgeColor='secondary'
-          date={format(
-            new Date(invoice?.dateCreated),
-            'dd MMMM yyyy'
-          )}
+          date={format(new Date(invoice?.dateCreated), 'dd MMMM yyyy')}
           phrase={'Invoice enters DRAFT state.'}
         />
       )}
@@ -34,32 +31,33 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ( {invoice}) => (
         />
       )}
 
-      {invoice?.payments?.length > 0 && (
-        <TimelineMini
-          icon='check-circle'
-          iconClassName='text-success'
-          badgeTitle='Paid'
-          badgeColor='success'
-          date={format(
-            invoice?.payments
-              ?.map((i) => new Date(i.datePaid))
-              .sort(compareDesc)[0],
-            'dd MMMM yyyy'
-          )}
-          phrase={'Invoice enters FINAL state.'}
-        />
-      )}
+      {invoice?.payments?.length > 0 &&
+        invoice?.payments.reduce(
+          (acc, p) => acc || p.status === 'COMPLETED',
+          false
+        ) && (
+          <TimelineMini
+            icon='check-circle'
+            iconClassName='text-success'
+            badgeTitle='Paid'
+            badgeColor='success'
+            date={format(
+              invoice?.payments
+                ?.map((i) => new Date(i.datePaid))
+                .sort(compareDesc)[0],
+              'dd MMMM yyyy'
+            )}
+            phrase={'Invoice Payment received.'}
+          />
+        )}
 
-      {invoice?.dateMovedToFinal && (
+      {(invoice?.dateMovedToFinal || invoice?.status === 'FINAL') && (
         <TimelineMini
           icon='check-circle'
           iconClassName='text-success'
           badgeTitle='Finalized'
           badgeColor='success'
-          date={format(
-            new Date(invoice?.dateMovedToFinal),
-            'dd MMMM yyyy'
-          )}
+          date={format(new Date(invoice?.dateMovedToFinal), 'dd MMMM yyyy')}
           phrase={'Invoice enters FINAL state.'}
         />
       )}
@@ -93,7 +91,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ( {invoice}) => (
       )}
     </CardBody>
   </Card>
-)
+);
 
 interface InvoiceTimelineProps {
   invoice: Invoice;

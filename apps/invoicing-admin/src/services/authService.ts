@@ -15,7 +15,7 @@ export enum AuthStatus {
   NOT_INITIALIZED = 'NOT_INITIALIZED',
   IN_PROGRESS = 'IN_PROGRESS',
   SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
 }
 
 export interface AuthState {
@@ -31,25 +31,25 @@ export class AuthService {
     this.keycloak = Keycloak({
       url: config.authServerUrl,
       realm: config.authServerRealm,
-      clientId: config.authServerClientId
+      clientId: config.authServerClientId,
     });
 
     this.keycloak.onAuthSuccess = () => this.handleAuthSuccess();
     this.keycloak.onAuthError = () => this.handleAuthError();
 
     this.$state = new BehaviorSubject({
-      status: AuthStatus.NOT_INITIALIZED
+      status: AuthStatus.NOT_INITIALIZED,
     });
   }
 
   init() {
     this.$state.next({
-      status: AuthStatus.IN_PROGRESS
+      status: AuthStatus.IN_PROGRESS,
     });
 
     this.keycloak.init({
       onLoad: 'login-required',
-      promiseType: 'native'
+      // promiseType: 'native',
     });
   }
 
@@ -65,20 +65,20 @@ export class AuthService {
         name: data.name,
         email: data.email,
         token: keycloak.token,
-        roles: data.resource_access.phenom.roles
+        roles: data.resource_access.phenom.roles,
       };
     }
 
     this.$state.next({
       status: AuthStatus.SUCCESS,
-      session
+      session,
     });
   }
 
   private handleAuthError() {
     this.$state.next({
       status: AuthStatus.ERROR,
-      session: undefined
+      session: undefined,
     });
   }
 }

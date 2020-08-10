@@ -6,10 +6,11 @@ import {
   ConfirmInvoiceUsecase,
 } from '@hindawi/shared';
 
+import { Context } from '../../builders';
 import { Resolvers } from '../schema';
 import { env } from '../../env';
 
-export const payer: Resolvers<any> = {
+export const payer: Resolvers<Context> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
       const {

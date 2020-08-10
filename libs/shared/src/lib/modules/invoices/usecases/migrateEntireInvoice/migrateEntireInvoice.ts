@@ -28,15 +28,9 @@ import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
-import { PaymentStrategy } from '../../../payments/domain/strategies/PaymentStrategy';
-import { PaymentFactory } from '../../../payments/domain/strategies/PaymentFactory';
-import { PaymentModel } from '../../../payments/domain/contracts/PaymentModel';
 import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 import { PaymentMap } from '../../../payments/mapper/Payment';
 import { Payment } from '../../../payments/domain/Payment';
-
-import { MigrationPayment } from '../../../payments/domain/strategies/MigrationPayment';
-import { Migration } from '../../../payments/domain/strategies/Migration';
 
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
@@ -702,7 +696,10 @@ export class MigrateEntireInvoiceUsecase
     payer: Payer;
   }) {
     if (!invoice) {
-      return right<null, Record<string, any>>({});
+      return right<null, DTO & { invoice: null }>({
+        ...request,
+        invoice: null,
+      });
     }
 
     const usecase = new PublishInvoiceConfirmedUsecase(this.sqsPublishService);
@@ -767,18 +764,6 @@ export class MigrateEntireInvoiceUsecase
         payment: null,
       });
     }
-
-    const migration = new Migration();
-    const paymentFactory = new PaymentFactory();
-    paymentFactory.registerPayment(migration);
-    const paymentStrategy: PaymentStrategy = new PaymentStrategy([
-      ['Migration', new MigrationPayment()],
-    ]);
-    const paymentModel: PaymentModel = paymentFactory.create(
-      'MigrationPayment'
-    );
-
-    await paymentStrategy.makePayment(paymentModel, request.apc.paymentAmount);
 
     return new AsyncEither<null, null>(null)
       .then(() => this.getMigrationPaymentMethod())

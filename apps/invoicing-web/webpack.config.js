@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const getRollupBabelOptions = require("@nrwl/react/plugins/bundle-babel");
+const path = require("path");
 
 module.exports = (nxConfig, context) => {
   const webpackConfig = {
@@ -7,6 +8,10 @@ module.exports = (nxConfig, context) => {
     node: {
       process: true,
       global: true,
+    },
+    output: {
+      filename: "[name].[contenthash].js",
+      path: path.resolve(__dirname, "../../dist/apps/invoicing-web"),
     },
   };
 

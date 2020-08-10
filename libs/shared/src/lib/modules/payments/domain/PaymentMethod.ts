@@ -1,15 +1,22 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
 // import {Guard} from '../../core/Guard';
 
 // * Subdomain
-import {PaymentMethodId} from './PaymentMethodId';
+import { PaymentMethodId } from './PaymentMethodId';
 
 interface PaymentMethodProps {
   name: string;
   isActive: boolean;
+}
+
+export enum PaymentMethodNames {
+  BankTransfer = 'Bank Transfer',
+  CreditCard = 'Credit Card',
+  Migration = 'Migration',
+  PayPal = 'Paypal',
 }
 
 export class PaymentMethod extends AggregateRoot<PaymentMethodProps> {
@@ -50,7 +57,7 @@ export class PaymentMethod extends AggregateRoot<PaymentMethodProps> {
     // } else {
     const paymentMethod = new PaymentMethod(
       {
-        ...props
+        ...props,
       },
       id
     );

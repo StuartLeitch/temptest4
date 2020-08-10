@@ -17,4 +17,12 @@ export namespace CreateCreditNoteErrors {
       } as UseCaseError);
     }
   }
+
+  export class InvoiceIsDraftError extends Result<UseCaseError> {
+    constructor(invoiceId: string) {
+      super(false, {
+        message: `Invoice with id {${invoiceId}} is still in "DRAFT" status and cannot have a credit note created`,
+      });
+    }
+  }
 }

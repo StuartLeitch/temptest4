@@ -1,10 +1,14 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { AppError } from '../../../.././core/logic/AppError';
 
-// import {UpdateTransactionErrors} from './updateTransactionErrors';
+import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
 
 export type UpdateTransactionOnAcceptManuscriptResponse = Either<
-  // | UpdateTransactionErrors.SomeBlahBlahError
-  AppError.UnexpectedError,
+  | UpdateTransactionOnAcceptManuscriptErrors.CatalogItemNotFoundError
+  | UpdateTransactionOnAcceptManuscriptErrors.InvoiceItemNotFoundError
+  | UpdateTransactionOnAcceptManuscriptErrors.TransactionNotFoundError
+  | UpdateTransactionOnAcceptManuscriptErrors.ManuscriptNotFoundError
+  | UpdateTransactionOnAcceptManuscriptErrors.InvoiceNotFoundError
+  | AppError.UnexpectedError,
   Result<void>
 >;

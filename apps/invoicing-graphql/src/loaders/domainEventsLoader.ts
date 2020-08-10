@@ -1,5 +1,5 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
+// /* eslint-disable max-len */
 
 import {
   MicroframeworkLoader,
@@ -19,21 +19,21 @@ import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/module
 import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
+import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules/payments/subscriptions/after-payment-completed';
+
 // import { AfterManuscriptPublishedEvent } from '../../../../libs/shared/src/lib/modules/manuscripts/subscriptions/AfterManuscriptPublishedEvent';
 
+import { Context } from '../builders';
+
 import { env } from '../env';
-import { Logger } from '../lib/logger';
 
 // This feature is a copy from https://github.com/kadirahq/graphql-errors
-const logger = new Logger();
-logger.setScope('Domain:events');
 
 export const domainEventsRegisterLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
-    const context = settings.getData('context');
-
+    const context: Context = settings.getData('context');
     const {
       repos: {
         paymentMethod,
@@ -52,8 +52,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         erp: { sage: erpService, netsuite: netSuiteService },
         logger: loggerService,
         schedulingService,
+        qq: queue,
       },
-      qq: queue,
     } = context;
 
     const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
@@ -169,6 +169,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     );
 
     // tslint:disable-next-line: no-unused-expression
+    new AfterPaymentCompleted(invoice, loggerService);
+
     // new AfterManuscriptPublishedEvent(logger, manuscript);
   }
 };

@@ -7,9 +7,11 @@ import {
 
 import { Resolvers } from '../schema';
 
+import { Context } from '../../builders';
+
 import { env } from '../../env';
 
-export const generateMissingReminderJobs: Resolvers<any> = {
+export const generateMissingReminderJobs: Resolvers<Context> = {
   Mutation: {
     async generateMissingReminderJobs(parent, args, context) {
       const {

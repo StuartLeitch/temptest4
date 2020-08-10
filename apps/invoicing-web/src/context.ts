@@ -1,5 +1,5 @@
-import { Config } from './config';
-import { GraphqlAdapter, RestAdapter } from './services';
+import { Config, config } from "./config";
+import { GraphqlAdapter, RestAdapter } from "./services";
 
 export class Context {
   public graphqlAdapter: GraphqlAdapter;
@@ -10,3 +10,5 @@ export class Context {
     this.restAdapter = new RestAdapter(config.apiRoot);
   }
 }
+
+export const oneContext = new Context(config);

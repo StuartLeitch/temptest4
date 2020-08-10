@@ -1,10 +1,10 @@
 export interface CreatePaymentDTO {
-  // manuscriptId?: string;
-  // journalId?: string;
-  // title?: string;
-  // articleTypeId?: string;
-  // created?: string;
-  // authorEmail?: string;
-  // authorCountry?: string;
-  // authorSurname?: string;
+  foreignPaymentId: string;
+  isFinalPayment: boolean;
+  paymentMethodId: string;
+  datePaid?: string;
+  invoiceId: string;
+  payerId: string;
+  amount: number;
+  status: string;
 }

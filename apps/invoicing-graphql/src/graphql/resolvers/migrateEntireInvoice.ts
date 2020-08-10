@@ -1,3 +1,5 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   MigrateEntireInvoiceUsecase,
   MigrateEntireInvoiceDTO,
@@ -6,9 +8,11 @@ import {
 
 import { Resolvers } from '../schema';
 
+import { Context } from '../../builders';
+
 import { env } from '../../env';
 
-export const migrateEntireInvoice: Resolvers<any> = {
+export const migrateEntireInvoice: Resolvers<Context> = {
   Mutation: {
     async migrateEntireInvoice(parent, args, context) {
       const {
@@ -24,8 +28,7 @@ export const migrateEntireInvoice: Resolvers<any> = {
           waiver,
           payer,
         },
-        services: { logger: loggerService },
-        qq: sqsQueService,
+        services: { logger: loggerService, qq: sqsQueService },
       } = context;
 
       const migrateUsecase = new MigrateEntireInvoiceUsecase(

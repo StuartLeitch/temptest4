@@ -26,11 +26,12 @@ export * from './modules/manuscripts/domain/ManuscriptTypes';
 export * from './modules/manuscripts/repos';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetailsDTO';
-export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
 export * from './modules/manuscripts/usecases/createManuscript/createManuscript';
 export * from './modules/manuscripts/usecases/createManuscript/createManuscriptDTO';
 export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptIdDTO';
+export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
+export * from './modules/manuscripts/usecases/editManuscript/editManuscriptDTO';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -45,6 +46,10 @@ export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscri
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
+export * from './modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
+export * from './modules/transactions/usecases/createTransaction/createTransaction';
+export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTOs';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
@@ -54,10 +59,13 @@ export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
 
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+// // export * from './invoices/domain/events/invoiceSentEvent';
+
+export * from './modules/invoices/repos';
+
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDTO';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
-export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/createInvoice/createInvoice';
 export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
 export * from './modules/invoices/usecases/updateInvoiceItems/updateInvoiceItems';
@@ -69,12 +77,34 @@ export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-export * from './modules/invoices/mappers/InvoiceMap';
-export * from './modules/invoices/mappers/InvoiceItemMap';
-
 export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
+export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
+export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
+export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
+export * from './modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
+
+export * from './modules/invoices/usecases/publishEvents/publishInvoiceConfirmed/publishInvoiceConfirmed';
+export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+export * from './modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
+export * from './modules/invoices/usecases/publishEvents/publishInvoiceFinalized/publishInvoiceFinalized';
+export * from './modules/invoices/usecases/publishEvents/publishInvoicePaid/publishInvoicePaid';
+export * from './modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
+export * from './modules/invoices/usecases/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+
+export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
+export * from './modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
+export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
+export * from './modules/invoices/subscriptions/AfterInvoicePaidEvents';
+export * from './modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
+
+// export * from './invoices/usecases/sendInvoice/sendInvoice';
+// export * from './modules/invoices/dtos/InvoiceDTO';
+
+export * from './modules/invoices/mappers/InvoiceMap';
+export * from './modules/invoices/mappers/InvoiceItemMap';
 
 // * Export Payer Subdomain
 export * from './modules/payers/domain/Payer';
@@ -114,6 +144,13 @@ export * from './modules/journals/usecases/journals/getJournal/getJournal';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 export * from './modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
 export * from './modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
+export * from './modules/journals/usecases/journals/getJournalList/getJournalList';
+export * from './modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
+export * from './modules/journals/usecases/journals/getJournal/getJournal';
+export * from './modules/journals/usecases/journals/getJournal/getJournalDTO';
+export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
+export * from './modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+// export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
@@ -121,36 +158,42 @@ export { Roles } from './modules/users/domain/enums/Roles';
 // * Export Payments Subdomain
 export * from './modules/payments/domain/Payment';
 export * from './modules/payments/domain/PaymentId';
-export { PaymentMethod } from './modules/payments/domain/PaymentMethod';
+export * from './modules/payments/domain/PaymentMethod';
 export * from './modules/payments/domain/PaymentMethodId';
-export * from './modules/payments/domain/contracts/PaymentModel';
-export * from './modules/payments/domain/strategies/PaymentFactory';
-export * from './modules/payments/domain/strategies/PaymentStrategy';
-export * from './modules/payments/domain/strategies/CreditCardPayment';
-export * from './modules/payments/domain/strategies/CreditCard';
-export * from './modules/payments/usecases/recordPayment/recordPayment';
-export * from './modules/payments/usecases/recordPayment/recordPaymentDTO';
+export * from './modules/payments/domain/external-order-id';
+export * from './modules/payments/domain/payment-proof';
+
 export * from './modules/payments/mapper/Payment';
 export * from './modules/payments/mapper/PaymentMethod';
+
 export * from './modules/payments/repos';
+
+export * from './modules/payments/usecases/recordPayment/recordPayment';
+export * from './modules/payments/usecases/recordPayment/recordPaymentDTO';
 export * from './modules/payments/usecases/getPaymentMethodByName/getPaymentMethodByName';
-export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPayment';
-export * from './modules/payments/usecases/recordPayPalPayment/recordPayPalPaymentDTO';
-export * from './modules/payments/usecases/recordCreditCardPayment/recordCreditCardPayment';
-export * from './modules/payments/usecases/recordCreditCardPayment/recordCreditCardPaymentDTO';
-export * from './modules/payments/usecases/migratePayment/migratePayment';
-export * from './modules/payments/usecases/migratePayment/migratePaymentDTO';
 export * from './modules/payments/usecases/generateClientToken/generateClientToken';
-export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPayment';
-export * from './modules/payments/usecases/recordBankTransferPayment/recordBankTransferPaymentDTO';
 export * from './modules/payments/usecases/getPaymentInfo/getPaymentInfoDTO';
 export * from './modules/payments/usecases/getPaymentInfo/getPaymentInfo';
 export * from './modules/payments/usecases/getPaymentsByInvoiceId/getPaymentsByInvoiceIdDTO';
 export * from './modules/payments/usecases/getPaymentsByInvoiceId/getPaymentsByInvoiceId';
-
-export * from './modules/payments/domain/events/paymentDone';
 export * from './modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
 export * from './modules/payments/usecases/createPayment/CreatePayment';
+export * from './modules/payments/usecases/paypalPaymentApproved/paypal-payment-approved';
+export * from './modules/payments/usecases/paypalPaymentApproved/paypal-payment-approved.dto';
+export * from './modules/payments/usecases/paypalProcessFinished/paypal-process-finished';
+export * from './modules/payments/usecases/paypalProcessFinished/paypal-process-finished.dto';
+export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id';
+export * from './modules/payments/usecases/getPaymentByForeignPaymentId/get-payment-by-foreign-payment-id.dto';
+export * from './modules/payments/usecases/getPaymentMethodById/getPaymentMethodById';
+
+export * from './modules/payments/domain/strategies/behaviors/capture-money/implementations';
+export * from './modules/payments/domain/strategies/behaviors/client-token/implementations';
+export * from './modules/payments/domain/strategies/behaviors/payment/implementations';
+export * from './modules/payments/domain/strategies/payment-strategy-factory';
+
+export * from './modules/payments/domain/events/payment-completed';
+
+export * from './modules/payments/subscriptions/after-payment-completed';
 
 // * Export Waiver, Coupon Subdomain
 export * from './modules/coupons/usecases/createCoupon/createCoupon';
@@ -162,9 +205,12 @@ export * from './modules/coupons/usecases/getRecentCoupons/getRecentCouponsDTO';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCode';
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
 export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
+export * from './modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
+
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 
 export * from './modules/coupons/mappers/CouponMap';
+export * from './modules/waivers/mappers/WaiverMap';
 export * from './modules/coupons/repos';
 
 // * Export Notifications Subdomain
@@ -213,6 +259,21 @@ import * as QueuePayloads from './infrastructure/message-queues/payloads';
 export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';
 
+export * from './infrastructure/logging/LoggerBuilder';
+export * from './infrastructure/logging/implementations/Logger';
+
+// * Services Contracts
+export * from './domain/services/payment/braintree-service';
+export * from './domain/services/payment/paypal-service';
+export * from './domain/services/ExchangeRateService';
+export * from './domain/services/SQSPublishService';
+
+// * Domain Types
+export * from './domain/PaymentClientToken';
+
+export * from './core/domain/CorrelationID';
+export * from './core/logic/UseCaseError';
+
 // ? Should we export this
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
 export { VATService } from './domain/services/VATService';
@@ -227,3 +288,6 @@ export * from './utils/VersionCompare';
 
 export * from './utils/ObjectUtils';
 export * from './utils/EventUtils';
+
+export * from './core/logic/AsyncEither';
+export * from './core/logic/Either';

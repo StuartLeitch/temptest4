@@ -163,7 +163,7 @@ export class ApplyCouponToInvoiceUsecase
 
       const total = invoice.invoiceItems
         .getItems()
-        .reduce((sum, ii) => sum + ii.calculatePrice(), 0);
+        .reduce((sum, ii) => sum + ii.calculateNetPrice(), 0);
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (total <= 0) {

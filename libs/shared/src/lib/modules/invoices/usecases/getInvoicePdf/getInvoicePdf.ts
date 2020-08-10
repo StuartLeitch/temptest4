@@ -40,7 +40,7 @@ import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 
 import {
   pdfGeneratorService,
-  InvoicePayload
+  InvoicePayload,
 } from '../../../../domain/services/PdfGenerator';
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
@@ -295,9 +295,9 @@ export class GetInvoicePdfUsecase
       }));
     } else {
       return left<AppError.UnexpectedError, InvoicePayload>(
-        Result.fail({
-          message: `no APC found for the invoice with id ${payload.invoice.id.toString()}`,
-        })
+        new AppError.UnexpectedError(
+          `no APC found for the invoice with id ${payload.invoice.id.toString()}`
+        )
       );
     }
   }
