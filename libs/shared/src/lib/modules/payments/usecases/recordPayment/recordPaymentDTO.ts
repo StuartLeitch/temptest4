@@ -1,9 +1,8 @@
 export interface RecordPaymentDTO {
-  foreignPaymentId?: string;
-  paymentMethodId: string;
+  payerIdentification?: string;
+  paymentReference?: string;
+  isFinalPayment?: boolean;
   invoiceId: string;
   datePaid?: string;
-  payerId: string;
-  amount: number;
-  markInvoiceAsPaid?: boolean;
+  amount?: number;
 }

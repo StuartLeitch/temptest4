@@ -92,7 +92,8 @@ const ViewEditContainer: React.FC = () => {
         variables: { coupon: { id: data.coupon.id, ...fieldsToUpdate } },
       });
 
-      const updateError = updateCouponResult?.error?.graphQLErrors[0]?.message;
+      const updateError = (updateCouponResult?.error?.graphQLErrors[0] as any)
+        ?.message;
 
       if (!updateError) {
         couponQueryRefetch();

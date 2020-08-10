@@ -1,7 +1,7 @@
-import { Config } from '@hindawi/invoicing-web/config';
-import { BehaviorSubject } from 'rxjs';
+import { Config } from "@hindawi/invoicing-web/config";
+import { BehaviorSubject } from "rxjs";
 
-import Keycloak from 'keycloak-js';
+import Keycloak from "keycloak-js";
 
 export interface AuthSession {
   user: string;
@@ -12,10 +12,10 @@ export interface AuthSession {
 }
 
 export enum AuthStatus {
-  NOT_INITIALIZED = 'NOT_INITIALIZED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
+  NOT_INITIALIZED = "NOT_INITIALIZED",
+  IN_PROGRESS = "IN_PROGRESS",
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR",
 }
 
 export interface AuthState {
@@ -44,12 +44,12 @@ export class AuthService {
 
   init() {
     this.$state.next({
-      status: AuthStatus.IN_PROGRESS
+      status: AuthStatus.IN_PROGRESS,
     });
 
     this.keycloak.init({
-      onLoad: 'login-required',
-      promiseType: 'native',
+      onLoad: "login-required",
+      // promiseType: 'native',
     });
   }
 
@@ -65,7 +65,7 @@ export class AuthService {
         name: data.name,
         email: data.email,
         token: keycloak.token,
-        roles: data.resource_access.phenom.roles
+        roles: data.resource_access.phenom.roles,
       };
     }
 

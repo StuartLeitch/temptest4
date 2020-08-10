@@ -12,9 +12,11 @@ import {
   CouponMap,
 } from '@hindawi/shared';
 
+import { Context } from '../../builders';
+
 import { Resolvers } from '../schema';
 
-export const coupon: Resolvers<any> = {
+export const coupon: Resolvers<Context> = {
   Query: {
     async coupon(parent, args, context) {
       const { repos } = context;

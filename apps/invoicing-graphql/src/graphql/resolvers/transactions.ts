@@ -1,10 +1,14 @@
-import { Roles, GetPaymentMethodsUseCase } from '@hindawi/shared';
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
+import {
+  SetTransactionToActiveByCustomIdUsecase,
+  Roles,
+} from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
+import { Context } from '../../builders';
 
-import { SetTransactionToActiveByCustomIdUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
-
-export const transactions: Resolvers<any> = {
+export const transactions: Resolvers<Context> = {
   Mutation: {
     async setTransactionToActive(parent, args, context) {
       const {
@@ -13,8 +17,8 @@ export const transactions: Resolvers<any> = {
           transaction: transactionRepo,
           invoiceItem: invoiceItemRepo,
           invoice: invoiceRepo,
-          manuscript: articleRepo
-        }
+          manuscript: articleRepo,
+        },
       } = context;
       const { customId } = args;
 
@@ -29,7 +33,7 @@ export const transactions: Resolvers<any> = {
 
       const result = await setTransactionToActiveByCustomId.execute(
         {
-          customId
+          customId,
         },
         usecaseContext
       );
@@ -42,8 +46,8 @@ export const transactions: Resolvers<any> = {
 
       return {
         id: updatedTransaction.transactionId.id.toString(),
-        status: updatedTransaction.status
+        status: updatedTransaction.status,
       };
-    }
-  }
+    },
+  },
 };

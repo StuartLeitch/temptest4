@@ -297,7 +297,7 @@ export class SageService implements ErpServiceContract {
   ): Promise<string> {
     const connection = await this.getConnection();
     const { journalName, article, payer, vatNote } = data;
-    const discountAmount = invoiceItem.price - invoiceItem.calculatePrice();
+    const discountAmount = invoiceItem.price - invoiceItem.calculateNetPrice();
     const description =
       invoiceItem.type === 'APC'
         ? `${journalName} - Article Processing Charges for article ${article.customId}`
@@ -314,7 +314,7 @@ export class SageService implements ErpServiceContract {
       s2cor__Discount_Amount__c: discountAmount,
       s2cor__Discount_Value__c: discountAmount,
       s2cor__Tax_Amount__c:
-        (invoiceItem.vat / 100) * invoiceItem.calculatePrice(),
+        (invoiceItem.vat / 100) * invoiceItem.calculateNetPrice(),
       s2cor__Tax_Rates__c: invoiceItem.vat.toString(),
     };
 
@@ -372,7 +372,7 @@ export class SageService implements ErpServiceContract {
         '{Vat/Rate}',
         `${(
           invoiceItems.reduce(
-            (acc, curr) => acc + (curr.vat / 100) * curr.calculatePrice(),
+            (acc, curr) => acc + (curr.vat / 100) * curr.calculateNetPrice(),
             0
           ) / rate
         ).toFixed(2)}`

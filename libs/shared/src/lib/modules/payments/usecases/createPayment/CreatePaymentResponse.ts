@@ -1,12 +1,20 @@
-import {Either, Result} from '../../../../core/logic/Result';
-import {AppError} from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Result';
 
-import {Payment} from './../../domain/Payment';
-import {CreatePaymentErrors} from './CreatePaymentErrors';
+import { Payment } from './../../domain/Payment';
+import * as Errors from './CreatePaymentErrors';
 
 export type CreatePaymentResponse = Either<
-  | CreatePaymentErrors.PaymentCreatedError
-  | AppError.UnexpectedError
-  | Result<any>,
-  Result<Payment>
+  | Errors.ForeignPaymentIdRequiredError
+  | Errors.PaymentMethodIdRequiredError
+  | Errors.IsFinalPaymentRequiredError
+  | Errors.StatusInvalidValueError
+  | Errors.InvoiceIdRequiredError
+  | Errors.PaymentCreationError
+  | Errors.PayerIdRequiredError
+  | Errors.PaymentSavingDbError
+  | Errors.AmountRequiredError
+  | Errors.StatusRequiredError
+  | UnexpectedError,
+  Payment
 >;
