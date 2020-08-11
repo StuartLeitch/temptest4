@@ -27,17 +27,17 @@ import { UserId } from '../../../../users/domain/UserId';
 
 export class CreateEditor
   implements
-    UseCase<
-      CreateEditorDTO,
-      Promise<CreateEditorResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      CreateEditorDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  constructor(private editorRepo: EditorRepoContract) {}
+  UseCase<
+  CreateEditorDTO,
+  Promise<CreateEditorResponse>,
+  UsecaseAuthorizationContext
+  >,
+  AccessControlledUsecase<
+  CreateEditorDTO,
+  UsecaseAuthorizationContext,
+  AccessControlContext
+  > {
+  constructor(private editorRepo: EditorRepoContract) { }
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -58,7 +58,7 @@ export class CreateEditor
       // console.info(request);
 
       const nameOrError = Name.create({
-        value: `${request.givenNames} ${request.surname}` || request.name,
+        value: request.givenNames || request.surname ? `${request.givenNames} ${request.surname}` : request.name,
       });
       if (nameOrError.isFailure) {
         return left(nameOrError);

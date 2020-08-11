@@ -53,12 +53,15 @@ export class EditorMap extends Mapper<Editor> {
   }
 
   public static fromEventToDTO(raw: any): CreateEditorDTO {
+    let names = [];
+    if (raw.givenNames) { names.push(raw.givenNames) }
+    if (raw.surname) { names.push(raw.surname) }
     return {
       editorId: raw.id,
       journalId: raw.journalId,
       userId: raw.userId,
       email: raw.email,
-      name: raw.givenNames,
+      name: names.join(' '),
       createdAt: raw.createdAt ? new Date(raw.createdAt) : null,
       updatedAt: raw.updatedAt ? new Date(raw.updatedAt) : null,
       roleLabel: raw.role && raw.role.label,

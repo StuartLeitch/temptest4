@@ -56,7 +56,8 @@ export class AddCatalogItemToCatalogUseCase
           )
         );
       }
-
+      
+      
       catalogItem = CatalogMap.toDomain({
         id: journalId,
         // type,
@@ -70,10 +71,16 @@ export class AddCatalogItemToCatalogUseCase
         name: journalTitle,
         publisherId: publisher.publisherId.id.toString(),
       });
-
-      // * This is where all the magic happens
-      await this.catalogRepo.save(catalogItem);
-
+      
+      const isCreated = await this.catalogRepo.exists(catalogItem)
+      if (isCreated) {
+        console.log(`Journal ${catalogItem.journalTitle} already exists.`)
+      }
+      else {
+        // * This is where all the magic happens
+        await this.catalogRepo.save(catalogItem);
+      } 
+        
       return right(Result.ok<CatalogItem>(catalogItem));
     } catch (err) {
       console.log(err);
