@@ -7,16 +7,16 @@ import {
   SendInvoiceCreditControlReminderDTO,
   QueuePayloads,
   Roles,
+  LoggerContract,
 } from '@hindawi/shared';
 
-import { Logger } from '../../lib/logger';
-
+import { Context } from '../../builders';
 import { env } from '../../env';
 
 export const invoiceCreditControlHandler = (
   payload: JobData<QueuePayloads.InvoiceReminderPayload>,
-  appContext: any,
-  loggerService: Logger
+  appContext: Context,
+  loggerService: LoggerContract
 ) => {
   const {
     repos: {
@@ -50,6 +50,7 @@ export const invoiceCreditControlHandler = (
   };
 
   const request: SendInvoiceCreditControlReminderDTO = {
+    notificationDisabled: env.scheduler.pauseCreditControlReminders,
     creditControlDelay: env.scheduler.creditControlReminderDelay,
     senderEmail: env.app.creditControlReminderSenderEmail,
     senderName: env.app.creditControlReminderSenderName,

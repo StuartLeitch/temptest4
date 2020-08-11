@@ -43,7 +43,11 @@ import { SendInvoiceCreditControlReminderResponse as Response } from './sendInvo
 import { SendInvoiceCreditControlReminderDTO as DTO } from './sendInvoiceCreditControlReminderDTO';
 import * as Errors from './sendInvoiceCreditControlReminderErrors';
 
-import { constructCreditControlReminderData, CompoundData } from './utils';
+import {
+  constructCreditControlReminderData,
+  NotificationStatus,
+  CompoundData,
+} from './utils';
 
 export class SendInvoiceCreditControlReminderUsecase
   implements
@@ -69,6 +73,7 @@ export class SendInvoiceCreditControlReminderUsecase
       this
     );
     this.noReminderSentRecently = this.noReminderSentRecently.bind(this);
+    this.isNotificationEnabled = this.isNotificationEnabled.bind(this);
     this.attachItemsToInvoice = this.attachItemsToInvoice.bind(this);
     this.saveNotification = this.saveNotification.bind(this);
     this.shouldSendEmail = this.shouldSendEmail.bind(this);
@@ -92,6 +97,7 @@ export class SendInvoiceCreditControlReminderUsecase
     try {
       const execution = new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
+        .advanceOrEnd(this.isNotificationEnabled)
         .then(this.getInvoice(context))
         .then(this.attachItemsToInvoice(context))
         .then(this.getManuscript(context))
@@ -128,6 +134,16 @@ export class SendInvoiceCreditControlReminderUsecase
       return left(new Errors.SenderNameRequiredError());
     }
     return right<null, DTO>(request);
+  }
+
+  private async isNotificationEnabled<T extends NotificationStatus>(
+    request: T
+  ): Promise<Either<never, boolean>> {
+    if (request.notificationDisabled) {
+      return right(false);
+    }
+
+    return right(true);
   }
 
   private getInvoice(context: UsecaseAuthorizationContext) {

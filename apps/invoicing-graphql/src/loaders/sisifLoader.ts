@@ -3,18 +3,18 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { LoggerContract } from '@hindawi/shared';
+import { LoggerContract, LoggerBuilder } from '@hindawi/shared';
 import { Job } from '@hindawi/sisif';
 
 import { SisifHandlers } from '../sisif';
-import { Logger } from '../lib/logger';
-
+import { Context } from '../builders';
 import { env } from '../env';
 
-const sisifLogger = new Logger();
+const loggerBuilder = new LoggerBuilder();
+const sisifLogger = loggerBuilder.getLogger();
 sisifLogger.setScope('sisif:loader');
 
-function jobHandlerDispatcher(context: any, loggerService: LoggerContract) {
+function jobHandlerDispatcher(context: Context, loggerService: LoggerContract) {
   return (job: Job) => {
     const { data, type } = job;
 
@@ -35,7 +35,7 @@ export const sisifLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
-    const context = settings.getData('context');
+    const context: Context = settings.getData('context');
     const {
       services: { schedulingService, logger: loggerService },
     } = context;
