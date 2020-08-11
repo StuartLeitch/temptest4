@@ -59,6 +59,16 @@ export class CreditControlDelayIsRequired extends Result<UseCaseError> {
   }
 }
 
+export class CreditControlDisabledSettingRequiredError extends Result<
+  UseCaseError
+> {
+  constructor() {
+    super(false, {
+      message: `The credit control disabled setting is required`,
+    });
+  }
+}
+
 export class ScheduleCreditControlReminderError extends Result<UseCaseError> {
   constructor(err: Error) {
     super(false, {

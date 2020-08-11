@@ -133,6 +133,13 @@ export class SendInvoiceCreditControlReminderUsecase
     if (!request.senderName) {
       return left(new Errors.SenderNameRequiredError());
     }
+    if (
+      request.notificationDisabled === null ||
+      request.notificationDisabled === undefined
+    ) {
+      return left(new Errors.NotificationDisabledSettingRequiredError());
+    }
+
     return right<null, DTO>(request);
   }
 
