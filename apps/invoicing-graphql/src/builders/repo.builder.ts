@@ -41,20 +41,20 @@ export interface Repos {
 
 export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
   return {
-    address: new KnexAddressRepo(db),
-    catalog: new KnexCatalogRepo(db),
+    address: new KnexAddressRepo(db, loggerBuilder.getLogger()),
+    catalog: new KnexCatalogRepo(db, loggerBuilder.getLogger()),
     invoice: new KnexInvoiceRepo(db, loggerBuilder.getLogger()),
     invoiceItem: new KnexInvoiceItemRepo(db, loggerBuilder.getLogger()),
     transaction: new KnexTransactionRepo(db, loggerBuilder.getLogger()),
-    payer: new KnexPayerRepo(db),
-    payment: new KnexPaymentRepo(db),
+    payer: new KnexPayerRepo(db, loggerBuilder.getLogger()),
+    payment: new KnexPaymentRepo(db, loggerBuilder.getLogger()),
     paymentMethod: new KnexPaymentMethodRepo(db, loggerBuilder.getLogger()),
-    waiver: new KnexWaiverRepo(db),
+    waiver: new KnexWaiverRepo(db, loggerBuilder.getLogger()),
     manuscript: new KnexArticleRepo(db, loggerBuilder.getLogger()),
-    editor: new KnexEditorRepo(db),
-    coupon: new KnexCouponRepo(db),
-    publisher: new KnexPublisherRepo(db),
-    sentNotifications: new KnexSentNotificationsRepo(db),
-    pausedReminder: new KnexPausedReminderRepo(db),
+    editor: new KnexEditorRepo(db, loggerBuilder.getLogger()),
+    coupon: new KnexCouponRepo(db, loggerBuilder.getLogger()),
+    publisher: new KnexPublisherRepo(db, loggerBuilder.getLogger()),
+    sentNotifications: new KnexSentNotificationsRepo(db, loggerBuilder.getLogger()),
+    pausedReminder: new KnexPausedReminderRepo(db, loggerBuilder.getLogger()),
   };
 }

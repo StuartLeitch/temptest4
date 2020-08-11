@@ -13,7 +13,7 @@ export const JournalUpdatedHandler = {
   event: JOURNAL_UPDATED,
   async handler(data: JournalUpdated) {
     const {
-      repos: { catalog: catalogRepo },
+      repos: { catalog: catalogRepo, publisher: publisherRepo },
       services: { logger },
     } = this;
 
@@ -21,7 +21,7 @@ export const JournalUpdatedHandler = {
     logger.info(`Incoming Event Data`, data);
 
     const updateJournalUsecase = new UpdateCatalogItemToCatalogUseCase(
-      catalogRepo
+      catalogRepo, publisherRepo
     );
 
     const result = await updateJournalUsecase.execute({

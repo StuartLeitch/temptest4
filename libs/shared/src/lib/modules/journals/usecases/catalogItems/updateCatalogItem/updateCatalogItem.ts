@@ -7,6 +7,10 @@ import { CatalogItem } from '../../../domain/CatalogItem';
 import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { JournalId } from '../../../domain/JournalId';
 import { CatalogMap } from '../../../mappers/CatalogMap';
+import { Publisher } from '../../../../publishers/domain/Publisher';
+import { AddCatalogItemToCatalogErrors } from '../addCatalogItemToCatalog/addCatalogItemToCatalogErrors';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { UseCaseError } from 'libs/shared/src/lib/shared';
 
 export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
   type: string;
@@ -19,21 +23,31 @@ export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
   updated?: string;
   isActive?: boolean;
 }
+
 export type UpdateCatalogItemToCatalogUseCaseResponse = Either<
-  // | UpdateTransactionErrors.SomeBlahBlahError
+  PublisherNotFoundError |
   AppError.UnexpectedError,
   Result<CatalogItem>
 >;
+class PublisherNotFoundError extends Result<UseCaseError> {
+  constructor(publisherName: string) {
+    super(false, {
+      message: `Couldn't find a Publisher for name {${publisherName}}.`
+    } as UseCaseError);
+  }
+}
 export class UpdateCatalogItemToCatalogUseCase
   implements
-    UseCase<
-      UpdateCatalogItemToCatalogUseCaseRequestDTO,
-      UpdateCatalogItemToCatalogUseCaseResponse
-    > {
+  UseCase<
+  UpdateCatalogItemToCatalogUseCaseRequestDTO,
+  UpdateCatalogItemToCatalogUseCaseResponse
+  > {
   private catalogRepo: CatalogRepoContract;
+  private publisherRepo: PublisherRepoContract;
 
-  constructor(catalogRepo: CatalogRepoContract) {
+  constructor(catalogRepo: CatalogRepoContract, publisherRepo: PublisherRepoContract) {
     this.catalogRepo = catalogRepo;
+    this.publisherRepo = publisherRepo;
   }
 
   public async execute(
@@ -61,7 +75,19 @@ export class UpdateCatalogItemToCatalogUseCase
       journalTitle,
       updated,
     } = request;
-
+    let publisher: Publisher;
+    const defaultPublisher = 'Hindawi';
+    try {
+      publisher = await this.publisherRepo.getPublisherByName(
+        defaultPublisher
+      );
+    } catch (err) {
+      return left(
+        new AddCatalogItemToCatalogErrors.PublisherNotFoundError(
+          defaultPublisher
+        )
+      );
+    }
     try {
       const journalId: JournalId = JournalId.create(
         new UniqueEntityID(rawJournalId)
@@ -89,8 +115,9 @@ export class UpdateCatalogItemToCatalogUseCase
         currency,
         isActive,
         issn,
-        journalId,
+        journalId: rawJournalId,
         name: journalTitle,
+        publisherId: publisher.publisherId.id.toString(),
       });
 
       // * This is where all the magic happens
