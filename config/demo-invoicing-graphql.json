@@ -73,6 +73,7 @@
   "MONITOR_ROUTE": "/monitor",
   "NOTIFICATIONS_QUEUES": "email-reminders",
   "PAYMENT_REMINDER_DELAY_DAYS": 5,
+  "PAUSE_CREDIT_CONTROL_REMINDERS": false,
   "PORT": 3000,
   "SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER": "rares.stan@hindawi.com",
   "SANCTIONED_COUNTRY_NOTIFICATION_SENDER": "phenom.invoicing@hindawi.com",
