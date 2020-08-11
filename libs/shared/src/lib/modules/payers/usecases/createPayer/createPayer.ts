@@ -4,7 +4,7 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { CreatePayerResponse } from './createPayerResponse';
 
 import { PayerRepoContract } from '../../repos/payerRepo';
@@ -80,7 +80,7 @@ export class CreatePayerUsecase
 
       return right(Result.ok<Payer>(payer));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

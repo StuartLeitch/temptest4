@@ -4,7 +4,7 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { Invoice } from './../../../invoices/domain/Invoice';
 import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
@@ -129,7 +129,7 @@ export class SoftDeleteDraftTransactionUsecase
 
       return right(Result.ok<void>());
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

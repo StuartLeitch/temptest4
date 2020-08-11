@@ -5,7 +5,7 @@ import { CatalogItem } from '../../../domain/CatalogItem';
 import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { JournalId } from '../../../domain/JournalId';
 import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
-import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
+import { UnexpectedError } from 'libs/shared/src/lib/core/logic/AppError';
 import { CatalogMap } from '../../../mappers/CatalogMap';
 
 export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
@@ -21,7 +21,7 @@ export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
 }
 export type UpdateCatalogItemToCatalogUseCaseResponse = Either<
   // | UpdateTransactionErrors.SomeBlahBlahError
-  AppError.UnexpectedError,
+  UnexpectedError,
   Result<CatalogItem>
 >;
 export class UpdateCatalogItemToCatalogUseCase
@@ -63,7 +63,7 @@ export class UpdateCatalogItemToCatalogUseCase
 
       if (!catalogItem) {
         return left(
-          new AppError.UnexpectedError(
+          new UnexpectedError(
             `Journal with id ${journalIdValueObject.id.toString()} does not exist.`
           )
         );
@@ -86,7 +86,7 @@ export class UpdateCatalogItemToCatalogUseCase
       );
 
       if (catalogItemOrError.isFailure) {
-        return left(new AppError.UnexpectedError(catalogItemOrError.error));
+        return left(new UnexpectedError(catalogItemOrError.error));
       }
 
       catalogItem = catalogItemOrError.getValue();
@@ -98,7 +98,7 @@ export class UpdateCatalogItemToCatalogUseCase
       return right(Result.ok<CatalogItem>(catalogItem));
     } catch (err) {
       console.log(err);
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

@@ -2,7 +2,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { UseCase } from '../../../../../core/domain/UseCase';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { right, Result, Either, left } from '../../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
@@ -29,7 +29,7 @@ interface AssignEditorsToJournalDTO {
 }
 
 type AssignEditorsToJournalResponse = Either<
-  AppError.UnexpectedError | Result<Record<string, unknown>>,
+  UnexpectedError | Result<Record<string, unknown>>,
   Result<void>
 >;
 
@@ -74,9 +74,7 @@ export class AssignEditorsToJournalUsecase
       );
       if (!journal) {
         return left(
-          new AppError.UnexpectedError(
-            `Journal ${journalId.id.toString()} not found.`
-          )
+          new UnexpectedError(`Journal ${journalId.id.toString()} not found.`)
         );
       }
 
@@ -85,7 +83,7 @@ export class AssignEditorsToJournalUsecase
       );
       if (!currentEditors) {
         return left(
-          new AppError.UnexpectedError(
+          new UnexpectedError(
             `Could not get editors for journalId: ${journalId.id.toString()}.`
           )
         );
@@ -120,12 +118,12 @@ export class AssignEditorsToJournalUsecase
       }
 
       if (errs.length > 0) {
-        return left(new AppError.UnexpectedError(errs));
+        return left(new UnexpectedError(errs));
       }
 
       return right(Result.ok<void>());
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

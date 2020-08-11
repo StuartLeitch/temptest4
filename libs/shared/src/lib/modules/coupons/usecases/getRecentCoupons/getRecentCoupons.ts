@@ -2,7 +2,7 @@
 
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
@@ -43,9 +43,7 @@ export class GetRecentCouponsUsecase
       const paginatedResult = await this.couponRepo.getRecentCoupons(request);
       return right(Result.ok(paginatedResult));
     } catch (err) {
-      return left(
-        new AppError.UnexpectedError(err, 'Getting recent coupons failed.')
-      );
+      return left(new UnexpectedError(err, 'Getting recent coupons failed.'));
     }
   }
 }

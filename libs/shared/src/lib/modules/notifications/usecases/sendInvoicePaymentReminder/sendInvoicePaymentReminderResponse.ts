@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as SendInvoicePaymentReminderErrors from './sendInvoicePaymentReminderErrors';
 
@@ -14,6 +14,6 @@ export type SendInvoicePaymentReminderResponse = Either<
   | SendInvoicePaymentReminderErrors.RescheduleTaskFailed
   | SendInvoicePaymentReminderErrors.EmailSendingFailure
   | SendInvoicePaymentReminderErrors.ManuscriptNotFound
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<void>
 >;

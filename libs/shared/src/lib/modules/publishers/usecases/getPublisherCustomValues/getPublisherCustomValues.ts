@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
@@ -63,7 +63,7 @@ export class GetPublisherCustomValuesUsecase
       );
       return right(Result.ok(customValues));
     } catch (e) {
-      return left(new AppError.UnexpectedError(e));
+      return left(new UnexpectedError(e));
     }
   }
 }

@@ -4,7 +4,7 @@
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -156,7 +156,7 @@ export class GenerateCompensatoryEventsUsecase
         .execute();
       return execution;
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 

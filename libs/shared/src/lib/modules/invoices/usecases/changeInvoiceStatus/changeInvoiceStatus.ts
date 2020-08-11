@@ -1,16 +1,16 @@
 // * Core Domain
-import {UseCase} from '../../../../core/domain/UseCase';
-import {AppError} from '../../../../core/logic/AppError';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {Result, left, right} from '../../../../core/logic/Result';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Result, left, right } from '../../../../core/logic/Result';
 
-import {Invoice} from '../../domain/Invoice';
-import {InvoiceId} from '../../domain/InvoiceId';
-import {InvoiceStatus} from '../../domain/Invoice';
-import {InvoiceRepoContract} from '../../repos/invoiceRepo';
-import {ChangeInvoiceStatusErrors} from './changeInvoiceStatusErrors';
+import { Invoice } from '../../domain/Invoice';
+import { InvoiceId } from '../../domain/InvoiceId';
+import { InvoiceStatus } from '../../domain/Invoice';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { ChangeInvoiceStatusErrors } from './changeInvoiceStatusErrors';
 
-import {ChangeInvoiceStatusResponse} from './changeInvoiceStatusResponse';
+import { ChangeInvoiceStatusResponse } from './changeInvoiceStatusResponse';
 
 export interface ChangeInvoiceStatusRequestDTO {
   invoiceId: string;
@@ -54,7 +54,7 @@ export class ChangeInvoiceStatus
 
       return right(Result.ok<Invoice>(invoice));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

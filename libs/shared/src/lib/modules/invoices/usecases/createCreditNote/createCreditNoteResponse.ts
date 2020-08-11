@@ -1,4 +1,4 @@
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Either, Result } from '../../../../core/logic/Result';
 
 import { Invoice } from '../../domain/Invoice';
@@ -8,6 +8,6 @@ export type CreateCreditNoteResponse = Either<
   | CreateCreditNoteErrors.TransactionNotFoundError
   | CreateCreditNoteErrors.InvoiceNotFoundError
   | CreateCreditNoteErrors.InvoiceIsDraftError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<Invoice>
 >;

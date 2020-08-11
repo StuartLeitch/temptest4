@@ -3,7 +3,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
@@ -47,9 +47,7 @@ export class GetRecentInvoicesUsecase
       const paginatedResult = await this.invoiceRepo.getRecentInvoices(request);
       return right(Result.ok<any>(paginatedResult));
     } catch (err) {
-      return left(
-        new AppError.UnexpectedError(err, 'Getting recent invoices failed')
-      );
+      return left(new UnexpectedError(err, 'Getting recent invoices failed'));
     }
   }
 }

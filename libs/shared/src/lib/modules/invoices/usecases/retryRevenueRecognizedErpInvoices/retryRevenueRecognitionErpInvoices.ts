@@ -10,7 +10,7 @@ import {
 import { ErpResponse } from './../../../../domain/services/ErpService';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
@@ -25,7 +25,7 @@ import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 export type RetryRevenueRecognitionErpInvoicesResponse = Either<
-  AppError.UnexpectedError,
+  UnexpectedError,
   Result<ErpResponse[]>
 >;
 
@@ -123,15 +123,13 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
 
       if (errs.length > 0) {
         console.log(JSON.stringify(errs, null, 2));
-        return left(
-          new AppError.UnexpectedError(errs, JSON.stringify(errs, null, 2))
-        );
+        return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
       return right(Result.ok<ErpResponse[]>(updatedInvoices));
     } catch (err) {
       console.log(err);
-      return left(new AppError.UnexpectedError(err, err.toString()));
+      return left(new UnexpectedError(err, err.toString()));
     }
   }
 }

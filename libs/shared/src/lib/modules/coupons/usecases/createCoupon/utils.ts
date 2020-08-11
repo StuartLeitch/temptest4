@@ -1,5 +1,5 @@
 import { left, right, Either } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { CouponType, CouponStatus } from '../../domain/Coupon';
 import { CouponCode } from '../../domain/CouponCode';
@@ -29,7 +29,7 @@ type SanityCheckResult = Either<
   | InvalidCouponCodeError
   | InvalidCouponTypeError
   | CouponCodeRequiredError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   CreateCouponDTO
 >;
 

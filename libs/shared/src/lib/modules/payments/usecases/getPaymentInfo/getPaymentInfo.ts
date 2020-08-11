@@ -3,7 +3,7 @@
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, right, left } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -77,7 +77,7 @@ export class GetPaymentInfoUsecase
         return left(new Errors.PaymentInfoDbError(request.invoiceId, e));
       }
     } catch (e) {
-      return left(new AppError.UnexpectedError(e));
+      return left(new UnexpectedError(e));
     }
   }
 }

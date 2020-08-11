@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -47,7 +47,7 @@ export class GetInvoicesIdsUsecase
       }
       return right(Result.ok(generator));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 

@@ -60,8 +60,9 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
-    // console.log('registerRevenueRecognition Data:');
-    // console.info(data);
+    console.log('registerRevenueRecognition Data:');
+    console.info(data);
+
     const { customSegmentId } = data;
     const customerId = await this.getCustomerId(data);
 
@@ -310,6 +311,9 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async createRevenueRecognition(data: any) {
+    console.log('createRevenueRecognition Data:');
+    console.info(data);
+
     const {
       connection: { config, oauth, token },
     } = this;
@@ -363,6 +367,9 @@ export class NetSuiteService implements ErpServiceContract {
         id: customSegmentId,
       };
     }
+
+    console.log('createJournalPayload:');
+    console.info(createJournalPayload);
 
     try {
       const res = await axios({

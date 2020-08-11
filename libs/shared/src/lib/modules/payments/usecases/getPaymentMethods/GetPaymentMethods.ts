@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -60,7 +60,7 @@ export class GetPaymentMethodsUseCase
         return left(new Errors.GetPaymentMethodsDbRequestError(err));
       }
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

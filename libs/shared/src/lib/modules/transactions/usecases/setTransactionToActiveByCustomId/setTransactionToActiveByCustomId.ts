@@ -3,7 +3,7 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
@@ -144,7 +144,7 @@ export class SetTransactionToActiveByCustomIdUsecase
 
       return right(Result.ok<Transaction>(transaction));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

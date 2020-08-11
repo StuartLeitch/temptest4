@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
 
 // * Authorization Logic
@@ -55,7 +55,7 @@ export class GetPublisherDetailsByNameUsecase
           new GetPublisherDetailsByNameErrors.PublisherNotFoundError(name)
         );
       }
-      return left(new AppError.UnexpectedError(e));
+      return left(new UnexpectedError(e));
     }
   }
 }

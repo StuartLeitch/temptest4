@@ -107,7 +107,7 @@ export class AddPayerToInvoiceUsecase
 
     //   return right(Result.ok<Invoice>(invoice));
     // } catch (err) {
-    //   return left(new AppError.UnexpectedError(err));
+    //   return left(new UnexpectedError(err));
     // }
     return right(Result.ok(null));
   }

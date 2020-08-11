@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as SendInvoiceCreditControlReminderErrors from './sendInvoiceCreditControlReminderErrors';
 
@@ -13,6 +13,6 @@ export type SendInvoiceCreditControlReminderResponse = Either<
   | SendInvoiceCreditControlReminderErrors.InvoiceNotFoundError
   | SendInvoiceCreditControlReminderErrors.RescheduleTaskFailed
   | SendInvoiceCreditControlReminderErrors.EmailSendingFailure
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<void>
 >;

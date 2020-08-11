@@ -2,7 +2,7 @@
 import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -284,7 +284,7 @@ export class MigrateEntireInvoiceUsecase
     acceptanceDate: string;
     submissionDate: string;
     invoiceId: string;
-  }): Promise<Either<AppError.UnexpectedError, string>> {
+  }): Promise<Either<UnexpectedError, string>> {
     const { acceptanceDate, submissionDate, transaction, invoiceId } = data;
 
     return await new AsyncEither<null, Transaction>(transaction)
@@ -304,11 +304,9 @@ export class MigrateEntireInvoiceUsecase
   private async updateTransactionDetails(transaction: Transaction) {
     try {
       const result = await this.transactionRepo.update(transaction);
-      return right<AppError.UnexpectedError, Transaction>(result);
+      return right<UnexpectedError, Transaction>(result);
     } catch (err) {
-      return left<AppError.UnexpectedError, Transaction>(
-        new AppError.UnexpectedError(err)
-      );
+      return left<UnexpectedError, Transaction>(new UnexpectedError(err));
     }
   }
 
@@ -399,7 +397,7 @@ export class MigrateEntireInvoiceUsecase
       | PublishInvoiceCreatedErrors.InvoiceItemsRequiredError
       | PublishInvoiceCreatedErrors.ManuscriptRequiredError
       | PublishInvoiceCreatedErrors.InvoiceRequiredError
-      | AppError.UnexpectedError,
+      | UnexpectedError,
       void
     >
   > {
@@ -550,11 +548,9 @@ export class MigrateEntireInvoiceUsecase
   private async updateInvoiceItem(item: InvoiceItem) {
     try {
       const result = await this.invoiceItemRepo.update(item);
-      return right<AppError.UnexpectedError, InvoiceItem>(result);
+      return right<UnexpectedError, InvoiceItem>(result);
     } catch (err) {
-      return left<AppError.UnexpectedError, InvoiceItem>(
-        new AppError.UnexpectedError(err)
-      );
+      return left<UnexpectedError, InvoiceItem>(new UnexpectedError(err));
     }
   }
 
@@ -667,22 +663,18 @@ export class MigrateEntireInvoiceUsecase
   private async getManuscript(customId: string) {
     try {
       const manuscript = await this.manuscriptRepo.findByCustomId(customId);
-      return right<AppError.UnexpectedError, Manuscript>(manuscript);
+      return right<UnexpectedError, Manuscript>(manuscript);
     } catch (err) {
-      return left<AppError.UnexpectedError, Manuscript>(
-        new AppError.UnexpectedError(err)
-      );
+      return left<UnexpectedError, Manuscript>(new UnexpectedError(err));
     }
   }
 
   private async updateManuscript(manuscript: Manuscript) {
     try {
       const newManuscript = await this.manuscriptRepo.update(manuscript);
-      return right<AppError.UnexpectedError, Manuscript>(newManuscript);
+      return right<UnexpectedError, Manuscript>(newManuscript);
     } catch (err) {
-      return left<AppError.UnexpectedError, Manuscript>(
-        new AppError.UnexpectedError(err)
-      );
+      return left<UnexpectedError, Manuscript>(new UnexpectedError(err));
     }
   }
 
@@ -811,11 +803,9 @@ export class MigrateEntireInvoiceUsecase
   private async savePayment(payment: Payment) {
     try {
       const result = await this.paymentRepo.save(payment);
-      return right<AppError.UnexpectedError, Payment>(result);
+      return right<UnexpectedError, Payment>(result);
     } catch (err) {
-      return left<AppError.UnexpectedError, Payment>(
-        new AppError.UnexpectedError(err)
-      );
+      return left<UnexpectedError, Payment>(new UnexpectedError(err));
     }
   }
 
@@ -823,11 +813,9 @@ export class MigrateEntireInvoiceUsecase
     const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
     try {
       const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-      return right<AppError.UnexpectedError, Payer>(payer);
+      return right<UnexpectedError, Payer>(payer);
     } catch (err) {
-      return left<AppError.UnexpectedError, Payer>(
-        new AppError.UnexpectedError(err)
-      );
+      return left<UnexpectedError, Payer>(new UnexpectedError(err));
     }
   }
 
@@ -881,12 +869,10 @@ export class MigrateEntireInvoiceUsecase
       const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(
         invoiceId
       );
-      return right<AppError.UnexpectedError, InvoicePaymentInfo>(
-        paymentDetails
-      );
+      return right<UnexpectedError, InvoicePaymentInfo>(paymentDetails);
     } catch (err) {
-      return left<AppError.UnexpectedError, InvoicePaymentInfo>(
-        new AppError.UnexpectedError(err)
+      return left<UnexpectedError, InvoicePaymentInfo>(
+        new UnexpectedError(err)
       );
     }
   }

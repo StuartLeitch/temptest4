@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { chain } from '../../../../core/logic/EitherChain';
 import { Result, left, right, Either } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -124,7 +124,7 @@ export class GetManuscriptByInvoiceIdUsecase
       }
       return right(await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId));
     } catch (e) {
-      return left(new AppError.UnexpectedError(e));
+      return left(new UnexpectedError(e));
     }
   }
 
@@ -142,7 +142,7 @@ export class GetManuscriptByInvoiceIdUsecase
         manuscripts.push(manuscript);
       }
     } catch (e) {
-      return left(new AppError.UnexpectedError(e));
+      return left(new UnexpectedError(e));
     }
 
     return right(manuscripts);

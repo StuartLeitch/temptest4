@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Result, right, left } from '../../../../core/logic/Result';
 
 import { Address } from '../../domain/Address';
@@ -30,7 +30,7 @@ export class CreateAddress
 
       return right(Result.ok<Address>(address));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as AreNotificationsPausedErrors from './areNotificationsPausedErrors';
 
@@ -8,6 +8,6 @@ export type AreNotificationsPausedResponse = Either<
   | AreNotificationsPausedErrors.InvalidNotificationType
   | AreNotificationsPausedErrors.EncounteredDbError
   | AreNotificationsPausedErrors.InvoiceIdRequired
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<boolean>
 >;

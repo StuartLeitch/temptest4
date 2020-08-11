@@ -5,7 +5,7 @@ import { getEuMembers } from 'is-eu-member';
 
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, left } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import {
@@ -270,7 +270,7 @@ export class PublishInvoiceToErpUsecase
       }
     } catch (err) {
       console.log(err);
-      return left(new AppError.UnexpectedError(err, err.toString()));
+      return left(new UnexpectedError(err, err.toString()));
     }
   }
 }

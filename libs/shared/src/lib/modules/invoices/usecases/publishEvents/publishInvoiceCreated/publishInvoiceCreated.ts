@@ -3,7 +3,7 @@
 import { InvoiceCreated as InvoiceCreatedEvent } from '@hindawi/phenom-events';
 
 import { Either, right, left } from '../../../../../core/logic/Result';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 import { EventUtils } from '../../../../../utils/EventUtils';
@@ -74,7 +74,7 @@ export class PublishInvoiceCreatedUsecase
       });
       return right(null);
     } catch (err) {
-      return left(new AppError.UnexpectedError(err.toString()));
+      return left(new UnexpectedError(err.toString()));
     }
   }
 

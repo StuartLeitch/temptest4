@@ -3,7 +3,7 @@
 // * Core Domain
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../../core/logic/Result';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
@@ -111,7 +111,7 @@ export class CreateEditor
 
       return right(Result.ok<void>());
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

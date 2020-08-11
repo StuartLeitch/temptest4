@@ -1,6 +1,6 @@
 import { UniqueEntityID } from '../../../../../lib/core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { left, right, Result } from '../../../../core/logic/Result';
 
@@ -241,7 +241,7 @@ export class ApplyCouponToInvoiceUsecase
 
       return right(Result.ok(coupon));
     } catch (error) {
-      return left(new AppError.UnexpectedError(error));
+      return left(new UnexpectedError(error));
     }
   }
 

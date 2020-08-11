@@ -2,7 +2,7 @@
 // * Core Domain
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
@@ -189,7 +189,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       } catch (error) {
         console.log('Failed to save waiver', error);
         return left(
-          new AppError.UnexpectedError(
+          new UnexpectedError(
             `Failed to save waiver due to error: ${error.message}: ${error.stack}`
           )
         );
@@ -278,7 +278,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
             return maybeConfirmed.map(() => Result.ok<void>());
           }
         } catch (err) {
-          return left(new AppError.UnexpectedError(err));
+          return left(new UnexpectedError(err));
         }
 
         return right(Result.ok<void>());
@@ -299,7 +299,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       return right(Result.ok<void>());
     } catch (err) {
       console.error(err);
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

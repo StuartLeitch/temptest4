@@ -4,7 +4,7 @@
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { Result, left, right } from '../../../../../core/logic/Result';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
 import {
@@ -60,7 +60,7 @@ export class GetJournal
 
       return right(Result.ok(journal));
     } catch (e) {
-      return left(new AppError.UnexpectedError(e));
+      return left(new UnexpectedError(e));
     }
   }
 }

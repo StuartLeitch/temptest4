@@ -4,7 +4,7 @@
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
@@ -107,7 +107,7 @@ export class EditManuscriptUsecase
 
       return right(Result.ok<Manuscript>(manuscript));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

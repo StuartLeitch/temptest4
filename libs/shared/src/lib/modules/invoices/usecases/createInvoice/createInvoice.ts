@@ -4,7 +4,7 @@
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { Invoice, InvoiceStatus } from '../../domain/Invoice';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
@@ -92,7 +92,7 @@ export class CreateInvoiceUsecase
 
       return right(Result.ok<Invoice>(invoice));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

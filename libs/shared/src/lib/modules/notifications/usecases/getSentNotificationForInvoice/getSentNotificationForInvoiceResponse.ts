@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { Notification } from '../../domain/Notification';
 
@@ -9,6 +9,6 @@ export type GetSentNotificationForInvoiceResponse = Either<
   | GetSentNotificationForInvoiceErrors.InvoiceNotFoundError
   | GetSentNotificationForInvoiceErrors.EncounteredDbError
   | GetSentNotificationForInvoiceErrors.InvoiceIdRequired
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<Notification[]>
 >;

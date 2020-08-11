@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as PauseInvoicePaymentRemindersErrors from './pauseInvoicePaymentRemindersErrors';
 
@@ -7,6 +7,6 @@ export type PauseInvoicePaymentRemindersResponse = Either<
   | PauseInvoicePaymentRemindersErrors.SetReminderPauseDbError
   | PauseInvoicePaymentRemindersErrors.InvoiceIdRequiredError
   | PauseInvoicePaymentRemindersErrors.InvoiceNotFoundError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<void>
 >;

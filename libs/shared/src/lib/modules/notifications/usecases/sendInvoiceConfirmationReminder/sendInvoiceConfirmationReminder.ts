@@ -3,7 +3,7 @@
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -120,7 +120,7 @@ export class SendInvoiceConfirmationReminderUsecase
 
       return execution.execute();
     } catch (e) {
-      return left(new AppError.UnexpectedError(e));
+      return left(new UnexpectedError(e));
     }
   }
 

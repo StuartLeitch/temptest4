@@ -7,7 +7,7 @@ import { Publisher } from './../../../../publishers/domain/Publisher';
 import { PublisherRepoContract } from './../../../../publishers/repos/publisherRepo';
 // import { JournalId } from '../../../domain/JournalId';
 // import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
-import { AppError } from '../../../../../../lib/core/logic/AppError';
+import { UnexpectedError } from '../../../../../../lib/core/logic/AppError';
 import { CatalogMap } from '../../../mappers/CatalogMap';
 
 import { AddCatalogItemToCatalogUseCaseRequestDTO } from './addCatalogItemToCatalogDTOs';
@@ -37,7 +37,7 @@ export class AddCatalogItemToCatalogUseCase
       issn,
       journalId,
       journalTitle,
-      updated
+      updated,
     } = request;
 
     let catalogItem: CatalogItem;
@@ -67,7 +67,7 @@ export class AddCatalogItemToCatalogUseCase
         issn,
         journalId,
         journalTitle,
-        publisherId: publisher.publisherId.id.toString()
+        publisherId: publisher.publisherId.id.toString(),
       });
 
       // This is where all the magic happens
@@ -76,7 +76,7 @@ export class AddCatalogItemToCatalogUseCase
       return right(Result.ok<CatalogItem>(catalogItem));
     } catch (err) {
       console.log(err);
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

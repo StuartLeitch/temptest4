@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { NotificationPause } from '../../domain/NotificationPause';
 
@@ -9,6 +9,6 @@ export type GetRemindersPauseStateForInvoiceResponse = Either<
   | GetRemindersPauseStateForInvoiceErrors.GetRemindersPauseDbError
   | GetRemindersPauseStateForInvoiceErrors.InvoiceIdRequiredError
   | GetRemindersPauseStateForInvoiceErrors.InvoiceNotFoundError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<NotificationPause>
 >;

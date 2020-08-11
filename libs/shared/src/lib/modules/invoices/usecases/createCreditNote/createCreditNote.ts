@@ -2,7 +2,7 @@
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 import { Invoice, InvoiceStatus } from '../../domain/Invoice';
@@ -126,7 +126,7 @@ export class CreateCreditNoteUsecase
           // new GetItemsForInvoiceErrors.InvoiceNotFoundError(
           //   invoiceId.id.toString()
           // )
-          new AppError.UnexpectedError('Bad Invoice Items!')
+          new UnexpectedError('Bad Invoice Items!')
         );
       }
 
@@ -257,7 +257,7 @@ export class CreateCreditNoteUsecase
 
       return right(Result.ok<Invoice>(creditNote));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

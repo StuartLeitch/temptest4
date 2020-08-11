@@ -1,7 +1,7 @@
 // * Core Domain
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { left, right } from '../../../../../core/logic/Either';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 // import { EditorRole } from '../../../../../domain/EditorRole';
@@ -61,7 +61,7 @@ export class DeleteEditor
 
       return right(null);
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

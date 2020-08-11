@@ -1,10 +1,10 @@
-import {Either, Result} from '../../../../core/logic/Result';
-import {AppError} from '../../../.././core/logic/AppError';
+import { Either, Result } from '../../../../core/logic/Result';
+import { UnexpectedError } from '../../../.././core/logic/AppError';
 
-import {GetPayerDetailsErrors} from './getPayerDetailsErrors';
-import {Payer} from './../../domain/Payer';
+import { GetPayerDetailsErrors } from './getPayerDetailsErrors';
+import { Payer } from './../../domain/Payer';
 
 export type GetPayerDetailsResponse = Either<
-  GetPayerDetailsErrors.PayerNotFoundError | AppError.UnexpectedError,
+  GetPayerDetailsErrors.PayerNotFoundError | UnexpectedError,
   Result<Payer>
 >;

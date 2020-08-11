@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { Result, left } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { map } from '../../../../core/logic/EitherMap';
 
@@ -65,7 +65,7 @@ export class CreateCouponUsecase
 
       return (finalResult as unknown) as CreateCouponResponse;
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 

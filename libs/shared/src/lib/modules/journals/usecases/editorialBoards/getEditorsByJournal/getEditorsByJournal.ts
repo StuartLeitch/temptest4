@@ -2,7 +2,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { UseCase } from '../../../../../core/domain/UseCase';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { right, Either, left } from '../../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
@@ -22,10 +22,7 @@ interface GetEditorsByJournalDTO {
   journalId: string;
 }
 
-type GetEditorsByJournalResponse = Either<
-  AppError.UnexpectedError | unknown,
-  Editor[]
->;
+type GetEditorsByJournalResponse = Either<UnexpectedError | unknown, Editor[]>;
 
 export class GetEditorsByJournalUsecase
   implements
@@ -65,9 +62,7 @@ export class GetEditorsByJournalUsecase
       );
       if (!journal) {
         return left(
-          new AppError.UnexpectedError(
-            `Journal ${journalId.id.toString()} not found.`
-          )
+          new UnexpectedError(`Journal ${journalId.id.toString()} not found.`)
         );
       }
 
@@ -77,7 +72,7 @@ export class GetEditorsByJournalUsecase
 
       if (!currentEditors) {
         return left(
-          new AppError.UnexpectedError(
+          new UnexpectedError(
             `Could not get editors for journalId: ${journalId.id.toString()}.`
           )
         );
@@ -85,7 +80,7 @@ export class GetEditorsByJournalUsecase
 
       return right(currentEditors);
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

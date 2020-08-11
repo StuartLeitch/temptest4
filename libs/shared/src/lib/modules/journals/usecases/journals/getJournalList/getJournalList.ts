@@ -3,7 +3,7 @@
 // * Core Domain
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../../core/logic/Result';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../../domain/authorization';
@@ -47,9 +47,7 @@ export class GetJournalListUsecase
       const result = await this.journalRepo.getCatalogCollection();
       return right(Result.ok<CatalogItem[]>(result));
     } catch (err) {
-      return left(
-        new AppError.UnexpectedError(err, 'Getting journal list failed')
-      );
+      return left(new UnexpectedError(err, 'Getting journal list failed'));
     }
   }
 }

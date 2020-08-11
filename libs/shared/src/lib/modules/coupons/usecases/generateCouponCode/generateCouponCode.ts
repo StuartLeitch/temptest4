@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import {
@@ -46,9 +46,7 @@ export class GenerateCouponCodeUsecase
         }
       }
     } catch (err) {
-      return left(
-        new AppError.UnexpectedError(err, 'Generating coupon code failed.')
-      );
+      return left(new UnexpectedError(err, 'Generating coupon code failed.'));
     }
   }
 }

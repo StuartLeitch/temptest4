@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { Payment } from '../../domain/Payment';
 
@@ -9,6 +9,6 @@ export type GetPaymentsByInvoiceIdResponse = Either<
   | Errors.RetrievingPaymentsDbError
   | Errors.InvoiceIdRequiredError
   | Errors.InvoiceNotFoundError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<Payment[]>
 >;

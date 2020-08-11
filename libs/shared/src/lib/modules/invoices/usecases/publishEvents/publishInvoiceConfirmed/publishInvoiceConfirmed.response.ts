@@ -1,4 +1,4 @@
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { Either } from '../../../../../core/logic/Result';
 
 import * as Errors from './publishInvoiceConfirmed.errors';
@@ -9,6 +9,6 @@ export type PublishInvoiceConfirmedResponse = Either<
   | Errors.ManuscriptRequiredError
   | Errors.InvoiceRequiredError
   | Errors.PayerRequiredError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   void
 >;

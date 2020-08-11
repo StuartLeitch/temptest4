@@ -1,7 +1,7 @@
 // * Core Domain
 import { UniqueEntityID } from './../../../../core/domain/UniqueEntityID';
 import { Result, Either, left, right } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { chain } from '../../../../core/logic/EitherChain';
 import { map } from '../../../../core/logic/EitherMap';
@@ -294,8 +294,8 @@ export class GetInvoicePdfUsecase
         article: articleResult.getValue(),
       }));
     } else {
-      return left<AppError.UnexpectedError, InvoicePayload>(
-        new AppError.UnexpectedError(
+      return left<UnexpectedError, InvoicePayload>(
+        new UnexpectedError(
           `no APC found for the invoice with id ${payload.invoice.id.toString()}`
         )
       );

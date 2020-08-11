@@ -1,20 +1,20 @@
 // * Core Domain
-import {UseCase} from '../../../../../core/domain/UseCase';
-import {Result, left, right} from '../../../../../core/logic/Result';
-import {AppError} from '../../../../../core/logic/AppError';
+import { UseCase } from '../../../../../core/domain/UseCase';
+import { Result, left, right } from '../../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 
-import {Email} from './../../../../../domain/Email';
-import {Name} from './../../../../../domain/Name';
+import { Email } from './../../../../../domain/Email';
+import { Name } from './../../../../../domain/Name';
 
-import {JournalRepoContract} from '../../../repos/journalRepo';
-import {Journal, JournalProps} from '../../../domain/Journal';
+import { JournalRepoContract } from '../../../repos/journalRepo';
+import { Journal, JournalProps } from '../../../domain/Journal';
 
-import {CreateJournalDTO} from './createJournalDTO';
-import {CreateJournalResponse} from './createJournalResponse';
+import { CreateJournalDTO } from './createJournalDTO';
+import { CreateJournalResponse } from './createJournalResponse';
 import {
   CreateJournalAuthorizationContext,
   AccessControlContext,
-  AccessControlledUsecase
+  AccessControlledUsecase,
 } from './createJournalAuthorizationContext';
 
 export class CreateJournal
@@ -44,13 +44,13 @@ export class CreateJournal
     let email: Email;
 
     try {
-      const nameOrError = Name.create({value: request.name});
+      const nameOrError = Name.create({ value: request.name });
       if (nameOrError.isFailure) {
         return left(nameOrError);
       }
       name = nameOrError.getValue();
 
-      const emailOrError = Email.create({value: request.email});
+      const emailOrError = Email.create({ value: request.email });
       if (emailOrError.isFailure) {
         return left(emailOrError);
       }
@@ -62,7 +62,7 @@ export class CreateJournal
         issn: request.issn,
         code: request.code,
         articleProcessingCharge: request.articleProcessingCharge,
-        isActive: request.isActive
+        isActive: request.isActive,
       };
 
       const journalOrError = Journal.create(journalProps);
@@ -77,7 +77,7 @@ export class CreateJournal
 
       return right(Result.ok<void>());
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

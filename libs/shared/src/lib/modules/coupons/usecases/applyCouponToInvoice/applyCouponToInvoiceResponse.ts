@@ -1,4 +1,4 @@
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Either, Result } from '../../../../core/logic/Result';
 import { Coupon } from '../../../../modules/coupons/domain/Coupon';
 
@@ -14,6 +14,6 @@ export type ApplyCouponToInvoiceResponse = Either<
   | CouponNotFoundError
   | TransactionNotFoundError
   | ManuscriptNotFoundError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<Coupon>
 >;

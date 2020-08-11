@@ -2,7 +2,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { right, Result, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
@@ -196,7 +196,7 @@ export class PublishRevenueRecognitionToErpUsecase
       return right(Result.ok<any>(erpResponse));
     } catch (err) {
       console.log(err);
-      return left(new AppError.UnexpectedError(err, err.toString()));
+      return left(new UnexpectedError(err, err.toString()));
     }
   }
 }

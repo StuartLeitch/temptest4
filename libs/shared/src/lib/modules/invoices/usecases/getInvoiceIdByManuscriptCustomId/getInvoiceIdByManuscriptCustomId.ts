@@ -1,6 +1,6 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
 
 // * Authorization Logic
@@ -81,7 +81,7 @@ export class GetInvoiceIdByManuscriptCustomIdUsecase
 
       return right(Result.ok<InvoiceId[]>(invoiceIds));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

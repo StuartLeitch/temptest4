@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Result, left, right } from '../../../../core/logic/Result';
 
 // * Authorization Logic
@@ -57,7 +57,7 @@ export class GetCouponDetailsByCodeUsecase
 
       return right(Result.ok<Coupon>(coupon));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

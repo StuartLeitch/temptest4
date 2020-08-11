@@ -3,7 +3,7 @@
 
 import { UseCase } from '../../../../../core/domain/UseCase';
 // import { UseCaseError } from '../../../../../core/logic/UseCaseError';
-import { AppError } from '../../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { right, Result, Either, left } from '../../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
@@ -28,10 +28,7 @@ interface RemoveEditorsFromJournalDTO {
   allEditors: DeleteEditorDTO[];
 }
 
-type RemoveEditorsFromJournalResponse = Either<
-  AppError.UnexpectedError | unknown,
-  null
->;
+type RemoveEditorsFromJournalResponse = Either<UnexpectedError | unknown, null>;
 
 export class RemoveEditorsFromJournalUsecase
   implements
@@ -74,9 +71,7 @@ export class RemoveEditorsFromJournalUsecase
       );
       if (!journal) {
         return left(
-          new AppError.UnexpectedError(
-            `Journal ${journalId.id.toString()} not found.`
-          )
+          new UnexpectedError(`Journal ${journalId.id.toString()} not found.`)
         );
       }
 
@@ -92,12 +87,12 @@ export class RemoveEditorsFromJournalUsecase
       }
 
       if (errs.length > 0) {
-        return left(new AppError.UnexpectedError(errs));
+        return left(new UnexpectedError(errs));
       }
 
       return right(null);
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

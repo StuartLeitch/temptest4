@@ -1,6 +1,6 @@
-import {CouponMap} from './../../mappers/CouponMap';
-import {AppError} from '../../../../../lib/core/logic/AppError';
-import {SQSPublishServiceContract} from './../../../../domain/services/SQSPublishService';
+import { CouponMap } from './../../mappers/CouponMap';
+import { UnexpectedError } from '../../../../../lib/core/logic/AppError';
+import { SQSPublishServiceContract } from './../../../../domain/services/SQSPublishService';
 
 export class PublishCouponApplied {
   constructor(private publishService: SQSPublishServiceContract) {}
@@ -12,14 +12,14 @@ export class PublishCouponApplied {
       data: {
         invoiceId: 'invoice-id',
         couponId: coupon.id,
-        dateApplied: coupon.applied
-      }
+        dateApplied: coupon.applied,
+      },
     };
 
     try {
       await this.publishService.publishMessage(message);
     } catch (err) {
-      throw new AppError.UnexpectedError(err.toString());
+      throw new UnexpectedError(err.toString());
     }
   }
 }

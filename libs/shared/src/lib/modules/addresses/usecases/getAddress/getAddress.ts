@@ -2,7 +2,7 @@
 
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Result, right, left } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -35,7 +35,7 @@ export class GetAddressUseCase
 
       return right(Result.ok<Address>(address));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

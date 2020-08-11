@@ -1,9 +1,9 @@
 import { Result, Either } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as Errors from './getInvoicesIdsErrors';
 
 export type GetInvoicesIdsResponse = Either<
-  Errors.FilteringInvoicesDbError | AppError.UnexpectedError,
+  Errors.FilteringInvoicesDbError | UnexpectedError,
   Result<AsyncGenerator<string, void, unknown>>
 >;

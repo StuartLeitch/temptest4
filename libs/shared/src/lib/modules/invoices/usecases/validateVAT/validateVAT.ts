@@ -4,7 +4,7 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { ValidateVATResponse } from './validateVATResponse';
 import { ValidateVATErrors } from './validateVATErrors';
 import { VATService } from '../../../../domain/services/VATService';
@@ -67,7 +67,7 @@ export class ValidateVATUsecase
       }
       return right(Result.ok<any>(vatResponse));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 }

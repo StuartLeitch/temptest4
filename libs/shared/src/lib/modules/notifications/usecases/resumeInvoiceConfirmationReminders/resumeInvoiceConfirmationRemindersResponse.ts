@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as ResumeInvoiceConfirmationRemindersErrors from './resumeInvoiceConfirmationRemindersErrors';
 
@@ -12,6 +12,6 @@ export type ResumeInvoiceConfirmationRemindersResponse = Either<
   | ResumeInvoiceConfirmationRemindersErrors.QueueNameRequiredError
   | ResumeInvoiceConfirmationRemindersErrors.InvoiceNotFoundError
   | ResumeInvoiceConfirmationRemindersErrors.ScheduleTaskFailed
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<void>
 >;

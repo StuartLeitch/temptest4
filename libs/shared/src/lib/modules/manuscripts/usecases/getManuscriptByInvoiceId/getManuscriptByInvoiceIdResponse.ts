@@ -1,4 +1,4 @@
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Result, Either } from '../../../../core/logic/Result';
 
 import { Manuscript } from '../../domain/Manuscript';
@@ -9,6 +9,6 @@ export type GetManuscriptByInvoiceIdResponse = Either<
   | GetManuscriptByInvoiceIdErrors.ApcHasNoManuscript
   | GetManuscriptByInvoiceIdErrors.InvalidInvoiceId
   | GetManuscriptByInvoiceIdErrors.NoApcForInvoice
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<Manuscript[]>
 >;

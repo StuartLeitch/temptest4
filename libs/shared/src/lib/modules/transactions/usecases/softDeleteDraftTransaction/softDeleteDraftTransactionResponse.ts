@@ -1,10 +1,10 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../.././core/logic/AppError';
+import { UnexpectedError } from '../../../.././core/logic/AppError';
 
 import { SoftDeleteDraftTransactionErrors } from './softDeleteDraftTransactionErrors';
 
 export type SoftDeleteDraftTransactionResponse = Either<
   // | SoftDeleteDraftTransactionErrors.TransactionNotFoundError
-  AppError.UnexpectedError,
+  UnexpectedError,
   Result<void>
 >;

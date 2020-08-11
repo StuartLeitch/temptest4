@@ -1,7 +1,7 @@
 // * Core Domain
 import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -70,7 +70,7 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
         .map(({ transaction }) => Result.ok(transaction))
         .execute();
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      return left(new UnexpectedError(err));
     }
   }
 

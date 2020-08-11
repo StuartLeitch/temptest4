@@ -1,5 +1,5 @@
 import { Either, Result } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as ScheduleRemindersForExistingInvoicesErrors from './scheduleRemindersForExistingInvoicesErrors';
 
@@ -13,6 +13,6 @@ export type ScheduleRemindersForExistingInvoicesResponse = Either<
   | ScheduleRemindersForExistingInvoicesErrors.CreditControlDelayIsRequired
   | ScheduleRemindersForExistingInvoicesErrors.PaymentDelayRequiredError
   | ScheduleRemindersForExistingInvoicesErrors.PauseDbError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<void>
 >;

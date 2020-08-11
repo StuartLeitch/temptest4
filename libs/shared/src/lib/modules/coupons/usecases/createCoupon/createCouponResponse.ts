@@ -1,5 +1,5 @@
 import { Result, Either } from '../../../../core/logic/Result';
-import { AppError } from '../../../../core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { Coupon } from '../../domain/Coupon';
 
@@ -13,6 +13,6 @@ export type CreateCouponResponse = Either<
   | CreateCouponErrors.InvalidCouponStatusError
   | CreateCouponErrors.InvalidCouponCodeError
   | CreateCouponErrors.InvalidCouponTypeError
-  | AppError.UnexpectedError,
+  | UnexpectedError,
   Result<Coupon>
 >;
