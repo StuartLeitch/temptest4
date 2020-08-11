@@ -60,14 +60,14 @@ export class AddCatalogItemToCatalogUseCase
       catalogItem = CatalogMap.toDomain({
         id: journalId,
         // type,
-        amount,
+        apc: amount,
         created,
         updated,
         currency,
         isActive,
         issn,
         journalId,
-        journalTitle,
+        name: journalTitle,
         publisherId: publisher.publisherId.id.toString(),
       });
 

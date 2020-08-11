@@ -90,7 +90,7 @@ export class UpdateCatalogItemToCatalogUseCase
         isActive,
         issn,
         journalId,
-        journalTitle,
+        name: journalTitle,
       });
 
       // * This is where all the magic happens
