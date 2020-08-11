@@ -60,6 +60,37 @@ export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
     }, []);
   }
 
+  async getPaymentByForeignId(foreignPaymentId: string): Promise<Payment> {
+    const result = await this.db(TABLES.PAYMENTS)
+      .select()
+      .where({ foreignPaymentId })
+      .first();
+
+    if (!result) {
+      throw RepoError.createEntityNotFoundError(
+        'payment by foreignPaymentId',
+        foreignPaymentId
+      );
+    }
+
+    return PaymentMap.toDomain(result);
+  }
+
+  async updatePayment(payment: Payment): Promise<Payment> {
+    const updated = await this.db(TABLES.PAYMENTS)
+      .where({ id: payment.id.toString() })
+      .update(PaymentMap.toPersistence(payment));
+
+    if (!updated) {
+      throw RepoError.createEntityNotFoundError(
+        'payment',
+        payment.id.toString()
+      );
+    }
+
+    return this.getPaymentById(payment.paymentId);
+  }
+
   async save(payment: Payment): Promise<Payment> {
     const { db } = this;
 

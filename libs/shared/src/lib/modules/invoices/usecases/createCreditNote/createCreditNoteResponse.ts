@@ -5,6 +5,9 @@ import { Invoice } from '../../domain/Invoice';
 import { CreateCreditNoteErrors } from './createCreditNoteErrors';
 
 export type CreateCreditNoteResponse = Either<
-  CreateCreditNoteErrors.InvoiceNotFoundError | AppError.UnexpectedError,
+  | CreateCreditNoteErrors.TransactionNotFoundError
+  | CreateCreditNoteErrors.InvoiceNotFoundError
+  | CreateCreditNoteErrors.InvoiceIsDraftError
+  | AppError.UnexpectedError,
   Result<Invoice>
 >;

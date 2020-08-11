@@ -11,6 +11,8 @@ import { InvoicePayment } from "./InvoicePayment";
 import { PaymentHeader } from "./PaymentHeader";
 import { PaymentFooter } from "./PaymentFooter";
 
+import { oneContext } from "../../../context";
+
 import {
   // invoiceTypes,
   invoiceActions,
@@ -27,6 +29,9 @@ import {
   ApplyCouponDTO,
 } from "../../state/modules/invoice/types";
 // import { getClientToken } from "@hindawi/invoicing-web/app/state/modules/payment/actions";
+
+import gql from "graphql-tag";
+import { ASTNode } from "graphql";
 
 interface Props {
   invoiceError: string;
@@ -56,11 +61,26 @@ interface Props {
 const payByPayPal = (recordAction, invoice) => {
   return (data) => {
     return recordAction({
-      paymentMethodId: data.paymentMethodId,
       invoiceId: invoice.invoiceId,
-      payPalOrderId: data.orderID,
-      payerId: invoice.payer.id,
+      orderId: data.orderId,
     });
+  };
+};
+
+const createPayPalOrder: ASTNode = gql`
+  mutation createPayPalOrder($invoiceId: ID!) {
+    createPayPalOrder(invoiceId: $invoiceId) {
+      id
+    }
+  }
+`;
+
+const createPayPalOrderAction = (invoice) => {
+  return async () => {
+    const aa: any = await oneContext.graphqlAdapter.send(createPayPalOrder, {
+      invoiceId: invoice.invoiceId,
+    });
+    return aa.data.createPayPalOrder.id;
   };
 };
 
@@ -142,6 +162,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 ccToken={token}
                 methods={paymentMethods}
                 invoiceStatus={invoice.status}
+                createPayPalOrder={createPayPalOrderAction(invoice)}
                 paymentStatus={invoice.payments.map((p) => p.status)}
                 error={creditCardPaymentError || payPalPaymentError}
                 payByCardSubmit={payByCard}

@@ -63,7 +63,8 @@ const ViewEditContainer: React.FC = () => {
         },
       });
 
-      const createError = createCouponResult?.error?.graphQLErrors[0]?.message;
+      const createError = (createCouponResult?.error?.graphQLErrors[0] as any)
+        ?.message;
 
       if (!createError) {
         history.push('/coupons/list');

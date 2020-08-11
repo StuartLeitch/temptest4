@@ -1,30 +1,35 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
+
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { Result } from '../../../core/logic/Result';
-import { File } from '../../../domain/File';
 import { Amount } from '../../../domain/Amount';
 
 // * Subdomain
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { PayerId } from '../../payers/domain/PayerId';
-import { PaymentId } from './PaymentId';
 import { PaymentMethodId } from './PaymentMethodId';
+import { PaymentProof } from './payment-proof';
+import { PaymentId } from './PaymentId';
 
 export enum PaymentStatus {
+  COMPLETED = 'COMPLETED',
+  CREATED = 'CREATED',
   PENDING = 'PENDING',
   FAILED = 'FAILED',
-  COMPLETED = 'COMPLETED',
 }
 
-interface PaymentProps {
+import { PaymentCompleted } from './events';
+
+export interface PaymentProps {
   invoiceId: InvoiceId;
   payerId: PayerId;
   amount: Amount;
   paymentMethodId?: PaymentMethodId;
   foreignPaymentId?: string;
   datePaid?: Date;
-  paymentProof?: File;
+  paymentProof?: PaymentProof;
   status: PaymentStatus;
 }
 
@@ -49,8 +54,12 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return this.props.paymentMethodId;
   }
 
-  get paymentProof(): File {
+  get paymentProof(): PaymentProof {
     return this.props.paymentProof;
+  }
+
+  set paymentProof(paymentProof: PaymentProof) {
+    this.props.paymentProof = paymentProof;
   }
 
   get amount(): Amount {
@@ -89,5 +98,11 @@ export class Payment extends AggregateRoot<PaymentProps> {
     );
 
     return Result.ok<Payment>(payment);
+  }
+
+  public movedToCompleted(isFinal: boolean = true): void {
+    if (this.status === PaymentStatus.COMPLETED) {
+      this.addDomainEvent(new PaymentCompleted(this, isFinal));
+    }
   }
 }

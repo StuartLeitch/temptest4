@@ -1,17 +1,18 @@
-/* eslint-disable max-len */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { Roles } from '@hindawi/shared';
+import { GetJournalListUsecase, CatalogMap, Roles } from '@hindawi/shared';
+
 import { Resolvers } from '../schema';
-import { GetJournalListUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/journals/getJournalList/getJournalList';
-import { CatalogMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
 
-export const journals: Resolvers<any> = {
+import { Context } from '../../builders';
+
+export const journals: Resolvers<Context> = {
   Query: {
     async journals(parent, args, context) {
       const { repos } = context;
       const usecase = new GetJournalListUsecase(repos.catalog);
       const usecaseContext = {
-        roles: [Roles.ADMIN]
+        roles: [Roles.ADMIN],
       };
       const result = await usecase.execute(args, usecaseContext);
       if (result.isLeft()) {
@@ -26,6 +27,6 @@ export const journals: Resolvers<any> = {
       //   journalId: journalId.id.toString(),
       //   journalTitle,
       // }));
-    }
-  }
+    },
+  },
 };

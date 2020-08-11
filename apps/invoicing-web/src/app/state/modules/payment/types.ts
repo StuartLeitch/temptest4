@@ -35,8 +35,6 @@ export interface PaymentsSlice {
 }
 
 export interface PayPalPayment {
-  paymentMethodId: string;
-  payPalOrderId: string;
   invoiceId: string;
-  payerId: string;
+  orderId: string;
 }

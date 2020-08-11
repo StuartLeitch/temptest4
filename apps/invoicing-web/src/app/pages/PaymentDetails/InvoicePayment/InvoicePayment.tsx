@@ -11,7 +11,6 @@ import {
   Icon,
   th,
 } from "@hindawi/react-components";
-import { FormatUtils } from "@hindawi/invoicing-web/app/utils/format";
 
 import { config } from "../../../../config";
 import Paypal from "./Paypal";
@@ -20,15 +19,9 @@ import ChoosePayment from "./ChoosePayment";
 import CreditCardForm from "./CreditCardForm";
 import SuccessfulPayment from "./SuccessfulPayment";
 
-import { invoiceSelectors, invoiceTypes } from "../../../state/modules/invoice";
+import { invoiceSelectors } from "../../../state/modules/invoice";
 
-const PAYMENT_METHODS = {
-  paypal: "paypal",
-  creditCard: "creditCard",
-  bankTransfer: "bankTransfer",
-};
-
-type PaymentStatus = "PENDING" | "FAILED" | "COMPLETED";
+type PaymentStatus = "CREATED" | "PENDING" | "FAILED" | "COMPLETED";
 
 interface Props {
   ccToken: string;
@@ -42,6 +35,7 @@ interface Props {
   methods: Record<string, string>;
   payByCardSubmit: (data: any) => void;
   payByPayPalSubmit: (data: any) => void;
+  createPayPalOrder: () => Promise<string>;
 }
 
 const validateFn = (methods) => (values) => {
@@ -115,6 +109,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   paymentStatus,
   payByCardSubmit,
   payByPayPalSubmit,
+  createPayPalOrder,
   ccToken,
 }) => {
   const parsedMethods = useMemo(
@@ -190,11 +185,8 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
               )}
               {methods[values.paymentMethodId] === "Paypal" && (
                 <Paypal
-                  invoiceReferenceNumber={invoice.referenceNumber}
-                  manuscriptCustomId={invoice.article.customId}
-                  paymentMethodId={values.paymentMethodId}
+                  createPayPalOrder={createPayPalOrder}
                   onSuccess={payByPayPalSubmit}
-                  total={calculateTotalToBePaid(invoice)}
                 />
               )}
               {error && <Text type="warning">{error}</Text>}

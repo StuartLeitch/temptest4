@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useMutation } from 'graphql-hooks';
 import { toast } from 'react-toastify';
 import SuccessfulPaymentToast from './SuccessfulPaymentToast';
@@ -23,7 +23,7 @@ import { BANK_TRANSFER_MUTATION } from '../../graphql';
 const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
   invoice,
   getPaymentMethods,
-  onSuccessCallback
+  onSuccessCallback,
 }) => {
   const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
   const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
@@ -40,18 +40,15 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
         paymentMethodId: getPaymentMethods.find(
           (pm) => pm.name === 'Bank Transfer'
         ).id,
-        amount: parseFloat(
-          bankTransferPaymentData.paymentAmount
-        ),
-        paymentReference:
-          bankTransferPaymentData.paymentReference,
+        amount: parseFloat(bankTransferPaymentData.paymentAmount + ''),
+        paymentReference: bankTransferPaymentData.paymentReference,
         datePaid: bankTransferPaymentData.paymentDate.toISOString(),
         markInvoiceAsPaid,
       },
     });
     onSuccessCallback();
     return toast.success(SuccessfulPaymentToast);
-  }
+  };
 
   return (
     <ModalDropdown
@@ -95,9 +92,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
             </Label>
             <Col sm={8}>
               <InputGroup>
-                <InputGroupAddon addonType='prepend'>
-                  $
-                </InputGroupAddon>
+                <InputGroupAddon addonType='prepend'>$</InputGroupAddon>
                 <Input
                   placeholder='Amount...'
                   id='bothAddon'
@@ -144,8 +139,8 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
         {/* END Form */}
       </ModalBody>
     </ModalDropdown>
-  )
-}
+  );
+};
 
 interface PaymentMethod {
   id: string;
@@ -155,7 +150,7 @@ interface PaymentMethod {
 
 interface AddPaymentModalProps {
   invoice: Invoice;
-  getPaymentMethods: PaymentMethod[],
+  getPaymentMethods: PaymentMethod[];
   onSuccessCallback(): void;
 }
 

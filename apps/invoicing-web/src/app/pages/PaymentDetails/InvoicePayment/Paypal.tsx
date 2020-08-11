@@ -4,16 +4,12 @@ import scriptLoader from "react-async-script-loader";
 import { config } from "../../../../config";
 
 interface Props {
-  total: number;
-  currency?: string;
   isScriptLoaded: boolean;
   isScriptLoadSucceed: boolean;
-  paymentMethodId: string;
-  invoiceReferenceNumber: string;
-  manuscriptCustomId: string;
   onError?(data?: any): void;
   onCancel?(data?: any): void;
   onSuccess?(data?: any): void;
+  createPayPalOrder(): Promise<string>;
 }
 
 const ENV = config.env === "production" ? "production" : "sandbox";
@@ -24,60 +20,40 @@ const CLIENT = {
 };
 
 const Paypal: React.FunctionComponent<Props> = ({
-  total,
-  currency,
   onError,
   onCancel,
   onSuccess,
-  invoiceReferenceNumber,
-  manuscriptCustomId,
   isScriptLoaded,
-  paymentMethodId,
   isScriptLoadSucceed,
+  createPayPalOrder,
 }) => {
-  let paypalRef = useRef();
+  const paypalRef = useRef();
 
   useEffect(() => {
     isScriptLoadSucceed &&
       isScriptLoaded &&
       (window as any).paypal
         .Buttons({
-          createOrder: (data, actions) => {
-            return actions.order.create({
-              purchase_units: [
-                {
-                  amount: {
-                    currency_code: currency,
-                    value: total,
-                  },
-                  invoice_id: invoiceReferenceNumber,
-                  description: `${manuscriptCustomId} Article Processing charges`,
-                },
-              ],
-            });
+          style: {
+            layout: "horizontal",
+            label: "pay",
+          },
+          createOrder: async (data, actions) => {
+            const a = await createPayPalOrder();
+            return a;
           },
           onApprove: async (data, actions) => {
-            const order = await actions.order.capture();
-            const payment = {
-              paid: true,
-              cancelled: false,
-              payerID: data.payerID,
-              orderID: data.orderID,
-              paymentMethodId,
-            };
-            onSuccess(payment);
+            console.log(data);
+            // onSuccess(payment);
+            onSuccess({ orderId: data.orderID });
           },
           onError,
           onCancel,
         })
         .render(paypalRef.current);
-  }, [total, isScriptLoadSucceed, isScriptLoaded]);
+  }, [isScriptLoadSucceed, isScriptLoaded]);
 
   return isScriptLoadSucceed && isScriptLoaded && <div ref={paypalRef} />;
-};
-
-Paypal.defaultProps = {
-  currency: "USD",
 };
 
 export default scriptLoader(

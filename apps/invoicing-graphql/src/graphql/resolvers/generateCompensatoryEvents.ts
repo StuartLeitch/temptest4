@@ -7,9 +7,11 @@ import {
   Roles,
 } from '@hindawi/shared';
 
+import { Context } from '../../builders';
+
 import { Resolvers } from '../schema';
 
-export const generateCompensatoryEvents: Resolvers<any> = {
+export const generateCompensatoryEvents: Resolvers<Context> = {
   Mutation: {
     async generateCompensatoryEvents(parent, args, context) {
       const { invoiceIds, journalIds } = args;
@@ -25,8 +27,7 @@ export const generateCompensatoryEvents: Resolvers<any> = {
           payer,
           payment,
         },
-        services: { logger: loggerService },
-        qq: sqsQueService,
+        services: { logger: loggerService, qq: sqsQueService },
       } = context;
       const usecase = new GenerateCompensatoryEventsUsecase(
         paymentMethod,

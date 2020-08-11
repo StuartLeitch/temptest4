@@ -1,6 +1,8 @@
 import { merge } from 'lodash';
 import { Resolvers } from '../schema';
 
+import { Context } from '../../builders';
+
 import { payer } from './payer';
 import { invoice } from './invoice';
 import { coupon } from './coupon';
@@ -12,7 +14,7 @@ import { generateCompensatoryEvents } from './generateCompensatoryEvents';
 import { reminders } from './reminders';
 import { generateMissingReminderJobs } from './generateMissingReminderJobs';
 
-export const resolvers: Resolvers<any> = merge(
+export const resolvers: Resolvers<Context> = merge(
   {},
   payer,
   invoice,
