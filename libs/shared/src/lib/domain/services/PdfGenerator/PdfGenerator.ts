@@ -3,7 +3,7 @@ import path from 'path';
 import { Readable } from 'stream';
 import { format } from 'date-fns';
 import ejs from 'ejs';
-import pdf from 'html-pdf';
+// import pdf from 'html-pdf';
 import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
@@ -85,7 +85,7 @@ export class PdfGeneratorService {
       };
       const html = template(data);
 
-      const pdfOptions: pdf.CreateOptions = {
+      const pdfOptions /* : pdf.CreateOptions*/ = {
         border: {
           left: '1cm',
           right: '1cm',
@@ -99,18 +99,19 @@ export class PdfGeneratorService {
         header: {
           height: '2.5cm',
         },
-        phantomPath: '/usr/bin/phantomjs',
+        // phantomPath: '/usr/bin/phantomjs',
         // phantomPath: 'node_modules/.bin/phantomjs',
-        phantomArgs: [],
+        // phantomArgs: [],
       };
       try {
-        pdf.create(html, pdfOptions).toStream((err, stream) => {
-          if (err) {
-            return reject(err);
-          }
+        // pdf.create(html, pdfOptions).toStream((err, stream) => {
+        //   if (err) {
+        //     return reject(err);
+        //   }
 
-          resolve(stream);
-        });
+        //   resolve(stream);
+        // })
+        resolve(null);
       } catch (e) {
         console.log(e);
         resolve(null);
