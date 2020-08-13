@@ -3,13 +3,18 @@ import path from 'path';
 import { Readable } from 'stream';
 import { format } from 'date-fns';
 import ejs from 'ejs';
-import pdf from 'html-pdf';
+// import pdf from 'html-pdf';
 import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
+
+import PdfPrinter from 'pdfmake';
+import htmlToPdfmake from 'html-to-pdfmake';
+import jsdom from 'jsdom';
+import { stylesObject } from './stylesObject';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -44,6 +49,17 @@ export class PdfGeneratorService {
   public async getInvoice(payload: InvoicePayload): Promise<Readable> {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
+
+    const fonts = {
+      Roboto: {
+        normal: 'fonts/Roboto-Regular.ttf',
+        bold: 'fonts/Roboto-Medium.ttf',
+        italics: 'fonts/Roboto-Italic.ttf',
+        bolditalics: 'fonts/Roboto-MediumItalic.ttf',
+      },
+    };
+
+    const printer = new PdfPrinter(fonts);
 
     return new Promise((resolve, reject) => {
       const template = this.getTemplate('invoice');
@@ -83,34 +99,39 @@ export class PdfGeneratorService {
           ].join(', '),
         },
       };
-      const html = template(data);
+      const { JSDOM } = jsdom;
+      const { window } = new JSDOM('');
+      const htmlTemplate = template(data);
+      const pdfDocument = htmlToPdfmake(htmlTemplate, { window: window });
+      const docDefinition = { content: [pdfDocument], styles: stylesObject };
+      console.log(pdfDocument);
 
-      const pdfOptions: pdf.CreateOptions = {
-        border: {
-          left: '1cm',
-          right: '1cm',
-          bottom: '0.75cm',
-          top: '0.25cm',
-        },
-        format: 'A4',
-        footer: {
-          height: '2cm',
-        },
-        header: {
-          height: '2.5cm',
-        },
-        phantomPath: '/usr/bin/phantomjs',
-        // phantomPath: 'node_modules/.bin/phantomjs',
-        phantomArgs: [],
-      };
+      // const pdfOptions: pdf.CreateOptions = {
+      //   border: {
+      //     left: '1cm',
+      //     right: '1cm',
+      //     bottom: '0.75cm',
+      //     top: '0.25cm',
+      //   },
+      //   format: 'A4',
+      //   footer: {
+      //     height: '2cm',
+      //   },
+      //   header: {
+      //     height: '2.5cm',
+      //   },
+      //   phantomPath: '/usr/local/bin/phantomjs',
+      //   // phantomPath: 'node_modules/.bin/phantomjs',
+      //   phantomArgs: [],
+      // };
       try {
-        pdf.create(html, pdfOptions).toStream((err, stream) => {
-          if (err) {
-            return reject(err);
-          }
-
-          resolve(stream);
-        });
+        const pdfDoc = printer.createPdfKitDocument(docDefinition);
+        if (!pdfDoc) {
+          return reject(new Error('Invalid PDF data'));
+        }
+        const result = pdfDoc.pipe(fs.createWriteStream('doc.pdf'));
+        resolve(result);
+        pdfDoc.end();
       } catch (e) {
         console.log(e);
         resolve(null);
