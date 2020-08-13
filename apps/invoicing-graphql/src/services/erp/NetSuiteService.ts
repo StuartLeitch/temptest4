@@ -27,13 +27,8 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   public async registerInvoice(data: ErpData): Promise<ErpResponse> {
-<<<<<<< HEAD
     // console.log('ERP Data:');
     // console.info(data);
-=======
-    console.log('ERP Data:');
-    console.info(data);
->>>>>>> develop
 
     const customerId = await this.getCustomerId(data);
 
@@ -61,12 +56,6 @@ export class NetSuiteService implements ErpServiceContract {
       customerId = await this.createCustomer(data);
     }
 
-<<<<<<< HEAD
-=======
-    console.log('Customer ID:');
-    console.info(customerId);
-
->>>>>>> develop
     return customerId;
   }
 
