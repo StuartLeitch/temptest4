@@ -27,17 +27,17 @@ import { UserId } from '../../../../users/domain/UserId';
 
 export class CreateEditor
   implements
-    UseCase<
-      CreateEditorDTO,
-      Promise<CreateEditorResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      CreateEditorDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  constructor(private editorRepo: EditorRepoContract) {}
+  UseCase<
+  CreateEditorDTO,
+  Promise<CreateEditorResponse>,
+  UsecaseAuthorizationContext
+  >,
+  AccessControlledUsecase<
+  CreateEditorDTO,
+  UsecaseAuthorizationContext,
+  AccessControlContext
+  > {
+  constructor(private editorRepo: EditorRepoContract) { }
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -55,7 +55,11 @@ export class CreateEditor
     let userId: UserId;
 
     try {
-      const nameOrError = Name.create({ value: request.name });
+      // console.info(request);
+
+      const nameOrError = Name.create({
+        value: request.givenNames || request.surname ? `${request.givenNames} ${request.surname}` : request.name,
+      });
       if (nameOrError.isFailure) {
         return left(nameOrError);
       }
@@ -68,8 +72,8 @@ export class CreateEditor
       editorEmail = emailOrError.getValue();
 
       const editorRoleOrError = EditorRole.create({
-        label: request.roleLabel,
-        type: request.roleType,
+        label: request?.role?.label || request.roleLabel,
+        type: request?.role?.type || request.roleType,
       });
       if (editorRoleOrError.isFailure) {
         return left(editorRoleOrError);
@@ -100,6 +104,7 @@ export class CreateEditor
         editorProps,
         new UniqueEntityID(request.editorId)
       );
+      // console.info(editorOrError);
 
       if (editorOrError.isFailure) {
         return left(editorOrError);

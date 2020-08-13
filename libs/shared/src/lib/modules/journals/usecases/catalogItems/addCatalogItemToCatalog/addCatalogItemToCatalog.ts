@@ -29,7 +29,7 @@ export class AddCatalogItemToCatalogUseCase
     request: AddCatalogItemToCatalogUseCaseRequestDTO
   ): Promise<AddCatalogItemToCatalogUseCaseResponse> {
     const {
-      type,
+      // type,
       amount,
       created,
       currency,
@@ -58,20 +58,26 @@ export class AddCatalogItemToCatalogUseCase
       }
 
       catalogItem = CatalogMap.toDomain({
-        type,
-        amount,
+        id: journalId,
+        // type,
+        apc: amount,
         created,
         updated,
         currency,
         isActive,
         issn,
         journalId,
-        journalTitle,
+        name: journalTitle,
         publisherId: publisher.publisherId.id.toString(),
       });
 
-      // This is where all the magic happens
-      await this.catalogRepo.save(catalogItem);
+      const isCreated = await this.catalogRepo.exists(catalogItem);
+      if (isCreated) {
+        console.log(`Journal ${catalogItem.journalTitle} already exists.`);
+      } else {
+        // * This is where all the magic happens
+        await this.catalogRepo.save(catalogItem);
+      }
 
       return right(Result.ok<CatalogItem>(catalogItem));
     } catch (err) {
