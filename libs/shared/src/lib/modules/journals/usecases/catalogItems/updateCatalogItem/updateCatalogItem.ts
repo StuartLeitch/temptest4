@@ -1,11 +1,11 @@
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../../core/domain/UseCase';
+import { AppError } from '../../../../../core/logic/AppError';
 import { Result, Either, left, right } from '../../../../../core/logic/Result';
 
 import { CatalogItem } from '../../../domain/CatalogItem';
 import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { JournalId } from '../../../domain/JournalId';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
-import { AppError } from 'libs/shared/src/lib/core/logic/AppError';
 import { CatalogMap } from '../../../mappers/CatalogMap';
 
 export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
@@ -39,63 +39,65 @@ export class UpdateCatalogItemToCatalogUseCase
   public async execute(
     request: UpdateCatalogItemToCatalogUseCaseRequestDTO
   ): Promise<UpdateCatalogItemToCatalogUseCaseResponse> {
+    // const foo = {
+    //   amount: 1339,
+    //   created: '2020-06-25T04:57:07.247Z',
+    //   updated: '2020-06-25T07:04:37.286Z',
+    //   currency: 'USD',
+    //   issn: '1234-9832',
+    //   journalTitle: "bunch of stars - se - it don't work in screening",
+    //   isActive: true,
+    //   journalId: '16abc826-e86a-44c2-aaa2-d8b4049dfcba',
+    // };
+
     const {
-      type,
+      // type,
       amount,
       created,
       currency,
       isActive,
       issn,
-      journalId,
+      journalId: rawJournalId,
       journalTitle,
       updated,
     } = request;
 
     try {
-      const journalIdValueObject = JournalId.create(
-        new UniqueEntityID(journalId)
+      const journalId: JournalId = JournalId.create(
+        new UniqueEntityID(rawJournalId)
       ).getValue();
 
       // getting catalog item id
-      let catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
-        journalIdValueObject
+      const catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+        journalId
       );
 
       if (!catalogItem) {
         return left(
           new AppError.UnexpectedError(
-            `Journal with id ${journalIdValueObject.id.toString()} does not exist.`
+            `Journal with id ${journalId.id.toString()} does not exist.`
           )
         );
       }
 
-      const catalogItemOrError = CatalogItem.create(
-        {
-          type,
-          amount,
-          created: created ? new Date(created) : null,
-          updated: updated ? new Date(updated) : null,
-          currency,
-          isActive,
-          issn,
-          journalId: journalIdValueObject,
-          journalTitle,
-          publisherId: catalogItem.publisherId,
-        },
-        catalogItem.id
-      );
+      const updatedCatalogItem = CatalogMap.toDomain({
+        id: journalId.id.toString(),
+        // type,
+        apc: amount,
+        created: created ? new Date(created) : null,
+        updated: updated ? new Date(updated) : null,
+        currency,
+        isActive,
+        issn,
+        journalId,
+        name: journalTitle,
+      });
 
-      if (catalogItemOrError.isFailure) {
-        return left(new AppError.UnexpectedError(catalogItemOrError.error));
-      }
+      // * This is where all the magic happens
+      await this.catalogRepo.updateCatalogItem(updatedCatalogItem);
 
-      catalogItem = catalogItemOrError.getValue();
-
-      // This is where all the magic happens
-      await this.catalogRepo.updateCatalogItem(catalogItem);
-
-      // todo will editors change here?
-      return right(Result.ok<CatalogItem>(catalogItem));
+      // TODO: will editors change here?
+      return right(Result.ok<CatalogItem>(updatedCatalogItem));
     } catch (err) {
       console.log(err);
       return left(new AppError.UnexpectedError(err));

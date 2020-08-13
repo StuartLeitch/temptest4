@@ -39,9 +39,9 @@ export class MockCatalogRepo extends BaseMockRepo<CatalogItem>
     catalogItem: CatalogItem
   ): Promise<CatalogItem> {
     if (await this.exists(catalogItem)) {
-      await this.save(catalogItem);
-      return catalogItem;
+      return await this.save(catalogItem);
     }
+
     return null;
   }
 
@@ -56,8 +56,9 @@ export class MockCatalogRepo extends BaseMockRepo<CatalogItem>
     const alreadyExists = await this.exists(catalogItem);
 
     if (alreadyExists) {
-      this._items.map((i) => {
+      this._items.map((i, idx) => {
         if (this.compareMockItems(i, catalogItem)) {
+          this._items[idx] = catalogItem;
           return catalogItem;
         } else {
           return i;

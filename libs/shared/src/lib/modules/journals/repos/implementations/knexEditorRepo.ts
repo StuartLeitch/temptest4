@@ -17,7 +17,8 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
 
     const editors = await db(TABLES.EDITORS)
       .select()
-      .where('email', editorEmail);
+      .where('email', editorEmail)
+      .where('deleted', 0);
 
     return editors.map((editor) => EditorMap.toDomain(editor));
   }
@@ -28,6 +29,7 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
     const editor = await db(TABLES.EDITORS)
       .select()
       .where('id', editorId.id.toString())
+      .where('deleted', 0)
       .first();
 
     if (!editor) {
@@ -57,9 +59,10 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
     const { db } = this;
 
     const rawEditor = EditorMap.toPersistence(editor);
-
+    const insert = db(TABLES.EDITORS).insert(rawEditor);
+    const update = db.queryBuilder().update({ ...rawEditor, deleted: 0 });
     try {
-      await db(TABLES.EDITORS).insert(rawEditor);
+      await db.raw(`? ON CONFLICT (id) DO ?`, [insert, update]);
     } catch (e) {
       throw RepoError.fromDBError(e);
     }
@@ -72,7 +75,8 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
 
     const editors = await db(TABLES.EDITORS)
       .select()
-      .where('journalId', journalId.id.toString());
+      .where('journalId', journalId.id.toString())
+      .where('deleted', 0);
 
     return editors.map(EditorMap.toDomain);
   }

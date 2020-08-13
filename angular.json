@@ -40,7 +40,8 @@
         "serve": {
           "builder": "@nrwl/node:execute",
           "options": {
-            "buildTarget": "invoicing-graphql:build"
+            "buildTarget": "invoicing-graphql:build",
+            "port": 57050
           }
         },
         "lint": {

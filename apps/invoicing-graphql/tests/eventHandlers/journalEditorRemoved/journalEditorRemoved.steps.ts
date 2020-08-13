@@ -12,7 +12,8 @@ import {
   MockCatalogRepo,
 } from '@hindawi/shared';
 
-import { JournalEditorRemovedHandler } from '../../src/queue_service/handlers/JournalEditorRemoved';
+import { JournalEditorRemovedHandler } from '../../../src/queue_service/handlers/JournalEditorRemoved';
+import * as JournalEditorRemovedData from './JournalEditorRemoved_2.json';
 
 function getRandom(arr: string[], n: number) {
   const result = new Array(n);

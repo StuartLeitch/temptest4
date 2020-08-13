@@ -1,0 +1,24 @@
+{
+  "id": "d4b6e38c-b319-4132-8ae4-a8fb4120299d",
+  "created": "2020-06-22T12:07:01.540Z",
+  "updated": "2020-06-22T12:07:01.540Z",
+  "name": "Razvan Journal Editor Removed 3",
+  "publisherName": null,
+  "code": "RJER3",
+  "email": "razvan.ariciuc+ae4@gmail.com",
+  "issn": null,
+  "apc": 4352,
+  "isActive": true,
+  "activationDate": "2020-06-22T00:00:00.000Z",
+  "sections": [],
+  "specialIssues": [],
+  "articleTypes": [
+    {
+      "name": "Research Article"
+    },
+    {
+      "name": "Editorial"
+    }
+  ],
+  "editors": []
+}
