@@ -54,6 +54,7 @@ Thumbs.db
 .invoicing.backend.gsw.env
 .reporting.backend.env
 *.env
+**/env-config.js
 tools/scripts/aws/sqs/dlq/failedEvents.json
 tools/scripts/aws/sqs/dlq/delete-message-batch.json
 *.nx-tmp
