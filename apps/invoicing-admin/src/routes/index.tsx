@@ -33,24 +33,39 @@ export const RoutedContent = () => {
     <Switch>
       <Redirect from='/' to='/dashboards/invoicing' exact />
       {/*     Invoices Routes      */}
-      <Route path='/invoices/list' exact component={InvoicesList} />
-      <Route path='/invoices/details/:id' exact component={InvoiceDetails} />
+      <PrivateRoute path='/invoices/list' exact>
+        <InvoicesList />
+      </PrivateRoute>
+      <PrivateRoute path='/invoices/details/:id' exact>
+        <InvoiceDetails />
+      </PrivateRoute>
 
-      <Route path='/invoices/split-invoice/:id' exact component={SplitInvoice} />
+      <PrivateRoute path='/invoices/split-invoice/:id' exact>
+        <SplitInvoice />
+      </PrivateRoute>
       {/* Credit Notes Routes */}
-      <Route
-        path='/credit-notes/details/:id'
-        exact
-        component={CreditNoteDetails}
-      />
+      <PrivateRoute path='/credit-notes/details/:id' exact>
+        <CreditNoteDetails />
+      </PrivateRoute>
       {/* Coupons Routes */}
-      <Route path='/coupons/list' exact component={CouponsList} />
-      <Route path='/coupons/details/:code' exact component={CouponDetails} />
-      <Route path='/coupons/create' exact component={CouponCreate} />
+      <PrivateRoute path='/coupons/list' exact>
+        <CouponsList />
+      </PrivateRoute>
+      <PrivateRoute path='/coupons/details/:code' exact>
+        <CouponDetails />
+      </PrivateRoute>
+
+      <PrivateRoute path='/coupons/create' exact>
+        <CouponCreate />
+      </PrivateRoute>
       {/* Layout Routes */}
-      <Route path='/dashboards/projects' exact component={ProjectsDashboard} />
+
+      <PrivateRoute exact path='/dashboards/projects'>
+        <ProjectsDashboard pageConfig={null} />
+      </PrivateRoute>
+
       <PrivateRoute exact path='/dashboards/invoicing'>
-        <InvoicingDashboard />
+        <InvoicingDashboard pageConfig={null} />
       </PrivateRoute>
 
       <Route path='/dashboards/financial' exact component={Financial} />
