@@ -334,6 +334,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
+      tranId: `Revenue Recognition - ${invoice.referenceNumber}`,
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,

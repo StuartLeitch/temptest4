@@ -165,35 +165,37 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
-      // const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
-      //   {
-      //     invoice,
-      //     manuscript,
-      //     invoiceTotal: netCharges,
-      //   }
-      // );
-      // this.loggerService.info(
-      //   `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${netSuiteResponse}`
-      // );
-
-      const erpResponse = await this.sageService.registerRevenueRecognition({
-        invoice,
-        manuscript,
-        customSegmentId: publisherCustomValues?.customSegmentId,
-        invoiceTotal: netCharges,
-        publisherCustomValues,
-      });
-
-      this.loggerService.info(
-        `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${
-          erpResponse.journal.id
-        }`
+      const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
+        {
+          invoice,
+          manuscript,
+          payer,
+          customSegmentId: publisherCustomValues?.customSegmentId,
+          invoiceTotal: netCharges,
+        }
       );
-      invoice.revenueRecognitionReference = erpResponse.journal.id;
+      this.loggerService.info(
+        `NetSuite Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${netSuiteResponse}`
+      );
+
+      // const erpResponse = await this.sageService.registerRevenueRecognition({
+      //   invoice,
+      //   manuscript,
+      //   customSegmentId: publisherCustomValues?.customSegmentId,
+      //   invoiceTotal: netCharges,
+      //   publisherCustomValues,
+      // });
+      // this.loggerService.info(
+      //   `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${
+      //     erpResponse.journal.id
+      //   }`
+      // );
+      // invoice.revenueRecognitionReference = erpResponse.journal.id;
+      invoice.revenueRecognitionReference = netSuiteResponse;
 
       await this.invoiceRepo.update(invoice);
 
-      return right(Result.ok<any>(erpResponse));
+      return right(Result.ok<any>(netSuiteResponse));
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));
