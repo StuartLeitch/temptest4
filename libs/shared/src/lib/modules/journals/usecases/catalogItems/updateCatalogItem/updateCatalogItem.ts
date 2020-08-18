@@ -109,14 +109,14 @@ export class UpdateCatalogItemToCatalogUseCase
       const updatedCatalogItem = CatalogMap.toDomain({
         id: journalId.id.toString(),
         // type,
-        apc: amount,
+        amount,
         created: created ? new Date(created) : null,
         updated: updated ? new Date(updated) : null,
         currency,
         isActive,
         issn,
         journalId: rawJournalId,
-        name: journalTitle,
+        journalTitle,
         publisherId: publisher.publisherId.id.toString(),
       });
 
