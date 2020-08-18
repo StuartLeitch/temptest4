@@ -57,6 +57,7 @@
     "src/lib/infrastructure/database/knex/migrations/20200721135248_add_temporay_ns_reference_to_invoices_table.js",
     "src/lib/infrastructure/database/knex/migrations/20200807103606_add_soft_delete_to_editors_table.js",
     "src/lib/infrastructure/database/knex/migrations/20200820162330_add_nsrevrecreference_to_invoices_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20200818163344_add_arxiv_id_to_manuscript.js"
+    "src/lib/infrastructure/database/knex/migrations/20200818163344_add_arxiv_id_to_manuscript.js",
+    "src/lib/infrastructure/database/knex/migrations/20200818172244_drop_journals_table.js"
   ]
 }
