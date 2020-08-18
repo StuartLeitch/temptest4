@@ -15,6 +15,7 @@ interface ManuscriptProps {
   authorSurname?: string;
   authorFirstName?: string;
   datePublished?: Date;
+  arxivId?: string;
 }
 
 export class Manuscript extends AggregateRoot<ManuscriptProps> {
@@ -102,6 +103,14 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.datePublished;
   }
 
+  get arxivId(): string {
+    return this.props.arxivId;
+  }
+
+  set arxivId(arxivId: string) {
+    this.props.arxivId = arxivId;
+  }
+
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -113,7 +122,7 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     const manuscript = new Manuscript(
       {
         ...props,
-        created: props.created ? props.created : new Date()
+        created: props.created ? props.created : new Date(),
       },
       id
     );

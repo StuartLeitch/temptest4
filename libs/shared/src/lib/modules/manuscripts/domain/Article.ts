@@ -15,6 +15,7 @@ interface ArticleProps {
   authorSurname?: string;
   authorFirstName?: string;
   datePublished?: Date;
+  arxivId?: string;
 }
 
 export class Article extends AggregateRoot<ArticleProps> {
@@ -102,6 +103,14 @@ export class Article extends AggregateRoot<ArticleProps> {
     return this.props.datePublished;
   }
 
+  get arxivId(): string {
+    return this.props.arxivId;
+  }
+
+  set arxivId(arxivId: string) {
+    this.props.arxivId = arxivId;
+  }
+
   private constructor(props: ArticleProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -113,7 +122,7 @@ export class Article extends AggregateRoot<ArticleProps> {
     const article = new Article(
       {
         ...props,
-        created: props.created ? props.created : new Date()
+        created: props.created ? props.created : new Date(),
       },
       id
     );

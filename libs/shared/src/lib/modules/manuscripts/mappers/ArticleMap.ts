@@ -15,7 +15,8 @@ export class ArticleMap extends Mapper<Article> {
         authorCountry: raw.authorCountry,
         authorSurname: raw.authorSurname,
         authorFirstName: raw.authorFirstName,
-        datePublished: raw.datePublished
+        datePublished: raw.datePublished,
+        arxivId: raw.arxivId,
       },
       new UniqueEntityID(raw.id)
     );
@@ -37,7 +38,8 @@ export class ArticleMap extends Mapper<Article> {
       authorFirstName: article.props.authorFirstName,
       created: article.props.created,
       customId: article.props.customId,
-      datePublished: article.props.datePublished
+      datePublished: article.props.datePublished,
+      arxivId: article.props.arxivId,
     };
   }
 }
