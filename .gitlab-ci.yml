@@ -74,8 +74,8 @@ Build:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
+  # only:
+  #   - develop
 
 Package Images:dev:
   interruptible: true
@@ -103,8 +103,8 @@ Package Images:dev:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
+  # only:
+  #   - develop
 
 Deploy:dev:
   stage: deploy
@@ -121,6 +121,7 @@ Deploy:dev:
     COMMAND: build-manifests
   before_script:
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+    - apk add --no-cache curl
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
@@ -136,8 +137,8 @@ Deploy:dev:
   artifacts:
     paths:
       - dist-k8s
-  only:
-    - develop
+  # only:
+  #   - develop
 # Pages:
 #   interruptible: true
 #   stage: deploy
