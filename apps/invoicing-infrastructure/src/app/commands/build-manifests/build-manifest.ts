@@ -73,7 +73,7 @@ export class BuildManifestsCommand implements Command {
         // todo delete contiune, this should exit with error
         continue;
       }
-
+      console.log('building ' + app)
       await HindawiServiceChart.withAwsSecrets(rootConstruct, app, appProps);
     }
     rootConstruct.synth();
