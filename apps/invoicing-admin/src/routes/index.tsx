@@ -61,11 +61,11 @@ export const RoutedContent = () => {
       {/* Layout Routes */}
 
       <PrivateRoute exact path='/dashboards/projects'>
-        <ProjectsDashboard pageConfig={null} />
+        <ProjectsDashboard pageConfig={{}} />
       </PrivateRoute>
 
       <PrivateRoute exact path='/dashboards/invoicing'>
-        <InvoicingDashboard pageConfig={null} />
+        <InvoicingDashboard pageConfig={{}} />
       </PrivateRoute>
 
       <Route path='/dashboards/financial' exact component={Financial} />
