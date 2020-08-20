@@ -103,15 +103,18 @@ export const RoutedSidebars = () => (
   </Switch>
 );
 
+function childrenInRoute(children, pathMatch, params) {
+  const toRender = <React.Suspense fallback={null}>{children}</React.Suspense>;
+  return <Route {...params} render={() => toRender} />;
+}
+
 function PrivateRoute({ children, ...rest }) {
   const auth = useAuth();
 
   // * If auth is not enabled
   if (typeof auth === 'object' && !auth) {
-    return <React.Suspense fallback={null}>{children}</React.Suspense>;
+    return childrenInRoute(children, rest.computedMatch, rest);
   }
-
-  let toRender = null;
 
   const { data, login } = auth;
   if (!data || !data.isAuthenticated) {
@@ -120,10 +123,6 @@ function PrivateRoute({ children, ...rest }) {
   }
 
   if (data && 'isAuthenticated' in data && data.isAuthenticated) {
-    toRender = (
-      <React.Suspense fallback={<PendingLogging />}>{children}</React.Suspense>
-    );
+    return childrenInRoute(children, rest.computedMatch, rest);
   }
-
-  return <Route {...rest} render={() => toRender} />;
 }

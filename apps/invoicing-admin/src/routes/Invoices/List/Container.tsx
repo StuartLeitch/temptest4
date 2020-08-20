@@ -290,8 +290,8 @@ const InvoicesContainer: React.FC = () => {
   }
 };
 
-InvoicesContainer.propTypes = {
-  match: PropTypes.object.isRequired,
-};
+// InvoicesContainer.propTypes = {
+//   match: PropTypes.object.isRequired,
+// };
 
 export default InvoicesContainer;
