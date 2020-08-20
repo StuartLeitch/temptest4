@@ -48,6 +48,7 @@ export class Logger implements LoggerContract {
     } else {
       this.setScope(scope);
     }
+
     this.protocol = console;
   }
 

@@ -60,7 +60,7 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
 
     const rawEditor = EditorMap.toPersistence(editor);
     const insert = db(TABLES.EDITORS).insert(rawEditor);
-    const update = db.queryBuilder().update({ ...rawEditor, deleted: 0 });
+    const update = db.queryBuilder().update({ ...rawEditor, deleted: 0, updatedAt: new Date() });
     try {
       await db.raw(`? ON CONFLICT (id) DO ?`, [insert, update]);
     } catch (e) {
@@ -86,7 +86,7 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
 
     const deletedRows = await db(TABLES.EDITORS)
       .where('id', editor.id.toString())
-      .update({ ...EditorMap.toPersistence(editor), deleted: 1 });
+      .update({ ...EditorMap.toPersistence(editor), deleted: 1, updatedAt: new Date() });
 
     if (!deletedRows) {
       throw RepoError.createEntityNotFoundError('editor', editor.id.toString());

@@ -11,6 +11,7 @@ const defaultValues: WithAwsSecretsServiceProps = {
         '916437579680.dkr.ecr.eu-west-1.amazonaws.com/invoicing-admin',
       tag: 'latest',
     },
+    containerPort: 3000,
     replicaCount: 1,
     service: {
       port: 80,

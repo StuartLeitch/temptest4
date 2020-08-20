@@ -33,14 +33,14 @@ function createCucumber(options, context) {
       options.features,
       '--require',
       supportEntryPath,
-      '--format',
-      `${format}:${fullPath}/cucumber_report.json`,
+      // '--format',
+      // `${format}:${fullPath}/cucumber_report.json`,
       // '--format',
       // `usage:${fullPath}/usage.txt`,
     ],
   ];
   // ./node_modules/.bin/nyc --report-dir /Users/lucianlature/Projects/hindawi/report/apps/invoicing-graphql --reporter=lcov --reporter=text node_modules/.bin/cucumber-js  --require apps/invoicing-graphql/tests/**/*.steps.ts apps/invoicing-graphql/tests/**/*.feature
-  var subprocess = execa_1.command(args, {
+  var subprocess = execa_1(args[0], args[1], {
     env: { TS_NODE_PROJECT: options.tsConfig },
   });
   // [
@@ -53,28 +53,28 @@ function createCucumber(options, context) {
   //   // `usage:${fullPath}/usage.txt`,
   // ],
   // { env: { TS_NODE_PROJECT: options.tsConfig } }
-  subprocess.stdout.pipe(process.stdout);
-  subprocess.stderr.pipe(process.stderr);
+  // subprocess.stdout.pipe(process.stdout);
+  // subprocess.stderr.pipe(process.stderr);
   // var bundleTarget = architect_1.targetFromTargetString(options.bundleTarget);
   // var bundle$ = architect_1.scheduleTargetAndForget(context, bundleTarget);
   var cucumberLogger = logger.createChild('Cucumber:');
   return rxjs_1.from(subprocess).pipe(
     operators_1.map(function () {
-      // if (runCoverage) {
-      //   execa_1(
-      //     path_1.join('tools', 'scripts', 'cucumber-report.sh', fullPath),
-      //     {
-      //       shell: true,
-      //     }
-      //   ).stdout.pipe(process.stdout);
+      if (runCoverage) {
+        execa_1(
+          path_1.join('tools', 'scripts', 'cucumber-report.sh', fullPath),
+          {
+            shell: true,
+          }
+        ).stdout.pipe(process.stdout);
 
-      //   // execa_1(
-      //   //   path_1.join('tools', 'scripts', 'generate-coverage.sh', fullPath),
-      //   //   {
-      //   //     shell: true,
-      //   //   }
-      //   // ).stdout.pipe(process.stdout);
-      // }
+        //   // execa_1(
+        //   //   path_1.join('tools', 'scripts', 'generate-coverage.sh', fullPath),
+        //   //   {
+        //   //     shell: true,
+        //   //   }
+        //   // ).stdout.pipe(process.stdout);
+      }
 
       return { success: true };
     }),

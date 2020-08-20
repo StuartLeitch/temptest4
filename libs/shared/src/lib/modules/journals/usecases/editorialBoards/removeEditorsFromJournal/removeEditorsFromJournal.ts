@@ -35,20 +35,20 @@ type RemoveEditorsFromJournalResponse = Either<
 
 export class RemoveEditorsFromJournalUsecase
   implements
-    UseCase<
-      RemoveEditorsFromJournalDTO,
-      Promise<RemoveEditorsFromJournalResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      RemoveEditorsFromJournalDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  UseCase<
+  RemoveEditorsFromJournalDTO,
+  Promise<RemoveEditorsFromJournalResponse>,
+  UsecaseAuthorizationContext
+  >,
+  AccessControlledUsecase<
+  RemoveEditorsFromJournalDTO,
+  UsecaseAuthorizationContext,
+  AccessControlContext
+  > {
   constructor(
     private editorRepo: EditorRepoContract,
     private catalogRepo: CatalogRepoContract
-  ) {}
+  ) { }
 
   private async getAccessControlContext(request, context?) {
     return {};
@@ -80,19 +80,21 @@ export class RemoveEditorsFromJournalUsecase
         );
       }
 
-      const deleteEditorsResponse = await Promise.all(
-        allEditors.map((e) => this.editorRepo.delete(EditorMap.toDomain(e)))
-      );
-
-      const errs = [];
-      for (const editorResponse of deleteEditorsResponse) {
-        if (typeof editorResponse !== 'undefined') {
-          errs.push('Editor delete error.');
+      try {
+        await Promise.all(
+          allEditors.map((e) => this.editorRepo.delete(EditorMap.toDomain(e)))
+        );
+      } catch (errors) {
+        const errs = [];
+        for (const editorResponse of errors) {
+          if (typeof editorResponse !== 'undefined') {
+            errs.push('Editor delete error.');
+          }
         }
-      }
 
-      if (errs.length > 0) {
-        return left(new AppError.UnexpectedError(errs));
+        if (errs.length > 0) {
+          return left(new AppError.UnexpectedError(errs));
+        }
       }
 
       return right(null);

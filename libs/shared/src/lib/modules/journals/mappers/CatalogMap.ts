@@ -12,7 +12,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
     const catalogOrError = CatalogItem.create(
       {
         type: raw.type,
-        amount: raw.apc,
+        amount: raw.amount,
         journalId: JournalId.create(
           new UniqueEntityID(raw.journalId)
         ).getValue(),
@@ -20,7 +20,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
         updated: raw.updated ? new Date(raw.updated) : null,
         currency: raw.currency,
         isActive: !!raw.isActive,
-        journalTitle: raw.name,
+        journalTitle: raw.journalTitle,
         publisherId: raw.publisherId
           ? PublisherId.create(new UniqueEntityID(raw.publisherId)).getValue()
           : null,
