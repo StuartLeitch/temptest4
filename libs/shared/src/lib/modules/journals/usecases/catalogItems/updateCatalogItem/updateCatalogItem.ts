@@ -1,16 +1,17 @@
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { AppError } from '../../../../../core/logic/AppError';
-import { Result, Either, left, right } from '../../../../../core/logic/Result';
-
+import { Either, left, Result, right } from '../../../../../core/logic/Result';
+import { UseCaseError } from '../../../../../core/logic/UseCaseError';
+import { Publisher } from '../../../../publishers/domain/Publisher';
+import { PublisherRepoContract } from '../../../../publishers/repos';
 import { CatalogItem } from '../../../domain/CatalogItem';
-import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { JournalId } from '../../../domain/JournalId';
 import { CatalogMap } from '../../../mappers/CatalogMap';
-import { Publisher } from '../../../../publishers/domain/Publisher';
+import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { AddCatalogItemToCatalogErrors } from '../addCatalogItemToCatalog/addCatalogItemToCatalogErrors';
-import { PublisherRepoContract } from '../../../../publishers/repos';
-import { UseCaseError } from 'libs/shared/src/lib/shared';
+
+
 
 export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
   type: string;
