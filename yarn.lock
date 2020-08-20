@@ -2865,10 +2865,10 @@
   dependencies:
     "@hapi/hoek" "^8.3.0"
 
-"@hindawi/phenom-charts@0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@hindawi/phenom-charts/-/phenom-charts-0.1.7.tgz#f9f533e91e381bc1a95634bbb23bb14136e09523"
-  integrity sha512-5gnA1FnXKmeX+leaOntHtbRlPHTPpNkYyt92mbfnreg2gKEjdjZUysXGjQnwLwSDTRbnFJgeyDCSeUd0ekT7sw==
+"@hindawi/phenom-charts@0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@hindawi/phenom-charts/-/phenom-charts-0.1.8.tgz#01400a2332ab10fb50ab639580a42a5abf6370df"
+  integrity sha512-GRXR84XuvQxGL39m6hkl4oFSOMJuG5mpEDvz9zaT+ZN6sm6wvNu83x3D4Lgq2ZpkXPpHR97I2dcgv5KUl1YZ/g==
   dependencies:
     cdk8s "0.21.0"
     constructs "2.0.1"
