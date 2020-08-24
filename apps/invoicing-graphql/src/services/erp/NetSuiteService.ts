@@ -102,11 +102,12 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   public async registerCreditNote(data: ErpData): Promise<ErpResponse> {
-    // console.log('registerCreditNote Data:');
-    // console.info(data);
+    console.log('registerCreditNote Data:');
+    console.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
-    // const creditNote = await this.patchCreditNote({ ...data, creditNoteId });
+    console.info(creditNoteId);
+    await this.patchCreditNote({ ...data, creditNoteId });
 
     return creditNoteId;
   }
@@ -149,7 +150,8 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { payer } = data;
+    const { payer, article } = data;
+    console.info(article);
 
     let newCustomerId = null;
 
@@ -167,11 +169,14 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
-      createCustomerPayload.lastName = lastNames.join(' ');
+      createCustomerPayload.lastName = `${lastNames.join(
+        ' '
+      )} - ${article.customId.toString()}`;
     } else {
       createCustomerPayload.isPerson = false;
-      createCustomerPayload.companyName =
-        payer?.organization.toString() || payer?.name.toString();
+      createCustomerPayload.companyName = `${
+        payer?.organization.toString() || payer?.name.toString()
+      } - ${article.customId.toString()}`;
       createCustomerPayload.vatRegNumber = payer.VATId;
     }
 
@@ -229,7 +234,10 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateCreated),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
-      tranId: `${invoice.invoiceNumber}/${format(new Date(), 'yyyy')}`,
+      tranId: `${invoice.invoiceNumber}/${format(
+        new Date(invoice.dateCreated),
+        'yyyy'
+      )}`,
       entity: {
         id: customerId,
       },
@@ -395,6 +403,10 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { invoice, journalId } = data;
 
+    console.log('patchInvoice data:');
+    console.info(journalId);
+    console.info(invoice);
+
     const invoiceRequestOpts = {
       url: `${
         config.endpoint
@@ -431,10 +443,11 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { creditNote } = data;
 
+    console.log('transformCreditNote data:');
+    console.info(creditNote);
+
     const creditNoteTransformOpts = {
-      url: `${
-        config.endpoint
-      }record/v1/invoice/${creditNote.id.toString()}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${creditNote.nsReference}/!transform/creditmemo`,
       method: 'POST',
     };
 
@@ -459,10 +472,10 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditNote } = data;
+    const { creditNote, creditNoteId } = data;
 
     const creditNoteRequestOpts = {
-      url: `${config.endpoint}record/v1/creditmemo/${creditNote.id.toString()}`,
+      url: `${config.endpoint}record/v1/creditmemo/${creditNoteId}`,
       method: 'PATCH',
     };
 

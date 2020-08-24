@@ -130,7 +130,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
       }
     } catch (err) {
       this.loggerService.info(
-        `[AfterInvoiceActivated]: Failed to execute onPublishInvoiceActivated use case AfterInvoiceActivated. Err: ${err}`
+        `[AfterInvoiceActivated]: Failed to execute onPublishInvoiceActivated use case AfterInvoiceActivated. Err: ${err.message}`
       );
     }
 
@@ -147,9 +147,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
       }
     } catch (error) {
       this.loggerService.info(
-        `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${JSON.stringify(
-          error
-        )}`
+        `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error.message}`
       );
     }
   }

@@ -85,10 +85,13 @@ export class PublishCreditNoteToErpUsecase
       creditNote = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(new UniqueEntityID(request.creditNoteId)).getValue()
       );
-      // this.loggerService.info('PublishCreditNoteToERP invoice', invoice);
+      this.loggerService.info('PublishCreditNoteToERP credit note', creditNote);
 
       let invoiceItems = creditNote.invoiceItems.currentItems;
-      // this.loggerService.info('PublishCreditNoteToERP invoiceItems', invoiceItems);
+      // this.loggerService.info(
+      //   'PublishCreditNoteToERP invoiceItems',
+      //   invoiceItems
+      // );
 
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -136,132 +139,31 @@ export class PublishCreditNoteToErpUsecase
       //   invoiceItems
       // );
 
-      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
-      if (creditNote.getInvoiceTotal() <= 0) {
-        creditNote.erpReference = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(creditNote);
-        return right(null);
-      }
-
-      const payer = await this.payerRepo.getPayerByInvoiceId(
-        creditNote.invoiceId
-      );
-      if (!payer) {
-        throw new Error(`CreditNote ${creditNote.id} has no payers.`);
-      }
-      // this.loggerService.info('PublishCreditNoteToERP payer', payer);
-
-      const address = await this.addressRepo.findById(payer.billingAddressId);
-      if (!address) {
-        throw new Error(
-          `CreditNote ${creditNote.id} has no address associated.`
-        );
-      }
-      // this.loggerService.info('PublishCreditNoteToERP address', address);
-
-      const manuscript = await this.manuscriptRepo.findById(
-        invoiceItems[0].manuscriptId
-      );
-      if (!manuscript) {
-        throw new Error(
-          `CreditNote ${creditNote.id} has no manuscripts associated.`
-        );
-      }
-      // this.loggerService.info('PublishCreditNoteToERP manuscript', manuscript);
-
-      const catalog = await this.catalogRepo.getCatalogItemByJournalId(
-        JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
-      );
-      if (!catalog) {
-        throw new Error(
-          `CreditNote ${creditNote.id} has no catalog associated.`
-        );
-      }
-      // this.loggerService.info('PublishCreditNoteToERP catalog', catalog);
-
-      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        catalog.publisherId
-      );
-      if (!publisherCustomValues) {
-        throw new Error(
-          `CreditNote ${creditNote.id} has no publisher associated.`
-        );
-      }
-      // this.loggerService.info(
-      //   'PublishCreditNoteToERP publisher data',
-      //   publisherCustomValues
-      // );
-
-      const vatService = new VATService();
-      const vatNote = vatService.getVATNote(
-        {
-          postalCode: address.postalCode,
-          countryCode: address.country,
-          stateCode: address.state,
-        },
-        payer.type !== PayerType.INSTITUTION
-      );
-      // this.loggerService.info('PublishCreditNoteToERP vatNote', vatNote);
-      const exchangeRateService = new ExchangeRateService();
-      // this.loggerService.info(
-      //   'PublishCreditNoteToERP exchangeService',
-      //   exchangeRateService
-      // );
-      let rate = 1.42; // ! Average value for the last seven years
-      if (creditNote && creditNote.dateIssued) {
-        const exchangeRate = await exchangeRateService.getExchangeRate(
-          new Date(creditNote.dateIssued),
-          'USD'
-        );
-        // this.loggerService.info(
-        //   'PublishCreditNoteToERP exchangeRate',
-        //   exchangeRate
-        // );
-        rate = exchangeRate.exchangeRate;
-      }
-      // this.loggerService.info('PublishCreditNoteToERP rate', rate);
-
-      // * Calculate Tax Rate code
-      // * id=10 O-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
-      let taxRateId = '10';
-      const euCountries = getEuMembers();
-      if (euCountries.includes(address.country)) {
-        if (payer.type === PayerType.INSTITUTION) {
-          // * id=15 ESSS-GB = ECOutputServices_GB in Sage, i.e. Sales made outside UK but in EU where there is a EU VAT registration number
-          taxRateId = '15';
-        } else {
-          // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number
-          taxRateId = '7';
-        }
-      }
-
       try {
         const erpData = {
           creditNote,
-          payer,
-          items: invoiceItems,
-          article: manuscript as any,
-          billingAddress: address,
-          journalName: catalog.journalTitle,
-          vatNote,
-          rate,
-          tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          itemId: publisherCustomValues?.itemId,
-          taxRateId,
+          // payer,
+          // items: invoiceItems,
+          // billingAddress: address,
+          // journalName: catalog.journalTitle,
+          // vatNote,
+          // tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
+          // customSegmentId: publisherCustomValues?.customSegmentId,
+          // itemId: publisherCustomValues?.itemId,
+          // taxRateId,
         };
 
         const netSuiteResponse = await this.netSuiteService.registerCreditNote(
           erpData
         );
-        // console.info(netSuiteResponse);
         this.loggerService.info(
           `Updating credit note ${creditNote.id.toString()}: netSuiteReference -> ${JSON.stringify(
             netSuiteResponse
           )}`
         );
-        creditNote.nsReference = JSON.stringify(netSuiteResponse); // netSuiteResponse;
-        creditNote.erpReference = JSON.stringify(netSuiteResponse); // .tradeDocumentId;
+        console.info(netSuiteResponse);
+        creditNote.nsReference = String(netSuiteResponse); // netSuiteResponse;
+        creditNote.erpReference = String(netSuiteResponse); // .tradeDocumentId;
 
         // this.loggerService.info('PublishCreditNoteToERP full credit note', creditNote);
         await this.invoiceRepo.update(creditNote);
