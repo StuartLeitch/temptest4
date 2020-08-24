@@ -408,9 +408,7 @@ export class NetSuiteService implements ErpServiceContract {
     console.info(invoice);
 
     const invoiceRequestOpts = {
-      url: `${
-        config.endpoint
-      }record/v1/invoice/${invoice.invoiceId.id.toString()}`,
+      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
       method: 'PATCH',
     };
 
