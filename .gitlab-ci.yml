@@ -62,7 +62,7 @@ Test:
 Build:
   interruptible: true
   stage: build
-  allow_failure: false
+  when: manual
   script:
     - cd $HOME
     - yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production
@@ -74,12 +74,9 @@ Build:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
 
 Package Images:dev:
   interruptible: true
-  allow_failure: false
   stage: package
   image: docker
   variables:
@@ -103,12 +100,9 @@ Package Images:dev:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
 
 Deploy:dev:
   stage: deploy
-  allow_failure: false
   dependencies:
     - Package Images:dev
   when: manual
@@ -137,8 +131,6 @@ Deploy:dev:
   artifacts:
     paths:
       - dist-k8s
-  only:
-    - develop
 # Pages:
 #   interruptible: true
 #   stage: deploy
