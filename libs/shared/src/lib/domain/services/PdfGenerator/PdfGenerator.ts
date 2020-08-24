@@ -5,6 +5,7 @@ import ejs from 'ejs';
 import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
+import { Readable } from 'stream';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
@@ -41,7 +42,7 @@ export class PdfGeneratorService {
     });
   }
 
-  public async getInvoice(payload: InvoicePayload): Promise<any> {
+  public async getInvoice(payload: InvoicePayload): Promise<Buffer> {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
@@ -98,12 +99,16 @@ export class PdfGeneratorService {
       waitUntil: 'domcontentloaded',
       args: ['--shm-size=1gb'],
     });
-    await page.pdf({
-      path: 'doc.pdf',
+
+    const buffer = await page.pdf({
+      format: 'A4',
+      path: 'invoice.pdf',
       margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
+      printBackground: true,
     });
 
     await browser.close();
+    return buffer;
   }
 
   public addTemplate(name: string, fileName: string): PdfGeneratorService {
