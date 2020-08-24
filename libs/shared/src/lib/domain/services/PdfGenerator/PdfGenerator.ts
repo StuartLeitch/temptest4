@@ -6,7 +6,14 @@ import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
 
-import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
+import {
+  Address,
+  Article,
+  Invoice,
+  Author,
+  Payer,
+  Logger,
+} from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
 
 import puppeteer from 'puppeteer';
@@ -45,11 +52,13 @@ export class PdfGeneratorService {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
+    const logger = new Logger();
+
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     process.on('unhandledRejection', (reason, p) => {
-      console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
+      logger.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
       browser.close();
     });
 
