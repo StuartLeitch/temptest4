@@ -3,14 +3,15 @@
     <style>
       body,
       html {
-        font: 8px sans-serif;
+        font: 8px 'Open Sans';
         color: #6f7a79;
       }
 
       #pageFooter {
-        font-size: 1.75rem;
+        font-size: 2rem;
         padding-top: 5rem;
         text-align: center;
+        font-weight: 600;
       }
 
       #pageFooter h2 {
@@ -29,7 +30,7 @@
 
       #pageHeader h2 {
         color: #575756;
-        font-weight: normal;
+        font-weight: bold;
         font-size: 4rem;
         text-transform: uppercase;
         text-align: right;
@@ -55,7 +56,7 @@
 
       h1 {
         color: #006f92;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         padding: 0.2rem 0;
         margin-bottom: 0.5rem;
       }
@@ -72,7 +73,7 @@
         border-collapse: collapse;
         height: 100%;
         width: 100%;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         padding: 0;
       }
 
@@ -88,11 +89,14 @@
 
       table.data th {
         font-weight: normal;
+        font-size: 1.5rem;
       }
       table.data td {
         text-align: left;
         vertical-align: top;
         font-weight: bold;
+        font-size: 1.5rem;
+        color: black;
       }
 
       table.data.billing th em {
@@ -153,13 +157,14 @@
       }
 
       .email th {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: normal;
       }
 
       .email td {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: bold;
+        color: black;
       }
 
       .vat {
@@ -169,13 +174,14 @@
       }
 
       .vat th {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: normal;
       }
 
       .vat td {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: bold;
+        color: black;
       }
 
       .invoiceHeader {
@@ -198,11 +204,13 @@
       .separator {
         border-top: 0.25rem solid;
         color: #007890;
+        margin-bottom: 1rem;
       }
 
       .separatorFooter {
         border-top: 0.1rem solid;
-        margin-bottom: 5rem;
+        margin-bottom: 0.5rem;
+        margin-top: 1rem;
       }
 
       .amount {
@@ -210,9 +218,10 @@
       }
 
       .amountDue {
-        font-size: 2rem;
+        font-size: 3rem;
         font-weight: bold;
         text-align: right;
+        color: black;
       }
 
       table.midSection {
@@ -228,33 +237,39 @@
         float: right;
         text-align: right;
         margin-left: 0px;
+        margin-top: 0px;
         height: 100%;
-        padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+        padding: 0 1.5rem 0 1.5rem;
       }
 
       table.articleDetails {
         float: left;
         text-align: left;
+        width: 60%;
       }
 
       table.chargeDetails th {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: normal;
+        margin-right: 2rem;
       }
 
       table.chargeDetails td {
         font-weight: bold;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
+        color: black;
       }
 
       table.articleDetails th {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: normal;
+        vertical-align: top;
       }
 
       table.articleDetails td {
         font-weight: bold;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
+        color: black;
       }
 
       .paymentContainer {
@@ -262,6 +277,8 @@
         border-radius: 3px;
         margin-top: 0.5rem;
         overflow: hidden;
+        position: relative;
+        width: 100%;
       }
 
       .banking {
@@ -272,7 +289,7 @@
       }
 
       .banking th {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: normal;
         text-align: left;
         width: 50%;
@@ -280,8 +297,9 @@
       }
 
       .banking td {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: bold;
+        color: black;
       }
 
       .paymentFooter div {
@@ -291,12 +309,12 @@
 
       .paymentFooter {
         color: black;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: bold;
       }
 
       .banking h3 {
-        font-size: 1.5rem;
+        font-size: 2rem;
         margin-left: 0px;
         color: black;
       }
@@ -309,14 +327,22 @@
       }
 
       .paymentOptions p {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: normal;
       }
 
       .paymentOptions h3 {
-        font-size: 1.5rem;
+        font-size: 2rem;
         margin-left: 0px;
         color: black;
+      }
+
+      .divider {
+        position: absolute;
+        left: 57%;
+        top: 0;
+        bottom: 0;
+        border-left: 0.15rem solid #c6c6c6;
       }
     </style>
   </head>
@@ -492,7 +518,7 @@
                 <tr>
                   <th>Discounts (-<%= discount %>%)</th>
                   <td>
-                    - $<%= formatPriceFn((item.price * discount / 100)) %>
+                    -$ <%= formatPriceFn((item.price * discount / 100)) %>
                   </td>
                 </tr>
                 <% } %>
@@ -526,6 +552,10 @@
     </table>
 
     <div class="separatorFooter"></div>
+    <p style="font-size: 1.25rem; margin-bottom: 10rem;">
+      UK VAT applies to this invoice, based on the country of the payer. (VAT
+      amount in GBP is 204.07 GBP, 1 GBP = 1.227USD)
+    </p>
     <h1>Payment options</h1>
     <table class="paymentContainer">
       <tr>
@@ -569,6 +599,7 @@
               </td>
             </tr>
           </table>
+          <div class="divider"></div>
           <table class="paymentOptions">
             <tr>
               <td>
@@ -610,7 +641,7 @@
               <td>
                 <div>Important!</div>
                 Please ensure that the reference used in the bank transfer is
-                the invoice Ref for this article.
+                the Invoice Ref for this article.
               </td>
             </tr>
           </table>
