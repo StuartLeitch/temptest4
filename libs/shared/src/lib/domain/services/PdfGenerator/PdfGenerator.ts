@@ -49,10 +49,9 @@ export class PdfGeneratorService {
   }
 
   public async getInvoice(payload: InvoicePayload): Promise<Buffer> {
+    const logger = new Logger();
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
-
-    const logger = new Logger();
 
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -110,6 +109,7 @@ export class PdfGeneratorService {
 
     const buffer = await page.pdf({
       format: 'A4',
+      path: 'invoice.pdf',
       margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
       printBackground: true,
     });
