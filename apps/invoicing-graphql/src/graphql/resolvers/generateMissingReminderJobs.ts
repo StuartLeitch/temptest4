@@ -41,6 +41,7 @@ export const generateMissingReminderJobs: Resolvers<Context> = {
 
       const maybeResult = await usecase.execute(
         {
+          creditControlDisabled: env.scheduler.pauseCreditControlReminders,
           creditControlDelay: env.scheduler.creditControlReminderDelay,
           confirmationDelay: env.scheduler.confirmationReminderDelay,
           confirmationQueueName: env.scheduler.emailRemindersQueue,
