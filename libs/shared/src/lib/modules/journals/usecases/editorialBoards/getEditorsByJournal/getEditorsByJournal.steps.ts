@@ -3,6 +3,10 @@ import { Given, When, Then, BeforeAll, AfterAll } from 'cucumber';
 
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
+import {
+  Roles,
+  UsecaseAuthorizationContext,
+} from '../../../../../domain/authorization';
 import { EditorCollection } from '../../../domain/Editor';
 import { EditorMap } from '../../../mappers/EditorMap';
 import { CatalogMap } from '../../../mappers/CatalogMap';
@@ -11,11 +15,6 @@ import { JournalId } from '../../../domain/JournalId';
 import { MockEditorRepo } from '../../../repos/mocks/mockEditorRepo';
 import { MockCatalogRepo } from '../../../repos/mocks/mockCatalogRepo';
 import { GetEditorsByJournalUsecase } from './getEditorsByJournal';
-
-import {
-  Roles,
-  GetEditorsByJournalAuthorizationContext,
-} from './getEditorsByJournalAuthorizationContext';
 
 function getRandom(arr: string[], n: number) {
   const result = new Array(n);
@@ -35,7 +34,7 @@ function getRandom(arr: string[], n: number) {
   return result;
 }
 
-const defaultContext: GetEditorsByJournalAuthorizationContext = {
+const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 

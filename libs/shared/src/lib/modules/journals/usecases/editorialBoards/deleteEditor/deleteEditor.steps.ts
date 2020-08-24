@@ -9,9 +9,9 @@ import { MockEditorRepo } from '../../../repos/mocks/mockEditorRepo';
 import { DeleteEditor } from './deleteEditor';
 
 import {
+  UsecaseAuthorizationContext,
   Roles,
-  DeleteEditorAuthorizationContext,
-} from './deleteEditorAuthorizationContext';
+} from '../../../../../../../src/lib/domain/authorization';
 
 function getRandom(arr: string[], n: number) {
   const result = new Array(n);
@@ -31,7 +31,7 @@ function getRandom(arr: string[], n: number) {
   return result;
 }
 
-const defaultContext: DeleteEditorAuthorizationContext = {
+const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 

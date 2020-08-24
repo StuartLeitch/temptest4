@@ -1,7 +1,10 @@
 import { expect } from 'chai';
 import { Given, When, Then } from 'cucumber';
 
-import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
+import {
+  Roles,
+  UsecaseAuthorizationContext,
+} from '../../../../../../src/lib/domain/authorization';
 
 import { Invoice } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
@@ -10,7 +13,6 @@ import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/I
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { Manuscript } from '../../../../../../src/lib/modules/manuscripts/domain/Manuscript';
 import { SoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
-import { DeleteTransactionContext } from '../../../../../../src/lib/modules/transactions/usecases/deleteTransaction/deleteTransaction';
 import {
   Transaction,
   TransactionStatus,
@@ -24,7 +26,9 @@ import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscrip
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
 
-const defaultContext: DeleteTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
 const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
