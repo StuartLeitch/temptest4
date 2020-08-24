@@ -477,9 +477,8 @@
                 <tr>
                   <th>Article Processing Charges</th>
                   <td>
-                    <%=
+                    $ <%=
                     formatPriceFn(invoice.invoiceItems.currentItems[i].price) %>
-                    USD
                   </td>
                 </tr>
                 <% } %> <% } %> <% let price = invoice.getInvoiceTotal() %> <%
@@ -493,13 +492,13 @@
                 <tr>
                   <th>Discounts (-<%= discount %>%)</th>
                   <td>
-                    -<%= formatPriceFn((item.price * discount / 100)) %> USD
+                    - $<%= formatPriceFn((item.price * discount / 100)) %>
                   </td>
                 </tr>
                 <% } %>
                 <tr>
                   <th>Net Charges</th>
-                  <td><%= formatPriceFn(price) %> USD</td>
+                  <td>$ <%= formatPriceFn(price) %></td>
                 </tr>
                 <tr>
                   <th>
@@ -507,13 +506,13 @@
                     <em>(<%= vat %>%)</em>
                   </th>
                   <td>
-                    <%= formatPriceFn(vatAmount) %> USD
+                    $ <%= formatPriceFn(vatAmount) %>
                   </td>
                 </tr>
                 <tr>
                   <th class="summary">Total</th>
                   <td class="summary">
-                    <%= formatPriceFn(price + vatAmount) %> USD
+                    $ <%= formatPriceFn(price + vatAmount) %>
                   </td>
                 </tr>
               </td>
