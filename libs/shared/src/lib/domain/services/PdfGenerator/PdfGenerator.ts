@@ -5,7 +5,6 @@ import ejs from 'ejs';
 import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
-import { Readable } from 'stream';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
@@ -126,7 +125,6 @@ export class PdfGeneratorService {
     const file = path.join(__dirname, 'templates/', template.fileName);
 
     const templateStr = fs.readFileSync(file, 'utf8');
-
     if (!template.compile) {
       template.compile = ejs.compile(templateStr);
     }

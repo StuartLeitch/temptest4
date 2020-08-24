@@ -392,7 +392,9 @@
                             <table class="data">
                               <tr>
                                 <td>
-                                  values
+                                  <%= dateFormatFn(invoice.dateIssued, "d MMMM")
+                                  %> <%= dateFormatFn(invoice.dateIssued,
+                                  "yyyy") %>
                                 </td>
                               </tr>
                             </table>
@@ -412,7 +414,7 @@
                             <h1>Invoice ref</h1>
                             <table class="data">
                               <tr>
-                                <td>values</td>
+                                <td><%= invoice.referenceNumber %></td>
                               </tr>
                             </table>
                           </td>
@@ -427,11 +429,6 @@
         </td>
       </tr>
     </table>
-
-    <h1 class="amount">Amount due</h1>
-
-    <div class="amountDue">value</div>
-    <div class="separator"></div>
 
     <table class="midSection">
       <tr>
@@ -520,37 +517,14 @@
                   </td>
                 </tr>
               </td>
-              <td>
-                <tr>
-                  <th>Invoice Issue Date</th>
-                  <td>
-                    <%= dateFormatFn(invoice.dateIssued, "d MMMM yyyy") %>
-                  </td>
-                </tr>
-                <tr>
-                  <th>Date of Supply</th>
-                  <td>
-                    <%= dateFormatFn(invoice.dateIssued, "d MMMM yyyy") %>
-                  </td>
-                </tr>
-                <tr>
-                  <th>Invoice Ref. No.</th>
-                  <td>
-                    <%= invoice.referenceNumber %>
-                  </td>
-                </tr>
-              </td>
             </tr>
           </table>
         </td>
       </tr>
+      <h1 class="amount">Amount due</h1>
+      <div class="amountDue">$ <%= formatPriceFn(price + vatAmount) %> USD</div>
+      <div class="separator"></div>
     </table>
-
-    <!-- <div class="separator isCentered">
-      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn(
-      vatAmount / invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate)
-      %>
-    </div> -->
 
     <div class="separatorFooter"></div>
     <h1>Payment options</h1>
