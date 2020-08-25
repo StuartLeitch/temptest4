@@ -9,21 +9,21 @@ stages:
   - deploy
 
 variables:
-  AFFECTED_ARGS: "--base=remotes/origin/develop"
+  AFFECTED_ARGS: '--base=remotes/origin/develop'
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: ''
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
   BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   LATEST_BUILD_IMAGE: $CI_REGISTRY_IMAGE:latest
-  AWS_REGION: "eu-west-1"
-  BT_ENVIRONMENT: "sandbox"
-  BT_MERCHANT_ID: "test-merchant-id"
-  BT_PUBLIC_KEY: "test-public-key"
-  BT_PRIVATE_KEY: "test-private-key"
-  VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
+  AWS_REGION: 'eu-west-1'
+  BT_ENVIRONMENT: 'sandbox'
+  BT_MERCHANT_ID: 'test-merchant-id'
+  BT_PUBLIC_KEY: 'test-public-key'
+  BT_PRIVATE_KEY: 'test-private-key'
+  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   # AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_APPS: "shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend"
+  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
   interruptible: true
@@ -31,8 +31,8 @@ Install Dependencies:
   stage: setup
   services:
     - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
   image: docker
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
@@ -50,6 +50,7 @@ Test:
     - mkdir report && chmod -R +x report
     - yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production
     - yarn run ci:coverage
+    - cp report $CI_PROJECT_DIR
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
@@ -88,8 +89,8 @@ Package Images:dev:
     - apk add --no-cache aws-cli
   services:
     - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
@@ -131,17 +132,15 @@ Deploy:dev:
   artifacts:
     paths:
       - dist-k8s
-# Pages:
-#   interruptible: true
-#   stage: deploy
-#   script:
-#     - mkdir -p public
-#     - cp coverage/*.* public/
-#     - mv public/index.html public/coverage.html
-#   artifacts:
-#     paths:
-#       - public
-#   dependencies:
-#     - Test
-#   only:
-#     - develop
+Pages:
+  interruptible: true
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp report/*.* public/
+    - mv public/index.html public/coverage.html
+  artifacts:
+    paths:
+      - public
+  dependencies:
+    - Test
