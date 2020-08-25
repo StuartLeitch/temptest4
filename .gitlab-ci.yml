@@ -141,6 +141,6 @@ Pages:
     - mv public/index.html public/coverage.html
   artifacts:
     paths:
-      - public
+      - report
   dependencies:
     - Test
