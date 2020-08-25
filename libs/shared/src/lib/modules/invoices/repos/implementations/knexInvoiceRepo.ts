@@ -244,20 +244,15 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
           .whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
-          .andWhere(function () {
-            this.whereNull('invoices.revenueRecognitionReference').orWhereNull(
-              'invoices.nsRevRecReference'
-            );
-          })
-          .andWhere(function () {
-            this.whereNotNull('invoices.erpReference').orWhereNotNull(
-              'invoices.nsReference'
-            );
-          })
+          .whereNotNull('invoices.revenueRecognitionReference')
+          .whereNotNull('invoices.erpReference')
+          .whereNull('invoices.nsReference')
+          .whereNull('invoices.nsRevRecReference')
           .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
           .where('invoices.erpReference', '<>', 'MigrationRef')
           .where('invoices.erpReference', '<>', 'migrationRef');
-      });
+      })
+      .limit(50);
 
     logger.debug('select', {
       sql: sql.toString(),
