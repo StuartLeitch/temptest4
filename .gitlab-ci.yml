@@ -50,7 +50,7 @@ Test:
     - mkdir report && chmod -R +x report
     - yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production
     - yarn run ci:coverage
-    - cp report $CI_PROJECT_DIR
+    - cp -r report $CI_PROJECT_DIR
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
