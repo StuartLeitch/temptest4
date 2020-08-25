@@ -182,19 +182,27 @@ export class PublishRevenueRecognitionToErpUsecase
       );
       invoice.nsRevRecReference = String(netSuiteResponse);
 
-      const erpResponse = await this.sageService.registerRevenueRecognition({
-        invoice,
-        manuscript,
-        customSegmentId: publisherCustomValues?.customSegmentId,
-        invoiceTotal: netCharges,
-        publisherCustomValues,
-      });
-      this.loggerService.info(
-        `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${
-          erpResponse.journal.id
-        }`
-      );
-      invoice.revenueRecognitionReference = erpResponse.journal.id;
+      try {
+        const erpResponse = await this.sageService.registerRevenueRecognition({
+          invoice,
+          manuscript,
+          customSegmentId: publisherCustomValues?.customSegmentId,
+          invoiceTotal: netCharges,
+          publisherCustomValues,
+        });
+        this.loggerService.info(
+          `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${
+            erpResponse.journal.id
+          }`
+        );
+        invoice.revenueRecognitionReference = erpResponse.journal.id;
+      } catch (error) {
+        this.loggerService.info(
+          `Revenue Recognition in SAGE failed for Invoice ${invoice.id.toString()}: error -> ${
+            error.message
+          }`
+        );
+      }
 
       await this.invoiceRepo.update(invoice);
 
