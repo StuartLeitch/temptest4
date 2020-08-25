@@ -6,15 +6,9 @@ import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
 
-import {
-  Address,
-  Article,
-  Invoice,
-  Author,
-  Payer,
-  Logger,
-} from '@hindawi/shared';
+import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import puppeteer from 'puppeteer';
 
@@ -28,6 +22,7 @@ export interface InvoicePayload {
 }
 
 export class PdfGeneratorService {
+  constructor(private logger: LoggerContract) {}
   private templates: {
     [key: string]: {
       fileName: string;
@@ -49,17 +44,11 @@ export class PdfGeneratorService {
   }
 
   public async getInvoice(payload: InvoicePayload): Promise<Buffer> {
-    const logger = new Logger();
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-
-    process.on('unhandledRejection', (reason, p) => {
-      logger.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
-      browser.close();
-    });
 
     const template = this.getTemplate('invoice');
 
@@ -102,20 +91,26 @@ export class PdfGeneratorService {
 
     const htmlTemplate = template(data);
 
-    await page.setContent(htmlTemplate, {
-      waitUntil: 'domcontentloaded',
-      args: ['--shm-size=1gb'],
-    });
+    try {
+      await page.setContent(htmlTemplate, {
+        waitUntil: 'domcontentloaded',
+        args: ['--shm-size=1gb'],
+      });
 
-    const buffer = await page.pdf({
-      format: 'A4',
-      path: 'invoice.pdf',
-      margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
-      printBackground: true,
-    });
+      const buffer = await page.pdf({
+        format: 'A4',
+        path: 'invoice.pdf',
+        margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
+        printBackground: true,
+      });
 
-    await browser.close();
-    return buffer;
+      await browser.close();
+      return buffer;
+    } catch (error) {
+      this.logger.error(error.message);
+      await browser.close();
+      throw error;
+    }
   }
 
   public addTemplate(name: string, fileName: string): PdfGeneratorService {
