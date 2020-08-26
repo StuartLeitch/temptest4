@@ -562,11 +562,15 @@
       <div class="separator"></div>
     </table>
 
-    <div class="separatorFooter"></div>
-    <p style="font-size: 1.25rem; margin-bottom: 6rem;">
-      UK VAT applies to this invoice, based on the country of the payer. (VAT
-      amount in GBP is 204.07 GBP, 1 GBP = 1.227USD)
-    </p>
+    <div
+      class="separatorFooter"
+      style="font-size: 1.25rem; margin-bottom: 6rem;"
+    >
+      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn(
+      vatAmount / invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate)
+      %>
+    </div>
+
     <h1>Payment options</h1>
     <table class="paymentContainer">
       <tr>
