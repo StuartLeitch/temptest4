@@ -4,8 +4,10 @@ import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 export { PdfGeneratorService, InvoicePayload };
 
-let logger: LoggerContract;
-
-export const pdfGeneratorService = new PdfGeneratorService(logger);
-
-pdfGeneratorService.addTemplate('invoice', 'invoice.ejs');
+export function createPdfGenerator(
+  logger: LoggerContract
+): PdfGeneratorService {
+  const service = new PdfGeneratorService(logger);
+  service.addTemplate('invoice', 'invoice.ejs');
+  return service;
+}

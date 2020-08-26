@@ -39,9 +39,10 @@ import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 
 import {
-  pdfGeneratorService,
   InvoicePayload,
+  createPdfGenerator,
 } from '../../../../domain/services/PdfGenerator';
+
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
@@ -168,8 +169,8 @@ export class GetInvoicePdfUsecase
 
   private generateThePdf(payload: InvoicePayload) {
     try {
-      const pdf = pdfGeneratorService.getInvoice(payload);
-      return right(pdf);
+      const pdf = createPdfGenerator();
+      return right(pdf.getInvoice(payload));
     } catch (e) {
       console.log(e);
       return left(

@@ -98,6 +98,7 @@ export class PdfGeneratorService {
       });
 
       const buffer = await page.pdf({
+        format: 'A4',
         path: 'invoice.pdf',
         margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
         printBackground: true,
@@ -106,7 +107,7 @@ export class PdfGeneratorService {
       await browser.close();
       return buffer;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error.message, error);
       await browser.close();
       throw error;
     }
