@@ -40,7 +40,7 @@ import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 
 import {
   InvoicePayload,
-  createPdfGenerator,
+  PdfGeneratorService,
 } from '../../../../domain/services/PdfGenerator';
 
 import { VATService } from '../../../../domain/services/VATService';
@@ -74,7 +74,9 @@ export class GetInvoicePdfUsecase
     private payerRepo: PayerRepoContract,
     private catalogRepo: CatalogRepoContract,
     private couponRepo: CouponRepoContract,
-    private waiverRepo: WaiverRepoContract
+    private waiverRepo: WaiverRepoContract,
+    private pdfGenerator: PdfGeneratorService,
+    private logger: LoggerContract
   ) {}
 
   // @Authorize('payer:read')
@@ -170,12 +172,11 @@ export class GetInvoicePdfUsecase
   }
 
   private generateThePdf(payload: InvoicePayload) {
-    let logger: LoggerContract;
     try {
-      const pdf = createPdfGenerator(logger);
-      return right(pdf.getInvoice(payload));
+      const pdf = this.pdfGenerator.getInvoice(payload);
+      return right(pdf);
     } catch (error) {
-      logger.error(error.message, error);
+      this.logger.error(error.message, error);
       return left(
         new GetInvoicePdfErrors.PdfInvoiceError(
           'empty pdf',
