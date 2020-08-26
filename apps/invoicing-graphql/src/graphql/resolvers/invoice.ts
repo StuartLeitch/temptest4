@@ -51,6 +51,8 @@ export const invoice: Resolvers<Context> = {
       const result = await usecase.execute(request, usecaseContext);
 
       if (result.isLeft()) {
+        const err = result.value.errorValue();
+        context.services.logger.error(err.message, err);
         return undefined;
       }
 

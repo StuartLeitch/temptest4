@@ -56,6 +56,16 @@ export class SenderNameRequiredError extends Result<UseCaseError> {
   }
 }
 
+export class NotificationDisabledSettingRequiredError extends Result<
+  UseCaseError
+> {
+  constructor() {
+    super(false, {
+      message: `Notification disabled setting is required.`,
+    });
+  }
+}
+
 export class EmailSendingFailure extends Result<UseCaseError> {
   constructor(err: Error) {
     super(false, {

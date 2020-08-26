@@ -9,6 +9,8 @@ AWS_ENVIRONMENT="dev"
 APP="invoicing-admin"
 TO="${AWS_ENVIRONMENT}-${APP}"
 
+rm -r ./dist/apps/invoicing-web
+
 printf -- "Build FrontEnd App for ${AWS_ENVIRONMENT} environment"
 yarn run build invoicing-admin --configuration=production
 

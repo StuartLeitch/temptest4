@@ -76,6 +76,7 @@
   "MONITOR_ROUTE": "/monitor",
   "NOTIFICATIONS_QUEUES": "email-reminders",
   "PAYMENT_REMINDER_DELAY_DAYS": 5,
+  "PAUSE_CREDIT_CONTROL_REMINDERS": false,
   "PHENOM_LARGE_EVENTS_BUCKET": "production-in-flight-events",
   "PHENOM_LARGE_EVENTS_PREFIX": "",
   "PORT": 3000,

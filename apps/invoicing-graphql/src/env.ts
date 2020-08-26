@@ -169,6 +169,9 @@ export const env = {
     creditControlReminderDelay: toFloat(
       getOsEnv('CREDIT_CONTROL_REMINDER_DELAY_DAYS')
     ),
+    pauseCreditControlReminders: toBool(
+      getOsEnv('PAUSE_CREDIT_CONTROL_REMINDERS')
+    ),
   },
   braintree: {
     merchantAccountId: getOsEnv('BT_MERCHANT_ACCOUNT_ID'),
