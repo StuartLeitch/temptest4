@@ -18,6 +18,8 @@ import {
   WaiverService,
   EmailService,
   VATService,
+  createPdfGenerator,
+  PdfGeneratorService,
 } from '@hindawi/shared';
 
 import {
@@ -33,6 +35,7 @@ import { Repos } from './repo.builder';
 
 export interface Services {
   logger: LoggerContract;
+  pdfGenerator: PdfGeneratorService;
   vatService: VATService;
   waiverService: WaiverService;
   emailService: EmailService;
@@ -91,6 +94,7 @@ export function buildServices(
 
   return {
     logger: loggerBuilder.getLogger(),
+    pdfGenerator: createPdfGenerator(loggerBuilder.getLogger()),
     vatService: new VATService(),
     waiverService: new WaiverService(repos.waiver, repos.editor),
     emailService: new EmailService(

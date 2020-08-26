@@ -46,6 +46,8 @@ import {
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
 import { PayerType } from '../../../payers/domain/Payer';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
@@ -168,11 +170,12 @@ export class GetInvoicePdfUsecase
   }
 
   private generateThePdf(payload: InvoicePayload) {
+    let logger: LoggerContract;
     try {
-      const pdf = createPdfGenerator();
+      const pdf = createPdfGenerator(logger);
       return right(pdf.getInvoice(payload));
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      logger.error(error.message, error);
       return left(
         new GetInvoicePdfErrors.PdfInvoiceError(
           'empty pdf',
