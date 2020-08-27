@@ -66,8 +66,6 @@ export * from './modules/invoices/repos';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 export * from './modules/invoices/usecases/getInvoiceDetails/getInvoiceDetailsDTO';
 export * from './modules/invoices/usecases/deleteInvoice/deleteInvoice';
-export * from './modules/invoices/usecases/createInvoice/createInvoice';
-export * from './modules/invoices/usecases/createInvoice/createInvoiceDTO';
 export * from './modules/invoices/usecases/updateInvoiceItems/updateInvoiceItems';
 export * from './modules/invoices/usecases/updateInvoiceItems/updateInvoiceItemsDTO';
 export * from './modules/invoices/usecases/applyVatToInvoice/applyVatToInvoice';
