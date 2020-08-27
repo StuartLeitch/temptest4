@@ -1,3 +1,5 @@
+import puppeteer from 'puppeteer';
+import { Readable } from 'stream';
 import fs from 'fs';
 import path from 'path';
 import { format } from 'date-fns';
@@ -9,8 +11,6 @@ import base64Img from 'base64-img';
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
-
-import puppeteer from 'puppeteer';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -43,11 +43,14 @@ export class PdfGeneratorService {
     });
   }
 
-  public async getInvoice(payload: InvoicePayload): Promise<Buffer> {
+  public async getInvoice(payload: InvoicePayload): Promise<Readable> {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox'],
+    });
     const page = await browser.newPage();
 
     const template = this.getTemplate('invoice');
@@ -94,7 +97,7 @@ export class PdfGeneratorService {
     try {
       await page.setContent(htmlTemplate, {
         waitUntil: 'domcontentloaded',
-        args: ['--shm-size=1gb'],
+        args: ['--disable-dev-shm-usage'],
       });
 
       const buffer = await page.pdf({
@@ -104,7 +107,13 @@ export class PdfGeneratorService {
       });
 
       await browser.close();
-      return buffer;
+
+      return new Readable({
+        read() {
+          this.push(buffer);
+          this.push(null);
+        },
+      });
     } catch (error) {
       this.logger.error(error.message, error);
       await browser.close();

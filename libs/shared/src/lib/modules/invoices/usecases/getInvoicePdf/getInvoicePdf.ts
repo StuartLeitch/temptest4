@@ -1,3 +1,5 @@
+import { Readable } from 'stream';
+
 // * Core Domain
 import { UniqueEntityID } from './../../../../core/domain/UniqueEntityID';
 import { Result, Either, left, right } from '../../../../core/logic/Result';
@@ -171,7 +173,9 @@ export class GetInvoicePdfUsecase
     ) as GetInvoicePdfResponse;
   }
 
-  private generateThePdf(payload: InvoicePayload) {
+  private generateThePdf(
+    payload: InvoicePayload
+  ): Either<unknown, Promise<Readable>> {
     try {
       const pdf = this.pdfGenerator.getInvoice(payload);
       return right(pdf);
