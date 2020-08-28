@@ -17,9 +17,10 @@ import { VATService } from '../../../../../../src/lib/domain/services/VATService
 import {
   InvoiceItemMap,
   PayerInput,
-  PayerId,
   CouponMap,
   WaiverMap,
+  Roles,
+  UsecaseAuthorizationContext,
 } from '../../../../../../src/lib/shared';
 import { ConfirmInvoiceResponse } from '../../../../../../src/lib/modules/invoices/usecases/confirmInvoice/confirmInvoiceResponse';
 
@@ -36,6 +37,9 @@ const mockVatService: VATService = new VATService();
 
 let useCase: ConfirmInvoiceUsecase;
 let response: ConfirmInvoiceResponse;
+let context: UsecaseAuthorizationContext = {
+  roles: [Roles.ADMIN],
+};
 
 Before(function () {
   let _emailService = {
@@ -138,7 +142,7 @@ When(
         country: payerCountry,
       },
     };
-    response = await useCase.execute({ payer: payerInput });
+    response = await useCase.execute({ payer: payerInput }, context);
   }
 );
 
