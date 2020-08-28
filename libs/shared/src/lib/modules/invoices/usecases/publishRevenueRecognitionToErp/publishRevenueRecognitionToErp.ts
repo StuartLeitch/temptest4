@@ -168,7 +168,7 @@ export class PublishRevenueRecognitionToErpUsecase
       const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
         {
           invoice,
-          manuscript,
+          article: manuscript as any,
           payer,
           customSegmentId: publisherCustomValues?.customSegmentId,
           invoiceTotal: netCharges,

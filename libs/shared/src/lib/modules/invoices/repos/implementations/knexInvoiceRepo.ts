@@ -206,15 +206,22 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICES)
-      .select()
+      .select('invoices.*', 'articles.datePublished')
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
       .where(function () {
-        this.whereNot('deleted', 1)
-          .whereIn('status', ['ACTIVE', 'FINAL'])
-          .whereNull('cancelledInvoiceReference')
-          .andWhere(function () {
-            this.whereNull('erpReference').orWhereNull('nsReference');
-          });
-      });
+        this.whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.nsReference');
+        // .andWhere(function () {
+        //   this.whereNull('invoices.erpReference').orWhereNull('invoices.nsReference');
+        // });
+      })
+      .orderBy('articles.datePublished', 'desc')
+      // .offset(200)
+      .limit(200);
 
     logger.debug('select', {
       sql: sql.toString(),
@@ -240,19 +247,21 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
       .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
       .where(function () {
-        this.whereNotNull('articles.datePublished')
-          .whereNot('invoices.deleted', 1)
+        // this.whereNotNull('articles.datePublished')
+        this.whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
-          .whereNotNull('invoices.revenueRecognitionReference')
-          .whereNotNull('invoices.erpReference')
-          .whereNull('invoices.nsReference')
+          //.whereNotNull('invoices.revenueRecognitionReference')
+          //.whereNotNull('invoices.erpReference')
+          .whereNotNull('invoices.nsReference')
           .whereNull('invoices.nsRevRecReference')
           .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
           .where('invoices.erpReference', '<>', 'MigrationRef')
           .where('invoices.erpReference', '<>', 'migrationRef');
       })
-      .limit(50);
+      .orderBy('articles.datePublished', 'desc')
+      .offset(0)
+      .limit(20);
 
     logger.debug('select', {
       sql: sql.toString(),

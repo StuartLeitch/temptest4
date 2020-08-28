@@ -7,13 +7,17 @@ import format from 'date-fns/format';
 const parser = require('xml2json');
 
 export class ExchangeRateService {
-  public async getExchangeRate(date: Date, currency: string) {
+  public async getExchangeRate(
+    date: Date,
+    currency: string
+  ): Promise<{ exchangeRate: number }> {
     let rates: any;
 
     try {
       rates = await this.readFile(this.getFilePathFromDate(date));
     } catch (err) {
       console.error(err);
+      return err;
     }
 
     if (!('exchangeRateMonthList' in rates)) {

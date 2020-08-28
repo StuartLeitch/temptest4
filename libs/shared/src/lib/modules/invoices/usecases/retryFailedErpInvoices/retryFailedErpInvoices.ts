@@ -108,17 +108,22 @@ export class RetryFailedErpInvoicesUsecase
 
         const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
 
-        if (maybeUpdatedInvoiceResponse.isLeft()) {
+        if (
+          typeof maybeUpdatedInvoiceResponse?.isLeft === 'function' &&
+          maybeUpdatedInvoiceResponse?.isLeft()
+        ) {
           return left(updatedInvoiceResponse);
         }
         const assignedErpReference = updatedInvoiceResponse;
 
-        if (assignedErpReference === null) {
-          // simply do nothing yet
-        } else {
+        // console.log('Assigned ERP Reference:');
+        // console.info('type ', typeof assignedErpReference);
+        // console.info(assignedErpReference);
+
+        if (assignedErpReference) {
           console.log(
             `Assigned successfully ${
-              assignedErpReference.tradeDocumentId
+              assignedErpReference?.tradeDocumentId
             } to invoice ${failedInvoice.invoiceId.id.toString()}`
           );
           updatedInvoices.push(assignedErpReference);

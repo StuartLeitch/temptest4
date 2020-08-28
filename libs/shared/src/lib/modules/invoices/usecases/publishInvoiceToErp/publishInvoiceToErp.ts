@@ -163,16 +163,21 @@ export class PublishInvoiceToErpUsecase
       }
       this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
 
-      const catalog = await this.catalogRepo.getCatalogItemByJournalId(
-        JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
-      );
-      if (!catalog) {
-        throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
+      let catalog;
+      try {
+        catalog = await this.catalogRepo.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+        );
+        if (!catalog) {
+          throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
+        }
+        this.loggerService.info('PublishInvoiceToERP catalog', catalog);
+      } catch (err) {
+        return err;
       }
-      this.loggerService.info('PublishInvoiceToERP catalog', catalog);
 
       const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        catalog.publisherId
+        catalog?.publisherId
       );
       if (!publisherCustomValues) {
         throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
@@ -258,12 +263,15 @@ export class PublishInvoiceToErpUsecase
         let erpResponse;
         try {
           erpResponse = await this.sageService.registerInvoice(erpData);
-          this.loggerService.info(
-            `Updating invoice ${invoice.id.toString()}: erpReference -> ${
-              erpResponse.tradeDocumentId
-            }`
-          );
-          invoice.erpReference = erpResponse.tradeDocumentId;
+
+          if (erpResponse) {
+            this.loggerService.info(
+              `Updating invoice ${invoice.id.toString()}: erpReference -> ${
+                erpResponse.tradeDocumentId
+              }`
+            );
+            invoice.erpReference = erpResponse.tradeDocumentId;
+          }
         } catch (error) {
           this.loggerService.info(
             `[PublishInvoiceToERP]: Failed to register in SAGE. Err: ${error}`

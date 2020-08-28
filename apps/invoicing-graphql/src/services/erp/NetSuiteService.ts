@@ -151,7 +151,6 @@ export class NetSuiteService implements ErpServiceContract {
       connection: { config, oauth, token },
     } = this;
     const { payer, article } = data;
-    console.info(article);
 
     let newCustomerId = null;
 
@@ -403,9 +402,9 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { invoice, journalId } = data;
 
-    console.log('patchInvoice data:');
-    console.info(journalId);
-    console.info(invoice);
+    // console.log('patchInvoice data:');
+    // console.info(journalId);
+    // console.info(invoice);
 
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
