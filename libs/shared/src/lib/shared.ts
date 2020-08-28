@@ -59,7 +59,6 @@ export * from './modules/invoices/domain/InvoiceItemId';
 export * from './modules/invoices/domain/ManuscriptId';
 
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
-// // export * from './invoices/domain/events/invoiceSentEvent';
 
 export * from './modules/invoices/repos';
 

@@ -71,6 +71,7 @@
   "MONITOR_ROUTE": "/monitor",
   "NOTIFICATIONS_QUEUES": "email-reminders",
   "PAYMENT_REMINDER_DELAY_DAYS": 5,
+  "PAUSE_CREDIT_CONTROL_REMINDERS": true,
   "PHENOM_LARGE_EVENTS_PREFIX": "",
   "PHENOM_LARGE_EVENTS_BUCKET": "demo-gsw-in-flight-events",
   "PORT": 3000,

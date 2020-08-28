@@ -1,4 +1,5 @@
 export interface SendInvoiceCreditControlReminderDTO {
+  notificationDisabled: boolean;
   creditControlDelay: number;
   recipientEmail: string;
   recipientName: string;
