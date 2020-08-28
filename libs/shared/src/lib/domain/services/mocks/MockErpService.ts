@@ -6,6 +6,7 @@ export class MockErpService implements ErpServiceContract {
 
   public readonly erpRef: string = 'ERP_REF';
   public readonly accountRef: string = 'ACC_REF';
+  public readonly revenueRef: string = 'REV_REF';
 
   async registerInvoice(data: ErpData): Promise<ErpResponse> {
     const invoiceId = data.invoice.id.toValue().toString();
@@ -18,11 +19,20 @@ export class MockErpService implements ErpServiceContract {
       ),
     };
   }
-  registerRevenueRecognition(data: any): Promise<any> {
-    throw new Error('Method not implemented.');
+
+  async registerRevenueRecognition(data: any): Promise<any> {
+    const invoiceId = data.invoice.id.toValue().toString();
+    this.revenueMap[invoiceId] = data;
+    return {
+      journal: { id: this.revenueRef },
+    };
   }
 
-  getInvoice(invoiceId: string) {
+  public getInvoice(invoiceId: string): ErpData {
     return this.invoiceMap[invoiceId];
+  }
+
+  public getRevenue(invoiceId: string): any {
+    return this.revenueMap[invoiceId];
   }
 }

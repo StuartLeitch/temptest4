@@ -8,8 +8,8 @@ import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { PublishInvoiceToErpUsecase } from '../../../../../../src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-import { PublishInvoiceToErpResponse } from '../../../../../../src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErpResponse';
+import { PublishRevenueRecognitionToErpUsecase } from '../../../../../../src/lib/modules/invoices/usecases/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+import { PublishRevenueRecognitionToErpResponse } from '../../../../../../src/lib/modules/invoices/usecases/publishRevenueRecognitionToErp/publishRevenueRecognitionToErpResponse';
 import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
@@ -44,8 +44,8 @@ let mockSalesforceService: MockErpService;
 let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
 
-let useCase: PublishInvoiceToErpUsecase;
-let response: PublishInvoiceToErpResponse;
+let useCase: PublishRevenueRecognitionToErpUsecase;
+let response: PublishRevenueRecognitionToErpResponse;
 let invoice: Invoice;
 
 let context: UsecaseAuthorizationContext = {
@@ -67,7 +67,7 @@ Before(function () {
   mockNetsuiteService = new MockErpService();
   mockPublisherRepo = new MockPublisherRepo();
 
-  useCase = new PublishInvoiceToErpUsecase(
+  useCase = new PublishRevenueRecognitionToErpUsecase(
     mockInvoiceRepo,
     mockInvoiceItemRepo,
     mockCouponRepo,
@@ -76,14 +76,14 @@ Before(function () {
     mockAddressRepo,
     mockManuscriptRepo,
     mockCatalogRepo,
+    mockPublisherRepo,
     mockSalesforceService,
     mockNetsuiteService,
-    mockPublisherRepo,
     console
   );
 });
 
-Given(/There is an existing Invoice with the ID "([\w-]+)"/, async function (
+Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
   invoiceId: string
 ) {
   const transaction = TransactionMap.toDomain({
@@ -133,7 +133,24 @@ Given(/There is an existing Invoice with the ID "([\w-]+)"/, async function (
 });
 
 Given(
-  /There is an fully discounted Invoice with an existing ID "([\w-]+)"/,
+  /The payer country is "([\w-]+)" and their type is "([\w-]+)"/,
+  async function (country: string, payerType: string) {
+    const address = AddressMap.toDomain({
+      country,
+    });
+    const payer = PayerMap.toDomain({
+      name: 'John',
+      addressId: address.id.toValue(),
+      invoiceId: invoice.invoiceId.id.toValue(),
+      type: payerType,
+    });
+    await mockPayerRepo.addMockItem(payer);
+    await mockAddressRepo.addMockItem(address);
+  }
+);
+
+Given(
+  /There is a fully discounted Invoice with the ID "([\w-]+)" created/,
   async function (invoiceId: string) {
     const transaction = TransactionMap.toDomain({
       status: TransactionStatus.ACTIVE,
@@ -207,78 +224,41 @@ Given(
   }
 );
 
-Given(
-  /The payer is from "([\w-]+)" and their type is "([\w-]+)"/,
-  async function (country: string, payerType: string) {
-    const address = AddressMap.toDomain({
-      country,
-    });
-    const payer = PayerMap.toDomain({
-      name: 'John',
-      addressId: address.id.toValue(),
-      invoiceId: invoice.invoiceId.id.toValue(),
-      type: payerType,
-    });
-    await mockPayerRepo.addMockItem(payer);
-    await mockAddressRepo.addMockItem(address);
-  }
-);
-
 When(
-  /The usecase is executed for the Invoice with the ID "([\w-]+)"/,
+  /Revenue recognition usecase is execute for the invoice with the ID "([\w-]+)"/,
   async function (invoiceId: string) {
     response = await useCase.execute({ invoiceId }, context);
   }
 );
 
 Then(
-  /The Invoice with the ID "([\w-]+)" is registered to netsuite/,
+  /Revenue recognition for the Invoice with the ID "([\w-]+)" is registered to salesforce/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
-    let netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
-    expect(!!netsuiteData).to.be.true;
+
+    let revenueData = mockSalesforceService.getRevenue(invoiceId);
+    expect(!!revenueData).to.be.true;
 
     let invoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
-    // expect(invoice.nsReference).to.equal(mockNetsuiteService.erpRef);
-    expect(!!invoice.nsReference).to.be.true;
+    expect(invoice.revenueRecognitionReference).to.equal(
+      mockSalesforceService.revenueRef
+    );
   }
 );
 
 Then(
-  /The Invoice with the ID "([\w-]+)" is registered to salesforce/,
+  /Revenue recognition for the Invoice with the ID "([\w-]+)" is skipped/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
 
-    let salesforceData = mockSalesforceService.getInvoice(invoiceId);
-    expect(!!salesforceData).to.be.true;
+    let revenueData = mockSalesforceService.getRevenue(invoiceId);
+    expect(!!revenueData).to.be.false;
 
     let invoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
-    expect(invoice.erpReference).to.equal(mockSalesforceService.erpRef);
-  }
-);
-
-Then(
-  /The Invoice with the ID "([\w-]+)" is not registered to erp/,
-  async function (invoiceId: string) {
-    expect(response.isRight()).to.be.true;
-
-    let salesforceData = mockSalesforceService.getInvoice(invoiceId);
-    expect(!!salesforceData).to.be.false;
-
-    let netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
-    expect(!!netsuiteData).to.be.false;
-  }
-);
-
-Then(
-  /The tax code selected for the Invoice with the ID "([\w-]+)" is ([\d]+)/,
-  function (invoiceId: string, taxRate: string) {
-    expect(response.isRight()).to.be.true;
-    let netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
-    expect(netsuiteData.taxRateId).to.equal(taxRate);
+    expect(invoice.erpReference).to.equal('NON_INVOICEABLE');
   }
 );
