@@ -45,6 +45,7 @@ export const articleFragment = gql`
     journalTitle
     authorSurname
     authorFirstName
+    arxivId
   }
 `;
 
