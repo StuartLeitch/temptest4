@@ -103,6 +103,7 @@ export const INVOICE_QUERY = `
     authorFirstName
     journalTitle
     datePublished
+    arxivId
   }
   fragment creditNoteFragment on Invoice {
     invoiceId
