@@ -524,11 +524,12 @@
                 <% let price = invoice.getInvoiceNetTotal() %> 
                 <% let vat = invoice.getInvoiceVatTotal() %> 
                 <% let discount = invoice.getInvoiceDiscountTotal() %>
+                <% let discountPercentage = invoice.getInvoiceDiscountPercentageTotal() %>
                 <% if(discount !== 0) { %>
                 <tr>
-                  <th>Discounts (-<%= discount %>%)</th>
+                  <th>Discounts (-<%= discountPercentage %>%)</th>
                   <td>
-                    -$ <%= formatPriceFn((item.price * discount / 100)) %>
+                    -$ <%= formatPriceFn(discount) %>
                   </td>
                 </tr>
                 <% } %>

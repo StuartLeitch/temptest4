@@ -315,6 +315,21 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     );
   }
 
+  public getInvoiceDiscountPercentageTotal(): number {
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    const totalItemsDiscount = this.invoiceItems.reduce(
+      (acc, item) => acc + item.calculateTotalDiscountPercentage(),
+      0
+    );
+
+    return twoDigitPrecision(totalItemsDiscount / this.invoiceItems.length);
+  }
+
   public getInvoiceNetTotalBeforeDiscount(): number {
     return twoDigitPrecision(
       this.getInvoiceNetTotal() + this.getInvoiceDiscountTotal()
