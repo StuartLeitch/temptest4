@@ -2,9 +2,8 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { UseCase } from '../../../../../core/domain/UseCase';
-// import { UseCaseError } from '../../../../../core/logic/UseCaseError';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { right, Result, Either, left } from '../../../../../core/logic/Result';
+import { right, Either, left } from '../../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
@@ -75,19 +74,21 @@ export class RemoveEditorsFromJournalUsecase
         );
       }
 
-      const deleteEditorsResponse = await Promise.all(
-        allEditors.map((e) => this.editorRepo.delete(EditorMap.toDomain(e)))
-      );
-
-      const errs = [];
-      for (const editorResponse of deleteEditorsResponse) {
-        if (typeof editorResponse !== 'undefined') {
-          errs.push('Editor delete error.');
+      try {
+        await Promise.all(
+          allEditors.map((e) => this.editorRepo.delete(EditorMap.toDomain(e)))
+        );
+      } catch (errors) {
+        const errs = [];
+        for (const editorResponse of errors) {
+          if (typeof editorResponse !== 'undefined') {
+            errs.push('Editor delete error.');
+          }
         }
-      }
 
-      if (errs.length > 0) {
-        return left(new UnexpectedError(errs));
+        if (errs.length > 0) {
+          return left(new UnexpectedError(errs));
+        }
       }
 
       return right(null);

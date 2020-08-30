@@ -166,6 +166,12 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     if (!request.paymentQueueName) {
       return left(new Errors.PaymentQueueNameRequiredError());
     }
+    if (
+      request.creditControlDisabled === null ||
+      request.creditControlDisabled === undefined
+    ) {
+      return left(new Errors.CreditControlDisabledSettingRequiredError());
+    }
 
     return right(request);
   }
@@ -347,13 +353,19 @@ export class ScheduleRemindersForExistingInvoicesUsecase
   }
 
   private async shouldScheduleCreditControl({
+    creditControlDisabled,
     creditControlDelay,
     transaction,
     invoice,
   }: InvoiceIdDTO & {
+    creditControlDisabled: boolean;
     transaction: Transaction;
     invoice: Invoice;
   }): Promise<Either<null, boolean>> {
+    if (creditControlDisabled) {
+      return right(false);
+    }
+
     if (transaction.status !== TransactionStatus.ACTIVE) {
       return right(false);
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, Route } from 'react-router-dom';
 import { useQuery } from 'graphql-hooks';
 
 import {
@@ -37,7 +37,7 @@ import AddPaymentModal from './components/AddPaymentModal';
 const APPLY_COUPON_MODAL_TARGET = 'applyCouponModal';
 const CREATE_CREDIT_NOTE_MODAL_TARGET = 'createCreditNoteModal';
 
-const Details: React.FC = () => {
+const Details: React.FC = (props) => {
   const { id } = useParams();
 
   const { loading, error, data, refetch: invoiceQueryRefetch } = useQuery(
@@ -166,13 +166,13 @@ const Details: React.FC = () => {
                   </DropdownMenu>
                 </UncontrolledButtonDropdown>
 
-                {status === 'ACTIVE' &&
+                {status === 'ACTIVE' && (
                   <AddPaymentModal
                     invoice={invoice}
                     getPaymentMethods={getPaymentMethods}
                     onSuccessCallback={invoiceQueryRefetch}
                   />
-                }
+                )}
 
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') &&
@@ -196,10 +196,11 @@ const Details: React.FC = () => {
 
                 {transaction.status === 'ACTIVE' && status === 'DRAFT' && (
                   <Link to={`/invoices/split-invoice/${invoiceId}`}>
-                    <Button color="secondary" className='ml-2'>Split Invoice</Button>
+                    <Button color='secondary' className='ml-2'>
+                      Split Invoice
+                    </Button>
                   </Link>
                 )}
-
               </ButtonToolbar>
             </div>
           </Col>
@@ -247,13 +248,13 @@ const Details: React.FC = () => {
                   <PayerDetailsTab invoice={invoice} />
                 </TabPane>
                 <TabPane tabId='reminders'>
-                  <InvoiceReminders/>
+                  <InvoiceReminders />
                 </TabPane>
               </UncontrolledTabs.TabContent>
             </UncontrolledTabs>
           </Col>
           <Col lg={4}>
-            <InvoiceTimeline invoice={invoice}/>
+            <InvoiceTimeline invoice={invoice} />
           </Col>
         </Row>
       </Container>

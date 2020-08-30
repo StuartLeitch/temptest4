@@ -1,12 +1,16 @@
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { Result, Either, left, right } from '../../../../../core/logic/Result';
+import { Either, left, Result, right } from '../../../../../core/logic/Result';
+import { UseCaseError } from '../../../../../core/logic/UseCaseError';
 
+import { Publisher } from '../../../../publishers/domain/Publisher';
+import { PublisherRepoContract } from '../../../../publishers/repos';
 import { CatalogItem } from '../../../domain/CatalogItem';
-import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { JournalId } from '../../../domain/JournalId';
 import { CatalogMap } from '../../../mappers/CatalogMap';
+import { CatalogRepoContract } from '../../../repos/catalogRepo';
+import { AddCatalogItemToCatalogErrors } from '../addCatalogItemToCatalog/addCatalogItemToCatalogErrors';
 
 export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
   type: string;
@@ -19,11 +23,18 @@ export interface UpdateCatalogItemToCatalogUseCaseRequestDTO {
   updated?: string;
   isActive?: boolean;
 }
+
 export type UpdateCatalogItemToCatalogUseCaseResponse = Either<
-  // | UpdateTransactionErrors.SomeBlahBlahError
-  UnexpectedError,
+  PublisherNotFoundError | UnexpectedError,
   Result<CatalogItem>
 >;
+class PublisherNotFoundError extends Result<UseCaseError> {
+  constructor(publisherName: string) {
+    super(false, {
+      message: `Couldn't find a Publisher for name {${publisherName}}.`,
+    } as UseCaseError);
+  }
+}
 export class UpdateCatalogItemToCatalogUseCase
   implements
     UseCase<
@@ -31,9 +42,14 @@ export class UpdateCatalogItemToCatalogUseCase
       UpdateCatalogItemToCatalogUseCaseResponse
     > {
   private catalogRepo: CatalogRepoContract;
+  private publisherRepo: PublisherRepoContract;
 
-  constructor(catalogRepo: CatalogRepoContract) {
+  constructor(
+    catalogRepo: CatalogRepoContract,
+    publisherRepo: PublisherRepoContract
+  ) {
     this.catalogRepo = catalogRepo;
+    this.publisherRepo = publisherRepo;
   }
 
   public async execute(
@@ -61,7 +77,17 @@ export class UpdateCatalogItemToCatalogUseCase
       journalTitle,
       updated,
     } = request;
-
+    let publisher: Publisher;
+    const defaultPublisher = 'Hindawi';
+    try {
+      publisher = await this.publisherRepo.getPublisherByName(defaultPublisher);
+    } catch (err) {
+      return left(
+        new AddCatalogItemToCatalogErrors.PublisherNotFoundError(
+          defaultPublisher
+        )
+      );
+    }
     try {
       const journalId: JournalId = JournalId.create(
         new UniqueEntityID(rawJournalId)
@@ -86,14 +112,15 @@ export class UpdateCatalogItemToCatalogUseCase
       const updatedCatalogItem = CatalogMap.toDomain({
         id: journalId.id.toString(),
         // type,
-        apc: amount,
+        amount,
         created: created ? new Date(created) : null,
         updated: updated ? new Date(updated) : null,
         currency,
         isActive,
         issn,
-        journalId,
-        name: journalTitle,
+        journalId: rawJournalId,
+        journalTitle,
+        publisherId: publisher.publisherId.id.toString(),
       });
 
       // * This is where all the magic happens

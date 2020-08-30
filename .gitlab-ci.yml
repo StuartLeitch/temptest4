@@ -40,7 +40,7 @@ Install Dependencies:
 
 Test:
   interruptible: true
-  allow_failure: true
+  allow_failure: false
   stage: test
   # before_script: added to dockerfile.build
   #   - apt-get update
@@ -62,7 +62,7 @@ Test:
 Build:
   interruptible: true
   stage: build
-  allow_failure: false
+  when: manual
   script:
     - cd $HOME
     - yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production
@@ -74,12 +74,9 @@ Build:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
 
 Package Images:dev:
   interruptible: true
-  allow_failure: false
   stage: package
   image: docker
   variables:
@@ -103,12 +100,9 @@ Package Images:dev:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
 
 Deploy:dev:
   stage: deploy
-  allow_failure: false
   dependencies:
     - Package Images:dev
   when: manual
@@ -121,6 +115,7 @@ Deploy:dev:
     COMMAND: build-manifests
   before_script:
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+    - apk add --no-cache curl
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
@@ -136,8 +131,6 @@ Deploy:dev:
   artifacts:
     paths:
       - dist-k8s
-  only:
-    - develop
 # Pages:
 #   interruptible: true
 #   stage: deploy

@@ -7,7 +7,6 @@ import { Result } from '../../../core/logic/Result';
 import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
-import { InvoiceSentEvent } from './events/invoiceSent';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
@@ -268,10 +267,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public generateCreatedEvent(): void {
     const now = new Date();
     this.addDomainEvent(new InvoiceCreated(this, now));
-  }
-
-  public send(): void {
-    this.addDomainEvent(new InvoiceSentEvent(this.invoiceId, new Date()));
   }
 
   public markAsActive(): void {

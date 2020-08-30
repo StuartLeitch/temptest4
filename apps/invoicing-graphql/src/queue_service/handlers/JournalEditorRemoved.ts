@@ -8,6 +8,7 @@ import {
   AssignEditorsToJournalUsecase,
   RemoveEditorsFromJournalUsecase,
   EditorMap,
+  JournalEventMap,
 } from '@hindawi/shared';
 
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
@@ -40,25 +41,7 @@ function removeEditorEventHandlerFactory(eventName: string) {
 
     try {
       const journalId = data.id;
-      const eventEditors = [];
-
-      if (data.editors && Array.isArray(data.editors)) {
-        eventEditors.push(...data.editors);
-      }
-
-      // parsing Journal Section Editors
-      if (data?.sections && Array.isArray(data.sections)) {
-        for (const section of data.sections) {
-          // section.editors
-          if (Array.isArray(section.editors)) {
-            eventEditors.push(...section.editors);
-          }
-        }
-      }
-
-      const allEditors = eventEditors.filter(
-        (ee) => ee.roleType !== 'editorialAssistant'
-      );
+      const eventEditors = JournalEventMap.extractEditors(data);
 
       const maybeCurrentEditors = await getEditorsByJournal.execute({
         journalId,
@@ -89,7 +72,7 @@ function removeEditorEventHandlerFactory(eventName: string) {
 
       const maybeAddEditorsToJournal = await assignEditorsToJournal.execute({
         journalId,
-        allEditors,
+        allEditors: eventEditors,
       });
 
       const addEditorsToJournalResponse = maybeAddEditorsToJournal.value;

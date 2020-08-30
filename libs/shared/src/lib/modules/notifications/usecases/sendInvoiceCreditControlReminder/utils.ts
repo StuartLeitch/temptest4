@@ -15,6 +15,10 @@ export interface CompoundData extends DTO {
   paused: boolean;
 }
 
+export interface NotificationStatus {
+  notificationDisabled: boolean;
+}
+
 export function constructCreditControlReminderData(
   data: CompoundData
 ): PaymentReminder {

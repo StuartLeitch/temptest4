@@ -2865,10 +2865,10 @@
   dependencies:
     "@hapi/hoek" "^8.3.0"
 
-"@hindawi/phenom-charts@0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@hindawi/phenom-charts/-/phenom-charts-0.1.7.tgz#f9f533e91e381bc1a95634bbb23bb14136e09523"
-  integrity sha512-5gnA1FnXKmeX+leaOntHtbRlPHTPpNkYyt92mbfnreg2gKEjdjZUysXGjQnwLwSDTRbnFJgeyDCSeUd0ekT7sw==
+"@hindawi/phenom-charts@0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@hindawi/phenom-charts/-/phenom-charts-0.1.8.tgz#01400a2332ab10fb50ab639580a42a5abf6370df"
+  integrity sha512-GRXR84XuvQxGL39m6hkl4oFSOMJuG5mpEDvz9zaT+ZN6sm6wvNu83x3D4Lgq2ZpkXPpHR97I2dcgv5KUl1YZ/g==
   dependencies:
     cdk8s "0.21.0"
     constructs "2.0.1"
@@ -16507,10 +16507,10 @@ karma-source-map-support@1.4.0:
   dependencies:
     source-map-support "^0.5.5"
 
-keycloak-js@11.0.0:
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-11.0.0.tgz#2bc3126e192e3c5279ca157c33f4cc657467540a"
-  integrity sha512-hjpIrO+ujaRsSJC76xEpVlZVAPpXm3OZYruxGa/cZ/PF7lwp9kRmIinqCxdg0jttr4dogCbOZ2YrFpqPx4a8mw==
+keycloak-js@10.0.2:
+  version "10.0.2"
+  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-10.0.2.tgz#f0cf5b942627c5221f1466552c40e4624503b77b"
+  integrity sha512-7nkg4Ob1khHGcNbuK36AMndKUEuIQFpNlWU9ygWs7nSBPCI9VZ8dJjjXfKJHm0ewgcqLFGPIJ6bxxRlfcQ6sLg==
   dependencies:
     base64-js "1.3.1"
     js-sha256 "0.9.0"
