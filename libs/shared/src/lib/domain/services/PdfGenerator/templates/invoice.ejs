@@ -519,14 +519,12 @@
                     formatPriceFn(invoice.invoiceItems.currentItems[i].price) %>
                   </td>
                 </tr>
-                <% } %> <% } %> <% let price = invoice.getInvoiceTotal() %> <%
-                let vat = invoice.invoiceItems.currentItems.length > 0 ?
-                invoice.invoiceItems.currentItems[0].vat : 0 %> <% let vatAmount
-                = invoice.getInvoiceTotal() * vat / 100 %> <% let item =
-                invoice.invoiceItems.currentItems[0] %> <% let reductions =
-                [...item.coupons.getItems(), ...item.waivers] %> <% if
-                (reductions.length) { %> <% let discount =
-                reductions.reduce((acc, curr) => acc + curr.reduction, 0) %>
+                <% } %> <% } %> 
+                <% let item = invoice.invoiceItems.currentItems[0] %>
+                <% let price = invoice.getInvoiceNetTotal() %> 
+                <% let vat = invoice.getInvoiceVatTotal() %> 
+                <% let discount = invoice.getInvoiceDiscountTotal() %>
+                <% if(discount !== 0) { %>
                 <tr>
                   <th>Discounts (-<%= discount %>%)</th>
                   <td>
@@ -544,13 +542,13 @@
                     <em>(<%= vat %>%)</em>
                   </th>
                   <td>
-                    $ <%= formatPriceFn(vatAmount) %>
+                    $ <%= formatPriceFn(vat) %>
                   </td>
                 </tr>
                 <tr>
                   <th class="summary">Total</th>
                   <td class="summary">
-                    $ <%= formatPriceFn(price + vatAmount) %>
+                    $ <%= formatPriceFn(price + vat) %>
                   </td>
                 </tr>
               </td>
@@ -559,7 +557,7 @@
         </td>
       </tr>
       <h1 class="amount">Amount due</h1>
-      <div class="amountDue">$ <%= formatPriceFn(price + vatAmount) %> USD</div>
+      <div class="amountDue">$ <%= formatPriceFn(price + vat) %> USD</div>
       <div class="separator"></div>
     </table>
 
@@ -568,7 +566,7 @@
       style="font-size: 1.25rem; margin-bottom: 7rem;"
     >
       <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn(
-      vatAmount / invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate)
+      vat / invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate)
       %>
     </div>
 
