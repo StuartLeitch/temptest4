@@ -85,6 +85,8 @@ export class PublishInvoiceFinalizedUsecase
       payer: payer ? formatPayer(payer, billingAddress) : null,
 
       payments: payments ? formatPayments(payments, paymentMethods) : null,
+
+      arxivId: manuscript.arxivId,
     };
 
     try {
