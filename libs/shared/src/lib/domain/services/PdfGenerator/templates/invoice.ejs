@@ -519,13 +519,13 @@
                     formatPriceFn(invoice.invoiceItems.currentItems[i].price) %>
                   </td>
                 </tr>
-                <% } %> <% } %> <% let item =
-                invoice.invoiceItems.currentItems[0] %> <% let price =
-                invoice.getInvoiceNetTotal() %> <% let vat =
-                invoice.getInvoiceVatTotal() %> <% let discount =
-                invoice.getInvoiceDiscountTotal() %> <% let discountPercentage =
-                invoice.getInvoiceDiscountPercentageTotal() %> <% if(discount
-                !== 0) { %>
+                <% } %> <% } %> 
+                  <% let item = invoice.invoiceItems.currentItems[0] %> 
+                  <% let price = invoice.invoiceNetTotal %> 
+                  <% let vat = invoice.invoiceVatTotal %>
+                  <% let discount = invoice.invoiceDiscountTotal %>
+                  <% let discountPercentage = invoice.invoiceDiscountPercentageTotal %> 
+                  <% if(discount!== 0) { %>
                 <tr>
                   <th>Discounts (-<%= discountPercentage %>%)</th>
                   <td>
@@ -540,7 +540,7 @@
                 <tr>
                   <th>
                     VAT
-                    <em>(<%= vat %>%)</em>
+                    <em>(<%= item.vat %>%)</em>
                   </th>
                   <td>
                     $ <%= formatPriceFn(vat) %>

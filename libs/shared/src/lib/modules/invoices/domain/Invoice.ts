@@ -203,6 +203,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.getInvoiceNetTotalBeforeDiscount();
   }
 
+  get invoiceDiscountPercentageTotal(): number {
+    return this.getInvoiceDiscountPercentageTotal();
+  }
+
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
     if (this.props.invoiceItems.exists(invoiceItem)) {
       this.props.invoiceItems.remove(invoiceItem);
