@@ -12,6 +12,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
@@ -59,7 +60,7 @@ export class EpicOnArticlePublishedUsecase
     private waiverRepo: WaiverRepoContract,
     private emailService: EmailService,
     private vatService: VATService,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {}
 
   private async getAccessControlContext(request, context?) {

@@ -14,6 +14,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 import { VATService } from '../../../../domain/services/VATService';
@@ -62,7 +63,7 @@ export class PublishCreditNoteToErpUsecase
     private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {}
 
   private async getAccessControlContext(request: any, context?: any) {

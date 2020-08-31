@@ -12,6 +12,7 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -54,7 +55,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private publisherRepo: PublisherRepoContract,
     private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {
     this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
       this.invoiceRepo,

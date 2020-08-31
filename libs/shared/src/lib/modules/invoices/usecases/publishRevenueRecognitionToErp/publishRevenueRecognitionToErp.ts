@@ -13,6 +13,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
@@ -60,7 +61,7 @@ export class PublishRevenueRecognitionToErpUsecase
     private publisherRepo: PublisherRepoContract,
     private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {}
 
   private async getAccessControlContext(request: any, context?: any) {

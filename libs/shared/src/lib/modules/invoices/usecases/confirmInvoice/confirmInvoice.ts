@@ -14,6 +14,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { PoliciesRegister } from '../../../../domain/reductions/policies/PoliciesRegister';
 import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
 import { VATService } from '../../../../domain/services/VATService';
@@ -74,7 +75,7 @@ export class ConfirmInvoiceUsecase
     private waiverRepo: WaiverRepoContract,
     private emailService: EmailService,
     private vatService: VATService,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {
     this.authorizationContext = { roles: [Roles.PAYER] };
 

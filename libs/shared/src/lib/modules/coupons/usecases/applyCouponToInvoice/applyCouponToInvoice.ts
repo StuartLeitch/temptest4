@@ -13,6 +13,7 @@ import {
   Roles,
 } from '../../../../domain/authorization';
 
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { VATService } from '../../../../domain/services/VATService';
 
@@ -79,7 +80,7 @@ export class ApplyCouponToInvoiceUsecase
     private waiverRepo: WaiverRepoContract,
     private emailService: EmailService,
     private vatService: VATService,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {}
 
   public async execute(
