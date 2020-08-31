@@ -519,13 +519,13 @@
                     formatPriceFn(invoice.invoiceItems.currentItems[i].price) %>
                   </td>
                 </tr>
-                <% } %> <% } %> 
-                <% let item = invoice.invoiceItems.currentItems[0] %>
-                <% let price = invoice.getInvoiceNetTotal() %> 
-                <% let vat = invoice.getInvoiceVatTotal() %> 
-                <% let discount = invoice.getInvoiceDiscountTotal() %>
-                <% let discountPercentage = invoice.getInvoiceDiscountPercentageTotal() %>
-                <% if(discount !== 0) { %>
+                <% } %> <% } %> <% let item =
+                invoice.invoiceItems.currentItems[0] %> <% let price =
+                invoice.getInvoiceNetTotal() %> <% let vat =
+                invoice.getInvoiceVatTotal() %> <% let discount =
+                invoice.getInvoiceDiscountTotal() %> <% let discountPercentage =
+                invoice.getInvoiceDiscountPercentageTotal() %> <% if(discount
+                !== 0) { %>
                 <tr>
                   <th>Discounts (-<%= discountPercentage %>%)</th>
                   <td>
@@ -566,9 +566,8 @@
       class="separatorFooter"
       style="font-size: 1.25rem; margin-bottom: 7rem;"
     >
-      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn(
-      vat / invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate)
-      %>
+      <%= invoice.props.vatnote.replace( "{Vat/Rate}", `${formatPriceFn( vat /
+      invoice.props.rate)}`, ).replace("{Rate}", invoice.props.rate) %>
     </div>
 
     <h1>Payment options</h1>
@@ -587,7 +586,10 @@
             </tr>
             <tr>
               <th>Sort Code</th>
-              <td><%= bankDetails.sortCode %></td>
+              <td>
+                <%= bankDetails.sortCode.replace(/(\d{2})(\d{2})(\d+)/,
+                '$1-$2-$3') %>
+              </td>
             </tr>
             <tr>
               <th>Account Number</th>
