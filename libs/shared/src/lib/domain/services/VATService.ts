@@ -7,7 +7,10 @@ import { UKVATTreatmentArticleProcessingChargesPolicy } from './../../modules/in
 import { USVATPolicy } from './../../modules/invoices/domain/policies/USVATPolicy';
 import { Address as VATAddress } from '../../modules/invoices/domain/policies/Address';
 
-const endpoint = process.env.VAT_VALIDATION_SERVICE_ENDPOINT;
+function getEndpoint() {
+  return process.env.VAT_VALIDATION_SERVICE_ENDPOINT;
+}
+
 const INVALID_INPUT = 'soap:Server: INVALID_INPUT';
 const MS_UNAVAILABLE = 'soap:Server: MS_UNAVAILABLE';
 
@@ -28,7 +31,7 @@ policiesRegister.registerPolicy(VATPolicy);
 export class VATService {
   private async createClient() {
     return new Promise((resolve, reject) => {
-      createClient(endpoint, (err, client) => {
+      createClient(getEndpoint(), (err, client) => {
         if (err) {
           reject(err);
         }

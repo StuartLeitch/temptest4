@@ -13,15 +13,15 @@ import { InvoiceCollection } from './../../../../../../src/lib/modules/invoices/
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { CreateCreditNoteUsecase } from './../../../../../../src/lib/modules/invoices/usecases/createCreditNote/createCreditNote';
+import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 import { WaiverService } from './../../../../../../src/lib/domain/services/WaiverService';
 import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
 import { TransactionStatus } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
 
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
-import { CreateTransactionContext } from './../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransaction';
 
-const defaultContext: CreateTransactionContext = {
+const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 
@@ -33,7 +33,7 @@ let mockWaiverRepo: MockWaiverRepo;
 let mockPausedReminderRepo: MockPausedReminderRepo;
 let mockEditorRepo: MockEditorRepo;
 
-let mockWaiverService : WaiverService;
+let mockWaiverService: WaiverService;
 
 let useCase: CreateCreditNoteUsecase;
 
@@ -41,7 +41,7 @@ let invoiceCollection: InvoiceCollection;
 let transaction;
 let invoice;
 
-BeforeAll(function() {
+BeforeAll(function () {
   mockInvoiceRepo = new MockInvoiceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockTransactionRepo = new MockTransactionRepo();
@@ -62,57 +62,58 @@ BeforeAll(function() {
   );
 });
 
-AfterAll(function() {
+AfterAll(function () {
   mockTransactionRepo.clear();
   mockInvoiceRepo.clear();
 });
 
-
-Given(/^There is an ACTIVE Invoice with an existing id "([\w-]+)"$/, async function(
-  invoiceId: string
-) {
+Given(
+  /^There is an ACTIVE Invoice with an existing id "([\w-]+)"$/,
+  async function (invoiceId: string) {
     transaction = TransactionMap.toDomain({
-    status: TransactionStatus.ACTIVE,
-    deleted: 0,
-    dateCreated: new Date(),
-    dateUpdated: new Date(),
+      status: TransactionStatus.ACTIVE,
+      deleted: 0,
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
     });
 
     invoice = InvoiceMap.toDomain({
       id: invoiceId,
       status: InvoiceStatus.ACTIVE,
-      transactionId: transaction.transactionId.id.toString()
+      transactionId: transaction.transactionId.id.toString(),
     });
 
     mockTransactionRepo.save(transaction);
     mockInvoiceRepo.save(invoice);
 
     transaction.addInvoice(invoice);
-});
+  }
+);
 
-When(/^I try to create a Credit Note for the invoice with id "([\w-]+)"$/, async function(
-  invoiceId: string
-) {
-  await useCase.execute(
-    { invoiceId },
-    defaultContext
-  )
-});
+When(
+  /^I try to create a Credit Note for the invoice with id "([\w-]+)"$/,
+  async function (invoiceId: string) {
+    await useCase.execute({ invoiceId }, defaultContext);
+  }
+);
 
-Then("The original Invoice is marked as final", async function() {
+Then('The original Invoice is marked as final', async function () {
   invoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
 
-  expect(invoiceCollection[0].invoiceId.id.toString()).to.equal(invoice.id.value);
+  expect(invoiceCollection[0].invoiceId.id.toString()).to.equal(
+    invoice.id.value
+  );
   expect(invoiceCollection[0].status).to.equal(InvoiceStatus.FINAL);
 });
 
-Then(/^A new Invoice is generated with a reference to the original Invoice ID "([\w-]+)"$/, async function(
-  invoiceId: string
-){
-  expect(invoiceCollection.length).to.equal(2);
-  expect(invoiceCollection[1].cancelledInvoiceReference).to.equal(invoiceId);
-});
+Then(
+  /^A new Invoice is generated with a reference to the original Invoice ID "([\w-]+)"$/,
+  async function (invoiceId: string) {
+    expect(invoiceCollection.length).to.equal(2);
+    expect(invoiceCollection[1].cancelledInvoiceReference).to.equal(invoiceId);
+  }
+);
 
-Then("The new Invoice is marked as final", async function() {
+Then('The new Invoice is marked as final', async function () {
   expect(invoiceCollection[1].status).to.equal(InvoiceStatus.FINAL);
-})
+});

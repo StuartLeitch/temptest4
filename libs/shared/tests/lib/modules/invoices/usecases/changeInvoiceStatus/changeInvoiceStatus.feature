@@ -6,10 +6,10 @@ Feature: Change Invoice Status
         Then The Invoice with ID "invoice-id" is successfully updated to <Status>
 
         Examples:
-        | Status      | 
-        | PENDING     |  
-        | ACTIVE      |
-        | FINAL       |
+            | Status  |
+            | PENDING |
+            | ACTIVE  |
+            | FINAL   |
 
     Scenario: Change Invoice Status for a non-existing ID
         Given There is an Invoice with a non-existing ID "unknown-id"

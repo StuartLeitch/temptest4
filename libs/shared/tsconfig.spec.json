@@ -3,7 +3,13 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@hindawi/shared": ["src/index.ts"],
+      "@hindawi/infrastructure": ["src/lib/infrastructure/index.ts"],
+      "@utils": ["src/lib/utils/index.ts"]
+    }
   },
   "include": [
     "**/*.spec.ts",

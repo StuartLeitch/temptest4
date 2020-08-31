@@ -258,6 +258,7 @@
     "jest-junit-reporter": "1.1.0",
     "jest-prop-type-error": "1.1.0",
     "knex-tiny-logger": "2.0.0",
+    "nock": "^13.0.4",
     "prettier": "2.0.5",
     "react-hot-loader": "4.12.21",
     "sass": "1.26.10",

@@ -10,6 +10,7 @@ export interface ErpData {
   vatNote?: Record<string, unknown>;
   rate?: number;
   tradeDocumentItemProduct: string;
+  taxRateId?: string;
 }
 
 export interface ErpResponse {
