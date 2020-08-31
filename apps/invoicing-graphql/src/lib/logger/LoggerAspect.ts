@@ -3,25 +3,12 @@
 
 import { beforeMethod, afterMethod, Metadata } from 'aspect.js';
 
-// import { EpicOnArticlePublishedUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
-// import { GetPaymentMethodsUseCase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/getPaymentMethods/GetPaymentMethods';
-import { CreateTransactionUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/createTransaction/createTransaction';
-import { CreateManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/createManuscript/createManuscript';
-import { GetManuscriptByManuscriptIdUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
-import { SoftDeleteDraftTransactionUsecase } from './../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
-import { EditManuscriptUsecase } from './../../../../../libs/shared/src/lib/modules/manuscripts/usecases/editManuscript/editManuscript';
-import { UpdateInvoiceItemsUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/updateInvoiceItems/updateInvoiceItems';
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
-import { GetItemsForInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { GetJournal } from './../../../../../libs/shared/src/lib/modules/journals/usecases/journals/getJournal/getJournal';
-import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
-import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
-import { AssignEditorsToJournalUsecase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
-import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
 import {
   ScheduleRemindersForExistingInvoicesUsecase,
+  UpdateTransactionOnAcceptManuscriptUsecase,
   PauseInvoiceConfirmationRemindersUsecase,
   ResumeInvoiceConfirmationReminderUsecase,
+  GetInvoiceIdByManuscriptCustomIdUsecase,
   GetRemindersPauseStateForInvoiceUsecase,
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceConfirmationReminderUsecase,
@@ -29,13 +16,28 @@ import {
   AddEmptyPauseStateForInvoiceUsecase,
   PauseInvoicePaymentRemindersUsecase,
   ResumeInvoicePaymentReminderUsecase,
+  GetManuscriptByManuscriptIdUsecase,
   GetPayerDetailsByInvoiceIdUsecase,
   SendInvoicePaymentReminderUsecase,
+  SoftDeleteDraftTransactionUsecase,
+  UpdateCatalogItemToCatalogUseCase,
+  AddCatalogItemToCatalogUseCase,
   AreNotificationsPausedUsecase,
+  AssignEditorsToJournalUsecase,
+  PayPalPaymentApprovedUsecase,
+  PayPalProcessFinishedUsecase,
+  UpdateInvoiceItemsUsecase,
+  GetItemsForInvoiceUsecase,
+  CreateTransactionUsecase,
+  CreateManuscriptUsecase,
+  EditManuscriptUsecase,
   GetPaymentInfoUsecase,
+  RecordPaymentUsecase,
+  GetJournal,
+  Logger,
 } from '@hindawi/shared';
 
-import { Logger } from '../../../../../libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+// import { Logger } from '../../../../../libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 const logger = new Logger();
 logger.setScope('Usecase:Aspect');
 
@@ -71,6 +73,9 @@ const watchList = [
   ScheduleRemindersForExistingInvoicesUsecase,
   GetPayerDetailsByInvoiceIdUsecase,
   GetPaymentInfoUsecase,
+  RecordPaymentUsecase,
+  PayPalPaymentApprovedUsecase,
+  PayPalProcessFinishedUsecase,
 ];
 const aspect = {
   classes: watchList,
@@ -113,6 +118,9 @@ export class LoggerAspect {
       ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
       GetPayerDetailsByInvoiceIdUsecase.prototype.execute,
       GetPaymentInfoUsecase.prototype.execute,
+      RecordPaymentUsecase.prototype.execute,
+      PayPalPaymentApprovedUsecase.prototype.execute,
+      PayPalProcessFinishedUsecase.prototype.execute,
     ],
   })
   invokeBeforeMethod(meta: Metadata) {
@@ -155,6 +163,9 @@ export class LoggerAspect {
       ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
       GetPayerDetailsByInvoiceIdUsecase.prototype.execute,
       GetPaymentInfoUsecase.prototype.execute,
+      RecordPaymentUsecase.prototype.execute,
+      PayPalPaymentApprovedUsecase.prototype.execute,
+      PayPalProcessFinishedUsecase.prototype.execute,
     ],
   })
   async invokeAfterMethod(meta: Metadata) {

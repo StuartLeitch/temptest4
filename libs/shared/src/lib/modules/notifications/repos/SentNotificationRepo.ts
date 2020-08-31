@@ -1,7 +1,6 @@
 import { Repo } from '../../../infrastructure/Repo';
 
 import { NotificationType, Notification } from '../domain/Notification';
-import { NotificationPause } from '../domain/NotificationPause';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { NotificationId } from '../domain/NotificationId';
 

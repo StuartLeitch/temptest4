@@ -7,9 +7,10 @@ export interface ErpData {
   article: Article;
   billingAddress: Address;
   journalName?: string;
-  vatNote?: object;
+  vatNote?: Record<string, unknown>;
   rate?: number;
   tradeDocumentItemProduct: string;
+  taxRateId?: string;
 }
 
 export interface ErpResponse {

@@ -1,24 +1,20 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { BraintreeGateway } from '../../../../../libs/shared/src/lib/modules/payments/infrastructure/gateways/braintree/gateway';
 import {
-  RecordCreditCardPaymentUsecase,
-  RecordBankTransferPaymentUsecase,
+  PayPalPaymentApprovedUsecase,
   GenerateClientTokenUsecase,
-  RecordPayPalPaymentUsecase,
   GetPaymentMethodsUseCase,
-  MigratePaymentUsecase,
+  RecordPaymentUsecase,
   PaymentMethodMap,
+  CorrelationID,
   Roles,
 } from '@hindawi/shared';
-import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 
-import { env } from '../../env';
-
+import { Context } from '../../builders';
 import { Resolvers } from '../schema';
 
-export const payments: Resolvers<any> = {
+export const payments: Resolvers<Context> = {
   Query: {
     async getPaymentMethods(parent, args, context) {
       const {
@@ -42,16 +38,22 @@ export const payments: Resolvers<any> = {
       }
     },
     async getClientToken(parent, args, context) {
-      const usecase = new GenerateClientTokenUsecase();
+      const {
+        services: { paymentStrategyFactory, logger },
+      } = context;
+      const usecase = new GenerateClientTokenUsecase(paymentStrategyFactory);
 
-      const result = await usecase.execute({
-        merchantAccountId: env.braintree.merchantAccountId,
-      });
+      const result = await usecase.execute();
 
       if (result.isRight()) {
-        const paymentClientToken = result.value.getValue();
+        const paymentClientToken = result.value;
         return paymentClientToken;
       } else {
+        const err = result.value;
+        logger.error(
+          `While getting the braintree client token an error ocurred {${err.message}}`,
+          err
+        );
         throw new Error(`Can't get client token.`);
       }
     },
@@ -64,43 +66,41 @@ export const payments: Resolvers<any> = {
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           manuscript: manuscriptRepo,
+          coupon: couponRepo,
+          waiver: waiverRepo,
+          payer: payerRepo,
         },
+        services: { paymentStrategyFactory, logger },
       } = context;
-      const {
-        invoiceId,
-        payerId,
-        paymentMethodId,
-        paymentMethodNonce,
-        amount,
-      } = args;
+      const { paymentMethodNonce, invoiceId } = args;
 
-      const recordCreditCardPaymentUsecase = new RecordCreditCardPaymentUsecase(
+      const usecase = new RecordPaymentUsecase(
+        paymentStrategyFactory,
+        invoiceItemRepo,
+        manuscriptRepo,
         paymentRepo,
         invoiceRepo,
-        manuscriptRepo,
-        invoiceItemRepo,
-        BraintreeGateway
+        couponRepo,
+        waiverRepo,
+        payerRepo,
+        logger
       );
       const usecaseContext = { roles: [Roles.PAYER] };
 
-      const result = await recordCreditCardPaymentUsecase.execute(
+      const result = await usecase.execute(
         {
-          merchantAccountId: env.braintree.merchantAccountId,
-          paymentMethodId,
-          paymentMethodNonce,
+          payerIdentification: paymentMethodNonce,
           invoiceId,
-          amount,
-          payerId,
         },
         usecaseContext
       );
 
       if (result.isLeft()) {
-        console.log(result.value.errorValue());
+        console.log(result.value.message);
         return null;
       }
 
-      const confirmedPayment = result.value.getValue();
+      const confirmedPayment = result.value;
 
       return {
         id: confirmedPayment.paymentId.id.toString(),
@@ -113,144 +113,143 @@ export const payments: Resolvers<any> = {
       };
     },
 
-    async recordPayPalPayment(parent, args, context) {
-      const { invoiceId, payerId, orderId, paymentMethodId } = args;
+    async createPayPalOrder(parent, args, context) {
+      const { invoiceId } = args;
       const usecaseContext = { roles: [Roles.PAYER] };
-      const {
-        services: { payPalService },
-        repos: { invoice: invoiceRepo, payment: paymentRepo },
-      } = context;
-
-      const usecase = new RecordPayPalPaymentUsecase(
-        paymentRepo,
-        invoiceRepo,
-        payPalService
-      );
-
-      const result = await usecase.execute(
-        {
-          invoiceId,
-          payerId,
-          orderId,
-          paymentMethodId,
-        },
-        usecaseContext
-      );
-
-      if (result.isLeft()) {
-        return null;
-      }
-
-      const confirmedPayment = result.value.getValue();
-
-      return {
-        id: confirmedPayment.paymentId.id.toString(),
-        invoiceId: confirmedPayment.invoiceId.id.toString(),
-        paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
-        foreignPaymentId: confirmedPayment.foreignPaymentId,
-        amount: confirmedPayment.amount.value,
-        datePaid: confirmedPayment.datePaid.toISOString(),
-      };
-    },
-
-    async migratePayment(parent, args, context) {
-      const {
-        repos: {
-          paymentMethod: paymentMethodRepo,
-          payment: paymentRepo,
-          invoice: invoiceRepo,
-        },
-      } = context;
-      const { invoiceId, payerId, amount, datePaid } = args;
-
-      const migratePaymentUsecase = new MigratePaymentUsecase(
-        paymentMethodRepo,
-        paymentRepo,
-        invoiceRepo
-      );
-      const usecaseContext = { roles: [Roles.PAYER] };
-
-      const result = await migratePaymentUsecase.execute(
-        {
-          invoiceId,
-          payerId,
-          amount,
-          datePaid,
-        },
-        usecaseContext
-      );
-
-      if (result.isLeft()) {
-        return null;
-      }
-
-      const migratedPayment = result.value.getValue();
-
-      return {
-        id: migratedPayment.paymentId.id.toString(),
-        payerId: migratedPayment.payerId.id.toString(),
-        paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
-        datePaid: migratedPayment.datePaid.toISOString(),
-        amount: migratedPayment.amount.value,
-        invoiceId: migratedPayment.invoiceId.id.toString(),
-        foreignPaymentId: migratedPayment.foreignPaymentId,
-      };
-    },
-
-    async bankTransferPayment(parent, args, context) {
       const {
         repos: {
           payment: paymentRepo,
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           manuscript: manuscriptRepo,
+          coupon: couponRepo,
+          waiver: waiverRepo,
+          payer: payerRepo,
         },
+        services: { paymentStrategyFactory, logger },
       } = context;
-      const {
-        invoiceId,
-        payerId,
-        paymentMethodId,
-        paymentReference,
-        amount,
-        datePaid,
-        markInvoiceAsPaid,
-      } = args;
 
-      const recordBankTransferPaymentUsecase = new RecordBankTransferPaymentUsecase(
+      const usecase = new RecordPaymentUsecase(
+        paymentStrategyFactory,
+        invoiceItemRepo,
+        manuscriptRepo,
         paymentRepo,
         invoiceRepo,
-        manuscriptRepo,
-        invoiceItemRepo
+        couponRepo,
+        waiverRepo,
+        payerRepo,
+        logger
       );
-      const usecaseContext = { roles: [Roles.PAYER] };
 
-      const result = await recordBankTransferPaymentUsecase.execute(
+      const result = await usecase.execute(
         {
           invoiceId,
-          payerId,
-          paymentMethodId,
-          paymentReference,
-          amount,
-          datePaid,
-          markInvoiceAsPaid,
         },
         usecaseContext
       );
 
       if (result.isLeft()) {
-        console.log(result.value.errorValue());
+        console.log(result.value.message);
         return null;
       }
 
-      const confirmedPayment = result.value.getValue();
+      const confirmedPayment = result.value;
 
       return {
-        id: confirmedPayment.paymentId.id.toString(),
-        invoiceId: confirmedPayment.invoiceId.id.toString(),
+        id: confirmedPayment.foreignPaymentId,
+      };
+    },
+
+    async recordPayPalPayment(parent, args, context) {
+      const { invoiceId, orderId } = args;
+
+      const {
+        repos: { payment: paymentRepo, invoice: invoiceRepo },
+        services: { paymentStrategyFactory },
+      } = context;
+
+      const usecase = new PayPalPaymentApprovedUsecase(
+        invoiceRepo,
+        paymentRepo,
+        paymentStrategyFactory
+      );
+      const usecaseContext = { roles: [Roles.PAYER] };
+      try {
+        const result = await usecase.execute(
+          { invoiceId, payPalOrderId: orderId },
+          usecaseContext
+        );
+
+        if (result.isLeft()) {
+          throw result.value;
+        }
+
+        return invoiceId;
+      } catch (e) {
+        console.info(e);
+        throw e;
+      }
+    },
+
+    async bankTransferPayment(parent, args, context) {
+      const {
+        repos: {
+          invoiceItem: invoiceItemRepo,
+          manuscript: manuscriptRepo,
+          invoice: invoiceRepo,
+          payment: paymentRepo,
+          coupon: couponRepo,
+          waiver: waiverRepo,
+          payer: payerRepo,
+        },
+        services: { paymentStrategyFactory, logger },
+      } = context;
+      const {
+        markInvoiceAsPaid,
+        paymentReference,
+        invoiceId,
+        datePaid,
+        amount,
+      } = args;
+
+      const usecaseContext = { roles: [Roles.PAYER] };
+      const usecase = new RecordPaymentUsecase(
+        paymentStrategyFactory,
+        invoiceItemRepo,
+        manuscriptRepo,
+        paymentRepo,
+        invoiceRepo,
+        couponRepo,
+        waiverRepo,
+        payerRepo,
+        logger
+      );
+
+      const result = await usecase.execute(
+        {
+          isFinalPayment: markInvoiceAsPaid,
+          paymentReference,
+          invoiceId,
+          datePaid,
+          amount,
+        },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        console.log(result.value);
+        return null;
+      }
+
+      const confirmedPayment = result.value;
+
+      return {
         paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
+        invoiceId: confirmedPayment.invoiceId.id.toString(),
         foreignPaymentId: confirmedPayment.foreignPaymentId,
-        amount: confirmedPayment.amount.value,
         datePaid: confirmedPayment.datePaid.toISOString(),
+        id: confirmedPayment.paymentId.id.toString(),
+        amount: confirmedPayment.amount.value,
         status: confirmedPayment.status,
       };
     },

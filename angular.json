@@ -40,7 +40,8 @@
         "serve": {
           "builder": "@nrwl/node:execute",
           "options": {
-            "buildTarget": "invoicing-graphql:build"
+            "buildTarget": "invoicing-graphql:build",
+            "port": 57050
           }
         },
         "lint": {
@@ -52,10 +53,7 @@
               "apps/invoicing-graphql/tsconfig.app.json",
               "apps/invoicing-graphql/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/invoicing-graphql/**"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/invoicing-graphql/**"]
           }
         },
         "test": {
@@ -93,10 +91,7 @@
               "libs/shared/tsconfig.lib.json",
               "libs/shared/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/shared/**"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/shared/**"]
           }
         },
         "test": {
@@ -134,10 +129,7 @@
               "libs/react-components/tsconfig.lib.json",
               "libs/react-components/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/react-components/**"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/react-components/**"]
           }
         },
         "test": {
@@ -172,9 +164,7 @@
               "apps/invoicing-web/src/Dockerfile",
               "apps/invoicing-web/src/nginx.conf"
             ],
-            "styles": [
-              "apps/invoicing-web/src/styles.scss"
-            ],
+            "styles": ["apps/invoicing-web/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -216,10 +206,7 @@
               "apps/invoicing-web/tsconfig.app.json",
               "apps/invoicing-web/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/invoicing-web/**"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/invoicing-web/**"]
           }
         },
         "test": {
@@ -254,13 +241,8 @@
           "options": {
             "linter": "eslint",
             "config": "apps/invoicing-web-e2e/.eslintrc",
-            "tsConfig": [
-              "apps/invoicing-web-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/invoicing-web-e2e/**"
-            ]
+            "tsConfig": ["apps/invoicing-web-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-web-e2e/**"]
           }
         }
       }
@@ -288,9 +270,7 @@
               "apps/invoicing-admin/src/Dockerfile",
               "apps/invoicing-admin/src/nginx.conf"
             ],
-            "styles": [
-              "apps/invoicing-admin/src/styles.scss"
-            ],
+            "styles": ["apps/invoicing-admin/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -338,10 +318,7 @@
               "apps/invoicing-admin/tsconfig.app.json",
               "apps/invoicing-admin/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/invoicing-admin/**"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/invoicing-admin/**"]
           }
         },
         "test": {
@@ -376,13 +353,8 @@
           "options": {
             "linter": "eslint",
             "config": "apps/invoicing-admin-e2e/.eslintrc",
-            "tsConfig": [
-              "apps/invoicing-admin-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/invoicing-admin-e2e/**"
-            ]
+            "tsConfig": ["apps/invoicing-admin-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/invoicing-admin-e2e/**"]
           }
         }
       }
@@ -401,9 +373,7 @@
             "outputPath": "dist/apps/reporting-backend",
             "main": "apps/reporting-backend/src/main.ts",
             "tsConfig": "apps/reporting-backend/tsconfig.app.json",
-            "assets": [
-              "apps/reporting-backend/src/Dockerfile"
-            ]
+            "assets": ["apps/reporting-backend/src/Dockerfile"]
           },
           "configurations": {
             "production": {
@@ -434,10 +404,7 @@
               "apps/reporting-backend/tsconfig.app.json",
               "apps/reporting-backend/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/reporting-backend/**"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/reporting-backend/**"]
           }
         },
         "test": {
@@ -462,10 +429,7 @@
               "libs/eve/tsconfig.lib.json",
               "libs/eve/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/eve/**"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/eve/**"]
           }
         },
         "test": {
@@ -491,9 +455,7 @@
             "tsConfig": "libs/eve/tsconfig.lib.json",
             "outputPath": "dist/libs/eve",
             "packageJson": "libs/eve/package.json",
-            "assets": [
-              "libs/eve/README.md"
-            ]
+            "assets": ["libs/eve/README.md"]
           }
         }
       }
@@ -571,10 +533,7 @@
               "libs/sisif/tsconfig.lib.json",
               "libs/sisif/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/sisif/**"
-            ]
+            "exclude": ["**/node_modules/**", "!libs/sisif/**"]
           }
         },
         "test": {
@@ -599,9 +558,7 @@
             "outputPath": "dist/apps/sisif-test",
             "main": "apps/sisif-test/src/main.ts",
             "tsConfig": "apps/sisif-test/tsconfig.app.json",
-            "assets": [
-              "apps/sisif-test/src/Dockerfile"
-            ]
+            "assets": ["apps/sisif-test/src/Dockerfile"]
           },
           "configurations": {
             "production": {
@@ -632,10 +589,7 @@
               "apps/sisif-test/tsconfig.app.json",
               "apps/sisif-test/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/sisif-test/**"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/sisif-test/**"]
           }
         },
         "test": {

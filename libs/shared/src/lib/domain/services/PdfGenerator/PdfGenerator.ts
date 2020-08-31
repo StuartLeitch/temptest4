@@ -3,7 +3,7 @@ import path from 'path';
 import { Readable } from 'stream';
 import { format } from 'date-fns';
 import ejs from 'ejs';
-import pdf from 'html-pdf';
+// import pdf from 'html-pdf';
 import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
@@ -72,45 +72,46 @@ export class PdfGeneratorService {
             process.env.BANK_ADDRESS_LINE_3,
             process.env.BANK_ADDRESS_CITY,
             process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY,
-            process.env.BANK_ADDRESS_POSTCODE
+            process.env.BANK_ADDRESS_POSTCODE,
           ].join(', '),
           beneficiaryAddress: [
             process.env.BANK_BENEFICIARY_ADDRESS_LINE_1,
             process.env.BANK_BENEFICIARY_ADDRESS_LINE_2,
             process.env.BANK_BENEFICIARY_ADDRESS_CITY,
             process.env.BANK_BENEFICIARY_ADDRESS_POSTCODE,
-            process.env.BANK_BENEFICIARY_ADDRESS_STATE
-          ].join(', ')
-        }
+            process.env.BANK_BENEFICIARY_ADDRESS_STATE,
+          ].join(', '),
+        },
       };
       const html = template(data);
 
-      const pdfOptions: pdf.CreateOptions = {
+      const pdfOptions /* : pdf.CreateOptions*/ = {
         border: {
           left: '1cm',
           right: '1cm',
           bottom: '0.75cm',
-          top: '0.25cm'
+          top: '0.25cm',
         },
         format: 'A4',
         footer: {
-          height: '2cm'
+          height: '2cm',
         },
         header: {
-          height: '2.5cm'
+          height: '2.5cm',
         },
-        phantomPath: '/usr/local/bin/phantomjs',
+        // phantomPath: '/usr/bin/phantomjs',
         // phantomPath: 'node_modules/.bin/phantomjs',
-        phantomArgs: []
+        // phantomArgs: [],
       };
       try {
-        pdf.create(html, pdfOptions).toStream((err, stream) => {
-          if (err) {
-            return reject(err);
-          }
+        // pdf.create(html, pdfOptions).toStream((err, stream) => {
+        //   if (err) {
+        //     return reject(err);
+        //   }
 
-          resolve(stream);
-        });
+        //   resolve(stream);
+        // })
+        resolve(null);
       } catch (e) {
         console.log(e);
         resolve(null);

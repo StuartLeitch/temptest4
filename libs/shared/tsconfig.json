@@ -51,6 +51,10 @@
     "src/lib/infrastructure/database/knex/migrations/20200422164040_add_migration_waiver.js",
     "src/lib/infrastructure/database/knex/migrations/20200520142528_add_status_to_payments_table.js",
     "src/lib/infrastructure/database/knex/migrations/20200527135136_fix_broken_dates_on_invoice.js",
-    "src/lib/infrastructure/database/knex/migrations/20200529094558_generate_missing_paused_reminders.js"
+    "src/lib/infrastructure/database/knex/migrations/20200529094558_generate_missing_paused_reminders.js",
+    "src/lib/infrastructure/database/knex/migrations/20200618145121_add_migration_payment_method.js",
+    "src/lib/infrastructure/database/knex/migrations/20200623152522_add_created_status_for_payments.js",
+    "src/lib/infrastructure/database/knex/migrations/20200721135248_add_temporay_ns_reference_to_invoices_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20200807103606_add_soft_delete_to_editors_table.js"
   ]
 }

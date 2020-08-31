@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import { getEuMembers } from 'is-eu-member';
+
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, left } from '../../../../core/logic/Result';
 import { AppError } from '../../../../core/logic/AppError';
@@ -57,7 +59,7 @@ export class PublishInvoiceToErpUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: any
@@ -72,7 +74,7 @@ export class PublishInvoiceToErpUsecase
     request: PublishInvoiceToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishInvoiceToErpResponse> {
-    // this.loggerService.info('PublishInvoiceToERP Request', request);
+    this.loggerService.info('PublishInvoiceToERP Request', request);
     if (process.env.ERP_DISABLED === 'true') {
       return right(null);
     }
@@ -209,6 +211,20 @@ export class PublishInvoiceToErpUsecase
       }
       // this.loggerService.info('PublishInvoiceToERP rate', rate);
 
+      // * Calculate Tax Rate code
+      // * id=10 O-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
+      let taxRateId = '10';
+      const euCountries = getEuMembers();
+      if (euCountries.includes(address.country)) {
+        if (payer.type === PayerType.INSTITUTION) {
+          // * id=15 ESSS-GB = ECOutputServices_GB in Sage, i.e. Sales made outside UK but in EU where there is a EU VAT registration number
+          taxRateId = '15';
+        } else {
+          // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number
+          taxRateId = '7';
+        }
+      }
+
       try {
         const erpData = {
           invoice,
@@ -220,16 +236,23 @@ export class PublishInvoiceToErpUsecase
           vatNote,
           rate,
           tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
+          customSegmentId: publisherCustomValues?.customSegmentId,
+          itemId: publisherCustomValues?.itemId,
+          taxRateId,
         };
 
         const netSuiteResponse = await this.netSuiteService.registerInvoice(
           erpData
         );
+        // console.info(netSuiteResponse);
         this.loggerService.info(
-          `Updating invoice ${invoice.id.toString()}: netSuiteReference -> ${netSuiteResponse}`
+          `Updating invoice ${invoice.id.toString()}: netSuiteReference -> ${JSON.stringify(
+            netSuiteResponse
+          )}`
         );
+        invoice.nsReference = JSON.stringify(netSuiteResponse); // netSuiteResponse; // .tradeDocumentId;
 
-        const erpResponse = await this.erpService.registerInvoice(erpData);
+        const erpResponse = await this.sageService.registerInvoice(erpData);
         // this.loggerService.info('PublishInvoiceToERP erp response', erpResponse);
 
         this.loggerService.info(
@@ -246,7 +269,8 @@ export class PublishInvoiceToErpUsecase
         return left(err);
       }
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      console.log(err);
+      return left(new AppError.UnexpectedError(err, err.toString()));
     }
   }
 }

@@ -1,7 +1,10 @@
 import { expect } from 'chai';
 import { Given, When, Then } from 'cucumber';
 
-import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
+import {
+  Roles,
+  UsecaseAuthorizationContext,
+} from '../../../../../../../shared/src/lib/domain/authorization';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import {
   InvoiceCollection,
@@ -9,10 +12,7 @@ import {
 } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
-import {
-  GetInvoiceDetailsUsecase,
-  GetInvoiceDetailsContext,
-} from '../../../../../../src/lib/modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetInvoiceDetailsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 
 const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
 const usecase: GetInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(
@@ -22,7 +22,9 @@ let result: any;
 
 let invoiceCollection: InvoiceCollection;
 
-const defaultContext: GetInvoiceDetailsContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 Given(/^A invoice with the id "([\w-]+)"$/, (invoiceId: string) => {
   const invoice = InvoiceMap.toDomain({

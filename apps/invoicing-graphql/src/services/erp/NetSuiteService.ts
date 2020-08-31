@@ -3,6 +3,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
 
+import { ErpServiceContract, PayerType } from '@hindawi/shared';
+
 import {
   // ErpServiceContract,
   ErpData,
@@ -12,7 +14,7 @@ import {
 import { Connection } from './netsuite/Connection';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
 
-export class NetSuiteService {
+export class NetSuiteService implements ErpServiceContract {
   private constructor(private connection: Connection) {}
 
   public static create(config: Record<string, unknown>): NetSuiteService {
@@ -25,23 +27,44 @@ export class NetSuiteService {
   }
 
   public async registerInvoice(data: ErpData): Promise<ErpResponse> {
-    // console.log('ERP Data:');
+    console.log('ERP Data:');
+    console.info(data);
+
+    const customerId = await this.getCustomerId(data);
+
+    return this.createInvoice({ ...data, customerId });
+  }
+
+  private async getCustomerId(data: ErpData) {
+    const { payer } = data;
 
     let customerId;
     const customerAlreadyExists = await this.queryCustomer(data);
 
     if (customerAlreadyExists) {
-      customerId = customerAlreadyExists.id;
+      if (
+        (customerAlreadyExists.isperson === 'T' &&
+          payer.type === PayerType.INSTITUTION) ||
+        (customerAlreadyExists.isperson === 'F' &&
+          payer.type !== PayerType.INSTITUTION)
+      ) {
+        customerId = await this.createCustomer(data);
+      } else {
+        customerId = customerAlreadyExists.id;
+      }
     } else {
       customerId = await this.createCustomer(data);
     }
 
-    return this.createInvoice({ ...data, customerId });
+    console.log('Customer ID:');
+    console.info(customerId);
+
+    return customerId;
   }
 
   public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
-    console.log('registerRevenueRecognition Data:');
-    console.info(data);
+    // console.log('registerRevenueRecognition Data:');
+    // console.info(data);
 
     const debitAccountId = '1'; // this.queryAccount(data);
     const creditAccountId = '213'; // this.queryAccount(data);
@@ -53,6 +76,13 @@ export class NetSuiteService {
     });
 
     return revenueRecognition;
+  }
+
+  public async registerCreditNote(data: ErpData): Promise<ErpResponse> {
+    // console.log('registerCreditNote Data:');
+    // console.info(data);
+
+    return null;
   }
 
   private async queryCustomer(data: any) {
@@ -68,7 +98,7 @@ export class NetSuiteService {
     };
 
     const queryCustomerRequest = {
-      q: `SELECT id, companyName, email, dateCreated FROM customer WHERE email = '${payer?.email?.toString()}'`,
+      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${payer?.email?.toString()}'`,
     };
 
     try {
@@ -107,14 +137,16 @@ export class NetSuiteService {
       email: payer?.email.toString(),
     };
 
-    if (data?.payer?.type !== 'INSTITUTION') {
+    if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
-      const [firstName, ...lastNames] = payer?.name.split(' ');
+      const [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
       createCustomerPayload.lastName = lastNames.join(' ');
     } else {
       createCustomerPayload.isPerson = false;
-      createCustomerPayload.companyName = payer?.name.toString();
+      createCustomerPayload.companyName =
+        payer?.organization.toString() || payer?.name.toString();
+      createCustomerPayload.vatRegNumber = payer.VATId;
     }
 
     try {
@@ -147,9 +179,12 @@ export class NetSuiteService {
       // billingAddress,
       // journalName,
       // vatNote,
-      rate,
+      // rate,
       // tradeDocumentItemProduct,
       customerId,
+      customSegmentId,
+      itemId,
+      taxRateId,
     } = data;
     // console.info(item);
     // console.info(invoice);
@@ -165,15 +200,12 @@ export class NetSuiteService {
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
-        new Date(invoice.dateMovedToFinal),
+        new Date(invoice.dateCreated),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
       tranId: `${invoice.invoiceNumber}/${format(new Date(), 'yyyy')}`,
       entity: {
         id: customerId,
-      },
-      cseg1: {
-        id: '1',
       },
       item: {
         items: [
@@ -183,20 +215,26 @@ export class NetSuiteService {
               article.customId
             }/${format(new Date(), 'yyyy')}`,
             quantity: 1.0,
-            rate,
+            rate: item.price,
             taxRate1: item.rate,
             excludeFromRateRequest: false,
             printItems: false,
             item: {
-              id: '23',
+              id: itemId,
             },
             taxCode: {
-              id: '7',
+              id: taxRateId,
             },
           },
         ],
       },
     };
+
+    if (customSegmentId !== '0') {
+      createInvoicePayload.cseg1 = {
+        id: customSegmentId,
+      };
+    }
 
     try {
       const res = await axios({

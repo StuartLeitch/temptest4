@@ -2,12 +2,14 @@
 
 AWS_REGISTRY="496598730381.dkr.ecr.eu-west-1.amazonaws.com"
 AWS_ENVIRONMENT="dev"
-TIMESTAMP=$(date +'%d_%m_%Y_%R')
-CI_COMMIT_SHA="${USER}_${TIMESTAMP/:/_}"
+TIMESTAMP=$(date +'%d_%m_%Y_%H_%M')
+CI_COMMIT_SHA="${USER}_${TIMESTAMP}"
 
 # AFFECTED_APPS="demo-invoicing-graphql demo-invoicing-web"
 APP="invoicing-web"
 TO="${AWS_ENVIRONMENT}-${APP}"
+
+rm -r ./dist/apps/invoicing-web
 
 printf -- "Build FrontEnd App for ${AWS_ENVIRONMENT} environment"
 yarn run build invoicing-web --configuration=production

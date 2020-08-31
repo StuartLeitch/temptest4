@@ -9,6 +9,15 @@ module.exports = (nxConfig, context) => {
       global: true,
     },
   };
+  webpackConfig.module.rules[0].options.babelrcRoots = ["*"];
+  webpackConfig.module.rules[0].options.presets = ["@nrwl/web/babel"];
+  webpackConfig.module.rules[0].options.plugins = [
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-transform-runtime",
+    "universal-import"
+  ];
 
   getRollupBabelOptions(webpackConfig.module.rules[0].options);
 

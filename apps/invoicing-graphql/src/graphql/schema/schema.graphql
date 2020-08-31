@@ -47,6 +47,7 @@ enum PaymentStatus {
   PENDING
   FAILED
   COMPLETED
+  CREATED
 }
 
 type InvoiceItem @model(id: "invoice_items") {
@@ -167,6 +168,10 @@ type Payment {
   amount: Float
   datePaid: Date
   paymentMethod: PaymentMethod
+}
+
+type PayPalOrderId {
+  id: String!
 }
 
 type CreditNote {
@@ -340,27 +345,8 @@ type Mutation {
     markInvoiceAsPaid: Boolean
   ): Payment!
   createCreditNote(invoiceId: String!, createDraft: Boolean): CreditNote!
-  recordPayPalPayment(
-    paymentMethodId: String!
-    invoiceId: ID!
-    payerId: String!
-    orderId: String!
-  ): Payment!
-  migratePayment(
-    invoiceId: ID!
-    payerId: String!
-    amount: Float
-    datePaid: String
-  ): Payment!
-  migrateInvoice(
-    invoiceId: ID!
-    vatValue: Float
-    invoiceReference: Float
-    discount: Float
-    APC: Float
-    dateIssued: String
-    dateAccepted: String
-  ): Invoice
+  createPayPalOrder(invoiceId: ID!): PayPalOrderId!
+  recordPayPalPayment(invoiceId: ID!, orderId: ID!): ID!
   migrateEntireInvoice(
     acceptanceDate: String
     submissionDate: String!

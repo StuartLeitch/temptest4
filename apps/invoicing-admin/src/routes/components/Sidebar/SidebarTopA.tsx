@@ -8,7 +8,7 @@ import {
   AvatarAddOn,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
 } from '../../../components';
 import { useAuth } from '../../../contexts/Auth';
 
@@ -40,7 +40,7 @@ const SidebarTopA = () => {
                     className='fa fas fa-circle'
                     color='success'
                     key='avatar-icon-fg'
-                  />
+                  />,
                 ]}
               />
             </Sidebar.HideSlim>
@@ -58,8 +58,8 @@ const SidebarTopA = () => {
               <DropdownItem header>{name}</DropdownItem>
               <DropdownItem divider />
               <DropdownItem
-                onClick={evt => {
-                  logout();
+                onClick={(evt) => {
+                  // logout();
                 }}
               >
                 <i className='fas fa-sign-out-alt mr-2'></i>
@@ -88,7 +88,7 @@ const SidebarTopA = () => {
                 className='fa fas fa-circle'
                 color='success'
                 key='avatar-icon-fg'
-              />
+              />,
             ]}
           />
         </Sidebar.Section>

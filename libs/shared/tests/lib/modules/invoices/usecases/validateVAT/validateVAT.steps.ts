@@ -4,12 +4,11 @@ import { Given, When, Then, Before } from 'cucumber';
 // import { ValidateVATErrors } from './../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
+import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 
-import {
-  ValidateVATContext,
-  ValidateVATUsecase,
-} from '../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVAT';
+import { ValidateVATUsecase } from '../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVAT';
 import { VATService } from '../../../../../../src/lib/domain/services/VATService';
+import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 import {
@@ -28,8 +27,11 @@ import { PoliciesRegister } from '../../../../../../src/lib/modules/invoices/dom
 import { UKVATTreatmentArticleProcessingChargesPolicy } from '../../../../../../src/lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 
 const vatService: VATService = new VATService();
+
 const validateVATUsecase = new ValidateVATUsecase(vatService);
-const defaultContext: ValidateVATContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 let payer: Payer;
 let invoice: Invoice;
 let invoiceItem: InvoiceItem;
@@ -92,6 +94,7 @@ Before(() => {
     manuscriptId: 'test-manuscript',
   });
   policiesRegister = new PoliciesRegister();
+  setupVatService();
 });
 
 Given(/^The Payer is in (\w+)$/, (country: string) => {

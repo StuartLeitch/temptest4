@@ -23,7 +23,7 @@ variables:
   BT_PRIVATE_KEY: 'test-private-key'
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   # AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_APPS: 'invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
+  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
   interruptible: true
@@ -40,7 +40,7 @@ Install Dependencies:
 
 Test:
   interruptible: true
-  allow_failure: true
+  allow_failure: false
   stage: test
   # before_script: added to dockerfile.build
   #   - apt-get update
@@ -48,8 +48,9 @@ Test:
   script:
     - cd $HOME
     - mkdir report && chmod -R +x report
-    - yarn run nx run-many --target=cucumber --projects=$AFFECTED_APPS --configuration=production
+    - yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production
     - yarn run ci:coverage
+    - cp -r report $CI_PROJECT_DIR
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
@@ -62,7 +63,7 @@ Test:
 Build:
   interruptible: true
   stage: build
-  allow_failure: false
+  when: manual
   script:
     - cd $HOME
     - yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production
@@ -74,12 +75,9 @@ Build:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
 
 Package Images:dev:
   interruptible: true
-  allow_failure: false
   stage: package
   image: docker
   variables:
@@ -103,12 +101,9 @@ Package Images:dev:
     paths:
       - .ci_status
       - dist
-  only:
-    - develop
 
 Deploy:dev:
   stage: deploy
-  allow_failure: false
   dependencies:
     - Package Images:dev
   when: manual
@@ -121,6 +116,7 @@ Deploy:dev:
     COMMAND: build-manifests
   before_script:
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+    - apk add --no-cache curl
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
@@ -136,19 +132,16 @@ Deploy:dev:
   artifacts:
     paths:
       - dist-k8s
-  only:
-    - develop
-# Pages:
-#   interruptible: true
-#   stage: deploy
-#   script:
-#     - mkdir -p public
-#     - cp coverage/*.* public/
-#     - mv public/index.html public/coverage.html
-#   artifacts:
-#     paths:
-#       - public
-#   dependencies:
-#     - Test
-#   only:
-#     - develop
+Pages:
+  interruptible: true
+  stage: deploy
+  when: manual
+  script:
+    - mkdir -p public
+    - cp -r report public/
+    - mv public/index.html public/coverage.html
+  artifacts:
+    paths:
+      - report/
+  dependencies:
+    - Test

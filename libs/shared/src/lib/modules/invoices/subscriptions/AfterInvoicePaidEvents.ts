@@ -2,7 +2,7 @@ import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
-import { InvoicePaidEvent } from '../domain/events/invoicePaid';
+import { InvoicePaymentAddedEvent } from '../domain/events/invoicePaymentAdded';
 
 import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
@@ -19,7 +19,8 @@ import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getIte
 import { PublishInvoicePaidUsecase } from '../usecases/publishEvents/publishInvoicePaid';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
 
-export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
+export class AfterInvoicePaidEvent
+  implements HandleContract<InvoicePaymentAddedEvent> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -39,11 +40,13 @@ export class AfterInvoicePaidEvent implements HandleContract<InvoicePaidEvent> {
   setupSubscriptions(): void {
     DomainEvents.register(
       this.onInvoicePaidEvent.bind(this),
-      InvoicePaidEvent.name
+      InvoicePaymentAddedEvent.name
     );
   }
 
-  private async onInvoicePaidEvent(event: InvoicePaidEvent): Promise<any> {
+  private async onInvoicePaidEvent(
+    event: InvoicePaymentAddedEvent
+  ): Promise<any> {
     try {
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       let invoiceItems = invoice.invoiceItems.currentItems;

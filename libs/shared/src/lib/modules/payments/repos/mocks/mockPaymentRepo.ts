@@ -1,4 +1,5 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
 import { PaymentRepoContract } from '../paymentRepo';
 import { Payment } from '../../domain/Payment';
@@ -45,11 +46,42 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
       this._items.map((p) => {
         if (this.compareMockItems(p, payment)) {
           return Payment;
-        } else {
-          return p;
         }
+        return p;
       });
     }
+
+    return payment;
+  }
+
+  async getPaymentByForeignId(foreignPaymentId: string): Promise<Payment> {
+    const result = this._items.find(
+      (item) => item.foreignPaymentId === foreignPaymentId
+    );
+
+    if (!result) {
+      throw RepoError.createEntityNotFoundError(
+        'payment by foreignPaymentId',
+        foreignPaymentId
+      );
+    }
+
+    return result;
+  }
+
+  public async updatePayment(payment: Payment): Promise<Payment> {
+    const alreadyExists = await this.exists(payment);
+
+    if (!alreadyExists) {
+      throw RepoError.createEntityNotFoundError(
+        'payment',
+        payment.id.toString()
+      );
+    }
+
+    const index = this._items.findIndex((p) => p.id.equals(payment.id));
+
+    this._items[index] = payment;
 
     return payment;
   }

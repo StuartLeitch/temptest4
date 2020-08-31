@@ -49,7 +49,8 @@ export class Result<T> {
     this.error = error;
     this._value = value;
 
-    Object.freeze(this);
+    // Other classes extend this class, we should avoid frezing the object
+    // Object.freeze(this);
   }
 
   public getValue(): T {

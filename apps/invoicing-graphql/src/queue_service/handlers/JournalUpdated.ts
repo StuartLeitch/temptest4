@@ -13,23 +13,23 @@ export const JournalUpdatedHandler = {
   event: JOURNAL_UPDATED,
   async handler(data: JournalUpdated) {
     const {
-      repos: { catalog: catalogRepo },
+      repos: { catalog: catalogRepo, publisher: publisherRepo },
       services: { logger },
     } = this;
 
     logger.setScope(`PhenomEvent:${JOURNAL_UPDATED}`);
     logger.info(`Incoming Event Data`, data);
 
-    const addJournalUsecase = new UpdateCatalogItemToCatalogUseCase(
-      catalogRepo
+    const updateJournalUsecase = new UpdateCatalogItemToCatalogUseCase(
+      catalogRepo, publisherRepo
     );
 
-    const result = await addJournalUsecase.execute({
+    const result = await updateJournalUsecase.execute({
       // type: ??
+      currency: 'USD',
       amount: data.apc,
       created: data.created,
       updated: data.updated,
-      currency: 'USD',
       issn: data.issn,
       journalTitle: data.name,
       isActive: data.isActive,

@@ -1,41 +1,40 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
 
 import {
-  PayerMap,
+  GetInvoiceIdByManuscriptCustomIdUsecase,
+  GetInvoiceIdByManuscriptCustomIdDTO,
+  GetCreditNoteByInvoiceIdUsecase,
+  ApplyCouponToInvoiceUsecase,
+  GetPaymentMethodByIdUsecase,
+  GetItemsForInvoiceUsecase,
+  GetArticleDetailsUsecase,
+  GetInvoiceDetailsUsecase,
+  GetRecentInvoicesUsecase,
+  CreateCreditNoteUsecase,
+  GetInvoiceDetailsDTO,
+  PaymentMethodMap,
+  InvoiceItemMap,
   TransactionMap,
+  UniqueEntityID,
+  InvoiceItemId,
+  ArticleMap,
+  InvoiceMap,
+  PaymentMap,
+  CouponMap,
   InvoiceId,
   JournalId,
-  ArticleMap,
-  UniqueEntityID,
-  InvoiceItemMap,
-  GetInvoiceDetailsDTO,
-  GetInvoiceDetailsUsecase,
-  GetArticleDetailsUsecase,
-  GetItemsForInvoiceUsecase,
+  WaiverMap,
+  PayerMap,
   Roles,
-  InvoiceItemId,
 } from '@hindawi/shared';
-import { CouponMap } from './../../../../../libs/shared/src/lib/modules/coupons/mappers/CouponMap';
-
-import { GetRecentInvoicesUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
-import { MigrateInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/migrateInvoice/migrateInvoice';
-import { ApplyCouponToInvoiceUsecase } from './../../../../../libs/shared/src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
-import { GetInvoiceIdByManuscriptCustomIdDTO } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
-import { CreateCreditNoteUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/createCreditNote/createCreditNote';
-import { GetCreditNoteByInvoiceIdUsecase } from './../../../../../libs/shared/src/lib/modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
-import { WaiverMap } from 'libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
-import { PaymentMap } from './../../../../../libs/shared/src/lib/modules/payments/mapper/Payment';
-import { PaymentMethodMap } from './../../../../../libs/shared/src/lib/modules/payments/mapper/PaymentMethod';
-import { InvoiceMap } from './../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
-import { GetPaymentMethodByIdUsecase } from './../../../../../libs/shared/src/lib/modules/payments/usecases/getPaymentMethodById/getPaymentMethodById';
+
+import { Context } from '../../builders';
 
 import { env } from '../../env';
 
-export const invoice: Resolvers<any> = {
+export const invoice: Resolvers<Context> = {
   Query: {
     async invoice(parent, args, context) {
       const { repos } = context;
@@ -52,6 +51,8 @@ export const invoice: Resolvers<any> = {
       const result = await usecase.execute(request, usecaseContext);
 
       if (result.isLeft()) {
+        const err = result.value.errorValue();
+        context.services.logger.error(err.message, err);
         return undefined;
       }
 
@@ -493,57 +494,6 @@ export const invoice: Resolvers<any> = {
       }
 
       return CouponMap.toPersistence(result.value.getValue());
-    },
-    async migrateInvoice(parent, args, context) {
-      const {
-        repos: { invoice: invoiceRepo, invoiceItem: invoiceItemRepo },
-      } = context;
-      const {
-        invoiceId,
-        vatValue,
-        invoiceReference,
-        discount,
-        APC,
-        dateIssued,
-        dateAccepted,
-      } = args;
-
-      const migrateInvoiceUsecase = new MigrateInvoiceUsecase(
-        invoiceRepo,
-        invoiceItemRepo
-      );
-      const usecaseContext = { roles: [Roles.PAYER] };
-
-      const result = await migrateInvoiceUsecase.execute(
-        {
-          invoiceId,
-          vatValue,
-          invoiceReference: String(invoiceReference),
-          discount,
-          APC,
-          dateIssued,
-          dateAccepted,
-        },
-        usecaseContext
-      );
-
-      if (result.isLeft()) {
-        return null;
-      }
-
-      const migratedInvoice = result.value.getValue();
-
-      return {
-        invoiceId: migratedInvoice.invoiceId.id.toString(),
-        referenceNumber: migratedInvoice.invoiceNumber,
-        dateIssued: migratedInvoice?.dateIssued?.toISOString(),
-        dateAccepted: migratedInvoice?.dateAccepted?.toISOString(),
-        // paymentMethodId: migratedPayment.paymentMethodId.id.toString(),
-        // datePaid: migratedPayment.datePaid.toISOString(),
-        // amount: migratedPayment.amount.value,
-        // invoiceId: migratedPayment.invoiceId.id.toString(),
-        // foreignPaymentId: migratedPayment.foreignPaymentId
-      };
     },
     async createCreditNote(parent, args, context) {
       const {

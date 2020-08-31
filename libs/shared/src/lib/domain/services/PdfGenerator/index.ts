@@ -1,4 +1,5 @@
-import { PdfGeneratorService, InvoicePayload } from './PdfGenerator';
+import { PdfGeneratorService } from './PdfGenerator';
+import type { InvoicePayload } from './PdfGenerator';
 
 export { PdfGeneratorService, InvoicePayload };
 

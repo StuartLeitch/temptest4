@@ -52,7 +52,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
-    private erpService: ErpServiceContract,
+    private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private loggerService: any
   ) {
@@ -66,7 +66,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.publisherRepo,
-      this.erpService,
+      this.sageService,
       this.netSuiteService,
       this.loggerService
     );
@@ -122,12 +122,16 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        return left(new AppError.UnexpectedError(errs));
+        console.log(JSON.stringify(errs, null, 2));
+        return left(
+          new AppError.UnexpectedError(errs, JSON.stringify(errs, null, 2))
+        );
       }
 
       return right(Result.ok<ErpResponse[]>(updatedInvoices));
     } catch (err) {
-      return left(new AppError.UnexpectedError(err));
+      console.log(err);
+      return left(new AppError.UnexpectedError(err, err.toString()));
     }
   }
 }

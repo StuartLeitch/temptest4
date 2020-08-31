@@ -6,7 +6,7 @@ import {
 } from 'microframework-w3tec';
 
 import { LoggerBuilder } from './../../../../libs/shared/src/lib/infrastructure/logging/LoggerBuilder';
-import { ErpService } from '../services/erp';
+import { SageService } from '../services/erp';
 import { NetSuiteService } from './../services/erp/NetSuiteService';
 
 import { env } from '../env';
@@ -28,7 +28,10 @@ export const erpLoader: MicroframeworkLoader = async (
       tokenSecret: env.netSuite.tokenSecret,
     },
   });
-  const sageService = new ErpService(loggerBuilder.getLogger(), env.salesForce);
+  const sageService = new SageService(
+    loggerBuilder.getLogger(),
+    env.salesForce
+  );
 
   if (settings) {
     const context = settings.getData('context');

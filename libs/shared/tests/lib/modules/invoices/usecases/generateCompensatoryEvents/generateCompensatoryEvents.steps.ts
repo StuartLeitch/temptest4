@@ -1,8 +1,12 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from 'cucumber';
 
+import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 import { PublishMessage } from './../../../../../../src/lib/domain/services/sqs/PublishMessage';
-import { LoggerContract, MockLogger } from './../../../../../../src/lib/infrastructure/logging';
+import {
+  LoggerContract,
+  MockLogger,
+} from './../../../../../../src/lib/infrastructure/logging';
 import { SQSPublishServiceContract } from './../../../../../../src/lib/domain/services/SQSPublishService';
 
 import { MockPaymentMethodRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
@@ -15,8 +19,7 @@ import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoice
 import { MockPayerRepo } from './../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 
-
-import { GenerateCompensatoryEventsContext, GenerateCompensatoryEventsUsecase } from './../../../../../../src/lib/modules/invoices/usecases/generateCompensatoryEvents/generateCompensatoryEvents';
+import { GenerateCompensatoryEventsUsecase } from './../../../../../../src/lib/modules/invoices/usecases/generateCompensatoryEvents/generateCompensatoryEvents';
 
 import {
   addBillingAddresses,
@@ -53,12 +56,12 @@ let mockPayerRepo: MockPayerRepo;
 let loggerService: LoggerContract;
 
 let useCase: GenerateCompensatoryEventsUsecase;
-let context: GenerateCompensatoryEventsContext;
+let context: UsecaseAuthorizationContext;
 
 let payload;
 let event;
 
-Before(function() {
+Before(function () {
   mockSqsPublishService = new MockSQSPublishService();
   mockPaymentMethodRepo = new MockPaymentMethodRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
@@ -100,48 +103,54 @@ Before(function() {
   );
 });
 
-Given("There is an Invoice marked as FINAL", async function() {
-  payload = { invoiceId: '1'};
+Given('There is an Invoice marked as FINAL', async function () {
+  payload = { invoiceId: '1' };
 });
 
-Given("There is an Invoice marked as DRAFT with NO acceptance date", async function() {
-  payload = { invoiceId: '2'};
+Given(
+  'There is an Invoice marked as DRAFT with NO acceptance date',
+  async function () {
+    payload = { invoiceId: '2' };
+  }
+);
+
+Given(
+  'There is an Invoice marked as DRAFT with acceptance date',
+  async function () {
+    payload = { invoiceId: '5' };
+  }
+);
+
+Given(
+  'There is an Invoice marked as ACTIVE with acceptance date and issued date',
+  async function () {
+    payload = { invoiceId: '3' };
+  }
+);
+
+Given('There is an Invoice marked as PENDING', async function () {
+  payload = { invoiceId: '4' };
 });
 
-Given("There is an Invoice marked as DRAFT with acceptance date", async function() {
-  payload = { invoiceId: '5'};
+Given('There is a Credit Note', async function () {
+  payload = { invoiceId: '7' };
 });
 
-Given("There is an Invoice marked as ACTIVE with acceptance date and issued date", async function() {
-  payload = { invoiceId: '3'};
+When('I try to generate a compensatory event', async function () {
+  await useCase.execute(payload, context);
 });
 
-Given("There is an Invoice marked as PENDING", async function() {
-  payload = { invoiceId: '4'};
-});
-
-Given("There is a Credit Note", async function() {
-  payload = { invoiceId: '7'};
-});
-
-When("I try to generate a compensatory event", async function() {
-   await useCase.execute(
-    payload,
-    context
+Then(/^It should send an (.+) Event$/, async function (eventName: string) {
+  event = mockSqsPublishService.messages.find(
+    (message) => message.event === eventName
   );
-});
-
-Then(/^It should send an (.+) Event$/, async function (
-  eventName: string
-) {
-  event = mockSqsPublishService.messages.find(message => message.event === eventName);
   expect(Object.keys(event).length).to.be.greaterThan(0);
 });
 
-Then("No Credit Note is created", async function() {
+Then('No Credit Note is created', async function () {
   expect(event.data.isCreditNote).to.equal(false);
 });
 
-Then("It should not send any event", async function() {
+Then('It should not send any event', async function () {
   expect(mockSqsPublishService.messages.length).to.equal(0);
 });

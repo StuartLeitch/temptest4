@@ -1,3 +1,5 @@
-import { RawEvent } from 'libs/shared/src/lib/infrastructure/RawEvent';
-
-export type Event = RawEvent;
+export interface Event {
+  MessageAttributes: Record<string, any>;
+  MessageId: string;
+  Message: string;
+}

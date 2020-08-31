@@ -7,6 +7,8 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
+import { LoggerContract } from '../../../../infrastructure/logging';
+
 import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
@@ -74,7 +76,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     private waiverService: WaiverService,
     private emailService: EmailService,
     private vatService: VATService,
-    private loggerService: any
+    private loggerService: LoggerContract
   ) {}
 
   private async getAccessControlContext(request, context?) {

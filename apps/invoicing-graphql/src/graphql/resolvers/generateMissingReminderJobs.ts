@@ -7,9 +7,11 @@ import {
 
 import { Resolvers } from '../schema';
 
+import { Context } from '../../builders';
+
 import { env } from '../../env';
 
-export const generateMissingReminderJobs: Resolvers<any> = {
+export const generateMissingReminderJobs: Resolvers<Context> = {
   Mutation: {
     async generateMissingReminderJobs(parent, args, context) {
       const {
@@ -39,6 +41,7 @@ export const generateMissingReminderJobs: Resolvers<any> = {
 
       const maybeResult = await usecase.execute(
         {
+          creditControlDisabled: env.scheduler.pauseCreditControlReminders,
           creditControlDelay: env.scheduler.creditControlReminderDelay,
           confirmationDelay: env.scheduler.confirmationReminderDelay,
           confirmationQueueName: env.scheduler.emailRemindersQueue,

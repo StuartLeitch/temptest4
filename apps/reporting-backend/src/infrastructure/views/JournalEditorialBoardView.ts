@@ -5,7 +5,7 @@ import {
 } from './contracts/EventViewContract';
 import journalsView from './JournalsView';
 import journalSectionsView from './JournalSectionsView';
-import journalSpecialIssuesView from './JournalSpecialIssuesDataView';
+import journalSpecialIssuesDataView from './JournalSpecialIssuesDataView';
 
 class JournalEditorialBoardView extends AbstractEventView
   implements EventViewContract {
@@ -68,7 +68,7 @@ SELECT
 	jsi.special_issue_name,
 	jsi.editors_json AS editors
 FROM
-	${journalSpecialIssuesView.getViewName()} jsi) j,
+	${journalSpecialIssuesDataView.getViewName()} jsi) j,
 	jsonb_to_recordset(j.editors) AS editor_view ("expiredDate" text,
 		"invitedDate" text,
 		"removedDate" text,
@@ -108,6 +108,6 @@ const journalEditorialBoardView = new JournalEditorialBoardView();
 
 journalEditorialBoardView.addDependency(journalsView);
 journalEditorialBoardView.addDependency(journalSectionsView);
-journalEditorialBoardView.addDependency(journalSpecialIssuesView);
+journalEditorialBoardView.addDependency(journalSpecialIssuesDataView);
 
 export default journalEditorialBoardView;

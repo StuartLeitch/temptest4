@@ -1,62 +1,47 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // * Core Domain
-import { Result, left, right } from '../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { AppError } from '../../../../core/logic/AppError';
+import { left } from '../../../../core/logic/Either';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../domain/authorization';
 
 // * Usecase specific
-import { BraintreeGateway } from './../../infrastructure/gateways/braintree/gateway';
-import { Braintree } from './../../domain/strategies/Braintree';
-import { BraintreePayment } from '../../domain/strategies/BrainTreePayment';
-import { PaymentFactory } from './../../domain/strategies/PaymentFactory';
-import { PaymentClientToken } from './../../../../domain/PaymentClientToken';
+import {
+  PaymentStrategySelection,
+  PaymentStrategyFactory,
+} from '../../domain/strategies/payment-strategy-factory';
 
-import { GenerateClientTokenResponse } from './generateClientTokenResponse';
-import { GenerateClientTokenErrors } from './generateClientTokenErrors';
+import { GenerateClientTokenResponse as Response } from './generateClientToken.response';
+import { GenerateClientTokenDTO as DTO } from './generateClientToken.dto';
 
 export class GenerateClientTokenUsecase
   implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<GenerateClientTokenResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      Record<string, unknown>,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  public async execute(
-    request: { merchantAccountId: string },
-    context?: UsecaseAuthorizationContext
-  ): Promise<GenerateClientTokenResponse> {
-    const braintree = new Braintree();
-    const paymentFactory = new PaymentFactory();
-    paymentFactory.registerPayment(braintree);
-    const braintreePayment = new BraintreePayment(BraintreeGateway);
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  constructor(private strategyFactory: PaymentStrategyFactory) {}
+
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    const strategy = await this.strategyFactory.getStrategy(
+      PaymentStrategySelection.Braintree
+    );
 
     try {
-      const tokenGenerated: any = await braintreePayment.generateClientToken(
-        request.merchantAccountId
+      const result = await strategy.createClientToken();
+      return result;
+    } catch (e) {
+      return left(
+        new UnexpectedError(
+          e,
+          'While generating the braintree client token error ocurred'
+        )
       );
-
-      if (tokenGenerated.isFailure) {
-        return left(new GenerateClientTokenErrors.ClientTokenNotGenerated());
-      }
-
-      const token = tokenGenerated.getValue();
-
-      return right(Result.ok<PaymentClientToken>(token));
-    } catch (err) {
-      return left(new AppError.UnexpectedError(err));
     }
   }
 }

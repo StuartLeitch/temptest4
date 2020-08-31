@@ -1,0 +1,7 @@
+export enum PayPalStatus {
+  COMPLETED = 'COMPLETED',
+  APPROVED = 'APPROVED',
+  CREATED = 'CREATED',
+  VOIDED = 'VOIDED',
+  SAVED = 'SAVED',
+}

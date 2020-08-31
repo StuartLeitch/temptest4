@@ -26,130 +26,116 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
   invoice,
   netCharges,
   vatAmount,
-  totalCharges
+  totalCharges,
 }) => {
-
   const invoiceDetails = () => (
     <>
       <CardTitle tag='h6' className='d-flex'>
-      Invoice: Details
-      <a
-        target='_blank'
-        rel='noopener noreferrer'
-        href={`${Config.feRoot}/payment-details/${invoiceId}`}
-        className='ml-auto'
+        Invoice: Details
+        <a
+          target='_blank'
+          rel='noopener noreferrer'
+          href={`${Config.feRoot}/payment-details/${invoiceId}`}
+          className='ml-auto'
+        >
+          {
+            <span className='font-weight-normal text-underlined text-blue'>
+              <u>#{invoiceId}</u>
+            </span>
+          }
+        </a>
+      </CardTitle>
+      <Form
+        style={{
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexDirection: 'row',
+          display: 'flex',
+        }}
       >
-        {
-          <span className='font-weight-normal text-underlined text-blue'>
-            <u>#{invoiceId}</u>
-          </span>
-        }
-      </a>
-    </CardTitle>
-    <Form
-      style={{
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        flexDirection: 'row',
-        display: 'flex',
-      }}
-    >
-      <div style={{ flex: 1 }} className='mr-2'>
-        <FormGroup row>
-          <Label sm={5}>Invoice Issue Date</Label>
-          <Col sm={7}>
-            <DatePicker
-              customInput={<ButtonInput />}
-              selected={new Date(invoice.dateIssued)}
-              onChange={() => ({})}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Label sm={5}>Date of Supply</Label>
-          <Col sm={7}>
-            <DatePicker
-              readOnly
-              customInput={<ButtonInput />}
-              selected={Date.now()}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Label for='staticText' sm={5}>
-            Terms
-          </Label>
-          <Col sm={7}>
-            <Input
-              readOnly
-              plaintext
-              value='Payable upon Receipt'
-            />
-          </Col>
-        </FormGroup>
-        {invoice.creditNote && (
+        <div style={{ flex: 1 }} className='mr-2'>
           <FormGroup row>
-            <Label for='staticText' sm={12}>
-              Credit Note
-              <Link
-                to={`/credit-notes/details/${invoice.creditNote.invoiceId}`}
-              >
-                {
-                  <span className='ml-1 font-weight-bold text-warning'>
-                    Credit Note #
-                    {invoice.creditNote.referenceNumber}
-                  </span>
-                }
-              </Link>
-            </Label>
+            <Label sm={5}>Invoice Issue Date</Label>
+            <Col sm={7}>
+              <DatePicker
+                customInput={<ButtonInput />}
+                selected={new Date(invoice.dateIssued)}
+                onChange={() => ({})}
+              />
+            </Col>
           </FormGroup>
-        )}
-      </div>
-      <div style={{ flex: 1 }} className='ml-2'>
-        <FormGroup row>
-          <Label for='staticText' sm={5}>
-            Ref. Number
-          </Label>
-          <Col sm={7}>
-            <Input
-              plaintext
-              readOnly
-              value={invoice.referenceNumber}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Label for='staticText' sm={5}>
-            ERP Reference
-          </Label>
-          <Col sm={7}>
-            <Input
-              plaintext
-              readOnly
-              value={invoice.erpReference}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Label for='staticText' sm={5}>
-            Rev. Rec. ERP Ref.
-          </Label>
-          <Col sm={7}>
-            <Input
-              plaintext
-              readOnly
-              value={invoice.revenueRecognitionReference}
-            />
-          </Col>
-        </FormGroup>
-      </div>
-    </Form>
-  </>
-  )
+          <FormGroup row>
+            <Label sm={5}>Date of Supply</Label>
+            <Col sm={7}>
+              <DatePicker
+                readOnly
+                customInput={<ButtonInput />}
+                selected={Date.now()}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Label for='staticText' sm={5}>
+              Terms
+            </Label>
+            <Col sm={7}>
+              <Input readOnly plaintext value='Payable upon Receipt' />
+            </Col>
+          </FormGroup>
+          {invoice.creditNote && (
+            <FormGroup row>
+              <Label for='staticText' sm={12}>
+                Credit Note
+                <Link
+                  to={`/credit-notes/details/${invoice.creditNote.invoiceId}`}
+                >
+                  {
+                    <span className='ml-1 font-weight-bold text-warning'>
+                      Credit Note #{invoice.creditNote.referenceNumber}
+                    </span>
+                  }
+                </Link>
+              </Label>
+            </FormGroup>
+          )}
+        </div>
+        <div style={{ flex: 1 }} className='ml-2'>
+          <FormGroup row>
+            <Label for='staticText' sm={5}>
+              Ref. Number
+            </Label>
+            <Col sm={7}>
+              <Input plaintext readOnly value={invoice.referenceNumber} />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Label for='staticText' sm={5}>
+              ERP Reference
+            </Label>
+            <Col sm={7}>
+              <Input plaintext readOnly value={invoice.erpReference} />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Label for='staticText' sm={5}>
+              Rev. Rec. ERP Ref.
+            </Label>
+            <Col sm={7}>
+              <Input
+                plaintext
+                readOnly
+                value={invoice.revenueRecognitionReference}
+              />
+            </Col>
+          </FormGroup>
+        </div>
+      </Form>
+    </>
+  );
 
   const invoiceCharges = () => (
     <>
-          <CardTitle tag='h6' className='mt-5 mb-4'>
+      <CardTitle tag='h6' className='mt-5 mb-4'>
         Invoice: Charges
       </CardTitle>
       <Table className='mb-0' responsive>
@@ -191,10 +177,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
           {invoice?.invoiceItem?.coupons?.length > 0 &&
             invoice.invoiceItem.coupons.map((coupon, index) => (
               <tr key={index}>
-                <td
-                  colSpan={2}
-                  style={{ borderTop: 'none' }}
-                ></td>
+                <td colSpan={2} style={{ borderTop: 'none' }}></td>
                 <td
                   className='align-middle text-right'
                   style={{ borderTop: 'none' }}
@@ -204,9 +187,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                   </Badge>
                 </td>
                 <td>
-                  <span className='small mt-2'>
-                    {coupon.code}
-                  </span>
+                  <span className='small mt-2'>{coupon.code}</span>
                   <span className='text-muted px-2'>
                     (&ndash;{coupon.reduction}%)
                   </span>
@@ -214,9 +195,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                 <td className='align-middle text-right text-dark font-weight-bold'>
                   &ndash;
                   {numeral(
-                    (invoice.invoiceItem.price *
-                      coupon.reduction) /
-                      100
+                    (invoice.invoiceItem.price * coupon.reduction) / 100
                   ).format('$0.00')}
                 </td>
               </tr>
@@ -224,10 +203,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
           {invoice?.invoiceItem?.waivers?.length > 0 &&
             invoice.invoiceItem.waivers.map((waiver) => (
               <tr>
-                <td
-                  colSpan={2}
-                  style={{ borderTop: 'none' }}
-                ></td>
+                <td colSpan={2} style={{ borderTop: 'none' }}></td>
                 <td
                   className='align-middle text-right'
                   style={{ borderTop: 'none' }}
@@ -237,18 +213,14 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                   </Badge>
                 </td>
                 <td>
-                  <span className='small mt-2'>
-                    {waiver.type_id}
-                  </span>
+                  <span className='small mt-2'>{waiver.type_id}</span>
                   <span className='text-muted px-2'>
                     (&ndash;{waiver.reduction}%)
                   </span>
                 </td>
                 <td className='align-middle text-right text-dark font-weight-bold'>
                   {numeral(
-                    (waiver.reduction / 100) *
-                      invoice.invoiceItem.price *
-                      -1
+                    (waiver.reduction / 100) * invoice.invoiceItem.price * -1
                   ).format('$0.00')}
                 </td>
               </tr>
@@ -288,17 +260,23 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
         </tbody>
       </Table>
     </>
-  )
+  );
+
+  const paymentStatusColor = (status: string) => {
+    if (status === 'PENDING') return 'info';
+    if (status === 'COMPLETED') return 'success';
+    if (status === 'FAILED') return 'danger';
+    if (status === 'CREATED') return 'secondary';
+    return '';
+  };
 
   const invoicePayments = () => (
     <>
-          <CardTitle tag='h6' className='mt-5 mb-4'>
+      <CardTitle tag='h6' className='mt-5 mb-4'>
         Invoice: Payments
       </CardTitle>
       {invoice?.payments?.length === 0 && (
-        <span className='medium text-muted'>
-          No payments processed yet.
-        </span>
+        <span className='medium text-muted'>No payments processed yet.</span>
       )}
       {invoice?.payments?.length > 0 &&
         invoice?.payments?.map((payment) => {
@@ -322,18 +300,16 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                   className={`fa-fw text-primary mr-2 ${paymentMethodClassName}`}
                 ></i>
                 {` ${paymentMethod}`}
-                <span className='small ml-1 text-muted'>
-                  payment method
-                </span>
+                <span className='small ml-1 text-muted'>payment method</span>
               </h6>
               <Row tag='dl'>
                 <dt className='col-sm-4'>Status</dt>
                 <dd className='col-sm-8'>
-                  <strong>
-                    <mark className='pl-2 pr-2 text-info'>
+                  <h5>
+                    <Badge pill color={paymentStatusColor(payment?.status)}>
                       {payment?.status}
-                    </mark>
-                  </strong>
+                    </Badge>
+                  </h5>
                 </dd>
 
                 <dt className='col-sm-4'>Payer</dt>
@@ -343,16 +319,13 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                     <a href={`mailto:${invoice?.payer?.email}`}>
                       {invoice?.payer?.email}
                     </a>
-                    ))
+                    )
                   </samp>
                 </dd>
 
                 <dt className='col-sm-4'>Paid Date</dt>
                 <dd className='col-sm-8 text-inverse'>
-                  {format(
-                    new Date(payment?.datePaid),
-                    'dd MMMM yyyy'
-                  )}
+                  {format(new Date(payment?.datePaid), 'dd MMMM yyyy')}
                 </dd>
                 <dt className='col-sm-4'>Amount</dt>
                 <dd className='col-sm-8 text-inverse'>
@@ -368,17 +341,18 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
           );
         })}
     </>
-  )
+  );
 
   return (
-  <Card body className='border-top-0'>
-    <CardBody>
-      {invoiceDetails()}
-      {invoiceCharges()}
-      {invoicePayments()}
-    </CardBody>
-  </Card>
-)}
+    <Card body className='border-top-0'>
+      <CardBody>
+        {invoiceDetails()}
+        {invoiceCharges()}
+        {invoicePayments()}
+      </CardBody>
+    </Card>
+  );
+};
 
 interface InvoiceDetailsTabProps {
   invoiceId: string;

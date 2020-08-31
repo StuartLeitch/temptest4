@@ -6,7 +6,7 @@ import {
 import authorsView from './AuthorsView';
 import invoicesView from './InvoicesView';
 import journalSectionsView from './JournalSectionsView';
-import journalSpecialIssuesView from './JournalSpecialIssuesDataView';
+import journalSpecialIssuesView from './JournalSpecialIssuesView';
 import manuscriptEditorsView from './ManuscriptEditorsView';
 import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';
@@ -28,7 +28,6 @@ AS SELECT
   last_sd.event_timestamp as last_event_date,
   sd.event_timestamp as final_decision_date,
   sd.submission_event as final_decision_type,
-  case when sd.submission_event = 'SubmissionQualityCheckPassed' then sd.event_timestamp else null end as accepted_date,
   case 
     when i.apc is not null then i.apc
     when s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') then 'free'
@@ -55,6 +54,13 @@ AS SELECT
   END AS issue_type,
   spec.special_issue_name as "special_issue",
   spec.special_issue_custom_id as "special_issue_custom_id",
+  spec.open_date as "special_issue_open_date",
+  spec.closed_date as "special_issue_closed_date",
+  spec.lead_guest_editor_name as "si_lead_guest_editor_name",
+  spec.lead_guest_editor_email as "si_lead_guest_editor_email",
+  spec.lead_guest_editor_affiliation as "si_lead_guest_editor_affiliation",
+  spec.lead_guest_editor_country as "si_lead_guest_editor_country",
+  spec.editor_count as "si_guest_editor_count",
   sec.section_name as "section",
   concat(a.given_names, ' ', a.surname) as corresponding_author, a.email as corresponding_author_email, a.country as corresponding_author_country, a.aff as corresponding_author_affiliation,
   concat(a2.given_names, ' ', a2.surname) as submitting_author, a2.email as submitting_author_email, a2.country as submitting_author_country, a2.aff as submitting_author_affiliation,
@@ -65,6 +71,7 @@ AS SELECT
   screener.checker_email as screener_email,
   quality_checker.checker_name as quality_checker_name,
   quality_checker.checker_email as quality_checker_email,
+  coalesce(s.screening_paused_date, '01-01-1900'::TIMESTAMP) > coalesce(s.screening_unpaused_date, '01-01-1901'::TIMESTAMP) as is_paused,
   reviewers.invited_reviewers_count,
   reviewers.last_reviewer_invitation_date,
   accepted_reviewers.accepted_reviewers_count,

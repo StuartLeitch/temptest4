@@ -128,7 +128,7 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     super(props, id);
   }
 
-  public calculatePrice(withReductions?: Reduction<unknown>[]) {
+  public calculateNetPrice(withReductions?: Reduction<unknown>[]): number {
     const reductions: Reduction<unknown>[] = [];
     if (this.coupons) {
       reductions.push(...this.coupons.getItems());
@@ -150,5 +150,39 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     }
 
     return this.price - (totalDiscount * this.price) / 100;
+  }
+
+  public calculateDiscount(withReductions?: Reduction<unknown>[]): number {
+    const reductions: Reduction<unknown>[] = [];
+    if (this.coupons) {
+      reductions.push(...this.coupons.getItems());
+    }
+    if (this.waivers) {
+      reductions.push(...this.waivers);
+    }
+    if (withReductions) {
+      reductions.push(...withReductions);
+    }
+
+    const totalDiscount = reductions.reduce(
+      (acc, curr) => acc + curr.reduction,
+      0
+    );
+
+    if (totalDiscount >= 100) return this.price;
+
+    return (totalDiscount * this.price) / 100;
+  }
+
+  public calculateVat(withReductions?: Reduction<unknown>[]): number {
+    const net = this.calculateNetPrice(withReductions);
+
+    return (this.vat * net) / 100;
+  }
+
+  public calculateTotalPrice(withReductions?: Reduction<unknown>[]): number {
+    const net = this.calculateNetPrice(withReductions);
+
+    return net + (net * this.vat) / 100;
   }
 }

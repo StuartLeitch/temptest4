@@ -7,8 +7,7 @@ import { Result } from '../../../core/logic/Result';
 import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
-import { InvoiceSentEvent } from './events/invoiceSent';
-import { InvoicePaidEvent } from './events/invoicePaid';
+import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
@@ -26,6 +25,10 @@ export enum InvoiceStatus {
   FINAL = 'FINAL', // after a resolution has been set: either it was paid, it was waived, or it has been considered bad debt
 }
 
+function twoDigitPrecision(n: number): number {
+  return Number.parseFloat(n.toFixed(2));
+}
+
 interface InvoiceProps {
   status: InvoiceStatus;
   invoiceNumber?: string;
@@ -40,6 +43,7 @@ interface InvoiceProps {
   charge?: number;
   totalNumInvoiceItems?: number;
   erpReference?: string;
+  nsReference?: string;
   revenueRecognitionReference?: string;
   cancelledInvoiceReference?: string;
   vatnote?: string;
@@ -157,6 +161,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.revenueRecognitionReference = revenueRecognitionReference;
   }
 
+  get nsReference(): string {
+    return this.props.nsReference;
+  }
+
+  set nsReference(nsReference: string) {
+    this.props.nsReference = nsReference;
+  }
+
   get cancelledInvoiceReference(): string {
     return this.props.cancelledInvoiceReference;
   }
@@ -173,6 +185,22 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get invoiceTotal(): number {
     return this.getInvoiceTotal();
+  }
+
+  get invoiceNetTotal(): number {
+    return this.getInvoiceNetTotal();
+  }
+
+  get invoiceVatTotal(): number {
+    return this.getInvoiceVatTotal();
+  }
+
+  get invoiceDiscountTotal(): number {
+    return this.getInvoiceDiscountTotal();
+  }
+
+  get netTotalBeforeDiscount(): number {
+    return this.getInvoiceNetTotalBeforeDiscount();
   }
 
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
@@ -227,13 +255,9 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return Result.ok<Invoice>(invoice);
   }
 
-  public generateCreatedEvent() {
+  public generateCreatedEvent(): void {
     const now = new Date();
     this.addDomainEvent(new InvoiceCreated(this, now));
-  }
-
-  public send(): void {
-    this.addDomainEvent(new InvoiceSentEvent(this.invoiceId, new Date()));
   }
 
   public markAsActive(): void {
@@ -244,11 +268,13 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.addDomainEvent(new InvoiceConfirmed(this, now));
   }
 
-  public markAsPaid(paymentId: PaymentId): void {
+  public paymentAdded(paymentId: PaymentId): void {
     const now = new Date();
     this.props.dateUpdated = now;
-    this.props.status = InvoiceStatus.FINAL;
-    this.addDomainEvent(new InvoicePaidEvent(this.invoiceId, paymentId, now));
+    // this.props.status = InvoiceStatus.FINAL;
+    this.addDomainEvent(
+      new InvoicePaymentAddedEvent(this.invoiceId, paymentId, now)
+    );
   }
 
   public markAsFinal(): void {
@@ -269,9 +295,53 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       );
     }
 
-    return this.invoiceItems.reduce(
-      (acc, item) => acc + item.calculatePrice(),
-      0
+    return twoDigitPrecision(
+      this.invoiceItems.reduce(
+        (acc, item) => acc + item.calculateTotalPrice(),
+        0
+      )
+    );
+  }
+
+  public getInvoiceDiscountTotal(): number {
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return twoDigitPrecision(
+      this.invoiceItems.reduce((acc, item) => acc + item.calculateDiscount(), 0)
+    );
+  }
+
+  public getInvoiceNetTotalBeforeDiscount(): number {
+    return twoDigitPrecision(
+      this.getInvoiceNetTotal() + this.getInvoiceDiscountTotal()
+    );
+  }
+
+  public getInvoiceVatTotal(): number {
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return twoDigitPrecision(
+      this.invoiceItems.reduce((acc, item) => acc + item.calculateVat(), 0)
+    );
+  }
+
+  public getInvoiceNetTotal(): number {
+    if (this.invoiceItems.length == 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return twoDigitPrecision(
+      this.invoiceItems.reduce((acc, item) => acc + item.calculateNetPrice(), 0)
     );
   }
 

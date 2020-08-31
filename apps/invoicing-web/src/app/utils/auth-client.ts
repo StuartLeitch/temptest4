@@ -3,7 +3,7 @@ import Keycloak from "keycloak-js";
 import { config } from "../../config";
 
 class _AuthClient {
-  private kc: Keycloak.KeycloakInstance<"native">;
+  private kc: Keycloak.KeycloakInstance;
   public authState: any = {
     isAuthenticated: false,
     user: null,
@@ -16,7 +16,7 @@ class _AuthClient {
       clientId: config.authServerClientId,
     };
 
-    this.kc = Keycloak<"native">(kcConfig);
+    this.kc = Keycloak(kcConfig);
     this.kc.onAuthSuccess = () => this.handleAuthSuccess();
     this.kc.onAuthError = () => this.handleAuthError();
   }
