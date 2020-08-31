@@ -566,7 +566,10 @@ export class NetSuiteService implements ErpServiceContract {
       //   new Date(invoice.dateCreated),
       //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       // ), // '2020-07-01T12:00:12.857Z',
-      tranId: `CN-${creditNote.invoiceNumber}/${format(new Date(), 'yyyy')}`,
+      tranId: `CN-${creditNote.invoiceNumber}/${format(
+        new Date(creditNote.dateCreated),
+        'yyyy'
+      )}`,
 
       // entity: {
       //   id: customerId,
