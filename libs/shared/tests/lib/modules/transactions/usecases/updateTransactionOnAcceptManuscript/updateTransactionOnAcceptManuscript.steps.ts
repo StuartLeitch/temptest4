@@ -44,12 +44,10 @@ import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/rep
 import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
 import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
 import { VATService } from '../../../../../../src/lib/domain/services/VATService';
-
-import { UpdateTransactionContext } from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptAuthorizationContext';
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { AddressRepoContract } from '../../../../../../src/lib/modules/addresses/repos/addressRepo';
 
-const defaultContext: UpdateTransactionContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext = { roles: [Roles.SUPER_ADMIN] };
 
 const mockTransactionRepo: TransactionRepoContract = new MockTransactionRepo();
 const mockInvoiceRepo: InvoiceRepoContract = new MockInvoiceRepo();
