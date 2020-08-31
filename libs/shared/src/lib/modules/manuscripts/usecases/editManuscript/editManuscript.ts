@@ -103,6 +103,10 @@ export class EditManuscriptUsecase
         manuscript.authorFirstName = request.authorFirstName;
       }
 
+      if (request.arxivId) {
+        manuscript.arxivId = request.arxivId;
+      }
+
       await this.manuscriptRepo.update(manuscript);
 
       return right(Result.ok<Manuscript>(manuscript));

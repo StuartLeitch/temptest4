@@ -8,4 +8,5 @@ export interface EditManuscriptDTO {
   authorCountry?: string;
   authorSurname?: string;
   authorFirstName?: string;
+  arxivId?: string;
 }
