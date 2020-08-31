@@ -6,6 +6,7 @@ import {
   MicroframeworkSettings,
 } from 'microframework-w3tec';
 
+import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
 import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
@@ -13,6 +14,7 @@ import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/
 import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
+import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
@@ -56,35 +58,55 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       },
     } = context;
 
-    const publishInvoiceToErpUsecase = new PublishInvoiceToErpUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      erpService,
-      netSuiteService,
-      publisher,
-      loggerService
-    );
+    const publishInvoiceToErpUsecase = env.loaders.erpEnabled
+      ? new PublishInvoiceToErpUsecase(
+          invoice,
+          invoiceItem,
+          coupon,
+          waiver,
+          payer,
+          address,
+          manuscript,
+          catalog,
+          erpService,
+          netSuiteService,
+          publisher,
+          loggerService
+        )
+      : new NoOpUseCase();
 
-    const publishCreditNoteToErp = new PublishCreditNoteToErpUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      erpService,
-      netSuiteService,
-      publisher,
-      loggerService
-    );
+    const publishCreditNoteToErp = env.loaders.erpEnabled
+      ? new PublishCreditNoteToErpUsecase(
+          invoice,
+          invoiceItem,
+          coupon,
+          waiver,
+          payer,
+          address,
+          manuscript,
+          catalog,
+          erpService,
+          netSuiteService,
+          publisher,
+          loggerService
+        )
+      : new NoOpUseCase();
+
+    const publishPaymentToErp = env.loaders.erpEnabled
+      ? new PublishPaymentToErpUsecase(
+          payment,
+          // invoiceItem,
+          // coupon,
+          // waiver,
+          // payer,
+          // address,
+          // manuscript,
+          // erpService,
+          netSuiteService,
+          // publisher,
+          loggerService
+        )
+      : new NoOpUseCase();
 
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
       queue
@@ -169,7 +191,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     );
 
     // tslint:disable-next-line: no-unused-expression
-    new AfterPaymentCompleted(invoice, loggerService);
+    new AfterPaymentCompleted(invoice, loggerService, publishPaymentToErp);
 
     // new AfterManuscriptPublishedEvent(logger, manuscript);
   }

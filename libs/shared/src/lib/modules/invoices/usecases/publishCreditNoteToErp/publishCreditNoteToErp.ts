@@ -75,9 +75,6 @@ export class PublishCreditNoteToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<PublishCreditNoteToErpResponse> {
     this.loggerService.info('PublishCreditNoteToERP Request', request);
-    if (process.env.ERP_DISABLED === 'true') {
-      return right(null);
-    }
 
     let creditNote: Invoice;
 

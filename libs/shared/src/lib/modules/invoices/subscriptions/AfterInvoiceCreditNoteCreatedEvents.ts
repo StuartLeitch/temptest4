@@ -1,3 +1,4 @@
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
@@ -36,7 +37,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase,
-    private publishCreditNoteToErp: PublishCreditNoteToErpUsecase,
+    private publishCreditNoteToErp: PublishCreditNoteToErpUsecase | NoOpUseCase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();

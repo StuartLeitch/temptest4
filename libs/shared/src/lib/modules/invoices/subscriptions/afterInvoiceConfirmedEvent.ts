@@ -1,3 +1,4 @@
+import { NoOpUseCase } from '../../../core/domain/NoOpUseCase';
 import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
@@ -38,7 +39,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceConfirmed: PublishInvoiceConfirmedUsecase,
-    private invoiceToErpUsecase: PublishInvoiceToErpUsecase,
+    private invoiceToErpUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
     private scheduler: SchedulerContract,
     private loggerService: LoggerContract,
     private creditControlReminderDelay: number,
