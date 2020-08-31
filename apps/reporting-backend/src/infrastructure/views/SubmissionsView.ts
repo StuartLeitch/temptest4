@@ -38,6 +38,7 @@ AS SELECT
   t.first_decision_date,
   t.special_issue_id,
   t.section_id,
+  t.preprint_value,
   t.title,
   t.journal_id,
   t.journal_name,
@@ -81,6 +82,10 @@ FROM (
       s.last_version_index,
       s.special_issue_id,
       s.section_id,
+      case 
+        WHEN s.preprint_value = 'null' then null
+        ELSE s.preprint_value
+      end preprint_value,
       j.journal_id,
       j.journal_name,
       j.apc,
@@ -120,6 +125,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`,
     `create index on ${this.getViewName()} (journal_name)`,
+    `create index on ${this.getViewName()} (preprint_value)`,
   ];
 
   getViewName(): string {

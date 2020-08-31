@@ -137,6 +137,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (journal_id)`,
     `create index on ${this.getViewName()} (journal_name)`,
     `create index on ${this.getViewName()} (publisher_name)`,
+    `create index on ${this.getViewName()} (preprint_value)`,
   ];
 
   getRefreshQuery() {
