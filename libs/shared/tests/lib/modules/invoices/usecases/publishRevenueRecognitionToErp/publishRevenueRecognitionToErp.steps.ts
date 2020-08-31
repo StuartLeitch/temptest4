@@ -249,7 +249,7 @@ Then(
 );
 
 Then(
-  /Revenue recognition for the Invoice with the ID "([\w-]+)" is skipped/,
+  /Revenue recognition for the Invoice with the ID "([\w-]+)" is not registered/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
 

@@ -164,7 +164,7 @@ Then(
 );
 
 Then(
-  /^The Payer "([\w-]+)" for the invoice with the ID "([\w-]+)" is saved successfully$/,
+  /^The Payer "([\w-]+)" is saved successfully for the invoice with the ID "([\w-]+)"$/,
   async function (payerName: string, invoiceId: string) {
     const payer = await mockPayerRepo.getPayerByInvoiceId(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()

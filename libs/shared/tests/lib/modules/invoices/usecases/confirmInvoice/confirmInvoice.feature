@@ -10,7 +10,7 @@ Feature: Confirm invoice
         When The Payer "John" from "GB" confirms the invoice with the ID "normal-invoice"
         Then The result is successfull
 
-    Scenario: Invoice is confirmed successfully
+    Scenario: Invoice status is changed to ACTIVE after confirmation
         Given There is an Invoice with the ID "normal-invoice"
         When The Payer "John" from "GB" confirms the invoice with the ID "normal-invoice"
         Then The invoice "normal-invoice" is successfully updated to status "ACTIVE"
@@ -18,7 +18,7 @@ Feature: Confirm invoice
     Scenario: Payer is saved successfully
         Given There is an Invoice with the ID "normal-invoice"
         When The Payer "John" from "GB" confirms the invoice with the ID "normal-invoice"
-        Then The Payer "John" for the invoice with the ID "normal-invoice" is saved successfully
+        Then The Payer "John" is saved successfully for the invoice with the ID "normal-invoice"
 
     Scenario: Vat is applied successfully
         Given There is an Invoice with the ID "vat-invoice"

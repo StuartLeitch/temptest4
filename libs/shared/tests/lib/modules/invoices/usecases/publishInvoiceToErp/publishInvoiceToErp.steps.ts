@@ -224,12 +224,11 @@ Given(
   }
 );
 
-When(
-  /The usecase is executed for the Invoice with the ID "([\w-]+)"/,
-  async function (invoiceId: string) {
-    response = await useCase.execute({ invoiceId }, context);
-  }
-);
+When(/The Invoice with the ID "([\w-]+)" is published/, async function (
+  invoiceId: string
+) {
+  response = await useCase.execute({ invoiceId }, context);
+});
 
 Then(
   /The Invoice with the ID "([\w-]+)" is registered to netsuite/,

@@ -10,4 +10,4 @@ Feature: Publish revenue recognition to erp system
         Given There is a fully discounted Invoice with the ID "discounted-invoice" created
         And The payer country is "GB" and their type is "INDIVIDUAL"
         When Revenue recognition usecase is execute for the invoice with the ID "discounted-invoice"
-        Then Revenue recognition for the Invoice with the ID "discounted-invoice" is skipped
+        Then Revenue recognition for the Invoice with the ID "discounted-invoice" is not registered
