@@ -23,4 +23,5 @@ export interface ErpServiceContract {
   registerInvoice(data: ErpData): Promise<ErpResponse>;
   registerRevenueRecognition(data: any): Promise<any>;
   registerCreditNote?(data: any): Promise<any>;
+  registerPayment?(data: any): Promise<any>;
 }

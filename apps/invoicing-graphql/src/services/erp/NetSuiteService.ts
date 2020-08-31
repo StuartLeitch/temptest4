@@ -35,30 +35,6 @@ export class NetSuiteService implements ErpServiceContract {
     return this.createInvoice({ ...data, customerId });
   }
 
-  private async getCustomerId(data: ErpData) {
-    const { payer } = data;
-
-    let customerId;
-    const customerAlreadyExists = await this.queryCustomer(data);
-
-    if (customerAlreadyExists) {
-      if (
-        (customerAlreadyExists.isperson === 'T' &&
-          payer.type === PayerType.INSTITUTION) ||
-        (customerAlreadyExists.isperson === 'F' &&
-          payer.type !== PayerType.INSTITUTION)
-      ) {
-        customerId = await this.createCustomer(data);
-      } else {
-        customerId = customerAlreadyExists.id;
-      }
-    } else {
-      customerId = await this.createCustomer(data);
-    }
-
-    return customerId;
-  }
-
   public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
     console.log('registerRevenueRecognition Data:');
     console.info(data);
@@ -110,6 +86,40 @@ export class NetSuiteService implements ErpServiceContract {
     await this.patchCreditNote({ ...data, creditNoteId });
 
     return creditNoteId;
+  }
+
+  public async registerPayment(data: ErpData): Promise<ErpResponse> {
+    console.log('registerPayment Data:');
+    console.info(data);
+
+    const paymentId = await this.createPayment(data);
+    console.info(paymentId);
+
+    return paymentId;
+  }
+
+  private async getCustomerId(data: ErpData) {
+    const { payer } = data;
+
+    let customerId;
+    const customerAlreadyExists = await this.queryCustomer(data);
+
+    if (customerAlreadyExists) {
+      if (
+        (customerAlreadyExists.isperson === 'T' &&
+          payer.type === PayerType.INSTITUTION) ||
+        (customerAlreadyExists.isperson === 'F' &&
+          payer.type !== PayerType.INSTITUTION)
+      ) {
+        customerId = await this.createCustomer(data);
+      } else {
+        customerId = customerAlreadyExists.id;
+      }
+    } else {
+      customerId = await this.createCustomer(data);
+    }
+
+    return customerId;
   }
 
   private async queryCustomer(data: any) {
@@ -274,6 +284,77 @@ export class NetSuiteService implements ErpServiceContract {
         ...invoiceRequestOpts,
         headers: oauth.toHeader(oauth.authorize(invoiceRequestOpts, token)),
         data: createInvoicePayload,
+      } as AxiosRequestConfig);
+
+      return res?.headers?.location?.split('/').pop();
+    } catch (err) {
+      console.error(err);
+      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
+      return { err } as unknown;
+    }
+  }
+
+  private async createPayment(data: any) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+    const { payment } = data;
+
+    const paymentRequestOpts = {
+      url: `${config.endpoint}record/v1/payment`,
+      method: 'POST',
+    };
+
+    const createPaymentPayload: Record<string, any> = {
+      createdDate: format(
+        new Date(payment.dateCreated),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
+      saleseffectivedate: format(
+        new Date(payment.dateCreated),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T12:00:12.857Z',
+      tranId: `${payment.invoiceNumber}/${format(
+        new Date(payment.dateCreated),
+        'yyyy'
+      )}`,
+      // entity: {
+      //   id: customerId,
+      // },
+      // item: {
+      //   items: [
+      //     {
+      //       amount: item.price,
+      //       description: `${article.title} - Article Processing Charges for ${
+      //         article.customId
+      //       }/${format(new Date(), 'yyyy')}`,
+      //       quantity: 1.0,
+      //       rate: item.price,
+      //       taxRate1: item.rate,
+      //       excludeFromRateRequest: false,
+      //       printItems: false,
+      //       item: {
+      //         id: itemId,
+      //       },
+      //       taxCode: {
+      //         id: taxRateId,
+      //       },
+      //     },
+      //   ],
+      // },
+    };
+
+    // if (customSegmentId !== '0') {
+    //   createInvoicePayload.cseg1 = {
+    //     id: customSegmentId,
+    //   };
+    // }
+
+    try {
+      const res = await axios({
+        ...paymentRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(paymentRequestOpts, token)),
+        data: createPaymentPayload,
       } as AxiosRequestConfig);
 
       return res?.headers?.location?.split('/').pop();
