@@ -20,7 +20,7 @@ import { PaymentRepoContract } from '../../repos/paymentRepo';
 import { GetPaymentByForeignPaymentIdUsecase } from '../getPaymentByForeignPaymentId';
 
 import { PayPalProcessFinishedResponse as Response } from './paypal-process-finished.response';
-import { PayPalProcessFinishedDTO as DTO } from './paypal-process-finished.dto';
+import type { PayPalProcessFinishedDTO as DTO } from './paypal-process-finished.dto';
 import * as Errors from './paypal-process-finished.errors';
 
 interface WithPayPalOrderId {

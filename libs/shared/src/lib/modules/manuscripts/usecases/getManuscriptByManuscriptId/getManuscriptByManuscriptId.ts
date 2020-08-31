@@ -17,7 +17,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { GetManuscriptByManuscriptIdDTO } from './getManuscriptByManuscriptIdDTO';
+import type { GetManuscriptByManuscriptIdDTO } from './getManuscriptByManuscriptIdDTO';
 import { GetManuscriptByManuscriptIdResponse } from './getManuscriptByManuscriptIdResponse';
 import { GetManuscriptByManuscriptIdErrors } from './getManuscriptByManuscriptIdErrors';
 

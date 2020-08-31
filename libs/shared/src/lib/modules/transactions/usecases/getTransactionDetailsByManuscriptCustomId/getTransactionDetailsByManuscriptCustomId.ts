@@ -28,7 +28,7 @@ import { GetTransactionUsecase } from '../getTransaction/getTransaction';
 
 // * Usecase specific
 import { GetTransactionDetailsByManuscriptCustomIdResponse as Response } from './getTransactionDetailsByManuscriptCustomId.response';
-import { GetTransactionDetailsByManuscriptCustomIdDTO as DTO } from './getTransactionDetailsByManuscriptCustomId.dto';
+import type { GetTransactionDetailsByManuscriptCustomIdDTO as DTO } from './getTransactionDetailsByManuscriptCustomId.dto';
 import * as Errors from './getTransactionDetailsByManuscriptCustomId.errors';
 
 export class GetTransactionDetailsByManuscriptCustomIdUsecase

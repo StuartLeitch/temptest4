@@ -29,7 +29,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { CreateCreditNoteRequestDTO } from './createCreditNoteDTO';
+import type { CreateCreditNoteRequestDTO } from './createCreditNoteDTO';
 import { CreateCreditNoteResponse } from './createCreditNoteResponse';
 import { CreateCreditNoteErrors } from './createCreditNoteErrors';
 

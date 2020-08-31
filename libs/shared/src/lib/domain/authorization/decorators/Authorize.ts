@@ -1,6 +1,6 @@
 import { Result } from '../../../core/logic/Result';
 import { accessControl } from '../AccessControl';
-import { AccessControlContext } from '../AccessControlContext';
+import type { AccessControlContext } from '../AccessControlContext';
 
 type Authorization = 'Authorization';
 

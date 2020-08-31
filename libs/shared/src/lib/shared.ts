@@ -247,8 +247,8 @@ export * from './modules/users/mappers/UserMap';
 
 // ? Should we export this
 // * Infra
-export { SchedulerContract } from './infrastructure/scheduler/Scheduler';
-export { ListenerContract } from './infrastructure/listener/Listener';
+export type { SchedulerContract } from './infrastructure/scheduler/Scheduler';
+export type { ListenerContract } from './infrastructure/listener/Listener';
 export * from './infrastructure/logging';
 export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';

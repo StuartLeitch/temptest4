@@ -19,7 +19,7 @@ import { CouponRepoContract } from '../../repos/couponRepo';
 // * Usecase specific
 import { GetCouponDetailsByCodeResponse } from './getCouponDetailsByCodeResponse';
 import { CouponNotFoundError } from './getCouponDetailsByCodeErrors';
-import { GetCouponDetailsByCodeDTO } from './getCouponDetailsByCodeDTO';
+import type { GetCouponDetailsByCodeDTO } from './getCouponDetailsByCodeDTO';
 
 export class GetCouponDetailsByCodeUsecase
   implements

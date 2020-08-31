@@ -17,7 +17,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { CreateManuscriptDTO } from './createManuscriptDTO';
+import type { CreateManuscriptDTO } from './createManuscriptDTO';
 import { CreateManuscriptResponse } from './createManuscriptResponse';
 
 export class CreateManuscriptUsecase

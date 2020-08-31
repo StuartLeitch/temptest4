@@ -24,7 +24,7 @@ import { PayerId } from '../../../payers/domain/PayerId';
 import { Amount } from '../../../../domain/Amount';
 
 import { CreatePaymentResponse as Response } from './CreatePaymentResponse';
-import { CreatePaymentDTO as DTO } from './CreatePaymentDTO';
+import type { CreatePaymentDTO as DTO } from './CreatePaymentDTO';
 import * as Errors from './CreatePaymentErrors';
 
 type ValidationErrors =

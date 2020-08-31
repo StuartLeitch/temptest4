@@ -21,7 +21,7 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 // * Usecase specific
 import { GetInvoiceDetailsResponse } from './getInvoiceDetailsResponse';
 import { GetInvoiceDetailsErrors } from './getInvoiceDetailsErrors';
-import { GetInvoiceDetailsDTO } from './getInvoiceDetailsDTO';
+import type { GetInvoiceDetailsDTO } from './getInvoiceDetailsDTO';
 
 export class GetInvoiceDetailsUsecase
   implements

@@ -2,5 +2,5 @@ import * as GetPaymentByForeignPaymentIdErrors from './get-payment-by-foreign-pa
 
 export { GetPaymentByForeignPaymentIdErrors };
 export * from './get-payment-by-foreign-payment-id.response';
-export * from './get-payment-by-foreign-payment-id.dto';
+export type { GetPaymentByForeignPaymentIdDTO } from './get-payment-by-foreign-payment-id.dto';
 export * from './get-payment-by-foreign-payment-id';

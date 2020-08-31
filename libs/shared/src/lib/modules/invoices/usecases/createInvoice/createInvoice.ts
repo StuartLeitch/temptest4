@@ -19,7 +19,7 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../domain/authorization';
-import { CreateInvoiceRequestDTO } from './createInvoiceDTO';
+import type { CreateInvoiceRequestDTO } from './createInvoiceDTO';
 import { CreateInvoiceResponse } from './createInvoiceResponse';
 import { CreateInvoiceErrors } from './createInvoiceErrors';
 

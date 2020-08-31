@@ -26,7 +26,7 @@ import {
 } from '../../domain/strategies/payment-strategy-factory';
 
 import { PayPalPaymentApprovedResponse as Response } from './paypal-payment-approved.response';
-import { PayPalPaymentApprovedDTO as DTO } from './paypal-payment-approved.dto';
+import type { PayPalPaymentApprovedDTO as DTO } from './paypal-payment-approved.dto';
 import * as Errors from './paypal-payment-approved.errors';
 
 interface WithOrderId {

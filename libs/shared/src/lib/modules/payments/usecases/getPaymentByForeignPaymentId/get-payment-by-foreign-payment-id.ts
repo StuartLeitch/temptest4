@@ -17,7 +17,7 @@ import { Payment } from '../../domain/Payment';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { GetPaymentByForeignPaymentIdResponse as Response } from './get-payment-by-foreign-payment-id.response';
-import { GetPaymentByForeignPaymentIdDTO as DTO } from './get-payment-by-foreign-payment-id.dto';
+import type { GetPaymentByForeignPaymentIdDTO as DTO } from './get-payment-by-foreign-payment-id.dto';
 import * as Errors from './get-payment-by-foreign-payment-id.errors';
 
 interface WithForeignId {

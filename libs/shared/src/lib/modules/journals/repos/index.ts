@@ -1,5 +1,5 @@
-import { CatalogRepoContract } from './catalogRepo';
-import { EditorRepoContract } from './editorRepo';
+import type { CatalogRepoContract } from './catalogRepo';
+import type { EditorRepoContract } from './editorRepo';
 import { KnexCatalogRepo } from './implementations/knexCatalogRepo';
 import { KnexEditorRepo } from './implementations/knexEditorRepo';
 import { MockCatalogRepo } from './mocks/mockCatalogRepo';

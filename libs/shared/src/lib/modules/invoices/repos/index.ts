@@ -1,6 +1,6 @@
 // * Invoice Repos Contracts
-import { InvoiceRepoContract } from './invoiceRepo';
-import { InvoiceItemRepoContract } from './invoiceItemRepo';
+import type { InvoiceRepoContract } from './invoiceRepo';
+import type { InvoiceItemRepoContract } from './invoiceItemRepo';
 
 // * Invoice Repos Knex Implementations
 import { KnexInvoiceRepo } from './implementations/knexInvoiceRepo';
@@ -10,5 +10,5 @@ export {
   InvoiceRepoContract,
   InvoiceItemRepoContract,
   KnexInvoiceRepo,
-  KnexInvoiceItemRepo
+  KnexInvoiceItemRepo,
 };

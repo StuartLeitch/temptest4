@@ -17,7 +17,7 @@ import {
 import { Manuscript } from '../../domain/Manuscript';
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
-import { EditManuscriptDTO } from './editManuscriptDTO';
+import type { EditManuscriptDTO } from './editManuscriptDTO';
 import { EditManuscriptResponse } from './editManuscriptResponse';
 import { EditManuscriptErrors } from './editManuscriptErrors';
 

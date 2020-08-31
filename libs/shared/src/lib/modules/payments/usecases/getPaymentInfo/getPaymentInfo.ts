@@ -21,7 +21,7 @@ import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 // * Usecase specific
 import { GetPaymentInfoResponse as Response } from './getPaymentInfoResponse';
-import { GetPaymentInfoDTO as DTO } from './getPaymentInfoDTO';
+import type { GetPaymentInfoDTO as DTO } from './getPaymentInfoDTO';
 import * as Errors from './getPaymentInfoErrors';
 
 export class GetPaymentInfoUsecase

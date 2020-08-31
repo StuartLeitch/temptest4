@@ -1,5 +1,5 @@
 import * as MigrateEntireInvoiceErrors from './migrateEntireInvoiceErrors';
-import { MigrateEntireInvoiceDTO } from './migrateEntireInvoiceDTO';
+import type { MigrateEntireInvoiceDTO } from './migrateEntireInvoiceDTO';
 
 export { MigrateEntireInvoiceErrors, MigrateEntireInvoiceDTO };
 export * from './migrateEntireInvoiceResponse';

@@ -34,7 +34,7 @@ import { VATService } from '../../../../domain/services/VATService';
 // * Usecase specifics
 import { UpdateTransactionOnAcceptManuscriptResponse } from './updateTransactionOnAcceptManuscriptResponse';
 import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
-import { UpdateTransactionOnAcceptManuscriptDTO } from './updateTransactionOnAcceptManuscriptDTOs';
+import type { UpdateTransactionOnAcceptManuscriptDTO } from './updateTransactionOnAcceptManuscriptDTOs';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';

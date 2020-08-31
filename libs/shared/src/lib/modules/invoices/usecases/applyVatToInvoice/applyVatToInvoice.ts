@@ -14,8 +14,8 @@ import {
 import { PayerType } from '../../../payers/domain/Payer';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 
-import { ApplyVatToInvoiceDTO } from './applyVatToInvoiceDTO';
-import { ApplyVatToInvoiceResponse } from './applyVatToInvoiceResponse';
+import type { ApplyVatToInvoiceDTO } from './applyVatToInvoiceDTO';
+import type { ApplyVatToInvoiceResponse } from './applyVatToInvoiceResponse';
 
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 

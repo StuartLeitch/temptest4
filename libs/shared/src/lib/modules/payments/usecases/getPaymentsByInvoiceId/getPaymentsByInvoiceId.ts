@@ -20,7 +20,7 @@ import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 // * Usecase specific
 import { GetPaymentsByInvoiceIdResponse as Response } from './getPaymentsByInvoiceIdResponse';
-import { GetPaymentsByInvoiceIdDTO as DTO } from './getPaymentsByInvoiceIdDTO';
+import type { GetPaymentsByInvoiceIdDTO as DTO } from './getPaymentsByInvoiceIdDTO';
 import * as Errors from './getPaymentsByInvoiceIdErrors';
 
 export class GetPaymentsByInvoiceIdUsecase

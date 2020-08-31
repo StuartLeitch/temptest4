@@ -39,7 +39,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
   }
 
   get paymentId(): PaymentId {
-    return PaymentId.create(this.id);
+    return PaymentId.create(this._id).getValue();
   }
 
   get invoiceId(): InvoiceId {

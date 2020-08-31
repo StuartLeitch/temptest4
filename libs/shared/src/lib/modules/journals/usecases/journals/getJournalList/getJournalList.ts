@@ -18,7 +18,7 @@ import { CatalogRepoContract } from '../../../repos/catalogRepo';
 
 // * Usecase specifics
 import { GetJournalListResponse } from './getJournalListResponse';
-import { GetJournalListDTO } from './getJournalListDTO';
+import type { GetJournalListDTO } from './getJournalListDTO';
 
 export class GetJournalListUsecase
   implements

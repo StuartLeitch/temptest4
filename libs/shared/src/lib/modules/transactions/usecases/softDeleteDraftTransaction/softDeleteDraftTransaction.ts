@@ -16,7 +16,7 @@ import { TransactionRepoContract } from '../../repos/transactionRepo';
 import { Manuscript } from './../../../manuscripts/domain/Manuscript';
 import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
 
-import { SoftDeleteDraftTransactionRequestDTO } from './softDeleteDraftTransactionDTOs';
+import type { SoftDeleteDraftTransactionRequestDTO } from './softDeleteDraftTransactionDTOs';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';

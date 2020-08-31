@@ -14,7 +14,7 @@ import {
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 import { GetRecentCouponsResponse } from './getRecentCouponsResponse';
-import { GetRecentCouponsDTO } from './getRecentCouponsDTO';
+import type { GetRecentCouponsDTO } from './getRecentCouponsDTO';
 
 export class GetRecentCouponsUsecase
   implements

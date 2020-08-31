@@ -9,7 +9,7 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specifics
 import { GetRecentInvoicesResponse } from './getRecentInvoicesResponse';
-import { GetRecentInvoicesDTO } from './getRecentInvoicesDTO';
+import type { GetRecentInvoicesDTO } from './getRecentInvoicesDTO';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
