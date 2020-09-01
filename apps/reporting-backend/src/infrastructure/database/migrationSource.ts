@@ -179,8 +179,10 @@ class KnexMigrationSource {
     ),
     add_preprint_value_to_submission_data,
     rebuild_materialized_views(
-      '20200831162115_add_preprint_value_to_submissions'
+      '20200831162115_add_preprint_value_to_submissions',
+      true
     ),
+    rebuild_materialized_views('20200901362115_add_more_paused_dates'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
