@@ -27,8 +27,8 @@ import { PublisherRepoContract } from '../../../publishers/repos';
 import { LoggerContract } from './../../../../infrastructure/logging/Logger';
 
 export type RetryFailedErpInvoicesResponse = Either<
-  UnexpectedError,
-  Result<ErpResponse[]>
+  UnexpectedError | ErpResponse,
+  ErpResponse[]
 >;
 
 export class RetryFailedErpInvoicesUsecase
@@ -90,7 +90,7 @@ export class RetryFailedErpInvoicesUsecase
 
       if (failedErpInvoices.length === 0) {
         this.loggerService.info('No failed erp invoices');
-        return right(Result.ok<ErpResponse[]>(updatedInvoices));
+        return right(updatedInvoices);
       }
       this.loggerService.info(
         `Retrying sync with erp for invoices: ${failedErpInvoices
@@ -109,12 +109,12 @@ export class RetryFailedErpInvoicesUsecase
         const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
 
         if (
-          typeof maybeUpdatedInvoiceResponse?.isLeft === 'function' &&
-          maybeUpdatedInvoiceResponse?.isLeft()
+          typeof maybeUpdatedInvoiceResponse.isLeft === 'function' &&
+          maybeUpdatedInvoiceResponse.isLeft()
         ) {
           return left(updatedInvoiceResponse);
         }
-        const assignedErpReference = updatedInvoiceResponse;
+        const assignedErpReference = updatedInvoiceResponse as ErpResponse;
 
         // console.log('Assigned ERP Reference:');
         // console.info('type ', typeof assignedErpReference);
@@ -135,7 +135,7 @@ export class RetryFailedErpInvoicesUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs)));
       }
 
-      return right(Result.ok<ErpResponse[]>(updatedInvoices));
+      return right(updatedInvoices);
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));
