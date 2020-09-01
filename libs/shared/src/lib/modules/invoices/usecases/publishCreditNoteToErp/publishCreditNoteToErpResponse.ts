@@ -3,6 +3,6 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { ErpResponse } from '../../../../domain/services/ErpService';
 
 export type PublishCreditNoteToErpResponse = Either<
-  UnexpectedError | any,
+  UnexpectedError,
   ErpResponse
 >;

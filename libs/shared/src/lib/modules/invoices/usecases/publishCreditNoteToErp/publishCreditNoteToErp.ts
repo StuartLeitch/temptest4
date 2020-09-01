@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { getEuMembers } from 'is-eu-member';
+// import { getEuMembers } from 'is-eu-member';
 
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, left } from '../../../../core/logic/Result';
@@ -16,23 +16,23 @@ import {
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
-import { VATService } from '../../../../domain/services/VATService';
+// import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
+// import { VATService } from '../../../../domain/services/VATService';
 import { PublishCreditNoteToErpResponse } from './publishCreditNoteToErpResponse';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+// import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { JournalId } from '../../../journals/domain/JournalId';
+// import { CatalogRepoContract } from '../../../journals/repos';
+// import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../domain/Invoice';
-import { PublisherRepoContract } from '../../../publishers/repos';
+// import { PublisherRepoContract } from '../../../publishers/repos';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { PayerType } from '../../../payers/domain/Payer';
-import { ArticleRepoContract } from '../../../manuscripts/repos';
+// import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+// import { PayerType } from '../../../payers/domain/Payer';
+// import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 
 export interface PublishCreditNoteToErpRequestDTO {
@@ -56,13 +56,13 @@ export class PublishCreditNoteToErpUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private payerRepo: PayerRepoContract,
-    private addressRepo: AddressRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
-    private catalogRepo: CatalogRepoContract,
-    private sageService: ErpServiceContract,
+    // private payerRepo: PayerRepoContract,
+    // private addressRepo: AddressRepoContract,
+    // private manuscriptRepo: ArticleRepoContract,
+    // private catalogRepo: CatalogRepoContract,
+    // private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
-    private publisherRepo: PublisherRepoContract,
+    // private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {}
 
@@ -131,7 +131,7 @@ export class PublishCreditNoteToErpUsecase
         throw new Error(`CreditNote ${creditNote.id} has no invoice items.`);
       }
 
-      invoiceItems.forEach((ii) => creditNote.addInvoiceItem(ii));
+      creditNote.addItems(invoiceItems);
       // this.loggerService.info(
       //   'PublishCreditNoteToERP full invoice items',
       //   invoiceItems
@@ -140,15 +140,6 @@ export class PublishCreditNoteToErpUsecase
       try {
         const erpData = {
           creditNote,
-          // payer,
-          // items: invoiceItems,
-          // billingAddress: address,
-          // journalName: catalog.journalTitle,
-          // vatNote,
-          // tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-          // customSegmentId: publisherCustomValues?.customSegmentId,
-          // itemId: publisherCustomValues?.itemId,
-          // taxRateId,
         };
 
         const netSuiteResponse = await this.netSuiteService.registerCreditNote(
@@ -159,7 +150,6 @@ export class PublishCreditNoteToErpUsecase
             netSuiteResponse
           )}`
         );
-        console.info(netSuiteResponse);
         creditNote.nsReference = String(netSuiteResponse); // netSuiteResponse;
         creditNote.erpReference = String(netSuiteResponse); // .tradeDocumentId;
 

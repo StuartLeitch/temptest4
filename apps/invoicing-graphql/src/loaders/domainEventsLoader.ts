@@ -81,31 +81,13 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           invoiceItem,
           coupon,
           waiver,
-          payer,
-          address,
-          manuscript,
-          catalog,
-          erpService,
           netSuiteService,
-          publisher,
           loggerService
         )
       : new NoOpUseCase();
 
     const publishPaymentToErp = env.loaders.erpEnabled
-      ? new PublishPaymentToErpUsecase(
-          payment,
-          // invoiceItem,
-          // coupon,
-          // waiver,
-          // payer,
-          // address,
-          // manuscript,
-          // erpService,
-          netSuiteService,
-          // publisher,
-          loggerService
-        )
+      ? new PublishPaymentToErpUsecase(payment, netSuiteService, loggerService)
       : new NoOpUseCase();
 
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
