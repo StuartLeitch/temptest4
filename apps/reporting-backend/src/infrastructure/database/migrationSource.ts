@@ -183,7 +183,8 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views('20200901362115_add_more_paused_dates', true),
-    rebuild_materialized_views('20200901362115_file_requested_counts'),
+    rebuild_materialized_views('20200901362115_file_requested_counts', true),
+    rebuild_materialized_views('20200901662115_manuscript_users_orcid'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

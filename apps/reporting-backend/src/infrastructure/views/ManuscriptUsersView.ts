@@ -6,6 +6,7 @@ import {
 import manuscriptEditorsView from './ManuscriptEditorsView';
 import manuscriptReviewers from './ManuscriptReviewersView';
 import manuscriptsView from './ManuscriptsView';
+import usersDataView from './UsersDataView';
 
 class ManuscriptsUsersView extends AbstractEventView
   implements EventViewContract {
@@ -14,6 +15,7 @@ class ManuscriptsUsersView extends AbstractEventView
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
   users.*,
+  user_identities.orcid,
   m.submission_id,
   m.manuscript_version_id,
   m.journal_name,
@@ -50,6 +52,7 @@ AS SELECT
     FROM
       ${manuscriptReviewers.getViewName()} mr) AS users
   JOIN ${manuscriptsView.getViewName()} m ON m.manuscript_custom_id = users.manuscript_custom_id
+  LEFT JOIN LATERAL ( select * from ${usersDataView.getViewName()} where email = users.email and orcid is not null limit 1) user_identities ON user_identities.email = users.email
 WITH DATA;`;
   }
 
