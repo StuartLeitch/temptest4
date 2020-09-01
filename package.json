@@ -258,6 +258,7 @@
     "jest-prop-type-error": "1.1.0",
     "knex-tiny-logger": "2.0.0",
     "prettier": "2.1.1",
+    "nock": "^13.0.4",
     "react-hot-loader": "4.12.21",
     "sass": "1.26.10",
     "shelljs": "0.8.4",

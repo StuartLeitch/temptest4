@@ -3,7 +3,7 @@ const common = [
   // '--require-module @babel/register', // Load Babel module
   '--require-module ts-node/register', // Load TypeScript module
   '--require-module tsconfig-paths/register', // Load TypeScript module
-  '--parallel 4',
+  // '--parallel 4',
   `--format ${
     process.env.CI || !process.stdout.isTTY ? 'progress' : 'progress-bar'
   }`,

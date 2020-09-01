@@ -1,7 +1,11 @@
 import { expect } from 'chai';
 import { Given, When, Then } from 'cucumber';
 
-import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
+import {
+  Roles,
+  UsecaseAuthorizationContext,
+} from '../../../../../../src/lib/domain/authorization';
+
 import { Invoice } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
 import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
@@ -44,10 +48,13 @@ import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/rep
 import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
 import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
 import { VATService } from '../../../../../../src/lib/domain/services/VATService';
+
 import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
 import { AddressRepoContract } from '../../../../../../src/lib/modules/addresses/repos/addressRepo';
 
-const defaultContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 const mockTransactionRepo: TransactionRepoContract = new MockTransactionRepo();
 const mockInvoiceRepo: InvoiceRepoContract = new MockInvoiceRepo();

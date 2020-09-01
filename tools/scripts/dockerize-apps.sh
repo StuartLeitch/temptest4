@@ -1,3 +1,5 @@
+set -e
+
 for APP in $AFFECTED_APPS
 do
   if [ -s "dist/apps/${APP}/Dockerfile" ]

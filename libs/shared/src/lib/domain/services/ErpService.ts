@@ -11,6 +11,7 @@ export interface ErpData {
   rate?: number;
   tradeDocumentItemProduct: string;
   customSegmentId?: string;
+  taxRateId?: string;
 }
 
 export interface ErpResponse {
