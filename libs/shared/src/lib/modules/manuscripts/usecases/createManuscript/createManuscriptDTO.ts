@@ -9,4 +9,5 @@ export interface CreateManuscriptDTO {
   authorSurname: string;
   authorFirstName: string;
   created: Date;
+  arxivId: string;
 }

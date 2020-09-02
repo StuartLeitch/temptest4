@@ -253,6 +253,7 @@ export const SubmissionSubmittedHandler = {
           authorSurname: surname,
           authorFirstName: givenNames,
           created: new Date(created),
+          arxivId: preprintValue,
         };
 
         const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(
