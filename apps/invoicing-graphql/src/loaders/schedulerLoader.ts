@@ -81,7 +81,12 @@ export const schedulerLoader: MicroframeworkLoader = async (
       // TODO Describe first job
       async function retryFailedErpInvoicesJob() {
         try {
-          await retryFailedErpInvoicesUsecase.execute();
+          const maybeResponse = await retryFailedErpInvoicesUsecase.execute();
+          const response = maybeResponse.value;
+          if (maybeResponse.isLeft()) {
+            // logger.error(response);
+            throw response;
+          }
         } catch (err) {
           throw err;
         }
@@ -89,7 +94,11 @@ export const schedulerLoader: MicroframeworkLoader = async (
       // TODO Describe second job
       async function retryRevenueRecognizedInvoicesToErpJob() {
         try {
-          await retryRevenueRecognizedInvoicesToErpUsecase.execute();
+          const response = await retryRevenueRecognizedInvoicesToErpUsecase.execute();
+          if (response.isLeft()) {
+            logger.error(response.value.errorValue().message);
+            throw response.value.error;
+          }
         } catch (err) {
           throw err;
         }
