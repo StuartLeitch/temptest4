@@ -59,12 +59,12 @@ export class NetSuiteService implements ErpServiceContract {
 
     let creditAccountId;
     let debitAccountId;
-    if (customSegmentId !== '0') {
-      creditAccountId = idMap.Partnership.credit;
-      debitAccountId = idMap.Partnership.debit;
-    } else {
+    if (customSegmentId !== '2') {
       creditAccountId = idMap.Hindawi.credit;
       debitAccountId = idMap.Hindawi.debit;
+    } else {
+      creditAccountId = idMap.Partnership.credit;
+      debitAccountId = idMap.Partnership.debit;
     }
 
     const revenueRecognition = await this.createRevenueRecognition({
@@ -174,7 +174,7 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
-    const createCustomerPayload: Record<string, unknown> = {
+    const createCustomerPayload: Record<string, string | boolean> = {
       email: payer?.email.toString(),
     };
 
@@ -185,11 +185,21 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.lastName = `${lastNames.join(
         ' '
       )} - ${article.customId.toString()}`;
+      if (createCustomerPayload?.lastName?.length > 40) {
+        createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
+          createCustomerPayload?.lastName?.length - 40
+        );
+      }
     } else {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
       } - ${article.customId.toString()}`;
+      if (createCustomerPayload.companyName.length > 40) {
+        createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
+          createCustomerPayload.companyName.length - 40
+        );
+      }
       createCustomerPayload.vatRegNumber = payer.VATId;
     }
 
@@ -230,8 +240,11 @@ export class NetSuiteService implements ErpServiceContract {
       itemId,
       taxRateId,
     } = data;
-    // console.info(item);
-    // console.info(invoice);
+    console.log('Create invoice item');
+    console.info(item);
+    console.info(item.calculateNetPrice());
+    console.log('Create invoice invoice');
+    console.info(invoice);
 
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice`,
@@ -257,7 +270,7 @@ export class NetSuiteService implements ErpServiceContract {
       item: {
         items: [
           {
-            amount: item.price,
+            amount: item.calculateNetPrice(),
             description: `${article.title} - Article Processing Charges for ${
               article.customId
             }/${format(new Date(), 'yyyy')}`,

@@ -223,7 +223,7 @@ export class KnexInvoiceRepo
       })
       .orderBy('articles.datePublished', 'desc')
       // .offset(200)
-      .limit(100);
+      .limit(10);
 
     logger.debug('select', {
       sql: sql.toString(),

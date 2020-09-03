@@ -231,6 +231,11 @@ export class PublishInvoiceToErpUsecase
         }
       }
 
+      if (address.country === 'UK' || address.country === 'GB') {
+        // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number
+        taxRateId = '7';
+      }
+
       try {
         const erpData = {
           invoice,
