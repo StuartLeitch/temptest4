@@ -264,6 +264,7 @@ export * from './domain/services/payment/braintree-service';
 export * from './domain/services/payment/paypal-service';
 export * from './domain/services/ExchangeRateService';
 export * from './domain/services/SQSPublishService';
+export * from './domain/services/PdfGenerator';
 
 // * Domain Types
 export * from './domain/PaymentClientToken';

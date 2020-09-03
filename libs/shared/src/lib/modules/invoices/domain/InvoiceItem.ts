@@ -129,45 +129,11 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
   }
 
   public calculateNetPrice(withReductions?: Reduction<unknown>[]): number {
-    const reductions: Reduction<unknown>[] = [];
-    if (this.coupons) {
-      reductions.push(...this.coupons.getItems());
-    }
-    if (this.waivers) {
-      reductions.push(...this.waivers);
-    }
-    if (withReductions) {
-      reductions.push(...withReductions);
-    }
-
-    const totalDiscount = reductions.reduce(
-      (acc, curr) => acc + curr.reduction,
-      0
-    );
-
-    if (totalDiscount >= 100) {
-      return 0;
-    }
-
-    return this.price - (totalDiscount * this.price) / 100;
+    return this.price - this.calculateDiscount(withReductions);
   }
 
   public calculateDiscount(withReductions?: Reduction<unknown>[]): number {
-    const reductions: Reduction<unknown>[] = [];
-    if (this.coupons) {
-      reductions.push(...this.coupons.getItems());
-    }
-    if (this.waivers) {
-      reductions.push(...this.waivers);
-    }
-    if (withReductions) {
-      reductions.push(...withReductions);
-    }
-
-    const totalDiscount = reductions.reduce(
-      (acc, curr) => acc + curr.reduction,
-      0
-    );
+    const totalDiscount = this.calculateTotalDiscountPercentage(withReductions);
 
     if (totalDiscount >= 100) return this.price;
 
@@ -184,5 +150,27 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     const net = this.calculateNetPrice(withReductions);
 
     return net + (net * this.vat) / 100;
+  }
+
+  public calculateTotalDiscountPercentage(
+    withReductions?: Reduction<unknown>[]
+  ): number {
+    const reductions: Reduction<unknown>[] = [];
+    if (this.coupons) {
+      reductions.push(...this.coupons.getItems());
+    }
+    if (this.waivers) {
+      reductions.push(...this.waivers);
+    }
+    if (withReductions) {
+      reductions.push(...withReductions);
+    }
+
+    const totalDiscount = reductions.reduce(
+      (acc, curr) => acc + curr.reduction,
+      0
+    );
+
+    return totalDiscount >= 100 ? 100 : totalDiscount;
   }
 }

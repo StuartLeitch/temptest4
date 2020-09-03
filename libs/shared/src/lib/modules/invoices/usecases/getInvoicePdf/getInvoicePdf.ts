@@ -1,3 +1,5 @@
+import { Readable } from 'stream';
+
 // * Core Domain
 import { UniqueEntityID } from './../../../../core/domain/UniqueEntityID';
 import { Result, Either, left, right } from '../../../../core/logic/Result';
@@ -39,11 +41,14 @@ import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 
 import {
-  pdfGeneratorService,
   InvoicePayload,
+  PdfGeneratorService,
 } from '../../../../domain/services/PdfGenerator';
+
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
+
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 import { PayerType } from '../../../payers/domain/Payer';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -71,7 +76,9 @@ export class GetInvoicePdfUsecase
     private payerRepo: PayerRepoContract,
     private catalogRepo: CatalogRepoContract,
     private couponRepo: CouponRepoContract,
-    private waiverRepo: WaiverRepoContract
+    private waiverRepo: WaiverRepoContract,
+    private pdfGenerator: PdfGeneratorService,
+    private logger: LoggerContract
   ) {}
 
   // @Authorize('payer:read')
@@ -166,12 +173,14 @@ export class GetInvoicePdfUsecase
     ) as GetInvoicePdfResponse;
   }
 
-  private generateThePdf(payload: InvoicePayload) {
+  private generateThePdf(
+    payload: InvoicePayload
+  ): Either<unknown, Promise<Readable>> {
     try {
-      const pdf = pdfGeneratorService.getInvoice(payload);
+      const pdf = this.pdfGenerator.getInvoice(payload);
       return right(pdf);
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      this.logger.error(error.message, error);
       return left(
         new GetInvoicePdfErrors.PdfInvoiceError(
           'empty pdf',

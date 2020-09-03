@@ -1,15 +1,16 @@
+import puppeteer from 'puppeteer';
+import { Readable } from 'stream';
 import fs from 'fs';
 import path from 'path';
-import { Readable } from 'stream';
 import { format } from 'date-fns';
 import ejs from 'ejs';
-// import pdf from 'html-pdf';
 import countryList from 'country-list';
 import stateList from 'state-list';
 import base64Img from 'base64-img';
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -21,6 +22,7 @@ export interface InvoicePayload {
 }
 
 export class PdfGeneratorService {
+  constructor(private logger: LoggerContract) {}
   private templates: {
     [key: string]: {
       fileName: string;
@@ -45,78 +47,78 @@ export class PdfGeneratorService {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
-    return new Promise((resolve, reject) => {
-      const template = this.getTemplate('invoice');
-      const data = {
-        formatPriceFn: FormatUtils.formatPrice,
-        dateFormatFn: format,
-        ...payload,
-        addressCountry: countryList.getName(payload.address.country),
-        addressState: stateList.name[payload.address.state],
-        companyNumber: process.env.COMPANY_REGISTRATION_NUMBER,
-        vatNumber: process.env.COMPANY_VAT_NUMBER,
-        assistanceEmail: process.env.ASSISTANCE_EMAIL,
-        tenantName: process.env.TENANT_NAME,
-        tenantAddress: process.env.TENANT_ADDRESS,
-        logo: logoData,
-        bankDetails: {
-          accountName: process.env.BANK_ACCOUNT_NAME,
-          accountType: process.env.BANK_ACCOUNT_TYPE,
-          accountNumber: process.env.BANK_ACCOUNT_NUMBER,
-          sortCode: process.env.BANK_SORT_CODE,
-          swift: process.env.BANK_SWIFT,
-          iban: process.env.BANK_IBAN,
-          bankAddress: [
-            process.env.BANK_ADDRESS_LINE_1,
-            process.env.BANK_ADDRESS_LINE_2,
-            process.env.BANK_ADDRESS_LINE_3,
-            process.env.BANK_ADDRESS_CITY,
-            process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY,
-            process.env.BANK_ADDRESS_POSTCODE,
-          ].join(', '),
-          beneficiaryAddress: [
-            process.env.BANK_BENEFICIARY_ADDRESS_LINE_1,
-            process.env.BANK_BENEFICIARY_ADDRESS_LINE_2,
-            process.env.BANK_BENEFICIARY_ADDRESS_CITY,
-            process.env.BANK_BENEFICIARY_ADDRESS_POSTCODE,
-            process.env.BANK_BENEFICIARY_ADDRESS_STATE,
-          ].join(', '),
-        },
-      };
-      const html = template(data);
-
-      const pdfOptions /* : pdf.CreateOptions*/ = {
-        border: {
-          left: '1cm',
-          right: '1cm',
-          bottom: '0.75cm',
-          top: '0.25cm',
-        },
-        format: 'A4',
-        footer: {
-          height: '2cm',
-        },
-        header: {
-          height: '2.5cm',
-        },
-        // phantomPath: '/usr/bin/phantomjs',
-        // phantomPath: 'node_modules/.bin/phantomjs',
-        // phantomArgs: [],
-      };
-      try {
-        // pdf.create(html, pdfOptions).toStream((err, stream) => {
-        //   if (err) {
-        //     return reject(err);
-        //   }
-
-        //   resolve(stream);
-        // })
-        resolve(null);
-      } catch (e) {
-        console.log(e);
-        resolve(null);
-      }
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox'],
     });
+    const page = await browser.newPage();
+
+    const template = this.getTemplate('invoice');
+
+    const data = {
+      formatPriceFn: FormatUtils.formatPrice,
+      dateFormatFn: format,
+      ...payload,
+      addressCountry: countryList.getName(payload.address.country),
+      addressState: stateList.name[payload.address.state],
+      companyNumber: process.env.COMPANY_REGISTRATION_NUMBER,
+      vatNumber: process.env.COMPANY_VAT_NUMBER,
+      assistanceEmail: process.env.ASSISTANCE_EMAIL,
+      tenantName: process.env.TENANT_NAME,
+      tenantAddress: process.env.TENANT_ADDRESS,
+      logo: logoData,
+      bankDetails: {
+        accountName: process.env.BANK_ACCOUNT_NAME,
+        accountType: process.env.BANK_ACCOUNT_TYPE,
+        accountNumber: process.env.BANK_ACCOUNT_NUMBER,
+        sortCode: process.env.BANK_SORT_CODE,
+        swift: process.env.BANK_SWIFT,
+        iban: process.env.BANK_IBAN,
+        bankAddress: [
+          process.env.BANK_ADDRESS_LINE_1,
+          process.env.BANK_ADDRESS_LINE_2,
+          process.env.BANK_ADDRESS_LINE_3,
+          process.env.BANK_ADDRESS_CITY,
+          process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY,
+          process.env.BANK_ADDRESS_POSTCODE,
+        ].join(', '),
+        beneficiaryAddress: [
+          process.env.BANK_BENEFICIARY_ADDRESS_LINE_1,
+          process.env.BANK_BENEFICIARY_ADDRESS_LINE_2,
+          process.env.BANK_BENEFICIARY_ADDRESS_CITY,
+          process.env.BANK_BENEFICIARY_ADDRESS_POSTCODE,
+          process.env.BANK_BENEFICIARY_ADDRESS_STATE,
+        ].join(', '),
+      },
+    };
+
+    const htmlTemplate = template(data);
+
+    try {
+      await page.setContent(htmlTemplate, {
+        waitUntil: 'domcontentloaded',
+        args: ['--disable-dev-shm-usage'],
+      });
+
+      const buffer = await page.pdf({
+        format: 'A4',
+        margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
+        printBackground: true,
+      });
+
+      await browser.close();
+
+      return new Readable({
+        read() {
+          this.push(buffer);
+          this.push(null);
+        },
+      });
+    } catch (error) {
+      this.logger.error(error.message, error);
+      await browser.close();
+      throw error;
+    }
   }
 
   public addTemplate(name: string, fileName: string): PdfGeneratorService {
@@ -134,7 +136,6 @@ export class PdfGeneratorService {
     const file = path.join(__dirname, 'templates/', template.fileName);
 
     const templateStr = fs.readFileSync(file, 'utf8');
-
     if (!template.compile) {
       template.compile = ejs.compile(templateStr);
     }

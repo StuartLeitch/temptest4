@@ -63,7 +63,6 @@ Test:
 Build:
   interruptible: true
   stage: build
-  when: manual
   script:
     - cd $HOME
     - yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production
@@ -84,7 +83,6 @@ Package Images:dev:
     AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
     AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
     AWS_REGISTRY: $DEV_AWS_REGISTRY
-  when: manual
   before_script:
     - apk add --no-cache aws-cli
   services:
@@ -102,18 +100,8 @@ Package Images:dev:
       - .ci_status
       - dist
 
-Deploy:dev:
-  stage: deploy
-  dependencies:
-    - Package Images:dev
+deploy_base: &script_deploy
   when: manual
-  variables:
-    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
-    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
-    TENANT: hindawi
-    NODE_ENV: dev
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
-    COMMAND: build-manifests
   before_script:
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
     - apk add --no-cache curl
@@ -132,6 +120,33 @@ Deploy:dev:
   artifacts:
     paths:
       - dist-k8s
+
+Deploy:dev:
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
+    TENANT: hindawi
+    NODE_ENV: dev
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:qa:
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
+    TENANT: hindawi
+    NODE_ENV: qa
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
 Pages:
   interruptible: true
   stage: deploy

@@ -1,8 +1,13 @@
 import { PdfGeneratorService } from './PdfGenerator';
 import type { InvoicePayload } from './PdfGenerator';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 export { PdfGeneratorService, InvoicePayload };
 
-export const pdfGeneratorService = new PdfGeneratorService();
-
-pdfGeneratorService.addTemplate('invoice', 'invoice.ejs');
+export function createPdfGenerator(
+  logger: LoggerContract
+): PdfGeneratorService {
+  const service = new PdfGeneratorService(logger);
+  service.addTemplate('invoice', 'invoice.ejs');
+  return service;
+}

@@ -240,11 +240,11 @@ export class NetSuiteService implements ErpServiceContract {
       itemId,
       taxRateId,
     } = data;
-    console.log('Create invoice item');
-    console.info(item);
-    console.info(item.calculateNetPrice());
-    console.log('Create invoice invoice');
-    console.info(invoice);
+    // console.log('Create invoice item');
+    // console.info(item);
+    // console.info(item.calculateNetPrice());
+    // console.log('Create invoice invoice');
+    // console.info(invoice);
 
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice`,
@@ -273,7 +273,7 @@ export class NetSuiteService implements ErpServiceContract {
             amount: item.calculateNetPrice(),
             description: `${article.title} - Article Processing Charges for ${
               article.customId
-            }/${format(new Date(), 'yyyy')}`,
+            }/${format(new Date(invoice.dateCreated), 'yyyy')}`,
             quantity: 1.0,
             rate: item.price,
             taxRate1: item.rate,

@@ -40,7 +40,10 @@ export const expressLoader: MicroframeworkLoader = (
     app.use(corsMiddleware());
 
     app.get('/api/invoice/:payerId', async (req, res) => {
-      const { repos } = context;
+      const {
+        repos,
+        services: { pdfGenerator, logger },
+      } = context;
       const authContext = { roles: [Roles.PAYER] };
 
       const usecase = new GetInvoicePdfUsecase(
@@ -51,7 +54,9 @@ export const expressLoader: MicroframeworkLoader = (
         repos.payer,
         repos.catalog,
         repos.coupon,
-        repos.waiver
+        repos.waiver,
+        pdfGenerator,
+        logger
       );
 
       const invoiceLink = req.headers.referer;

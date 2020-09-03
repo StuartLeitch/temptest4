@@ -3,7 +3,7 @@ import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['dev/invoicing/invoicing-admin'],
+  secretNames: ['qa/invoicing/invoicing-admin'],
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {
@@ -13,7 +13,7 @@ const values: WithAwsSecretsServiceProps = {
       APP_NAME: 'Invoicing Admin',
     },
     ingressOptions: {
-      host: 'invoicing-admin.dev.phenom.pub',
+      host: 'invoicing-admin.qa.phenom.pub',
     },
   },
 };
