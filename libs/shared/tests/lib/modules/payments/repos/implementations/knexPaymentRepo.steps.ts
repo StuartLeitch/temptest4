@@ -42,7 +42,9 @@ Given(/^a payment with the id "([\w-]+)"$/, async (paymentId: string) => {
 });
 
 When(/^we call getPaymentById for "([\w-]+)"$/, async (paymentId: string) => {
-  const paymentIdObj = PaymentId.create(new UniqueEntityID(paymentId));
+  const paymentIdObj = PaymentId.create(
+    new UniqueEntityID(paymentId)
+  ).getValue();
   foundPayment = await mockPaymentRepo.getPaymentById(paymentIdObj);
 });
 
@@ -53,7 +55,7 @@ Then('getPaymentById returns payment', async () => {
 When(
   /^we call getPaymentById for an un-existent payment "([\w-]+)"$/,
   async (wrongPaymentId: string) => {
-    const id = PaymentId.create(new UniqueEntityID(wrongPaymentId));
+    const id = PaymentId.create(new UniqueEntityID(wrongPaymentId)).getValue();
     foundPayment = await mockPaymentRepo.getPaymentById(id);
   }
 );
@@ -63,7 +65,7 @@ Then('getPaymentById returns null', async () => {
 });
 
 When(/^we call exists for ([\w-]+) payment id$/, async (paymentId: string) => {
-  const id = PaymentId.create(new UniqueEntityID(paymentId));
+  const id = PaymentId.create(new UniqueEntityID(paymentId)).getValue();
   foundPayment = await mockPaymentRepo.getPaymentById(id);
   if (!foundPayment) {
     foundPayment = await makePaymentData({ id: paymentId });

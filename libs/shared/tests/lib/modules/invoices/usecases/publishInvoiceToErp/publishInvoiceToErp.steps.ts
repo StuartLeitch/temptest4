@@ -1,3 +1,5 @@
+// tslint:disable: no-unused-expression
+
 import { expect } from 'chai';
 import { Before, Given, Then, When } from 'cucumber';
 
@@ -13,6 +15,7 @@ import { PublishInvoiceToErpResponse } from '../../../../../../src/lib/modules/i
 import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
@@ -43,12 +46,13 @@ let mockCatalogRepo: MockCatalogRepo;
 let mockSalesforceService: MockErpService;
 let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
+let mockLogger: MockLogger;
 
 let useCase: PublishInvoiceToErpUsecase;
 let response: PublishInvoiceToErpResponse;
 let invoice: Invoice;
 
-let context: UsecaseAuthorizationContext = {
+const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
@@ -65,6 +69,7 @@ Before(function () {
   mockCatalogRepo = new MockCatalogRepo();
   mockSalesforceService = new MockErpService();
   mockNetsuiteService = new MockErpService();
+  mockLogger = new MockLogger();
   mockPublisherRepo = new MockPublisherRepo();
 
   useCase = new PublishInvoiceToErpUsecase(
@@ -79,7 +84,7 @@ Before(function () {
     mockSalesforceService,
     mockNetsuiteService,
     mockPublisherRepo,
-    console
+    mockLogger
   );
 });
 
@@ -219,8 +224,8 @@ Given(
       invoiceId: invoice.invoiceId.id.toValue(),
       type: payerType,
     });
-    await mockPayerRepo.addMockItem(payer);
-    await mockAddressRepo.addMockItem(address);
+    mockPayerRepo.addMockItem(payer);
+    mockAddressRepo.addMockItem(address);
   }
 );
 
@@ -234,10 +239,10 @@ Then(
   /The Invoice with the ID "([\w-]+)" is registered to netsuite/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
-    let netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
+    const netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
     expect(!!netsuiteData).to.be.true;
 
-    let invoice = await mockInvoiceRepo.getInvoiceById(
+    const invoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
     // expect(invoice.nsReference).to.equal(mockNetsuiteService.erpRef);
@@ -250,10 +255,10 @@ Then(
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
 
-    let salesforceData = mockSalesforceService.getInvoice(invoiceId);
+    const salesforceData = mockSalesforceService.getInvoice(invoiceId);
     expect(!!salesforceData).to.be.true;
 
-    let invoice = await mockInvoiceRepo.getInvoiceById(
+    const invoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
     expect(invoice.erpReference).to.equal(mockSalesforceService.erpRef);
@@ -265,10 +270,10 @@ Then(
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
 
-    let salesforceData = mockSalesforceService.getInvoice(invoiceId);
+    const salesforceData = mockSalesforceService.getInvoice(invoiceId);
     expect(!!salesforceData).to.be.false;
 
-    let netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
+    const netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
     expect(!!netsuiteData).to.be.false;
   }
 );
@@ -277,7 +282,7 @@ Then(
   /The tax code selected for the Invoice with the ID "([\w-]+)" is ([\d]+)/,
   function (invoiceId: string, taxRate: string) {
     expect(response.isRight()).to.be.true;
-    let netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
+    const netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
     expect(netsuiteData.taxRateId).to.equal(taxRate);
   }
 );

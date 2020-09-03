@@ -10,6 +10,7 @@ import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/rep
 import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
@@ -30,6 +31,7 @@ let mockAddressRepo: MockAddressRepo;
 let mockPayerRepo: MockPayerRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
+let mockLogger: MockLogger;
 let mockEmailService: any;
 
 const mockVatService: VATService = new VATService();
@@ -37,14 +39,14 @@ const mockVatService: VATService = new VATService();
 
 let useCase: ConfirmInvoiceUsecase;
 let response: ConfirmInvoiceResponse;
-let context: UsecaseAuthorizationContext = {
+const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
 Before(function () {
-  let _emailService = {
+  const _emailService = {
     createInvoicePendingNotification: () => ({
-      sendEmail: () => {},
+      sendEmail: () => void 0,
     }),
   };
 
@@ -55,6 +57,8 @@ Before(function () {
   mockEmailService = spy(_emailService);
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
+  mockLogger = new MockLogger();
+
   useCase = new ConfirmInvoiceUsecase(
     mockInvoiceItemRepo,
     mockAddressRepo,
@@ -64,7 +68,7 @@ Before(function () {
     mockWaiverRepo,
     mockEmailService,
     mockVatService,
-    console
+    mockLogger
   );
 });
 
@@ -134,7 +138,7 @@ Given(
 When(
   /^The Payer "([\w-]+)" from "([\w-]+)" confirms the invoice with the ID "([\w-]+)"$/,
   async function (payerName: string, payerCountry: string, invoiceId: string) {
-    let payerInput: PayerInput = {
+    const payerInput: PayerInput = {
       name: payerName,
       invoiceId: invoiceId,
       id: payerName,
@@ -156,7 +160,7 @@ Then('The result is successfull', function () {
 Then(
   /^The invoice "([\w-]+)" is successfully updated to status "([\w-]+)"$/,
   async function (invoiceId: string, status: string) {
-    let invoice = await mockInvoiceRepo.getInvoiceById(
+    const invoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
     expect(invoice.status).to.equal(status);
@@ -176,8 +180,8 @@ Then(
 Then(
   /^The Invoice "([\w-]+)" has vat amount greater than (\d+)$/,
   async function (invoiceId: string, vatAmount: number) {
-    let id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
-    let invoice = await mockInvoiceRepo.getInvoiceById(id);
+    const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
+    const invoice = await mockInvoiceRepo.getInvoiceById(id);
 
     invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
 

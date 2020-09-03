@@ -1,3 +1,5 @@
+// tslint:disable: no-unused-expression
+
 import { expect } from 'chai';
 import { Before, Given, Then, When } from 'cucumber';
 
@@ -16,6 +18,7 @@ import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mo
 import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import {
   AddressMap,
   ArticleMap,
@@ -43,12 +46,13 @@ let mockCatalogRepo: MockCatalogRepo;
 let mockSalesforceService: MockErpService;
 let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
+let mockLogger: MockLogger;
 
 let useCase: PublishRevenueRecognitionToErpUsecase;
 let response: PublishRevenueRecognitionToErpResponse;
 let invoice: Invoice;
 
-let context: UsecaseAuthorizationContext = {
+const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
@@ -66,6 +70,7 @@ Before(function () {
   mockSalesforceService = new MockErpService();
   mockNetsuiteService = new MockErpService();
   mockPublisherRepo = new MockPublisherRepo();
+  mockLogger = new MockLogger();
 
   useCase = new PublishRevenueRecognitionToErpUsecase(
     mockInvoiceRepo,
@@ -79,7 +84,7 @@ Before(function () {
     mockPublisherRepo,
     mockSalesforceService,
     mockNetsuiteService,
-    console
+    mockLogger
   );
 });
 
@@ -236,10 +241,10 @@ Then(
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
 
-    let revenueData = mockSalesforceService.getRevenue(invoiceId);
+    const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.true;
 
-    let invoice = await mockInvoiceRepo.getInvoiceById(
+    const invoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
     expect(invoice.revenueRecognitionReference).to.equal(
@@ -253,10 +258,10 @@ Then(
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
 
-    let revenueData = mockSalesforceService.getRevenue(invoiceId);
+    const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.false;
 
-    let invoice = await mockInvoiceRepo.getInvoiceById(
+    const invoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
     expect(invoice.erpReference).to.equal('NON_INVOICEABLE');
