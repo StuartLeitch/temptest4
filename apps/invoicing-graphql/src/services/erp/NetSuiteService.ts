@@ -59,12 +59,12 @@ export class NetSuiteService implements ErpServiceContract {
 
     let creditAccountId;
     let debitAccountId;
-    if (customSegmentId !== '2') {
-      creditAccountId = idMap.Hindawi.credit;
-      debitAccountId = idMap.Hindawi.debit;
-    } else {
+    if (customSegmentId !== '4') {
       creditAccountId = idMap.Partnership.credit;
       debitAccountId = idMap.Partnership.debit;
+    } else {
+      creditAccountId = idMap.Hindawi.credit;
+      debitAccountId = idMap.Hindawi.debit;
     }
 
     const revenueRecognition = await this.createRevenueRecognition({
@@ -288,7 +288,7 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '0') {
+    if (customSegmentId !== '4') {
       createInvoicePayload.cseg1 = {
         id: customSegmentId,
       };
@@ -342,7 +342,7 @@ export class NetSuiteService implements ErpServiceContract {
       payment: payment.amount,
     };
 
-    // if (customSegmentId !== '0') {
+    // if (customSegmentId !== '4') {
     //   createInvoicePayload.cseg1 = {
     //     id: customSegmentId,
     //   };
@@ -449,7 +449,7 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '0') {
+    if (customSegmentId !== '4') {
       createJournalPayload.cseg1 = {
         id: customSegmentId,
       };
@@ -595,7 +595,7 @@ export class NetSuiteService implements ErpServiceContract {
       // },
     };
 
-    // if (customSegmentId !== '0') {
+    // if (customSegmentId !== '4') {
     //   createInvoicePayload.cseg1 = {
     //     id: customSegmentId,
     //   };
