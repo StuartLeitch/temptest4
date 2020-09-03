@@ -38,7 +38,7 @@ const Content = ({ loading, data, error, mode }) => {
 };
 
 const ViewEditContainer: React.FC = () => {
-  const { code } = useParams();
+  const { code } = useParams() as any;
   const [updateInProgress, setUpdateInProgress] = useState(false);
   const [mode, setMode] = useState(VIEW);
 

@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { DropdownMenu } from 'reactstrap';
 
 import {
   Button,
   ButtonToolbar,
-  DropdownToggle,
+  DropdownMenu,
   DropdownItem,
+  DropdownToggle,
   Modal,
   ModalHeader,
   ModalFooter,
   UncontrolledButtonDropdown,
-} from '..';
+} from 'reactstrap';
 
 export const ModalDropdown: React.FC<ModalDropdownProps> = ({
   className,
@@ -27,13 +27,13 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
     open: false,
     options: [
       { text: 'doNothing', value: 'doNothing' },
-      { text: 'openModal', value: 'openModal' }
-    ]
+      { text: 'openModal', value: 'openModal' },
+    ],
   });
   const classes = classNames(className, 'extended-dropdown');
 
   const onClose = () => setModalState({ ...modalState, open: false });
-  const onChange = event => {
+  const onChange = (event) => {
     const role = event.target.getAttribute('role');
     if (role === 'menuitem') {
       setModalState({ ...modalState, open: true });
@@ -99,7 +99,7 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
 ModalDropdown.propTypes = {
   className: PropTypes.string,
   dropdownToggle: PropTypes.any,
-  onSave: PropTypes.func
+  onSave: PropTypes.func,
 };
 
 interface ModalDropdownProps {

@@ -25,7 +25,7 @@ function spinner(show: boolean) {
 }
 
 const InvoiceReminders = () => {
-  const { id } = useParams();
+  const { id } = useParams() as any;
   const queryOptions = { variables: { id } };
   const sentRemindersResponse = useQuery<QuerySentReminders>(
     SENT_REMINDERS,

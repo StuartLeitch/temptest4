@@ -114,7 +114,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   paymentMethods,
   token,
 }) => {
-  const { invoiceId } = useParams();
+  const { invoiceId } = useParams() as any;
 
   // * This will only run once
   useEffect(() => {

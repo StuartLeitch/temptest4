@@ -123,7 +123,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
   applyCoupon,
   refreshInvoice,
 }: any) => {
-  const { invoiceId } = useParams();
+  const { invoiceId } = useParams() as any;
   const { showModal, hideModal } = useModalActions();
 
   if (!payer) {

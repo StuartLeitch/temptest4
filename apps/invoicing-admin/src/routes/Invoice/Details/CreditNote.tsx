@@ -32,7 +32,7 @@ import ArticleDetailsTab from './components/ArticleDetailsTab';
 import PayerDetailsTab from './components/PayerDetailsTab';
 
 const Details: React.FC = () => {
-  const { id } = useParams();
+  const { id } = useParams() as any;
 
   const { loading, error, data } = useQuery(INVOICE_QUERY, {
     variables: {
@@ -154,7 +154,7 @@ const Details: React.FC = () => {
                     netCharges={netCharges}
                     vat={vat}
                     total={total}
-                    />
+                  />
                 </TabPane>
                 <TabPane tabId='article'>
                   <ArticleDetailsTab invoice={invoice} />

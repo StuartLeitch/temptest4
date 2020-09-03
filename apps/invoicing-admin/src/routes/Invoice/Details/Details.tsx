@@ -38,7 +38,7 @@ const APPLY_COUPON_MODAL_TARGET = 'applyCouponModal';
 const CREATE_CREDIT_NOTE_MODAL_TARGET = 'createCreditNoteModal';
 
 const Details: React.FC = (props) => {
-  const { id } = useParams();
+  const { id } = useParams() as any;
 
   const { loading, error, data, refetch: invoiceQueryRefetch } = useQuery(
     INVOICE_QUERY,
