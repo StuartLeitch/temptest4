@@ -271,9 +271,7 @@ export class NetSuiteService implements ErpServiceContract {
         items: [
           {
             amount: item.calculateNetPrice(),
-            description: `${article.title} - Article Processing Charges for ${
-              article.customId
-            }/${format(new Date(invoice.dateCreated), 'yyyy')}`,
+            description: `${article.title} - Article Processing Charges for ${article.customId}`,
             quantity: 1.0,
             rate: item.price,
             taxRate1: item.rate,
