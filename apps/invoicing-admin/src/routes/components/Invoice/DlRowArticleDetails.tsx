@@ -31,7 +31,7 @@ const DlRowArticleDetails = (props) => (
       </dd>
       <dt className={`col-sm-3 ${props.leftSideClassName}`}>Preprint ID</dt>
       <dd className={`col-sm-9 ${props.rightSideClassName}`}>
-        {props.arxivId}
+        {props.preprintValue}
       </dd>
     </dl>
   </React.Fragment>

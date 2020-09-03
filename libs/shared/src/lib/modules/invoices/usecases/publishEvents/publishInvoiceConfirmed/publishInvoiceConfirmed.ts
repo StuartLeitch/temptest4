@@ -79,7 +79,7 @@ export class PublishInvoiceConfirmedUsecase
 
       payer: payer ? formatPayer(payer, billingAddress) : null,
 
-      arxivId: manuscript.arxivId,
+      preprintValue: manuscript.preprintValue,
     };
 
     try {

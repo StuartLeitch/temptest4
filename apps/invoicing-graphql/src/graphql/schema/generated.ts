@@ -48,7 +48,7 @@ export type Article = {
   authorSurname?: Maybe<Scalars['String']>;
   authorFirstName?: Maybe<Scalars['String']>;
   datePublished?: Maybe<Scalars['Date']>;
-  arxivId?: Maybe<Scalars['String']>;
+  preprintValue?: Maybe<Scalars['String']>;
 };
 
 export type Transaction = {
@@ -810,7 +810,11 @@ export type ArticleResolvers<
     ParentType,
     ContextType
   >;
-  arxivId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  preprintValue?: Resolver<
+    Maybe<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: isTypeOfResolverFn<ParentType>;
 };
 

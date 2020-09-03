@@ -210,7 +210,7 @@ export const SubmissionSubmittedHandler = {
           authorCountry: country,
           authorSurname: surname,
           authorFirstName: givenNames,
-          arxivId: preprintValue,
+          preprintValue,
         },
         defaultContext
       );
@@ -253,7 +253,7 @@ export const SubmissionSubmittedHandler = {
           authorSurname: surname,
           authorFirstName: givenNames,
           created: new Date(created),
-          arxivId: preprintValue,
+          preprintValue,
         };
 
         const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(

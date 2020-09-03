@@ -15,7 +15,7 @@ interface ManuscriptProps {
   authorSurname?: string;
   authorFirstName?: string;
   datePublished?: Date;
-  arxivId?: string;
+  preprintValue?: string;
 }
 
 export class Manuscript extends AggregateRoot<ManuscriptProps> {
@@ -103,12 +103,12 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     return this.props.datePublished;
   }
 
-  get arxivId(): string {
-    return this.props.arxivId;
+  get preprintValue(): string {
+    return this.props.preprintValue;
   }
 
-  set arxivId(arxivId: string) {
-    this.props.arxivId = arxivId;
+  set preprintValue(preprintValue: string) {
+    this.props.preprintValue = preprintValue;
   }
 
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {

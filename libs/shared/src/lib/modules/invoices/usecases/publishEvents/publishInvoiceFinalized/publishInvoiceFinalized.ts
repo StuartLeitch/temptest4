@@ -86,7 +86,7 @@ export class PublishInvoiceFinalizedUsecase
 
       payments: payments ? formatPayments(payments, paymentMethods) : null,
 
-      arxivId: manuscript.arxivId,
+      preprintValue: manuscript.preprintValue,
     };
 
     try {

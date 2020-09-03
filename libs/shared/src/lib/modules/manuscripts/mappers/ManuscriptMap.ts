@@ -14,7 +14,7 @@ export class ManuscriptMap extends Mapper<Manuscript> {
         authorCountry: raw.authorCountry,
         authorSurname: raw.authorSurname,
         datePublished: raw.datePublished,
-        arxivId: raw.arxivId,
+        preprintValue: raw.preprintValue,
       },
       new UniqueEntityID(raw.id)
     );
@@ -38,7 +38,7 @@ export class ManuscriptMap extends Mapper<Manuscript> {
       created: manuscript.props.created,
       customId: manuscript.props.customId,
       datePublished: manuscript.props.datePublished,
-      arxivId: manuscript.props.arxivId,
+      preprintValue: manuscript.props.preprintValue,
     };
   }
 }

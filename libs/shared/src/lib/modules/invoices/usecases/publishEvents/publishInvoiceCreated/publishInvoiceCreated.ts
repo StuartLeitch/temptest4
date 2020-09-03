@@ -65,7 +65,7 @@ export class PublishInvoiceCreatedUsecase
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 
-      arxivId: manuscript.arxivId,
+      preprintValue: manuscript.preprintValue,
     };
 
     try {

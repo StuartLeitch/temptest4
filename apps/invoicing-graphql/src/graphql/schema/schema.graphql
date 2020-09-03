@@ -30,7 +30,7 @@ type Article @model(id: "articles") {
   authorSurname: String
   authorFirstName: String
   datePublished: Date
-  arxivId: String
+  preprintValue: String
 }
 
 type Transaction @model(id: "transactions") {
