@@ -14,8 +14,8 @@ variables:
   DOCKER_TLS_CERTDIR: ''
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
-  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  LATEST_BUILD_IMAGE: $CI_REGISTRY_IMAGE:latest
+  BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
+  LATEST_BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:latest
   AWS_REGION: 'eu-west-1'
   BT_ENVIRONMENT: 'sandbox'
   BT_MERCHANT_ID: 'test-merchant-id'
@@ -29,13 +29,15 @@ Install Dependencies:
   interruptible: true
   allow_failure: false
   stage: setup
+  before_script:
+    - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
   services:
     - name: docker:dind
       entrypoint: ['env', '-u', 'DOCKER_HOST']
       command: ['dockerd-entrypoint.sh']
   image: docker
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - ./tools/scripts/dockerize-builder.sh
 
 Test:
