@@ -102,7 +102,7 @@ Package Images:dev:
       - .ci_status
       - dist
 
-deploy_base: &script_deploy
+.deploy_base: &script_deploy
   when: manual
   before_script:
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
