@@ -114,8 +114,8 @@ deploy_base: &script_deploy
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-    - aws eks --region eu-west-1 update-kubeconfig --name hindawi-dev
-    - kubectl config set-context --current --namespace=dev
+    - aws eks --region eu-west-1 update-kubeconfig --name $CLUSTER
+    - kubectl config set-context --current --namespace=$NAMESPACE
     - cd $HOME
     - ./tools/scripts/deploy-ci.sh
     - cp -r dist-k8s $CI_PROJECT_DIR
@@ -133,6 +133,8 @@ Deploy:dev:
     AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
     TENANT: hindawi
     NODE_ENV: dev
+    NAMESPACE: dev
+    CLUSTER: hindawi-dev
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
 
@@ -146,6 +148,8 @@ Deploy:qa:
     AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
     TENANT: hindawi
     NODE_ENV: qa
+    NAMESPACE: qa
+    CLUSTER: hindawi-dev
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
 
