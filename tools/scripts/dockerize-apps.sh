@@ -6,7 +6,7 @@ do
   then
     echo "Building dist/apps/${APP}/Dockerfile"
     docker pull $AWS_REGISTRY/$APP:latest || true
-    docker build -f dist/apps/$APP/Dockerfile -t $AWS_REGISTRY/$APP:$CI_COMMIT_SHA -t $AWS_REGISTRY/$APP:latest .
+    docker build --cache-from $AWS_REGISTRY/$APP:latest -f dist/apps/$APP/Dockerfile -t $AWS_REGISTRY/$APP:$CI_COMMIT_SHA -t $AWS_REGISTRY/$APP:latest .
     docker push $AWS_REGISTRY/$APP:$CI_COMMIT_SHA
     docker push $AWS_REGISTRY/$APP:latest
     # TODO check for git tag docker tag $AWS_REGISTRY/$APP:$CI_COMMIT_SHA $AWS_REGISTRY/$APP:$CI_COMMIT_TAG
