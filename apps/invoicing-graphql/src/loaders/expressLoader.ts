@@ -104,6 +104,12 @@ export const expressLoader: MicroframeworkLoader = (
             }. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
             result.value
           );
+          console.error(
+            `Handling PayPal event finished with error ${
+              result.value.message
+            }. \nEvent had body {${JSON.stringify(req.body, null, 2)}}\n`,
+            JSON.stringify(result.value, null, 2)
+          );
           res.status(500);
         } else {
           res.status(200);
@@ -114,6 +120,12 @@ export const expressLoader: MicroframeworkLoader = (
             e.message
           }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
           e
+        );
+        console.error(
+          `While handling PayPal event an error ocurred {${
+            e.message
+          }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}\n`,
+          JSON.stringify(e, null, 2)
         );
         res.status(500);
       }
