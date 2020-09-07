@@ -15,7 +15,7 @@ const values: WithAwsSecretsServiceProps = {
     },
     ingressOptions: {
       host: "invoicing-web.dev.phenom.pub",
-    },
+    } as IngressOptionsSpec & { host: string },
   },
 };
 
