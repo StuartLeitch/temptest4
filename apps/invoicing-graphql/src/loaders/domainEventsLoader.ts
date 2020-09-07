@@ -7,6 +7,9 @@ import {
 } from 'microframework-w3tec';
 
 import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
+import { NetSuiteService } from './../services/erp/NetSuiteService';
+import { SageService } from './../services/erp/SageService';
+
 import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
@@ -36,6 +39,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
+
     const {
       repos: {
         paymentMethod,
@@ -50,13 +54,16 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         waiver,
         payer,
       },
-      services: {
-        erp: { sage: erpService, netsuite: netSuiteService },
-        logger: loggerService,
-        schedulingService,
-        qq: queue,
-      },
+      services: { logger: loggerService, schedulingService, qq: queue },
     } = context;
+
+    let erpService: SageService = null;
+    let netSuiteService: NetSuiteService = null;
+
+    if (context.services.erp) {
+      erpService = context.services.erp.sage;
+      netSuiteService = context.services.erp.netsuite;
+    }
 
     const publishInvoiceToErpUsecase = env.loaders.erpEnabled
       ? new PublishInvoiceToErpUsecase(

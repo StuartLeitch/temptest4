@@ -24271,6 +24271,11 @@ sisteransi@^1.0.4:
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
 
+slang@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/slang/-/slang-0.3.0.tgz#13af75b4f0c018c6a8193d704f65b23be4fbabdc"
+  integrity sha1-E691tPDAGMaoGT1wT2WyO+T7q9w=
+
 slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
@@ -26900,6 +26905,13 @@ wcwidth@^1.0.1:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
+
+weasyprint-wrapper@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/weasyprint-wrapper/-/weasyprint-wrapper-0.1.2.tgz#c2516c3c81dcdd60ef5eabfa2830c7796c522888"
+  integrity sha512-rArmwWQIFgvllO/qbfjps6g3VARpGhUO8l0p9E/GmjXfTUuH5I0X5yvcDtkU5Ze686QQdTjZqiaonYr1MuUI8w==
+  dependencies:
+    slang "^0.3.0"
 
 web-namespaces@^1.0.0:
   version "1.1.4"
