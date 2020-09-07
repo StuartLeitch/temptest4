@@ -1,7 +1,4 @@
-import {
-  WithAwsSecretsServiceProps,
-  IngressOptionsSpec,
-} from '@hindawi/phenom-charts';
+import { WithAwsSecretsServiceProps } from '@hindawi/phenom-charts';
 import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
@@ -17,7 +14,7 @@ const values: WithAwsSecretsServiceProps = {
     },
     ingressOptions: {
       host: 'invoicing-admin.qa.phenom.pub',
-    } as IngressOptionsSpec & { host: string },
+    },
   },
 };
 

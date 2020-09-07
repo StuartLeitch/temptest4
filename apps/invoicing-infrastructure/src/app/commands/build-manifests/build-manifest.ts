@@ -34,11 +34,11 @@ interface EnvProps {
 
 export class BuildManifestsCommand implements Command {
   private parseEnv(): EnvProps {
-    let tenant: string = getOsEnv('TENANT');
-    let environment: string = getOsEnv('NODE_ENV');
-    let tag: string = getOsEnv('CI_COMMIT_SHA');
-    let awsRegistry: string = getOsEnv('AWS_REGISTRY');
-    let apps: App[] = getOsEnv('AFFECTED_APPS')
+    const tenant: string = getOsEnv('TENANT');
+    const environment: string = getOsEnv('NODE_ENV');
+    const tag: string = getOsEnv('CI_COMMIT_SHA');
+    const awsRegistry: string = getOsEnv('AWS_REGISTRY');
+    const apps: App[] = getOsEnv('AFFECTED_APPS')
       .split(/[\s,]/)
       .map((a) => a.trim())
       .map(makeAppEnum)
@@ -73,7 +73,7 @@ export class BuildManifestsCommand implements Command {
         // todo delete contiune, this should exit with error
         continue;
       }
-      console.log('building ' + app)
+      console.log('building ' + app);
       await HindawiServiceChart.withAwsSecrets(rootConstruct, app, appProps);
     }
     rootConstruct.synth();
