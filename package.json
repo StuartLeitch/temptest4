@@ -39,7 +39,7 @@
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-free": "5.14.0",
-    "@hindawi/phenom-charts": "0.2.0",
+    "@hindawi/phenom-charts": "0.1.8",
     "@hindawi/phenom-events": "1.11.1",
     "@hindawi/queue-service": "1.3.4",
     "@owczar/dashboard-style--airframe": "0.1.23",
