@@ -22,7 +22,7 @@ export interface InvoicePayload {
 }
 
 // Specify the location of weasyprint cli if not in PATH
-weasyprint.command = '/usr/bin/python -m weasyprint';
+weasyprint.command = '/usr/local/bin/python3 -m weasyprint';
 
 // // URL
 // weasyprint('http://google.com/', { pageSize: 'letter' }).pipe(
@@ -118,7 +118,6 @@ export class PdfGeneratorService {
     };
 
     const htmlTemplate = template(data);
-
     try {
       // await page.setContent(htmlTemplate, {
       //   waitUntil: 'domcontentloaded',
@@ -131,8 +130,10 @@ export class PdfGeneratorService {
       //   printBackground: true,
       // });
 
-      // await browser.close();
-      return weasyprint(htmlTemplate, { pageSize: 'A4' });
+      // await browser.close();]
+      return weasyprint(htmlTemplate, {
+        pageSize: 'A4',
+      });
       // .pipe
       // new Readable({
       //   read() {
@@ -144,6 +145,7 @@ export class PdfGeneratorService {
     } catch (error) {
       this.logger.error(error.message, error);
       // await browser.close();
+
       throw error;
     }
   }
