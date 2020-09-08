@@ -24,28 +24,6 @@ export interface InvoicePayload {
 // Specify the location of weasyprint cli if not in PATH
 weasyprint.command = '/usr/local/bin/python3 -m weasyprint';
 
-// // URL
-// weasyprint('http://google.com/', { pageSize: 'letter' }).pipe(
-//   fs.createWriteStream('out.pdf')
-// );
-
-// // HTML
-// weasyprint('<h1>Test</h1><p>Hello world</p>').pipe(res);
-
-// // Stream input and output
-// var stream = weasyprint(fs.createReadStream('file.html'));
-
-// // output to a file directly
-// weasyprint('http://apple.com/', { output: 'out.pdf' });
-
-// // Optional callback
-// weasyprint('http://google.com/', { pageSize: 'letter' }, function (
-//   err,
-//   stream
-// ) {
-//   // do whatever with the stream
-// });
-
 export class PdfGeneratorService {
   constructor(private logger: LoggerContract) {}
   private templates: {
@@ -71,12 +49,6 @@ export class PdfGeneratorService {
   public async getInvoice(payload: InvoicePayload): Promise<Readable> {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
-
-    // const browser = await puppeteer.launch({
-    //   headless: true,
-    //   args: ['--no-sandbox'],
-    // });
-    // const page = await browser.newPage();
 
     const template = this.getTemplate('invoice');
 
@@ -119,18 +91,7 @@ export class PdfGeneratorService {
 
     const htmlTemplate = template(data);
     try {
-      // await page.setContent(htmlTemplate, {
-      //   waitUntil: 'domcontentloaded',
-      //   args: ['--disable-dev-shm-usage'],
-      // });
-
-      // const buffer = await page.pdf({
-      //   format: 'A4',
-      //   margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
-      //   printBackground: true,
-      // });
-
-      // await browser.close();]
+      
       return weasyprint(htmlTemplate, {
         pageSize: 'A4',
       });
@@ -144,8 +105,6 @@ export class PdfGeneratorService {
       // ();
     } catch (error) {
       this.logger.error(error.message, error);
-      // await browser.close();
-
       throw error;
     }
   }

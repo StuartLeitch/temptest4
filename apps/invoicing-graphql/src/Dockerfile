@@ -4,20 +4,10 @@ WORKDIR ${HOME}
 
 RUN apk update && apk upgrade && \
   apk add --no-cache bash git openssh g++ make python \
-  chromium \
-      nss \
-      freetype \
-      freetype-dev \
-      harfbuzz \
-      ca-certificates \
-      ttf-freefont
 
 # Copy package.json to the working directory
 COPY package.json yarn.lock ./
 
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 # Install any needed packages specified in package.json
 RUN yarn install --frozen-lockfile --production
 
