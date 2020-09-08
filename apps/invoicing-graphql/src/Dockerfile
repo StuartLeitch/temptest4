@@ -3,8 +3,7 @@ ENV HOME "/home/app"
 WORKDIR ${HOME}
 
 RUN apk update && apk upgrade && \
-  apk add --no-cache bash git openssh g++ make python \
-
+  apk add --no-cache bash git openssh g++ make python3
 # Copy package.json to the working directory
 COPY package.json yarn.lock ./
 
