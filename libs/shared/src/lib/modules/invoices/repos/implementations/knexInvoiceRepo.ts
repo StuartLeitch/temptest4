@@ -18,7 +18,8 @@ import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 
 import { applyFilters } from './utils';
 
-export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
+export class KnexInvoiceRepo
+  extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const { db, logger } = this;
@@ -213,7 +214,6 @@ export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice>
       .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
       .where(function () {
         this.whereNot('invoices.deleted', 1)
-          .whereNotNull('articles.datePublished')
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
           .whereNull('invoices.nsReference')
