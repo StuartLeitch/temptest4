@@ -54,6 +54,18 @@ export const env = {
       getOsEnv('FAILED_ERP_CRON_RETRY_DISABLED')
     ),
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
+    erpRegisterInvoicesEnabled: toBool(
+      getOsEnv('ERP_REGISTER_INVOICES_ENABLED')
+    ),
+    erpRegisterCreditNotesEnabled: toBool(
+      getOsEnv('ERP_REGISTER_CREDIT_NOTES_ENABLED')
+    ),
+    erpRegisterRevenueRecognitionEnabled: toBool(
+      getOsEnv('ERP_REGISTER_REVENUE_RECOGNITION_ENABLED')
+    ),
+    erpRegisterPaymentsEnabled: toBool(
+      getOsEnv('ERP_REGISTER_PAYMENTS_ENABLED')
+    ),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     banner: toBool(getOsEnv('APP_BANNER')),
     tenantName: getOsEnv('TENANT_NAME'),

@@ -1,3 +1,4 @@
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { InvoiceCreated } from '../domain/events/invoiceCreated';
@@ -23,7 +24,7 @@ export class AfterInvoiceCreatedEvent
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceCreated: PublishInvoiceCreatedUsecase,
+    private publishInvoiceCreated: PublishInvoiceCreatedUsecase | NoOpUseCase,
     private scheduler: SchedulerContract,
     private confirmationReminderDelay: number,
     private confirmationReminderQueueName: string

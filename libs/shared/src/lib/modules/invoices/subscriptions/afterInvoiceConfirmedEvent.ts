@@ -38,7 +38,9 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceConfirmed: PublishInvoiceConfirmedUsecase,
+    private publishInvoiceConfirmed:
+      | PublishInvoiceConfirmedUsecase
+      | NoOpUseCase,
     private invoiceToErpUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
     private scheduler: SchedulerContract,
     private loggerService: LoggerContract,

@@ -58,7 +58,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       },
     } = context;
 
-    const publishInvoiceToErpUsecase = env.loaders.erpEnabled
+    const publishInvoiceToErpUsecase = env.app.erpRegisterInvoicesEnabled
       ? new PublishInvoiceToErpUsecase(
           invoice,
           invoiceItem,
@@ -75,7 +75,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         )
       : new NoOpUseCase();
 
-    const publishCreditNoteToErp = env.loaders.erpEnabled
+    const publishCreditNoteToErp = env.app.erpRegisterCreditNotesEnabled
       ? new PublishCreditNoteToErpUsecase(
           invoice,
           invoiceItem,
@@ -86,17 +86,35 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         )
       : new NoOpUseCase();
 
-    const publishPaymentToErp = env.loaders.erpEnabled
-      ? new PublishPaymentToErpUsecase(payment, netSuiteService, loggerService)
+    const publishPaymentToErp = env.app.erpRegisterPaymentsEnabled
+      ? new PublishPaymentToErpUsecase(
+          invoice,
+          invoiceItem,
+          payment,
+          paymentMethod,
+          coupon,
+          waiver,
+          payer,
+          netSuiteService,
+          loggerService
+        )
       : new NoOpUseCase();
 
-    const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
-      queue
-    );
-    const publishInvoiceConfirmed = new PublishInvoiceConfirmedUsecase(queue);
-    const publishInvoiceFinalized = new PublishInvoiceFinalizedUsecase(queue);
-    const publishInvoiceCredited = new PublishInvoiceCreditedUsecase(queue);
-    const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
+    const publishInvoiceCreatedUsecase = env.loaders.queueServiceEnabled
+      ? new PublishInvoiceCreatedUsecase(queue)
+      : new NoOpUseCase();
+    const publishInvoiceConfirmed = env.loaders.queueServiceEnabled
+      ? new PublishInvoiceConfirmedUsecase(queue)
+      : new NoOpUseCase();
+    const publishInvoiceFinalized = env.loaders.queueServiceEnabled
+      ? new PublishInvoiceFinalizedUsecase(queue)
+      : new NoOpUseCase();
+    const publishInvoiceCredited = env.loaders.queueServiceEnabled
+      ? new PublishInvoiceCreditedUsecase(queue)
+      : new NoOpUseCase();
+    const publishInvoicePaid = env.loaders.queueServiceEnabled
+      ? new PublishInvoicePaidUsecase(queue)
+      : new NoOpUseCase();
 
     // Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression
@@ -169,6 +187,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoicePaid,
+      publishPaymentToErp,
       loggerService
     );
 

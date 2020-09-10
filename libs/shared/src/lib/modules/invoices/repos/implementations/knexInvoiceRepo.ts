@@ -216,14 +216,14 @@ export class KnexInvoiceRepo
         this.whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.nsReference');
-        // .andWhere(function () {
-        //   this.whereNull('invoices.erpReference').orWhereNull('invoices.nsReference');
-        // });
+          .whereNull('invoices.nsReference')
+          .whereNotNull('invoices.erpReference')
+          .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
+          .where('invoices.erpReference', '<>', 'MigrationRef')
+          .where('invoices.erpReference', '<>', 'migrationRef');
       })
       .orderBy('articles.datePublished', 'desc')
-      // .offset(200)
-      .limit(10);
+      .limit(100);
 
     logger.debug('select', {
       sql: sql.toString(),

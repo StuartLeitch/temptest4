@@ -23,11 +23,15 @@ import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { PaymentId } from '../../domain/PaymentId';
+import { Invoice } from '../../../invoices/domain/Invoice';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { Payment } from '../../domain/Payment';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { PublisherRepoContract } from '../../../publishers/repos';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { PaymentRepoContract } from './../../repos/paymentRepo';
 import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
@@ -35,7 +39,8 @@ import { PayerType } from '../../../payers/domain/Payer';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 
 export interface PublishPaymentToErpRequestDTO {
-  paymentId?: string;
+  invoiceId?: string;
+  total?: Number;
 }
 
 export class PublishPaymentToErpUsecase
@@ -51,11 +56,13 @@ export class PublishPaymentToErpUsecase
       AccessControlContext
     > {
   constructor(
+    private invoiceRepo: InvoiceRepoContract,
+    private invoiceItemRepo: InvoiceItemRepoContract,
     private paymentRepo: PaymentRepoContract,
-    // private paymentMethodRepo: PaymentMethodRepoContract,
-    // private couponRepo: CouponRepoContract,
-    // private waiverRepo: WaiverRepoContract,
-    // private payerRepo: PayerRepoContract,
+    private paymentMethodRepo: PaymentMethodRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
+    private payerRepo: PayerRepoContract,
     // private addressRepo: AddressRepoContract,
     // private manuscriptRepo: ArticleRepoContract,
     // private catalogRepo: CatalogRepoContract,
@@ -74,18 +81,24 @@ export class PublishPaymentToErpUsecase
     request: PublishPaymentToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishPaymentToErpResponse> {
-    this.loggerService.info('PublishPaymentToERP Request', request);
+    // this.loggerService.info('PublishPaymentToERP Request', request);
 
-    let payment: Payment;
+    // let payment: Payment;
+    let invoice: Invoice;
 
     try {
-      payment = await this.paymentRepo.getPaymentById(
-        PaymentId.create(new UniqueEntityID(request.paymentId)).getValue()
+      invoice = await this.invoiceRepo.getInvoiceById(
+        InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
       );
-      this.loggerService.info('PublishPaymentToERP payment', payment);
+      this.loggerService.info('PublishPaymentToERP invoice', invoice);
+
+      const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
+      const payments = await this.paymentRepo.getPaymentsByInvoiceId(
+        invoice.invoiceId
+      );
 
       // let invoiceItems = invoice.invoiceItems.currentItems;
-      // this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
+      // // this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
 
       // if (invoiceItems.length === 0) {
       //   const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -140,10 +153,10 @@ export class PublishPaymentToErpUsecase
       //   return right(null);
       // }
 
-      // const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      // if (!payer) {
-      //   throw new Error(`Invoice ${invoice.id} has no payers.`);
-      // }
+      const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
+      if (!payer) {
+        throw new Error(`Invoice ${invoice.id} has no payers.`);
+      }
       // this.loggerService.info('PublishInvoiceToERP payer', payer);
 
       // const address = await this.addressRepo.findById(payer.billingAddressId);
@@ -229,8 +242,11 @@ export class PublishPaymentToErpUsecase
 
       try {
         const erpData = {
-          payment,
-          // payer,
+          invoice,
+          payer,
+          paymentMethods,
+          payments,
+          total: request.total,
           // items: invoiceItems,
           // article: manuscript as any,
           // billingAddress: address,
@@ -263,7 +279,7 @@ export class PublishPaymentToErpUsecase
 
           if (erpResponse) {
             this.loggerService.info(
-              `Updating payment ${payment.id.toString()}: netSuiteReference -> ${JSON.stringify(
+              `Updating invoice ${invoice.id.toString()}: paymentReference -> ${JSON.stringify(
                 erpResponse
               )}`
             );
@@ -279,7 +295,7 @@ export class PublishPaymentToErpUsecase
           erpResponse
         );
 
-        this.loggerService.info('PublishPaymentToERP full payment', payment);
+        this.loggerService.info('PublishPaymentToERP full invoice', invoice);
         // await this.paymentRepo.update(payment);
         return right(erpResponse);
       } catch (err) {

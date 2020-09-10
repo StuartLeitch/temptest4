@@ -10,6 +10,7 @@ import {
   // clearIntervalAsync
 } from 'set-interval-async/dynamic';
 
+import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
 import { RetryFailedErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/retryFailedErpInvoices/retryFailedErpInvoices';
 import { RetryRevenueRecognitionErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/retryRevenueRecognizedErpInvoices/retryRevenueRecognitionErpInvoices';
 
@@ -44,6 +45,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
     const {
       failedErpCronRetryTimeMinutes,
       failedErpCronRetryDisabled,
+      erpRegisterRevenueRecognitionEnabled,
     } = env.app;
 
     const retryFailedErpInvoicesUsecase = new RetryFailedErpInvoicesUsecase(
@@ -61,20 +63,22 @@ export const schedulerLoader: MicroframeworkLoader = async (
       loggerService
     );
 
-    const retryRevenueRecognizedInvoicesToErpUsecase = new RetryRevenueRecognitionErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      publisher,
-      erpService,
-      netSuiteService,
-      loggerService
-    );
+    const retryRevenueRecognizedInvoicesToErpUsecase = erpRegisterRevenueRecognitionEnabled
+      ? new RetryRevenueRecognitionErpInvoicesUsecase(
+          invoice,
+          invoiceItem,
+          coupon,
+          waiver,
+          payer,
+          address,
+          manuscript,
+          catalog,
+          publisher,
+          erpService,
+          netSuiteService,
+          loggerService
+        )
+      : new NoOpUseCase();
 
     // start scheduler
     const jobsQueue = [
