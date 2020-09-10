@@ -78,6 +78,8 @@ export class PublishInvoiceConfirmedUsecase
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 
       payer: payer ? formatPayer(payer, billingAddress) : null,
+
+      preprintValue: manuscript.preprintValue,
     };
 
     try {

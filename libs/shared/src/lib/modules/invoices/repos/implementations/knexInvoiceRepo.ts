@@ -217,10 +217,7 @@ export class KnexInvoiceRepo
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
           .whereNull('invoices.nsReference')
-          .whereNotNull('invoices.erpReference')
-          .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
-          .where('invoices.erpReference', '<>', 'MigrationRef')
-          .where('invoices.erpReference', '<>', 'migrationRef');
+          .whereNull('invoices.erpReference');
       })
       .orderBy('articles.datePublished', 'desc')
       .limit(100);
@@ -236,35 +233,6 @@ export class KnexInvoiceRepo
 
   async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
     const { db, logger } = this;
-    const LIMIT = 10;
-
-    // * SQL for retrieving results needed only for NetSuite registration
-    // const prepareIdsForNetSuiteOnlySQL = db(TABLES.INVOICES)
-    //   .select(
-    //     'invoices.id as invoiceId',
-    //     'invoices.transactionId as transactionId',
-    //     'invoices.status as invoiceStatus',
-    //     'articles.id AS manuscriptId',
-    //     'articles.datePublished'
-    //   )
-    //   .from('invoices')
-    //   .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-    //   .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-    //   .where(function () {
-    //     this.whereNotNull('articles.datePublished')
-    //       .whereNot('invoices.deleted', 1)
-    //       .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-    //       .whereNull('invoices.cancelledInvoiceReference')
-    //       .whereNotNull('invoices.revenueRecognitionReference')
-    //       .whereNull('invoices.nsRevRecReference')
-    //       .whereNull('invoices.nsReference');
-    //   })
-    //   .orderBy('articles.datePublished', 'desc')
-    //   .limit(LIMIT);
-
-    // logger.debug('select', {
-    //   NetSuiteSQL: prepareIdsForNetSuiteOnlySQL.toString(),
-    // });
 
     // * SQL for retrieving results needed only for Sage registration
     const prepareIdsForSageOnlySQL = db(TABLES.INVOICES)
@@ -290,19 +258,12 @@ export class KnexInvoiceRepo
           .where('invoices.erpReference', '<>', 'migrationRef');
       })
       .orderBy('articles.datePublished', 'desc');
-    // .limit(LIMIT);
 
     logger.debug('select', {
       SageSQL: prepareIdsForSageOnlySQL.toString(),
     });
 
-    // const netSuiteInvoices = await prepareIdsForNetSuiteOnlySQL;
     const sageInvoices = await prepareIdsForSageOnlySQL;
-
-    // const invoices: any[] = _(netSuiteInvoices.concat(sageInvoices))
-    //   .groupBy('invoiceId')
-    //   .map((objs) => _.assignWith({}, ...objs, (val1, val2) => val1 || val2))
-    //   .value();
 
     return sageInvoices.map((i) =>
       InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()

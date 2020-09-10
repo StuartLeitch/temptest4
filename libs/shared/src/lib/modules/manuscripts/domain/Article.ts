@@ -15,6 +15,7 @@ interface ArticleProps {
   authorSurname?: string;
   authorFirstName?: string;
   datePublished?: Date;
+  preprintValue?: string;
 }
 
 export class Article extends AggregateRoot<ArticleProps> {
@@ -28,6 +29,10 @@ export class Article extends AggregateRoot<ArticleProps> {
 
   get authorSurname(): string {
     return this.props.authorSurname;
+  }
+
+  set authorSurname(surname: string) {
+    this.props.authorSurname = surname;
   }
 
   get authorEmail(): string {
@@ -44,10 +49,6 @@ export class Article extends AggregateRoot<ArticleProps> {
 
   set authorCountry(country: string) {
     this.props.authorCountry = country;
-  }
-
-  set authorSurname(surname: string) {
-    this.props.authorSurname = surname;
   }
 
   get authorFirstName(): string {
@@ -102,6 +103,14 @@ export class Article extends AggregateRoot<ArticleProps> {
     return this.props.datePublished;
   }
 
+  get preprintValue(): string {
+    return this.props.preprintValue;
+  }
+
+  set preprintValue(preprintValue: string) {
+    this.props.preprintValue = preprintValue;
+  }
+
   private constructor(props: ArticleProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -113,7 +122,7 @@ export class Article extends AggregateRoot<ArticleProps> {
     const article = new Article(
       {
         ...props,
-        created: props.created ? props.created : new Date()
+        created: props.created ? props.created : new Date(),
       },
       id
     );

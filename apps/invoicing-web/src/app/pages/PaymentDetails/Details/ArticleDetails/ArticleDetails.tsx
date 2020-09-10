@@ -30,6 +30,7 @@ const ArticleDetails: React.FunctionComponent<Props> = ({ article }: any) => {
           label="Corresponding Author"
           text={`${article.authorFirstName} ${article.authorSurname}`}
         />
+        <DetailItem label="Preprint ID" text={article.preprintValue} />
       </Root>
     </Expander>
   );

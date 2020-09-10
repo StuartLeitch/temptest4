@@ -189,7 +189,13 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                   onSuccess={payByPayPalSubmit}
                 />
               )}
-              {error && <Text type="warning">{error}</Text>}
+              {error && (
+                <Text type="warning">
+                  {error.indexOf("INSTRUMENT_DECLINED") > -1
+                    ? "Payment declined, please chose other payment method from PayPal or chose Credit Card payment."
+                    : error}
+                </Text>
+              )}
             </Root>
           );
         }}

@@ -57,6 +57,7 @@ export const SubmissionSubmittedHandler = {
           articleType: { name },
           submissionCreatedDate: created,
           authors,
+          preprintValue,
         },
       ],
     } = data;
@@ -209,6 +210,7 @@ export const SubmissionSubmittedHandler = {
           authorCountry: country,
           authorSurname: surname,
           authorFirstName: givenNames,
+          preprintValue,
         },
         defaultContext
       );
@@ -251,6 +253,7 @@ export const SubmissionSubmittedHandler = {
           authorSurname: surname,
           authorFirstName: givenNames,
           created: new Date(created),
+          preprintValue,
         };
 
         const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(

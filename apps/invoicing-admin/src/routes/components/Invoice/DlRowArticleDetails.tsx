@@ -29,6 +29,10 @@ const DlRowArticleDetails = (props) => (
         {props.authorFirstName} {props.authorSurname} (
         <a href='#'>{props.authorEmail}</a>)
       </dd>
+      <dt className={`col-sm-3 ${props.leftSideClassName}`}>Preprint ID</dt>
+      <dd className={`col-sm-9 ${props.rightSideClassName}`}>
+        {props.preprintValue}
+      </dd>
     </dl>
   </React.Fragment>
 );

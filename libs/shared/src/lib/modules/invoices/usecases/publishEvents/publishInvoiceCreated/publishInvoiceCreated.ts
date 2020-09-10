@@ -64,6 +64,8 @@ export class PublishInvoiceCreatedUsecase
       costs: formatCosts(invoiceItems, [], invoice),
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
+
+      preprintValue: manuscript.preprintValue,
     };
 
     try {

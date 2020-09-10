@@ -84,6 +84,8 @@ export class PublishInvoiceCreditedUsecase
       payer: formatPayer(payer, billingAddress),
 
       payments: formatPayments(payments, paymentMethods),
+
+      preprintValue: manuscript.preprintValue,
     };
 
     try {

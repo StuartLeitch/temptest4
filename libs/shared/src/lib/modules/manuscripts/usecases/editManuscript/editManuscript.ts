@@ -103,6 +103,10 @@ export class EditManuscriptUsecase
         manuscript.authorFirstName = request.authorFirstName;
       }
 
+      if (request.preprintValue) {
+        manuscript.preprintValue = request.preprintValue;
+      }
+
       await this.manuscriptRepo.update(manuscript);
 
       return right(Result.ok<Manuscript>(manuscript));
