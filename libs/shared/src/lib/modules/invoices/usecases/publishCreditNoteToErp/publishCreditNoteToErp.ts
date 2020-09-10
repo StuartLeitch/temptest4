@@ -150,8 +150,7 @@ export class PublishCreditNoteToErpUsecase
             netSuiteResponse
           )}`
         );
-        creditNote.nsReference = String(netSuiteResponse); // netSuiteResponse;
-        creditNote.erpReference = String(netSuiteResponse); // .tradeDocumentId;
+        creditNote.creditNoteReference = String(netSuiteResponse); // netSuiteResponse;
 
         // this.loggerService.info('PublishCreditNoteToERP full credit note', creditNote);
         await this.invoiceRepo.update(creditNote);
