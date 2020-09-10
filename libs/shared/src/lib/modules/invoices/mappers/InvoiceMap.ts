@@ -23,6 +23,7 @@ export class InvoiceMap extends Mapper<Invoice> {
         erpReference: raw.erpReference,
         nsReference: raw.nsReference,
         nsRevRecReference: raw.nsRevRecReference,
+        creditNoteReference: raw.creditNoteReference,
         revenueRecognitionReference: raw.revenueRecognitionReference,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
       },
@@ -53,6 +54,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       erpReference: invoice.erpReference ?? null,
       nsReference: invoice.nsReference ?? null,
       nsRevRecReference: invoice.nsRevRecReference ?? null,
+      creditNoteReference: invoice.creditNoteReference ?? null,
       revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
     };
