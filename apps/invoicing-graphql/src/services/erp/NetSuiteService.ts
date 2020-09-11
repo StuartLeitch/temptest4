@@ -36,8 +36,8 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
-    console.log('registerRevenueRecognition Data:');
-    console.info(data);
+    // console.log('registerRevenueRecognition Data:');
+    // console.info(data);
 
     const { customSegmentId } = data;
     const customerId = await this.getCustomerId(data);
@@ -184,9 +184,10 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.firstName = firstName;
       createCustomerPayload.lastName = `${lastNames.join(
         ' '
-      )} - ${article.customId.toString()}`;
+      )} ${article.customId.toString()}`;
       if (createCustomerPayload?.lastName?.length > 40) {
         createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
+          0,
           createCustomerPayload?.lastName?.length - 40
         );
       }
@@ -194,9 +195,10 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } - ${article.customId.toString()}`;
+      } ${article.customId.toString()}`;
       if (createCustomerPayload.companyName.length > 40) {
         createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
+          0,
           createCustomerPayload.companyName.length - 40
         );
       }
@@ -231,7 +233,7 @@ export class NetSuiteService implements ErpServiceContract {
       items: [item],
       article,
       // billingAddress,
-      // journalName,
+      journalName,
       // vatNote,
       // rate,
       // tradeDocumentItemProduct,
@@ -271,7 +273,7 @@ export class NetSuiteService implements ErpServiceContract {
         items: [
           {
             amount: item.calculateNetPrice(),
-            description: `${article.title} - Article Processing Charges for ${article.customId}`,
+            description: `${journalName} - Article Processing Charges for ${article.customId}`,
             quantity: 1.0,
             rate: item.price,
             taxRate1: item.rate,
@@ -397,15 +399,12 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async createRevenueRecognition(data: any) {
-    console.log('createRevenueRecognition Data:');
-    console.info(data);
-
     const {
       connection: { config, oauth, token },
     } = this;
     const {
       invoice,
-      // manuscript,
+      article,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -426,7 +425,7 @@ export class NetSuiteService implements ErpServiceContract {
         id: customerId,
       },
       createdDate: format(
-        new Date(data.invoice.dateCreated),
+        new Date(data.article.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
       line: {
