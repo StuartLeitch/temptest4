@@ -34,10 +34,17 @@ AS SELECT
   t.last_materials_check_files_submitted_date,
   t.screening_paused_date,
   t.screening_unpaused_date,
+  t.qc_paused_date,
+  t.qc_unpaused_date,
+  t.qc_escalated_date,
+  t.materials_check_files_requested_count,
+  t.materials_check_files_submitted_count,
+  t.screening_returned_to_draft_count,
   t.accepted_date,
   t.first_decision_date,
   t.special_issue_id,
   t.section_id,
+  t.preprint_value,
   t.title,
   t.journal_id,
   t.journal_name,
@@ -58,15 +65,21 @@ FROM (
       screening_passed_dates.max as screening_passed_date,
       recommendation_dates.max as last_recommendation_date,
       screening_draft_dates.max as last_returned_to_draft_date,
+      screening_draft_dates.count as screening_returned_to_draft_count,
       returned_to_editor_dates.max as last_returned_to_editor_date,
       revision_dates.max as last_revision_submitted,
       submission_accepted_dates.max as sent_to_quality_check_date,
       peer_review_dates.max as sent_to_materials_check_date,
       revision_requested_dates.min as first_decision_date,
       materials_check_files_requested_dates.max as last_materials_check_files_requested_date,
+      materials_check_files_requested_dates.count as materials_check_files_requested_count,
       materials_check_files_submitted_dates.max as last_materials_check_files_submitted_date,
+      materials_check_files_submitted_dates.count as materials_check_files_submitted_count,
       paused_dates.max as screening_paused_date,
       unpaused_dates.max as screening_unpaused_date,
+      qc_paused_dates.max as qc_paused_date,
+      qc_unpaused_dates.max as qc_unpaused_date,
+      qc_escalated_dates.max as qc_escalated_date,
       accepted_dates.min as accepted_date,
       void_dates.max as void_date,
       void_dates.max is not null as is_void,
@@ -81,6 +94,10 @@ FROM (
       s.last_version_index,
       s.special_issue_id,
       s.section_id,
+      case 
+        WHEN s.preprint_value = 'null' then null
+        ELSE s.preprint_value
+      end preprint_value,
       j.journal_id,
       j.journal_name,
       j.apc,
@@ -102,6 +119,9 @@ FROM (
       LEFT JOIN (SELECT submission_id, max(event_timestamp), min(event_timestamp), count(*) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningVoid' group by submission_id) void_dates on void_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningPaused' group by submission_id) paused_dates on paused_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionScreeningUnpaused' group by submission_id) unpaused_dates on unpaused_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckPaused' group by submission_id) qc_paused_dates on qc_paused_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckUnpaused' group by submission_id) qc_unpaused_dates on qc_unpaused_dates.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckEscalated' group by submission_id) qc_escalated_dates on qc_unpaused_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, min(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event in ('SubmissionQualityCheckPassed', 'SubmissionPeerReviewCycleCheckPassed') group by submission_id) accepted_dates on accepted_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
@@ -120,6 +140,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (article_type)`,
     `create index on ${this.getViewName()} (journal_id)`,
     `create index on ${this.getViewName()} (journal_name)`,
+    `create index on ${this.getViewName()} (preprint_value)`,
   ];
 
   getViewName(): string {

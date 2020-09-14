@@ -6,7 +6,6 @@ import {
   EventViewContract,
 } from './contracts/EventViewContract';
 import invoiceDataView from './InvoicesDataView';
-import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';
 import paymentsView from './PaymentsView';
 
@@ -22,7 +21,7 @@ AS SELECT
     inv.invoice_created_date as "invoice_created_date",
     inv.manuscript_accepted_date as "invoice_sent_date",
     inv.invoice_issue_date as "invoice_issue_date",
-    coalesce(sd.event_timestamp, inv.manuscript_accepted_date) as manuscript_accepted_date,
+    coalesce(s.accepted_date, inv.manuscript_accepted_date) as manuscript_accepted_date,
     case 
     	when inv.status = 'DRAFT' then null
     	when coalesce(inv.paid_amount, 0) = 0 then null
@@ -93,8 +92,6 @@ AS SELECT
     jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'waivers') as waivers("waiverType" text)
     group by event_id
   ) waivers on waivers.event_id = inv.event_id
-  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed') 
-    order by event_timestamp desc nulls last limit 1) sd on sd.manuscript_custom_id = inv.manuscript_custom_id
   LEFT JOIN (
     select id as event_id, STRING_AGG(code, ', ') as coupon_codes
     from ${REPORTING_TABLES.INVOICE} ie,
