@@ -1,4 +1,12 @@
-import { Invoice, Payer, InvoiceItem, Address, Article } from '@hindawi/shared';
+import {
+  Invoice,
+  Payer,
+  InvoiceItem,
+  Address,
+  Article,
+  Payment,
+  PaymentMethod,
+} from '@hindawi/shared';
 
 export interface ErpData {
   invoice: Invoice;
@@ -9,9 +17,20 @@ export interface ErpData {
   journalName?: string;
   vatNote?: Record<string, unknown>;
   rate?: number;
+  total?: number;
+  invoiceTotal?: number;
   tradeDocumentItemProduct: string;
   customSegmentId?: string;
   taxRateId?: string;
+  customerId?: string;
+  itemId?: string;
+  payments?: Payment[];
+  paymentMethods?: PaymentMethod[];
+  creditAccountId?: string;
+  debitAccountId?: string;
+  journalId?: string;
+  creditNote?: Invoice;
+  creditNoteId?: string;
 }
 
 export interface ErpResponse {

@@ -88,7 +88,7 @@ export class NetSuiteService implements ErpServiceContract {
     return this.createCustomer(data);
   }
 
-  private async queryCustomer(data: any) {
+  private async queryCustomer(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -122,7 +122,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createCustomer(data: any) {
+  private async createCustomer(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -183,7 +183,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createInvoice(data: any) {
+  private async createInvoice(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -225,7 +225,7 @@ export class NetSuiteService implements ErpServiceContract {
             description: `${article.title} - Article Processing Charges for ${article.customId}`,
             quantity: 1.0,
             rate: item.price,
-            taxRate1: item.rate,
+            taxRate1: item.price,
             excludeFromRateRequest: false,
             printItems: false,
             item: {
@@ -260,7 +260,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createPayment(data: any) {
+  private async createPayment(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -316,7 +316,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async queryAccount(data: any) {
+  private async queryAccount(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -349,7 +349,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createRevenueRecognition(data: any) {
+  private async createRevenueRecognition(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -421,7 +421,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async patchInvoice(data: any) {
+  private async patchInvoice(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -452,7 +452,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async transformCreditNote(data: any) {
+  private async transformCreditNote(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -480,7 +480,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async patchCreditNote(data: any) {
+  private async patchCreditNote(data: ErpData) {
     const {
       connection: { config, oauth, token },
     } = this;
