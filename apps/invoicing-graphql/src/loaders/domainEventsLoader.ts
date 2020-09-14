@@ -17,6 +17,7 @@ import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modul
 import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
+import { AfterInvoiceSubmittedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceSubmittedEvent';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
@@ -28,6 +29,10 @@ import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules
 import { Context } from '../builders';
 
 import { env } from '../env';
+import {
+  PublishInvoiceDraftCreatedErrors,
+  PublishInvoiceDraftCreatedUseCase,
+} from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
 
 // This feature is a copy from https://github.com/kadirahq/graphql-errors
 
@@ -90,6 +95,9 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       ? new PublishPaymentToErpUsecase(payment, netSuiteService, loggerService)
       : new NoOpUseCase();
 
+    const publishInvoiceDraftCreatedUseCase = new PublishInvoiceDraftCreatedUseCase(
+      queue
+    );
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
       queue
     );
@@ -100,6 +108,12 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression
+    new AfterInvoiceSubmittedEvent(
+      invoice,
+      invoiceItem,
+      manuscript,
+      publishInvoiceDraftCreatedUseCase
+    );
     new AfterInvoiceCreatedEvent(
       invoice,
       invoiceItem,
