@@ -1,5 +1,6 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import { createQueueService } from '@hindawi/queue-service';
 import { BullScheduler } from '@hindawi/sisif';
 import {
   PaymentMethodRepoContract,
@@ -86,10 +87,39 @@ function buildPaymentStrategyFactory(
   );
 }
 
-export function buildServices(
+async function setupQueueService(loggerBuilder: LoggerBuilder) {
+  const logger = loggerBuilder.getLogger();
+  const config = {
+    region: env.aws.sns.sqsRegion,
+    accessKeyId: env.aws.sns.sqsAccessKey,
+    secretAccessKey: env.aws.sns.sqsSecretKey,
+    snsEndpoint: env.aws.sns.endpoint,
+    sqsEndpoint: env.aws.sqs.endpoint,
+    s3Endpoint: env.aws.s3.endpoint,
+    topicName: env.aws.sns.topic,
+    queueName: env.aws.sqs.queueName,
+    bucketName: env.aws.s3.largeEventBucket,
+    bucketPrefix: env.aws.s3.bucketPrefix,
+    eventNamespace: env.app.eventNamespace,
+    publisherName: env.app.publisherName,
+    serviceName: env.app.name,
+    defaultMessageAttributes: env.app.defaultMessageAttributes,
+  };
+
+  let queue: any;
+  try {
+    queue = await createQueueService(config);
+  } catch (err) {
+    logger.error(err);
+  }
+
+  return queue;
+}
+
+export async function buildServices(
   repos: Repos,
   loggerBuilder: LoggerBuilder
-): Services {
+): Promise<Services> {
   const bullData = env.scheduler.db;
 
   return {
@@ -110,6 +140,8 @@ export function buildServices(
       repos
     ),
     erp: null,
-    qq: null,
+    qq: env.loaders.queueServiceEnabled
+      ? await setupQueueService(loggerBuilder)
+      : null,
   };
 }

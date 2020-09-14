@@ -91,7 +91,7 @@ async function main() {
     const { erpLoader } = await import(
       /* webpackChunkName: "erpLoader" */ './loaders/erpLoader'
     );
-    log.info('ERP Sage integration initiated ✔️');
+    log.info('ERP integration initiated ✔️');
     loaders.push(erpLoader);
   }
 
@@ -120,6 +120,7 @@ async function main() {
     log.info('Domain Events initiated ✔️');
     loaders.push(domainEventsRegisterLoader);
   }
+
   if (env.loaders.sisifEnabled) {
     // import { sisifLoader } from './loaders/sisifLoader';
     const { sisifLoader } = await import(

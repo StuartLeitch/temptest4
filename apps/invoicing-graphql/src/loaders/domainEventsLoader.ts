@@ -50,12 +50,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         waiver,
         payer,
       },
-      services: {
-        erp: { sage: erpService, netsuite: netSuiteService },
-        logger: loggerService,
-        schedulingService,
-        qq: queue,
-      },
+      services: { erp, logger: loggerService, schedulingService, qq: queue },
     } = context;
 
     const publishInvoiceToErpUsecase = env.app.erpRegisterInvoicesEnabled
@@ -68,8 +63,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           address,
           manuscript,
           catalog,
-          erpService,
-          netSuiteService,
+          erp?.sage || null,
+          erp?.netsuite || null,
           publisher,
           loggerService
         )
@@ -81,7 +76,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           invoiceItem,
           coupon,
           waiver,
-          netSuiteService,
+          erp?.netsuite || null,
           loggerService
         )
       : new NoOpUseCase();
@@ -95,26 +90,18 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           coupon,
           waiver,
           payer,
-          netSuiteService,
+          erp?.netsuite || null,
           loggerService
         )
       : new NoOpUseCase();
 
-    const publishInvoiceCreatedUsecase = env.loaders.queueServiceEnabled
-      ? new PublishInvoiceCreatedUsecase(queue)
-      : new NoOpUseCase();
-    const publishInvoiceConfirmed = env.loaders.queueServiceEnabled
-      ? new PublishInvoiceConfirmedUsecase(queue)
-      : new NoOpUseCase();
-    const publishInvoiceFinalized = env.loaders.queueServiceEnabled
-      ? new PublishInvoiceFinalizedUsecase(queue)
-      : new NoOpUseCase();
-    const publishInvoiceCredited = env.loaders.queueServiceEnabled
-      ? new PublishInvoiceCreditedUsecase(queue)
-      : new NoOpUseCase();
-    const publishInvoicePaid = env.loaders.queueServiceEnabled
-      ? new PublishInvoicePaidUsecase(queue)
-      : new NoOpUseCase();
+    const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
+      queue
+    );
+    const publishInvoiceConfirmed = new PublishInvoiceConfirmedUsecase(queue);
+    const publishInvoiceFinalized = new PublishInvoiceFinalizedUsecase(queue);
+    const publishInvoiceCredited = new PublishInvoiceCreditedUsecase(queue);
+    const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
 
     // Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression

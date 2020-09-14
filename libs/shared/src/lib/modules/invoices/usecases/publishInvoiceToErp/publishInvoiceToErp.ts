@@ -76,9 +76,6 @@ export class PublishInvoiceToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<PublishInvoiceToErpResponse> {
     this.loggerService.info('PublishInvoiceToERP Request', request);
-    if (process.env.ERP_DISABLED === 'true') {
-      return right(null);
-    }
 
     let invoice: Invoice;
 
