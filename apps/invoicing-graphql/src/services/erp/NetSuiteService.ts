@@ -146,9 +146,10 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.firstName = firstName;
       createCustomerPayload.lastName = `${lastNames.join(
         ' '
-      )} - ${article.customId.toString()}`;
+      )} ${article.customId.toString()}`;
       if (createCustomerPayload?.lastName?.length > 40) {
         createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
+          0,
           createCustomerPayload?.lastName?.length - 40
         );
       }
@@ -156,9 +157,10 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } - ${article.customId.toString()}`;
+      } ${article.customId.toString()}`;
       if (createCustomerPayload.companyName.length > 40) {
         createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
+          0,
           createCustomerPayload.companyName.length - 40
         );
       }
@@ -191,6 +193,11 @@ export class NetSuiteService implements ErpServiceContract {
       invoice,
       items: [item],
       article,
+      // billingAddress,
+      journalName,
+      // vatNote,
+      // rate,
+      // tradeDocumentItemProduct,
       customerId,
       customSegmentId,
       itemId,
@@ -222,7 +229,7 @@ export class NetSuiteService implements ErpServiceContract {
         items: [
           {
             amount: item.calculateNetPrice(),
-            description: `${article.title} - Article Processing Charges for ${article.customId}`,
+            description: `${journalName} - Article Processing Charges for ${article.customId}`,
             quantity: 1.0,
             rate: item.price,
             taxRate1: item.price,
@@ -355,6 +362,7 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const {
       invoice,
+      article,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -375,7 +383,7 @@ export class NetSuiteService implements ErpServiceContract {
         id: customerId,
       },
       createdDate: format(
-        new Date(data.invoice.dateCreated),
+        new Date(article.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
       line: {
