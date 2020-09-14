@@ -118,28 +118,21 @@ export class AfterInvoicePaidEvent
 
       invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
 
-      // const publishResult = await this.publishInvoicePaid.execute({
-      //   paymentMethods: paymentMethods.value.getValue(),
-      //   invoiceItems,
-      //   billingAddress,
-      //   manuscript,
-      //   payments,
-      //   invoice,
-      //   payer,
-      // });
+      const publishResult = await this.publishInvoicePaid.execute({
+        paymentMethods: paymentMethods.value.getValue(),
+        invoiceItems,
+        billingAddress,
+        manuscript,
+        payments,
+        invoice,
+        payer,
+      });
 
-      // if (publishResult.isLeft()) {
-      //   throw publishResult.value.errorValue();
-      // }
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
 
-      const publishPaymentToErpResult = await this.publishPaymentToErp.execute({
-        // paymentMethods: paymentMethods.value.getValue(),
-        // invoiceItems,
-        // billingAddress,
-        // manuscript,
-        // payments,
-        // invoice,
-        // payer,
+      await this.publishPaymentToErp.execute({
         invoiceId: invoice.invoiceId.toString(),
         total: invoice.getInvoiceTotal(),
       });
