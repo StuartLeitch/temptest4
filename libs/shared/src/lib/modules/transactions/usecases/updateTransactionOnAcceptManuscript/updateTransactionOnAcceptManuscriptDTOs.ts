@@ -18,4 +18,5 @@ export interface UpdateTransactionOnAcceptManuscriptDTO {
   bankTransferCopyReceiver?: string;
   sanctionedCountryNotificationReceiver?: string;
   sanctionedCountryNotificationSender?: string;
+  acceptanceDate?: string;
 }
