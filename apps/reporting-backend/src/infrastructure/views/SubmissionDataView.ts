@@ -26,6 +26,7 @@ CREATE TABLE ${this.getViewName()} (
   last_version_index int4 NULL,
   CONSTRAINT submission_data_pkey PRIMARY KEY (event_id)
 )`;
+    // preprint_value text NULL
   }
 
   public getTriggerQuery(): string {
@@ -87,7 +88,8 @@ execute procedure ${this.getTriggerName()}();
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'sectionId'),
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'version'),
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'id'),
-          _last_version_index) ON CONFLICT (event_id) DO UPDATE set
+          _last_version_index, 
+          (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'preprintValue')) ON CONFLICT (event_id) DO UPDATE set
             event_timestamp = excluded.event_timestamp,
             submission_event = excluded.submission_event,
             submission_id = excluded.submission_id,
@@ -99,7 +101,8 @@ execute procedure ${this.getTriggerName()}();
             section_id = excluded.section_id,
             "version" = excluded."version",
             manuscript_version_id = excluded.manuscript_version_id,
-            last_version_index = excluded.last_version_index;
+            last_version_index = excluded.last_version_index,
+            preprint_value = excluded.preprint_value;
         RETURN NEW;
     END
     $$

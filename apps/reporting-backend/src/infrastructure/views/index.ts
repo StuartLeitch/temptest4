@@ -24,10 +24,12 @@ import manuscriptsVendorView from './ManuscriptVendorsView';
 import paymentsView from './PaymentsView';
 import submissionDataView from './SubmissionDataView';
 import submissionsView from './SubmissionsView';
+import usersDataView from './UsersDataView';
 
 export const materializedViewList: AbstractEventView[] = OrderUtils.orderDependencies(
   [
     invoicesDataView,
+    usersDataView,
     articleDataView,
     checkerSubmissionData,
     checkerToSubmission,
