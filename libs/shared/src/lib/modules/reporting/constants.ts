@@ -34,6 +34,7 @@ export const SYNDICATION_EVENTS = [
 export const JOURNAL_EVENTS = [
   'JournalAdded',
   'JournalUpdated',
+  'JournalActivated',
   'JournalEditorAssigned',
   'JournalEditorRemoved',
   'JournalEditorialAssistantAssigned',
@@ -53,4 +54,6 @@ export const JOURNAL_EVENTS = [
   'JournalSectionSpecialIssueEditorAssigned',
   'JournalSectionSpecialIssueEditorRemoved',
   'JournalSectionSpecialIssueOpened',
+  'JournalSectionSpecialIssueDeactivated',
+  'JournalSpecialIssueDeactivated',
 ];
