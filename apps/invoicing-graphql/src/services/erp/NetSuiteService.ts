@@ -382,7 +382,7 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
-      createdDate: format(
+      trandate: format(
         new Date(article.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),

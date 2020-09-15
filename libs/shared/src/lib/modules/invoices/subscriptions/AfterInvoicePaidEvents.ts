@@ -116,7 +116,7 @@ export class AfterInvoicePaidEvent
         invoice.invoiceId
       );
 
-      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
+      invoice.addItems(invoiceItems);
 
       const publishResult = await this.publishInvoicePaid.execute({
         paymentMethods: paymentMethods.value.getValue(),
