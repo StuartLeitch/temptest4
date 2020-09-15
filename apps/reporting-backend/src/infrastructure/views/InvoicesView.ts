@@ -17,6 +17,12 @@ AS SELECT
     inv.reference_number as "invoice_reference_number",
     original_invoice.reference_number as "credited_invoice_reference_number",
     inv.is_credit_note,
+    case
+      when deleted_invoices.invoice_id is not null 
+        then true
+        else false
+    end as is_deleted,
+    deleted_invoices.event_timestamp as deleted_date,
     inv.manuscript_custom_id as "manuscript_custom_id",
     inv.invoice_created_date as "invoice_created_date",
     inv.manuscript_accepted_date as "invoice_sent_date",
@@ -103,7 +109,13 @@ AS SELECT
     from ${paymentsView.getViewName()}
     group by invoice_id
   ) payments on payments.invoice_id = inv.invoice_id
-  LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 where id2.invoice_id = inv.cancelled_invoice_reference limit 1) original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
+  LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 
+      where id2.invoice_id = inv.cancelled_invoice_reference limit 1) 
+    original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
+  LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} deleted_invoices
+      where deleted_invoices.invoice_id = inv.invoice_id
+        and event = 'InvoiceDraftDeleted'
+      limit 1) deleted_invoices on deleted_invoices.invoice_id = inv.invoice_id
 WITH DATA;
     `;
   }
