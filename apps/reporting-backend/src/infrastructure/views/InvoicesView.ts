@@ -62,7 +62,7 @@ AS SELECT
     s.journal_name as "journal_name",
     s.publisher_name as "publisher_name",
     s.journal_code as "journal_code",
-    CASE WHEN s.special_issue_id is null THEN 'special'
+    CASE WHEN s.special_issue_id is not null THEN 'special'
          ELSE 'regular'
     END as "issue_type",
     s.submission_date as "manuscript_submission_date",

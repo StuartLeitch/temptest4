@@ -190,7 +190,8 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views('20200914662115_qc_events_rename', true),
-    rebuild_materialized_views('20200915122115_add_deleted_invoices'),
+    rebuild_materialized_views('20200915122115_add_deleted_invoices', true),
+    rebuild_materialized_views('20200916122115_fix_invoices_issue_type'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
