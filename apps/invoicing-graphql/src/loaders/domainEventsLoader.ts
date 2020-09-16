@@ -8,6 +8,7 @@ import {
 
 import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
 import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
+import { PublishInvoiceDraftCreatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
@@ -17,7 +18,7 @@ import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modul
 import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
-import { AfterInvoiceSubmittedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceSubmittedEvent';
+import { AfterInvoiceDraftCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
@@ -29,10 +30,6 @@ import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules
 import { Context } from '../builders';
 
 import { env } from '../env';
-import {
-  PublishInvoiceDraftCreatedErrors,
-  PublishInvoiceDraftCreatedUseCase,
-} from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
 
 // This feature is a copy from https://github.com/kadirahq/graphql-errors
 
@@ -108,7 +105,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression
-    new AfterInvoiceSubmittedEvent(
+    new AfterInvoiceDraftCreatedEvent(
       invoice,
       invoiceItem,
       manuscript,

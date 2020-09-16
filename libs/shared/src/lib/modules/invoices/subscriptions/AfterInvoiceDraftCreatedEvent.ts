@@ -6,7 +6,7 @@ import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
 import { PublishInvoiceDraftCreatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftCreated';
 
-export class AfterInvoiceSubmittedEvent
+export class AfterInvoiceDraftCreatedEvent
   implements HandleContract<InvoiceDraftCreated> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -17,7 +17,7 @@ export class AfterInvoiceSubmittedEvent
     this.setupSubscriptions();
   }
 
-  setupSubscriptions() {
+  setupSubscriptions(): void {
     DomainEvents.register(
       this.onInvoiceDraftCreatedEvent.bind(this),
       InvoiceDraftCreated.name
@@ -29,6 +29,7 @@ export class AfterInvoiceSubmittedEvent
   ): Promise<any> {
     //Get invoice data
     try {
+      console.log('lets goooooooo');
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       if (!invoice) {
         throw new Error(

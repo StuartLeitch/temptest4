@@ -4,6 +4,7 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { CreateTransactionResponse } from './createTransactionResponse';
@@ -109,6 +110,7 @@ export class CreateTransactionUsecase
         return left(new CreateTransactionErrors.InvoiceCreatedError());
       }
       const invoice = invoiceOrError.getValue();
+      invoice.generateInvoiceDraftEvent();
 
       //* System creates invoice item(s)
       const invoiceItemProps = {
@@ -158,6 +160,9 @@ export class CreateTransactionUsecase
         // [CreateTransactionUsecase Result Data]:
         // ${JSON.stringify(TransactionMap.toPersistence(transaction))}
         //       `);
+
+        //Event dispatch
+        DomainEvents.dispatchEventsForAggregate(invoice.id);
 
         return right(Result.ok<Transaction>(transaction));
       } else {
