@@ -425,10 +425,10 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
-      createdDate: format(
-        new Date(data.invoice.dateCreated),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
+      // createdDate: format(
+      //   new Date(data.invoice.dateCreated),
+      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      // ),
       line: {
         items: [
           {
@@ -455,8 +455,8 @@ export class NetSuiteService implements ErpServiceContract {
       };
     }
 
-    console.log('createJournalPayload:');
-    console.info(createJournalPayload);
+    // console.log('createJournalPayload:');
+    // console.info(createJournalPayload);
 
     try {
       const res = await axios({
@@ -519,8 +519,8 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { creditNote } = data;
 
-    console.log('transformCreditNote data:');
-    console.info(creditNote);
+    // console.log('transformCreditNote data:');
+    // console.info(creditNote);
 
     const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${creditNote.nsReference}/!transform/creditmemo`,

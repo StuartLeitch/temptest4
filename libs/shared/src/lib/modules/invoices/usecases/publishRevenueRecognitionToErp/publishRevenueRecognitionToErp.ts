@@ -166,22 +166,24 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
-      const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
-        {
-          invoice,
-          article: manuscript as any,
-          payer,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          invoiceTotal: netCharges,
-        }
-      );
+      if (!invoice.nsRevRecReference) {
+        const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
+          {
+            invoice,
+            article: manuscript as any,
+            payer,
+            customSegmentId: publisherCustomValues?.customSegmentId,
+            invoiceTotal: netCharges,
+          }
+        );
 
-      this.loggerService.info(
-        `NetSuite Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
-          netSuiteResponse
-        )}`
-      );
-      invoice.nsRevRecReference = String(netSuiteResponse);
+        this.loggerService.info(
+          `NetSuite Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
+            netSuiteResponse
+          )}`
+        );
+        invoice.nsRevRecReference = String(netSuiteResponse);
+      }
 
       try {
         const erpResponse = await this.sageService.registerRevenueRecognition({
