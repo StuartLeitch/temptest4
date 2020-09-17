@@ -272,11 +272,11 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    // if (customSegmentId !== '4') {
-    //   createInvoicePayload.cseg1 = {
-    //     id: customSegmentId,
-    //   };
-    // }
+    if (customSegmentId !== '4') {
+      createInvoicePayload.cseg1 = {
+        id: customSegmentId,
+      };
+    }
 
     try {
       const res = await axios({
