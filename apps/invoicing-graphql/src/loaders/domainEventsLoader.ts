@@ -50,12 +50,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         waiver,
         payer,
       },
-      services: {
-        erp: { sage: erpService, netsuite: netSuiteService },
-        logger: loggerService,
-        schedulingService,
-        qq: queue,
-      },
+      services: { erp, logger: loggerService, schedulingService, qq: queue },
     } = context;
 
     const publishInvoiceToErpUsecase = env.loaders.erpEnabled
@@ -68,8 +63,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           address,
           manuscript,
           catalog,
-          erpService,
-          netSuiteService,
+          erp?.sage || null,
+          erp?.netsuite || null,
           publisher,
           loggerService
         )
@@ -81,13 +76,17 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           invoiceItem,
           coupon,
           waiver,
-          netSuiteService,
+          erp?.netsuite || null,
           loggerService
         )
       : new NoOpUseCase();
 
     const publishPaymentToErp = env.loaders.erpEnabled
-      ? new PublishPaymentToErpUsecase(payment, netSuiteService, loggerService)
+      ? new PublishPaymentToErpUsecase(
+          payment,
+          erp?.netsuite || null,
+          loggerService
+        )
       : new NoOpUseCase();
 
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
