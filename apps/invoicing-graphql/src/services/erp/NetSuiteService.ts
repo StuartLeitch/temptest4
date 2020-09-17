@@ -3,7 +3,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
 
-import { ErpServiceContract, PayerType } from '@hindawi/shared';
+import { ErpServiceContract, PayerType, Payer, Article } from '@hindawi/shared';
 
 import {
   // ErpServiceContract,
@@ -13,6 +13,8 @@ import {
 
 import { Connection } from './netsuite/Connection';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
+
+type CustomerPayload = Record<string, string | boolean>;
 
 export class NetSuiteService implements ErpServiceContract {
   private constructor(private connection: Connection) {}
@@ -92,7 +94,14 @@ export class NetSuiteService implements ErpServiceContract {
     console.log('registerPayment Data:');
     console.info(data);
 
-    const customerAlreadyExists = await this.queryCustomer(data);
+    const customerAlreadyExists = await this.queryCustomer(
+      this.getCustomerPayload(data.payer, data.article)
+    );
+    if (!customerAlreadyExists) {
+      console.error(
+        `Customer does not exists for article: ${data.article.customId}.`
+      );
+    }
     const paymentId = await this.createPayment({
       ...data,
       customerId: customerAlreadyExists.id,
@@ -103,34 +112,36 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async getCustomerId(data: ErpData) {
-    // const { payer } = data;
+    const { payer } = data;
 
-    // let customerId;
-    // const customerAlreadyExists = await this.queryCustomer(data);
+    let customerId;
 
-    // if (customerAlreadyExists) {
-    //   if (
-    //     (customerAlreadyExists.isperson === 'T' &&
-    //       payer.type === PayerType.INSTITUTION) ||
-    //     (customerAlreadyExists.isperson === 'F' &&
-    //       payer.type !== PayerType.INSTITUTION)
-    //   ) {
-    const customerId = await this.createCustomer(data);
-    //   } else {
-    //     customerId = customerAlreadyExists.id;
-    //   }
-    // } else {
-    //   customerId = await this.createCustomer(data);
-    // }
+    const customerAlreadyExists = await this.queryCustomer(
+      this.getCustomerPayload(data.payer, data.article)
+    );
+
+    if (customerAlreadyExists) {
+      if (
+        (customerAlreadyExists.isperson === 'T' &&
+          payer.type === PayerType.INSTITUTION) ||
+        (customerAlreadyExists.isperson === 'F' &&
+          payer.type !== PayerType.INSTITUTION)
+      ) {
+        customerId = await this.createCustomer(data);
+      } else {
+        customerId = customerAlreadyExists.id;
+      }
+    } else {
+      customerId = await this.createCustomer(data);
+    }
 
     return customerId;
   }
 
-  private async queryCustomer(data: any) {
+  private async queryCustomer(customer: CustomerPayload) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { payer } = data;
 
     // * Query customers
     const queryCustomerRequestOpts = {
@@ -139,7 +150,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const queryCustomerRequest = {
-      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${payer?.email?.toString()}'`,
+      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${customer.email}' AND lastName = '${customer?.lastName}'`,
     };
 
     try {
@@ -174,34 +185,7 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
-    const createCustomerPayload: Record<string, string | boolean> = {
-      email: payer?.email.toString(),
-    };
-
-    if (payer?.type !== PayerType.INSTITUTION) {
-      createCustomerPayload.isPerson = true;
-      const [firstName, ...lastNames] = payer?.name.toString().split(' ');
-      createCustomerPayload.firstName = firstName;
-      createCustomerPayload.lastName = `${lastNames.join(
-        ' '
-      )} - ${article.customId.toString()}`;
-      if (createCustomerPayload?.lastName?.length > 40) {
-        createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
-          createCustomerPayload?.lastName?.length - 40
-        );
-      }
-    } else {
-      createCustomerPayload.isPerson = false;
-      createCustomerPayload.companyName = `${
-        payer?.organization.toString() || payer?.name.toString()
-      } - ${article.customId.toString()}`;
-      if (createCustomerPayload.companyName.length > 40) {
-        createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
-          createCustomerPayload.companyName.length - 40
-        );
-      }
-      createCustomerPayload.vatRegNumber = payer.VATId;
-    }
+    const createCustomerPayload = this.getCustomerPayload(payer, article);
 
     try {
       const res = await axios({
@@ -288,11 +272,11 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '4') {
-      createInvoicePayload.cseg1 = {
-        id: customSegmentId,
-      };
-    }
+    // if (customSegmentId !== '4') {
+    //   createInvoicePayload.cseg1 = {
+    //     id: customSegmentId,
+    //   };
+    // }
 
     try {
       const res = await axios({
@@ -614,5 +598,37 @@ export class NetSuiteService implements ErpServiceContract {
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
+  }
+
+  private getCustomerPayload(payer: Payer, article: Article): CustomerPayload {
+    const createCustomerPayload: Record<string, string | boolean> = {
+      email: payer?.email.toString(),
+    };
+
+    if (payer?.type !== PayerType.INSTITUTION) {
+      createCustomerPayload.isPerson = true;
+      const [firstName, ...lastNames] = payer?.name.toString().split(' ');
+      createCustomerPayload.firstName = firstName;
+      createCustomerPayload.lastName = `${lastNames.join(
+        ' '
+      )} - ${article.customId.toString()}`;
+      if (createCustomerPayload?.lastName?.length > 40) {
+        createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
+          createCustomerPayload?.lastName?.length - 40
+        );
+      }
+    } else {
+      createCustomerPayload.isPerson = false;
+      createCustomerPayload.companyName = `${
+        payer?.organization.toString() || payer?.name.toString()
+      } - ${article.customId.toString()}`;
+      if (createCustomerPayload.companyName.length > 40) {
+        createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
+          createCustomerPayload.companyName.length - 40
+        );
+      }
+      createCustomerPayload.vatRegNumber = payer.VATId;
+    }
+    return createCustomerPayload;
   }
 }
