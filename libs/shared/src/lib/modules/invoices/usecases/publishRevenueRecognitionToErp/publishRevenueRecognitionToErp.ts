@@ -166,8 +166,9 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
+      let netSuiteResponse;
       if (!invoice.nsRevRecReference) {
-        const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
+        netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
           {
             invoice,
             article: manuscript as any,
