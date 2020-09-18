@@ -1,24 +1,6 @@
 /* eslint-disable */
 const uuid = require('uuid/v4');
 
-const paymentMethods = [
-  {
-    id: v4(),
-    name: 'Credit Card',
-    isActive: true,
-  },
-  {
-    id: v4(),
-    name: 'Bank Transfer',
-    isActive: true,
-  },
-  {
-    id: v4(),
-    name: 'Paypal',
-    isActive: true,
-  },
-];
-
 const seed = async (knex) => {
   console.log('Seeding publisher custom values...');
   await knex('publisher_custom_values').truncate();

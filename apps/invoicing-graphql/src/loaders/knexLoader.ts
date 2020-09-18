@@ -1,6 +1,6 @@
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import Knex from 'knex';
 // import knexTinyLogger from 'knex-tiny-logger';
@@ -15,20 +15,21 @@ export const knexLoader: MicroframeworkLoader = async (
   const knex = Knex({
     client: 'pg',
     migrations: {
-      directory: env.app.dirs.migrationsDir
+      directory: env.app.dirs.migrationsDir,
     },
     seeds: {
-      directory: env.app.dirs.seedsDir
+      directory: env.app.dirs.seedsDir,
     },
     connection: {
       host: env.db.host,
       user: env.db.username,
       password: env.db.password,
-      database: env.db.database
-    }
+      database: env.db.database,
+    },
   });
 
   await knex.migrate.latest();
+  await knex.seed.run();
 
   // knex.on('query-response', function(response, obj, builder) {
   //   logger.debug(obj.method, {
