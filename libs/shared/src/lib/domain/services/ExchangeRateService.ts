@@ -55,7 +55,7 @@ export class ExchangeRateService {
         try {
           resolve(parser.toJson(data, { object: true, sanitize: true }));
         } catch (error) {
-          reject(err);
+          reject(error);
         }
       });
     });
