@@ -9,21 +9,21 @@ stages:
   - deploy
 
 variables:
-  AFFECTED_ARGS: "--base=remotes/origin/develop"
+  AFFECTED_ARGS: '--base=remotes/origin/develop'
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: ''
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
   BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
   LATEST_BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:latest
-  AWS_REGION: "eu-west-1"
-  BT_ENVIRONMENT: "sandbox"
-  BT_MERCHANT_ID: "test-merchant-id"
-  BT_PUBLIC_KEY: "test-public-key"
-  BT_PRIVATE_KEY: "test-private-key"
-  VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
+  AWS_REGION: 'eu-west-1'
+  BT_ENVIRONMENT: 'sandbox'
+  BT_MERCHANT_ID: 'test-merchant-id'
+  BT_PUBLIC_KEY: 'test-public-key'
+  BT_PRIVATE_KEY: 'test-private-key'
+  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   # AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_APPS: "shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend"
+  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
   interruptible: true
@@ -34,8 +34,8 @@ Install Dependencies:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
   image: docker
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
@@ -91,8 +91,8 @@ Package Images:dev:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
@@ -107,9 +107,8 @@ Package Images:dev:
 .deploy_base: &script_deploy
   when: manual
   before_script:
-    - apk add --no-cache aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
-    - pip install --upgrade --user awscli<1.18
-    - apk add 'py3-botocore<1.18.0'
+    - apk add python3
+    - pip3 install --upgrade awscli
     - apk add --no-cache curl
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
