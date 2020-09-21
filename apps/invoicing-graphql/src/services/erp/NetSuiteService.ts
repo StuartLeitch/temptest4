@@ -253,12 +253,12 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const createInvoicePayload: Record<string, any> = {
-      createdDate: format(
-        new Date(invoice.dateCreated),
+      tranDate: format(
+        new Date(invoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
-        new Date(invoice.dateCreated),
+        new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
       tranId: invoice.referenceNumber,
