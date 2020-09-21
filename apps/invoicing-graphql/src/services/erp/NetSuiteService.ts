@@ -601,7 +601,7 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private getCustomerPayload(payer: Payer, article: Article): CustomerPayload {
-    const MAX_LENGTH = 32;
+    const MAX_LENGTH = 24;
     const createCustomerPayload: Record<string, string | boolean> = {
       email: payer?.email.toString(),
     };
