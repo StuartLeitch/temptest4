@@ -146,11 +146,22 @@ export class GetInvoicePdfUsecase
           );
 
           if (payload && payload.invoice && payload.invoice.dateIssued) {
-            const exchangeRate = await exchangeRateService.getExchangeRate(
-              new Date(payload.invoice.dateIssued),
-              'USD'
-            );
-            rate = exchangeRate.exchangeRate;
+            let exchangeRate = null;
+            try {
+              exchangeRate = await exchangeRateService.getExchangeRate(
+                new Date(payload.invoice.dateIssued),
+                'USD'
+              );
+              this.logger.info(
+                'PublishInvoiceToERP exchangeRate',
+                exchangeRate
+              );
+            } catch (error) {
+              this.logger.error('PublishInvoiceToERP exchangeRate', error);
+            }
+            if (exchangeRate?.exchangeRate) {
+              rate = exchangeRate.exchangeRate;
+            }
           }
 
           payload.invoice.props.rate = Math.round(rate * 10000) / 10000;
