@@ -52,7 +52,11 @@ export class ExchangeRateService {
           return;
         }
 
-        resolve(parser.toJson(data, { object: true, sanitize: true }));
+        try {
+          resolve(parser.toJson(data, { object: true, sanitize: true }));
+        } catch (error) {
+          reject(err);
+        }
       });
     });
   }
