@@ -45,6 +45,7 @@ const seed = async (knex) => {
     },
   ];
 
+  await knex('publishers').truncate();
   await Promise.all(publishers.map((p) => knex('publishers').insert(p)));
   await knex.schema.table('catalog', (table) => {
     table.string('publisherId', 40).defaultTo(hindawiId).notNullable();
