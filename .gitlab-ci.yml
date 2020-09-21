@@ -107,8 +107,8 @@ Package Images:dev:
 .deploy_base: &script_deploy
   when: manual
   before_script:
-    - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
-    - apk add 'py3-botocore<1.18.0'
+    - apk add python3
+    - pip3 install --upgrade awscli
     - apk add --no-cache curl
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
