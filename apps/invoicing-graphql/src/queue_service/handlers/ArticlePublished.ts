@@ -34,7 +34,7 @@ export const ArticlePublishedHandler = {
 
     const { customId, articleType, published } = data;
 
-    if (articleType?.name in ManuscriptTypeNotInvoiceable) {
+    if (articleType in ManuscriptTypeNotInvoiceable) {
       return;
     }
 
