@@ -31,7 +31,6 @@ export const knexLoader: MicroframeworkLoader = async (
   });
 
   await knex.migrate.latest();
-  await knex.seed.run();
 
   if (!skippingSeeding) {
     await knex.seed.run();
