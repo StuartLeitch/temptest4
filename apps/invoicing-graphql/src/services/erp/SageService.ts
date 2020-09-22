@@ -32,6 +32,14 @@ export class SageService implements ErpServiceContract {
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
+  get invoiceErpRefFieldName(): string {
+    return 'erpReference';
+  }
+
+  get invoiceRevenueRecRefFieldName(): string {
+    return 'revenueRecognitionReference';
+  }
+
   private async getConnection(): Promise<Connection> {
     const { user, password, securityToken, loginUrl } = this.config;
 

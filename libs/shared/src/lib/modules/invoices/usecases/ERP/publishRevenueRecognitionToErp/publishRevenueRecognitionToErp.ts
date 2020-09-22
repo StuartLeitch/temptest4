@@ -1,36 +1,36 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
-import { right, Result, left } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UseCase } from '../../../../../core/domain/UseCase';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { right, Result, left } from '../../../../../core/logic/Result';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
   AccessControlledUsecase,
   UsecaseAuthorizationContext,
   AccessControlContext,
-} from '../../../../domain/authorization';
+} from '../../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
-import { Invoice } from '../../domain/Invoice';
-import { InvoiceId } from '../../domain/InvoiceId';
-import { Payer } from '../../../payers/domain/Payer';
-import { Address } from '../../../addresses/domain/Address';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
-import { InvoiceRepoContract } from './../../repos/invoiceRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { PublisherRepoContract } from '../../../publishers/repos';
-import { JournalId } from '../../../journals/domain/JournalId';
-import { GetItemsForInvoiceUsecase } from './../getItemsForInvoice/getItemsForInvoice';
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
+import { Invoice } from '../../../domain/Invoice';
+import { InvoiceId } from '../../../domain/InvoiceId';
+import { Payer } from '../../../../payers/domain/Payer';
+import { Address } from '../../../../addresses/domain/Address';
+import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
+import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
+import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { ArticleRepoContract } from '../../../../manuscripts/repos';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { JournalId } from '../../../../journals/domain/JournalId';
+import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
 import { PublishRevenueRecognitionToErpResponse } from './publishRevenueRecognitionToErpResponse';
 
 export interface PublishRevenueRecognitionToErpRequestDTO {

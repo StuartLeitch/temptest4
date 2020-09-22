@@ -20,6 +20,14 @@ type CustomerPayload = Record<string, string | boolean>;
 export class NetSuiteService implements ErpServiceContract {
   private constructor(private connection: Connection) {}
 
+  get invoiceErpRefFieldName(): string {
+    return 'nsReference';
+  }
+
+  get invoiceRevenueRecRefFieldName(): string {
+    return 'nsRevRecReference';
+  }
+
   public static create(config: Record<string, unknown>): NetSuiteService {
     const connection = new Connection({
       config: new ConnectionConfig(config.connection),

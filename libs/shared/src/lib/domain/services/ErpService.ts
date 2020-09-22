@@ -21,6 +21,8 @@ export interface ErpResponse {
 }
 
 export interface ErpServiceContract {
+  readonly invoiceErpRefFieldName: string;
+  readonly invoiceRevenueRecRefFieldName: string;
   registerInvoice(data: ErpData): Promise<ErpResponse>;
   registerRevenueRecognition(data: any): Promise<any>;
   registerCreditNote?(data: any): Promise<any>;

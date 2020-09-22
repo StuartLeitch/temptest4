@@ -23,7 +23,7 @@ import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { PublisherRepoContract } from '../../../../publishers/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { PublishRevenueRecognitionToErpUsecase } from '../../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 export type RetryRevenueRecognitionErpInvoicesResponse = Either<
   UnexpectedError,

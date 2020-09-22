@@ -9,7 +9,8 @@ import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 
-export class MockInvoiceRepo extends BaseMockRepo<Invoice>
+export class MockInvoiceRepo
+  extends BaseMockRepo<Invoice>
   implements InvoiceRepoContract {
   constructor() {
     super();
@@ -24,7 +25,11 @@ export class MockInvoiceRepo extends BaseMockRepo<Invoice>
     }
   }
 
-  public async getFailedErpInvoices(): Promise<Invoice[]> {
+  public async getFailedSageErpInvoices(): Promise<Invoice[]> {
+    return [];
+  }
+
+  public async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
     return [];
   }
 

@@ -3,37 +3,37 @@
 
 import { getEuMembers } from 'is-eu-member';
 
-import { UseCase } from '../../../../core/domain/UseCase';
-import { right, left } from '../../../../core/logic/Result';
-import { UnexpectedError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../../core/domain/UseCase';
+import { right, left } from '../../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
 import {
   AccessControlledUsecase,
   UsecaseAuthorizationContext,
   AccessControlContext,
-} from '../../../../domain/authorization';
+} from '../../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
-import { VATService } from '../../../../domain/services/VATService';
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
+import { VATService } from '../../../../../domain/services/VATService';
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
-import { InvoiceId } from '../../domain/InvoiceId';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { JournalId } from '../../../journals/domain/JournalId';
-import { Invoice } from '../../domain/Invoice';
-import { PublisherRepoContract } from '../../../publishers/repos';
-import { InvoiceRepoContract } from './../../repos/invoiceRepo';
-import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
-import { PayerRepoContract } from './../../../payers/repos/payerRepo';
-import { PayerType } from './../../../payers/domain/Payer';
-import { ArticleRepoContract } from '../../../manuscripts/repos';
-import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
+import { InvoiceId } from '../../../domain/InvoiceId';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { JournalId } from '../../../../journals/domain/JournalId';
+import { Invoice } from '../../../domain/Invoice';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
+import { PayerRepoContract } from './../../../../payers/repos/payerRepo';
+import { PayerType } from './../../../../payers/domain/Payer';
+import { ArticleRepoContract } from '../../../../manuscripts/repos';
+import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
 
 export interface PublishInvoiceToErpRequestDTO {
   invoiceId?: string;
@@ -60,10 +60,10 @@ export class PublishInvoiceToErpUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private sageService: ErpServiceContract,
-    private netSuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
-    private loggerService: LoggerContract
+    private loggerService: LoggerContract,
+    private vatService: VATService
   ) {}
 
   private async getAccessControlContext(request: any, context?: any) {
@@ -88,50 +88,34 @@ export class PublishInvoiceToErpUsecase
       );
       this.loggerService.info('PublishInvoiceToERP invoice', invoice);
 
-      let invoiceItems = invoice.invoiceItems.currentItems;
-      this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
+      const getItemsUsecase = new GetItemsForInvoiceUsecase(
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo
+      );
 
-      if (invoiceItems.length === 0) {
-        const getItemsUsecase = new GetItemsForInvoiceUsecase(
-          this.invoiceItemRepo,
-          this.couponRepo,
-          this.waiverRepo
+      const resp = await getItemsUsecase.execute({
+        invoiceId: request.invoiceId,
+      });
+      this.loggerService.info(
+        'PublishInvoiceToERP getItemsUsecase response',
+        resp
+      );
+      if (resp.isLeft()) {
+        throw new Error(
+          `Invoice ${invoice.id.toString()} has no invoice items.`
         );
-
-        const resp = await getItemsUsecase.execute({
-          invoiceId: request.invoiceId,
-        });
-        this.loggerService.info(
-          'PublishInvoiceToERP getItemsUsecase response',
-          resp
-        );
-        if (resp.isLeft()) {
-          throw new Error(
-            `Invoice ${invoice.id.toString()} has no invoice items.`
-          );
-        }
-
-        invoiceItems = resp.value.getValue();
-        this.loggerService.info(
-          'PublishInvoiceToERP invoice items',
-          invoiceItems
-        );
-
-        for (const item of invoiceItems) {
-          const [coupons, waivers] = await Promise.all([
-            this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
-            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
-          ]);
-          coupons.forEach((c) => item.addCoupon(c));
-          item.waivers = waivers;
-        }
       }
+
+      const invoiceItems = resp.value.getValue();
+
+      this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
 
       if (invoiceItems.length === 0) {
         throw new Error(`Invoice ${invoice.id} has no invoice items.`);
       }
 
-      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
+      invoice.addItems(invoiceItems);
       this.loggerService.info(
         'PublishInvoiceToERP full invoice items',
         invoiceItems
@@ -140,6 +124,7 @@ export class PublishInvoiceToErpUsecase
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
         invoice.erpReference = 'NON_INVOICEABLE';
+        invoice.nsReference = 'NON_INVOICEABLE';
         await this.invoiceRepo.update(invoice);
         return right(null);
       }
@@ -188,8 +173,7 @@ export class PublishInvoiceToErpUsecase
         publisherCustomValues
       );
 
-      const vatService = new VATService();
-      const vatNote = vatService.getVATNote(
+      const vatNote = this.vatService.getVATNote(
         {
           postalCode: address.postalCode,
           countryCode: address.country,
@@ -259,41 +243,18 @@ export class PublishInvoiceToErpUsecase
           taxRateId,
         };
 
-        const netSuiteResponse = await this.netSuiteService.registerInvoice(
-          erpData
-        );
+        const erpResponse = await this.erpService.registerInvoice(erpData);
         this.loggerService.info(
-          'PublishInvoiceToERP NetSuite response',
-          netSuiteResponse
-        );
-        this.loggerService.info(
-          `Updating invoice ${invoice.id.toString()}: netSuiteReference -> ${JSON.stringify(
-            netSuiteResponse
-          )}`
-        );
-        invoice.nsReference = String(netSuiteResponse); // netSuiteResponse; // .tradeDocumentId;
-
-        let erpResponse;
-        try {
-          erpResponse = await this.sageService.registerInvoice(erpData);
-
-          if (erpResponse) {
-            this.loggerService.info(
-              `Updating invoice ${invoice.id.toString()}: erpReference -> ${
-                erpResponse.tradeDocumentId
-              }`
-            );
-            invoice.erpReference = erpResponse.tradeDocumentId;
-          }
-        } catch (error) {
-          this.loggerService.info(
-            `[PublishInvoiceToERP]: Failed to register in SAGE. Err: ${error}`
-          );
-        }
-        this.loggerService.info(
-          'PublishInvoiceToERP SAGE response',
+          `PublishInvoiceToERP ${this.erpService.constructor.name} response`,
           erpResponse
         );
+        this.loggerService.info(
+          `Updating invoice ${invoice.id.toString()}: ${
+            this.erpService.invoiceErpRefFieldName
+          } -> ${JSON.stringify(erpResponse)}`
+        );
+
+        invoice[this.erpService.invoiceErpRefFieldName] = String(erpResponse);
 
         this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
         await this.invoiceRepo.update(invoice);

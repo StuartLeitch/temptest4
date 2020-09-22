@@ -2,7 +2,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { UseCase } from '../../../../../core/domain/UseCase';
-import { right, Result, left, Either } from '../../../../../core/logic/Result';
+import { right, left, Either } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
@@ -11,10 +11,10 @@ import {
   UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../../domain/authorization';
-import { ErpResponse } from './../../../../../domain/services/ErpService';
+import { ErpResponse } from '../../../../../domain/services/ErpService';
 
-import { InvoiceRepoContract } from '../../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../../../invoices/repos/invoiceItemRepo';
+import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
+import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
@@ -22,20 +22,21 @@ import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { PublishInvoiceToErpUsecase } from '../../publishInvoiceToErp/publishInvoiceToErp';
+import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 import { PublisherRepoContract } from '../../../../publishers/repos';
-import { LoggerContract } from './../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { VATService } from 'libs/shared/src/lib/domain/services/VATService';
 
-export type RetryFailedErpInvoicesResponse = Either<
+export type RetryFailedNetsuiteErpInvoicesResponse = Either<
   UnexpectedError | ErpResponse,
   ErpResponse[]
 >;
 
-export class RetryFailedErpInvoicesUsecase
+export class RetryFailedNetsuiteErpInvoicesUsecase
   implements
     UseCase<
       Record<string, unknown>,
-      Promise<RetryFailedErpInvoicesResponse>,
+      Promise<RetryFailedNetsuiteErpInvoicesResponse>,
       UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
@@ -53,10 +54,10 @@ export class RetryFailedErpInvoicesUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
-    private loggerService: LoggerContract
+    private loggerService: LoggerContract,
+    private vatService: VATService
   ) {
     this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
       this.invoiceRepo,
@@ -67,10 +68,10 @@ export class RetryFailedErpInvoicesUsecase
       this.addressRepo,
       this.manuscriptRepo,
       this.catalogRepo,
-      this.sageService,
       this.netSuiteService,
       this.publisherRepo,
-      this.loggerService
+      this.loggerService,
+      this.vatService
     );
   }
 
@@ -82,9 +83,9 @@ export class RetryFailedErpInvoicesUsecase
   public async execute(
     request?: Record<string, unknown>,
     context?: UsecaseAuthorizationContext
-  ): Promise<RetryFailedErpInvoicesResponse> {
+  ): Promise<RetryFailedNetsuiteErpInvoicesResponse> {
     try {
-      const failedErpInvoices = await this.invoiceRepo.getFailedErpInvoices();
+      const failedErpInvoices = await this.invoiceRepo.getFailedSageErpInvoices();
 
       const updatedInvoices: ErpResponse[] = [];
 
