@@ -3,7 +3,9 @@ const uuid = require('uuid/v4');
 
 const seed = async (knex) => {
   console.log('Seeding publisher custom values...');
-  await knex('publisher_custom_values').truncate();
+  // await knex('publishers').truncate();
+  // await knex('publisher_custom_values').truncate();
+  await knex.raw('TRUNCATE TABLE publisher_custom_values, publishers CASCADE');
 
   const now = new Date();
   const hindawiId = uuid();
@@ -45,11 +47,14 @@ const seed = async (knex) => {
     },
   ];
 
-  await knex('publishers').truncate();
   await Promise.all(publishers.map((p) => knex('publishers').insert(p)));
   await knex.schema.table('catalog', (table) => {
     table.string('publisherId', 40).defaultTo(hindawiId).notNullable();
-    table.foreign('publisherId').references('publishers.id');
+    table
+      .foreign('publisherId')
+      .references('publishers.id')
+      .onDelete('CASCADE');
+    // t.uuid('product_id').notNullable().references('id').inTable('products').onDelete('CASCADE');
   });
 
   const publisherCustomValues = [

@@ -14,7 +14,10 @@ module.exports.up = async function (knex) {
     table.string('name');
     table.string('publisherId', 40);
     table.string('value');
-    table.foreign('publisherId').references('publishers.id');
+    table
+      .foreign('publisherId')
+      .references('publishers.id')
+      .onDelete('CASCADE');
     table.primary(['name', 'publisherId']);
   });
 };
