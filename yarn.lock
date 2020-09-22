@@ -2754,10 +2754,10 @@
     cdk8s "0.21.0"
     constructs "2.0.1"
 
-"@hindawi/phenom-events@1.11.1":
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/@hindawi/phenom-events/-/phenom-events-1.11.1.tgz#367bb8f4e59767684616b57816f3297b6a51a692"
-  integrity sha512-wfpNQ1n5VXyMWcYaWyY+m9OtCdGWxED34GCn8OTueHVibgn+liRSLuPAe1soiAxEU6LLscallCigQFqf5mRBTQ==
+"@hindawi/phenom-events@1.13.0":
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@hindawi/phenom-events/-/phenom-events-1.13.0.tgz#0701190b311f7c77c59cc593312deda854d4234f"
+  integrity sha512-q/E2n74GaIALK3XkuLLUytvkaxBEJ9XI+jbItN81qetfOcxX/tNCw3aLriVSJ+Thay+8oNZglvo4s1DUIOpK9g==
 
 "@hindawi/queue-service@1.3.4":
   version "1.3.4"
