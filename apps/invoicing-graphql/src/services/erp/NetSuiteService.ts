@@ -151,10 +151,20 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const queryBuilder = knex({ client: 'pg' });
-    const query = queryBuilder.raw(
-      'select id, companyName, email, isPerson, dateCreated from customer where email = ? and lastName = ?',
-      [customer.email, customer.lastName]
+    let query = queryBuilder.raw(
+      'select id, companyName, email, isPerson, dateCreated from customer where email = ?',
+      [customer.email]
     );
+    if (customer.lastName) {
+      query = queryBuilder.raw(`${query.toQuery()} and lastName = ?`, [
+        customer.lastName,
+      ]);
+    }
+    if (customer.company) {
+      query = queryBuilder.raw(`${query.toQuery()} and companyName = ?`, [
+        customer.company,
+      ]);
+    }
 
     const queryCustomerRequest = {
       q: query.toQuery(),
