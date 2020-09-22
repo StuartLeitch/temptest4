@@ -641,7 +641,7 @@ export class NetSuiteService implements ErpServiceContract {
           .slice(createCustomerPayload.companyName.length - 40)
           .trim();
       }
-      createCustomerPayload.vatRegNumber = payer.VATId;
+      createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
     }
     return createCustomerPayload;
   }
