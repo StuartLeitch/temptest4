@@ -622,24 +622,24 @@ export class NetSuiteService implements ErpServiceContract {
     if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
-      createCustomerPayload.firstName = firstName;
+      createCustomerPayload.firstName = firstName.trim();
       createCustomerPayload.lastName = `${lastNames.join(
         ' '
-      )} - ${article.customId.toString()}`;
+      )} - ${article.customId.toString()}`.trim();
       if (createCustomerPayload?.lastName?.length > 40) {
-        createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
-          createCustomerPayload?.lastName?.length - 40
-        );
+        createCustomerPayload.lastName = createCustomerPayload?.lastName
+          ?.slice(createCustomerPayload?.lastName?.length - 40)
+          .trim();
       }
     } else {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } - ${article.customId.toString()}`;
+      } - ${article.customId.toString()}`.trim();
       if (createCustomerPayload.companyName.length > 40) {
-        createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
-          createCustomerPayload.companyName.length - 40
-        );
+        createCustomerPayload.companyName = createCustomerPayload.companyName
+          .slice(createCustomerPayload.companyName.length - 40)
+          .trim();
       }
       createCustomerPayload.vatRegNumber = payer.VATId;
     }
