@@ -12,6 +12,8 @@ export const knexLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   const logger = new Logger();
+  const { skippingSeeding } = env.app;
+
   const knex = Knex({
     client: 'pg',
     migrations: {
@@ -30,6 +32,10 @@ export const knexLoader: MicroframeworkLoader = async (
 
   await knex.migrate.latest();
   await knex.seed.run();
+
+  if (!skippingSeeding) {
+    await knex.seed.run();
+  }
 
   // knex.on('query-response', function(response, obj, builder) {
   //   logger.debug(obj.method, {

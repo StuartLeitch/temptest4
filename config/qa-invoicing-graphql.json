@@ -79,6 +79,7 @@
   "SANCTIONED_COUNTRY_NOTIFICATION_SENDER": "phenom.invoicing@hindawi.com",
   "SCHEDULER_DB_PORT": 6379,
   "SERVICE_NAME": "invoicing",
+  "SKIPPING_SEEDING": true,
   "TENANT_ADDRESS": "Hindawi Ltd., Adam House, Third Floor, 1 Fitzroy Square, London W1T 5HF, UK",
   "TENANT_COUNTRY": "UK",
   "TENANT_NAME": "Hindawi",
