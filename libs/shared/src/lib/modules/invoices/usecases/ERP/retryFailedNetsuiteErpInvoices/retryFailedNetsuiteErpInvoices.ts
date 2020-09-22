@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { UseCase } from '../../../../../core/domain/UseCase';
-import { right, left, Either } from '../../../../../core/logic/Result';
+import { Either, right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
@@ -11,21 +11,24 @@ import {
   UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../../domain/authorization';
-import { ErpResponse } from '../../../../../domain/services/ErpService';
 
-import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
+import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
-import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
-import { CatalogRepoContract } from '../../../../journals/repos';
+
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
-import { PublisherRepoContract } from '../../../../publishers/repos';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { VATService } from 'libs/shared/src/lib/domain/services/VATService';
+
+import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
+
+import { ErpResponse } from '../../../../../domain/services/ErpService';
 
 export type RetryFailedNetsuiteErpInvoicesResponse = Either<
   UnexpectedError | ErpResponse,

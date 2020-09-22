@@ -13,7 +13,8 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   findByCancelledInvoiceReference(invoiceId: InvoiceId): Promise<Invoice>;
   getFailedSageErpInvoices(): Promise<Invoice[]>;
   getFailedNetsuiteErpInvoices(): Promise<Invoice[]>;
-  getUnrecognizedErpInvoices(): Promise<InvoiceId[]>;
+  getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]>;
+  getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]>;
   getInvoicePaymentInfo(invoiceId: InvoiceId): Promise<InvoicePaymentInfo>;
   assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice>;
   delete(invoice: Invoice): Promise<unknown>;

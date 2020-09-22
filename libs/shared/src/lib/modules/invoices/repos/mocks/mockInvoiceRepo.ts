@@ -163,7 +163,11 @@ export class MockInvoiceRepo
     yield* this._items.map((item) => item.id.toString());
   }
 
-  async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
+  async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
+    return [];
+  }
+
+  async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
     return [];
   }
 

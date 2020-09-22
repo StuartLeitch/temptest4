@@ -7,14 +7,14 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../../domain/authorization';
-import { ErpResponse } from './../../../../../domain/services/ErpService';
+import { ErpResponse } from '../../../../../domain/services/ErpService';
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { InvoiceRepoContract } from '../../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../../../invoices/repos/invoiceItemRepo';
+import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
+import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
@@ -25,16 +25,16 @@ import { PublisherRepoContract } from '../../../../publishers/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
-export type RetryRevenueRecognitionErpInvoicesResponse = Either<
+export type RetryRevenueRecognitionSageErpInvoicesResponse = Either<
   UnexpectedError,
   Result<ErpResponse[]>
 >;
 
-export class RetryRevenueRecognitionErpInvoicesUsecase
+export class RetryRevenueRecognitionSageErpInvoicesUsecase
   implements
     UseCase<
       Record<string, unknown>,
-      Promise<RetryRevenueRecognitionErpInvoicesResponse>,
+      Promise<RetryRevenueRecognitionSageErpInvoicesResponse>,
       UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
@@ -54,7 +54,6 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
     private sageService: ErpServiceContract,
-    private netSuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
     this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
@@ -68,7 +67,6 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       this.catalogRepo,
       this.publisherRepo,
       this.sageService,
-      this.netSuiteService,
       this.loggerService
     );
   }
@@ -81,9 +79,9 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
   public async execute(
     request?: Record<string, unknown>,
     context?: UsecaseAuthorizationContext
-  ): Promise<RetryRevenueRecognitionErpInvoicesResponse> {
+  ): Promise<RetryRevenueRecognitionSageErpInvoicesResponse> {
     try {
-      const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedErpInvoices();
+      const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedSageErpInvoices();
       const updatedInvoices: ErpResponse[] = [];
 
       if (unrecognizedErpInvoices.length === 0) {
