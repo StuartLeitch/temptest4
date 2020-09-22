@@ -10,8 +10,8 @@ import {
   // clearIntervalAsync
 } from 'set-interval-async/dynamic';
 
-import { RetryFailedErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/retryFailedErpInvoices/retryFailedErpInvoices';
-import { RetryRevenueRecognitionErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/retryRevenueRecognizedErpInvoices/retryRevenueRecognitionErpInvoices';
+import { RetryFailedErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryFailedErpInvoices/retryFailedErpInvoices';
+import { RetryRevenueRecognitionErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryRevenueRecognizedErpInvoices/retryRevenueRecognitionErpInvoices';
 
 import { env } from '../env';
 import { Logger } from '../lib/logger';
