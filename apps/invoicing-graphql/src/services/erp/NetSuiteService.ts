@@ -2,6 +2,7 @@
 
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
+import knex from 'knex';
 
 import { ErpServiceContract, PayerType, Payer, Article } from '@hindawi/shared';
 
@@ -149,8 +150,14 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const queryBuilder = knex({ client: 'pg' });
+    const query = queryBuilder.raw(
+      'select id, companyName, email, isPerson, dateCreated from customer where email = ? and lastName = ?',
+      [customer.email, customer.lastName]
+    );
+
     const queryCustomerRequest = {
-      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${customer.email}' AND lastName = '${customer?.lastName}'`,
+      q: query.toQuery(),
     };
 
     try {
@@ -244,10 +251,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateCreated),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
-      tranId: `${invoice.invoiceNumber}/${format(
-        new Date(invoice.dateCreated),
-        'yyyy'
-      )}`,
+      tranId: invoice.referenceNumber,
       entity: {
         id: customerId,
       },
