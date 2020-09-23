@@ -51,6 +51,8 @@ Test:
   script:
     - cd $HOME
     - mkdir report && chmod -R +x report
+    - git branch -r
+    # git remote add upstream git://github.com/svnpenn/rtmpdump.git
     - yarn run affected:test ${AFFECTED_ARGS} --parallel --configuration=production
     - yarn run ci:coverage
     - cp -r report $CI_PROJECT_DIR
