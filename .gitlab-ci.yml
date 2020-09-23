@@ -70,7 +70,7 @@ Build:
     - yarn run affected:build $AFFECTED_ARGS --configuration=production --parallel
     # artifacts can't be uploaded outside $CI_PROJECT_DIR
     - mkdir $CI_PROJECT_DIR/.ci_status
-    - nx affected:apps $AFFECTED_ARGS --plain > $CI_PROJECT_DIR/.ci_status/affected_apps
+    - yarn run affected:apps $AFFECTED_ARGS --plain > $CI_PROJECT_DIR/.ci_status/affected_apps
     - cp -r dist $CI_PROJECT_DIR
   artifacts:
     paths:
