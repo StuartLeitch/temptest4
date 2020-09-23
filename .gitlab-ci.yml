@@ -93,7 +93,6 @@ Package Images:dev:
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
   script:
-    - git fetch
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/dockerize-apps.sh
