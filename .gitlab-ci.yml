@@ -3,10 +3,10 @@ image:
 
 stages:
   - setup
-  # - test
-  # - build
-  # - package
-  # - deploy
+  - test
+  - build
+  - package
+  - deploy
 
 variables:
   DOCKER_HOST: tcp://docker:2375
