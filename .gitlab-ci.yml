@@ -45,15 +45,11 @@ Test:
   interruptible: true
   allow_failure: false
   stage: test
-  # before_script: added to dockerfile.build
-  #   - apt-get update
-  #   - apt-get -y install imagemagick graphicsmagick
+  before_script:
+    - git fetch
   script:
     - cd $HOME
     - mkdir report && chmod -R +x report
-    - git fetch
-    - git branch -a
-    # git remote add upstream git://github.com/svnpenn/rtmpdump.git
     - yarn run affected:test ${AFFECTED_ARGS} --parallel --configuration=production
     - yarn run ci:coverage
     - cp -r report $CI_PROJECT_DIR
@@ -69,6 +65,8 @@ Test:
 Build:
   interruptible: true
   stage: build
+  before_script:
+    - git fetch
   script:
     - cd $HOME
     - yarn run affected:build $AFFECTED_ARGS --configuration=production --parallel
@@ -92,6 +90,7 @@ Package Images:dev:
   before_script:
     - apk add --no-cache aws-cli
     - apk add 'py3-botocore<1.18.0'
+    - git fetch
   services:
     - name: docker:dind
       entrypoint: ["env", "-u", "DOCKER_HOST"]
