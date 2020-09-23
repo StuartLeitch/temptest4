@@ -22,7 +22,7 @@ variables:
   BT_PRIVATE_KEY: "test-private-key"
   VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
   # AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_ARGS: "--base=remotes/origin/develop"
+  AFFECTED_ARGS: "--base=origin/develop"
   AFFECTED_APPS: "shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend"
 
 Install Dependencies:
@@ -51,8 +51,6 @@ Test:
   script:
     - cd $HOME
     - mkdir report && chmod -R +x report
-    - git branch -r
-    # git remote add upstream git://github.com/svnpenn/rtmpdump.git
     - yarn run affected:test ${AFFECTED_ARGS} --parallel --configuration=production
     - yarn run ci:coverage
     - cp -r report $CI_PROJECT_DIR
