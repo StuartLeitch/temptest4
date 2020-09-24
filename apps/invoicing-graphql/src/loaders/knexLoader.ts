@@ -36,6 +36,8 @@ export const knexLoader: MicroframeworkLoader = async (
     await knex.seed.run();
   }
 
+  // console.log('Test AFFECTED apps');
+
   // knex.on('query-response', function(response, obj, builder) {
   //   logger.debug(obj.method, {
   //     query: obj.sql,

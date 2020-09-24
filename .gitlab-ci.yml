@@ -9,21 +9,22 @@ stages:
   - deploy
 
 variables:
-  AFFECTED_ARGS: '--base=remotes/origin/develop'
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ''
+  DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
   BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
   LATEST_BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:latest
-  AWS_REGION: 'eu-west-1'
-  BT_ENVIRONMENT: 'sandbox'
-  BT_MERCHANT_ID: 'test-merchant-id'
-  BT_PUBLIC_KEY: 'test-public-key'
-  BT_PRIVATE_KEY: 'test-private-key'
-  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
+  AWS_REGION: "eu-west-1"
+  BT_ENVIRONMENT: "sandbox"
+  BT_MERCHANT_ID: "test-merchant-id"
+  BT_PUBLIC_KEY: "test-public-key"
+  BT_PRIVATE_KEY: "test-private-key"
+  VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
   # AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
+  AFFECTED_COMMAND: ""
+  AFFECTED_ARGS: "--base=remotes/origin/develop"
+  AFFECTED_APPS: "shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend"
 
 Install Dependencies:
   interruptible: true
@@ -34,8 +35,8 @@ Install Dependencies:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ['env', '-u', 'DOCKER_HOST']
-      command: ['dockerd-entrypoint.sh']
+      entrypoint: ["env", "-u", "DOCKER_HOST"]
+      command: ["dockerd-entrypoint.sh"]
   image: docker
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
@@ -45,13 +46,17 @@ Test:
   interruptible: true
   allow_failure: false
   stage: test
-  # before_script: added to dockerfile.build
-  #   - apt-get update
-  #   - apt-get -y install imagemagick graphicsmagick
   script:
     - cd $HOME
+    - git fetch
     - mkdir report && chmod -R +x report
-    - yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production
+    - |
+      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
+        AFFECTED_COMMAND="yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --parallel"
+      else
+       AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
+      fi
+    - eval $AFFECTED_COMMAND
     - yarn run ci:coverage
     - cp -r report $CI_PROJECT_DIR
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
@@ -68,10 +73,23 @@ Build:
   stage: build
   script:
     - cd $HOME
-    - yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production
+    - git fetch
+    - |
+      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
+        AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel"
+      else
+       AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production"
+      fi
+    - eval $AFFECTED_COMMAND
     # artifacts can't be uploaded outside $CI_PROJECT_DIR
     - mkdir $CI_PROJECT_DIR/.ci_status
-    - echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps
+    - |
+      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
+        AFFECTED_COMMAND="echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps"
+      else
+       AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
+      fi
+    - eval $AFFECTED_COMMAND
     - cp -r dist $CI_PROJECT_DIR
   artifacts:
     paths:
@@ -91,8 +109,8 @@ Package Images:dev:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ['env', '-u', 'DOCKER_HOST']
-      command: ['dockerd-entrypoint.sh']
+      entrypoint: ["env", "-u", "DOCKER_HOST"]
+      command: ["dockerd-entrypoint.sh"]
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)

@@ -2,6 +2,7 @@
 
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
+import knex from 'knex';
 
 import { ErpServiceContract, PayerType, Payer, Article } from '@hindawi/shared';
 
@@ -149,8 +150,24 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      'select id, companyName, email, isPerson, dateCreated from customer where email = ?',
+      [customer.email]
+    );
+    if (customer.lastName) {
+      query = queryBuilder.raw(`${query.toQuery()} and lastName = ?`, [
+        customer.lastName,
+      ]);
+    }
+    if (customer.companyName) {
+      query = queryBuilder.raw(`${query.toQuery()} and companyName = ?`, [
+        customer.companyName,
+      ]);
+    }
+
     const queryCustomerRequest = {
-      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${customer.email}' AND lastName = '${customer?.lastName}'`,
+      q: query.toQuery(),
     };
 
     try {
@@ -244,10 +261,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateCreated),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
-      tranId: `${invoice.invoiceNumber}/${format(
-        new Date(invoice.dateCreated),
-        'yyyy'
-      )}`,
+      tranId: invoice.referenceNumber,
       entity: {
         id: customerId,
       },
@@ -608,26 +622,26 @@ export class NetSuiteService implements ErpServiceContract {
     if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
-      createCustomerPayload.firstName = firstName;
+      createCustomerPayload.firstName = firstName.trim();
       createCustomerPayload.lastName = `${lastNames.join(
         ' '
-      )} - ${article.customId.toString()}`;
+      )} - ${article.customId.toString()}`.trim();
       if (createCustomerPayload?.lastName?.length > 40) {
-        createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
-          createCustomerPayload?.lastName?.length - 40
-        );
+        createCustomerPayload.lastName = createCustomerPayload?.lastName
+          ?.slice(createCustomerPayload?.lastName?.length - 40)
+          .trim();
       }
     } else {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } - ${article.customId.toString()}`;
+      } - ${article.customId.toString()}`.trim();
       if (createCustomerPayload.companyName.length > 40) {
-        createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
-          createCustomerPayload.companyName.length - 40
-        );
+        createCustomerPayload.companyName = createCustomerPayload.companyName
+          .slice(createCustomerPayload.companyName.length - 40)
+          .trim();
       }
-      createCustomerPayload.vatRegNumber = payer.VATId;
+      createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
     }
     return createCustomerPayload;
   }
