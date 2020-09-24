@@ -160,9 +160,9 @@ export class NetSuiteService implements ErpServiceContract {
         customer.lastName,
       ]);
     }
-    if (customer.company) {
+    if (customer.companyName) {
       query = queryBuilder.raw(`${query.toQuery()} and companyName = ?`, [
-        customer.company,
+        customer.companyName,
       ]);
     }
 
