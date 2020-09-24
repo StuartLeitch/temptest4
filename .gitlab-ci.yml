@@ -87,7 +87,7 @@ Build:
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
         AFFECTED_COMMAND="echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps"
       else
-       AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
+       AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events// | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
       fi
     - eval $AFFECTED_COMMAND
     - cp -r dist $CI_PROJECT_DIR
@@ -113,7 +113,6 @@ Package Images:dev:
       command: ["dockerd-entrypoint.sh"]
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
-    - echo $(cat .ci_status/affected_apps) | sed -e "s/sisif-test//" | sed -i -e "s/reporting-pull-historic-events//" > $CI_PROJECT_DIR/.ci_status/affected_apps
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/dockerize-apps.sh
   dependencies:
