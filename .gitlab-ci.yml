@@ -87,7 +87,7 @@ Build:
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
         AFFECTED_COMMAND="echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps"
       else
-       AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events// | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
+       AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
       fi
     - eval $AFFECTED_COMMAND
     - cp -r dist $CI_PROJECT_DIR
