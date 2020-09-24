@@ -113,7 +113,7 @@ Package Images:dev:
       command: ["dockerd-entrypoint.sh"]
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
-    - echo $AFFECTED_APPS | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" > $CI_PROJECT_DIR/.ci_status/affected_apps
+    - echo $(cat .ci_status/affected_apps) | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" > $CI_PROJECT_DIR/.ci_status/affected_apps
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/dockerize-apps.sh
   dependencies:
