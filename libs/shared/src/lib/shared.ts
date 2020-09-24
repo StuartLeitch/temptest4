@@ -88,8 +88,8 @@ export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/p
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceFinalized/publishInvoiceFinalized';
 export * from './modules/invoices/usecases/publishEvents/publishInvoicePaid/publishInvoicePaid';
-export * from './modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-export * from './modules/invoices/usecases/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+export * from './modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
+export * from './modules/invoices/usecases/ERP/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';

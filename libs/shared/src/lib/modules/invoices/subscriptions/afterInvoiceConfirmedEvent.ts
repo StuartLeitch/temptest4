@@ -26,8 +26,8 @@ import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 import { InvoiceItemRepoContract } from '../repos';
 
+import { PublishInvoiceToErpUsecase } from '../usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmedUsecase } from '../usecases/publishEvents/publishInvoiceConfirmed';
-import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 
 export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {

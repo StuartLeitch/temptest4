@@ -10,8 +10,8 @@ import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { PublishInvoiceToErpUsecase } from '../../../../../../src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-import { PublishInvoiceToErpResponse } from '../../../../../../src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErpResponse';
+import { PublishInvoiceToErpUsecase } from '../../../../../../src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
+import { PublishInvoiceToErpResponse } from '../../../../../../src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErpResponse';
 import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
@@ -19,6 +19,7 @@ import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/m
 import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 import {
   AddressMap,
   ArticleMap,
@@ -32,6 +33,7 @@ import {
   TransactionStatus,
   UsecaseAuthorizationContext,
   WaiverMap,
+  VATService,
 } from '../../../../../../src/lib/shared';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
@@ -47,6 +49,7 @@ let mockSalesforceService: MockErpService;
 let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
 let mockLogger: MockLogger;
+let vatService: VATService;
 
 let useCase: PublishInvoiceToErpUsecase;
 let response: PublishInvoiceToErpResponse;
@@ -71,6 +74,9 @@ Before(function () {
   mockNetsuiteService = new MockErpService();
   mockLogger = new MockLogger();
   mockPublisherRepo = new MockPublisherRepo();
+  vatService = new VATService();
+
+  setupVatService();
 
   useCase = new PublishInvoiceToErpUsecase(
     mockInvoiceRepo,
@@ -82,9 +88,9 @@ Before(function () {
     mockManuscriptRepo,
     mockCatalogRepo,
     mockSalesforceService,
-    mockNetsuiteService,
     mockPublisherRepo,
-    mockLogger
+    mockLogger,
+    vatService
   );
 });
 
