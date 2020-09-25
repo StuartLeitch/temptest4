@@ -166,7 +166,7 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
-      let erpResponse = {
+      const erpResponse = {
         sage: null,
         netSuite: null,
       };
