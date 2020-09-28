@@ -112,10 +112,12 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
           if (assignedErpReference === null) {
             // simply do nothing yet
           } else {
+            const { sage, netSuite } = assignedErpReference as any;
             this.loggerService.info(
-              `Invoice ${unrecognizedInvoice.id.toString()} successfully recognized ${
-                (assignedErpReference as any).journal?.id
-              }`
+              `Invoice ${unrecognizedInvoice.id.toString()} successfully recognized in Sage ${sage}`
+            );
+            this.loggerService.info(
+              `Invoice ${unrecognizedInvoice.id.toString()} successfully recognized in NetSuite ${netSuite}`
             );
             updatedInvoices.push(assignedErpReference);
           }

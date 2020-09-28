@@ -1,7 +1,7 @@
 /* eslint-disable */
-const { v4 } = require('uuid');
+const uuid = require('uuid/v4');
 
-const seed = async knex => {
+const seed = async (knex) => {
   // console.log('seeding invoice items...');
   // await knex('invoice_items').truncate();
   // const journal = {
