@@ -612,34 +612,35 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private getCustomerPayload(payer: Payer, article: Article): CustomerPayload {
+    const MAX_LENGTH = 24;
     const createCustomerPayload: Record<string, string | boolean> = {
       email: payer?.email.toString(),
     };
 
+    const keep = ` ${article.customId.toString()}`;
     if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
-      createCustomerPayload.firstName = firstName.trim();
-      createCustomerPayload.lastName = `${lastNames.join(
-        ' '
-      )} - ${article.customId.toString()}`.trim();
-      if (createCustomerPayload?.lastName?.length > 40) {
-        createCustomerPayload.lastName = createCustomerPayload?.lastName
-          ?.slice(createCustomerPayload?.lastName?.length - 40)
-          .trim();
+      createCustomerPayload.firstName = firstName;
+      createCustomerPayload.lastName = `${lastNames.join(' ')} ${keep}`;
+      if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
+        createCustomerPayload.lastName =
+          createCustomerPayload?.lastName?.slice(0, MAX_LENGTH - keep.length) +
+          keep;
       }
     } else {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } - ${article.customId.toString()}`.trim();
-      if (createCustomerPayload.companyName.length > 40) {
-        createCustomerPayload.companyName = createCustomerPayload.companyName
-          .slice(createCustomerPayload.companyName.length - 40)
-          .trim();
+      } ${keep}`;
+      if (createCustomerPayload.companyName.length > MAX_LENGTH) {
+        createCustomerPayload.companyName =
+          createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
+          keep;
       }
       createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
     }
+
     return createCustomerPayload;
   }
 }
