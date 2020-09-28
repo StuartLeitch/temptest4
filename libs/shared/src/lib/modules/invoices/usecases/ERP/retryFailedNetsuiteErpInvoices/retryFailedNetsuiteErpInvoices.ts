@@ -28,11 +28,11 @@ import { VATService } from 'libs/shared/src/lib/domain/services/VATService';
 
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 
-import { ErpResponse } from '../../../../../domain/services/ErpService';
+import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 export type RetryFailedNetsuiteErpInvoicesResponse = Either<
-  UnexpectedError | ErpResponse,
-  ErpResponse[]
+  UnexpectedError | ErpInvoiceResponse,
+  ErpInvoiceResponse[]
 >;
 
 export class RetryFailedNetsuiteErpInvoicesUsecase
@@ -90,7 +90,7 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
     try {
       const failedErpInvoices = await this.invoiceRepo.getFailedSageErpInvoices();
 
-      const updatedInvoices: ErpResponse[] = [];
+      const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (failedErpInvoices.length === 0) {
         this.loggerService.info('No failed erp invoices');
@@ -118,7 +118,7 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
         ) {
           return left(updatedInvoiceResponse);
         }
-        const assignedErpReference = updatedInvoiceResponse as ErpResponse;
+        const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
         // console.log('Assigned ERP Reference:');
         // console.info('type ', typeof assignedErpReference);

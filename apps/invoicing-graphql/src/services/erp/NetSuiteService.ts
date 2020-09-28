@@ -9,7 +9,8 @@ import { ErpServiceContract, PayerType, Payer, Article } from '@hindawi/shared';
 import {
   // ErpServiceContract,
   ErpData,
-  ErpResponse,
+  ErpInvoiceResponse,
+  ErpRevRecResponse,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
 import { Connection } from './netsuite/Connection';
@@ -37,18 +38,25 @@ export class NetSuiteService implements ErpServiceContract {
     return service;
   }
 
-  public async registerInvoice(data: ErpData): Promise<ErpResponse> {
+  public async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
     // console.log('ERP Data:');
     // console.info(data);
 
     const customerId = await this.getCustomerId(data);
 
-    return this.createInvoice({ ...data, customerId });
+    const response = await this.createInvoice({ ...data, customerId });
+    return {
+      tradeDocumentId: String(response),
+      tradeItemIds: null,
+      accountId: null,
+    };
   }
 
-  public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
-    // console.log('registerRevenueRecognition Data:');
-    // console.info(data);
+  public async registerRevenueRecognition(
+    data: ErpData
+  ): Promise<ErpRevRecResponse> {
+    console.log('registerRevenueRecognition Data:');
+    console.info(data);
 
     const { customSegmentId } = data;
     const customerId = await this.getCustomerId(data);
@@ -85,10 +93,10 @@ export class NetSuiteService implements ErpServiceContract {
       debitAccountId,
     });
 
-    return revenueRecognition;
+    return { journal: { id: String(revenueRecognition) } };
   }
 
-  public async registerCreditNote(data: ErpData): Promise<ErpResponse> {
+  public async registerCreditNote(data: ErpData): Promise<ErpInvoiceResponse> {
     console.log('registerCreditNote Data:');
     console.info(data);
 
@@ -99,7 +107,7 @@ export class NetSuiteService implements ErpServiceContract {
     return creditNoteId;
   }
 
-  public async registerPayment(data: ErpData): Promise<ErpResponse> {
+  public async registerPayment(data: ErpData): Promise<ErpInvoiceResponse> {
     console.log('registerPayment Data:');
     console.info(data);
 

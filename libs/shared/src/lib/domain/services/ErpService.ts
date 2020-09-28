@@ -14,17 +14,23 @@ export interface ErpData {
   taxRateId?: string;
 }
 
-export interface ErpResponse {
+export interface ErpInvoiceResponse {
   accountId: string;
   tradeDocumentId: string;
   tradeItemIds: string[];
 }
 
+export interface ErpRevRecResponse {
+  journal: {
+    id: string;
+  };
+}
+
 export interface ErpServiceContract {
   readonly invoiceErpRefFieldName: string;
   readonly invoiceRevenueRecRefFieldName: string;
-  registerInvoice(data: ErpData): Promise<ErpResponse>;
-  registerRevenueRecognition(data: any): Promise<any>;
+  registerInvoice(data: ErpData): Promise<ErpInvoiceResponse>;
+  registerRevenueRecognition(data: any): Promise<ErpRevRecResponse>;
   registerCreditNote?(data: any): Promise<any>;
   registerPayment?(data: any): Promise<any>;
 }

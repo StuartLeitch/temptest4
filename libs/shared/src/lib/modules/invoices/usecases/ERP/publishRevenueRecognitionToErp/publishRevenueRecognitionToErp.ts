@@ -170,23 +170,21 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
-      const netSuiteResponse = await this.erpService.registerRevenueRecognition(
-        {
-          invoice,
-          article: manuscript as any,
-          payer,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          invoiceTotal: netCharges,
-        }
-      );
+      const erpResponse = await this.erpService.registerRevenueRecognition({
+        invoice,
+        article: manuscript as any,
+        payer,
+        customSegmentId: publisherCustomValues?.customSegmentId,
+        invoiceTotal: netCharges,
+      });
 
       this.loggerService.info(
         `NetSuite Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
-          netSuiteResponse
+          erpResponse
         )}`
       );
       invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
-        netSuiteResponse
+        erpResponse.journal.id
       );
 
       await this.invoiceRepo.update(invoice);

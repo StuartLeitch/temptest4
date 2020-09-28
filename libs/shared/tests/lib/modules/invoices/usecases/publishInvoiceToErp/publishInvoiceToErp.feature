@@ -1,16 +1,10 @@
 Feature: Publish invoice to erp system
 
-    Scenario: Invoice is saved successfully to netsuite
-        Given There is an existing Invoice with the ID "netsuite-invoice"
+    Scenario: Invoice is saved successfully to erp
+        Given There is an existing Invoice with the ID "erp-invoice"
         And The payer is from "GB" and their type is "INDIVIDUAL"
-        When The Invoice with the ID "netsuite-invoice" is published
-        Then The Invoice with the ID "netsuite-invoice" is registered to netsuite
-
-    Scenario: Invoice is saved successfully to salesforce
-        Given There is an existing Invoice with the ID "salesforce-invoice"
-        And The payer is from "GB" and their type is "INDIVIDUAL"
-        When The Invoice with the ID "salesforce-invoice" is published
-        Then The Invoice with the ID "salesforce-invoice" is registered to salesforce
+        When The Invoice with the ID "erp-invoice" is published
+        Then The Invoice with the ID "erp-invoice" is registered to erp
 
     Scenario Outline: Tax code is assigned correctly
         Given There is an existing Invoice with the ID "tax-invoice"

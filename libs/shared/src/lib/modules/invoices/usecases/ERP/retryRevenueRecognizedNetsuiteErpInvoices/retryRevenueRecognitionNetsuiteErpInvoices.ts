@@ -7,7 +7,7 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../../domain/authorization';
-import { ErpResponse } from '../../../../../domain/services/ErpService';
+import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
@@ -27,7 +27,7 @@ import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognit
 
 export type RetryRevenueRecognitionNetsuiteErpInvoicesResponse = Either<
   UnexpectedError,
-  Result<ErpResponse[]>
+  Result<ErpInvoiceResponse[]>
 >;
 
 export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
@@ -82,11 +82,11 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
   ): Promise<RetryRevenueRecognitionNetsuiteErpInvoicesResponse> {
     try {
       const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedNetsuiteErpInvoices();
-      const updatedInvoices: ErpResponse[] = [];
+      const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (unrecognizedErpInvoices.length === 0) {
         this.loggerService.info('No revenue unrecognized invoices');
-        return right(Result.ok<ErpResponse[]>(updatedInvoices));
+        return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
       }
 
       this.loggerService.info(
@@ -125,7 +125,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
-      return right(Result.ok<ErpResponse[]>(updatedInvoices));
+      return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));

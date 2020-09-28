@@ -241,7 +241,6 @@ When(
 Then(
   /Revenue recognition for the Invoice with the ID "([\w-]+)" is registered to salesforce/,
   async function (invoiceId: string) {
-    console.log(JSON.stringify(response, null, 2));
     expect(response.isRight()).to.be.true;
 
     const revenueData = mockSalesforceService.getRevenue(invoiceId);

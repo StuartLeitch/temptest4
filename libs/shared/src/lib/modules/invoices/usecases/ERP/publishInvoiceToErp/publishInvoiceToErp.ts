@@ -258,7 +258,9 @@ export class PublishInvoiceToErpUsecase
           } -> ${JSON.stringify(erpResponse)}`
         );
 
-        invoice[this.erpService.invoiceErpRefFieldName] = String(erpResponse);
+        invoice[this.erpService.invoiceErpRefFieldName] = String(
+          erpResponse.tradeDocumentId
+        );
 
         this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
         await this.invoiceRepo.update(invoice);

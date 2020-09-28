@@ -45,8 +45,7 @@ let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockCatalogRepo: MockCatalogRepo;
-let mockSalesforceService: MockErpService;
-let mockNetsuiteService: MockErpService;
+let mockErpService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
 let mockLogger: MockLogger;
 let vatService: VATService;
@@ -70,8 +69,7 @@ Before(function () {
   mockWaiverRepo = new MockWaiverRepo();
   mockManuscriptRepo = new MockArticleRepo();
   mockCatalogRepo = new MockCatalogRepo();
-  mockSalesforceService = new MockErpService();
-  mockNetsuiteService = new MockErpService();
+  mockErpService = new MockErpService();
   mockLogger = new MockLogger();
   mockPublisherRepo = new MockPublisherRepo();
   vatService = new VATService();
@@ -87,7 +85,7 @@ Before(function () {
     mockAddressRepo,
     mockManuscriptRepo,
     mockCatalogRepo,
-    mockSalesforceService,
+    mockErpService,
     mockPublisherRepo,
     mockLogger,
     vatService
@@ -241,46 +239,27 @@ When(/The Invoice with the ID "([\w-]+)" is published/, async function (
   response = await useCase.execute({ invoiceId }, context);
 });
 
-Then(
-  /The Invoice with the ID "([\w-]+)" is registered to netsuite/,
-  async function (invoiceId: string) {
-    expect(response.isRight()).to.be.true;
-    const netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
-    expect(!!netsuiteData).to.be.true;
+Then(/The Invoice with the ID "([\w-]+)" is registered to erp/, async function (
+  invoiceId: string
+) {
+  expect(response.isRight()).to.be.true;
 
-    const invoice = await mockInvoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
-    );
-    // expect(invoice.nsReference).to.equal(mockNetsuiteService.erpRef);
-    expect(!!invoice.nsReference).to.be.true;
-  }
-);
+  const erpData = mockErpService.getInvoice(invoiceId);
+  expect(!!erpData).to.be.true;
 
-Then(
-  /The Invoice with the ID "([\w-]+)" is registered to salesforce/,
-  async function (invoiceId: string) {
-    expect(response.isRight()).to.be.true;
-
-    const salesforceData = mockSalesforceService.getInvoice(invoiceId);
-    expect(!!salesforceData).to.be.true;
-
-    const invoice = await mockInvoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
-    );
-    expect(invoice.erpReference).to.equal(mockSalesforceService.erpRef);
-  }
-);
+  const invoice = await mockInvoiceRepo.getInvoiceById(
+    InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+  );
+  expect(invoice.erpReference).to.equal(mockErpService.erpRef);
+});
 
 Then(
   /The Invoice with the ID "([\w-]+)" is not registered to erp/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
 
-    const salesforceData = mockSalesforceService.getInvoice(invoiceId);
-    expect(!!salesforceData).to.be.false;
-
-    const netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
-    expect(!!netsuiteData).to.be.false;
+    const erpData = mockErpService.getInvoice(invoiceId);
+    expect(!!erpData).to.be.false;
   }
 );
 
@@ -288,7 +267,7 @@ Then(
   /The tax code selected for the Invoice with the ID "([\w-]+)" is ([\d]+)/,
   function (invoiceId: string, taxRate: string) {
     expect(response.isRight()).to.be.true;
-    const netsuiteData = mockNetsuiteService.getInvoice(invoiceId);
+    const netsuiteData = mockErpService.getInvoice(invoiceId);
     expect(netsuiteData.taxRateId).to.equal(taxRate);
   }
 );

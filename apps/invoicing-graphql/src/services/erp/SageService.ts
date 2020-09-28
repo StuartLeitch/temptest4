@@ -7,7 +7,7 @@ import {
   ErpServiceContract,
   PayerType,
   InvoiceItem,
-  ErpResponse,
+  ErpInvoiceResponse,
 } from '@hindawi/shared';
 import countryList from 'country-list';
 
@@ -67,7 +67,7 @@ export class SageService implements ErpServiceContract {
     return this.connection;
   }
 
-  async registerInvoice(data: ErpData): Promise<ErpResponse> {
+  async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
     // console.info(`registerInvoice init with`, data);
 
     const { items, tradeDocumentItemProduct } = data;
