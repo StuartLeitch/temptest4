@@ -81,6 +81,7 @@ export class DeleteInvoiceUsecase
 
       // * This is where all the magic happens
       await this.invoiceRepo.delete(invoice);
+      invoice.generateInvoiceDraftDeletedEvent();
 
       return Result.ok<Invoice>(null);
     } catch (err) {

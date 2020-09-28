@@ -9,6 +9,7 @@ import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
+import { InvoiceDraftDeleted } f./events/invoiceDraftDeletedaftDeleted';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
@@ -272,6 +273,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public generateInvoiceDraftEvent(): void {
     const now = new Date();
     this.addDomainEvent(new InvoiceDraftCreated(this, now));
+  }
+
+  public generateInvoiceDraftDeletedEvent(): void {
+    const now = new Date();
+    this.addDomainEvent(new InvoiceDraftDeleted(this, now));
   }
 
   public generateCreatedEvent(): void {

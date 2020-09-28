@@ -1,31 +1,31 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { InvoiceDraftCreated } from '../domain/events/invoiceDraftCreated';
+import { InvoiceDraftDeleted } from '../domain/events/invoiceDraftDeleted';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
-import { PublishInvoiceDraftCreatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftCreated';
+import { PublishInvoiceDraftDeletedUseCase } from '../usecases/publishEvents/publishInvoiceDeleted';
 
-export class AfterInvoiceDraftCreatedEvent
-  implements HandleContract<InvoiceDraftCreated> {
+export class AfterInvoiceDeletedEvent
+  implements HandleContract<InvoiceDraftDeleted> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceDraftCreated: PublishInvoiceDraftCreatedUseCase
+    private publishInvoiceDeleted: PublishInvoiceDraftDeletedUseCase
   ) {
     this.setupSubscriptions();
   }
 
   setupSubscriptions(): void {
     DomainEvents.register(
-      this.onInvoiceDraftCreatedEvent.bind(this),
-      InvoiceDraftCreated.name
+      this.onInvoiceDeletedEvent.bind(this),
+      InvoiceDraftDeleted.name
     );
   }
 
-  private async onInvoiceDraftCreatedEvent(
-    event: InvoiceDraftCreated
+  private async onInvoiceDeletedEvent(
+    event: InvoiceDraftDeleted
   ): Promise<any> {
     //Get invoice data
     try {
@@ -55,17 +55,20 @@ export class AfterInvoiceDraftCreatedEvent
         );
       }
 
-      const result = await this.publishInvoiceDraftCreated.execute({
-        invoice,
-        invoiceItems,
-        manuscript,
-      });
-      if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+      if (invoice.status === 'DRAFT') {
+        const result = await this.publishInvoiceDeleted.execute({
+          invoice,
+          invoiceItems,
+          manuscript,
+        });
+
+        if (result.isLeft()) {
+          throw new Error(result.value.errorValue().message);
+        }
       }
     } catch (err) {
       console.log(
-        `[AfterInvoiceDraft]: Failed to execute onInvoiceDraftCreatedEvent subscription AfterInvoiceSubmitted. Err: ${err}`
+        `[AfterInvoiceDeleted]: Failed to execute onInvoiceDraftCreatedEvent subscription AfterInvoiceSubmitted. Err: ${err}`
       );
     }
   }
