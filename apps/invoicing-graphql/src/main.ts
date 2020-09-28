@@ -120,6 +120,7 @@ async function main() {
     log.info('Domain Events initiated ✔️');
     loaders.push(domainEventsRegisterLoader);
   }
+
   if (env.loaders.sisifEnabled) {
     // import { sisifLoader } from './loaders/sisifLoader';
     const { sisifLoader } = await import(

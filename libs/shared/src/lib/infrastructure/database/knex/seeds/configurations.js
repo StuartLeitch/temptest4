@@ -1,11 +1,11 @@
+/* eslint-disable no-undef */
 
-exports.seed = function(knex) {
+exports.seed = function (knex) {
   // Deletes ALL existing entries
-  return knex('configurations').del()
+  return knex('configurations')
+    .del()
     .then(function () {
       // Inserts seed entries
-      return knex('configurations').insert([
-        {invoiceReferenceNumber: 90000},
-      ]);
+      return knex('configurations').insert([{ invoiceReferenceNumber: 90000 }]);
     });
 };

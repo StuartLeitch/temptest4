@@ -2,6 +2,7 @@
 
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
+import knex from 'knex';
 
 import { ErpServiceContract, PayerType, Payer, Article } from '@hindawi/shared';
 
@@ -149,8 +150,24 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      'select id, companyName, email, isPerson, dateCreated from customer where email = ?',
+      [customer.email]
+    );
+    if (customer.lastName) {
+      query = queryBuilder.raw(`${query.toQuery()} and lastName = ?`, [
+        customer.lastName,
+      ]);
+    }
+    if (customer.companyName) {
+      query = queryBuilder.raw(`${query.toQuery()} and companyName = ?`, [
+        customer.companyName,
+      ]);
+    }
+
     const queryCustomerRequest = {
-      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${customer.email}' AND lastName = '${customer?.lastName}'`,
+      q: query.toQuery(),
     };
 
     try {
@@ -236,18 +253,15 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const createInvoicePayload: Record<string, any> = {
-      createdDate: format(
-        new Date(invoice.dateCreated),
+      tranDate: format(
+        new Date(invoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
-        new Date(invoice.dateCreated),
+        new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
-      tranId: `${invoice.invoiceNumber}/${format(
-        new Date(invoice.dateCreated),
-        'yyyy'
-      )}`,
+      tranId: invoice.referenceNumber,
       entity: {
         id: customerId,
       },
@@ -409,10 +423,10 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
-      createdDate: format(
-        new Date(data.invoice.dateCreated),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
+      // createdDate: format(
+      //   new Date(data.invoice.dateCreated),
+      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      // ),
       line: {
         items: [
           {
@@ -439,8 +453,8 @@ export class NetSuiteService implements ErpServiceContract {
       };
     }
 
-    console.log('createJournalPayload:');
-    console.info(createJournalPayload);
+    // console.log('createJournalPayload:');
+    // console.info(createJournalPayload);
 
     try {
       const res = await axios({
@@ -503,8 +517,8 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { creditNote } = data;
 
-    console.log('transformCreditNote data:');
-    console.info(creditNote);
+    // console.log('transformCreditNote data:');
+    // console.info(creditNote);
 
     const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${creditNote.nsReference}/!transform/creditmemo`,
@@ -627,7 +641,7 @@ export class NetSuiteService implements ErpServiceContract {
           createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
           keep;
       }
-      createCustomerPayload.vatRegNumber = payer.VATId;
+      createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
     }
 
     return createCustomerPayload;

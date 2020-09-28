@@ -32,13 +32,9 @@ export const ArticlePublishedHandler = {
     logger.setScope(`PhenomEvent:${ARTICLE_PUBLISHED}`);
     logger.info(`Incoming Event Data`, { correlationId, data });
 
-    const {
-      customId,
-      articleType: { name },
-      published,
-    } = data;
+    const { customId, articleType, published } = data;
 
-    if (name in ManuscriptTypeNotInvoiceable) {
+    if (articleType in ManuscriptTypeNotInvoiceable) {
       return;
     }
 
