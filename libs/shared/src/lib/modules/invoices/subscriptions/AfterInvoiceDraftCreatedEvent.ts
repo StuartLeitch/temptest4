@@ -29,7 +29,6 @@ export class AfterInvoiceDraftCreatedEvent
   ): Promise<any> {
     //Get invoice data
     try {
-      console.log('lets goooooooo');
       const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
       if (!invoice) {
         throw new Error(
