@@ -63,14 +63,12 @@ export class PublishInvoiceDraftCreatedUseCase
     };
 
     try {
-      if (data.invoiceStatus === 'DRAFT') {
-        await this.publishService.publishMessage({
-          timestamp: messageTimestamp?.toISOString(),
-          event: INVOICE_DRAFT_CREATED,
-          data,
-        });
-        return right(null);
-      }
+      await this.publishService.publishMessage({
+        timestamp: messageTimestamp?.toISOString(),
+        event: INVOICE_DRAFT_CREATED,
+        data,
+      });
+      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err.toString()));
     }

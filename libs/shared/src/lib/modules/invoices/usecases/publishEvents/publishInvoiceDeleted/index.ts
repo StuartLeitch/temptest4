@@ -1,4 +1,4 @@
-import * as PublishInvoiceDraftDeletedErrors from './publishInvoiceDraftDeleted.error';
+import * as PublishInvoiceDraftDeletedErrors from './publishInvoiceDraftDeleted.errors';
 
 export { PublishInvoiceDraftDeletedErrors };
 export * from './publishInvoiceDraftDeleted';

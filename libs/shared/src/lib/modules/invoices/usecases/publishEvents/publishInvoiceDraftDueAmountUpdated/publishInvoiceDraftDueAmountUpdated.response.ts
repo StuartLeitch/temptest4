@@ -1,9 +1,9 @@
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { Either } from '../../../../../core/logic/Result';
 
-import * as Errors from './publishInvoiceDraftDeleted.errors';
+import * as Errors from './publishInvoiceAmountUpdated.errors';
 
-export type PublishInvoiceDraftDeletedResponse = Either<
+export type PublishInvoiceDraftDueAmountUpdatedResponse = Either<
   | Errors.InvoiceItemsRequiredError
   | Errors.InvoiceRequiredError
   | Errors.ManuscriptRequiredError

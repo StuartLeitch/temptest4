@@ -55,13 +55,15 @@ export class AfterInvoiceDraftCreatedEvent
         );
       }
 
-      const result = await this.publishInvoiceDraftCreated.execute({
-        invoice,
-        invoiceItems,
-        manuscript,
-      });
-      if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+      if (invoice.status === 'DRAFT') {
+        const result = await this.publishInvoiceDraftCreated.execute({
+          invoice,
+          invoiceItems,
+          manuscript,
+        });
+        if (result.isLeft()) {
+          throw new Error(result.value.errorValue().message);
+        }
       }
     } catch (err) {
       console.log(

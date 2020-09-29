@@ -237,7 +237,7 @@ export class ApplyCouponToInvoiceUsecase
           }
         }
       }
-
+      invoice.generateInvoiceDraftAmountUpdatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       return right(Result.ok(coupon));

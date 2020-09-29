@@ -8,8 +8,9 @@ import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
+import { InvoiceDraftAmountUpdated } from './events/invoiceDraftAmountUpdated';
 import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
-import { InvoiceDraftDeleted } f./events/invoiceDraftDeletedaftDeleted';
+import { InvoiceDraftDeleted } from './events/invoiceDraftDeleted';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
@@ -278,6 +279,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public generateInvoiceDraftDeletedEvent(): void {
     const now = new Date();
     this.addDomainEvent(new InvoiceDraftDeleted(this, now));
+  }
+
+  public generateInvoiceDraftAmountUpdatedEvent(): void {
+    const now = new Date();
+    this.addDomainEvent(new InvoiceDraftAmountUpdated(this, now));
   }
 
   public generateCreatedEvent(): void {

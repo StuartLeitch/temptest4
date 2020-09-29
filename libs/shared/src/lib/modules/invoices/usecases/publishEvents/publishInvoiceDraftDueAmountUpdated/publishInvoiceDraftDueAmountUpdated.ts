@@ -1,4 +1,4 @@
-import { InvoiceDraftDeleted } from '@hindawi/phenom-events';
+import { InvoiceDraftDueAmountUpdated } from '@hindawi/phenom-events';
 
 import { Either, right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
@@ -16,13 +16,13 @@ import {
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import { formatInvoiceItems, formatCosts } from '../eventFormatters';
 
-import { PublishInvoiceDraftDeletedResponse as Response } from './publishInvoiceDraftDeleted.response';
-import { PublishInvoiceDraftDeletedDTO as DTO } from './publishInvoiceDraftDeleted.dto';
-import * as Errors from './publishInvoiceDraftDeleted.errors';
+import { PublishInvoiceDraftDueAmountUpdatedResponse as Response } from './publishInvoiceDraftDueAmountUpdated.response';
+import { PublishInvoiceDraftDueAmountUpdatedDTO as DTO } from './publishInvoiceDueDraftDueAmountUpdated.dto';
+import * as Errors from './publishInvoiceDraftDueAmountUpdated.errors';
 
-const INVOICE_DRAFT_DELETED = 'InvoiceDraftDeleted';
+const INVOICE_DRAFT_DUE_AMOUNT_UPDATED = 'InvoiceDraftDueAmountUpdated';
 
-export class PublishInvoiceDraftDeletedUseCase
+export class PublishInvoiceDraftDueAmountUpdatedUseCase
   implements
     UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
@@ -42,7 +42,7 @@ export class PublishInvoiceDraftDeletedUseCase
     }
 
     const { messageTimestamp, invoiceItems, manuscript, invoice } = request;
-    const data: InvoiceDraftDeleted = {
+    const data: InvoiceDraftDueAmountUpdated = {
       ...EventUtils.createEventObject(),
       transactionId: invoice.transactionId.toString(),
       referenceNumber: invoice.referenceNumber,
@@ -66,7 +66,7 @@ export class PublishInvoiceDraftDeletedUseCase
     try {
       await this.publishService.publishMessage({
         timestamp: messageTimestamp?.toISOString(),
-        event: INVOICE_DRAFT_DELETED,
+        event: INVOICE_DRAFT_DUE_AMOUNT_UPDATED,
         data,
       });
       return right(null);
