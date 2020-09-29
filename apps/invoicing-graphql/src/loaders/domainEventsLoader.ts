@@ -18,6 +18,8 @@ import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modul
 import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
+import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
+import { AfterInvoiceDraftDeletedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';
 import { AfterInvoiceDraftCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
@@ -30,6 +32,8 @@ import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules
 import { Context } from '../builders';
 
 import { env } from '../env';
+import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
+import { PublishInvoiceDraftDueAmountUpdatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 
 // This feature is a copy from https://github.com/kadirahq/graphql-errors
 
@@ -95,6 +99,12 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const publishInvoiceDraftCreatedUseCase = new PublishInvoiceDraftCreatedUseCase(
       queue
     );
+    const publishInvoiceDraftDeletedUseCase = new PublishInvoiceDraftDeletedUseCase(
+      queue
+    );
+    const publishInvoiceDraftDueAmountUpdatedUseCase = new PublishInvoiceDraftDueAmountUpdatedUseCase(
+      queue
+    );
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
       queue
     );
@@ -111,6 +121,21 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       publishInvoiceDraftCreatedUseCase
     );
+
+    new AfterInvoiceDraftDeletedEvent(
+      invoice,
+      invoiceItem,
+      manuscript,
+      publishInvoiceDraftDeletedUseCase
+    );
+
+    new AfterInvoiceDraftDueAmountUpdatedEvent(
+      invoice,
+      invoiceItem,
+      manuscript,
+      publishInvoiceDraftDueAmountUpdatedUseCase
+    );
+
     new AfterInvoiceCreatedEvent(
       invoice,
       invoiceItem,

@@ -4,15 +4,14 @@ import { InvoiceDraftDeleted } from '../domain/events/invoiceDraftDeleted';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
-import { PublishInvoiceDraftDeletedUseCase } from '../usecases/publishEvents/publishInvoiceDeleted';
-
-export class AfterInvoiceDeletedEvent
+import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
+export class AfterInvoiceDraftDueAmountUpdatedEvent
   implements HandleContract<InvoiceDraftDeleted> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
-    private publishInvoiceDeleted: PublishInvoiceDraftDeletedUseCase
+    private publishInvoiceDraftDueAmountUpdated: PublishInvoiceDraftDueAmountUpdatedUseCase
   ) {
     this.setupSubscriptions();
   }
@@ -56,7 +55,7 @@ export class AfterInvoiceDeletedEvent
       }
 
       if (invoice.status === 'DRAFT') {
-        const result = await this.publishInvoiceDeleted.execute({
+        const result = await this.publishInvoiceDraftDueAmountUpdated.execute({
           invoice,
           invoiceItems,
           manuscript,

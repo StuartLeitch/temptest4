@@ -17,7 +17,7 @@ import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPub
 import { formatInvoiceItems, formatCosts } from '../eventFormatters';
 
 import { PublishInvoiceDraftDueAmountUpdatedResponse as Response } from './publishInvoiceDraftDueAmountUpdated.response';
-import { PublishInvoiceDraftDueAmountUpdatedDTO as DTO } from './publishInvoiceDueDraftDueAmountUpdated.dto';
+import { PublishInvoiceDraftDueAmountUpdatedDTO as DTO } from './publishInvoiceDraftDueAmountUpdated.dto';
 import * as Errors from './publishInvoiceDraftDueAmountUpdated.errors';
 
 const INVOICE_DRAFT_DUE_AMOUNT_UPDATED = 'InvoiceDraftDueAmountUpdated';
