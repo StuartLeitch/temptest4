@@ -159,9 +159,11 @@ export function formatPayments(
 }
 
 export function calculateLastPaymentDate(payments: Payment[]): Date | null {
-  return payments.reduce((acc, payment) => {
-    if (!acc) return payment.datePaid;
-    if (acc < payment.datePaid) return payment.datePaid;
-    return acc;
-  }, null as Date);
+  return payments
+    .filter((payment) => payment.status === PaymentStatus.COMPLETED)
+    .reduce((acc, payment) => {
+      if (!acc) return payment.datePaid;
+      if (acc < payment.datePaid) return payment.datePaid;
+      return acc;
+    }, null as Date);
 }
