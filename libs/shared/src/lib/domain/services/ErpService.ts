@@ -34,3 +34,41 @@ export interface ErpServiceContract {
   registerCreditNote?(data: any): Promise<any>;
   registerPayment?(data: any): Promise<any>;
 }
+
+export class EmptyErpService implements ErpServiceContract {
+  get invoiceErpRefFieldName(): string {
+    return 'emptyErpInvoiceRef';
+  }
+
+  get invoiceRevenueRecRefFieldName(): string {
+    return 'emptyErpRecRef';
+  }
+
+  async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
+    return {
+      tradeDocumentId: '',
+      tradeItemIds: [''],
+      accountId: '',
+    };
+  }
+
+  async registerRevenueRecognition(data: any): Promise<ErpRevRecResponse> {
+    return {
+      journal: {
+        id: '',
+      },
+    };
+  }
+
+  async registerCreditNote?(data: any): Promise<any> {
+    return '';
+  }
+
+  async registerPayment?(data: any): Promise<any> {
+    return {
+      tradeDocumentId: '',
+      tradeItemIds: [''],
+      accountId: '',
+    };
+  }
+}

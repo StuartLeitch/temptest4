@@ -108,9 +108,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       loggerService
     );
 
-    // start scheduler
-    const jobsQueue = [
-      // TODO Describe first job
+    const sageJobQueue = [
       async function retryFailedSageErpInvoicesJob() {
         try {
           const maybeResponse = await retryFailedSageErpInvoicesUsecase.execute();
@@ -123,6 +121,20 @@ export const schedulerLoader: MicroframeworkLoader = async (
           throw err;
         }
       },
+      async function retryRevenueRecognizedInvoicesToSageErpJob() {
+        try {
+          const response = await retryRevenueRecognizedInvoicesToSageErpUsecase.execute();
+          if (response.isLeft()) {
+            logger.error(response.value.errorValue().message);
+            throw response.value.error;
+          }
+        } catch (err) {
+          throw err;
+        }
+      },
+    ];
+
+    const netSuiteJobQueue = [
       async function retryFailedNetsuiteErpInvoicesJob() {
         try {
           const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute();
@@ -135,19 +147,8 @@ export const schedulerLoader: MicroframeworkLoader = async (
           throw err;
         }
       },
-      // TODO Describe second job
-      async function retryRevenueRecognizedInvoicesToSageErpJob() {
-        try {
-          const response = await retryRevenueRecognizedInvoicesToSageErpUsecase.execute();
-          if (response.isLeft()) {
-            logger.error(response.value.errorValue().message);
-            throw response.value.error;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
-      async function retryRevenueRecognizedInvoicesToNEtsuiteErpJob() {
+
+      async function retryRevenueRecognizedInvoicesToNetsuiteErpJob() {
         try {
           const response = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
           if (response.isLeft()) {
@@ -159,6 +160,12 @@ export const schedulerLoader: MicroframeworkLoader = async (
         }
       },
     ];
+
+    // start scheduler
+    const jobsQueue = [].concat(
+      env.netSuite.netSuiteEnabled ? netSuiteJobQueue : [],
+      env.salesForce.sageEnabled ? sageJobQueue : []
+    );
 
     async function processJobsQueue() {
       // * clones the jobs queue
