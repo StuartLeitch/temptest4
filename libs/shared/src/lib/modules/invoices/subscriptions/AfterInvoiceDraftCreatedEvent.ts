@@ -67,7 +67,7 @@ export class AfterInvoiceDraftCreatedEvent
       }
     } catch (err) {
       console.log(
-        `[AfterInvoiceDraft]: Failed to execute onInvoiceDraftCreatedEvent subscription AfterInvoiceSubmitted. Err: ${err}`
+        `[AfterInvoiceDraftCreated]: Failed to execute onInvoiceDraftCreatedEvent subscription AfterInvoiceDraftCreated. Err: ${err}`
       );
     }
   }

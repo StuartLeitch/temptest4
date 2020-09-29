@@ -1,12 +1,12 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { InvoiceDraftDeleted } from '../domain/events/invoiceDraftDeleted';
+import { InvoiceDraftDueAmountUpdated } from '../domain/events/invoiceDraftDueAmountUpdated';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 export class AfterInvoiceDraftDueAmountUpdatedEvent
-  implements HandleContract<InvoiceDraftDeleted> {
+  implements HandleContract<InvoiceDraftDueAmountUpdated> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -18,13 +18,13 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
 
   setupSubscriptions(): void {
     DomainEvents.register(
-      this.onInvoiceDeletedEvent.bind(this),
-      InvoiceDraftDeleted.name
+      this.onInvoiceDraftDueAmountUpdatedEvent.bind(this),
+      InvoiceDraftDueAmountUpdated.name
     );
   }
 
-  private async onInvoiceDeletedEvent(
-    event: InvoiceDraftDeleted
+  private async onInvoiceDraftDueAmountUpdatedEvent(
+    event: InvoiceDraftDueAmountUpdated
   ): Promise<any> {
     //Get invoice data
     try {
@@ -67,7 +67,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
       }
     } catch (err) {
       console.log(
-        `[AfterInvoiceDeleted]: Failed to execute onInvoiceDraftCreatedEvent subscription AfterInvoiceSubmitted. Err: ${err}`
+        `[AfterInvoiceDraftDueAmountUpdated]: Failed to execute onInvoiceDraftDueAmountUpdatedEvent subscription AfterInvoiceDraftDueAmountUpdatedEvent. Err: ${err}`
       );
     }
   }
