@@ -13,7 +13,7 @@ import { Name } from '../../../../domain/Name';
 
 import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 import { Address } from '../../../addresses/domain/Address';
-import { Payment } from '../../../payments/domain/Payment';
+import { Payment, PaymentStatus } from '../../../payments/domain/Payment';
 import { Coupons } from '../../../coupons/domain/Coupons';
 import { Waiver } from '../../../waivers/domain/Waiver';
 import { InvoiceItem } from '../../domain/InvoiceItem';
@@ -104,7 +104,9 @@ export function formatCosts(
     (acc, item) => acc + itemReduction(item),
     0
   );
-  const paid = payments.reduce((acc, payment) => acc + payment.amount.value, 0);
+  const paid = payments
+    .filter((payment) => payment.status === PaymentStatus.COMPLETED)
+    .reduce((acc, payment) => acc + payment.amount.value, 0);
   const dueAmount = totalPrice - totalDiscount + vatAmount - paid;
 
   return {
@@ -146,12 +148,14 @@ export function formatPayments(
     {}
   );
 
-  return payments.map((payment) => ({
-    paymentType: methods[payment.paymentMethodId.toString()].name,
-    paymentDate: payment?.datePaid?.toISOString(),
-    foreignPaymentId: payment.foreignPaymentId,
-    paymentAmount: payment.amount.value,
-  }));
+  return payments
+    .filter((payment) => payment.status === PaymentStatus.COMPLETED)
+    .map((payment) => ({
+      paymentType: methods[payment.paymentMethodId.toString()].name,
+      paymentDate: payment?.datePaid?.toISOString(),
+      foreignPaymentId: payment.foreignPaymentId,
+      paymentAmount: payment.amount.value,
+    }));
 }
 
 export function calculateLastPaymentDate(payments: Payment[]): Date | null {
