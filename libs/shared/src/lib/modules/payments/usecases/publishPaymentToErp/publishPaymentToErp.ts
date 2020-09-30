@@ -273,6 +273,7 @@ export class PublishPaymentToErpUsecase
         // );
         // invoice.nsReference = String(netSuiteResponse); // netSuiteResponse; // .tradeDocumentId;
 
+        const [payment] = payments;
         let erpResponse;
         try {
           erpResponse = await this.netSuiteService.registerPayment(erpData);
@@ -283,7 +284,8 @@ export class PublishPaymentToErpUsecase
                 erpResponse
               )}`
             );
-            // payment.erpReference = erpResponse.tradeDocumentId;
+
+            payment.foreignPaymentId = erpResponse.tradeDocumentId;
           }
         } catch (error) {
           this.loggerService.info(
@@ -296,7 +298,8 @@ export class PublishPaymentToErpUsecase
         );
 
         this.loggerService.info('PublishPaymentToERP full invoice', invoice);
-        // await this.paymentRepo.update(payment);
+        await this.paymentRepo.updatePayment(payment);
+
         return right(erpResponse);
       } catch (err) {
         return left(err);

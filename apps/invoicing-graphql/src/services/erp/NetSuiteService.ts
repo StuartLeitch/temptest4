@@ -95,6 +95,8 @@ export class NetSuiteService implements ErpServiceContract {
       ...data,
       customerId: customerAlreadyExists.id,
     });
+
+    return paymentId;
   }
 
   private async getCustomerId(data: ErpData) {
