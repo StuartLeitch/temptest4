@@ -38,7 +38,7 @@ export class InvoiceMap extends Mapper<Invoice> {
   public static toPersistence(invoice: Invoice): any {
     // console.info(invoice);
     // console.info('invoice.id', invoice.id.toString());
-    // console.info('invoice.status', invoice.status);
+    // console.info('invoice.nsRevRecReference', invoice.nsRevRecReference);
     // console.info(invoice.transactionId);
 
     return {

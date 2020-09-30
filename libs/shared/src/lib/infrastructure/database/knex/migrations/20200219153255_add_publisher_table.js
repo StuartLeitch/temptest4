@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-undef */
 
-const uuid = require('uuid/v4');
-
 module.exports.up = async function (knex) {
   await knex.schema.createTable('publishers', (table) => {
     table.string('id', 40).primary();
@@ -16,106 +14,12 @@ module.exports.up = async function (knex) {
     table.string('name');
     table.string('publisherId', 40);
     table.string('value');
-    table.foreign('publisherId').references('publishers.id');
+    table
+      .foreign('publisherId')
+      .references('publishers.id')
+      .onDelete('CASCADE');
     table.primary(['name', 'publisherId']);
   });
-
-  const now = new Date();
-  const hindawiId = uuid();
-  const wileyId = uuid();
-
-  await knex('publishers').insert([
-    {
-      dateCreated: now,
-      dateUpdated: now,
-      name: 'Hindawi',
-      id: hindawiId,
-    },
-    {
-      dateCreated: now,
-      dateUpdated: now,
-      name: 'Wiley',
-      id: wileyId,
-    },
-  ]);
-
-  await knex.schema.table('catalog', (table) => {
-    table.string('publisherId', 40).defaultTo(hindawiId).notNullable();
-    table.foreign('publisherId').references('publishers.id');
-  });
-
-  await knex('publisher_custom_values').insert([
-    {
-      name: 'tradeDocumentItem',
-      publisherId: hindawiId,
-      value: '01t0Y000002BuB9QAK',
-    },
-    {
-      name: 'tradeDocumentItem',
-      publisherId: wileyId,
-      value: '01t0Y000002BkzAQAS',
-    },
-    {
-      name: 'journalReference',
-      publisherId: hindawiId,
-      value: 'Hindawi APC Recognition for article',
-    },
-    {
-      name: 'journalReference',
-      publisherId: wileyId,
-      value: 'Wiley-Hindawi APC Recognition for article',
-    },
-    {
-      name: 'journalItemReference',
-      publisherId: hindawiId,
-      value: 'Hindawi APC Recognition for article',
-    },
-    {
-      name: 'journalItemReference',
-      publisherId: wileyId,
-      value: 'Wiley-Hindawi APC Recognition for article',
-    },
-    {
-      name: 'journalTag',
-      publisherId: hindawiId,
-      value: 'a5L0Y000000g0EeUAI',
-    },
-    {
-      name: 'journalTag',
-      publisherId: wileyId,
-      value: 'a5L0Y000000g0TMUAY',
-    },
-    {
-      name: 'journalItemTag',
-      publisherId: hindawiId,
-      value: 'a5L0Y000000g0BmUAI',
-    },
-    {
-      name: 'journalItemTag',
-      publisherId: wileyId,
-      value: 'a5L0Y000000fzUOUAY',
-    },
-    {
-      name: 'customSegmentId',
-      publisherId: hindawiId,
-      value: '1',
-    },
-    {
-      name: 'customSegmentId',
-      publisherId: wileyId,
-      value: '2',
-    },
-    {
-      name: 'itemId',
-      publisherId: hindawiId,
-      value: '1',
-    },
-    {
-      name: 'itemId',
-      publisherId: wileyId,
-      value: '2',
-    },
-  ]);
 };
 
 module.exports.down = async function (knex) {

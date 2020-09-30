@@ -15,6 +15,7 @@
   "DOMAIN_EVENTS_REGISTER_LOADER_ENABLED": true,
   "SISIF_LOADER_ENABLED": true,
   "ERP_LOADER_ENABLED": true,
+  "SKIPPING_SEEDING": true,
   "ASSISTANCE_EMAIL": "accounts.receivable@hindawi.com",
   "AWS_SES_REGION": "eu-west-1",
   "AWS_SNS_SQS_REGION": "eu-west-1",

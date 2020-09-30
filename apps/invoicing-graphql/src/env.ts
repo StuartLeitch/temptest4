@@ -53,6 +53,7 @@ export const env = {
     failedErpCronRetryDisabled: toBool(
       getOsEnv('FAILED_ERP_CRON_RETRY_DISABLED')
     ),
+    skippingSeeding: toBool(getOsEnv('SKIPPING_SEEDING')),
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
     erpRegisterInvoicesEnabled: toBool(
       getOsEnv('ERP_REGISTER_INVOICES_ENABLED')

@@ -202,15 +202,22 @@ export class PublishInvoiceToErpUsecase
       );
       let rate = 1.42; // ! Average value for the last seven years
       if (invoice && invoice.dateIssued) {
-        const exchangeRate = await exchangeRateService.getExchangeRate(
-          new Date(invoice.dateIssued),
-          'USD'
-        );
-        this.loggerService.info(
-          'PublishInvoiceToERP exchangeRate',
-          exchangeRate
-        );
-        rate = exchangeRate.exchangeRate;
+        let exchangeRate = null;
+        try {
+          exchangeRate = await exchangeRateService.getExchangeRate(
+            new Date(invoice.dateIssued),
+            'USD'
+          );
+          this.loggerService.info(
+            'PublishInvoiceToERP exchangeRate',
+            exchangeRate
+          );
+        } catch (error) {
+          this.loggerService.error('PublishInvoiceToERP exchangeRate', error);
+        }
+        if (exchangeRate?.exchangeRate) {
+          rate = exchangeRate.exchangeRate;
+        }
       }
       this.loggerService.info('PublishInvoiceToERP rate', rate);
 

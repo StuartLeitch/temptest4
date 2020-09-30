@@ -173,7 +173,9 @@ export const invoice: Resolvers<Context> = {
           new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
           'USD'
         );
-        rate = exchangeRate.exchangeRate;
+        if (exchangeRate?.exchangeRate) {
+          rate = exchangeRate.exchangeRate;
+        }
       } catch (error) {
         // do nothing yet
       }
@@ -260,11 +262,15 @@ export const invoice: Resolvers<Context> = {
 
       let rate = 1.42; // ! Average value for the last seven years
       if (parent && parent.dateIssued) {
-        const exchangeRate = await exchangeRateService.getExchangeRate(
-          new Date(parent.dateIssued),
-          'USD'
-        );
-        rate = exchangeRate.exchangeRate;
+        try {
+          const exchangeRate = await exchangeRateService.getExchangeRate(
+            new Date(parent.dateIssued),
+            'USD'
+          );
+          if (exchangeRate?.exchangeRate) {
+            rate = exchangeRate?.exchangeRate;
+          }
+        } catch (error) {}
       }
 
       const invoiceId = InvoiceId.create(

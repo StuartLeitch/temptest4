@@ -17,6 +17,7 @@
   "ERP_LOADER_ENABLED": true,
   "ASSISTANCE_EMAIL": "accounts.receivable@hindawi.com",
   "AWS_ENABLED": true,
+  "SKIPPING_SEEDING": true,
   "AWS_SES_REGION": "eu-west-1",
   "AWS_SNS_SQS_REGION": "eu-west-1",
   "BANK_ACCOUNT_NAME": "Hindawi Limited",
