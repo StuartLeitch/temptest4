@@ -48,7 +48,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         payment,
         coupon,
         waiver,
-        payer,
+        payer
       },
       services: { erp, logger: loggerService, schedulingService, qq: queue },
     } = context;
@@ -90,7 +90,10 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           coupon,
           waiver,
           payer,
+          manuscript,
+          catalog,
           erp?.netsuite || null,
+          publisher,
           loggerService
         )
       : new NoOpUseCase();

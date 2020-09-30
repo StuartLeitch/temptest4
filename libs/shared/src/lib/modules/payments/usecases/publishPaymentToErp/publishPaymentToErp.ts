@@ -37,6 +37,7 @@ import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { PayerType } from '../../../payers/domain/Payer';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 
 export interface PublishPaymentToErpRequestDTO {
   invoiceId?: string;
@@ -64,11 +65,11 @@ export class PublishPaymentToErpUsecase
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     // private addressRepo: AddressRepoContract,
-    // private manuscriptRepo: ArticleRepoContract,
-    // private catalogRepo: CatalogRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private catalogRepo: CatalogRepoContract,
     // private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
-    // private publisherRepo: PublisherRepoContract,
+    private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {}
 
@@ -97,61 +98,61 @@ export class PublishPaymentToErpUsecase
         invoice.invoiceId
       );
 
-      // let invoiceItems = invoice.invoiceItems.currentItems;
+      let invoiceItems = invoice.invoiceItems.currentItems;
       // // this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
 
-      // if (invoiceItems.length === 0) {
-      //   const getItemsUsecase = new GetItemsForInvoiceUsecase(
-      //     this.invoiceItemRepo,
-      //     this.couponRepo,
-      //     this.waiverRepo
-      //   );
+      if (invoiceItems.length === 0) {
+      const getItemsUsecase = new GetItemsForInvoiceUsecase(
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo
+      );
 
-      //   const resp = await getItemsUsecase.execute({
-      //     invoiceId: request.invoiceId,
-      //   });
-      //   this.loggerService.info(
-      //     'PublishInvoiceToERP getItemsUsecase response',
-      //     resp
-      //   );
-      //   if (resp.isLeft()) {
-      //     throw new Error(
-      //       `Invoice ${invoice.id.toString()} has no invoice items.`
-      //     );
-      //   }
+        const resp = await getItemsUsecase.execute({
+          invoiceId: request.invoiceId,
+        });
+        this.loggerService.info(
+          'PublishInvoiceToERP getItemsUsecase response',
+          resp
+        );
+        if (resp.isLeft()) {
+          throw new Error(
+            `Invoice ${invoice.id.toString()} has no invoice items.`
+          );
+        }
 
-      //   invoiceItems = resp.value.getValue();
-      //   this.loggerService.info(
-      //     'PublishInvoiceToERP invoice items',
-      //     invoiceItems
-      //   );
+        invoiceItems = resp.value.getValue();
+        this.loggerService.info(
+          'PublishInvoiceToERP invoice items',
+          invoiceItems
+        );
 
-      //   for (const item of invoiceItems) {
-      //     const [coupons, waivers] = await Promise.all([
-      //       this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
-      //       this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
-      //     ]);
-      //     coupons.forEach((c) => item.addCoupon(c));
-      //     item.waivers = waivers;
-      //   }
-      // }
+        for (const item of invoiceItems) {
+          const [coupons, waivers] = await Promise.all([
+            this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
+            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
+          ]);
+          coupons.forEach((c) => item.addCoupon(c));
+          item.waivers = waivers;
+        }
+      }
 
-      // if (invoiceItems.length === 0) {
-      //   throw new Error(`Invoice ${invoice.id} has no invoice items.`);
-      // }
+      if (invoiceItems.length === 0) {
+        throw new Error(`Invoice ${invoice.id} has no invoice items.`);
+      }
 
-      // invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
-      // this.loggerService.info(
-      //   'PublishInvoiceToERP full invoice items',
-      //   invoiceItems
-      // );
+      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
+      this.loggerService.info(
+        'PublishInvoiceToERP full invoice items',
+        invoiceItems
+      );
 
-      // // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
-      // if (invoice.getInvoiceTotal() <= 0) {
-      //   invoice.erpReference = 'NON_INVOICEABLE';
-      //   await this.invoiceRepo.update(invoice);
-      //   return right(null);
-      // }
+      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      if (invoice.getInvoiceTotal() <= 0) {
+        invoice.erpReference = 'NON_INVOICEABLE';
+        await this.invoiceRepo.update(invoice);
+        return right(null);
+      }
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
       if (!payer) {
@@ -165,37 +166,37 @@ export class PublishPaymentToErpUsecase
       // }
       // this.loggerService.info('PublishInvoiceToERP address', address);
 
-      // const manuscript = await this.manuscriptRepo.findById(
-      //   invoiceItems[0].manuscriptId
-      // );
-      // if (!manuscript) {
-      //   throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
-      // }
-      // this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
+      const manuscript = await this.manuscriptRepo.findById(
+        invoiceItems[0].manuscriptId
+      );
+      if (!manuscript) {
+        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
+      }
+      this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
 
-      // let catalog;
-      // try {
-      //   catalog = await this.catalogRepo.getCatalogItemByJournalId(
-      //     JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
-      //   );
-      //   if (!catalog) {
-      //     throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
-      //   }
-      //   this.loggerService.info('PublishInvoiceToERP catalog', catalog);
-      // } catch (err) {
-      //   return err;
-      // }
+      let catalog;
+      try {
+        catalog = await this.catalogRepo.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+        );
+        if (!catalog) {
+          throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
+        }
+        this.loggerService.info('PublishInvoiceToERP catalog', catalog);
+      } catch (err) {
+        return err;
+      }
 
-      // const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-      //   catalog?.publisherId
-      // );
-      // if (!publisherCustomValues) {
-      //   throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
-      // }
-      // this.loggerService.info(
-      //   'PublishInvoiceToERP publisher data',
-      //   publisherCustomValues
-      // );
+      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
+        catalog?.publisherId
+      );
+      if (!publisherCustomValues) {
+        throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
+      }
+      this.loggerService.info(
+        'PublishInvoiceToERP publisher data',
+        publisherCustomValues
+      );
 
       // const vatService = new VATService();
       // const vatNote = vatService.getVATNote(
@@ -247,15 +248,15 @@ export class PublishPaymentToErpUsecase
           paymentMethods,
           payments,
           total: request.total,
-          // items: invoiceItems,
-          // article: manuscript as any,
+          items: invoiceItems,
+          article: manuscript as any,
           // billingAddress: address,
           // journalName: catalog.journalTitle,
           // vatNote,
           // rate,
-          // tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-          // customSegmentId: publisherCustomValues?.customSegmentId,
-          // itemId: publisherCustomValues?.itemId,
+          tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
+          customSegmentId: publisherCustomValues?.customSegmentId,
+          itemId: publisherCustomValues?.itemId,
           // taxRateId,
         };
 
