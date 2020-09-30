@@ -189,6 +189,8 @@ export class CreateCreditNoteUsecase
           dateMovedToFinal: null,
           invoiceNumber: null,
           erpReference: null,
+          revenueRecognitionReference: null,
+          nsRevRecReference: null,
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain
 
