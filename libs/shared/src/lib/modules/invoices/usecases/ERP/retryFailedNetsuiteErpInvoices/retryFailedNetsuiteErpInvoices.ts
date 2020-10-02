@@ -88,7 +88,7 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryFailedNetsuiteErpInvoicesResponse> {
     try {
-      const failedErpInvoices = await this.invoiceRepo.getFailedSageErpInvoices();
+      const failedErpInvoices = await this.invoiceRepo.getFailedNetsuiteErpInvoices();
 
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
