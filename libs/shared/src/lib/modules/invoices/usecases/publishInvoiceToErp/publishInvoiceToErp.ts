@@ -205,15 +205,22 @@ export class PublishInvoiceToErpUsecase
       );
       let rate = 1.42; // ! Average value for the last seven years
       if (invoice && invoice.dateIssued) {
-        const exchangeRate = await exchangeRateService.getExchangeRate(
-          new Date(invoice.dateIssued),
-          'USD'
-        );
-        this.loggerService.info(
-          'PublishInvoiceToERP exchangeRate',
-          exchangeRate
-        );
-        rate = exchangeRate.exchangeRate;
+        let exchangeRate = null;
+        try {
+          exchangeRate = await exchangeRateService.getExchangeRate(
+            new Date(invoice.dateIssued),
+            'USD'
+          );
+          this.loggerService.info(
+            'PublishInvoiceToERP exchangeRate',
+            exchangeRate
+          );
+        } catch (error) {
+          this.loggerService.error('PublishInvoiceToERP exchangeRate', error);
+        }
+        if (exchangeRate?.exchangeRate) {
+          rate = exchangeRate.exchangeRate;
+        }
       }
       this.loggerService.info('PublishInvoiceToERP rate', rate);
 
@@ -280,7 +287,11 @@ export class PublishInvoiceToErpUsecase
           }
         } catch (error) {
           this.loggerService.info(
-            `[PublishInvoiceToERP]: Failed to register in SAGE. Err: ${error}`
+            `[PublishInvoiceToERP]: Failed to register in SAGE. Err: ${JSON.stringify(
+              error,
+              null,
+              2
+            )}`
           );
         }
         this.loggerService.info(

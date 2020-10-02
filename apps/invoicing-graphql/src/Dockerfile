@@ -3,14 +3,14 @@ ENV HOME "/home/app"
 WORKDIR ${HOME}
 
 RUN apk update && apk upgrade && \
-  apk add --no-cache bash git openssh g++ make python \
-  chromium \
-      nss \
-      freetype \
-      freetype-dev \
-      harfbuzz \
-      ca-certificates \
-      ttf-freefont
+    apk add --no-cache bash git openssh g++ make python \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
 
 # Copy package.json to the working directory
 COPY package.json yarn.lock ./
@@ -22,6 +22,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 RUN yarn install --frozen-lockfile --production
 
 COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
+COPY libs/shared/src/lib/infrastructure/database/knex/seeds/ ./seeds/
 COPY config/ ./config/
 COPY dist/apps/invoicing-graphql ./
 

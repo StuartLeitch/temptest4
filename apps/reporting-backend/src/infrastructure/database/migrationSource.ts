@@ -15,6 +15,7 @@ import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_in
 import * as add_acceptance_rates_table from './migrations/20200610141941_add_acceptance_rates_table';
 import * as create_syndication_events_table from './migrations/20200629123541_add_syndication_events_table';
 import * as add_deleted_manuscripts_table from './migrations/20200703082115_add_deleted_manuscripts_table';
+import * as add_preprint_value_to_submission_data from './migrations/20200831162115_add_preprint_value_to_submission_data';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -160,10 +161,37 @@ class KnexMigrationSource {
       '20200703084515_add_manuscript_users_view',
       true
     ),
-    rebuild_materialized_views('20200703091515_add_last_editor_declined_date', true),
-    rebuild_materialized_views('20200729121500_add_screening_paused_dates', true),
-    rebuild_materialized_views('20200729131500_change_accepted_peer_review_cycle', true),
-    rebuild_materialized_views('20200729141500_manuscripts_si_editor_fields'),
+    rebuild_materialized_views(
+      '20200703091515_add_last_editor_declined_date',
+      true
+    ),
+    rebuild_materialized_views(
+      '20200729121500_add_screening_paused_dates',
+      true
+    ),
+    rebuild_materialized_views(
+      '20200729131500_change_accepted_peer_review_cycle',
+      true
+    ),
+    rebuild_materialized_views(
+      '20200729141500_manuscripts_si_editor_fields',
+      true
+    ),
+    add_preprint_value_to_submission_data,
+    rebuild_materialized_views(
+      '20200831162115_add_preprint_value_to_submissions',
+      true
+    ),
+    rebuild_materialized_views('20200901362115_add_more_paused_dates', true),
+    rebuild_materialized_views('20200901362115_file_requested_counts', true),
+    rebuild_materialized_views('20200901662115_manuscript_users_orcid', true),
+    rebuild_materialized_views(
+      '20200902662115_invoices_manuscript_accepted_date_fix',
+      true
+    ),
+    rebuild_materialized_views('20200914662115_qc_events_rename', true),
+    rebuild_materialized_views('20200915122115_add_deleted_invoices', true),
+    rebuild_materialized_views('20200916122115_fix_invoices_issue_type'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

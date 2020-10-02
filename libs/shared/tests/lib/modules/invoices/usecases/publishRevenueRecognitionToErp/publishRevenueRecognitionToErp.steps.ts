@@ -10,8 +10,8 @@ import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { PublishRevenueRecognitionToErpUsecase } from '../../../../../../src/lib/modules/invoices/usecases/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
-import { PublishRevenueRecognitionToErpResponse } from '../../../../../../src/lib/modules/invoices/usecases/publishRevenueRecognitionToErp/publishRevenueRecognitionToErpResponse';
+import { PublishRevenueRecognitionToErpUsecase } from '../../../../../../src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+import { PublishRevenueRecognitionToErpResponse } from '../../../../../../src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionToErp/publishRevenueRecognitionToErpResponse';
 import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
@@ -19,6 +19,7 @@ import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappe
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
+import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 import {
   AddressMap,
   ArticleMap,
@@ -72,6 +73,8 @@ Before(function () {
   mockPublisherRepo = new MockPublisherRepo();
   mockLogger = new MockLogger();
 
+  setupVatService();
+
   useCase = new PublishRevenueRecognitionToErpUsecase(
     mockInvoiceRepo,
     mockInvoiceItemRepo,
@@ -83,7 +86,6 @@ Before(function () {
     mockCatalogRepo,
     mockPublisherRepo,
     mockSalesforceService,
-    mockNetsuiteService,
     mockLogger
   );
 });

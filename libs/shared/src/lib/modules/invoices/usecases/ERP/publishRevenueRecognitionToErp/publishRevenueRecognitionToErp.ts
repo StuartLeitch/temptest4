@@ -1,36 +1,40 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
-import { right, Result, left } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { Result, right, left } from '../../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
-  AccessControlledUsecase,
   UsecaseAuthorizationContext,
+  AccessControlledUsecase,
   AccessControlContext,
-} from '../../../../domain/authorization';
+} from '../../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
-import { Invoice } from '../../domain/Invoice';
-import { InvoiceId } from '../../domain/InvoiceId';
-import { Payer } from '../../../payers/domain/Payer';
-import { Address } from '../../../addresses/domain/Address';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
-import { InvoiceRepoContract } from './../../repos/invoiceRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { PublisherRepoContract } from '../../../publishers/repos';
-import { JournalId } from '../../../journals/domain/JournalId';
-import { GetItemsForInvoiceUsecase } from './../getItemsForInvoice/getItemsForInvoice';
+import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { ArticleRepoContract } from '../../../../manuscripts/repos';
+import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
+
+import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
+import { JournalId } from '../../../../journals/domain/JournalId';
+import { Address } from '../../../../addresses/domain/Address';
+import { Payer } from '../../../../payers/domain/Payer';
+import { InvoiceId } from '../../../domain/InvoiceId';
+import { Invoice } from '../../../domain/Invoice';
+
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+
+import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
+
 import { PublishRevenueRecognitionToErpResponse } from './publishRevenueRecognitionToErpResponse';
 
 export interface PublishRevenueRecognitionToErpRequestDTO {
@@ -59,8 +63,7 @@ export class PublishRevenueRecognitionToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
-    private sageService: ErpServiceContract,
-    private netSuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {}
 
@@ -110,7 +113,7 @@ export class PublishRevenueRecognitionToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no invoice items.`);
       }
 
-      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
+      invoice.addItems(invoiceItems);
 
       payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
       if (!payer) {
@@ -162,52 +165,31 @@ export class PublishRevenueRecognitionToErpUsecase
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {
         invoice.erpReference = 'NON_INVOICEABLE';
+        invoice.nsReference = 'NON_INVOICEABLE';
         await this.invoiceRepo.update(invoice);
         return right(Result.ok<any>(null));
       }
 
-      const netSuiteResponse = await this.netSuiteService.registerRevenueRecognition(
-        {
-          invoice,
-          article: manuscript as any,
-          payer,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          invoiceTotal: netCharges,
-        }
-      );
+      const erpResponse = await this.erpService.registerRevenueRecognition({
+        invoice,
+        article: manuscript as any,
+        payer,
+        customSegmentId: publisherCustomValues?.customSegmentId,
+        invoiceTotal: netCharges,
+      });
 
       this.loggerService.info(
         `NetSuite Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
-          netSuiteResponse
+          erpResponse
         )}`
       );
-      invoice.nsRevRecReference = String(netSuiteResponse);
-
-      try {
-        const erpResponse = await this.sageService.registerRevenueRecognition({
-          invoice,
-          manuscript,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          invoiceTotal: netCharges,
-          publisherCustomValues,
-        });
-        this.loggerService.info(
-          `Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${
-            erpResponse.journal.id
-          }`
-        );
-        invoice.revenueRecognitionReference = erpResponse.journal.id;
-      } catch (error) {
-        this.loggerService.info(
-          `Revenue Recognition in SAGE failed for Invoice ${invoice.id.toString()}: error -> ${
-            error.message
-          }`
-        );
-      }
+      invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
+        erpResponse.journal.id
+      );
 
       await this.invoiceRepo.update(invoice);
 
-      return right(Result.ok<any>(netSuiteResponse));
+      return right(Result.ok<any>(erpResponse));
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));

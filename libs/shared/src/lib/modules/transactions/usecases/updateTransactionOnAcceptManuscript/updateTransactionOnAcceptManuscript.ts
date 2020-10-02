@@ -201,7 +201,9 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.articleRepo.update(manuscript);
 
       invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
-      invoice.dateAccepted = new Date();
+      invoice.dateAccepted = request.acceptanceDate
+        ? new Date(request.acceptanceDate)
+        : new Date();
 
       await this.invoiceRepo.update(invoice);
 

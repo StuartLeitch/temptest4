@@ -6,35 +6,35 @@ import {
   UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
-} from '../../../../domain/authorization';
-import { ErpResponse } from './../../../../domain/services/ErpService';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { right, Result, left, Either } from '../../../../core/logic/Result';
-import { UnexpectedError } from '../../../../core/logic/AppError';
+} from '../../../../../domain/authorization';
+import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
+import { UseCase } from '../../../../../core/domain/UseCase';
+import { right, Result, left, Either } from '../../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { PublisherRepoContract } from '../../../publishers/repos';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
+import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
-export type RetryRevenueRecognitionErpInvoicesResponse = Either<
+export type RetryRevenueRecognitionNetsuiteErpInvoicesResponse = Either<
   UnexpectedError,
-  Result<ErpResponse[]>
+  Result<ErpInvoiceResponse[]>
 >;
 
-export class RetryRevenueRecognitionErpInvoicesUsecase
+export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
   implements
     UseCase<
       Record<string, unknown>,
-      Promise<RetryRevenueRecognitionErpInvoicesResponse>,
+      Promise<RetryRevenueRecognitionNetsuiteErpInvoicesResponse>,
       UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
@@ -53,8 +53,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
-    private sageService: ErpServiceContract,
-    private netSuiteService: ErpServiceContract,
+    private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
     this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
@@ -67,8 +66,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.publisherRepo,
-      this.sageService,
-      this.netSuiteService,
+      this.netsuiteService,
       this.loggerService
     );
   }
@@ -81,14 +79,14 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
   public async execute(
     request?: Record<string, unknown>,
     context?: UsecaseAuthorizationContext
-  ): Promise<RetryRevenueRecognitionErpInvoicesResponse> {
+  ): Promise<RetryRevenueRecognitionNetsuiteErpInvoicesResponse> {
     try {
-      const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedErpInvoices();
-      const updatedInvoices: ErpResponse[] = [];
+      const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedNetsuiteErpInvoices();
+      const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (unrecognizedErpInvoices.length === 0) {
         this.loggerService.info('No revenue unrecognized invoices');
-        return right(Result.ok<ErpResponse[]>(updatedInvoices));
+        return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
       }
 
       this.loggerService.info(
@@ -127,7 +125,7 @@ export class RetryRevenueRecognitionErpInvoicesUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
-      return right(Result.ok<ErpResponse[]>(updatedInvoices));
+      return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));

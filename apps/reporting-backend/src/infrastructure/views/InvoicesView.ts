@@ -6,7 +6,6 @@ import {
   EventViewContract,
 } from './contracts/EventViewContract';
 import invoiceDataView from './InvoicesDataView';
-import submissionDataView from './SubmissionDataView';
 import submissionView from './SubmissionsView';
 import paymentsView from './PaymentsView';
 
@@ -18,11 +17,17 @@ AS SELECT
     inv.reference_number as "invoice_reference_number",
     original_invoice.reference_number as "credited_invoice_reference_number",
     inv.is_credit_note,
+    case
+      when deleted_invoices.invoice_id is not null 
+        then true
+        else false
+    end as is_deleted,
+    deleted_invoices.event_timestamp as deleted_date,
     inv.manuscript_custom_id as "manuscript_custom_id",
     inv.invoice_created_date as "invoice_created_date",
     inv.manuscript_accepted_date as "invoice_sent_date",
     inv.invoice_issue_date as "invoice_issue_date",
-    coalesce(sd.event_timestamp, inv.manuscript_accepted_date) as manuscript_accepted_date,
+    coalesce(s.accepted_date, inv.manuscript_accepted_date) as manuscript_accepted_date,
     case 
     	when inv.status = 'DRAFT' then null
     	when coalesce(inv.paid_amount, 0) = 0 then null
@@ -57,7 +62,7 @@ AS SELECT
     s.journal_name as "journal_name",
     s.publisher_name as "publisher_name",
     s.journal_code as "journal_code",
-    CASE WHEN s.special_issue_id is null THEN 'special'
+    CASE WHEN s.special_issue_id is not null THEN 'special'
          ELSE 'regular'
     END as "issue_type",
     s.submission_date as "manuscript_submission_date",
@@ -93,8 +98,6 @@ AS SELECT
     jsonb_to_recordset(payload -> 'invoiceItems' -> 0 -> 'waivers') as waivers("waiverType" text)
     group by event_id
   ) waivers on waivers.event_id = inv.event_id
-  LEFT JOIN LATERAL (SELECT * FROM ${submissionDataView.getViewName()} sd where sd.manuscript_custom_id = inv.manuscript_custom_id and sd.submission_event in ('SubmissionQualityCheckPassed') 
-    order by event_timestamp desc nulls last limit 1) sd on sd.manuscript_custom_id = inv.manuscript_custom_id
   LEFT JOIN (
     select id as event_id, STRING_AGG(code, ', ') as coupon_codes
     from ${REPORTING_TABLES.INVOICE} ie,
@@ -106,7 +109,13 @@ AS SELECT
     from ${paymentsView.getViewName()}
     group by invoice_id
   ) payments on payments.invoice_id = inv.invoice_id
-  LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 where id2.invoice_id = inv.cancelled_invoice_reference limit 1) original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
+  LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} id2 
+      where id2.invoice_id = inv.cancelled_invoice_reference limit 1) 
+    original_invoice on original_invoice.invoice_id = inv.cancelled_invoice_reference
+  LEFT JOIN LATERAL (SELECT * FROM ${invoiceDataView.getViewName()} deleted_invoices
+      where deleted_invoices.invoice_id = inv.invoice_id
+        and event = 'InvoiceDraftDeleted'
+      limit 1) deleted_invoices on deleted_invoices.invoice_id = inv.invoice_id
 WITH DATA;
     `;
   }

@@ -2,20 +2,32 @@
 
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
+import knex from 'knex';
 
-import { ErpServiceContract, PayerType } from '@hindawi/shared';
+import { ErpServiceContract, PayerType, Payer, Article } from '@hindawi/shared';
 
 import {
   // ErpServiceContract,
   ErpData,
-  ErpResponse,
+  ErpInvoiceResponse,
+  ErpRevRecResponse,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
 import { Connection } from './netsuite/Connection';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
 
+type CustomerPayload = Record<string, string | boolean>;
+
 export class NetSuiteService implements ErpServiceContract {
   private constructor(private connection: Connection) {}
+
+  get invoiceErpRefFieldName(): string {
+    return 'nsReference';
+  }
+
+  get invoiceRevenueRecRefFieldName(): string {
+    return 'nsRevRecReference';
+  }
 
   public static create(config: Record<string, unknown>): NetSuiteService {
     const connection = new Connection({
@@ -26,16 +38,23 @@ export class NetSuiteService implements ErpServiceContract {
     return service;
   }
 
-  public async registerInvoice(data: ErpData): Promise<ErpResponse> {
+  public async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
     // console.log('ERP Data:');
     // console.info(data);
 
     const customerId = await this.getCustomerId(data);
 
-    return this.createInvoice({ ...data, customerId });
+    const response = await this.createInvoice({ ...data, customerId });
+    return {
+      tradeDocumentId: String(response),
+      tradeItemIds: null,
+      accountId: null,
+    };
   }
 
-  public async registerRevenueRecognition(data: ErpData): Promise<ErpResponse> {
+  public async registerRevenueRecognition(
+    data: ErpData
+  ): Promise<ErpRevRecResponse> {
     console.log('registerRevenueRecognition Data:');
     console.info(data);
 
@@ -74,10 +93,10 @@ export class NetSuiteService implements ErpServiceContract {
       debitAccountId,
     });
 
-    return revenueRecognition;
+    return { journal: { id: String(revenueRecognition) } };
   }
 
-  public async registerCreditNote(data: ErpData): Promise<ErpResponse> {
+  public async registerCreditNote(data: ErpData): Promise<ErpInvoiceResponse> {
     console.log('registerCreditNote Data:');
     console.info(data);
 
@@ -88,11 +107,18 @@ export class NetSuiteService implements ErpServiceContract {
     return creditNoteId;
   }
 
-  public async registerPayment(data: ErpData): Promise<ErpResponse> {
+  public async registerPayment(data: ErpData): Promise<ErpInvoiceResponse> {
     console.log('registerPayment Data:');
     console.info(data);
 
-    const customerAlreadyExists = await this.queryCustomer(data);
+    const customerAlreadyExists = await this.queryCustomer(
+      this.getCustomerPayload(data.payer, data.article)
+    );
+    if (!customerAlreadyExists) {
+      console.error(
+        `Customer does not exists for article: ${data.article.customId}.`
+      );
+    }
     const paymentId = await this.createPayment({
       ...data,
       customerId: customerAlreadyExists.id,
@@ -103,34 +129,36 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async getCustomerId(data: ErpData) {
-    // const { payer } = data;
+    const { payer } = data;
 
-    // let customerId;
-    // const customerAlreadyExists = await this.queryCustomer(data);
+    let customerId;
 
-    // if (customerAlreadyExists) {
-    //   if (
-    //     (customerAlreadyExists.isperson === 'T' &&
-    //       payer.type === PayerType.INSTITUTION) ||
-    //     (customerAlreadyExists.isperson === 'F' &&
-    //       payer.type !== PayerType.INSTITUTION)
-    //   ) {
-    const customerId = await this.createCustomer(data);
-    //   } else {
-    //     customerId = customerAlreadyExists.id;
-    //   }
-    // } else {
-    //   customerId = await this.createCustomer(data);
-    // }
+    const customerAlreadyExists = await this.queryCustomer(
+      this.getCustomerPayload(data.payer, data.article)
+    );
+
+    if (customerAlreadyExists) {
+      if (
+        (customerAlreadyExists.isperson === 'T' &&
+          payer.type === PayerType.INSTITUTION) ||
+        (customerAlreadyExists.isperson === 'F' &&
+          payer.type !== PayerType.INSTITUTION)
+      ) {
+        customerId = await this.createCustomer(data);
+      } else {
+        customerId = customerAlreadyExists.id;
+      }
+    } else {
+      customerId = await this.createCustomer(data);
+    }
 
     return customerId;
   }
 
-  private async queryCustomer(data: any) {
+  private async queryCustomer(customer: CustomerPayload) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { payer } = data;
 
     // * Query customers
     const queryCustomerRequestOpts = {
@@ -138,8 +166,24 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      'select id, companyName, email, isPerson, dateCreated from customer where email = ?',
+      [customer.email]
+    );
+    if (customer.lastName) {
+      query = queryBuilder.raw(`${query.toQuery()} and lastName = ?`, [
+        customer.lastName,
+      ]);
+    }
+    if (customer.companyName) {
+      query = queryBuilder.raw(`${query.toQuery()} and companyName = ?`, [
+        customer.companyName,
+      ]);
+    }
+
     const queryCustomerRequest = {
-      q: `SELECT id, companyName, email, isPerson, dateCreated FROM customer WHERE email = '${payer?.email?.toString()}'`,
+      q: query.toQuery(),
     };
 
     try {
@@ -174,34 +218,7 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
-    const createCustomerPayload: Record<string, string | boolean> = {
-      email: payer?.email.toString(),
-    };
-
-    if (payer?.type !== PayerType.INSTITUTION) {
-      createCustomerPayload.isPerson = true;
-      const [firstName, ...lastNames] = payer?.name.toString().split(' ');
-      createCustomerPayload.firstName = firstName;
-      createCustomerPayload.lastName = `${lastNames.join(
-        ' '
-      )} - ${article.customId.toString()}`;
-      if (createCustomerPayload?.lastName?.length > 40) {
-        createCustomerPayload.lastName = createCustomerPayload?.lastName?.slice(
-          createCustomerPayload?.lastName?.length - 40
-        );
-      }
-    } else {
-      createCustomerPayload.isPerson = false;
-      createCustomerPayload.companyName = `${
-        payer?.organization.toString() || payer?.name.toString()
-      } - ${article.customId.toString()}`;
-      if (createCustomerPayload.companyName.length > 40) {
-        createCustomerPayload.companyName = createCustomerPayload.companyName.slice(
-          createCustomerPayload.companyName.length - 40
-        );
-      }
-      createCustomerPayload.vatRegNumber = payer.VATId;
-    }
+    const createCustomerPayload = this.getCustomerPayload(payer, article);
 
     try {
       const res = await axios({
@@ -231,7 +248,7 @@ export class NetSuiteService implements ErpServiceContract {
       items: [item],
       article,
       // billingAddress,
-      // journalName,
+      journalName,
       // vatNote,
       // rate,
       // tradeDocumentItemProduct,
@@ -252,18 +269,15 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const createInvoicePayload: Record<string, any> = {
-      createdDate: format(
-        new Date(invoice.dateCreated),
+      tranDate: format(
+        new Date(invoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
-        new Date(invoice.dateCreated),
+        new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
-      tranId: `${invoice.invoiceNumber}/${format(
-        new Date(invoice.dateCreated),
-        'yyyy'
-      )}`,
+      tranId: invoice.referenceNumber,
       entity: {
         id: customerId,
       },
@@ -271,7 +285,7 @@ export class NetSuiteService implements ErpServiceContract {
         items: [
           {
             amount: item.calculateNetPrice(),
-            description: `${article.title} - Article Processing Charges for ${article.customId}`,
+            description: `${journalName} - Article Processing Charges for ${article.customId}`,
             quantity: 1.0,
             rate: item.price,
             taxRate1: item.rate,
@@ -397,15 +411,12 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async createRevenueRecognition(data: any) {
-    console.log('createRevenueRecognition Data:');
-    console.info(data);
-
     const {
       connection: { config, oauth, token },
     } = this;
     const {
       invoice,
-      // manuscript,
+      article,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -425,10 +436,10 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
-      createdDate: format(
-        new Date(data.invoice.dateCreated),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
+      // createdDate: format(
+      //   new Date(data.invoice.dateCreated),
+      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      // ),
       line: {
         items: [
           {
@@ -455,8 +466,8 @@ export class NetSuiteService implements ErpServiceContract {
       };
     }
 
-    console.log('createJournalPayload:');
-    console.info(createJournalPayload);
+    // console.log('createJournalPayload:');
+    // console.info(createJournalPayload);
 
     try {
       const res = await axios({
@@ -519,8 +530,8 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { creditNote } = data;
 
-    console.log('transformCreditNote data:');
-    console.info(creditNote);
+    // console.log('transformCreditNote data:');
+    // console.info(creditNote);
 
     const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${creditNote.nsReference}/!transform/creditmemo`,
@@ -614,5 +625,38 @@ export class NetSuiteService implements ErpServiceContract {
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
+  }
+
+  private getCustomerPayload(payer: Payer, article: Article): CustomerPayload {
+    const MAX_LENGTH = 24;
+    const createCustomerPayload: Record<string, string | boolean> = {
+      email: payer?.email.toString(),
+    };
+
+    const keep = ` ${article.customId.toString()}`;
+    if (payer?.type !== PayerType.INSTITUTION) {
+      createCustomerPayload.isPerson = true;
+      const [firstName, ...lastNames] = payer?.name.toString().split(' ');
+      createCustomerPayload.firstName = firstName;
+      createCustomerPayload.lastName = `${lastNames.join(' ')} ${keep}`;
+      if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
+        createCustomerPayload.lastName =
+          createCustomerPayload?.lastName?.slice(0, MAX_LENGTH - keep.length) +
+          keep;
+      }
+    } else {
+      createCustomerPayload.isPerson = false;
+      createCustomerPayload.companyName = `${
+        payer?.organization.toString() || payer?.name.toString()
+      } ${keep}`;
+      if (createCustomerPayload.companyName.length > MAX_LENGTH) {
+        createCustomerPayload.companyName =
+          createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
+          keep;
+      }
+      createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
+    }
+
+    return createCustomerPayload;
   }
 }

@@ -45,7 +45,7 @@ export const SubmissionPeerReviewCycleCheckPassed = {
     logger.setScope(`PhenomEvent:${SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED}`);
     logger.info('Incoming Event Data', data);
 
-    const { submissionId, manuscripts } = data;
+    const { submissionId, manuscripts, updated } = data;
 
     if (manuscripts[0]?.articleType?.name in ManuscriptTypeNotInvoiceable) {
       return;
@@ -116,6 +116,7 @@ export const SubmissionPeerReviewCycleCheckPassed = {
         authorCountry: country,
         authorSurname: surname,
         authorFirstName: givenNames,
+        acceptanceDate: updated,
         bankTransferCopyReceiver:
           env.app.invoicePaymentEmailBankTransferCopyReceiver,
         emailSenderInfo: {

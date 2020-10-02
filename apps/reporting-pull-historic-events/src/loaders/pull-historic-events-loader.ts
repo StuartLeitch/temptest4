@@ -1,3 +1,17 @@
+/* eslint-disable no-case-declarations */
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
+import { S3, SQS } from 'aws-sdk';
+import Knex from 'knex';
+import {
+  MicroframeworkLoader,
+  MicroframeworkSettings,
+} from 'microframework-w3tec';
+import { ConsumerTransport } from '../contants';
+import { env } from '../env';
+// import { Logger } from '../lib/logger';
+
+import { LoggerBuilder } from '@hindawi/shared';
 import {
   Event,
   FileResumeService,
@@ -7,15 +21,6 @@ import {
   UsecasePublishConsumer,
   CounterConsumer,
 } from 'libs/eve/src';
-import { S3, SQS } from 'aws-sdk';
-import Knex from 'knex';
-import {
-  MicroframeworkLoader,
-  MicroframeworkSettings,
-} from 'microframework-w3tec';
-import { ConsumerTransport } from '../contants';
-import { env } from '../env';
-import { Logger } from '../lib/logger';
 import { defaultRegistry } from 'libs/shared/src/lib/modules/reporting/EventMappingRegistry';
 import { FilterEventsService } from 'libs/shared/src/lib/modules/reporting/services/FilterEventsService';
 import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
@@ -59,26 +64,34 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
         settings.onShutdown(() => knex.destroy());
       }
 
+      const loggerBuilder = new LoggerBuilder();
+      const filterEventsServiceLogger = loggerBuilder.getLogger();
+      filterEventsServiceLogger.setScope('service:FilterEvents');
+
       const filterEventsService = new FilterEventsService(
         s3,
-        new Logger('service:FilterEvents')
+        filterEventsServiceLogger
       );
 
       const registry = defaultRegistry;
       const eventsRepo = new KnexEventsRepo(knex);
       const saveEventsUsecase = new SaveEventsUsecase(eventsRepo, registry);
+      const saveSqsEventsLogger = loggerBuilder.getLogger();
+      saveSqsEventsLogger.setScope('saveSqsEvents:usecase');
       const saveSqsEventsUsecase = new SaveSqsEventsUsecase(
         filterEventsService,
         saveEventsUsecase,
-        new Logger('saveSqsEvents:usecase')
+        saveSqsEventsLogger
       );
       consumer = new UsecasePublishConsumer<any>(saveSqsEventsUsecase); // saveSqsEventsUsecase support both EveEvent and SqsEvent
       break;
     case ConsumerTransport.HTTP:
+      const publisherHttpLogger = loggerBuilder.getLogger();
+      publisherHttpLogger.setScope('publisher:http');
       consumer = new HttpPublishConsumer(
         env.consumerHttp.host,
         env.consumerHttp.token,
-        new Logger('publisher:http')
+        publisherHttpLogger
       );
       break;
 
@@ -94,7 +107,9 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
       consumer = new SqsPublishConsumer<Event>(sqs, sqsConfig.queueName);
       break;
     case ConsumerTransport.Counter:
-      consumer = new CounterConsumer<Event>(new Logger('consumer:counter'));
+      const consumerCounterLogger = loggerBuilder.getLogger();
+      consumerCounterLogger.setScope('consumer:counter');
+      consumer = new CounterConsumer<Event>(consumerCounterLogger);
       break;
     default:
       throw new Error('Unknown consumer type');

@@ -7,7 +7,7 @@ import {
   ErpServiceContract,
   PayerType,
   InvoiceItem,
-  ErpResponse,
+  ErpInvoiceResponse,
 } from '@hindawi/shared';
 import countryList from 'country-list';
 
@@ -31,6 +31,14 @@ export class SageService implements ErpServiceContract {
     private config: any,
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
+
+  get invoiceErpRefFieldName(): string {
+    return 'erpReference';
+  }
+
+  get invoiceRevenueRecRefFieldName(): string {
+    return 'revenueRecognitionReference';
+  }
 
   private async getConnection(): Promise<Connection> {
     const { user, password, securityToken, loginUrl } = this.config;
@@ -59,7 +67,7 @@ export class SageService implements ErpServiceContract {
     return this.connection;
   }
 
-  async registerInvoice(data: ErpData): Promise<ErpResponse> {
+  async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
     // console.info(`registerInvoice init with`, data);
 
     const { items, tradeDocumentItemProduct } = data;
