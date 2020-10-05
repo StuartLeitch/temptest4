@@ -1,10 +1,12 @@
 import { Invoice, Payer, InvoiceItem, Address, Article } from '@hindawi/shared';
+import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
+import { PublisherCustomValues } from '../../modules/publishers/domain/PublisherCustomValues';
 
-export interface ErpData {
+export interface ErpInvoiceRequest {
   invoice: Invoice;
   items: InvoiceItem[];
   payer: Payer;
-  article: Article;
+  manuscript: Manuscript;
   billingAddress: Address;
   journalName?: string;
   vatNote?: Record<string, unknown>;
@@ -12,6 +14,15 @@ export interface ErpData {
   tradeDocumentItemProduct: string;
   customSegmentId?: string;
   taxRateId?: string;
+  itemId?: string;
+}
+
+export interface ErpRevRecRequest {
+  publisherCustomValues: PublisherCustomValues;
+  manuscript: Manuscript;
+  invoiceTotal: number;
+  invoice: Invoice;
+  payer: Payer;
 }
 
 export interface ErpInvoiceResponse {
@@ -24,13 +35,18 @@ export interface ErpRevRecResponse {
   journal: {
     id: string;
   };
+  journalItem: any;
+  journalTags: any;
+  journalItemTag: any;
 }
 
 export interface ErpServiceContract {
   readonly invoiceErpRefFieldName: string;
   readonly invoiceRevenueRecRefFieldName: string;
-  registerInvoice(data: ErpData): Promise<ErpInvoiceResponse>;
-  registerRevenueRecognition(data: any): Promise<ErpRevRecResponse>;
+  registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse>;
+  registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse>;
   registerCreditNote?(data: any): Promise<any>;
   registerPayment?(data: any): Promise<any>;
 }
@@ -44,7 +60,7 @@ export class EmptyErpService implements ErpServiceContract {
     return 'emptyErpRecRef';
   }
 
-  async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
+  async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
     return {
       tradeDocumentId: '',
       tradeItemIds: [''],
@@ -52,11 +68,16 @@ export class EmptyErpService implements ErpServiceContract {
     };
   }
 
-  async registerRevenueRecognition(data: any): Promise<ErpRevRecResponse> {
+  async registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
     return {
       journal: {
         id: '',
       },
+      journalItem: null,
+      journalTags: null,
+      journalItemTag: null,
     };
   }
 

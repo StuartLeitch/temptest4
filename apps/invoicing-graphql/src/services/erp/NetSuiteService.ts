@@ -4,13 +4,21 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { format } from 'date-fns';
 import knex from 'knex';
 
-import { ErpServiceContract, PayerType, Payer, Article } from '@hindawi/shared';
+import {
+  ErpServiceContract,
+  PayerType,
+  Payer,
+  Manuscript,
+  Invoice,
+  InvoiceItem,
+} from '@hindawi/shared';
 
 import {
   // ErpServiceContract,
-  ErpData,
+  ErpInvoiceRequest,
   ErpInvoiceResponse,
   ErpRevRecResponse,
+  ErpRevRecRequest,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
 import { Connection } from './netsuite/Connection';
@@ -38,13 +46,25 @@ export class NetSuiteService implements ErpServiceContract {
     return service;
   }
 
-  public async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
+  public async registerInvoice(
+    data: ErpInvoiceRequest
+  ): Promise<ErpInvoiceResponse> {
     // console.log('ERP Data:');
     // console.info(data);
 
     const customerId = await this.getCustomerId(data);
 
-    const response = await this.createInvoice({ ...data, customerId });
+    const response = await this.createInvoice({
+      customerId,
+      customSegmentId: data.customSegmentId,
+      invoice: data.invoice,
+      itemId: data.itemId,
+      items: data.items,
+      journalName: data.journalName,
+      manuscript: data.manuscript,
+      rate: data.rate,
+      taxRateId: data.taxRateId,
+    });
     return {
       tradeDocumentId: String(response),
       tradeItemIds: null,
@@ -53,12 +73,14 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   public async registerRevenueRecognition(
-    data: ErpData
+    data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
     console.log('registerRevenueRecognition Data:');
     console.info(data);
 
-    const { customSegmentId } = data;
+    const {
+      publisherCustomValues: { customSegmentId },
+    } = data;
     const customerId = await this.getCustomerId(data);
 
     /**
@@ -91,12 +113,20 @@ export class NetSuiteService implements ErpServiceContract {
       customerId,
       creditAccountId,
       debitAccountId,
+      customSegmentId,
     });
 
-    return { journal: { id: String(revenueRecognition) } };
+    return {
+      journal: { id: String(revenueRecognition) },
+      journalItem: null,
+      journalTags: null,
+      journalItemTag: null,
+    };
   }
 
-  public async registerCreditNote(data: ErpData): Promise<ErpInvoiceResponse> {
+  public async registerCreditNote(
+    data: ErpInvoiceRequest
+  ): Promise<ErpInvoiceResponse> {
     console.log('registerCreditNote Data:');
     console.info(data);
 
@@ -107,16 +137,18 @@ export class NetSuiteService implements ErpServiceContract {
     return creditNoteId;
   }
 
-  public async registerPayment(data: ErpData): Promise<ErpInvoiceResponse> {
+  public async registerPayment(
+    data: ErpInvoiceRequest
+  ): Promise<ErpInvoiceResponse> {
     console.log('registerPayment Data:');
     console.info(data);
 
     const customerAlreadyExists = await this.queryCustomer(
-      this.getCustomerPayload(data.payer, data.article)
+      this.getCustomerPayload(data.payer, data.manuscript)
     );
     if (!customerAlreadyExists) {
       console.error(
-        `Customer does not exists for article: ${data.article.customId}.`
+        `Customer does not exists for article: ${data.manuscript.customId}.`
       );
     }
     const paymentId = await this.createPayment({
@@ -128,13 +160,13 @@ export class NetSuiteService implements ErpServiceContract {
     return paymentId;
   }
 
-  private async getCustomerId(data: ErpData) {
-    const { payer } = data;
+  private async getCustomerId(data: { payer: Payer; manuscript: Manuscript }) {
+    const { payer, manuscript } = data;
 
     let customerId;
 
     const customerAlreadyExists = await this.queryCustomer(
-      this.getCustomerPayload(data.payer, data.article)
+      this.getCustomerPayload(payer, manuscript)
     );
 
     if (customerAlreadyExists) {
@@ -204,11 +236,11 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createCustomer(data: any) {
+  private async createCustomer(data: { payer: Payer; manuscript: Manuscript }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { payer, article } = data;
+    const { payer, manuscript } = data;
 
     let newCustomerId = null;
 
@@ -218,7 +250,7 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
-    const createCustomerPayload = this.getCustomerPayload(payer, article);
+    const createCustomerPayload = this.getCustomerPayload(payer, manuscript);
 
     try {
       const res = await axios({
@@ -238,23 +270,29 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createInvoice(data: any) {
+  private async createInvoice(data: {
+    invoice: Invoice;
+    items: InvoiceItem[];
+    manuscript: Manuscript;
+    journalName: string;
+    customSegmentId: string;
+    taxRateId: string;
+    itemId: string;
+    customerId: string;
+    rate: number;
+  }) {
     const {
       connection: { config, oauth, token },
     } = this;
     const {
       invoice,
-      // payer,
       items: [item],
-      article,
-      // billingAddress,
+      manuscript,
       journalName,
-      // vatNote,
-      // rate,
-      // tradeDocumentItemProduct,
       customerId,
       customSegmentId,
       itemId,
+      rate,
       taxRateId,
     } = data;
     // console.log('Create invoice item');
@@ -285,10 +323,10 @@ export class NetSuiteService implements ErpServiceContract {
         items: [
           {
             amount: item.calculateNetPrice(),
-            description: `${journalName} - Article Processing Charges for ${article.customId}`,
+            description: `${journalName} - Article Processing Charges for ${manuscript.customId}`,
             quantity: 1.0,
             rate: item.price,
-            taxRate1: item.rate,
+            taxRate1: rate,
             excludeFromRateRequest: false,
             printItems: false,
             item: {
@@ -410,13 +448,19 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createRevenueRecognition(data: any) {
+  private async createRevenueRecognition(data: {
+    invoice: Invoice;
+    invoiceTotal: number;
+    creditAccountId: string;
+    debitAccountId: string;
+    customerId: string;
+    customSegmentId: string;
+  }) {
     const {
       connection: { config, oauth, token },
     } = this;
     const {
       invoice,
-      article,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -627,13 +671,16 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private getCustomerPayload(payer: Payer, article: Article): CustomerPayload {
+  private getCustomerPayload(
+    payer: Payer,
+    manuscript: Manuscript
+  ): CustomerPayload {
     const MAX_LENGTH = 24;
     const createCustomerPayload: Record<string, string | boolean> = {
       email: payer?.email.toString(),
     };
 
-    const keep = ` ${article.customId.toString()}`;
+    const keep = ` ${manuscript.customId.toString()}`;
     if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');

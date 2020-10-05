@@ -1,7 +1,13 @@
-import { ErpServiceContract, ErpData, ErpInvoiceResponse } from '../ErpService';
+import {
+  ErpServiceContract,
+  ErpInvoiceRequest,
+  ErpInvoiceResponse,
+  ErpRevRecRequest,
+  ErpRevRecResponse,
+} from '../ErpService';
 
 export class MockErpService implements ErpServiceContract {
-  private invoiceMap: { [key: string]: ErpData } = {};
+  private invoiceMap: { [key: string]: ErpInvoiceRequest } = {};
   private revenueMap: { [key: string]: any } = {};
 
   public readonly erpRef: string = 'ERP_REF';
@@ -16,7 +22,7 @@ export class MockErpService implements ErpServiceContract {
     return 'revenueRecognitionReference';
   }
 
-  async registerInvoice(data: ErpData): Promise<ErpInvoiceResponse> {
+  async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
     const invoiceId = data.invoice.id.toValue().toString();
     this.invoiceMap[invoiceId] = data;
     return {
@@ -28,15 +34,20 @@ export class MockErpService implements ErpServiceContract {
     };
   }
 
-  async registerRevenueRecognition(data: any): Promise<any> {
+  async registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
     const invoiceId = data.invoice.id.toValue().toString();
     this.revenueMap[invoiceId] = data;
     return {
       journal: { id: this.revenueRef },
+      journalItem: null,
+      journalItemTag: null,
+      journalTags: null,
     };
   }
 
-  public getInvoice(invoiceId: string): ErpData {
+  public getInvoice(invoiceId: string): ErpInvoiceRequest {
     return this.invoiceMap[invoiceId];
   }
 
