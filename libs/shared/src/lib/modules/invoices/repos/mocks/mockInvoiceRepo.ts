@@ -30,7 +30,11 @@ export class MockInvoiceRepo
     }
   }
 
-  public async getFailedErpInvoices(): Promise<Invoice[]> {
+  public async getFailedSageErpInvoices(): Promise<Invoice[]> {
+    return [];
+  }
+
+  public async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
     return [];
   }
 

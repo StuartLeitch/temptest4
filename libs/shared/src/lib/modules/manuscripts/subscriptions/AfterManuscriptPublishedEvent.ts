@@ -1,6 +1,8 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
+
 import { ManuscriptPublished } from '../domain/events/manuscriptPublished';
 // import { PublishInvoiceConfirmed } from '../usecases/publishInvoiceConfirmed';
 
@@ -17,7 +19,7 @@ import { ArticleRepoContract as ManuscriptRepoContract } from '../../manuscripts
 export class AfterManuscriptPublishedEvent
   implements HandleContract<ManuscriptPublished> {
   constructor(
-    private logger: any,
+    private logger: LoggerContract,
     // private invoiceItemRepo: InvoiceItemRepoContract,
     // private couponRepo: CouponRepoContract,
     // private waiverRepo: WaiverRepoContract,

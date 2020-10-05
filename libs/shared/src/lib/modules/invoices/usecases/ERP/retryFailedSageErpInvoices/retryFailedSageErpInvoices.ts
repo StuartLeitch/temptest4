@@ -1,41 +1,45 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { UseCase } from '../../../../core/domain/UseCase';
-import { right, Result, left, Either } from '../../../../core/logic/Result';
-import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either, right, left } from '../../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
-  AccessControlledUsecase,
   UsecaseAuthorizationContext,
+  AccessControlledUsecase,
   AccessControlContext,
-} from '../../../../domain/authorization';
-import { ErpResponse } from './../../../../domain/services/ErpService';
+} from '../../../../../domain/authorization';
 
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
+
+import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { VATService } from 'libs/shared/src/lib/domain/services/VATService';
+
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
-import { PublisherRepoContract } from '../../../publishers/repos';
-import { LoggerContract } from './../../../../infrastructure/logging/Logger';
 
-export type RetryFailedErpInvoicesResponse = Either<
-  UnexpectedError | ErpResponse,
-  ErpResponse[]
+import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
+
+export type RetryFailedSageErpInvoicesResponse = Either<
+  UnexpectedError | ErpInvoiceResponse,
+  ErpInvoiceResponse[]
 >;
 
-export class RetryFailedErpInvoicesUsecase
+export class RetryFailedSageErpInvoicesUsecase
   implements
     UseCase<
       Record<string, unknown>,
-      Promise<RetryFailedErpInvoicesResponse>,
+      Promise<RetryFailedSageErpInvoicesResponse>,
       UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
@@ -54,9 +58,9 @@ export class RetryFailedErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private sageService: ErpServiceContract,
-    private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
-    private loggerService: LoggerContract
+    private loggerService: LoggerContract,
+    private vatService: VATService
   ) {
     this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
       this.invoiceRepo,
@@ -68,9 +72,9 @@ export class RetryFailedErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.sageService,
-      this.netSuiteService,
       this.publisherRepo,
-      this.loggerService
+      this.loggerService,
+      this.vatService
     );
   }
 
@@ -82,11 +86,11 @@ export class RetryFailedErpInvoicesUsecase
   public async execute(
     request?: Record<string, unknown>,
     context?: UsecaseAuthorizationContext
-  ): Promise<RetryFailedErpInvoicesResponse> {
+  ): Promise<RetryFailedSageErpInvoicesResponse> {
     try {
-      const failedErpInvoices = await this.invoiceRepo.getFailedErpInvoices();
+      const failedErpInvoices = await this.invoiceRepo.getFailedSageErpInvoices();
 
-      const updatedInvoices: ErpResponse[] = [];
+      const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (failedErpInvoices.length === 0) {
         this.loggerService.info('No failed erp invoices');
@@ -114,7 +118,7 @@ export class RetryFailedErpInvoicesUsecase
         ) {
           return left(updatedInvoiceResponse);
         }
-        const assignedErpReference = updatedInvoiceResponse as ErpResponse;
+        const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
         // console.log('Assigned ERP Reference:');
         // console.info('type ', typeof assignedErpReference);

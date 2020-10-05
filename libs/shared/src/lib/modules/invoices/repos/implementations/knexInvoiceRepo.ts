@@ -251,7 +251,8 @@ export class KnexInvoiceRepo
     return result[0];
   }
 
-  async getFailedErpInvoices(): Promise<Invoice[]> {
+  async getFailedSageErpInvoices(): Promise<Invoice[]> {
+    const LIMIT = 30;
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICES)
@@ -263,15 +264,10 @@ export class KnexInvoiceRepo
         this.whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.nsReference')
           .whereNull('invoices.erpReference');
-        // .andWhere(function () {
-        //   this.whereNull('invoices.erpReference').orWhereNull('invoices.nsReference');
-        // });
       })
       .orderBy('articles.datePublished', 'desc')
-      // .offset(200)
-      .limit(10);
+      .limit(LIMIT);
 
     logger.debug('select', {
       sql: sql.toString(),
