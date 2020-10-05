@@ -113,4 +113,14 @@ export class KnexArticleRepo
           )
         );
   }
+
+  async filterBy(criteria): Promise<unknown> {
+    const { condition, field } = criteria;
+    return (query) => {
+      const join = query
+        .leftJoin(TABLES.ARTICLES, 'articles.id', 'invoice_items.manuscriptId')
+        .orderBy(field, 'desc');
+      return join[condition](field);
+    };
+  }
 }

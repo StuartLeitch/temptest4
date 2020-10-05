@@ -19,7 +19,7 @@ export abstract class BaseMockRepo<T> {
   }
 
   public removeMockItem(t: T): void {
-    this._items = this._items.filter(item => !this.compareMockItems(item, t));
+    this._items = this._items.filter((item) => !this.compareMockItems(item, t));
   }
 
   public clear(): void {

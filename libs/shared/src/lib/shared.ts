@@ -16,11 +16,13 @@ export * from './modules/addresses/domain/Address';
 export * from './modules/addresses/usecases/getAddress/getAddress';
 export * from './modules/addresses/mappers/AddressMap';
 export * from './modules/addresses/repos/implementations/knexAddressRepo';
+export * from './modules/addresses/repos/mocks/mockAddressRepo';
 export * from './modules/addresses/mappers/AddressMap';
 
 // * Export Article Subdomain
 export * from './modules/manuscripts/domain/Article';
 export * from './modules/manuscripts/mappers/ArticleMap';
+export * from './modules/manuscripts/mappers/ManuscriptMap';
 export * from './modules/manuscripts/domain/ArticleId';
 export * from './modules/manuscripts/domain/ManuscriptTypes';
 export * from './modules/manuscripts/repos';
@@ -82,6 +84,7 @@ export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getI
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
 export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
 export * from './modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
+export * from './modules/invoices/usecases/retryRevenueRecognizedErpInvoices/retryRevenueRecognitionErpInvoices';
 
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceConfirmed/publishInvoiceConfirmed';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
@@ -110,6 +113,7 @@ export * from './modules/payers/domain/PayerName';
 export * from './modules/payers/domain/PayerTitle';
 export * from './modules/payers/repos/payerRepo';
 export * from './modules/payers/repos/implementations/knexPayerRepo';
+export * from './modules/payers/repos/mocks/mockPayerRepo';
 export * from './modules/payers/mapper/Payer';
 export * from './modules/payers/usecases/getPayer/getPayer';
 export * from './modules/payers/usecases/getPayerDetails/getPayerDetails';
@@ -204,7 +208,7 @@ export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetail
 export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
 export * from './modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 
-export * from './modules/waivers/repos/implementations/knexWaiverRepo';
+export * from './modules/waivers/repos';
 
 export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/waivers/mappers/WaiverMap';

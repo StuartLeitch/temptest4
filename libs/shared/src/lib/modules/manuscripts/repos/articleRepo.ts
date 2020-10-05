@@ -7,8 +7,11 @@ import { Manuscript } from '../domain/Manuscript';
 
 export interface ArticleRepoContract extends Repo<Article | Manuscript> {
   findById(manuscriptId: ManuscriptId): Promise<Article | Manuscript>;
-  findByCustomId(customId: ManuscriptId | string): Promise<Article>;
+  findByCustomId(
+    customId: ManuscriptId | string
+  ): Promise<Article | Manuscript>;
   getAuthorOfArticle(articleId: ArticleId): Promise<unknown>;
   delete(manuscript: Manuscript): Promise<unknown>;
   update(manuscript: Manuscript): Promise<Manuscript>;
+  filterBy(criteria: any): any;
 }
