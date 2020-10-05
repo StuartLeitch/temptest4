@@ -251,33 +251,6 @@ export class KnexInvoiceRepo
     return result[0];
   }
 
-  async getFailedSageErpInvoices(): Promise<Invoice[]> {
-    const LIMIT = 30;
-    const { db, logger } = this;
-
-    const sql = db(TABLES.INVOICES)
-      .select('invoices.*', 'articles.datePublished')
-      .from('invoices')
-      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-      .where(function () {
-        this.whereNot('invoices.deleted', 1)
-          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.erpReference');
-      })
-      .orderBy('articles.datePublished', 'desc')
-      .limit(LIMIT);
-
-    logger.debug('select', {
-      sql: sql.toString(),
-    });
-
-    const invoices = await sql;
-
-    return invoices.map((i) => InvoiceMap.toDomain(i));
-  }
-
   async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
     const { logger } = this;
 
@@ -335,6 +308,142 @@ export class KnexInvoiceRepo
           .orderBy('articles.datePublished', 'desc')
       );
     };
+  }
+
+  async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
+    const { db, logger } = this;
+    const LIMIT = 30;
+
+    // * SQL for retrieving results needed only for Sage registration
+    const prepareIdsForSageOnlySQL = db(TABLES.INVOICES)
+      .select(
+        'invoices.id as invoiceId',
+        'invoices.transactionId as transactionId',
+        'invoices.status as invoiceStatus',
+        'articles.id AS manuscriptId',
+        'articles.datePublished'
+      )
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
+      .where(function () {
+        this.whereNotNull('articles.datePublished')
+          .whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.revenueRecognitionReference')
+          .whereNotNull('invoices.erpReference')
+          .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
+          .where('invoices.erpReference', '<>', 'MigrationRef')
+          .where('invoices.erpReference', '<>', 'migrationRef');
+      })
+      .orderBy('articles.datePublished', 'desc')
+      .limit(LIMIT);
+
+    logger.debug('select', {
+      SageSQL: prepareIdsForSageOnlySQL.toString(),
+    });
+
+    const sageInvoices = await prepareIdsForSageOnlySQL;
+
+    return sageInvoices.map((i) =>
+      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
+    );
+  }
+
+  async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
+    const LIMIT = 30;
+    const { db, logger } = this;
+
+    const sql = db(TABLES.INVOICES)
+      .select('invoices.*', 'articles.datePublished')
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
+      .where(function () {
+        this.whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.nsReference');
+      })
+      .orderBy('articles.datePublished', 'desc')
+      .limit(LIMIT);
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
+
+    return invoices.map((i) => InvoiceMap.toDomain(i));
+  }
+
+  async getFailedSageErpInvoices(): Promise<Invoice[]> {
+    const LIMIT = 30;
+    const { db, logger } = this;
+
+    const sql = db(TABLES.INVOICES)
+      .select('invoices.*', 'articles.datePublished')
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
+      .where(function () {
+        this.whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.erpReference');
+      })
+      .orderBy('articles.datePublished', 'desc')
+      .limit(LIMIT);
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
+
+    return invoices.map((i) => InvoiceMap.toDomain(i));
+  }
+
+  async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
+    const { db, logger } = this;
+    const LIMIT = 30;
+
+    // * SQL for retrieving results needed only for NetSuite registration
+    const prepareIdsForNetSuiteOnlySQL = db(TABLES.INVOICES)
+      .select(
+        'invoices.id as invoiceId',
+        'invoices.transactionId as transactionId',
+        'invoices.status as invoiceStatus',
+        'articles.id AS manuscriptId',
+        'articles.datePublished'
+      )
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
+      .where(function () {
+        this.whereNotNull('articles.datePublished')
+          .whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.nsRevRecReference')
+          .whereNotNull('invoices.nsReference')
+          .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
+          .where('invoices.nsReference', '<>', 'MigrationRef')
+          .where('invoices.nsReference', '<>', 'migrationRef');
+      })
+      .orderBy('articles.datePublished', 'desc')
+      .limit(LIMIT);
+
+    logger.debug('select', {
+      NetSuiteSQL: prepareIdsForNetSuiteOnlySQL.toString(),
+    });
+
+    const netSuiteInvoices = await prepareIdsForNetSuiteOnlySQL;
+
+    return netSuiteInvoices.map((i) =>
+      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
+    );
   }
 
   async delete(invoice: Invoice): Promise<unknown> {

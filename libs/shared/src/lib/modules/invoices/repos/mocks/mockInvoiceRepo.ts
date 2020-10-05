@@ -168,7 +168,7 @@ export class MockInvoiceRepo
     yield* this._items.map((item) => item.id.toString());
   }
 
-  async getUnrecognizedErpInvoices(): Promise<InvoiceId[]> {
+  async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
     const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRevenueRecognition();
 
     const [filterArticlesByNotNullDatePublished] = this.articleRepo.filterBy({
@@ -190,6 +190,10 @@ export class MockInvoiceRepo
     return filterInvoicesReadyForRevenueRecognition(
       invoicesWithPublishedManuscripts
     );
+  }
+
+  public async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
+    return null;
   }
 
   public filterReadyForRevenueRecognition() {

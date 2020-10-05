@@ -15,7 +15,7 @@ import {
   MockInvoiceRepo,
   MockCouponRepo,
   MockWaiverRepo,
-  RetryRevenueRecognitionErpInvoicesUsecase,
+  RetryRevenueRecognitionNetsuiteErpInvoicesUsecase,
   CreateCreditNoteUsecase,
   ManuscriptMap,
 } from '@hindawi/shared';
@@ -45,7 +45,7 @@ let mockWaiverRepo: MockWaiverRepo;
 let mockTransactionRepo: MockTransactionRepo;
 let loggerService: LoggerContract;
 
-let revenueRecognitionUseCase: RetryRevenueRecognitionErpInvoicesUsecase;
+let revenueRecognitionUseCase: RetryRevenueRecognitionNetsuiteErpInvoicesUsecase;
 let createCreditNoteUsecase: CreateCreditNoteUsecase;
 let context: UsecaseAuthorizationContext;
 
@@ -84,12 +84,11 @@ Before(function () {
   // addWaivers(mockWaiverRepo);
   // addPayers(mockPayerRepo);
 
-  revenueRecognitionUseCase = new RetryRevenueRecognitionErpInvoicesUsecase(
+  revenueRecognitionUseCase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
     mockInvoiceRepo,
     mockInvoiceItemRepo,
     mockCouponRepo,
     mockWaiverRepo,
-    null,
     null,
     null,
     null,
@@ -168,7 +167,7 @@ When(
 Then(
   'It should not enlist the credit note for revenue recognition',
   async function () {
-    const invoices = await mockInvoiceRepo.getUnrecognizedErpInvoices();
+    const invoices = await mockInvoiceRepo.getUnrecognizedNetsuiteErpInvoices();
     expect(invoices.length).to.equal(1);
   }
 );
