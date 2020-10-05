@@ -3,8 +3,8 @@ import { Selector } from '../../../selector';
 import { Filter } from '../../../filters';
 
 interface MockEvent {
-  MessageId: string;
-  Message: string;
+  messageId: string;
+  body: string;
 }
 
 let S3;
@@ -22,9 +22,9 @@ const mockKeys = [
 ];
 
 const mockObjects = {
-  '1': `{"MessageId":"1","Message":"{'a':'1'}"}`,
-  '2': `{"MessageId":"2","Message":"{'a':'2'}"}`,
-  '3': `{"MessageId":"3","Message":"{'a':'3'}"}`,
+  '1': `{"messageId":"1","body":"{'a':'1'}"}`,
+  '2': `{"messageId":"2","body":"{'a':'2'}"}`,
+  '3': `{"messageId":"3","body":"{'a':'3'}"}`,
 };
 
 class MockSelector implements Selector<string> {
@@ -50,7 +50,7 @@ class MockFilter implements Filter<MockEvent> {
   }
 
   match(event: MockEvent): boolean {
-    return this.acceptedEvents.includes(event.MessageId);
+    return this.acceptedEvents.includes(event.messageId);
   }
 }
 
@@ -72,7 +72,7 @@ describe('S3 Event Producer', () => {
         promise: jest.fn().mockResolvedValue({
           $response: {
             data: {
-              Message: values[Key],
+              Body: values[Key],
             },
           },
         }),
@@ -88,9 +88,9 @@ describe('S3 Event Producer', () => {
     const producer = new S3EventProducer(S3(), '');
     const list = producer.produce();
     const expectedResult = [
-      { MessageId: '1', Message: "{'a':'1'}" },
-      { MessageId: '2', Message: "{'a':'2'}" },
-      { MessageId: '3', Message: "{'a':'3'}" },
+      { messageId: '1', body: "{'a':'1'}" },
+      { messageId: '2', body: "{'a':'2'}" },
+      { messageId: '3', body: "{'a':'3'}" },
     ];
 
     const results = [];
@@ -98,9 +98,9 @@ describe('S3 Event Producer', () => {
       results.push(event);
     }
     expect(
-      results.map((e) => ({ ...e, Message: e.Message.replace(' ', '') }))
+      results.map((e) => ({ ...e, body: e.body.replace(' ', '') }))
     ).toEqual(
-      expectedResult.map((e) => ({ ...e, Message: e.Message.replace(' ', '') }))
+      expectedResult.map((e) => ({ ...e, body: e.body.replace(' ', '') }))
     );
   });
 
@@ -127,8 +127,8 @@ describe('S3 Event Producer', () => {
 
     const list = producer.produce();
     const expectedResult = [
-      { MessageId: '1', Message: "{'a':'1'}" },
-      { MessageId: '3', Message: "{'a':'3'}" },
+      { messageId: '1', body: "{'a':'1'}" },
+      { messageId: '3', body: "{'a':'3'}" },
     ];
 
     const results = [];
@@ -137,9 +137,9 @@ describe('S3 Event Producer', () => {
     }
 
     expect(
-      results.map((e) => ({ ...e, Message: e.Message.replace(' ', '') }))
+      results.map((e) => ({ ...e, body: e.body.replace(' ', '') }))
     ).toEqual(
-      expectedResult.map((e) => ({ ...e, Message: e.Message.replace(' ', '') }))
+      expectedResult.map((e) => ({ ...e, body: e.body.replace(' ', '') }))
     );
     expect(s3.getObject.mock.calls[0][0].Key).toBe('1');
     expect(s3.getObject.mock.calls[1][0].Key).toBe('2');
