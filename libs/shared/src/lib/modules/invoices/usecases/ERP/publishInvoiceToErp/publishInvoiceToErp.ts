@@ -236,7 +236,7 @@ export class PublishInvoiceToErpUsecase
           invoice,
           payer,
           items: invoiceItems,
-          article: manuscript as any,
+          manuscript,
           billingAddress: address,
           journalName: catalog.journalTitle,
           vatNote,

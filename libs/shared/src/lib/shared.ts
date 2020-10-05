@@ -23,6 +23,7 @@ export * from './modules/manuscripts/domain/Article';
 export * from './modules/manuscripts/mappers/ArticleMap';
 export * from './modules/manuscripts/domain/ArticleId';
 export * from './modules/manuscripts/domain/ManuscriptTypes';
+export * from './modules/manuscripts/domain/Manuscript';
 export * from './modules/manuscripts/repos';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetailsDTO';

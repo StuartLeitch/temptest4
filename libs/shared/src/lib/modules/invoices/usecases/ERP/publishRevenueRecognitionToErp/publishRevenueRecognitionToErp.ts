@@ -171,15 +171,15 @@ export class PublishRevenueRecognitionToErpUsecase
       }
 
       const erpResponse = await this.erpService.registerRevenueRecognition({
+        manuscript,
         invoice,
-        article: manuscript as any,
         payer,
-        customSegmentId: publisherCustomValues?.customSegmentId,
+        publisherCustomValues,
         invoiceTotal: netCharges,
       });
 
       this.loggerService.info(
-        `NetSuite Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
+        `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
           erpResponse
         )}`
       );
