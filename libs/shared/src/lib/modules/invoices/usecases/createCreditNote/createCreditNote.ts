@@ -136,6 +136,10 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.transactionId = transaction.transactionId.id.toString();
       clonedRawInvoice.dateCreated = new Date();
       clonedRawInvoice.dateIssued = new Date();
+      clonedRawInvoice.erpReference = null;
+      clonedRawInvoice.nsReference = null;
+      clonedRawInvoice.revenueRecognitionReference = null;
+      clonedRawInvoice.nsRevRecReference = null;
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {
