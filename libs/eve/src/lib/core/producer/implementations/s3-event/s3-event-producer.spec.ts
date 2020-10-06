@@ -3,8 +3,8 @@ import { Selector } from '../../../selector';
 import { Filter } from '../../../filters';
 
 interface MockEvent {
-  messageId: string;
-  body: string;
+  MessageId: string;
+  Message: string;
 }
 
 let S3;
@@ -50,7 +50,7 @@ class MockFilter implements Filter<MockEvent> {
   }
 
   match(event: MockEvent): boolean {
-    return this.acceptedEvents.includes(event.messageId);
+    return this.acceptedEvents.includes(event.MessageId);
   }
 }
 

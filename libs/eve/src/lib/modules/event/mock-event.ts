@@ -1,4 +1,4 @@
 export interface MockEvent {
-  messageId: string;
-  body: string;
+  MessageId: string;
+  Message: string;
 }
