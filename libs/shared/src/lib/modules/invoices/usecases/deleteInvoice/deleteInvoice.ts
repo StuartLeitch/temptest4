@@ -4,7 +4,7 @@
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
@@ -78,10 +78,10 @@ export class DeleteInvoiceUsecase
       }
 
       const invoice = invoiceOrError.getValue();
-
       // * This is where all the magic happens
       await this.invoiceRepo.delete(invoice);
       invoice.generateInvoiceDraftDeletedEvent();
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       return Result.ok<Invoice>(null);
     } catch (err) {
