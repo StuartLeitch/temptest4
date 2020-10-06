@@ -15,8 +15,8 @@ export class MockInvoiceRepo
   extends BaseMockRepo<Invoice>
   implements InvoiceRepoContract {
   constructor(
-    private articleRepo: ArticleRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract
+    private articleRepo?: ArticleRepoContract,
+    private invoiceItemRepo?: InvoiceItemRepoContract
   ) {
     super();
   }
