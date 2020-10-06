@@ -93,7 +93,6 @@ export class PublishInvoiceDraftCreatedUseCase
     if (!request.invoice) {
       return left(new Errors.InvoiceRequiredError());
     }
-
     return right(null);
   }
 }

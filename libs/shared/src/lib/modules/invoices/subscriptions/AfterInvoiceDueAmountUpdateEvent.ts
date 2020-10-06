@@ -1,6 +1,11 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { InvoiceDraftDueAmountUpdated } from '../domain/events/invoiceDraftDueAmountUpdated';
+import { InvoiceRepoContract } from '../repos/invoiceRepo';
+import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
+import { ArticleRepoContract } from '../../manuscripts/repos';
+import { WaiverRepoContract } from '../../waivers/repos';
+import { CouponRepoContract } from '../../coupons/repos';
 import { GetInvoiceDetailsUsecase } from '../usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetManuscriptByManuscriptIdUsecase } from '../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
@@ -8,9 +13,11 @@ import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../usecases/publishE
 export class AfterInvoiceDraftDueAmountUpdatedEvent
   implements HandleContract<InvoiceDraftDueAmountUpdated> {
   constructor(
-    private getInvoice: GetInvoiceDetailsUsecase,
-    private getInvoiceItems: GetItemsForInvoiceUsecase,
-    private getManuscript: GetManuscriptByManuscriptIdUsecase,
+    private invoiceRepo: InvoiceRepoContract,
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
     private publishInvoiceDraftDueAmountUpdated: PublishInvoiceDraftDueAmountUpdatedUseCase
   ) {
     this.setupSubscriptions();
@@ -28,8 +35,18 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
   ): Promise<any> {
     //Get invoice data
     const invoiceId = event.invoiceId.toString();
+    const getInvoice = new GetInvoiceDetailsUsecase(this.invoiceRepo);
+    const getInvoiceItems = new GetItemsForInvoiceUsecase(
+      this.invoiceItemRepo,
+      this.couponRepo,
+      this.waiverRepo
+    );
+    const getManuscript = new GetManuscriptByManuscriptIdUsecase(
+      this.manuscriptRepo
+    );
+
     try {
-      const maybeInvoice = await this.getInvoice.execute({ invoiceId });
+      const maybeInvoice = await getInvoice.execute({ invoiceId });
       if (!maybeInvoice || maybeInvoice.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} does not exist.`
@@ -37,7 +54,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
       }
       const invoice = maybeInvoice.value.getValue();
 
-      const maybeInvoiceItems = await this.getInvoiceItems.execute({
+      const maybeInvoiceItems = await getInvoiceItems.execute({
         invoiceId,
       });
       if (!maybeInvoiceItems || maybeInvoiceItems.isLeft()) {
@@ -48,7 +65,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
       const invoiceItems = maybeInvoiceItems.value.getValue();
 
       const manuscriptId = invoiceItems[0].manuscriptId.toString();
-      const maybeManuscript = await this.getManuscript.execute({
+      const maybeManuscript = await getManuscript.execute({
         manuscriptId,
       });
       if (!maybeManuscript || maybeManuscript.isLeft()) {
