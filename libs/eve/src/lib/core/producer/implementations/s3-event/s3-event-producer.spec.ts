@@ -120,7 +120,7 @@ describe('S3 Event Producer', () => {
     expect(s3.getObject.mock.calls[1][0].Key).toBe('3');
   });
 
-  it.skip('should call getObjects only for the keys that match the selector', async () => {
+  it('should call getObjects only for the keys that match the selector', async () => {
     const s3 = S3();
     const producer = new S3EventProducer(s3, '');
     producer.addFilter(new MockFilter(['1', '3']));

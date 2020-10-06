@@ -270,20 +270,25 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
     return Result.ok<Invoice>(invoice);
   }
-
   public generateInvoiceDraftEvent(): void {
-    const now = new Date();
-    this.addDomainEvent(new InvoiceDraftCreated(this, now));
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftCreated(this, now));
+    }
   }
 
   public generateInvoiceDraftDeletedEvent(): void {
-    const now = new Date();
-    this.addDomainEvent(new InvoiceDraftDeleted(this, now));
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftDeleted(this, now));
+    }
   }
 
   public generateInvoiceDraftAmountUpdatedEvent(): void {
-    const now = new Date();
-    this.addDomainEvent(new InvoiceDraftDueAmountUpdated(this, now));
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftDueAmountUpdated(this, now));
+    }
   }
 
   public generateCreatedEvent(): void {

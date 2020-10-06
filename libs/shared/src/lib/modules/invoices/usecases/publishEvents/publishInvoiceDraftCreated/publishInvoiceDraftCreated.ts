@@ -36,9 +36,9 @@ export class PublishInvoiceDraftCreatedUseCase
     request: DTO,
     context?: UsecaseAuthorizationContext
   ): Promise<Response> {
-    const validRequest = this.verifyInput(request);
-    if (validRequest.isLeft()) {
-      return validRequest;
+    const maybeValidRequest = this.verifyInput(request);
+    if (maybeValidRequest.isLeft()) {
+      return maybeValidRequest;
     }
     const { messageTimestamp, invoiceItems, manuscript, invoice } = request;
     const data: InvoiceDraftCreatedEvent = {
