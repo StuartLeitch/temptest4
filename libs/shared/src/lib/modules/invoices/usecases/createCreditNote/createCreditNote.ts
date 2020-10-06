@@ -137,6 +137,7 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.dateCreated = new Date();
       clonedRawInvoice.dateIssued = new Date();
       clonedRawInvoice.erpReference = null;
+      clonedRawInvoice.cancelledInvoiceReference = null;
       clonedRawInvoice.nsReference = null;
       clonedRawInvoice.revenueRecognitionReference = null;
       clonedRawInvoice.nsRevRecReference = null;
@@ -193,8 +194,10 @@ export class CreateCreditNoteUsecase
           dateMovedToFinal: null,
           invoiceNumber: null,
           erpReference: null,
+          nsReference: null,
           revenueRecognitionReference: null,
           nsRevRecReference: null,
+          cancelledInvoiceReference: null,
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain
 

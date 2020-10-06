@@ -8,7 +8,9 @@ import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEn
 import { InvoiceStatus } from './../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { TransactionId } from './../../../../../../src/lib/modules/transactions/domain/TransactionId';
 
+import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 
 function makeInvoiceData(overwrites?: any): Invoice {
   return InvoiceMap.toDomain({
@@ -20,6 +22,8 @@ function makeInvoiceData(overwrites?: any): Invoice {
 }
 
 let mockInvoiceRepo: MockInvoiceRepo;
+let mockInvoiceItemRepo: MockInvoiceItemRepo;
+let mockArticleRepo: MockArticleRepo;
 let invoice: Invoice;
 let invoiceExists: boolean;
 let saveInvoice: Invoice;
@@ -27,7 +31,9 @@ let invoiceList: Invoice[];
 let foundInvoice: Invoice;
 
 Before(async () => {
-  mockInvoiceRepo = new MockInvoiceRepo();
+  mockInvoiceItemRepo = new MockInvoiceItemRepo();
+  mockArticleRepo = new MockArticleRepo();
+  mockInvoiceRepo = new MockInvoiceRepo(mockArticleRepo, mockInvoiceItemRepo);
 });
 
 Given(
