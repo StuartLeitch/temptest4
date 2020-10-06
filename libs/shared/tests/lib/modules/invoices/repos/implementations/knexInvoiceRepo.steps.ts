@@ -9,8 +9,8 @@ import { InvoiceStatus } from './../../../../../../src/lib/modules/invoices/doma
 import { TransactionId } from './../../../../../../src/lib/modules/transactions/domain/TransactionId';
 
 import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 
 function makeInvoiceData(overwrites?: any): Invoice {
   return InvoiceMap.toDomain({
