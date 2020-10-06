@@ -267,7 +267,7 @@ export class PublishPaymentToErpUsecase
                 erpResponse
               )}`
             );
-            // payment.erpReference = erpResponse.tradeDocumentId;
+            payment.erpid = String(erpResponse); //.tradeDocumentId;
           }
         } catch (error) {
           this.loggerService.info(
