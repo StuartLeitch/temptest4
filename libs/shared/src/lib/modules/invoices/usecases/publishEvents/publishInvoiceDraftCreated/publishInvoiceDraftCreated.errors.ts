@@ -26,9 +26,9 @@ export class InvoiceRequiredError extends Result<UseCaseError> {
 }
 
 export class SQSServiceFailure extends Result<UseCaseError> {
-  constructor() {
+  constructor(public errorMsg: string) {
     super(false, {
-      message: 'SQS Service failed.',
+      message: `SQS Service failure: ${errorMsg}`,
     });
   }
 }
