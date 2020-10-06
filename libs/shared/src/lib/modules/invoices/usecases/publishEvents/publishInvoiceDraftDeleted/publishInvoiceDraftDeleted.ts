@@ -70,7 +70,7 @@ export class PublishInvoiceDraftDeletedUseCase
       });
       return right(null);
     } catch (err) {
-      return left(new Errors.SQSServiceFailure());
+      return left(new Errors.SQSServiceFailure(err));
     }
   }
 
