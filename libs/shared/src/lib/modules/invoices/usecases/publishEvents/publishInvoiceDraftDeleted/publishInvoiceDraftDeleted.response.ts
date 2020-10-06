@@ -7,6 +7,7 @@ export type PublishInvoiceDraftDeletedResponse = Either<
   | Errors.InvoiceItemsRequiredError
   | Errors.InvoiceRequiredError
   | Errors.ManuscriptRequiredError
+  | Errors.SQSServiceFailure
   | UnexpectedError,
   void
 >;

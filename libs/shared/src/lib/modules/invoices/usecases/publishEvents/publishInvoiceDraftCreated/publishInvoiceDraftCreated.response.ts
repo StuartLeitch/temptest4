@@ -7,6 +7,7 @@ export type PublishInvoiceDraftCreatedResponse = Either<
   | Errors.InvoiceItemsRequiredError
   | Errors.InvoiceRequiredError
   | Errors.ManuscriptRequiredError
+  | Errors.SQSServiceFailure
   | UnexpectedError,
   void
 >;

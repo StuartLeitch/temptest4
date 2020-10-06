@@ -1,7 +1,6 @@
 import { InvoiceDraftCreated as InvoiceDraftCreatedEvent } from '@hindawi/phenom-events';
 
 import { Either, right, left } from '../../../../../core/logic/Result';
-import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 import { EventUtils } from '../../../../../utils/EventUtils';
@@ -40,6 +39,7 @@ export class PublishInvoiceDraftCreatedUseCase
     if (maybeValidRequest.isLeft()) {
       return maybeValidRequest;
     }
+
     const { messageTimestamp, invoiceItems, manuscript, invoice } = request;
     const data: InvoiceDraftCreatedEvent = {
       ...EventUtils.createEventObject(),
@@ -70,7 +70,7 @@ export class PublishInvoiceDraftCreatedUseCase
       });
       return right(null);
     } catch (err) {
-      return left(new UnexpectedError(err.toString()));
+      return left(new Errors.SQSServiceFailure());
     }
   }
 

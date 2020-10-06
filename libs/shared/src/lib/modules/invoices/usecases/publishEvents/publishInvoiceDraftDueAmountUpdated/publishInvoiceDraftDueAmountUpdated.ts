@@ -1,7 +1,6 @@
 import { InvoiceDraftDueAmountUpdated } from '@hindawi/phenom-events';
 
 import { Either, right, left } from '../../../../../core/logic/Result';
-import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 import { EventUtils } from '../../../../../utils/EventUtils';
@@ -71,7 +70,7 @@ export class PublishInvoiceDraftDueAmountUpdatedUseCase
       });
       return right(null);
     } catch (err) {
-      return left(new UnexpectedError(err.toString()));
+      return left(new Errors.SQSServiceFailure());
     }
   }
 
