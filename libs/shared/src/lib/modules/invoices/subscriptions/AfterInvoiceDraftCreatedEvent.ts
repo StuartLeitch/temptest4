@@ -1,17 +1,17 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { InvoiceDraftCreated } from '../domain/events/invoiceDraftCreated';
-import { InvoiceRepoContract } from '../repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
-import { ArticleRepoContract } from '../../manuscripts/repos';
+import { GetInvoiceDetailsUsecase } from '../usecases/getInvoiceDetails';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetManuscriptByManuscriptIdUsecase } from '../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 import { PublishInvoiceDraftCreatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftCreated';
 
 export class AfterInvoiceDraftCreatedEvent
   implements HandleContract<InvoiceDraftCreated> {
   constructor(
-    private invoiceRepo: InvoiceRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
+    private getInvoice: GetInvoiceDetailsUsecase,
+    private getInvoiceItems: GetItemsForInvoiceUsecase,
+    private getManuscript: GetManuscriptByManuscriptIdUsecase,
     private publishInvoiceDraftCreated: PublishInvoiceDraftCreatedUseCase
   ) {
     this.setupSubscriptions();
@@ -28,32 +28,36 @@ export class AfterInvoiceDraftCreatedEvent
     event: InvoiceDraftCreated
   ): Promise<any> {
     //Get invoice data
+    const invoiceId = event.invoiceId.toString();
     try {
-      const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
-      if (!invoice) {
+      const maybeInvoice = await this.getInvoice.execute({ invoiceId });
+      if (!maybeInvoice || maybeInvoice.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} does not exist.`
         );
       }
+      const invoice = maybeInvoice.value.getValue();
 
-      const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
-        event.invoiceId
-      );
-      if (!invoiceItems || invoiceItems.length === 0) {
+      const maybeInvoiceItems = await this.getInvoiceItems.execute({
+        invoiceId,
+      });
+      if (!maybeInvoiceItems || maybeInvoiceItems.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} has no invoice items.`
         );
       }
+      const invoiceItems = maybeInvoiceItems.value.getValue();
 
-      const manuscript = await this.manuscriptRepo.findById(
-        invoiceItems[0].manuscriptId
-      );
-
-      if (!manuscript) {
+      const manuscriptId = invoiceItems[0].manuscriptId.toString();
+      const maybeManuscript = await this.getManuscript.execute({
+        manuscriptId,
+      });
+      if (!maybeManuscript || maybeManuscript.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} has no manuscripts associated.`
         );
       }
+      const manuscript = maybeManuscript.value.getValue();
 
       if (invoice.status === 'DRAFT') {
         const result = await this.publishInvoiceDraftCreated.execute({
