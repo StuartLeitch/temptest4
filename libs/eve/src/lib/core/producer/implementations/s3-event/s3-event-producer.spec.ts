@@ -98,7 +98,7 @@ describe('S3 Event Producer', () => {
       results.push(event);
     }
     expect(
-      results.map((e) => ({ ...e, body: e.Message.replace(' ', '') }))
+      results.map((e) => ({ ...e, body: e.body.replace(' ', '') }))
     ).toEqual(
       expectedResult.map((e) => ({ ...e, body: e.Message.replace(' ', '') }))
     );
@@ -137,7 +137,7 @@ describe('S3 Event Producer', () => {
     }
 
     expect(
-      results.map((e) => ({ ...e, body: e.Message.replace(' ', '') }))
+      results.map((e) => ({ ...e, body: e.body.replace(' ', '') }))
     ).toEqual(
       expectedResult.map((e) => ({ ...e, body: e.Message.replace(' ', '') }))
     );
