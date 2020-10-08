@@ -127,6 +127,10 @@ export class PublishRevenueRecognitionToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
+      if (!manuscript.datePublished) {
+        return right(Result.ok<any>(null));
+      }
+
       const catalog = await this.catalogRepo.getCatalogItemByJournalId(
         JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
       );
@@ -162,7 +166,6 @@ export class PublishRevenueRecognitionToErpUsecase
         invoice.erpReference = 'NON_INVOICEABLE';
         invoice.nsReference = 'NON_INVOICEABLE';
         await this.invoiceRepo.update(invoice);
-        return right(Result.ok<any>(null));
       }
 
       const erpResponse = await this.erpService.registerRevenueRecognition({
