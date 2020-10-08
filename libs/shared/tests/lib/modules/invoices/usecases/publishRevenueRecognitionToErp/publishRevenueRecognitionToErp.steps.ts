@@ -119,6 +119,7 @@ Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
   const manuscript = ArticleMap.toDomain({
     customId: '8888',
     journalId: catalog.journalId.id.toValue(),
+    datePublished: new Date(),
   });
 
   const invoiceItem = InvoiceItemMap.toDomain({
@@ -185,6 +186,7 @@ Given(
     const manuscript = ArticleMap.toDomain({
       customId: '8888',
       journalId: catalog.journalId.id.toValue(),
+      datePublished: new Date(),
     });
 
     const invoiceItem = InvoiceItemMap.toDomain({
@@ -242,7 +244,6 @@ Then(
   /Revenue recognition for the Invoice with the ID "([\w-]+)" is registered to salesforce/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
-
     const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.true;
 
@@ -259,7 +260,6 @@ Then(
   /Revenue recognition for the Invoice with the ID "([\w-]+)" is not registered/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
-
     const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.false;
 
