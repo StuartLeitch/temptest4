@@ -326,7 +326,7 @@ export class NetSuiteService implements ErpServiceContract {
             description: `${journalName} - Article Processing Charges for ${manuscript.customId}`,
             quantity: 1.0,
             rate: item.price,
-            taxRate1: rate,
+            // taxRate1: rate,
             excludeFromRateRequest: false,
             printItems: false,
             item: {
@@ -365,7 +365,7 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { payment, customerId } = data;
+    const { invoice, total, payment, customerId } = data;
 
     const paymentRequestOpts = {
       url: `${config.endpoint}record/v1/customerpayment`,
@@ -373,7 +373,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const createPaymentPayload: Record<string, any> = {
-      createdDate: format(
+      tranDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
@@ -389,9 +389,11 @@ export class NetSuiteService implements ErpServiceContract {
         id: customerId,
       },
       // Invoice reference number,
+      refName: `Invoice #${invoice.referenceNumber}`,
       // Original amount,
+      total,
       // Amount due,
-      payment: payment.amount,
+      payment: payment.amount.value,
     };
 
     // if (customSegmentId !== '4') {

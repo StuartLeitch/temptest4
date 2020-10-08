@@ -59,7 +59,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       },
     } = context;
 
-    const publishSageInvoiceToErpUsecase = env.loaders.erpEnabled
+    const publishSageInvoiceToErpUsecase = env.app.erpRegisterInvoicesEnabled
       ? new PublishInvoiceToErpUsecase(
           invoice,
           invoiceItem,
@@ -75,7 +75,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           vatService
         )
       : new NoOpUseCase();
-    const publishNetsuiteInvoiceToErpUsecase = env.loaders.erpEnabled
+    const publishNetsuiteInvoiceToErpUsecase = env.app
+      .erpRegisterInvoicesEnabled
       ? new PublishInvoiceToErpUsecase(
           invoice,
           invoiceItem,
@@ -92,7 +93,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         )
       : new NoOpUseCase();
 
-    const publishCreditNoteToErp = env.loaders.erpEnabled
+    const publishCreditNoteToErp = env.app.erpRegisterCreditNotesEnabled
       ? new PublishCreditNoteToErpUsecase(
           invoice,
           invoiceItem,
@@ -103,7 +104,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         )
       : new NoOpUseCase();
 
-    const publishPaymentToErp = env.loaders.erpEnabled
+    const publishPaymentToErp = env.app.erpRegisterPaymentsEnabled
       ? new PublishPaymentToErpUsecase(
           payment,
           erp?.netsuite || null,

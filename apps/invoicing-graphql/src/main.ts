@@ -91,7 +91,7 @@ async function main() {
     const { erpLoader } = await import(
       /* webpackChunkName: "erpLoader" */ './loaders/erpLoader'
     );
-    log.info('ERP Sage integration initiated ✔️');
+    log.info('ERP integration initiated ✔️');
     loaders.push(erpLoader);
   }
 

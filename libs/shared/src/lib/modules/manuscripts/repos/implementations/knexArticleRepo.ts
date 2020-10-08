@@ -114,12 +114,13 @@ export class KnexArticleRepo
         );
   }
 
-  async filterBy(criteria): Promise<unknown> {
-    const { condition, field } = criteria;
+  filterBy(criteria): unknown {
+    const [condition, field] = Object.entries(criteria)[0];
     return (query) => {
       const join = query
         .leftJoin(TABLES.ARTICLES, 'articles.id', 'invoice_items.manuscriptId')
         .orderBy(field, 'desc');
+
       return join[condition](field);
     };
   }

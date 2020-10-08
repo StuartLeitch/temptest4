@@ -76,11 +76,6 @@ export class PublishRevenueRecognitionToErpUsecase
     request: PublishRevenueRecognitionToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishRevenueRecognitionToErpResponse> {
-    // TODO Looks very hackish, to be changed later
-    if (process.env.ERP_DISABLED === 'true') {
-      return right(Result.ok<any>(null));
-    }
-
     let invoice: Invoice;
     let payer: Payer;
     let address: Address;
