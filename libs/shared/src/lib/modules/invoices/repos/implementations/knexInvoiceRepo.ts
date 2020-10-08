@@ -205,6 +205,7 @@ export class KnexInvoiceRepo
   }
 
   async getFailedSageErpInvoices(): Promise<Invoice[]> {
+    const LIMIT = 30;
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICES)
@@ -219,7 +220,7 @@ export class KnexInvoiceRepo
           .whereNull('invoices.erpReference');
       })
       .orderBy('articles.datePublished', 'desc')
-      .limit(10);
+      .limit(LIMIT);
 
     logger.debug('select', {
       sql: sql.toString(),
@@ -231,6 +232,7 @@ export class KnexInvoiceRepo
   }
 
   async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
+    const LIMIT = 30;
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICES)
@@ -245,7 +247,7 @@ export class KnexInvoiceRepo
           .whereNull('invoices.nsReference');
       })
       .orderBy('articles.datePublished', 'desc')
-      .limit(10);
+      .limit(LIMIT);
 
     logger.debug('select', {
       sql: sql.toString(),
@@ -258,7 +260,7 @@ export class KnexInvoiceRepo
 
   async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
     const { db, logger } = this;
-    const LIMIT = 10;
+    const LIMIT = 30;
 
     // * SQL for retrieving results needed only for Sage registration
     const prepareIdsForSageOnlySQL = db(TABLES.INVOICES)
@@ -281,10 +283,7 @@ export class KnexInvoiceRepo
           .whereNotNull('invoices.erpReference')
           .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
           .where('invoices.erpReference', '<>', 'MigrationRef')
-          .where('invoices.erpReference', '<>', 'migrationRef')
-          .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
-          .where('invoices.nsReference', '<>', 'MigrationRef')
-          .where('invoices.nsReference', '<>', 'migrationRef');
+          .where('invoices.erpReference', '<>', 'migrationRef');
       })
       .orderBy('articles.datePublished', 'desc')
       .limit(LIMIT);
@@ -302,7 +301,7 @@ export class KnexInvoiceRepo
 
   async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
     const { db, logger } = this;
-    const LIMIT = 10;
+    const LIMIT = 30;
 
     // * SQL for retrieving results needed only for NetSuite registration
     const prepareIdsForNetSuiteOnlySQL = db(TABLES.INVOICES)
@@ -325,10 +324,7 @@ export class KnexInvoiceRepo
           .whereNotNull('invoices.nsReference')
           .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
           .where('invoices.nsReference', '<>', 'MigrationRef')
-          .where('invoices.nsReference', '<>', 'migrationRef')
-          .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
-          .where('invoices.erpReference', '<>', 'MigrationRef')
-          .where('invoices.erpReference', '<>', 'migrationRef');
+          .where('invoices.nsReference', '<>', 'migrationRef');
       })
       .orderBy('articles.datePublished', 'desc')
       .limit(LIMIT);
