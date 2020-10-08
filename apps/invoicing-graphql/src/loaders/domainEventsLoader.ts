@@ -140,6 +140,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       invoice,
       invoiceItem,
       manuscript,
+      coupon,
+      waiver,
       publishInvoiceDraftCreated
     );
 
@@ -147,6 +149,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       invoice,
       invoiceItem,
       manuscript,
+      coupon,
+      waiver,
       publishInvoiceDraftDeleted
     );
 
@@ -154,6 +158,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       invoice,
       invoiceItem,
       manuscript,
+      coupon,
+      waiver,
       publishInvoiceDraftDueAmountUpdated
     );
 
