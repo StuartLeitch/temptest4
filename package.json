@@ -55,7 +55,7 @@
     "apollo-server": "2.17.0",
     "apollo-server-testing": "2.17.0",
     "aspect.js": "0.8.1",
-    "aws-sdk": "2.745.0",
+    "aws-sdk": "2.743.0",
     "axios": "0.20.0",
     "axios-cancel": "0.2.2",
     "axios-observable": "1.1.3",
