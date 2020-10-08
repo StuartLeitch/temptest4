@@ -110,7 +110,6 @@ export class CreateTransactionUsecase
         return left(new CreateTransactionErrors.InvoiceCreatedError());
       }
       const invoice = invoiceOrError.getValue();
-      invoice.generateInvoiceDraftEvent();
 
       //* System creates invoice item(s)
       const invoiceItemProps = {
@@ -162,6 +161,7 @@ export class CreateTransactionUsecase
         //       `);
 
         //Event dispatch
+        invoice.generateInvoiceDraftEvent();
         DomainEvents.dispatchEventsForAggregate(invoice.id);
 
         return right(Result.ok<Transaction>(transaction));
