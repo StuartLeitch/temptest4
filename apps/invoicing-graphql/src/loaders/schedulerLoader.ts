@@ -165,7 +165,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
 
     // start scheduler
     const jobsQueue = [].concat(
-      env.netSuite.netSuiteEnabled ? netSuiteJobQueue : []
+      env.netSuite.netSuiteEnabled ? netSuiteJobQueue : [],
       env.salesForce.sageEnabled ? sageJobQueue : []
     );
 
