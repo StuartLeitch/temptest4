@@ -21,8 +21,13 @@ export const JournalUpdatedHandler = {
     logger.info(`Incoming Event Data`, data);
 
     const updateJournalUsecase = new UpdateCatalogItemToCatalogUseCase(
-      catalogRepo, publisherRepo
+      catalogRepo,
+      publisherRepo
     );
+
+    console.log('----------- journal updated -----------');
+    console.log(JSON.stringify(data, null, 2));
+    console.log('------------------end----------------');
 
     const result = await updateJournalUsecase.execute({
       // type: ??

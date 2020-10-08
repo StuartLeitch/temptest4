@@ -1,46 +1,48 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
+// /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+// /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 // * Domain imports
 import {
-  UsecaseAuthorizationContext,
-  Roles,
-  ManuscriptTypeNotInvoiceable,
-  CreateTransactionUsecase,
-  CreateManuscriptUsecase,
-  CreateManuscriptDTO,
+  RestoreSoftDeleteDraftTransactionUsecase,
+  GetInvoiceIdByManuscriptCustomIdUsecase,
   GetManuscriptByManuscriptIdUsecase,
   SoftDeleteDraftTransactionUsecase,
-  RestoreSoftDeleteDraftTransactionUsecase,
-  EditManuscriptUsecase,
-  UpdateInvoiceItemsUsecase,
-  GetInvoiceIdByManuscriptCustomIdUsecase,
+  ManuscriptTypeNotInvoiceable,
+  UsecaseAuthorizationContext,
   GetItemsForInvoiceUsecase,
+  UpdateInvoiceItemsUsecase,
+  CreateTransactionUsecase,
+  CreateManuscriptUsecase,
+  EditManuscriptUsecase,
+  CreateManuscriptDTO,
   GetJournal,
+  Roles,
 } from '@hindawi/shared';
 
+import { EventHandler } from '../event-handler';
+
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
+
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 
-export const SubmissionSubmittedHandler = {
+export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
   event: SUBMISSION_SUBMITTED,
   handler: async function submissionSubmittedHandler(
     data: SubmissionSubmitted
-  ) {
+  ): Promise<void> {
     const {
       repos: {
-        transaction: transactionRepo,
-        invoice: invoiceRepo,
+        pausedReminder: pausedReminderRepo,
         invoiceItem: invoiceItemRepo,
-        catalog: catalogRepo,
+        transaction: transactionRepo,
         manuscript: manuscriptRepo,
+        catalog: catalogRepo,
+        invoice: invoiceRepo,
         coupon: couponRepo,
         waiver: waiverRepo,
-        pausedReminder: pausedReminderRepo,
       },
       services: { logger },
     } = this;
@@ -52,13 +54,13 @@ export const SubmissionSubmittedHandler = {
       submissionId,
       manuscripts: [
         {
-          customId,
-          journalId,
-          title,
-          articleType: { name },
-          submissionCreatedDate: created,
-          authors,
           preprintValue,
+          journalId,
+          customId,
+          authors,
+          title,
+          submissionCreatedDate: created,
+          articleType: { name },
         },
       ],
     } = data;
@@ -213,21 +215,22 @@ export const SubmissionSubmittedHandler = {
           items
         );
       }
+      const newJournalId =
+        journalId !== alreadyExistingManuscript.journalId
+          ? journalId
+          : alreadyExistingManuscript.journalId;
 
       await editManuscript.execute(
         {
-          journalId:
-            journalId !== alreadyExistingManuscript.journalId
-              ? journalId
-              : alreadyExistingManuscript.journalId,
-          manuscriptId: submissionId,
+          preprintValue,
           title,
-          articleType: name,
-          authorEmail: email,
+          authorFirstName: givenNames,
+          manuscriptId: submissionId,
+          journalId: newJournalId,
           authorCountry: country,
           authorSurname: surname,
-          authorFirstName: givenNames,
-          preprintValue,
+          authorEmail: email,
+          articleType: name,
         },
         defaultContext
       );
@@ -260,17 +263,17 @@ export const SubmissionSubmittedHandler = {
         logger.info(`Transaction Data`, newTransaction);
 
         const manuscriptProps: CreateManuscriptDTO = {
-          id: submissionId,
-          customId,
+          preprintValue,
           journalId,
+          customId,
           title,
-          articleType: name,
-          authorEmail: email,
-          authorCountry: country,
-          authorSurname: surname,
           authorFirstName: givenNames,
           created: new Date(created),
-          preprintValue,
+          authorCountry: country,
+          authorSurname: surname,
+          authorEmail: email,
+          articleType: name,
+          id: submissionId,
         };
 
         const createManuscript: CreateManuscriptUsecase = new CreateManuscriptUsecase(

@@ -8,6 +8,8 @@ import {
   PaymentStrategyFactory,
   BraintreeClientToken,
   ExchangeRateService,
+  PdfGeneratorService,
+  createPdfGenerator,
   PayPalCaptureMoney,
   EmptyCaptureMoney,
   BraintreePayment,
@@ -19,8 +21,6 @@ import {
   WaiverService,
   EmailService,
   VATService,
-  createPdfGenerator,
-  PdfGeneratorService,
 } from '@hindawi/shared';
 
 import {
