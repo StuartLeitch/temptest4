@@ -137,18 +137,18 @@ export const schedulerLoader: MicroframeworkLoader = async (
     ];
 
     const netSuiteJobQueue = [
-      // async function retryFailedNetsuiteErpInvoicesJob() {
-      //   try {
-      //     const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute();
-      //     const response = maybeResponse.value;
-      //     if (maybeResponse.isLeft()) {
-      //       // logger.error(response);
-      //       throw response;
-      //     }
-      //   } catch (err) {
-      //     throw err;
-      //   }
-      // },
+      async function retryFailedNetsuiteErpInvoicesJob() {
+        try {
+          const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute();
+          const response = maybeResponse.value;
+          if (maybeResponse.isLeft()) {
+            // logger.error(response);
+            throw response;
+          }
+        } catch (err) {
+          throw err;
+        }
+      },
 
       async function retryRevenueRecognizedInvoicesToNetsuiteErpJob() {
         try {
@@ -166,7 +166,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
     // start scheduler
     const jobsQueue = [].concat(
       env.netSuite.netSuiteEnabled ? netSuiteJobQueue : []
-      // env.salesForce.sageEnabled ? sageJobQueue : []
+      env.salesForce.sageEnabled ? sageJobQueue : []
     );
 
     async function processJobsQueue() {
