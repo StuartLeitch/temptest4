@@ -323,7 +323,6 @@ export class NetSuiteService implements ErpServiceContract {
             description: `${journalName} - Article Processing Charges for ${manuscript.customId}`,
             quantity: 1.0,
             rate: item.price,
-            taxRate1: item.vat,
             excludeFromRateRequest: false,
             printItems: false,
             item: {
