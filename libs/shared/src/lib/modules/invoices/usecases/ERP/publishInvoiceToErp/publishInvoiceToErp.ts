@@ -26,7 +26,10 @@ import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
-import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import {
+  ErpInvoiceRequest,
+  ErpServiceContract,
+} from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { VATService } from '../../../../../domain/services/VATService';
 
@@ -191,7 +194,7 @@ export class PublishInvoiceToErpUsecase
         'PublishInvoiceToERP exchangeService',
         exchangeRateService
       );
-      let rate = 1.42; // ! Average value for the last seven years
+      let finalExchangeRate = 1.42; // ! Average value for the last seven years
       if (invoice && invoice.dateIssued) {
         let exchangeRate = null;
         try {
@@ -207,10 +210,10 @@ export class PublishInvoiceToErpUsecase
           this.loggerService.error('PublishInvoiceToERP exchangeRate', error);
         }
         if (exchangeRate?.exchangeRate) {
-          rate = exchangeRate.exchangeRate;
+          finalExchangeRate = exchangeRate.exchangeRate;
         }
       }
-      this.loggerService.info('PublishInvoiceToERP rate', rate);
+      this.loggerService.info('PublishInvoiceToERP rate', finalExchangeRate);
 
       // * Calculate Tax Rate code
       // * id=10 O-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
@@ -232,7 +235,7 @@ export class PublishInvoiceToErpUsecase
       }
 
       try {
-        const erpData = {
+        const erpData: ErpInvoiceRequest = {
           invoice,
           payer,
           items: invoiceItems,
@@ -240,7 +243,7 @@ export class PublishInvoiceToErpUsecase
           billingAddress: address,
           journalName: catalog.journalTitle,
           vatNote,
-          rate,
+          exchangeRate: finalExchangeRate,
           tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
           customSegmentId: publisherCustomValues?.customSegmentId,
           itemId: publisherCustomValues?.itemId,

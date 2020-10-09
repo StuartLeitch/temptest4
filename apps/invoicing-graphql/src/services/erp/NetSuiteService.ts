@@ -62,7 +62,6 @@ export class NetSuiteService implements ErpServiceContract {
       items: data.items,
       journalName: data.journalName,
       manuscript: data.manuscript,
-      rate: data.rate,
       taxRateId: data.taxRateId,
     });
     return {
@@ -279,7 +278,6 @@ export class NetSuiteService implements ErpServiceContract {
     taxRateId: string;
     itemId: string;
     customerId: string;
-    rate: number;
   }) {
     const {
       connection: { config, oauth, token },
@@ -292,7 +290,6 @@ export class NetSuiteService implements ErpServiceContract {
       customerId,
       customSegmentId,
       itemId,
-      rate,
       taxRateId,
     } = data;
     // console.log('Create invoice item');
@@ -326,7 +323,7 @@ export class NetSuiteService implements ErpServiceContract {
             description: `${journalName} - Article Processing Charges for ${manuscript.customId}`,
             quantity: 1.0,
             rate: item.price,
-            taxRate1: rate,
+            taxRate1: item.vat,
             excludeFromRateRequest: false,
             printItems: false,
             item: {

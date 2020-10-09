@@ -10,7 +10,7 @@ export interface ErpInvoiceRequest {
   billingAddress: Address;
   journalName?: string;
   vatNote?: Record<string, unknown>;
-  rate?: number;
+  exchangeRate?: number;
   tradeDocumentItemProduct: string;
   customSegmentId?: string;
   taxRateId?: string;
