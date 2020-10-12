@@ -5,6 +5,6 @@ import { GetJournalErrors } from './getJournalErrors';
 import { CatalogItem } from './../../../domain/CatalogItem';
 
 export type GetJournalResponse = Either<
-  GetJournalErrors.JournalDoesntExistError | UnexpectedError | Result<any>,
+  GetJournalErrors.JournalDoesntExistError | UnexpectedError,
   Result<CatalogItem>
 >;

@@ -66,7 +66,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
     } = data;
 
     const { email, country, surname, givenNames } = authors.find(
-      (a: any) => a.isCorresponding
+      (a) => a.isCorresponding
     );
 
     const getManuscriptBySubmissionId: GetManuscriptByManuscriptIdUsecase = new GetManuscriptByManuscriptIdUsecase(
@@ -163,7 +163,6 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
           );
         }
 
-        let items: any = [];
         const itemsResult = await getItemsForInvoiceUsecase.execute(
           {
             invoiceId: invoiceId.id.toString(),
@@ -175,7 +174,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
           throw itemsResult.value.error;
         }
 
-        items = itemsResult.value.getValue();
+        const items = itemsResult.value.getValue();
         logger.info('Get invoice items for Invoice ID', items);
 
         let journal = null;
@@ -191,10 +190,10 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
           throw journalResult.value.error;
         }
 
-        journal = (journalResult as any).value.getValue();
+        journal = journalResult.value.getValue();
         logger.info('Get Journal details for new journal ID', journal);
 
-        items.forEach((i: any) => {
+        items.forEach((i) => {
           i.price = journal.amount;
         });
 
