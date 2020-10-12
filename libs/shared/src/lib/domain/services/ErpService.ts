@@ -1,18 +1,12 @@
-import {
-  Invoice,
-  Payer,
-  InvoiceItem,
-  Address,
-  Article,
-  Payment,
-  PaymentMethod,
-} from '@hindawi/shared';
+import { Invoice, Payer, InvoiceItem, Address, Article } from '@hindawi/shared';
+import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
+import { PublisherCustomValues } from '../../modules/publishers/domain/PublisherCustomValues';
 
-export interface ErpData {
+export interface ErpInvoiceRequest {
   invoice: Invoice;
   items: InvoiceItem[];
   payer: Payer;
-  article: Article;
+  manuscript: Manuscript;
   billingAddress: Address;
   journalName?: string;
   vatNote?: Record<string, unknown>;
@@ -22,26 +16,82 @@ export interface ErpData {
   tradeDocumentItemProduct: string;
   customSegmentId?: string;
   taxRateId?: string;
-  customerId?: string;
   itemId?: string;
-  payments?: Payment[];
-  paymentMethods?: PaymentMethod[];
-  creditAccountId?: string;
-  debitAccountId?: string;
-  journalId?: string;
-  creditNote?: Invoice;
-  creditNoteId?: string;
 }
 
-export interface ErpResponse {
+export interface ErpRevRecRequest {
+  publisherCustomValues: PublisherCustomValues;
+  manuscript: Manuscript;
+  invoiceTotal: number;
+  invoice: Invoice;
+  payer: Payer;
+}
+
+export interface ErpInvoiceResponse {
   accountId: string;
   tradeDocumentId: string;
   tradeItemIds: string[];
 }
 
+export interface ErpRevRecResponse {
+  journal: {
+    id: string;
+  };
+  journalItem: any;
+  journalTags: any;
+  journalItemTag: any;
+}
+
 export interface ErpServiceContract {
-  registerInvoice(data: ErpData): Promise<ErpResponse>;
-  registerRevenueRecognition(data: any): Promise<any>;
+  readonly invoiceErpRefFieldName: string;
+  readonly invoiceRevenueRecRefFieldName: string;
+  registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse>;
+  registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse>;
   registerCreditNote?(data: any): Promise<any>;
   registerPayment?(data: any): Promise<any>;
+}
+
+export class EmptyErpService implements ErpServiceContract {
+  get invoiceErpRefFieldName(): string {
+    return 'emptyErpInvoiceRef';
+  }
+
+  get invoiceRevenueRecRefFieldName(): string {
+    return 'emptyErpRecRef';
+  }
+
+  async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
+    return {
+      tradeDocumentId: '',
+      tradeItemIds: [''],
+      accountId: '',
+    };
+  }
+
+  async registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
+    return {
+      journal: {
+        id: '',
+      },
+      journalItem: null,
+      journalTags: null,
+      journalItemTag: null,
+    };
+  }
+
+  async registerCreditNote?(data: any): Promise<any> {
+    return '';
+  }
+
+  async registerPayment?(data: any): Promise<any> {
+    return {
+      tradeDocumentId: '',
+      tradeItemIds: [''],
+      accountId: '',
+    };
+  }
 }

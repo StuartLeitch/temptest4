@@ -81,6 +81,8 @@
   "PORT": 3000,
   "SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER": "rares.stan@hindawi.com",
   "SANCTIONED_COUNTRY_NOTIFICATION_SENDER": "phenom.invoicing@hindawi.com",
+  "SAGE_ENABLED": true,
+  "NETSUITE_ENABLED": true,
   "SCHEDULER_DB_PORT": 6379,
   "SERVICE_NAME": "invoicing",
   "SKIPPING_SEEDING": true,

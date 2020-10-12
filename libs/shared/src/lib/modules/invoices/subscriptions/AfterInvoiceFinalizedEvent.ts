@@ -20,7 +20,6 @@ import { InvoiceItemRepoContract } from '../repos';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods/GetPaymentMethods';
 import { PublishInvoiceFinalizedUsecase } from '../usecases/publishEvents/publishInvoiceFinalized';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-// import { PublishInvoiceToErpUsecase } from '../usecases/publishInvoiceToErp/publishInvoiceToErp';
 
 export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
   constructor(

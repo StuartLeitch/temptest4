@@ -9,12 +9,12 @@ import {
 import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
 import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
+import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
-import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishCreditNoteToErp/publishCreditNoteToErp';
-import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
 import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
+import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
@@ -50,10 +50,16 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         waiver,
         payer
       },
-      services: { erp, logger: loggerService, schedulingService, qq: queue },
+      services: {
+        erp,
+        logger: loggerService,
+        schedulingService,
+        qq: queue,
+        vatService,
+      },
     } = context;
 
-    const publishInvoiceToErpUsecase = env.app.erpRegisterInvoicesEnabled
+    const publishSageInvoiceToErpUsecase = env.loaders.erpEnabled
       ? new PublishInvoiceToErpUsecase(
           invoice,
           invoiceItem,
@@ -64,9 +70,25 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           manuscript,
           catalog,
           erp?.sage || null,
+          publisher,
+          loggerService,
+          vatService
+        )
+      : new NoOpUseCase();
+    const publishNetsuiteInvoiceToErpUsecase = env.loaders.erpEnabled
+      ? new PublishInvoiceToErpUsecase(
+          invoice,
+          invoiceItem,
+          coupon,
+          waiver,
+          payer,
+          address,
+          manuscript,
+          catalog,
           erp?.netsuite || null,
           publisher,
-          loggerService
+          loggerService,
+          vatService
         )
       : new NoOpUseCase();
 
@@ -143,7 +165,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       publishInvoiceConfirmed,
-      publishInvoiceToErpUsecase,
+      publishSageInvoiceToErpUsecase,
+      publishNetsuiteInvoiceToErpUsecase,
       schedulingService,
       loggerService,
       env.scheduler.creditControlReminderDelay,
