@@ -13,7 +13,7 @@ import {
   MockCatalogRepo,
 } from '@hindawi/shared';
 
-import { JournalEditorAssignedHandler } from '../../src/queue_service/handlers/JournalEditorAssigned';
+import { JournalEditorAssignedHandler } from '../../../src/queue_service/handlers/JournalEditorAssigned';
 
 let mockLogger: MockLogger;
 let mockEditorRepo: MockEditorRepo;
