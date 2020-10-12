@@ -1,5 +1,9 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import {
+  Roles,
+  UsecaseAuthorizationContext,
+} from '../../../domain/authorization';
 import { InvoiceDraftDueAmountUpdated } from '../domain/events/invoiceDraftDueAmountUpdated';
 import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
@@ -10,6 +14,11 @@ import { GetInvoiceDetailsUsecase } from '../usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetManuscriptByManuscriptIdUsecase } from '../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
+
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
+
 export class AfterInvoiceDraftDueAmountUpdatedEvent
   implements HandleContract<InvoiceDraftDueAmountUpdated> {
   constructor(
@@ -34,7 +43,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
     event: InvoiceDraftDueAmountUpdated
   ): Promise<any> {
     //Get invoice data
-    const invoiceId = event.invoiceId.toString();
+    const invoiceId = event.invoiceId.id.toString();
     const getInvoice = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     const getInvoiceItems = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
@@ -46,7 +55,10 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
     );
 
     try {
-      const maybeInvoice = await getInvoice.execute({ invoiceId });
+      const maybeInvoice = await getInvoice.execute(
+        { invoiceId },
+        defaultContext
+      );
       if (!maybeInvoice || maybeInvoice.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} does not exist.`
@@ -54,9 +66,12 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
       }
       const invoice = maybeInvoice.value.getValue();
 
-      const maybeInvoiceItems = await getInvoiceItems.execute({
-        invoiceId,
-      });
+      const maybeInvoiceItems = await getInvoiceItems.execute(
+        {
+          invoiceId,
+        },
+        defaultContext
+      );
       if (!maybeInvoiceItems || maybeInvoiceItems.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} has no invoice items.`
@@ -64,10 +79,13 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
       }
       const invoiceItems = maybeInvoiceItems.value.getValue();
 
-      const manuscriptId = invoiceItems[0].manuscriptId.toString();
-      const maybeManuscript = await getManuscript.execute({
-        manuscriptId,
-      });
+      const manuscriptId = invoiceItems[0].manuscriptId.id.toString();
+      const maybeManuscript = await getManuscript.execute(
+        {
+          manuscriptId,
+        },
+        defaultContext
+      );
       if (!maybeManuscript || maybeManuscript.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} has no manuscripts associated.`
@@ -76,11 +94,14 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
       const manuscript = maybeManuscript.value.getValue();
 
       if (invoice.status === 'DRAFT') {
-        const result = await this.publishInvoiceDraftDueAmountUpdated.execute({
-          invoice,
-          invoiceItems,
-          manuscript,
-        });
+        const result = await this.publishInvoiceDraftDueAmountUpdated.execute(
+          {
+            invoice,
+            invoiceItems,
+            manuscript,
+          },
+          defaultContext
+        );
 
         if (result.isLeft()) {
           throw new Error(result.value.errorValue().message);
