@@ -1,13 +1,15 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import {
-  MicroframeworkLoader,
   MicroframeworkSettings,
+  MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { LoggerBuilder } from './../../../../libs/shared/src/lib/infrastructure/logging/LoggerBuilder';
+import { LoggerBuilder } from '../../../../libs/shared/src/lib/infrastructure/logging/LoggerBuilder';
+import { EmptyErpService } from '../../../../libs/shared/src/lib/domain/services/ErpService';
+
+import { NetSuiteService } from '../services/erp/NetSuiteService';
 import { SageService } from '../services/erp';
-import { NetSuiteService } from './../services/erp/NetSuiteService';
 
 import { env } from '../env';
 
@@ -35,10 +37,11 @@ export const erpLoader: MicroframeworkLoader = async (
 
   if (settings) {
     const context = settings.getData('context');
+    const emptyErp = new EmptyErpService();
 
     context.services.erp = {
-      sage: sageService,
-      netsuite: netSuiteService,
+      sage: env.salesForce.sageEnabled ? sageService : emptyErp,
+      netsuite: env.netSuite.netSuiteEnabled ? netSuiteService : emptyErp,
     };
 
     // settings.onShutdown(() => erpConnection.destroy());

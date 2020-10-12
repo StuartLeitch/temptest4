@@ -80,6 +80,8 @@
   "PUBLISHER_NAME": "gsw",
   "SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER": "accounts.receivable@hindawi.com",
   "SANCTIONED_COUNTRY_NOTIFICATION_SENDER": "invoicing@hindawi.com",
+  "SAGE_ENABLED": false,
+  "NETSUITE_ENABLED": false,
   "SCHEDULER_DB_PORT": 6379,
   "SERVICE_NAME": "invoicing",
   "TENANT_ADDRESS": "1750 Tysons Boulevard, Suite 1500  McLean,  VA 22102,  United States",

@@ -85,6 +85,8 @@
   "PUBLISHER_NAME": "hindawi",
   "SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER": "accounts.receivable@hindawi.com",
   "SANCTIONED_COUNTRY_NOTIFICATION_SENDER": "phenom.invoicing@hindawi.com",
+  "SAGE_ENABLED": true,
+  "NETSUITE_ENABLED": true,
   "SCHEDULER_DB_PASSWORD": "",
   "SCHEDULER_DB_PORT": 6379,
   "SERVICE_NAME": "invoicing",

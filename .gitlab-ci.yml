@@ -90,6 +90,7 @@ Build:
        AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
       fi
     - eval $AFFECTED_COMMAND
+    - mkdir -p dist
     - cp -r dist $CI_PROJECT_DIR
   artifacts:
     paths:

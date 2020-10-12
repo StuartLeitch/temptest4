@@ -1,7 +1,7 @@
-import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
@@ -19,10 +19,10 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
+import { PublishCreditNoteToErpUsecase } from '../usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
-import { PublishCreditNoteToErpUsecase } from '../usecases/publishCreditNoteToErp/publishCreditNoteToErp';
 
 export class AfterInvoiceCreditNoteCreatedEvent
   implements HandleContract<InvoiceCreditNoteCreatedEvent> {

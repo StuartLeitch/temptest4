@@ -3,13 +3,18 @@
 
 import { Connection } from 'jsforce';
 import {
-  ErpData,
+  ErpInvoiceRequest,
   ErpServiceContract,
   PayerType,
   InvoiceItem,
-  ErpResponse,
+  ErpInvoiceResponse,
+  ErpRevRecRequest,
+  Invoice,
+  PublisherCustomValues,
+  ErpRevRecResponse,
 } from '@hindawi/shared';
 import countryList from 'country-list';
+import { Manuscript } from 'libs/shared/src/lib/modules/manuscripts/domain/Manuscript';
 
 interface ErpFixedValues {
   tradeDocumentType: string;
@@ -31,6 +36,14 @@ export class SageService implements ErpServiceContract {
     private config: any,
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
+
+  get invoiceErpRefFieldName(): string {
+    return 'erpReference';
+  }
+
+  get invoiceRevenueRecRefFieldName(): string {
+    return 'revenueRecognitionReference';
+  }
 
   private async getConnection(): Promise<Connection> {
     const { user, password, securityToken, loginUrl } = this.config;
@@ -59,7 +72,7 @@ export class SageService implements ErpServiceContract {
     return this.connection;
   }
 
-  async registerInvoice(data: ErpData): Promise<ErpResponse> {
+  async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
     // console.info(`registerInvoice init with`, data);
 
     const { items, tradeDocumentItemProduct } = data;
@@ -90,7 +103,9 @@ export class SageService implements ErpServiceContract {
     };
   }
 
-  public async registerRevenueRecognition(data: any): Promise<any> {
+  public async registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
     const journal = await this.registerJournal(data);
 
     if (journal == null) {
@@ -120,7 +135,9 @@ export class SageService implements ErpServiceContract {
     };
   }
 
-  private async registerPayer(data: Partial<ErpData>): Promise<string> {
+  private async registerPayer(
+    data: Partial<ErpInvoiceRequest>
+  ): Promise<string> {
     this.logger.info('Register payer');
     const connection = await this.getConnection();
 
@@ -128,18 +145,18 @@ export class SageService implements ErpServiceContract {
       throw new Error('Failed login. No connection to ERP service.');
     }
 
-    const { article, payer, billingAddress } = data;
+    const { manuscript, payer, billingAddress } = data;
 
     let name =
       payer.type === PayerType.INDIVIDUAL
         ? payer.name.value
         : payer.organization.value;
     name = name.slice(0, 70);
-    name += ` ${article.customId}`;
+    name += ` ${manuscript.customId}`;
 
     const accountData = {
       Name: name,
-      AccountNumber: article.customId,
+      AccountNumber: manuscript.customId,
       // BillingAddress:{Street: billingAddress.addressLine1},
       s2cor__Country_Code__c: billingAddress.country,
       s2cor__Registration_Number_Type__c: 'VAT Registration Number',
@@ -208,7 +225,7 @@ export class SageService implements ErpServiceContract {
 
   private async registerTradeDocument(
     accountId: string,
-    data: Partial<ErpData>
+    data: Partial<ErpInvoiceRequest>
   ): Promise<string> {
     this.logger.info('Register TradeDocument');
     const connection = await this.getConnection();
@@ -220,7 +237,7 @@ export class SageService implements ErpServiceContract {
 
     const {
       invoice,
-      article,
+      manuscript,
       items,
       billingAddress,
       journalName,
@@ -235,7 +252,7 @@ export class SageService implements ErpServiceContract {
       referenceNumber = invoice.referenceNumber;
     }
 
-    const description = `${journalName} - Article Processing Charges for article ${article.customId}`;
+    const description = `${journalName} - Article Processing Charges for article ${manuscript.customId}`;
     const tradeDocumentObject = {
       s2cor__Account__c: accountId,
       s2cor__Approval_Status__c: 'Approved',
@@ -291,17 +308,17 @@ export class SageService implements ErpServiceContract {
    */
   private async registerInvoiceItem(
     tradeDocumentId: string,
-    data: Partial<ErpData>,
+    data: Partial<ErpInvoiceRequest>,
     invoiceItem: InvoiceItem,
     product: string
   ): Promise<string> {
     const connection = await this.getConnection();
-    const { journalName, article, payer, vatNote } = data;
+    const { journalName, manuscript, vatNote } = data;
     const discountAmount = invoiceItem.price - invoiceItem.calculateNetPrice();
     const description =
       invoiceItem.type === 'APC'
-        ? `${journalName} - Article Processing Charges for article ${article.customId}`
-        : `${journalName} - Article Reprint Charges for article ${article.customId}`;
+        ? `${journalName} - Article Processing Charges for article ${manuscript.customId}`
+        : `${journalName} - Article Reprint Charges for article ${manuscript.customId}`;
     const tdObj = {
       s2cor__Trade_Document__c: tradeDocumentId,
       s2cor__Description__c: description,
@@ -380,7 +397,11 @@ export class SageService implements ErpServiceContract {
       .replace('{Rate}', rate);
   }
 
-  private async registerJournal(data: any) {
+  private async registerJournal(data: {
+    invoice: Invoice;
+    manuscript: Manuscript;
+    publisherCustomValues: PublisherCustomValues;
+  }) {
     // console.info(`registerJournal init with`, data);
 
     const connection = await this.getConnection();
@@ -449,7 +470,13 @@ export class SageService implements ErpServiceContract {
     return journal;
   }
 
-  private async registerJournalItem(data: any) {
+  private async registerJournalItem(data: {
+    journal: any;
+    manuscript: Manuscript;
+    invoice: Invoice;
+    invoiceTotal: number;
+    publisherCustomValues: PublisherCustomValues;
+  }) {
     // this.logger.info(`registerJournalItem init with`, data);
 
     const connection = await this.getConnection();
@@ -504,7 +531,11 @@ export class SageService implements ErpServiceContract {
     return journalItem;
   }
 
-  private async registerJournalTags(data: any) {
+  private async registerJournalTags(data: {
+    journal: any;
+    invoice: Invoice;
+    publisherCustomValues: PublisherCustomValues;
+  }) {
     // this.logger.info(`registerJournalTags init with`, data);
 
     const connection = await this.getConnection();
@@ -573,7 +604,10 @@ export class SageService implements ErpServiceContract {
     return journalTags;
   }
 
-  private async registerJournalItemTag(data: any) {
+  private async registerJournalItemTag(data: {
+    journalItem: any;
+    publisherCustomValues: PublisherCustomValues;
+  }) {
     // this.logger.info(`registerJournalItemTag init with`, data);
 
     const connection = await this.getConnection();

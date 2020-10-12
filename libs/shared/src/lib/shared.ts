@@ -23,6 +23,7 @@ export * from './modules/manuscripts/domain/Article';
 export * from './modules/manuscripts/mappers/ArticleMap';
 export * from './modules/manuscripts/domain/ArticleId';
 export * from './modules/manuscripts/domain/ManuscriptTypes';
+export * from './modules/manuscripts/domain/Manuscript';
 export * from './modules/manuscripts/repos';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetailsDTO';
@@ -88,8 +89,8 @@ export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/p
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceFinalized/publishInvoiceFinalized';
 export * from './modules/invoices/usecases/publishEvents/publishInvoicePaid/publishInvoicePaid';
-export * from './modules/invoices/usecases/publishInvoiceToErp/publishInvoiceToErp';
-export * from './modules/invoices/usecases/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+export * from './modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
+export * from './modules/invoices/usecases/ERP/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
