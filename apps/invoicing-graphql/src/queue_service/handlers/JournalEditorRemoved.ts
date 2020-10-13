@@ -1,7 +1,10 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
 
-import { JournalEditorRemoved } from '@hindawi/phenom-events';
+import {
+  JournalSectionEditorRemoved,
+  JournalEditorRemoved,
+} from '@hindawi/phenom-events';
 
 import {
   GetEditorsByJournalUsecase,
@@ -11,90 +14,95 @@ import {
   JournalEventMap,
 } from '@hindawi/shared';
 
+import { Context } from '../../builders';
+
+import { HandlerFunction, EventHandler } from '../event-handler';
+
 const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
 const JOURNAL_SECTION_EDITOR_REMOVED = 'JournalSectionEditorRemoved';
 
 function removeEditorEventHandlerFactory(eventName: string) {
-  return async function (data: JournalEditorRemoved) {
-    const {
-      repos: { catalog: catalogRepo, editor: editorRepo },
-      services: { logger },
-    } = this;
+  return (context: Context): HandlerFunction<JournalEditorRemoved> => {
+    return async (data: JournalEditorRemoved) => {
+      const {
+        repos: { catalog: catalogRepo, editor: editorRepo },
+        services: { logger },
+      } = context;
 
-    logger.setScope(`PhenomEvent:${eventName}`);
-    logger.info(`Incoming Event Data`, data);
+      logger.setScope(`PhenomEvent:${eventName}`);
+      logger.info(`Incoming Event Data`, data);
 
-    const getEditorsByJournal = new GetEditorsByJournalUsecase(
-      editorRepo,
-      catalogRepo
-    );
-
-    const removeEditorsFromJournal = new RemoveEditorsFromJournalUsecase(
-      editorRepo,
-      catalogRepo
-    );
-
-    const assignEditorsToJournal = new AssignEditorsToJournalUsecase(
-      editorRepo,
-      catalogRepo
-    );
-
-    try {
-      const journalId = data.id;
-      const eventEditors = JournalEventMap.extractEditors(data);
-
-      const maybeCurrentEditors = await getEditorsByJournal.execute({
-        journalId,
-      });
-      const currentEditorsResponse = maybeCurrentEditors.value;
-
-      if (maybeCurrentEditors.isLeft()) {
-        const err = currentEditorsResponse;
-        logger.error(err);
-        throw err;
-      }
-
-      const currentEditors = (currentEditorsResponse as any).map(
-        EditorMap.toPersistence
+      const getEditorsByJournal = new GetEditorsByJournalUsecase(
+        editorRepo,
+        catalogRepo
       );
 
-      const maybeEditorsRemoved = await removeEditorsFromJournal.execute({
-        journalId,
-        allEditors: currentEditors,
-      });
+      const removeEditorsFromJournal = new RemoveEditorsFromJournalUsecase(
+        editorRepo,
+        catalogRepo
+      );
 
-      const editorsRemovedResponse = maybeEditorsRemoved.value;
+      const assignEditorsToJournal = new AssignEditorsToJournalUsecase(
+        editorRepo,
+        catalogRepo
+      );
 
-      if (maybeEditorsRemoved.isLeft()) {
-        logger.error(editorsRemovedResponse);
-        throw editorsRemovedResponse;
+      try {
+        const journalId = data.id;
+        const eventEditors = JournalEventMap.extractEditors(data);
+
+        const maybeCurrentEditors = await getEditorsByJournal.execute({
+          journalId,
+        });
+
+        if (maybeCurrentEditors.isLeft()) {
+          const err = maybeCurrentEditors.value.errorValue();
+          logger.error(err.message);
+          throw err;
+        }
+
+        const currentEditors = maybeCurrentEditors.value.map(
+          EditorMap.toPersistence
+        );
+
+        const maybeEditorsRemoved = await removeEditorsFromJournal.execute({
+          journalId,
+          allEditors: currentEditors,
+        });
+
+        const editorsRemovedResponse = maybeEditorsRemoved.value;
+
+        if (maybeEditorsRemoved.isLeft()) {
+          logger.error(editorsRemovedResponse.errorValue().message);
+          throw editorsRemovedResponse;
+        }
+
+        const maybeAddEditorsToJournal = await assignEditorsToJournal.execute({
+          journalId,
+          allEditors: eventEditors,
+        });
+
+        const addEditorsToJournalResponse = maybeAddEditorsToJournal.value;
+        if (maybeAddEditorsToJournal.isLeft()) {
+          logger.error(maybeAddEditorsToJournal.value.errorValue().message);
+          throw addEditorsToJournalResponse;
+        }
+
+        logger.info(`Successfully executed event ${eventName}`);
+      } catch (error) {
+        logger.error(error.message);
+        throw error;
       }
-
-      const maybeAddEditorsToJournal = await assignEditorsToJournal.execute({
-        journalId,
-        allEditors: eventEditors,
-      });
-
-      const addEditorsToJournalResponse = maybeAddEditorsToJournal.value;
-      if (maybeAddEditorsToJournal.isLeft()) {
-        logger.error(addEditorsToJournalResponse);
-        throw addEditorsToJournalResponse;
-      }
-
-      logger.info(`Successfully executed event ${eventName}`);
-    } catch (error) {
-      logger.error(error.message);
-      throw error;
-    }
+    };
   };
 }
 
-export const JournalEditorRemovedHandler = {
+export const JournalEditorRemovedHandler: EventHandler<JournalEditorRemoved> = {
   event: JOURNAL_EDITOR_REMOVED,
   handler: removeEditorEventHandlerFactory(JOURNAL_EDITOR_REMOVED),
 };
 
-export const JournalSectionEditorRemovedHandler = {
+export const JournalSectionEditorRemovedHandler: EventHandler<JournalSectionEditorRemoved> = {
   event: JOURNAL_SECTION_EDITOR_REMOVED,
   handler: removeEditorEventHandlerFactory(JOURNAL_SECTION_EDITOR_REMOVED),
 };

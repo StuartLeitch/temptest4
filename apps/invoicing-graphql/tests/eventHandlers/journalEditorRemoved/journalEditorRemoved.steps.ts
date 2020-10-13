@@ -12,6 +12,8 @@ import {
   MockCatalogRepo,
 } from '@hindawi/shared';
 
+import { Context } from '../../../src/builders';
+
 import { JournalEditorRemovedHandler } from '../../../src/queue_service/handlers/JournalEditorRemoved';
 import * as JournalEditorRemovedData from './JournalEditorRemoved_2.json';
 
@@ -115,7 +117,7 @@ Given(
 
 When('"JournalEditorRemoved" event is being published', async function () {
   try {
-    await handler.call(context, eventData);
+    await handler(context as Context)(eventData);
   } catch (err) {
     console.error(err);
   }

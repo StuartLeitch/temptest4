@@ -2,48 +2,52 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { JournalUpdated } from '@hindawi/phenom-events';
-import {
-  UpdateCatalogItemToCatalogUseCase,
-  UpdateCatalogItemToCatalogUseCaseRequestDTO,
-} from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
+
+import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
+
+import { Context } from '../../builders';
+
+import { EventHandler } from '../event-handler';
 
 const JOURNAL_UPDATED = 'JournalUpdated';
 
-export const JournalUpdatedHandler = {
+export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
   event: JOURNAL_UPDATED,
-  async handler(data: JournalUpdated) {
-    const {
-      repos: { catalog: catalogRepo, publisher: publisherRepo },
-      services: { logger },
-    } = this;
+  handler(context: Context) {
+    return async (data: JournalUpdated) => {
+      const {
+        repos: { catalog: catalogRepo, publisher: publisherRepo },
+        services: { logger },
+      } = context;
 
-    logger.setScope(`PhenomEvent:${JOURNAL_UPDATED}`);
-    logger.info(`Incoming Event Data`, data);
+      logger.setScope(`PhenomEvent:${JOURNAL_UPDATED}`);
+      logger.info(`Incoming Event Data`, data);
 
-    const updateJournalUsecase = new UpdateCatalogItemToCatalogUseCase(
-      catalogRepo,
-      publisherRepo
-    );
+      const updateJournalUsecase = new UpdateCatalogItemToCatalogUseCase(
+        catalogRepo,
+        publisherRepo
+      );
 
-    console.log('----------- journal updated -----------');
-    console.log(JSON.stringify(data, null, 2));
-    console.log('------------------end----------------');
+      console.log('----------- journal updated -----------');
+      console.log(JSON.stringify(data, null, 2));
+      console.log('------------------end----------------');
 
-    const result = await updateJournalUsecase.execute({
-      // type: ??
-      currency: 'USD',
-      amount: data.apc,
-      created: data.created,
-      updated: data.updated,
-      issn: data.issn,
-      journalTitle: data.name,
-      isActive: data.isActive,
-      journalId: data.id,
-    } as UpdateCatalogItemToCatalogUseCaseRequestDTO);
+      const result = await updateJournalUsecase.execute({
+        type: null,
+        currency: 'USD',
+        amount: data.apc,
+        created: data.created,
+        updated: data.updated,
+        issn: data.issn,
+        journalTitle: data.name,
+        isActive: data.isActive,
+        journalId: data.id,
+      });
 
-    if (result.isLeft()) {
-      logger.error(result.value.errorValue().message);
-      throw result.value.error;
-    }
+      if (result.isLeft()) {
+        logger.error(result.value.errorValue().message);
+        throw result.value.error;
+      }
+    };
   },
 };

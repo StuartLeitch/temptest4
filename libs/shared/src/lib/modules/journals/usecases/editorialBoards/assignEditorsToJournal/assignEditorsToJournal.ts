@@ -28,10 +28,7 @@ interface AssignEditorsToJournalDTO {
   allEditors: CreateEditorDTO[];
 }
 
-type AssignEditorsToJournalResponse = Either<
-  UnexpectedError | Result<Record<string, unknown>>,
-  Result<void>
->;
+type AssignEditorsToJournalResponse = Either<UnexpectedError, Result<void>>;
 
 export class AssignEditorsToJournalUsecase
   implements

@@ -1,56 +1,72 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 /* eslint-disable max-len */
+import {
+  JournalSectionEditorAssigned,
+  JournalEditorAssigned,
+} from '@hindawi/phenom-events';
 
 import {
   AssignEditorsToJournalUsecase,
   JournalEventMap,
 } from '@hindawi/shared';
 
+import { Context } from '../../builders';
+
+import { HandlerFunction, EventHandler } from '../event-handler';
+
 const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
 const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
 
-function addEditorEventHandlerFactory(eventName: string): any {
-  return async function (data: any) {
-    const {
-      repos: { catalog: catalogRepo, editor: editorRepo },
-      services: { logger },
-    } = this;
+type EnvType = JournalSectionEditorAssigned | JournalEditorAssigned;
 
-    logger.setScope(`PhenomEvent:${eventName}`);
-    logger.info(`Incoming Event Data`, data);
+function addEditorEventHandlerFactory<T extends EnvType>(eventName: string) {
+  return (context: Context): HandlerFunction<T> => {
+    return async (data: T) => {
+      const {
+        repos: { catalog: catalogRepo, editor: editorRepo },
+        services: { logger },
+      } = context;
 
-    const assignEditorToJournal = new AssignEditorsToJournalUsecase(
-      editorRepo,
-      catalogRepo
-    );
+      logger.setScope(`PhenomEvent:${eventName}`);
+      logger.info(`Incoming Event Data`, data);
 
-    try {
-      const journalId = data.id;
-      const editors = JournalEventMap.extractEditors(data);
-      const assignEditorResponse = await assignEditorToJournal.execute({
-        journalId,
-        allEditors: editors,
-      });
+      const assignEditorToJournal = new AssignEditorsToJournalUsecase(
+        editorRepo,
+        catalogRepo
+      );
 
-      if (assignEditorResponse.isLeft()) {
-        logger.error(assignEditorResponse.value.errorValue().message);
-        throw assignEditorResponse.value.error;
+      try {
+        const journalId = data.id;
+        const editors = JournalEventMap.extractEditors(data);
+        const assignEditorResponse = await assignEditorToJournal.execute({
+          journalId,
+          allEditors: editors,
+        });
+
+        if (assignEditorResponse.isLeft()) {
+          logger.error(assignEditorResponse.value.errorValue().message);
+          throw assignEditorResponse.value.error;
+        }
+
+        logger.info(`Successfully executed event ${eventName}`);
+      } catch (error) {
+        logger.error(error.message);
+        throw error;
       }
-
-      logger.info(`Successfully executed event ${eventName}`);
-    } catch (error) {
-      logger.error(error.message);
-      throw error;
-    }
+    };
   };
 }
 
-export const JournalEditorAssignedHandler = {
+export const JournalEditorAssignedHandler: EventHandler<JournalEditorAssigned> = {
   event: JOURNAL_EDITOR_ASSIGNED,
-  handler: addEditorEventHandlerFactory(JOURNAL_EDITOR_ASSIGNED),
+  handler: addEditorEventHandlerFactory<JournalEditorAssigned>(
+    JOURNAL_EDITOR_ASSIGNED
+  ),
 };
 
-export const JournalSectionEditorAssignedHandler = {
+export const JournalSectionEditorAssignedHandler: EventHandler<JournalSectionEditorAssigned> = {
   event: JOURNAL_SECTION_EDITOR_ASSIGNED,
-  handler: addEditorEventHandlerFactory(JOURNAL_SECTION_EDITOR_ASSIGNED),
+  handler: addEditorEventHandlerFactory<JournalSectionEditorAssigned>(
+    JOURNAL_SECTION_EDITOR_ASSIGNED
+  ),
 };

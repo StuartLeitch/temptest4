@@ -11,6 +11,8 @@ import {
   MockCatalogRepo,
 } from '@hindawi/shared';
 
+import { Context } from '../../../src/builders';
+
 import { JournalAddedHandler } from '../../../src/queue_service/handlers/JournalAdded';
 import * as JournalAddedData from './JournalAdded.json';
 
@@ -47,7 +49,7 @@ Given(/^There is no Journal registered$/, async () => {
 
 When('JournalAdded event is being published', async () => {
   try {
-    await handler.call(context, JournalAddedData);
+    await handler(context as Context)(JournalAddedData);
   } catch (err) {
     console.error(err);
   }

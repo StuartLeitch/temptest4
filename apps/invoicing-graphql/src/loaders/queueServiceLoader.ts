@@ -27,13 +27,6 @@ export const queueServiceLoader: MicroframeworkLoader = async (
       Object.keys(eventHandlers).forEach((eventHandler: string) => {
         const { handler, event } = eventHandlers[eventHandler];
 
-        // if (event === 'ArticlePublished') {
-        //   queue.__LOCAL__ = {
-        //     event,
-        //     handler: handler.bind(context),
-        //   };
-        // }
-
         queue.registerEventHandler({
           event,
           handler: handler(context),
