@@ -205,21 +205,19 @@ export class KnexInvoiceRepo
   }
 
   async getFailedSageErpInvoices(): Promise<Invoice[]> {
-    const LIMIT = 30;
+    const LIMIT = 200;
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICES)
-      .select('invoices.*', 'articles.datePublished')
+      .select('invoices.*')
       .from('invoices')
-      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
       .where(function () {
         this.whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
           .whereNull('invoices.erpReference');
       })
-      .orderBy('articles.datePublished', 'desc')
+      .orderBy('invoices.dateIssued', 'desc')
       .limit(LIMIT);
 
     logger.debug('select', {
@@ -232,21 +230,19 @@ export class KnexInvoiceRepo
   }
 
   async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
-    const LIMIT = 30;
+    const LIMIT = 200;
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICES)
-      .select('invoices.*', 'articles.datePublished')
+      .select('invoices.*')
       .from('invoices')
-      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
       .where(function () {
         this.whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
           .whereNull('invoices.cancelledInvoiceReference')
           .whereNull('invoices.nsReference');
       })
-      .orderBy('articles.datePublished', 'desc')
+      .orderBy('invoices.dateIssued', 'desc')
       .limit(LIMIT);
 
     logger.debug('select', {
