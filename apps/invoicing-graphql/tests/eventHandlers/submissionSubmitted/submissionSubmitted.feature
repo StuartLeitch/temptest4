@@ -35,3 +35,23 @@ Feature: Submission Submitted event handled
     And The article with CustomId "111114" is re-submitted with articleType "Corrigendum"
     When The event with EventId "envSecond" is handled
     Then The invoice for CustomId "111114" is deleted
+
+  Scenario: Article with applicable waiver is applied
+    Given There is a Journal "foo-journal"
+    And There is an editor for Journal "foo-journal" with email "editor@test.com"
+    And There is no article with CustomId "111115"
+    And An article with CustomId "111115" is submitted
+    And The article with CustomId "111115" has an author with email "editor@test.com" from country "RO"
+    And The article with CustomId "111115" has articleType "Research Article"
+    When The event with EventId "discount" is handled
+    Then The invoice for CustomId "111115" has a waiver applied
+
+  Scenario: Article with applicable waiver is applied
+    Given There is a Journal "foo-journal"
+    And There is an editor for Journal "foo-journal" with email "editor@test.com"
+    And There is no article with CustomId "111116"
+    And An article with CustomId "111116" is submitted
+    And The article with CustomId "111116" has an author with email "noteditor@test.com" from country "RO"
+    And The article with CustomId "111116" has articleType "Research Article"
+    When The event with EventId "discount" is handled
+    Then The invoice for CustomId "111116" has no waiver applied
