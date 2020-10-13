@@ -87,7 +87,7 @@
   "PORT": 3000,
   "PP_ENVIRONMENT": "production",
   "PUBLISHER_NAME": "hindawi",
-  "SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER": "accounts.receivable@hindawi.com",
+  "SANCTIONED_COUNTRY_NOTIFICATION_RECEIVER": "credit.control@hindawi.com",
   "SANCTIONED_COUNTRY_NOTIFICATION_SENDER": "phenom.invoicing@hindawi.com",
   "SAGE_ENABLED": true,
   "NETSUITE_ENABLED": true,
