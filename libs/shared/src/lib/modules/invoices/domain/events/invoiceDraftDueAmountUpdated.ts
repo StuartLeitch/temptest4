@@ -3,7 +3,7 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 import { InvoiceId } from '../InvoiceId';
 
-export class InvoiceCreated implements DomainEventContract {
+export class InvoiceDraftDueAmountUpdated implements DomainEventContract {
   public dateTimeOccurred: Date;
   public invoiceId: InvoiceId;
 

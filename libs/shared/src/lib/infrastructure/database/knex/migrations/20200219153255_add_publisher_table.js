@@ -10,6 +10,11 @@ module.exports.up = async function (knex) {
     table.unique('name');
   });
 
+  await knex.schema.table('catalog', (table) => {
+    table.string('publisherId', 40).notNullable();
+    table.foreign('publisherId').references('publishers.id');
+  });
+
   await knex.schema.createTable('publisher_custom_values', (table) => {
     table.string('name');
     table.string('publisherId', 40);

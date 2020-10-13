@@ -36,7 +36,7 @@ export class S3EventProducer implements Producer<Event, string> {
       const contents = await this.getS3Object(key);
       const events = splitS3ObjectIntoEvents(contents)
         .filter(this.checkFilters.bind(this))
-        .map(event => Object.assign(cloneDeep(this.defaultValues), event));
+        .map((event) => Object.assign(cloneDeep(this.defaultValues), event));
       yield events;
     }
   }
@@ -88,7 +88,7 @@ export class S3EventProducer implements Producer<Event, string> {
     }
     while (true) {
       const { isTruncated, objects } = await this.listObjects(lastKey);
-      const keys = objects.map(obj => obj.Key);
+      const keys = objects.map((obj) => obj.Key);
 
       for (const key of keys.filter(this.checkSelectors.bind(this))) {
         yield key;

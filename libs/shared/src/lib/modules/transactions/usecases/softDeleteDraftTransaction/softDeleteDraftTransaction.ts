@@ -2,6 +2,7 @@
 
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
@@ -126,6 +127,9 @@ export class SoftDeleteDraftTransactionUsecase
       await this.invoiceItemRepo.delete(invoiceItem);
       // * System soft deletes manuscript
       await this.manuscriptRepo.delete(manuscript);
+
+      invoice.generateInvoiceDraftDeletedEvent();
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
 
       return right(Result.ok<void>());
     } catch (err) {

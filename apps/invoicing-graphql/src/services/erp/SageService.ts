@@ -242,7 +242,7 @@ export class SageService implements ErpServiceContract {
       billingAddress,
       journalName,
       vatNote,
-      rate,
+      exchangeRate,
     } = data;
     const invoiceDate = invoice.dateIssued;
     const fixedValues = this.fixedValues;
@@ -265,7 +265,7 @@ export class SageService implements ErpServiceContract {
       s2cor__Reference__c: referenceNumber,
       s2cor__Status__c: 'Unsubmitted',
       s2cor__Trade_Document_Type__c: fixedValues.tradeDocumentType,
-      s2cor__Legal_Note__c: this.getVatNote(vatNote, items, rate),
+      s2cor__Legal_Note__c: this.getVatNote(vatNote, items, exchangeRate),
       s2cor__BillingCountry__c: countryList.getName(billingAddress.country),
       s2cor__BillingCity__c: billingAddress.city,
       s2cor__BillingStreet__c: billingAddress?.addressLine1
@@ -381,7 +381,7 @@ export class SageService implements ErpServiceContract {
   private getVatNote(
     vatNote: any,
     invoiceItems: InvoiceItem[],
-    rate: number
+    exchangeRate: number
   ): string {
     const { template } = vatNote;
     return template
@@ -391,10 +391,10 @@ export class SageService implements ErpServiceContract {
           invoiceItems.reduce(
             (acc, curr) => acc + (curr.vat / 100) * curr.calculateNetPrice(),
             0
-          ) / rate
+          ) / exchangeRate
         ).toFixed(2)}`
       )
-      .replace('{Rate}', rate);
+      .replace('{Rate}', exchangeRate);
   }
 
   private async registerJournal(data: {
