@@ -7,11 +7,7 @@ interface PayerNameProps {
 
 export class PayerName extends ValueObject<PayerNameProps> {
   get value(): string {
-    return this.props.value;
-  }
-
-  toString(): string {
-    return this.props.value;
+    return this.props.value.trim();
   }
 
   private constructor(props: PayerNameProps) {
@@ -24,5 +20,9 @@ export class PayerName extends ValueObject<PayerNameProps> {
     } else {
       return Result.ok<PayerName>(new PayerName({ value: name }));
     }
+  }
+
+  toString(): string {
+    return this.props.value.trim();
   }
 }

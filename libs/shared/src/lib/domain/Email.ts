@@ -8,11 +8,7 @@ interface EmailProps {
 
 export class Email extends ValueObject<EmailProps> {
   get value(): string {
-    return this.props.value;
-  }
-
-  toString(): string {
-    return this.props.value;
+    return this.props.value.trim();
   }
 
   private constructor(props: EmailProps) {
@@ -27,5 +23,9 @@ export class Email extends ValueObject<EmailProps> {
     }
 
     return Result.ok<Email>(new Email(props));
+  }
+
+  toString(): string {
+    return this.props.value.trim();
   }
 }
