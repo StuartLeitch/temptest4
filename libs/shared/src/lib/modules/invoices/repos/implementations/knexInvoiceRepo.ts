@@ -232,7 +232,7 @@ export class KnexInvoiceRepo
   }
 
   async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
-    const LIMIT = 30;
+    const LIMIT = 200;
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICES)
@@ -246,7 +246,7 @@ export class KnexInvoiceRepo
           .whereNull('invoices.cancelledInvoiceReference')
           .whereNull('invoices.nsReference');
       })
-      .orderBy('articles.datePublished', 'desc')
+      .orderBy('invoices.dateIssued', 'desc')
       .limit(LIMIT);
 
     logger.debug('select', {
