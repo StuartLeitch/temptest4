@@ -6,6 +6,7 @@ import { expect } from 'chai';
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 
 import { UsecaseAuthorizationContext } from '../../../../../libs/shared/src/lib/domain/authorization';
+import { WaiverService } from '../../../../../libs/shared/src/lib/domain/services/WaiverService';
 
 import { Manuscript } from '../../../../../libs/shared/src/lib/modules/manuscripts/domain/Manuscript';
 import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
@@ -16,6 +17,7 @@ import { MockInvoiceItemRepo } from '../../../../../libs/shared/src/lib/modules/
 import { MockArticleRepo } from '../../../../../libs/shared/src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockCatalogRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockInvoiceRepo } from '../../../../../libs/shared/src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockEditorRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
 import { MockCouponRepo } from '../../../../../libs/shared/src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from '../../../../../libs/shared/src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
@@ -23,6 +25,8 @@ import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/lo
 import { ManuscriptMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ManuscriptMap';
 import { ArticleMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ArticleMap';
 import { CatalogMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
+import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
+import { WaiverMap } from '../../../../../libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 import { GetItemsForInvoiceUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
@@ -41,9 +45,11 @@ interface MockContext {
     catalog: MockCatalogRepo;
     invoice: MockInvoiceRepo;
     coupon: MockCouponRepo;
+    editor: MockEditorRepo;
     waiver: MockWaiverRepo;
   };
   services: {
+    waiverService: WaiverService;
     logger: MockLogger;
   };
 }
@@ -57,9 +63,11 @@ let context: MockContext = {
     catalog: null,
     invoice: null,
     coupon: null,
+    editor: null,
     waiver: null,
   },
   services: {
+    waiverService: null,
     logger: null,
   },
 };
@@ -79,9 +87,14 @@ Before(() => {
   context.repos.catalog = new MockCatalogRepo();
   context.repos.invoice = new MockInvoiceRepo();
   context.repos.coupon = new MockCouponRepo();
+  context.repos.editor = new MockEditorRepo();
   context.repos.waiver = new MockWaiverRepo();
 
   context.services.logger = new MockLogger();
+  context.services.waiverService = new WaiverService(
+    context.repos.waiver,
+    context.repos.editor
+  );
 
   submittingManuscript = null;
   event = null;
@@ -97,9 +110,11 @@ After(() => {
       catalog: null,
       invoice: null,
       coupon: null,
+      editor: null,
       waiver: null,
     },
     services: {
+      waiverService: null,
       logger: null,
     },
   };
@@ -265,5 +280,77 @@ Then(
     const article = await context.repos.manuscript.findByCustomId(customId);
 
     expect(article).to.be.null;
+  }
+);
+
+Given(
+  /^There is an editor for Journal "([\w-]+)" with email "([\w_.@]+)"$/,
+  async (journalId: string, email: string) => {
+    const editor = EditorMap.toDomain({
+      journalId,
+      email,
+      roleLabel: 'Academic Editor',
+      roleType: 'academicEditor',
+      name: 'test',
+    });
+
+    await context.repos.editor.save(editor);
+  }
+);
+
+Given('There is a waiver for editors', async () => {
+  const waiver = WaiverMap.toDomain({
+    waiverType: 'EDITOR_DISCOUNT',
+    reduction: 50,
+    isActive: true,
+  });
+  context.repos.waiver.addMockItem(waiver);
+});
+
+Given(
+  /^The corresponding author has email "([\w_.@]+)"$/,
+  async (email: string) => {
+    submittingManuscript.authorEmail = email;
+  }
+);
+
+Then(
+  /^The invoice for CustomId "([\w_.@]+)" has "([\d]+)" waivers applied$/,
+  async (customId: string, count: string) => {
+    const waiversCount = Number.parseInt(count);
+
+    const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+      context.repos.manuscript,
+      context.repos.invoiceItem
+    );
+    const invoiceItemsUsecase = new GetItemsForInvoiceUsecase(
+      context.repos.invoiceItem,
+      context.repos.coupon,
+      context.repos.waiver
+    );
+
+    const maybeInvoiceId = await invoiceIdUsecase.execute(
+      { customId },
+      defaultUsecaseContext
+    );
+
+    expect(maybeInvoiceId.isRight()).to.be.true;
+    if (maybeInvoiceId.isLeft()) {
+      throw maybeInvoiceId.value;
+    }
+
+    const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
+
+    const maybeInvoiceItems = await invoiceItemsUsecase.execute(
+      { invoiceId },
+      defaultUsecaseContext
+    );
+    expect(maybeInvoiceItems.isRight()).to.be.true;
+    if (maybeInvoiceItems.isLeft()) {
+      throw maybeInvoiceItems.value;
+    }
+
+    const items = maybeInvoiceItems.value.getValue();
+    expect(items[0].waivers.length).to.equal(waiversCount);
   }
 );

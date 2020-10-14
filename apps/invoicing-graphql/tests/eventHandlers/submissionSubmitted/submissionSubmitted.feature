@@ -31,16 +31,15 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111114" is deleted
 
-  Scenario: Article with with corresponding author as an editor has waiver applied
-    Given There is an editor for Journal "foo-journal" with email "editor@test.com"
+  Scenario Outline: Article with with corresponding author as an editor has waiver applied
+    Given There is an editor for Journal "foo-journal" with email "<editorEmail>"
+    And There is a waiver for editors
     And A "Research Article" with CustomId "111115" is submitted on journal "foo-journal"
-    And The article with CustomId "111115" has coresponding author with email "editor@test.com" from country "RO"
+    And The corresponding author has email "<authorEmail>"
     When The "Submission Submitted" event is triggered
-    Then The invoice for CustomId "111115" has a waiver applied
+    Then The invoice for CustomId "111115" has "<waiversApplied>" waivers applied
 
-  Scenario: Article with authot not an editor has no waiver applied
-    Given There is an editor for Journal "foo-journal" with email "editor@test.com"
-    And A "Research Article" with CustomId "111116" is submitted on journal "foo-journal"
-    And The article with CustomId "111116" has coresponding author with email "not_editor@test.com" from country "RO"
-    When The "Submission Submitted" event is triggered
-    Then The invoice for CustomId "111116" has no waiver applied
+    Examples:
+      | editorEmail     | authorEmail         | waiversApplied |
+      | editor@test.com | editor@test.com     | 1              |
+      | editor@test.com | not_editor@test.com | 0              |
