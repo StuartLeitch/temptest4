@@ -8,6 +8,9 @@ import {
 
 import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
 import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
+import { PublishInvoiceDraftCreatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
+import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
+import { PublishInvoiceDraftDueAmountUpdatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
@@ -17,6 +20,9 @@ import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modu
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
+import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
+import { AfterInvoiceDraftDeletedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';
+import { AfterInvoiceDraftCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
@@ -112,6 +118,15 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         )
       : new NoOpUseCase();
 
+    const publishInvoiceDraftCreated = new PublishInvoiceDraftCreatedUseCase(
+      queue
+    );
+    const publishInvoiceDraftDeleted = new PublishInvoiceDraftDeletedUseCase(
+      queue
+    );
+    const publishInvoiceDraftDueAmountUpdated = new PublishInvoiceDraftDueAmountUpdatedUseCase(
+      queue
+    );
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
       queue
     );
@@ -122,6 +137,33 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression
+    new AfterInvoiceDraftCreatedEvent(
+      invoice,
+      invoiceItem,
+      manuscript,
+      coupon,
+      waiver,
+      publishInvoiceDraftCreated
+    );
+
+    new AfterInvoiceDraftDeletedEvent(
+      invoice,
+      invoiceItem,
+      manuscript,
+      coupon,
+      waiver,
+      publishInvoiceDraftDeleted
+    );
+
+    new AfterInvoiceDraftDueAmountUpdatedEvent(
+      invoice,
+      invoiceItem,
+      manuscript,
+      coupon,
+      waiver,
+      publishInvoiceDraftDueAmountUpdated
+    );
+
     new AfterInvoiceCreatedEvent(
       invoice,
       invoiceItem,

@@ -8,6 +8,9 @@ import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
+import { InvoiceDraftDueAmountUpdated } from './events/invoiceDraftDueAmountUpdated';
+import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
+import { InvoiceDraftDeleted } from './events/invoiceDraftDeleted';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
@@ -266,6 +269,26 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     }
 
     return Result.ok<Invoice>(invoice);
+  }
+  public generateInvoiceDraftEvent(): void {
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftCreated(this, now));
+    }
+  }
+
+  public generateInvoiceDraftDeletedEvent(): void {
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftDeleted(this, now));
+    }
+  }
+
+  public generateInvoiceDraftAmountUpdatedEvent(): void {
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftDueAmountUpdated(this, now));
+    }
   }
 
   public generateCreatedEvent(): void {

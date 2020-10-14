@@ -5,26 +5,25 @@ replicaCount: 1
 
 ## Set default image, imageTag, and imagePullPolicy.
 image:
-  repository: "916437579680.dkr.ecr.eu-west-1.amazonaws.com/iris"
-  tag: "0.3.0"
-  pullPolicy: "IfNotPresent"
+  repository: '916437579680.dkr.ecr.eu-west-1.amazonaws.com/iris'
+  tag: '0.3.0'
+  pullPolicy: 'IfNotPresent'
   pullSecrets: []
-
 
 ## Extra environment variables that will be passed onto deployment pod
 ##
-envVars: 
+envVars:
   LOG_LEVEL: 'INFO'
   SECRET_KEY: 'superset_secret'
   SQLALCHEMY_DATABASE_URI: 'superset_db_secret'
 
-sso: 
-  enabled: true
-  host: 'https://sso.review.hindawi.com/auth/realms/Phenom'
-  clientId: 'dev-reporting'
-  clientSecret: 'client_secret'
-  realmKey: 'realm_public_key'
-  
+sso:
+  {}
+  # enabled: true
+  # host: 'https://sso.review.hindawi.com/auth/realms/Phenom'
+  # clientId: 'dev-reporting'
+  # clientSecret: 'client_secret'
+  # realmKey: 'realm_public_key'
 
 ## Deployment level annotations
 ## Useful for passing other third party annotations to interact with eg. kube2iam.
@@ -41,14 +40,13 @@ service:
   loadBalancerSourceRanges: []
   # - 172.31.0.0/16
 
-
 ingress:
   ## If true, superset Ingress will be created
   ##
   enabled: true
 
   ## superset Ingress annotations
-  annotations:   
+  annotations:
     kubernetes.io/ingress.class: nginx
 
   ## superset Ingress hostnames
