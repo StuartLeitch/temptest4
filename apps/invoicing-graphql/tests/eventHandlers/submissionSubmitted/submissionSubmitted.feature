@@ -46,7 +46,7 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111115" has a waiver applied
 
-  Scenario: Article with applicable waiver is applied
+  Scenario: Article with no applicable waiver has no waivers applied
     Given There is a Journal "foo-journal" with APC "200"
     And There is an editor for Journal "foo-journal" with email "editor@test.com"
     And There is no article with CustomId "111116"
