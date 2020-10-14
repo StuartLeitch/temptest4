@@ -34,12 +34,12 @@ Feature: Submission Submitted event handled
   Scenario Outline: Article with with corresponding author as an editor has waiver applied
     Given There is an editor for Journal "foo-journal" with email "<editorEmail>"
     And There is a waiver for editors
-    And A "Research Article" with CustomId "111115" is submitted on journal "foo-journal"
+    And A "Research Article" with CustomId "<customId>" is submitted on journal "foo-journal"
     And The corresponding author has email "<authorEmail>"
     When The "Submission Submitted" event is triggered
-    Then The invoice for CustomId "111115" has "<waiversApplied>" waivers applied
+    Then The invoice for CustomId "<customId>" has "<waiversApplied>" waivers applied
 
     Examples:
-      | editorEmail     | authorEmail         | waiversApplied |
-      | editor@test.com | editor@test.com     | 1              |
-      | editor@test.com | not_editor@test.com | 0              |
+      | customId | editorEmail     | authorEmail         | waiversApplied |
+      | 111115   | editor@test.com | editor@test.com     | 1              |
+      | 111116   | editor@test.com | not_editor@test.com | 0              |
