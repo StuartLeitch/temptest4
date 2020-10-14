@@ -1,3 +1,5 @@
+import { getYear } from 'date-fns';
+
 // * Core Domain
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
@@ -137,7 +139,13 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       return null;
     }
     const paddedNumber = this.props.invoiceNumber.toString().padStart(5, '0');
-    const creationYear = this.props.dateAccepted.getFullYear();
+    let creationYear = this.props.dateAccepted.getFullYear();
+    if (
+      this.props.dateIssued &&
+      getYear(this.props.dateIssued) < getYear(this.props.dateAccepted)
+    ) {
+      creationYear = this.props.dateIssued.getFullYear();
+    }
     return `${paddedNumber}/${creationYear}`;
   }
 
