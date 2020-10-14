@@ -185,9 +185,12 @@ export class PublishRevenueRecognitionToErpUsecase
           erpResponse
         )}`
       );
-      invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
-        erpResponse.journal.id
-      );
+
+      if (erpResponse) {
+        invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
+          erpResponse?.journal?.id
+        );
+      }
 
       await this.invoiceRepo.update(invoice);
 
