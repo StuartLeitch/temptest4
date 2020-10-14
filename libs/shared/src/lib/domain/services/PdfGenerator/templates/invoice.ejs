@@ -379,11 +379,11 @@
                         <tr>
                           <td><%= payer.name.value %></td>
                         </tr>
-                        <%= if(payer.organization) { %>
+                        <% if(payer.organization) { %>
                           <tr>
                             <td><%= payer.organization.value %></td>
                           </tr>
-                        <%= } %>
+                        <% } %>
                         <tr>
                           <td>
                             <%= address.addressLine1 %> <%= address.addressLine2
