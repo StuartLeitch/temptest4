@@ -25,12 +25,11 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111113" has price "300"
 
-# Scenario: Article is re-submitted with other articleType
-#   Given There is an article with CustomId "111114" on journal "foo-journal"
-#   And The article with CustomId "111114" has articleType "Research Article"
-#   And The article with CustomId "111114" is re-submitted with articleType "Corrigendum"
-#   When The "Submission Submitted" event is triggered
-#   Then The invoice for CustomId "111114" is deleted
+  Scenario: Article is re-submitted with other articleType
+    Given A "Research Article" with CustomId "111114" is on "foo-journal"
+    And A "Corrigendum" with CustomId "111114" is submitted on journal "foo-journal"
+    When The "Submission Submitted" event is triggered
+    Then The invoice for CustomId "111114" is deleted
 
 # Scenario: Article with applicable waiver is applied
 #   Given There is an editor for Journal "foo-journal" with email "editor@test.com"

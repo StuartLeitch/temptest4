@@ -258,3 +258,12 @@ Given(
     await Handler.handler((context as unknown) as Context)(event);
   }
 );
+
+Then(
+  /^The invoice for CustomId "([\w\d]+)" is deleted$/,
+  async (customId: string) => {
+    const article = await context.repos.manuscript.findByCustomId(customId);
+
+    expect(article).to.be.null;
+  }
+);
