@@ -9,6 +9,10 @@ import { UsecaseAuthorizationContext } from '../../../../../libs/shared/src/lib/
 import { WaiverService } from '../../../../../libs/shared/src/lib/domain/services/WaiverService';
 
 import { Manuscript } from '../../../../../libs/shared/src/lib/modules/manuscripts/domain/Manuscript';
+import {
+  Invoice,
+  InvoiceStatus,
+} from '../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
 import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { MockPausedReminderRepo } from '../../../../../libs/shared/src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
@@ -203,10 +207,10 @@ Then(
       defaultUsecaseContext
     );
 
-    expect(maybeInvoiceId.isRight()).to.be.true;
     if (maybeInvoiceId.isLeft()) {
       throw maybeInvoiceId.value;
     }
+    expect(maybeInvoiceId.isRight()).to.be.true;
 
     const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
 
@@ -215,10 +219,10 @@ Then(
       defaultUsecaseContext
     );
 
-    expect(maybeInvoice.isRight()).to.be.true;
     if (maybeInvoice.isLeft()) {
       throw maybeInvoice.value;
     }
+    expect(maybeInvoice.isRight()).to.be.true;
 
     const invoice = maybeInvoice.value.getValue();
 
@@ -226,10 +230,11 @@ Then(
       { invoiceId },
       defaultUsecaseContext
     );
-    expect(maybeInvoiceItems.isRight()).to.be.true;
+
     if (maybeInvoiceItems.isLeft()) {
       throw maybeInvoiceItems.value;
     }
+    expect(maybeInvoiceItems.isRight()).to.be.true;
 
     invoice.addItems(maybeInvoiceItems.value.getValue());
 
@@ -334,10 +339,10 @@ Then(
       defaultUsecaseContext
     );
 
-    expect(maybeInvoiceId.isRight()).to.be.true;
     if (maybeInvoiceId.isLeft()) {
       throw maybeInvoiceId.value;
     }
+    expect(maybeInvoiceId.isRight()).to.be.true;
 
     const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
 
@@ -345,12 +350,50 @@ Then(
       { invoiceId },
       defaultUsecaseContext
     );
-    expect(maybeInvoiceItems.isRight()).to.be.true;
+
     if (maybeInvoiceItems.isLeft()) {
       throw maybeInvoiceItems.value;
     }
+    expect(maybeInvoiceItems.isRight()).to.be.true;
 
     const items = maybeInvoiceItems.value.getValue();
     expect(items[0].waivers.length).to.equal(waiversCount);
+  }
+);
+
+Then(
+  /^The invoice for CustomId "([\w_.@]+)" remains in DRAFT state$/,
+  async (customId: string) => {
+    const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+      context.repos.manuscript,
+      context.repos.invoiceItem
+    );
+    const invoiceUsecase = new GetInvoiceDetailsUsecase(context.repos.invoice);
+
+    const maybeInvoiceId = await invoiceIdUsecase.execute(
+      { customId },
+      defaultUsecaseContext
+    );
+
+    if (maybeInvoiceId.isLeft()) {
+      throw maybeInvoiceId.value;
+    }
+    expect(maybeInvoiceId.isRight()).to.be.true;
+
+    const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
+
+    const maybeInvoice = await invoiceUsecase.execute(
+      { invoiceId },
+      defaultUsecaseContext
+    );
+
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+    expect(maybeInvoice.isRight()).to.be.true;
+
+    const invoice = maybeInvoice.value.getValue();
+    console.log(invoice.status);
+    expect(invoice.status).to.be.equal(InvoiceStatus.DRAFT);
   }
 );

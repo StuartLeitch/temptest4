@@ -38,6 +38,7 @@ Feature: Submission Submitted event handled
     And The corresponding author has email "<authorEmail>"
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "<customId>" has "<waiversApplied>" waivers applied
+    And The invoice for CustomId "<customId>" remains in DRAFT state
 
     Examples:
       | customId | editorEmail     | authorEmail         | waiversApplied |
