@@ -69,7 +69,7 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
   }
 
   get vat(): number {
-    return this.props.vat;
+    return this.props.vat || 0;
   }
 
   get coupons(): Coupons {

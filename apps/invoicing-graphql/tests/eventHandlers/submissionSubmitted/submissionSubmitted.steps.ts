@@ -5,7 +5,10 @@ import { expect } from 'chai';
 
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 
+import { UsecaseAuthorizationContext } from '../../../../../libs/shared/src/lib/domain/authorization';
+
 import { Manuscript } from '../../../../../libs/shared/src/lib/modules/manuscripts/domain/Manuscript';
+import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { MockPausedReminderRepo } from '../../../../../libs/shared/src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
 import { MockTransactionRepo } from '../../../../../libs/shared/src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
@@ -18,6 +21,7 @@ import { MockWaiverRepo } from '../../../../../libs/shared/src/lib/modules/waive
 import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
 
 import { ManuscriptMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ManuscriptMap';
+import { ArticleMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ArticleMap';
 import { CatalogMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
@@ -60,6 +64,10 @@ let context: MockContext = {
   },
 };
 
+const defaultUsecaseContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
+
 let submittingManuscript: Manuscript = null;
 let event: SubmissionSubmitted = null;
 
@@ -99,13 +107,13 @@ After(() => {
 
 Given(
   /^There is a Journal "([\w-]+)" with APC "([\d]+)"$/,
-  async (journalId: string, apc: number) => {
+  async (journalId: string, apc: string) => {
     const journal = CatalogMap.toDomain({
       journalId,
       journalTitle: journalId,
       id: journalId,
       type: 'mock',
-      amount: apc,
+      amount: Number.parseFloat(apc),
     });
 
     context.repos.catalog.addMockItem(journal);
@@ -113,39 +121,57 @@ Given(
 );
 
 Given(
-  /^There is no article with CustomId "([\w\d]+)"$/,
-  async (customId: string) => {
-    const manuscript = await context.repos.manuscript.findByCustomId(customId);
-    if (manuscript) {
-      await context.repos.manuscript.delete(manuscript);
-    }
-  }
-);
-
-Given(
-  /^An article with CustomId "([\w\d]+)" is submitted$/,
-  async (customId: string) => {
+  /^A "([\w\s]+)" with CustomId "([\w\d]+)" is submitted on journal "([\w-]+)"$/,
+  async (articleType: string, customId: string, journalId: string) => {
     submittingManuscript = ManuscriptMap.toDomain({
+      articleType,
+      journalId,
       customId,
     });
   }
 );
 
-Given(
-  /^The submitting articleType is "([\w]+)"$/,
-  async (articleType: string) => {
-    expect(submittingManuscript).to.be.ok;
-    submittingManuscript.articleType = articleType;
-  }
-);
-
 When(`The "Submission Submitted" event is triggered`, async () => {
+  event = {
+    submissionId: submittingManuscript.customId,
+    manuscripts: [
+      {
+        journalId: submittingManuscript.journalId,
+        articleType: { name: submittingManuscript.articleType },
+        customId: submittingManuscript.customId,
+        authors: [
+          {
+            email: submittingManuscript.authorEmail,
+            isCorresponding: true,
+          },
+        ],
+      },
+    ],
+  } as SubmissionSubmitted;
   await Handler.handler((context as unknown) as Context)(event);
 });
 
 Then(
-  /^The invoice for CustomId "([\w\d]+)" is created and has price "([\d]+)"$/,
-  async (customId: string, price: number) => {
+  /^The invoice for CustomId "([\w\d]+)" is created$/,
+  async (customId: string) => {
+    const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+      context.repos.manuscript,
+      context.repos.invoiceItem
+    );
+
+    const maybeInvoiceId = await invoiceIdUsecase.execute(
+      { customId },
+      defaultUsecaseContext
+    );
+
+    expect(maybeInvoiceId.isRight()).to.be.true;
+    expect(maybeInvoiceId.value.getValue()).to.be.ok;
+  }
+);
+
+Then(
+  /^The invoice for CustomId "([\w\d]+)" has price "([\d]+)"$/,
+  async (customId: string, price: string) => {
     const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
       context.repos.manuscript,
       context.repos.invoiceItem
@@ -157,15 +183,22 @@ Then(
       context.repos.waiver
     );
 
-    const maybeInvoiceId = await invoiceIdUsecase.execute({ customId });
+    const maybeInvoiceId = await invoiceIdUsecase.execute(
+      { customId },
+      defaultUsecaseContext
+    );
 
     expect(maybeInvoiceId.isRight()).to.be.true;
     if (maybeInvoiceId.isLeft()) {
       throw maybeInvoiceId.value;
     }
+
     const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
 
-    const maybeInvoice = await invoiceUsecase.execute({ invoiceId });
+    const maybeInvoice = await invoiceUsecase.execute(
+      { invoiceId },
+      defaultUsecaseContext
+    );
 
     expect(maybeInvoice.isRight()).to.be.true;
     if (maybeInvoice.isLeft()) {
@@ -174,7 +207,10 @@ Then(
 
     const invoice = maybeInvoice.value.getValue();
 
-    const maybeInvoiceItems = await invoiceItemsUsecase.execute({ invoiceId });
+    const maybeInvoiceItems = await invoiceItemsUsecase.execute(
+      { invoiceId },
+      defaultUsecaseContext
+    );
     expect(maybeInvoiceItems.isRight()).to.be.true;
     if (maybeInvoiceItems.isLeft()) {
       throw maybeInvoiceItems.value;
@@ -182,6 +218,43 @@ Then(
 
     invoice.addItems(maybeInvoiceItems.value.getValue());
 
-    expect(invoice.invoiceTotal).to.equal(price);
+    expect(invoice.invoiceTotal).to.equal(Number.parseFloat(price));
+  }
+);
+
+Then(
+  /^The invoice for CustomId "([\w\d]+)" is not created$/,
+  async (customId: string) => {
+    const article = await context.repos.manuscript.findByCustomId(customId);
+    expect(article).to.be.null;
+  }
+);
+
+Given(
+  /^A "([\w\s]+)" with CustomId "([\w\d]+)" is on "([\w-]+)"$/,
+  async (articleType: string, customId: string, journalId: string) => {
+    const article = ArticleMap.toDomain({
+      articleType,
+      journalId,
+      customId,
+    });
+
+    event = {
+      submissionId: customId,
+      manuscripts: [
+        {
+          journalId: article.journalId,
+          articleType: { name: article.articleType },
+          customId: article.customId,
+          authors: [
+            {
+              email: article.authorEmail,
+              isCorresponding: true,
+            },
+          ],
+        },
+      ],
+    } as SubmissionSubmitted;
+    await Handler.handler((context as unknown) as Context)(event);
   }
 );

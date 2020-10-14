@@ -10,6 +10,8 @@ import {
   MockLogger,
   MockCatalogRepo,
 } from '@hindawi/shared';
+import { MockPublisherRepo } from '../../../../../libs/shared/src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
+import { PublisherMap } from '../../../../../libs/shared/src/lib/modules/publishers/mappers/PublisherMap';
 
 import { Context } from '../../../src/builders';
 
@@ -20,16 +22,35 @@ const { handler } = JournalAddedHandler;
 
 let mockLogger: MockLogger;
 let mockCatalogRepo: MockCatalogRepo;
+let mockPublisherRepo: MockPublisherRepo;
 
 let context = {};
+
+const defaultPublisher = {
+  customValues: {
+    journalItemReference: '',
+    tradeDocumentItem: '',
+    journalReference: '',
+    journalItemTag: '',
+    journalTag: '',
+  },
+  dateCreated: null,
+  dateUpdated: null,
+  id: 'Hindawi',
+  name: 'Hindawi',
+};
 
 Before(() => {
   mockLogger = new MockLogger();
   mockCatalogRepo = new MockCatalogRepo();
+  mockPublisherRepo = new MockPublisherRepo();
+
+  mockPublisherRepo.addMockItem(PublisherMap.toDomain(defaultPublisher));
 
   context = {
     repos: {
       catalog: mockCatalogRepo,
+      publisher: mockPublisherRepo,
     },
     services: {
       logger: mockLogger,
@@ -43,6 +64,7 @@ Given(/^There is no Journal registered$/, async () => {
     journalId: JournalAddedData.id,
     type: 'FOO',
     apc: 666,
+    publisherId: 'Hindawi',
   });
   await mockCatalogRepo.save(testJournal);
 });
