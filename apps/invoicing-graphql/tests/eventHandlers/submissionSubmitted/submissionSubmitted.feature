@@ -31,20 +31,16 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111114" is deleted
 
-# Scenario: Article with applicable waiver is applied
-#   Given There is an editor for Journal "foo-journal" with email "editor@test.com"
-#   And There is no article with CustomId "111115"
-#   And An article with CustomId "111115" is submitted
-#   And The article with CustomId "111115" has an author with email "editor@test.com" from country "RO"
-#   And The article with CustomId "111115" has articleType "Research Article"
-#   When The "Submission Submitted" event is triggered
-#   Then The invoice for CustomId "111115" has a waiver applied
+  Scenario: Article with with corresponding author as an editor has waiver applied
+    Given There is an editor for Journal "foo-journal" with email "editor@test.com"
+    And A "Research Article" with CustomId "111115" is submitted on journal "foo-journal"
+    And The article with CustomId "111115" has coresponding author with email "editor@test.com" from country "RO"
+    When The "Submission Submitted" event is triggered
+    Then The invoice for CustomId "111115" has a waiver applied
 
-# Scenario: Article with no applicable waiver has no waivers applied
-#   Given There is an editor for Journal "foo-journal" with email "editor@test.com"
-#   And There is no article with CustomId "111116"
-#   And An article with CustomId "111116" is submitted
-#   And The article with CustomId "111116" has an author with email "noteditor@test.com" from country "RO"
-#   And The article with CustomId "111116" has articleType "Research Article"
-#   When The "Submission Submitted" event is triggered
-#   Then The invoice for CustomId "111116" has no waiver applied
+  Scenario: Article with authot not an editor has no waiver applied
+    Given There is an editor for Journal "foo-journal" with email "editor@test.com"
+    And A "Research Article" with CustomId "111116" is submitted on journal "foo-journal"
+    And The article with CustomId "111116" has coresponding author with email "not_editor@test.com" from country "RO"
+    When The "Submission Submitted" event is triggered
+    Then The invoice for CustomId "111116" has no waiver applied
