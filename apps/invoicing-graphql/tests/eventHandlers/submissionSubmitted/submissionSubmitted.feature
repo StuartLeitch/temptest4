@@ -15,7 +15,7 @@ Feature: Submission Submitted event handled
   Scenario: Article is submitted for the first time and is non-invoiceable
     Given There is a Journal "foo-journal" with APC "200"
     And There is no article with CustomId "111112"
-    And An article with CustomId "111111" is submitted
+    And An article with CustomId "111112" is submitted
     And The submitting articleType is "Corrigendum"
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111112" is not created
