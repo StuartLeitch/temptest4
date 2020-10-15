@@ -130,7 +130,6 @@ export class NetSuiteService implements ErpServiceContract {
     console.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
-    console.info(creditNoteId);
     await this.patchCreditNote({ ...data, creditNoteId });
 
     return creditNoteId;
@@ -216,6 +215,9 @@ export class NetSuiteService implements ErpServiceContract {
     const queryCustomerRequest = {
       q: query.toQuery(),
     };
+
+    console.log('queryCustomerRequest');
+    console.info(queryCustomerRequest);
 
     try {
       const res = await axios({
@@ -683,7 +685,12 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
-      createCustomerPayload.lastName = `${lastNames.join(' ')} ${keep}`;
+
+      createCustomerPayload.lastName =
+        lastNames.length > 0
+          ? `${lastNames.join(' ')} ${keep}`
+          : `${keep}`.trim();
+
       if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
         createCustomerPayload.lastName =
           createCustomerPayload?.lastName?.slice(0, MAX_LENGTH - keep.length) +

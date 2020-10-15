@@ -181,6 +181,12 @@ export class PublishRevenueRecognitionToErpUsecase
       });
 
       this.loggerService.info(
+        'ERP field',
+        this.erpService.invoiceRevenueRecRefFieldName
+      );
+      this.loggerService.info('ERP response', erpResponse);
+
+      this.loggerService.info(
         `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
           erpResponse
         )}`
