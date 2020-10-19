@@ -134,7 +134,6 @@ Package Images:dev:
     - mv ./kubectl /usr/local/bin
   script:
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-    - kubectl config set-context --current --namespace=$NAMESPACE
     - cd $HOME
     - ./tools/scripts/deploy-ci.sh
     - cp -r dist-k8s $CI_PROJECT_DIR
