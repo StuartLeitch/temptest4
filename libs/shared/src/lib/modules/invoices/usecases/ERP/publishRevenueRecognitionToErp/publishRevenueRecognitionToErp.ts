@@ -161,6 +161,9 @@ export class PublishRevenueRecognitionToErpUsecase
       //   return right(Result.ok<any>(null));
       // }
 
+      console.info(manuscript);
+      console.info(invoice);
+
       if (invoice.isCreditNote() && manuscript.datePublished) {
         return right(Result.ok<any>(null));
       }

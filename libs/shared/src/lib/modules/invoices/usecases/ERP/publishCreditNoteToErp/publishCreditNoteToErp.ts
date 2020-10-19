@@ -86,10 +86,14 @@ export class PublishCreditNoteToErpUsecase
       );
       this.loggerService.info('PublishCreditNoteToERP credit note', creditNote);
 
-      originalInvoice = await this.invoiceRepo.findByCancelledInvoiceReference(
+      originalInvoice = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(
-          new UniqueEntityID(creditNote.id.toString())
+          new UniqueEntityID(creditNote.cancelledInvoiceReference)
         ).getValue()
+      );
+      this.loggerService.info(
+        'PublishCreditNoteToERP original invoice',
+        originalInvoice
       );
 
       let invoiceItems = creditNote.invoiceItems.currentItems;
