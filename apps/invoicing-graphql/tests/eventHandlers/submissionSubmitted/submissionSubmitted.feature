@@ -31,7 +31,7 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111114" is deleted
 
-  Scenario Outline: Article with with corresponding author as an editor has waiver applied
+  Scenario Outline: Article has waivers applied if it is eligible for them
     Given There is an editor for Journal "foo-journal" with email "<editorEmail>"
     And There is a waiver for editors
     And A "Research Article" with CustomId "<customId>" is submitted on journal "foo-journal"

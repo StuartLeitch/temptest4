@@ -10,7 +10,7 @@ import {
   JournalSectionEditorRemovedHandler,
 } from './JournalEditorRemoved';
 import { SubmissionScreeningRTCd } from './SubmissionScreeningRTCd';
-import { SubmissionSubmittedHandler } from './SubmissionSubmitted';
+import { SubmissionSubmittedHandler } from './submission-submitted';
 import { ArticlePublishedHandler } from './ArticlePublished';
 import { SubmissionWithdrawn } from './SubmissionWithdrawn';
 import { SubmissionRejected } from './SubmissionRejected';

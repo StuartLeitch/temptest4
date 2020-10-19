@@ -9,10 +9,7 @@ import { UsecaseAuthorizationContext } from '../../../../../libs/shared/src/lib/
 import { WaiverService } from '../../../../../libs/shared/src/lib/domain/services/WaiverService';
 
 import { Manuscript } from '../../../../../libs/shared/src/lib/modules/manuscripts/domain/Manuscript';
-import {
-  Invoice,
-  InvoiceStatus,
-} from '../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
+import { InvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
 import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { MockPausedReminderRepo } from '../../../../../libs/shared/src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
@@ -38,7 +35,7 @@ import { GetInvoiceDetailsUsecase } from '../../../../../libs/shared/src/lib/mod
 
 import { Context } from '../../../src/builders';
 
-import { SubmissionSubmittedHandler as Handler } from '../../../src/queue_service/handlers/SubmissionSubmitted';
+import { SubmissionSubmittedHandler as Handler } from '../../../src/queue_service/handlers/submission-submitted/SubmissionSubmitted';
 
 interface MockContext {
   repos: {
