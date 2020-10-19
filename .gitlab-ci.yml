@@ -216,6 +216,20 @@ Deploy:gsw-demo:
 #     CLUSTER: hindawi-prod
 #     AWS_REGISTRY: $DEV_AWS_REGISTRY
 #     COMMAND: build-manifests
+Deploy:hindawi-prod:
+  tags:
+    - 'cluster:hindawi-prod'
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: prod
+    NAMESPACE: prod-hindawi
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
 
 Pages:
   interruptible: true

@@ -6,7 +6,7 @@ import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['demo/invoicing/invoicing-admin-legacy'],
+  secretNames: ['prod/invoicing/invoicing-admin-legacy'],
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {
@@ -15,10 +15,10 @@ const values: WithAwsSecretsServiceProps = {
     ingressOptions: {
       rules: [
         {
-          host: 'invoicing-admin.demo.phenom.pub',
+          host: 'invoicing-admin.prod.phenom.pub',
         },
         {
-          host: 'demo-admin.invoicing.hindawi.com',
+          host: 'admin.invoicing.hindawi.com',
         },
       ],
     },
