@@ -129,48 +129,51 @@ export class PublishRevenueRecognitionToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
-      // const { customId } = manuscript;
+      if (!manuscript.datePublished) {
+        return right(Result.ok<any>(null));
+      }
 
-      // // * Get all invoices associated with this custom id
-      // const referencedInvoicesByCustomId: any[] = await this.invoiceRepo.getInvoicesByCustomId(
-      //   customId
-      // );
-
-      // // console.info(invoice);
-      // // console.info(manuscript);
-      // // console.info(referencedInvoicesByCustomId);
-
-      // let skip = false;
-      // referencedInvoicesByCustomId.forEach((i, index, arr) => {
-      //   const itHasACreditNote = arr.find(
-      //     (item) => item.cancelledInvoiceReference === i.invoiceId
-      //   );
-      //   // console.info(i);
-      //   // console.info(found);
-      //   if (
-      //     i.cancelledInvoiceReference === null &&
-      //     i.invoiceStatus === 'FINAL' &&
-      //     itHasACreditNote
-      //   ) {
-      //     skip = true;
-      //   }
-      // });
-      // // process.exit(1);
-
-      // if (skip) {
-      //   return right(Result.ok<any>(null));
-      // }
-
-      console.info(manuscript);
-      console.info(invoice);
-
+      // * If it's a credit node and the manuscript has been published
       if (invoice.isCreditNote() && manuscript.datePublished) {
         return right(Result.ok<any>(null));
+      }
+
+      // console.info(invoice);
+      // console.info(manuscript);
+      // console.info(referencedInvoicesByCustomId);
+
+      const { customId } = manuscript;
+
+      // * Get all invoices associated with this custom id
+      const referencedInvoicesByCustomId: any[] = await this.invoiceRepo.getInvoicesByCustomId(
+        customId
+      );
+
+      // * If the invoice has a credit note
+      // * and the manuscript has been published before its creation
+      const associatedCreditNote = referencedInvoicesByCustomId.find(
+        (item) =>
+          item.cancelledInvoiceReference === invoice.invoiceId.id.toString()
+      );
+
+      if (associatedCreditNote) {
+        const creditNoteCreatedOn = new Date(
+          associatedCreditNote.invoiceDateCreated
+        );
+        const { datePublished: manuscriptPublishedOn } = manuscript;
+
+        if (
+          !invoice.isCreditNote() &&
+          creditNoteCreatedOn.getTime() > manuscriptPublishedOn.getTime()
+        ) {
+          return right(Result.ok<any>(null));
+        }
       }
 
       const catalog = await this.catalogRepo.getCatalogItemByJournalId(
         JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
       );
+
       if (!catalog) {
         throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
       }
@@ -196,10 +199,6 @@ export class PublishRevenueRecognitionToErpUsecase
           (acc, waiver) => acc + (waiver.reduction / 100) * price,
           0
         );
-      }
-
-      if (!manuscript.datePublished) {
-        return right(Result.ok<any>(null));
       }
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
