@@ -336,7 +336,7 @@ export class KnexInvoiceRepo
     );
   }
 
-  async delete(invoice: Invoice): Promise<unknown> {
+  async delete(invoice: Invoice): Promise<void> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.INVOICES)
@@ -349,22 +349,21 @@ export class KnexInvoiceRepo
         invoice.id.toString()
       );
     }
-
-    return deletedRows;
   }
 
-  async restore(invoice: Invoice): Promise<unknown> {
+  async restore(invoice: Invoice): Promise<void> {
     const { db } = this;
 
     const restoredRows = await db(TABLES.INVOICES)
       .where('id', invoice.id.toString())
       .update({ ...InvoiceMap.toPersistence(invoice), deleted: 0 });
 
-    return restoredRows
-      ? restoredRows
-      : Promise.reject(
-          RepoError.createEntityNotFoundError('invoice', invoice.id.toString())
-        );
+    if (!restoredRows) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice',
+        invoice.id.toString()
+      );
+    }
   }
 
   async update(invoice: Invoice): Promise<Invoice> {

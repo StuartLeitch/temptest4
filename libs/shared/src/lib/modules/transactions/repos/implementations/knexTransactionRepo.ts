@@ -65,38 +65,34 @@ export class KnexTransactionRepo
     }, []);
   }
 
-  async delete(transaction: Transaction): Promise<unknown> {
+  async delete(transaction: Transaction): Promise<void> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.TRANSACTIONS)
       .where('id', transaction.id.toString())
       .update({ ...TransactionMap.toPersistence(transaction), deleted: 1 });
 
-    return deletedRows
-      ? deletedRows
-      : Promise.reject(
-          RepoError.createEntityNotFoundError(
-            'transaction',
-            transaction.id.toString()
-          )
-        );
+    if (!deletedRows) {
+      throw RepoError.createEntityNotFoundError(
+        'transaction',
+        transaction.id.toString()
+      );
+    }
   }
 
-  async restore(transaction: Transaction): Promise<unknown> {
+  async restore(transaction: Transaction): Promise<void> {
     const { db } = this;
 
     const restoredRows = await db(TABLES.TRANSACTIONS)
       .where('id', transaction.id.toString())
       .update({ ...TransactionMap.toPersistence(transaction), deleted: 0 });
 
-    return restoredRows
-      ? restoredRows
-      : Promise.reject(
-          RepoError.createEntityNotFoundError(
-            'transaction',
-            transaction.id.toString()
-          )
-        );
+    if (!restoredRows) {
+      throw RepoError.createEntityNotFoundError(
+        'transaction',
+        transaction.id.toString()
+      );
+    }
   }
 
   async update(transaction: Transaction): Promise<Transaction> {

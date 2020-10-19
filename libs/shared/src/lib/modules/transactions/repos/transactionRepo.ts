@@ -7,7 +7,7 @@ export interface TransactionRepoContract extends Repo<Transaction> {
   getTransactionById(transactionId: TransactionId): Promise<Transaction>;
   getTransactionByInvoiceId(invoiceId: InvoiceId): Promise<Transaction>;
   getTransactionCollection(): Promise<Transaction[]>;
-  delete(transaction: Transaction): Promise<unknown>;
-  restore(transaction: Transaction): Promise<unknown>;
+  delete(transaction: Transaction): Promise<void>;
+  restore(transaction: Transaction): Promise<void>;
   update(transaction: Transaction): Promise<Transaction>;
 }
