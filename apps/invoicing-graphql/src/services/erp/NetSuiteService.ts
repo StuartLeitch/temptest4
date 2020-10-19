@@ -569,13 +569,13 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditNote } = data;
+    const { originalInvoice } = data;
 
     // console.log('transformCreditNote data:');
     // console.info(creditNote);
 
     const creditNoteTransformOpts = {
-      url: `${config.endpoint}record/v1/invoice/${creditNote.nsReference}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
       method: 'POST',
     };
 

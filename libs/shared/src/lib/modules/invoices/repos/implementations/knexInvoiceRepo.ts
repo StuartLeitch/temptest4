@@ -146,6 +146,7 @@ export class KnexInvoiceRepo
       .select(
         'invoices.id AS invoiceId',
         'invoices.cancelledInvoiceReference AS cancelledInvoiceReference',
+        'invoices.status AS invoiceStatus',
         'articles.customId as customId',
         'articles.datePublished as datePublished'
       )

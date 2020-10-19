@@ -136,14 +136,30 @@ export class PublishRevenueRecognitionToErpUsecase
       //   customId
       // );
 
-      // console.info(invoice);
-      // console.info(manuscript);
-      // console.info(referencedInvoicesByCustomId);
+      // // console.info(invoice);
+      // // console.info(manuscript);
+      // // console.info(referencedInvoicesByCustomId);
 
-      // referencedInvoicesByCustomId.forEach((i) => {
+      // let skip = false;
+      // referencedInvoicesByCustomId.forEach((i, index, arr) => {
+      //   const itHasACreditNote = arr.find(
+      //     (item) => item.cancelledInvoiceReference === i.invoiceId
+      //   );
+      //   // console.info(i);
+      //   // console.info(found);
+      //   if (
+      //     i.cancelledInvoiceReference === null &&
+      //     i.invoiceStatus === 'FINAL' &&
+      //     itHasACreditNote
+      //   ) {
+      //     skip = true;
+      //   }
+      // });
+      // // process.exit(1);
 
-      // })
-      // process.exit(1);
+      // if (skip) {
+      //   return right(Result.ok<any>(null));
+      // }
 
       if (invoice.isCreditNote() && manuscript.datePublished) {
         return right(Result.ok<any>(null));
