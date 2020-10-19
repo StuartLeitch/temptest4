@@ -6,17 +6,17 @@ import { defaultValues } from "../../default";
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ["gsw-demo/invoicing/invoicing-web-legacy"],
+  secretNames: ["gsw-prod/invoicing/invoicing-web-legacy"],
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {},
     ingressOptions: {
       rules: [
         {
-          host: "invoicing-web.gsw-demo.phenom.pub",
+          host: "invoicing-web.gsw-prod.phenom.pub",
         },
         {
-          host: "demo.invoicing.gsw.hindawi.com",
+          host: "invoicing.lithosphere.geoscienceworld.org",
         },
       ],
     },

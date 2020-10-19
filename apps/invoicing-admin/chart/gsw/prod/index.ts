@@ -1,19 +1,24 @@
 import {
   WithAwsSecretsServiceProps,
-  ConfigurationMountType,
   IngressOptionsSpec,
 } from '@hindawi/phenom-charts';
 import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['gsw-demo/invoicing/invoicing-graphql-legacy'],
+  secretNames: ['gsw-prod/invoicing/invoicing-admin-legacy'],
   serviceProps: {
     ...defaultValues.serviceProps,
+    envVars: {
+      ...defaultValues.serviceProps.envVars,
+    },
     ingressOptions: {
       rules: [
         {
-          host: 'invoicing-graphql.gsw-demo.phenom.pub',
+          host: 'invoicing-admin.gsw-prod.phenom.pub',
+        },
+        {
+          host: 'prod-invoicing-admin.gsw.hindawi.com',
         },
       ],
     },

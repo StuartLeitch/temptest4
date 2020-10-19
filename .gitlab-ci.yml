@@ -202,6 +202,21 @@ Deploy:gsw-demo:
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
 
+# Deploy:gsw-prod:
+#   tags:
+#     - 'cluster:hindawi-prod'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: gsw
+#     NODE_ENV: prod
+#     NAMESPACE: gsw-prod
+#     CLUSTER: hindawi-prod
+#     AWS_REGISTRY: $DEV_AWS_REGISTRY
+#     COMMAND: build-manifests
+
 Pages:
   interruptible: true
   stage: deploy
