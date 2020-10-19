@@ -521,7 +521,7 @@ export const invoice: Resolvers<Context> = {
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
         // paymentRepo,
         invoiceRepo,
-        manuscriptRepo,
+        // manuscriptRepo,
         invoiceItemRepo,
         transactionRepo,
         couponRepo,

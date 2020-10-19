@@ -141,36 +141,29 @@ export class KnexInvoiceRepo
 
   async getInvoicesByCustomId(customId: string): Promise<Invoice[]> {
     const { db } = this;
-    // const invoices = await db(TABLES.INVOICES)
-    //   .select()
-    //   const result = await this.db
-    //   .select(
-    //     "articles".*,
-    //   	"invoices"."id" AS "invoiceId",
-    //     "invoices"."cancelledInvoiceReference" AS "cancelledInvoiceReference"
-    //   )
-    //   .from('invoices')
-    //   .leftJoin('payers', 'payers.invoiceId', '=', 'invoices.id')
-    //   .leftJoin('addresses', 'payers.billingAddressId', '=', 'addresses.id')
-    //   .leftJoin('payments', 'payments.invoiceId', '=', 'invoices.id')
-    //   .leftJoin(
-    //     'payment_methods',
-    //     'payment_methods.id',
-    //     '=',
-    //     'payments.paymentMethodId'
-    //   )
-    //   .where({ 'invoices.id': invoiceId.id.toString() });
 
-    // if (result.length === 0) {
-    //   throw RepoError.createEntityNotFoundError(
-    //     'invoice',
-    //     invoiceId.id.toString()
-    //   );
-    // }
+    const result = await db
+      .select(
+        'invoices.id AS invoiceId',
+        'invoices.cancelledInvoiceReference AS cancelledInvoiceReference',
+        'articles.customId as customId',
+        'articles.datePublished as datePublished'
+      )
+      .from('articles')
+      .leftJoin(
+        'invoice_items',
+        'invoice_items.manuscriptId',
+        '=',
+        'articles.id'
+      )
+      .leftJoin('invoices', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .where({ 'articles.customId': customId });
 
-    // return result[0];
-    //   .where('articles.customId', customId);
+    if (result.length === 0) {
+      throw RepoError.createEntityNotFoundError('article', customId);
+    }
 
+    return result;
     // return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 

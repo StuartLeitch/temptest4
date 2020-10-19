@@ -132,12 +132,17 @@ export class PublishRevenueRecognitionToErpUsecase
       // const { customId } = manuscript;
 
       // // * Get all invoices associated with this custom id
-      // const referencedInvoicesByCustomId = this.invoiceRepo.getInvoicesByCustomId(
+      // const referencedInvoicesByCustomId: any[] = await this.invoiceRepo.getInvoicesByCustomId(
       //   customId
       // );
 
       // console.info(invoice);
       // console.info(manuscript);
+      // console.info(referencedInvoicesByCustomId);
+
+      // referencedInvoicesByCustomId.forEach((i) => {
+
+      // })
       // process.exit(1);
 
       if (invoice.isCreditNote() && manuscript.datePublished) {
