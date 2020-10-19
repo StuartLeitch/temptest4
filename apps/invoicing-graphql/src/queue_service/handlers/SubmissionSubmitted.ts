@@ -13,6 +13,7 @@ import {
   CreateManuscriptDTO,
   GetManuscriptByManuscriptIdUsecase,
   SoftDeleteDraftTransactionUsecase,
+  RestoreSoftDeleteDraftTransactionUsecase,
   EditManuscriptUsecase,
   UpdateInvoiceItemsUsecase,
   GetInvoiceIdByManuscriptCustomIdUsecase,
@@ -73,6 +74,13 @@ export const SubmissionSubmittedHandler = {
       manuscriptRepo
     );
     const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
+      transactionRepo,
+      invoiceItemRepo,
+      invoiceRepo,
+      manuscriptRepo
+    );
+
+    const restoreDeletedTransactionsUsecase: RestoreSoftDeleteDraftTransactionUsecase = new RestoreSoftDeleteDraftTransactionUsecase(
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,

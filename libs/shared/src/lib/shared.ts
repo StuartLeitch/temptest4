@@ -40,7 +40,6 @@ export * from './modules/transactions/domain/TransactionId';
 export * from './modules/transactions/repos';
 export * from './modules/transactions/usecases/getTransaction/getTransaction';
 export * from './modules/transactions/usecases/createTransaction/createTransaction';
-export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 
 export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
@@ -51,6 +50,8 @@ export * from './modules/transactions/usecases/setTransactionToActiveByCustomId/
 export * from './modules/transactions/usecases/createTransaction/createTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTOs';
+export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
+export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransactionDTOs.ts';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';

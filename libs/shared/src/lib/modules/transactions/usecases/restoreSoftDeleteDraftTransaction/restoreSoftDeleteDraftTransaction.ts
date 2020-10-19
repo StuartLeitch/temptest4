@@ -118,13 +118,13 @@ export class RestoreSoftDeleteDraftTransactionUsecase
 
       // This is where all the magic happens!
 
-      // * System soft deletes transaction
+      // * System restores transaction
       await this.transactionRepo.restore(transaction);
-      // * System soft deletes invoice
+      // * System restores invoice
       await this.invoiceRepo.restore(invoice);
-      // * System soft deletes invoice item
+      // * System restores invoice item
       await this.invoiceItemRepo.restore(invoiceItem);
-      // * System soft deletes manuscript
+      // * System restores manuscript
       await this.manuscriptRepo.restore(manuscript);
 
       return right(Result.ok<void>());
