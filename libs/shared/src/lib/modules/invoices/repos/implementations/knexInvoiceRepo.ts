@@ -33,27 +33,17 @@ export class KnexInvoiceRepo
     super(db, logger);
   }
 
-  private createBaseQuery(): any {
-    // const models = this.models;
-    const { db } = this;
-    return db(TABLES.INVOICES).select(
-      'invoices.id as invoiceId',
-      'invoices.transactionId as transactionId',
-      'invoices.status as invoiceStatus'
-    );
-  }
-
   private createBaseDetailsQuery(): any {
     const { db } = this;
-    const LIMIT = 15;
+    const LIMIT = 200;
 
     return db(TABLES.INVOICES)
       .select(
         'invoices.id as invoiceId',
         'invoices.transactionId as transactionId',
-        'invoices.status as invoiceStatus',
-        'articles.id AS manuscriptId',
-        'articles.datePublished'
+        'invoices.status as invoiceStatus'
+        // 'articles.id AS manuscriptId',
+        // 'articles.datePublished'
       )
       .leftJoin(TABLES.INVOICE_ITEMS, 'invoice_items.invoiceId', 'invoices.id')
       .limit(LIMIT)
@@ -147,6 +137,41 @@ export class KnexInvoiceRepo
       .where('transactionId', transactionId.id.toString());
 
     return invoices.map((i) => InvoiceMap.toDomain(i));
+  }
+
+  async getInvoicesByCustomId(customId: string): Promise<Invoice[]> {
+    const { db } = this;
+    // const invoices = await db(TABLES.INVOICES)
+    //   .select()
+    //   const result = await this.db
+    //   .select(
+    //     "articles".*,
+    //   	"invoices"."id" AS "invoiceId",
+    //     "invoices"."cancelledInvoiceReference" AS "cancelledInvoiceReference"
+    //   )
+    //   .from('invoices')
+    //   .leftJoin('payers', 'payers.invoiceId', '=', 'invoices.id')
+    //   .leftJoin('addresses', 'payers.billingAddressId', '=', 'addresses.id')
+    //   .leftJoin('payments', 'payments.invoiceId', '=', 'invoices.id')
+    //   .leftJoin(
+    //     'payment_methods',
+    //     'payment_methods.id',
+    //     '=',
+    //     'payments.paymentMethodId'
+    //   )
+    //   .where({ 'invoices.id': invoiceId.id.toString() });
+
+    // if (result.length === 0) {
+    //   throw RepoError.createEntityNotFoundError(
+    //     'invoice',
+    //     invoiceId.id.toString()
+    //   );
+    // }
+
+    // return result[0];
+    //   .where('articles.customId', customId);
+
+    // return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
   async findByCancelledInvoiceReference(
@@ -267,7 +292,7 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNull('invoices.cancelledInvoiceReference')
+        // .whereNull('invoices.cancelledInvoiceReference')
         .whereNull('invoices.nsRevRecReference')
         .whereNotNull('invoices.nsReference')
         .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
@@ -309,13 +334,14 @@ export class KnexInvoiceRepo
     // * SQL for retrieving results needed only for NetSuite registration
     const filterInvoicesReadyForNetSuiteRevenueRecognition = this.filterReadyForNetSuiteRevenueRecognition();
 
-    const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
-      whereNotNull: 'articles.datePublished',
-    });
+    // const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
+    //   whereNotNull: 'articles.datePublished',
+    // });
 
-    const prepareIdsForNetSuiteOnlySQL = filterArticlesByNotNullDatePublished(
-      filterInvoicesReadyForNetSuiteRevenueRecognition(detailsQuery)
-    );
+    const prepareIdsForNetSuiteOnlySQL =
+      /* filterArticlesByNotNullDatePublished(*/
+      filterInvoicesReadyForNetSuiteRevenueRecognition(detailsQuery);
+    /* ); */
 
     logger.debug('select', {
       NetSuiteSQL: prepareIdsForNetSuiteOnlySQL.toString(),
@@ -367,10 +393,10 @@ export class KnexInvoiceRepo
       .where(function () {
         this.whereNot('invoices.deleted', 1)
           .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          .whereNull('invoices.cancelledInvoiceReference')
+          // .whereNull('invoices.cancelledInvoiceReference')
           .whereNull('invoices.erpReference');
       })
-      .orderBy('articles.datePublished', 'desc')
+      .orderBy('invoices.dateIssued', 'desc')
       .limit(LIMIT);
 
     logger.debug('select', {
@@ -486,5 +512,10 @@ export class KnexInvoiceRepo
     for await (const a of stream) {
       yield a;
     }
+  }
+
+  filterByInvoiceId(invoiceId: InvoiceId): unknown {
+    return (query) =>
+      query.where('invoices.id', invoiceId.id.toString()).first();
   }
 }

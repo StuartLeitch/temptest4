@@ -216,9 +216,6 @@ export class NetSuiteService implements ErpServiceContract {
       q: query.toQuery(),
     };
 
-    console.log('queryCustomerRequest');
-    console.info(queryCustomerRequest);
-
     try {
       const res = await axios({
         ...queryCustomerRequestOpts,

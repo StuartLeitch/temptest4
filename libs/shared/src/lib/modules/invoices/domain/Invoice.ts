@@ -438,4 +438,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   //   const reductionValue = netAmount * reduction;
   //   return netAmount - reductionValue;
   // }
+
+  public isCreditNote(): boolean {
+    return !!this.props.cancelledInvoiceReference;
+  }
 }

@@ -501,7 +501,7 @@ export const invoice: Resolvers<Context> = {
 
       return CouponMap.toPersistence(result.value.getValue());
     },
-    async createCreditNote(parent, args, context) {
+    async createCreditNote(parent, args, context): Promise<any> {
       const {
         repos: {
           // payment: paymentRepo,
@@ -511,7 +511,7 @@ export const invoice: Resolvers<Context> = {
           coupon: couponRepo,
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
-          // manuscript: manuscriptRepo
+          manuscript: manuscriptRepo,
         },
         services: { waiverService },
       } = context;
@@ -521,7 +521,7 @@ export const invoice: Resolvers<Context> = {
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
         // paymentRepo,
         invoiceRepo,
-        // manuscriptRepo,
+        manuscriptRepo,
         invoiceItemRepo,
         transactionRepo,
         couponRepo,

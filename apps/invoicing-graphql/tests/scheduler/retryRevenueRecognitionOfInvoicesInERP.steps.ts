@@ -106,6 +106,7 @@ Before(function () {
 
   createCreditNoteUsecase = new CreateCreditNoteUsecase(
     mockInvoiceRepo,
+    null,
     mockInvoiceItemRepo,
     mockTransactionRepo,
     mockCouponRepo,

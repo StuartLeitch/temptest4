@@ -90,7 +90,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
       }
 
       this.loggerService.info(
-        `Retrying recognizing in erp for invoices: ${unrecognizedErpInvoices
+        `Retrying recognizing in NetSuite for invoices: ${unrecognizedErpInvoices
           .map((i) => i.id.toString())
           .join(', ')}`
       );

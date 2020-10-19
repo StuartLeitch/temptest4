@@ -110,14 +110,16 @@ export class PublishRevenueRecognitionToErpUsecase
 
       invoice.addItems(invoiceItems);
 
-      payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      if (!payer) {
-        throw new Error(`Invoice ${invoice.id} has no payers.`);
-      }
+      if (!invoice.isCreditNote()) {
+        payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
+        if (!payer) {
+          throw new Error(`Invoice ${invoice.id} has no payers.`);
+        }
 
-      address = await this.addressRepo.findById(payer.billingAddressId);
-      if (!address) {
-        throw new Error(`Invoice ${invoice.id} has no address associated.`);
+        address = await this.addressRepo.findById(payer.billingAddressId);
+        if (!address) {
+          throw new Error(`Invoice ${invoice.id} has no address associated.`);
+        }
       }
 
       manuscript = await this.manuscriptRepo.findById(
@@ -125,6 +127,21 @@ export class PublishRevenueRecognitionToErpUsecase
       );
       if (!manuscript) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
+      }
+
+      // const { customId } = manuscript;
+
+      // // * Get all invoices associated with this custom id
+      // const referencedInvoicesByCustomId = this.invoiceRepo.getInvoicesByCustomId(
+      //   customId
+      // );
+
+      // console.info(invoice);
+      // console.info(manuscript);
+      // process.exit(1);
+
+      if (invoice.isCreditNote() && manuscript.datePublished) {
+        return right(Result.ok<any>(null));
       }
 
       const catalog = await this.catalogRepo.getCatalogItemByJournalId(
@@ -157,15 +174,12 @@ export class PublishRevenueRecognitionToErpUsecase
         );
       }
 
-      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
-      if (netCharges <= 0) {
-        invoice.erpReference = 'NON_INVOICEABLE';
-        invoice.nsReference = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(invoice);
+      if (!manuscript.datePublished) {
         return right(Result.ok<any>(null));
       }
 
-      if (!manuscript.datePublished) {
+      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      if (netCharges <= 0) {
         invoice.erpReference = 'NON_INVOICEABLE';
         invoice.nsReference = 'NON_INVOICEABLE';
         await this.invoiceRepo.update(invoice);

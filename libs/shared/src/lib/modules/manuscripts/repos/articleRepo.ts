@@ -1,5 +1,6 @@
 import { Repo } from '../../../infrastructure/Repo';
 
+import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { ManuscriptId } from '../../invoices/domain/ManuscriptId';
 import { Article } from '../domain/Article';
 import { ArticleId } from '../domain/ArticleId';
@@ -14,4 +15,5 @@ export interface ArticleRepoContract extends Repo<Article | Manuscript> {
   delete(manuscript: Manuscript): Promise<unknown>;
   update(manuscript: Manuscript): Promise<Manuscript>;
   filterBy(criteria: any): any;
+  findByInvoiceId?(invoiceId: InvoiceId): Promise<Manuscript>;
 }
