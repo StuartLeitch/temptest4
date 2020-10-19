@@ -116,10 +116,11 @@ Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
     journalId: 'journal1',
   });
 
+  const datePublished = new Date();
   const manuscript = ArticleMap.toDomain({
     customId: '8888',
     journalId: catalog.journalId.id.toValue(),
-    datePublished: new Date(),
+    datePublished: datePublished.setDate(datePublished.getDate() - 1),
   });
 
   const invoiceItem = InvoiceItemMap.toDomain({

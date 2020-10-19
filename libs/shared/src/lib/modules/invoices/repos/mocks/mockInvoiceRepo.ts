@@ -38,6 +38,10 @@ export class MockInvoiceRepo
     return [];
   }
 
+  public async getInvoicesByCustomId(): Promise<any[]> {
+    return [];
+  }
+
   public async getInvoiceByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Invoice> {
