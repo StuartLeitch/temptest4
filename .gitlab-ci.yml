@@ -10,21 +10,21 @@ stages:
 
 variables:
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: ''
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
   BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
   LATEST_BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:latest
-  AWS_REGION: "eu-west-1"
-  BT_ENVIRONMENT: "sandbox"
-  BT_MERCHANT_ID: "test-merchant-id"
-  BT_PUBLIC_KEY: "test-public-key"
-  BT_PRIVATE_KEY: "test-private-key"
-  VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
+  AWS_REGION: 'eu-west-1'
+  BT_ENVIRONMENT: 'sandbox'
+  BT_MERCHANT_ID: 'test-merchant-id'
+  BT_PUBLIC_KEY: 'test-public-key'
+  BT_PRIVATE_KEY: 'test-private-key'
+  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   # AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_COMMAND: ""
-  AFFECTED_ARGS: "--base=remotes/origin/develop"
-  AFFECTED_APPS: "shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend"
+  AFFECTED_COMMAND: ''
+  AFFECTED_ARGS: '--base=remotes/origin/develop'
+  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
   interruptible: true
@@ -35,8 +35,8 @@ Install Dependencies:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
   image: docker
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
@@ -110,8 +110,8 @@ Package Images:dev:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
+      entrypoint: ['env', '-u', 'DOCKER_HOST']
+      command: ['dockerd-entrypoint.sh']
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
@@ -133,10 +133,7 @@ Package Images:dev:
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
   script:
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-    - aws eks --region eu-west-1 update-kubeconfig --name $CLUSTER
     - kubectl config set-context --current --namespace=$NAMESPACE
     - cd $HOME
     - ./tools/scripts/deploy-ci.sh
@@ -146,13 +143,13 @@ Package Images:dev:
       - dist-k8s
 
 Deploy:dev:
+  tags:
+    - 'cluster:hindawi-dev'
   stage: deploy
   dependencies:
     - Package Images:dev
   <<: *script_deploy
   variables:
-    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
-    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
     TENANT: hindawi
     NODE_ENV: dev
     NAMESPACE: dev
@@ -161,16 +158,46 @@ Deploy:dev:
     COMMAND: build-manifests
 
 Deploy:qa:
+  tags:
+    - 'cluster:hindawi-dev'
   stage: deploy
   dependencies:
     - Package Images:dev
   <<: *script_deploy
   variables:
-    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
-    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
     TENANT: hindawi
     NODE_ENV: qa
     NAMESPACE: qa
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:hindawi-demo:
+  tags:
+    - 'cluster:hindawi-dev'
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: demo
+    NAMESPACE: demo
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:gsw-demo:
+  tags:
+    - 'cluster:hindawi-dev'
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: demo
+    NAMESPACE: gsw-demo
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
