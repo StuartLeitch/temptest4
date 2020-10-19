@@ -113,4 +113,21 @@ export class KnexArticleRepo
           )
         );
   }
+
+  async restore(manuscript: Manuscript): Promise<unknown> {
+    const { db } = this;
+
+    const restoredRows = await db(TABLES.ARTICLES)
+      .where('id', manuscript.id.toString())
+      .update({ ...ManuscriptMap.toPersistence(manuscript), deleted: 0 });
+
+    return restoredRows
+      ? restoredRows
+      : Promise.reject(
+          RepoError.createEntityNotFoundError(
+            'manuscript',
+            manuscript.id.toString()
+          )
+        );
+  }
 }

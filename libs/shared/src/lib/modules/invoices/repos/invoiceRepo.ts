@@ -18,6 +18,7 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   getInvoicePaymentInfo(invoiceId: InvoiceId): Promise<InvoicePaymentInfo>;
   assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice>;
   delete(invoice: Invoice): Promise<unknown>;
+  restore(invoice: Invoice): Promise<unknown>;
   update(invoice: Invoice): Promise<Invoice>;
   existsWithId(id: InvoiceId): Promise<boolean>;
   getInvoicesIds(
