@@ -4,6 +4,8 @@ import { PublisherCustomValues } from '../../modules/publishers/domain/Publisher
 
 export interface ErpInvoiceRequest {
   invoice: Invoice;
+  originalInvoice?: Invoice;
+  creditNote?: Invoice;
   items: InvoiceItem[];
   payer: Payer;
   manuscript: Manuscript;

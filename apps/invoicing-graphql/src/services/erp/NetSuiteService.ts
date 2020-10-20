@@ -136,9 +136,7 @@ export class NetSuiteService implements ErpServiceContract {
     return creditNoteId;
   }
 
-  public async registerPayment(
-    data: ErpInvoiceRequest
-  ): Promise<ErpInvoiceResponse> {
+  public async registerPayment(data: any): Promise<ErpInvoiceResponse> {
     // console.log('registerPayment Data:');
     // console.info(data);
 
@@ -362,7 +360,7 @@ export class NetSuiteService implements ErpServiceContract {
     customSegmentId: string;
     taxRateId: string;
     itemId: string;
-    customerId: string;
+    customerId?: string;
   }) {
     const {
       connection: { config, oauth, token },
@@ -484,10 +482,10 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
-      trandate: format(
-        new Date(article.datePublished),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
+      // trandate: format(
+      //   new Date(article.datePublished),
+      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      // ),
       line: {
         items: [
           {
@@ -562,7 +560,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async transformCreditNote(data: { originalInvoice: Invoice }) {
+  private async transformCreditNote(data: { originalInvoice?: Invoice }) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -591,8 +589,8 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async patchCreditNote(data: {
-    creditNote: Invoice;
-    creditNoteId: string;
+    creditNote?: Invoice;
+    creditNoteId?: string;
   }) {
     const {
       connection: { config, oauth, token },
