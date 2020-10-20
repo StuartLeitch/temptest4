@@ -20,12 +20,18 @@ interface ErpFixedValues {
   tradeDocumentType: string;
   currencyId: string;
   companyId: string;
+  taxTreatment: string;
+  journalType: string;
+  productDimension: string;
 }
 
 export const defaultErpFixedValues: ErpFixedValues = {
   tradeDocumentType: 'a650Y000000boz4QAA',
   currencyId: 'a5W0Y000000GnlcUAC',
   companyId: 'a5T0Y000000TR3pUAG',
+  taxTreatment: 'a6B0Y000000fyP2UAI',
+  journalType: 'a4n0Y000000HGqQQAW',
+  productDimension: 'a4V0Y0000001chNUAQ',
 };
 
 export class SageService implements ErpServiceContract {
@@ -344,7 +350,7 @@ export class SageService implements ErpServiceContract {
         (ii) => (ii as any).Id
       );
 
-      console.log('Deleting invoice items: ', invoiceItemsToDelete);
+      // console.log('Deleting invoice items: ', invoiceItemsToDelete);
 
       const deleteResponses = await connection
         .sobject('s2cor__Sage_INV_Trade_Document_Item__c')
@@ -412,21 +418,18 @@ export class SageService implements ErpServiceContract {
     }
 
     const {
-      fixedValues: { companyId },
+      fixedValues: { currencyId, companyId, taxTreatment, journalType },
     } = this;
     const { invoice, manuscript, publisherCustomValues } = data;
 
-    const existingTagsByInvoiceNumber = await connection
+    const existingJournalTags = await connection
       .sobject('s2cor__Sage_ACC_Tag__c')
       .select({ Id: true })
       .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
       .execute();
-    // this.logger.info(
-    //   'Existing Tags by Invoice Number: ',
-    //   existingTagsByInvoiceNumber
-    // );
+    // this.logger.info('Existing Tags by Invoice Number: ', existingJournalTags);
 
-    if (existingTagsByInvoiceNumber.length === 0) {
+    if (existingJournalTags.length === 0) {
       return null;
     }
 
@@ -437,10 +440,10 @@ export class SageService implements ErpServiceContract {
       s2cor__Approval_Status__c: 'Unposted',
       s2cor__Date__c: manuscript.datePublished,
       s2cor__Create_Tags__c: false,
-      s2cor__Company__c: 'a5T0Y000000TR3pUAG',
-      s2cor__Default_Tax_Treatment__c: 'a6B0Y000000fyP2UAI',
-      s2cor__Currency__c: 'a5W0Y000000GnlcUAC',
-      s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW',
+      s2cor__Company__c: companyId,
+      s2cor__Default_Tax_Treatment__c: taxTreatment,
+      s2cor__Currency__c: currencyId,
+      s2cor__Journal_Type__c: journalType,
     };
     // this.logger.info('journalData', journalData);
 
@@ -449,22 +452,22 @@ export class SageService implements ErpServiceContract {
       .select({ Id: true })
       .where({ Name: journalData.name })
       .execute();
-    // this.logger.info('Existing Journal: ', existingJournal);
+    this.logger.info('Existing Journal: ', existingJournal);
 
     let journal: any;
     if (existingJournal.length) {
       journal = existingJournal[0];
       journal.id = journal.Id || journal.id;
-      // this.logger.info('Journal object reused', journal);
+      this.logger.info('Journal object reused', journal);
     } else {
       journal = await connection
         .sobject('s2cor__Sage_ACC_Journal__c')
         .create(journalData);
-      // this.logger.info('Journal creation:', journal);
+      this.logger.info('Journal creation:', journal);
       if (!journal.success) {
         throw journal;
       }
-      // this.logger.info('Journal object registered: ', journal);
+      this.logger.info('Journal object registered: ', journal);
     }
 
     return journal;
@@ -493,12 +496,15 @@ export class SageService implements ErpServiceContract {
       invoiceTotal,
       publisherCustomValues,
     } = data;
+    const {
+      fixedValues: { journalType },
+    } = this;
 
     const journalItemData = {
       Name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       s2cor__Journal__c: journal.id,
       s2cor__Reference__c: `${publisherCustomValues.journalItemReference} ${manuscript.customId} ${invoice.referenceNumber}`,
-      s2cor__Journal_Type__c: 'a4n0Y000000HGqQQAW',
+      s2cor__Journal_Type__c: journalType,
       s2cor__Amount__c: invoiceTotal,
       s2cor__Date__c: manuscript.datePublished,
       s2cor__Approval_Status__c: 'Unposted',
@@ -546,7 +552,7 @@ export class SageService implements ErpServiceContract {
     }
 
     const {
-      fixedValues: { companyId },
+      fixedValues: { companyId, productDimension },
     } = this;
     const { invoice, journal, publisherCustomValues } = data;
 
@@ -554,7 +560,7 @@ export class SageService implements ErpServiceContract {
     const dimensions = {
       RevenueRecognitionType: 'a4V0Y0000001chdUAA',
       SalesInvoiceNumber: 'a4V0Y0000001chSUAQ',
-      Product: 'a4V0Y0000001chNUAQ',
+      Product: productDimension,
     };
     // this.logger.info('Dimensions: ', dimensions);
 
@@ -618,10 +624,13 @@ export class SageService implements ErpServiceContract {
     }
 
     const { journalItem, publisherCustomValues } = data;
+    const {
+      fixedValues: { productDimension },
+    } = this;
 
     const journalItemTagData = {
       s2cor__Journal_Item__c: journalItem.id,
-      s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
+      s2cor__Dimension__c: productDimension,
       s2cor__Tag__c: publisherCustomValues.journalItemTag,
     };
     // this.logger.info(`Journal Item Tag Data`, journalItemTagData);
@@ -631,8 +640,7 @@ export class SageService implements ErpServiceContract {
       .select({ Id: true })
       .where({
         s2cor__Journal_Item__c: journalItem.id,
-        s2cor__Dimension__c: 'a4V0Y0000001chNUAQ',
-        // s2cor__Tag__c: publisherCustomValues.journalItemTag,
+        s2cor__Dimension__c: productDimension,
       })
       .execute();
 

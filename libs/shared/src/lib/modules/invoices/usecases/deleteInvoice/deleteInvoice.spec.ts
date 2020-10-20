@@ -1,6 +1,7 @@
 import { Result } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
+import { UsecaseAuthorizationContext } from './../../../../domain/authorization/index';
 import { Roles } from '../../../users/domain/enums/Roles';
 
 import { MockInvoiceRepo } from '../../repos/mocks/mockInvoiceRepo';
@@ -8,9 +9,9 @@ import { TransactionId } from './../../../transactions/domain/TransactionId';
 import {
   Invoice,
   InvoiceCollection,
-  InvoiceStatus
+  InvoiceStatus,
 } from '../../domain/Invoice';
-import { DeleteInvoiceUsecase, DeleteInvoiceContext } from './deleteInvoice';
+import { DeleteInvoiceUsecase } from './deleteInvoice';
 
 let usecase: DeleteInvoiceUsecase;
 let mockInvoiceRepo: MockInvoiceRepo;
@@ -20,7 +21,9 @@ let invoiceCollection: InvoiceCollection;
 
 let invoiceId;
 
-const defaultContext: DeleteInvoiceContext = { roles: [Roles.SUPER_ADMIN] };
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 describe('DeleteInvoiceUsecase', () => {
   beforeEach(() => {
@@ -31,7 +34,7 @@ describe('DeleteInvoiceUsecase', () => {
         transactionId: TransactionId.create(
           new UniqueEntityID('transaction-id-2')
         ),
-        status: InvoiceStatus.DRAFT
+        status: InvoiceStatus.DRAFT,
       },
       new UniqueEntityID(invoiceId)
     ).getValue();

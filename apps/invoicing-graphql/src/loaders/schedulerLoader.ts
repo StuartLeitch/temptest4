@@ -10,6 +10,7 @@ import {
   // clearIntervalAsync
 } from 'set-interval-async/dynamic';
 
+import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
 import { RetryRevenueRecognitionNetsuiteErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryRevenueRecognizedNetsuiteErpInvoices/retryRevenueRecognitionNetsuiteErpInvoices';
 import { RetryRevenueRecognitionSageErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
 import { RetryFailedNetsuiteErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
@@ -39,15 +40,12 @@ export const schedulerLoader: MicroframeworkLoader = async (
         waiver,
         payer,
       },
-      services: {
-        erp: { netsuite: netSuiteService, sage: sageService },
-        logger: loggerService,
-        vatService,
-      },
+      services: { erp, logger: loggerService, vatService },
     } = context;
     const {
       failedErpCronRetryTimeMinutes,
       failedErpCronRetryDisabled,
+      erpRegisterRevenueRecognitionEnabled,
     } = env.app;
 
     const retryFailedSageErpInvoicesUsecase = new RetryFailedSageErpInvoicesUsecase(
@@ -59,7 +57,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       catalog,
-      sageService,
+      erp?.sage || null,
       publisher,
       loggerService,
       vatService
@@ -74,39 +72,43 @@ export const schedulerLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       catalog,
-      netSuiteService,
+      erp?.netsuite || null,
       publisher,
       loggerService,
       vatService
     );
 
-    const retryRevenueRecognizedInvoicesToSageErpUsecase = new RetryRevenueRecognitionSageErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      publisher,
-      sageService,
-      loggerService
-    );
+    const retryRevenueRecognizedInvoicesToSageErpUsecase = erpRegisterRevenueRecognitionEnabled
+      ? new RetryRevenueRecognitionSageErpInvoicesUsecase(
+          invoice,
+          invoiceItem,
+          coupon,
+          waiver,
+          payer,
+          address,
+          manuscript,
+          catalog,
+          publisher,
+          erp?.sage || null,
+          loggerService
+        )
+      : new NoOpUseCase();
 
-    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      publisher,
-      netSuiteService,
-      loggerService
-    );
+    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = erpRegisterRevenueRecognitionEnabled
+      ? new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
+          invoice,
+          invoiceItem,
+          coupon,
+          waiver,
+          payer,
+          address,
+          manuscript,
+          catalog,
+          publisher,
+          erp?.netsuite || null,
+          loggerService
+        )
+      : new NoOpUseCase();
 
     const sageJobQueue = [
       async function retryFailedSageErpInvoicesJob() {
