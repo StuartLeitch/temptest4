@@ -39,6 +39,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
       if (manuscript) {
         if (articleType in ManuscriptTypeNotInvoiceable) {
           await helpers.softDelete(submissionId);
+          return;
         }
 
         if (journalId !== manuscript.journalId) {

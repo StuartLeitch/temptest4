@@ -282,7 +282,7 @@ function createManuscript(context: Context) {
       preprintValue: manuscript.preprintValue,
       authorFirstName: author.givenNames,
       journalId: manuscript.journalId,
-      customId: manuscript.journalId,
+      customId: manuscript.customId,
       authorCountry: author.country,
       authorSurname: author.surname,
       authorEmail: author.email,

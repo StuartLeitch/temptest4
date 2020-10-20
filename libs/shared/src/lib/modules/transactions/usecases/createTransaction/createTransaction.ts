@@ -23,6 +23,7 @@ import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { JournalId } from './../../../journals/domain/JournalId';
+import { Waiver } from '../../../waivers/domain/Waiver';
 
 import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
@@ -32,7 +33,7 @@ import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
 
 import { CreateTransactionResponse as Response } from './createTransactionResponse';
-import { CreateTransactionRequestDTO as DTO } from './createTransactionDTO';
+import type { CreateTransactionRequestDTO as DTO } from './createTransactionDTO';
 import * as Errors from './createTransactionErrors';
 import {
   WithManuscriptId,
@@ -318,15 +319,17 @@ export class CreateTransactionUsecase
 
   private async calculateWaivers<T extends WithManuscript & WithInvoice>(
     data: T
-  ): Promise<Either<Errors.WaiversCalculationError, T>> {
+  ): Promise<Either<Errors.WaiversCalculationError, T & { waiver: Waiver }>> {
     const { manuscript, invoice } = data;
     try {
-      await this.waiverService.applyWaiver({
+      const waiver = await this.waiverService.applyWaiver({
         authorEmail: manuscript.authorEmail,
         country: manuscript.authorCountry,
         invoiceId: invoice.id.toString(),
         journalId: manuscript.journalId,
       });
+
+      return right({ ...data, waiver });
     } catch (err) {
       return left(new Errors.WaiversCalculationError(err));
     }

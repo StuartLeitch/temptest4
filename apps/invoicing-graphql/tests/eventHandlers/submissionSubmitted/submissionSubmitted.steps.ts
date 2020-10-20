@@ -296,13 +296,13 @@ Given(
       name: 'test',
     });
 
-    await context.repos.editor.save(editor);
+    context.repos.editor.addMockItem(editor);
   }
 );
 
 Given('There is a waiver for editors', async () => {
   const waiver = WaiverMap.toDomain({
-    waiverType: 'EDITOR_DISCOUNT',
+    type_id: 'EDITOR_DISCOUNT',
     reduction: 50,
     isActive: true,
   });
@@ -317,7 +317,7 @@ Given(
 );
 
 Then(
-  /^The invoice for CustomId "([\w_.@]+)" has "([\d]+)" waivers applied$/,
+  /^The invoice for CustomId "([\w\d]+)" has "([\d]+)" waivers applied$/,
   async (customId: string, count: string) => {
     const waiversCount = Number.parseInt(count);
 
@@ -390,7 +390,7 @@ Then(
     expect(maybeInvoice.isRight()).to.be.true;
 
     const invoice = maybeInvoice.value.getValue();
-    console.log(invoice.status);
+
     expect(invoice.status).to.be.equal(InvoiceStatus.DRAFT);
   }
 );
