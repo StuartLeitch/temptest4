@@ -20,11 +20,10 @@ export class InvoiceMap extends Mapper<Invoice> {
         dateMovedToFinal: raw.dateMovedToFinal
           ? new Date(raw.dateMovedToFinal)
           : null,
-        erpReference: raw.erpReference,
-        nsReference: raw.nsReference,
-        nsRevRecReference: raw.nsRevRecReference,
-        creditNoteReference: raw.creditNoteReference,
-        revenueRecognitionReference: raw.revenueRecognitionReference,
+        erpReference: raw.erpReference ?? null,
+        nsReference: raw.nsReference ?? null,
+        nsRevRecReference: raw.nsRevRecReference ?? null,
+        revenueRecognitionReference: raw.revenueRecognitionReference ?? null,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
       },
       new UniqueEntityID(raw.id)

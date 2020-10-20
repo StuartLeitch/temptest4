@@ -121,6 +121,7 @@ export async function buildServices(
   loggerBuilder: LoggerBuilder
 ): Promise<Services> {
   const bullData = env.scheduler.db;
+  const { sisifEnabled } = env.loaders;
 
   return {
     logger: loggerBuilder.getLogger(),
@@ -133,7 +134,9 @@ export async function buildServices(
       env.app.tenantName
     ),
     exchangeRateService: new ExchangeRateService(),
-    schedulingService: new BullScheduler(bullData, loggerBuilder.getLogger()),
+    schedulingService: sisifEnabled
+      ? new BullScheduler(bullData, loggerBuilder.getLogger())
+      : null,
     paymentStrategyFactory: buildPaymentStrategyFactory(
       repos.paymentMethod,
       loggerBuilder,

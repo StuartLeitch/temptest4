@@ -16,8 +16,12 @@ const values: WithAwsSecretsServiceProps = {
       APP_NAME: 'Invoicing Admin',
     },
     ingressOptions: {
-      host: 'invoicing-admin.dev.phenom.pub',
-    } as IngressOptionsSpec & { host: string },
+      rules: [
+        {
+          host: 'invoicing-admin.dev.phenom.pub',
+        },
+      ],
+    },
   },
 };
 

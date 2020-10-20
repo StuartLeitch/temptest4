@@ -76,11 +76,6 @@ export class PublishRevenueRecognitionToErpUsecase
     request: PublishRevenueRecognitionToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishRevenueRecognitionToErpResponse> {
-    // TODO Looks very hackish, to be changed later
-    if (process.env.ERP_DISABLED === 'true') {
-      return right(Result.ok<any>(null));
-    }
-
     let invoice: Invoice;
     let payer: Payer;
     let address: Address;
@@ -115,14 +110,16 @@ export class PublishRevenueRecognitionToErpUsecase
 
       invoice.addItems(invoiceItems);
 
-      payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      if (!payer) {
-        throw new Error(`Invoice ${invoice.id} has no payers.`);
-      }
+      if (!invoice.isCreditNote()) {
+        payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
+        if (!payer) {
+          throw new Error(`Invoice ${invoice.id} has no payers.`);
+        }
 
-      address = await this.addressRepo.findById(payer.billingAddressId);
-      if (!address) {
-        throw new Error(`Invoice ${invoice.id} has no address associated.`);
+        address = await this.addressRepo.findById(payer.billingAddressId);
+        if (!address) {
+          throw new Error(`Invoice ${invoice.id} has no address associated.`);
+        }
       }
 
       manuscript = await this.manuscriptRepo.findById(
@@ -132,9 +129,51 @@ export class PublishRevenueRecognitionToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
+      if (!manuscript.datePublished) {
+        return right(Result.ok<any>(null));
+      }
+
+      // * If it's a credit node and the manuscript has been published
+      if (invoice.isCreditNote() && manuscript.datePublished) {
+        return right(Result.ok<any>(null));
+      }
+
+      // console.info(invoice);
+      // console.info(manuscript);
+      // console.info(referencedInvoicesByCustomId);
+
+      const { customId } = manuscript;
+
+      // * Get all invoices associated with this custom id
+      const referencedInvoicesByCustomId: any[] = await this.invoiceRepo.getInvoicesByCustomId(
+        customId
+      );
+
+      // * If the invoice has a credit note
+      // * and the manuscript has been published before its creation
+      const associatedCreditNote = referencedInvoicesByCustomId.find(
+        (item) =>
+          item.cancelledInvoiceReference === invoice.invoiceId.id.toString()
+      );
+
+      if (associatedCreditNote) {
+        const creditNoteCreatedOn = new Date(
+          associatedCreditNote.invoiceDateCreated
+        );
+        const { datePublished: manuscriptPublishedOn } = manuscript;
+
+        if (
+          !invoice.isCreditNote() &&
+          creditNoteCreatedOn.getTime() > manuscriptPublishedOn.getTime()
+        ) {
+          return right(Result.ok<any>(null));
+        }
+      }
+
       const catalog = await this.catalogRepo.getCatalogItemByJournalId(
         JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
       );
+
       if (!catalog) {
         throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
       }
@@ -179,13 +218,22 @@ export class PublishRevenueRecognitionToErpUsecase
       });
 
       this.loggerService.info(
+        'ERP field',
+        this.erpService.invoiceRevenueRecRefFieldName
+      );
+      this.loggerService.info('ERP response', erpResponse);
+
+      this.loggerService.info(
         `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
           erpResponse
         )}`
       );
-      invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
-        erpResponse.journal.id
-      );
+
+      if (erpResponse?.journal?.id) {
+        invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
+          erpResponse?.journal?.id
+        );
+      }
 
       await this.invoiceRepo.update(invoice);
 

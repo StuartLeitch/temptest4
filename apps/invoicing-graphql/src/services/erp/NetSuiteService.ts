@@ -8,6 +8,8 @@ import {
   ErpServiceContract,
   PayerType,
   Payer,
+  Payment,
+  PaymentMethod,
   Manuscript,
   Invoice,
   InvoiceItem,
@@ -62,7 +64,6 @@ export class NetSuiteService implements ErpServiceContract {
       items: data.items,
       journalName: data.journalName,
       manuscript: data.manuscript,
-      rate: data.rate,
       taxRateId: data.taxRateId,
     });
     return {
@@ -276,7 +277,6 @@ export class NetSuiteService implements ErpServiceContract {
     taxRateId: string;
     itemId: string;
     customerId: string;
-    rate: number;
   }) {
     const {
       connection: { config, oauth, token },
@@ -289,7 +289,6 @@ export class NetSuiteService implements ErpServiceContract {
       customerId,
       customSegmentId,
       itemId,
-      rate,
       taxRateId,
     } = data;
 
@@ -318,7 +317,6 @@ export class NetSuiteService implements ErpServiceContract {
             description: `${journalName} - Article Processing Charges for ${manuscript.customId}`,
             quantity: 1.0,
             rate: item.price,
-            taxRate1: rate,
             excludeFromRateRequest: false,
             printItems: false,
             item: {
@@ -353,7 +351,19 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createPayment(data: ErpData) {
+  private async createPayment(data: {
+    invoice: Invoice;
+    items: InvoiceItem[];
+    payments: Payment[];
+    paymentMethods: PaymentMethod[];
+    total: number;
+    manuscript: Manuscript;
+    journalName: string;
+    customSegmentId: string;
+    taxRateId: string;
+    itemId: string;
+    customerId: string;
+  }) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -409,7 +419,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async queryAccount(data: ErpData) {
+  private async queryAccount(data: { payer: Payer }) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -521,7 +531,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async patchInvoice(data: ErpData) {
+  private async patchInvoice(data: { invoice: Invoice; journalId: string }) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -552,14 +562,14 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async transformCreditNote(data: ErpData) {
+  private async transformCreditNote(data: { originalInvoice: Invoice }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditNote } = data;
+    const { originalInvoice } = data;
 
     const creditNoteTransformOpts = {
-      url: `${config.endpoint}record/v1/invoice/${creditNote.nsReference}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
       method: 'POST',
     };
 
@@ -580,7 +590,10 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async patchCreditNote(data: ErpData) {
+  private async patchCreditNote(data: {
+    creditNote: Invoice;
+    creditNoteId: string;
+  }) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -617,7 +630,7 @@ export class NetSuiteService implements ErpServiceContract {
     payer: Payer,
     manuscript: Manuscript
   ): CustomerPayload {
-    const MAX_LENGTH = 24;
+    const MAX_LENGTH = 32;
     const createCustomerPayload: Record<string, string | boolean> = {
       email: payer?.email.toString(),
     };
@@ -627,7 +640,12 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
-      createCustomerPayload.lastName = `${lastNames.join(' ')} ${keep}`;
+
+      createCustomerPayload.lastName =
+        lastNames.length > 0
+          ? `${lastNames.join(' ')} ${keep}`.trim()
+          : `${keep}`.trim();
+
       if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
         createCustomerPayload.lastName =
           createCustomerPayload?.lastName?.slice(0, MAX_LENGTH - keep.length) +
@@ -637,7 +655,7 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } ${keep}`;
+      } ${keep}`.trim();
       if (createCustomerPayload.companyName.length > MAX_LENGTH) {
         createCustomerPayload.companyName =
           createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +

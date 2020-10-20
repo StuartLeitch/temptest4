@@ -4,17 +4,24 @@ import { Given, When, Then, Before } from 'cucumber';
 import { ChangeInvoiceStatus } from '../../../../../../src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
 import { ChangeInvoiceStatusResponse } from './../../../../../../src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatusResponse';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
 let mockInvoiceRepo: MockInvoiceRepo;
+let mockInvoiceItemRepo: MockInvoiceItemRepo;
+let mockArticleRepo: MockArticleRepo;
 let response: ChangeInvoiceStatusResponse;
 
 let useCase: ChangeInvoiceStatus;
 
 Before(function () {
-  mockInvoiceRepo = new MockInvoiceRepo();
+  mockInvoiceItemRepo = new MockInvoiceItemRepo();
+  mockArticleRepo = new MockArticleRepo();
+  mockInvoiceRepo = new MockInvoiceRepo(mockArticleRepo, mockInvoiceItemRepo);
   useCase = new ChangeInvoiceStatus(mockInvoiceRepo);
 });
 

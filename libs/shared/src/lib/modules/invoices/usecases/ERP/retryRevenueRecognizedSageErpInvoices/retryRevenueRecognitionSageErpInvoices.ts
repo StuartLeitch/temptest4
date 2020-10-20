@@ -90,7 +90,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
       }
 
       this.loggerService.info(
-        `Retrying recognizing in erp for invoices: ${unrecognizedErpInvoices
+        `Retrying recognizing in Sage for invoices: ${unrecognizedErpInvoices
           .map((i) => i.id.toString())
           .join(', ')}`
       );

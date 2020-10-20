@@ -13,6 +13,7 @@ export interface ErpInvoiceRequest {
   rate?: number;
   total?: number;
   invoiceTotal?: number;
+  exchangeRate?: number;
   tradeDocumentItemProduct: string;
   customSegmentId?: string;
   taxRateId?: string;
