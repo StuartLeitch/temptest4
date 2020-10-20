@@ -1,31 +1,24 @@
 import {
   WithAwsSecretsServiceProps,
-  ConfigurationMountType,
   IngressOptionsSpec,
 } from '@hindawi/phenom-charts';
 import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['qa/invoicing/invoicing-graphql'],
+  secretNames: ['demo/invoicing/invoicing-admin-legacy'],
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {
       ...defaultValues.serviceProps.envVars,
-      SCHEDULER_DB_HOST: 'sisif-redis-master',
-    },
-    secrets: {
-      ['sisif-redis']: {
-        as: ConfigurationMountType.ENV,
-        items: {
-          'redis-password': 'SCHEDULER_DB_PASSWORD',
-        },
-      },
     },
     ingressOptions: {
       rules: [
         {
-          host: 'invoicing-graphql.qa.phenom.pub',
+          host: 'invoicing-admin.demo.phenom.pub',
+        },
+        {
+          host: 'demo-admin.invoicing.hindawi.com',
         },
       ],
     },

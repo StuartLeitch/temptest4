@@ -6,17 +6,17 @@ import { defaultValues } from "../../default";
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ["qa/invoicing/invoicing-web"],
+  secretNames: ["prod/invoicing/invoicing-web-legacy"],
   serviceProps: {
     ...defaultValues.serviceProps,
-    envVars: {
-      TENANT_NAME: "Hindawi",
-      NODE_ENV: "dev",
-    },
+    envVars: {},
     ingressOptions: {
       rules: [
         {
-          host: "invoicing-web.qa.phenom.pub",
+          host: "invoicing-web.prod.phenom.pub",
+        },
+        {
+          host: "invoicing.hindawi.com",
         },
       ],
     },

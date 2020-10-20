@@ -1,22 +1,24 @@
 import {
   WithAwsSecretsServiceProps,
   IngressOptionsSpec,
-} from "@hindawi/phenom-charts";
-import { defaultValues } from "../../default";
+} from '@hindawi/phenom-charts';
+import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ["qa/invoicing/invoicing-web"],
+  secretNames: ['prod/invoicing/invoicing-admin-legacy'],
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {
-      TENANT_NAME: "Hindawi",
-      NODE_ENV: "dev",
+      ...defaultValues.serviceProps.envVars,
     },
     ingressOptions: {
       rules: [
         {
-          host: "invoicing-web.qa.phenom.pub",
+          host: 'invoicing-admin.prod.phenom.pub',
+        },
+        {
+          host: 'admin.invoicing.hindawi.com',
         },
       ],
     },
