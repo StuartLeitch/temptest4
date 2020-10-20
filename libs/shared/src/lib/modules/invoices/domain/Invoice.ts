@@ -373,7 +373,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceVatTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );
@@ -385,7 +385,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceNetTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );
@@ -438,4 +438,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   //   const reductionValue = netAmount * reduction;
   //   return netAmount - reductionValue;
   // }
+
+  public isCreditNote(): boolean {
+    return !!this.props.cancelledInvoiceReference;
+  }
 }

@@ -6,14 +6,16 @@ import { ArticleId } from '../../domain/ArticleId';
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
 import { Manuscript } from '../../domain/Manuscript';
 
+type PhenomManuscript = Article | Manuscript;
+
 export class MockArticleRepo
-  extends BaseMockRepo<Article>
+  extends BaseMockRepo<PhenomManuscript>
   implements ArticleRepoContract {
   constructor() {
     super();
   }
 
-  public async findById(manuscriptId: ManuscriptId): Promise<Article> {
+  public async findById(manuscriptId: ManuscriptId): Promise<PhenomManuscript> {
     const match = this._items.find((i) => i.manuscriptId.equals(manuscriptId));
 
     return match ? match : null;
@@ -21,7 +23,7 @@ export class MockArticleRepo
 
   public async findByCustomId(
     customId: ManuscriptId | string
-  ): Promise<Article> {
+  ): Promise<PhenomManuscript> {
     if (customId instanceof ManuscriptId) {
       return this.findById(customId);
     }
@@ -34,12 +36,24 @@ export class MockArticleRepo
     return null;
   }
 
-  public async exists(article: Article): Promise<boolean> {
+  public async exists(article: PhenomManuscript): Promise<boolean> {
     const found = this._items.filter((i) => this.compareMockItems(i, article));
     return found.length !== 0;
   }
 
-  public async save(article: Article): Promise<Article> {
+  public filterBy(criteria): PhenomManuscript[] {
+    const [condition, field] = Object.entries(criteria)[0];
+
+    const conditionsMaps = {
+      whereNotNull: (value) => value !== null,
+    };
+
+    return this._items.filter((i) => {
+      return conditionsMaps[condition].call(i, field);
+    });
+  }
+
+  public async save(article: PhenomManuscript): Promise<PhenomManuscript> {
     const alreadyExists = await this.exists(article);
 
     if (alreadyExists) {
@@ -74,7 +88,7 @@ export class MockArticleRepo
     return manuscript;
   }
 
-  public compareMockItems(a: Article, b: Article): boolean {
+  public compareMockItems(a: PhenomManuscript, b: PhenomManuscript): boolean {
     return a.id.equals(b.id);
   }
 }

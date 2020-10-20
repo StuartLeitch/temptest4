@@ -12,15 +12,44 @@ import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 
 import { InvoiceRepoContract } from '../invoiceRepo';
+import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
+import type { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 
 import { applyFilters } from './utils';
 
 export class KnexInvoiceRepo
   extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
+  constructor(
+    protected db: Knex,
+    protected logger?: any,
+    private models?: any,
+    private articleRepo?: ArticleRepoContract,
+    private invoiceItemRepo?: InvoiceItemRepoContract
+  ) {
+    super(db, logger);
+  }
+
+  private createBaseDetailsQuery(): any {
+    const { db } = this;
+    const LIMIT = 200;
+
+    return db(TABLES.INVOICES)
+      .select(
+        'invoices.id as invoiceId',
+        'invoices.transactionId as transactionId',
+        'invoices.status as invoiceStatus'
+        // 'articles.id AS manuscriptId',
+        // 'articles.datePublished'
+      )
+      .leftJoin(TABLES.INVOICE_ITEMS, 'invoice_items.invoiceId', 'invoices.id')
+      .limit(LIMIT)
+      .offset(0);
+  }
+
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const { db, logger } = this;
 
@@ -69,6 +98,12 @@ export class KnexInvoiceRepo
   }
 
   async getRecentInvoices(args?: any): Promise<any> {
+    // const InvoiceModel = this.models.Invoice;
+    // const detailsQuery = this.createBaseDetailsQuery();
+    // detailsQuery.offset = offset ? offset : detailsQuery.offset;
+
+    // const invoices = await InvoicesModel.findAll(detailsQuery);
+
     const { pagination, filters } = args;
     const { db } = this;
 
@@ -102,6 +137,36 @@ export class KnexInvoiceRepo
       .where('transactionId', transactionId.id.toString());
 
     return invoices.map((i) => InvoiceMap.toDomain(i));
+  }
+
+  async getInvoicesByCustomId(customId: string): Promise<Invoice[]> {
+    const { db } = this;
+
+    const result = await db
+      .select(
+        'invoices.id AS invoiceId',
+        'invoices.cancelledInvoiceReference AS cancelledInvoiceReference',
+        'invoices.status AS invoiceStatus',
+        'invoices.dateCreated as invoiceDateCreated',
+        'articles.customId as customId',
+        'articles.datePublished as datePublished'
+      )
+      .from('articles')
+      .leftJoin(
+        'invoice_items',
+        'invoice_items.manuscriptId',
+        '=',
+        'articles.id'
+      )
+      .leftJoin('invoices', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .where({ 'articles.customId': customId });
+
+    if (result.length === 0) {
+      throw RepoError.createEntityNotFoundError('article', customId);
+    }
+
+    return result;
+    // return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
   async findByCancelledInvoiceReference(
@@ -204,85 +269,46 @@ export class KnexInvoiceRepo
     return result[0];
   }
 
-  async getFailedSageErpInvoices(): Promise<Invoice[]> {
-    const LIMIT = 200;
-    const { db, logger } = this;
-
-    const sql = db(TABLES.INVOICES)
-      .select('invoices.*')
-      .from('invoices')
-      .where(function () {
-        this.whereNot('invoices.deleted', 1)
-          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.erpReference');
-      })
-      .orderBy('invoices.dateIssued', 'desc')
-      .limit(LIMIT);
-
-    logger.debug('select', {
-      sql: sql.toString(),
-    });
-
-    const invoices = await sql;
-
-    return invoices.map((i) => InvoiceMap.toDomain(i));
+  private filterReadyForSageRevenueRecognition(): any {
+    return (query) =>
+      query
+        .whereNot('invoices.deleted', 1)
+        .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+        .whereNull('invoices.cancelledInvoiceReference')
+        .whereNull('invoices.revenueRecognitionReference')
+        .whereNotNull('invoices.erpReference')
+        .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
+        .where('invoices.erpReference', '<>', 'MigrationRef')
+        .where('invoices.erpReference', '<>', 'migrationRef');
   }
 
-  async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
-    const LIMIT = 200;
-    const { db, logger } = this;
-
-    const sql = db(TABLES.INVOICES)
-      .select('invoices.*')
-      .from('invoices')
-      .where(function () {
-        this.whereNot('invoices.deleted', 1)
-          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.nsReference');
-      })
-      .orderBy('invoices.dateIssued', 'desc')
-      .limit(LIMIT);
-
-    logger.debug('select', {
-      sql: sql.toString(),
-    });
-
-    const invoices = await sql;
-
-    return invoices.map((i) => InvoiceMap.toDomain(i));
+  private filterReadyForNetSuiteRevenueRecognition(): any {
+    return (query) =>
+      query
+        .whereNot('invoices.deleted', 1)
+        .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+        // .whereNull('invoices.cancelledInvoiceReference')
+        .whereNull('invoices.nsRevRecReference')
+        .whereNotNull('invoices.nsReference')
+        .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
+        .where('invoices.nsReference', '<>', 'MigrationRef')
+        .where('invoices.nsReference', '<>', 'migrationRef');
   }
 
   async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
-    const { db, logger } = this;
-    const LIMIT = 30;
+    const { logger } = this;
+
+    const detailsQuery = this.createBaseDetailsQuery();
 
     // * SQL for retrieving results needed only for Sage registration
-    const prepareIdsForSageOnlySQL = db(TABLES.INVOICES)
-      .select(
-        'invoices.id as invoiceId',
-        'invoices.transactionId as transactionId',
-        'invoices.status as invoiceStatus',
-        'articles.id AS manuscriptId',
-        'articles.datePublished'
-      )
-      .from('invoices')
-      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-      .where(function () {
-        this.whereNotNull('articles.datePublished')
-          .whereNot('invoices.deleted', 1)
-          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.revenueRecognitionReference')
-          .whereNotNull('invoices.erpReference')
-          .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
-          .where('invoices.erpReference', '<>', 'MigrationRef')
-          .where('invoices.erpReference', '<>', 'migrationRef');
-      })
-      .orderBy('articles.datePublished', 'desc')
-      .limit(LIMIT);
+    const filterInvoicesReadyForSageRevenueRecognition = this.filterReadyForSageRevenueRecognition();
+
+    const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
+      whereNotNull: 'articles.datePublished',
+    });
+    const prepareIdsForSageOnlySQL = filterArticlesByNotNullDatePublished(
+      filterInvoicesReadyForSageRevenueRecognition(detailsQuery)
+    );
 
     logger.debug('select', {
       SageSQL: prepareIdsForSageOnlySQL.toString(),
@@ -296,34 +322,21 @@ export class KnexInvoiceRepo
   }
 
   async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
-    const { db, logger } = this;
-    const LIMIT = 30;
+    const { logger } = this;
+
+    const detailsQuery = this.createBaseDetailsQuery();
 
     // * SQL for retrieving results needed only for NetSuite registration
-    const prepareIdsForNetSuiteOnlySQL = db(TABLES.INVOICES)
-      .select(
-        'invoices.id as invoiceId',
-        'invoices.transactionId as transactionId',
-        'invoices.status as invoiceStatus',
-        'articles.id AS manuscriptId',
-        'articles.datePublished'
-      )
-      .from('invoices')
-      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-      .where(function () {
-        this.whereNotNull('articles.datePublished')
-          .whereNot('invoices.deleted', 1)
-          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.nsRevRecReference')
-          .whereNotNull('invoices.nsReference')
-          .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
-          .where('invoices.nsReference', '<>', 'MigrationRef')
-          .where('invoices.nsReference', '<>', 'migrationRef');
-      })
-      .orderBy('articles.datePublished', 'desc')
-      .limit(LIMIT);
+    const filterInvoicesReadyForNetSuiteRevenueRecognition = this.filterReadyForNetSuiteRevenueRecognition();
+
+    // const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
+    //   whereNotNull: 'articles.datePublished',
+    // });
+
+    const prepareIdsForNetSuiteOnlySQL =
+      /* filterArticlesByNotNullDatePublished(*/
+      filterInvoicesReadyForNetSuiteRevenueRecognition(detailsQuery);
+    /* ); */
 
     logger.debug('select', {
       NetSuiteSQL: prepareIdsForNetSuiteOnlySQL.toString(),
@@ -334,6 +347,60 @@ export class KnexInvoiceRepo
     return netSuiteInvoices.map((i) =>
       InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
     );
+  }
+
+  async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
+    const { db, logger } = this;
+    const LIMIT = 30;
+
+    const sql = db(TABLES.INVOICES)
+      .select('invoices.*', 'articles.datePublished')
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
+      .where(function () {
+        this.whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.nsReference');
+      })
+      .orderBy('articles.datePublished', 'desc')
+      .limit(LIMIT);
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
+
+    return invoices.map((i) => InvoiceMap.toDomain(i));
+  }
+
+  async getFailedSageErpInvoices(): Promise<Invoice[]> {
+    const LIMIT = 30;
+    const { db, logger } = this;
+
+    const sql = db(TABLES.INVOICES)
+      .select('invoices.*', 'articles.datePublished')
+      .from('invoices')
+      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
+      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
+      .where(function () {
+        this.whereNot('invoices.deleted', 1)
+          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+          // .whereNull('invoices.cancelledInvoiceReference')
+          .whereNull('invoices.erpReference');
+      })
+      .orderBy('invoices.dateIssued', 'desc')
+      .limit(LIMIT);
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const invoices = await sql;
+
+    return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
   async delete(invoice: Invoice): Promise<void> {
@@ -453,5 +520,10 @@ export class KnexInvoiceRepo
     for await (const a of stream) {
       yield a;
     }
+  }
+
+  filterByInvoiceId(invoiceId: InvoiceId): unknown {
+    return (query) =>
+      query.where('invoices.id', invoiceId.id.toString()).first();
   }
 }

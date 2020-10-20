@@ -130,7 +130,6 @@ export class NetSuiteService implements ErpServiceContract {
     console.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
-    console.info(creditNoteId);
     await this.patchCreditNote({ ...data, creditNoteId });
 
     return creditNoteId;
@@ -361,7 +360,7 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { payment, customerId } = data;
+    const { invoice, total, payment, customerId } = data;
 
     const paymentRequestOpts = {
       url: `${config.endpoint}record/v1/customerpayment`,
@@ -369,7 +368,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const createPaymentPayload: Record<string, any> = {
-      createdDate: format(
+      tranDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
@@ -385,9 +384,11 @@ export class NetSuiteService implements ErpServiceContract {
         id: customerId,
       },
       // Invoice reference number,
+      refName: `Invoice #${invoice.referenceNumber}`,
       // Original amount,
+      total,
       // Amount due,
-      payment: payment.amount,
+      payment: payment.amount.value,
     };
 
     // if (customSegmentId !== '4') {
@@ -568,13 +569,13 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditNote } = data;
+    const { originalInvoice } = data;
 
     // console.log('transformCreditNote data:');
     // console.info(creditNote);
 
     const creditNoteTransformOpts = {
-      url: `${config.endpoint}record/v1/invoice/${creditNote.nsReference}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
       method: 'POST',
     };
 
@@ -671,7 +672,7 @@ export class NetSuiteService implements ErpServiceContract {
     payer: Payer,
     manuscript: Manuscript
   ): CustomerPayload {
-    const MAX_LENGTH = 24;
+    const MAX_LENGTH = 32;
     const createCustomerPayload: Record<string, string | boolean> = {
       email: payer?.email.toString(),
     };
@@ -681,7 +682,12 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = true;
       const [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
-      createCustomerPayload.lastName = `${lastNames.join(' ')} ${keep}`;
+
+      createCustomerPayload.lastName =
+        lastNames.length > 0
+          ? `${lastNames.join(' ')} ${keep}`.trim()
+          : `${keep}`.trim();
+
       if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
         createCustomerPayload.lastName =
           createCustomerPayload?.lastName?.slice(0, MAX_LENGTH - keep.length) +
@@ -691,7 +697,7 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } ${keep}`;
+      } ${keep}`.trim();
       if (createCustomerPayload.companyName.length > MAX_LENGTH) {
         createCustomerPayload.companyName =
           createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
