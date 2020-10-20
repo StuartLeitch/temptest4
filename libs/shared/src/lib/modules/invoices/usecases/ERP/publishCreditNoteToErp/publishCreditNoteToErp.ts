@@ -158,12 +158,11 @@ export class PublishCreditNoteToErpUsecase
           erpData
         );
         this.loggerService.info(
-          `Updating credit note ${creditNote.id.toString()}: netSuiteReference -> ${JSON.stringify(
+          `Updating credit note ${creditNote.id.toString()}: creditNoteReference -> ${JSON.stringify(
             netSuiteResponse
           )}`
         );
-        creditNote.nsReference = String(netSuiteResponse); // netSuiteResponse;
-        creditNote.erpReference = String(netSuiteResponse); // .tradeDocumentId;
+        creditNote.creditNoteReference = String(netSuiteResponse);
 
         // this.loggerService.info('PublishCreditNoteToERP full credit note', creditNote);
         await this.invoiceRepo.update(creditNote);

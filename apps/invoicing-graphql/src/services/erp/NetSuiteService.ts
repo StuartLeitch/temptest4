@@ -126,8 +126,8 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerCreditNote(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    console.log('registerCreditNote Data:');
-    console.info(data);
+    // console.log('registerCreditNote Data:');
+    // console.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
     await this.patchCreditNote({ ...data, creditNoteId });
@@ -138,8 +138,8 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerPayment(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    console.log('registerPayment Data:');
-    console.info(data);
+    // console.log('registerPayment Data:');
+    // console.info(data);
 
     const customerAlreadyExists = await this.queryCustomer(
       this.getCustomerPayload(data.payer, data.manuscript)
