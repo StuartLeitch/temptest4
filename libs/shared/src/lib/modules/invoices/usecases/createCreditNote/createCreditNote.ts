@@ -143,6 +143,8 @@ export class CreateCreditNoteUsecase
         getYear(invoice.dateIssued) < getYear(invoice.dateAccepted)
       ) {
         clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateIssued));
+      } else {
+        clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateAccepted));
       }
       clonedRawInvoice.erpReference = null;
       clonedRawInvoice.cancelledInvoiceReference = null;
