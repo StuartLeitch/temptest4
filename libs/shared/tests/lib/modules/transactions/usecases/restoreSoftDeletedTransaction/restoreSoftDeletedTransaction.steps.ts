@@ -51,23 +51,23 @@ let invoice: Invoice;
 let invoiceItem: InvoiceItem;
 let manuscript: Manuscript;
 
-Given(/^A journal "([\w-]+)" with a manuscript "([\w-]+)"$/, async function (
-  journalTestId: string,
-  manuscriptTestId: string
-) {
-  journalId = journalTestId;
-  manuscriptId = manuscriptTestId;
+Given(
+  /^The journal named "([\w-]+)" with the manuscript named "([\w-]+)"$/,
+  async function (journalTestId: string, manuscriptTestId: string) {
+    journalId = journalTestId;
+    manuscriptId = manuscriptTestId;
 
-  manuscript = ArticleMap.toDomain({
-    id: manuscriptId,
-    journalId: journalId,
-  });
+    manuscript = ArticleMap.toDomain({
+      id: manuscriptId,
+      journalId: journalId,
+    });
 
-  mockArticleRepo.save(manuscript);
-});
+    mockArticleRepo.save(manuscript);
+  }
+);
 
 Given(
-  /^A Invoice with a DRAFT Transaction and a Invoice Item tied to the manuscript "([\w-]+)"$/,
+  /^A Invoice in a DRAFT Transaction and a Invoice Item is linked to the manuscript "([\w-]+)"$/,
   async function (manuscriptTestId: string) {
     transaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT,
@@ -93,7 +93,7 @@ Given(
 );
 
 When(
-  /^RestoreSoftDeleteDraftTransactionUsecase is executed for manuscript "([\w-]+)"$/,
+  /^RestoreSoftDeleteDraftTransactionUsecase is executed for the manuscript "([\w-]+)"$/,
   async (manuscriptTestId: string) => {
     result = await usecase.execute(
       {
@@ -105,7 +105,7 @@ When(
 );
 
 Then(
-  'The DRAFT Transaction associated with the manuscript should be restored',
+  'The DRAFT Transaction tied with the manuscript should be restored',
   async () => {
     expect(result.value.isSuccess).to.equal(true);
 
@@ -115,7 +115,7 @@ Then(
 );
 
 Then(
-  'The DRAFT Invoice associated with the manuscript should be restored',
+  'The DRAFT Invoice tied with the manuscript should be restored',
   async () => {
     const invoices = await mockInvoiceRepo.getInvoiceCollection();
     expect(invoices.length).to.equal(1);
@@ -123,7 +123,7 @@ Then(
 );
 
 Then(
-  'The Invoice Item associated with the manuscript should be restored',
+  'The Invoice Item tied with the manuscript should be restored',
   async () => {
     const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
     expect(invoiceItems.length).to.equal(1);
