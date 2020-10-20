@@ -227,14 +227,15 @@ function createTransaction(context: Context) {
   ): Promise<Transaction> => {
     const {
       repos: { pausedReminder, invoiceItem, transaction, invoice, catalog },
-      services: { logger },
+      services: { waiverService, logger },
     } = context;
     const createTransactionUsecase = new CreateTransactionUsecase(
-      transaction,
-      invoice,
+      pausedReminder,
       invoiceItem,
+      transaction,
       catalog,
-      pausedReminder
+      invoice,
+      waiverService
     );
 
     const maybeTransaction = await createTransactionUsecase.execute(

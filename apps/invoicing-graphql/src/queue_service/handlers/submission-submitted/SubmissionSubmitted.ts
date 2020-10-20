@@ -17,7 +17,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
   handler(context: Context) {
     return async (data: SubmissionSubmitted): Promise<void> => {
       const {
-        services: { waiverService, logger },
+        services: { logger },
       } = context;
       const helpers = SubmissionSubmittedHelpers(context);
 

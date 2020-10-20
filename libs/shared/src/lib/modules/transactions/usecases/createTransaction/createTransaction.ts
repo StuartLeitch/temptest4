@@ -1,66 +1,51 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { CreateTransactionResponse } from './createTransactionResponse';
-import { CreateTransactionErrors } from './createTransactionErrors';
+import { UseCase } from '../../../../core/domain/UseCase';
 
-import { Transaction, TransactionStatus } from '../../domain/Transaction';
-import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
-import { NotificationPause } from '../../../notifications/domain/NotificationPause';
-import { Invoice, InvoiceStatus } from './../../../invoices/domain/Invoice';
-import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-
-import { JournalId } from './../../../journals/domain/JournalId';
-import { CatalogItem } from './../../../journals/domain/CatalogItem';
-import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
-
-// * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import { WaiverService } from '../../../../domain/services/WaiverService';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-export interface CreateTransactionRequestDTO {
-  manuscriptId?: string;
-  journalId?: string;
-  title?: string;
-  articleType?: string;
-  created?: string;
-  authorEmail?: string;
-  authorCountry?: string;
-  authorSurname?: string;
-}
+import { NotificationPause } from '../../../notifications/domain/NotificationPause';
+import { InvoiceStatus, Invoice } from './../../../invoices/domain/Invoice';
+import { TransactionStatus, Transaction } from '../../domain/Transaction';
+import { CatalogItem } from './../../../journals/domain/CatalogItem';
+import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
+import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
+import { JournalId } from './../../../journals/domain/JournalId';
+
+import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
+import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
+
+import { CreateTransactionResponse as Response } from './createTransactionResponse';
+import { CreateTransactionRequestDTO as DTO } from './createTransactionDTO';
+import * as Errors from './createTransactionErrors';
+
+type Context = UsecaseAuthorizationContext;
 
 export class CreateTransactionUsecase
   implements
-    UseCase<
-      CreateTransactionRequestDTO,
-      Promise<CreateTransactionResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      CreateTransactionRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
-    private transactionRepo: TransactionRepoContract,
-    private invoiceRepo: InvoiceRepoContract,
+    private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private transactionRepo: TransactionRepoContract,
     private catalogRepo: CatalogRepoContract,
-    private pausedReminderRepo: PausedReminderRepoContract
+    private invoiceRepo: InvoiceRepoContract,
+    private waiverService: WaiverService
   ) {}
 
   private async getAccessControlContext(request, context?) {
@@ -68,16 +53,8 @@ export class CreateTransactionUsecase
   }
 
   @Authorize('transaction:create')
-  public async execute(
-    request: CreateTransactionRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<CreateTransactionResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let catalogItem: CatalogItem;
-
-    //     console.log(`
-    // [CreateTransactionUsecase Request Data]:
-    // ${JSON.stringify(request)}
-    //     `);
 
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
@@ -94,7 +71,7 @@ export class CreateTransactionUsecase
       // * System creates DRAFT transaction
       const transactionOrError = Transaction.create(transactionProps);
       if (transactionOrError.isFailure) {
-        return left(new CreateTransactionErrors.TransactionCreatedError());
+        return left(new Errors.TransactionCreatedError());
       }
 
       const transaction = transactionOrError.getValue();
@@ -107,7 +84,7 @@ export class CreateTransactionUsecase
 
       const invoiceOrError = Invoice.create(invoiceProps);
       if (invoiceOrError.isFailure) {
-        return left(new CreateTransactionErrors.InvoiceCreatedError());
+        return left(new Errors.InvoiceCreatedError());
       }
       const invoice = invoiceOrError.getValue();
 
@@ -120,7 +97,7 @@ export class CreateTransactionUsecase
 
       const invoiceItemOrError = InvoiceItem.create(invoiceItemProps);
       if (invoiceItemOrError.isFailure) {
-        return left(new CreateTransactionErrors.InvoiceItemCreatedError());
+        return left(new Errors.InvoiceItemCreatedError());
       }
       const invoiceItem = invoiceItemOrError.getValue();
 
@@ -131,9 +108,7 @@ export class CreateTransactionUsecase
         );
       } catch (err) {
         return left(
-          new CreateTransactionErrors.CatalogItemNotFoundError(
-            journalId.id.toString()
-          )
+          new Errors.CatalogItemNotFoundError(journalId.id.toString())
         );
       }
 
@@ -155,11 +130,6 @@ export class CreateTransactionUsecase
         await this.transactionRepo.save(transaction);
         await this.pausedReminderRepo.save(reminderPause);
 
-        //         console.log(`
-        // [CreateTransactionUsecase Result Data]:
-        // ${JSON.stringify(TransactionMap.toPersistence(transaction))}
-        //       `);
-
         //Event dispatch
         invoice.generateInvoiceDraftEvent();
         DomainEvents.dispatchEventsForAggregate(invoice.id);
@@ -167,9 +137,7 @@ export class CreateTransactionUsecase
         return right(Result.ok<Transaction>(transaction));
       } else {
         return left(
-          new CreateTransactionErrors.CatalogItemNotFoundError(
-            journalId.id.toString()
-          )
+          new Errors.CatalogItemNotFoundError(journalId.id.toString())
         );
       }
     } catch (err) {

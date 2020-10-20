@@ -23,6 +23,9 @@ import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repo
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
+import { MockEditorRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
+import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
@@ -33,6 +36,9 @@ const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
 const mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
 const mockCatalogRepo: MockCatalogRepo = new MockCatalogRepo();
 const mockPausedReminderRepo = new MockPausedReminderRepo();
+const mockWaiverRepo = new MockWaiverRepo();
+const mockEditorRepo = new MockEditorRepo();
+const waiverService = new WaiverService(mockWaiverRepo, mockEditorRepo);
 let result: CreateTransactionResponse;
 
 let journalId;
@@ -42,11 +48,12 @@ let transactionId: TransactionId;
 let invoiceId: InvoiceId;
 
 const usecase: CreateTransactionUsecase = new CreateTransactionUsecase(
-  mockTransactionRepo,
-  mockInvoiceRepo,
+  mockPausedReminderRepo,
   mockInvoiceItemRepo,
+  mockTransactionRepo,
   mockCatalogRepo,
-  mockPausedReminderRepo
+  mockInvoiceRepo,
+  waiverService
 );
 
 Given(
