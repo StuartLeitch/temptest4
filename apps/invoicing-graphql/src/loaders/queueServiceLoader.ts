@@ -5,7 +5,6 @@ import {
 
 import { Context } from '../builders';
 
-import { PhenomSqsServiceContract } from '../queue_service/phenom-queue-service';
 import * as eventHandlers from '../queue_service/handlers';
 import { Logger } from '../lib/logger';
 
@@ -20,8 +19,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
   if (settings && env.aws.enabled) {
     const context: Context = settings.getData('context');
 
-    const queue = (context?.services
-      ?.qq as unknown) as PhenomSqsServiceContract;
+    const queue = context?.services?.qq;
 
     if (queue) {
       Object.keys(eventHandlers).forEach((eventHandler: string) => {

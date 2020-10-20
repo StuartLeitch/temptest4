@@ -23,6 +23,8 @@ import {
   VATService,
 } from '@hindawi/shared';
 
+import { PhenomSqsServiceContract } from '../queue_service/phenom-queue-service';
+
 import {
   BraintreeService,
   NetSuiteService,
@@ -43,7 +45,7 @@ export interface Services {
   exchangeRateService: ExchangeRateService;
   schedulingService: BullScheduler;
   paymentStrategyFactory: PaymentStrategyFactory;
-  qq: SQSPublishServiceContract;
+  qq: PhenomSqsServiceContract;
   erp: {
     sage: SageService;
     netsuite: NetSuiteService;
