@@ -4,7 +4,6 @@ import { createQueueService } from '@hindawi/queue-service';
 import { BullScheduler } from '@hindawi/sisif';
 import {
   PaymentMethodRepoContract,
-  SQSPublishServiceContract,
   PaymentStrategyFactory,
   BraintreeClientToken,
   ExchangeRateService,
@@ -108,7 +107,7 @@ async function setupQueueService(loggerBuilder: LoggerBuilder) {
     defaultMessageAttributes: env.app.defaultMessageAttributes,
   };
 
-  let queue: any;
+  let queue: PhenomSqsServiceContract;
   try {
     queue = await createQueueService(config);
   } catch (err) {
