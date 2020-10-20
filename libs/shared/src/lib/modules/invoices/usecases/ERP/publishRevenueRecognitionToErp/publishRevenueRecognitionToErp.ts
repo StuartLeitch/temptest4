@@ -229,7 +229,7 @@ export class PublishRevenueRecognitionToErpUsecase
         )}`
       );
 
-      if (erpResponse) {
+      if (erpResponse?.journal?.id) {
         invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
           erpResponse?.journal?.id
         );
