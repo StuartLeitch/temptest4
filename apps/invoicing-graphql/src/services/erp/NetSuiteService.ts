@@ -672,7 +672,7 @@ export class NetSuiteService implements ErpServiceContract {
     payer: Payer,
     manuscript: Manuscript
   ): CustomerPayload {
-    const MAX_LENGTH = 24;
+    const MAX_LENGTH = 32;
     const createCustomerPayload: Record<string, string | boolean> = {
       email: payer?.email.toString(),
     };
@@ -685,7 +685,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       createCustomerPayload.lastName =
         lastNames.length > 0
-          ? `${lastNames.join(' ')} ${keep}`
+          ? `${lastNames.join(' ')} ${keep}`.trim()
           : `${keep}`.trim();
 
       if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
@@ -697,7 +697,7 @@ export class NetSuiteService implements ErpServiceContract {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
         payer?.organization.toString() || payer?.name.toString()
-      } ${keep}`;
+      } ${keep}`.trim();
       if (createCustomerPayload.companyName.length > MAX_LENGTH) {
         createCustomerPayload.companyName =
           createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
