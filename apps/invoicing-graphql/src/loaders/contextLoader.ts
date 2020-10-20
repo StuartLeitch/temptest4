@@ -8,7 +8,7 @@ import { LoggerBuilder } from '@hindawi/shared';
 
 import { buildServices, buildRepos, Context } from '../builders';
 
-export const contextLoader: MicroframeworkLoader = (
+export const contextLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
@@ -16,7 +16,7 @@ export const contextLoader: MicroframeworkLoader = (
     const loggerBuilder = new LoggerBuilder();
 
     const repos = buildRepos(db, loggerBuilder);
-    const services = buildServices(repos, loggerBuilder);
+    const services = await buildServices(repos, loggerBuilder);
 
     const context: Context = {
       services,

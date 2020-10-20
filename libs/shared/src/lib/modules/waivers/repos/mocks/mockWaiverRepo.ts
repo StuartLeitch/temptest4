@@ -7,7 +7,8 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
 // import {TransactionId} from '../../../transactions/domain/TransactionId';
 
-export class MockWaiverRepo extends BaseMockRepo<Waiver>
+export class MockWaiverRepo
+  extends BaseMockRepo<Waiver>
   implements WaiverRepoContract {
   private invoiceItemToWaiverMapper: {
     [key: string]: UniqueEntityID[];
@@ -52,7 +53,7 @@ export class MockWaiverRepo extends BaseMockRepo<Waiver>
   public addMockWaiverForInvoiceItem(
     newWaiver: Waiver,
     invoiceItemId: InvoiceItemId
-  ) {
+  ): void {
     const invoiceIdValue = invoiceItemId.id.toString();
     if (!this.invoiceItemToWaiverMapper[invoiceIdValue]) {
       this.invoiceItemToWaiverMapper[invoiceIdValue] = [];
@@ -65,7 +66,7 @@ export class MockWaiverRepo extends BaseMockRepo<Waiver>
   public addMockInvoiceItemToInvoice(
     invoiceId: InvoiceId,
     invoiceItemId: InvoiceItemId
-  ) {
+  ): void {
     const invoiceIdValue = invoiceId.id.toString();
     const invoiceItemIdValue = invoiceItemId.id.toString();
     if (!this.invoiceToInvoiceItemMapper[invoiceIdValue]) {
@@ -128,7 +129,7 @@ export class MockWaiverRepo extends BaseMockRepo<Waiver>
     return waiver;
   }
 
-  public async removeInvoiceWaivers(invoiceId: InvoiceId) {
+  public async removeInvoiceWaivers(invoiceId: InvoiceId): Promise<void> {
     const invoiceItemIds = this.invoiceToInvoiceItemMapper[
       invoiceId.id.toString()
     ];
