@@ -19,7 +19,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
       const {
         services: { logger },
       } = context;
-      const helpers = SubmissionSubmittedHelpers(context);
+      const helpers = new SubmissionSubmittedHelpers(context);
 
       logger.setScope(`PhenomEvent:${SUBMISSION_SUBMITTED}`);
       logger.info(`Incoming Event Data`, data);
@@ -51,15 +51,15 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
           return;
         }
 
+        const newManuscript = await helpers.createManuscript(data);
+
+        logger.info('Manuscript Data', newManuscript);
+
         const newTransaction = await helpers.createTransaction(
           submissionId,
           journalId
         );
         logger.info(`Transaction Data`, newTransaction);
-
-        const newManuscript = await helpers.createManuscript(data);
-
-        logger.info('Manuscript Data', newManuscript);
       }
     };
   },

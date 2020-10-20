@@ -4,7 +4,6 @@ import {
   GetInvoiceIdByManuscriptCustomIdUsecase,
   GetManuscriptByManuscriptIdUsecase,
   SoftDeleteDraftTransactionUsecase,
-  ManuscriptTypeNotInvoiceable,
   UsecaseAuthorizationContext,
   GetItemsForInvoiceUsecase,
   UpdateInvoiceItemsUsecase,
@@ -226,13 +225,21 @@ function createTransaction(context: Context) {
     journalId: string
   ): Promise<Transaction> => {
     const {
-      repos: { pausedReminder, invoiceItem, transaction, invoice, catalog },
+      repos: {
+        pausedReminder,
+        invoiceItem,
+        transaction,
+        manuscript,
+        invoice,
+        catalog,
+      },
       services: { waiverService, logger },
     } = context;
     const createTransactionUsecase = new CreateTransactionUsecase(
       pausedReminder,
       invoiceItem,
       transaction,
+      manuscript,
       catalog,
       invoice,
       waiverService
@@ -247,11 +254,11 @@ function createTransaction(context: Context) {
     );
 
     if (maybeTransaction.isLeft()) {
-      logger.error(maybeTransaction.value.errorValue().message);
-      throw maybeTransaction.value.error;
+      logger.error(maybeTransaction.value.message);
+      throw maybeTransaction.value;
     }
 
-    return maybeTransaction.value.getValue();
+    return maybeTransaction.value;
   };
 }
 
@@ -297,14 +304,14 @@ function createManuscript(context: Context) {
   };
 }
 
-export const SubmissionSubmittedHelpers = (context: Context) => {
-  return {
-    getExistingManuscript: getExistingManuscript(context),
-    updateInvoicePrice: updateInvoicePrice(context),
-    createTransaction: createTransaction(context),
-    createManuscript: createManuscript(context),
-    updateManuscript: updateManuscript(context),
-    getInvoiceItems: getInvoiceItems(context),
-    softDelete: softDelete(context),
-  };
-};
+export class SubmissionSubmittedHelpers {
+  constructor(private context: Context) {}
+
+  getExistingManuscript = getExistingManuscript(this.context);
+  updateInvoicePrice = updateInvoicePrice(this.context);
+  createTransaction = createTransaction(this.context);
+  createManuscript = createManuscript(this.context);
+  updateManuscript = updateManuscript(this.context);
+  getInvoiceItems = getInvoiceItems(this.context);
+  softDelete = softDelete(this.context);
+}

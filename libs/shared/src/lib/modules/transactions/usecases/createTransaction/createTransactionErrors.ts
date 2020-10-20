@@ -1,34 +1,83 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
-export class TransactionCreatedError extends Result<UseCaseError> {
+export class ManuscriptIdRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Can't create a new Transaction.`,
-    } as UseCaseError);
+    super(`ManuscriptId is required.`);
   }
 }
 
-export class InvoiceCreatedError extends Result<UseCaseError> {
+export class JournalIdRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Can't create a new Invoice.`,
-    } as UseCaseError);
+    super(`JournalId is required.`);
   }
 }
 
-export class InvoiceItemCreatedError extends Result<UseCaseError> {
-  constructor() {
-    super(false, {
-      message: `Can't create a new Invoice Item.`,
-    } as UseCaseError);
+export class TransactionCreatedError extends UseCaseError {
+  constructor(err: Error) {
+    super(`Can't create a new Transaction: ${err.message} \n ${err.stack}`);
   }
 }
 
-export class CatalogItemNotFoundError extends Result<UseCaseError> {
+export class InvoiceCreatedError extends UseCaseError {
+  constructor(err: Error) {
+    super(`Can't create a new Invoice: ${err.message} \n ${err.stack}`);
+  }
+}
+
+export class InvoiceItemCreatedError extends UseCaseError {
+  constructor(err: Error) {
+    super(`Can't create a new Invoice Item: ${err.message} \n ${err.stack}`);
+  }
+}
+
+export class CatalogItemNotFoundError extends UseCaseError {
   constructor(journalId: string) {
-    super(false, {
-      message: `Couldn't find a Catalog Item for Journal id = {${journalId}}.`,
-    } as UseCaseError);
+    super(`Couldn't find a Catalog Item for Journal id = {${journalId}}.`);
+  }
+}
+
+export class SaveInvoiceError extends UseCaseError {
+  constructor(err: Error) {
+    super(
+      `While saving the invoice an error ocurred: ${err.message}, with stack ${err.stack}`
+    );
+  }
+}
+
+export class SaveInvoiceItemError extends UseCaseError {
+  constructor(err: Error) {
+    super(
+      `While saving the invoice item an error ocurred: ${err.message}, with stack ${err.stack}`
+    );
+  }
+}
+
+export class SaveTransactionError extends UseCaseError {
+  constructor(err: Error) {
+    super(
+      `While saving the transaction an error ocurred: ${err.message}, with stack ${err.stack}`
+    );
+  }
+}
+
+export class SaveRemindersStateError extends UseCaseError {
+  constructor(err: Error) {
+    super(
+      `While saving the reminders state an error ocurred: ${err.message}, with stack ${err.stack}`
+    );
+  }
+}
+
+export class ManuscriptNotFoundError extends UseCaseError {
+  constructor(manuscriptId: string) {
+    super(`Could not find a manuscript with id {${manuscriptId}}`);
+  }
+}
+
+export class WaiversCalculationError extends UseCaseError {
+  constructor(err: Error) {
+    super(
+      `While calculating the waiver to apply for invoice an error occured: ${err.message}, with stack ${err.stack}`
+    );
   }
 }

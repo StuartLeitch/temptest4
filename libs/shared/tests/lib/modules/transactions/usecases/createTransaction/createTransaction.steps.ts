@@ -26,6 +26,7 @@ import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifi
 import { MockEditorRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
 import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
@@ -38,6 +39,7 @@ const mockCatalogRepo: MockCatalogRepo = new MockCatalogRepo();
 const mockPausedReminderRepo = new MockPausedReminderRepo();
 const mockWaiverRepo = new MockWaiverRepo();
 const mockEditorRepo = new MockEditorRepo();
+const mockManuscriptRepo = new MockArticleRepo();
 const waiverService = new WaiverService(mockWaiverRepo, mockEditorRepo);
 let result: CreateTransactionResponse;
 
@@ -51,6 +53,7 @@ const usecase: CreateTransactionUsecase = new CreateTransactionUsecase(
   mockPausedReminderRepo,
   mockInvoiceItemRepo,
   mockTransactionRepo,
+  mockManuscriptRepo,
   mockCatalogRepo,
   mockInvoiceRepo,
   waiverService
@@ -86,7 +89,7 @@ When(
 );
 
 Then('A DRAFT Transaction should be created', async () => {
-  expect(result.value.isSuccess).to.equal(true);
+  expect(result.isRight).to.equal(true);
 
   const lastSavedTransactions = await mockTransactionRepo.getTransactionCollection();
 
