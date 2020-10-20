@@ -196,7 +196,7 @@ Deploy:gsw-demo:
   variables:
     TENANT: gsw
     NODE_ENV: demo
-    NAMESPACE: gsw-demo
+    NAMESPACE: demo-gsw
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
