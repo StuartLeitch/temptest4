@@ -20,11 +20,12 @@ export class InvoiceMap extends Mapper<Invoice> {
         dateMovedToFinal: raw.dateMovedToFinal
           ? new Date(raw.dateMovedToFinal)
           : null,
-        erpReference: raw.erpReference,
-        nsReference: raw.nsReference,
-        nsRevRecReference: raw.nsRevRecReference,
-        revenueRecognitionReference: raw.revenueRecognitionReference,
+        erpReference: raw.erpReference ?? null,
+        nsReference: raw.nsReference ?? null,
+        nsRevRecReference: raw.nsRevRecReference ?? null,
+        revenueRecognitionReference: raw.revenueRecognitionReference ?? null,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
+        creditNoteReference: raw.creditNoteReference ?? null,
       },
       new UniqueEntityID(raw.id)
     );
@@ -55,6 +56,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       nsRevRecReference: invoice.nsRevRecReference ?? null,
       revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
+      creditNoteReference: invoice.creditNoteReference ?? null,
     };
   }
 }

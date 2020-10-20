@@ -270,7 +270,9 @@ export const invoice: Resolvers<Context> = {
           if (exchangeRate?.exchangeRate) {
             rate = exchangeRate?.exchangeRate;
           }
-        } catch (error) {}
+        } catch (error) {
+          // do nothing yet
+        }
       }
 
       const invoiceId = InvoiceId.create(
@@ -360,6 +362,7 @@ export const invoice: Resolvers<Context> = {
         charge: creditNoteDetails.charge,
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
         erpReference: creditNoteDetails.erpReference,
+        creditNoteReference: creditNoteDetails.creditNoteReference,
         revenueRecognitionReference:
           creditNoteDetails.revenueRecognitionReference,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
@@ -501,7 +504,7 @@ export const invoice: Resolvers<Context> = {
 
       return CouponMap.toPersistence(result.value.getValue());
     },
-    async createCreditNote(parent, args, context) {
+    async createCreditNote(parent, args, context): Promise<any> {
       const {
         repos: {
           // payment: paymentRepo,
@@ -511,7 +514,7 @@ export const invoice: Resolvers<Context> = {
           coupon: couponRepo,
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
-          // manuscript: manuscriptRepo
+          manuscript: manuscriptRepo,
         },
         services: { waiverService },
       } = context;

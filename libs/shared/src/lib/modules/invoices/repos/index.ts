@@ -6,9 +6,15 @@ import type { InvoiceItemRepoContract } from './invoiceItemRepo';
 import { KnexInvoiceRepo } from './implementations/knexInvoiceRepo';
 import { KnexInvoiceItemRepo } from './implementations/knexInvoiceItemRepo';
 
+// * Invoice Mock Repos
+import { MockInvoiceRepo } from './mocks/mockInvoiceRepo';
+import { MockInvoiceItemRepo } from './mocks/mockInvoiceItemRepo';
+
 export {
   InvoiceRepoContract,
   InvoiceItemRepoContract,
   KnexInvoiceRepo,
   KnexInvoiceItemRepo,
+  MockInvoiceItemRepo,
+  MockInvoiceRepo,
 };

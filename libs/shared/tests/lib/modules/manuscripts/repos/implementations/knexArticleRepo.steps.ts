@@ -3,13 +3,14 @@ import { Given, When, Then, Before } from 'cucumber';
 
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { Article } from '../../../../../../src/lib/modules/manuscripts/domain/Article';
+import { Manuscript } from '../../../../../../src/lib/modules/manuscripts/domain/Manuscript';
 import { ArticleId } from '../../../../../../src/lib/modules/manuscripts/domain/ArticleId';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
 import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEntityID';
 
 let mockArticleRepo: MockArticleRepo;
 let article: Article;
-let foundArticle: Article;
+let foundArticle: Article | Manuscript;
 let ArticleExists: boolean;
 let saveArticle;
 

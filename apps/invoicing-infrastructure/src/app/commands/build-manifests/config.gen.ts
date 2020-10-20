@@ -12,12 +12,30 @@ import { values as qaInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart
 import { values as qaInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/qa';
 import { values as qaInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/qa';
 
+import { values as demoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/demo';
+import { values as demoInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/demo';
+import { values as demoInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/demo';
+
+import { values as gswDemoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/gsw/demo';
+import { values as gswDemoInvoicingWebValues } from 'apps/invoicing-web/chart/gsw/demo';
+import { values as gswDemoInvoicingAdminValues } from 'apps/invoicing-admin/chart/gsw/demo';
+
+import { values as gswProdInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/gsw/prod';
+import { values as gswProdInvoicingWebValues } from 'apps/invoicing-web/chart/gsw/prod';
+import { values as gswProdInvoicingAdminValues } from 'apps/invoicing-admin/chart/gsw/prod';
+import { values as gswProdReportingValues } from 'apps/reporting-backend/chart/gsw/prod';
+
 const masterConfig: {
   [tenant: string]: {
     [env: string]: { [app: string]: WithAwsSecretsServiceProps };
   };
 } = {
   [Tenant.hindawi]: {
+    demo: {
+      [App.graphql]: demoInvoicingGraphqlValues,
+      [App.admin]: demoInvoicingAdminValues,
+      [App.web]: demoInvoicingWebValues,
+    },
     qa: {
       [App.graphql]: qaInvoicingGraphqlValues,
       [App.admin]: qaInvoicingAdminValues,
@@ -28,6 +46,19 @@ const masterConfig: {
       [App.graphql]: devInvoicingGraphqlValues,
       [App.web]: devInvoicingWebValues,
       [App.reporting]: devReportingBackendValues,
+    },
+  },
+  [Tenant.gsw]: {
+    prod: {
+      [App.graphql]: gswProdInvoicingGraphqlValues,
+      [App.admin]: gswProdInvoicingAdminValues,
+      [App.web]: gswProdInvoicingWebValues,
+      [App.reporting]: gswProdReportingValues,
+    },
+    demo: {
+      [App.graphql]: gswDemoInvoicingGraphqlValues,
+      [App.admin]: gswDemoInvoicingAdminValues,
+      [App.web]: gswDemoInvoicingWebValues,
     },
   },
 };
