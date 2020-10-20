@@ -57,7 +57,6 @@ export class InvoiceMap extends Mapper<Invoice> {
       creditNoteReference: invoice.creditNoteReference ?? null,
       revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
-      creditNoteReference: invoice.creditNoteReference ?? null,
     };
   }
 }

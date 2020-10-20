@@ -212,14 +212,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     }
   }
 
-  get creditNoteReference(): string {
-    return this.props.creditNoteReference;
-  }
-
-  set creditNoteReference(creditNoteReference: string) {
-    this.props.creditNoteReference = creditNoteReference;
-  }
-
   get invoiceTotal(): number {
     return this.getInvoiceTotal();
   }
