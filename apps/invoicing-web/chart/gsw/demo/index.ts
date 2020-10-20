@@ -13,7 +13,7 @@ const values: WithAwsSecretsServiceProps = {
     ingressOptions: {
       rules: [
         {
-          host: "invoicing-web.gsw-demo.phenom.pub",
+          host: "invoicing-web.demo-gsw.phenom.pub",
         },
         {
           host: "demo.invoicing.gsw.hindawi.com",
