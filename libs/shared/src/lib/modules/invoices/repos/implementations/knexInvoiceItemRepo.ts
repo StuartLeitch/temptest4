@@ -101,7 +101,7 @@ export class KnexInvoiceItemRepo
   async restore(invoiceItem: InvoiceItem): Promise<void> {
     const { db } = this;
 
-    const restoredRows = await db(TABLES.TRANSACTIONS)
+    const restoredRows = await db(TABLES.INVOICE_ITEMS)
       .where('id', invoiceItem.id.toString())
       .update({ ...InvoiceItemMap.toPersistence(invoiceItem), deleted: 0 });
 

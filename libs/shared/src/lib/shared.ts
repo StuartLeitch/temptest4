@@ -53,7 +53,7 @@ export * from './modules/transactions/usecases/createTransaction/createTransacti
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTOs';
 export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
-export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransactionDTOs.ts';
+export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction.dto';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
