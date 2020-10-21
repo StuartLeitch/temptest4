@@ -76,8 +76,8 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerRevenueRecognition(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
-    console.log('registerRevenueRecognition Data:');
-    console.info(data);
+    // console.log('registerRevenueRecognition Data:');
+    // console.info(data);
 
     const {
       publisherCustomValues: { customSegmentId },
@@ -137,15 +137,17 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   public async registerPayment(data: any): Promise<ErpInvoiceResponse> {
-    // console.log('registerPayment Data:');
-    // console.info(data);
+    console.log('registerPayment Data:');
+    console.info(data);
+
+    const { payer, manuscript } = data;
 
     const customerAlreadyExists = await this.queryCustomer(
-      this.getCustomerPayload(data.payer, data.manuscript)
+      this.getCustomerPayload(payer, manuscript)
     );
     if (!customerAlreadyExists) {
       console.error(
-        `Customer does not exists for article: ${data.manuscript.customId}.`
+        `Customer does not exists for article: ${manuscript.customId}.`
       );
     }
     const paymentId = await this.createPayment({
@@ -478,14 +480,14 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Revenue Recognition - ${invoice.referenceNumber}`,
-      memo: `${invoice.referenceNumber}`,
-      entity: {
-        id: customerId,
-      },
       // trandate: format(
       //   new Date(article.datePublished),
       //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       // ),
+      memo: `${invoice.referenceNumber}`,
+      entity: {
+        id: customerId,
+      },
       line: {
         items: [
           {

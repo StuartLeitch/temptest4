@@ -102,11 +102,11 @@ export class PublishPaymentToErpUsecase
       // // this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
 
       if (invoiceItems.length === 0) {
-      const getItemsUsecase = new GetItemsForInvoiceUsecase(
-        this.invoiceItemRepo,
-        this.couponRepo,
-        this.waiverRepo
-      );
+        const getItemsUsecase = new GetItemsForInvoiceUsecase(
+          this.invoiceItemRepo,
+          this.couponRepo,
+          this.waiverRepo
+        );
 
         const resp = await getItemsUsecase.execute({
           invoiceId: request.invoiceId,
@@ -249,7 +249,7 @@ export class PublishPaymentToErpUsecase
           payments,
           total: request.total,
           items: invoiceItems,
-          article: manuscript as any,
+          manuscript: manuscript as any,
           // billingAddress: address,
           // journalName: catalog.journalTitle,
           // vatNote,
