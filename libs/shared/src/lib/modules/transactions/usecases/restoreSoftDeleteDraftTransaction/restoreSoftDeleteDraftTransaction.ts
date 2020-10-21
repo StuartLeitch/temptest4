@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { Either, Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Invoice } from '../../../invoices/domain/Invoice';
@@ -75,6 +75,10 @@ export class RestoreSoftDeleteDraftTransactionUsecase
     let transaction: Transaction;
     let manuscript: Manuscript;
 
+    const maybeValidRequest = this.verifyData(request);
+    if (maybeValidRequest.isLeft()) {
+      return maybeValidRequest;
+    }
     // * build the ManuscriptId
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
@@ -161,30 +165,39 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       try {
         await this.transactionRepo.restore(transaction);
       } catch (err) {
-        throw new Errors.TransactionRestoreError(err);
+        return left(new Errors.TransactionRestoreError(err));
       }
       // * System restores invoice
       try {
         await this.invoiceRepo.restore(invoice);
       } catch (err) {
-        throw new Errors.InvoiceRestoreError(err);
+        return left(new Errors.InvoiceRestoreError(err));
       }
       // * System restores invoice item
       try {
         await this.invoiceItemRepo.restore(invoiceItem);
       } catch (err) {
-        throw new Errors.InvoiceItemRestoreError(err);
+        return left(new Errors.InvoiceItemRestoreError(err));
       }
       // * System restores manuscript
       try {
         await this.manuscriptRepo.restore(manuscript);
       } catch (err) {
-        throw new Errors.ManuscriptRestoreError(err);
+        return left(new Errors.ManuscriptRestoreError(err));
       }
 
       return right(Result.ok<void>());
     } catch (err) {
       return left(new UnexpectedError(err));
     }
+  }
+
+  private verifyData(
+    request: DTO
+  ): Either<Errors.ManuscriptRequiredError, void> {
+    if (!request.manuscriptId) {
+      return left(new Errors.ManuscriptRequiredError());
+    }
+    return right(null);
   }
 }

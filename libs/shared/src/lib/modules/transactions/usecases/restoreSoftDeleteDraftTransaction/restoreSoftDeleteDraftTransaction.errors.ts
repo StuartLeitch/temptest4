@@ -71,3 +71,11 @@ export class ManuscriptRestoreError extends Result<UseCaseError> {
     });
   }
 }
+
+export class ManuscriptRequiredError extends Result<UseCaseError> {
+  constructor() {
+    super(false, {
+      message: 'Manuscript required',
+    });
+  }
+}

@@ -20,6 +20,12 @@ import {
 import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
 import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
+import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
+import { CouponRepoContract } from '../../../../../../src/lib/modules/coupons/repos/couponRepo';
+
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { WaiverRepoContract } from '../../../../../../src/lib/modules/waivers/repos/waiverRepo';
+
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscripts/repos/articleRepo';
@@ -34,12 +40,16 @@ const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
 const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
 const mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
 const mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
+const mockCouponRepo: CouponRepoContract = new MockCouponRepo();
+const mockWaiverRepo: WaiverRepoContract = new MockWaiverRepo();
 
 const usecase: RestoreSoftDeleteDraftTransactionUsecase = new RestoreSoftDeleteDraftTransactionUsecase(
   mockTransactionRepo,
   mockInvoiceItemRepo,
   mockInvoiceRepo,
-  mockArticleRepo
+  mockArticleRepo,
+  mockCouponRepo,
+  mockWaiverRepo
 );
 
 let manuscriptId;

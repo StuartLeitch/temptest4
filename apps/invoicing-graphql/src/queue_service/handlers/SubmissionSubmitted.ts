@@ -84,7 +84,9 @@ export const SubmissionSubmittedHandler = {
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
-      manuscriptRepo
+      manuscriptRepo,
+      couponRepo,
+      waiverRepo
     );
     const getInvoiceIdByManuscriptCustomIdUsecase: GetInvoiceIdByManuscriptCustomIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
       manuscriptRepo,
