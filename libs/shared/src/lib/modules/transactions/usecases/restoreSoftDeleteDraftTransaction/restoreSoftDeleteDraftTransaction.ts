@@ -35,9 +35,9 @@ import type { RestoreSoftDeleteDraftTransactionRequestDTO as DTO } from './resto
 import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
 import { RestoreSoftDeleteDraftTransactionResponse as Response } from './restoreSoftDeleteDraftTransaction.response';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails';
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
 import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { GetManuscriptByManuscriptIdUsecase } from '../../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
+import { GetManuscriptByManuscriptIdUsecase } from '../../../manuscripts/usecases/getManuscriptByManuscriptId';
 import { GetTransactionDetailsByManuscriptCustomIdUsecase } from '../../usecases/getTransactionDetailsByManuscriptCustomId';
 
 const defaultContext: UsecaseAuthorizationContext = {
