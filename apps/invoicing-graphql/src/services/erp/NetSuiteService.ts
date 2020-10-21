@@ -136,9 +136,21 @@ export class NetSuiteService implements ErpServiceContract {
     return creditNoteId;
   }
 
-  public async registerPayment(data: any): Promise<ErpInvoiceResponse> {
-    console.log('registerPayment Data:');
-    console.info(data);
+  public async registerPayment(data: {
+    manuscript: Manuscript;
+    payer: Payer;
+    invoice: Invoice;
+    items: InvoiceItem[];
+    payments: Payment[];
+    paymentMethods: PaymentMethod[];
+    total: number;
+    journalName: string;
+    customSegmentId: string;
+    taxRateId: string;
+    itemId: string;
+  }): Promise<ErpInvoiceResponse> {
+    // console.log('registerPayment Data:');
+    // console.info(data);
 
     const { payer, manuscript } = data;
 
