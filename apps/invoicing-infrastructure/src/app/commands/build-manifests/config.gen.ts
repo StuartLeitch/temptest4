@@ -25,12 +25,23 @@ import { values as gswProdInvoicingWebValues } from 'apps/invoicing-web/chart/gs
 import { values as gswProdInvoicingAdminValues } from 'apps/invoicing-admin/chart/gsw/prod';
 import { values as gswProdReportingValues } from 'apps/reporting-backend/chart/gsw/prod';
 
+import { values as hindawiProdInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/prod';
+import { values as hindawiProdInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/prod';
+import { values as hindawiProdInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/prod';
+import { values as hindawiProdReportingValues } from 'apps/reporting-backend/chart/hindawi/prod';
+
 const masterConfig: {
   [tenant: string]: {
     [env: string]: { [app: string]: WithAwsSecretsServiceProps };
   };
 } = {
   [Tenant.hindawi]: {
+    prod: {
+      [App.graphql]: hindawiProdInvoicingGraphqlValues,
+      [App.admin]: hindawiProdInvoicingAdminValues,
+      [App.web]: hindawiProdInvoicingWebValues,
+      [App.reporting]: hindawiProdReportingValues,
+    },
     demo: {
       [App.graphql]: demoInvoicingGraphqlValues,
       [App.admin]: demoInvoicingAdminValues,
