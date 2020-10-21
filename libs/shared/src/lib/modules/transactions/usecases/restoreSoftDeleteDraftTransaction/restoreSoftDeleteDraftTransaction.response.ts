@@ -14,5 +14,5 @@ export type RestoreSoftDeleteDraftTransactionResponse = Either<
   | Errors.TransactionRestoreError
   | Errors.ManuscriptRequiredError
   | UnexpectedError,
-  void
+  Result<void>
 >;

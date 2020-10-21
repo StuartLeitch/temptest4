@@ -194,7 +194,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
 
   private verifyData(
     request: DTO
-  ): Either<Errors.ManuscriptRequiredError, void> {
+  ): Either<Errors.ManuscriptRequiredError, Result<void>> {
     if (!request.manuscriptId) {
       return left(new Errors.ManuscriptRequiredError());
     }
