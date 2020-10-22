@@ -16,6 +16,7 @@ import * as add_acceptance_rates_table from './migrations/20200610141941_add_acc
 import * as create_syndication_events_table from './migrations/20200629123541_add_syndication_events_table';
 import * as add_deleted_manuscripts_table from './migrations/20200703082115_add_deleted_manuscripts_table';
 import * as add_preprint_value_to_submission_data from './migrations/20200831162115_add_preprint_value_to_submission_data';
+import * as move_article_events from './migrations/20201012162115_move_article_events';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -192,6 +193,7 @@ class KnexMigrationSource {
     rebuild_materialized_views('20200914662115_qc_events_rename', true),
     rebuild_materialized_views('20200915122115_add_deleted_invoices', true),
     rebuild_materialized_views('20200916122115_fix_invoices_issue_type'),
+    move_article_events,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
