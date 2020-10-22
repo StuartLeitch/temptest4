@@ -105,20 +105,8 @@ export class RestoreSoftDeleteDraftTransactionUsecase
     const getManuscript = new GetManuscriptByManuscriptIdUsecase(
       this.manuscriptRepo
     );
-    const customId = manuscript.customId;
 
     try {
-      // * System obtains invoiceId by manuscript custom Id
-      const maybeInvoiceId = await getInvoiceId.execute(
-        { customId },
-        defaultContext
-      );
-      if (!maybeInvoiceId || maybeInvoiceId.isLeft()) {
-        throw new Errors.InvoiceIdNotFoundError(customId);
-      }
-
-      const invoiceId = maybeInvoiceId.value.getValue().toString();
-
       // * System identifies article by manuscript Id
       const maybeManuscript = await getManuscript.execute(
         { manuscriptId },
@@ -130,6 +118,17 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       }
       const manuscript = maybeManuscript.value.getValue();
 
+      // * System obtains invoiceId by manuscript custom Id
+      const customId = manuscript.customId;
+      const maybeInvoiceId = await getInvoiceId.execute(
+        { customId },
+        defaultContext
+      );
+      if (!maybeInvoiceId || maybeInvoiceId.isLeft()) {
+        throw new Errors.InvoiceIdNotFoundError(customId);
+      }
+
+      const invoiceId = maybeInvoiceId.value.getValue().toString();
       // * System identifies invoice by invoice Id
       const maybeInvoice = await getInvoice.execute(
         { invoiceId },
