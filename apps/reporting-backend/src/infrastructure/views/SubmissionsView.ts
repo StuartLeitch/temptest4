@@ -124,7 +124,7 @@ FROM (
       LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckingEscalated' group by submission_id) qc_escalated_dates on qc_unpaused_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, min(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event in ('SubmissionQualityCheckPassed', 'SubmissionPeerReviewCycleCheckPassed') group by submission_id) accepted_dates on accepted_dates.submission_id = s.submission_id
       WHERE s.manuscript_custom_id is not null
-      AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%'
+      AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%' and s.submission_event != 'SubmissionPeerReviewCycleCheckPassed'
     ) sd
 ) t
 WHERE t.rn = 1

@@ -20,6 +20,15 @@ const values: WithAwsSecretsServiceProps = {
         },
       ],
     },
+    resources: {
+      limits: {
+        memory: '1000Mi',
+      },
+      requests: {
+        memory: '1000Mi',
+        cpu: '1',
+      },
+    },
   },
 };
 

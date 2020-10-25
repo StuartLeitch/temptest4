@@ -77,9 +77,9 @@ Build:
     - git fetch
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-        AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel"
+        AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel --maxParallel=2"
       else
-       AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production"
+       AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production --maxParallel=2"
       fi
     - eval $AFFECTED_COMMAND
     # artifacts can't be uploaded outside $CI_PROJECT_DIR
@@ -202,20 +202,21 @@ Deploy:gsw-demo:
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
 
-# Deploy:gsw-prod:
-#   tags:
-#     - 'cluster:hindawi-prod'
-#   stage: deploy-prod
-#   dependencies:
-#     - Package Images:dev
-#   <<: *script_deploy
-#   variables:
-#     TENANT: gsw
-#     NODE_ENV: prod
-#     NAMESPACE: gsw-prod
-#     CLUSTER: hindawi-prod
-#     AWS_REGISTRY: $DEV_AWS_REGISTRY
-#     COMMAND: build-manifests
+Deploy:gsw-prod:
+  tags:
+    - 'cluster:hindawi-prod'
+  stage: deploy-prod
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: prod
+    NAMESPACE: gsw-prod
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
 Deploy:hindawi-prod:
   tags:
     - 'cluster:hindawi-prod'
