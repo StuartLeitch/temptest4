@@ -50,6 +50,28 @@ export class KnexInvoiceRepo
       .offset(0);
   }
 
+  private createBaseArticleDetailsQuery(): any {
+    const { db } = this;
+
+    return db(TABLES.ARTICLES)
+      .select(
+        'articles.id AS manuscriptId',
+        'articles.datePublished',
+        'invoices.id as invoiceId',
+        'invoices.transactionId as transactionId',
+        'invoices.status as invoiceStatus',
+        'invoices.invoiceNumber AS invoiceNumber',
+        'invoices.revenueRecognitionReference',
+        'invoices.nsReference',
+        'invoices.nsRevRecReference'
+      )
+      .leftJoin(
+        TABLES.INVOICE_ITEMS,
+        'invoice_items.manuscriptId',
+        'articles.id'
+      );
+  }
+
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const { db, logger } = this;
 
@@ -287,7 +309,6 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        // .whereNull('invoices.cancelledInvoiceReference')
         .whereNull('invoices.nsRevRecReference')
         .whereNotNull('invoices.nsReference')
         .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
@@ -298,7 +319,7 @@ export class KnexInvoiceRepo
   async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
     const { logger } = this;
 
-    const detailsQuery = this.createBaseDetailsQuery();
+    const detailsQuery = this.createBaseArticleDetailsQuery();
 
     // * SQL for retrieving results needed only for Sage registration
     const filterInvoicesReadyForSageRevenueRecognition = this.filterReadyForSageRevenueRecognition();
@@ -324,19 +345,18 @@ export class KnexInvoiceRepo
   async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
     const { logger } = this;
 
-    const detailsQuery = this.createBaseDetailsQuery();
+    const detailsQuery = this.createBaseArticleDetailsQuery();
 
     // * SQL for retrieving results needed only for NetSuite registration
     const filterInvoicesReadyForNetSuiteRevenueRecognition = this.filterReadyForNetSuiteRevenueRecognition();
 
-    // const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
-    //   whereNotNull: 'articles.datePublished',
-    // });
+    const filterArticlesByNotNullDatePublished = this.filterBy({
+      whereNotNull: 'articles.datePublished',
+    });
 
-    const prepareIdsForNetSuiteOnlySQL =
-      /* filterArticlesByNotNullDatePublished(*/
-      filterInvoicesReadyForNetSuiteRevenueRecognition(detailsQuery);
-    /* ); */
+    const prepareIdsForNetSuiteOnlySQL = filterArticlesByNotNullDatePublished(
+      filterInvoicesReadyForNetSuiteRevenueRecognition(detailsQuery)
+    );
 
     logger.debug('select', {
       NetSuiteSQL: prepareIdsForNetSuiteOnlySQL.toString(),
@@ -512,5 +532,16 @@ export class KnexInvoiceRepo
   filterByInvoiceId(invoiceId: InvoiceId): unknown {
     return (query) =>
       query.where('invoices.id', invoiceId.id.toString()).first();
+  }
+
+  filterBy(criteria): any {
+    const [condition, field] = Object.entries(criteria)[0];
+    return (query) => {
+      const join = query
+        .leftJoin(TABLES.INVOICES, 'invoices.id', 'invoice_items.invoiceId')
+        .orderBy(field, 'desc');
+
+      return join[condition](field);
+    };
   }
 }
