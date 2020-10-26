@@ -69,6 +69,9 @@ AS SELECT
     CASE WHEN inv.net_amount = 0 THEN 'free'
          ELSE 'paid'
     END as "apc",
+    CASE WHEN first_invoice_event.net_amount = 0 THEN 'waived'
+         ELSE 'priced'
+    END as "submission_pricing_status",
     CONCAT(a.given_names, ' ', a.surname) as "corresponding_author_name",
     a.country as "corresponding_author_country",
     a.email as "corresponding_author_email",
@@ -116,6 +119,15 @@ AS SELECT
       where deleted_invoices.invoice_id = inv.invoice_id
         and event = 'InvoiceDraftDeleted'
       limit 1) deleted_invoices on deleted_invoices.invoice_id = inv.invoice_id
+  LEFT JOIN LATERAL (
+    SELECT * FROM ${invoiceDataView.getViewName()} id 
+    where id.invoice_id = inv.invoice_id 
+        AND id.event IN ('InvoiceDraftCreated', 'InvoiceCreated')
+    ORDER BY 
+      CASE WHEN event = 'InvoiceDraftCreated' THEN 1 ELSE 2 END ASC,
+      event_timestamp DESC nulls LAST
+    LIMIT 1
+  ) first_invoice_event on first_invoice_event.invoice_id = inv.invoice_id
 WITH DATA;
     `;
   }

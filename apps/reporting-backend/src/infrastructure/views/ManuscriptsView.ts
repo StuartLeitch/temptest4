@@ -1,21 +1,21 @@
+import { DELETED_MANUSCRIPTS_TABLE } from 'libs/shared/src/lib/modules/reporting/constants';
+
+import acceptanceRatesView from './AcceptanceRatesView';
+import articleData from './ArticleDataView';
+import authorsView from './AuthorsView';
+import checkerToSubmissionView from './CheckerToSubmissionView';
 import {
   AbstractEventView,
   EventViewContract,
 } from './contracts/EventViewContract';
-
-import authorsView from './AuthorsView';
 import invoicesView from './InvoicesView';
 import journalSectionsView from './JournalSectionsView';
 import journalSpecialIssuesView from './JournalSpecialIssuesView';
 import manuscriptEditorsView from './ManuscriptEditorsView';
-import submissionDataView from './SubmissionDataView';
-import submissionView from './SubmissionsView';
-import checkerToSubmissionView from './CheckerToSubmissionView';
 import manuscriptReviewers from './ManuscriptReviewersView';
 import manuscriptReviewsView from './ManuscriptReviewsView';
-import acceptanceRatesView from './AcceptanceRatesView';
-import articleData from './ArticleDataView';
-import { DELETED_MANUSCRIPTS_TABLE } from 'libs/shared/src/lib/modules/reporting/constants';
+import submissionDataView from './SubmissionDataView';
+import submissionView from './SubmissionsView';
 
 class ManuscriptsView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -33,6 +33,11 @@ AS SELECT
     when s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') then 'free'
     else 'paid'
   end as apc,
+  case 
+    when i.submission_pricing_status is not null then i.submission_pricing_status
+    when s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') then 'non-priced'
+    else 'priced'
+  end as submission_pricing_status,
   article_data.published_date,
   coalesce(i.gross_apc_value, s.journal_apc::float) as gross_apc,
   i.discount,
