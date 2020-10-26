@@ -2,6 +2,8 @@ import {
   AbstractEventView,
   EventViewContract,
 } from './contracts/EventViewContract';
+import journalSectionsView from './JournalSectionsView';
+import journalSpecialIssuesView from './JournalSpecialIssuesView';
 import journalsView from './JournalsView';
 import submissionDataView from './SubmissionDataView';
 
@@ -43,7 +45,9 @@ AS SELECT
   t.accepted_date,
   t.first_decision_date,
   t.special_issue_id,
+  t.special_issue_name,
   t.section_id,
+  t.section_name,
   t.preprint_value,
   t.title,
   t.journal_id,
@@ -94,6 +98,8 @@ FROM (
       s.last_version_index,
       s.special_issue_id,
       s.section_id,
+      sec.section_name,
+      spec.special_issue_name,
       case 
         WHEN s.preprint_value = 'null' then null
         ELSE s.preprint_value
@@ -123,6 +129,8 @@ FROM (
       LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckingUnpaused' group by submission_id) qc_unpaused_dates on qc_unpaused_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckingEscalated' group by submission_id) qc_escalated_dates on qc_unpaused_dates.submission_id = s.submission_id
       LEFT JOIN (SELECT submission_id, min(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event in ('SubmissionQualityCheckPassed', 'SubmissionPeerReviewCycleCheckPassed') group by submission_id) accepted_dates on accepted_dates.submission_id = s.submission_id
+      LEFT JOIN LATERAL (SELECT * FROM ${journalSectionsView.getViewName()} js where js.section_id = s.section_id limit 1) sec on sec.section_id = s.section_id
+      LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%' and s.submission_event != 'SubmissionPeerReviewCycleCheckPassed'
     ) sd
@@ -150,5 +158,7 @@ WITH DATA;
 
 const submissionView = new SubmissionView();
 submissionView.addDependency(journalsView);
+submissionView.addDependency(journalSectionsView);
+submissionView.addDependency(journalSpecialIssuesView);
 
 export default submissionView;

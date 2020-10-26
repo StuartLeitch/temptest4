@@ -199,7 +199,8 @@ class KnexMigrationSource {
       '20201026122115_add_more_first_dates_manuscripts',
       true
     ),
-    rebuild_materialized_views('20201026132115_add_submission_apc'),
+    rebuild_materialized_views('20201026132115_add_submission_apc', true),
+    rebuild_materialized_views('20201026142115_add_journal_info_editors_view'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
