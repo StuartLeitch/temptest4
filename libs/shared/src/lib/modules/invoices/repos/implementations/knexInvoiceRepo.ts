@@ -305,6 +305,7 @@ export class KnexInvoiceRepo
   }
 
   private filterReadyForNetSuiteRevenueRecognition(): any {
+    const { db } = this;
     return (query) =>
       query
         .whereNot('invoices.deleted', 1)
@@ -313,7 +314,14 @@ export class KnexInvoiceRepo
         .whereNotNull('invoices.nsReference')
         .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
         .where('invoices.nsReference', '<>', 'MigrationRef')
-        .where('invoices.nsReference', '<>', 'migrationRef');
+        .where('invoices.nsReference', '<>', 'migrationRef')
+        .whereNotNull('invoices.cancelledInvoiceReference')
+        .whereNotIn(
+          'invoices.id',
+          db.raw(
+            `SELECT invoices."cancelledInvoiceReference" from invoices where invoices."cancelledInvoiceReference" is not NULL`
+          )
+        );
   }
 
   async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
