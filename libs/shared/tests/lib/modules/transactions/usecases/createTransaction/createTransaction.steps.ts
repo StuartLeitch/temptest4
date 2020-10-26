@@ -40,7 +40,11 @@ const mockPausedReminderRepo = new MockPausedReminderRepo();
 const mockWaiverRepo = new MockWaiverRepo();
 const mockEditorRepo = new MockEditorRepo();
 const mockManuscriptRepo = new MockArticleRepo();
-const waiverService = new WaiverService(mockWaiverRepo, mockEditorRepo);
+const waiverService = new WaiverService(
+  mockInvoiceItemRepo,
+  mockEditorRepo,
+  mockWaiverRepo
+);
 let result: CreateTransactionResponse;
 
 let journalId;

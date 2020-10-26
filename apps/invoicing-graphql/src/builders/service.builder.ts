@@ -128,7 +128,11 @@ export async function buildServices(
     logger: loggerBuilder.getLogger(),
     pdfGenerator: createPdfGenerator(loggerBuilder.getLogger()),
     vatService: new VATService(),
-    waiverService: new WaiverService(repos.waiver, repos.editor),
+    waiverService: new WaiverService(
+      repos.invoiceItem,
+      repos.editor,
+      repos.waiver
+    ),
     emailService: new EmailService(
       env.app.mailingDisabled,
       env.app.FERoot,

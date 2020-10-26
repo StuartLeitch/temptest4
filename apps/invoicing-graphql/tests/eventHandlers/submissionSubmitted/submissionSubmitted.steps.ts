@@ -93,8 +93,9 @@ Before(() => {
 
   context.services.logger = new MockLogger();
   context.services.waiverService = new WaiverService(
-    context.repos.waiver,
-    context.repos.editor
+    context.repos.invoiceItem,
+    context.repos.editor,
+    context.repos.waiver
   );
 
   submittingManuscript = null;
@@ -354,6 +355,7 @@ Then(
     expect(maybeInvoiceItems.isRight()).to.be.true;
 
     const items = maybeInvoiceItems.value.getValue();
+    // console.log(JSON.stringify(items[0].waivers, null, 2));
     expect(items[0].waivers.length).to.equal(waiversCount);
   }
 );

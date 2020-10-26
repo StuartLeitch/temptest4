@@ -28,20 +28,16 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
         publisherRepo
       );
 
-      console.log('----------- journal updated -----------');
-      console.log(JSON.stringify(data, null, 2));
-      console.log('------------------end----------------');
-
       const result = await updateJournalUsecase.execute({
-        type: null,
-        currency: 'USD',
-        amount: data.apc,
+        isActive: data.isActive,
+        journalTitle: data.name,
         created: data.created,
         updated: data.updated,
-        issn: data.issn,
-        journalTitle: data.name,
-        isActive: data.isActive,
         journalId: data.id,
+        amount: data.apc,
+        currency: 'USD',
+        issn: data.issn,
+        type: null,
       });
 
       if (result.isLeft()) {

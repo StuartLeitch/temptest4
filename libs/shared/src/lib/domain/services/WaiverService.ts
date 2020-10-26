@@ -1,29 +1,34 @@
-import { PoliciesRegister as ReductionsPoliciesRegister } from '../reductions/policies/PoliciesRegister';
-import { WaivedCountryPolicy } from '../reductions/policies/WaivedCountryPolicy';
-import { WaiverRepoContract } from '../../modules/waivers/repos';
-import { Waiver, WaiverType } from '../../modules/waivers/domain/Waiver';
-import { InvoiceId } from '../../modules/invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../core/domain/UniqueEntityID';
-import { SanctionedCountryPolicy } from '../reductions/policies/SanctionedCountryPolicy';
+
+import { WaiverType, Waiver } from '../../modules/waivers/domain/Waiver';
+import { InvoiceId } from '../../modules/invoices/domain/InvoiceId';
+
+import { InvoiceItemRepoContract } from '../../modules/invoices/repos';
 import { EditorRepoContract } from '../../modules/journals/repos';
+import { WaiverRepoContract } from '../../modules/waivers/repos';
+
+import { PoliciesRegister as ReductionsPoliciesRegister } from '../reductions/policies/PoliciesRegister';
+import { SanctionedCountryPolicy } from '../reductions/policies/SanctionedCountryPolicy';
+import { WaivedCountryPolicy } from '../reductions/policies/WaivedCountryPolicy';
 
 interface WaiverServiceDTO {
-  country: string;
+  authorEmail: string;
   invoiceId: string;
   journalId: string;
-  authorEmail: string;
+  country: string;
 }
 
 export class WaiverService {
   constructor(
-    private waiverRepo: WaiverRepoContract,
-    private editorRepo: EditorRepoContract
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private editorRepo: EditorRepoContract,
+    private waiverRepo: WaiverRepoContract
   ) {}
   public async applyWaiver({
-    country,
-    invoiceId,
     authorEmail,
+    invoiceId,
     journalId,
+    country,
   }: WaiverServiceDTO): Promise<Waiver> {
     const waiversToApply: WaiverType[] = [];
 
@@ -105,11 +110,21 @@ export class WaiverService {
     invoiceId: InvoiceId,
     applicableWaivers: Waiver[]
   ): Promise<Waiver> {
+    const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+      invoiceId
+    );
+
+    if (!invoiceItems || invoiceItems.length === 0) {
+      return;
+    }
+
+    const item = invoiceItems[0];
+
     if (!applicableWaivers.length) {
       return;
     }
-    const existingWaivers = await this.waiverRepo.getWaiversByInvoiceId(
-      invoiceId
+    const existingWaivers = await this.waiverRepo.getWaiversByInvoiceItemId(
+      item.invoiceItemId
     );
 
     const highestReductionWaiver = applicableWaivers.sort(
@@ -123,13 +138,13 @@ export class WaiverService {
       ) {
         return existingWaivers[0];
       } else {
-        this.waiverRepo.removeInvoiceWaivers(invoiceId);
+        this.waiverRepo.removeInvoiceItemWaivers(item.invoiceItemId);
       }
     }
 
-    return this.waiverRepo.attachWaiverToInvoice(
+    return this.waiverRepo.attachWaiverToInvoiceItem(
       highestReductionWaiver.waiverType,
-      invoiceId
+      item.invoiceItemId
     );
   }
 }

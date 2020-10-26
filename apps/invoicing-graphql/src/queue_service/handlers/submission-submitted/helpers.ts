@@ -12,10 +12,10 @@ import {
   EditManuscriptUsecase,
   CreateManuscriptDTO,
   InvoiceItem,
+  Transaction,
   GetJournal,
   Manuscript,
   Roles,
-  Transaction,
 } from '@hindawi/shared';
 
 import { Context } from '../../../builders';
