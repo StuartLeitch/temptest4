@@ -75,15 +75,20 @@ AS SELECT
   coalesce(s.qc_paused_date, '01-01-1900'::TIMESTAMP) > coalesce(s.qc_unpaused_date, '01-01-1901'::TIMESTAMP) as is_quality_check_paused,
   reviewers.invited_reviewers_count,
   reviewers.last_reviewer_invitation_date,
+  reviewers.first_reviewer_invitation_date,
   accepted_reviewers.accepted_reviewers_count,
   accepted_reviewers.last_reviewer_accepted_date,
+  accepted_reviewers.first_reviewer_accepted_date,
   pending_reviewers.pending_reviewers_count,
   review_reports.review_reports_count,
   review_reports.last_review_report_submitted_date,
+  review_reports.first_review_report_submitted_date,
   handling_editors.invited_handling_editors_count,
   handling_editors.last_handling_editor_invited_date,
   handling_editors.current_handling_editor_accepted_date,
   handling_editors.last_handling_editor_declined_date,
+  handling_editors.first_handling_editor_invited_date,
+  handling_editors.first_handling_editor_accepted_date,
   last_editor_recommendation.recommendation last_editor_recommendation,
   last_editor_recommendation.submitted_date as last_editor_recommendation_submitted_date
 FROM ${submissionView.getViewName()} s
@@ -106,11 +111,34 @@ FROM ${submissionView.getViewName()} s
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'screener' limit 1) screener on screener.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id
   LEFT JOIN LATERAL (select * from ${manuscriptReviewsView.getViewName()} r where r.manuscript_custom_id = s.manuscript_custom_id and r.team_type = 'editor' order by submitted_date desc nulls last limit 1) last_editor_recommendation on last_editor_recommendation.manuscript_custom_id = s.manuscript_custom_id
-  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count, max(invited_date) as last_reviewer_invitation_date from ${manuscriptReviewers.getViewName()} group by manuscript_custom_id, "version") reviewers on reviewers.manuscript_custom_id = s.manuscript_custom_id and reviewers."version" = s."version"
-  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count, max(accepted_date) as last_reviewer_accepted_date from ${manuscriptReviewers.getViewName()} where status = 'accepted' group by manuscript_custom_id, version) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
+  LEFT JOIN (
+    SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count, 
+      max(invited_date) as last_reviewer_invitation_date,
+      min(invited_date) as first_reviewer_invitation_date
+    from ${manuscriptReviewers.getViewName()} group by manuscript_custom_id, "version"
+  ) reviewers on reviewers.manuscript_custom_id = s.manuscript_custom_id and reviewers."version" = s."version"
+  LEFT JOIN (
+    SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count, 
+      min(accepted_date) as first_reviewer_accepted_date,
+      max(accepted_date) as last_reviewer_accepted_date 
+    from ${manuscriptReviewers.getViewName()} where status = 'accepted' group by manuscript_custom_id, version
+  ) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
   LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as pending_reviewers_count from ${manuscriptReviewers.getViewName()} where responded_date is null group by manuscript_custom_id, version) pending_reviewers on pending_reviewers.manuscript_custom_id = s.manuscript_custom_id and pending_reviewers."version" = s."version"
-  LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as review_reports_count, max(submitted_date) as last_review_report_submitted_date from ${manuscriptReviewsView.getViewName()} where recommendation in ('publish', 'reject', 'minor', 'major') group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
-  LEFT JOIN (SELECT manuscript_custom_id, count(*) as invited_handling_editors_count, max(invited_date) as last_handling_editor_invited_date, max(accepted_date) current_handling_editor_accepted_date, max(declined_date) as last_handling_editor_declined_date from ${manuscriptEditorsView.getViewName()} where role_type = 'academicEditor' group by manuscript_custom_id) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
+  LEFT JOIN (
+    SELECT manuscript_custom_id, "version", count(*) as review_reports_count, 
+      max(submitted_date) as last_review_report_submitted_date,
+      min(submitted_date) as first_review_report_submitted_date
+    from ${manuscriptReviewsView.getViewName()} where recommendation in ('publish', 'reject', 'minor', 'major') group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
+  LEFT JOIN (
+    SELECT manuscript_custom_id, count(*) as invited_handling_editors_count, 
+      min(invited_date) as first_handling_editor_invited_date,
+      max(invited_date) as last_handling_editor_invited_date, 
+      min(accepted_date) first_handling_editor_accepted_date, 
+      max(accepted_date) current_handling_editor_accepted_date, 
+      max(declined_date) as last_handling_editor_declined_date
+    from ${manuscriptEditorsView.getViewName()} 
+    where role_type = 'academicEditor' group by manuscript_custom_id
+  ) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
   LEFT JOIN (SELECT journal_id, "month", avg(journal_rate) as journal_rate from ${acceptanceRatesView.getViewName()} group by journal_id, "month") individual_ar on individual_ar."month" = to_char(s.submission_date, 'YYYY-MM-01')::date and s.journal_id = individual_ar.journal_id
   LEFT JOIN (SELECT "month", avg(journal_rate) as journal_rate from ${acceptanceRatesView.getViewName()} where journal_rate is not null group by "month") global_ar on global_ar."month" = to_char(s.submission_date, 'YYYY-MM-01')::date
   LEFT JOIN LATERAL (select * from ${articleData.getViewName()} a WHERE

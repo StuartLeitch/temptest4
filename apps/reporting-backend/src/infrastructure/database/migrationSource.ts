@@ -194,7 +194,10 @@ class KnexMigrationSource {
     rebuild_materialized_views('20200915122115_add_deleted_invoices', true),
     rebuild_materialized_views('20200916122115_fix_invoices_issue_type', true),
     move_article_events,
-    rebuild_materialized_views('20201023122115_prrccp_fix'),
+    rebuild_materialized_views('20201023122115_prrccp_fix', true),
+    rebuild_materialized_views(
+      '20201026122115_add_more_first_dates_manuscripts'
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
