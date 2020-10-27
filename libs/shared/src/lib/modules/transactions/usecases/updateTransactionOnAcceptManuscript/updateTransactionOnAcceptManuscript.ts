@@ -184,6 +184,9 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       // * Identify applicable waiver
       try {
+        await this.waiverRepo.removeInvoiceItemWaivers(
+          invoiceItem.invoiceItemId
+        );
         await this.waiverService.applyWaiver({
           invoiceId: invoice.invoiceId.id.toString(),
           authorEmail: manuscript.authorEmail,

@@ -49,7 +49,7 @@ export class KnexWaiverRepo
     dateCreated?: Date
   ): Promise<Waiver> {
     let toInsert: any = {
-      invoiceItemId: invoiceItemId,
+      invoiceItemId: invoiceItemId.id.toString(),
       waiverId: waiverType,
     };
 
@@ -58,6 +58,7 @@ export class KnexWaiverRepo
     }
 
     try {
+      console.log(JSON.stringify(toInsert, null, 2));
       await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS).insert(toInsert);
     } catch (e) {
       throw RepoError.fromDBError(e);
