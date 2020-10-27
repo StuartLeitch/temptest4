@@ -1,87 +1,134 @@
+import { Before, Given, Then, When } from 'cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, BeforeAll } from 'cucumber';
 
 import {
-  Roles,
   UsecaseAuthorizationContext,
+  Roles,
 } from '../../../../../../src/lib/domain/authorization';
 
 // * Domain imports
+import { TransactionStatus } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
+import { TransactionId } from '../../../../../../src/lib/modules/transactions/domain/TransactionId';
 import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
-import { TransactionId } from '../../../../../../src/lib/modules/transactions/domain/TransactionId';
-import { TransactionStatus } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
+
+import { ManuscriptMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ManuscriptMap';
 import { CatalogMap } from '../../../../../../src/lib/modules/journals/mappers/CatalogMap';
 
-// * Usecases imports
-import { CreateTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransaction';
-import { CreateTransactionResponse } from '../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransactionResponse';
-
 // * Mock repos imports
-import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
-import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
-import { MockEditorRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
-import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
-import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockEditorRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
+
+// * Usecases imports
+import { CreateTransactionResponse } from '../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransactionResponse';
+import { CreateTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransaction';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 
-const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
-const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
-const mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
-const mockCatalogRepo: MockCatalogRepo = new MockCatalogRepo();
-const mockPausedReminderRepo = new MockPausedReminderRepo();
-const mockWaiverRepo = new MockWaiverRepo();
-const mockEditorRepo = new MockEditorRepo();
-const mockManuscriptRepo = new MockArticleRepo();
-const waiverService = new WaiverService(
-  mockInvoiceItemRepo,
-  mockEditorRepo,
-  mockWaiverRepo
-);
+interface Context {
+  repos: {
+    pausedReminder: MockPausedReminderRepo;
+    invoiceItem: MockInvoiceItemRepo;
+    transaction: MockTransactionRepo;
+    manuscript: MockArticleRepo;
+    catalog: MockCatalogRepo;
+    invoice: MockInvoiceRepo;
+    editor: MockEditorRepo;
+    waiver: MockWaiverRepo;
+  };
+  services: {
+    waiverService: WaiverService;
+  };
+}
+
+const context: Context = {
+  repos: {
+    pausedReminder: null,
+    invoiceItem: null,
+    transaction: null,
+    manuscript: null,
+    catalog: null,
+    invoice: null,
+    editor: null,
+    waiver: null,
+  },
+  services: {
+    waiverService: null,
+  },
+};
+
 let result: CreateTransactionResponse;
 
-let journalId;
-let manuscriptId;
-let price;
 let transactionId: TransactionId;
 let invoiceId: InvoiceId;
 
-const usecase: CreateTransactionUsecase = new CreateTransactionUsecase(
-  mockPausedReminderRepo,
-  mockInvoiceItemRepo,
-  mockTransactionRepo,
-  mockManuscriptRepo,
-  mockCatalogRepo,
-  mockInvoiceRepo,
-  waiverService
-);
+let usecase: CreateTransactionUsecase = null;
+
+Before(() => {
+  context.repos.pausedReminder = new MockPausedReminderRepo();
+  context.repos.invoiceItem = new MockInvoiceItemRepo();
+  context.repos.transaction = new MockTransactionRepo();
+  context.repos.manuscript = new MockArticleRepo();
+  context.repos.catalog = new MockCatalogRepo();
+  context.repos.invoice = new MockInvoiceRepo();
+  context.repos.editor = new MockEditorRepo();
+  context.repos.waiver = new MockWaiverRepo();
+
+  context.services.waiverService = new WaiverService(
+    context.repos.invoiceItem,
+    context.repos.editor,
+    context.repos.waiver
+  );
+
+  usecase = new CreateTransactionUsecase(
+    context.repos.pausedReminder,
+    context.repos.invoiceItem,
+    context.repos.transaction,
+    context.repos.manuscript,
+    context.repos.catalog,
+    context.repos.invoice,
+    context.services.waiverService
+  );
+});
 
 Given(
   /^A journal "([\w-]+)" with the APC of (\d+)$/,
-  (journalTestId: string, priceTest: number) => {
-    journalId = journalTestId;
-    price = priceTest;
+  (journalId: string, price: number) => {
     const catalogItem = CatalogMap.toDomain({
       journalId,
-      type: 'APC',
       amount: price,
-      // journalTile: 'manuscript-title',
+      type: 'APC',
     });
-    mockCatalogRepo.save(catalogItem);
+
+    context.repos.catalog.addMockItem(catalogItem);
+  }
+);
+
+Given(
+  /^A manuscript with id "([\w-]+)" is on journal "foo-journal"$/,
+  (manuscriptId: string) => {
+    const manuscript = ManuscriptMap.toDomain({
+      customId: manuscriptId,
+      title: manuscriptId,
+      id: manuscriptId,
+    });
+
+    context.repos.manuscript.addMockItem(manuscript);
   }
 );
 
 When(
-  /^CreateTransactionUsecase is executed for manuscript "([\w-]+)"$/,
-  async (manuscriptTestId: string) => {
-    manuscriptId = manuscriptTestId;
+  /^CreateTransactionUsecase is executed for manuscript "([\w-]+)" on journal "([\w-]+)"$/,
+  async (manuscriptId: string, journalId: string) => {
     result = await usecase.execute(
       {
         manuscriptId,
@@ -93,9 +140,9 @@ When(
 );
 
 Then('A DRAFT Transaction should be created', async () => {
-  expect(result.isRight).to.equal(true);
+  expect(result.isRight()).to.equal(true);
 
-  const lastSavedTransactions = await mockTransactionRepo.getTransactionCollection();
+  const lastSavedTransactions = await context.repos.transaction.getTransactionCollection();
 
   expect(lastSavedTransactions.length).to.equal(1);
   expect(lastSavedTransactions[0].status).to.equal(TransactionStatus.DRAFT);
@@ -103,7 +150,7 @@ Then('A DRAFT Transaction should be created', async () => {
 });
 
 Then('A DRAFT Invoice should be created', async () => {
-  const lastSavedInvoices = await mockInvoiceRepo.getInvoiceCollection();
+  const lastSavedInvoices = await context.repos.invoice.getInvoiceCollection();
 
   expect(lastSavedInvoices.length).to.equal(1);
   expect(lastSavedInvoices[0].status).to.equal(InvoiceStatus.DRAFT);
@@ -114,7 +161,7 @@ Then('A DRAFT Invoice should be created', async () => {
 });
 
 Then('An Invoice Item should be created', async () => {
-  const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+  const lastSavedInvoiceItems = await context.repos.invoiceItem.getInvoiceItemCollection();
 
   expect(lastSavedInvoiceItems.length).to.equal(1);
   expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).to.equal(
@@ -125,7 +172,7 @@ Then('An Invoice Item should be created', async () => {
 Then(
   /^The Invoice Item should have a price attached equal to (\d+)$/,
   async (invoiceItemTestPrice: number) => {
-    const lastSavedInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+    const lastSavedInvoiceItems = await context.repos.invoiceItem.getInvoiceItemCollection();
     expect(lastSavedInvoiceItems.length).to.equal(1);
     expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).to.equal(
       invoiceId.id.toString()
