@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then } from 'cucumber';
+import { Given, When, Then, Before } from 'cucumber';
 
 import {
   Roles,
@@ -21,66 +21,75 @@ import { TransactionMap } from '../../../../../../src/lib/modules/transactions/m
 import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
 import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
-import { CouponRepoContract } from '../../../../../../src/lib/modules/coupons/repos/couponRepo';
-
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { WaiverRepoContract } from '../../../../../../src/lib/modules/waivers/repos/waiverRepo';
-
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscripts/repos/articleRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
 
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
-};
-
-const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();
-const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
-const mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
-const mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
-const mockCouponRepo: CouponRepoContract = new MockCouponRepo();
-const mockWaiverRepo: WaiverRepoContract = new MockWaiverRepo();
-
-const usecase: RestoreSoftDeleteDraftTransactionUsecase = new RestoreSoftDeleteDraftTransactionUsecase(
-  mockTransactionRepo,
-  mockInvoiceItemRepo,
-  mockInvoiceRepo,
-  mockArticleRepo,
-  mockCouponRepo,
-  mockWaiverRepo
-);
+let result: any;
+let invoice: Invoice;
+let manuscript: Manuscript;
+let transaction: Transaction;
+let invoiceItem: InvoiceItem;
 
 let manuscriptId;
 let journalId;
 
-let result: any;
-let transaction: Transaction;
-let invoice: Invoice;
-let invoiceItem: InvoiceItem;
-let manuscript: Manuscript;
+let mockCouponRepo: MockCouponRepo;
+let mockWaiverRepo: MockWaiverRepo;
+let mockInvoiceRepo: MockInvoiceRepo;
+let mockArticleRepo: MockArticleRepo;
+let mockTransactionRepo: MockTransactionRepo;
+let mockInvoiceItemRepo: MockInvoiceItemRepo;
+let usecase: RestoreSoftDeleteDraftTransactionUsecase;
+
+let defaultContext: UsecaseAuthorizationContext;
+
+Before(function () {
+  mockTransactionRepo = new MockTransactionRepo();
+  mockInvoiceRepo = new MockInvoiceRepo();
+  mockInvoiceItemRepo = new MockInvoiceItemRepo();
+  mockArticleRepo = new MockArticleRepo();
+  mockCouponRepo = new MockCouponRepo();
+  mockWaiverRepo = new MockWaiverRepo();
+
+  defaultContext = {
+    roles: [Roles.SUPER_ADMIN],
+  };
+
+  usecase = new RestoreSoftDeleteDraftTransactionUsecase(
+    mockTransactionRepo,
+    mockInvoiceItemRepo,
+    mockArticleRepo,
+    mockInvoiceRepo,
+    mockCouponRepo,
+    mockWaiverRepo
+  );
+});
 
 Given(
-  /^The journal named "([\w-]+)" with the manuscript named "([\w-]+)"$/,
-  async function (journalTestId: string, manuscriptTestId: string) {
+  /^A resubmitted manuscript "([\w-]+)" on journal "([\w-]+)"$/,
+  async function (manuscriptTestId: string, journalTestId: string) {
     journalId = journalTestId;
     manuscriptId = manuscriptTestId;
 
     manuscript = ArticleMap.toDomain({
       id: manuscriptId,
       journalId: journalId,
+      customId: '1111',
     });
 
-    mockArticleRepo.save(manuscript);
+    mockArticleRepo.addMockItem(manuscript);
   }
 );
 
 Given(
-  /^A Invoice in a DRAFT Transaction and a Invoice Item is linked to the manuscript "([\w-]+)"$/,
+  /^An Invoice with a DRAFT Transaction and an Invoice Item linked to the manuscript "([\w-]+)"$/,
   async function (manuscriptTestId: string) {
     transaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT,
+      deleted: 1,
     });
 
     invoice = InvoiceMap.toDomain({
@@ -96,14 +105,14 @@ Given(
     invoice.addInvoiceItem(invoiceItem);
     transaction.addInvoice(invoice);
 
-    mockTransactionRepo.save(transaction);
-    mockInvoiceRepo.save(invoice);
-    mockInvoiceItemRepo.save(invoiceItem);
+    mockTransactionRepo.addMockItem(transaction);
+    mockInvoiceRepo.addMockItem(invoice);
+    mockInvoiceItemRepo.addMockItem(invoiceItem);
   }
 );
 
 When(
-  /^RestoreSoftDeleteDraftTransactionUsecase is executed for the manuscript "([\w-]+)"$/,
+  /^RestoreSoftDeleteDraftTransactionUsecase executes for manuscript "([\w-]+)"$/,
   async (manuscriptTestId: string) => {
     result = await usecase.execute(
       {
@@ -118,9 +127,9 @@ Then(
   'The DRAFT Transaction tied with the manuscript should be restored',
   async () => {
     expect(result.value.isSuccess).to.equal(true);
-
     const transactions = await mockTransactionRepo.getTransactionCollection();
-    expect(transactions.length).to.equal(1);
+    console.log(transactions);
+    expect(transactions[0].props.deleted).to.equal(0);
   }
 );
 

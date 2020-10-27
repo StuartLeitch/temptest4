@@ -17,7 +17,8 @@ export class MockTransactionRepo
   }
 
   public async restore(transaction: Transaction): Promise<void> {
-    this.addMockItem(transaction);
+    const restoredTransaction = transaction;
+    restoredTransaction.props.deleted = 0;
   }
 
   public async update(transaction: Transaction): Promise<Transaction> {

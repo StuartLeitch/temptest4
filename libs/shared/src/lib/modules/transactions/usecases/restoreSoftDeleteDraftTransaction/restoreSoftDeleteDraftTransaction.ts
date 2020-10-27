@@ -3,19 +3,10 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Either, Result, left, right } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { Transaction } from '../../domain/Transaction';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 
 // * Authorization Logic
-import {
-  Roles,
-  UsecaseAuthorizationContext,
-} from '../../../../domain/authorization';
+import { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   Authorize,
   AccessControlledUsecase,
@@ -23,40 +14,34 @@ import {
 } from '../../../../domain/authorization';
 
 //* Repo Imports
+import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
 import { ArticleRepoContract as ManuscriptRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
 
 //* Usecase Imports
-import type { RestoreSoftDeleteDraftTransactionRequestDTO as DTO } from './restoreSoftDeleteDraftTransaction.dto';
-import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
-import { RestoreSoftDeleteDraftTransactionResponse as Response } from './restoreSoftDeleteDraftTransaction.response';
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails';
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
 import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetManuscriptByManuscriptIdUsecase } from '../../../manuscripts/usecases/getManuscriptByManuscriptId';
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
 import { GetTransactionDetailsByManuscriptCustomIdUsecase } from '../../usecases/getTransactionDetailsByManuscriptCustomId';
 
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
-};
+import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
+import type { RestoreSoftDeleteDraftTransactionRequestDTO as DTO } from './restoreSoftDeleteDraftTransaction.dto';
+import { RestoreSoftDeleteDraftTransactionResponse as Response } from './restoreSoftDeleteDraftTransaction.response';
 
+type Context = UsecaseAuthorizationContext;
 export class RestoreSoftDeleteDraftTransactionUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private invoiceRepo: InvoiceRepoContract,
     private manuscriptRepo: ManuscriptRepoContract,
+    private invoiceRepo: InvoiceRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract
   ) {}
@@ -66,25 +51,13 @@ export class RestoreSoftDeleteDraftTransactionUsecase
   }
 
   @Authorize('transaction:restore')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
-    let invoiceItem: InvoiceItem;
-    let invoice: Invoice;
-    let transaction: Transaction;
-    let manuscript: Manuscript;
-
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const maybeValidRequest = this.verifyData(request);
     if (maybeValidRequest.isLeft()) {
       return maybeValidRequest;
     }
     // * build the ManuscriptId
-    const manuscriptId = ManuscriptId.create(
-      new UniqueEntityID(request.manuscriptId)
-    )
-      .getValue()
-      .toString();
+    const manuscriptId = request.manuscriptId;
 
     const getInvoice = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     const getTransaction = new GetTransactionDetailsByManuscriptCustomIdUsecase(
@@ -110,7 +83,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       // * System identifies article by manuscript Id
       const maybeManuscript = await getManuscript.execute(
         { manuscriptId },
-        defaultContext
+        context
       );
 
       if (!maybeManuscript || maybeManuscript.isLeft()) {
@@ -120,20 +93,15 @@ export class RestoreSoftDeleteDraftTransactionUsecase
 
       // * System obtains invoiceId by manuscript custom Id
       const customId = manuscript.customId;
-      const maybeInvoiceId = await getInvoiceId.execute(
-        { customId },
-        defaultContext
-      );
+      const maybeInvoiceId = await getInvoiceId.execute({ customId }, context);
       if (!maybeInvoiceId || maybeInvoiceId.isLeft()) {
         throw new Errors.InvoiceIdNotFoundError(customId);
       }
 
       const invoiceId = maybeInvoiceId.value.getValue().toString();
+
       // * System identifies invoice by invoice Id
-      const maybeInvoice = await getInvoice.execute(
-        { invoiceId },
-        defaultContext
-      );
+      const maybeInvoice = await getInvoice.execute({ invoiceId }, context);
       if (!maybeInvoice || maybeInvoice.isLeft()) {
         throw new Errors.InvoiceNotFoundError(invoiceId);
       }
@@ -143,23 +111,23 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       // * System identifies invoice item by invoice Id
       const maybeInvoiceItems = await getInvoiceItems.execute(
         { invoiceId },
-        defaultContext
+        context
       );
       if (!maybeInvoiceItems || maybeInvoiceItems.isLeft()) {
         throw new Errors.InvoiceItemNotFoundError(invoiceId);
       }
-      const invoiceItem = maybeInvoiceItems[0].value.getValue();
+      const invoiceItem = maybeInvoiceItems.value.getValue()[0];
 
       // * System identifies transaction by manuscript custom Id
       const maybeTransaction = await getTransaction.execute(
         { customId },
-        defaultContext
+        context
       );
       if (!maybeTransaction || maybeTransaction.isLeft()) {
         throw new Errors.TransactionNotFoundError(manuscriptId);
       }
+      const transaction = maybeTransaction.value.getValue();
       // This is where all the magic happens!
-
       // * System restores transaction
       try {
         await this.transactionRepo.restore(transaction);
