@@ -2,45 +2,50 @@
 
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { chain } from '../../../../core/logic/EitherChain';
 import { Either, Result, right } from '../../../../core/logic/Result';
+import { chain } from '../../../../core/logic/EitherChain';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
-  AccessControlledUsecase,
   UsecaseAuthorizationContext,
-  Roles,
+  AccessControlledUsecase,
   AccessControlContext,
+  Roles,
 } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { PoliciesRegister } from '../../../../domain/reductions/policies/PoliciesRegister';
-import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
-import { VATService } from '../../../../domain/services/VATService';
 import { EmailService } from '../../../../infrastructure/communication-channels';
-import { Address } from '../../../addresses/domain/Address';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
+import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
+import { PoliciesRegister } from '../../../../domain/reductions/policies/PoliciesRegister';
+import { VATService } from '../../../../domain/services/VATService';
+
 import { Payer, PayerType } from '../../../payers/domain/Payer';
+import { Invoice, InvoiceStatus } from '../../domain/Invoice';
+import { Address } from '../../../addresses/domain/Address';
+
+import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
+
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
+import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
+import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
+import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
 import {
   CreatePayerRequestDTO,
   CreatePayerUsecase,
 } from '../../../payers/usecases/createPayer/createPayer';
 
 // * Usecase specific
-import { Invoice, InvoiceStatus } from '../../domain/Invoice';
-import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
-import { InvoiceRepoContract } from '../../repos/invoiceRepo';
-import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
-import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
+
 import { ConfirmInvoiceDTO, PayerInput } from './confirmInvoiceDTO';
 import { ConfirmInvoiceResponse } from './confirmInvoiceResponse';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
 
 interface PayerDataDomain {
   address: Address;

@@ -93,7 +93,7 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
         return;
       }
 
-      const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
+      const updateTransactionOnAcceptManuscript = new UpdateTransactionOnAcceptManuscriptUsecase(
         addressRepo,
         catalogRepo,
         transactionRepo,

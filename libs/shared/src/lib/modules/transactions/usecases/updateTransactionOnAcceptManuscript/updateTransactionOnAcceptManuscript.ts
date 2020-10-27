@@ -1,13 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
+
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 import { LoggerContract } from '../../../../infrastructure/logging';
+
+import { EmailService } from '../../../../infrastructure/communication-channels';
+import { WaiverService } from '../../../../domain/services/WaiverService';
+import { VATService } from '../../../../domain/services/VATService';
 
 import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
@@ -15,41 +26,32 @@ import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../../invoices/domain/Invoice';
+import { PayerType } from '../../../payers/domain/Payer';
 import { Transaction } from '../../domain/Transaction';
 
-import { AddressRepoContract } from './../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
+import { AddressRepoContract } from './../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
-import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { CatalogRepoContract } from '../../../journals/repos';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+import { CatalogRepoContract } from '../../../journals/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
 
-import { EmailService } from '../../../../infrastructure/communication-channels';
-import { WaiverService } from '../../../../domain/services/WaiverService';
-import { VATService } from '../../../../domain/services/VATService';
+import { AddressMap } from '../../../addresses/mappers/AddressMap';
+import { PayerMap } from '../../../payers/mapper/Payer';
+
+import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+import {
+  ConfirmInvoiceUsecase,
+  ConfirmInvoiceDTO,
+} from '../../../invoices/usecases/confirmInvoice';
 
 // * Usecase specifics
 import { UpdateTransactionOnAcceptManuscriptResponse } from './updateTransactionOnAcceptManuscriptResponse';
 import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
 import type { UpdateTransactionOnAcceptManuscriptDTO } from './updateTransactionOnAcceptManuscriptDTOs';
-
-// * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
-import {
-  Authorize,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
-
-import { AddressMap } from '../../../addresses/mappers/AddressMap';
-import { PayerMap } from '../../../payers/mapper/Payer';
-import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
-import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/confirmInvoiceDTO';
-import { PayerType } from '../../../payers/domain/Payer';
-import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   implements
@@ -245,10 +247,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         // * create new address
         const newAddress = AddressMap.toDomain({
           country: manuscript.authorCountry,
-          // ? city: city,
-          // ? state: state,
-          // ? postalCode: raw.postalCode,
-          // ? addressLine1: raw.addressLine1
         });
 
         // * create new payer
@@ -256,11 +254,10 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
           // associate payer to the invoice
           invoiceId: invoice.invoiceId.id.toString(),
           name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
-          email: manuscript.authorEmail,
           addressId: newAddress.addressId.id.toString(),
-          organization: ' ',
+          email: manuscript.authorEmail,
           type: PayerType.INDIVIDUAL,
-          // ? vatId: payer.vatRegistrationNumber,
+          organization: ' ',
         });
 
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {
