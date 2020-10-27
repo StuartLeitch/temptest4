@@ -1,10 +1,13 @@
 import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
 
-import { SoftDeleteDraftTransactionErrors } from './softDeleteDraftTransactionErrors';
+import * as Errors from './softDeleteDraftTransactionErrors';
 
 export type SoftDeleteDraftTransactionResponse = Either<
-  // | SoftDeleteDraftTransactionErrors.TransactionNotFoundError
-  UnexpectedError,
+  | Errors.ManuscriptNotFoundError
+  | Errors.InvoiceItemNotFoundError
+  | Errors.InvoiceNotFoundError
+  | Errors.TransactionNotFoundError
+  | UnexpectedError,
   Result<void>
 >;
