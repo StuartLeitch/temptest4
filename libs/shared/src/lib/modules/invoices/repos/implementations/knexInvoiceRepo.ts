@@ -327,7 +327,7 @@ export class KnexInvoiceRepo
   async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
     const { logger } = this;
 
-    const detailsQuery = this.createBaseArticleDetailsQuery();
+    const detailsQuery = this.createBaseDetailsQuery();
 
     // * SQL for retrieving results needed only for Sage registration
     const filterInvoicesReadyForSageRevenueRecognition = this.filterReadyForSageRevenueRecognition();
