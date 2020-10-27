@@ -14,8 +14,8 @@ import {
 } from '../../../../domain/authorization';
 
 //* Repo Imports
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
+import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
+import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
