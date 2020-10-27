@@ -315,7 +315,7 @@ export class KnexInvoiceRepo
         .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
         .where('invoices.nsReference', '<>', 'MigrationRef')
         .where('invoices.nsReference', '<>', 'migrationRef')
-        // .whereNotNull('invoices.cancelledInvoiceReference')
+        .whereNull('invoices.cancelledInvoiceReference')
         .whereNotIn(
           'invoices.id',
           db.raw(
