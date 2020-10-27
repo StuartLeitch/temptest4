@@ -1,3 +1,5 @@
+import { getYear } from 'date-fns';
+
 // * Core Domain
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
@@ -50,6 +52,7 @@ interface InvoiceProps {
   revenueRecognitionReference?: string;
   cancelledInvoiceReference?: string;
   nsRevRecReference?: string;
+  creditNoteReference?: string;
   vatnote?: string;
 }
 
@@ -137,7 +140,13 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       return null;
     }
     const paddedNumber = this.props.invoiceNumber.toString().padStart(5, '0');
-    const creationYear = this.props.dateAccepted.getFullYear();
+    let creationYear = this.props.dateAccepted.getFullYear();
+    if (
+      this.props.dateIssued &&
+      getYear(this.props.dateIssued) < getYear(this.props.dateAccepted)
+    ) {
+      creationYear = this.props.dateIssued.getFullYear();
+    }
     return `${paddedNumber}/${creationYear}`;
   }
 
@@ -179,6 +188,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set nsRevRecReference(nsRevRecReference: string) {
     this.props.nsRevRecReference = nsRevRecReference;
+  }
+
+  get creditNoteReference(): string {
+    return this.props.creditNoteReference;
+  }
+
+  set creditNoteReference(creditNoteReference: string) {
+    this.props.creditNoteReference = creditNoteReference;
   }
 
   get cancelledInvoiceReference(): string {

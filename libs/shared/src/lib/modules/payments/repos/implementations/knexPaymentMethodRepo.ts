@@ -67,7 +67,7 @@ export class KnexPaymentMethodRepo
   async getPaymentMethods(): Promise<PaymentMethod[]> {
     const { db, logger } = this;
 
-    const paymentMethodsSelect = await db(TABLES.PAYMENT_METHODS).select();
+    const paymentMethodsSelect = db(TABLES.PAYMENT_METHODS).select();
 
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
@@ -78,7 +78,7 @@ export class KnexPaymentMethodRepo
     });
 
     try {
-      return paymentMethodsSelect.map(PaymentMethodMap.toDomain);
+      return (await paymentMethodsSelect).map(PaymentMethodMap.toDomain);
     } catch (e) {
       throw RepoError.fromDBError(e);
     }

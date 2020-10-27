@@ -1,3 +1,5 @@
+import { getYear } from 'date-fns';
+
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -136,6 +138,14 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.transactionId = transaction.transactionId.id.toString();
       clonedRawInvoice.dateCreated = new Date();
       clonedRawInvoice.dateIssued = new Date();
+      if (
+        invoice.dateIssued &&
+        getYear(invoice.dateIssued) < getYear(invoice.dateAccepted)
+      ) {
+        clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateIssued));
+      } else {
+        clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateAccepted));
+      }
       clonedRawInvoice.erpReference = null;
       clonedRawInvoice.cancelledInvoiceReference = null;
       clonedRawInvoice.nsReference = null;

@@ -8,6 +8,8 @@ import {
   ErpServiceContract,
   PayerType,
   Payer,
+  Payment,
+  PaymentMethod,
   Manuscript,
   Invoice,
   InvoiceItem,
@@ -74,8 +76,8 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerRevenueRecognition(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
-    console.log('registerRevenueRecognition Data:');
-    console.info(data);
+    // console.log('registerRevenueRecognition Data:');
+    // console.info(data);
 
     const {
       publisherCustomValues: { customSegmentId },
@@ -126,34 +128,44 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerCreditNote(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    console.log('registerCreditNote Data:');
-    console.info(data);
+    // console.log('registerCreditNote Data:');
+    // console.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
     await this.patchCreditNote({ ...data, creditNoteId });
-
     return creditNoteId;
   }
 
-  public async registerPayment(
-    data: ErpInvoiceRequest
-  ): Promise<ErpInvoiceResponse> {
-    console.log('registerPayment Data:');
-    console.info(data);
+  public async registerPayment(data: {
+    manuscript: Manuscript;
+    payer: Payer;
+    invoice: Invoice;
+    items: InvoiceItem[];
+    payments: Payment[];
+    paymentMethods: PaymentMethod[];
+    total: number;
+    journalName: string;
+    customSegmentId: string;
+    taxRateId: string;
+    itemId: string;
+  }): Promise<ErpInvoiceResponse> {
+    // console.log('registerPayment Data:');
+    // console.info(data);
+
+    const { payer, manuscript } = data;
 
     const customerAlreadyExists = await this.queryCustomer(
-      this.getCustomerPayload(data.payer, data.manuscript)
+      this.getCustomerPayload(payer, manuscript)
     );
     if (!customerAlreadyExists) {
       console.error(
-        `Customer does not exists for article: ${data.manuscript.customId}.`
+        `Customer does not exists for article: ${manuscript.customId}.`
       );
     }
     const paymentId = await this.createPayment({
       ...data,
       customerId: customerAlreadyExists.id,
     });
-    console.info(paymentId);
 
     return paymentId;
   }
@@ -291,11 +303,6 @@ export class NetSuiteService implements ErpServiceContract {
       itemId,
       taxRateId,
     } = data;
-    // console.log('Create invoice item');
-    // console.info(item);
-    // console.info(item.calculateNetPrice());
-    // console.log('Create invoice invoice');
-    // console.info(invoice);
 
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice`,
@@ -356,30 +363,48 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async createPayment(data: any) {
+  private async createPayment(data: {
+    invoice: Invoice;
+    items: InvoiceItem[];
+    payments: Payment[];
+    paymentMethods: PaymentMethod[];
+    total: number;
+    manuscript: Manuscript;
+    journalName: string;
+    customSegmentId: string;
+    taxRateId: string;
+    itemId: string;
+    customerId?: string;
+  }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { invoice, total, payment, customerId } = data;
+    const { invoice, payments, paymentMethods, total, customerId } = data;
+
+    const accountMap = {
+      Paypal: '213',
+      'Credit Card': '216',
+      'Bank Transfer': '347',
+    };
 
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/customerpayment`,
+      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}/!transform/customerpayment`,
       method: 'POST',
     };
 
-    const createPaymentPayload: Record<string, any> = {
-      tranDate: format(
+    const [payment] = payments;
+    const [paymentAccount] = paymentMethods.filter((pm) =>
+      pm.id.equals(payment.paymentMethodId.id)
+    );
+
+    const createPaymentPayload = {
+      account: {
+        id: accountMap[paymentAccount.name],
+      },
+      createdDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ), // '2020-07-01T14:09:00Z',
-      // saleseffectivedate: format(
-      //   new Date(payment.dateCreated),
-      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      // ), // '2020-07-01T12:00:12.857Z',
-      // tranId: `${payment.invoiceNumber}/${format(
-      //   new Date(payment.dateCreated),
-      //   'yyyy'
-      // )}`,
+      ),
       entity: {
         id: customerId,
       },
@@ -390,12 +415,6 @@ export class NetSuiteService implements ErpServiceContract {
       // Amount due,
       payment: payment.amount.value,
     };
-
-    // if (customSegmentId !== '4') {
-    //   createInvoicePayload.cseg1 = {
-    //     id: customSegmentId,
-    //   };
-    // }
 
     try {
       const res = await axios({
@@ -412,7 +431,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async queryAccount(data: any) {
+  private async queryAccount(data: { payer: Payer }) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -473,14 +492,14 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Revenue Recognition - ${invoice.referenceNumber}`,
+      // trandate: format(
+      //   new Date(article.datePublished),
+      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      // ),
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
       },
-      // createdDate: format(
-      //   new Date(data.invoice.dateCreated),
-      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      // ),
       line: {
         items: [
           {
@@ -507,9 +526,6 @@ export class NetSuiteService implements ErpServiceContract {
       };
     }
 
-    // console.log('createJournalPayload:');
-    // console.info(createJournalPayload);
-
     try {
       const res = await axios({
         ...journalRequestOpts,
@@ -527,15 +543,11 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async patchInvoice(data: any) {
+  private async patchInvoice(data: { invoice: Invoice; journalId: string }) {
     const {
       connection: { config, oauth, token },
     } = this;
     const { invoice, journalId } = data;
-
-    // console.log('patchInvoice data:');
-    // console.info(journalId);
-    // console.info(invoice);
 
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
@@ -555,9 +567,6 @@ export class NetSuiteService implements ErpServiceContract {
         headers: oauth.toHeader(oauth.authorize(invoiceRequestOpts, token)),
         data: patchInvoicePayload,
       } as AxiosRequestConfig);
-
-      // const journalId = res?.headers?.location?.split('/').pop();
-      // return journalId;
     } catch (err) {
       console.error(err);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
@@ -565,14 +574,11 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async transformCreditNote(data: any) {
+  private async transformCreditNote(data: { originalInvoice?: Invoice }) {
     const {
       connection: { config, oauth, token },
     } = this;
     const { originalInvoice } = data;
-
-    // console.log('transformCreditNote data:');
-    // console.info(creditNote);
 
     const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
@@ -596,7 +602,10 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async patchCreditNote(data: any) {
+  private async patchCreditNote(data: {
+    creditNote?: Invoice;
+    creditNoteId?: string;
+  }) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -608,50 +617,11 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const patchCreditNotePayload: Record<string, any> = {
-      // createdDate: format(
-      //   new Date(invoice.dateCreated),
-      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      // ), // '2020-07-01T14:09:00Z',
-      // saleseffectivedate: format(
-      //   new Date(invoice.dateCreated),
-      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      // ), // '2020-07-01T12:00:12.857Z',
       tranId: `CN-${creditNote.invoiceNumber}/${format(
         new Date(creditNote.dateCreated),
         'yyyy'
       )}`,
-
-      // entity: {
-      //   id: customerId,
-      // },
-      // item: {
-      //   items: [
-      //     {
-      //       amount: item.price,
-      //       description: `${article.title} - Article Processing Charges for ${
-      //         article.customId
-      //       }/${format(new Date(), 'yyyy')}`,
-      //       quantity: 1.0,
-      //       rate: item.price,
-      //       taxRate1: item.rate,
-      //       excludeFromRateRequest: false,
-      //       printItems: false,
-      //       item: {
-      //         id: itemId,
-      //       },
-      //       taxCode: {
-      //         id: taxRateId,
-      //       },
-      //     },
-      //   ],
-      // },
     };
-
-    // if (customSegmentId !== '4') {
-    //   createInvoicePayload.cseg1 = {
-    //     id: customSegmentId,
-    //   };
-    // }
 
     try {
       const res = await axios({

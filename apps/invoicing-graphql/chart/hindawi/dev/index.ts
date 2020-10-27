@@ -23,8 +23,12 @@ const values: WithAwsSecretsServiceProps = {
       },
     },
     ingressOptions: {
-      host: 'invoicing-graphql.dev.phenom.pub',
-    } as IngressOptionsSpec & { host: string },
+      rules: [
+        {
+          host: 'invoicing-graphql.dev.phenom.pub',
+        },
+      ],
+    },
   },
 };
 

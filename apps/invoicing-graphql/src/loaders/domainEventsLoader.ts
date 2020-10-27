@@ -54,7 +54,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         payment,
         coupon,
         waiver,
-        payer,
+        payer
       },
       services: {
         erp,
@@ -112,8 +112,17 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     const publishPaymentToErp = env.app.erpRegisterPaymentsEnabled
       ? new PublishPaymentToErpUsecase(
+          invoice,
+          invoiceItem,
           payment,
+          paymentMethod,
+          coupon,
+          waiver,
+          payer,
+          manuscript,
+          catalog,
           erp?.netsuite || null,
+          publisher,
           loggerService
         )
       : new NoOpUseCase();
@@ -234,6 +243,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoicePaid,
+      publishPaymentToErp,
       loggerService
     );
 

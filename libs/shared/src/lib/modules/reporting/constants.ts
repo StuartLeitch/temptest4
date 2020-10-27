@@ -57,3 +57,5 @@ export const JOURNAL_EVENTS = [
   'JournalSectionSpecialIssueDeactivated',
   'JournalSpecialIssueDeactivated',
 ];
+
+export const ARTICLE_PUBLISHED_EVENTS = ['ArticlePublished'];

@@ -1,3 +1,4 @@
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
@@ -30,7 +31,9 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private publishInvoiceFinalized: PublishInvoiceFinalizedUsecase,
+    private publishInvoiceFinalized:
+      | PublishInvoiceFinalizedUsecase
+      | NoOpUseCase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -137,8 +140,9 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         `[AfterInvoiceFinalized]: Successfully executed onPublishInvoiceFinalized use case AfterInvoiceFinalized`
       );
     } catch (err) {
+      console.error(err);
       this.loggerService.info(
-        `[AfterInvoiceFinalized]: Failed to execute onPublishInvoiceFinalized use case AfterInvoiceFinalized. Err: ${err}`
+        `[AfterInvoiceFinalized]: Failed to execute onPublishInvoiceFinalized use case AfterInvoiceFinalized. Err: ${err.message}`
       );
     }
   }

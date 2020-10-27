@@ -36,7 +36,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private publishInvoiceCredited: PublishInvoiceCreditedUsecase,
+    private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
     private publishCreditNoteToErp: PublishCreditNoteToErpUsecase | NoOpUseCase,
     private loggerService: LoggerContract
   ) {

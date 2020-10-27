@@ -4,12 +4,17 @@ import { PublisherCustomValues } from '../../modules/publishers/domain/Publisher
 
 export interface ErpInvoiceRequest {
   invoice: Invoice;
+  originalInvoice?: Invoice;
+  creditNote?: Invoice;
   items: InvoiceItem[];
   payer: Payer;
   manuscript: Manuscript;
   billingAddress: Address;
   journalName?: string;
   vatNote?: Record<string, unknown>;
+  rate?: number;
+  total?: number;
+  invoiceTotal?: number;
   exchangeRate?: number;
   tradeDocumentItemProduct: string;
   customSegmentId?: string;
