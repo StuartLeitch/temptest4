@@ -128,7 +128,6 @@ Then(
   async () => {
     expect(result.value.isSuccess).to.equal(true);
     const transactions = await mockTransactionRepo.getTransactionCollection();
-    console.log(transactions);
     expect(transactions[0].props.deleted).to.equal(0);
   }
 );
