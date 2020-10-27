@@ -84,7 +84,7 @@ interface ReportingUsecases {
 
 interface ReportingServices {
   s3: AWS.S3;
-  sqs: AWS.SQS;
+  sqs: any; // AWS.SQS;
   filterEventsService: FilterEventsService;
 }
 

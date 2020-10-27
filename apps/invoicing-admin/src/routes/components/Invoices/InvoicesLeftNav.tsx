@@ -23,7 +23,7 @@ const InvoicesLeftNav = (props) => {
   const referenceNumber = props?.filters?.referenceNumber || '';
   const customId = props?.filters?.customId || '';
 
-  const [onFilterHandler] = useDebouncedCallback((eventTarget: any) => {
+  const onFilterHandler = useDebouncedCallback((eventTarget: any) => {
     const value =
       eventTarget?.type === 'checkbox'
         ? eventTarget.checked
@@ -43,7 +43,7 @@ const InvoicesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={(evt) => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler.callback(evt.target)}
             name='invoiceStatus.DRAFT'
             checked={invoiceStatus.includes('DRAFT')}
             className='text-warning'
@@ -56,7 +56,7 @@ const InvoicesLeftNav = (props) => {
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
             name='invoiceStatus.ACTIVE'
-            onChange={(evt) => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler.callback(evt.target)}
             checked={invoiceStatus.includes('ACTIVE')}
             className='text-primary'
             type='checkbox'
@@ -68,7 +68,7 @@ const InvoicesLeftNav = (props) => {
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
             name='invoiceStatus.FINAL'
-            onChange={(evt: any) => onFilterHandler(evt.target)}
+            onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={invoiceStatus.includes('FINAL')}
             className='text-success'
             type='checkbox'
@@ -89,7 +89,7 @@ const InvoicesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={(evt) => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler.callback(evt.target)}
             name='transactionStatus.DRAFT'
             checked={transactionStatus.includes('DRAFT')}
             className='text-warning'
@@ -101,7 +101,7 @@ const InvoicesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            onChange={(evt) => onFilterHandler(evt.target)}
+            onChange={(evt) => onFilterHandler.callback(evt.target)}
             checked={transactionStatus.includes('ACTIVE')}
             name='transactionStatus.ACTIVE'
             className='text-primary'
@@ -125,7 +125,7 @@ const InvoicesLeftNav = (props) => {
           selected={journalId}
           onChange={(selections: any) => {
             const target = { name: 'journalTitle', value: selections };
-            onFilterHandler(target);
+            onFilterHandler.callback(target);
           }}
         />
         {/* <NavItem className='d-flex p-0 form-control'>
@@ -161,7 +161,7 @@ const InvoicesLeftNav = (props) => {
               type='input'
               value={referenceNumber}
               onChange={(evt: any) =>
-                onFilterHandler({
+                onFilterHandler.callback({
                   name: 'referenceNumber',
                   value: evt.target.value,
                 })
@@ -174,7 +174,7 @@ const InvoicesLeftNav = (props) => {
                 color='secondary'
                 outline
                 onClick={(evt: any) => {
-                  onFilterHandler({ name: 'referenceNumber', value: '' });
+                  onFilterHandler.callback({ name: 'referenceNumber', value: '' });
                 }}
               >
                 <i className='fa fa-times mr-2'></i>
@@ -198,7 +198,7 @@ const InvoicesLeftNav = (props) => {
             <Input
               name='customId'
               onChange={(evt: any) =>
-                onFilterHandler({ name: 'customId', value: evt.target.value })
+                onFilterHandler.callback({ name: 'customId', value: evt.target.value })
               }
               className='form-control'
               placeholder='Enter a custom ID'
@@ -210,7 +210,7 @@ const InvoicesLeftNav = (props) => {
                 color='secondary'
                 outline
                 onClick={(evt: any) =>
-                  onFilterHandler({ name: 'customId', value: '' })
+                  onFilterHandler.callback({ name: 'customId', value: '' })
                 }
               >
                 <i className='fa fa-times mr-2'></i>
