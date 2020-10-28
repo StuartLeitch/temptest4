@@ -5,12 +5,17 @@ import {
 } from './contracts/EventViewContract';
 import submissionView from './SubmissionsView';
 
-class ManuscriptReviewersView extends AbstractEventView
+class ManuscriptReviewersView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS select se.manuscript_custom_id as "manuscript_custom_id",
+  se.journal_name,
+  se.section_name,
+  se.special_issue_name,
+  se.special_issue_id,
   manuscripts->>'version' as "version",
   reviewer_view.email as "email",
   reviewer_view.id as "reviewer_id",

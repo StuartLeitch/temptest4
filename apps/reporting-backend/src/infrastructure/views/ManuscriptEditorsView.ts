@@ -5,7 +5,8 @@ import {
 } from './contracts/EventViewContract';
 import submissionView from './SubmissionsView';
 
-class ManuscriptEditorsView extends AbstractEventView
+class ManuscriptEditorsView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -13,6 +14,10 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
 AS SELECT
   editor_view.id as "id",
   se.manuscript_custom_id as "manuscript_custom_id",
+  se.journal_name,
+  se.section_name,
+  se.special_issue_name,
+  se.special_issue_id,
   editor_view.email as "email",
   cast_to_timestamp(editor_view."expiredDate") as expired_date,
   cast_to_timestamp(editor_view."invitedDate") as invited_date,
@@ -35,7 +40,11 @@ AS SELECT
       s.last_version_index,
       se.payload,
       s.event_id,
-      s.manuscript_custom_id
+      s.manuscript_custom_id,
+      s.journal_name,
+      s.section_name,
+      s.special_issue_name,
+      s.special_issue_id
     FROM
       ${REPORTING_TABLES.SUBMISSION} se
     JOIN ${submissionView.getViewName()} s on
