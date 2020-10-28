@@ -6,7 +6,8 @@ import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { ManuscriptId } from '../../domain/ManuscriptId';
 import { InvoiceId } from '../../domain/InvoiceId';
 
-export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
+export class MockInvoiceItemRepo
+  extends BaseMockRepo<InvoiceItem>
   implements InvoiceItemRepoContract {
   constructor() {
     super();
@@ -15,7 +16,9 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   public async getInvoiceItemById(
     invoiceItemId: InvoiceItemId
   ): Promise<InvoiceItem> {
-    const matches = this._items.filter(i => i.invoiceId.equals(invoiceItemId));
+    const matches = this._items.filter((i) =>
+      i.invoiceId.equals(invoiceItemId)
+    );
     if (matches.length !== 0) {
       return matches[0];
     } else {
@@ -26,7 +29,9 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   public async getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
   ): Promise<InvoiceItem[]> {
-    const match = this._items.filter(i => i.manuscriptId.equals(manuscriptId));
+    const match = this._items.filter((i) =>
+      i.manuscriptId.equals(manuscriptId)
+    );
     return match;
   }
 
@@ -38,7 +43,7 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
     const alreadyExists = await this.exists(invoiceItem);
 
     if (alreadyExists) {
-      this._items.map(i => {
+      this._items.map((i) => {
         if (this.compareMockItems(i, invoiceItem)) {
           return invoiceItem;
         } else {
@@ -56,7 +61,7 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
     const alreadyExists = await this.exists(invoiceItem);
 
     if (alreadyExists) {
-      this._items.map(i => {
+      this._items.map((i) => {
         if (this.compareMockItems(i, invoiceItem)) {
           return invoiceItem;
         } else {
@@ -72,8 +77,12 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
     this.removeMockItem(invoiceItem);
   }
 
+  public async restore(invoiceItem: InvoiceItem): Promise<void> {
+    this.addMockItem(invoiceItem);
+  }
+
   public async exists(invoiceItem: InvoiceItem): Promise<boolean> {
-    const found = this._items.filter(i =>
+    const found = this._items.filter((i) =>
       this.compareMockItems(i, invoiceItem)
     );
     return found.length !== 0;
@@ -84,7 +93,7 @@ export class MockInvoiceItemRepo extends BaseMockRepo<InvoiceItem>
   }
 
   async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
-    const matches = this._items.filter(item => {
+    const matches = this._items.filter((item) => {
       return item.invoiceId.equals(invoiceId);
     });
     return matches;
