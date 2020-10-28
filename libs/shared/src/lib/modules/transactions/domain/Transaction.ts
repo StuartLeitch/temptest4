@@ -20,7 +20,6 @@ interface TransactionProps {
   invoices?: Invoices;
   dateCreated?: Date; // CreateTimestamp
   dateUpdated?: Date; // LastUpdateTimestamp
-  deleted?: number; // soft delete
   totalNumInvoices?: number;
 }
 
@@ -48,10 +47,6 @@ export class Transaction extends AggregateRoot<TransactionProps> {
 
   get dateUpdated(): Date {
     return this.props.dateUpdated;
-  }
-
-  get deleted(): number {
-    return this.props.deleted;
   }
 
   get invoices(): Invoices {
