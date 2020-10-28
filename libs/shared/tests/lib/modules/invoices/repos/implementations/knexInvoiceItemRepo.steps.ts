@@ -83,9 +83,9 @@ Then(
     const invoiceItemIdObj = InvoiceItemId.create(
       new UniqueEntityID(invoiceItemId)
     );
-    const index = mockInvoiceItemRepo.deletedItems.findIndex((item) => {
-      return item.id.equals(invoiceItemIdObj.id);
-    });
+    const index = mockInvoiceItemRepo.deletedItems.findIndex((item) =>
+      item.id.equals(invoiceItemIdObj.id)
+    );
 
     expect(index).to.not.equal(-1);
   }

@@ -280,9 +280,11 @@ Given(
 Then(
   /^The invoice for CustomId "([\w\d]+)" is deleted$/,
   async (customId: string) => {
-    const article = await context.repos.manuscript.findByCustomId(customId);
+    const index = context.repos.manuscript.deletedItems.findIndex(
+      (item) => item.customId === customId
+    );
 
-    expect(article).to.be.null;
+    expect(index).to.not.equal(-1);
   }
 );
 
