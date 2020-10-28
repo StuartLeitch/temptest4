@@ -64,17 +64,16 @@ AS select
         ELSE 'special'::text
       END AS issue_type,
       case 
-        when i.submission_pricing_status = 'priced' and s.special_issue_id is NULL
-          then coalesce(individual_ar.paid_regular_rate, individual_ar.journal_rate, global_ar.journal_rate)
-        when i.submission_pricing_status = 'priced' and s.special_issue_id is not NULL
-          then coalesce(individual_ar.paid_special_issue_rate, individual_ar.journal_rate, global_ar.journal_rate)
         when i.submission_pricing_status is null and s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') 
-          then coalesce(individual_ar.free_rate, individual_ar.journal_rate, global_ar.journal_rate)
+          then coalesce(individual_ar.free_rate, avg_rate.journal_rate, individual_ar.journal_rate)
         when i.submission_pricing_status = 'non-priced'
-          then coalesce(individual_ar.free_rate, individual_ar.journal_rate, global_ar.journal_rate)
-        else null
-      end
-      as acceptance_chance,
+          then coalesce(individual_ar.free_rate, avg_rate.journal_rate, individual_ar.journal_rate)
+        when s.special_issue_id is NULL
+          then coalesce(individual_ar.paid_regular_rate, avg_rate.paid_regular_rate, individual_ar.journal_rate)
+        when s.special_issue_id is not NULL
+          then coalesce(individual_ar.paid_special_issue_rate, avg_rate.paid_special_issue_rate, individual_ar.journal_rate)
+        else coalesce(individual_ar.journal_rate, avg_rate.journal_rate)
+      end as acceptance_chance,
       spec.special_issue_name as "special_issue",
       spec.special_issue_custom_id as "special_issue_custom_id",
       spec.open_date as "special_issue_open_date",
@@ -163,7 +162,7 @@ AS select
         where role_type = 'academicEditor' group by manuscript_custom_id
       ) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
       LEFT JOIN ${acceptanceRatesView.getViewName()} individual_ar on individual_ar."month" = to_char(s.submission_date, 'YYYY-MM-01')::date and s.journal_id = individual_ar.journal_id
-      LEFT JOIN (SELECT "month", avg(journal_rate) as journal_rate from ${acceptanceRatesView.getViewName()} where journal_rate is not null group by "month") global_ar on global_ar."month" = to_char(s.submission_date, 'YYYY-MM-01')::date
+      LEFT JOIN (SELECT journal_id, avg(journal_rate) as journal_rate, avg(paid_regular_rate) as paid_regular_rate, avg(paid_special_issue_rate) as paid_special_issue_rate from ${acceptanceRatesView.getViewName()} group by "journal_id") avg_rate on avg_rate."journal_id" = s.journal_id
       LEFT JOIN LATERAL (select * from ${articleData.getViewName()} a WHERE
           a.manuscript_custom_id = s.manuscript_custom_id
         LIMIT 1) article_data on article_data.manuscript_custom_id = s.manuscript_custom_id
@@ -203,7 +202,7 @@ WITH DATA;
 }
 
 const manuscriptsView = new ManuscriptsView();
-
+console.log(manuscriptsView.getCreateQuery());
 manuscriptsView.addDependency(authorsView);
 manuscriptsView.addDependency(invoicesView);
 manuscriptsView.addDependency(journalSectionsView);
