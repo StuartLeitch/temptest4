@@ -1,6 +1,7 @@
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 // * Domain imports
 import {
+  RestoreSoftDeleteDraftTransactionUsecase,
   GetInvoiceIdByManuscriptCustomIdUsecase,
   GetManuscriptByManuscriptIdUsecase,
   SoftDeleteDraftTransactionUsecase,
@@ -72,8 +73,38 @@ function softDelete(context: Context) {
     );
 
     if (maybeDelete.isLeft()) {
-      logger.error(maybeDelete.value.errorValue().message);
-      throw maybeDelete.value.error;
+      logger.error(maybeDelete.value.message);
+      throw maybeDelete.value;
+    }
+  };
+}
+
+function restore(context: Context) {
+  return async (manuscriptId: string): Promise<void> => {
+    const {
+      repos: { transaction, invoice, invoiceItem, coupon, waiver, manuscript },
+      services: { logger },
+    } = context;
+
+    const usecase = new RestoreSoftDeleteDraftTransactionUsecase(
+      transaction,
+      invoiceItem,
+      manuscript,
+      invoice,
+      coupon,
+      waiver
+    );
+
+    const maybeRestore = await usecase.execute(
+      {
+        manuscriptId,
+      },
+      defaultContext
+    );
+
+    if (maybeRestore.isLeft()) {
+      logger.error(maybeRestore.value.message);
+      throw maybeRestore.value;
     }
   };
 }
@@ -314,4 +345,5 @@ export class SubmissionSubmittedHelpers {
   updateManuscript = updateManuscript(this.context);
   getInvoiceItems = getInvoiceItems(this.context);
   softDelete = softDelete(this.context);
+  restore = restore(this.context);
 }

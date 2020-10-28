@@ -64,9 +64,10 @@ export const SubmissionWithdrawn: EventHandler<SubmissionWithdrawnPayload> = {
         defaultContext
       );
 
-    if (result.isLeft()) {
-      logger.error(result.value.message);
-      throw result.value;
-    }
+      if (result.isLeft()) {
+        logger.error(result.value.message);
+        throw result.value;
+      }
+    };
   },
 };
