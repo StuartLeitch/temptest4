@@ -47,6 +47,10 @@ export class PdfGeneratorService {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
+    const invoiceId = payload.invoice.id.toString();
+    const paymentPath = 'payment-details/';
+
+    const link = payload.invoiceLink.concat(paymentPath, invoiceId);
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox'],
@@ -59,6 +63,7 @@ export class PdfGeneratorService {
       formatPriceFn: FormatUtils.formatPrice,
       dateFormatFn: format,
       ...payload,
+      invoiceLink: link,
       addressCountry: countryList.getName(payload.address.country),
       addressState: stateList.name[payload.address.state],
       companyNumber: process.env.COMPANY_REGISTRATION_NUMBER,
