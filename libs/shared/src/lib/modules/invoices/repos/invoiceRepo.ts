@@ -17,7 +17,8 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]>;
   getInvoicePaymentInfo(invoiceId: InvoiceId): Promise<InvoicePaymentInfo>;
   assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice>;
-  delete(invoice: Invoice): Promise<unknown>;
+  delete(invoice: Invoice): Promise<void>;
+  restore(invoice: Invoice): Promise<void>;
   update(invoice: Invoice): Promise<Invoice>;
   existsWithId(id: InvoiceId): Promise<boolean>;
   getInvoicesIds(

@@ -8,7 +8,8 @@ import manuscriptEditorsView from './ManuscriptEditorsView';
 import manuscriptReviewers from './ManuscriptReviewersView';
 import submissionView from './SubmissionsView';
 
-class ManuscriptReviewsView extends AbstractEventView
+class ManuscriptReviewsView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -35,6 +36,10 @@ AS SELECT
     review_view.submitted as submitted_date,
     review_view.recommendation,
     review_view."teamMemberId" as team_member_id,
+    s.journal_name,
+    s.section_name,
+    s.special_issue_name,
+    s.special_issue_id,
     s.event_id
   from ${REPORTING_TABLES.SUBMISSION} se	
     join ${submissionView.getViewName()} s on se.id = s.event_id,

@@ -13,6 +13,7 @@ import {
   CreateManuscriptDTO,
   GetManuscriptByManuscriptIdUsecase,
   SoftDeleteDraftTransactionUsecase,
+  RestoreSoftDeleteDraftTransactionUsecase,
   EditManuscriptUsecase,
   UpdateInvoiceItemsUsecase,
   GetInvoiceIdByManuscriptCustomIdUsecase,
@@ -78,6 +79,15 @@ export const SubmissionSubmittedHandler = {
       invoiceRepo,
       manuscriptRepo
     );
+
+    const restoreDeletedTransactionsUsecase: RestoreSoftDeleteDraftTransactionUsecase = new RestoreSoftDeleteDraftTransactionUsecase(
+      transactionRepo,
+      invoiceItemRepo,
+      invoiceRepo,
+      manuscriptRepo,
+      couponRepo,
+      waiverRepo
+    );
     const getInvoiceIdByManuscriptCustomIdUsecase: GetInvoiceIdByManuscriptCustomIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
       manuscriptRepo,
       invoiceItemRepo
@@ -116,7 +126,14 @@ export const SubmissionSubmittedHandler = {
     const alreadyExistingManuscript = alreadyExistingManuscriptResult.value.getValue();
 
     if (alreadyExistingManuscript) {
-      if (name in ManuscriptTypeNotInvoiceable) {
+      if (!(name in ManuscriptTypeNotInvoiceable)) {
+        await restoreDeletedTransactionsUsecase.execute(
+          {
+            manuscriptId: submissionId,
+          },
+          defaultContext
+        );
+      } else {
         await softDeleteDraftTransactionUsecase.execute(
           {
             manuscriptId: submissionId,

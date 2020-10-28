@@ -45,7 +45,6 @@ const usecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactio
 let manuscriptId;
 let journalId;
 
-let result: any;
 let transaction: Transaction;
 let invoice: Invoice;
 let invoiceItem: InvoiceItem;
@@ -94,7 +93,7 @@ Given(
 When(
   /^SoftDeleteDraftTransactionUsecase is executed for manuscript "([\w-]+)"$/,
   async (manuscriptTestId: string) => {
-    result = await usecase.execute(
+    await usecase.execute(
       {
         manuscriptId: manuscriptTestId,
       },
@@ -106,8 +105,6 @@ When(
 Then(
   'The DRAFT Transaction associated with the manuscript should be soft deleted',
   async () => {
-    expect(result.value.isSuccess).to.equal(true);
-
     const transactions = await mockTransactionRepo.getTransactionCollection();
     expect(transactions.length).to.equal(0);
   }

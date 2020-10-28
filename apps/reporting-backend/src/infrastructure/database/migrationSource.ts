@@ -194,7 +194,18 @@ class KnexMigrationSource {
     rebuild_materialized_views('20200915122115_add_deleted_invoices', true),
     rebuild_materialized_views('20200916122115_fix_invoices_issue_type', true),
     move_article_events,
-    rebuild_materialized_views('20201023122115_prrccp_fix'),
+    rebuild_materialized_views('20201023122115_prrccp_fix', true),
+    rebuild_materialized_views(
+      '20201026122115_add_more_first_dates_manuscripts',
+      true
+    ),
+    rebuild_materialized_views('20201026132115_add_submission_apc', true),
+    rebuild_materialized_views(
+      '20201026142115_add_journal_info_editors_view',
+      true
+    ),
+    rebuild_materialized_views('20201027142115_rework_submissions_view', true),
+    rebuild_materialized_views('20201027152115_acceptance_rates_fix'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

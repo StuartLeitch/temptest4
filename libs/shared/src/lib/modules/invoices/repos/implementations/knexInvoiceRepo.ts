@@ -403,7 +403,7 @@ export class KnexInvoiceRepo
     return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
-  async delete(invoice: Invoice): Promise<unknown> {
+  async delete(invoice: Invoice): Promise<void> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.INVOICES)
@@ -416,8 +416,21 @@ export class KnexInvoiceRepo
         invoice.id.toString()
       );
     }
+  }
 
-    return deletedRows;
+  async restore(invoice: Invoice): Promise<void> {
+    const { db } = this;
+
+    const restoredRows = await db(TABLES.INVOICES)
+      .where('id', invoice.id.toString())
+      .update({ ...InvoiceMap.toPersistence(invoice), deleted: 0 });
+
+    if (!restoredRows) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice',
+        invoice.id.toString()
+      );
+    }
   }
 
   async update(invoice: Invoice): Promise<Invoice> {

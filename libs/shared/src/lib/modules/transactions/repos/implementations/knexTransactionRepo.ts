@@ -10,7 +10,8 @@ import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRep
 import { RepoError } from '../../../../infrastructure/RepoError';
 import { TransactionRepoContract } from '../transactionRepo';
 
-export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
+export class KnexTransactionRepo
+  extends AbstractBaseDBRepo<Knex, Transaction>
   implements TransactionRepoContract {
   async getTransactionById(transactionId: TransactionId): Promise<Transaction> {
     const { db } = this;
@@ -47,7 +48,7 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
 
     logger.debug('select', {
       correlationId,
-      sql: transactionRow.toString()
+      sql: transactionRow.toString(),
     });
 
     return transactionRow ? TransactionMap.toDomain(transactionRow) : null;
@@ -64,21 +65,34 @@ export class KnexTransactionRepo extends AbstractBaseDBRepo<Knex, Transaction>
     }, []);
   }
 
-  async delete(transaction: Transaction): Promise<unknown> {
+  async delete(transaction: Transaction): Promise<void> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.TRANSACTIONS)
       .where('id', transaction.id.toString())
       .update({ ...TransactionMap.toPersistence(transaction), deleted: 1 });
 
-    return deletedRows
-      ? deletedRows
-      : Promise.reject(
-          RepoError.createEntityNotFoundError(
-            'transaction',
-            transaction.id.toString()
-          )
-        );
+    if (!deletedRows) {
+      throw RepoError.createEntityNotFoundError(
+        'transaction',
+        transaction.id.toString()
+      );
+    }
+  }
+
+  async restore(transaction: Transaction): Promise<void> {
+    const { db } = this;
+
+    const restoredRows = await db(TABLES.TRANSACTIONS)
+      .where('id', transaction.id.toString())
+      .update({ ...TransactionMap.toPersistence(transaction), deleted: 0 });
+
+    if (!restoredRows) {
+      throw RepoError.createEntityNotFoundError(
+        'transaction',
+        transaction.id.toString()
+      );
+    }
   }
 
   async update(transaction: Transaction): Promise<Transaction> {
