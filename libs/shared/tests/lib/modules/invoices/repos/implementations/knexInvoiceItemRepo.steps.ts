@@ -31,7 +31,7 @@ Before(async () => {
 Given(
   /^a invoice item with the id "([\w-]+)"$/,
   async (invoiceItemId: string) => {
-    invoiceItem = makeInvoiceItemData({ invoiceId: invoiceItemId });
+    invoiceItem = makeInvoiceItemData({ id: invoiceItemId });
     await mockInvoiceItemRepo.save(invoiceItem);
   }
 );
@@ -83,10 +83,11 @@ Then(
     const invoiceItemIdObj = InvoiceItemId.create(
       new UniqueEntityID(invoiceItemId)
     );
-    foundInvoiceItem = await mockInvoiceItemRepo.getInvoiceItemById(
-      invoiceItemIdObj
-    );
-    expect(foundInvoiceItem).to.equal(null);
+    const index = mockInvoiceItemRepo.deletedItems.findIndex((item) => {
+      return item.id.equals(invoiceItemIdObj.id);
+    });
+
+    expect(index).to.not.equal(-1);
   }
 );
 

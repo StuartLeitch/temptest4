@@ -82,10 +82,10 @@ Then(
     const transactionIdObj = TransactionId.create(
       new UniqueEntityID(transactionId)
     );
-    foundTransaction = await mockTransactionRepo.getTransactionById(
-      transactionIdObj
+    const index = mockTransactionRepo.deletedItems.findIndex((item) =>
+      item.id.equals(transactionIdObj.id)
     );
-    expect(foundTransaction).to.equal(null);
+    expect(index).to.not.equal(-1);
   }
 );
 
