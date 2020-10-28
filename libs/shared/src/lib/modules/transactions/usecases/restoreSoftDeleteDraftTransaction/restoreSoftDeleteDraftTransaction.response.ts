@@ -1,4 +1,4 @@
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
 
@@ -14,5 +14,5 @@ export type RestoreSoftDeleteDraftTransactionResponse = Either<
   | Errors.TransactionRestoreError
   | Errors.ManuscriptRequiredError
   | UnexpectedError,
-  Result<void>
+  void
 >;

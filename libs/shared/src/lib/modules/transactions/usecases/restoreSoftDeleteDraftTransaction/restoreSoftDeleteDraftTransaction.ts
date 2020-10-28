@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Either, Result, left, right } from '../../../../core/logic/Result';
+import { Either, left, right } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
@@ -153,7 +153,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
         return left(new Errors.ManuscriptRestoreError(err));
       }
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err));
     }
@@ -161,7 +161,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
 
   private verifyData(
     request: DTO
-  ): Either<Errors.ManuscriptRequiredError, Result<void>> {
+  ): Either<Errors.ManuscriptRequiredError, void> {
     if (!request.manuscriptId) {
       return left(new Errors.ManuscriptRequiredError());
     }

@@ -3,7 +3,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
@@ -121,7 +121,7 @@ export class SoftDeleteDraftTransactionUsecase
       invoice.generateInvoiceDraftDeletedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err));
     }
