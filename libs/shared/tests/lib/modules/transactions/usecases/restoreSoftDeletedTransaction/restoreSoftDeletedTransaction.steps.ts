@@ -27,7 +27,6 @@ import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
 
-let result: any;
 let invoice: Invoice;
 let manuscript: Manuscript;
 let transaction: Transaction;
@@ -114,7 +113,7 @@ Given(
 When(
   /^RestoreSoftDeleteDraftTransactionUsecase executes for manuscript "([\w-]+)"$/,
   async (manuscriptTestId: string) => {
-    result = await usecase.execute(
+    await usecase.execute(
       {
         manuscriptId: manuscriptTestId,
       },
@@ -126,7 +125,6 @@ When(
 Then(
   'The DRAFT Transaction tied with the manuscript should be restored',
   async () => {
-    expect(result.value.isSuccess).to.equal(true);
     const transactions = await mockTransactionRepo.getTransactionCollection();
     expect(transactions[0].props.deleted).to.equal(0);
   }
