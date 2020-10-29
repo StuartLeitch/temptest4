@@ -2,51 +2,44 @@
 
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-import { Manuscript } from '../../domain/Manuscript';
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
-import type { EditManuscriptDTO } from './editManuscriptDTO';
-import { EditManuscriptResponse } from './editManuscriptResponse';
-import { EditManuscriptErrors } from './editManuscriptErrors';
+import { Manuscript } from '../../domain/Manuscript';
+
+import { ArticleRepoContract } from '../../repos/articleRepo';
+
+import { EditManuscriptResponse as Response } from './editManuscriptResponse';
+import type { EditManuscriptDTO as DTO } from './editManuscriptDTO';
+import * as Errors from './editManuscriptErrors';
+
+type Context = UsecaseAuthorizationContext;
 
 export class EditManuscriptUsecase
   implements
-    UseCase<
-      EditManuscriptDTO,
-      Promise<EditManuscriptResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      EditManuscriptDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  constructor(private manuscriptRepo: ManuscriptRepoContract) {}
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  constructor(private manuscriptRepo: ArticleRepoContract) {}
 
   private async getAccessControlContext(
-    request: EditManuscriptDTO,
-    context?: UsecaseAuthorizationContext
+    request: DTO,
+    context?: Context
   ): Promise<AccessControlContext> {
     return {};
   }
 
   @Authorize('edit:manuscript')
-  public async execute(
-    request: EditManuscriptDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<EditManuscriptResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 
     const manuscriptId = ManuscriptId.create(
@@ -58,9 +51,7 @@ export class EditManuscriptUsecase
         manuscript = await this.manuscriptRepo.findById(manuscriptId);
       } catch (e) {
         return left(
-          new EditManuscriptErrors.ManuscriptFoundError(
-            manuscriptId.id.toString()
-          )
+          new Errors.ManuscriptFoundError(manuscriptId.id.toString())
         );
       }
 
@@ -69,10 +60,8 @@ export class EditManuscriptUsecase
       }
 
       // * get author details
-      let { authorCountry } = manuscript;
       if (request.authorCountry) {
         manuscript.authorCountry = request.authorCountry;
-        authorCountry = request.authorCountry;
       }
 
       if (request.customId) {
@@ -107,9 +96,13 @@ export class EditManuscriptUsecase
         manuscript.preprintValue = request.preprintValue;
       }
 
-      await this.manuscriptRepo.update(manuscript);
+      try {
+        await this.manuscriptRepo.update(manuscript);
+      } catch (err) {
+        return left(new Errors.ManuscriptUpdateDbError(err));
+      }
 
-      return right(Result.ok<Manuscript>(manuscript));
+      return right(manuscript);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

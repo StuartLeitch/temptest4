@@ -278,7 +278,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
     return Result.ok<Invoice>(invoice);
   }
-  public generateInvoiceDraftEvent(): void {
+  public generateInvoiceDraftCreatedEvent(): void {
     if (this.props.status === InvoiceStatus.DRAFT) {
       const now = new Date();
       this.addDomainEvent(new InvoiceDraftCreated(this, now));

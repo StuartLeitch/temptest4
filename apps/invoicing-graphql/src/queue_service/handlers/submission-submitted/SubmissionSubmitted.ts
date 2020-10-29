@@ -1,6 +1,3 @@
-// /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-// /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { ManuscriptTypeNotInvoiceable } from '@hindawi/shared';
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 
@@ -39,30 +36,28 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
       if (manuscript) {
         if (articleType in ManuscriptTypeNotInvoiceable) {
           await helpers.softDelete(submissionId);
-          return;
         } else {
           await helpers.restore(manuscript.id.toString());
-        }
 
-        if (journalId !== manuscript.journalId) {
-          await helpers.updateInvoicePrice(manuscript.customId, journalId);
-        }
+          if (journalId !== manuscript.journalId) {
+            await helpers.updateInvoicePrice(manuscript.customId, journalId);
+          }
 
-        await helpers.updateManuscript(manuscript, data);
+          await helpers.updateManuscript(manuscript, data);
+          await helpers.updateWaivers(data);
+        }
       } else {
-        if (articleType in ManuscriptTypeNotInvoiceable) {
-          return;
+        if (!(articleType in ManuscriptTypeNotInvoiceable)) {
+          const newManuscript = await helpers.createManuscript(data);
+
+          logger.info('Manuscript Data', newManuscript);
+
+          const newTransaction = await helpers.createTransaction(
+            submissionId,
+            journalId
+          );
+          logger.info(`Transaction Data`, newTransaction);
         }
-
-        const newManuscript = await helpers.createManuscript(data);
-
-        logger.info('Manuscript Data', newManuscript);
-
-        const newTransaction = await helpers.createTransaction(
-          submissionId,
-          journalId
-        );
-        logger.info(`Transaction Data`, newTransaction);
       }
     };
   },

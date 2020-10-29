@@ -286,7 +286,7 @@ export class CreateTransactionUsecase
   }
 
   private dispatchDomainEvents<T extends WithInvoice>(data: T) {
-    data.invoice.generateInvoiceDraftEvent();
+    data.invoice.generateInvoiceDraftCreatedEvent();
     DomainEvents.dispatchEventsForAggregate(data.invoice.id);
 
     return data;
