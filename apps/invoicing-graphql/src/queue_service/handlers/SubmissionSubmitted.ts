@@ -126,14 +126,7 @@ export const SubmissionSubmittedHandler = {
     const alreadyExistingManuscript = alreadyExistingManuscriptResult.value.getValue();
 
     if (alreadyExistingManuscript) {
-      if (!(name in ManuscriptTypeNotInvoiceable)) {
-        await restoreDeletedTransactionsUsecase.execute(
-          {
-            manuscriptId: submissionId,
-          },
-          defaultContext
-        );
-      } else {
+      if (name in ManuscriptTypeNotInvoiceable) {
         await softDeleteDraftTransactionUsecase.execute(
           {
             manuscriptId: submissionId,
@@ -141,6 +134,12 @@ export const SubmissionSubmittedHandler = {
           defaultContext
         );
       }
+      await restoreDeletedTransactionsUsecase.execute(
+        {
+          manuscriptId: submissionId,
+        },
+        defaultContext
+      );
 
       if (journalId !== alreadyExistingManuscript.journalId) {
         let invoiceId = null;
