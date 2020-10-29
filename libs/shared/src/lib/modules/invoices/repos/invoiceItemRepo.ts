@@ -11,6 +11,7 @@ export interface InvoiceItemRepoContract extends Repo<InvoiceItem> {
   ): Promise<InvoiceItem[]>;
   getInvoiceItemCollection(): Promise<InvoiceItem[]>;
   delete(invoiceItem: InvoiceItem): Promise<void>;
+  restore(invoiceItem: InvoiceItem): Promise<void>;
 
   getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]>;
   update(invoiceItem: InvoiceItem): Promise<InvoiceItem>;

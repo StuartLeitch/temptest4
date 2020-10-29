@@ -152,21 +152,34 @@ export class KnexArticleRepo
     return manuscript;
   }
 
-  async delete(manuscript: Manuscript): Promise<unknown> {
+  async delete(manuscript: Manuscript): Promise<void> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.ARTICLES)
       .where('id', manuscript.id.toString())
       .update({ ...ManuscriptMap.toPersistence(manuscript), deleted: 1 });
 
-    return deletedRows
-      ? deletedRows
-      : Promise.reject(
-          RepoError.createEntityNotFoundError(
-            'manuscript',
-            manuscript.id.toString()
-          )
-        );
+    if (!deletedRows) {
+      throw RepoError.createEntityNotFoundError(
+        'manuscript',
+        manuscript.id.toString()
+      );
+    }
+  }
+
+  async restore(manuscript: Manuscript): Promise<void> {
+    const { db } = this;
+
+    const restoredRows = await db(TABLES.ARTICLES)
+      .where('id', manuscript.id.toString())
+      .update({ ...ManuscriptMap.toPersistence(manuscript), deleted: 0 });
+
+    if (!restoredRows) {
+      throw RepoError.createEntityNotFoundError(
+        'manuscript',
+        manuscript.id.toString()
+      );
+    }
   }
 
   filterBy(criteria): unknown {

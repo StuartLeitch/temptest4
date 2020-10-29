@@ -3,7 +3,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
@@ -27,7 +27,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { SoftDeleteDraftTransactionErrors } from './softDeleteDraftTransactionErrors';
+import * as Errors from './softDeleteDraftTransactionErrors';
 import { SoftDeleteDraftTransactionResponse } from './softDeleteDraftTransactionResponse';
 
 export class SoftDeleteDraftTransactionUsecase
@@ -73,11 +73,7 @@ export class SoftDeleteDraftTransactionUsecase
         // * System identifies article by manuscript Id
         manuscript = await this.manuscriptRepo.findById(manuscriptId);
       } catch (err) {
-        return left(
-          new SoftDeleteDraftTransactionErrors.InvoiceItemNotFoundError(
-            request.manuscriptId
-          )
-        );
+        return left(new Errors.InvoiceItemNotFoundError(request.manuscriptId));
       }
 
       try {
@@ -86,11 +82,7 @@ export class SoftDeleteDraftTransactionUsecase
           manuscriptId
         );
       } catch (err) {
-        return left(
-          new SoftDeleteDraftTransactionErrors.InvoiceItemNotFoundError(
-            request.manuscriptId
-          )
-        );
+        return left(new Errors.InvoiceItemNotFoundError(request.manuscriptId));
       }
 
       try {
@@ -98,7 +90,7 @@ export class SoftDeleteDraftTransactionUsecase
         invoice = await this.invoiceRepo.getInvoiceById(invoiceItem.invoiceId);
       } catch (err) {
         return left(
-          new SoftDeleteDraftTransactionErrors.InvoiceNotFoundError(
+          new Errors.InvoiceNotFoundError(
             invoiceItem.invoiceItemId.id.toString()
           )
         );
@@ -111,9 +103,7 @@ export class SoftDeleteDraftTransactionUsecase
         );
       } catch (err) {
         return left(
-          new SoftDeleteDraftTransactionErrors.TransactionNotFoundError(
-            invoice.invoiceId.id.toString()
-          )
+          new Errors.TransactionNotFoundError(invoice.invoiceId.id.toString())
         );
       }
 
@@ -131,7 +121,7 @@ export class SoftDeleteDraftTransactionUsecase
       invoice.generateInvoiceDraftDeletedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

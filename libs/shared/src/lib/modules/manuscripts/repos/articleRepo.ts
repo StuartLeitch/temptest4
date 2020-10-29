@@ -12,7 +12,8 @@ export interface ArticleRepoContract extends Repo<Article | Manuscript> {
     customId: ManuscriptId | string
   ): Promise<Article | Manuscript>;
   getAuthorOfArticle(articleId: ArticleId): Promise<unknown>;
-  delete(manuscript: Manuscript): Promise<unknown>;
+  delete(manuscript: Manuscript): Promise<void>;
+  restore(manuscript: Manuscript): Promise<void>;
   update(manuscript: Manuscript): Promise<Manuscript>;
   filterBy(criteria: any): any;
   findByInvoiceId?(invoiceId: InvoiceId): Promise<Manuscript>;

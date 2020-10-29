@@ -71,12 +71,18 @@ export class MockArticleRepo
     return article;
   }
 
-  public async delete(manuscript: PhenomManuscript): Promise<unknown> {
+  public async delete(manuscript: Manuscript): Promise<void> {
     const index = this._items.findIndex((item) => item.id === manuscript.id);
-    return index < 0 ? null : this._items.splice(index, 1);
+    index < 0 ? null : this._items.splice(index, 1);
   }
 
-  public async update(manuscript: PhenomManuscript): Promise<PhenomManuscript> {
+  public async restore(manuscript: Manuscript): Promise<void> {
+    const index = this._items.findIndex((item) => item.id === manuscript.id);
+    const removed = this._items.splice(index, 1);
+    index < 0 ? this._items.splice(index, 0, ...removed) : null;
+  }
+
+  public async update(manuscript: Manuscript): Promise<Manuscript> {
     const index = this._items.findIndex((item) => item.id === manuscript.id);
     index < -1 ? null : (this._items[index] = manuscript as Article);
     return manuscript;

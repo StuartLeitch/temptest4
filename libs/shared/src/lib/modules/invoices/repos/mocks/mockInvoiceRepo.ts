@@ -150,6 +150,10 @@ export class MockInvoiceRepo
     this.removeMockItem(invoice);
   }
 
+  public async restore(invoice: Invoice): Promise<void> {
+    this.addMockItem(invoice);
+  }
+
   public async exists(invoice: Invoice): Promise<boolean> {
     const found = this._items.filter((i) => this.compareMockItems(i, invoice));
     return found.length !== 0;
