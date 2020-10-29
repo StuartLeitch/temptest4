@@ -202,7 +202,7 @@ WITH DATA;
 }
 
 const manuscriptsView = new ManuscriptsView();
-console.log(manuscriptsView.getCreateQuery());
+
 manuscriptsView.addDependency(authorsView);
 manuscriptsView.addDependency(invoicesView);
 manuscriptsView.addDependency(journalSectionsView);
