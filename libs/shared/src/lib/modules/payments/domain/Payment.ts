@@ -79,14 +79,6 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return this.props.foreignPaymentId;
   }
 
-  get erpid(): string {
-    return this.props.erpid;
-  }
-
-  set erpid(erpId: string) {
-    this.props.erpid = erpId;
-  }
-
   get status(): PaymentStatus {
     return this.props.status;
   }

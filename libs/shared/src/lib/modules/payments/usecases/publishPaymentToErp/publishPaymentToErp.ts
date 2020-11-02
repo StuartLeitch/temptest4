@@ -16,16 +16,16 @@ import {
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
-import { VATService } from '../../../../domain/services/VATService';
+// import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
+// import { VATService } from '../../../../domain/services/VATService';
 import { PublishPaymentToErpResponse } from './publishPaymentToErpResponse';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+// import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
-import { PaymentId } from '../../domain/PaymentId';
+// import { PaymentId } from '../../domain/PaymentId';
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { Payment } from '../../domain/Payment';
+// import { Payment } from '../../domain/Payment';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
@@ -35,13 +35,13 @@ import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRe
 import { PaymentRepoContract } from './../../repos/paymentRepo';
 import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { PayerType } from '../../../payers/domain/Payer';
+// import { PayerType } from '../../../payers/domain/Payer';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 
 export interface PublishPaymentToErpRequestDTO {
   invoiceId?: string;
-  total?: Number;
+  total?: number;
 }
 
 export class PublishPaymentToErpUsecase
