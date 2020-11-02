@@ -13,7 +13,7 @@ import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/i
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
-import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
+// import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
@@ -54,50 +54,50 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         payment,
         coupon,
         waiver,
-        payer
+        payer,
       },
       services: {
         erp,
         logger: loggerService,
         schedulingService,
         qq: queue,
-        vatService,
+        // vatService,
       },
     } = context;
 
-    const publishSageInvoiceToErpUsecase = env.app.erpRegisterInvoicesEnabled
-      ? new PublishInvoiceToErpUsecase(
-          invoice,
-          invoiceItem,
-          coupon,
-          waiver,
-          payer,
-          address,
-          manuscript,
-          catalog,
-          erp?.sage || null,
-          publisher,
-          loggerService,
-          vatService
-        )
-      : new NoOpUseCase();
-    const publishNetsuiteInvoiceToErpUsecase = env.app
-      .erpRegisterInvoicesEnabled
-      ? new PublishInvoiceToErpUsecase(
-          invoice,
-          invoiceItem,
-          coupon,
-          waiver,
-          payer,
-          address,
-          manuscript,
-          catalog,
-          erp?.netsuite || null,
-          publisher,
-          loggerService,
-          vatService
-        )
-      : new NoOpUseCase();
+    // const publishSageInvoiceToErpUsecase = env.app.erpRegisterInvoicesEnabled
+    //   ? new PublishInvoiceToErpUsecase(
+    //       invoice,
+    //       invoiceItem,
+    //       coupon,
+    //       waiver,
+    //       payer,
+    //       address,
+    //       manuscript,
+    //       catalog,
+    //       erp?.sage || null,
+    //       publisher,
+    //       loggerService,
+    //       vatService
+    //     )
+    //   : new NoOpUseCase();
+    // const publishNetsuiteInvoiceToErpUsecase = env.app
+    //   .erpRegisterInvoicesEnabled
+    //   ? new PublishInvoiceToErpUsecase(
+    //       invoice,
+    //       invoiceItem,
+    //       coupon,
+    //       waiver,
+    //       payer,
+    //       address,
+    //       manuscript,
+    //       catalog,
+    //       erp?.netsuite || null,
+    //       publisher,
+    //       loggerService,
+    //       vatService
+    //     )
+    //   : new NoOpUseCase();
 
     const publishCreditNoteToErp = env.app.erpRegisterCreditNotesEnabled
       ? new PublishCreditNoteToErpUsecase(
@@ -155,6 +155,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       publishInvoiceDraftCreated
     );
 
+    // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceDraftDeletedEvent(
       invoice,
       invoiceItem,
@@ -164,6 +165,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       publishInvoiceDraftDeleted
     );
 
+    // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceDraftDueAmountUpdatedEvent(
       invoice,
       invoiceItem,
@@ -173,6 +175,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       publishInvoiceDraftDueAmountUpdated
     );
 
+    // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceCreatedEvent(
       invoice,
       invoiceItem,
@@ -208,8 +211,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       publishInvoiceConfirmed,
-      publishSageInvoiceToErpUsecase,
-      publishNetsuiteInvoiceToErpUsecase,
+      // publishSageInvoiceToErpUsecase,
+      // publishNetsuiteInvoiceToErpUsecase,
       schedulingService,
       loggerService,
       env.scheduler.creditControlReminderDelay,
