@@ -10,6 +10,7 @@ import { WaiverService } from '../../../../../libs/shared/src/lib/domain/service
 
 import { Manuscript } from '../../../../../libs/shared/src/lib/modules/manuscripts/domain/Manuscript';
 import { InvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
+import { WaiverType } from '../../../../../libs/shared/src/lib/modules/waivers/domain/Waiver';
 import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
 
 import { MockPausedReminderRepo } from '../../../../../libs/shared/src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
@@ -23,13 +24,17 @@ import { MockCouponRepo } from '../../../../../libs/shared/src/lib/modules/coupo
 import { MockWaiverRepo } from '../../../../../libs/shared/src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
 
+import { TransactionMap } from '../../../../../libs/shared/src/lib/modules/transactions/mappers/TransactionMap';
 import { ManuscriptMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ManuscriptMap';
+import { InvoiceItemMap } from '../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { ArticleMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ArticleMap';
 import { CatalogMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
+import { InvoiceMap } from '../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
 import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
 import { WaiverMap } from '../../../../../libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
 
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
+import { SoftDeleteDraftTransactionUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import { GetItemsForInvoiceUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceDetails';
 
@@ -255,25 +260,28 @@ Given(
       articleType,
       journalId,
       customId,
+      id: customId,
     });
 
-    event = {
-      submissionId: customId,
-      manuscripts: [
-        {
-          journalId: article.journalId,
-          articleType: { name: article.articleType },
-          customId: article.customId,
-          authors: [
-            {
-              email: article.authorEmail,
-              isCorresponding: true,
-            },
-          ],
-        },
-      ],
-    } as SubmissionSubmitted;
-    await Handler.handler((context as unknown) as Context)(event);
+    const transaction = TransactionMap.toDomain({
+      status: 'DRAFT',
+    });
+
+    const invoice = InvoiceMap.toDomain({
+      transactionId: transaction.id.toString(),
+      status: 'DRAFT',
+    });
+
+    const invoiceItem = InvoiceItemMap.toDomain({
+      manuscriptId: article.id.toString(),
+      invoiceId: invoice.id.toString(),
+      price: 200,
+    });
+
+    context.repos.invoiceItem.addMockItem(invoiceItem);
+    context.repos.transaction.addMockItem(transaction);
+    context.repos.manuscript.addMockItem(article);
+    context.repos.invoice.addMockItem(invoice);
   }
 );
 
@@ -285,6 +293,37 @@ Then(
     );
 
     expect(index).to.not.equal(-1);
+  }
+);
+
+Given(
+  /^Article with CustomId "([\w\d]+)" is deleted$/,
+  async (customId: string) => {
+    const usecase = new SoftDeleteDraftTransactionUsecase(
+      context.repos.transaction,
+      context.repos.invoiceItem,
+      context.repos.invoice,
+      context.repos.manuscript
+    );
+
+    const maybeResult = await usecase.execute(
+      { manuscriptId: customId },
+      defaultUsecaseContext
+    );
+
+    if (maybeResult.isLeft()) {
+      throw maybeResult.value;
+    }
+  }
+);
+
+Then(
+  /^The invoice for CustomId "([\w\d]+)" is restored$/,
+  async (customId: string) => {
+    expect(context.repos.invoiceItem.deletedItems.length).to.be.equal(0);
+    expect(context.repos.transaction.deletedItems.length).to.be.equal(0);
+    expect(context.repos.manuscript.deletedItems.length).to.be.equal(0);
+    expect(context.repos.invoice.deletedItems.length).to.be.equal(0);
   }
 );
 
@@ -305,7 +344,7 @@ Given(
 
 Given('There is a waiver for editors', async () => {
   const waiver = WaiverMap.toDomain({
-    type_id: 'EDITOR_DISCOUNT',
+    type_id: WaiverType.EDITOR_DISCOUNT,
     reduction: 50,
     isActive: true,
   });
@@ -357,13 +396,13 @@ Then(
     expect(maybeInvoiceItems.isRight()).to.be.true;
 
     const items = maybeInvoiceItems.value.getValue();
-    // console.log(JSON.stringify(items[0].waivers, null, 2));
+
     expect(items[0].waivers.length).to.equal(waiversCount);
   }
 );
 
 Then(
-  /^The invoice for CustomId "([\w_.@]+)" remains in DRAFT state$/,
+  /^The invoice for CustomId "([\w\d]+)" remains in DRAFT state$/,
   async (customId: string) => {
     const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
       context.repos.manuscript,
@@ -396,5 +435,22 @@ Then(
     const invoice = maybeInvoice.value.getValue();
 
     expect(invoice.status).to.be.equal(InvoiceStatus.DRAFT);
+  }
+);
+
+Given(
+  /^Invoice for article with CustomId "([\w\d]+)" has waiver applied$/,
+  async (customId: string) => {
+    const manuscript = await context.repos.manuscript.findByCustomId(customId);
+    const [item] = await context.repos.invoiceItem.getInvoiceItemByManuscriptId(
+      manuscript.manuscriptId
+    );
+    const waiver = await context.repos.waiver.getWaiverByType(
+      WaiverType.EDITOR_DISCOUNT
+    );
+    context.repos.waiver.addMockWaiverForInvoiceItem(
+      waiver,
+      item.invoiceItemId
+    );
   }
 );

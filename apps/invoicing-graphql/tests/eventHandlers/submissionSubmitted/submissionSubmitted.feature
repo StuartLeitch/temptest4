@@ -31,6 +31,14 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111114" is deleted
 
+  Scenario: Article is re-submitted after it was soft-deleted
+    Given A "Research Article" with CustomId "111115" is on "foo-journal"
+    And Article with CustomId "111115" is deleted
+    And A "Research Article" with CustomId "111115" is submitted on journal "foo-journal"
+    When The "Submission Submitted" event is triggered
+    Then The invoice for CustomId "111115" is restored
+
+
   Scenario Outline: Article has waivers applied if it is eligible for them
     Given There is an editor for Journal "foo-journal" with email "<editorEmail>"
     And There is a waiver for editors
@@ -42,5 +50,21 @@ Feature: Submission Submitted event handled
 
     Examples:
       | customId | editorEmail     | authorEmail         | waiversApplied |
-      | 111115   | editor@test.com | editor@test.com     | 1              |
-      | 111116   | editor@test.com | not_editor@test.com | 0              |
+      | 111116   | editor@test.com | editor@test.com     | 1              |
+      | 111117   | editor@test.com | not_editor@test.com | 0              |
+
+  Scenario Outline: Article has waivers recalculated on re-submittion
+    Given There is an editor for Journal "foo-journal" with email "<editorEmail>"
+    And There is a waiver for editors
+    And A "Research Article" with CustomId "<customId>" is on "foo-journal"
+    And Invoice for article with CustomId "<customId>" has waiver applied
+    And A "Research Article" with CustomId "<customId>" is submitted on journal "foo-journal"
+    And The corresponding author has email "<authorEmail>"
+    When The "Submission Submitted" event is triggered
+    Then The invoice for CustomId "<customId>" has "<waiversApplied>" waivers applied
+    And The invoice for CustomId "<customId>" remains in DRAFT state
+
+    Examples:
+      | customId | editorEmail     | authorEmail         | waiversApplied |
+      | 111118   | editor@test.com | editor@test.com     | 1              |
+      | 111119   | editor@test.com | not_editor@test.com | 0              |

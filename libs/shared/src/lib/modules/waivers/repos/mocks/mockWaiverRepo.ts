@@ -55,7 +55,7 @@ export class MockWaiverRepo
     }
 
     this.invoiceItemToWaiverMapper[invoiceIdValue].push(newWaiver.id);
-    this._items.push(newWaiver);
+    this.addMockItem(newWaiver);
   }
 
   public async getWaiversByInvoiceItemId(

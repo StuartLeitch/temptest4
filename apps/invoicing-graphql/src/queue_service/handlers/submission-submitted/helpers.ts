@@ -280,7 +280,7 @@ function updateWaivers(context: Context) {
           authorEmail,
           journalId,
           country,
-          invoiceId: item.id.toString(),
+          invoiceId: item.invoiceId.toString(),
         })
     );
 
