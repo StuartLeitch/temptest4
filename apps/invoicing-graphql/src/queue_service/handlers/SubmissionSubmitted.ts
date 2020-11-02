@@ -83,8 +83,8 @@ export const SubmissionSubmittedHandler = {
     const restoreDeletedTransactionsUsecase: RestoreSoftDeleteDraftTransactionUsecase = new RestoreSoftDeleteDraftTransactionUsecase(
       transactionRepo,
       invoiceItemRepo,
-      invoiceRepo,
       manuscriptRepo,
+      invoiceRepo,
       couponRepo,
       waiverRepo
     );
@@ -126,6 +126,14 @@ export const SubmissionSubmittedHandler = {
     const alreadyExistingManuscript = alreadyExistingManuscriptResult.value.getValue();
 
     if (alreadyExistingManuscript) {
+      if (!(name in ManuscriptTypeNotInvoiceable)) {
+        await restoreDeletedTransactionsUsecase.execute(
+          {
+            manuscriptId: submissionId,
+          },
+          defaultContext
+        );
+      }
       if (name in ManuscriptTypeNotInvoiceable) {
         await softDeleteDraftTransactionUsecase.execute(
           {
@@ -134,12 +142,6 @@ export const SubmissionSubmittedHandler = {
           defaultContext
         );
       }
-      await restoreDeletedTransactionsUsecase.execute(
-        {
-          manuscriptId: submissionId,
-        },
-        defaultContext
-      );
 
       if (journalId !== alreadyExistingManuscript.journalId) {
         let invoiceId = null;
