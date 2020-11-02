@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import { BatchUtils } from 'libs/shared/src/lib/utils/Batch';
 import {
   MicroframeworkLoader,
-  MicroframeworkSettings
+  MicroframeworkSettings,
 } from 'microframework-w3tec';
 import { Consumer } from 'sqs-consumer';
 import { env } from '../env';
@@ -16,7 +16,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
   const handlers: ReportingHandlers = settings.getData('handlers');
   const { sqs } = context.services;
 
-  let { QueueUrl } = await sqs
+  const { QueueUrl } = await sqs
     .getQueueUrl({ QueueName: env.aws.sqs.queueName })
     .promise();
 
@@ -30,7 +30,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     sqs,
     queueUrl: QueueUrl,
     batchSize: 10,
-    handleMessageBatch: handler
+    handleMessageBatch: handler,
   });
 
   if (!env.aws.sqs.disabled && !sqsConsumer.isRunning) {

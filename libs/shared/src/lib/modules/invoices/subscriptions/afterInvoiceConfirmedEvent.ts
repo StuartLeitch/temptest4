@@ -26,7 +26,7 @@ import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 import { InvoiceItemRepoContract } from '../repos';
 
-import { PublishInvoiceToErpUsecase } from '../usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
+// import { PublishInvoiceToErpUsecase } from '../usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmedUsecase } from '../usecases/publishEvents/publishInvoiceConfirmed';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 
@@ -39,8 +39,8 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceConfirmed: PublishInvoiceConfirmedUsecase,
-    private invoiceToSageUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
-    private invoiceToNetsuiteUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
+    // private invoiceToSageUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
+    // private invoiceToNetsuiteUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
     private scheduler: SchedulerContract,
     private loggerService: LoggerContract,
     private creditControlReminderDelay: number,
@@ -136,38 +136,38 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
       );
     }
 
-    try {
-      const resp = await this.invoiceToSageUsecase.execute({
-        invoiceId: invoice.id.toString(),
-      });
-      if (resp.isLeft()) {
-        throw resp.value;
-      } else {
-        this.loggerService.info(
-          `[AfterInvoiceActivated]: Successfully executed invoiceToSageUsecase use case AfterInvoiceActivated`
-        );
-      }
-    } catch (error) {
-      this.loggerService.info(
-        `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error.message}`
-      );
-    }
-    try {
-      const resp = await this.invoiceToNetsuiteUsecase.execute({
-        invoiceId: invoice.id.toString(),
-      });
-      if (resp.isLeft()) {
-        throw resp.value;
-      } else {
-        this.loggerService.info(
-          `[AfterInvoiceActivated]: Successfully executed invoiceToNetsuiteUsecase use case AfterInvoiceActivated`
-        );
-      }
-    } catch (error) {
-      this.loggerService.info(
-        `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error.message}`
-      );
-    }
+    // try {
+    //   const resp = await this.invoiceToSageUsecase.execute({
+    //     invoiceId: invoice.id.toString(),
+    //   });
+    //   if (resp.isLeft()) {
+    //     throw resp.value;
+    //   } else {
+    //     this.loggerService.info(
+    //       `[AfterInvoiceActivated]: Successfully executed invoiceToSageUsecase use case AfterInvoiceActivated`
+    //     );
+    //   }
+    // } catch (error) {
+    //   this.loggerService.info(
+    //     `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error.message}`
+    //   );
+    // }
+    // try {
+    //   const resp = await this.invoiceToNetsuiteUsecase.execute({
+    //     invoiceId: invoice.id.toString(),
+    //   });
+    //   if (resp.isLeft()) {
+    //     throw resp.value;
+    //   } else {
+    //     this.loggerService.info(
+    //       `[AfterInvoiceActivated]: Successfully executed invoiceToNetsuiteUsecase use case AfterInvoiceActivated`
+    //     );
+    //   }
+    // } catch (error) {
+    //   this.loggerService.info(
+    //     `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error.message}`
+    //   );
+    // }
   }
 
   private async scheduleReminders(invoice: Invoice, payer: Payer) {

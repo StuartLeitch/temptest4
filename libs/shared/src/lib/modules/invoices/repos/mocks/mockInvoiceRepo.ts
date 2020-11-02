@@ -2,7 +2,9 @@ import { cloneDeep } from 'lodash';
 
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
+import type { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { InvoiceRepoContract } from '../invoiceRepo';
+import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -12,7 +14,10 @@ import { TransactionId } from '../../../transactions/domain/TransactionId';
 export class MockInvoiceRepo
   extends BaseMockRepo<Invoice>
   implements InvoiceRepoContract {
-  constructor() {
+  constructor(
+    private articleRepo?: ArticleRepoContract,
+    private invoiceItemRepo?: InvoiceItemRepoContract
+  ) {
     super();
   }
 
@@ -30,6 +35,10 @@ export class MockInvoiceRepo
   }
 
   public async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
+    return [];
+  }
+
+  public async getInvoicesByCustomId(): Promise<any[]> {
     return [];
   }
 
@@ -141,6 +150,10 @@ export class MockInvoiceRepo
     this.removeMockItem(invoice);
   }
 
+  public async restore(invoice: Invoice): Promise<void> {
+    this.addMockItem(invoice);
+  }
+
   public async exists(invoice: Invoice): Promise<boolean> {
     const found = this._items.filter((i) => this.compareMockItems(i, invoice));
     return found.length !== 0;
@@ -163,12 +176,97 @@ export class MockInvoiceRepo
     yield* this._items.map((item) => item.id.toString());
   }
 
-  async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
-    return [];
+  async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
+    const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRevenueRecognition();
+
+    const [filterArticlesByNotNullDatePublished] = this.articleRepo.filterBy({
+      whereNotNull: 'articles.datePublished',
+    });
+
+    // search invoices through invoice items
+    const invoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+      filterArticlesByNotNullDatePublished.manuscriptId
+    );
+
+    const invoiceQueries = invoiceItems.reduce((aggr, ii) => {
+      aggr.push(this.getInvoiceById(ii.invoiceId));
+      return aggr;
+    }, []);
+
+    const invoicesWithPublishedManuscripts = await Promise.all(invoiceQueries);
+
+    return filterInvoicesReadyForRevenueRecognition(
+      invoicesWithPublishedManuscripts
+    );
   }
 
-  async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
-    return [];
+  public async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
+    return null;
+  }
+
+  public filterReadyForRevenueRecognition() {
+    return (items) =>
+      this.filterBy(
+        {
+          whereIn: [['status', ['ACTIVE', 'FINAL']]],
+          whereNull: [
+            ['cancelledInvoiceReference'],
+            ['revenueRecognitionReference'],
+          ],
+          whereNotNull: ['erpReference'],
+          where: [
+            ['erpReference', '<>', 'NON_INVOICEABLE'],
+            ['erpReference', '<>', 'MigrationRef'],
+            ['erpReference', '<>', 'migrationRef'],
+          ],
+        },
+        items
+      );
+  }
+
+  public filterBy(criteria, items): Invoice[] {
+    // * All these must return true
+    const conditionsMap = {
+      whereNotNull: (value) => value !== null,
+      whereNull: (value) => value === null,
+      whereNot: (value, valueNot) => value !== valueNot,
+      whereIn: (value, ins) => ins.includes(value),
+      where: (field, operator, value) => {
+        if (operator === '<>') {
+          return field !== value;
+        }
+      },
+    };
+
+    for (const [filter, conditions] of Object.entries(criteria)) {
+      items = items.filter((i) => {
+        let toKeep = true;
+        for (const cnd of conditions as any[]) {
+          if (!toKeep) {
+            break;
+          }
+
+          if (filter === 'whereIn' || filter === 'whereNot') {
+            const [field, values] = cnd;
+            toKeep = conditionsMap[filter].call(i, i[field], values);
+          } else if (filter === 'whereNull' || filter === 'whereNotNull') {
+            let field = cnd;
+            if (Array.isArray(cnd)) {
+              [field] = cnd;
+            }
+            toKeep = conditionsMap[filter].call(i, i[field]);
+          } else if (filter === 'where') {
+            const [field, operator, value] = cnd;
+            toKeep = conditionsMap[filter].call(i, i[field], operator, value);
+          } else {
+            toKeep = conditionsMap[filter].call(i, cnd);
+          }
+        }
+        return toKeep;
+      });
+    }
+
+    return items;
   }
 
   async findByCancelledInvoiceReference(id: InvoiceId): Promise<Invoice> {

@@ -36,15 +36,18 @@ export const sisifLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
+    const { sisifEnabled } = env.loaders;
     const {
       services: { schedulingService, logger: loggerService },
     } = context;
 
-    env.scheduler.notificationsQueues.forEach((queue) => {
-      schedulingService.startListening(
-        queue,
-        jobHandlerDispatcher(context, loggerService)
-      );
-    });
+    if (sisifEnabled) {
+      env.scheduler.notificationsQueues.forEach((queue) => {
+        schedulingService.startListening(
+          queue,
+          jobHandlerDispatcher(context, loggerService)
+        );
+      });
+    }
   }
 };

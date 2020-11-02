@@ -26,7 +26,10 @@ import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
-import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import {
+  ErpInvoiceRequest,
+  ErpServiceContract,
+} from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { VATService } from '../../../../../domain/services/VATService';
 
@@ -80,9 +83,6 @@ export class PublishInvoiceToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<PublishInvoiceToErpResponse> {
     this.loggerService.info('PublishInvoiceToERP Request', request);
-    if (process.env.ERP_DISABLED === 'true') {
-      return right(null);
-    }
 
     let invoice: Invoice;
 
@@ -191,7 +191,7 @@ export class PublishInvoiceToErpUsecase
         'PublishInvoiceToERP exchangeService',
         exchangeRateService
       );
-      let rate = 1.42; // ! Average value for the last seven years
+      let finalExchangeRate = 1.42; // ! Average value for the last seven years
       if (invoice && invoice.dateIssued) {
         let exchangeRate = null;
         try {
@@ -207,19 +207,19 @@ export class PublishInvoiceToErpUsecase
           this.loggerService.error('PublishInvoiceToERP exchangeRate', error);
         }
         if (exchangeRate?.exchangeRate) {
-          rate = exchangeRate.exchangeRate;
+          finalExchangeRate = exchangeRate.exchangeRate;
         }
       }
-      this.loggerService.info('PublishInvoiceToERP rate', rate);
+      this.loggerService.info('PublishInvoiceToERP rate', finalExchangeRate);
 
       // * Calculate Tax Rate code
-      // * id=10 O-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
-      let taxRateId = '10';
+      // * id=20 E-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
+      let taxRateId = '20';
       const euCountries = getEuMembers();
       if (euCountries.includes(address.country)) {
         if (payer.type === PayerType.INSTITUTION) {
-          // * id=15 ESSS-GB = ECOutputServices_GB in Sage, i.e. Sales made outside UK but in EU where there is a EU VAT registration number
-          taxRateId = '15';
+          // * id=6 Z-GB = ECOutputServices_GB in Sage, i.e. Sales made outside UK but in EU where there is a EU VAT registration number
+          taxRateId = '6';
         } else {
           // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number
           taxRateId = '7';
@@ -232,7 +232,7 @@ export class PublishInvoiceToErpUsecase
       }
 
       try {
-        const erpData = {
+        const erpData: ErpInvoiceRequest = {
           invoice,
           payer,
           items: invoiceItems,
@@ -240,7 +240,7 @@ export class PublishInvoiceToErpUsecase
           billingAddress: address,
           journalName: catalog.journalTitle,
           vatNote,
-          rate,
+          exchangeRate: finalExchangeRate,
           tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
           customSegmentId: publisherCustomValues?.customSegmentId,
           itemId: publisherCustomValues?.itemId,

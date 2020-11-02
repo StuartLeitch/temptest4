@@ -19,9 +19,9 @@ Feature: Publish invoice to erp system
             | UK           | INDIVIDUAL  | 7       |
             | UK           | INSTITUTION | 7       |
             | RO           | INDIVIDUAL  | 7       |
-            | RO           | INSTITUTION | 15      |
-            | CH           | INDIVIDUAL  | 10      |
-            | CH           | INSTITUTION | 10      |
+            | RO           | INSTITUTION | 6       |
+            | CH           | INDIVIDUAL  | 20      |
+            | CH           | INSTITUTION | 20      |
 
     Scenario: Fully discounted invoices are not sent to sage
         Given There is an fully discounted Invoice with an existing ID "discounted-invoice"

@@ -71,6 +71,10 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return this.props.datePaid;
   }
 
+  set foreignPaymentId(paymentId: string) {
+    this.props.foreignPaymentId = paymentId;
+  }
+
   get foreignPaymentId(): string {
     return this.props.foreignPaymentId;
   }

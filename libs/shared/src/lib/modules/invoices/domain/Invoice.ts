@@ -1,3 +1,5 @@
+import { getYear } from 'date-fns';
+
 // * Core Domain
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
@@ -8,6 +10,9 @@ import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
+import { InvoiceDraftDueAmountUpdated } from './events/invoiceDraftDueAmountUpdated';
+import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
+import { InvoiceDraftDeleted } from './events/invoiceDraftDeleted';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
 import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
@@ -47,6 +52,7 @@ interface InvoiceProps {
   revenueRecognitionReference?: string;
   cancelledInvoiceReference?: string;
   nsRevRecReference?: string;
+  creditNoteReference?: string;
   vatnote?: string;
 }
 
@@ -134,7 +140,13 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       return null;
     }
     const paddedNumber = this.props.invoiceNumber.toString().padStart(5, '0');
-    const creationYear = this.props.dateAccepted.getFullYear();
+    let creationYear = this.props.dateAccepted.getFullYear();
+    if (
+      this.props.dateIssued &&
+      getYear(this.props.dateIssued) < getYear(this.props.dateAccepted)
+    ) {
+      creationYear = this.props.dateIssued.getFullYear();
+    }
     return `${paddedNumber}/${creationYear}`;
   }
 
@@ -176,6 +188,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set nsRevRecReference(nsRevRecReference: string) {
     this.props.nsRevRecReference = nsRevRecReference;
+  }
+
+  get creditNoteReference(): string {
+    return this.props.creditNoteReference;
+  }
+
+  set creditNoteReference(creditNoteReference: string) {
+    this.props.creditNoteReference = creditNoteReference;
   }
 
   get cancelledInvoiceReference(): string {
@@ -267,6 +287,26 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
     return Result.ok<Invoice>(invoice);
   }
+  public generateInvoiceDraftEvent(): void {
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftCreated(this, now));
+    }
+  }
+
+  public generateInvoiceDraftDeletedEvent(): void {
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftDeleted(this, now));
+    }
+  }
+
+  public generateInvoiceDraftAmountUpdatedEvent(): void {
+    if (this.props.status === InvoiceStatus.DRAFT) {
+      const now = new Date();
+      this.addDomainEvent(new InvoiceDraftDueAmountUpdated(this, now));
+    }
+  }
 
   public generateCreatedEvent(): void {
     const now = new Date();
@@ -350,7 +390,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceVatTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );
@@ -362,7 +402,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceNetTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );
@@ -415,4 +455,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   //   const reductionValue = netAmount * reduction;
   //   return netAmount - reductionValue;
   // }
+
+  public isCreditNote(): boolean {
+    return !!this.props.cancelledInvoiceReference;
+  }
 }

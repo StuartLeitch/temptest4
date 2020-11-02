@@ -8,11 +8,7 @@ interface NameProps {
 
 export class Name extends ValueObject<NameProps> {
   get value(): string {
-    return this.props.value;
-  }
-
-  toString(): string {
-    return this.props.value;
+    return this.props.value.trim();
   }
 
   private constructor(props: NameProps) {
@@ -27,5 +23,9 @@ export class Name extends ValueObject<NameProps> {
     }
 
     return Result.ok<Name>(new Name(props));
+  }
+
+  toString(): string {
+    return this.props.value.trim();
   }
 }

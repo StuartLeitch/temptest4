@@ -1,7 +1,7 @@
 import {
   WithAwsSecretsServiceProps,
   ConfigurationMountType,
-  IngressOptionsSpec
+  IngressOptionsSpec,
 } from '@hindawi/phenom-charts';
 import { defaultValues } from '../../default';
 
@@ -23,8 +23,12 @@ const values: WithAwsSecretsServiceProps = {
       },
     },
     ingressOptions: {
-      host: 'invoicing-graphql.qa.phenom.pub',
-    } as IngressOptionsSpec & { host: string },
+      rules: [
+        {
+          host: 'invoicing-graphql.qa.phenom.pub',
+        },
+      ],
+    },
   },
 };
 

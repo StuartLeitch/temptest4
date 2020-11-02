@@ -78,12 +78,23 @@ export class PublishCreditNoteToErpUsecase
     this.loggerService.info('PublishCreditNoteToERP Request', request);
 
     let creditNote: Invoice;
+    let originalInvoice: Invoice;
 
     try {
       creditNote = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(new UniqueEntityID(request.creditNoteId)).getValue()
       );
       this.loggerService.info('PublishCreditNoteToERP credit note', creditNote);
+
+      originalInvoice = await this.invoiceRepo.getInvoiceById(
+        InvoiceId.create(
+          new UniqueEntityID(creditNote.cancelledInvoiceReference)
+        ).getValue()
+      );
+      this.loggerService.info(
+        'PublishCreditNoteToERP original invoice',
+        originalInvoice
+      );
 
       let invoiceItems = creditNote.invoiceItems.currentItems;
       // this.loggerService.info(
@@ -140,18 +151,18 @@ export class PublishCreditNoteToErpUsecase
       try {
         const erpData = {
           creditNote,
+          originalInvoice,
         };
 
         const netSuiteResponse = await this.netSuiteService.registerCreditNote(
           erpData
         );
         this.loggerService.info(
-          `Updating credit note ${creditNote.id.toString()}: netSuiteReference -> ${JSON.stringify(
+          `Updating credit note ${creditNote.id.toString()}: creditNoteReference -> ${JSON.stringify(
             netSuiteResponse
           )}`
         );
-        creditNote.nsReference = String(netSuiteResponse); // netSuiteResponse;
-        creditNote.erpReference = String(netSuiteResponse); // .tradeDocumentId;
+        creditNote.creditNoteReference = String(netSuiteResponse);
 
         // this.loggerService.info('PublishCreditNoteToERP full credit note', creditNote);
         await this.invoiceRepo.update(creditNote);

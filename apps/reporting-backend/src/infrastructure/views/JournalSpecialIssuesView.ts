@@ -5,7 +5,8 @@ import {
 import journalEditorialBoardView from './JournalEditorialBoardView';
 import journalSpecialIssuesDataView from './JournalSpecialIssuesDataView';
 
-class JournalSpecialIssuesView extends AbstractEventView
+class JournalSpecialIssuesView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -44,7 +45,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()} AS
     FROM ${journalEditorialBoardView.getViewName()} jeb
       WHERE jeb.special_issue_id = si_data.special_issue_id
         AND role_type = 'triageEditor'
-    ORDER BY accepted_date desc nulls last, invited_date desc nulls last
+    ORDER BY invited_date desc nulls last
     LIMIT 1
   ) lead_guest_editor on lead_guest_editor.special_issue_id = si_data.special_issue_id
 WITH DATA

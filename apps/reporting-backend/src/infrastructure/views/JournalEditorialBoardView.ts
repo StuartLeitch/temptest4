@@ -7,7 +7,8 @@ import journalsView from './JournalsView';
 import journalSectionsView from './JournalSectionsView';
 import journalSpecialIssuesDataView from './JournalSpecialIssuesDataView';
 
-class JournalEditorialBoardView extends AbstractEventView
+class JournalEditorialBoardView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -26,12 +27,8 @@ AS SELECT
 	editor_view. "status" AS "status",
 	editor_view. "role" ->> 'type' AS role_type,
 	editor_view. "role" ->> 'label' AS role_label,
-	cast_to_timestamp (editor_view. "expiredDate") AS expired_date,
 	cast_to_timestamp (editor_view. "invitedDate") AS invited_date,
-	cast_to_timestamp (editor_view. "removedDate") AS removed_date,
-	cast_to_timestamp (editor_view. "acceptedDate") AS accepted_date,
 	cast_to_timestamp (editor_view. "assignedDate") AS assigned_date,
-	cast_to_timestamp (editor_view. "declinedDate") AS declined_date,
 	editor_view.country AS "country",
 	editor_view. "isCorresponding" AS is_corresponding,
 	editor_view. "userId" AS user_id
@@ -93,8 +90,8 @@ WITH DATA `;
     `create index on ${this.getViewName()} (email)`,
     `create index on ${this.getViewName()} (role_type)`,
     `create index on ${this.getViewName()} (special_issue_id)`,
-    `create index on ${this.getViewName()} (accepted_date desc nulls last, invited_date desc nulls last)`,
-    `create index on ${this.getViewName()} (accepted_date desc nulls last, invited_date desc nulls last, special_issue_id)`,
+    `create index on ${this.getViewName()} (invited_date desc nulls last)`,
+    `create index on ${this.getViewName()} (invited_date desc nulls last, special_issue_id)`,
     `create index on ${this.getViewName()} (section_id)`,
     `create index on ${this.getViewName()} (journal_id)`,
   ];

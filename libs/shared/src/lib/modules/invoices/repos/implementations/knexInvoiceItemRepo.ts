@@ -9,7 +9,8 @@ import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
 
-export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
+export class KnexInvoiceItemRepo
+  extends AbstractBaseDBRepo<Knex, InvoiceItem>
   implements InvoiceItemRepoContract {
   async getInvoiceItemById(invoiceItemId: InvoiceItemId): Promise<InvoiceItem> {
     const { db } = this;
@@ -90,6 +91,21 @@ export class KnexInvoiceItemRepo extends AbstractBaseDBRepo<Knex, InvoiceItem>
       .update({ ...InvoiceItemMap.toPersistence(invoiceItem), deleted: 1 });
 
     if (!deletedRows) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice item',
+        invoiceItem.id.toString()
+      );
+    }
+  }
+
+  async restore(invoiceItem: InvoiceItem): Promise<void> {
+    const { db } = this;
+
+    const restoredRows = await db(TABLES.INVOICE_ITEMS)
+      .where('id', invoiceItem.id.toString())
+      .update({ ...InvoiceItemMap.toPersistence(invoiceItem), deleted: 0 });
+
+    if (!restoredRows) {
       throw RepoError.createEntityNotFoundError(
         'invoice item',
         invoiceItem.id.toString()

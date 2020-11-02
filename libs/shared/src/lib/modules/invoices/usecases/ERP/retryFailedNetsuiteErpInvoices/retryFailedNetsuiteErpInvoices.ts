@@ -93,11 +93,11 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (failedErpInvoices.length === 0) {
-        this.loggerService.info('No failed erp invoices');
+        this.loggerService.info('No failed invoices to register in NetSuite');
         return right(updatedInvoices);
       }
       this.loggerService.info(
-        `Retrying sync with erp for invoices: ${failedErpInvoices
+        `Retrying sync with NetSuite for invoices: ${failedErpInvoices
           .map((i) => i.invoiceId.id.toString())
           .join(', ')}`
       );

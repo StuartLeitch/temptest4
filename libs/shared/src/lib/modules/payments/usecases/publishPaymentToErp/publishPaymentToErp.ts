@@ -23,19 +23,25 @@ import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { PaymentId } from '../../domain/PaymentId';
+import { Invoice } from '../../../invoices/domain/Invoice';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { Payment } from '../../domain/Payment';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { PublisherRepoContract } from '../../../publishers/repos';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { PaymentRepoContract } from './../../repos/paymentRepo';
 import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { PayerType } from '../../../payers/domain/Payer';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 
 export interface PublishPaymentToErpRequestDTO {
-  paymentId?: string;
+  invoiceId?: string;
+  total?: Number;
 }
 
 export class PublishPaymentToErpUsecase
@@ -51,17 +57,19 @@ export class PublishPaymentToErpUsecase
       AccessControlContext
     > {
   constructor(
+    private invoiceRepo: InvoiceRepoContract,
+    private invoiceItemRepo: InvoiceItemRepoContract,
     private paymentRepo: PaymentRepoContract,
-    // private paymentMethodRepo: PaymentMethodRepoContract,
-    // private couponRepo: CouponRepoContract,
-    // private waiverRepo: WaiverRepoContract,
-    // private payerRepo: PayerRepoContract,
+    private paymentMethodRepo: PaymentMethodRepoContract,
+    private couponRepo: CouponRepoContract,
+    private waiverRepo: WaiverRepoContract,
+    private payerRepo: PayerRepoContract,
     // private addressRepo: AddressRepoContract,
-    // private manuscriptRepo: ArticleRepoContract,
-    // private catalogRepo: CatalogRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private catalogRepo: CatalogRepoContract,
     // private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
-    // private publisherRepo: PublisherRepoContract,
+    private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {}
 
@@ -74,76 +82,82 @@ export class PublishPaymentToErpUsecase
     request: PublishPaymentToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishPaymentToErpResponse> {
-    this.loggerService.info('PublishPaymentToERP Request', request);
+    // this.loggerService.info('PublishPaymentToERP Request', request);
 
-    let payment: Payment;
+    // let payment: Payment;
+    let invoice: Invoice;
 
     try {
-      payment = await this.paymentRepo.getPaymentById(
-        PaymentId.create(new UniqueEntityID(request.paymentId)).getValue()
+      invoice = await this.invoiceRepo.getInvoiceById(
+        InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
       );
-      this.loggerService.info('PublishPaymentToERP payment', payment);
+      this.loggerService.info('PublishPaymentToERP invoice', invoice);
 
-      // let invoiceItems = invoice.invoiceItems.currentItems;
-      // this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
+      const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
+      const payments = await this.paymentRepo.getPaymentsByInvoiceId(
+        invoice.invoiceId
+      );
 
-      // if (invoiceItems.length === 0) {
-      //   const getItemsUsecase = new GetItemsForInvoiceUsecase(
-      //     this.invoiceItemRepo,
-      //     this.couponRepo,
-      //     this.waiverRepo
-      //   );
+      let invoiceItems = invoice.invoiceItems.currentItems;
+      // // this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
 
-      //   const resp = await getItemsUsecase.execute({
-      //     invoiceId: request.invoiceId,
-      //   });
-      //   this.loggerService.info(
-      //     'PublishInvoiceToERP getItemsUsecase response',
-      //     resp
-      //   );
-      //   if (resp.isLeft()) {
-      //     throw new Error(
-      //       `Invoice ${invoice.id.toString()} has no invoice items.`
-      //     );
-      //   }
+      if (invoiceItems.length === 0) {
+        const getItemsUsecase = new GetItemsForInvoiceUsecase(
+          this.invoiceItemRepo,
+          this.couponRepo,
+          this.waiverRepo
+        );
 
-      //   invoiceItems = resp.value.getValue();
-      //   this.loggerService.info(
-      //     'PublishInvoiceToERP invoice items',
-      //     invoiceItems
-      //   );
+        const resp = await getItemsUsecase.execute({
+          invoiceId: request.invoiceId,
+        });
+        this.loggerService.info(
+          'PublishInvoiceToERP getItemsUsecase response',
+          resp
+        );
+        if (resp.isLeft()) {
+          throw new Error(
+            `Invoice ${invoice.id.toString()} has no invoice items.`
+          );
+        }
 
-      //   for (const item of invoiceItems) {
-      //     const [coupons, waivers] = await Promise.all([
-      //       this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
-      //       this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
-      //     ]);
-      //     coupons.forEach((c) => item.addCoupon(c));
-      //     item.waivers = waivers;
-      //   }
-      // }
+        invoiceItems = resp.value.getValue();
+        this.loggerService.info(
+          'PublishInvoiceToERP invoice items',
+          invoiceItems
+        );
 
-      // if (invoiceItems.length === 0) {
-      //   throw new Error(`Invoice ${invoice.id} has no invoice items.`);
-      // }
+        for (const item of invoiceItems) {
+          const [coupons, waivers] = await Promise.all([
+            this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
+            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
+          ]);
+          coupons.forEach((c) => item.addCoupon(c));
+          item.waivers = waivers;
+        }
+      }
 
-      // invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
-      // this.loggerService.info(
-      //   'PublishInvoiceToERP full invoice items',
-      //   invoiceItems
-      // );
+      if (invoiceItems.length === 0) {
+        throw new Error(`Invoice ${invoice.id} has no invoice items.`);
+      }
 
-      // // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
-      // if (invoice.getInvoiceTotal() <= 0) {
-      //   invoice.erpReference = 'NON_INVOICEABLE';
-      //   await this.invoiceRepo.update(invoice);
-      //   return right(null);
-      // }
+      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
+      this.loggerService.info(
+        'PublishInvoiceToERP full invoice items',
+        invoiceItems
+      );
 
-      // const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      // if (!payer) {
-      //   throw new Error(`Invoice ${invoice.id} has no payers.`);
-      // }
+      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      if (invoice.getInvoiceTotal() <= 0) {
+        invoice.erpReference = 'NON_INVOICEABLE';
+        await this.invoiceRepo.update(invoice);
+        return right(null);
+      }
+
+      const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
+      if (!payer) {
+        throw new Error(`Invoice ${invoice.id} has no payers.`);
+      }
       // this.loggerService.info('PublishInvoiceToERP payer', payer);
 
       // const address = await this.addressRepo.findById(payer.billingAddressId);
@@ -152,37 +166,37 @@ export class PublishPaymentToErpUsecase
       // }
       // this.loggerService.info('PublishInvoiceToERP address', address);
 
-      // const manuscript = await this.manuscriptRepo.findById(
-      //   invoiceItems[0].manuscriptId
-      // );
-      // if (!manuscript) {
-      //   throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
-      // }
-      // this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
+      const manuscript = await this.manuscriptRepo.findById(
+        invoiceItems[0].manuscriptId
+      );
+      if (!manuscript) {
+        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
+      }
+      this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
 
-      // let catalog;
-      // try {
-      //   catalog = await this.catalogRepo.getCatalogItemByJournalId(
-      //     JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
-      //   );
-      //   if (!catalog) {
-      //     throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
-      //   }
-      //   this.loggerService.info('PublishInvoiceToERP catalog', catalog);
-      // } catch (err) {
-      //   return err;
-      // }
+      let catalog;
+      try {
+        catalog = await this.catalogRepo.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+        );
+        if (!catalog) {
+          throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
+        }
+        this.loggerService.info('PublishInvoiceToERP catalog', catalog);
+      } catch (err) {
+        return err;
+      }
 
-      // const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-      //   catalog?.publisherId
-      // );
-      // if (!publisherCustomValues) {
-      //   throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
-      // }
-      // this.loggerService.info(
-      //   'PublishInvoiceToERP publisher data',
-      //   publisherCustomValues
-      // );
+      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
+        catalog?.publisherId
+      );
+      if (!publisherCustomValues) {
+        throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
+      }
+      this.loggerService.info(
+        'PublishInvoiceToERP publisher data',
+        publisherCustomValues
+      );
 
       // const vatService = new VATService();
       // const vatNote = vatService.getVATNote(
@@ -229,17 +243,20 @@ export class PublishPaymentToErpUsecase
 
       try {
         const erpData = {
-          payment,
-          // payer,
-          // items: invoiceItems,
-          // article: manuscript as any,
+          invoice,
+          payer,
+          paymentMethods,
+          payments,
+          total: request.total,
+          items: invoiceItems,
+          manuscript: manuscript as any,
           // billingAddress: address,
           // journalName: catalog.journalTitle,
           // vatNote,
           // rate,
-          // tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-          // customSegmentId: publisherCustomValues?.customSegmentId,
-          // itemId: publisherCustomValues?.itemId,
+          tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
+          customSegmentId: publisherCustomValues?.customSegmentId,
+          itemId: publisherCustomValues?.itemId,
           // taxRateId,
         };
 
@@ -257,17 +274,19 @@ export class PublishPaymentToErpUsecase
         // );
         // invoice.nsReference = String(netSuiteResponse); // netSuiteResponse; // .tradeDocumentId;
 
+        const [payment] = payments;
         let erpResponse;
         try {
           erpResponse = await this.netSuiteService.registerPayment(erpData);
 
           if (erpResponse) {
             this.loggerService.info(
-              `Updating payment ${payment.id.toString()}: netSuiteReference -> ${JSON.stringify(
+              `Updating invoice ${invoice.id.toString()}: paymentReference -> ${JSON.stringify(
                 erpResponse
               )}`
             );
-            payment.erpid = String(erpResponse); //.tradeDocumentId;
+
+            payment.foreignPaymentId = erpResponse.tradeDocumentId;
           }
         } catch (error) {
           this.loggerService.info(
@@ -279,8 +298,9 @@ export class PublishPaymentToErpUsecase
           erpResponse
         );
 
-        this.loggerService.info('PublishPaymentToERP full payment', payment);
-        // await this.paymentRepo.update(payment);
+        this.loggerService.info('PublishPaymentToERP full invoice', invoice);
+        await this.paymentRepo.updatePayment(payment);
+
         return right(erpResponse);
       } catch (err) {
         return left(err);

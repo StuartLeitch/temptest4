@@ -1,3 +1,4 @@
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
@@ -18,6 +19,7 @@ import { GetPayerDetailsByInvoiceIdUsecase } from '../../payers/usecases/getPaye
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { PublishInvoicePaidUsecase } from '../usecases/publishEvents/publishInvoicePaid';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
+import { PublishPaymentToErpUsecase } from '../../payments/usecases/publishPaymentToErp/publishPaymentToErp';
 
 export class AfterInvoicePaidEvent
   implements HandleContract<InvoicePaymentAddedEvent> {
@@ -31,7 +33,8 @@ export class AfterInvoicePaidEvent
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private publishInvoicePaid: PublishInvoicePaidUsecase,
+    private publishInvoicePaid: PublishInvoicePaidUsecase | NoOpUseCase,
+    private publishPaymentToErp: PublishPaymentToErpUsecase | NoOpUseCase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -113,6 +116,8 @@ export class AfterInvoicePaidEvent
         invoice.invoiceId
       );
 
+      invoice.addItems(invoiceItems);
+
       const publishResult = await this.publishInvoicePaid.execute({
         paymentMethods: paymentMethods.value.getValue(),
         invoiceItems,
@@ -122,15 +127,23 @@ export class AfterInvoicePaidEvent
         invoice,
         payer,
       });
+
       if (publishResult.isLeft()) {
         throw publishResult.value.errorValue();
       }
+
+      await this.publishPaymentToErp.execute({
+        invoiceId: invoice.invoiceId.toString(),
+        total: invoice.getInvoiceTotal(),
+      });
+
       console.log(
         `[AfterInvoicePaid]: Successfully executed onInvoicePaidEvent use case InvoicePaidEvent`
       );
     } catch (err) {
+      console.error(err);
       console.log(
-        `[AfterInvoicePaid]: Failed to execute onInvoicePaidEvent use case InvoicePaidEvent. Err: ${err}`
+        `[AfterInvoicePaid]: Failed to execute onInvoicePaidEvent use case InvoicePaidEvent. Err: ${err.message}`
       );
     }
   }

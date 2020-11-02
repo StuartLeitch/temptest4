@@ -7,6 +7,10 @@ stages:
   - build
   - package
   - deploy
+  - deploy-prod
+
+include:
+  - template: License-Scanning.gitlab-ci.yml
 
 variables:
   DOCKER_HOST: tcp://docker:2375
@@ -76,9 +80,9 @@ Build:
     - git fetch
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-        AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel"
+        AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel --maxParallel=2"
       else
-       AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production"
+       AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production --maxParallel=2"
       fi
     - eval $AFFECTED_COMMAND
     # artifacts can't be uploaded outside $CI_PROJECT_DIR
@@ -90,6 +94,7 @@ Build:
        AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
       fi
     - eval $AFFECTED_COMMAND
+    - mkdir -p dist
     - cp -r dist $CI_PROJECT_DIR
   artifacts:
     paths:
@@ -132,11 +137,7 @@ Package Images:dev:
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
   script:
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-    - aws eks --region eu-west-1 update-kubeconfig --name $CLUSTER
-    - kubectl config set-context --current --namespace=$NAMESPACE
     - cd $HOME
     - ./tools/scripts/deploy-ci.sh
     - cp -r dist-k8s $CI_PROJECT_DIR
@@ -145,13 +146,13 @@ Package Images:dev:
       - dist-k8s
 
 Deploy:dev:
+  tags:
+    - "cluster:hindawi-dev"
   stage: deploy
   dependencies:
     - Package Images:dev
   <<: *script_deploy
   variables:
-    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
-    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
     TENANT: hindawi
     NODE_ENV: dev
     NAMESPACE: dev
@@ -160,17 +161,77 @@ Deploy:dev:
     COMMAND: build-manifests
 
 Deploy:qa:
+  tags:
+    - "cluster:hindawi-dev"
   stage: deploy
   dependencies:
     - Package Images:dev
   <<: *script_deploy
   variables:
-    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
-    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
     TENANT: hindawi
     NODE_ENV: qa
     NAMESPACE: qa
     CLUSTER: hindawi-dev
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:hindawi-demo:
+  tags:
+    - "cluster:hindawi-dev"
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: demo
+    NAMESPACE: demo
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:gsw-demo:
+  tags:
+    - "cluster:hindawi-dev"
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: demo
+    NAMESPACE: demo-gsw
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:gsw-prod:
+  tags:
+    - "cluster:hindawi-prod"
+  stage: deploy-prod
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: prod
+    NAMESPACE: gsw-prod
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:hindawi-prod:
+  tags:
+    - "cluster:hindawi-prod"
+  stage: deploy-prod
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: prod
+    NAMESPACE: prod-hindawi
+    CLUSTER: hindawi-prod
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
 

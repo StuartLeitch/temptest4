@@ -62,8 +62,8 @@ export const SubmissionWithdrawn = {
     );
 
     if (result.isLeft()) {
-      logger.error(result.value.errorValue().message);
-      throw result.value.error;
+      logger.error(result.value.message);
+      throw result.value.message;
     }
   },
 };

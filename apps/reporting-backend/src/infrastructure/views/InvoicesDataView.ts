@@ -50,6 +50,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (invoice_created_date)`,
     `create index on ${this.getViewName()} (invoice_issue_date)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
+    `create index on ${this.getViewName()} (manuscript_custom_id, event, event_timestamp)`,
     `create index on ${this.getViewName()} (reference_number)`,
     `create index on ${this.getViewName()} (cancelled_invoice_reference)`,
     `create index on ${this.getViewName()} (event_id)`,
