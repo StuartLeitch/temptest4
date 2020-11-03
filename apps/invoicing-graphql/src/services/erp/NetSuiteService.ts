@@ -1,7 +1,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { format } from 'date-fns';
+import { format, getYear } from 'date-fns';
 import knex from 'knex';
 
 import {
@@ -616,11 +616,16 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'PATCH',
     };
 
+    let creationYear = creditNote.dateAccepted.getFullYear();
+    if (
+      creditNote.dateIssued &&
+      getYear(creditNote.dateIssued) < getYear(creditNote.dateAccepted)
+    ) {
+      creationYear = creditNote.dateIssued.getFullYear();
+    }
+
     const patchCreditNotePayload: Record<string, any> = {
-      tranId: `CN-${creditNote.invoiceNumber}/${format(
-        new Date(creditNote.dateCreated),
-        'yyyy'
-      )}`,
+      tranId: `CN-${creditNote.invoiceNumber}/${creationYear}`,
     };
 
     try {

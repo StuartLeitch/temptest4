@@ -9,23 +9,26 @@ stages:
   - deploy
   - deploy-prod
 
+include:
+  - template: License-Scanning.gitlab-ci.yml
+
 variables:
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ''
+  DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
   BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
   LATEST_BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:latest
-  AWS_REGION: 'eu-west-1'
-  BT_ENVIRONMENT: 'sandbox'
-  BT_MERCHANT_ID: 'test-merchant-id'
-  BT_PUBLIC_KEY: 'test-public-key'
-  BT_PRIVATE_KEY: 'test-private-key'
-  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
+  AWS_REGION: "eu-west-1"
+  BT_ENVIRONMENT: "sandbox"
+  BT_MERCHANT_ID: "test-merchant-id"
+  BT_PUBLIC_KEY: "test-public-key"
+  BT_PRIVATE_KEY: "test-private-key"
+  VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
   # AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_COMMAND: ''
-  AFFECTED_ARGS: '--base=remotes/origin/develop'
-  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
+  AFFECTED_COMMAND: ""
+  AFFECTED_ARGS: "--base=remotes/origin/develop"
+  AFFECTED_APPS: "shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend"
 
 Install Dependencies:
   interruptible: true
@@ -36,8 +39,8 @@ Install Dependencies:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ['env', '-u', 'DOCKER_HOST']
-      command: ['dockerd-entrypoint.sh']
+      entrypoint: ["env", "-u", "DOCKER_HOST"]
+      command: ["dockerd-entrypoint.sh"]
   image: docker
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
@@ -111,8 +114,8 @@ Package Images:dev:
     - apk add 'py3-botocore<1.18.0'
   services:
     - name: docker:dind
-      entrypoint: ['env', '-u', 'DOCKER_HOST']
-      command: ['dockerd-entrypoint.sh']
+      entrypoint: ["env", "-u", "DOCKER_HOST"]
+      command: ["dockerd-entrypoint.sh"]
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
@@ -144,7 +147,7 @@ Package Images:dev:
 
 Deploy:dev:
   tags:
-    - 'cluster:hindawi-dev'
+    - "cluster:hindawi-dev"
   stage: deploy
   dependencies:
     - Package Images:dev
@@ -159,7 +162,7 @@ Deploy:dev:
 
 Deploy:qa:
   tags:
-    - 'cluster:hindawi-dev'
+    - "cluster:hindawi-dev"
   stage: deploy
   dependencies:
     - Package Images:dev
@@ -174,7 +177,7 @@ Deploy:qa:
 
 Deploy:hindawi-demo:
   tags:
-    - 'cluster:hindawi-dev'
+    - "cluster:hindawi-dev"
   stage: deploy
   dependencies:
     - Package Images:dev
@@ -189,7 +192,7 @@ Deploy:hindawi-demo:
 
 Deploy:gsw-demo:
   tags:
-    - 'cluster:hindawi-dev'
+    - "cluster:hindawi-dev"
   stage: deploy
   dependencies:
     - Package Images:dev
@@ -204,7 +207,7 @@ Deploy:gsw-demo:
 
 Deploy:gsw-prod:
   tags:
-    - 'cluster:hindawi-prod'
+    - "cluster:hindawi-prod"
   stage: deploy-prod
   dependencies:
     - Package Images:dev
@@ -219,7 +222,7 @@ Deploy:gsw-prod:
 
 Deploy:hindawi-prod:
   tags:
-    - 'cluster:hindawi-prod'
+    - "cluster:hindawi-prod"
   stage: deploy-prod
   dependencies:
     - Package Images:dev
