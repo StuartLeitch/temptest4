@@ -133,8 +133,7 @@ export const SubmissionSubmittedHandler = {
           },
           defaultContext
         );
-      }
-      if (name in ManuscriptTypeNotInvoiceable) {
+      } else {
         await softDeleteDraftTransactionUsecase.execute(
           {
             manuscriptId: submissionId,
