@@ -57,11 +57,16 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
           <FormGroup row>
             <Label sm={5}>Invoice Issue Date</Label>
             <Col sm={7}>
-              <DatePicker
-                customInput={<ButtonInput />}
-                selected={new Date(invoice.dateIssued)}
-                onChange={() => ({})}
-              />
+              {invoice.dateIssued ? (
+                <DatePicker
+                  disabled
+                  customInput={<ButtonInput />}
+                  selected={new Date(invoice.dateIssued)}
+                  onChange={() => ({})}
+                />
+              ) : (
+                <Input readOnly plaintext value='---' />
+              )}
             </Col>
           </FormGroup>
           <FormGroup row>
