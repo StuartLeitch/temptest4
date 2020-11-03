@@ -1,21 +1,16 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+
+import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
+import { Waiver, WaiverType } from '../../domain/Waiver';
 
 import { WaiverRepoContract } from '../waiverRepo';
-import { Waiver, WaiverType } from '../../domain/Waiver';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
-// import {TransactionId} from '../../../transactions/domain/TransactionId';
 
 export class MockWaiverRepo
   extends BaseMockRepo<Waiver>
   implements WaiverRepoContract {
   private invoiceItemToWaiverMapper: {
     [key: string]: UniqueEntityID[];
-  } = {};
-
-  private invoiceToInvoiceItemMapper: {
-    [key: string]: string[];
   } = {};
 
   constructor() {
@@ -60,37 +55,7 @@ export class MockWaiverRepo
     }
 
     this.invoiceItemToWaiverMapper[invoiceIdValue].push(newWaiver.id);
-    this._items.push(newWaiver);
-  }
-
-  public addMockInvoiceItemToInvoice(
-    invoiceId: InvoiceId,
-    invoiceItemId: InvoiceItemId
-  ): void {
-    const invoiceIdValue = invoiceId.id.toString();
-    const invoiceItemIdValue = invoiceItemId.id.toString();
-    if (!this.invoiceToInvoiceItemMapper[invoiceIdValue]) {
-      this.invoiceToInvoiceItemMapper[invoiceIdValue] = [];
-    }
-    this.invoiceToInvoiceItemMapper[invoiceIdValue].push(invoiceItemIdValue);
-  }
-
-  public async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
-    const invoiceIdValue = invoiceId.id.toString();
-    const invoiceItemIds = this.invoiceToInvoiceItemMapper[invoiceIdValue];
-    if (invoiceItemIds) {
-      const waiversIds: UniqueEntityID[] = [];
-      invoiceItemIds.map((id) =>
-        waiversIds.push(...this.invoiceItemToWaiverMapper[id])
-      );
-      const waivers: Waiver[] = [];
-      for (let index = 0; index < waiversIds.length; index++) {
-        const waiver = await this.getWaiverById(waiversIds[index]);
-        waivers.push(waiver);
-      }
-      return waivers;
-    }
-    return [];
+    this.addMockItem(newWaiver);
   }
 
   public async getWaiversByInvoiceItemId(
@@ -105,14 +70,11 @@ export class MockWaiverRepo
     return this._items.filter((item) => waiverIds.includes(item.id));
   }
 
-  public async attachWaiverToInvoice(
+  public async attachWaiverToInvoiceItem(
     waiverType: WaiverType,
-    invoiceId: InvoiceId
+    invoiceItemId: InvoiceItemId
   ): Promise<Waiver> {
-    const invoiceItemIds = this.invoiceToInvoiceItemMapper[
-      invoiceId.id.toString()
-    ];
-    if (!invoiceItemIds) {
+    if (!invoiceItemId) {
       return;
     }
     const waiver: Waiver = await this.getWaiverByType(waiverType);
@@ -121,21 +83,20 @@ export class MockWaiverRepo
       return;
     }
 
-    invoiceItemIds.map((id) => {
-      const invoiceIdObject = InvoiceItemId.create(new UniqueEntityID(id));
-      this.addMockWaiverForInvoiceItem(waiver, invoiceIdObject);
-    });
+    const invoiceIdValue = invoiceItemId.id.toString();
+    if (!this.invoiceItemToWaiverMapper[invoiceIdValue]) {
+      this.invoiceItemToWaiverMapper[invoiceIdValue] = [];
+    }
+
+    this.invoiceItemToWaiverMapper[invoiceIdValue].push(waiver.id);
 
     return waiver;
   }
 
-  public async removeInvoiceWaivers(invoiceId: InvoiceId): Promise<void> {
-    const invoiceItemIds = this.invoiceToInvoiceItemMapper[
-      invoiceId.id.toString()
-    ];
-    invoiceItemIds.map((id) => {
-      delete this.invoiceItemToWaiverMapper[id];
-    });
+  public async removeInvoiceItemWaivers(
+    invoiceItemId: InvoiceItemId
+  ): Promise<void> {
+    delete this.invoiceItemToWaiverMapper[invoiceItemId.id.toValue()];
   }
 
   public async getWaiverCollection(): Promise<Waiver[]> {

@@ -20,7 +20,6 @@ interface TransactionProps {
   invoices?: Invoices;
   dateCreated?: Date; // CreateTimestamp
   dateUpdated?: Date; // LastUpdateTimestamp
-  deleted?: number; // soft delete
   totalNumInvoices?: number;
 }
 
@@ -50,10 +49,6 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     return this.props.dateUpdated;
   }
 
-  get deleted(): number {
-    return this.props.deleted;
-  }
-
   get invoices(): Invoices {
     return this.props.invoices;
   }
@@ -61,22 +56,6 @@ export class Transaction extends AggregateRoot<TransactionProps> {
   get totalNumInvoices(): number {
     return this.props.totalNumInvoices;
   }
-
-  // get netAmount(): number {
-  //   return this.props.invoices.reduce((amount: number, invoice: Invoice) => {
-  //     // invoice.netAmount = Math.round(
-  //     //   this.amount.value / this.props.invoices.length
-  //     // );
-  //     amount += invoice.invoiceItems.reduce(
-  //       (price: number, invoiceItem: InvoiceItem) => {
-  //         price += invoiceItem.price;
-  //         return price;
-  //       },
-  //       0
-  //     );
-  //     return amount;
-  //   }, 0);
-  // }
 
   private constructor(props: TransactionProps, id?: UniqueEntityID) {
     super(props, id);
@@ -94,13 +73,6 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     };
     const transaction = new Transaction(defaultValues, id);
 
-    // const idWasProvided = !!id;
-    // if (!idWasProvided) {
-    //   transaction.addDomainEvent(
-    //     new TransactionCreatedEvent(transaction.transactionId, new Date())
-    //   );
-    // }
-
     return Result.ok<Transaction>(transaction);
   }
 
@@ -117,27 +89,6 @@ export class Transaction extends AggregateRoot<TransactionProps> {
     // this.addDomainEvent(new CommentPosted(this, comment));
     return Result.ok<void>();
   }
-
-  // public removeInvoice(invoice: Invoice): void {
-  //   this.props.invoices = this.props.invoices.filter(
-  //     i => !i.id.equals(invoice.id)
-  //   );
-
-  //   // adjust invoices net amounts
-  //   this.adjustInvoices();
-  // }
-
-  // public clearInvoices(): void {
-  //   this.props.invoices = [];
-  // }
-
-  // private adjustInvoices(): void {
-  //   this.props.invoices.forEach(invoice => {
-  //     // invoice.netAmount = Math.round(
-  //     //   this.amount.value / this.props.invoices.length
-  //     // );
-  //   });
-  // }
 
   public markAsActive(): void {
     const now = new Date();

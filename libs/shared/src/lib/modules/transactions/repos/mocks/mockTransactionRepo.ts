@@ -8,17 +8,23 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 export class MockTransactionRepo
   extends BaseMockRepo<Transaction>
   implements TransactionRepoContract {
+  deletedItems: Transaction[] = [];
+
   constructor() {
     super();
   }
 
   public async delete(transaction: Transaction): Promise<void> {
-    this.removeMockItem(transaction);
+    this.deletedItems.push(transaction);
   }
 
   public async restore(transaction: Transaction): Promise<void> {
-    const restoredTransaction = transaction;
-    restoredTransaction.props.deleted = 0;
+    const index = this.deletedItems.findIndex((item) =>
+      item.id.equals(transaction.id)
+    );
+    if (index >= 0) {
+      this.deletedItems.splice(index, 1);
+    }
   }
 
   public async update(transaction: Transaction): Promise<Transaction> {

@@ -9,6 +9,8 @@ import { InvoiceId } from '../../domain/InvoiceId';
 export class MockInvoiceItemRepo
   extends BaseMockRepo<InvoiceItem>
   implements InvoiceItemRepoContract {
+  deletedItems: InvoiceItem[] = [];
+
   constructor() {
     super();
   }
@@ -17,7 +19,7 @@ export class MockInvoiceItemRepo
     invoiceItemId: InvoiceItemId
   ): Promise<InvoiceItem> {
     const matches = this._items.filter((i) =>
-      i.invoiceId.equals(invoiceItemId)
+      i.invoiceItemId.equals(invoiceItemId)
     );
     if (matches.length !== 0) {
       return matches[0];
@@ -74,11 +76,16 @@ export class MockInvoiceItemRepo
   }
 
   public async delete(invoiceItem: InvoiceItem): Promise<void> {
-    this.removeMockItem(invoiceItem);
+    this.deletedItems.push(invoiceItem);
   }
 
   public async restore(invoiceItem: InvoiceItem): Promise<void> {
-    this.addMockItem(invoiceItem);
+    const index = this.deletedItems.findIndex((item) =>
+      item.id.equals(invoiceItem.id)
+    );
+    if (index >= 0) {
+      this.deletedItems.splice(index, 1);
+    }
   }
 
   public async exists(invoiceItem: InvoiceItem): Promise<boolean> {

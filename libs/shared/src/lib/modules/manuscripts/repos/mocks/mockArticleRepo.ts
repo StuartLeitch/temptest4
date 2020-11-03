@@ -11,6 +11,8 @@ type PhenomManuscript = Article | Manuscript;
 export class MockArticleRepo
   extends BaseMockRepo<PhenomManuscript>
   implements ArticleRepoContract {
+  deletedItems: Manuscript[] = [];
+
   constructor() {
     super();
   }
@@ -72,19 +74,23 @@ export class MockArticleRepo
   }
 
   public async delete(manuscript: Manuscript): Promise<void> {
-    const index = this._items.findIndex((item) => item.id === manuscript.id);
-    index < 0 ? null : this._items.splice(index, 1);
+    this.deletedItems.push(manuscript);
   }
 
   public async restore(manuscript: Manuscript): Promise<void> {
-    const index = this._items.findIndex((item) => item.id === manuscript.id);
-    const removed = this._items.splice(index, 1);
-    index < 0 ? this._items.splice(index, 0, ...removed) : null;
+    const index = this.deletedItems.findIndex((item) =>
+      item.id.equals(manuscript.id)
+    );
+    if (index >= 0) {
+      this.deletedItems.splice(index, 1);
+    }
   }
 
   public async update(manuscript: Manuscript): Promise<Manuscript> {
     const index = this._items.findIndex((item) => item.id === manuscript.id);
-    index < -1 ? null : (this._items[index] = manuscript as Article);
+    if (index >= 0) {
+      this._items[index] = manuscript;
+    }
     return manuscript;
   }
 

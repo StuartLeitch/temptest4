@@ -136,7 +136,9 @@ export class PayPalProcessFinishedUsecase
     };
   }
 
-  private async savePaymentChanges<T extends WithPayment>(request: T) {
+  private async savePaymentChanges<T extends WithPayment>(
+    request: T
+  ): Promise<Either<Errors.UpdatePaymentStatusDbError, T>> {
     try {
       const payment = await this.paymentRepo.updatePayment(request.payment);
 

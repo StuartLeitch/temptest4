@@ -1,49 +1,44 @@
+import { Before, Given, Then, When } from 'cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
 
 import {
-  Roles,
   UsecaseAuthorizationContext,
+  Roles,
 } from '../../../../../../src/lib/domain/authorization';
 
-import { Invoice } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
-import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
-import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
-import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
-import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { TransactionStatus } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
 import { Manuscript } from '../../../../../../src/lib/modules/manuscripts/domain/Manuscript';
-import { RestoreSoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
-import {
-  Transaction,
-  TransactionStatus,
-} from '../../../../../../src/lib/modules/transactions/domain/Transaction';
-import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
-import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
+import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 
-import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
-import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+
+import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
+import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
-let invoice: Invoice;
+import { RestoreSoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
+import { SoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+
 let manuscript: Manuscript;
-let transaction: Transaction;
-let invoiceItem: InvoiceItem;
 
-let manuscriptId;
-let journalId;
-
+let mockInvoiceItemRepo: MockInvoiceItemRepo;
+let mockTransactionRepo: MockTransactionRepo;
+let mockArticleRepo: MockArticleRepo;
+let mockInvoiceRepo: MockInvoiceRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
-let mockInvoiceRepo: MockInvoiceRepo;
-let mockArticleRepo: MockArticleRepo;
-let mockTransactionRepo: MockTransactionRepo;
-let mockInvoiceItemRepo: MockInvoiceItemRepo;
+
 let usecase: RestoreSoftDeleteDraftTransactionUsecase;
 
-let defaultContext: UsecaseAuthorizationContext;
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 Before(function () {
   mockTransactionRepo = new MockTransactionRepo();
@@ -52,10 +47,6 @@ Before(function () {
   mockArticleRepo = new MockArticleRepo();
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
-
-  defaultContext = {
-    roles: [Roles.SUPER_ADMIN],
-  };
 
   usecase = new RestoreSoftDeleteDraftTransactionUsecase(
     mockTransactionRepo,
@@ -69,10 +60,7 @@ Before(function () {
 
 Given(
   /^A resubmitted manuscript "([\w-]+)" on journal "([\w-]+)"$/,
-  async function (manuscriptTestId: string, journalTestId: string) {
-    journalId = journalTestId;
-    manuscriptId = manuscriptTestId;
-
+  async function (manuscriptId: string, journalId: string) {
     manuscript = ArticleMap.toDomain({
       id: manuscriptId,
       journalId: journalId,
@@ -86,17 +74,17 @@ Given(
 Given(
   /^An Invoice with a DRAFT Transaction and an Invoice Item linked to the manuscript "([\w-]+)"$/,
   async function (manuscriptTestId: string) {
-    transaction = TransactionMap.toDomain({
+    const transaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT,
       deleted: 1,
     });
 
-    invoice = InvoiceMap.toDomain({
+    const invoice = InvoiceMap.toDomain({
       status: InvoiceStatus.DRAFT,
       transactionId: transaction.transactionId.id.toString(),
     });
 
-    invoiceItem = InvoiceItemMap.toDomain({
+    const invoiceItem = InvoiceItemMap.toDomain({
       manuscriptId: manuscriptTestId,
       invoiceId: invoice.invoiceId.id.toString(),
     });
@@ -110,38 +98,60 @@ Given(
   }
 );
 
+Given(
+  /^The manuscript with id "([\w-]+)" is withdrawn$/,
+  async (manuscriptId: string) => {
+    const usecase = new SoftDeleteDraftTransactionUsecase(
+      mockTransactionRepo,
+      mockInvoiceItemRepo,
+      mockInvoiceRepo,
+      mockArticleRepo
+    );
+
+    const maybeDelete = await usecase.execute({ manuscriptId }, defaultContext);
+
+    if (maybeDelete.isLeft()) {
+      throw maybeDelete.value;
+    }
+  }
+);
+
 When(
   /^RestoreSoftDeleteDraftTransactionUsecase executes for manuscript "([\w-]+)"$/,
   async (manuscriptTestId: string) => {
-    await usecase.execute(
+    const maybeResult = await usecase.execute(
       {
         manuscriptId: manuscriptTestId,
       },
       defaultContext
     );
+    if (maybeResult.isLeft()) {
+      throw maybeResult.value;
+    }
   }
 );
 
 Then(
   'The DRAFT Transaction tied with the manuscript should be restored',
   async () => {
-    const transactions = await mockTransactionRepo.getTransactionCollection();
-    expect(transactions[0].props.deleted).to.equal(0);
+    expect(mockTransactionRepo.deletedItems.length).to.equal(0);
   }
 );
 
 Then(
   'The DRAFT Invoice tied with the manuscript should be restored',
   async () => {
-    const invoices = await mockInvoiceRepo.getInvoiceCollection();
-    expect(invoices.length).to.equal(1);
+    expect(mockInvoiceRepo.deletedItems.length).to.equal(0);
   }
 );
 
 Then(
   'The Invoice Item tied with the manuscript should be restored',
   async () => {
-    const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
-    expect(invoiceItems.length).to.equal(1);
+    expect(mockInvoiceItemRepo.deletedItems.length).to.equal(0);
   }
 );
+
+Then('The Manuscript should be restored', async () => {
+  expect(mockArticleRepo.deletedItems.length).to.equal(0);
+});

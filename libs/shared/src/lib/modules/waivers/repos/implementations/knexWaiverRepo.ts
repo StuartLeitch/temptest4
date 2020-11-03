@@ -1,18 +1,16 @@
-/* eslint-disable @typescript-eslint/camelcase */
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
-// import { Invoice } from '../../../invoices/domain/Invoice';
-import { Waiver, WaiverType } from '../../domain/Waiver';
-import { WaiverMap } from '../../mappers/WaiverMap';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import {
-  RepoError /*, RepoErrorCode */,
-} from '../../../../infrastructure/RepoError';
-import { WaiverRepoContract } from '../waiverRepo';
-import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
-export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
+import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
+import { WaiverType, Waiver } from '../../domain/Waiver';
+
+import { WaiverMap } from '../../mappers/WaiverMap';
+
+import { WaiverRepoContract } from '../waiverRepo';
+
+export class KnexWaiverRepo
+  extends AbstractBaseDBRepo<Knex, Waiver>
   implements WaiverRepoContract {
   async getWaiversByInvoiceItemId(
     invoiceItemId: InvoiceItemId
@@ -39,57 +37,19 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     return waivers.map((w) => WaiverMap.toDomain(w));
   }
 
-  async getWaiversByInvoiceId(invoiceId: InvoiceId): Promise<Waiver[]> {
-    const waivers = await this.db
-      .select()
-      .from(TABLES.INVOICE_ITEMS)
-      .where({
-        [`${TABLES.INVOICE_ITEMS}.invoiceId`]: invoiceId.id.toString(),
-      })
-      .join(
-        TABLES.INVOICE_ITEMS_TO_WAIVERS,
-        `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.invoiceItemId`,
-        '=',
-        `${TABLES.INVOICE_ITEMS}.id`
-      )
-      .join(
-        TABLES.WAIVERS,
-        `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.waiverId`,
-        '=',
-        `${TABLES.WAIVERS}.type_id`
-      );
-
-    return waivers.map((w) => WaiverMap.toDomain(w));
-  }
-
   async getWaivers(): Promise<Waiver[]> {
     const waivers = await this.db.select().from(TABLES.WAIVERS);
 
     return waivers.map((w) => WaiverMap.toDomain(w));
   }
 
-  async attachWaiverToInvoice(
+  async attachWaiverToInvoiceItem(
     waiverType: WaiverType,
-    invoiceId: InvoiceId,
+    invoiceItemId: InvoiceItemId,
     dateCreated?: Date
   ): Promise<Waiver> {
-    const invoiceItem = await this.db
-      .select()
-      .from(TABLES.INVOICE_ITEMS)
-      .where({
-        [`${TABLES.INVOICE_ITEMS}.invoiceId`]: invoiceId.id.toString(),
-      })
-      .first();
-
-    if (!invoiceItem) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice',
-        invoiceId.id.toString()
-      );
-    }
-
     let toInsert: any = {
-      invoiceItemId: invoiceItem.id,
+      invoiceItemId: invoiceItemId.id.toString(),
       waiverId: waiverType,
     };
 
@@ -98,6 +58,7 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     }
 
     try {
+      console.log(JSON.stringify(toInsert, null, 2));
       await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS).insert(toInsert);
     } catch (e) {
       throw RepoError.fromDBError(e);
@@ -106,25 +67,11 @@ export class KnexWaiverRepo extends AbstractBaseDBRepo<Knex, Waiver>
     return await this.getWaiversByTypes([waiverType])[0];
   }
 
-  async removeInvoiceWaivers(invoiceId: InvoiceId) {
-    const invoiceItems = await this.db
-      .select('id')
-      .from(TABLES.INVOICE_ITEMS)
-      .where({
-        [`${TABLES.INVOICE_ITEMS}.invoiceId`]: invoiceId.id.toString(),
-      });
-    const invoiceItemIds = invoiceItems.map((item) => item['id']);
-
-    if (!invoiceItemIds.length) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice',
-        invoiceId.id.toString()
-      );
-    }
-
+  async removeInvoiceItemWaivers(invoiceItemId: InvoiceItemId): Promise<void> {
+    const itemsIds = [invoiceItemId.id.toString()];
     try {
       await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS)
-        .whereIn('invoiceItemId', invoiceItemIds)
+        .whereIn('invoiceItemId', itemsIds)
         .del();
     } catch (e) {
       throw RepoError.fromDBError(e);

@@ -22,7 +22,7 @@ interface GetEditorsByJournalDTO {
   journalId: string;
 }
 
-type GetEditorsByJournalResponse = Either<UnexpectedError | unknown, Editor[]>;
+type GetEditorsByJournalResponse = Either<UnexpectedError, Editor[]>;
 
 export class GetEditorsByJournalUsecase
   implements

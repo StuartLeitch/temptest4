@@ -5,7 +5,8 @@ import { EditorId } from '../../domain/EditorId';
 import { JournalId } from '../../domain/JournalId';
 import { EditorRepoContract } from '../editorRepo';
 
-export class MockEditorRepo extends BaseMockRepo<Editor>
+export class MockEditorRepo
+  extends BaseMockRepo<Editor>
   implements EditorRepoContract {
   constructor() {
     super();

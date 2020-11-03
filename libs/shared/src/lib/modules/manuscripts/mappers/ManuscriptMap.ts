@@ -15,6 +15,7 @@ export class ManuscriptMap extends Mapper<Manuscript> {
         authorSurname: raw.authorSurname,
         datePublished: raw.datePublished,
         preprintValue: raw.preprintValue,
+        journalId: raw.journalId,
       },
       new UniqueEntityID(raw.id)
     );
