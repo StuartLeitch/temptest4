@@ -4,7 +4,7 @@ import {
   buildMockContext,
   MockContext,
 } from '../../../../../../specs/utils/mockContextBuilder';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before, After } from 'cucumber';
 import { RecordPaymentUsecase } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPayment';
 import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
 import { RecordPaymentDTO } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentDTO';
@@ -21,7 +21,10 @@ import {
   PayerMap,
   PaymentMethodMap,
   ArticleMap,
+  AfterPaymentCompleted,
 } from '../../../../../../src';
+import { NoOpUseCase } from '../../../../../../src/lib/core/domain/NoOpUseCase';
+import { DomainEvents } from '../../../../../../src/lib/core/domain/events/DomainEvents';
 
 let usecase: RecordPaymentUsecase;
 let context: MockContext;
@@ -30,7 +33,7 @@ let request: RecordPaymentDTO;
 const authContext: UsecaseAuthorizationContext = {
   roles: [Roles.PAYER],
 };
-
+let subscription: AfterPaymentCompleted;
 const testInvoiceId = 'test-invoice';
 const testManuscriptCustomId = '88888';
 let testPaymentId;
@@ -66,6 +69,7 @@ Before(async function () {
     transactionId: 'transaction-id',
     dateCreated: new Date(),
     id: testInvoiceId,
+    status: 'ACTIVE',
   });
   const invoiceItem = InvoiceItemMap.toDomain({
     invoiceId: testInvoiceId,
@@ -73,6 +77,7 @@ Before(async function () {
     price: 1000,
   });
   const article = ArticleMap.toDomain({
+    id: testManuscriptCustomId,
     customId: testManuscriptCustomId,
   });
   const payer = PayerMap.toDomain({
@@ -83,16 +88,34 @@ Before(async function () {
   await context.repos.invoiceItem.save(invoiceItem);
   await context.repos.payer.save(payer);
   await context.repos.manuscript.save(article);
+  const publishPaymentToErp = new NoOpUseCase();
+
+  subscription = new AfterPaymentCompleted(
+    context.repos.invoice,
+    context.services.logger,
+    publishPaymentToErp
+  );
+});
+
+After(async function () {
+  DomainEvents.clearHandlers();
 });
 
 Given(
-  /^1 non-final Bank Transfer payment with the amount (\d+) is applied$/,
-  async function (amount: number) {
+  /^1 "([\w-]+)" Bank Transfer payment with the amount (\d+) is applied$/,
+  async function (paymentType: string, amount: number) {
+    let isFinalPayment = false;
+
+    if (paymentType === 'final') {
+      console.log('setting final');
+      isFinalPayment = true;
+    }
+
     testPaymentId = 'Bank Transfer';
     request = {
       invoiceId: testInvoiceId,
       amount,
-      isFinalPayment: false,
+      isFinalPayment,
       paymentReference: '123',
     };
 
@@ -109,11 +132,32 @@ Given(
 
 Then(/^The payment amount is (\d+)$/, async (amount: number) => {
   expect(response.isRight()).to.eq(true);
-  expect(
-    (
-      await context.repos.payment.getPaymentByInvoiceId(
-        InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
-      )
-    ).amount
-  ).to.equal(amount);
+  const payments = await context.repos.payment.getPaymentsByInvoiceId(
+    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+  );
+  const expectedAmount = payments.reduce((acc, p) => acc + p.amount.value, 0);
+  expect(expectedAmount).to.equal(amount);
+});
+
+Then(/^The payments are of type "Bank Transfer"$/, async () => {
+  expect(response.isRight()).to.eq(true);
+  const payments = await context.repos.payment.getPaymentsByInvoiceId(
+    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+  );
+  const paymentMethod = await context.repos.paymentMethod.getPaymentMethodByName(
+    'Bank Transfer'
+  );
+  for (let payment of payments) {
+    expect(payment.paymentMethodId.toString()).to.equal(
+      paymentMethod.id.toString()
+    );
+  }
+});
+
+Then(/^The paid invoice has the status "([\w-]+)"$/, async (status: string) => {
+  expect(response.isRight()).to.eq(true);
+  const invoice = await context.repos.invoice.getInvoiceById(
+    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+  );
+  expect(invoice.status).to.equal(status);
 });
