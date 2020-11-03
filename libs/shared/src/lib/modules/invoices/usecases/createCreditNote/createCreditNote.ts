@@ -151,6 +151,7 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.nsReference = null;
       clonedRawInvoice.revenueRecognitionReference = null;
       clonedRawInvoice.nsRevRecReference = null;
+      clonedRawInvoice.creationReason = request.reason;
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {

@@ -60,6 +60,7 @@
     "src/lib/infrastructure/database/knex/migrations/20200818163344_add_arxiv_id_to_manuscript.js",
     "src/lib/infrastructure/database/knex/migrations/20200818172244_drop_journals_table.js",
     "src/lib/infrastructure/database/knex/migrations/20200903103030_change_arxivId_to_preprintValue.js",
-    "src/lib/infrastructure/database/knex/migrations/20200910125210_add_creditnotereference_to_invoices_table.js"
+    "src/lib/infrastructure/database/knex/migrations/20200910125210_add_creditnotereference_to_invoices_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20201103114325_add_reason_to_invoices_table.js"
   ]
 }

@@ -514,12 +514,12 @@ export const invoice: Resolvers<Context> = {
           coupon: couponRepo,
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
-          manuscript: manuscriptRepo,
+          // manuscript: manuscriptRepo,
         },
         services: { waiverService },
       } = context;
 
-      const { invoiceId, createDraft } = args;
+      const { invoiceId, createDraft, reason } = args;
 
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
         // paymentRepo,
@@ -538,6 +538,7 @@ export const invoice: Resolvers<Context> = {
         {
           invoiceId,
           createDraft,
+          reason,
         },
         usecaseContext
       );
