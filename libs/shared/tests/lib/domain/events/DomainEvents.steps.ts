@@ -27,6 +27,8 @@ Given('and a CouponPublish handler class', async function () {
 });
 
 When('we set up a CouponPublish subscription', async () => {
+  DomainEvents.clearHandlers();
+  DomainEvents.clearMarkedAggregates();
   publish.setupSubscriptions();
 });
 

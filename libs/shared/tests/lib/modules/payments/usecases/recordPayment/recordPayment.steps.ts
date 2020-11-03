@@ -97,8 +97,9 @@ Before(async function () {
   );
 });
 
-After(async function () {
+After(function () {
   DomainEvents.clearHandlers();
+  DomainEvents.clearMarkedAggregates();
 });
 
 Given(
