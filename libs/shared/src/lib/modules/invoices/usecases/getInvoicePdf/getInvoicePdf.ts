@@ -88,6 +88,7 @@ export class GetInvoicePdfUsecase
   ): Promise<GetInvoicePdfResponse> {
     this.authorizationContext = context;
     const { payerId } = request;
+
     const emptyPayload: InvoicePayload = {
       invoiceLink: request.invoiceLink,
       address: null,
@@ -188,6 +189,11 @@ export class GetInvoicePdfUsecase
     payload: InvoicePayload
   ): Either<unknown, Promise<Readable>> {
     try {
+      const invoiceId = payload.invoice.id.toString();
+      const paymentPath = 'payment-details/';
+      const link = payload.invoiceLink.concat(paymentPath, invoiceId);
+      payload.invoiceLink = link;
+
       const pdf = this.pdfGenerator.getInvoice(payload);
       return right(pdf);
     } catch (error) {
