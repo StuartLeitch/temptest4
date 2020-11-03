@@ -131,6 +131,7 @@ export * from './modules/publishers/domain/PublisherId';
 export * from './modules/publishers/domain/PublisherCustomValues';
 export * from './modules/publishers/repos/publisherRepo';
 export * from './modules/publishers/repos/implementations/knexPublisherRepo';
+export * from './modules/publishers/repos/mocks/mockPublisherRepo';
 export * from './modules/publishers/usecases/getPublisherCustomValues';
 export * from './modules/publishers/usecases/getPublisherCustomValuesByName';
 export * from './modules/publishers/usecases/getPublisherDetails';
