@@ -13,7 +13,9 @@ import {
   MockCatalogRepo,
 } from '@hindawi/shared';
 
-import { JournalEditorAssignedHandler } from '../../src/queue_service/handlers/JournalEditorAssigned';
+import { Context } from '../../../src/builders';
+
+import { JournalEditorAssignedHandler } from '../../../src/queue_service/handlers/JournalEditorAssigned';
 
 let mockLogger: MockLogger;
 let mockEditorRepo: MockEditorRepo;
@@ -26,7 +28,7 @@ let journalEditors = [];
 
 async function generateMockEditor(editorsLength: number) {
   await Promise.all(
-    [...new Array(+editorsLength)].map(async (curr: any, idx: number) => {
+    [...new Array(+editorsLength)].map(async (curr, idx: number) => {
       const rawEditor = {
         editorId: `${idx}-editor`,
         journalId: `${eventData.id}`,
@@ -99,7 +101,7 @@ Given(
 
 When('"JournalEditorAssigned" event is being published', async function () {
   try {
-    await handler.call(context, eventData);
+    await handler(context as Context)(eventData);
   } catch (err) {
     console.error(err);
   }

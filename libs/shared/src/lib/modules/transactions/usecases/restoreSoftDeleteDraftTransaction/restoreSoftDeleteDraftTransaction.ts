@@ -1,36 +1,36 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
 import { Either, left, right } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 //* Repo Imports
+import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
+import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
 import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { ArticleRepoContract as ManuscriptRepoContract } from '../../../manuscripts/repos/articleRepo';
 
 //* Usecase Imports
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails';
-import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { GetManuscriptByManuscriptIdUsecase } from '../../../manuscripts/usecases/getManuscriptByManuscriptId';
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
 import { GetTransactionDetailsByManuscriptCustomIdUsecase } from '../../usecases/getTransactionDetailsByManuscriptCustomId';
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
+import { GetManuscriptByManuscriptIdUsecase } from '../../../manuscripts/usecases/getManuscriptByManuscriptId';
+import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails';
 
-import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
-import type { RestoreSoftDeleteDraftTransactionRequestDTO as DTO } from './restoreSoftDeleteDraftTransaction.dto';
 import { RestoreSoftDeleteDraftTransactionResponse as Response } from './restoreSoftDeleteDraftTransaction.response';
+import type { RestoreSoftDeleteDraftTransactionDTO as DTO } from './restoreSoftDeleteDraftTransaction.dto';
+import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
 
 type Context = UsecaseAuthorizationContext;
 export class RestoreSoftDeleteDraftTransactionUsecase
@@ -40,7 +40,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
-    private manuscriptRepo: ManuscriptRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract

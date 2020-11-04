@@ -105,8 +105,10 @@ Then(
     const invoiceIdObj = InvoiceId.create(
       new UniqueEntityID(invoiceId)
     ).getValue();
-    foundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
-    expect(foundInvoice).to.equal(null);
+    const index = mockInvoiceRepo.deletedItems.findIndex((item) =>
+      item.id.equals(invoiceIdObj.id)
+    );
+    expect(index).to.not.equal(-1);
   }
 );
 

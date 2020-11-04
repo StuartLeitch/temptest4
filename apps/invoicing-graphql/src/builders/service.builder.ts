@@ -4,10 +4,11 @@ import { createQueueService } from '@hindawi/queue-service';
 import { BullScheduler } from '@hindawi/sisif';
 import {
   PaymentMethodRepoContract,
-  SQSPublishServiceContract,
   PaymentStrategyFactory,
   BraintreeClientToken,
   ExchangeRateService,
+  PdfGeneratorService,
+  createPdfGenerator,
   PayPalCaptureMoney,
   EmptyCaptureMoney,
   BraintreePayment,
@@ -19,9 +20,9 @@ import {
   WaiverService,
   EmailService,
   VATService,
-  createPdfGenerator,
-  PdfGeneratorService,
 } from '@hindawi/shared';
+
+import { PhenomSqsServiceContract } from '../queue_service/phenom-queue-service';
 
 import {
   BraintreeService,
@@ -43,7 +44,7 @@ export interface Services {
   exchangeRateService: ExchangeRateService;
   schedulingService: BullScheduler;
   paymentStrategyFactory: PaymentStrategyFactory;
-  qq: SQSPublishServiceContract;
+  qq: PhenomSqsServiceContract;
   erp: {
     sage: SageService;
     netsuite: NetSuiteService;
@@ -106,7 +107,7 @@ async function setupQueueService(loggerBuilder: LoggerBuilder) {
     defaultMessageAttributes: env.app.defaultMessageAttributes,
   };
 
-  let queue: any;
+  let queue: PhenomSqsServiceContract;
   try {
     queue = await createQueueService(config);
   } catch (err) {
@@ -127,7 +128,11 @@ export async function buildServices(
     logger: loggerBuilder.getLogger(),
     pdfGenerator: createPdfGenerator(loggerBuilder.getLogger()),
     vatService: new VATService(),
-    waiverService: new WaiverService(repos.waiver, repos.editor),
+    waiverService: new WaiverService(
+      repos.invoiceItem,
+      repos.editor,
+      repos.waiver
+    ),
     emailService: new EmailService(
       env.app.mailingDisabled,
       env.app.FERoot,

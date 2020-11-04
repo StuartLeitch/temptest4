@@ -1,3 +1,3 @@
-export interface RestoreSoftDeleteDraftTransactionRequestDTO {
+export interface RestoreSoftDeleteDraftTransactionDTO {
   manuscriptId: string;
 }

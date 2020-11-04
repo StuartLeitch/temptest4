@@ -3,46 +3,55 @@
 
 import { JournalAdded } from '@hindawi/phenom-events';
 
-import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
 import { AddCatalogItemToCatalogUseCaseRequestDTO } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogDTOs';
+import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+
+import { Context } from '../../builders';
+
+import { EventHandler } from '../event-handler';
 
 const JOURNAL_ADDED = 'JournalAdded';
 
-export const JournalAddedHandler = {
+export const JournalAddedHandler: EventHandler<JournalAdded> = {
   event: JOURNAL_ADDED,
-  async handler(data: JournalAdded) {
-    const {
-      repos: { catalog: catalogRepo, publisher: publisherRepo },
-      services: { logger },
-    } = this;
+  handler(context: Context) {
+    return async (data: JournalAdded) => {
+      const {
+        repos: { publisher: publisherRepo, catalog: catalogRepo },
+        services: { logger },
+      } = context;
 
-    logger.setScope(`PhenomEvent:${JOURNAL_ADDED}`);
-    logger.info(`Incoming Event Data`, data);
+      logger.setScope(`PhenomEvent:${JOURNAL_ADDED}`);
+      logger.info(`Incoming Event Data`, data);
 
-    const addJournalUsecase = new AddCatalogItemToCatalogUseCase(
-      catalogRepo,
-      publisherRepo
-    );
-    try {
-      const result = await addJournalUsecase.execute({
-        // type: data.id,
-        amount: data.apc,
+      const addJournalUsecase = new AddCatalogItemToCatalogUseCase(
+        catalogRepo,
+        publisherRepo
+      );
+
+      const request: AddCatalogItemToCatalogUseCaseRequestDTO = {
+        isActive: data.isActive,
+        journalTitle: data.name,
         created: data.created,
         updated: data.updated,
+        journalId: data.id,
+        amount: data.apc,
         currency: 'USD',
         issn: data.issn,
-        journalTitle: data.name,
-        isActive: data.isActive,
-        journalId: data.id,
-      } as AddCatalogItemToCatalogUseCaseRequestDTO);
+        type: null,
+      };
 
-      if (result.isLeft()) {
-        logger.error(result.value.errorValue().message);
-        throw result.value.error;
+      try {
+        const result = await addJournalUsecase.execute(request);
+
+        if (result.isLeft()) {
+          logger.error(result.value.errorValue().message);
+          throw result.value.error;
+        }
+      } catch (error) {
+        logger.error(error.message);
+        throw error;
       }
-    } catch (error) {
-      logger.error(error.message);
-      throw error;
-    }
+    };
   },
 };

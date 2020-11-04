@@ -5,65 +5,69 @@
 import { SubmissionWithdrawn as SubmissionWithdrawnPayload } from '@hindawi/phenom-events';
 // * Domain imports
 import {
+  SoftDeleteDraftTransactionUsecase,
+  ManuscriptTypeNotInvoiceable,
   UsecaseAuthorizationContext,
   Roles,
-  ManuscriptTypeNotInvoiceable,
-  SoftDeleteDraftTransactionUsecase,
 } from '@hindawi/shared';
+
+import { Context } from '../../builders';
+
+import { EventHandler } from '../event-handler';
 
 const SUBMISSION_WITHDRAWN = 'SubmissionWithdrawn';
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 
-export const SubmissionWithdrawn = {
+export const SubmissionWithdrawn: EventHandler<SubmissionWithdrawnPayload> = {
   event: SUBMISSION_WITHDRAWN,
-  handler: async function submissionWithdrawnHandler(
-    data: SubmissionWithdrawnPayload
-  ) {
-    const {
-      repos: {
-        transaction: transactionRepo,
-        invoiceItem: invoiceItemRepo,
-        invoice: invoiceRepo,
-        manuscript: manuscriptRepo,
-      },
-      services: { logger },
-    } = this;
-
-    logger.setScope(`PhenomEvent:${SUBMISSION_WITHDRAWN}`);
-    logger.info('Incoming Event Data', data);
-
-    const {
-      submissionId,
-      manuscripts: [
-        {
-          articleType: { name },
+  handler(context: Context) {
+    return async (data: SubmissionWithdrawnPayload) => {
+      const {
+        repos: {
+          transaction: transactionRepo,
+          invoiceItem: invoiceItemRepo,
+          invoice: invoiceRepo,
+          manuscript: manuscriptRepo,
         },
-      ],
-    } = data;
+        services: { logger },
+      } = context;
 
-    if (name in ManuscriptTypeNotInvoiceable) {
-      return;
-    }
+      logger.setScope(`PhenomEvent:${SUBMISSION_WITHDRAWN}`);
+      logger.info('Incoming Event Data', data);
 
-    const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
-      transactionRepo,
-      invoiceItemRepo,
-      invoiceRepo,
-      manuscriptRepo
-    );
+      const {
+        submissionId,
+        manuscripts: [
+          {
+            articleType: { name },
+          },
+        ],
+      } = data;
 
-    const result = await softDeleteDraftTransactionUsecase.execute(
-      {
-        manuscriptId: submissionId,
-      },
-      defaultContext
-    );
+      if (name in ManuscriptTypeNotInvoiceable) {
+        return;
+      }
 
-    if (result.isLeft()) {
-      logger.error(result.value.message);
-      throw result.value.message;
-    }
+      const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
+        transactionRepo,
+        invoiceItemRepo,
+        invoiceRepo,
+        manuscriptRepo
+      );
+
+      const result = await softDeleteDraftTransactionUsecase.execute(
+        {
+          manuscriptId: submissionId,
+        },
+        defaultContext
+      );
+
+      if (result.isLeft()) {
+        logger.error(result.value.message);
+        throw result.value;
+      }
+    };
   },
 };
