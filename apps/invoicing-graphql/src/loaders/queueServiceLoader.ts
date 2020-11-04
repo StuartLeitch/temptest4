@@ -1,14 +1,14 @@
 import {
-  MicroframeworkLoader,
   MicroframeworkSettings,
+  MicroframeworkLoader,
 } from 'microframework-w3tec';
-
-import { env } from '../env';
-import { Logger } from '../lib/logger';
 
 import { Context } from '../builders';
 
 import * as eventHandlers from '../queue_service/handlers';
+import { Logger } from '../lib/logger';
+
+import { env } from '../env';
 
 const logger = new Logger();
 logger.setScope(__filename);
@@ -25,16 +25,9 @@ export const queueServiceLoader: MicroframeworkLoader = async (
       Object.keys(eventHandlers).forEach((eventHandler: string) => {
         const { handler, event } = eventHandlers[eventHandler];
 
-        // if (event === 'ArticlePublished') {
-        //   queue.__LOCAL__ = {
-        //     event,
-        //     handler: handler.bind(context),
-        //   };
-        // }
-
         queue.registerEventHandler({
           event,
-          handler: handler.bind(context),
+          handler: handler(context),
         });
       });
       queue.start();

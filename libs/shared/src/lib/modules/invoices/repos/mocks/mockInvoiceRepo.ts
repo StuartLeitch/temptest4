@@ -14,6 +14,8 @@ import { TransactionId } from '../../../transactions/domain/TransactionId';
 export class MockInvoiceRepo
   extends BaseMockRepo<Invoice>
   implements InvoiceRepoContract {
+  deletedItems: Invoice[] = [];
+
   constructor(
     private articleRepo?: ArticleRepoContract,
     private invoiceItemRepo?: InvoiceItemRepoContract
@@ -147,11 +149,16 @@ export class MockInvoiceRepo
   }
 
   public async delete(invoice: Invoice): Promise<void> {
-    this.removeMockItem(invoice);
+    this.deletedItems.push(invoice);
   }
 
   public async restore(invoice: Invoice): Promise<void> {
-    this.addMockItem(invoice);
+    const index = this.deletedItems.findIndex((item) =>
+      item.id.equals(invoice.id)
+    );
+    if (index >= 0) {
+      this.deletedItems.splice(index, 1);
+    }
   }
 
   public async exists(invoice: Invoice): Promise<boolean> {

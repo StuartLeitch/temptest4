@@ -105,23 +105,20 @@ When(
 Then(
   'The DRAFT Transaction associated with the manuscript should be soft deleted',
   async () => {
-    const transactions = await mockTransactionRepo.getTransactionCollection();
-    expect(transactions.length).to.equal(0);
+    expect(mockTransactionRepo.deletedItems.length).to.equal(1);
   }
 );
 
 Then(
   'The DRAFT Invoice associated with the manuscript should be soft deleted',
   async () => {
-    const invoices = await mockInvoiceRepo.getInvoiceCollection();
-    expect(invoices.length).to.equal(0);
+    expect(mockInvoiceRepo.deletedItems.length).to.equal(1);
   }
 );
 
 Then(
   'The Invoice Item associated with the manuscript should be soft deleted',
   async () => {
-    const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
-    expect(invoiceItems.length).to.equal(0);
+    expect(mockInvoiceItemRepo.deletedItems.length).to.equal(1);
   }
 );

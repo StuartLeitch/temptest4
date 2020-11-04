@@ -68,8 +68,9 @@ const mockPayerRepo: PayerRepoContract = new MockPayerRepo();
 const mockCouponRepo: CouponRepoContract = new MockCouponRepo();
 
 const waiverService: WaiverService = new WaiverService(
-  mockWaiverRepo,
-  mockEditorRepo
+  mockInvoiceItemRepo,
+  mockEditorRepo,
+  mockWaiverRepo
 );
 const emailService: EmailService = new EmailService(
   true,

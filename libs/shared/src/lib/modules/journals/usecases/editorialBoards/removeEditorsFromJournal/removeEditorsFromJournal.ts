@@ -27,7 +27,7 @@ interface RemoveEditorsFromJournalDTO {
   allEditors: DeleteEditorDTO[];
 }
 
-type RemoveEditorsFromJournalResponse = Either<UnexpectedError | unknown, null>;
+type RemoveEditorsFromJournalResponse = Either<UnexpectedError, null>;
 
 export class RemoveEditorsFromJournalUsecase
   implements

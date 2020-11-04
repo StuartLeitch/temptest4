@@ -49,7 +49,11 @@ BeforeAll(function () {
   mockWaiverRepo = new MockWaiverRepo();
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockEditorRepo = new MockEditorRepo();
-  mockWaiverService = new WaiverService(mockWaiverRepo, mockEditorRepo);
+  mockWaiverService = new WaiverService(
+    mockInvoiceItemRepo,
+    mockEditorRepo,
+    mockWaiverRepo
+  );
 
   useCase = new CreateCreditNoteUsecase(
     mockInvoiceRepo,

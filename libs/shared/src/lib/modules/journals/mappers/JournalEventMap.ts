@@ -1,11 +1,16 @@
-import { JournalEditorAssigned } from '@hindawi/phenom-events';
 import { Editor } from '@hindawi/phenom-events/src/lib/editor';
+import {
+  JournalSectionEditorAssigned,
+  JournalEditorAssigned,
+} from '@hindawi/phenom-events';
+
 import { CreateEditorDTO } from '../usecases/editorialBoards/createEditor/createEditorDTO';
+
 import { EditorMap } from './EditorMap';
 
 export class JournalEventMap {
   public static extractEditors(
-    event: JournalEditorAssigned
+    event: JournalSectionEditorAssigned | JournalEditorAssigned
   ): CreateEditorDTO[] {
     const scheduledEditorMap: { [key: string]: boolean } = {};
     const scheduledEditors: CreateEditorDTO[] = [];

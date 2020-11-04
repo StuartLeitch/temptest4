@@ -688,8 +688,9 @@ export class MigrateEntireInvoiceUsecase
     payer: Payer;
   }) {
     if (!invoice) {
-      return right<null, DTO & { invoice: null }>({
+      return right<null, DTO & { invoiceItems: []; invoice: null }>({
         ...request,
+        invoiceItems: [],
         invoice: null,
       });
     }
@@ -726,7 +727,10 @@ export class MigrateEntireInvoiceUsecase
           invoice,
           payer,
         });
-        return right<null, DTO & { invoice: Invoice }>({ ...request, invoice });
+        return right<
+          null,
+          DTO & { invoiceItems: InvoiceItem[]; invoice: Invoice }
+        >({ ...request, invoiceItems, invoice });
       })
       .execute();
   }
@@ -1138,14 +1142,13 @@ export class MigrateEntireInvoiceUsecase
   }
 
   private addMigrationWaiver(context: UsecaseAuthorizationContext) {
-    return async (request: DTO & { invoice: Invoice }) => {
-      const uuid = new UniqueEntityID(request.invoiceId);
-      const invoiceId = InvoiceId.create(uuid).getValue();
-
+    return async (
+      request: DTO & { invoiceItems: InvoiceItem[]; invoice: Invoice }
+    ) => {
       try {
-        this.waiverRepo.attachWaiverToInvoice(
+        this.waiverRepo.attachWaiverToInvoiceItem(
           WaiverType.WAIVED_MIGRATION,
-          invoiceId,
+          request.invoiceItems[0].invoiceItemId,
           request.invoice.dateIssued
         );
         return right<Errors.AddingMigrationWaiverError, DTO>(request);

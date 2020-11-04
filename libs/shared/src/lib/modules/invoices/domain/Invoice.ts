@@ -274,20 +274,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       dateCreated: props.dateCreated ? props.dateCreated : new Date(),
     };
 
-    const isNewInvoice = !!id === false;
     const invoice = new Invoice(defaultValues, id);
-
-    if (isNewInvoice) {
-      // invoice.addDomainEvent(new InvoiceCreated(invoice));
-      // Create with initial invoice item from whomever created the invoice
-      // invoice.addInvoiceItem(
-      //   InvoiceItem.create(props.invoiceId, invoice.manuscriptId).getValue()
-      // );
-    }
 
     return Result.ok<Invoice>(invoice);
   }
-  public generateInvoiceDraftEvent(): void {
+  public generateInvoiceDraftCreatedEvent(): void {
     if (this.props.status === InvoiceStatus.DRAFT) {
       const now = new Date();
       this.addDomainEvent(new InvoiceDraftCreated(this, now));
