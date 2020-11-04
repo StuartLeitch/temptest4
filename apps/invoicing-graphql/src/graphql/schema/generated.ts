@@ -97,6 +97,7 @@ export type Invoice = {
   payer?: Maybe<Payer>;
   erpReference?: Maybe<Scalars['String']>;
   revenueRecognitionReference?: Maybe<Scalars['String']>;
+  creationReason?: Maybe<Scalars['String']>;
   referenceNumber?: Maybe<Scalars['ReferenceNumber']>;
   cancelledInvoiceReference?: Maybe<Scalars['ID']>;
   invoiceItem?: Maybe<InvoiceItem>;
@@ -782,6 +783,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   payer?: Resolver<Maybe<ResolversTypes['Payer']>, ParentType, ContextType>;
   erpReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   revenueRecognitionReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  creationReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   referenceNumber?: Resolver<Maybe<ResolversTypes['ReferenceNumber']>, ParentType, ContextType>;
   cancelledInvoiceReference?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   invoiceItem?: Resolver<Maybe<ResolversTypes['InvoiceItem']>, ParentType, ContextType>;

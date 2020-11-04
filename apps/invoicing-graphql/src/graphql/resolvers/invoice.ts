@@ -365,6 +365,7 @@ export const invoice: Resolvers<Context> = {
         creditNoteReference: creditNoteDetails.creditNoteReference,
         revenueRecognitionReference:
           creditNoteDetails.revenueRecognitionReference,
+        creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
         referenceNumber:
           creditNoteDetails.invoiceNumber && creditNoteDetails.dateAccepted
@@ -519,6 +520,8 @@ export const invoice: Resolvers<Context> = {
         services: { waiverService },
       } = context;
 
+      console.info(args);
+
       const { invoiceId, createDraft, reason } = args;
 
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
@@ -558,6 +561,7 @@ export const invoice: Resolvers<Context> = {
         dateCreated: creditNote?.dateCreated?.toISOString(),
         erpReference: creditNote.erpReference,
         revenueRecognitionReference: creditNote.revenueRecognitionReference,
+        creationReason: creditNote.creationReason,
         dateIssued: creditNote?.dateIssued?.toISOString(),
         referenceNumber:
           creditNote.invoiceNumber && creditNote.dateAccepted

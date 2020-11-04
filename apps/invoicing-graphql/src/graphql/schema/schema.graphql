@@ -79,6 +79,7 @@ type Invoice @model(id: "invoices") {
   payer: Payer
   erpReference: String
   revenueRecognitionReference: String
+  creationReason: String
   referenceNumber: ReferenceNumber @filter
   cancelledInvoiceReference: ID
   invoiceItem: InvoiceItem

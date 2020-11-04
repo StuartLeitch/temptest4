@@ -110,6 +110,7 @@ export const INVOICE_QUERY = `
     dateCreated
     cancelledInvoiceReference
     referenceNumber
+    creationReason
   }
   fragment transactionFragment on Transaction {
     id

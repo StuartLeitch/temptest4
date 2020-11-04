@@ -34,7 +34,7 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,
-    reason: 'other-reason'
+    reason: 'withdrawn-manuscript'
   });
   const [inProgress, setInProgress] = useState(false);
   const [error, setError] = useState('');
@@ -44,7 +44,7 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
     setError('');
 
     try {
-      const recordCreditNoteResult = await recordCreditNote({
+     const recordCreditNoteResult = await recordCreditNote({
         variables: {
           ...creditNoteData,
           invoiceId,
@@ -118,7 +118,7 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
                 type='select'
                 name='createDraft'
                 id='draftReason'
-                defaultValue={0}
+                defaultValue={'withdrawn-manuscript'}
                 onChange={(e) => {
                   const { value } = e.target;
                   const reasons = {
@@ -128,11 +128,14 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
                     'change-payer-details': true,
                     'other-reason': true,
                   }
-                  setCreditNoteData({
+
+                  const cnd = {
                     ...creditNoteData,
                     createDraft: reasons[value],
                     reason: value
-                  });
+                  }
+
+                  setCreditNoteData(cnd);
                 }}
               >
                 <option value='withdrawn-manuscript'>Withdrawn Manuscript</option>
