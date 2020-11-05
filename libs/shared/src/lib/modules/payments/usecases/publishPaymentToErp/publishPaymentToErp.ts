@@ -286,7 +286,7 @@ export class PublishPaymentToErpUsecase
               )}`
             );
 
-            payment.foreignPaymentId = erpResponse.tradeDocumentId;
+            payment.erpId = erpResponse.tradeDocumentId;
           }
         } catch (error) {
           this.loggerService.info(

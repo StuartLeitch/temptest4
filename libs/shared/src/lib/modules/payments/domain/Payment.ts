@@ -31,7 +31,7 @@ export interface PaymentProps {
   datePaid?: Date;
   paymentProof?: PaymentProof;
   status: PaymentStatus;
-  erpid?: string;
+  erpId?: string;
 }
 
 export class Payment extends AggregateRoot<PaymentProps> {
@@ -77,6 +77,14 @@ export class Payment extends AggregateRoot<PaymentProps> {
 
   get foreignPaymentId(): string {
     return this.props.foreignPaymentId;
+  }
+
+  set erpId(erpId: string) {
+    this.props.erpId = erpId;
+  }
+
+  get erpId(): string {
+    return this.props.erpId;
   }
 
   get status(): PaymentStatus {
