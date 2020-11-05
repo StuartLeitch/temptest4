@@ -240,11 +240,10 @@ Pages:
   stage: deploy
   when: manual
   script:
-    - mkdir -p public
     - cp -r report public/
     - mv public/index.html public/coverage.html
   artifacts:
     paths:
-      - report/
+      - public/
   dependencies:
     - Test
