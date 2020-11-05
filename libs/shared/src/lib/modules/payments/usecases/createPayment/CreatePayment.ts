@@ -100,7 +100,7 @@ export class CreatePaymentUsecase
     if (!request.status) {
       return left(new Errors.StatusRequiredError());
     }
-    if (!request.isFinalPayment) {
+    if (request.isFinalPayment == null) {
       return left(new Errors.IsFinalPaymentRequiredError());
     }
     if (!(request.status in PaymentStatus)) {
