@@ -53,7 +53,6 @@ Test:
   script:
     - cd $HOME
     - git fetch
-    - mkdir report && chmod -R +x report
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
         AFFECTED_COMMAND="yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --parallel"
@@ -61,12 +60,7 @@ Test:
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
       fi
     - eval $AFFECTED_COMMAND
-    - yarn run ci:coverage
-    - cp -r report $CI_PROJECT_DIR
-  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
-    paths:
-      - report/
     # reports:
     #   cucumber:
     #     - report/apps/**/usage.txt
@@ -235,16 +229,27 @@ Deploy:hindawi-prod:
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
 
-Pages:
-  interruptible: true
-  stage: deploy
-  when: manual
+# Pages:
+#   interruptible: true
+#   stage: deploy
+#   when: manual
+#   script:
+#     - cp -r report public/
+#     - mv public/index.html public/coverage.html
+#   artifacts:
+#     paths:
+#       - public/
+#   dependencies:
+#     - Test
+
+pages:
   script:
-    - mkdir -p public
+    - cd $HOME
+    - mkdir report && chmod -R +x report
+    - yarn run ci:coverage
     - cp -r report public/
-    - mv public/index.html public/coverage.html
+    # - mv public/index.html public/coverage.html
+  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
-      - report/
-  dependencies:
-    - Test
+      - public
