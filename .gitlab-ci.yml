@@ -245,7 +245,8 @@ Deploy:hindawi-prod:
 pages:
   script:
     - cd $HOME
-    # - mkdir report && chmod -R +x report
+    - mkdir -p coverage && chmod -R +x coverage
+    - rm -r coverage/*
     - yarn run ci:coverage
     - rm -r public/*
     - cp -a -v coverage/. public/
