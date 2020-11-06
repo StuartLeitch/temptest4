@@ -248,7 +248,7 @@ pages:
     # - mkdir report && chmod -R +x report
     - yarn run ci:coverage
     - ls -al $CI_PROJECT_DIR
-    - ls -al $CI_PROJECT_DIR/coverage
+    - ls -al coverage
     - cp -r coverage public/
     - ls -al $CI_PROJECT_DIR/public
     # - mv public/index.html public/coverage.html
