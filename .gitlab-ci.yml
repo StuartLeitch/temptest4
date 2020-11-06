@@ -247,11 +247,8 @@ pages:
     - cd $HOME
     # - mkdir report && chmod -R +x report
     - yarn run ci:coverage
-    - env
-    - ls -al $CI_PROJECT_DIR
-    - ls -al coverage
-    - cp -r coverage public/
-    - ls -al $CI_PROJECT_DIR/public
+    - rm -r public/*
+    - cp -a -v coverage/. public/
     # - mv public/index.html public/coverage.html
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
