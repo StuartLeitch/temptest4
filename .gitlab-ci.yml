@@ -247,7 +247,7 @@ pages:
     - cd $HOME
     # - mkdir report && chmod -R +x report
     - yarn run ci:coverage
-    - echo $CI_PROJECT_DIR
+    - env
     - ls -al $CI_PROJECT_DIR
     - ls -al coverage
     - cp -r coverage public/
