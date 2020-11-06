@@ -245,9 +245,9 @@ Deploy:hindawi-prod:
 pages:
   script:
     - cd $HOME
-    - mkdir report && chmod -R +x report
+    # - mkdir report && chmod -R +x report
     - yarn run ci:coverage
-    - cp -r report public/
+    - cp -r coverage public/
     # - mv public/index.html public/coverage.html
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
