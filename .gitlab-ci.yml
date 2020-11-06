@@ -63,6 +63,7 @@ Test:
     - eval $AFFECTED_COMMAND
     - yarn run ci:coverage
     - cp -r report $CI_PROJECT_DIR
+    - ls -al $CI_PROJECT_DIR
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
@@ -250,8 +251,8 @@ Deploy:hindawi-prod:
 
 pages:
   script:
-    - cp -r report public/
-    - mv public/index.html public/coverage.html
+    - cp -r $CI_PROJECT_DIR/report public/
+    # - mv public/index.html public/coverage.html
   artifacts:
     paths:
       - public
