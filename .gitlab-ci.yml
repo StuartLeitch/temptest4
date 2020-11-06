@@ -235,15 +235,23 @@ Deploy:hindawi-prod:
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
 
-Pages:
-  interruptible: true
-  stage: deploy
-  when: manual
+# Pages:
+#   interruptible: true
+#   stage: deploy
+#   when: manual
+#   script:
+#     - cp -r report public/
+#     - mv public/index.html public/coverage.html
+#   artifacts:
+#     paths:
+#       - public/
+#   dependencies:
+#     - Test
+
+pages:
   script:
     - cp -r report public/
     - mv public/index.html public/coverage.html
   artifacts:
     paths:
-      - public/
-  dependencies:
-    - Test
+      - public
