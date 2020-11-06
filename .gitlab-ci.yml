@@ -243,6 +243,8 @@ Deploy:hindawi-prod:
 #     - Test
 
 pages:
+  variables:
+    CI_DEBUG_TRACE: "true"
   script:
     - cd $HOME
     - mkdir -p coverage && chmod -R +x coverage
