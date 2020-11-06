@@ -246,7 +246,7 @@ pages:
   script:
     - cd $HOME
     - mkdir -p coverage && chmod -R +x coverage
-    - rm -r coverage/*
+    # - rm -r coverage/*
     - yarn run ci:coverage
     - rm -r public/*
     - cp -a -v coverage/. public/
