@@ -53,7 +53,6 @@ Test:
   script:
     - cd $HOME
     - git fetch
-    - mkdir report && chmod -R +x report
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
         AFFECTED_COMMAND="yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --parallel"
@@ -61,13 +60,7 @@ Test:
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
       fi
     - eval $AFFECTED_COMMAND
-    - yarn run ci:coverage
-    - cp -r report $CI_PROJECT_DIR
-    - ls -al $CI_PROJECT_DIR
-  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
-    paths:
-      - report/
     # reports:
     #   cucumber:
     #     - report/apps/**/usage.txt
@@ -251,8 +244,12 @@ Deploy:hindawi-prod:
 
 pages:
   script:
-    - cp -r $CI_PROJECT_DIR/report public/
+    - cd $HOME
+    - mkdir report && chmod -R +x report
+    - yarn run ci:coverage
+    - cp -r report public/
     # - mv public/index.html public/coverage.html
+  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
     paths:
       - public
