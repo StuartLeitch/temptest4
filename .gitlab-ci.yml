@@ -250,6 +250,7 @@ pages:
     - yarn run ci:coverage
     - rm -r public/*
     - cp -a -v coverage/. public/
+    - cat public/index.html
     # - mv public/index.html public/coverage.html
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   artifacts:
