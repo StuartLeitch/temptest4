@@ -37,6 +37,7 @@ import { GetAddressUseCase } from './,,/../../../../../addresses/usecases/getAdd
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
 import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
+import * as Errors from './publishRevenueRecognitionReversal.errors';
 
 export class PublishRevenuRecognitionReversalUsecase
   implements
@@ -94,7 +95,7 @@ export class PublishRevenuRecognitionReversalUsecase
       });
 
       if (maybeInvoice.isLeft()) {
-        throw new Error(`Cannot find Invoice for id: ${invoiceId}.`);
+        throw new Errors.InvoiceNotFoundError(invoiceId);
       }
       const invoice = maybeInvoice.value.getValue();
 
@@ -104,14 +105,12 @@ export class PublishRevenuRecognitionReversalUsecase
       });
 
       if (maybeItems.isLeft()) {
-        throw new Error(
-          `Invoice ${invoice.id.toString()} has no invoice items.`
-        );
+        throw new Errors.InvoiceItemsNotFoundError(invoiceId);
       }
 
       const invoiceItems = maybeItems.value.getValue();
       if (invoiceItems.length === 0) {
-        throw new Error(`Invoice ${invoice.id} has no invoice items.`);
+        throw new Errors.InvoiceItemsNotFoundError(invoiceId);
       }
 
       invoice.addItems(invoiceItems);
@@ -120,7 +119,7 @@ export class PublishRevenuRecognitionReversalUsecase
         //Get Payer details
         const maybePayer = await getPayerDetails.execute({ invoiceId });
         if (maybePayer.isLeft()) {
-          throw new Error(`Invoice ${invoice.id} has no payers.`);
+          throw new Errors.InvoicePayersNotFoundError(invoiceId);
         }
         const payer = maybePayer.value.getValue();
         const addressId = payer.billingAddressId.id.toString();
@@ -130,7 +129,7 @@ export class PublishRevenuRecognitionReversalUsecase
           billingAddressId: addressId,
         });
         if (maybeAddress.isLeft()) {
-          throw new Error(`Invoice ${invoice.id} has no address associated.`);
+          throw new Errors.InvoiceAddressNotFoundError(invoiceId);
         }
       }
 
@@ -138,7 +137,7 @@ export class PublishRevenuRecognitionReversalUsecase
       const manuscriptId = invoiceItems[0].manuscriptId.id.toString();
       const maybeManuscript = await getManuscript.execute({ manuscriptId });
       if (maybeManuscript.isLeft()) {
-        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
+        throw new Errors.InvoiceManuscriptNotFoundError(invoiceId);
       }
 
       const manuscript = maybeManuscript.value.getValue();
@@ -222,13 +221,15 @@ export class PublishRevenuRecognitionReversalUsecase
         return right(Result.ok<any>(null));
       }
 
-      const erpResponse = await this.erpService.registerRevenueRecognition({
-        manuscript,
-        invoice,
-        payer,
-        publisherCustomValues,
-        invoiceTotal: netCharges,
-      });
+      const erpResponse = await this.erpService.registerRevenueRecognitionReversal(
+        {
+          manuscript,
+          invoice,
+          payer,
+          publisherCustomValues,
+          invoiceTotal: netCharges,
+        }
+      );
 
       this.loggerService.info(
         'ERP field',
