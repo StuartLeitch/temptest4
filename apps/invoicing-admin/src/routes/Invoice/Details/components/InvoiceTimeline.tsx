@@ -5,6 +5,21 @@ import format from 'date-fns/format';
 import compareDesc from 'date-fns/compareDesc';
 import { Invoice } from '../types';
 
+function renderSwitch(reason) {
+  switch (reason) {
+    case 'withdrawn-manuscript':
+      return 'Withdrawn Manuscript';
+    case 'reduction-applied':
+      return 'Reduction Applied';
+    case 'waived-manuscript':
+      return 'Waived Manuscript';
+    case 'change-payer-details':
+      return 'Change Payer Details';
+    default:
+      return 'Other';
+  }
+}
+
 const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
   <Card className='mb-3'>
     <CardBody>
@@ -72,7 +87,10 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
             new Date(invoice?.creditNote?.dateCreated),
             'dd MMMM yyyy'
           )}
-          phrase={'Credit Note issued.'}
+          phrase={`
+          Credit Note issued.
+          Reason: ${renderSwitch(invoice?.creditNote?.creationReason)}
+          `}
         />
       )}
 

@@ -79,6 +79,7 @@ type Invoice @model(id: "invoices") {
   payer: Payer
   erpReference: String
   revenueRecognitionReference: String
+  creationReason: String
   referenceNumber: ReferenceNumber @filter
   cancelledInvoiceReference: ID
   invoiceItem: InvoiceItem
@@ -345,7 +346,11 @@ type Mutation {
     datePaid: String!
     markInvoiceAsPaid: Boolean
   ): Payment!
-  createCreditNote(invoiceId: String!, createDraft: Boolean): CreditNote!
+  createCreditNote(
+    invoiceId: String!
+    createDraft: Boolean
+    reason: String
+  ): CreditNote!
   createPayPalOrder(invoiceId: ID!): PayPalOrderId!
   recordPayPalPayment(invoiceId: ID!, orderId: ID!): ID!
   migrateEntireInvoice(

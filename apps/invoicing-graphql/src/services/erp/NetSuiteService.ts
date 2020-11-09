@@ -624,8 +624,26 @@ export class NetSuiteService implements ErpServiceContract {
       creationYear = creditNote.dateIssued.getFullYear();
     }
 
+    const { creationReason } = creditNote;
+    let memo = 'Other';
+    switch (creationReason) {
+      case 'withdrawn-manuscript':
+        memo = 'Withdrawn Manuscript';
+        break;
+      case 'reduction-applied':
+        memo = 'Reduction Applied';
+        break;
+      case 'waived-manuscript':
+        memo = 'Waived Manuscript';
+        break;
+      case 'change-payer-details':
+        memo = 'Change Payer Details';
+        break;
+    }
+
     const patchCreditNotePayload: Record<string, any> = {
       tranId: `CN-${creditNote.invoiceNumber}/${creationYear}`,
+      memo,
     };
 
     try {

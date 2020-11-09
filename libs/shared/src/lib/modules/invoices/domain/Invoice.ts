@@ -54,6 +54,7 @@ interface InvoiceProps {
   nsRevRecReference?: string;
   creditNoteReference?: string;
   vatnote?: string;
+  creationReason?: string;
 }
 
 export type InvoiceCollection = Invoice[];
@@ -234,6 +235,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get invoiceDiscountPercentageTotal(): number {
     return this.getInvoiceDiscountPercentageTotal();
+  }
+
+  get creationReason(): string {
+    return this.props.creationReason;
+  }
+
+  set creationReason(creationReason: string) {
+    this.props.creationReason = creationReason;
   }
 
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {

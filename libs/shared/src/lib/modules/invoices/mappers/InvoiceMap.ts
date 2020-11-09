@@ -26,6 +26,7 @@ export class InvoiceMap extends Mapper<Invoice> {
         revenueRecognitionReference: raw.revenueRecognitionReference ?? null,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
         creditNoteReference: raw.creditNoteReference ?? null,
+        creationReason: raw.creationReason ?? null,
       },
       new UniqueEntityID(raw.id)
     );
@@ -57,6 +58,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       creditNoteReference: invoice.creditNoteReference ?? null,
       revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
+      creationReason: invoice.creationReason ?? null,
     };
   }
 }
