@@ -143,6 +143,8 @@ Deploy:dev:
   tags:
     - "cluster:hindawi-dev"
   stage: deploy
+  environment:
+    name: dev
   dependencies:
     - Package Images:dev
   <<: *script_deploy
