@@ -1,26 +1,29 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 'use strict';
 
 exports.__esModule = true;
 exports.createCucumber = void 0;
 
-var architect = require('@angular-devkit/architect');
-var rxjs = require('rxjs');
-var execa = require('execa');
-var path = require('path');
-var fs = require('fs');
-var operators = require('rxjs/operators');
-var core = require('@angular-devkit/core');
+const architect = require('@angular-devkit/architect');
+const rxjs = require('rxjs');
+const execa = require('execa');
+const path = require('path');
+const fs = require('fs');
+const operators = require('rxjs/operators');
+const core = require('@angular-devkit/core');
 // var fs = require('fs');
 // var dateFormat = require('dateformat');
 function createCucumber(options, context) {
-  var _path = options.path,
-    format = options.format,
+  const _path = options.path,
+    { format } = options,
     supportEntryPath = options.steps,
     runCoverage = options.coverage,
-    workspaceRoot = context.workspaceRoot,
-    logger = context.logger;
+    { workspaceRoot } = context,
+    { logger } = context;
 
-  var fullPath = `${core.getSystemPath(
+  const fullPath = `${core.getSystemPath(
     core.normalize(workspaceRoot)
   )}/${_path}`;
 
@@ -28,12 +31,13 @@ function createCucumber(options, context) {
     fs.mkdirSync(fullPath, { recursive: true });
   }
 
-  var command = path.join('node_modules', '.bin', 'nyc');
-  var args = [
+  const command = path.join('node_modules', '.bin', 'nyc');
+  const args = [
     // 'report',
     '--report-dir',
     fullPath,
-    '--reporter=lcov',
+    '--reporter=json',
+    // '--reporter=lcov',
     '--reporter=text',
     path.join('node_modules', '.bin', 'cucumber-js'),
     options.features,
@@ -45,16 +49,17 @@ function createCucumber(options, context) {
     `usage:${fullPath}/usage.txt`,
   ];
 
+  // eslint-disable-next-line max-len
   // TS_NODE_PROJECT=apps/invoicing-graphql/tsconfig.spec.json ./node_modules/.bin/nyc --report-dir report/apps/invoicing-graphql --reporter=lcov --reporter=text node_modules/.bin/cucumber-js --require-module ts-node/register --require-module tsconfig-paths/register --require apps/invoicing-graphql/tests/**/*.steps.ts apps/invoicing-graphql/tests/**/*.feature
-  var subprocess = execa(command, args, {
+  const subprocess = execa(command, args, {
     env: {
       TS_NODE_PROJECT: options.tsConfig,
     },
   });
 
-  var cucumberLogger = logger.createChild('Cucumber:');
+  const cucumberLogger = logger.createChild('Cucumber:');
   return rxjs.from(subprocess).pipe(
-    operators.map(function () {
+    operators.map(() => {
       if (runCoverage) {
         execa(path.join('tools', 'scripts', 'cucumber-report.sh', fullPath), {
           shell: true,
@@ -70,10 +75,10 @@ function createCucumber(options, context) {
 
       return { success: true };
     }),
-    operators.tap(function () {
+    operators.tap(() => {
       return cucumberLogger.info(`Cucumber report created at ${fullPath}`);
     }),
-    operators.catchError(function (e) {
+    operators.catchError((e) => {
       console.error(e);
       cucumberLogger.error('Cucumber execution error', e);
       return rxjs.of({
