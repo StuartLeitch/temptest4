@@ -21,12 +21,8 @@ import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
-import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
 import { JournalId } from '../../../../journals/domain/JournalId';
-import { Address } from '../../../../addresses/domain/Address';
 import { Payer } from '../../../../payers/domain/Payer';
-import { InvoiceId } from '../../../domain/InvoiceId';
-import { Invoice } from '../../../domain/Invoice';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
