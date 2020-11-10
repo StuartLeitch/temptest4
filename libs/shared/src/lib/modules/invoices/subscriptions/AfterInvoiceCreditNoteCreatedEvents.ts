@@ -3,6 +3,10 @@ import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 
+import {
+  Roles,
+  UsecaseAuthorizationContext,
+} from '../../../domain/authorization';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { InvoiceCreditNoteCreated as InvoiceCreditNoteCreatedEvent } from '../domain/events/invoiceCreditNoteCreated';
@@ -21,8 +25,15 @@ import { WaiverRepoContract } from '../../waivers/repos';
 
 import { PublishCreditNoteToErpUsecase } from '../usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
+import { PublishRevenuRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
+import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
+
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 export class AfterInvoiceCreditNoteCreatedEvent
   implements HandleContract<InvoiceCreditNoteCreatedEvent> {
@@ -38,6 +49,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
     private publishCreditNoteToErp: PublishCreditNoteToErpUsecase | NoOpUseCase,
+    private publishRevenueRecognitionReversal: PublishRevenuRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -49,10 +61,15 @@ export class AfterInvoiceCreditNoteCreatedEvent
       InvoiceCreditNoteCreatedEvent.name
     );
   }
-
   private async onInvoiceCreditNoteCreatedEvent(
     event: InvoiceCreditNoteCreatedEvent
   ): Promise<any> {
+    const getInvoiceIdByManuscript = new GetInvoiceIdByManuscriptCustomIdUsecase(
+      this.manuscriptRepo,
+      this.invoiceItemRepo
+    );
+
+    const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const creditNote = await this.invoiceRepo.getInvoiceById(
         event.creditNoteId
@@ -129,7 +146,6 @@ export class AfterInvoiceCreditNoteCreatedEvent
       const billingAddress = await this.addressRepo.findById(
         payer.billingAddressId
       );
-
       const publishResult = await this.publishInvoiceCredited.execute({
         paymentMethods: paymentMethods.value.getValue(),
         invoiceItems,
@@ -153,6 +169,53 @@ export class AfterInvoiceCreditNoteCreatedEvent
       });
 
       this.loggerService.info('[PublishCreditNoteToERP]:', publishToErpResult);
+
+      //Get Invoice ID
+      const customId = manuscript.customId;
+      const maybeInvoiceId = await getInvoiceIdByManuscript.execute(
+        {
+          customId,
+        },
+        defaultContext
+      );
+
+      if (maybeInvoiceId.isLeft()) {
+        throw new Error(
+          `Couldn't find Invoice ID for manuscript with custom id: ${manuscript.customId}`
+        );
+      }
+      console.log(maybeInvoiceId);
+      const invoiceId = maybeInvoiceId.value.getValue()[0];
+
+      //Get Invoice
+      const maybeInvoice = await getInvoiceDetails.execute(
+        {
+          invoiceId: invoiceId.id.toString(),
+        },
+        defaultContext
+      );
+
+      if (maybeInvoice.isLeft()) {
+        throw new Error(`Couldn't find Invoice with ID: ${invoiceId}`);
+      }
+      const invoice = maybeInvoice.value.getValue();
+
+      console.log(manuscript.datePublished, invoice.nsRevRecReference);
+
+      if (manuscript.datePublished && invoice.nsRevRecReference) {
+        console.log(invoiceId.id.toString());
+        const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
+          { invoiceId: invoiceId.id.toString() },
+          defaultContext
+        );
+
+        if (publishRevenueRecognitionReversal.isLeft()) {
+          throw publishRevenueRecognitionReversal.value.message;
+        }
+        this.loggerService.info(
+          `[PublishRevenuRecognitionReversal]: ${publishRevenueRecognitionReversal.value.error}`
+        );
+      }
     } catch (err) {
       console.log(
         `[AfterInvoiceCreditNoteCreated]: Failed to execute onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent. Err: ${err}`

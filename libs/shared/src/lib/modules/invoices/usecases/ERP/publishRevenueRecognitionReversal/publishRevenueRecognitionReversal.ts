@@ -26,11 +26,12 @@ import { Payer } from '../../../../payers/domain/Payer';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
-import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
-import { GetInvoiceDetailsUsecase } from './../../getInvoiceDetails';
-import { GetPayerDetailsByInvoiceIdUsecase } from './../../../../payers/usecases/getPayerDetailsByInvoiceId';
-import { GetAddressUseCase } from './,,/../../../../../addresses/usecases/getAddress/getAddress';
+import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
+import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetAddressUseCase } from '../../../../addresses/usecases/getAddress/getAddress';
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
+import { GetPublisherCustomValuesUsecase } from '../../../../publishers/usecases/getPublisherCustomValues';
 import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
 import * as Errors from './publishRevenueRecognitionReversal.errors';
@@ -83,22 +84,30 @@ export class PublishRevenuRecognitionReversalUsecase
     const getManuscript = new GetManuscriptByManuscriptIdUsecase(
       this.manuscriptRepo
     );
-
+    const getPublisherCustomValue = new GetPublisherCustomValuesUsecase(
+      this.publisherRepo
+    );
     try {
       // Get Invoice
-      const maybeInvoice = await getInvoiceDetails.execute({
-        invoiceId,
-      });
-
+      const maybeInvoice = await getInvoiceDetails.execute(
+        {
+          invoiceId,
+        },
+        context
+      );
+      console.log('--------------------- IN USE CASE');
       if (maybeInvoice.isLeft()) {
         throw new Errors.InvoiceNotFoundError(invoiceId);
       }
       const invoice = maybeInvoice.value.getValue();
 
       //Get Invoice Items
-      const maybeItems = await getItemsUsecase.execute({
-        invoiceId,
-      });
+      const maybeItems = await getItemsUsecase.execute(
+        {
+          invoiceId,
+        },
+        context
+      );
 
       if (maybeItems.isLeft()) {
         throw new Errors.InvoiceItemsNotFoundError(invoiceId);
@@ -113,7 +122,10 @@ export class PublishRevenuRecognitionReversalUsecase
 
       if (!invoice.isCreditNote()) {
         //Get Payer details
-        const maybePayer = await getPayerDetails.execute({ invoiceId });
+        const maybePayer = await getPayerDetails.execute(
+          { invoiceId },
+          context
+        );
         if (maybePayer.isLeft()) {
           throw new Errors.InvoicePayersNotFoundError(invoiceId);
         }
@@ -121,9 +133,12 @@ export class PublishRevenuRecognitionReversalUsecase
         const addressId = payer.billingAddressId.id.toString();
 
         //Get Billing address
-        const maybeAddress = await getAddress.execute({
-          billingAddressId: addressId,
-        });
+        const maybeAddress = await getAddress.execute(
+          {
+            billingAddressId: addressId,
+          },
+          context
+        );
         if (maybeAddress.isLeft()) {
           throw new Errors.InvoiceAddressNotFoundError(invoiceId);
         }
@@ -131,7 +146,10 @@ export class PublishRevenuRecognitionReversalUsecase
 
       // Get Manuscript
       const manuscriptId = invoiceItems[0].manuscriptId.id.toString();
-      const maybeManuscript = await getManuscript.execute({ manuscriptId });
+      const maybeManuscript = await getManuscript.execute(
+        { manuscriptId },
+        context
+      );
       if (maybeManuscript.isLeft()) {
         throw new Errors.InvoiceManuscriptNotFoundError(invoiceId);
       }
@@ -178,20 +196,26 @@ export class PublishRevenuRecognitionReversalUsecase
         }
       }
 
+      //Get catalog
       const catalog = await this.catalogRepo.getCatalogItemByJournalId(
         JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
       );
 
       if (!catalog) {
-        throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
+        throw new Errors.InvoiceCatalogNotFoundError(invoiceId);
       }
 
-      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        catalog.publisherId
+      //Get publisher custom values
+      const maybePublisherCustomValue = await getPublisherCustomValue.execute(
+        {
+          publisherId: catalog.publisherId.id.toString(),
+        },
+        context
       );
-      if (!publisherCustomValues) {
-        throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
+      if (maybePublisherCustomValue.isLeft()) {
+        throw new Errors.InvoiceCatalogNotFoundError(invoiceId);
       }
+      const publisherCustomValues = maybePublisherCustomValue.value.getValue();
 
       const invoiceItem = invoice.invoiceItems.getItems().shift();
       const { coupons, waivers, price } = invoiceItem;
@@ -209,7 +233,7 @@ export class PublishRevenuRecognitionReversalUsecase
         );
       }
 
-      // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+      //   // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {
         invoice.erpReference = 'NON_INVOICEABLE';
         invoice.nsReference = 'NON_INVOICEABLE';
@@ -234,7 +258,7 @@ export class PublishRevenuRecognitionReversalUsecase
       this.loggerService.info('ERP response', erpResponse);
 
       this.loggerService.info(
-        `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
+        `ERP Revenue Recognized Reversal Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
           erpResponse
         )}`
       );

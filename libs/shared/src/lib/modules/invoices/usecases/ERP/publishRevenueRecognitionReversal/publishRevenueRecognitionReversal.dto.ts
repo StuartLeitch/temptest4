@@ -1,3 +1,3 @@
 export interface PublishRevenueRecognitionReversalDTO {
-  invoiceId?: string;
+  invoiceId: string;
 }

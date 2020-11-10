@@ -52,7 +52,7 @@ export interface ErpServiceContract {
   registerRevenueRecognition(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse>;
-  registerRevenueRecognitionReversal(
+  registerRevenueRecognitionReversal?(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse>;
   registerCreditNote?(data: any): Promise<any>;
@@ -89,7 +89,7 @@ export class EmptyErpService implements ErpServiceContract {
     };
   }
 
-  async registerRevenueRecognitionReversal(
+  async registerRevenueRecognitionReversal?(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
     return {
