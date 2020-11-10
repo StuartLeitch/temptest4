@@ -52,9 +52,8 @@ Test:
   allow_failure: false
   stage: test
   before_script:
-    - cd $HOME/reports
-    - mkdir -p coverage && chmod -R +x coverage
-    - mkdir -p cucumber && chmod -R +x cucumber
+    - mkdir -p $CI_PROJECT_DIR/reports/coverage && chmod -R +x $CI_PROJECT_DIR/reports/coverage
+    - mkdir -p $CI_PROJECT_DIR/reports/cucumber && chmod -R +x $CI_PROJECT_DIR/reports/cucumber
   script:
     - cd $HOME
     - git fetch
