@@ -11,12 +11,12 @@ const rxjs = require('rxjs');
 const execa = require('execa');
 const path = require('path');
 const fs = require('fs');
-const operators = require('rxjs/operators');
+const { map, tap, catchError } = require('rxjs/operators');
 const core = require('@angular-devkit/core');
 // var fs = require('fs');
 // var dateFormat = require('dateformat');
 function createCucumber(options, context) {
-  const _path = options.path,
+  const [type, name] = options.path.split('/'),
     { format } = options,
     supportEntryPath = options.steps,
     runCoverage = options.coverage,
@@ -25,7 +25,7 @@ function createCucumber(options, context) {
 
   const fullPath = `${core.getSystemPath(
     core.normalize(workspaceRoot)
-  )}/${_path}`;
+  )}/reports`;
 
   if (!fs.existsSync(fullPath)) {
     fs.mkdirSync(fullPath, { recursive: true });
@@ -33,20 +33,18 @@ function createCucumber(options, context) {
 
   const command = path.join('node_modules', '.bin', 'nyc');
   const args = [
-    // 'report',
     '--report-dir',
-    fullPath,
+    `${fullPath}/coverage`,
     '--reporter=json',
-    // '--reporter=lcov',
     '--reporter=text',
     path.join('node_modules', '.bin', 'cucumber-js'),
     options.features,
     '--require',
     supportEntryPath,
     '--format',
-    `${format}:${fullPath}/cucumber_report.json`,
+    `${format}:${fullPath}/cucumber/${type}_${name}_cucumber_report.json`,
     '--format',
-    `usage:${fullPath}/usage.txt`,
+    `usage:${fullPath}/cucumber/${type}_${name}_usage.txt`,
   ];
 
   // eslint-disable-next-line max-len
@@ -59,26 +57,16 @@ function createCucumber(options, context) {
 
   const cucumberLogger = logger.createChild('Cucumber:');
   return rxjs.from(subprocess).pipe(
-    operators.map(() => {
+    map(() => {
       if (runCoverage) {
-        execa(path.join('tools', 'scripts', 'cucumber-report.sh', fullPath), {
-          shell: true,
-        }).stdout.pipe(process.stdout);
-
-        //   // execa(
-        //   //   path.join('tools', 'scripts', 'generate-coverage.sh', fullPath),
-        //   //   {
-        //   //     shell: true,
-        //   //   }
-        //   // ).stdout.pipe(process.stdout);
+        // do nothing yet
       }
-
       return { success: true };
     }),
-    operators.tap(() => {
+    tap(() => {
       return cucumberLogger.info(`Cucumber report created at ${fullPath}`);
     }),
-    operators.catchError((e) => {
+    catchError((e) => {
       console.error(e);
       cucumberLogger.error('Cucumber execution error', e);
       return rxjs.of({
