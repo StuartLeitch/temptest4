@@ -4,6 +4,7 @@ image:
 stages:
   - setup
   - test
+  - reports
   - build
   - package
   - deploy
@@ -240,15 +241,16 @@ Deploy:hindawi-prod:
 #     - Test
 
 pages:
+  interruptible: true
+  stage: reports
   script:
     - cd $HOME
     - mkdir -p reports && chmod -R +x reports
     - yarn run ci:coverage
     - rm -r public/*
-    - cp -a -v reports/* $CI_PROJECT_DIR/public/
+    - cp -a reports/* $CI_PROJECT_DIR/public/
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
-  dependencies:
-    - Test
+  needs: [Test]
   artifacts:
     paths:
       - public
