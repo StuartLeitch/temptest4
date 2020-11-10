@@ -52,8 +52,8 @@ Test:
   allow_failure: false
   stage: test
   before_script:
-    - mkdir -p $CI_PROJECT_DIR/reports/coverage && chmod -R +x $CI_PROJECT_DIR/reports/coverage
-    - mkdir -p $CI_PROJECT_DIR/reports/cucumber && chmod -R +x $CI_PROJECT_DIR/reports/cucumber
+    - mkdir -p reports/coverage
+    - mkdir -p reports/cucumber
   script:
     - cd $HOME
     - git fetch
@@ -64,12 +64,10 @@ Test:
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
       fi
     - eval $AFFECTED_COMMAND
-    - ls -al reports
-    - ls -al reports/cucumber
-    - ls -al reports/coverage
+    - cp -r reports $CI_PROJECT_DIR/reports
   artifacts:
     paths:
-      - reports/*
+      - reports
 
 Build:
   interruptible: true
