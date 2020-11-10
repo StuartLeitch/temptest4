@@ -65,6 +65,9 @@ Test:
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
       fi
     - eval $AFFECTED_COMMAND
+  artifacts:
+    paths:
+      - reports
 
 Build:
   interruptible: true
