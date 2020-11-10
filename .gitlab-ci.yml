@@ -57,7 +57,6 @@ Test:
     - mkdir -p cucumber && chmod -R +x cucumber
   script:
     - cd $HOME
-    - ls -al reports
     - git fetch
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
@@ -66,6 +65,7 @@ Test:
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
       fi
     - eval $AFFECTED_COMMAND
+    - ls -al reports
   artifacts:
     paths:
       - reports
