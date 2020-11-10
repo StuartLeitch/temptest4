@@ -57,6 +57,7 @@ Test:
     - mkdir -p cucumber && chmod -R +x cucumber
   script:
     - cd $HOME
+    - ls -al reports
     - git fetch
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
