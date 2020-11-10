@@ -33,8 +33,8 @@ report.*.json
 # misc
 /.sass-cache
 /connect.lock
-coverage/
-/report
+/coverage
+/reports
 /.nyc_output
 /libpeerconnection.log
 npm-debug.log
