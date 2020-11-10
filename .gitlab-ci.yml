@@ -70,7 +70,7 @@ Test:
     - ls -al reports/coverage
   artifacts:
     paths:
-      - reports
+      - reports/*
 
 Build:
   interruptible: true
