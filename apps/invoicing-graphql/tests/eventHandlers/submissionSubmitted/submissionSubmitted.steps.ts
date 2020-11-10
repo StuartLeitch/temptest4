@@ -397,7 +397,7 @@ Then(
 
     const items = maybeInvoiceItems.value.getValue();
 
-    expect(items[0].waivers.length).to.equal(waiversCount);
+    expect(items[0].assignedWaivers.length).to.equal(waiversCount);
   }
 );
 

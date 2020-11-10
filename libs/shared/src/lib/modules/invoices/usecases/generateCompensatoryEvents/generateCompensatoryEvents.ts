@@ -16,7 +16,8 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
-import { Coupons } from '../../../coupons/domain/Coupons';
+import { WaiverAssignedCollection } from '../../../waivers/domain/WaiverAssignedCollection';
+import { CouponAssignedCollection } from '../../../coupons/domain/CouponAssignedCollection';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Invoice } from '../../domain/Invoice';
 
@@ -402,8 +403,8 @@ export class GenerateCompensatoryEventsUsecase
 
   private removeCouponsAndWaivers<T extends WithInvoiceItems>(request: T) {
     const invoiceItems = request.invoiceItems.map((item) => {
-      item.props.coupons = Coupons.create();
-      item.props.waivers = [];
+      item.props.assignedWaivers = WaiverAssignedCollection.create();
+      item.props.assignedCoupons = CouponAssignedCollection.create();
       return item;
     });
     return {

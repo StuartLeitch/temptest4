@@ -1,16 +1,18 @@
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
-import { Guard, GuardArgument } from './../../../core/logic/Guard';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardArgument, Guard } from './../../../core/logic/Guard';
 import { Result } from '../../../core/logic/Result';
 
-import { InvoiceId } from './InvoiceId';
+import { Reduction } from '../../../domain/reductions/Reduction';
+
+import { CouponAssignedCollection } from '../../coupons/domain/CouponAssignedCollection';
+import { WaiverAssignedCollection } from '../../waivers/domain/WaiverAssignedCollection';
+import { WaiverAssigned } from '../../waivers/domain/WaiverAssigned';
+import { CouponAssigned } from '../../coupons/domain/CouponAssigned';
 import { InvoiceItemId } from './InvoiceItemId';
 import { ManuscriptId } from './ManuscriptId';
-import { Coupon } from '../../coupons/domain/Coupon';
-import { Coupons } from '../../coupons/domain/Coupons';
-import { Reduction } from '../../../domain/reductions/Reduction';
-import { Waiver } from '../../waivers/domain/Waiver';
+import { InvoiceId } from './InvoiceId';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
 
@@ -22,9 +24,8 @@ export interface InvoiceItemProps {
   price?: number;
   dateCreated: Date;
   name?: string;
-  coupons?: Coupons;
-  totalNumCoupons?: number;
-  waivers?: Waiver[];
+  assignedCoupons?: CouponAssignedCollection;
+  assignedWaivers?: WaiverAssignedCollection;
 }
 
 export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
@@ -72,16 +73,12 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return this.props.vat || 0;
   }
 
-  get coupons(): Coupons {
-    return this.props.coupons;
+  get assignedCoupons(): CouponAssignedCollection {
+    return this.props.assignedCoupons;
   }
 
-  get waivers(): Waiver[] {
-    return this.props.waivers;
-  }
-
-  set waivers(waivers: Waiver[]) {
-    this.props.waivers = waivers;
+  get assignedWaivers(): WaiverAssignedCollection {
+    return this.props.assignedWaivers;
   }
 
   public static create(
@@ -103,25 +100,48 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
       ...props,
       type: props.type ? props.type : 'APC',
       dateCreated: props.dateCreated ? props.dateCreated : new Date(),
-      coupons: props.coupons ? props.coupons : Coupons.create([]),
+      assignedCoupons:
+        props.assignedCoupons ?? CouponAssignedCollection.create(),
+      assignedWaivers:
+        props.assignedWaivers ?? WaiverAssignedCollection.create(),
     };
 
     const invoiceItem = new InvoiceItem(defaultValues, id);
     return Result.ok<InvoiceItem>(invoiceItem);
   }
 
-  private removeCouponIfExists(coupon: Coupon): void {
-    if (this.props.coupons.exists(coupon)) {
-      this.props.coupons.remove(coupon);
+  private removeCouponIfExists(coupon: CouponAssigned): void {
+    if (this.props.assignedCoupons.exists(coupon)) {
+      this.props.assignedCoupons.remove(coupon);
     }
   }
 
-  public addCoupon(coupon: Coupon): Result<void> {
+  public addAssignedCoupon(coupon: CouponAssigned): void {
     this.removeCouponIfExists(coupon);
-    this.props.coupons.add(coupon);
-    this.props.totalNumCoupons++;
-    // this.addDomainEvent(new InvoiceItemIssued(this, invoiceItem));
-    return Result.ok<void>();
+    this.props.assignedCoupons.add(coupon);
+  }
+
+  public addAssignedCoupons(
+    coupons: CouponAssigned[] | CouponAssignedCollection
+  ): void {
+    coupons.forEach(this.addAssignedCoupon, this);
+  }
+
+  private removeWaiverIfExists(waiver: WaiverAssigned): void {
+    if (this.props.assignedWaivers.exists(waiver)) {
+      this.props.assignedWaivers.remove(waiver);
+    }
+  }
+
+  public addAssignedWaiver(waiver: WaiverAssigned): void {
+    this.removeWaiverIfExists(waiver);
+    this.props.assignedWaivers.add(waiver);
+  }
+
+  public addAssignedWaivers(
+    waivers: WaiverAssigned[] | WaiverAssignedCollection
+  ): void {
+    waivers.forEach(this.addAssignedWaiver, this);
   }
 
   private constructor(props: InvoiceItemProps, id?: UniqueEntityID) {
@@ -156,11 +176,11 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     withReductions?: Reduction<unknown>[]
   ): number {
     const reductions: Reduction<unknown>[] = [];
-    if (this.coupons) {
-      reductions.push(...this.coupons.getItems());
+    if (this.assignedCoupons) {
+      reductions.push(...this.assignedCoupons.coupons);
     }
-    if (this.waivers) {
-      reductions.push(...this.waivers);
+    if (this.assignedWaivers) {
+      reductions.push(...this.assignedWaivers.waivers);
     }
     if (withReductions) {
       reductions.push(...withReductions);

@@ -4,6 +4,8 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
 import { Waiver, WaiverType } from '../../domain/Waiver';
 
+import { WaiverAssignedCollection } from '../../domain/WaiverAssignedCollection';
+import { WaiverAssigned } from '../../domain/WaiverAssigned';
 import { WaiverRepoContract } from '../waiverRepo';
 
 export class MockWaiverRepo
@@ -60,14 +62,23 @@ export class MockWaiverRepo
 
   public async getWaiversByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<Waiver[]> {
+  ): Promise<WaiverAssignedCollection> {
     const waiverIds = this.invoiceItemToWaiverMapper[
       invoiceItemId.id.toString()
     ];
     if (!waiverIds) {
-      return [];
+      return WaiverAssignedCollection.create();
     }
-    return this._items.filter((item) => waiverIds.includes(item.id));
+    const waivers = this._items.filter((item) => waiverIds.includes(item.id));
+    return WaiverAssignedCollection.create(
+      waivers.map((i) =>
+        WaiverAssigned.create({
+          dateAssigned: null,
+          invoiceItemId,
+          waiver: i,
+        })
+      )
+    );
   }
 
   public async attachWaiverToInvoiceItem(

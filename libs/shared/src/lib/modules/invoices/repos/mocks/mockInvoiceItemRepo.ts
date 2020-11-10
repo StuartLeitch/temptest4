@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
 import { InvoiceItemRepoContract } from '../invoiceItemRepo';
@@ -5,6 +7,8 @@ import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { ManuscriptId } from '../../domain/ManuscriptId';
 import { InvoiceId } from '../../domain/InvoiceId';
+import { CouponAssignedCollection } from '../../../coupons/domain/CouponAssignedCollection';
+import { WaiverAssignedCollection } from '../../../waivers/domain/WaiverAssignedCollection';
 
 export class MockInvoiceItemRepo
   extends BaseMockRepo<InvoiceItem>
@@ -22,7 +26,10 @@ export class MockInvoiceItemRepo
       i.invoiceItemId.equals(invoiceItemId)
     );
     if (matches.length !== 0) {
-      return matches[0];
+      const item = matches[0];
+      item.props.assignedCoupons = CouponAssignedCollection.create();
+      item.props.assignedWaivers = WaiverAssignedCollection.create();
+      return item;
     } else {
       return null;
     }
@@ -34,49 +41,69 @@ export class MockInvoiceItemRepo
     const match = this._items.filter((i) =>
       i.manuscriptId.equals(manuscriptId)
     );
-    return match;
+    return match.map((item) => {
+      item.props.assignedCoupons = CouponAssignedCollection.create();
+      item.props.assignedWaivers = WaiverAssignedCollection.create();
+      return item;
+    });
   }
 
   public async getInvoiceItemCollection(): Promise<InvoiceItem[]> {
-    return this._items;
+    return this._items.map((item) => {
+      item.props.assignedCoupons = CouponAssignedCollection.create();
+      item.props.assignedWaivers = WaiverAssignedCollection.create();
+      return item;
+    });
   }
 
   public async save(invoiceItem: InvoiceItem): Promise<InvoiceItem> {
-    const alreadyExists = await this.exists(invoiceItem);
+    const item = cloneDeep(invoiceItem);
+    item.props.assignedCoupons = CouponAssignedCollection.create();
+    item.props.assignedWaivers = WaiverAssignedCollection.create();
+
+    const alreadyExists = await this.exists(item);
 
     if (alreadyExists) {
       this._items.map((i) => {
-        if (this.compareMockItems(i, invoiceItem)) {
-          return invoiceItem;
+        if (this.compareMockItems(i, item)) {
+          return item;
         } else {
           return i;
         }
       });
     } else {
-      this._items.push(invoiceItem);
+      this._items.push(item);
     }
 
-    return invoiceItem;
+    return item;
   }
 
   public async update(invoiceItem: InvoiceItem): Promise<InvoiceItem> {
-    const alreadyExists = await this.exists(invoiceItem);
+    const item = cloneDeep(invoiceItem);
+    item.props.assignedCoupons = CouponAssignedCollection.create();
+    item.props.assignedWaivers = WaiverAssignedCollection.create();
+
+    const alreadyExists = await this.exists(item);
 
     if (alreadyExists) {
       this._items.map((i) => {
-        if (this.compareMockItems(i, invoiceItem)) {
-          return invoiceItem;
+        if (this.compareMockItems(i, item)) {
+          return item;
         } else {
           return i;
         }
       });
     }
 
-    return invoiceItem;
+    return item;
   }
 
   public async delete(invoiceItem: InvoiceItem): Promise<void> {
-    this.deletedItems.push(invoiceItem);
+    const item = cloneDeep(invoiceItem);
+    item.props.assignedCoupons = CouponAssignedCollection.create();
+    item.props.assignedWaivers = WaiverAssignedCollection.create();
+
+    this.deletedItems.push(item);
   }
 
   public async restore(invoiceItem: InvoiceItem): Promise<void> {
@@ -103,6 +130,10 @@ export class MockInvoiceItemRepo
     const matches = this._items.filter((item) => {
       return item.invoiceId.equals(invoiceId);
     });
-    return matches;
+    return matches.map((item) => {
+      item.props.assignedCoupons = CouponAssignedCollection.create();
+      item.props.assignedWaivers = WaiverAssignedCollection.create();
+      return item;
+    });
   }
 }

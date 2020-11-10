@@ -106,7 +106,6 @@ export class MockInvoiceRepo
   public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
     let invoice = await this.getInvoiceById(invoiceId);
     if (invoice.invoiceNumber) {
-      console.log('Invoice number already set');
       return invoice;
     }
     invoice.invoiceNumber = String(this._items.length);

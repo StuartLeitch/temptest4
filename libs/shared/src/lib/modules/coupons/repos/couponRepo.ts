@@ -1,9 +1,11 @@
 import { PaginationArguments } from './../../../core/domain/arguments/arguments';
-import { Coupon } from '../domain/Coupon';
-import { CouponId } from '../domain/CouponId';
 import { Repo } from '../../../infrastructure/Repo';
-import { CouponCode } from '../domain/CouponCode';
+
 import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
+import { CouponCode } from '../domain/CouponCode';
+import { CouponId } from '../domain/CouponId';
+import { Coupon } from '../domain/Coupon';
+import { CouponAssignedCollection } from '../domain/CouponAssignedCollection';
 
 export interface GetRecentCouponsArguments {
   pagination?: PaginationArguments;
@@ -20,7 +22,9 @@ export interface CouponRepoContract extends Repo<Coupon> {
     args?: GetRecentCouponsArguments
   ): Promise<PaginatedCouponsResult>;
   getCouponCollection(): Promise<Coupon[]>;
-  getCouponsByInvoiceItemId(invoiceItemId: InvoiceItemId): Promise<Coupon[]>;
+  getCouponsByInvoiceItemId(
+    invoiceItemId: InvoiceItemId
+  ): Promise<CouponAssignedCollection>;
   getCouponById(couponId: CouponId): Promise<Coupon>;
   getCouponByCode(code: CouponCode): Promise<Coupon>;
   incrementRedeemedCount(coupon: Coupon): Promise<Coupon>;

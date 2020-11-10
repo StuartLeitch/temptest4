@@ -420,9 +420,11 @@ export const invoice: Resolvers<Context> = {
     },
 
     async waivers(parent, args, context) {
-      const waivers = await context.repos.waiver.getWaiversByInvoiceItemId(
-        InvoiceItemId.create(new UniqueEntityID(parent.id))
-      );
+      const waivers = (
+        await context.repos.waiver.getWaiversByInvoiceItemId(
+          InvoiceItemId.create(new UniqueEntityID(parent.id))
+        )
+      ).waivers;
       return waivers.map(WaiverMap.toPersistence);
     },
   },

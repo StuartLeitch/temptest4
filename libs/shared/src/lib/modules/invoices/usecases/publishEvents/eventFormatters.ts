@@ -14,13 +14,13 @@ import { Name } from '../../../../domain/Name';
 import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 import { Address } from '../../../addresses/domain/Address';
 import { Payment, PaymentStatus } from '../../../payments/domain/Payment';
-import { Coupons } from '../../../coupons/domain/Coupons';
+import { Coupon } from '../../../coupons/domain/Coupon';
 import { Waiver } from '../../../waivers/domain/Waiver';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Payer } from '../../../payers/domain/Payer';
 import { Invoice } from '../../domain/Invoice';
 
-export function formatCoupons(coupons: Coupons): PhenomCoupon[] {
+export function formatCoupons(coupons: Coupon[]): PhenomCoupon[] {
   if (!coupons) return undefined;
   return coupons.map((coupon) => ({
     applicableToInvoiceItemType: coupon.invoiceItemType as CouponApplicableInvoiceItemType,
@@ -72,12 +72,18 @@ function itemReduction(item: InvoiceItem): number {
   let couponTotal = 0;
   let waiverTotal = 0;
 
-  if (item.coupons) {
-    couponTotal = item.coupons.reduce((acc, c) => acc + c.reduction, 0);
+  if (item.assignedCoupons) {
+    couponTotal = item.assignedCoupons.coupons.reduce(
+      (acc, c) => acc + c.reduction,
+      0
+    );
   }
 
-  if (item.waivers) {
-    waiverTotal = item.waivers.reduce((acc, w) => acc + w.reduction, 0);
+  if (item.assignedWaivers) {
+    waiverTotal = item.assignedWaivers.waivers.reduce(
+      (acc, w) => acc + w.reduction,
+      0
+    );
   }
 
   const totalReduction = Math.min(couponTotal + waiverTotal, 100);
@@ -131,8 +137,8 @@ export function formatInvoiceItems(
     type: invoiceItem.type as any,
     price: invoiceItem.price,
     vatPercentage: invoiceItem.vat,
-    coupons: formatCoupons(invoiceItem.coupons),
-    waivers: formatWaiver(invoiceItem.waivers),
+    coupons: formatCoupons(invoiceItem.assignedCoupons.coupons),
+    waivers: formatWaiver(invoiceItem.assignedWaivers.waivers),
   }));
 }
 
