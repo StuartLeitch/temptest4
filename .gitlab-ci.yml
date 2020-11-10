@@ -236,7 +236,6 @@ Deploy:hindawi-prod:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
-
 # Pages:
 #   interruptible: true
 #   stage: deploy
@@ -250,17 +249,17 @@ Deploy:hindawi-prod:
 #   dependencies:
 #     - Test
 
-pages:
-  interruptible: true
-  stage: reports
-  script:
-    - cd $HOME
-    - mkdir -p reports && chmod -R +x reports
-    - yarn run ci:coverage
-    - rm -r public/*
-    - cp -a reports/* $CI_PROJECT_DIR/public/
-  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
-  needs: [Test]
-  artifacts:
-    paths:
-      - public
+# pages:
+#   interruptible: true
+#   stage: reports
+#   script:
+#     - cd $HOME
+#     - mkdir -p reports && chmod -R +x reports
+#     - yarn run ci:coverage
+#     - rm -r public/*
+#     - cp -a reports/* $CI_PROJECT_DIR/public/
+#   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
+#   needs: [Test]
+#   artifacts:
+#     paths:
+#       - public
