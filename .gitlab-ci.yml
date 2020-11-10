@@ -66,6 +66,8 @@ Test:
       fi
     - eval $AFFECTED_COMMAND
     - ls -al reports
+    - ls -al reports/cucumber
+    - ls -al reports/coverage
   artifacts:
     paths:
       - reports
