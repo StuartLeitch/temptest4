@@ -51,6 +51,10 @@ Test:
   interruptible: true
   allow_failure: false
   stage: test
+  before_script:
+    - cd $HOME/reports
+    - mkdir -p coverage && chmod -R +x coverage
+    - mkdir -p cucumber && chmod -R +x cucumber
   script:
     - cd $HOME
     - git fetch
