@@ -286,7 +286,7 @@ export class PublishPaymentToErpUsecase
               )}`
             );
 
-            payment.erpId = erpResponse.tradeDocumentId;
+            payment.erpId = String(erpResponse);
           }
         } catch (error) {
           this.loggerService.info(
