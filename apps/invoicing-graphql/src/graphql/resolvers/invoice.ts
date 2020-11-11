@@ -413,9 +413,11 @@ export const invoice: Resolvers<Context> = {
     },
 
     async coupons(parent, args, context) {
-      const coupons = await context.repos.coupon.getCouponsByInvoiceItemId(
-        InvoiceItemId.create(new UniqueEntityID(parent.id))
-      );
+      const coupons = await context.repos.coupon
+        .getCouponsByInvoiceItemId(
+          InvoiceItemId.create(new UniqueEntityID(parent.id))
+        )
+        .then((coupons) => coupons.map((c) => c.coupon));
       return coupons.map(CouponMap.toPersistence);
     },
 
