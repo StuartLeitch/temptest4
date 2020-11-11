@@ -66,7 +66,8 @@ export class PublishInvoiceCreditedUsecase
       creditNoteForInvoice: creditNote.cancelledInvoiceReference,
       referenceNumber: `CN-${creditNote.referenceNumber}`,
       transactionId: creditNote.transactionId.toString(),
-      erpReference: creditNote.erpReference,
+      // TODO: Fix erpReference
+      erpReference: null, // creditNote.erpReference,
       invoiceId: creditNote.id.toString(),
       invoiceStatus: creditNote.status,
       isCreditNote: true,

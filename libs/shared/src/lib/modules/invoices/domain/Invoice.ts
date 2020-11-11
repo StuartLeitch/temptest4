@@ -9,6 +9,7 @@ import { Result } from '../../../core/logic/Result';
 import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
 import { InvoiceItems } from './InvoiceItems';
+import { InvoiceErpReferences } from './InvoiceErpReferences';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceDraftDueAmountUpdated } from './events/invoiceDraftDueAmountUpdated';
 import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
@@ -47,13 +48,10 @@ interface InvoiceProps {
   dateMovedToFinal?: Date;
   charge?: number;
   totalNumInvoiceItems?: number;
-  erpReference?: string;
-  nsReference?: string;
-  revenueRecognitionReference?: string;
-  cancelledInvoiceReference?: string;
-  nsRevRecReference?: string;
-  creditNoteReference?: string;
   vatnote?: string;
+  creationReason?: string;
+  cancelledInvoiceReference?: string;
+  erpReferences?: InvoiceErpReferences;
 }
 
 export type InvoiceCollection = Invoice[];
@@ -158,44 +156,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.transactionId = transactionId;
   }
 
-  get erpReference(): string {
-    return this.props.erpReference;
-  }
-
-  set erpReference(erpReference: string) {
-    this.props.erpReference = erpReference;
-  }
-
-  get revenueRecognitionReference(): string {
-    return this.props.revenueRecognitionReference;
-  }
-
-  set revenueRecognitionReference(revenueRecognitionReference: string) {
-    this.props.revenueRecognitionReference = revenueRecognitionReference;
-  }
-
-  get nsReference(): string {
-    return this.props.nsReference;
-  }
-
-  set nsReference(nsReference: string) {
-    this.props.nsReference = nsReference;
-  }
-
-  get nsRevRecReference(): string {
-    return this.props.nsRevRecReference;
-  }
-
-  set nsRevRecReference(nsRevRecReference: string) {
-    this.props.nsRevRecReference = nsRevRecReference;
-  }
-
-  get creditNoteReference(): string {
-    return this.props.creditNoteReference;
-  }
-
-  set creditNoteReference(creditNoteReference: string) {
-    this.props.creditNoteReference = creditNoteReference;
+  public getErpReferences(): InvoiceErpReferences {
+    return this.props.erpReferences;
   }
 
   get cancelledInvoiceReference(): string {
@@ -236,6 +198,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.getInvoiceDiscountPercentageTotal();
   }
 
+  get creationReason(): string {
+    return this.props.creationReason;
+  }
+
+  set creationReason(creationReason: string) {
+    this.props.creationReason = creationReason;
+  }
+
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
     if (this.props.invoiceItems.exists(invoiceItem)) {
       this.props.invoiceItems.remove(invoiceItem);
@@ -246,7 +216,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.removeInvoiceItemIfExists(invoiceItem);
     this.props.invoiceItems.add(invoiceItem);
     this.props.totalNumInvoiceItems++;
-    // this.addDomainEvent(new InvoiceItemIssued(this, invoiceItem));
     return Result.ok<void>();
   }
 
@@ -265,12 +234,9 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   ): Result<Invoice> {
     const defaultValues = {
       ...props,
-      totalNumInvoiceItems: props.totalNumInvoiceItems
-        ? props.totalNumInvoiceItems
-        : 0,
-      invoiceItems: props.invoiceItems
-        ? props.invoiceItems
-        : InvoiceItems.create([]),
+      totalNumInvoiceItems: props.totalNumInvoiceItems ?? 0,
+      invoiceItems: props.invoiceItems ?? InvoiceItems.create([]),
+      erpReferences: props.erpReferences ?? InvoiceErpReferences.create([]),
       dateCreated: props.dateCreated ? props.dateCreated : new Date(),
     };
 
@@ -315,7 +281,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public paymentAdded(paymentId: PaymentId): void {
     const now = new Date();
     this.props.dateUpdated = now;
-    // this.props.status = InvoiceStatus.FINAL;
     this.addDomainEvent(
       new InvoicePaymentAddedEvent(this.invoiceId, paymentId, now)
     );
@@ -348,7 +313,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceDiscountTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );
@@ -360,7 +325,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceDiscountPercentageTotal(): number {
-    if (this.invoiceItems.length == 0) {
+    if (this.invoiceItems.length === 0) {
       throw new Error(
         `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
       );
@@ -403,49 +368,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       this.invoiceItems.reduce((acc, item) => acc + item.calculateNetPrice(), 0)
     );
   }
-
-  // public getValue(): number {
-  //   return this.invoiceItems.reduce(
-  //     (value: number, invoiceItem: InvoiceItem) => {
-  //       value += invoiceItem.price;
-  //       return value;
-  //     },
-  //     0
-  //   );
-  // }
-
-  // public addInvoiceItem(invoiceItem: InvoiceItem): void {
-  //   const alreadyAdded = this.props.invoiceItems.find(i =>
-  //     i.id.equals(invoiceItem.id)
-  //   );
-
-  //   if (!alreadyAdded) {
-  //     Object.assign(invoiceItem, {invoiceId: this.invoiceId});
-  //     this.props.invoiceItems.push(invoiceItem);
-  //   }
-  // }
-
-  // public removeInvoiceItems(invoiceItem: InvoiceItem): void {
-  //   this.props.invoiceItems = this.props.invoiceItems.filter(
-  //     i => !i.id.equals(invoiceItem.id)
-  //   );
-  // }
-
-  // public clearInvoiceItems(): void {
-  //   this.props.invoiceItems = [];
-  // }
-
-  // public addTax(taxRate: number) {
-  //   const netAmount = this.getValue();
-  //   const taxValue = (netAmount * taxRate) / 100;
-  //   return netAmount + taxValue;
-  // }
-
-  // public redeemCoupon(reduction: number) {
-  //   const netAmount = this.getValue();
-  //   const reductionValue = netAmount * reduction;
-  //   return netAmount - reductionValue;
-  // }
 
   public isCreditNote(): boolean {
     return !!this.props.cancelledInvoiceReference;

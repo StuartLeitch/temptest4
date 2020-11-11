@@ -127,8 +127,8 @@ export class PublishInvoiceToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
-        invoice.erpReference = 'NON_INVOICEABLE';
-        invoice.nsReference = 'NON_INVOICEABLE';
+        // invoice.erpReference = 'NON_INVOICEABLE';
+        // invoice.nsReference = 'NON_INVOICEABLE';
         await this.invoiceRepo.update(invoice);
         return right(null);
       }

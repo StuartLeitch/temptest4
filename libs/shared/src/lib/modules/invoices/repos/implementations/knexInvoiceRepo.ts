@@ -1,3 +1,4 @@
+import { AnyStyledComponent } from 'styled-components';
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { Transform } from 'stream';
@@ -17,6 +18,7 @@ import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRep
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import type { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { ErpReference } from './../../../vendors/domain/ErpReference';
 
 import { applyFilters } from './utils';
 
@@ -50,6 +52,24 @@ export class KnexInvoiceRepo
       .offset(0);
   }
 
+  private createErpDetailsQuery(): any {
+    const { db } = this;
+
+    return db(TABLES.INVOICES)
+      .select(
+        'invoices.id as invoiceId',
+        'erp_references.type',
+        'erp_references.vendor',
+        'erp_references.attribute',
+        'erp_references.value'
+      )
+      .leftJoin(
+        TABLES.ERP_REFERENCES,
+        'erp_references.entity_id',
+        'invoices.id'
+      );
+  }
+
   private createBaseArticleDetailsQuery(): any {
     const { db } = this;
 
@@ -73,30 +93,48 @@ export class KnexInvoiceRepo
   }
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
-    const { db, logger } = this;
+    const { logger } = this;
 
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
 
-    const sql = db(TABLES.INVOICES)
-      .select()
-      .where('id', invoiceId.id.toString())
-      .first();
+    const erpReferencesQuery = this.createErpDetailsQuery();
+    const filterByInvoiceId = this.filterByInvoiceId(invoiceId);
+    const sql = filterByInvoiceId(erpReferencesQuery);
 
-    logger.debug('select', {
+    logger.debug('getInvoiceById SQL', {
       correlationId,
       sql: sql.toString(),
     });
 
-    const invoice = await sql;
+    const invoiceWithErpReferences = await sql;
 
-    if (!invoice) {
+    if (!invoiceWithErpReferences) {
       throw RepoError.createEntityNotFoundError(
         'invoice',
         invoiceId.id.toString()
       );
     }
-    return InvoiceMap.toDomain(invoice);
+
+    const erpReferences = invoiceWithErpReferences.reduce(
+      (refs, { type, vendor, attribute, value }) => {
+        refs.push({
+          type,
+          vendor,
+          attribute,
+          value,
+        });
+        return refs;
+      },
+      []
+    );
+
+    const invoice = InvoiceMap.toDomain({
+      invoiceId: invoiceId.id.toString(),
+      erpReferences,
+    });
+    console.info(invoice);
+    return invoice;
   }
 
   public async getInvoiceByInvoiceItemId(
@@ -120,12 +158,6 @@ export class KnexInvoiceRepo
   }
 
   async getRecentInvoices(args?: any): Promise<any> {
-    // const InvoiceModel = this.models.Invoice;
-    // const detailsQuery = this.createBaseDetailsQuery();
-    // detailsQuery.offset = offset ? offset : detailsQuery.offset;
-
-    // const invoices = await InvoicesModel.findAll(detailsQuery);
-
     const { pagination, filters } = args;
     const { db } = this;
 
@@ -515,6 +547,12 @@ export class KnexInvoiceRepo
     return this.getInvoiceById(invoice.invoiceId);
   }
 
+  async saveBulk(invoices: Invoice[]): Promise<void> {
+    for (const invoice of invoices) {
+      await this.save(invoice);
+    }
+  }
+
   async *getInvoicesIds(
     ids: string[],
     journalIds: string[]
@@ -550,9 +588,8 @@ export class KnexInvoiceRepo
     }
   }
 
-  filterByInvoiceId(invoiceId: InvoiceId): unknown {
-    return (query) =>
-      query.where('invoices.id', invoiceId.id.toString()).first();
+  filterByInvoiceId(invoiceId: InvoiceId): any {
+    return (query) => query.where('invoices.id', invoiceId.id.toString()); //.first();
   }
 
   filterBy(criteria): any {

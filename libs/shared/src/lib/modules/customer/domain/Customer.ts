@@ -1,7 +1,7 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Result } from '../../../core/logic/Result';
 
 interface CustomerProps {
   name: string;
@@ -33,7 +33,7 @@ export class Customer extends AggregateRoot<CustomerProps> {
     // } else {
     const customer = new Customer(
       {
-        ...props
+        ...props,
       },
       id
     );

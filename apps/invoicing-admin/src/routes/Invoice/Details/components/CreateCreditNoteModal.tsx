@@ -34,6 +34,7 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
   const [recordCreditNote] = useMutation(CREATE_CREDIT_NOTE_MUTATION);
   const [creditNoteData, setCreditNoteData] = useState({
     createDraft: false,
+    reason: 'withdrawn-manuscript'
   });
   const [inProgress, setInProgress] = useState(false);
   const [error, setError] = useState('');
@@ -43,7 +44,7 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
     setError('');
 
     try {
-      const recordCreditNoteResult = await recordCreditNote({
+     const recordCreditNoteResult = await recordCreditNote({
         variables: {
           ...creditNoteData,
           invoiceId,
@@ -117,20 +118,31 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
                 type='select'
                 name='createDraft'
                 id='draftReason'
-                defaultValue={0}
+                defaultValue={'withdrawn-manuscript'}
                 onChange={(e) => {
                   const { value } = e.target;
-                  setCreditNoteData({
+                  const reasons = {
+                    'withdrawn-manuscript': false,
+                    'reduction-applied': true,
+                    'waived-manuscript': false,
+                    'change-payer-details': true,
+                    'other-reason': true,
+                  }
+
+                  const cnd = {
                     ...creditNoteData,
-                    createDraft: !!+value,
-                  });
+                    createDraft: reasons[value],
+                    reason: value
+                  }
+
+                  setCreditNoteData(cnd);
                 }}
               >
-                <option value='0'>Withdrawn Manuscript</option>
-                <option value='1'>Reduction Applied</option>
-                <option value='0'>Waived Manuscript</option>
-                <option value='1'>Change Payer Details</option>
-                <option value='1'>Other</option>
+                <option value='withdrawn-manuscript'>Withdrawn Manuscript</option>
+                <option value='reduction-applied'>Reduction Applied</option>
+                <option value='waived-manuscript'>Waived Manuscript</option>
+                <option value='change-payer-details'>Change Payer Details</option>
+                <option value='other-reason'>Other</option>
               </Input>
             </Col>
           </FormGroup>

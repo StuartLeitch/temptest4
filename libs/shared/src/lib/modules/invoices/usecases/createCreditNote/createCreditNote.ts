@@ -73,6 +73,8 @@ export class CreateCreditNoteUsecase
     let invoice: Invoice;
     let items: InvoiceItem[];
 
+    console.info(request);
+
     // * build the InvoiceId
     const invoiceId = InvoiceId.create(
       new UniqueEntityID(request.invoiceId)
@@ -151,6 +153,9 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.nsReference = null;
       clonedRawInvoice.revenueRecognitionReference = null;
       clonedRawInvoice.nsRevRecReference = null;
+      clonedRawInvoice.creationReason = request.reason;
+
+      console.info(clonedRawInvoice);
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {

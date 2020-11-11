@@ -35,10 +35,12 @@ export const CREATE_CREDIT_NOTE_MUTATION = `
   mutation createCreditNote (
     $invoiceId: String!
     $createDraft: Boolean!,
+    $reason: String
   ) {
     createCreditNote(
       invoiceId: $invoiceId
-      createDraft: $createDraft
+      createDraft: $createDraft,
+      reason: $reason
     ) {
       id
     }

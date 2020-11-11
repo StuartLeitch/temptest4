@@ -388,7 +388,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}/!transform/customerpayment`,
+      // url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}/!transform/customerpayment`,
       method: 'POST',
     };
 
@@ -550,7 +550,7 @@ export class NetSuiteService implements ErpServiceContract {
     const { invoice, journalId } = data;
 
     const invoiceRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
+      // url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
       method: 'PATCH',
     };
 
@@ -581,7 +581,7 @@ export class NetSuiteService implements ErpServiceContract {
     const { originalInvoice } = data;
 
     const creditNoteTransformOpts = {
-      url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
+      // url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
       method: 'POST',
     };
 
@@ -624,8 +624,26 @@ export class NetSuiteService implements ErpServiceContract {
       creationYear = creditNote.dateIssued.getFullYear();
     }
 
+    const { creationReason } = creditNote;
+    let memo = 'Other';
+    switch (creationReason) {
+      case 'withdrawn-manuscript':
+        memo = 'Withdrawn Manuscript';
+        break;
+      case 'reduction-applied':
+        memo = 'Reduction Applied';
+        break;
+      case 'waived-manuscript':
+        memo = 'Waived Manuscript';
+        break;
+      case 'change-payer-details':
+        memo = 'Change Payer Details';
+        break;
+    }
+
     const patchCreditNotePayload: Record<string, any> = {
       tranId: `CN-${creditNote.invoiceNumber}/${creationYear}`,
+      memo,
     };
 
     try {

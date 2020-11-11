@@ -1,15 +1,16 @@
 // * Core Domain
 // import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { ValueObject } from '../../../core/domain/ValueObject';
+import { Either, right, left } from '../../../core/logic/Result';
 // import { Result } from '../../../core/logic/Result';
 
-// import { ValueObject } from '../../../shared/domain/ValueObject';
-// import { Guard } from '../../../shared/core/Guard';
+import { Guard } from '../../../core/logic/Guard';
 // import { UserName } from '../../users/domain/userName';
 // // * Subdomain
 // import { AddressId } from './AddressId';
 
 export interface ErpReferenceProps {
+  entity_id: string;
   vendor: string;
   entity_type: string;
   attribute?: string;
@@ -23,38 +24,34 @@ export class ErpReference extends ValueObject<ErpReferenceProps> {
     return this.props.vendor;
   }
 
-  // get reputation(): number {
-  //   return this.props.reputation;
-  // }
-
-  // get isAdminUser(): boolean {
-  //   return this.props.isAdminUser;
-  // }
+  get entityType(): string {
+    return this.props.entity_type;
+  }
 
   // get isDeleted(): boolean {
   //   return this.props.isDeleted;
   // }
 
-  // private constructor(props: ErpReferenceProps) {
-  //   super(props);
-  // }
+  private constructor(props: ErpReferenceProps) {
+    super(props);
+  }
 
-  // public static create(props: ErpReferenceProps): Result<ErpReference> {
-  //   const guardResult = Guard.againstNullOrUndefinedBulk([
-  //     { argument: props.username, argumentName: 'username' },
-  //     { argument: props.reputation, argumentName: 'reputation' },
-  //   ]);
+  public static create(props: ErpReferenceProps): Either<any, ErpReference> {
+    const guardResult = Guard.againstNullOrUndefinedBulk([
+      { argument: props.vendor, argumentName: 'vendor' },
+      { argument: props.entity_type, argumentName: 'entity_type' },
+    ]);
 
-  //   if (!guardResult.succeeded) {
-  //     return Result.fail<ErpReference>(guardResult.message);
-  //   }
+    if (!guardResult.succeeded) {
+      return left(guardResult.message);
+    }
 
-  //   return Result.ok<ErpReference>(
-  //     new ErpReference({
-  //       ...props,
-  //       isAdminUser: props.isAdminUser ? props.isAdminUser : false,
-  //       isDeleted: props.isDeleted ? props.isDeleted : false,
-  //     })
-  //   );
-  // }
+    const newErpReference = new ErpReference({
+      ...props,
+      vendor: props.vendor ?? null,
+      entity_type: props.entity_type ?? null,
+    });
+
+    return right(newErpReference);
+  }
 }

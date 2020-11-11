@@ -29,6 +29,7 @@ export interface CreditNote {
   dateCreated: string;
   invoiceId: string;
   referenceNumber: string;
+  creationReason?: string;
 }
 
 export interface Invoice {
@@ -45,7 +46,7 @@ export interface Invoice {
   payments: Payment[] | null;
   referenceNumber: string | null;
   revenueRecognitionReference: string | null;
-  status: "DRAFT" | "ACTIVE" | "FINAL" | "PENDING" | null;
+  status: 'DRAFT' | 'ACTIVE' | 'FINAL' | 'PENDING' | null;
 }
 
 export interface InvoiceItem {
@@ -88,5 +89,4 @@ export interface Waiver {
   reduction: number;
 }
 
-type PaymentType = "INDIVIDUAL" | "INSTITUTION";
-
+type PaymentType = 'INDIVIDUAL' | 'INSTITUTION';

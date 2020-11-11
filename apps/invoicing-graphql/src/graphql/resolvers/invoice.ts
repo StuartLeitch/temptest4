@@ -66,8 +66,8 @@ export const invoice: Resolvers<Context> = {
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
-        erpReference: invoiceDetails.erpReference,
-        revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
+        // erpReference: invoiceDetails.erpReference,
+        // revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber:
@@ -361,10 +361,11 @@ export const invoice: Resolvers<Context> = {
         status: creditNoteDetails.status,
         charge: creditNoteDetails.charge,
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
-        erpReference: creditNoteDetails.erpReference,
-        creditNoteReference: creditNoteDetails.creditNoteReference,
-        revenueRecognitionReference:
-          creditNoteDetails.revenueRecognitionReference,
+        // erpReference: creditNoteDetails.erpReference,
+        // creditNoteReference: creditNoteDetails.creditNoteReference,
+        // revenueRecognitionReference:
+        //   creditNoteDetails.revenueRecognitionReference,
+        creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
         referenceNumber:
           creditNoteDetails.invoiceNumber && creditNoteDetails.dateAccepted
@@ -514,12 +515,14 @@ export const invoice: Resolvers<Context> = {
           coupon: couponRepo,
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
-          manuscript: manuscriptRepo,
+          // manuscript: manuscriptRepo,
         },
         services: { waiverService },
       } = context;
 
-      const { invoiceId, createDraft } = args;
+      console.info(args);
+
+      const { invoiceId, createDraft, reason } = args;
 
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
         // paymentRepo,
@@ -538,6 +541,7 @@ export const invoice: Resolvers<Context> = {
         {
           invoiceId,
           createDraft,
+          reason,
         },
         usecaseContext
       );
@@ -555,8 +559,9 @@ export const invoice: Resolvers<Context> = {
         status: creditNote.status,
         charge: creditNote.charge,
         dateCreated: creditNote?.dateCreated?.toISOString(),
-        erpReference: creditNote.erpReference,
-        revenueRecognitionReference: creditNote.revenueRecognitionReference,
+        // erpReference: creditNote.erpReference,
+        // revenueRecognitionReference: creditNote.revenueRecognitionReference,
+        creationReason: creditNote.creationReason,
         dateIssued: creditNote?.dateIssued?.toISOString(),
         referenceNumber:
           creditNote.invoiceNumber && creditNote.dateAccepted

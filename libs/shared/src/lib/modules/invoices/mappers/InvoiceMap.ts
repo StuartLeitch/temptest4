@@ -3,6 +3,7 @@ import { Mapper } from '../../../infrastructure/Mapper';
 
 import { Invoice } from '../domain/Invoice';
 import { TransactionId } from '../../transactions/domain/TransactionId';
+import { ErpReferenceMap } from './../../vendors/mapper/ErpReference';
 
 export class InvoiceMap extends Mapper<Invoice> {
   public static toDomain(raw: any): Invoice {
@@ -16,16 +17,14 @@ export class InvoiceMap extends Mapper<Invoice> {
         dateCreated: new Date(raw.dateCreated),
         dateAccepted: raw.dateAccepted ? new Date(raw.dateAccepted) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
-        // dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
         dateMovedToFinal: raw.dateMovedToFinal
           ? new Date(raw.dateMovedToFinal)
           : null,
-        erpReference: raw.erpReference ?? null,
-        nsReference: raw.nsReference ?? null,
-        nsRevRecReference: raw.nsRevRecReference ?? null,
-        revenueRecognitionReference: raw.revenueRecognitionReference ?? null,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
-        creditNoteReference: raw.creditNoteReference ?? null,
+        creationReason: raw.creationReason ?? null,
+        erpReferences: raw.erpReferences
+          ? raw.erpReferences.map((ef) => ErpReferenceMap.toDomain(ef))
+          : [],
       },
       new UniqueEntityID(raw.id)
     );
@@ -36,11 +35,6 @@ export class InvoiceMap extends Mapper<Invoice> {
   }
 
   public static toPersistence(invoice: Invoice): any {
-    // console.info(invoice);
-    // console.info('invoice.id', invoice.id.toString());
-    // console.info('invoice.nsRevRecReference', invoice.nsRevRecReference);
-    // console.info(invoice.transactionId);
-
     return {
       id: invoice.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
@@ -51,12 +45,8 @@ export class InvoiceMap extends Mapper<Invoice> {
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
       dateMovedToFinal: invoice.dateMovedToFinal,
-      erpReference: invoice.erpReference ?? null,
-      nsReference: invoice.nsReference ?? null,
-      nsRevRecReference: invoice.nsRevRecReference ?? null,
-      creditNoteReference: invoice.creditNoteReference ?? null,
-      revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
+      creationReason: invoice.creationReason ?? null,
     };
   }
 }

@@ -623,9 +623,9 @@ export class MigrateEntireInvoiceUsecase
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
         invoice.props.dateUpdated = new Date(request.issueDate);
         invoice.props.dateIssued = new Date(request.issueDate);
-        invoice.props.revenueRecognitionReference =
-          request.revenueRecognitionReference || null;
-        invoice.props.erpReference = request.erpReference || null;
+        // invoice.props.revenueRecognitionReference =
+        //   request.revenueRecognitionReference ?? null;
+        // invoice.props.erpReference = request.erpReference ?? null;
         invoice.props.invoiceNumber = invoiceNumber;
         invoice.payerId = payer ? payer.payerId : null;
 

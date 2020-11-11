@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMutation } from 'graphql-hooks';
 import { toast } from 'react-toastify';
 import SuccessfulPaymentToast from './SuccessfulPaymentToast';
@@ -19,21 +19,39 @@ import {
 } from '../../../../components';
 
 import { BANK_TRANSFER_MUTATION } from '../../graphql';
+import ErrorPaymentToast from './ErrorPaymentToast';
 
 const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
   invoice,
   getPaymentMethods,
   onSuccessCallback,
 }) => {
-  const [recordBankTransferPayment] = useMutation(BANK_TRANSFER_MUTATION);
+  const [fields, setFields] = useState({
+    paymentAmount: {
+      isValid: true,
+    },
+    paymentReference: {
+      isValid: true,
+    },
+  });
   const [bankTransferPaymentData, setBankTransferPaymentData] = useState({
     paymentDate: new Date(),
     paymentAmount: 0,
     paymentReference: '',
   });
+  const [touched, setTouched] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [recordBankTransferPayment, { loading }] = useMutation(
+    BANK_TRANSFER_MUTATION,
+    {}
+  );
 
   const savePayment = async (markInvoiceAsPaid: boolean) => {
-    await recordBankTransferPayment({
+    if (Object.values(fields).some((field) => field.isValid === false)) {
+      setTouched(true);
+      return;
+    }
+    const x = await recordBankTransferPayment({
       variables: {
         invoiceId: invoice?.id,
         payerId: invoice?.payer?.id,
@@ -46,9 +64,29 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
         markInvoiceAsPaid,
       },
     });
-    onSuccessCallback();
-    return toast.success(SuccessfulPaymentToast);
+    if (x.error) {
+      toast.error(ErrorPaymentToast);
+    } else {
+      onSuccessCallback();
+      setIsModalOpen(false);
+      toast.success(SuccessfulPaymentToast);
+    }
   };
+
+  useEffect(() => {
+    const { paymentAmount, paymentReference } = bankTransferPaymentData;
+    setFields({
+      paymentAmount: {
+        isValid: !!paymentAmount && /^[0-9]+$/.test(paymentAmount.toString()),
+      },
+      paymentReference: {
+        isValid: !!paymentReference.length,
+      },
+    });
+  }, [
+    bankTransferPaymentData.paymentAmount,
+    bankTransferPaymentData.paymentReference,
+  ]);
 
   return (
     <ModalDropdown
@@ -58,6 +96,8 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
           Add Payment
         </DropdownToggle>
       }
+      loading={loading}
+      open={isModalOpen}
       onSave={() => savePayment(false)}
       onSaveAndMarkInvoiceAsFinal={() => savePayment(true)}
     >
@@ -96,6 +136,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
                 <Input
                   placeholder='Amount...'
                   id='bothAddon'
+                  invalid={touched && !fields['paymentAmount'].isValid}
                   onChange={(e) => {
                     const { value } = e.target;
                     setBankTransferPaymentData({
@@ -125,6 +166,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
             <Col sm={8}>
               <Input
                 placeholder='Reference'
+                invalid={touched && !fields['paymentReference'].isValid}
                 onChange={(e) => {
                   const { value } = e.target;
                   setBankTransferPaymentData({

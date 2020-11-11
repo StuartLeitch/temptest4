@@ -162,7 +162,7 @@ export class PublishCreditNoteToErpUsecase
             netSuiteResponse
           )}`
         );
-        creditNote.creditNoteReference = String(netSuiteResponse);
+        // creditNote.creditNoteReference = String(netSuiteResponse);
 
         // this.loggerService.info('PublishCreditNoteToERP full credit note', creditNote);
         await this.invoiceRepo.update(creditNote);

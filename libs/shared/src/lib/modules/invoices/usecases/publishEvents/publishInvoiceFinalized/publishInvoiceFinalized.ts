@@ -68,7 +68,8 @@ export class PublishInvoiceFinalizedUsecase
       referenceNumber: this.formatReferenceNumber(invoice),
       isCreditNote: !!invoice.cancelledInvoiceReference,
       transactionId: invoice.transactionId.toString(),
-      erpReference: invoice.erpReference,
+      // TODO: Fix erpReference
+      erpReference: null, // invoice.erpReference,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status,
 

@@ -66,7 +66,8 @@ export class PublishInvoicePaidUsecase
 
       referenceNumber: invoice.referenceNumber,
       transactionId: invoice.transactionId.toString(),
-      erpReference: invoice.erpReference,
+      // TODO: FIX erpReference
+      erpReference: null, // invoice.erpReference,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status,
       isCreditNote: false,
