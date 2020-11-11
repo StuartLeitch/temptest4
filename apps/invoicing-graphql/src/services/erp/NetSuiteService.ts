@@ -128,9 +128,6 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerRevenueRecognitionReversal(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
-    // console.log('registerRevenueRecognition Data:');
-    // console.info(data);
-
     const {
       publisherCustomValues: { customSegmentId },
     } = data;

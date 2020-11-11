@@ -22,7 +22,6 @@ import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { JournalId } from '../../../../journals/domain/JournalId';
-import { Payer } from '../../../../payers/domain/Payer';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
@@ -66,8 +65,6 @@ export class PublishRevenuRecognitionReversalUsecase
     request: DTO,
     context?: UsecaseAuthorizationContext
   ): Promise<Response> {
-    let payer: Payer;
-
     const invoiceId = request.invoiceId;
     const getItemsUsecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
@@ -95,7 +92,7 @@ export class PublishRevenuRecognitionReversalUsecase
         },
         context
       );
-      console.log('--------------------- IN USE CASE');
+
       if (maybeInvoice.isLeft()) {
         throw new Errors.InvoiceNotFoundError(invoiceId);
       }
@@ -120,28 +117,23 @@ export class PublishRevenuRecognitionReversalUsecase
 
       invoice.addItems(invoiceItems);
 
-      if (!invoice.isCreditNote()) {
-        //Get Payer details
-        const maybePayer = await getPayerDetails.execute(
-          { invoiceId },
-          context
-        );
-        if (maybePayer.isLeft()) {
-          throw new Errors.InvoicePayersNotFoundError(invoiceId);
-        }
-        const payer = maybePayer.value.getValue();
-        const addressId = payer.billingAddressId.id.toString();
+      //Get Payer details
+      const maybePayer = await getPayerDetails.execute({ invoiceId }, context);
+      if (maybePayer.isLeft()) {
+        throw new Errors.InvoicePayersNotFoundError(invoiceId);
+      }
+      const payer = maybePayer.value.getValue();
+      const addressId = payer.billingAddressId.id.toString();
 
-        //Get Billing address
-        const maybeAddress = await getAddress.execute(
-          {
-            billingAddressId: addressId,
-          },
-          context
-        );
-        if (maybeAddress.isLeft()) {
-          throw new Errors.InvoiceAddressNotFoundError(invoiceId);
-        }
+      //Get Billing address
+      const maybeAddress = await getAddress.execute(
+        {
+          billingAddressId: addressId,
+        },
+        context
+      );
+      if (maybeAddress.isLeft()) {
+        throw new Errors.InvoiceAddressNotFoundError(invoiceId);
       }
 
       // Get Manuscript
@@ -157,43 +149,6 @@ export class PublishRevenuRecognitionReversalUsecase
       const manuscript = maybeManuscript.value.getValue();
       if (!manuscript.datePublished) {
         return right(Result.ok<any>(null));
-      }
-
-      // * If it's a credit node and the manuscript has been published
-      if (invoice.isCreditNote() && manuscript.datePublished) {
-        return right(Result.ok<any>(null));
-      }
-
-      // console.info(invoice);
-      // console.info(manuscript);
-      // console.info(referencedInvoicesByCustomId);
-
-      const { customId } = manuscript;
-
-      // * Get all invoices associated with this custom id
-      const referencedInvoicesByCustomId: any[] = await this.invoiceRepo.getInvoicesByCustomId(
-        customId
-      );
-
-      // * If the invoice has a credit note
-      // * and the manuscript has been published before its creation
-      const associatedCreditNote = referencedInvoicesByCustomId.find(
-        (item) =>
-          item.cancelledInvoiceReference === invoice.invoiceId.id.toString()
-      );
-
-      if (associatedCreditNote) {
-        const creditNoteCreatedOn = new Date(
-          associatedCreditNote.invoiceDateCreated
-        );
-        const { datePublished: manuscriptPublishedOn } = manuscript;
-
-        if (
-          !invoice.isCreditNote() &&
-          creditNoteCreatedOn.getTime() > manuscriptPublishedOn.getTime()
-        ) {
-          return right(Result.ok<any>(null));
-        }
       }
 
       //Get catalog
@@ -231,14 +186,6 @@ export class PublishRevenuRecognitionReversalUsecase
           (acc, waiver) => acc + (waiver.reduction / 100) * price,
           0
         );
-      }
-
-      //   // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
-      if (netCharges <= 0) {
-        invoice.erpReference = 'NON_INVOICEABLE';
-        invoice.nsReference = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(invoice);
-        return right(Result.ok<any>(null));
       }
 
       const erpResponse = await this.erpService.registerRevenueRecognitionReversal(
