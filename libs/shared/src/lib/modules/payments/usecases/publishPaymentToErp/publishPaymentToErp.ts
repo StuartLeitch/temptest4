@@ -275,6 +275,7 @@ export class PublishPaymentToErpUsecase
         // invoice.nsReference = String(netSuiteResponse); // netSuiteResponse; // .tradeDocumentId;
 
         const [payment] = payments;
+        this.loggerService.info('PublishPaymentToERP payment before', payment);
         let erpResponse;
         try {
           erpResponse = await this.netSuiteService.registerPayment(erpData);
@@ -299,6 +300,7 @@ export class PublishPaymentToErpUsecase
         );
 
         this.loggerService.info('PublishPaymentToERP full invoice', invoice);
+        this.loggerService.info('PublishPaymentToERP payment after', payment);
         await this.paymentRepo.updatePayment(payment);
 
         return right(erpResponse);
