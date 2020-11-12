@@ -25,7 +25,7 @@ import { WaiverRepoContract } from '../../waivers/repos';
 
 import { PublishCreditNoteToErpUsecase } from '../usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
-import { PublishRevenuRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
@@ -49,7 +49,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
     private publishCreditNoteToErp: PublishCreditNoteToErpUsecase | NoOpUseCase,
-    private publishRevenueRecognitionReversal: PublishRevenuRecognitionReversalUsecase,
+    private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();

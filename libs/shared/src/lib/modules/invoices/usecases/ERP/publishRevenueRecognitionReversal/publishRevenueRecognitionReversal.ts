@@ -33,7 +33,7 @@ import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRec
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
 import * as Errors from './publishRevenueRecognitionReversal.errors';
 
-export class PublishRevenuRecognitionReversalUsecase
+export class PublishRevenueRecognitionReversalUsecase
   implements
     UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
