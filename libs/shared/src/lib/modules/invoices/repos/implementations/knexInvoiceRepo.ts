@@ -130,17 +130,8 @@ export class KnexInvoiceRepo
       []
     );
 
+    // * .find(Boolean) is a shortcut for getting the first item
     const first = invoiceWithErpReferences.find(Boolean);
-    // delete first.id;
-    // delete first.type;
-    // delete first.vendor;
-    // delete first.attribute;
-    // delete first.value;
-    // delete first.erpReference;
-    // delete first.revenueRecognitionReference;
-    // delete first.nsReference;
-    // delete first.nsRevRecReference;
-    // delete first.creditNoteReference;
 
     const invoice = InvoiceMap.toDomain({
       invoiceId: invoiceId.id.toString(),
