@@ -2,6 +2,7 @@ import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { Result, right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
+import { JournalId } from '../../../../journals/domain/JournalId';
 
 // * Authorization Logic
 import {
@@ -20,17 +21,14 @@ import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
-
-import { JournalId } from '../../../../journals/domain/JournalId';
-
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
-import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
-import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
-import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetAddressUseCase } from '../../../../addresses/usecases/getAddress/getAddress';
-import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
+import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
+import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
 import { GetPublisherCustomValuesUsecase } from '../../../../publishers/usecases/getPublisherCustomValues';
+import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
 import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
 import * as Errors from './publishRevenueRecognitionReversal.errors';
@@ -205,7 +203,7 @@ export class PublishRevenuRecognitionReversalUsecase
       this.loggerService.info('ERP response', erpResponse);
 
       this.loggerService.info(
-        `ERP Revenue Recognized Reversal Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
+        `ERP Revenue Recognized Reversal Invoice ${invoice.id.toString()}: revenueRecognitionReversalReference -> ${JSON.stringify(
           erpResponse
         )}`
       );

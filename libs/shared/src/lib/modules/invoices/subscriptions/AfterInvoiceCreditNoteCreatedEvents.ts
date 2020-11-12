@@ -184,7 +184,6 @@ export class AfterInvoiceCreditNoteCreatedEvent
           `Couldn't find Invoice ID for manuscript with custom id: ${manuscript.customId}`
         );
       }
-      console.log(maybeInvoiceId);
       const invoiceId = maybeInvoiceId.value.getValue()[0];
 
       //Get Invoice
@@ -200,10 +199,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
       }
       const invoice = maybeInvoice.value.getValue();
 
-      console.log(manuscript.datePublished, invoice.nsRevRecReference);
-
       if (manuscript.datePublished && invoice.nsRevRecReference) {
-        console.log(invoiceId.id.toString());
         const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
           { invoiceId: invoiceId.id.toString() },
           defaultContext
