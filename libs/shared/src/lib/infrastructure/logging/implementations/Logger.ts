@@ -2,7 +2,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import * as path from 'path';
-// import winston from 'winston';
+import winston from 'winston';
 
 import { LoggerContract } from '@hindawi/shared';
 
@@ -49,7 +49,14 @@ export class Logger implements LoggerContract {
       this.setScope(scope);
     }
 
-    this.protocol = console;
+    const logger = winston.createLogger({
+      transports: [
+        new winston.transports.Console({
+          handleExceptions: true,
+        }),
+      ],
+    });
+    this.protocol = logger;
   }
 
   public debug(message: string, ...args: any[]): void {
@@ -70,11 +77,18 @@ export class Logger implements LoggerContract {
 
   private log(level: string, message: string, args: any[]): void {
     if (this.protocol) {
-      this.protocol[level](`${this.formatScope()} ${message}`, ...args);
+      let metadata: Record<string, any> = { scope: this.scope };
+      if (args.length) {
+        let newArgs = args.map((arg) => {
+          if (arg instanceof Error) {
+            return { ...arg, error: arg.message, stack: arg.stack };
+          }
+          return arg;
+        });
+        this.protocol[level]({ message, args: newArgs }, metadata);
+      } else {
+        this.protocol[level](message, metadata);
+      }
     }
-  }
-
-  private formatScope(): string {
-    return `[${this.scope}]`;
   }
 }

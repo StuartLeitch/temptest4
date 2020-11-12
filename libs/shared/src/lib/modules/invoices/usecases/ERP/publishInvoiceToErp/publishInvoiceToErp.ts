@@ -82,6 +82,7 @@ export class PublishInvoiceToErpUsecase
     request: PublishInvoiceToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishInvoiceToErpResponse> {
+    this.loggerService.setScope('PublishInvoiceToERP');
     this.loggerService.info('PublishInvoiceToERP Request', request);
 
     let invoice: Invoice;
