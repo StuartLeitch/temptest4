@@ -13,6 +13,8 @@ import {
   Manuscript,
   Invoice,
   InvoiceItem,
+  LoggerBuilder,
+  LoggerContract,
 } from '@hindawi/shared';
 
 import {
@@ -29,7 +31,10 @@ import { ConnectionConfig } from './netsuite/ConnectionConfig';
 type CustomerPayload = Record<string, string | boolean>;
 
 export class NetSuiteService implements ErpServiceContract {
-  private constructor(private connection: Connection) {}
+  private constructor(
+    private connection: Connection,
+    private logger: LoggerContract
+  ) {}
 
   get invoiceErpRefFieldName(): string {
     return 'nsReference';
@@ -43,7 +48,12 @@ export class NetSuiteService implements ErpServiceContract {
     const connection = new Connection({
       config: new ConnectionConfig(config.connection),
     });
-    const service = new NetSuiteService(connection);
+    const loggerBuilder = new LoggerBuilder();
+
+    let logger = loggerBuilder.getLogger();
+    logger.setScope('NetSuiteService');
+
+    const service = new NetSuiteService(connection, logger);
 
     return service;
   }
@@ -51,8 +61,12 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerInvoice(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    // console.log('ERP Data:');
-    // console.info(data);
+    // this.logger.log('ERP Data:');
+    // this.logger.info(data);
+    this.logger.info({
+      message: 'New Erp request',
+      request: data,
+    });
 
     const customerId = await this.getCustomerId(data);
 
@@ -76,8 +90,8 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerRevenueRecognition(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
-    // console.log('registerRevenueRecognition Data:');
-    // console.info(data);
+    // this.logger.log('registerRevenueRecognition Data:');
+    // this.logger.info(data);
 
     const {
       publisherCustomValues: { customSegmentId },
@@ -128,8 +142,8 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerCreditNote(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    // console.log('registerCreditNote Data:');
-    // console.info(data);
+    // this.logger.log('registerCreditNote Data:');
+    // this.logger.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
     await this.patchCreditNote({ ...data, creditNoteId });
@@ -149,8 +163,8 @@ export class NetSuiteService implements ErpServiceContract {
     taxRateId: string;
     itemId: string;
   }): Promise<ErpInvoiceResponse> {
-    // console.log('registerPayment Data:');
-    // console.info(data);
+    // this.logger.log('registerPayment Data:');
+    // this.logger.info(data);
 
     const { payer, manuscript } = data;
 
@@ -158,9 +172,9 @@ export class NetSuiteService implements ErpServiceContract {
       this.getCustomerPayload(payer, manuscript)
     );
     if (!customerAlreadyExists) {
-      console.error(
-        `Customer does not exists for article: ${manuscript.customId}.`
-      );
+      const erorrMessage = `Customer does not exists for article: ${manuscript.customId}.`;
+      this.logger.error(erorrMessage);
+      throw new Error(erorrMessage);
     }
     const paymentId = await this.createPayment({
       ...data,
@@ -180,6 +194,13 @@ export class NetSuiteService implements ErpServiceContract {
     );
 
     if (customerAlreadyExists) {
+      this.logger.info({
+        message: 'Reusing customer',
+        payer,
+        manuscript,
+        customer: customerAlreadyExists,
+      });
+
       if (
         (customerAlreadyExists.isperson === 'T' &&
           payer.type === PayerType.INSTITUTION) ||
@@ -228,6 +249,11 @@ export class NetSuiteService implements ErpServiceContract {
       q: query.toQuery(),
     };
 
+    this.logger.debug({
+      message: 'Query builder for get customer',
+      request: queryCustomerRequest,
+    });
+
     try {
       const res = await axios({
         ...queryCustomerRequestOpts,
@@ -240,7 +266,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.data?.items?.pop();
     } catch (err) {
-      console.error(err);
+      this.logger.error(err?.request?.data);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
@@ -262,6 +288,11 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createCustomerPayload = this.getCustomerPayload(payer, manuscript);
 
+    this.logger.info({
+      message: 'Creating customer netsuite',
+      request: createCustomerPayload,
+    });
+
     try {
       const res = await axios({
         ...createCustomerRequestOpts,
@@ -274,7 +305,11 @@ export class NetSuiteService implements ErpServiceContract {
       newCustomerId = res?.headers?.location?.split('/').pop();
       return newCustomerId;
     } catch (err) {
-      console.error(err);
+      this.logger.error({
+        message: 'Failed to create customer',
+        response: err?.response?.data,
+        request: createCustomerPayload,
+      });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err, isAuthError: true } as unknown;
     }
@@ -357,7 +392,11 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      console.error(err);
+      this.logger.error({
+        message: 'Failed to create invoice',
+        response: err?.response?.data,
+        request: createInvoicePayload,
+      });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
@@ -425,7 +464,10 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      console.error(err);
+      this.logger.error({
+        message: 'Failed to create payment',
+        response: err?.response?.data,
+      });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
@@ -458,7 +500,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.data?.items?.pop();
     } catch (err) {
-      console.error(err);
+      this.logger.error(err);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
@@ -537,7 +579,11 @@ export class NetSuiteService implements ErpServiceContract {
       await this.patchInvoice({ ...data, journalId });
       return journalId;
     } catch (err) {
-      console.error(err);
+      this.logger.error({
+        message: 'Failed to create revenue recognition',
+        response: err?.response?.data,
+        request: createJournalPayload,
+      });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
@@ -568,7 +614,11 @@ export class NetSuiteService implements ErpServiceContract {
         data: patchInvoicePayload,
       } as AxiosRequestConfig);
     } catch (err) {
-      console.error(err);
+      this.logger.error({
+        message: 'Failed to update invoice',
+        response: err?.response?.data,
+        request: patchInvoicePayload,
+      });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
@@ -596,7 +646,11 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      console.error(err);
+      this.logger.error({
+        message: 'Failed to create credit note',
+        response: err?.response?.data,
+        requestOptions: creditNoteTransformOpts,
+      });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
@@ -655,7 +709,11 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      console.error(err);
+      this.logger.error({
+        message: 'Failed to update credit note',
+        response: err?.response?.data,
+        request: patchCreditNotePayload,
+      });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }

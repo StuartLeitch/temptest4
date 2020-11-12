@@ -53,29 +53,30 @@ export class Logger implements LoggerContract {
       transports: [
         new winston.transports.Console({
           handleExceptions: true,
+          level: process.env.LOG_LEVEL || 'info',
         }),
       ],
     });
     this.protocol = logger;
   }
 
-  public debug(message: string, ...args: any[]): void {
+  public debug(message: any, ...args: any[]): void {
     this.log('debug', message, args);
   }
 
-  public info(message: string, ...args: any[]): void {
+  public info(message: any, ...args: any[]): void {
     this.log('info', message, args);
   }
 
-  public warn(message: string, ...args: any[]): void {
+  public warn(message: any, ...args: any[]): void {
     this.log('warn', message, args);
   }
 
-  public error(message: string, ...args: any[]): void {
+  public error(message: any, ...args: any[]): void {
     this.log('error', message, args);
   }
 
-  private log(level: string, message: string, args: any[]): void {
+  private log(level: string, message: any, args: any[]): void {
     if (this.protocol) {
       let metadata: Record<string, any> = { scope: this.scope };
       if (args.length) {
