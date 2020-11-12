@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -14,6 +14,8 @@ import {
   ModalFooter,
   UncontrolledButtonDropdown,
 } from 'reactstrap';
+import { Loading } from '../../routes/components';
+import { ButtonGroup, Spinner } from '..';
 
 export const ModalDropdown: React.FC<ModalDropdownProps> = ({
   className,
@@ -21,6 +23,8 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
   onSave,
   onSaveAndMarkInvoiceAsFinal,
   children,
+  open,
+  loading,
   ...otherProps
 }) => {
   const [modalState, setModalState] = useState({
@@ -31,7 +35,6 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
     ],
   });
   const classes = classNames(className, 'extended-dropdown');
-
   const onClose = () => setModalState({ ...modalState, open: false });
   const onChange = (event) => {
     const role = event.target.getAttribute('role');
@@ -39,6 +42,10 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
       setModalState({ ...modalState, open: true });
     }
   };
+
+  useEffect(() => {
+    setModalState({ ...modalState, open });
+  }, [open]);
 
   return (
     <React.Fragment>
@@ -56,22 +63,27 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
         <ModalHeader tag='h4'>Add Payment: Bank Transfer</ModalHeader>
         {children}
         <ModalFooter>
-          <Button color='link' onClick={onClose}>
+          <Button color='secondary' onClick={onClose}>
             <i className='fas fa-times mr-2'></i>
             Cancel
           </Button>
           <ButtonToolbar className='ml-auto'>
             <UncontrolledButtonDropdown className='mr-3'>
-              <DropdownToggle color='primary' caret>
-                <i className='fas fa-save mr-2'></i>
-                Save Payment
-              </DropdownToggle>
+              {loading ? (
+                <ButtonGroup>
+                  <Spinner style={{ width: '18px', height: '18px' }} />
+                </ButtonGroup>
+              ) : (
+                <DropdownToggle color='primary' caret>
+                  <i className='fas fa-save mr-2'></i>
+                  {'Save Payment'}
+                </DropdownToggle>
+              )}
               <DropdownMenu>
                 <DropdownItem
                   tag={Button}
                   color='secondary'
                   onClick={() => {
-                    onClose();
                     onSave();
                   }}
                 >
@@ -82,7 +94,6 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
                   tag={Button}
                   color='primary'
                   onClick={() => {
-                    onClose();
                     onSaveAndMarkInvoiceAsFinal();
                   }}
                 >
@@ -100,6 +111,8 @@ ModalDropdown.propTypes = {
   className: PropTypes.string,
   dropdownToggle: PropTypes.any,
   onSave: PropTypes.func,
+  open: PropTypes.bool,
+  loading: PropTypes.bool,
 };
 
 interface ModalDropdownProps {
@@ -108,4 +121,6 @@ interface ModalDropdownProps {
   dropdownToggle: any;
   onSave(): void;
   onSaveAndMarkInvoiceAsFinal(): void;
+  open: boolean;
+  loading: boolean;
 }

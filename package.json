@@ -32,7 +32,7 @@
     "workspace-schematic": "nx workspace-schematic",
     "dep-graph": "nx dep-graph",
     "help": "nx help",
-    "ci:coverage": "istanbul-combine -r html coverage/*/*/coverage-final.json",
+    "ci:coverage": "istanbul-combine -d reports/coverage -r lcov -r html reports/coverage/coverage-final.json && ./tools/scripts/cucumber-report.sh",
     "storybook": "cd libs/react-components && start-storybook -p 6006",
     "codegen:graphql": "graphql-codegen --config apps/invoicing-graphql/codegen.yml"
   },

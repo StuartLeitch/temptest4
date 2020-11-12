@@ -8,7 +8,8 @@ import { PaymentId } from './../../domain/PaymentId';
 import { Payment } from './../../domain/Payment';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
-export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
+export class KnexPaymentRepo
+  extends AbstractBaseDBRepo<Knex, Payment>
   implements PaymentRepoContract {
   async getPaymentById(paymentId: PaymentId): Promise<Payment> {
     const { db } = this;
@@ -77,9 +78,19 @@ export class KnexPaymentRepo extends AbstractBaseDBRepo<Knex, Payment>
   }
 
   async updatePayment(payment: Payment): Promise<Payment> {
-    const updated = await this.db(TABLES.PAYMENTS)
+    const { logger } = this;
+
+    logger.debug('update', payment);
+
+    const sql = this.db(TABLES.PAYMENTS)
       .where({ id: payment.id.toString() })
       .update(PaymentMap.toPersistence(payment));
+
+    logger.debug('update', {
+      sql: sql.toString(),
+    });
+
+    const updated = await sql;
 
     if (!updated) {
       throw RepoError.createEntityNotFoundError(

@@ -4,6 +4,7 @@ image:
 stages:
   - setup
   - test
+  - reports
   - build
   - package
   - deploy
@@ -50,6 +51,10 @@ Test:
   interruptible: true
   allow_failure: false
   stage: test
+  before_script:
+    - cd $HOME/reports
+    - mkdir -p coverage
+    - mkdir -p cucumber
   script:
     - cd $HOME
     - git fetch
@@ -60,11 +65,10 @@ Test:
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
       fi
     - eval $AFFECTED_COMMAND
+    - cp -r -a reports $CI_PROJECT_DIR
   artifacts:
-    # reports:
-    #   cucumber:
-    #     - report/apps/**/usage.txt
-    #     - report/libs/**/usage.txt
+    paths:
+      - reports
 
 Build:
   interruptible: true
@@ -143,6 +147,8 @@ Deploy:dev:
   tags:
     - "cluster:hindawi-dev"
   stage: deploy
+  environment:
+    name: dev
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -228,7 +234,6 @@ Deploy:hindawi-prod:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $DEV_AWS_REGISTRY
     COMMAND: build-manifests
-
 # Pages:
 #   interruptible: true
 #   stage: deploy
@@ -242,19 +247,17 @@ Deploy:hindawi-prod:
 #   dependencies:
 #     - Test
 
-pages:
-  variables:
-    CI_DEBUG_TRACE: "false"
-  script:
-    - cd $HOME
-    - mkdir -p coverage && chmod -R +x coverage
-    # - rm -r coverage/*
-    - yarn run ci:coverage
-    - rm -r public/*
-    - cp -a -v coverage/. public/
-    - cat public/index.html
-    # - mv public/index.html public/coverage.html
-  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
-  artifacts:
-    paths:
-      - public
+# pages:
+#   interruptible: true
+#   stage: reports
+#   script:
+#     - cd $HOME
+#     - mkdir -p reports && chmod -R +x reports
+#     - yarn run ci:coverage
+#     - rm -r public/*
+#     - cp -r -a reports/* $CI_PROJECT_DIR/public/
+#   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
+#   needs: [Test]
+#   artifacts:
+#     paths:
+#       - public
