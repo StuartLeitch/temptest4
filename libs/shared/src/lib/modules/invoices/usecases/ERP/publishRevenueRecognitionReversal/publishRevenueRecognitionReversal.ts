@@ -1,8 +1,7 @@
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../../core/logic/Result';
+import { right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
-import { JournalId } from '../../../../journals/domain/JournalId';
 
 // * Authorization Logic
 import {
@@ -11,18 +10,21 @@ import {
   AccessControlContext,
 } from '../../../../../domain/authorization';
 
-import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
-import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
+import { JournalId } from '../../../../journals/domain/JournalId';
+
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
-import { PublisherRepoContract } from '../../../../publishers/repos';
+import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../../manuscripts/repos';
 import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
-import { CouponRepoContract } from '../../../../coupons/repos';
-import { WaiverRepoContract } from '../../../../waivers/repos';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
 
+import * as Errors from './publishRevenueRecognitionReversal.errors';
 import { GetAddressUseCase } from '../../../../addresses/usecases/getAddress/getAddress';
 import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
@@ -31,7 +33,6 @@ import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/g
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
 import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
-import * as Errors from './publishRevenueRecognitionReversal.errors';
 
 export class PublishRevenueRecognitionReversalUsecase
   implements
@@ -92,7 +93,7 @@ export class PublishRevenueRecognitionReversalUsecase
       );
 
       if (maybeInvoice.isLeft()) {
-        throw new Errors.InvoiceNotFoundError(invoiceId);
+        return left(new Errors.InvoiceNotFoundError(invoiceId));
       }
       const invoice = maybeInvoice.value.getValue();
 
@@ -105,12 +106,12 @@ export class PublishRevenueRecognitionReversalUsecase
       );
 
       if (maybeItems.isLeft()) {
-        throw new Errors.InvoiceItemsNotFoundError(invoiceId);
+        return left(new Errors.InvoiceItemsNotFoundError(invoiceId));
       }
 
       const invoiceItems = maybeItems.value.getValue();
       if (invoiceItems.length === 0) {
-        throw new Errors.InvoiceItemsNotFoundError(invoiceId);
+        return left(new Errors.InvoiceItemsNotFoundError(invoiceId));
       }
 
       invoice.addItems(invoiceItems);
@@ -118,7 +119,7 @@ export class PublishRevenueRecognitionReversalUsecase
       //Get Payer details
       const maybePayer = await getPayerDetails.execute({ invoiceId }, context);
       if (maybePayer.isLeft()) {
-        throw new Errors.InvoicePayersNotFoundError(invoiceId);
+        return left(new Errors.InvoicePayersNotFoundError(invoiceId));
       }
       const payer = maybePayer.value.getValue();
       const addressId = payer.billingAddressId.id.toString();
@@ -131,7 +132,7 @@ export class PublishRevenueRecognitionReversalUsecase
         context
       );
       if (maybeAddress.isLeft()) {
-        throw new Errors.InvoiceAddressNotFoundError(invoiceId);
+        return left(new Errors.InvoiceAddressNotFoundError(invoiceId));
       }
 
       // Get Manuscript
@@ -141,12 +142,12 @@ export class PublishRevenueRecognitionReversalUsecase
         context
       );
       if (maybeManuscript.isLeft()) {
-        throw new Errors.InvoiceManuscriptNotFoundError(invoiceId);
+        return left(new Errors.InvoiceManuscriptNotFoundError(invoiceId));
       }
 
       const manuscript = maybeManuscript.value.getValue();
       if (!manuscript.datePublished) {
-        return right(Result.ok<any>(null));
+        return right(null);
       }
 
       //Get catalog
@@ -155,7 +156,7 @@ export class PublishRevenueRecognitionReversalUsecase
       );
 
       if (!catalog) {
-        throw new Errors.InvoiceCatalogNotFoundError(invoiceId);
+        return left(new Errors.InvoiceCatalogNotFoundError(invoiceId));
       }
 
       //Get publisher custom values
@@ -166,25 +167,11 @@ export class PublishRevenueRecognitionReversalUsecase
         context
       );
       if (maybePublisherCustomValue.isLeft()) {
-        throw new Errors.InvoiceCatalogNotFoundError(invoiceId);
+        return left(new Errors.InvoiceCatalogNotFoundError(invoiceId));
       }
       const publisherCustomValues = maybePublisherCustomValue.value.getValue();
 
-      const invoiceItem = invoice.invoiceItems.getItems().shift();
-      const { coupons, waivers, price } = invoiceItem;
-      let netCharges = price;
-      if (coupons?.length) {
-        netCharges -= coupons.reduce(
-          (acc, coupon) => acc + (coupon.reduction / 100) * price,
-          0
-        );
-      }
-      if (waivers?.length) {
-        netCharges -= waivers.reduce(
-          (acc, waiver) => acc + (waiver.reduction / 100) * price,
-          0
-        );
-      }
+      const invoiceTotal = invoice.invoiceTotal;
 
       const erpResponse = await this.erpService.registerRevenueRecognitionReversal(
         {
@@ -192,7 +179,7 @@ export class PublishRevenueRecognitionReversalUsecase
           invoice,
           payer,
           publisherCustomValues,
-          invoiceTotal: netCharges,
+          invoiceTotal,
         }
       );
 
@@ -216,9 +203,8 @@ export class PublishRevenueRecognitionReversalUsecase
 
       await this.invoiceRepo.update(invoice);
 
-      return right(Result.ok<any>(erpResponse));
+      return right(erpResponse);
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

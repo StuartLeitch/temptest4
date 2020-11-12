@@ -209,7 +209,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
           throw publishRevenueRecognitionReversal.value.message;
         }
         this.loggerService.info(
-          `[PublishRevenuRecognitionReversal]: ${publishRevenueRecognitionReversal.value.error}`
+          `[PublishRevenuRecognitionReversal]: ${publishRevenueRecognitionReversal.isLeft}`
         );
       }
     } catch (err) {

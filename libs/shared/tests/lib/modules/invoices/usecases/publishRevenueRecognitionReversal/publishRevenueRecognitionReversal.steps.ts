@@ -151,21 +151,9 @@ Given(
   }
 );
 
-Given(/There is a discounted Invoice with the ID "([\w-]+)"/, async function (
+Given(/A Discount apply for invoice with ID "([\w-]+)"/, async function (
   invoiceId: string
 ) {
-  const transaction = TransactionMap.toDomain({
-    status: TransactionStatus.ACTIVE,
-    deleted: 0,
-    dateCreated: new Date(),
-    dateUpdated: new Date(),
-  });
-  invoice = InvoiceMap.toDomain({
-    transactionId: transaction.id.toValue(),
-    dateCreated: new Date(),
-    id: invoiceId,
-  });
-
   const publisher = PublisherMap.toDomain({
     id: 'testingPublisher',
     customValues: {},
@@ -215,25 +203,17 @@ Given(/There is a discounted Invoice with the ID "([\w-]+)"/, async function (
     }),
     invoiceItem.invoiceItemId
   );
-
-  mockInvoiceRepo.addMockItem(invoice);
-  mockInvoiceItemRepo.addMockItem(invoiceItem);
-  mockManuscriptRepo.addMockItem(manuscript);
-  mockPublisherRepo.addMockItem(publisher);
-  mockCatalogRepo.addMockItem(catalog);
-
-  transaction.addInvoice(invoice);
 });
 
 When(
-  /Revenue recognition reversal usecase executes for the invoice with the ID "([\w-]+)"/,
+  /Revenue recognition reversal usecase executes for invoice "([\w-]+)"/,
   async function (invoiceId: string) {
     response = await useCase.execute({ invoiceId }, context);
   }
 );
 
 Then(
-  /Revenue recognition reversal is registered to Netsuite for Invoice with ID "([\w-]+)"/,
+  /Revenue recognition reversal is registered to Netsuite for Invoice "([\w-]+)"/,
   async function (invoiceId: string) {
     expect(response.isRight()).to.be.true;
     const revenueData = mockNetsuiteService.getRevenue(invoiceId);
