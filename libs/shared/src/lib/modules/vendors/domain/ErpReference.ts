@@ -20,6 +20,10 @@ export interface ErpReferenceProps {
  * @desc Read model for ErpReference
  */
 export class ErpReference extends ValueObject<ErpReferenceProps> {
+  get entity_id(): string {
+    return this.props.entity_id;
+  }
+
   get vendor(): string {
     return this.props.vendor;
   }
@@ -28,9 +32,13 @@ export class ErpReference extends ValueObject<ErpReferenceProps> {
     return this.props.entity_type;
   }
 
-  // get isDeleted(): boolean {
-  //   return this.props.isDeleted;
-  // }
+  get attribute(): string {
+    return this.props.attribute;
+  }
+
+  get value(): string {
+    return this.props.value;
+  }
 
   private constructor(props: ErpReferenceProps) {
     super(props);

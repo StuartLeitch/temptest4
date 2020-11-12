@@ -10,7 +10,6 @@ import { ErpReference } from '../domain/ErpReference';
 
 export class ErpReferenceMap implements Mapper<ErpReference> {
   public static toDomain(raw: any): ErpReference {
-    console.info(raw);
     const erpReferenceOrError = ErpReference.create({
       entity_id: raw.entity_id,
       vendor: raw.vendor,
