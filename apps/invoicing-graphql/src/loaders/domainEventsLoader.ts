@@ -18,7 +18,7 @@ import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
-import { PublishRevenuRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
@@ -128,7 +128,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         )
       : new NoOpUseCase();
 
-    const publishRevenueRecognitionReversal = new PublishRevenuRecognitionReversalUsecase(
+    const publishRevenueRecognitionReversal = new PublishRevenueRecognitionReversalUsecase(
       invoice,
       invoiceItem,
       coupon,
