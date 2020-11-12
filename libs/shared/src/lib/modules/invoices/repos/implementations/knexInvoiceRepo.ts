@@ -57,7 +57,7 @@ export class KnexInvoiceRepo
 
     return db(TABLES.INVOICES)
       .select(
-        'invoices.id as invoiceId',
+        'invoices.*',
         'erp_references.type',
         'erp_references.vendor',
         'erp_references.attribute',
@@ -119,6 +119,7 @@ export class KnexInvoiceRepo
     const erpReferences = invoiceWithErpReferences.reduce(
       (refs, { type, vendor, attribute, value }) => {
         refs.push({
+          entity_id: invoiceId.id.toString(),
           type,
           vendor,
           attribute,
@@ -129,11 +130,24 @@ export class KnexInvoiceRepo
       []
     );
 
+    const first = invoiceWithErpReferences.find(Boolean);
+    // delete first.id;
+    // delete first.type;
+    // delete first.vendor;
+    // delete first.attribute;
+    // delete first.value;
+    // delete first.erpReference;
+    // delete first.revenueRecognitionReference;
+    // delete first.nsReference;
+    // delete first.nsRevRecReference;
+    // delete first.creditNoteReference;
+
     const invoice = InvoiceMap.toDomain({
       invoiceId: invoiceId.id.toString(),
       erpReferences,
+      ...first,
     });
-    console.info(invoice);
+
     return invoice;
   }
 

@@ -66,7 +66,7 @@ export const invoice: Resolvers<Context> = {
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
-        // erpReference: invoiceDetails.erpReference,
+        erpReferences: invoiceDetails.getErpReferences().getItems(),
         // revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),

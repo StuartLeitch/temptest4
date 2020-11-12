@@ -54,6 +54,15 @@ export type Transaction = {
   status?: Maybe<Scalars['String']>;
 };
 
+export type ErpReference = {
+  __typename?: 'ErpReference';
+  entity_id?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+  vendor?: Maybe<Scalars['String']>;
+  attribute?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
 export enum TransactionStatus {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
@@ -96,6 +105,7 @@ export type Invoice = {
   status?: Maybe<InvoiceStatus>;
   payer?: Maybe<Payer>;
   erpReference?: Maybe<Scalars['String']>;
+  erpReferences?: Maybe<Array<Maybe<ErpReference>>>;
   revenueRecognitionReference?: Maybe<Scalars['String']>;
   creationReason?: Maybe<Scalars['String']>;
   referenceNumber?: Maybe<Scalars['ReferenceNumber']>;
@@ -618,6 +628,7 @@ export type ResolversTypes = {
   InvoiceStatus: InvoiceStatus;
   Article: ResolverTypeWrapper<Article>;
   Transaction: ResolverTypeWrapper<Transaction>;
+  ErpReference: ResolverTypeWrapper<ErpReference>;
   TransactionStatus: TransactionStatus;
   PaymentStatus: PaymentStatus;
   InvoiceItem: ResolverTypeWrapper<InvoiceItem>;
@@ -669,6 +680,7 @@ export type ResolversParentTypes = {
   String: Scalars['String'];
   Article: Article;
   Transaction: Transaction;
+  ErpReference: ErpReference;
   InvoiceItem: InvoiceItem;
   Float: Scalars['Float'];
   Invoice: Invoice;
@@ -754,6 +766,15 @@ export type TransactionResolvers<ContextType = any, ParentType extends Resolvers
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ErpReferenceResolvers<ContextType = any, ParentType extends ResolversParentTypes['ErpReference'] = ResolversParentTypes['ErpReference']> = {
+  entity_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  vendor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  attribute?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type InvoiceItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoiceItem'] = ResolversParentTypes['InvoiceItem']> = {
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
@@ -782,6 +803,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>;
   payer?: Resolver<Maybe<ResolversTypes['Payer']>, ParentType, ContextType>;
   erpReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  erpReferences?: Resolver<Maybe<Array<Maybe<ResolversTypes['ErpReference']>>>, ParentType, ContextType>;
   revenueRecognitionReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creationReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   referenceNumber?: Resolver<Maybe<ResolversTypes['ReferenceNumber']>, ParentType, ContextType>;
@@ -968,6 +990,7 @@ export type Resolvers<ContextType = any> = {
   Error?: ErrorResolvers<ContextType>;
   Article?: ArticleResolvers<ContextType>;
   Transaction?: TransactionResolvers<ContextType>;
+  ErpReference?: ErpReferenceResolvers<ContextType>;
   InvoiceItem?: InvoiceItemResolvers<ContextType>;
   Invoice?: InvoiceResolvers<ContextType>;
   InvoiceVat?: InvoiceVatResolvers<ContextType>;

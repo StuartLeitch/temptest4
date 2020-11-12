@@ -15,7 +15,9 @@ export const INVOICE_QUERY = `
     dateAccepted
     dateMovedToFinal
     referenceNumber
-    erpReference
+    erpReferences {
+      ...erpReferenceFragment
+    }
     revenueRecognitionReference
     cancelledInvoiceReference
     transaction {
@@ -59,6 +61,13 @@ export const INVOICE_QUERY = `
     address {
       ...addressFragment
     }
+  }
+  fragment erpReferenceFragment on ErpReference {
+    entity_id
+    type
+    vendor
+    attribute
+    value
   }
   fragment paymentFragment on Payment {
     id
