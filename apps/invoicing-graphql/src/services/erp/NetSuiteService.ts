@@ -622,10 +622,6 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Revenue Recognition Reversal - ${invoice.referenceNumber}`,
-      // trandate: format(
-      //   new Date(article.datePublished),
-      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      // ),
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -668,7 +664,6 @@ export class NetSuiteService implements ErpServiceContract {
       return journalId;
     } catch (err) {
       console.error(err);
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err } as unknown;
     }
   }
