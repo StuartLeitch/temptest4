@@ -54,6 +54,8 @@ const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
+const testInvoiceId = 'testing-invoice';
+
 Before(function () {
   invoice = null;
 
@@ -86,7 +88,7 @@ Before(function () {
   );
 });
 
-Given(/An Invoice with ID "([\w-]+)"/, async function (invoiceId: string) {
+Given(/A regular invoice/, async function () {
   const transaction = TransactionMap.toDomain({
     status: TransactionStatus.ACTIVE,
     deleted: 0,
@@ -96,24 +98,7 @@ Given(/An Invoice with ID "([\w-]+)"/, async function (invoiceId: string) {
   invoice = InvoiceMap.toDomain({
     transactionId: transaction.id.toValue(),
     dateCreated: new Date(),
-    id: invoiceId,
-  });
-
-  transaction.addInvoice(invoice);
-  mockInvoiceRepo.addMockItem(invoice);
-});
-
-Given(/An Invoice "([\w-]+)"/, async function (invoiceId: string) {
-  const transaction = TransactionMap.toDomain({
-    status: TransactionStatus.ACTIVE,
-    deleted: 0,
-    dateCreated: new Date(),
-    dateUpdated: new Date(),
-  });
-  invoice = InvoiceMap.toDomain({
-    transactionId: transaction.id.toValue(),
-    dateCreated: new Date(),
-    id: invoiceId,
+    id: testInvoiceId,
   });
 
   const publisher = PublisherMap.toDomain({
@@ -134,11 +119,11 @@ Given(/An Invoice "([\w-]+)"/, async function (invoiceId: string) {
   });
 
   const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: invoiceId,
+    invoiceId: testInvoiceId,
     id: 'invoice-item',
     manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
     price: 100,
-    vat: 0,
+    vat: 20,
   });
 
   invoice.addItems([invoiceItem]);
@@ -152,27 +137,25 @@ Given(/An Invoice "([\w-]+)"/, async function (invoiceId: string) {
   mockInvoiceRepo.addMockItem(invoice);
 });
 
-Given(
-  /The payer country is "([\w-]+)" and the type is "([\w-]+)"/,
-  async function (country: string, payerType: string) {
-    const address = AddressMap.toDomain({
-      country,
-    });
-    const payer = PayerMap.toDomain({
-      name: 'Silvestru',
-      addressId: address.id.toValue(),
-      invoiceId: invoice.invoiceId.id.toValue(),
-      type: payerType,
-    });
-
-    mockPayerRepo.addMockItem(payer);
-    mockAddressRepo.addMockItem(address);
-  }
-);
-
-Given(/A Discount apply for Invoice "([\w-]+)"/, async function (
-  invoiceId: string
+Given(/The payer is from "([\w-]+)" and an "([\w-]+)"/, async function (
+  country: string,
+  payerType: string
 ) {
+  const address = AddressMap.toDomain({
+    country,
+  });
+  const payer = PayerMap.toDomain({
+    name: 'Silvestru',
+    addressId: address.id.toValue(),
+    invoiceId: invoice.invoiceId.id.toValue(),
+    type: payerType,
+  });
+
+  mockPayerRepo.addMockItem(payer);
+  mockAddressRepo.addMockItem(address);
+});
+
+Given(/A Discount of 100% for Invoice/, async function () {
   const publisher = PublisherMap.toDomain({
     id: 'testingPublisher',
     customValues: {},
@@ -191,7 +174,7 @@ Given(/A Discount apply for Invoice "([\w-]+)"/, async function (
   });
 
   const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: invoiceId,
+    invoiceId: testInvoiceId,
     id: 'invoice-item',
     manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
     price: 100,
@@ -216,7 +199,7 @@ Given(/A Discount apply for Invoice "([\w-]+)"/, async function (
 
   mockWaiverRepo.addMockWaiverForInvoiceItem(
     WaiverMap.toDomain({
-      waiverType: 'EDITOR_DISCOUT',
+      waiverType: 'EDITOR_DISCOUNT',
       reduction: 50,
       isActive: true,
     }),
@@ -231,7 +214,7 @@ Given(/A Discount apply for Invoice "([\w-]+)"/, async function (
   mockInvoiceItemRepo.addMockItem(invoiceItem);
 });
 
-Given(/A VAT apply for Invoice "([\w-]+)"/, async function (invoiceId: string) {
+Given(/A VAT of 20% for Invoice/, async function () {
   const publisher = PublisherMap.toDomain({
     id: 'testingPublisher',
     customValues: {},
@@ -250,7 +233,7 @@ Given(/A VAT apply for Invoice "([\w-]+)"/, async function (invoiceId: string) {
   });
 
   const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: invoiceId,
+    invoiceId: testInvoiceId,
     id: 'invoice-item',
     manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
     price: 100,
@@ -265,44 +248,28 @@ Given(/A VAT apply for Invoice "([\w-]+)"/, async function (invoiceId: string) {
   mockInvoiceItemRepo.addMockItem(invoiceItem);
 });
 
-When(/Reversal usecase executes for Invoice "([\w-]+)"/, async function (
-  invoiceId: string
-) {
+When(/Reversal usecase executes for Invoice/, async function () {
+  const invoiceId = testInvoiceId;
   response = await useCase.execute({ invoiceId }, context);
 });
 
-Then(/Reversal is registered for Invoice "([\w-]+)"/, async function (
-  invoiceId: string
-) {
+Then(/Reversal created in Netsuite for Invoice/, async function () {
   expect(response.isRight()).to.be.true;
-  const revenueData = mockNetsuiteService.getRevenue(invoiceId);
+  const revenueData = mockNetsuiteService.getRevenue(testInvoiceId);
   expect(!!revenueData).to.be.true;
 
   const invoice = await mockInvoiceRepo.getInvoiceById(
-    InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
   );
-  console.log(invoice.invoiceTotal);
   expect(invoice.revenueRecognitionReference).to.equal(
     mockNetsuiteService.revenueRef
   );
 });
 
-Then(/^The Invoice "([\w-]+)" has VAT applied/, async function (
-  invoiceId: string
-) {
-  const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
+Then(/^The Invoice amount is (\d+)$/, async function (amount: number) {
+  const id = InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue();
   const invoice = await mockInvoiceRepo.getInvoiceById(id);
 
   invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
-  expect(invoice.invoiceTotal).to.be.greaterThan(100);
-});
-
-Then(/^The Invoice "([\w-]+)" is discounted/, async function (
-  invoiceId: string
-) {
-  const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
-  const invoice = await mockInvoiceRepo.getInvoiceById(id);
-
-  invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
-  expect(invoice.invoiceTotal).to.be.equal(0);
+  expect(invoice.invoiceTotal).to.be.equal(amount);
 });
