@@ -1,13 +1,9 @@
 // * Core Domain
-// import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { ValueObject } from '../../../core/domain/ValueObject';
 import { Either, right, left } from '../../../core/logic/Result';
-// import { Result } from '../../../core/logic/Result';
 
 import { Guard } from '../../../core/logic/Guard';
-// import { UserName } from '../../users/domain/userName';
-// // * Subdomain
-// import { AddressId } from './AddressId';
+import { InvalidErpReference } from './InvalidErpReference';
 
 export interface ErpReferenceProps {
   entity_id: string;
@@ -44,7 +40,9 @@ export class ErpReference extends ValueObject<ErpReferenceProps> {
     super(props);
   }
 
-  public static create(props: ErpReferenceProps): Either<any, ErpReference> {
+  public static create(
+    props: ErpReferenceProps
+  ): Either<InvalidErpReference, ErpReference> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
       { argument: props.vendor, argumentName: 'vendor' },
       { argument: props.entity_type, argumentName: 'entity_type' },

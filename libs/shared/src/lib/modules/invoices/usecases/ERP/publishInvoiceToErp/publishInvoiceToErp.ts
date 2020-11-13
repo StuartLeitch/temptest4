@@ -269,7 +269,7 @@ export class PublishInvoiceToErpUsecase
         const erpReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
-          vendor: 'netsuite',
+          vendor: this.erpService.vendorFieldName,
           attribute: this.erpService.invoiceErpRefFieldName,
           value: String(erpResponse.tradeDocumentId),
         });

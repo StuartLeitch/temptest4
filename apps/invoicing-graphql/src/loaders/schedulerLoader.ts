@@ -39,6 +39,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
         coupon,
         waiver,
         payer,
+        erpReference,
       },
       services: { erp, logger: loggerService, vatService },
     } = context;
@@ -57,6 +58,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       catalog,
+      erpReference,
       erp?.sage || null,
       publisher,
       loggerService,
@@ -72,6 +74,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       catalog,
+      erpReference,
       erp?.netsuite || null,
       publisher,
       loggerService,
@@ -89,6 +92,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
           manuscript,
           catalog,
           publisher,
+          erpReference,
           erp?.sage || null,
           loggerService
         )
@@ -105,6 +109,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
           manuscript,
           catalog,
           publisher,
+          erpReference,
           erp?.netsuite || null,
           loggerService
         )

@@ -1,12 +1,5 @@
 import { Mapper } from '../../../infrastructure/Mapper';
-import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-
 import { ErpReference } from '../domain/ErpReference';
-
-// import { CommentVote } from '../domain/commentVote';
-// import { MemberId } from '../domain/memberId';
-// import { CommentId } from '../domain/commentId';
-// import { VoteType } from '../domain/vote';
 
 export class ErpReferenceMap implements Mapper<ErpReference> {
   public static toDomain(raw: any): ErpReference {
@@ -19,13 +12,19 @@ export class ErpReferenceMap implements Mapper<ErpReference> {
     });
 
     if (erpReferenceOrError.isLeft()) {
-      throw new Error(erpReferenceOrError.value);
+      throw new Error(erpReferenceOrError.value.toString());
     }
 
-    return erpReferenceOrError?.value;
+    return erpReferenceOrError.value;
   }
 
   public static toPersistence(erpReference: ErpReference): any {
-    return erpReference;
+    return {
+      entity_id: erpReference.entity_id,
+      type: erpReference.entityType,
+      vendor: erpReference.vendor,
+      attribute: erpReference.attribute,
+      value: erpReference.value,
+    };
   }
 }

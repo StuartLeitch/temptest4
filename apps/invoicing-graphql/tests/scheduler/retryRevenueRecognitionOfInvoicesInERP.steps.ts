@@ -95,6 +95,7 @@ Before(function () {
     null,
     null,
     null,
+    null,
     // mockPaymentMethodRepo,
     // mockSqsPublishService,
     // mockManuscriptRepo,

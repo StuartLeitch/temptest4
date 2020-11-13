@@ -43,12 +43,16 @@ export class SageService implements ErpServiceContract {
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
+  get vendorFieldName(): string {
+    return 'sage';
+  }
+
   get invoiceErpRefFieldName(): string {
-    return 'erpReference';
+    return 'erp';
   }
 
   get invoiceRevenueRecRefFieldName(): string {
-    return 'revenueRecognitionReference';
+    return 'revenueRecognition';
   }
 
   private async getConnection(): Promise<Connection> {

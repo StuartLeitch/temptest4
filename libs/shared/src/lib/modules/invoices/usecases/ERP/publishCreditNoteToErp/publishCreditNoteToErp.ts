@@ -153,12 +153,13 @@ export class PublishCreditNoteToErpUsecase
         const erpReference = ErpReferenceMap.toDomain({
           entity_id: creditNote.invoiceId.id.toString(),
           type: 'creditNote',
-          vendor: 'netsuite',
-          attribute: 'creditNote',
+          vendor: this.netSuiteService.vendorFieldName,
+          attribute: this.netSuiteService.invoiceErpRefFieldName,
           value: String(netSuiteResponse),
         });
-        await this.erpReferenceRepo.save(erpReference);
+
         await this.invoiceRepo.update(creditNote);
+        await this.erpReferenceRepo.save(erpReference);
 
         return right(netSuiteResponse);
       } catch (err) {
