@@ -268,7 +268,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error(err?.request?.data);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -398,7 +398,7 @@ export class NetSuiteService implements ErpServiceContract {
         request: createInvoicePayload,
       });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -469,7 +469,7 @@ export class NetSuiteService implements ErpServiceContract {
         response: err?.response?.data,
       });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -502,7 +502,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error(err);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -585,7 +585,7 @@ export class NetSuiteService implements ErpServiceContract {
         request: createJournalPayload,
       });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -620,7 +620,7 @@ export class NetSuiteService implements ErpServiceContract {
         request: patchInvoicePayload,
       });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -652,7 +652,7 @@ export class NetSuiteService implements ErpServiceContract {
         requestOptions: creditNoteTransformOpts,
       });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -715,7 +715,7 @@ export class NetSuiteService implements ErpServiceContract {
         request: patchCreditNotePayload,
       });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      return { err } as unknown;
+      throw err;
     }
   }
 
@@ -731,24 +731,27 @@ export class NetSuiteService implements ErpServiceContract {
     const keep = ` ${manuscript.customId.toString()}`;
     if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
-      const [firstName, ...lastNames] = payer?.name.toString().split(' ');
+      let [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
+
+      lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length != 0);
 
       createCustomerPayload.lastName =
         lastNames.length > 0
-          ? `${lastNames.join(' ')} ${keep}`.trim()
+          ? `${lastNames.join(' ')}${keep}`.trim()
           : `${keep}`.trim();
 
       if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
         createCustomerPayload.lastName =
-          createCustomerPayload?.lastName?.slice(0, MAX_LENGTH - keep.length) +
-          keep;
+          createCustomerPayload?.lastName
+            ?.slice(0, MAX_LENGTH - keep.length)
+            .trim() + keep;
       }
     } else {
       createCustomerPayload.isPerson = false;
       createCustomerPayload.companyName = `${
-        payer?.organization.toString() || payer?.name.toString()
-      } ${keep}`.trim();
+        payer?.organization.toString().trim() || payer?.name.toString().trim()
+      }${keep}`.trim();
       if (createCustomerPayload.companyName.length > MAX_LENGTH) {
         createCustomerPayload.companyName =
           createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
