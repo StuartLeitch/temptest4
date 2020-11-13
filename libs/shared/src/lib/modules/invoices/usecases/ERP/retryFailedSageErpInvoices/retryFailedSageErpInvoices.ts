@@ -21,6 +21,7 @@ import { CatalogRepoContract } from '../../../../journals/repos';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
@@ -57,6 +58,7 @@ export class RetryFailedSageErpInvoicesUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private sageService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
@@ -71,6 +73,7 @@ export class RetryFailedSageErpInvoicesUsecase
       this.addressRepo,
       this.manuscriptRepo,
       this.catalogRepo,
+      this.erpReferenceRepo,
       this.sageService,
       this.publisherRepo,
       this.loggerService,
@@ -119,10 +122,6 @@ export class RetryFailedSageErpInvoicesUsecase
           return left(updatedInvoiceResponse);
         }
         const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
-
-        // console.log('Assigned ERP Reference:');
-        // console.info('type ', typeof assignedErpReference);
-        // console.info(assignedErpReference);
 
         if (assignedErpReference) {
           console.log(

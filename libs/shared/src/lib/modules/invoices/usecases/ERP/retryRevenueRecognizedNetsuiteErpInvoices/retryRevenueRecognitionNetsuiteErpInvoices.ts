@@ -23,6 +23,7 @@ import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { PublisherRepoContract } from '../../../../publishers/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 export type RetryRevenueRecognitionNetsuiteErpInvoicesResponse = Either<
@@ -53,6 +54,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
@@ -66,6 +68,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.publisherRepo,
+      this.erpReferenceRepo,
       this.netsuiteService,
       this.loggerService
     );

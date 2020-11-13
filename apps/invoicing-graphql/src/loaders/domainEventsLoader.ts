@@ -55,6 +55,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         coupon,
         waiver,
         payer,
+        erpReference,
       },
       services: {
         erp,
@@ -105,6 +106,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           invoiceItem,
           coupon,
           waiver,
+          erpReference,
           erp?.netsuite || null,
           loggerService
         )

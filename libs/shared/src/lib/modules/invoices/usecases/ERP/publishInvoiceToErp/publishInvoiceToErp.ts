@@ -24,6 +24,8 @@ import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
+import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 
 import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
 import {
@@ -39,7 +41,6 @@ import { Invoice } from '../../../domain/Invoice';
 import { PayerType } from './../../../../payers/domain/Payer';
 
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
-
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
 
 export interface PublishInvoiceToErpRequestDTO {
@@ -67,6 +68,7 @@ export class PublishInvoiceToErpUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
@@ -264,6 +266,14 @@ export class PublishInvoiceToErpUsecase
 
         this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
         await this.invoiceRepo.update(invoice);
+        const erpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: 'netsuite',
+          attribute: this.erpService.invoiceErpRefFieldName,
+          value: String(erpResponse.tradeDocumentId),
+        });
+        await this.erpReferenceRepo.save(erpReference);
         return right(erpResponse);
       } catch (err) {
         return left(err);

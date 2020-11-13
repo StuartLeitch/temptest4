@@ -1,15 +1,4 @@
-// import { KnexPaymentRepo } from './implementations/knexPaymentRepo';
-// import { KnexPaymentMethodRepo } from './implementations/knexPaymentMethodRepo';
+import { KnexErpReferenceRepo } from './implementations/knexErpReferenceRepo';
 import type { ErpReferenceRepoContract } from './ErpReferenceRepo';
-// import type { PaymentMethodRepoContract } from './paymentMethodRepo';
-// import { MockPaymentRepo } from './mocks/mockPaymentRepo';
-// import { MockPaymentMethodRepo } from './mocks/mockPaymentMethodRepo';
 
-export {
-  ErpReferenceRepoContract,
-  // PaymentMethodRepoContract,
-  // KnexPaymentRepo,
-  // KnexPaymentMethodRepo,
-  // MockPaymentRepo,
-  // MockPaymentMethodRepo,
-};
+export { ErpReferenceRepoContract, KnexErpReferenceRepo };
