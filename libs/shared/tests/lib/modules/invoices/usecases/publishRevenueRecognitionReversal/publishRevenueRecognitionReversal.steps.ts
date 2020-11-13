@@ -86,7 +86,24 @@ Before(function () {
   );
 });
 
-Given(/An Invoice with the ID "([\w-]+)"/, async function (invoiceId: string) {
+Given(/An Invoice with ID "([\w-]+)"/, async function (invoiceId: string) {
+  const transaction = TransactionMap.toDomain({
+    status: TransactionStatus.ACTIVE,
+    deleted: 0,
+    dateCreated: new Date(),
+    dateUpdated: new Date(),
+  });
+  invoice = InvoiceMap.toDomain({
+    transactionId: transaction.id.toValue(),
+    dateCreated: new Date(),
+    id: invoiceId,
+  });
+
+  transaction.addInvoice(invoice);
+  mockInvoiceRepo.addMockItem(invoice);
+});
+
+Given(/An Invoice "([\w-]+)"/, async function (invoiceId: string) {
   const transaction = TransactionMap.toDomain({
     status: TransactionStatus.ACTIVE,
     deleted: 0,
@@ -110,28 +127,29 @@ Given(/An Invoice with the ID "([\w-]+)"/, async function (invoiceId: string) {
     journalId: 'testingJournal',
   });
 
-  const datePublished = new Date();
   const manuscript = ArticleMap.toDomain({
     customId: '8888',
     journalId: catalog.journalId.id.toValue(),
-    datePublished: datePublished.setDate(datePublished.getDate() - 1),
+    datePublished: new Date(),
   });
 
   const invoiceItem = InvoiceItemMap.toDomain({
     invoiceId: invoiceId,
+    id: 'invoice-item',
     manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
     price: 100,
     vat: 0,
   });
 
   invoice.addItems([invoiceItem]);
-  transaction.addInvoice(invoice);
 
-  mockManuscriptRepo.addMockItem(manuscript);
-  mockInvoiceRepo.addMockItem(invoice);
-  mockInvoiceItemRepo.addMockItem(invoiceItem);
   mockPublisherRepo.addMockItem(publisher);
   mockCatalogRepo.addMockItem(catalog);
+  mockManuscriptRepo.addMockItem(manuscript);
+  mockInvoiceItemRepo.addMockItem(invoiceItem);
+
+  transaction.addInvoice(invoice);
+  mockInvoiceRepo.addMockItem(invoice);
 });
 
 Given(
@@ -146,12 +164,13 @@ Given(
       invoiceId: invoice.invoiceId.id.toValue(),
       type: payerType,
     });
+
     mockPayerRepo.addMockItem(payer);
     mockAddressRepo.addMockItem(address);
   }
 );
 
-Given(/A Discount apply for invoice with ID "([\w-]+)"/, async function (
+Given(/A Discount apply for Invoice "([\w-]+)"/, async function (
   invoiceId: string
 ) {
   const publisher = PublisherMap.toDomain({
@@ -176,7 +195,7 @@ Given(/A Discount apply for invoice with ID "([\w-]+)"/, async function (
     id: 'invoice-item',
     manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
     price: 100,
-    vat: 0,
+    vat: 20,
   });
 
   mockCouponRepo.addMockCouponToInvoiceItem(
@@ -203,27 +222,87 @@ Given(/A Discount apply for invoice with ID "([\w-]+)"/, async function (
     }),
     invoiceItem.invoiceItemId
   );
+
+  invoice.addItems([invoiceItem]);
+
+  mockPublisherRepo.addMockItem(publisher);
+  mockCatalogRepo.addMockItem(catalog);
+  mockManuscriptRepo.addMockItem(manuscript);
+  mockInvoiceItemRepo.addMockItem(invoiceItem);
 });
 
-When(
-  /Revenue recognition reversal usecase executes for invoice "([\w-]+)"/,
-  async function (invoiceId: string) {
-    response = await useCase.execute({ invoiceId }, context);
-  }
-);
+Given(/A VAT apply for Invoice "([\w-]+)"/, async function (invoiceId: string) {
+  const publisher = PublisherMap.toDomain({
+    id: 'testingPublisher',
+    customValues: {},
+  } as any);
 
-Then(
-  /Revenue recognition reversal is registered to Netsuite for Invoice "([\w-]+)"/,
-  async function (invoiceId: string) {
-    expect(response.isRight()).to.be.true;
-    const revenueData = mockNetsuiteService.getRevenue(invoiceId);
-    expect(!!revenueData).to.be.true;
+  const catalog = CatalogMap.toDomain({
+    publisherId: publisher.publisherId.id.toString(),
+    isActive: true,
+    journalId: 'testingJournal',
+  });
 
-    const invoice = await mockInvoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
-    );
-    expect(invoice.revenueRecognitionReference).to.equal(
-      mockNetsuiteService.revenueRef
-    );
-  }
-);
+  const manuscript = ArticleMap.toDomain({
+    customId: '8888',
+    journalId: catalog.journalId.id.toValue(),
+    datePublished: new Date(),
+  });
+
+  const invoiceItem = InvoiceItemMap.toDomain({
+    invoiceId: invoiceId,
+    id: 'invoice-item',
+    manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
+    price: 100,
+    vat: 20,
+  });
+
+  invoice.addItems([invoiceItem]);
+
+  mockPublisherRepo.addMockItem(publisher);
+  mockCatalogRepo.addMockItem(catalog);
+  mockManuscriptRepo.addMockItem(manuscript);
+  mockInvoiceItemRepo.addMockItem(invoiceItem);
+});
+
+When(/Reversal usecase executes for Invoice "([\w-]+)"/, async function (
+  invoiceId: string
+) {
+  response = await useCase.execute({ invoiceId }, context);
+});
+
+Then(/Reversal is registered for Invoice "([\w-]+)"/, async function (
+  invoiceId: string
+) {
+  expect(response.isRight()).to.be.true;
+  const revenueData = mockNetsuiteService.getRevenue(invoiceId);
+  expect(!!revenueData).to.be.true;
+
+  const invoice = await mockInvoiceRepo.getInvoiceById(
+    InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+  );
+  console.log(invoice.invoiceTotal);
+  expect(invoice.revenueRecognitionReference).to.equal(
+    mockNetsuiteService.revenueRef
+  );
+});
+
+Then(/^The Invoice "([\w-]+)" has VAT applied/, async function (
+  invoiceId: string
+) {
+  const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
+  const invoice = await mockInvoiceRepo.getInvoiceById(id);
+
+  invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
+  expect(invoice.invoiceTotal).to.be.greaterThan(100);
+});
+
+Then(/^The Invoice "([\w-]+)" is discounted/, async function (
+  invoiceId: string
+) {
+  const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
+  const invoice = await mockInvoiceRepo.getInvoiceById(id);
+
+  invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
+  expect(invoice.invoiceTotal).to.be.equal(0);
+});
