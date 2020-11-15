@@ -109,6 +109,7 @@ export abstract class WatchedList<T> {
     fn: (c: T, i: number, arr: T[]) => c is S,
     t?: any
   ): S[];
+  public filter(fn: (c: T, i: number, arr: T[]) => unknown, t?: any): T[];
   public filter(fn: (c: T, i: number, arr: T[]) => unknown, t?: any): T[] {
     return this.currentItems.filter(fn, t);
   }

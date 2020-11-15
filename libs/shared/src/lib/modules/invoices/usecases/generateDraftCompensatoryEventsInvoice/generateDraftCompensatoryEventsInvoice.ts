@@ -1,9 +1,13 @@
+import { cloneDeep } from 'lodash';
+
 // * Core Domain
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { Either, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
+
+import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
 // * Authorization Logic
 import {
@@ -13,11 +17,10 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
-import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
-
+import { CouponAssignedCollection } from '../../../coupons/domain/CouponAssignedCollection';
+import { WaiverAssignedCollection } from '../../../waivers/domain/WaiverAssignedCollection';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceItem } from '../../domain/InvoiceItem';
-import { InvoiceStatus } from '../../domain/Invoice';
 import { Invoice } from '../../domain/Invoice';
 
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
@@ -27,14 +30,13 @@ import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
-import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
-import { GetPaymentsByInvoiceIdUsecase } from '../../../payments/usecases/getPaymentsByInvoiceId';
-import { GetPaymentMethodsUseCase } from '../../../payments/usecases/getPaymentMethods';
-import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
+import { IsInvoiceDeletedUsecase } from '../isInvoiceDeleted';
 
+import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../publishEvents/publishInvoiceDraftDueAmountUpdated';
 import { PublishInvoiceDraftCreatedUseCase } from '../publishEvents/publishInvoiceDraftCreated';
+import { PublishInvoiceDraftDeletedUseCase } from '../publishEvents/publishInvoiceDraftDeleted';
 
 // * Usecase specific
 import { GenerateDraftCompensatoryEventsInvoiceResponse as Response } from './generateDraftCompensatoryEventsInvoice.response';
@@ -59,6 +61,8 @@ interface WithManuscript {
   manuscript: Manuscript;
 }
 
+type DraftEventData = WithInvoiceItems & WithManuscript & WithInvoice;
+
 function roundToHour(dateToRound: Date): Date {
   const date = new Date(dateToRound);
   date.setHours(date.getHours() + Math.round(date.getMinutes() / 60));
@@ -79,7 +83,14 @@ export class GenerateDraftCompensatoryEventsInvoiceUsecase
     private queueService: SQSPublishServiceContract,
     private logger: LoggerContract
   ) {
+    this.sendInvoiceDraftDueAmountUpdated = this.sendInvoiceDraftDueAmountUpdated.bind(
+      this
+    );
     this.sendInvoiceDraftCreated = this.sendInvoiceDraftCreated.bind(this);
+    this.sendInvoiceDraftDeleted = this.sendInvoiceDraftDeleted.bind(this);
+
+    this.shouldSendDeleteEvent = this.shouldSendDeleteEvent.bind(this);
+
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
     this.attachManuscript = this.attachManuscript.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
@@ -92,14 +103,20 @@ export class GenerateDraftCompensatoryEventsInvoiceUsecase
   @Authorize('invoice:regenerateEvents')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const execution = new AsyncEither(request)
+      const execution = await new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.attachInvoice(context))
         .then(this.attachInvoiceItems(context))
         .then(this.attachManuscript(context))
-        .then(this.sendInvoiceDraftCreated(context));
+        .map(this.keepInitialWaivers)
+        .then(this.sendInvoiceDraftCreated(context))
+        .then(this.attachInvoiceItems(context))
+        .then(this.sendInvoiceDraftDueAmountUpdated(context))
+        .advanceOrEnd(this.shouldSendDeleteEvent(context))
+        .then(this.sendInvoiceDraftDeleted(context))
+        .execute();
 
-      const result = await execution.execute();
+      return execution.map(() => null);
     } catch (e) {
       return left(
         new UnexpectedError(
@@ -108,7 +125,6 @@ export class GenerateDraftCompensatoryEventsInvoiceUsecase
         )
       );
     }
-    return right(null);
   }
 
   private async validateRequest<T extends DTO>(
@@ -175,7 +191,7 @@ export class GenerateDraftCompensatoryEventsInvoiceUsecase
     };
   }
 
-  private async keepInitialWaivers<T extends WithInvoiceItems & WithInvoice>(
+  private keepInitialWaivers<T extends WithInvoiceItems & WithInvoice>(
     request: T
   ) {
     const { invoiceItems, invoice } = request;
@@ -183,15 +199,24 @@ export class GenerateDraftCompensatoryEventsInvoiceUsecase
     const dateCreated = roundToHour(invoice.dateCreated);
 
     const newItems = invoiceItems.map((item) => {
-      // item.props.assignedCoupons = Coupons.create();
-      // item.assignedWaivers = item.assignedWaivers.filter(waiver => waiver.)
+      const initialWaivers = item.assignedWaivers.filter(
+        (w) => roundToHour(w.dateAssigned) === dateCreated
+      );
+      item.props.assignedWaivers = WaiverAssignedCollection.create(
+        initialWaivers
+      );
+      item.props.assignedCoupons = CouponAssignedCollection.create();
+      return item;
     });
+
+    return {
+      ...request,
+      invoiceItems: newItems,
+    };
   }
 
   private sendInvoiceDraftCreated(context: Context) {
-    return async <T extends WithInvoiceItems & WithManuscript & WithInvoice>(
-      request: T
-    ) => {
+    return async <T extends DraftEventData>(request: T) => {
       const usecase = new PublishInvoiceDraftCreatedUseCase(this.queueService);
       const { invoiceItems, manuscript, invoice } = request;
 
@@ -204,6 +229,101 @@ export class GenerateDraftCompensatoryEventsInvoiceUsecase
         },
         context
       );
+      return maybeSent.map(() => request);
+    };
+  }
+
+  private sendInvoiceDraftDueAmountUpdated(context: Context) {
+    return async <T extends DraftEventData>(request: T) => {
+      const usecase = new PublishInvoiceDraftDueAmountUpdatedUseCase(
+        this.queueService
+      );
+      const { invoiceItems, manuscript, invoice } = request;
+
+      const allW = invoiceItems
+        .map((i) => i.assignedWaivers.map((w) => roundToHour(w.dateAssigned)))
+        .reduce((acc, d) => acc.concat(d));
+      const allC = invoiceItems
+        .map((i) => i.assignedCoupons.map((c) => roundToHour(c.dateAssigned)))
+        .reduce((acc, d) => acc.concat(d));
+      const allReductionDates = Array.from(
+        new Set(allW.concat(allC).concat([roundToHour(invoice.dateCreated)]))
+      ).sort((a, b) => {
+        if (a < b) return -1;
+        else if (a.getTime() === b.getTime()) return 0;
+        else return 1;
+      });
+      allReductionDates.shift();
+
+      const originalItems = cloneDeep(invoiceItems);
+
+      let finalResp = right(null);
+
+      allReductionDates.forEach(async (date) => {
+        const it = cloneDeep(originalItems);
+
+        const newItems = it.map((item) => {
+          const apCoupons = item.assignedCoupons.filter(
+            (w) => roundToHour(w.dateAssigned) <= date
+          );
+          const apWaivers = item.assignedWaivers.filter(
+            (w) => roundToHour(w.dateAssigned) <= date
+          );
+          item.props.assignedCoupons = CouponAssignedCollection.create(
+            apCoupons
+          );
+          item.props.assignedWaivers = WaiverAssignedCollection.create(
+            apWaivers
+          );
+          return item;
+        });
+
+        const maybeSent = await usecase.execute(
+          {
+            manuscript,
+            invoice,
+            messageTimestamp: date,
+            invoiceItems: newItems,
+          },
+          context
+        );
+
+        finalResp = finalResp.chain(() => maybeSent);
+      });
+
+      return finalResp.map(() => request);
+    };
+  }
+
+  private shouldSendDeleteEvent(context: Context) {
+    return async <T extends WithInvoiceId>(request: T) => {
+      const usecase = new IsInvoiceDeletedUsecase(
+        this.invoiceRepo,
+        this.logger
+      );
+      const { invoiceId } = request;
+
+      const maybeDeleted = await usecase.execute({ invoiceId }, context);
+
+      return maybeDeleted;
+    };
+  }
+
+  private sendInvoiceDraftDeleted(context: Context) {
+    return async <T extends DraftEventData>(request: T) => {
+      const usecase = new PublishInvoiceDraftDeletedUseCase(this.queueService);
+      const { invoice, invoiceItems, manuscript } = request;
+
+      const maybeSent = await usecase.execute(
+        {
+          invoiceItems,
+          manuscript,
+          invoice,
+          messageTimestamp: invoice.dateUpdated,
+        },
+        context
+      );
+
       return maybeSent.map(() => request);
     };
   }
