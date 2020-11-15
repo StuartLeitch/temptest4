@@ -177,9 +177,13 @@ export class MockInvoiceRepo
 
   public async *getInvoicesIds(
     ids: string[],
-    journalIds: string[]
+    journalIds: string[],
+    omitDeleted: boolean
   ): AsyncGenerator<string, void, undefined> {
     yield* this._items.map((item) => item.id.toString());
+    if (!omitDeleted) {
+      yield* this.deletedItems.map((item) => item.id.toString());
+    }
   }
 
   async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {

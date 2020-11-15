@@ -526,7 +526,8 @@ export class KnexInvoiceRepo
 
   async *getInvoicesIds(
     ids: string[],
-    journalIds: string[]
+    journalIds: string[],
+    omitDeleted: boolean
   ): AsyncGenerator<string, void, undefined> {
     const extractInvoiceId = new Transform({
       objectMode: true,
@@ -549,10 +550,11 @@ export class KnexInvoiceRepo
       query = query.whereIn('c.id', journalIds);
     }
 
-    const stream = query
-      .where('i.deleted', 0)
-      .stream({ objectMode: true })
-      .pipe(extractInvoiceId);
+    if (omitDeleted) {
+      query = query.where('i.deleted', 0);
+    }
+
+    const stream = query.stream({ objectMode: true }).pipe(extractInvoiceId);
 
     for await (const a of stream) {
       yield a;
