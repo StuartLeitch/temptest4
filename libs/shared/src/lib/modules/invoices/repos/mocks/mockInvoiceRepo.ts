@@ -288,4 +288,10 @@ export class MockInvoiceRepo
 
     return found;
   }
+
+  async isInvoiceDeleted(id: InvoiceId): Promise<boolean> {
+    const found = this.deletedItems.find((invoice) => invoice.id.equals(id.id));
+
+    return !!found;
+  }
 }

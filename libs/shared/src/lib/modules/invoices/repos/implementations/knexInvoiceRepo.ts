@@ -161,6 +161,15 @@ export class KnexInvoiceRepo
     return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
+  async isInvoiceDeleted(id: InvoiceId): Promise<boolean> {
+    const isDeleted = await this.db(`${TABLES.INVOICES}`)
+      .select('deleted')
+      .where('id', id.id.toString())
+      .first();
+
+    return !!isDeleted.deleted;
+  }
+
   async getInvoicesByCustomId(customId: string): Promise<Invoice[]> {
     const { db } = this;
 
