@@ -266,14 +266,17 @@ export class PublishInvoiceToErpUsecase
 
         this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
         await this.invoiceRepo.update(invoice);
-        const erpReference = ErpReferenceMap.toDomain({
+
+        // * Save ERP reference
+        const erpPaymentReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorFieldName,
           attribute: this.erpService.invoiceErpRefFieldName,
           value: String(erpResponse.tradeDocumentId),
         });
-        await this.erpReferenceRepo.save(erpReference);
+        await this.erpReferenceRepo.save(erpPaymentReference);
+
         return right(erpResponse);
       } catch (err) {
         return left(err);
