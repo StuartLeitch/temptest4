@@ -39,9 +39,9 @@ import { PublishInvoiceDraftCreatedUseCase } from '../publishEvents/publishInvoi
 import { PublishInvoiceDraftDeletedUseCase } from '../publishEvents/publishInvoiceDraftDeleted';
 
 // * Usecase specific
-import { GenerateDraftCompensatoryEventsInvoiceResponse as Response } from './generateDraftCompensatoryEventsInvoice.response';
-import { GenerateDraftCompensatoryEventsInvoiceDTO as DTO } from './generateDraftCompensatoryEventsInvoice.dto';
-import * as Errors from './generateDraftCompensatoryEventsInvoice.errors';
+import { GenerateDraftCompensatoryEventsResponse as Response } from './generate-draft-compensatory-events.response';
+import { GenerateDraftCompensatoryEventsDTO as DTO } from './generate-draft-compensatory-events.dto';
+import * as Errors from './generate-draft-compensatory-events.errors';
 
 type Context = UsecaseAuthorizationContext;
 
@@ -70,7 +70,7 @@ function roundToHour(dateToRound: Date): Date {
   return date;
 }
 
-export class GenerateDraftCompensatoryEventsInvoiceUsecase
+export class GenerateDraftCompensatoryEventsUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
