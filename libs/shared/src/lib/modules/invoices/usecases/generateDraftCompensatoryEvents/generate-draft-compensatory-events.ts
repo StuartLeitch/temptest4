@@ -83,11 +83,9 @@ export class GenerateDraftCompensatoryEventsUsecase
     private queueService: SQSPublishServiceContract,
     private logger: LoggerContract
   ) {
-    this.sendInvoiceDraftDueAmountUpdated = this.sendInvoiceDraftDueAmountUpdated.bind(
-      this
-    );
-    this.sendInvoiceDraftCreated = this.sendInvoiceDraftCreated.bind(this);
-    this.sendInvoiceDraftDeleted = this.sendInvoiceDraftDeleted.bind(this);
+    this.sendDueAmountUpdated = this.sendDueAmountUpdated.bind(this);
+    this.sendCreated = this.sendCreated.bind(this);
+    this.sendDeleted = this.sendDeleted.bind(this);
 
     this.shouldSendDeleteEvent = this.shouldSendDeleteEvent.bind(this);
 
@@ -109,11 +107,11 @@ export class GenerateDraftCompensatoryEventsUsecase
         .then(this.attachInvoiceItems(context))
         .then(this.attachManuscript(context))
         .map(this.keepInitialWaivers)
-        .then(this.sendInvoiceDraftCreated(context))
+        .then(this.sendCreated(context))
         .then(this.attachInvoiceItems(context))
-        .then(this.sendInvoiceDraftDueAmountUpdated(context))
+        .then(this.sendDueAmountUpdated(context))
         .advanceOrEnd(this.shouldSendDeleteEvent(context))
-        .then(this.sendInvoiceDraftDeleted(context))
+        .then(this.sendDeleted(context))
         .execute();
 
       return execution.map(() => null);
@@ -215,7 +213,7 @@ export class GenerateDraftCompensatoryEventsUsecase
     };
   }
 
-  private sendInvoiceDraftCreated(context: Context) {
+  private sendCreated(context: Context) {
     return async <T extends DraftEventData>(request: T) => {
       const usecase = new PublishInvoiceDraftCreatedUseCase(this.queueService);
       const { invoiceItems, manuscript, invoice } = request;
@@ -233,7 +231,7 @@ export class GenerateDraftCompensatoryEventsUsecase
     };
   }
 
-  private sendInvoiceDraftDueAmountUpdated(context: Context) {
+  private sendDueAmountUpdated(context: Context) {
     return async <T extends DraftEventData>(request: T) => {
       const usecase = new PublishInvoiceDraftDueAmountUpdatedUseCase(
         this.queueService
@@ -309,7 +307,7 @@ export class GenerateDraftCompensatoryEventsUsecase
     };
   }
 
-  private sendInvoiceDraftDeleted(context: Context) {
+  private sendDeleted(context: Context) {
     return async <T extends DraftEventData>(request: T) => {
       const usecase = new PublishInvoiceDraftDeletedUseCase(this.queueService);
       const { invoice, invoiceItems, manuscript } = request;
