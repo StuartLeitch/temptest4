@@ -27,7 +27,15 @@ export class MockInvoiceRepo
   }
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
-    const filterInvoiceById = this.filterInvoiceById(invoiceId);
+    let filterInvoiceById = null;
+
+    filterInvoiceById = this.filterInvoiceById(invoiceId);
+
+    if (!filterInvoiceById) {
+      // throw new Error(`No invoice with id ${invoiceId.id.toString()}`);
+      return null;
+    }
+
     const [getErpReferencesByEntityId] = this.erpReferenceRepo.filterBy({
       where: [['entity_id', '=', invoiceId.id.toString()]],
     });
@@ -249,7 +257,7 @@ export class MockInvoiceRepo
     const found = this._items.find((item) => item.id.equals(invoiceId.id));
 
     if (!found) {
-      throw new Error(`No invoice with id ${invoiceId.id.toString()}`);
+      return null;
     }
 
     return found;
