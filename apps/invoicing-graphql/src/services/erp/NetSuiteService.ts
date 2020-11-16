@@ -161,9 +161,9 @@ export class NetSuiteService implements ErpServiceContract {
     const revenueRecognitionReversal = await this.createRevenueRecognitionReversal(
       {
         ...data,
-        customerId,
         creditAccountId,
         debitAccountId,
+        customerId,
         customSegmentId,
       }
     );
