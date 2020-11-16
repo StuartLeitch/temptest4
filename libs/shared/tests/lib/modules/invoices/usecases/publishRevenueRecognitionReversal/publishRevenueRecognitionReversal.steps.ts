@@ -22,15 +22,14 @@ import {
   AddressMap,
   ArticleMap,
   CatalogMap,
-  CouponMap,
   Invoice,
   InvoiceItemMap,
   PayerMap,
+  PayerType,
   Roles,
   TransactionMap,
   TransactionStatus,
   UsecaseAuthorizationContext,
-  WaiverMap,
 } from '../../../../../../src/lib/shared';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
@@ -126,6 +125,19 @@ Given(/A regular invoice/, async function () {
     vat: 20,
   });
 
+  const address = AddressMap.toDomain({
+    country: 'RO',
+  });
+  const payer = PayerMap.toDomain({
+    name: 'Silvestru',
+    addressId: address.id.toValue(),
+    invoiceId: invoice.invoiceId.id.toValue(),
+    type: PayerType.INDIVIDUAL,
+  });
+
+  mockPayerRepo.addMockItem(payer);
+  mockAddressRepo.addMockItem(address);
+
   invoice.addItems([invoiceItem]);
 
   mockPublisherRepo.addMockItem(publisher);
@@ -135,117 +147,6 @@ Given(/A regular invoice/, async function () {
 
   transaction.addInvoice(invoice);
   mockInvoiceRepo.addMockItem(invoice);
-});
-
-Given(/The payer is from "([\w-]+)" and an "([\w-]+)"/, async function (
-  country: string,
-  payerType: string
-) {
-  const address = AddressMap.toDomain({
-    country,
-  });
-  const payer = PayerMap.toDomain({
-    name: 'Silvestru',
-    addressId: address.id.toValue(),
-    invoiceId: invoice.invoiceId.id.toValue(),
-    type: payerType,
-  });
-
-  mockPayerRepo.addMockItem(payer);
-  mockAddressRepo.addMockItem(address);
-});
-
-Given(/A Discount of 100% for Invoice/, async function () {
-  const publisher = PublisherMap.toDomain({
-    id: 'testingPublisher',
-    customValues: {},
-  } as any);
-
-  const catalog = CatalogMap.toDomain({
-    publisherId: publisher.publisherId.id.toString(),
-    isActive: true,
-    journalId: 'testingJournal',
-  });
-
-  const manuscript = ArticleMap.toDomain({
-    customId: '8888',
-    journalId: catalog.journalId.id.toValue(),
-    datePublished: new Date(),
-  });
-
-  const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: testInvoiceId,
-    id: 'invoice-item',
-    manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
-    price: 100,
-    vat: 20,
-  });
-
-  mockCouponRepo.addMockCouponToInvoiceItem(
-    CouponMap.toDomain({
-      code: 'ASD1123',
-      dateCreated: new Date(),
-      dateUpdated: new Date(),
-      id: 'coup1',
-      invoiceItemType: 'APC',
-      name: 'coup',
-      redeemCount: 1,
-      reduction: 50,
-      status: 'active',
-      type: 'SINGLE_USE',
-    }),
-    invoiceItem.invoiceItemId
-  );
-
-  mockWaiverRepo.addMockWaiverForInvoiceItem(
-    WaiverMap.toDomain({
-      waiverType: 'EDITOR_DISCOUNT',
-      reduction: 50,
-      isActive: true,
-    }),
-    invoiceItem.invoiceItemId
-  );
-
-  invoice.addItems([invoiceItem]);
-
-  mockPublisherRepo.addMockItem(publisher);
-  mockCatalogRepo.addMockItem(catalog);
-  mockManuscriptRepo.addMockItem(manuscript);
-  mockInvoiceItemRepo.addMockItem(invoiceItem);
-});
-
-Given(/A VAT of 20% for Invoice/, async function () {
-  const publisher = PublisherMap.toDomain({
-    id: 'testingPublisher',
-    customValues: {},
-  } as any);
-
-  const catalog = CatalogMap.toDomain({
-    publisherId: publisher.publisherId.id.toString(),
-    isActive: true,
-    journalId: 'testingJournal',
-  });
-
-  const manuscript = ArticleMap.toDomain({
-    customId: '8888',
-    journalId: catalog.journalId.id.toValue(),
-    datePublished: new Date(),
-  });
-
-  const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: testInvoiceId,
-    id: 'invoice-item',
-    manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
-    price: 100,
-    vat: 20,
-  });
-
-  invoice.addItems([invoiceItem]);
-
-  mockPublisherRepo.addMockItem(publisher);
-  mockCatalogRepo.addMockItem(catalog);
-  mockManuscriptRepo.addMockItem(manuscript);
-  mockInvoiceItemRepo.addMockItem(invoiceItem);
 });
 
 When(/Reversal usecase executes for Invoice/, async function () {
@@ -264,12 +165,4 @@ Then(/Reversal created in Netsuite for Invoice/, async function () {
   expect(invoice.revenueRecognitionReference).to.equal(
     mockNetsuiteService.revenueRef
   );
-});
-
-Then(/^The Invoice amount is (\d+)$/, async function (amount: number) {
-  const id = InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue();
-  const invoice = await mockInvoiceRepo.getInvoiceById(id);
-
-  invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
-  expect(invoice.invoiceTotal).to.be.equal(amount);
 });
