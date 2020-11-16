@@ -97,7 +97,6 @@ export function addInvoices(invoicesRepo: MockInvoiceRepo) {
 
   for (const props of invoicesProps) {
     const invoice = InvoiceMap.toDomain(props);
-    invoice.props.dateUpdated = new Date(props.dateUpdated);
     invoicesRepo.addMockItem(invoice);
   }
 }

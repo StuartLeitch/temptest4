@@ -317,7 +317,7 @@ export class GenerateDraftCompensatoryEventsUsecase
           invoiceItems,
           manuscript,
           invoice,
-          messageTimestamp: invoice.dateUpdated,
+          messageTimestamp: invoice.dateCreated,
         },
         context
       );

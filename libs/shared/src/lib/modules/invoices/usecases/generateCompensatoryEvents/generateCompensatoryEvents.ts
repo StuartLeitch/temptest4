@@ -481,9 +481,6 @@ export class GenerateCompensatoryEventsUsecase
     return <T extends WithInvoice>(request: T) => {
       const { invoice } = request;
 
-      invoice.props.dateUpdated = useInvoice
-        ? invoice[useDate]
-        : request[useDate];
       invoice.status = InvoiceStatus[status];
 
       return {

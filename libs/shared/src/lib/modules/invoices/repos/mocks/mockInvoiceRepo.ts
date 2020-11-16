@@ -98,7 +98,7 @@ export class MockInvoiceRepo
       vatRegistrationNumber: '',
       foreignPaymentId: '',
       amount: null,
-      paymentDate: invoice.props.dateUpdated?.toISOString(),
+      paymentDate: invoice.props.dateAccepted?.toISOString(),
       paymentType: '',
     };
   }

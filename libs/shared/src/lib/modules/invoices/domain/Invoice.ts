@@ -41,7 +41,6 @@ interface InvoiceProps {
   payerId?: PayerId;
   invoiceItems?: InvoiceItems;
   dateCreated?: Date;
-  dateUpdated?: Date;
   dateAccepted?: Date;
   dateIssued?: Date;
   dateMovedToFinal?: Date;
@@ -98,14 +97,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get dateCreated(): Date {
     return this.props.dateCreated;
-  }
-
-  get dateUpdated(): Date {
-    return this.props.dateUpdated;
-  }
-
-  set dateUpdated(dateUpdated: Date) {
-    this.props.dateUpdated = dateUpdated;
   }
 
   get dateAccepted(): Date {
@@ -315,7 +306,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   public markAsActive(): void {
     const now = new Date();
-    this.props.dateUpdated = now;
     this.props.status = InvoiceStatus.ACTIVE;
     this.props.dateIssued = new Date();
     this.addDomainEvent(new InvoiceConfirmed(this, now));
@@ -323,8 +313,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   public paymentAdded(paymentId: PaymentId): void {
     const now = new Date();
-    this.props.dateUpdated = now;
-    // this.props.status = InvoiceStatus.FINAL;
     this.addDomainEvent(
       new InvoicePaymentAddedEvent(this.invoiceId, paymentId, now)
     );
@@ -332,7 +320,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   public markAsFinal(): void {
     const now = new Date();
-    this.props.dateUpdated = now;
     this.props.dateMovedToFinal = now;
     this.props.status = InvoiceStatus.FINAL;
     if (this.props.dateIssued === null) {

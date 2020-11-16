@@ -1,4 +1,4 @@
-import { Before, Given, When, Then, After } from 'cucumber';
+import { Before, Given, When, Then, After } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
@@ -8,19 +8,40 @@ import { MockSqsPublishService } from './../../../../../../src/lib/domain/servic
 
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
-import { MockPaymentMethodRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
+import { ManuscriptMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ManuscriptMap';
+import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+
+import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { MockAddressRepo } from './../../../../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
-import { MockPaymentRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentRepo';
+import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockPayerRepo } from './../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
-import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 
 import { GenerateDraftCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateDraftCompensatoryEvents';
 
-Before({ tags: '@generateDraftCompensatoryEvents' }, function () {
+const defaultUsecaseContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
+
+interface Context {
+  repos: {
+    invoiceItem: MockInvoiceItemRepo;
+    manuscript: MockArticleRepo;
+    invoice: MockInvoiceRepo;
+    coupon: MockCouponRepo;
+    waiver: MockWaiverRepo;
+  };
+  services: {
+    queueService: MockSqsPublishService;
+    logger: MockLogger;
+  };
+}
+
+let usecase: GenerateDraftCompensatoryEventsUsecase = null;
+let context: Context = null;
+
+Before({ tags: '@GenerateDraftCompensatoryEvents' }, () => {
   const invoiceItem = new MockInvoiceItemRepo();
   const manuscript = new MockArticleRepo();
   const invoice = new MockInvoiceRepo(manuscript, invoiceItem);
@@ -30,7 +51,7 @@ Before({ tags: '@generateDraftCompensatoryEvents' }, function () {
   const queueService = new MockSqsPublishService();
   const logger = new MockLogger();
 
-  const context = {
+  context = {
     repos: {
       invoiceItem,
       manuscript,
@@ -44,7 +65,7 @@ Before({ tags: '@generateDraftCompensatoryEvents' }, function () {
     },
   };
 
-  const usecase = new GenerateDraftCompensatoryEventsUsecase(
+  usecase = new GenerateDraftCompensatoryEventsUsecase(
     invoiceItem,
     manuscript,
     invoice,
@@ -53,7 +74,62 @@ Before({ tags: '@generateDraftCompensatoryEvents' }, function () {
     queueService,
     logger
   );
-
-  this.context = context;
-  this.usecase = usecase;
 });
+
+After({ tags: '@GenerateDraftCompensatoryEvents' }, () => {
+  context = null;
+  usecase = null;
+});
+
+Given(/^A manuscript with custom id "([\w\d]+)"$/, (customId: string) => {
+  const manuscript = ManuscriptMap.toDomain({
+    id: customId,
+    customId,
+  });
+
+  context.repos.manuscript.addMockItem(manuscript);
+});
+
+Given(
+  /^An invoice with id "([\w\d-]+)" for manuscript "([\w\d]+)" with price "([\d]+)"$/,
+  (invoiceId: string, manuscriptId: string, price: string) => {
+    const invoice = InvoiceMap.toDomain({
+      dateCreated: '2020-10-15T14:25:13',
+      transactionId: 'transaction-1',
+      status: 'DRAFT',
+      id: invoiceId,
+    });
+    const invoiceItem = InvoiceItemMap.toDomain({
+      invoiceId,
+      manuscriptId,
+      price: Number.parseFloat(price),
+    });
+
+    context.repos.invoiceItem.addMockItem(invoiceItem);
+    context.repos.invoice.addMockItem(invoice);
+  }
+);
+
+When(
+  /^GenerateDraftCompensatoryEvents is called for invoiceId "([\w-]+)"$/,
+  async (invoiceId: string) => {
+    const maybeResult = await usecase.execute(
+      { invoiceId },
+      defaultUsecaseContext
+    );
+
+    if (maybeResult.isLeft()) {
+      throw maybeResult.value;
+    }
+  }
+);
+
+Then(
+  /^An event of type "([\w]+)" is generated, for invoiceId "([\w\d-]+)"$/,
+  (eventName: string, invoiceId: string) => {
+    const event = context.services.queueService.findEvent(eventName);
+    expect(event).to.be.ok;
+    expect(event.data.invoiceId).to.be.equal(invoiceId);
+    console.log(event.data);
+  }
+);
