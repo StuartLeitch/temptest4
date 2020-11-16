@@ -27,4 +27,5 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   ): AsyncGenerator<string, void, undefined>;
   filterByInvoiceId?(invoiceId: InvoiceId): unknown;
   getInvoicesByCustomId?(customId: string): Promise<any[]>;
+  getUnregisteredErpCreditNotes(): Promise<InvoiceId[]>;
 }

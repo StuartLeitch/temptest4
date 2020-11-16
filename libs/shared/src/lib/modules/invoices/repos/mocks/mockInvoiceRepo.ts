@@ -211,6 +211,10 @@ export class MockInvoiceRepo
     return null;
   }
 
+  public async getUnregisteredErpCreditNotes(): Promise<InvoiceId[]> {
+    return null;
+  }
+
   public filterReadyForRevenueRecognition() {
     return (items) =>
       this.filterBy(

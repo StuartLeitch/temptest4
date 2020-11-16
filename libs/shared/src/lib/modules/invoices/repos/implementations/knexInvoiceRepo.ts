@@ -324,6 +324,14 @@ export class KnexInvoiceRepo
         );
   }
 
+  private filterCreditNotesReadyForErpRegistration(): any {
+    return (query) =>
+      query
+        .whereNot('invoices.deleted', 1)
+        .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+        .whereNotNull('invoices.cancelledInvoiceReference');
+  }
+
   async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
     const { logger } = this;
 
@@ -429,6 +437,32 @@ export class KnexInvoiceRepo
     const invoices = await sql;
 
     return invoices.map((i) => InvoiceMap.toDomain(i));
+  }
+
+  async getUnregisteredErpCreditNotes(): Promise<InvoiceId[]> {
+    const { logger } = this;
+
+    const detailsQuery = this.createBaseDetailsQuery();
+
+    // * SQL for retrieving results needed only for ERP registration
+    const filterCreditNotesReadyForERP = this.filterCreditNotesReadyForErpRegistration();
+
+    const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
+      whereNotNull: 'articles.datePublished',
+    });
+    const prepareIdsSQL = filterArticlesByNotNullDatePublished(
+      filterCreditNotesReadyForERP(detailsQuery)
+    );
+
+    logger.debug('select', {
+      unregisteredCreditNotes: prepareIdsSQL.toString(),
+    });
+
+    const creditNotes = await prepareIdsSQL;
+
+    return creditNotes.map((i) =>
+      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
+    );
   }
 
   async delete(invoice: Invoice): Promise<void> {
