@@ -167,7 +167,7 @@ export class NetSuiteService implements ErpServiceContract {
         customSegmentId,
       }
     );
-
+    console.log('-------- in register', revenueRecognitionReversal);
     return {
       journal: { id: String(revenueRecognitionReversal) },
       journalItem: null,
@@ -651,7 +651,7 @@ export class NetSuiteService implements ErpServiceContract {
         id: customSegmentId,
       };
     }
-
+    console.log('------- in create');
     try {
       const res = await axios({
         ...journalRequestOpts,

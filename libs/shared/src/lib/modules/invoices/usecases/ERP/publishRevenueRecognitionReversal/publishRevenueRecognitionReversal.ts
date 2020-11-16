@@ -175,14 +175,15 @@ export class PublishRevenueRecognitionReversalUsecase
 
       const erpResponse = await this.erpService.registerRevenueRecognitionReversal(
         {
+          publisherCustomValues,
           manuscript,
+          invoiceTotal,
           invoice,
           payer,
-          publisherCustomValues,
-          invoiceTotal,
         }
       );
 
+      console.log('--------- in usecase', erpResponse);
       this.loggerService.info(
         'ERP field',
         this.erpService.invoiceRevenueRecRefFieldName

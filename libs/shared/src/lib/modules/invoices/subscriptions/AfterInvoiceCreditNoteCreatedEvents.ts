@@ -198,18 +198,25 @@ export class AfterInvoiceCreditNoteCreatedEvent
         throw new Error(`Couldn't find Invoice with ID: ${invoiceId}`);
       }
       const invoice = maybeInvoice.value.getValue();
-
+      console.log(
+        '---- Condition values',
+        manuscript.datePublished,
+        invoice.nsRevRecReference
+      );
       if (manuscript.datePublished && invoice.nsRevRecReference) {
         const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
           { invoiceId: invoiceId.id.toString() },
           defaultContext
         );
+        console.log('----- in After', publishRevenueRecognitionReversal);
 
         if (publishRevenueRecognitionReversal.isLeft()) {
           throw publishRevenueRecognitionReversal.value.message;
         }
         this.loggerService.info(
-          `[PublishRevenuRecognitionReversal]: ${publishRevenueRecognitionReversal.isLeft}`
+          `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
+            publishRevenueRecognitionReversal
+          )}`
         );
       }
     } catch (err) {
