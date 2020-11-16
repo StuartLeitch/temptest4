@@ -1,5 +1,4 @@
-// import { env } from '../env';
-import { RegisterErpCreditMemosUsecase } from '@hindawi/shared';
+import { RetryCreditNotesUsecase } from '@hindawi/shared';
 
 import { Logger } from '../lib/logger';
 import { Context } from '../builders';
@@ -10,14 +9,14 @@ logger.setScope('cron:registerCreditMemos');
 import { FeatureFlags } from '../lib/FeatureFlags';
 import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
-export class RegisterCreditMemosCron {
+export class RegisterCreditNotesCron {
   public static async schedule(context: Context): Promise<any> {
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
     if (!FeatureFlags.isFeatureEnabled('erpRegisterCreditMemosEnabled')) {
       return logger.debug(
-        'Skipping the CRON Job credit memos registration scheduling...'
+        'Skipping the CRON Job credit notes registration scheduling...'
       );
     }
 
@@ -33,19 +32,14 @@ export class RegisterCreditMemosCron {
         waiver,
         payer,
       },
-      services: { erp, logger: loggerService, vatService },
+      services: { erp, logger: loggerService },
     } = context;
 
-    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
+    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryCreditNotesUsecase(
       invoice,
       invoiceItem,
       coupon,
       waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      publisher,
       erp?.netsuite || null,
       loggerService
     );

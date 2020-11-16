@@ -16,6 +16,7 @@ import { RetryFailedSageErpInvoicesUsecase } from '../../../../libs/shared/src/l
 
 import { RegisterInvoicesCron } from './../cron/registerInvoicesCron';
 import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecognitionsCron';
+import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
 
 import { env } from '../env';
 import { Logger } from '../lib/logger';
@@ -80,22 +81,6 @@ export const schedulerLoader: MicroframeworkLoader = async (
         )
       : new NoOpUseCase();
 
-    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = erpRegisterRevenueRecognitionEnabled
-      ? new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
-          invoice,
-          invoiceItem,
-          coupon,
-          waiver,
-          payer,
-          address,
-          manuscript,
-          catalog,
-          publisher,
-          erp?.netsuite || null,
-          loggerService
-        )
-      : new NoOpUseCase();
-
     const sageJobQueue = [
       async function retryFailedSageErpInvoicesJob() {
         try {
@@ -125,6 +110,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
     const netSuiteJobQueue = [
       RegisterInvoicesCron,
       RegisterRevenueRecognitionsCron,
+      RegisterPaymentsCron,
     ];
 
     // start scheduler

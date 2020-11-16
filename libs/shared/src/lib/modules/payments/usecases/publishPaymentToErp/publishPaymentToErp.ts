@@ -64,10 +64,8 @@ export class PublishPaymentToErpUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    // private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
-    // private sageService: ErpServiceContract,
     private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
