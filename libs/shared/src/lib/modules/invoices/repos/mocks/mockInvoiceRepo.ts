@@ -7,9 +7,11 @@ import { InvoiceRepoContract } from '../invoiceRepo';
 import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Invoice } from '../../domain/Invoice';
+import { InvoiceMap } from '../../mappers/InvoiceMap';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
+import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 
 export class MockInvoiceRepo
   extends BaseMockRepo<Invoice>
@@ -18,18 +20,30 @@ export class MockInvoiceRepo
 
   constructor(
     private articleRepo?: ArticleRepoContract,
-    private invoiceItemRepo?: InvoiceItemRepoContract
+    private invoiceItemRepo?: InvoiceItemRepoContract,
+    private erpReferenceRepo?: ErpReferenceRepoContract
   ) {
     super();
   }
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
-    const matches = this._items.filter((i) => i.invoiceId.equals(invoiceId));
-    if (matches.length !== 0) {
-      return cloneDeep(matches[0]);
-    } else {
-      return null;
-    }
+    const filterInvoiceById = this.filterInvoiceById(invoiceId);
+    const [getErpReferencesByEntityId] = this.erpReferenceRepo.filterBy({
+      where: [['entity_id', '=', invoiceId.id.toString()]],
+    });
+
+    return InvoiceMap.toDomain({
+      ...InvoiceMap.toPersistence(filterInvoiceById),
+      erpReferences: [
+        {
+          entity_id: getErpReferencesByEntityId?.entity_id,
+          type: getErpReferencesByEntityId?.entityType,
+          vendor: getErpReferencesByEntityId?.vendor,
+          attribute: getErpReferencesByEntityId?.attribute,
+          value: getErpReferencesByEntityId?.value,
+        },
+      ],
+    });
   }
 
   public async getFailedSageErpInvoices(): Promise<Invoice[]> {
@@ -229,6 +243,16 @@ export class MockInvoiceRepo
         },
         items
       );
+  }
+
+  private filterInvoiceById(invoiceId: InvoiceId) {
+    const found = this._items.find((item) => item.id.equals(invoiceId.id));
+
+    if (!found) {
+      throw new Error(`No invoice with id ${invoiceId.id.toString()}`);
+    }
+
+    return found;
   }
 
   public filterBy(criteria, items): Invoice[] {

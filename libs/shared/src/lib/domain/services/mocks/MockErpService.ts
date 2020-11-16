@@ -22,6 +22,10 @@ export class MockErpService implements ErpServiceContract {
     return 'revenueRecognitionReference';
   }
 
+  get vendorFieldName(): string {
+    return 'vendorName';
+  }
+
   async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
     const invoiceId = data.invoice.id.toValue().toString();
     this.invoiceMap[invoiceId] = data;

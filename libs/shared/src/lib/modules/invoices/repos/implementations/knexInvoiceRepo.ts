@@ -19,6 +19,7 @@ import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import type { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { ErpReference } from './../../../vendors/domain/ErpReference';
+import { ErpReferenceRepoContract } from './../../../vendors/repos';
 
 import { applyFilters } from './utils';
 
@@ -30,7 +31,8 @@ export class KnexInvoiceRepo
     protected logger?: any,
     private models?: any,
     private articleRepo?: ArticleRepoContract,
-    private invoiceItemRepo?: InvoiceItemRepoContract
+    private invoiceItemRepo?: InvoiceItemRepoContract,
+    private erpReferenceRepo?: ErpReferenceRepoContract
   ) {
     super(db, logger);
   }
@@ -249,11 +251,11 @@ export class KnexInvoiceRepo
   }
 
   async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
-    const { db } = this;
+    const { db, logger } = this;
 
     const invoice = await this.getInvoiceById(invoiceId);
     if (invoice.invoiceNumber) {
-      console.log('Invoice number already set');
+      logger.warning('Invoice number already set');
       return invoice;
     }
 

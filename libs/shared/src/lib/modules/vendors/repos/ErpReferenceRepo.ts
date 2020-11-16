@@ -8,4 +8,5 @@ export interface ErpReferenceRepoContract extends Repo<ErpReference> {
     invoiceId: InvoiceId
   ): Promise<InvoiceErpReferences>;
   save(erpReference: ErpReference): Promise<ErpReference>;
+  filterBy?(criteria: any, items?: any[]): any[];
 }

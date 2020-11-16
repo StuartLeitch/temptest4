@@ -27,7 +27,7 @@ export class InvoiceMap extends Mapper<Invoice> {
           raw.erpReferences &&
           raw.erpReferences.every((ef) => ef.vendor && ef.type)
             ? InvoiceErpReferences.create(
-                raw.erpReferences.map((ef) => ErpReferenceMap.toDomain(ef))
+                raw.erpReferences.map(ErpReferenceMap.toDomain)
               )
             : InvoiceErpReferences.create([]),
       },

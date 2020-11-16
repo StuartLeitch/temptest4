@@ -15,6 +15,7 @@ import { PublishInvoiceToErpResponse } from '../../../../../../src/lib/modules/i
 import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
@@ -36,6 +37,7 @@ import {
   VATService,
 } from '../../../../../../src/lib/shared';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { ErpReferenceMap } from './../../../../../../src/lib/modules/vendors/mapper/ErpReference';
 
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
@@ -47,6 +49,7 @@ let mockManuscriptRepo: MockArticleRepo;
 let mockCatalogRepo: MockCatalogRepo;
 let mockErpService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
 let vatService: VATService;
 
@@ -61,7 +64,6 @@ const context: UsecaseAuthorizationContext = {
 Before(function () {
   invoice = null;
 
-  mockInvoiceRepo = new MockInvoiceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockAddressRepo = new MockAddressRepo();
   mockPayerRepo = new MockPayerRepo();
@@ -69,10 +71,13 @@ Before(function () {
   mockWaiverRepo = new MockWaiverRepo();
   mockManuscriptRepo = new MockArticleRepo();
   mockCatalogRepo = new MockCatalogRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
   mockErpService = new MockErpService();
   mockLogger = new MockLogger();
   mockPublisherRepo = new MockPublisherRepo();
   vatService = new VATService();
+
+  mockInvoiceRepo = new MockInvoiceRepo(null, null, mockErpReferenceRepo);
 
   setupVatService();
 
@@ -85,6 +90,7 @@ Before(function () {
     mockAddressRepo,
     mockManuscriptRepo,
     mockCatalogRepo,
+    mockErpReferenceRepo,
     mockErpService,
     mockPublisherRepo,
     mockLogger,
@@ -130,6 +136,14 @@ Given(/There is an existing Invoice with the ID "([\w-]+)"/, async function (
     vat: 0,
   });
 
+  const erpReference = ErpReferenceMap.toDomain({
+    entity_id: invoiceId,
+    entity_type: 'invoice',
+    vendor: 'testVendor',
+    attribute: 'erp',
+    value: 'FOO',
+  });
+
   invoice.addItems([invoiceItem]);
 
   await mockInvoiceRepo.save(invoice);
@@ -137,6 +151,7 @@ Given(/There is an existing Invoice with the ID "([\w-]+)"/, async function (
   await mockManuscriptRepo.save(manuscript);
   mockPublisherRepo.addMockItem(publisher);
   mockCatalogRepo.addMockItem(catalog);
+  mockErpReferenceRepo.addMockItem(erpReference);
 
   transaction.addInvoice(invoice);
 });
@@ -198,7 +213,7 @@ Given(
 
     mockWaiverRepo.addMockWaiverForInvoiceItem(
       WaiverMap.toDomain({
-        waiverType: 'EDITOR_DISCOUT',
+        waiverType: 'EDITOR_DISCOUNT',
         reduction: 50,
         isActive: true,
       }),
@@ -247,10 +262,16 @@ Then(/The Invoice with the ID "([\w-]+)" is registered to erp/, async function (
   const erpData = mockErpService.getInvoice(invoiceId);
   expect(!!erpData).to.be.true;
 
-  const invoice = await mockInvoiceRepo.getInvoiceById(
+  const testInvoice = await mockInvoiceRepo.getInvoiceById(
     InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
   );
-  expect(invoice.erpReference).to.equal(mockErpService.erpRef);
+
+  expect(
+    testInvoice
+      .getErpReferences()
+      .getItems()
+      .find((ef) => ef.attribute === 'erp').value
+  ).to.equal('FOO');
 });
 
 Then(
