@@ -15,6 +15,7 @@
             "main": "apps/invoicing-graphql/src/main.ts",
             "tsConfig": "apps/invoicing-graphql/tsconfig.app.json",
             "assets": [
+              "apps/invoicing-graphql/src/cron_flags.yaml",
               "apps/invoicing-graphql/src/Dockerfile",
               {
                 "glob": "**/*",

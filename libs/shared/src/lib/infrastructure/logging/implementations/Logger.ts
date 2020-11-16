@@ -6,6 +6,14 @@ import * as path from 'path';
 
 import { LoggerContract } from '@hindawi/shared';
 
+const logLevelIcons: any = {
+  DEBUG: '\u{1F6E1}',
+  INFO: '\u{2139}',
+  WARNING: '\u{26A0}',
+  ERROR: '\u{2757}',
+  CRITICAL: '\u{203C}',
+};
+
 /**
  * core.Log
  * ------------------------------------------------
@@ -69,12 +77,16 @@ export class Logger implements LoggerContract {
   }
 
   private log(level: string, message: string, args: any[]): void {
+    const formatter = this.formatScope(level, message);
+
     if (this.protocol) {
-      this.protocol[level](`${this.formatScope()} ${message}`, ...args);
+      this.protocol.info(formatter, ...args);
     }
   }
 
-  private formatScope(): string {
-    return `[${this.scope}]`;
+  private formatScope(levelName: string, msg: string): string {
+    return `${
+      logLevelIcons[levelName.toUpperCase()]
+    } [${levelName}]: \x1b[37m${msg}`;
   }
 }

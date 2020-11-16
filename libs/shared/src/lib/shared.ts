@@ -253,6 +253,8 @@ export * from './modules/users/domain/User';
 export * from './modules/users/domain/UserId';
 export * from './modules/users/mappers/UserMap';
 
+export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
+
 // ? Should we export this
 // * Infra
 export type { SchedulerContract } from './infrastructure/scheduler/Scheduler';

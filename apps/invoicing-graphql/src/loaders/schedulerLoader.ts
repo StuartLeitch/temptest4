@@ -11,10 +11,11 @@ import {
 } from 'set-interval-async/dynamic';
 
 import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
-import { RetryRevenueRecognitionNetsuiteErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryRevenueRecognizedNetsuiteErpInvoices/retryRevenueRecognitionNetsuiteErpInvoices';
 import { RetryRevenueRecognitionSageErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
-import { RetryFailedNetsuiteErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
 import { RetryFailedSageErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
+
+import { RegisterInvoicesCron } from './../cron/registerInvoicesCron';
+import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecognitionsCron';
 
 import { env } from '../env';
 import { Logger } from '../lib/logger';
@@ -58,21 +59,6 @@ export const schedulerLoader: MicroframeworkLoader = async (
       manuscript,
       catalog,
       erp?.sage || null,
-      publisher,
-      loggerService,
-      vatService
-    );
-
-    const retryFailedNetsuiteErpInvoicesUsecase = new RetryFailedNetsuiteErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      erp?.netsuite || null,
       publisher,
       loggerService,
       vatService
@@ -137,36 +123,14 @@ export const schedulerLoader: MicroframeworkLoader = async (
     ];
 
     const netSuiteJobQueue = [
-      async function retryFailedNetsuiteErpInvoicesJob() {
-        try {
-          const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute();
-          const response = maybeResponse.value;
-          if (maybeResponse.isLeft()) {
-            // logger.error(response);
-            throw response;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
-
-      async function retryRevenueRecognizedInvoicesToNetsuiteErpJob() {
-        try {
-          const response = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
-          if (response.isLeft()) {
-            logger.error(response.value.errorValue().message);
-            throw response.value.error;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
+      RegisterInvoicesCron,
+      RegisterRevenueRecognitionsCron,
     ];
 
     // start scheduler
     const jobsQueue = [].concat(
-      env.netSuite.netSuiteEnabled ? netSuiteJobQueue : [],
-      env.salesForce.sageEnabled ? sageJobQueue : []
+      env.netSuite.netSuiteEnabled ? netSuiteJobQueue : []
+      // env.salesForce.sageEnabled ? sageJobQueue : []
     );
 
     async function processJobsQueue() {
@@ -181,7 +145,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
         const head = queue[0];
         logger.debug('startProcessing', { job: head.name });
         try {
-          await head();
+          await head.schedule(context);
         } catch (err) {
           logger.error('Job Error: ', err);
         }
