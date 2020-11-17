@@ -73,7 +73,7 @@ export class CreateCreditNoteUsecase
     let invoice: Invoice;
     let items: InvoiceItem[];
 
-    console.info(request);
+    // console.info(request);
 
     // * build the InvoiceId
     const invoiceId = InvoiceId.create(
@@ -155,7 +155,7 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.nsRevRecReference = null;
       clonedRawInvoice.creationReason = request.reason;
 
-      console.info(clonedRawInvoice);
+      // console.info(clonedRawInvoice);
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {

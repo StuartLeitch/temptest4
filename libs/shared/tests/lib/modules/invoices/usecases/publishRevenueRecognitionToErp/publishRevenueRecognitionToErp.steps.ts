@@ -153,6 +153,7 @@ Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
   await mockManuscriptRepo.save(manuscript);
   mockPublisherRepo.addMockItem(publisher);
   mockCatalogRepo.addMockItem(catalog);
+  mockErpReferenceRepo.addMockItem(erpReference);
 
   transaction.addInvoice(invoice);
 });
@@ -169,8 +170,8 @@ Given(
       invoiceId: invoice.invoiceId.id.toValue(),
       type: payerType,
     });
-    await mockPayerRepo.addMockItem(payer);
-    await mockAddressRepo.addMockItem(address);
+    mockPayerRepo.addMockItem(payer);
+    mockAddressRepo.addMockItem(address);
   }
 );
 
@@ -269,9 +270,9 @@ Then(
     );
     const erpReferences = testInvoice.getErpReferences().getItems();
 
-    expect(
-      erpReferences.find((ef) => ef.entityType === 'revenueRecognition').value
-    ).to.equal(mockSalesforceService.revenueRef);
+    expect(erpReferences.find((ef) => ef.attribute === 'erp').value).to.equal(
+      'FOO'
+    );
   }
 );
 

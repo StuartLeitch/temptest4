@@ -131,7 +131,7 @@ export class MockInvoiceRepo
   public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
     let invoice = await this.getInvoiceById(invoiceId);
     if (invoice.invoiceNumber) {
-      console.log('Invoice number already set');
+      console.warn('Invoice number already set');
       return invoice;
     }
     invoice.invoiceNumber = String(this._items.length);
@@ -209,6 +209,30 @@ export class MockInvoiceRepo
   }
 
   async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
+    const excludedCreditNotes = this.excludeCreditNotesForRevenueRecognition();
+
+    const [
+      filterArticlesByNotNullDatePublished,
+    ] = await this.articleRepo.filterBy({
+      whereNotNull: 'articles.datePublished',
+    });
+
+    // * search invoices through invoice items
+    const invoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+      filterArticlesByNotNullDatePublished.manuscriptId
+    );
+
+    const invoiceQueries = invoiceItems.reduce((aggr, ii) => {
+      aggr.push(this.getInvoiceById(ii.invoiceId));
+      return aggr;
+    }, []);
+
+    const invoicesWithPublishedManuscripts = await Promise.all(invoiceQueries);
+
+    return excludedCreditNotes(invoicesWithPublishedManuscripts);
+  }
+
+  async getUnrecognizedNetsuiteErpInvoicesDeprecated(): Promise<InvoiceId[]> {
     const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRevenueRecognition();
 
     const [filterArticlesByNotNullDatePublished] = this.articleRepo.filterBy({
@@ -251,6 +275,48 @@ export class MockInvoiceRepo
             ['erpReference', '<>', 'MigrationRef'],
             ['erpReference', '<>', 'migrationRef'],
           ],
+        },
+        items
+      );
+  }
+
+  public filterReadyForRevenueRecognitionThroughErpReferences() {
+    return (items) =>
+      this.filterBy(
+        {
+          // whereIn: [['status', ['ACTIVE', 'FINAL']]],
+          whereNull: [
+            // ['cancelledInvoiceReference'],
+            ['revenueRecognitionReference'],
+          ],
+          whereNotNull: ['erpReference'],
+          where: [
+            ['type', '=', 'invoice'],
+            ['attribute', '=', 'erp'],
+            // ['value', '<>', 'NON_INVOICEABLE'],
+            ['value', '<>', 'MigrationRef'],
+            ['value', '<>', 'migrationRef'],
+          ],
+        },
+        items
+      );
+  }
+
+  public excludeCreditNotesForRevenueRecognition() {
+    return (items) =>
+      this.filterBy(
+        {
+          whereIn: [['status', ['ACTIVE', 'FINAL']]],
+          whereNull: [
+            ['cancelledInvoiceReference'],
+            // ['revenueRecognitionReference'],
+          ],
+          // whereNotNull: ['erpReference'],
+          // where: [
+          //   ['erpReference', '<>', 'NON_INVOICEABLE'],
+          //   ['erpReference', '<>', 'MigrationRef'],
+          //   ['erpReference', '<>', 'migrationRef'],
+          // ],
         },
         items
       );

@@ -18,71 +18,43 @@ import {
   RetryRevenueRecognitionNetsuiteErpInvoicesUsecase,
   CreateCreditNoteUsecase,
   ManuscriptMap,
+  MockErpReferenceRepo,
+  ErpReferenceMap,
 } from '@hindawi/shared';
 
-import {
-  // addBillingAddresses,
-  // addPaymentMethods,
-  addInvoiceItems,
-  addManuscripts,
-  addInvoices,
-  // addPayments,
-  // addCoupons,
-  // addWaivers,
-  // addPayers,
-} from './testUtils';
-
-// let mockPaymentMethodRepo: MockPaymentMethodRepo;
-// let mockSqsPublishService: MockSQSPublishService;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockManuscriptRepo: MockArticleRepo;
-// let mockAddressRepo: MockAddressRepo;
 let mockInvoiceRepo: MockInvoiceRepo;
-// let mockPaymentRepo: MockPaymentRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
-// let mockPayerRepo: MockPayerRepo;
 let mockTransactionRepo: MockTransactionRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let loggerService: LoggerContract;
 
 let revenueRecognitionUseCase: RetryRevenueRecognitionNetsuiteErpInvoicesUsecase;
 let createCreditNoteUsecase: CreateCreditNoteUsecase;
 let context: UsecaseAuthorizationContext;
 
-// let payload;
-// let event;
 let invoiceId: string;
 let manuscript: any;
 
 Before(function () {
-  // mockPaymentMethodRepo = new MockPaymentMethodRepo();
-  mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockManuscriptRepo = new MockArticleRepo();
-  // mockAddressRepo = new MockAddressRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
+  mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockInvoiceRepo = new MockInvoiceRepo(
     mockManuscriptRepo,
-    mockInvoiceItemRepo
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
   );
-  // mockPaymentRepo = new MockPaymentRepo();
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
-  // mockPayerRepo = new MockPayerRepo();
   mockTransactionRepo = new MockTransactionRepo();
 
   context = {
     roles: [Roles.ADMIN],
   };
   loggerService = new MockLogger();
-
-  // addPaymentMethods(mockPaymentMethodRepo);
-  // addBillingAddresses(mockAddressRepo);
-  // addInvoiceItems(mockInvoiceItemRepo);
-  // addManuscripts(mockManuscriptRepo);
-  // addInvoices(mockInvoiceRepo);
-  // addPayments(mockPaymentRepo);
-  // addCoupons(mockCouponRepo);
-  // addWaivers(mockWaiverRepo);
-  // addPayers(mockPayerRepo);
 
   revenueRecognitionUseCase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
     mockInvoiceRepo,
@@ -96,18 +68,11 @@ Before(function () {
     null,
     null,
     null,
-    // mockPaymentMethodRepo,
-    // mockSqsPublishService,
-    // mockManuscriptRepo,
-    // mockAddressRepo,
-    // mockPaymentRepo,
-    // mockPayerRepo,
     loggerService
   );
 
   createCreditNoteUsecase = new CreateCreditNoteUsecase(
     mockInvoiceRepo,
-    // null,
     mockInvoiceItemRepo,
     mockTransactionRepo,
     mockCouponRepo,
@@ -143,12 +108,21 @@ Given(/^There is an Invoice with the ID "([\w-]+)"$/, async function (
     price: 100,
   });
 
+  const erpReference = ErpReferenceMap.toDomain({
+    entity_id: testInvoiceId,
+    entity_type: 'invoice',
+    vendor: 'testVendor',
+    attribute: 'erp',
+    value: 'FOO',
+  });
+
   invoice.addInvoiceItem(invoiceItem);
   transaction.addInvoice(invoice);
   await mockTransactionRepo.save(transaction);
   await mockInvoiceRepo.save(invoice);
   await mockInvoiceItemRepo.save(invoiceItem);
   await mockManuscriptRepo.save(manuscript);
+  await mockErpReferenceRepo.save(erpReference);
 });
 
 When('A credit note is created from it', async function () {
