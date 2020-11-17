@@ -14,7 +14,6 @@ export class LoggerBuilder implements LoggerBuilderContract {
    * used in further assembly.
    */
   constructor(private scope?: string, private options?: LoggerOptions) {
-    console.log('Logger, ', this.options);
     this.reset();
   }
 

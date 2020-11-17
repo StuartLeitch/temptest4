@@ -1,7 +1,7 @@
 import { env } from '../env';
-import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+import { LoggerContract } from 'libs/shared/src/lib/infrastructure/logging';
 
-export function banner(log: Logger): void {
+export function banner(log: LoggerContract): void {
   log.info(`App is ready on ${env.app.port}`);
   log.info(`To shut it down, press <CTRL> + C at any time.`);
   log.info(``);
