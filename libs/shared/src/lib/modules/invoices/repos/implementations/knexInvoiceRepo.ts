@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { Transform } from 'stream';
-import _ from 'lodash';
 
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
@@ -328,7 +327,7 @@ export class KnexInvoiceRepo
     return (query) =>
       query
         .whereNot('invoices.deleted', 1)
-        .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+        .whereIn('invoices.status', ['FINAL'])
         .whereNotNull('invoices.cancelledInvoiceReference');
   }
 
