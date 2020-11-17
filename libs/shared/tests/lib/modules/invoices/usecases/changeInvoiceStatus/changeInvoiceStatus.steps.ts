@@ -6,6 +6,7 @@ import { ChangeInvoiceStatusResponse } from './../../../../../../src/lib/modules
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
@@ -14,6 +15,7 @@ import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEnti
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockArticleRepo: MockArticleRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let response: ChangeInvoiceStatusResponse;
 
 let useCase: ChangeInvoiceStatus;
@@ -21,7 +23,12 @@ let useCase: ChangeInvoiceStatus;
 Before(function () {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockArticleRepo = new MockArticleRepo();
-  mockInvoiceRepo = new MockInvoiceRepo(mockArticleRepo, mockInvoiceItemRepo);
+  mockErpReferenceRepo = new MockErpReferenceRepo();
+  mockInvoiceRepo = new MockInvoiceRepo(
+    mockArticleRepo,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
   useCase = new ChangeInvoiceStatus(mockInvoiceRepo);
 });
 

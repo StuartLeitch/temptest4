@@ -28,6 +28,7 @@ export class MockInvoiceRepo
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     let filterInvoiceById = null;
+    let getErpReferencesByEntityId = null;
 
     filterInvoiceById = this.filterInvoiceById(invoiceId);
 
@@ -36,9 +37,11 @@ export class MockInvoiceRepo
       return null;
     }
 
-    const [getErpReferencesByEntityId] = this.erpReferenceRepo.filterBy({
-      where: [['entity_id', '=', invoiceId.id.toString()]],
-    });
+    if (this.erpReferenceRepo) {
+      [getErpReferencesByEntityId] = this.erpReferenceRepo.filterBy({
+        where: [['entity_id', '=', invoiceId.id.toString()]],
+      });
+    }
 
     return InvoiceMap.toDomain({
       ...InvoiceMap.toPersistence(filterInvoiceById),

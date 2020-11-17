@@ -11,6 +11,7 @@ import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts
 import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
@@ -33,6 +34,8 @@ let mockArticleRepo: MockArticleRepo;
 let mockPayerRepo: MockPayerRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
+
 let mockLogger: MockLogger;
 let mockEmailService: any;
 
@@ -53,8 +56,13 @@ Before(function () {
   };
 
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
   mockArticleRepo = new MockArticleRepo();
-  mockInvoiceRepo = new MockInvoiceRepo(mockArticleRepo, mockInvoiceItemRepo);
+  mockInvoiceRepo = new MockInvoiceRepo(
+    mockArticleRepo,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
   mockAddressRepo = new MockAddressRepo();
   mockPayerRepo = new MockPayerRepo();
   mockEmailService = spy(_emailService);
