@@ -35,14 +35,6 @@ export class NetSuiteService implements ErpServiceContract {
     return 'netsuite';
   }
 
-  get invoiceErpRefFieldName(): string {
-    return 'erp';
-  }
-
-  get invoiceRevenueRecRefFieldName(): string {
-    return 'revenueRecognition';
-  }
-
   public static create(config: Record<string, unknown>): NetSuiteService {
     const connection = new Connection({
       config: new ConnectionConfig(config.connection),
