@@ -6,11 +6,13 @@ import { MockLogger } from './../../../../../../src/lib/infrastructure/logging';
 
 import { MockSqsPublishService } from './../../../../../../src/lib/domain/services/SQSPublishService';
 
+import { WaiverType } from '../../../../../../src/lib/modules/waivers/domain/Waiver';
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
 import { ManuscriptMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ManuscriptMap';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { WaiverMap } from '../../../../../../src/lib/modules/waivers/mappers/WaiverMap';
 
 import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
@@ -19,6 +21,7 @@ import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repo
 import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 
 import { GenerateDraftCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateDraftCompensatoryEvents';
+import { InvoiceId, UniqueEntityID } from '../../../../../../src/lib/shared';
 
 const defaultUsecaseContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
@@ -37,6 +40,9 @@ interface Context {
     logger: MockLogger;
   };
 }
+
+const submissionDate = '2020-10-15T14:25:13';
+const updateDate = '2020-10-17T14:25:13';
 
 let usecase: GenerateDraftCompensatoryEventsUsecase = null;
 let context: Context = null;
@@ -94,8 +100,8 @@ Given(
   /^An invoice with id "([\w\d-]+)" for manuscript "([\w\d]+)" with price "([\d]+)"$/,
   (invoiceId: string, manuscriptId: string, price: string) => {
     const invoice = InvoiceMap.toDomain({
-      dateCreated: '2020-10-15T14:25:13',
       transactionId: 'transaction-1',
+      dateCreated: submissionDate,
       status: 'DRAFT',
       id: invoiceId,
     });
@@ -130,6 +136,45 @@ Then(
     const event = context.services.queueService.findEvent(eventName);
     expect(event).to.be.ok;
     expect(event.data.invoiceId).to.be.equal(invoiceId);
-    console.log(event.data);
+  }
+);
+
+Given(
+  /^A waiver applied at "([\w]+)" on invoiceId "([\w\d-]+)"$/,
+  async (moment: string, id: string) => {
+    let dateOfWaiver = '';
+    if (moment === 'Submission') {
+      dateOfWaiver = submissionDate;
+    } else {
+      dateOfWaiver = updateDate;
+    }
+
+    const waiver = WaiverMap.toDomain({
+      type_id: WaiverType.EDITOR_DISCOUNT,
+      reduction: 50,
+      isActive: true,
+    });
+
+    const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
+    const [invoiceItem] = await context.repos.invoiceItem.getItemsByInvoiceId(
+      invoiceId
+    );
+
+    context.repos.waiver.addMockWaiverForInvoiceItem(
+      waiver,
+      invoiceItem.invoiceItemId,
+      new Date(dateOfWaiver)
+    );
+  }
+);
+
+Then(
+  /^"([\w]+)" event has "([\d]+)" waivers in message and reduction calculated$/,
+  (eventName: string, waiverCount: string) => {
+    const event = context.services.queueService.findEvent(eventName);
+    expect(event).to.be.ok;
+    expect(event.data.invoiceItems[0].waivers.length).to.be.equal(
+      Number.parseInt(waiverCount)
+    );
   }
 );

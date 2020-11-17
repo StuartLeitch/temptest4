@@ -26,7 +26,7 @@ export class MockInvoiceItemRepo
       i.invoiceItemId.equals(invoiceItemId)
     );
     if (matches.length !== 0) {
-      const item = matches[0];
+      const item = cloneDeep(matches[0]);
       item.props.assignedCoupons = CouponAssignedCollection.create();
       item.props.assignedWaivers = WaiverAssignedCollection.create();
       return item;
@@ -38,8 +38,8 @@ export class MockInvoiceItemRepo
   public async getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
   ): Promise<InvoiceItem[]> {
-    const match = this._items.filter((i) =>
-      i.manuscriptId.equals(manuscriptId)
+    const match = cloneDeep(
+      this._items.filter((i) => i.manuscriptId.equals(manuscriptId))
     );
     return match.map((item) => {
       item.props.assignedCoupons = CouponAssignedCollection.create();
@@ -50,9 +50,10 @@ export class MockInvoiceItemRepo
 
   public async getInvoiceItemCollection(): Promise<InvoiceItem[]> {
     return this._items.map((item) => {
-      item.props.assignedCoupons = CouponAssignedCollection.create();
-      item.props.assignedWaivers = WaiverAssignedCollection.create();
-      return item;
+      const it = cloneDeep(item);
+      it.props.assignedCoupons = CouponAssignedCollection.create();
+      it.props.assignedWaivers = WaiverAssignedCollection.create();
+      return it;
     });
   }
 
@@ -127,9 +128,11 @@ export class MockInvoiceItemRepo
   }
 
   async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
-    const matches = this._items.filter((item) => {
-      return item.invoiceId.equals(invoiceId);
-    });
+    const matches = cloneDeep(
+      this._items.filter((item) => {
+        return item.invoiceId.equals(invoiceId);
+      })
+    );
     return matches.map((item) => {
       item.props.assignedCoupons = CouponAssignedCollection.create();
       item.props.assignedWaivers = WaiverAssignedCollection.create();

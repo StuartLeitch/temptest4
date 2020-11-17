@@ -14,6 +14,11 @@ export class MockWaiverRepo
   private invoiceItemToWaiverMapper: {
     [key: string]: UniqueEntityID[];
   } = {};
+  private invoiceItemToWaiverAssignedDate: {
+    [key: string]: {
+      [key: string]: Date;
+    };
+  } = {};
 
   constructor() {
     super();
@@ -49,15 +54,27 @@ export class MockWaiverRepo
 
   public addMockWaiverForInvoiceItem(
     newWaiver: Waiver,
-    invoiceItemId: InvoiceItemId
+    invoiceItemId: InvoiceItemId,
+    dateAssigned: Date = new Date()
   ): void {
     const invoiceIdValue = invoiceItemId.id.toString();
     if (!this.invoiceItemToWaiverMapper[invoiceIdValue]) {
       this.invoiceItemToWaiverMapper[invoiceIdValue] = [];
+      this.invoiceItemToWaiverAssignedDate[invoiceIdValue] = {};
     }
 
     this.invoiceItemToWaiverMapper[invoiceIdValue].push(newWaiver.id);
+    this.invoiceItemToWaiverAssignedDate[invoiceIdValue][
+      newWaiver.id.toString()
+    ] = dateAssigned;
     this.addMockItem(newWaiver);
+    // console.log('--------------------------------------------');
+    // console.log(this.invoiceItemToWaiverAssignedDate);
+    // console.log('--------------------------------------------');
+    // console.log(this.invoiceItemToWaiverMapper);
+    // console.log('--------------------------------------------');
+    // console.log(this._items);
+    // console.log('--------------------------------------------');
   }
 
   public async getWaiversByInvoiceItemId(
@@ -70,10 +87,15 @@ export class MockWaiverRepo
       return WaiverAssignedCollection.create();
     }
     const waivers = this._items.filter((item) => waiverIds.includes(item.id));
+    // console.log('-----------------2------------------');
+    // console.log(waivers);
+    // console.log('-----------------2------------------');
     return WaiverAssignedCollection.create(
       waivers.map((i) =>
         WaiverAssigned.create({
-          dateAssigned: null,
+          dateAssigned: this.invoiceItemToWaiverAssignedDate[
+            invoiceItemId.id.toString()
+          ][i.id.toString()],
           invoiceItemId,
           waiver: i,
         })

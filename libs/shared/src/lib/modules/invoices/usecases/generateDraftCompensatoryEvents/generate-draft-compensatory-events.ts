@@ -197,9 +197,9 @@ export class GenerateDraftCompensatoryEventsUsecase
     const dateCreated = roundToHour(invoice.dateCreated);
 
     const newItems = invoiceItems.map((item) => {
-      const initialWaivers = item.assignedWaivers.filter(
-        (w) => roundToHour(w.dateAssigned) === dateCreated
-      );
+      const initialWaivers = item.assignedWaivers.filter((w) => {
+        return roundToHour(w.dateAssigned).getTime() === dateCreated.getTime();
+      });
       item.props.assignedWaivers = WaiverAssignedCollection.create(
         initialWaivers
       );
