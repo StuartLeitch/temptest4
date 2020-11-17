@@ -65,6 +65,7 @@ export class GetItemsForInvoiceUsecase
           item.addAssignedWaivers(waivers);
         }
       } catch (err) {
+        console.log(err);
         return left(
           new GetItemsForInvoiceErrors.InvoiceNotFoundError(
             invoiceId.id.toString()

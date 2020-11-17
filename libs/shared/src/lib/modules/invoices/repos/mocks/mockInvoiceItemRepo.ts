@@ -130,11 +130,9 @@ export class MockInvoiceItemRepo
   async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
     const matches = cloneDeep(
       this._items.filter((item) => {
-        // console.log(item);
         return item.invoiceId.equals(invoiceId);
       })
     );
-    // console.log(matches);
     return matches.map((item) => {
       item.props.assignedCoupons = CouponAssignedCollection.create();
       item.props.assignedWaivers = WaiverAssignedCollection.create();

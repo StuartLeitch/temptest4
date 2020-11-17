@@ -91,7 +91,10 @@ Before(() => {
   context.repos.transaction = new MockTransactionRepo();
   context.repos.manuscript = new MockArticleRepo();
   context.repos.catalog = new MockCatalogRepo();
-  context.repos.invoice = new MockInvoiceRepo();
+  context.repos.invoice = new MockInvoiceRepo(
+    context.repos.manuscript,
+    context.repos.invoiceItem
+  );
   context.repos.coupon = new MockCouponRepo();
   context.repos.editor = new MockEditorRepo();
   context.repos.waiver = new MockWaiverRepo();

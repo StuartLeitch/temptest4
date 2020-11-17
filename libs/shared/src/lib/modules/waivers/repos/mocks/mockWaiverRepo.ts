@@ -68,13 +68,6 @@ export class MockWaiverRepo
       newWaiver.id.toString()
     ] = dateAssigned;
     this.addMockItem(newWaiver);
-    // console.log('--------------------------------------------');
-    // console.log(this.invoiceItemToWaiverAssignedDate);
-    // console.log('--------------------------------------------');
-    // console.log(this.invoiceItemToWaiverMapper);
-    // console.log('--------------------------------------------');
-    // console.log(this._items);
-    // console.log('--------------------------------------------');
   }
 
   public async getWaiversByInvoiceItemId(
@@ -87,19 +80,22 @@ export class MockWaiverRepo
       return WaiverAssignedCollection.create();
     }
     const waivers = this._items.filter((item) => waiverIds.includes(item.id));
-    // console.log('-----------------2------------------');
-    // console.log(waivers);
-    // console.log('-----------------2------------------');
+
     return WaiverAssignedCollection.create(
-      waivers.map((i) =>
-        WaiverAssigned.create({
-          dateAssigned: this.invoiceItemToWaiverAssignedDate[
-            invoiceItemId.id.toString()
-          ][i.id.toString()],
+      waivers.map((i) => {
+        let dateAssigned: Date = null;
+        const datesForItemWaiver = this.invoiceItemToWaiverAssignedDate[
+          invoiceItemId.id.toString()
+        ];
+        if (datesForItemWaiver) {
+          dateAssigned = datesForItemWaiver[i.id.toString()];
+        }
+        return WaiverAssigned.create({
           invoiceItemId,
+          dateAssigned,
           waiver: i,
-        })
-      )
+        });
+      })
     );
   }
 
