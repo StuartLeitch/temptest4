@@ -26,8 +26,6 @@ import { WaiverRepoContract } from '../../waivers/repos';
 import { PublishCreditNoteToErpUsecase } from '../usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
 import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
-import { GetInvoicesByInvoiceNumberUsecase } from '../usecases/getInvoiceByInvoiceNumber/getInvoicesByInvoiceNumber';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
@@ -65,15 +63,6 @@ export class AfterInvoiceCreditNoteCreatedEvent
   private async onInvoiceCreditNoteCreatedEvent(
     event: InvoiceCreditNoteCreatedEvent
   ): Promise<any> {
-    const getInvoiceIdByManuscript = new GetInvoiceIdByManuscriptCustomIdUsecase(
-      this.manuscriptRepo,
-      this.invoiceItemRepo
-    );
-
-    const getInvoicesByInvoiceNumber = new GetInvoicesByInvoiceNumberUsecase(
-      this.invoiceRepo
-    );
-
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const creditNote = await this.invoiceRepo.getInvoiceById(
@@ -175,52 +164,25 @@ export class AfterInvoiceCreditNoteCreatedEvent
       this.loggerService.info('[PublishCreditNoteToERP]:', publishToErpResult);
 
       //Get Invoice ID
-      const customId = manuscript.customId;
-      const maybeInvoiceId = await getInvoiceIdByManuscript.execute(
+      const invoiceId = creditNote.cancelledInvoiceReference;
+
+      //Get Invoice
+
+      const maybeInvoice = await getInvoiceDetails.execute(
         {
-          customId,
+          invoiceId,
         },
         defaultContext
       );
 
-      if (maybeInvoiceId.isLeft()) {
-        throw new Error(
-          `Couldn't find Invoice ID for manuscript with custom id: ${manuscript.customId}`
-        );
-      }
-      const invoiceId = maybeInvoiceId.value.getValue()[0];
-
-      //Get Invoice Values
-
-      const maybeInvoiceValues = await getInvoiceDetails.execute(
-        {
-          invoiceId: invoiceId.id.toString(),
-        },
-        defaultContext
-      );
-
-      if (maybeInvoiceValues.isLeft()) {
+      if (maybeInvoice.isLeft()) {
         throw new Error(`Couldn't find Invoice Values for ID: ${invoiceId}`);
       }
-      const invoiceValues = maybeInvoiceValues.value.getValue();
-      const invoiceNumber = invoiceValues.invoiceNumber;
-      console.log(invoiceNumber);
-      //Get Invoice
-      const maybeInvoices = await getInvoicesByInvoiceNumber.execute({
-        invoiceNumber,
-      });
-
-      if (maybeInvoices.isLeft()) {
-        throw new Error(
-          `Couldn't find a valid invoice for Invoice with number: ${invoiceNumber}`
-        );
-      }
-
-      const invoice = maybeInvoices.value[0];
+      const invoice = maybeInvoice.value.getValue();
 
       if (manuscript.datePublished && invoice.nsRevRecReference) {
         const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
-          { invoiceId: invoiceId.id.toString() },
+          { invoiceId },
           defaultContext
         );
 

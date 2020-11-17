@@ -43,16 +43,7 @@ export class MockInvoiceRepo
   public async getInvoicesByCustomId(): Promise<any[]> {
     return [];
   }
-  public async getInvoicesByInvoiceNumber(
-    invoiceNumber: string
-  ): Promise<Invoice[]> {
-    const matches = this._items.filter((i) => i.invoiceNumber == invoiceNumber);
-    if (matches.length !== 0) {
-      return [];
-    } else {
-      return null;
-    }
-  }
+
   public async getInvoiceByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Invoice> {

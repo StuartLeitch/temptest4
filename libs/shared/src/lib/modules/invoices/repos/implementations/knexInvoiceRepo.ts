@@ -72,25 +72,6 @@ export class KnexInvoiceRepo
       );
   }
 
-  public async getInvoicesByInvoiceNumber(
-    invoiceNumber: string
-  ): Promise<Invoice[]> {
-    const { db } = this;
-
-    const result = await db(TABLES.INVOICES)
-      .select(
-        'invoices.id AS invoiceId',
-        'invoices.nsRevRecReference AS nsRevRecReference'
-      )
-      .where('invoiceNumber', invoiceNumber)
-      .whereNull('cancelledInvoiceReference');
-
-    if (result.length === 0) {
-      throw RepoError.createEntityNotFoundError('invoice', invoiceNumber);
-    }
-
-    return result;
-  }
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     const { db, logger } = this;
 

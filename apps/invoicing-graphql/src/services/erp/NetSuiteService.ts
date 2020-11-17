@@ -167,7 +167,7 @@ export class NetSuiteService implements ErpServiceContract {
         customSegmentId,
       }
     );
-    console.log('-------- in register', revenueRecognitionReversal);
+
     return {
       journal: { id: String(revenueRecognitionReversal) },
       journalItem: null,
