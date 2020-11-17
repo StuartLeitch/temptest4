@@ -21,17 +21,7 @@ export class RegisterCreditNotesCron {
     }
 
     const {
-      repos: {
-        invoiceItem,
-        manuscript,
-        publisher,
-        address,
-        catalog,
-        invoice,
-        coupon,
-        waiver,
-        payer,
-      },
+      repos: { invoiceItem, invoice, coupon, waiver },
       services: { erp, logger: loggerService },
     } = context;
 

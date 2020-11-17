@@ -31,7 +31,7 @@ import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoic
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 export type RetryFailedSageErpInvoicesResponse = Either<
-  UnexpectedError | ErpInvoiceResponse,
+  UnexpectedError,
   ErpInvoiceResponse[]
 >;
 

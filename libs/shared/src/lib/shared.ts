@@ -256,6 +256,8 @@ export * from './modules/users/mappers/UserMap';
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
 export * from './modules/payments/usecases/retryPaymentsRegistration/retryPaymentRegistration';
 export * from './modules/invoices/usecases/ERP/retryCreditNotes/retryCreditNotes';
+export * from './modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
+export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
 
 // ? Should we export this
 // * Infra

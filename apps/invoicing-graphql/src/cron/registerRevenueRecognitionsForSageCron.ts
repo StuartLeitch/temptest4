@@ -1,15 +1,16 @@
-import { RetryRevenueRecognitionNetsuiteErpInvoicesUsecase } from '@hindawi/shared';
+// import { env } from '../env';
+import { RetryRevenueRecognitionSageErpInvoicesUsecase } from '@hindawi/shared';
 
 import { Logger } from '../lib/logger';
 import { Context } from '../builders';
 
 const logger = new Logger();
-logger.setScope('cron:registerRevenueRecognition');
+logger.setScope('cron:registerRevenueRecognitionForSage');
 
 import { FeatureFlags } from '../lib/FeatureFlags';
 import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
-export class RegisterRevenueRecognitionsCron {
+export class RegisterRevenueRecognitionsForSageCron {
   public static async schedule(context: Context): Promise<any> {
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
@@ -17,8 +18,8 @@ export class RegisterRevenueRecognitionsCron {
     if (
       !FeatureFlags.isFeatureEnabled('erpRegisterRevenueRecognitionEnabled')
     ) {
-      return logger.debug(
-        'Skipping the CRON Job revenue recognitions registration scheduling...'
+      return logger.warn(
+        'Skipping the CRON Job revenue recognitions registration for Sage scheduling...'
       );
     }
 
@@ -37,7 +38,7 @@ export class RegisterRevenueRecognitionsCron {
       services: { erp, logger: loggerService },
     } = context;
 
-    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
+    const retryRevenueRecognitionSageErpInvoicesUsecase = new RetryRevenueRecognitionSageErpInvoicesUsecase(
       invoice,
       invoiceItem,
       coupon,
@@ -47,11 +48,11 @@ export class RegisterRevenueRecognitionsCron {
       manuscript,
       catalog,
       publisher,
-      erp?.netsuite || null,
+      erp?.sage || null,
       loggerService
     );
 
-    const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
+    const maybeResponse = await retryRevenueRecognitionSageErpInvoicesUsecase.execute();
     if (maybeResponse.isLeft()) {
       logger.error(maybeResponse.value.errorValue().message);
       throw maybeResponse.value;
