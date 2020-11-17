@@ -1,17 +1,17 @@
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { banner } from './lib/banner';
-import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+import { LoggerBuilder } from 'libs/shared/src/lib/infrastructure/logging/LoggerBuilder';
 /**
  * Loaders
  */
 import { contextLoader } from './loaders/contextLoader';
 import { handlerLoader } from './loaders/handlerLoader';
 import { expressLoader } from './loaders/expressLoader';
-import { winstonLoader } from './loaders/winstonLoader';
 import { knexLoader } from './loaders/knexLoader';
 import { queueServiceLoader } from './loaders/queueServiceLoader';
 import { cronLoader } from './loaders/cronLoader';
+import { env } from './env';
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
  * ----------------------------------------
@@ -20,7 +20,10 @@ import { cronLoader } from './loaders/cronLoader';
  * The basic layer of this app is express. For further information visit
  * the 'README.md' file.
  */
-const log = new Logger(__filename);
+const log = new LoggerBuilder('system:loader', {
+  logLevel: env.log.level,
+  isDevelopment: env.isDevelopment,
+}).getLogger();
 
 bootstrapMicroframework({
   /**
@@ -28,7 +31,6 @@ bootstrapMicroframework({
    * bootstrap process. All loaders are executed one by one in a sequential order.
    */
   loaders: [
-    winstonLoader,
     knexLoader,
     contextLoader,
     handlerLoader,

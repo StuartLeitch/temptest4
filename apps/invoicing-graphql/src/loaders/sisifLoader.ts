@@ -10,9 +10,7 @@ import { SisifHandlers } from '../sisif';
 import { Context } from '../builders';
 import { env } from '../env';
 
-const loggerBuilder = new LoggerBuilder();
-const sisifLogger = loggerBuilder.getLogger();
-sisifLogger.setScope('sisif:loader');
+let sisifLogger: LoggerContract;
 
 function jobHandlerDispatcher(context: Context, loggerService: LoggerContract) {
   return (job: Job) => {
@@ -36,6 +34,8 @@ export const sisifLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
+    const loggerBuilder = context.loggerBuilder;
+
     const { sisifEnabled } = env.loaders;
     const {
       services: { schedulingService, logger: loggerService },
