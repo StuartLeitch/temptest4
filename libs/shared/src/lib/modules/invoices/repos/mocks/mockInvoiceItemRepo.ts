@@ -87,7 +87,7 @@ export class MockInvoiceItemRepo
     const alreadyExists = await this.exists(item);
 
     if (alreadyExists) {
-      this._items.map((i) => {
+      this._items = this._items.map((i) => {
         if (this.compareMockItems(i, item)) {
           return item;
         } else {
@@ -130,9 +130,11 @@ export class MockInvoiceItemRepo
   async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
     const matches = cloneDeep(
       this._items.filter((item) => {
+        // console.log(item);
         return item.invoiceId.equals(invoiceId);
       })
     );
+    // console.log(matches);
     return matches.map((item) => {
       item.props.assignedCoupons = CouponAssignedCollection.create();
       item.props.assignedWaivers = WaiverAssignedCollection.create();
