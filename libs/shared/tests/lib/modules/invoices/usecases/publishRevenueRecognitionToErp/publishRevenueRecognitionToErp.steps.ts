@@ -36,6 +36,7 @@ import {
   WaiverMap,
 } from '../../../../../../src/lib/shared';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { ErpReferenceMap } from './../../../../../../src/lib/modules/vendors/mapper/ErpReference';
 
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
@@ -46,7 +47,7 @@ let mockWaiverRepo: MockWaiverRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockCatalogRepo: MockCatalogRepo;
 let mockSalesforceService: MockErpService;
-let mockNetsuiteService: MockErpService;
+// let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
 let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
@@ -61,8 +62,6 @@ const context: UsecaseAuthorizationContext = {
 
 Before(function () {
   invoice = null;
-
-  mockInvoiceRepo = new MockInvoiceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockAddressRepo = new MockAddressRepo();
   mockPayerRepo = new MockPayerRepo();
@@ -72,9 +71,14 @@ Before(function () {
   mockCatalogRepo = new MockCatalogRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockSalesforceService = new MockErpService();
-  mockNetsuiteService = new MockErpService();
+  // mockNetsuiteService = new MockErpService();
   mockPublisherRepo = new MockPublisherRepo();
   mockLogger = new MockLogger();
+  mockInvoiceRepo = new MockInvoiceRepo(
+    mockManuscriptRepo,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
 
   setupVatService();
 
@@ -135,6 +139,14 @@ Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
   });
 
   invoice.addItems([invoiceItem]);
+
+  const erpReference = ErpReferenceMap.toDomain({
+    entity_id: invoiceId,
+    entity_type: 'invoice',
+    vendor: 'testVendor',
+    attribute: 'erp',
+    value: 'FOO',
+  });
 
   await mockInvoiceRepo.save(invoice);
   await mockInvoiceItemRepo.save(invoiceItem);
@@ -256,8 +268,9 @@ Then(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
     const erpReferences = testInvoice.getErpReferences().getItems();
+
     expect(
-      erpReferences.find((ef) => ef.attribute === 'revenueRecognition')
+      erpReferences.find((ef) => ef.entityType === 'revenueRecognition').value
     ).to.equal(mockSalesforceService.revenueRef);
   }
 );
@@ -269,9 +282,12 @@ Then(
     const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.false;
 
-    const invoice = await mockInvoiceRepo.getInvoiceById(
+    const testInvoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
-    expect(invoice.getErpReferences()).to.equal('NON_INVOICEABLE');
+    const erpReferences = testInvoice.getErpReferences().getItems();
+
+    // expect(erpReferences).to.equal('NON_INVOICEABLE');
+    expect(erpReferences.length).to.equal(0);
   }
 );

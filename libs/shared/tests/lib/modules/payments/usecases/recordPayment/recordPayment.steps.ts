@@ -148,7 +148,7 @@ Then(/^The payments are of type "Bank Transfer"$/, async () => {
   const paymentMethod = await context.repos.paymentMethod.getPaymentMethodByName(
     'Bank Transfer'
   );
-  for (let payment of payments) {
+  for (const payment of payments) {
     expect(payment.paymentMethodId.toString()).to.equal(
       paymentMethod.id.toString()
     );
