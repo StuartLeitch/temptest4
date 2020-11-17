@@ -183,7 +183,6 @@ export class PublishRevenueRecognitionReversalUsecase
         }
       );
 
-      console.log('--------- in usecase', erpResponse);
       this.loggerService.info(
         'ERP field',
         this.erpService.invoiceRevenueRecRefFieldName

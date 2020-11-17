@@ -651,7 +651,7 @@ export class NetSuiteService implements ErpServiceContract {
         id: customSegmentId,
       };
     }
-    console.log('------- in create');
+
     try {
       const res = await axios({
         ...journalRequestOpts,
