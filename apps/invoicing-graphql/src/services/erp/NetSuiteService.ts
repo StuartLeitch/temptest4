@@ -15,6 +15,7 @@ import {
   InvoiceItem,
   LoggerBuilder,
   LoggerContract,
+  LoggerBuilderContract,
 } from '@hindawi/shared';
 
 import {
@@ -44,11 +45,13 @@ export class NetSuiteService implements ErpServiceContract {
     return 'nsRevRecReference';
   }
 
-  public static create(config: Record<string, unknown>): NetSuiteService {
+  public static create(
+    config: Record<string, unknown>,
+    loggerBuilder: LoggerBuilderContract
+  ): NetSuiteService {
     const connection = new Connection({
       config: new ConnectionConfig(config.connection),
     });
-    const loggerBuilder = new LoggerBuilder();
 
     let logger = loggerBuilder.getLogger();
     logger.setScope('NetSuiteService');

@@ -12,24 +12,27 @@ import { NetSuiteService } from '../services/erp/NetSuiteService';
 import { SageService } from '../services/erp';
 
 import { env } from '../env';
+import { Context } from '../builders';
 
 export const erpLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
-  const loggerBuilder = new LoggerBuilder();
-  const logger = loggerBuilder.getLogger();
-  logger.setScope('ERP');
+  const context: Context = settings.getData('context');
+  const loggerBuilder = context.loggerBuilder;
 
-  const netSuiteService = NetSuiteService.create({
-    connection: {
-      account: env.netSuite.account,
-      endpoint: env.netSuite.endpoint,
-      consumerKey: env.netSuite.consumerKey,
-      consumerSecret: env.netSuite.consumerSecret,
-      tokenId: env.netSuite.tokenId,
-      tokenSecret: env.netSuite.tokenSecret,
+  const netSuiteService = NetSuiteService.create(
+    {
+      connection: {
+        account: env.netSuite.account,
+        endpoint: env.netSuite.endpoint,
+        consumerKey: env.netSuite.consumerKey,
+        consumerSecret: env.netSuite.consumerSecret,
+        tokenId: env.netSuite.tokenId,
+        tokenSecret: env.netSuite.tokenSecret,
+      },
     },
-  });
+    loggerBuilder
+  );
   const sageService = new SageService(
     loggerBuilder.getLogger(),
     env.salesForce

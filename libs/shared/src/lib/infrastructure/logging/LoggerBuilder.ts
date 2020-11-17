@@ -1,5 +1,5 @@
 import { Logger } from './implementations/Logger';
-import { LoggerBuilderContract, LoggerContract } from './Logger';
+import { LoggerBuilderContract, LoggerContract, LoggerOptions } from './Logger';
 
 /**
  * The Concrete Builder classes follow the Builder interface and provide
@@ -13,12 +13,13 @@ export class LoggerBuilder implements LoggerBuilderContract {
    * A fresh builder instance should contain a blank product object, which is
    * used in further assembly.
    */
-  constructor() {
+  constructor(private scope?: string, private options?: LoggerOptions) {
+    console.log('Logger, ', this.options);
     this.reset();
   }
 
   public reset(): void {
-    this.logger = new Logger();
+    this.logger = new Logger(this.scope, this.options);
   }
 
   public setScope(scope: string): void {

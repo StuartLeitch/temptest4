@@ -6,6 +6,7 @@ import { Logger } from './lib/logger';
 // import './lib/logger/LoggerAspect';
 
 import { env } from './env';
+import { LoggerBuilder } from '@hindawi/shared';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -15,7 +16,10 @@ import { env } from './env';
  * The basic layer of this app is express. For further information visit
  * the 'README.md' file.
  */
-const log = new Logger();
+const log = new LoggerBuilder('loader', {
+  logLevel: env.log.level,
+  isDevelopment: env.isDevelopment,
+}).getLogger();
 
 async function main() {
   /**

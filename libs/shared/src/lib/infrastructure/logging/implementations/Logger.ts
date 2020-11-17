@@ -5,6 +5,7 @@ import * as path from 'path';
 import winston from 'winston';
 
 import { LoggerContract } from '@hindawi/shared';
+import { LoggerOptions } from '../Logger';
 
 /**
  * core.Log
@@ -42,20 +43,43 @@ export class Logger implements LoggerContract {
     this.protocol = protocol;
   }
 
-  constructor(scope?: string) {
+  constructor(scope?: string, options: LoggerOptions = {}) {
     if (!scope) {
       this.scope = Logger.DEFAULT_SCOPE;
     } else {
       this.setScope(scope);
     }
 
+    let transport: winston.transport;
+    let { logLevel = 'info', isDevelopment = false } = options;
+
+    if (isDevelopment) {
+      transport = new winston.transports.Console({
+        handleExceptions: true,
+        level: logLevel,
+        format: winston.format.combine(
+          winston.format.colorize({ all: true }),
+          winston.format.simple(),
+          winston.format.printf(({ level, message, scope }) => {
+            let printableMessage;
+            if (typeof message === 'object') {
+              printableMessage = JSON.stringify(message, undefined, 2);
+            } else {
+              printableMessage = message;
+            }
+            return `${scope ? `[${scope}] ` : ''}${level}: ${message}`;
+          })
+        ),
+      });
+    } else {
+      transport = new winston.transports.Console({
+        handleExceptions: true,
+        level: logLevel,
+      });
+    }
+
     const logger = winston.createLogger({
-      transports: [
-        new winston.transports.Console({
-          handleExceptions: true,
-          level: process.env.LOG_LEVEL || 'info',
-        }),
-      ],
+      transports: [transport],
     });
     this.protocol = logger;
   }
