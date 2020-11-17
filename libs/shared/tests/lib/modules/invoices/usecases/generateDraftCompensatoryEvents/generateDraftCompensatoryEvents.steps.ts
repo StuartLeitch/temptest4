@@ -5,7 +5,9 @@ import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/au
 import { MockLogger } from './../../../../../../src/lib/infrastructure/logging';
 
 import { MockSqsPublishService } from './../../../../../../src/lib/domain/services/SQSPublishService';
+import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
+import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { WaiverType } from '../../../../../../src/lib/modules/waivers/domain/Waiver';
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
@@ -21,7 +23,6 @@ import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repo
 import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 
 import { GenerateDraftCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateDraftCompensatoryEvents';
-import { InvoiceId, UniqueEntityID } from '../../../../../../src/lib/shared';
 
 const defaultUsecaseContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
@@ -178,3 +179,9 @@ Then(
     );
   }
 );
+
+Given(/^Invoice with id "([\w\d-]+)" is deleted$/, async (id: string) => {
+  const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
+  const invoice = await context.repos.invoice.getInvoiceById(invoiceId);
+  await context.repos.invoice.delete(invoice);
+});
