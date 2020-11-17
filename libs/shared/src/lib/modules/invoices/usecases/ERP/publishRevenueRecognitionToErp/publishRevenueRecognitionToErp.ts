@@ -223,10 +223,7 @@ export class PublishRevenueRecognitionToErpUsecase
         invoiceTotal: netCharges,
       });
 
-      this.loggerService.info(
-        'ERP field',
-        this.erpService.invoiceRevenueRecRefFieldName
-      );
+      this.loggerService.info('ERP field', 'Revenue Recognition');
       this.loggerService.debug('ERP response', erpResponse);
 
       await this.invoiceRepo.update(invoice);
@@ -239,9 +236,9 @@ export class PublishRevenueRecognitionToErpUsecase
         );
         const erpReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
-          type: 'revenueRecognition',
-          vendor: this.erpService.vendorFieldName,
-          attribute: this.erpService.invoiceErpRefFieldName,
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute: 'revenueRecognition',
           value: String(erpResponse?.journal?.id),
         });
         await this.erpReferenceRepo.save(erpReference);

@@ -31,7 +31,7 @@ type CustomerPayload = Record<string, string | boolean>;
 export class NetSuiteService implements ErpServiceContract {
   private constructor(private connection: Connection) {}
 
-  get vendorFieldName(): string {
+  get vendorName(): string {
     return 'netsuite';
   }
 

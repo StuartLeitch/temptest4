@@ -254,15 +254,6 @@ export class PublishInvoiceToErpUsecase
           `PublishInvoiceToERP ${this.erpService.constructor.name} response`,
           erpResponse
         );
-        this.loggerService.info(
-          `Updating invoice ${invoice.id.toString()}: ${
-            this.erpService.invoiceErpRefFieldName
-          } -> ${JSON.stringify(erpResponse)}`
-        );
-
-        invoice[this.erpService.invoiceErpRefFieldName] = String(
-          erpResponse.tradeDocumentId
-        );
 
         this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
         await this.invoiceRepo.update(invoice);
@@ -271,11 +262,12 @@ export class PublishInvoiceToErpUsecase
         const erpPaymentReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
-          vendor: this.erpService.vendorFieldName,
-          attribute: this.erpService.invoiceErpRefFieldName,
+          vendor: this.erpService.vendorName,
+          attribute: 'erp',
           value: String(erpResponse.tradeDocumentId),
         });
         await this.erpReferenceRepo.save(erpPaymentReference);
+        this.loggerService.info(`Added ErpReference`, erpPaymentReference);
 
         return right(erpResponse);
       } catch (err) {
