@@ -19,17 +19,15 @@ import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecogn
 import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
 
 import { env } from '../env';
-import { Logger } from '../lib/logger';
 import { Context } from '../builders';
-
-const logger = new Logger();
-logger.setScope('scheduler:loader');
 
 export const schedulerLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
+    const logger = context.loggerBuilder.getLogger();
+    logger.setScope('SchedulingService');
     const {
       repos: {
         invoiceItem,

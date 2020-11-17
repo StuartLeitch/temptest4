@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
-import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+import { LoggerBuilder, LoggerOptions } from '@hindawi/shared';
+
 import { defaultRegistry } from 'libs/shared/src/lib/modules/reporting/EventMappingRegistry';
 import { FilterEventsService } from 'libs/shared/src/lib/modules/reporting/services/FilterEventsService';
 import { SaveEventsUsecase } from 'libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
@@ -48,9 +49,14 @@ export const contextLoader: MicroframeworkLoader = (
       region: config.region,
     });
 
+    const loggerOptions: LoggerOptions = {
+      isDevelopment: env.isDevelopment,
+      logLevel: env.log.level,
+    };
+
     const filterEventsService = new FilterEventsService(
       s3,
-      new Logger('service:FilterEvents')
+      new LoggerBuilder('FilterEventsService', loggerOptions).getLogger()
     );
 
     const services: ReportingServices = { s3, sqs, filterEventsService };
@@ -59,7 +65,7 @@ export const contextLoader: MicroframeworkLoader = (
     const saveSqsEventsUsecase = new SaveSqsEventsUsecase(
       filterEventsService,
       saveEventsUsecase,
-      new Logger('saveSqsEvents:usecase')
+      new LoggerBuilder('SaveSqsEventsUsecase', loggerOptions).getLogger()
     );
 
     const usecases: ReportingUsecases = {
