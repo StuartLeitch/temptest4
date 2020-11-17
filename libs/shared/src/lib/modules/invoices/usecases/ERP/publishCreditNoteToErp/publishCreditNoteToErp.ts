@@ -48,7 +48,7 @@ export class PublishCreditNoteToErpUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
-    private netSuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {}
 
@@ -136,12 +136,10 @@ export class PublishCreditNoteToErpUsecase
           originalInvoice,
         };
 
-        const netSuiteResponse = await this.netSuiteService.registerCreditNote(
-          erpData
-        );
+        const erpResponse = await this.erpService.registerCreditNote(erpData);
         this.loggerService.info(
           `Updating credit note ${creditNote.id.toString()}: creditNoteReference -> ${JSON.stringify(
-            netSuiteResponse
+            erpResponse
           )}`
         );
 
@@ -152,16 +150,16 @@ export class PublishCreditNoteToErpUsecase
 
         const erpReference = ErpReferenceMap.toDomain({
           entity_id: creditNote.invoiceId.id.toString(),
-          type: 'creditNote',
-          vendor: this.netSuiteService.vendorFieldName,
-          attribute: this.netSuiteService.invoiceErpRefFieldName,
-          value: String(netSuiteResponse),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute: 'creditNote',
+          value: String(erpResponse),
         });
 
         await this.invoiceRepo.update(creditNote);
         await this.erpReferenceRepo.save(erpReference);
 
-        return right(netSuiteResponse);
+        return right(erpResponse);
       } catch (err) {
         return left(err);
       }
