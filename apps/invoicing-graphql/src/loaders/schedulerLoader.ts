@@ -16,6 +16,7 @@ import { RegisterInvoicesForSageCron } from './../cron/registerInvoicesForSageCr
 import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecognitionsCron';
 import { RegisterRevenueRecognitionsForSageCron } from './../cron/registerRevenueRecognitionsForSageCron';
 import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
+import { RegisterCreditNotesCron } from './../cron/registerCreditNotesCron';
 
 import { env } from '../env';
 import { Context } from '../builders';
@@ -41,6 +42,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
     const netSuiteJobQueue = [
       RegisterInvoicesCron,
       RegisterRevenueRecognitionsCron,
+      RegisterCreditNotesCron,
       RegisterPaymentsCron,
     ];
 

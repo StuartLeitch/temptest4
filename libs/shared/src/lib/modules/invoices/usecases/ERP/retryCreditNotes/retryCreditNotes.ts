@@ -43,7 +43,7 @@ export class RetryCreditNotesUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private netsuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
     this.publishCreditNoteToErpUsecase = new PublishCreditNoteToErpUsecase(
@@ -51,7 +51,7 @@ export class RetryCreditNotesUsecase
       this.invoiceItemRepo,
       this.couponRepo,
       this.waiverRepo,
-      this.netsuiteService,
+      this.erpService,
       this.loggerService
     );
   }

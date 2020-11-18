@@ -7,13 +7,11 @@ import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import { PaymentCompleted } from '../domain/events';
 import { InvoiceRepoContract } from '../../invoices/repos/invoiceRepo';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
-import { PublishPaymentToErpUsecase } from '../usecases/publishPaymentToErp/publishPaymentToErp';
 
 export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
-    private logger: LoggerContract,
-    private publishPaymentToErp: PublishPaymentToErpUsecase | NoOpUseCase
+    private logger: LoggerContract
   ) {
     this.setupSubscriptions();
   }
@@ -49,18 +47,6 @@ export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
 
         try {
           await this.invoiceRepo.update(invoice);
-
-          // const publishResult = await this.publishInvoiceConfirmed.execute({
-          //   billingAddress,
-          //   invoiceItems,
-          //   manuscript,
-          //   invoice,
-          //   payer,
-          // });
-
-          // if (publishResult.isLeft()) {
-          //   throw publishResult.value.errorValue();
-          // }
 
           this.logger.info(
             `[AfterPaymentCompleted]: Successfully executed onPaymentCompleted use case`
