@@ -1,4 +1,4 @@
-import { AnyStyledComponent } from 'styled-components';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { Transform } from 'stream';
@@ -59,7 +59,7 @@ export class KnexInvoiceRepo
 
     return db(TABLES.INVOICES)
       .select(
-        'invoices.*',
+        'invoices.id',
         'erp_references.type',
         'erp_references.vendor',
         'erp_references.attribute',
@@ -92,6 +92,34 @@ export class KnexInvoiceRepo
         'invoice_items.manuscriptId',
         'articles.id'
       );
+  }
+
+  private withInvoicesItemsDetailsQuery(): any {
+    return (query) =>
+      query.leftJoin(
+        TABLES.INVOICE_ITEMS,
+        'invoice_items.invoiceId',
+        'invoices.id'
+      );
+  }
+
+  private withErpReferenceQuery(
+    alias: string,
+    associatedField: string,
+    type: string,
+    vendor: string,
+    attribute: string
+  ): any {
+    const { db } = this;
+    return (query) =>
+      query
+        .column({ [attribute]: `${alias}.value` })
+        .leftJoin({ [alias]: TABLES.ERP_REFERENCES }, function () {
+          this.on(`${alias}.entity_id`, associatedField)
+            .andOn(`${alias}.vendor`, db.raw('?', [vendor]))
+            .andOn(`${alias}.type`, db.raw('?', [type]))
+            .andOn(`${alias}.attribute`, db.raw('?', [attribute]));
+        });
   }
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
@@ -339,31 +367,19 @@ export class KnexInvoiceRepo
     return result[0];
   }
 
-  private filterReadyForSageRevenueRecognition(): any {
-    return (query) =>
-      query
-        .whereNot('invoices.deleted', 1)
-        .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNull('invoices.cancelledInvoiceReference')
-        .whereNull('invoices.revenueRecognitionReference')
-        .whereNotNull('invoices.erpReference')
-        .where('invoices.erpReference', '<>', 'NON_INVOICEABLE')
-        .where('invoices.erpReference', '<>', 'MigrationRef')
-        .where('invoices.erpReference', '<>', 'migrationRef');
-  }
-
-  private filterReadyForNetSuiteRevenueRecognition(): any {
+  private filterReadyForRevenueRecognition(): any {
     const { db } = this;
+
     return (query) =>
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNull('invoices.nsRevRecReference')
-        .whereNotNull('invoices.nsReference')
-        .where('invoices.nsReference', '<>', 'NON_INVOICEABLE')
-        .where('invoices.nsReference', '<>', 'MigrationRef')
-        .where('invoices.nsReference', '<>', 'migrationRef')
         .whereNull('invoices.cancelledInvoiceReference')
+        .whereNotNull('erprefs.value')
+        .where('erprefs.value', '<>', 'NON_INVOICEABLE')
+        .where('erprefs.value', '<>', 'MigrationRef')
+        .where('erprefs.value', '<>', 'migrationRef')
+        .whereNull('revrec.value')
         .whereNotIn(
           'invoices.id',
           db.raw(
@@ -372,111 +388,110 @@ export class KnexInvoiceRepo
         );
   }
 
-  async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
-    const { logger } = this;
+  private async getUnrecognizedInvoices(vendor: string) {
+    const LIMIT = 30;
+    const { db, logger } = this;
 
-    const detailsQuery = this.createBaseDetailsQuery();
-
-    // * SQL for retrieving results needed only for Sage registration
-    const filterInvoicesReadyForSageRevenueRecognition = this.filterReadyForSageRevenueRecognition();
-
+    const erpReferencesQuery = db(TABLES.INVOICES).select('invoices.id');
+    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
     const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
       whereNotNull: 'articles.datePublished',
     });
-    const prepareIdsForSageOnlySQL = filterArticlesByNotNullDatePublished(
-      filterInvoicesReadyForSageRevenueRecognition(detailsQuery)
+    const withErpReference = this.withErpReferenceQuery(
+      'erprefs',
+      'invoices.id',
+      'invoice',
+      vendor,
+      'erp'
+    );
+    const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
+      'revrec',
+      'invoices.id',
+      'invoice',
+      vendor,
+      'revenueRecognition'
     );
 
+    // * SQL for retrieving results needed only for Sage registration
+    const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRevenueRecognition();
+
+    const prepareIdsSQL = filterArticlesByNotNullDatePublished(
+      filterInvoicesReadyForRevenueRecognition(
+        withErpReference(
+          withRevenueRecognitionErpReference(
+            withInvoiceItems(erpReferencesQuery)
+          )
+        )
+      )
+    ).limit(LIMIT);
+
     logger.debug('select', {
-      SageSQL: prepareIdsForSageOnlySQL.toString(),
+      [`${vendor.toUpperCase()}SageSQL`]: prepareIdsSQL.toString(),
     });
 
-    const sageInvoices = await prepareIdsForSageOnlySQL;
+    const invoices = await prepareIdsSQL;
 
-    return sageInvoices.map((i) =>
+    return invoices.map((i) =>
       InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
     );
   }
 
-  async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
-    const { logger } = this;
+  public async getUnrecognizedSageErpInvoices(): Promise<InvoiceId[]> {
+    return this.getUnrecognizedInvoices('sage');
+  }
 
-    const detailsQuery = this.createBaseArticleDetailsQuery();
+  public async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
+    return this.getUnrecognizedInvoices('netsuite');
+  }
 
-    // * SQL for retrieving results needed only for NetSuite registration
-    const filterInvoicesReadyForNetSuiteRevenueRecognition = this.filterReadyForNetSuiteRevenueRecognition();
+  private filterReadyForRegistration(): any {
+    return (query) =>
+      query
+        .whereNot('invoices.deleted', 1)
+        .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
+        .whereNull('invoices.cancelledInvoiceReference')
+        .whereNull('erprefs.value');
+  }
 
-    const filterArticlesByNotNullDatePublished = this.filterBy({
-      whereNotNull: 'articles.datePublished',
-    });
+  private async getUnregisteredInvoices(vendor: string) {
+    const LIMIT = 30;
+    const { db, logger } = this;
 
-    const prepareIdsForNetSuiteOnlySQL = filterArticlesByNotNullDatePublished(
-      filterInvoicesReadyForNetSuiteRevenueRecognition(detailsQuery)
+    const erpReferencesQuery = db(TABLES.INVOICES).select('invoices.id');
+    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
+
+    const withErpReference = this.withErpReferenceQuery(
+      'erprefs',
+      'invoices.id',
+      'invoice',
+      vendor,
+      'erp'
     );
 
+    // * SQL for retrieving results needed only for registration
+    const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRegistration();
+
+    const prepareIdsSQL = filterInvoicesReadyForRevenueRecognition(
+      withErpReference(withInvoiceItems(erpReferencesQuery))
+    ).limit(LIMIT);
+
     logger.debug('select', {
-      NetSuiteSQL: prepareIdsForNetSuiteOnlySQL.toString(),
+      [`${vendor.toUpperCase()}SQL`]: prepareIdsSQL.toString(),
     });
 
-    const netSuiteInvoices = await prepareIdsForNetSuiteOnlySQL;
+    const invoices = await prepareIdsSQL;
 
-    return netSuiteInvoices.map((i) =>
+    return invoices.map((i) =>
       InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
     );
   }
 
   async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
-    const { db, logger } = this;
-    const LIMIT = 30;
-
-    const sql = db(TABLES.INVOICES)
-      .select('invoices.*', 'articles.datePublished')
-      .from('invoices')
-      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-      .where(function () {
-        this.whereNot('invoices.deleted', 1)
-          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.nsReference');
-      })
-      .orderBy('articles.datePublished', 'desc')
-      .limit(LIMIT);
-
-    logger.debug('select', {
-      sql: sql.toString(),
-    });
-
-    const invoices = await sql;
-
-    return invoices.map((i) => InvoiceMap.toDomain(i));
+    return this.getUnregisteredInvoices('netsuite');
   }
 
   async getFailedSageErpInvoices(): Promise<Invoice[]> {
-    const LIMIT = 30;
-    const { db, logger } = this;
-
-    const sql = db(TABLES.INVOICES)
-      .select('invoices.*', 'articles.datePublished')
-      .from('invoices')
-      .leftJoin('invoice_items', 'invoice_items.invoiceId', '=', 'invoices.id')
-      .leftJoin('articles', 'articles.id', '=', 'invoice_items.manuscriptId')
-      .where(function () {
-        this.whereNot('invoices.deleted', 1)
-          .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-          // .whereNull('invoices.cancelledInvoiceReference')
-          .whereNull('invoices.erpReference');
-      })
-      .orderBy('invoices.dateIssued', 'desc')
-      .limit(LIMIT);
-
-    logger.debug('select', {
-      sql: sql.toString(),
-    });
-
-    const invoices = await sql;
-
-    return invoices.map((i) => InvoiceMap.toDomain(i));
+    return this.getUnregisteredInvoices('sage');
   }
 
   async delete(invoice: Invoice): Promise<void> {
