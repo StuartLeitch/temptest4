@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-// import { getEuMembers } from 'is-eu-member';
-
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
@@ -32,7 +30,6 @@ import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRe
 import { PaymentRepoContract } from './../../repos/paymentRepo';
 import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-// import { PayerType } from '../../../payers/domain/Payer';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 
@@ -61,11 +58,10 @@ export class PublishPaymentToErpUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    // private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
-    private netSuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {}
@@ -79,9 +75,6 @@ export class PublishPaymentToErpUsecase
     request: PublishPaymentToErpRequestDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<PublishPaymentToErpResponse> {
-    // this.loggerService.info('PublishPaymentToERP Request', request);
-
-    // let payment: Payment;
     let invoice: Invoice;
 
     try {
@@ -96,7 +89,6 @@ export class PublishPaymentToErpUsecase
       );
 
       let invoiceItems = invoice.invoiceItems.currentItems;
-      // // this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
 
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -206,7 +198,7 @@ export class PublishPaymentToErpUsecase
 
         let erpResponse;
         try {
-          erpResponse = await this.netSuiteService.registerPayment(erpData);
+          erpResponse = await this.erpService.registerPayment(erpData);
 
           if (erpResponse) {
             this.loggerService.info(
@@ -231,8 +223,8 @@ export class PublishPaymentToErpUsecase
         const erpReference = ErpReferenceMap.toDomain({
           entity_id: payment.paymentId.id.toString(),
           type: 'payment',
-          vendor: this.netSuiteService.vendorFieldName,
-          attribute: this.netSuiteService.invoiceErpRefFieldName,
+          vendor: this.erpService.vendorName,
+          attribute: 'erp',
           value: String(erpResponse),
         });
         await this.erpReferenceRepo.save(erpReference);
