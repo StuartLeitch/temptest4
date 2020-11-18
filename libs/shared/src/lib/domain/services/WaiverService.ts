@@ -119,13 +119,12 @@ export class WaiverService {
     }
 
     const item = invoiceItems[0];
-
     if (!applicableWaivers.length) {
       return;
     }
-    const existingWaivers = await this.waiverRepo.getWaiversByInvoiceItemId(
-      item.invoiceItemId
-    );
+    const existingWaivers = (
+      await this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId)
+    ).waivers;
 
     const highestReductionWaiver = applicableWaivers.sort(
       (a, b) => b.reduction - a.reduction

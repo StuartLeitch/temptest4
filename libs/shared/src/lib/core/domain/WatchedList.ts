@@ -98,7 +98,7 @@ export abstract class WatchedList<T> {
   }
 
   public forEach(fn: (c: T, i: number, arr: T[]) => void, t?: any): void {
-    return this.currentItems.forEach(fn, this);
+    return this.currentItems.forEach(fn, t);
   }
 
   public map<U>(fn: (c: T, i: number, arr: T[]) => U, t?: any): U[] {
@@ -109,6 +109,7 @@ export abstract class WatchedList<T> {
     fn: (c: T, i: number, arr: T[]) => c is S,
     t?: any
   ): S[];
+  public filter(fn: (c: T, i: number, arr: T[]) => unknown, t?: any): T[];
   public filter(fn: (c: T, i: number, arr: T[]) => unknown, t?: any): T[] {
     return this.currentItems.filter(fn, t);
   }

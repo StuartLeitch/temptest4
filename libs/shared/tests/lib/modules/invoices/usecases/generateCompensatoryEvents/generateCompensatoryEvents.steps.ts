@@ -2,12 +2,11 @@ import { expect } from 'chai';
 import { Given, When, Then, Before } from 'cucumber';
 
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
-import { PublishMessage } from './../../../../../../src/lib/domain/services/sqs/PublishMessage';
 import {
   LoggerContract,
   MockLogger,
 } from './../../../../../../src/lib/infrastructure/logging';
-import { SQSPublishServiceContract } from './../../../../../../src/lib/domain/services/SQSPublishService';
+import { MockSqsPublishService } from './../../../../../../src/lib/domain/services/SQSPublishService';
 
 import { MockPaymentMethodRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
@@ -36,16 +35,8 @@ import {
 
 import { Roles } from './../../../../../../src/lib/modules/users/domain/enums/Roles';
 
-class MockSQSPublishService implements SQSPublishServiceContract {
-  messages: PublishMessage[] = [];
-
-  async publishMessage(message: PublishMessage): Promise<void> {
-    this.messages.push(message);
-  }
-}
-
 let mockPaymentMethodRepo: MockPaymentMethodRepo;
-let mockSqsPublishService: MockSQSPublishService;
+let mockSqsPublishService: MockSqsPublishService;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockAddressRepo: MockAddressRepo;
@@ -64,7 +55,7 @@ let payload;
 let event;
 
 Before(function () {
-  mockSqsPublishService = new MockSQSPublishService();
+  mockSqsPublishService = new MockSqsPublishService();
   mockPaymentMethodRepo = new MockPaymentMethodRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockManuscriptRepo = new MockArticleRepo();
@@ -148,9 +139,7 @@ When('I try to generate a compensatory event', async function () {
 });
 
 Then(/^It should send an (.+) Event$/, async function (eventName: string) {
-  event = mockSqsPublishService.messages.find(
-    (message) => message.event === eventName
-  );
+  event = mockSqsPublishService.findEvent(eventName);
   expect(Object.keys(event).length).to.be.greaterThan(0);
 });
 

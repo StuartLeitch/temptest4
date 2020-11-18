@@ -122,8 +122,8 @@ export class CreateCreditNoteUsecase
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          coupons.forEach((c) => item.addCoupon(c));
-          item.waivers = waivers;
+          item.addAssignedCoupons(coupons);
+          item.addAssignedWaivers(waivers);
         }
       } catch (err) {
         return left(
@@ -166,12 +166,12 @@ export class CreateCreditNoteUsecase
           rawInvoiceItem.dateCreated = new Date();
           delete rawInvoiceItem.id;
 
-          invoiceItem.coupons.getItems().forEach((c) => {
+          invoiceItem.assignedCoupons.coupons.forEach((c) => {
             rawInvoiceItem.price -=
               ((invoiceItem.price * -1) / 100) * c.reduction;
           });
 
-          invoiceItem.waivers.forEach((w) => {
+          invoiceItem.assignedWaivers.waivers.forEach((w) => {
             rawInvoiceItem.price -=
               ((invoiceItem.price * -1) / 100) * w.reduction;
           });
@@ -238,14 +238,14 @@ export class CreateCreditNoteUsecase
             await this.invoiceItemRepo.save(draftInvoiceItem);
 
             // * save coupons
-            invoiceItem.coupons.getItems().forEach(async (c) => {
+            invoiceItem.assignedCoupons.coupons.forEach(async (c) => {
               await this.couponRepo.assignCouponToInvoiceItem(
                 c,
                 draftInvoiceItem.invoiceItemId
               );
             });
 
-            waivers.push(...invoiceItem.waivers);
+            waivers.push(...invoiceItem.assignedWaivers.waivers);
           });
         }
 

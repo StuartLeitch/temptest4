@@ -376,6 +376,10 @@ type Mutation {
     status: String!
   ): String
   generateCompensatoryEvents(invoiceIds: [String], journalIds: [String]): String
+  generateDraftCompensatoryEvents(
+    invoiceIds: [String]
+    journalIds: [String]
+  ): String
   togglePauseConfirmationReminders(
     invoiceId: ID!
     state: Boolean!

@@ -200,6 +200,15 @@ export class KnexInvoiceRepo
     return invoices.map((i) => InvoiceMap.toDomain(i));
   }
 
+  async isInvoiceDeleted(id: InvoiceId): Promise<boolean> {
+    const isDeleted = await this.db(`${TABLES.INVOICES}`)
+      .select('deleted')
+      .where('id', id.id.toString())
+      .first();
+
+    return !!isDeleted.deleted;
+  }
+
   async getInvoicesByCustomId(customId: string): Promise<Invoice[]> {
     const { db } = this;
 
@@ -562,7 +571,8 @@ export class KnexInvoiceRepo
 
   async *getInvoicesIds(
     ids: string[],
-    journalIds: string[]
+    journalIds: string[],
+    omitDeleted: boolean
   ): AsyncGenerator<string, void, undefined> {
     const extractInvoiceId = new Transform({
       objectMode: true,
@@ -585,10 +595,11 @@ export class KnexInvoiceRepo
       query = query.whereIn('c.id', journalIds);
     }
 
-    const stream = query
-      .where('i.deleted', 0)
-      .stream({ objectMode: true })
-      .pipe(extractInvoiceId);
+    if (omitDeleted) {
+      query = query.where('i.deleted', 0);
+    }
+
+    const stream = query.stream({ objectMode: true }).pipe(extractInvoiceId);
 
     for await (const a of stream) {
       yield a;

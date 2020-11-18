@@ -49,7 +49,7 @@ When(
 );
 
 Then('getInvoiceItemById returns invoice item', async () => {
-  expect(foundInvoiceItem).to.equal(invoiceItem);
+  expect(foundInvoiceItem.id.toValue).to.equal(invoiceItem.id.toValue);
 });
 
 When(
@@ -147,5 +147,5 @@ When('we call InvoiceItem.save on the invoice item object', async () => {
 });
 
 Then('the invoice item object should be saved', async () => {
-  expect(saveInvoiceItem).to.equal(invoiceItem);
+  expect(saveInvoiceItem.id.toValue).to.equal(invoiceItem.id.toValue);
 });

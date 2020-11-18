@@ -108,7 +108,6 @@ Given(
     let isFinalPayment = false;
 
     if (paymentType === 'final') {
-      console.log('setting final');
       isFinalPayment = true;
     }
 

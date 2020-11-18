@@ -51,7 +51,7 @@ export class Logger implements LoggerContract {
     }
 
     let transport: winston.transport;
-    let { logLevel = 'info', isDevelopment = false } = options;
+    const { logLevel = 'info', isDevelopment = false } = options;
 
     if (isDevelopment) {
       transport = new winston.transports.Console({
@@ -61,12 +61,12 @@ export class Logger implements LoggerContract {
           winston.format.colorize({ all: true }),
           winston.format.simple(),
           winston.format.printf(({ level, message, scope }) => {
-            let printableMessage;
-            if (typeof message === 'object') {
-              printableMessage = JSON.stringify(message, undefined, 2);
-            } else {
-              printableMessage = message;
-            }
+            // let printableMessage;
+            // if (typeof message === 'object') {
+            //   printableMessage = JSON.stringify(message, undefined, 2);
+            // } else {
+            //   printableMessage = message;
+            // }
             return `${scope ? `[${scope}] ` : ''}${level}: ${message}`;
           })
         ),
@@ -102,9 +102,9 @@ export class Logger implements LoggerContract {
 
   private log(level: string, message: any, args: any[]): void {
     if (this.protocol) {
-      let metadata: Record<string, any> = { scope: this.scope };
+      const metadata: Record<string, any> = { scope: this.scope };
       if (args.length) {
-        let newArgs = args.map((arg) => {
+        const newArgs = args.map((arg) => {
           if (arg instanceof Error) {
             return { ...arg, error: arg.message, stack: arg.stack };
           }

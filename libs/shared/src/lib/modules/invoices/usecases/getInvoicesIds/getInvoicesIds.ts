@@ -51,8 +51,12 @@ export class GetInvoicesIdsUsecase
     }
   }
 
-  private async *getInvoiceIds({ invoiceIds, journalIds }: DTO) {
-    const items = this.invoiceRepo.getInvoicesIds(invoiceIds, journalIds);
+  private async *getInvoiceIds({ omitDeleted, invoiceIds, journalIds }: DTO) {
+    const items = this.invoiceRepo.getInvoicesIds(
+      invoiceIds,
+      journalIds,
+      omitDeleted
+    );
     yield* items;
   }
 }

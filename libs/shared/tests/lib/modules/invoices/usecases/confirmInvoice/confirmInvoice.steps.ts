@@ -137,7 +137,7 @@ Given(
 
     mockWaiverRepo.addMockWaiverForInvoiceItem(
       WaiverMap.toDomain({
-        waiverType: 'EDITOR_DISCOUT',
+        waiverType: 'EDITOR_DISCOUNT',
         reduction: 50,
         isActive: true,
       }),
@@ -164,7 +164,7 @@ When(
 Then('The result is successfull', function () {
   expect(response.isRight()).to.equal(
     true,
-    `Expected succes, got ${response.value}`
+    `Expected success, got ${response.value}`
   );
 });
 
@@ -195,7 +195,9 @@ Then(
     const invoice = await mockInvoiceRepo.getInvoiceById(id);
 
     invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
-
+    // console.log(invoice.invoiceItems.currentItems);
+    // console.log(invoice.invoiceVatTotal);
+    // console.log(vatAmount);
     expect(invoice.invoiceVatTotal).to.be.greaterThan(vatAmount);
   }
 );

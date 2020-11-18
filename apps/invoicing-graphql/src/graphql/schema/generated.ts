@@ -429,6 +429,7 @@ export type Mutation = {
   recordPayPalPayment: Scalars['ID'];
   migrateEntireInvoice?: Maybe<Scalars['String']>;
   generateCompensatoryEvents?: Maybe<Scalars['String']>;
+  generateDraftCompensatoryEvents?: Maybe<Scalars['String']>;
   togglePauseConfirmationReminders?: Maybe<RemindersStatus>;
   togglePausePaymentReminders?: Maybe<RemindersStatus>;
   generateMissingReminderJobs: Scalars['String'];
@@ -525,6 +526,12 @@ export type MutationMigrateEntireInvoiceArgs = {
 
 
 export type MutationGenerateCompensatoryEventsArgs = {
+  invoiceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+  journalIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type MutationGenerateDraftCompensatoryEventsArgs = {
   invoiceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   journalIds?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
@@ -978,6 +985,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   recordPayPalPayment?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'invoiceId' | 'orderId'>>;
   migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token' | 'status'>>;
   generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateCompensatoryEventsArgs, never>>;
+  generateDraftCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateDraftCompensatoryEventsArgs, never>>;
   togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePauseConfirmationRemindersArgs, 'invoiceId' | 'state'>>;
   togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePausePaymentRemindersArgs, 'invoiceId' | 'state'>>;
   generateMissingReminderJobs?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

@@ -23,8 +23,10 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   existsWithId(id: InvoiceId): Promise<boolean>;
   getInvoicesIds(
     ids: string[],
-    journalIds: string[]
+    journalIds: string[],
+    omitDeleted: boolean
   ): AsyncGenerator<string, void, undefined>;
   filterByInvoiceId?(invoiceId: InvoiceId): unknown;
   getInvoicesByCustomId?(customId: string): Promise<any[]>;
+  isInvoiceDeleted(id: InvoiceId): Promise<boolean>;
 }

@@ -413,16 +413,20 @@ export const invoice: Resolvers<Context> = {
     },
 
     async coupons(parent, args, context) {
-      const coupons = await context.repos.coupon.getCouponsByInvoiceItemId(
-        InvoiceItemId.create(new UniqueEntityID(parent.id))
-      );
+      const coupons = await context.repos.coupon
+        .getCouponsByInvoiceItemId(
+          InvoiceItemId.create(new UniqueEntityID(parent.id))
+        )
+        .then((coupons) => coupons.map((c) => c.coupon));
       return coupons.map(CouponMap.toPersistence);
     },
 
     async waivers(parent, args, context) {
-      const waivers = await context.repos.waiver.getWaiversByInvoiceItemId(
-        InvoiceItemId.create(new UniqueEntityID(parent.id))
-      );
+      const waivers = (
+        await context.repos.waiver.getWaiversByInvoiceItemId(
+          InvoiceItemId.create(new UniqueEntityID(parent.id))
+        )
+      ).waivers;
       return waivers.map(WaiverMap.toPersistence);
     },
   },

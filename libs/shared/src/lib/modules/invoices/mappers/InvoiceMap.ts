@@ -46,7 +46,6 @@ export class InvoiceMap extends Mapper<Invoice> {
       status: invoice.status,
       invoiceNumber: Number.parseInt(invoice.invoiceNumber, 10) || null,
       dateCreated: invoice.dateCreated,
-      // dateUpdated: invoice.dateUpdated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
       dateMovedToFinal: invoice.dateMovedToFinal,

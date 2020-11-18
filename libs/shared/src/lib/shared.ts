@@ -80,6 +80,7 @@ export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
+export * from './modules/invoices/usecases/generateDraftCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
 export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';

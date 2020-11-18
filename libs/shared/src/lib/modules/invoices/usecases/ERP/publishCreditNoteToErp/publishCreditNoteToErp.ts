@@ -119,8 +119,8 @@ export class PublishCreditNoteToErpUsecase
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          coupons.forEach((c) => item.addCoupon(c));
-          item.waivers = waivers;
+          item.addAssignedCoupons(coupons);
+          item.addAssignedWaivers(waivers);
         }
       }
 

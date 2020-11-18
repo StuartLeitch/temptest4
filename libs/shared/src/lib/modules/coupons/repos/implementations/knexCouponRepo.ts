@@ -1,26 +1,44 @@
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
-import { Coupon } from '../../domain/Coupon';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { CouponMap } from '../../mappers/CouponMap';
-import {
-  CouponRepoContract,
-  PaginatedCouponsResult,
-  GetRecentCouponsArguments,
-} from '../couponRepo';
-import { CouponId } from '../../domain/CouponId';
-import { CouponCode } from '../../domain/CouponCode';
-import { InvoiceItemId } from './../../../invoices/domain/InvoiceItemId';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
-export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
+import { CouponAssignedCollection } from '../../domain/CouponAssignedCollection';
+import { InvoiceItemId } from './../../../invoices/domain/InvoiceItemId';
+import { CouponCode } from '../../domain/CouponCode';
+import { CouponId } from '../../domain/CouponId';
+import { Coupon } from '../../domain/Coupon';
+
+import { CouponMap } from '../../mappers/CouponMap';
+
+import {
+  GetRecentCouponsArguments,
+  PaginatedCouponsResult,
+  CouponRepoContract,
+} from '../couponRepo';
+
+export class KnexCouponRepo
+  extends AbstractBaseDBRepo<Knex, Coupon>
   implements CouponRepoContract {
   async getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<Coupon[]> {
+  ): Promise<CouponAssignedCollection> {
     const { db } = this;
 
     const coupons = await db
-      .select()
+      .select(
+        `${TABLES.INVOICE_ITEMS_TO_COUPONS}.dateCreated as dateAssigned`,
+        `${TABLES.COUPONS}.invoiceItemType`,
+        `${TABLES.COUPONS}.expirationDate`,
+        `${TABLES.COUPONS}.dateCreated`,
+        `${TABLES.COUPONS}.dateUpdated`,
+        `${TABLES.COUPONS}.redeemCount`,
+        `${TABLES.COUPONS}.reduction`,
+        `${TABLES.COUPONS}.status`,
+        `${TABLES.COUPONS}.code`,
+        `${TABLES.COUPONS}.name`,
+        `${TABLES.COUPONS}.type`,
+        `${TABLES.COUPONS}.id`
+      )
       .from(TABLES.INVOICE_ITEMS_TO_COUPONS)
       .where('invoiceItemId', invoiceItemId.id.toString())
       .join(
@@ -30,7 +48,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
         `${TABLES.COUPONS}.id`
       );
 
-    return coupons.map(CouponMap.toDomain);
+    return CouponMap.toDomainCollection(coupons);
   }
 
   async getCouponByCode(code: CouponCode): Promise<Coupon> {
@@ -101,7 +119,7 @@ export class KnexCouponRepo extends AbstractBaseDBRepo<Knex, Coupon>
 
     const couponsRows = await db(TABLES.COUPONS);
 
-    return couponsRows.reduce((aggregator: any[], t) => {
+    return couponsRows.reduce((aggregator, t) => {
       aggregator.push(CouponMap.toDomain(t));
       return aggregator;
     }, []);
