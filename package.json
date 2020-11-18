@@ -157,9 +157,7 @@
     "use-location-state": "2.3.1",
     "webcomponent-router": "0.4.3",
     "winston": "3.3.3",
-    "winston-cloudwatch": "2.3.2",
-    "xml2json": "0.12.0",
-    "yaml": "^1.10.0"
+    "xml2json": "0.12.0"
   },
   "devDependencies": {
     "@angular-builders/custom-webpack": "10.0.1",

@@ -2,9 +2,10 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import * as path from 'path';
-// import winston from 'winston';
+import winston from 'winston';
 
 import { LoggerContract } from '@hindawi/shared';
+import { LoggerOptions } from '../Logger';
 
 const logLevelIcons: any = {
   DEBUG: '\u{1F6E1}',
@@ -50,43 +51,84 @@ export class Logger implements LoggerContract {
     this.protocol = protocol;
   }
 
-  constructor(scope?: string) {
+  constructor(scope?: string, options: LoggerOptions = {}) {
     if (!scope) {
       this.scope = Logger.DEFAULT_SCOPE;
     } else {
       this.setScope(scope);
     }
 
-    this.protocol = console;
+    let transport: winston.transport;
+    let { logLevel = 'info', isDevelopment = false } = options;
+
+    if (isDevelopment) {
+      transport = new winston.transports.Console({
+        handleExceptions: true,
+        level: logLevel,
+        format: winston.format.combine(
+          winston.format.colorize({ all: true }),
+          winston.format.simple(),
+          winston.format.printf(({ level, message, scope }) => {
+            let printableMessage;
+            if (typeof message === 'object') {
+              printableMessage = JSON.stringify(message, undefined, 2);
+            } else {
+              printableMessage = message;
+            }
+            return `${scope ? `[${scope}] ` : ''}${level}: ${message}`;
+          })
+        ),
+      });
+    } else {
+      transport = new winston.transports.Console({
+        handleExceptions: true,
+        level: logLevel,
+      });
+    }
+
+    const logger = winston.createLogger({
+      transports: [transport],
+    });
+    this.protocol = logger;
   }
 
-  public debug(message: string, ...args: any[]): void {
+  public debug(message: any, ...args: any[]): void {
     this.log('debug', message, args);
   }
 
-  public info(message: string, ...args: any[]): void {
+  public info(message: any, ...args: any[]): void {
     this.log('info', message, args);
   }
 
-  public warn(message: string, ...args: any[]): void {
+  public warn(message: any, ...args: any[]): void {
     this.log('warn', message, args);
   }
 
-  public error(message: string, ...args: any[]): void {
+  public error(message: any, ...args: any[]): void {
     this.log('error', message, args);
-  }
-
-  private log(level: string, message: string, args: any[]): void {
-    const formatter = this.formatScope(level, message);
-
-    if (this.protocol) {
-      this.protocol.info(formatter, ...args);
-    }
   }
 
   private formatScope(levelName: string, msg: string): string {
     return `${
       logLevelIcons[levelName.toUpperCase()]
     } [${levelName}]: \x1b[37m${msg}`;
+  }
+  private log(level: string, message: any, args: any[]): void {
+    const formatter = this.formatScope(level, message);
+
+    if (this.protocol) {
+      const metadata: Record<string, any> = { scope: this.scope };
+      if (args.length) {
+        const newArgs = args.map((arg) => {
+          if (arg instanceof Error) {
+            return { ...arg, error: arg.message, stack: arg.stack };
+          }
+          return arg;
+        });
+        this.protocol[level]({ formatter, args: newArgs }, metadata);
+      } else {
+        this.protocol[level](formatter, metadata);
+      }
+    }
   }
 }
