@@ -42,13 +42,15 @@ interface Context {
   };
 }
 
+const tag = { tags: '@GenerateDraftCompensatoryEvents' };
+
 const submissionDate = '2020-10-15T14:25:13';
 const updateDate = '2020-10-17T14:25:13';
 
 let usecase: GenerateDraftCompensatoryEventsUsecase = null;
 let context: Context = null;
 
-Before({ tags: '@GenerateDraftCompensatoryEvents' }, () => {
+Before(tag, () => {
   const invoiceItem = new MockInvoiceItemRepo();
   const manuscript = new MockArticleRepo();
   const invoice = new MockInvoiceRepo(manuscript, invoiceItem);
@@ -83,7 +85,7 @@ Before({ tags: '@GenerateDraftCompensatoryEvents' }, () => {
   );
 });
 
-After({ tags: '@GenerateDraftCompensatoryEvents' }, () => {
+After(tag, () => {
   context = null;
   usecase = null;
 });

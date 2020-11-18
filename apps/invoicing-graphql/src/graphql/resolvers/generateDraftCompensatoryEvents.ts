@@ -11,7 +11,7 @@ import { Context } from '../../builders';
 
 import { Resolvers } from '../schema';
 
-export const generateCompensatoryEvents: Resolvers<Context> = {
+export const generateDraftCompensatoryEvents: Resolvers<Context> = {
   Mutation: {
     async generateDraftCompensatoryEvents(parent, args, context) {
       const { invoiceIds, journalIds } = args;
