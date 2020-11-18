@@ -171,7 +171,7 @@ export class PublishRevenueRecognitionReversalUsecase
       }
       const publisherCustomValues = maybePublisherCustomValue.value.getValue();
 
-      const invoiceTotal = invoice.invoiceTotal;
+      const invoiceTotal = invoice.invoiceNetTotal;
 
       const erpResponse = await this.erpService.registerRevenueRecognitionReversal(
         {
