@@ -3,11 +3,12 @@
 
 module.exports.up = function (knex) {
   return knex.schema.table('invoices', function (table) {
-    table.dropColumn('erpReference');
-    table.dropColumn('revenueRecognitionReference');
-    table.dropColumn('nsReference');
-    table.dropColumn('nsRevRecReference');
-    table.dropColumn('creditNoteReference');
+    // TODO: To enable this after moving all data in erp_references table!
+    // table.dropColumn('erpReference');
+    // table.dropColumn('revenueRecognitionReference');
+    // table.dropColumn('nsReference');
+    // table.dropColumn('nsRevRecReference');
+    // table.dropColumn('creditNoteReference');
   });
 };
 
