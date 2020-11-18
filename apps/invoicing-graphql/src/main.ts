@@ -6,6 +6,7 @@ import { Logger } from './lib/logger';
 // import './lib/logger/LoggerAspect';
 
 import { env } from './env';
+import { LoggerBuilder } from '@hindawi/shared';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -15,37 +16,16 @@ import { env } from './env';
  * The basic layer of this app is express. For further information visit
  * the 'README.md' file.
  */
-const log = new Logger();
+const log = new LoggerBuilder('loader', {
+  logLevel: env.log.level,
+  isDevelopment: env.isDevelopment,
+}).getLogger();
 
 async function main() {
   /**
    * Loaders
    */
   const loaders = [];
-
-  if (env.loaders.winstonEnabled) {
-    const protocol = await import('winston');
-    const { winstonLoader } = await import(
-      /* webpackChunkName: "winstonLoader" */ './loaders/winstonLoader'
-    );
-
-    protocol.add(
-      new protocol.transports.Console({
-        level: env.log.level,
-        handleExceptions: true,
-        format:
-          env.node !== 'development'
-            ? protocol.format.combine(protocol.format.json())
-            : protocol.format.combine(
-                protocol.format.colorize(),
-                protocol.format.simple()
-              ),
-      })
-    );
-    log.setProtocol(protocol);
-    log.info('Winston logging initiated ✔️');
-    loaders.push(winstonLoader);
-  }
 
   if (env.loaders.knexEnabled) {
     const { knexLoader } = await import(

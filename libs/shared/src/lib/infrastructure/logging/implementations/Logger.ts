@@ -2,9 +2,10 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import * as path from 'path';
-// import winston from 'winston';
+import winston from 'winston';
 
 import { LoggerContract } from '@hindawi/shared';
+import { LoggerOptions } from '../Logger';
 
 /**
  * core.Log
@@ -42,39 +43,77 @@ export class Logger implements LoggerContract {
     this.protocol = protocol;
   }
 
-  constructor(scope?: string) {
+  constructor(scope?: string, options: LoggerOptions = {}) {
     if (!scope) {
       this.scope = Logger.DEFAULT_SCOPE;
     } else {
       this.setScope(scope);
     }
 
-    this.protocol = console;
+    let transport: winston.transport;
+    let { logLevel = 'info', isDevelopment = false } = options;
+
+    if (isDevelopment) {
+      transport = new winston.transports.Console({
+        handleExceptions: true,
+        level: logLevel,
+        format: winston.format.combine(
+          winston.format.colorize({ all: true }),
+          winston.format.simple(),
+          winston.format.printf(({ level, message, scope }) => {
+            let printableMessage;
+            if (typeof message === 'object') {
+              printableMessage = JSON.stringify(message, undefined, 2);
+            } else {
+              printableMessage = message;
+            }
+            return `${scope ? `[${scope}] ` : ''}${level}: ${message}`;
+          })
+        ),
+      });
+    } else {
+      transport = new winston.transports.Console({
+        handleExceptions: true,
+        level: logLevel,
+      });
+    }
+
+    const logger = winston.createLogger({
+      transports: [transport],
+    });
+    this.protocol = logger;
   }
 
-  public debug(message: string, ...args: any[]): void {
+  public debug(message: any, ...args: any[]): void {
     this.log('debug', message, args);
   }
 
-  public info(message: string, ...args: any[]): void {
+  public info(message: any, ...args: any[]): void {
     this.log('info', message, args);
   }
 
-  public warn(message: string, ...args: any[]): void {
+  public warn(message: any, ...args: any[]): void {
     this.log('warn', message, args);
   }
 
-  public error(message: string, ...args: any[]): void {
+  public error(message: any, ...args: any[]): void {
     this.log('error', message, args);
   }
 
-  private log(level: string, message: string, args: any[]): void {
+  private log(level: string, message: any, args: any[]): void {
     if (this.protocol) {
-      this.protocol[level](`${this.formatScope()} ${message}`, ...args);
+      let metadata: Record<string, any> = { scope: this.scope };
+      if (args.length) {
+        let newArgs = args.map((arg) => {
+          if (arg instanceof Error) {
+            return { ...arg, error: arg.message, stack: arg.stack };
+          }
+          return arg;
+        });
+        this.protocol[level]({ message, args: newArgs }, metadata);
+      } else {
+        this.protocol[level](message, metadata);
+      }
     }
-  }
-
-  private formatScope(): string {
-    return `[${this.scope}]`;
   }
 }

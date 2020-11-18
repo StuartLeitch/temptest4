@@ -11,6 +11,7 @@ dist/
 dist-k8s/
 /tmp
 /out-tsc
+report
 
 # dependencies
 **/node_modules
