@@ -37,6 +37,10 @@ export class NetSuiteService implements ErpServiceContract {
     private logger: LoggerContract
   ) {}
 
+  get vendorName(): string {
+    return 'netsuite';
+  }
+
   get invoiceErpRefFieldName(): string {
     return 'nsReference';
   }

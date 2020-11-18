@@ -82,6 +82,15 @@ export class KnexPaymentRepo
     const { db, logger } = this;
 
     const sql = db(TABLES.PAYMENTS)
+      .leftJoin(
+        'erp_references',
+        'payments.id',
+        '=',
+        'erp_references.entity_id'
+      )
+      .where('erp_references.type', '=', 'payment')
+      .where('erp_references.attribute', '=', 'erp')
+      .where('payments.status', '=', 'COMPLETED')
       .whereNotNull('payments.foreignPaymentId')
       .orderBy('payments.datePaid', 'desc')
       .limit(LIMIT);
