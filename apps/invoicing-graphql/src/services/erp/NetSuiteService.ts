@@ -13,13 +13,11 @@ import {
   Manuscript,
   Invoice,
   InvoiceItem,
-  LoggerBuilder,
   LoggerContract,
   LoggerBuilderContract,
 } from '@hindawi/shared';
 
 import {
-  // ErpServiceContract,
   ErpInvoiceRequest,
   ErpInvoiceResponse,
   ErpRevRecResponse,
@@ -49,7 +47,7 @@ export class NetSuiteService implements ErpServiceContract {
       config: new ConnectionConfig(config.connection),
     });
 
-    let logger = loggerBuilder.getLogger();
+    const logger = loggerBuilder.getLogger();
     logger.setScope('NetSuiteService');
 
     const service = new NetSuiteService(connection, logger);

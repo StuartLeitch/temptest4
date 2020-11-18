@@ -43,7 +43,7 @@ export class SageService implements ErpServiceContract {
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
-  get vendorFieldName(): string {
+  get vendorName(): string {
     return 'sage';
   }
 
