@@ -12,6 +12,8 @@ import {
   AccessControlContext,
 } from '../../../../../domain/authorization';
 
+import { VATService } from '@hindawi/shared';
+
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
@@ -24,14 +26,13 @@ import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { VATService } from 'libs/shared/src/lib/domain/services/VATService';
 
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 export type RetryFailedSageErpInvoicesResponse = Either<
-  UnexpectedError | ErpInvoiceResponse,
+  UnexpectedError,
   ErpInvoiceResponse[]
 >;
 

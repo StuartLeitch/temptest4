@@ -12,7 +12,7 @@ import { PublishInvoiceDraftCreatedUseCase } from 'libs/shared/src/lib/modules/i
 import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
-import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
+// import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 // import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
@@ -65,50 +65,16 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       },
     } = context;
 
-    // const publishSageInvoiceToErpUsecase = env.app.erpRegisterInvoicesEnabled
-    //   ? new PublishInvoiceToErpUsecase(
+    // const publishCreditNoteToErp = env.app.erpRegisterCreditNotesEnabled
+    //   ? new PublishCreditNoteToErpUsecase(
     //       invoice,
     //       invoiceItem,
     //       coupon,
     //       waiver,
-    //       payer,
-    //       address,
-    //       manuscript,
-    //       catalog,
-    //       erp?.sage || null,
-    //       publisher,
-    //       loggerService,
-    //       vatService
-    //     )
-    //   : new NoOpUseCase();
-    // const publishNetsuiteInvoiceToErpUsecase = env.app
-    //   .erpRegisterInvoicesEnabled
-    //   ? new PublishInvoiceToErpUsecase(
-    //       invoice,
-    //       invoiceItem,
-    //       coupon,
-    //       waiver,
-    //       payer,
-    //       address,
-    //       manuscript,
-    //       catalog,
     //       erp?.netsuite || null,
-    //       publisher,
-    //       loggerService,
-    //       vatService
+    //       loggerService
     //     )
     //   : new NoOpUseCase();
-
-    const publishCreditNoteToErp = env.app.erpRegisterCreditNotesEnabled
-      ? new PublishCreditNoteToErpUsecase(
-          invoice,
-          invoiceItem,
-          coupon,
-          waiver,
-          erp?.netsuite || null,
-          loggerService
-        )
-      : new NoOpUseCase();
 
     const publishPaymentToErp = env.app.erpRegisterPaymentsEnabled
       ? new PublishPaymentToErpUsecase(
@@ -198,7 +164,6 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoiceCredited,
-      publishCreditNoteToErp,
       loggerService
     );
 

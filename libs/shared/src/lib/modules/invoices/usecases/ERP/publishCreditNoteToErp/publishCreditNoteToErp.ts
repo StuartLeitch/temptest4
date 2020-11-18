@@ -56,7 +56,7 @@ export class PublishCreditNoteToErpUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private netSuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {}
 
@@ -91,10 +91,6 @@ export class PublishCreditNoteToErpUsecase
       );
 
       let invoiceItems = creditNote.invoiceItems.currentItems;
-      // this.loggerService.info(
-      //   'PublishCreditNoteToERP invoiceItems',
-      //   invoiceItems
-      // );
 
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -106,10 +102,7 @@ export class PublishCreditNoteToErpUsecase
         const resp = await getItemsUsecase.execute({
           invoiceId: request.creditNoteId,
         });
-        // this.loggerService.info(
-        //   'PublishCreditNoteToERP getItemsUsecase response',
-        //   resp
-        // );
+
         if (resp.isLeft()) {
           throw new Error(
             `CreditNote ${creditNote.id.toString()} has no invoice items.`
@@ -117,10 +110,6 @@ export class PublishCreditNoteToErpUsecase
         }
 
         invoiceItems = resp.value.getValue();
-        // this.loggerService.info(
-        //   'PublishCreditNoteToERP invoice items',
-        //   invoiceItems
-        // );
 
         for (const item of invoiceItems) {
           const [coupons, waivers] = await Promise.all([
@@ -137,10 +126,6 @@ export class PublishCreditNoteToErpUsecase
       }
 
       creditNote.addItems(invoiceItems);
-      // this.loggerService.info(
-      //   'PublishCreditNoteToERP full invoice items',
-      //   invoiceItems
-      // );
 
       try {
         const erpData = {
@@ -148,7 +133,7 @@ export class PublishCreditNoteToErpUsecase
           originalInvoice,
         };
 
-        const netSuiteResponse = await this.netSuiteService.registerCreditNote(
+        const netSuiteResponse = await this.erpService.registerCreditNote(
           erpData
         );
         this.loggerService.info(
@@ -156,7 +141,7 @@ export class PublishCreditNoteToErpUsecase
             netSuiteResponse
           )}`
         );
-        creditNote.creditNoteReference = String(netSuiteResponse);
+        (creditNote as any).creditNoteReference = String(netSuiteResponse);
 
         // this.loggerService.info('PublishCreditNoteToERP full credit note', creditNote);
         await this.invoiceRepo.update(creditNote);

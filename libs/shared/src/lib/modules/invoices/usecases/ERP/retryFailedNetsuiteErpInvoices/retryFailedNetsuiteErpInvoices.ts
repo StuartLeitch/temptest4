@@ -24,14 +24,14 @@ import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { VATService } from 'libs/shared/src/lib/domain/services/VATService';
+import { VATService } from '@hindawi/shared';
 
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 export type RetryFailedNetsuiteErpInvoicesResponse = Either<
-  UnexpectedError | ErpInvoiceResponse,
+  UnexpectedError,
   ErpInvoiceResponse[]
 >;
 

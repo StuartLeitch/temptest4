@@ -1,23 +1,23 @@
 // import { env } from '../env';
-import { RetryPaymentsRegistrationToErpUsecase } from '@hindawi/shared';
+import { RetryFailedSageErpInvoicesUsecase } from '@hindawi/shared';
 
 import { Logger } from '../lib/logger';
 import { Context } from '../builders';
 
 const logger = new Logger();
-logger.setScope('cron:registerCreditMemos');
+logger.setScope('cron:registerInvoicesForSage');
 
 import { FeatureFlags } from '../lib/FeatureFlags';
 import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
-export class RegisterPaymentsCron {
+export class RegisterInvoicesForSageCron {
   public static async schedule(context: Context): Promise<any> {
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
-    if (!FeatureFlags.isFeatureEnabled('erpRegisterPaymentsEnabled')) {
+    if (!FeatureFlags.isFeatureEnabled('erpRegisterInvoicesEnabled')) {
       return logger.debug(
-        'Skipping the CRON Job payments registration scheduling...'
+        'Skipping the CRON Job invoices registration for Sage scheduling...'
       );
     }
 
@@ -26,33 +26,32 @@ export class RegisterPaymentsCron {
         invoiceItem,
         manuscript,
         publisher,
+        address,
         catalog,
         invoice,
         coupon,
         waiver,
         payer,
-        payment,
-        paymentMethod,
       },
-      services: { erp, logger: loggerService },
+      services: { erp, logger: loggerService, vatService },
     } = context;
 
-    const retryPaymentsToNetsuiteErpUsecase = new RetryPaymentsRegistrationToErpUsecase(
+    const retryFailedSageErpInvoicesUsecase = new RetryFailedSageErpInvoicesUsecase(
       invoice,
       invoiceItem,
-      payment,
-      paymentMethod,
       coupon,
       waiver,
       payer,
+      address,
       manuscript,
       catalog,
-      erp?.netsuite || null,
+      erp?.sage || null,
       publisher,
-      loggerService
+      loggerService,
+      vatService
     );
 
-    const maybeResponse = await retryPaymentsToNetsuiteErpUsecase.execute();
+    const maybeResponse = await retryFailedSageErpInvoicesUsecase.execute();
     if (maybeResponse.isLeft()) {
       logger.error(maybeResponse.value.errorValue().message);
       throw maybeResponse.value;

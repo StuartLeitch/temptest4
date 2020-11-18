@@ -128,8 +128,8 @@ export class PublishInvoiceToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
-        invoice.erpReference = 'NON_INVOICEABLE';
-        invoice.nsReference = 'NON_INVOICEABLE';
+        // invoice.erpReference = 'NON_INVOICEABLE';
+        // invoice.nsReference = 'NON_INVOICEABLE';
         await this.invoiceRepo.update(invoice);
         return right(null);
       }
@@ -267,10 +267,10 @@ export class PublishInvoiceToErpUsecase
         await this.invoiceRepo.update(invoice);
         return right(erpResponse);
       } catch (err) {
-        return left(err);
+        return left(new UnexpectedError(err, err.toString()));
       }
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

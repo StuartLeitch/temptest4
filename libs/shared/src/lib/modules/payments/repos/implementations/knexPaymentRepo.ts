@@ -77,6 +77,24 @@ export class KnexPaymentRepo
     return PaymentMap.toDomain(result);
   }
 
+  async getUnregisteredErpPayments(): Promise<InvoiceId[]> {
+    const LIMIT = 30;
+    const { db, logger } = this;
+
+    const sql = db(TABLES.PAYMENTS)
+      .whereNotNull('payments.foreignPaymentId')
+      .orderBy('payments.datePaid', 'desc')
+      .limit(LIMIT);
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const payments = await sql;
+
+    return payments.map(PaymentMap.toDomain);
+  }
+
   async updatePayment(payment: Payment): Promise<Payment> {
     const { logger } = this;
 

@@ -59,7 +59,7 @@ export class Logger implements LoggerContract {
     }
 
     let transport: winston.transport;
-    let { logLevel = 'info', isDevelopment = false } = options;
+    const { logLevel = 'info', isDevelopment = false } = options;
 
     if (isDevelopment) {
       transport = new winston.transports.Console({

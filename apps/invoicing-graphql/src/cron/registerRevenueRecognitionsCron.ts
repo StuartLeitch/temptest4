@@ -1,4 +1,3 @@
-// import { env } from '../env';
 import { RetryRevenueRecognitionNetsuiteErpInvoicesUsecase } from '@hindawi/shared';
 
 import { Logger } from '../lib/logger';
@@ -35,7 +34,7 @@ export class RegisterRevenueRecognitionsCron {
         waiver,
         payer,
       },
-      services: { erp, logger: loggerService, vatService },
+      services: { erp, logger: loggerService },
     } = context;
 
     const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
