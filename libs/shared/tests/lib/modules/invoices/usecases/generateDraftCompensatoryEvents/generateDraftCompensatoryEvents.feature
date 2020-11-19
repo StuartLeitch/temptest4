@@ -35,3 +35,14 @@ Feature: Generate Draft Compensatory events usecase
     When GenerateDraftCompensatoryEvents is called for invoiceId "inv-4"
     Then An event of type "InvoiceDraftCreated" is generated, for invoiceId "inv-4"
     And An event of type "InvoiceDraftDeleted" is generated, for invoiceId "inv-4"
+
+  @GenerateDraftCompensatoryEvents
+  Scenario: Usecase is called for an invoice with waiver applied after invoice accepted
+    Given A manuscript with custom id "111115"
+    And An invoice with id "inv-5" for manuscript "111115" with price "200"
+    And Invoice with id "inv-5" is accepted
+    And A waiver applied at "Acceptance" on invoiceId "inv-5"
+    When GenerateDraftCompensatoryEvents is called for invoiceId "inv-5"
+    Then An event of type "InvoiceDraftCreated" is generated, for invoiceId "inv-5"
+    And "InvoiceDraftCreated" event has "0" waivers in message and reduction calculated
+    And An event of type "InvoiceDraftDueAmountUpdated" is NOT generated, for invoiceId "inv-5"
