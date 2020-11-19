@@ -23,6 +23,7 @@ import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { PublisherRepoContract } from '../../../../publishers/repos';
 import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 
 import * as Errors from './publishRevenueRecognitionReversal.errors';
 import { GetAddressUseCase } from '../../../../addresses/usecases/getAddress/getAddress';
@@ -33,7 +34,7 @@ import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/g
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
 import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
-
+import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 export class PublishRevenueRecognitionReversalUsecase
   implements
     UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
@@ -52,6 +53,7 @@ export class PublishRevenueRecognitionReversalUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {}
@@ -183,10 +185,6 @@ export class PublishRevenueRecognitionReversalUsecase
         }
       );
 
-      this.loggerService.info(
-        'ERP field',
-        this.erpService.invoiceRevenueRecRefFieldName
-      );
       this.loggerService.info('ERP response', erpResponse);
 
       this.loggerService.info(
@@ -196,8 +194,18 @@ export class PublishRevenueRecognitionReversalUsecase
       );
 
       if (erpResponse?.journal?.id) {
-        invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
-          erpResponse?.journal?.id
+        const erpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute: 'revenueRecognition',
+          value: String(erpResponse?.journal?.id),
+        });
+        await this.erpReferenceRepo.save(erpReference);
+        this.loggerService.info(
+          `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(
+            erpResponse
+          )}`
         );
       }
 

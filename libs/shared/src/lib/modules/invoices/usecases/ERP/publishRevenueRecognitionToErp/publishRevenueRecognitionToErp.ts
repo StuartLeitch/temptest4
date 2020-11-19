@@ -220,7 +220,6 @@ export class PublishRevenueRecognitionToErpUsecase
         invoiceTotal: netCharges,
       });
 
-      this.loggerService.info('ERP field', 'Revenue Recognition');
       this.loggerService.debug('ERP response', erpResponse);
 
       await this.invoiceRepo.update(invoice);

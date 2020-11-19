@@ -32,6 +32,8 @@ import {
   UsecaseAuthorizationContext,
 } from '../../../../../../src/lib/shared';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
+import { ErpReferenceMap } from './../../../../../../src/lib/modules/vendors/mapper/ErpReference';
 
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
@@ -43,6 +45,7 @@ let mockManuscriptRepo: MockArticleRepo;
 let mockCatalogRepo: MockCatalogRepo;
 let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
 
 let useCase: PublishRevenueRecognitionReversalUsecase;
@@ -58,7 +61,6 @@ const testInvoiceId = 'testing-invoice';
 Before(function () {
   invoice = null;
 
-  mockInvoiceRepo = new MockInvoiceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
@@ -66,9 +68,11 @@ Before(function () {
   mockAddressRepo = new MockAddressRepo();
   mockManuscriptRepo = new MockArticleRepo();
   mockCatalogRepo = new MockCatalogRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
   mockPublisherRepo = new MockPublisherRepo();
   mockNetsuiteService = new MockErpService();
   mockLogger = new MockLogger();
+  mockInvoiceRepo = new MockInvoiceRepo(null, null, mockErpReferenceRepo);
 
   setupVatService();
 
@@ -82,6 +86,7 @@ Before(function () {
     mockManuscriptRepo,
     mockCatalogRepo,
     mockPublisherRepo,
+    mockErpReferenceRepo,
     mockNetsuiteService,
     mockLogger
   );
@@ -125,6 +130,14 @@ Given(/A regular invoice/, async function () {
     vat: 20,
   });
 
+  const erpReference = ErpReferenceMap.toDomain({
+    entity_id: testInvoiceId,
+    entity_type: 'invoice',
+    vendor: 'testVendor',
+    attribute: 'revenueRecognition',
+    value: 'FOO',
+  });
+
   const address = AddressMap.toDomain({
     country: 'RO',
   });
@@ -144,6 +157,7 @@ Given(/A regular invoice/, async function () {
   mockCatalogRepo.addMockItem(catalog);
   mockManuscriptRepo.addMockItem(manuscript);
   mockInvoiceItemRepo.addMockItem(invoiceItem);
+  mockErpReferenceRepo.addMockItem(erpReference);
 
   transaction.addInvoice(invoice);
   mockInvoiceRepo.addMockItem(invoice);
@@ -155,14 +169,20 @@ When(/Reversal usecase executes for Invoice/, async function () {
 });
 
 Then(/Reversal created in Netsuite for Invoice/, async function () {
+  // tslint:disable-next-line: no-unused-expression
   expect(response.isRight()).to.be.true;
+
   const revenueData = mockNetsuiteService.getRevenue(testInvoiceId);
+  // tslint:disable-next-line: no-unused-expression
   expect(!!revenueData).to.be.true;
 
-  const invoice = await mockInvoiceRepo.getInvoiceById(
+  const testInvoice = await mockInvoiceRepo.getInvoiceById(
     InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
   );
-  expect(invoice.revenueRecognitionReference).to.equal(
-    mockNetsuiteService.revenueRef
-  );
+
+  const erpReferences = testInvoice.getErpReferences().getItems();
+
+  expect(
+    erpReferences.find((ef) => ef.attribute === 'revenueRecognition').value
+  ).to.equal('FOO');
 });
