@@ -46,6 +46,8 @@ interface Context {
 
 const tag = { tags: '@GenerateDraftCompensatoryEvents' };
 
+const invoiceAcceptanceDate = '2020-10-20T14:25:13';
+const waiverAcceptanceDate = '2020-10-20T14:25:14';
 const submissionDate = '2020-10-15T14:25:13';
 const updateDate = '2020-10-17T14:25:13';
 
@@ -146,12 +148,22 @@ Then(
   }
 );
 
+Then(
+  /^An event of type "([\w]+)" is NOT generated, for invoiceId "([\w\d-]+)"$/,
+  (eventName: string, invoiceId: string) => {
+    const event = context.services.queueService.findEvent(eventName);
+    expect(event).to.not.be.ok;
+  }
+);
+
 Given(
   /^A waiver applied at "([\w]+)" on invoiceId "([\w\d-]+)"$/,
   async (moment: string, id: string) => {
     let dateOfWaiver = '';
     if (moment === 'Submission') {
       dateOfWaiver = submissionDate;
+    } else if (moment === 'Acceptance') {
+      dateOfWaiver = waiverAcceptanceDate;
     } else {
       dateOfWaiver = updateDate;
     }
@@ -190,4 +202,11 @@ Given(/^Invoice with id "([\w\d-]+)" is deleted$/, async (id: string) => {
   const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
   const invoice = await context.repos.invoice.getInvoiceById(invoiceId);
   await context.repos.invoice.delete(invoice);
+});
+
+Given(/^Invoice with id "([\w\d-]+)" is accepted$/, async (id: string) => {
+  const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
+  const invoice = await context.repos.invoice.getInvoiceById(invoiceId);
+  invoice.props.dateAccepted = new Date(invoiceAcceptanceDate);
+  await context.repos.invoice.update(invoice);
 });

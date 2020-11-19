@@ -20,6 +20,9 @@ export class KnexWaiverRepo
       .select(
         `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.dateCreated as dateAssigned`,
         `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.invoiceItemId`,
+        `${TABLES.WAIVERS}.reduction`,
+        `${TABLES.WAIVERS}.isActive`,
+        `${TABLES.WAIVERS}.metadata`,
         `${TABLES.WAIVERS}.type_id`
       )
       .from(TABLES.INVOICE_ITEMS_TO_WAIVERS)
