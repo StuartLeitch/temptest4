@@ -16,7 +16,6 @@ export class InvoiceMap extends Mapper<Invoice> {
         dateCreated: new Date(raw.dateCreated),
         dateAccepted: raw.dateAccepted ? new Date(raw.dateAccepted) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
-        // dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
         dateMovedToFinal: raw.dateMovedToFinal
           ? new Date(raw.dateMovedToFinal)
           : null,
@@ -37,18 +36,12 @@ export class InvoiceMap extends Mapper<Invoice> {
   }
 
   public static toPersistence(invoice: Invoice): any {
-    // console.info(invoice);
-    // console.info('invoice.id', invoice.id.toString());
-    // console.info('invoice.nsRevRecReference', invoice.nsRevRecReference);
-    // console.info(invoice.transactionId);
-
     return {
       id: invoice.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
       status: invoice.status,
       invoiceNumber: Number.parseInt(invoice.invoiceNumber, 10) || null,
       dateCreated: invoice.dateCreated,
-      // dateUpdated: invoice.dateUpdated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
       dateMovedToFinal: invoice.dateMovedToFinal,

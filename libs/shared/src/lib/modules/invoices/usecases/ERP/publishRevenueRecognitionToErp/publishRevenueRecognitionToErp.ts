@@ -186,16 +186,16 @@ export class PublishRevenueRecognitionToErpUsecase
       }
 
       const invoiceItem = invoice.invoiceItems.getItems().shift();
-      const { coupons, waivers, price } = invoiceItem;
+      const { assignedCoupons, assignedWaivers, price } = invoiceItem;
       let netCharges = price;
-      if (coupons?.length) {
-        netCharges -= coupons.reduce(
+      if (assignedCoupons?.length) {
+        netCharges -= assignedCoupons.coupons.reduce(
           (acc, coupon) => acc + (coupon.reduction / 100) * price,
           0
         );
       }
-      if (waivers?.length) {
-        netCharges -= waivers.reduce(
+      if (assignedWaivers?.length) {
+        netCharges -= assignedWaivers.waivers.reduce(
           (acc, waiver) => acc + (waiver.reduction / 100) * price,
           0
         );

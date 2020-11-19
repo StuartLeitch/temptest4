@@ -98,7 +98,7 @@ export class MockInvoiceRepo
       vatRegistrationNumber: '',
       foreignPaymentId: '',
       amount: null,
-      paymentDate: invoice.props.dateUpdated?.toISOString(),
+      paymentDate: invoice.props.dateAccepted?.toISOString(),
       paymentType: '',
     };
   }
@@ -106,7 +106,6 @@ export class MockInvoiceRepo
   public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
     let invoice = await this.getInvoiceById(invoiceId);
     if (invoice.invoiceNumber) {
-      console.log('Invoice number already set');
       return invoice;
     }
     invoice.invoiceNumber = String(this._items.length);
@@ -178,9 +177,13 @@ export class MockInvoiceRepo
 
   public async *getInvoicesIds(
     ids: string[],
-    journalIds: string[]
+    journalIds: string[],
+    omitDeleted: boolean
   ): AsyncGenerator<string, void, undefined> {
     yield* this._items.map((item) => item.id.toString());
+    if (!omitDeleted) {
+      yield* this.deletedItems.map((item) => item.id.toString());
+    }
   }
 
   async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
@@ -288,5 +291,11 @@ export class MockInvoiceRepo
     }
 
     return found;
+  }
+
+  async isInvoiceDeleted(id: InvoiceId): Promise<boolean> {
+    const found = this.deletedItems.find((invoice) => invoice.id.equals(id.id));
+
+    return !!found;
   }
 }

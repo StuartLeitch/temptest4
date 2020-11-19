@@ -61,10 +61,11 @@ export class GetItemsForInvoiceUsecase
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          coupons.forEach((c) => item.addCoupon(c));
-          item.waivers = waivers;
+          item.addAssignedCoupons(coupons);
+          item.addAssignedWaivers(waivers);
         }
       } catch (err) {
+        console.log(err);
         return left(
           new GetItemsForInvoiceErrors.InvoiceNotFoundError(
             invoiceId.id.toString()
@@ -73,7 +74,6 @@ export class GetItemsForInvoiceUsecase
       }
 
       if (items.length === 0) {
-        // return right(Result.ok<InvoiceItem[]>([]));
         return left(
           new GetItemsForInvoiceErrors.InvoiceHasNoItems(
             invoiceId.id.toString()

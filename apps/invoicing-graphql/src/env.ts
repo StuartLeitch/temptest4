@@ -47,7 +47,7 @@ export const env = {
     publisherName: getOsEnv('PUBLISHER_NAME'),
     defaultMessageAttributes: getOsEnv('DEFAULT_MESSAGE_ATTRIBUTES'),
     vatValidationServiceEndpoint: getOsEnv('VAT_VALIDATION_SERVICE_ENDPOINT'),
-    failedErpCronRetryTimeMinutes: toNumber(
+    failedErpCronRetryTimeMinutes: toFloat(
       getOsEnv('FAILED_ERP_CRON_RETRY_TIME_MINUTES')
     ),
     failedErpCronRetryDisabled: toBool(

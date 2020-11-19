@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import {
-  GenerateCompensatoryEventsUsecase,
+  GenerateDraftCompensatoryEventsUsecase,
   GetInvoicesIdsUsecase,
   Roles,
 } from '@hindawi/shared';
@@ -11,42 +11,28 @@ import { Context } from '../../builders';
 
 import { Resolvers } from '../schema';
 
-export const generateCompensatoryEvents: Resolvers<Context> = {
+export const generateDraftCompensatoryEvents: Resolvers<Context> = {
   Mutation: {
-    async generateCompensatoryEvents(parent, args, context) {
+    async generateDraftCompensatoryEvents(parent, args, context) {
       const { invoiceIds, journalIds } = args;
       const {
-        repos: {
-          paymentMethod,
-          invoiceItem,
-          manuscript,
-          address,
-          invoice,
-          coupon,
-          waiver,
-          payer,
-          payment,
-        },
+        repos: { invoiceItem, manuscript, invoice, coupon, waiver },
         services: { logger: loggerService, qq: sqsQueService },
       } = context;
-      const usecase = new GenerateCompensatoryEventsUsecase(
-        paymentMethod,
+      const usecase = new GenerateDraftCompensatoryEventsUsecase(
         invoiceItem,
-        sqsQueService,
         manuscript,
-        address,
         invoice,
-        payment,
         coupon,
         waiver,
-        payer,
+        sqsQueService,
         loggerService
       );
       const getIdsUsecase = new GetInvoicesIdsUsecase(invoice);
       const maybeResult = await getIdsUsecase.execute({
         invoiceIds,
         journalIds,
-        omitDeleted: true,
+        omitDeleted: false,
       });
 
       if (maybeResult.isLeft()) {
@@ -63,8 +49,7 @@ export const generateCompensatoryEvents: Resolvers<Context> = {
       for await (const invoiceId of ids) {
         const result = await usecase.execute({ invoiceId }, usecaseContext);
         if (result.isLeft()) {
-          errors.push(result.value.errorValue());
-          // throw new Error(result.value.errorValue().message);
+          errors.push(result.value);
         }
       }
 
