@@ -130,9 +130,21 @@ export class PublishInvoiceToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
-        // invoice.erpReference = 'NON_INVOICEABLE';
-        // invoice.nsReference = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(invoice);
+        const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute: 'erp',
+          value: 'NON_INVOICEABLE',
+        });
+
+        await this.erpReferenceRepo.save(nonInvoiceableErpReference);
+
+        this.loggerService.info(
+          `PublishInvoiceToERP Flag invoice ${invoice.invoiceId.id.toString()} as NON_INVOICEABLE`,
+          nonInvoiceableErpReference
+        );
+
         return right(null);
       }
 

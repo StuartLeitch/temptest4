@@ -41,11 +41,18 @@ export class PublishInvoiceDraftDueAmountUpdatedUseCase
     }
 
     const { messageTimestamp, invoiceItems, manuscript, invoice } = request;
+
+    const erpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .find(Boolean);
+
     const data: InvoiceDraftDueAmountUpdated = {
       ...EventUtils.createEventObject(),
       transactionId: invoice.transactionId.toString(),
       referenceNumber: invoice.referenceNumber,
-      erpReference: null, // invoice.erpReference,
+      erpReference: erpReference.value,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status,
       isCreditNote: false,

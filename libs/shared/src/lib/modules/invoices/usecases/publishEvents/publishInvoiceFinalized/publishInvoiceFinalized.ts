@@ -62,14 +62,19 @@ export class PublishInvoiceFinalizedUsecase
       payer,
     } = request;
 
+    const erpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .find(Boolean);
+
     const data: InvoiceFinalizedEvent = {
       ...EventUtils.createEventObject(),
 
       referenceNumber: this.formatReferenceNumber(invoice),
       isCreditNote: !!invoice.cancelledInvoiceReference,
       transactionId: invoice.transactionId.toString(),
-      // TODO: Fix erpReference
-      erpReference: null, // invoice.erpReference,
+      erpReference: erpReference.value,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status,
 

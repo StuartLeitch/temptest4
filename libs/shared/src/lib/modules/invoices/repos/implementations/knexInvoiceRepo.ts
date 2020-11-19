@@ -123,30 +123,41 @@ export class KnexInvoiceRepo
   }
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
-    const { logger } = this;
+    const { logger, db } = this;
 
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
 
-    const erpReferencesQuery = this.createErpDetailsQuery();
-    const filterByInvoiceId = this.filterByInvoiceId(invoiceId);
-    const sql = filterByInvoiceId(erpReferencesQuery);
+    const sql = db(TABLES.INVOICES)
+      .select()
+      .where('id', invoiceId.id.toString())
+      .first();
 
-    logger.debug('getInvoiceById SQL', {
+    logger.debug('select', {
       correlationId,
       sql: sql.toString(),
     });
 
-    const invoiceWithErpReferences = await sql;
+    const invoice = await sql;
 
-    if (!invoiceWithErpReferences) {
+    if (!invoice) {
       throw RepoError.createEntityNotFoundError(
         'invoice',
         invoiceId.id.toString()
       );
     }
 
-    const erpReferences = invoiceWithErpReferences.reduce(
+    const erpReferencesSQL = db(TABLES.ERP_REFERENCES)
+      .select()
+      .where('entity_id', invoiceId.id.toString());
+
+    logger.debug('select', {
+      correlationId,
+      erpReferencesSQL: erpReferencesSQL.toString(),
+    });
+
+    const associatedErpReferences = await erpReferencesSQL;
+    const erpReferences = associatedErpReferences.reduce(
       (refs, { type, vendor, attribute, value }) => {
         refs.push({
           entity_id: invoiceId.id.toString(),
@@ -160,16 +171,10 @@ export class KnexInvoiceRepo
       []
     );
 
-    // * .find(Boolean) is a shortcut for getting the first item
-    const first = invoiceWithErpReferences.find(Boolean);
-
-    const invoice = InvoiceMap.toDomain({
-      invoiceId: invoiceId.id.toString(),
+    return InvoiceMap.toDomain({
+      ...invoice,
       erpReferences,
-      ...first,
     });
-
-    return invoice;
   }
 
   public async getInvoiceByInvoiceItemId(

@@ -33,10 +33,11 @@ import { Resolvers, Invoice, PayerType } from '../schema';
 import { Context } from '../../builders';
 
 import { env } from '../../env';
+import { AnyPtrRecord } from 'dns';
 
 export const invoice: Resolvers<Context> = {
   Query: {
-    async invoice(parent, args, context) {
+    async invoice(parent, args, context): Promise<any> {
       const { repos } = context;
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 

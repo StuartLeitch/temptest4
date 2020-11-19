@@ -138,8 +138,14 @@ export class PublishPaymentToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
-        // invoice.erpReference = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(invoice);
+        const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'payment',
+          vendor: this.erpService.vendorName,
+          attribute: 'erp',
+          value: 'NON_INVOICEABLE',
+        });
+        await this.erpReferenceRepo.save(nonInvoiceableErpReference);
         return right(null);
       }
 

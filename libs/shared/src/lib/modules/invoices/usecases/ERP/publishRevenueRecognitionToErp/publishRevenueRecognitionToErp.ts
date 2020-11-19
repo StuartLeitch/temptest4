@@ -199,19 +199,16 @@ export class PublishRevenueRecognitionToErpUsecase
         );
       }
 
-      // const erpReference = ErpReferenceMap.toDomain({
-      //   entity_id: invoice.invoiceId.id.toString(),
-      //   type: 'invoice',
-      //   vendor: 'netsuite',
-      //   // attribute: this.erpService.invoiceRevenueRecRefFieldName,
-      //   // value: String(erpResponse.tradeDocumentId),
-      // });
-
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {
-        // erpReference.attribute = '';
-        // erpReference.value = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(invoice);
+        const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute: 'revenueRecognition',
+          value: 'NON_INVOICEABLE',
+        });
+        await this.erpReferenceRepo.save(nonInvoiceableErpReference);
         return right(Result.ok<any>(null));
       }
 
@@ -242,6 +239,11 @@ export class PublishRevenueRecognitionToErpUsecase
           value: String(erpResponse?.journal?.id),
         });
         await this.erpReferenceRepo.save(erpReference);
+        this.loggerService.info(
+          `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(
+            erpResponse
+          )}`
+        );
       }
 
       return right(Result.ok<any>(erpResponse));

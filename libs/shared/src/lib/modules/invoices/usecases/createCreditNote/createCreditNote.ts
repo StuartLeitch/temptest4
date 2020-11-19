@@ -208,10 +208,7 @@ export class CreateCreditNoteUsecase
           status: InvoiceStatus.DRAFT,
           dateMovedToFinal: null,
           invoiceNumber: null,
-          erpReference: null,
-          nsReference: null,
-          revenueRecognitionReference: null,
-          nsRevRecReference: null,
+          erpReferences: null,
           cancelledInvoiceReference: null,
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain

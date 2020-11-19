@@ -6,8 +6,8 @@ import { Guard } from '../../../core/logic/Guard';
 import { InvalidErpReference } from './InvalidErpReference';
 
 export interface ErpReferenceProps {
-  entity_id: string;
-  vendor: string;
+  readonly entity_id: string;
+  readonly vendor: string;
   entity_type: string;
   attribute?: string;
   value?: string;
