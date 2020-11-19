@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, BeforeAll, AfterAll } from 'cucumber';
+import { Given, When, Then, BeforeAll, AfterAll } from '@cucumber/cucumber';
 
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';

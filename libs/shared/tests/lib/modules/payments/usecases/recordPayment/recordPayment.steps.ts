@@ -4,7 +4,7 @@ import {
   buildMockContext,
   MockContext,
 } from '../../../../../../specs/utils/mockContextBuilder';
-import { Given, When, Then, Before, After } from 'cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 import { RecordPaymentUsecase } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPayment';
 import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
 import { RecordPaymentDTO } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentDTO';

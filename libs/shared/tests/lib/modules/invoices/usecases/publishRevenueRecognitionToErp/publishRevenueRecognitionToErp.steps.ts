@@ -1,7 +1,7 @@
 // tslint:disable: no-unused-expression
 
 import { expect } from 'chai';
-import { Before, Given, Then, When } from 'cucumber';
+import { Before, Given, Then, When } from '@cucumber/cucumber';
 
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 import { MockErpService } from '../../../../../../src/lib/domain/services/mocks/MockErpService';

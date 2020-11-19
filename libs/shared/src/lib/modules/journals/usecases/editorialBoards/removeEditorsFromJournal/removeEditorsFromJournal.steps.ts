@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from 'cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 

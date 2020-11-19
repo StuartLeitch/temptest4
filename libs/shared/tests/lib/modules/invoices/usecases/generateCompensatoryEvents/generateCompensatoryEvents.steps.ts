@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 import {

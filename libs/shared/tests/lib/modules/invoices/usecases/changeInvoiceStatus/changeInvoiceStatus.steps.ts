@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { ChangeInvoiceStatus } from '../../../../../../src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatus';
 import { ChangeInvoiceStatusResponse } from './../../../../../../src/lib/modules/invoices/usecases/changeInvoiceStatus/changeInvoiceStatusResponse';
