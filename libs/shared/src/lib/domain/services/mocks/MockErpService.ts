@@ -44,6 +44,20 @@ export class MockErpService implements ErpServiceContract {
     };
   }
 
+  async registerRevenueRecognitionReversal(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
+    const invoiceId = data.invoice.id.toString();
+    this.revenueMap[invoiceId] = data;
+
+    return {
+      journal: { id: this.revenueRef },
+      journalItem: null,
+      journalItemTag: null,
+      journalTags: null,
+    };
+  }
+
   public getInvoice(invoiceId: string): ErpInvoiceRequest {
     return this.invoiceMap[invoiceId];
   }

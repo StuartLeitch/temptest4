@@ -136,6 +136,57 @@ export class NetSuiteService implements ErpServiceContract {
     };
   }
 
+  public async registerRevenueRecognitionReversal(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
+    const {
+      publisherCustomValues: { customSegmentId },
+    } = data;
+    const customerId = await this.getCustomerId(data);
+
+    /**
+     * * Hindawi will be accounts: debit id "376", credit id: "401"
+     * * Partnerships will be accounts: debit id "377", credit id: "402"
+     **/
+    const idMap = {
+      Hindawi: {
+        debit: 376,
+        credit: 401,
+      },
+      Partnership: {
+        debit: 377,
+        credit: 402,
+      },
+    };
+
+    let creditAccountId;
+    let debitAccountId;
+    if (customSegmentId !== '4') {
+      creditAccountId = idMap.Partnership.credit;
+      debitAccountId = idMap.Partnership.debit;
+    } else {
+      creditAccountId = idMap.Hindawi.credit;
+      debitAccountId = idMap.Hindawi.debit;
+    }
+
+    const revenueRecognitionReversal = await this.createRevenueRecognitionReversal(
+      {
+        ...data,
+        creditAccountId,
+        debitAccountId,
+        customerId,
+        customSegmentId,
+      }
+    );
+
+    return {
+      journal: { id: String(revenueRecognitionReversal) },
+      journalItem: null,
+      journalTags: null,
+      journalItemTag: null,
+    };
+  }
+
   public async registerCreditNote(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
@@ -583,6 +634,80 @@ export class NetSuiteService implements ErpServiceContract {
       });
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
+    }
+  }
+
+  private async createRevenueRecognitionReversal(data: {
+    invoice: Invoice;
+    invoiceTotal: number;
+    creditAccountId: string;
+    debitAccountId: string;
+    customerId: string;
+    customSegmentId: string;
+  }) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+    const {
+      invoice,
+      invoiceTotal,
+      creditAccountId,
+      debitAccountId,
+      customerId,
+      customSegmentId,
+    } = data;
+
+    const journalRequestOpts = {
+      url: `${config.endpoint}record/v1/journalentry`,
+      method: 'POST',
+    };
+
+    const createJournalPayload: Record<string, unknown> = {
+      approved: true,
+      tranId: `Revenue Recognition Reversal - ${invoice.referenceNumber}`,
+      memo: `${invoice.referenceNumber}`,
+      entity: {
+        id: customerId,
+      },
+      line: {
+        items: [
+          {
+            memo: `${invoice.referenceNumber}`,
+            account: {
+              id: creditAccountId,
+            },
+            debit: invoiceTotal,
+          },
+          {
+            memo: `${invoice.referenceNumber}`,
+            account: {
+              id: debitAccountId,
+            },
+            credit: invoiceTotal,
+          },
+        ],
+      },
+    };
+
+    if (customSegmentId !== '4') {
+      createJournalPayload.cseg1 = {
+        id: customSegmentId,
+      };
+    }
+
+    try {
+      const res = await axios({
+        ...journalRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(journalRequestOpts, token)),
+        data: createJournalPayload,
+      } as AxiosRequestConfig);
+
+      const journalId = res?.headers?.location?.split('/').pop();
+      await this.patchInvoice({ ...data, journalId });
+      return journalId;
+    } catch (err) {
+      console.error(err);
+      return { err } as unknown;
     }
   }
 

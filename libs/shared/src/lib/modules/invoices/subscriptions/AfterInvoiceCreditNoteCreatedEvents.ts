@@ -3,6 +3,10 @@ import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 
+import {
+  Roles,
+  UsecaseAuthorizationContext,
+} from '../../../domain/authorization';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { InvoiceCreditNoteCreated as InvoiceCreditNoteCreatedEvent } from '../domain/events/invoiceCreditNoteCreated';
@@ -21,8 +25,14 @@ import { WaiverRepoContract } from '../../waivers/repos';
 
 import { PublishCreditNoteToErpUsecase } from '../usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
+import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
+
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
 
 export class AfterInvoiceCreditNoteCreatedEvent
   implements HandleContract<InvoiceCreditNoteCreatedEvent> {
@@ -38,6 +48,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
     private publishCreditNoteToErp: PublishCreditNoteToErpUsecase | NoOpUseCase,
+    private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -49,15 +60,14 @@ export class AfterInvoiceCreditNoteCreatedEvent
       InvoiceCreditNoteCreatedEvent.name
     );
   }
-
   private async onInvoiceCreditNoteCreatedEvent(
     event: InvoiceCreditNoteCreatedEvent
   ): Promise<any> {
+    const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const creditNote = await this.invoiceRepo.getInvoiceById(
         event.creditNoteId
       );
-
       let invoiceItems = creditNote.invoiceItems.currentItems;
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -129,7 +139,6 @@ export class AfterInvoiceCreditNoteCreatedEvent
       const billingAddress = await this.addressRepo.findById(
         payer.billingAddressId
       );
-
       const publishResult = await this.publishInvoiceCredited.execute({
         paymentMethods: paymentMethods.value.getValue(),
         invoiceItems,
@@ -153,6 +162,39 @@ export class AfterInvoiceCreditNoteCreatedEvent
       });
 
       this.loggerService.info('[PublishCreditNoteToERP]:', publishToErpResult);
+
+      //Get Invoice ID
+      const invoiceId = creditNote.cancelledInvoiceReference;
+
+      //Get Invoice
+
+      const maybeInvoice = await getInvoiceDetails.execute(
+        {
+          invoiceId,
+        },
+        defaultContext
+      );
+
+      if (maybeInvoice.isLeft()) {
+        throw new Error(`Couldn't find Invoice Values for ID: ${invoiceId}`);
+      }
+      const invoice = maybeInvoice.value.getValue();
+
+      if (manuscript.datePublished && invoice.nsRevRecReference) {
+        const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
+          { invoiceId },
+          defaultContext
+        );
+
+        if (publishRevenueRecognitionReversal.isLeft()) {
+          throw publishRevenueRecognitionReversal.value.message;
+        }
+        this.loggerService.info(
+          `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
+            publishRevenueRecognitionReversal
+          )}`
+        );
+      }
     } catch (err) {
       console.log(
         `[AfterInvoiceCreditNoteCreated]: Failed to execute onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent. Err: ${err}`
