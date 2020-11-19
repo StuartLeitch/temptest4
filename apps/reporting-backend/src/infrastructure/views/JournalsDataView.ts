@@ -18,6 +18,7 @@ AS SELECT journal_events.id AS event_id,
     journal_events.payload ->> 'apc'::text AS apc,
     journal_events.payload ->> 'email'::text AS journal_email,
     journal_events.payload ->> 'publisherName'::text AS publisher_name,
+    journal_events.payload -> 'peerReviewModel' ->> 'name'::text AS peer_review_model,
     coalesce(journal_events.time, cast_to_timestamp(journal_events.payload ->> 'updated'::text), cast_to_timestamp('1980-01-01')) as event_date,
     cast_to_timestamp(journal_events.payload ->> 'updated'::text) AS updated_date
     FROM ${REPORTING_TABLES.JOURNAL}
