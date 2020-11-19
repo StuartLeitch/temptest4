@@ -44,6 +44,7 @@ export class ErpReference extends ValueObject<ErpReferenceProps> {
     props: ErpReferenceProps
   ): Either<InvalidErpReference, ErpReference> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
+      { argument: props.entity_id, argumentName: 'entity_id' },
       { argument: props.vendor, argumentName: 'vendor' },
       { argument: props.entity_type, argumentName: 'entity_type' },
     ]);
