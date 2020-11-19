@@ -28,7 +28,6 @@ export class MockInvoiceRepo
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
     let filterInvoiceById = null;
-    let getErpReferencesByEntityId = null;
 
     filterInvoiceById = this.filterInvoiceById(invoiceId);
 
@@ -37,23 +36,24 @@ export class MockInvoiceRepo
       return null;
     }
 
+    let erpReferences = [];
     if (this.erpReferenceRepo) {
-      [getErpReferencesByEntityId] = this.erpReferenceRepo.filterBy({
+      const foundReferences = this.erpReferenceRepo.filterBy({
         where: [['entity_id', '=', invoiceId.id.toString()]],
       });
+
+      erpReferences = erpReferences.concat(foundReferences);
     }
 
     return InvoiceMap.toDomain({
       ...InvoiceMap.toPersistence(filterInvoiceById),
-      erpReferences: [
-        {
-          entity_id: getErpReferencesByEntityId?.entity_id,
-          type: getErpReferencesByEntityId?.entityType,
-          vendor: getErpReferencesByEntityId?.vendor,
-          attribute: getErpReferencesByEntityId?.attribute,
-          value: getErpReferencesByEntityId?.value,
-        },
-      ],
+      erpReferences: erpReferences.map((ef) => ({
+        entity_id: ef?.entity_id,
+        type: ef?.entityType,
+        vendor: ef?.vendor,
+        attribute: ef?.attribute,
+        value: ef?.value,
+      })),
     });
   }
 

@@ -288,7 +288,9 @@ Then(
     );
     const erpReferences = testInvoice.getErpReferences().getItems();
 
-    // expect(erpReferences).to.equal('NON_INVOICEABLE');
-    expect(erpReferences.length).to.equal(0);
+    expect(erpReferences.length).to.equal(1);
+
+    const [nonInvoiceable] = erpReferences;
+    expect(nonInvoiceable.value).to.equal('NON_INVOICEABLE');
   }
 );

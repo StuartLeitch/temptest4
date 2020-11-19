@@ -101,6 +101,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       catalog,
       publisher,
+      erpReference,
       erp.netsuite,
       loggerService
     );

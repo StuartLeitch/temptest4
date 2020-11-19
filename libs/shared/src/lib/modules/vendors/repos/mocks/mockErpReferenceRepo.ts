@@ -18,6 +18,7 @@ export class MockErpReferenceRepo
   public async getErpReferencesByInvoiceId(
     invoiceId: InvoiceId
   ): Promise<InvoiceErpReferences> {
+    console.info('\n\n\n :\u{2757} DEBUG \n\n\n');
     const match = this._items.find(() =>
       this._items.some((ef) => ef.entity_id === invoiceId.id.toString())
     );
@@ -73,13 +74,16 @@ export class MockErpReferenceRepo
         if (operator === '<>') {
           return field !== value;
         }
+        if (operator === '=') {
+          return field === value;
+        }
       },
     };
 
-    const items = this._items;
+    let items = this._items;
 
     for (const [filter, conditions] of Object.entries(criteria)) {
-      items.filter((i) => {
+      items = items.filter((i) => {
         let toKeep = true;
         for (const cnd of conditions as any[]) {
           if (!toKeep) {

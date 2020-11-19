@@ -31,6 +31,7 @@ import {
   addCoupons,
   addWaivers,
   addPayers,
+  addErpReferences,
 } from './testUtils';
 
 import { Roles } from './../../../../../../src/lib/modules/users/domain/enums/Roles';
@@ -85,6 +86,7 @@ Before(function () {
   addCoupons(mockCouponRepo);
   addWaivers(mockWaiverRepo);
   addPayers(mockPayerRepo);
+  addErpReferences(mockErpReferenceRepo);
 
   useCase = new GenerateCompensatoryEventsUsecase(
     mockPaymentMethodRepo,

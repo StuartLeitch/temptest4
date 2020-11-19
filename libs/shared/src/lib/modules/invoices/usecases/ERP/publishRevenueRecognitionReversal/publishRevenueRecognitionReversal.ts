@@ -152,7 +152,7 @@ export class PublishRevenueRecognitionReversalUsecase
         return right(null);
       }
 
-      //Get catalog
+      // * Get catalog
       const catalog = await this.catalogRepo.getCatalogItemByJournalId(
         JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
       );
@@ -161,13 +161,14 @@ export class PublishRevenueRecognitionReversalUsecase
         return left(new Errors.InvoiceCatalogNotFoundError(invoiceId));
       }
 
-      //Get publisher custom values
+      // * Get publisher custom values
       const maybePublisherCustomValue = await getPublisherCustomValue.execute(
         {
           publisherId: catalog.publisherId.id.toString(),
         },
         context
       );
+
       if (maybePublisherCustomValue.isLeft()) {
         return left(new Errors.InvoiceCatalogNotFoundError(invoiceId));
       }
