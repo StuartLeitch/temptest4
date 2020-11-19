@@ -486,11 +486,11 @@ export class KnexInvoiceRepo
     );
   }
 
-  async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
+  public async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {
     return this.getUnregisteredInvoices('netsuite');
   }
 
-  async getFailedSageErpInvoices(): Promise<Invoice[]> {
+  public async getFailedSageErpInvoices(): Promise<Invoice[]> {
     return this.getUnregisteredInvoices('sage');
   }
 
