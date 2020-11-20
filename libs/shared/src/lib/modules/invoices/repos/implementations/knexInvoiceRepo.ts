@@ -431,7 +431,7 @@ export class KnexInvoiceRepo
     ).limit(LIMIT);
 
     logger.debug('select', {
-      [`${vendor.toUpperCase()}SageSQL`]: prepareIdsSQL.toString(),
+      [`${vendor.toUpperCase()}_SQL`]: prepareIdsSQL.toString(),
     });
 
     const invoices = await prepareIdsSQL;
@@ -481,7 +481,7 @@ export class KnexInvoiceRepo
     ).limit(LIMIT);
 
     logger.debug('select', {
-      [`${vendor.toUpperCase()}SQL`]: prepareIdsSQL.toString(),
+      [`${vendor.toUpperCase()}_SQL`]: prepareIdsSQL.toString(),
     });
 
     const invoices = await prepareIdsSQL;

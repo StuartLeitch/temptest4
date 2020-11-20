@@ -101,9 +101,10 @@ export class RetryFailedSageErpInvoicesUsecase
       }
       this.loggerService.info(
         `Retrying sync with Sage for invoices: ${failedErpInvoices
-          .map((i) => i.invoiceId.id.toString())
+          .map((i) => i.id.toString())
           .join(', ')}`
       );
+
       const errs = [];
 
       for (const failedInvoice of failedErpInvoices) {

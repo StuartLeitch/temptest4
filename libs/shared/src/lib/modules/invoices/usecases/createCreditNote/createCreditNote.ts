@@ -190,6 +190,7 @@ export class CreateCreditNoteUsecase
 
       // * Assign the cancelled invoice reference
       // * This assignment will trigger an INVOICE_CREDITED event
+
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
       creditNote.markAsFinal();
 

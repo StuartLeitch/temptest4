@@ -102,7 +102,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       catalog,
       publisher,
       erpReference,
-      erp.netsuite,
+      erp?.netsuite ?? null,
       loggerService
     );
     const publishInvoiceDraftCreated = new PublishInvoiceDraftCreatedUseCase(
