@@ -149,6 +149,7 @@ const InvoicesLeftNav = (props) => {
                 /\d/,
                 /\d/,
                 /\d/,
+                /\d/,
                 '/',
                 /1|2/,
                 /0|9/,
