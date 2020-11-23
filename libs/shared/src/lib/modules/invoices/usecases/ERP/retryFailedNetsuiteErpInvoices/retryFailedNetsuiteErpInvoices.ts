@@ -91,27 +91,27 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryFailedNetsuiteErpInvoicesResponse> {
     try {
-      const failedErpInvoices = await this.invoiceRepo.getFailedNetsuiteErpInvoices();
+      const failedErpInvoicesIds = await this.invoiceRepo.getFailedNetsuiteErpInvoices();
 
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
-      if (failedErpInvoices.length === 0) {
+      if (failedErpInvoicesIds.length === 0) {
         this.loggerService.info('No failed invoices to register in NetSuite');
         return right(updatedInvoices);
       }
 
       this.loggerService.info(
-        `Retrying sync with NetSuite for invoices: ${failedErpInvoices
+        `Retrying sync with NetSuite for invoices: ${failedErpInvoicesIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
 
       const errs = [];
 
-      for (const failedInvoice of failedErpInvoices) {
+      for (const failedInvoice of failedErpInvoicesIds) {
         const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
           {
-            invoiceId: failedInvoice.invoiceId.id.toString(),
+            invoiceId: failedInvoice.id.toString(),
           }
         );
 
@@ -126,17 +126,17 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
         const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
         if (assignedErpReference) {
-          console.log(
+          this.loggerService.info(
             `Assigned successfully ${
               assignedErpReference?.tradeDocumentId
-            } to invoice ${failedInvoice.invoiceId.id.toString()}`
+            } to invoice ${failedInvoice.id.toString()}`
           );
           updatedInvoices.push(assignedErpReference);
         }
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        this.loggerService.error(JSON.stringify(errs, null, 2));
         return left(new UnexpectedError(errs, JSON.stringify(errs)));
       }
 

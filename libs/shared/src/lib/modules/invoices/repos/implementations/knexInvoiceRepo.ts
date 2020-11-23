@@ -397,7 +397,9 @@ export class KnexInvoiceRepo
     const LIMIT = 30;
     const { db, logger } = this;
 
-    const erpReferencesQuery = db(TABLES.INVOICES).select('invoices.id');
+    const erpReferencesQuery = db(TABLES.INVOICES)
+      .column({ invoiceId: 'invoices.id' })
+      .select();
     const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
     const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
       whereNotNull: 'articles.datePublished',
@@ -462,7 +464,9 @@ export class KnexInvoiceRepo
     const LIMIT = 30;
     const { db, logger } = this;
 
-    const erpReferencesQuery = db(TABLES.INVOICES).select('invoices.id');
+    const erpReferencesQuery = db(TABLES.INVOICES)
+      .column({ invoiceId: 'invoices.id' })
+      .select();
     const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
 
     const withErpReference = this.withErpReferenceQuery(
@@ -486,9 +490,9 @@ export class KnexInvoiceRepo
 
     const invoices = await prepareIdsSQL;
 
-    return invoices.map((i) =>
-      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
-    );
+    return invoices.map((i) => {
+      return InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue();
+    });
   }
 
   public async getFailedNetsuiteErpInvoices(): Promise<Invoice[]> {

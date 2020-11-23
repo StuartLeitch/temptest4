@@ -84,22 +84,22 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryRevenueRecognitionNetsuiteErpInvoicesResponse> {
     try {
-      const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedNetsuiteErpInvoices();
+      const unrecognizedErpInvoicesIds = await this.invoiceRepo.getUnrecognizedNetsuiteErpInvoices();
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
-      if (unrecognizedErpInvoices.length === 0) {
+      if (unrecognizedErpInvoicesIds.length === 0) {
         this.loggerService.info('No revenue unrecognized invoices');
         return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
       }
 
       this.loggerService.info(
-        `Retrying recognizing in NetSuite for invoices: ${unrecognizedErpInvoices
+        `Retrying recognizing in NetSuite for invoices: ${unrecognizedErpInvoicesIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unrecognizedInvoice of unrecognizedErpInvoices) {
+      for (const unrecognizedInvoice of unrecognizedErpInvoicesIds) {
         const updatedInvoiceResponse = await this.publishRevenueRecognitionToErpUsecase.execute(
           {
             invoiceId: unrecognizedInvoice.id.toString(),
