@@ -16,6 +16,6 @@ export const ErpReferenceAttributesMapping = {
     paymentConfirmation: 'payment',
     revenueRecognition: 'journal',
     revenueRecognitionReversal: 'journal',
-    creditNote: 'creditMemo',
+    creditNote: 'creditNote',
   },
 };
