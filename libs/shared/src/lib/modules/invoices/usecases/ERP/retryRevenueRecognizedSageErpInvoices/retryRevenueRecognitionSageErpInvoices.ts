@@ -85,6 +85,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
   ): Promise<RetryRevenueRecognitionSageErpInvoicesResponse> {
     try {
       const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedSageErpInvoices();
+
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (unrecognizedErpInvoices.length === 0) {

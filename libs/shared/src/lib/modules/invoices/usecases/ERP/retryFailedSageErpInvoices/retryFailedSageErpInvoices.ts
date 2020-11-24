@@ -125,7 +125,7 @@ export class RetryFailedSageErpInvoicesUsecase
         const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
         if (assignedErpReference) {
-          console.log(
+          this.loggerService.info(
             `Assigned successfully ${
               assignedErpReference?.tradeDocumentId
             } to invoice ${failedInvoice.invoiceId.id.toString()}`
@@ -135,7 +135,7 @@ export class RetryFailedSageErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs)));
       }
 

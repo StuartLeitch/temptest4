@@ -236,7 +236,9 @@ export class PublishRevenueRecognitionToErpUsecase
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
-          attribute: 'revenueRecognition',
+          attribute:
+            this.erpService?.referenceMappings?.revenueRecognition ||
+            'revenueRecognition',
           value: String(erpResponse?.journal?.id),
         });
         await this.erpReferenceRepo.save(erpReference);

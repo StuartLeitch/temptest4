@@ -49,7 +49,6 @@ export const erpLoader: MicroframeworkLoader = async (
       sage: env.salesForce.sageEnabled ? sageService : emptyErp,
       netsuite: env.netSuite.netSuiteEnabled ? netSuiteService : emptyErp,
     };
-
     // settings.onShutdown(() => erpConnection.destroy());
   }
 };

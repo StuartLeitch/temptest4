@@ -136,7 +136,7 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        this.loggerService.error(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs)));
       }
 

@@ -85,6 +85,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
   ): Promise<RetryRevenueRecognitionNetsuiteErpInvoicesResponse> {
     try {
       const unrecognizedErpInvoicesIds = await this.invoiceRepo.getUnrecognizedNetsuiteErpInvoices();
+
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (unrecognizedErpInvoicesIds.length === 0) {
@@ -124,7 +125,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
