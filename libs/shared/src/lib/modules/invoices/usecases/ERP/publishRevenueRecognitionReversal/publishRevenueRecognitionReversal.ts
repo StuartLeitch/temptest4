@@ -199,10 +199,11 @@ export class PublishRevenueRecognitionReversalUsecase
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
-          attribute: 'revenueRecognition',
+          attribute: 'revenueRecognitionReversal',
           value: String(erpResponse?.journal?.id),
         });
         await this.erpReferenceRepo.save(erpReference);
+
         this.loggerService.info(
           `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(
             erpResponse
