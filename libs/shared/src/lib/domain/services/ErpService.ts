@@ -47,6 +47,7 @@ export interface ErpRevRecResponse {
 
 export interface ErpServiceContract {
   readonly vendorName: string;
+  readonly referenceMappings?: Record<string, any>;
   registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse>;
   registerRevenueRecognition(
     data: ErpRevRecRequest
@@ -61,6 +62,10 @@ export interface ErpServiceContract {
 export class EmptyErpService implements ErpServiceContract {
   get vendorName(): string {
     return 'emptyVendor';
+  }
+
+  get referenceMappings(): Record<string, any> {
+    return {};
   }
 
   async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {

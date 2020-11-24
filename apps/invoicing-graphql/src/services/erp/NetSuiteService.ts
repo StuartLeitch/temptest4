@@ -32,7 +32,8 @@ type CustomerPayload = Record<string, string | boolean>;
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
-    private logger: LoggerContract
+    private logger: LoggerContract,
+    readonly referenceMappings?: Record<string, any>
   ) {}
 
   get vendorName(): string {
@@ -43,14 +44,15 @@ export class NetSuiteService implements ErpServiceContract {
     config: Record<string, unknown>,
     loggerBuilder: LoggerBuilderContract
   ): NetSuiteService {
+    const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
-      config: new ConnectionConfig(config.connection),
+      config: new ConnectionConfig(configConnection),
     });
 
     const logger = loggerBuilder.getLogger();
     logger.setScope('NetSuiteService');
 
-    const service = new NetSuiteService(connection, logger);
+    const service = new NetSuiteService(connection, logger, referenceMappings);
 
     return service;
   }

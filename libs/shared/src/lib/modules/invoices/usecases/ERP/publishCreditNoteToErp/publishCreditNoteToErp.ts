@@ -154,7 +154,8 @@ export class PublishCreditNoteToErpUsecase
             entity_id: creditNote.invoiceId.id.toString(),
             type: 'invoice',
             vendor: this.erpService.vendorName,
-            attribute: 'creditNote',
+            attribute:
+              this.erpService?.referenceMappings?.creditNote || 'creditNote',
             value: String(erpResponse),
           });
           await this.erpReferenceRepo.save(erpReference);

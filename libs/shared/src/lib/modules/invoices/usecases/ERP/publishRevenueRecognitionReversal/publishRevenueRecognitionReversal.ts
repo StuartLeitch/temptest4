@@ -196,10 +196,14 @@ export class PublishRevenueRecognitionReversalUsecase
 
       if (erpResponse?.journal?.id) {
         const erpReference = ErpReferenceMap.toDomain({
+          // ? Uncomment this if you want to store the original credited invoice id
+          // entity_id: invoice.cancelledInvoiceReference,
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
-          attribute: 'revenueRecognitionReversal',
+          attribute:
+            this.erpService?.referenceMappings?.revenueRecognitionReversal ||
+            'revenueRecognitionReversal',
           value: String(erpResponse?.journal?.id),
         });
         await this.erpReferenceRepo.save(erpReference);

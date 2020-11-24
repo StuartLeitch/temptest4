@@ -231,7 +231,9 @@ export class PublishPaymentToErpUsecase
             entity_id: payment.paymentId.id.toString(),
             type: 'payment',
             vendor: this.erpService.vendorName,
-            attribute: 'erp',
+            attribute:
+              this.erpService?.referenceMappings?.paymentConfirmation ||
+              'payment',
             value: String(erpResponse),
           });
           await this.erpReferenceRepo.save(erpReference);
