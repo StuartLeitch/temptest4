@@ -18,7 +18,7 @@ export class MockErpReferenceRepo
   public async getErpReferencesByInvoiceId(
     invoiceId: InvoiceId
   ): Promise<InvoiceErpReferences> {
-    console.info('\n\n\n :\u{2757} DEBUG \n\n\n');
+    // console.info('\n\n\n :\u{2757} DEBUG \n\n\n');
     const match = this._items.find(() =>
       this._items.some((ef) => ef.entity_id === invoiceId.id.toString())
     );

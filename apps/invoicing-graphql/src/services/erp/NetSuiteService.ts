@@ -474,8 +474,14 @@ export class NetSuiteService implements ErpServiceContract {
       'Bank Transfer': '347',
     };
 
+    const nsErpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .find(Boolean);
+
     const paymentRequestOpts = {
-      // url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}/!transform/customerpayment`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference}/!transform/customerpayment`,
       method: 'POST',
     };
 
@@ -502,6 +508,10 @@ export class NetSuiteService implements ErpServiceContract {
       // Amount due,
       payment: payment.amount.value,
     };
+
+    this.logger.info({
+      createPaymentPayload,
+    });
 
     try {
       const res = await axios({
