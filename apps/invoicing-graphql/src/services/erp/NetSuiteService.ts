@@ -481,7 +481,7 @@ export class NetSuiteService implements ErpServiceContract {
       .find(Boolean);
 
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference}/!transform/customerpayment`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}/!transform/customerpayment`,
       method: 'POST',
     };
 
@@ -734,7 +734,7 @@ export class NetSuiteService implements ErpServiceContract {
       .find(Boolean);
 
     const invoiceRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference}`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
       method: 'PATCH',
     };
 
@@ -768,14 +768,14 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { originalInvoice } = data;
 
-    const originalnsErpReference = originalInvoice
+    const originalNSErpReference = originalInvoice
       .getErpReferences()
       .getItems()
       .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
       .find(Boolean);
 
     const creditNoteTransformOpts = {
-      url: `${config.endpoint}record/v1/invoice/${originalnsErpReference}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${originalNSErpReference.value}/!transform/creditmemo`,
       method: 'POST',
     };
 
