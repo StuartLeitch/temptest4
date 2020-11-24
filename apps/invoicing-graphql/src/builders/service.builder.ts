@@ -53,14 +53,10 @@ export interface Services {
 
 function buildPaymentStrategyFactory(
   paymentMethodRepo: PaymentMethodRepoContract,
-  loggerBuilder: LoggerBuilder,
-  repos: Repos
+  loggerBuilder: LoggerBuilder
 ) {
   const paypalService = new PayPalService(
     env.paypal,
-    repos.paymentMethod,
-    repos.invoice,
-    repos.payment,
     loggerBuilder.getLogger()
   );
   const braintreeService = new BraintreeService(
@@ -144,8 +140,7 @@ export async function buildServices(
       : null,
     paymentStrategyFactory: buildPaymentStrategyFactory(
       repos.paymentMethod,
-      loggerBuilder,
-      repos
+      loggerBuilder
     ),
     erp: null,
     qq: env.loaders.queueServiceEnabled

@@ -29,29 +29,26 @@ import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsFo
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
-import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 import { CreatePaymentUsecase, CreatePaymentDTO } from '../createPayment';
+import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 
-import { PaymentDTO } from '../../domain/strategies/behaviors';
-import {
-  PaymentStrategySelectionData,
-  PaymentStrategyFactory,
-} from '../../domain/strategies/payment-strategy-factory';
+import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
 import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
+import { PaymentDTO } from '../../domain/strategies/behaviors';
+import { PaymentStatus } from '../../domain/Payment';
 
 import {
+  WithPaymentMethodId,
   SelectionData,
   WithInvoiceId,
   PaymentData,
   WithInvoice,
   WithPayment,
-  WithForeignPaymentId,
 } from './helper-types';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
-import { PaymentStatus } from '../../domain/Payment';
 
 export class RecordPaymentUsecase
   implements
@@ -176,11 +173,11 @@ export class RecordPaymentUsecase
     request: T
   ): Promise<Either<void, T & { strategy: PaymentStrategy }>> {
     const { payerIdentification, paymentReference } = request;
-    const data: PaymentStrategySelectionData = {
+
+    const strategy = await this.strategyFactory.selectStrategy({
       payerIdentification,
       paymentReference,
-    };
-    const strategy = await this.strategyFactory.selectStrategy(data);
+    });
 
     return right({
       ...request,
@@ -221,7 +218,7 @@ export class RecordPaymentUsecase
       this.paymentRepo
     );
 
-    return async <T extends WithForeignPaymentId & WithInvoiceId>(
+    return async <T extends WithInvoiceId & WithPaymentMethodId>(
       request: T
     ) => {
       return new AsyncEither(request.invoiceId)
@@ -231,7 +228,8 @@ export class RecordPaymentUsecase
           return payments
             .filter((payment) => payment.status === PaymentStatus.CREATED)
             .filter(
-              (payment) => payment.foreignPaymentId === request.foreignPaymentId
+              (payment) =>
+                payment.paymentMethodId.toString() === request.paymentMethodId
             );
         })
         .map((payments) => {
@@ -266,6 +264,7 @@ export class RecordPaymentUsecase
         datePaid,
       };
 
+      // TODO: Update payment if payment already exists else create new payment
       return new AsyncEither(dto)
         .then(this.attachPaymentIfExists(context))
         .advanceOrEnd(async (data) => {

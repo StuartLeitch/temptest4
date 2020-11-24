@@ -41,3 +41,7 @@ export interface WithPayment {
 export interface WithForeignPaymentId {
   foreignPaymentId: string;
 }
+
+export interface WithPaymentMethodId {
+  paymentMethodId: string;
+}
