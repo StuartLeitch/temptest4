@@ -140,7 +140,7 @@ Given(/There is an existing Invoice with the ID "([\w-]+)"/, async function (
     entity_id: invoiceId,
     entity_type: 'invoice',
     vendor: 'testVendor',
-    attribute: 'erp',
+    attribute: 'confirmation',
     value: 'FOO',
   });
 
@@ -270,7 +270,7 @@ Then(/The Invoice with the ID "([\w-]+)" is registered to erp/, async function (
     testInvoice
       .getErpReferences()
       .getItems()
-      .find((ef) => ef.attribute === 'erp').value
+      .find((ef) => ef.attribute === 'confirmation').value
   ).to.equal('FOO');
 });
 

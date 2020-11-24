@@ -65,7 +65,9 @@ export class PublishInvoiceFinalizedUsecase
     const erpReference = invoice
       .getErpReferences()
       .getItems()
-      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
       .find(Boolean);
 
     const data: InvoiceFinalizedEvent = {

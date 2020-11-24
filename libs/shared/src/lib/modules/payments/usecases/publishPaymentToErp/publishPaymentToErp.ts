@@ -142,7 +142,9 @@ export class PublishPaymentToErpUsecase
           entity_id: invoice.invoiceId.id.toString(),
           type: 'payment',
           vendor: this.erpService.vendorName,
-          attribute: 'erp',
+          attribute:
+            this.erpService?.referenceMappings?.invoiceConfirmation ||
+            'invoice',
           value: 'NON_INVOICEABLE',
         });
         await this.erpReferenceRepo.save(nonInvoiceableErpReference);

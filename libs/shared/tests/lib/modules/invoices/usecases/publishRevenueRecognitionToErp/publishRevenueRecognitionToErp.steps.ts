@@ -144,7 +144,7 @@ Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
     entity_id: invoiceId,
     entity_type: 'invoice',
     vendor: 'testVendor',
-    attribute: 'erp',
+    attribute: 'confirmation',
     value: 'FOO',
   });
 
@@ -270,9 +270,9 @@ Then(
     );
     const erpReferences = testInvoice.getErpReferences().getItems();
 
-    expect(erpReferences.find((ef) => ef.attribute === 'erp').value).to.equal(
-      'FOO'
-    );
+    expect(
+      erpReferences.find((ef) => ef.attribute === 'confirmation').value
+    ).to.equal('FOO');
   }
 );
 

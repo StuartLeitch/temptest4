@@ -18,7 +18,7 @@ import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRep
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import type { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { ErpReference } from './../../../vendors/domain/ErpReference';
+// import { ErpReference } from './../../../vendors/domain/ErpReference';
 import { ErpReferenceRepoContract } from './../../../vendors/repos';
 
 import { applyFilters } from './utils';
@@ -409,14 +409,14 @@ export class KnexInvoiceRepo
       'invoices.id',
       'invoice',
       vendor,
-      'erp'
+      'confirmation'
     );
     const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
       'revrec',
       'invoices.id',
       'invoice',
       vendor,
-      'revenueRecognition'
+      vendor === 'netsuite' ? 'journal' : 'revenueRecognition'
     );
 
     // * SQL for retrieving results needed only for Sage registration
@@ -474,7 +474,7 @@ export class KnexInvoiceRepo
       'invoices.id',
       'invoice',
       vendor,
-      'erp'
+      'confirmation'
     );
 
     // * SQL for retrieving results needed only for registration

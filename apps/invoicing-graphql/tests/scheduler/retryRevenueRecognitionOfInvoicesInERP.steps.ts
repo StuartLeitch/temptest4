@@ -112,7 +112,7 @@ Given(/^There is an Invoice with the ID "([\w-]+)"$/, async function (
     entity_id: testInvoiceId,
     entity_type: 'invoice',
     vendor: 'testVendor',
-    attribute: 'erp',
+    attribute: 'confirmation',
     value: 'FOO',
   });
 

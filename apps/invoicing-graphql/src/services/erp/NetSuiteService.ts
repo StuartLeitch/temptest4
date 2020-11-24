@@ -479,7 +479,9 @@ export class NetSuiteService implements ErpServiceContract {
     const nsErpReference = invoice
       .getErpReferences()
       .getItems()
-      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
       .find(Boolean);
 
     const paymentRequestOpts = {
@@ -732,7 +734,9 @@ export class NetSuiteService implements ErpServiceContract {
     const nsErpReference = invoice
       .getErpReferences()
       .getItems()
-      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
       .find(Boolean);
 
     const invoiceRequestOpts = {
@@ -773,7 +777,9 @@ export class NetSuiteService implements ErpServiceContract {
     const originalNSErpReference = originalInvoice
       .getErpReferences()
       .getItems()
-      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
       .find(Boolean);
 
     const creditNoteTransformOpts = {

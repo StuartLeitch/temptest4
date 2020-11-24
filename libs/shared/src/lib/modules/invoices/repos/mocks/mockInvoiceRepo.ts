@@ -295,7 +295,7 @@ export class MockInvoiceRepo
           whereNotNull: ['erpReference'],
           where: [
             ['type', '=', 'invoice'],
-            ['attribute', '=', 'erp'],
+            ['attribute', '=', 'confirmation'],
             // ['value', '<>', 'NON_INVOICEABLE'],
             ['value', '<>', 'MigrationRef'],
             ['value', '<>', 'migrationRef'],

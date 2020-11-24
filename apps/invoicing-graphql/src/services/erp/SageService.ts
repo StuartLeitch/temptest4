@@ -49,7 +49,7 @@ export class SageService implements ErpServiceContract {
   }
 
   get invoiceErpRefFieldName(): string {
-    return 'erp';
+    return 'confirmation';
   }
 
   get invoiceRevenueRecRefFieldName(): string {

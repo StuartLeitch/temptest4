@@ -134,7 +134,9 @@ export class PublishInvoiceToErpUsecase
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
-          attribute: 'erp',
+          attribute:
+            this.erpService?.referenceMappings?.invoiceConfirmation ||
+            'invoice',
           value: 'NON_INVOICEABLE',
         });
 
