@@ -199,6 +199,8 @@ export class PublishRevenueRecognitionToErpUsecase
         );
       }
 
+      await this.invoiceRepo.update(invoice);
+
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {
         const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
@@ -221,8 +223,6 @@ export class PublishRevenueRecognitionToErpUsecase
       });
 
       this.loggerService.debug('ERP response', erpResponse);
-
-      await this.invoiceRepo.update(invoice);
 
       if (erpResponse?.journal?.id) {
         this.loggerService.info(

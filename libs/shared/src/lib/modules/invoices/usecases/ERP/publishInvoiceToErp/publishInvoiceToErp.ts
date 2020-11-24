@@ -247,6 +247,9 @@ export class PublishInvoiceToErpUsecase
       }
 
       try {
+        await this.invoiceRepo.update(invoice);
+        this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
+
         const erpData: ErpInvoiceRequest = {
           invoice,
           payer,
@@ -268,19 +271,18 @@ export class PublishInvoiceToErpUsecase
           erpResponse
         );
 
-        this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
-        await this.invoiceRepo.update(invoice);
-
-        // * Save ERP reference
-        const erpPaymentReference = ErpReferenceMap.toDomain({
-          entity_id: invoice.invoiceId.id.toString(),
-          type: 'invoice',
-          vendor: this.erpService.vendorName,
-          attribute: 'erp',
-          value: String(erpResponse.tradeDocumentId),
-        });
-        await this.erpReferenceRepo.save(erpPaymentReference);
-        this.loggerService.info(`Added ErpReference`, erpPaymentReference);
+        if (erpResponse) {
+          // * Save ERP reference
+          const erpPaymentReference = ErpReferenceMap.toDomain({
+            entity_id: invoice.invoiceId.id.toString(),
+            type: 'invoice',
+            vendor: this.erpService.vendorName,
+            attribute: 'erp',
+            value: String(erpResponse.tradeDocumentId),
+          });
+          await this.erpReferenceRepo.save(erpPaymentReference);
+          this.loggerService.info(`Added ErpReference`, erpPaymentReference);
+        }
 
         return right(erpResponse);
       } catch (err) {

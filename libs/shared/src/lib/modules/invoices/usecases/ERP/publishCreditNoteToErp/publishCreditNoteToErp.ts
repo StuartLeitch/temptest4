@@ -131,6 +131,12 @@ export class PublishCreditNoteToErpUsecase
       creditNote.addItems(invoiceItems);
 
       try {
+        await this.invoiceRepo.update(creditNote);
+        this.loggerService.debug(
+          'PublishCreditNoteToERP full credit note',
+          creditNote
+        );
+
         const erpData = {
           creditNote,
           originalInvoice,
@@ -143,21 +149,16 @@ export class PublishCreditNoteToErpUsecase
           )}`
         );
 
-        this.loggerService.debug(
-          'PublishCreditNoteToERP full credit note',
-          creditNote
-        );
-
-        const erpReference = ErpReferenceMap.toDomain({
-          entity_id: creditNote.invoiceId.id.toString(),
-          type: 'invoice',
-          vendor: this.erpService.vendorName,
-          attribute: 'creditNote',
-          value: String(erpResponse),
-        });
-
-        await this.invoiceRepo.update(creditNote);
-        await this.erpReferenceRepo.save(erpReference);
+        if (erpResponse) {
+          const erpReference = ErpReferenceMap.toDomain({
+            entity_id: creditNote.invoiceId.id.toString(),
+            type: 'invoice',
+            vendor: this.erpService.vendorName,
+            attribute: 'creditNote',
+            value: String(erpResponse),
+          });
+          await this.erpReferenceRepo.save(erpReference);
+        }
 
         return right(erpResponse);
       } catch (err) {

@@ -226,14 +226,16 @@ export class PublishPaymentToErpUsecase
         this.loggerService.info('PublishPaymentToERP final payment', payment);
         await this.paymentRepo.updatePayment(payment);
 
-        const erpReference = ErpReferenceMap.toDomain({
-          entity_id: payment.paymentId.id.toString(),
-          type: 'payment',
-          vendor: this.erpService.vendorName,
-          attribute: 'erp',
-          value: String(erpResponse),
-        });
-        await this.erpReferenceRepo.save(erpReference);
+        if (erpResponse) {
+          const erpReference = ErpReferenceMap.toDomain({
+            entity_id: payment.paymentId.id.toString(),
+            type: 'payment',
+            vendor: this.erpService.vendorName,
+            attribute: 'erp',
+            value: String(erpResponse),
+          });
+          await this.erpReferenceRepo.save(erpReference);
+        }
 
         return right(erpResponse);
       } catch (err) {
