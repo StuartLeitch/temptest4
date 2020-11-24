@@ -727,8 +727,14 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { invoice, journalId } = data;
 
+    const nsErpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .find(Boolean);
+
     const invoiceRequestOpts = {
-      // url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference}`,
       method: 'PATCH',
     };
 
@@ -762,8 +768,14 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { originalInvoice } = data;
 
+    const originalnsErpReference = originalInvoice
+      .getErpReferences()
+      .getItems()
+      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'erp')
+      .find(Boolean);
+
     const creditNoteTransformOpts = {
-      // url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${originalnsErpReference}/!transform/creditmemo`,
       method: 'POST',
     };
 
