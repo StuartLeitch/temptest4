@@ -68,33 +68,6 @@ export function formatPayer(
   };
 }
 
-function itemReduction(item: InvoiceItem): number {
-  let couponTotal = 0;
-  let waiverTotal = 0;
-
-  if (item.assignedCoupons) {
-    couponTotal = item.assignedCoupons.coupons.reduce(
-      (acc, c) => acc + c.reduction,
-      0
-    );
-  }
-
-  if (item.assignedWaivers) {
-    waiverTotal = item.assignedWaivers.waivers.reduce(
-      (acc, w) => acc + w.reduction,
-      0
-    );
-  }
-
-  const totalReduction = Math.min(couponTotal + waiverTotal, 100);
-  return (item.price * totalReduction) / 100;
-}
-
-function calculateVatForItem(item: InvoiceItem): number {
-  const reductions = itemReduction(item);
-  return ((item.price - reductions) * item.vat) / 100;
-}
-
 export function formatCosts(
   invoiceItems: InvoiceItem[],
   payments: Payment[],
@@ -103,11 +76,11 @@ export function formatCosts(
   const apcItems = invoiceItems.filter((item) => item.type === 'APC');
   const totalPrice = apcItems.reduce((acc, item) => acc + item.price, 0);
   const vatAmount = apcItems.reduce(
-    (acc, item) => acc + calculateVatForItem(item),
+    (acc, item) => acc + item.calculateVat(),
     0
   );
   const totalDiscount = apcItems.reduce(
-    (acc, item) => acc + itemReduction(item),
+    (acc, item) => acc + item.calculateDiscount(),
     0
   );
   const paid = payments

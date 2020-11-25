@@ -239,10 +239,26 @@ export class GenerateDraftCompensatoryEventsUsecase
       const { invoiceItems, manuscript, invoice } = request;
 
       const allW = invoiceItems
-        .map((i) => i.assignedWaivers.map((w) => roundToHour(w.dateAssigned)))
+        .map((i) =>
+          i.assignedWaivers
+            .filter((w) =>
+              invoice.dateAccepted
+                ? w.dateAssigned < invoice.dateAccepted
+                : true
+            )
+            .map((w) => roundToHour(w.dateAssigned))
+        )
         .reduce((acc, d) => acc.concat(d));
       const allC = invoiceItems
-        .map((i) => i.assignedCoupons.map((c) => roundToHour(c.dateAssigned)))
+        .map((i) =>
+          i.assignedCoupons
+            .filter((c) =>
+              invoice.dateAccepted
+                ? c.dateAssigned < invoice.dateAccepted
+                : true
+            )
+            .map((c) => roundToHour(c.dateAssigned))
+        )
         .reduce((acc, d) => acc.concat(d));
       const allReductionDates = Array.from(
         new Set(allW.concat(allC).concat([roundToHour(invoice.dateCreated)]))
