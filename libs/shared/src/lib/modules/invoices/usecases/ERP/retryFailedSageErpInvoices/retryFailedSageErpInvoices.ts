@@ -91,26 +91,26 @@ export class RetryFailedSageErpInvoicesUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryFailedSageErpInvoicesResponse> {
     try {
-      const failedErpInvoices = await this.invoiceRepo.getFailedSageErpInvoices();
+      const failedErpInvoicesIds = await this.invoiceRepo.getFailedSageErpInvoices();
 
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
-      if (failedErpInvoices.length === 0) {
+      if (failedErpInvoicesIds.length === 0) {
         this.loggerService.info('No failed invoices to register in Sage');
         return right(updatedInvoices);
       }
       this.loggerService.info(
-        `Retrying sync with Sage for invoices: ${failedErpInvoices
+        `Retrying sync with Sage for invoices: ${failedErpInvoicesIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
 
       const errs = [];
 
-      for (const failedInvoice of failedErpInvoices) {
+      for (const failedInvoice of failedErpInvoicesIds) {
         const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
           {
-            invoiceId: failedInvoice.invoiceId.id.toString(),
+            invoiceId: failedInvoice.id.toString(),
           }
         );
 
@@ -128,7 +128,7 @@ export class RetryFailedSageErpInvoicesUsecase
           this.loggerService.info(
             `Assigned successfully ${
               assignedErpReference?.tradeDocumentId
-            } to invoice ${failedInvoice.invoiceId.id.toString()}`
+            } to invoice ${failedInvoice.id.toString()}`
           );
           updatedInvoices.push(assignedErpReference);
         }

@@ -14,8 +14,8 @@ export const ErpReferenceAttributesMapping = {
   netsuite: {
     invoiceConfirmation: 'confirmation',
     paymentConfirmation: 'payment',
-    revenueRecognition: 'journal',
-    revenueRecognitionReversal: 'journal',
+    revenueRecognition: 'revenueRecognition',
+    revenueRecognitionReversal: 'revenueRecognitionReversal',
     creditNote: 'creditNote',
   },
 };
