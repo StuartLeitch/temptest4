@@ -140,11 +140,11 @@ export class PublishPaymentToErpUsecase
       if (invoice.getInvoiceTotal() <= 0) {
         const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
-          type: 'payment',
+          type: 'invoice',
           vendor: this.erpService.vendorName,
           attribute:
             this.erpService?.referenceMappings?.invoiceConfirmation ||
-            'payment',
+            'invoice',
           value: 'NON_INVOICEABLE',
         });
         await this.erpReferenceRepo.save(nonInvoiceableErpReference);
