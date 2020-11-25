@@ -116,14 +116,14 @@ export class PublishPaymentToErpUsecase
           invoiceItems
         );
 
-        for (const item of invoiceItems) {
-          const [coupons, waivers] = await Promise.all([
-            this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
-            this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
-          ]);
-          item.addAssignedCoupons(coupons);
-          item.addAssignedWaivers(waivers);
-        }
+        // for (const item of invoiceItems) {
+        //   const [coupons, waivers] = await Promise.all([
+        //     this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
+        //     this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
+        //   ]);
+        //   item.addAssignedCoupons(coupons);
+        //   item.addAssignedWaivers(waivers);
+        // }
       }
 
       if (invoiceItems.length === 0) {
