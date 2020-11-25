@@ -254,55 +254,6 @@ function updateManuscript(context: Context) {
   };
 }
 
-function updateWaivers(context: Context) {
-  return async (data: SubmissionSubmitted): Promise<void> => {
-    const {
-      repos: { invoice: invoiceRepo, waiver: waiverRepo },
-      services: { waiverService, logger },
-    } = context;
-
-    const newManuscript = data.manuscripts[0];
-    const { journalId, customId } = newManuscript;
-    const { email: authorEmail, country } = newManuscript.authors.find(
-      (a) => a.isCorresponding
-    );
-
-    const items = await getInvoiceItems(context)(customId);
-
-    items.forEach(
-      async (item) =>
-        await waiverRepo.removeInvoiceItemWaivers(item.invoiceItemId)
-    );
-
-    items.forEach(
-      async (item) =>
-        await waiverService.applyWaiver({
-          authorEmail,
-          journalId,
-          country,
-          invoiceId: item.invoiceId.toString(),
-        })
-    );
-
-    const usecase = new GetInvoiceDetailsUsecase(invoiceRepo);
-
-    const maybeInvoice = await usecase.execute(
-      { invoiceId: items[0].invoiceId.id.toString() },
-      defaultContext
-    );
-
-    if (maybeInvoice.isLeft()) {
-      logger.error(maybeInvoice.value.errorValue().message);
-      throw maybeInvoice.value.error;
-    }
-
-    const invoice = maybeInvoice.value.getValue();
-
-    invoice.generateInvoiceDraftAmountUpdatedEvent();
-    DomainEvents.dispatchEventsForAggregate(invoice.id);
-  };
-}
-
 function createTransaction(context: Context) {
   return async (
     manuscriptId: string,
@@ -397,7 +348,6 @@ export class SubmissionSubmittedHelpers {
   createManuscript = createManuscript(this.context);
   updateManuscript = updateManuscript(this.context);
   getInvoiceItems = getInvoiceItems(this.context);
-  updateWaivers = updateWaivers(this.context);
   softDelete = softDelete(this.context);
   restore = restore(this.context);
 }
