@@ -416,7 +416,7 @@ export class KnexInvoiceRepo
       'invoices.id',
       'invoice',
       vendor,
-      vendor === 'netsuite' ? 'journal' : 'revenueRecognition'
+      'revenueRecognition'
     );
 
     // * SQL for retrieving results needed only for Sage registration
