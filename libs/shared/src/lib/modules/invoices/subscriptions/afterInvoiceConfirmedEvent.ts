@@ -135,39 +135,6 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
         `[AfterInvoiceActivated]: Failed to execute onPublishInvoiceActivated use case AfterInvoiceActivated. Err: ${err.message}`
       );
     }
-
-    // try {
-    //   const resp = await this.invoiceToSageUsecase.execute({
-    //     invoiceId: invoice.id.toString(),
-    //   });
-    //   if (resp.isLeft()) {
-    //     throw resp.value;
-    //   } else {
-    //     this.loggerService.info(
-    //       `[AfterInvoiceActivated]: Successfully executed invoiceToSageUsecase use case AfterInvoiceActivated`
-    //     );
-    //   }
-    // } catch (error) {
-    //   this.loggerService.info(
-    //     `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error.message}`
-    //   );
-    // }
-    // try {
-    //   const resp = await this.invoiceToNetsuiteUsecase.execute({
-    //     invoiceId: invoice.id.toString(),
-    //   });
-    //   if (resp.isLeft()) {
-    //     throw resp.value;
-    //   } else {
-    //     this.loggerService.info(
-    //       `[AfterInvoiceActivated]: Successfully executed invoiceToNetsuiteUsecase use case AfterInvoiceActivated`
-    //     );
-    //   }
-    // } catch (error) {
-    //   this.loggerService.info(
-    //     `[AfterInvoiceActivated]: Failed to execute invoiceToErpUsecase use case AfterInvoiceActivated. Err: ${error.message}`
-    //   );
-    // }
   }
 
   private async scheduleReminders(invoice: Invoice, payer: Payer) {

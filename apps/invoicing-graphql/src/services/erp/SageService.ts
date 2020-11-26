@@ -40,22 +40,24 @@ export class SageService implements ErpServiceContract {
   constructor(
     private readonly logger: any,
     private config: any,
+    readonly referenceMappings?: unknown,
     private fixedValues: ErpFixedValues = defaultErpFixedValues
   ) {}
 
+  get vendorName(): string {
+    return 'sage';
+  }
+
   get invoiceErpRefFieldName(): string {
-    return 'erpReference';
+    return 'confirmation';
   }
 
   get invoiceRevenueRecRefFieldName(): string {
-    return 'revenueRecognitionReference';
+    return 'revenueRecognition';
   }
 
   private async getConnection(): Promise<Connection> {
     const { user, password, securityToken, loginUrl } = this.config;
-
-    // console.info('getConnection called!...');
-    // console.info('EVAL=', !this.connection);
 
     if (!this.connection) {
       this.connection = new Connection({
@@ -79,8 +81,6 @@ export class SageService implements ErpServiceContract {
   }
 
   async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
-    // console.info(`registerInvoice init with`, data);
-
     const { items, tradeDocumentItemProduct } = data;
 
     const accountId = await this.registerPayer(data);

@@ -60,13 +60,19 @@ export class PublishInvoiceCreditedUsecase
       payer,
     } = request;
 
+    const erpReference = creditNote
+      .getErpReferences()
+      .getItems()
+      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'creditNote')
+      .find(Boolean);
+
     const data: InvoiceCreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 
       creditNoteForInvoice: creditNote.cancelledInvoiceReference,
       referenceNumber: `CN-${creditNote.referenceNumber}`,
       transactionId: creditNote.transactionId.toString(),
-      erpReference: null, // creditNote.erpReference,
+      erpReference: erpReference?.value ?? null,
       invoiceId: creditNote.id.toString(),
       invoiceStatus: creditNote.status,
       isCreditNote: true,

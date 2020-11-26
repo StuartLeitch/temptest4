@@ -13,13 +13,11 @@ import {
   Manuscript,
   Invoice,
   InvoiceItem,
-  LoggerBuilder,
   LoggerContract,
   LoggerBuilderContract,
 } from '@hindawi/shared';
 
 import {
-  // ErpServiceContract,
   ErpInvoiceRequest,
   ErpInvoiceResponse,
   ErpRevRecResponse,
@@ -34,33 +32,27 @@ type CustomerPayload = Record<string, string | boolean>;
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
-    private logger: LoggerContract
+    private logger: LoggerContract,
+    readonly referenceMappings?: Record<string, any>
   ) {}
 
   get vendorName(): string {
     return 'netsuite';
   }
 
-  get invoiceErpRefFieldName(): string {
-    return 'nsReference';
-  }
-
-  get invoiceRevenueRecRefFieldName(): string {
-    return 'nsRevRecReference';
-  }
-
   public static create(
     config: Record<string, unknown>,
     loggerBuilder: LoggerBuilderContract
   ): NetSuiteService {
+    const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
-      config: new ConnectionConfig(config.connection),
+      config: new ConnectionConfig(configConnection),
     });
 
-    let logger = loggerBuilder.getLogger();
+    const logger = loggerBuilder.getLogger();
     logger.setScope('NetSuiteService');
 
-    const service = new NetSuiteService(connection, logger);
+    const service = new NetSuiteService(connection, logger, referenceMappings);
 
     return service;
   }
@@ -140,6 +132,57 @@ export class NetSuiteService implements ErpServiceContract {
 
     return {
       journal: { id: String(revenueRecognition) },
+      journalItem: null,
+      journalTags: null,
+      journalItemTag: null,
+    };
+  }
+
+  public async registerRevenueRecognitionReversal(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
+    const {
+      publisherCustomValues: { customSegmentId },
+    } = data;
+    const customerId = await this.getCustomerId(data);
+
+    /**
+     * * Hindawi will be accounts: debit id "376", credit id: "401"
+     * * Partnerships will be accounts: debit id "377", credit id: "402"
+     **/
+    const idMap = {
+      Hindawi: {
+        debit: 376,
+        credit: 401,
+      },
+      Partnership: {
+        debit: 377,
+        credit: 402,
+      },
+    };
+
+    let creditAccountId;
+    let debitAccountId;
+    if (customSegmentId !== '4') {
+      creditAccountId = idMap.Partnership.credit;
+      debitAccountId = idMap.Partnership.debit;
+    } else {
+      creditAccountId = idMap.Hindawi.credit;
+      debitAccountId = idMap.Hindawi.debit;
+    }
+
+    const revenueRecognitionReversal = await this.createRevenueRecognitionReversal(
+      {
+        ...data,
+        creditAccountId,
+        debitAccountId,
+        customerId,
+        customSegmentId,
+      }
+    );
+
+    return {
+      journal: { id: String(revenueRecognitionReversal) },
       journalItem: null,
       journalTags: null,
       journalItemTag: null,
@@ -433,8 +476,16 @@ export class NetSuiteService implements ErpServiceContract {
       'Bank Transfer': '347',
     };
 
+    const nsErpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
+      .find(Boolean);
+
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}/!transform/customerpayment`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}/!transform/customerpayment`,
       method: 'POST',
     };
 
@@ -461,6 +512,10 @@ export class NetSuiteService implements ErpServiceContract {
       // Amount due,
       payment: payment.amount.value,
     };
+
+    this.logger.info({
+      createPaymentPayload,
+    });
 
     try {
       const res = await axios({
@@ -596,14 +651,96 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
+  private async createRevenueRecognitionReversal(data: {
+    invoice: Invoice;
+    invoiceTotal: number;
+    creditAccountId: string;
+    debitAccountId: string;
+    customerId: string;
+    customSegmentId: string;
+  }) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+    const {
+      invoice,
+      invoiceTotal,
+      creditAccountId,
+      debitAccountId,
+      customerId,
+      customSegmentId,
+    } = data;
+
+    const journalRequestOpts = {
+      url: `${config.endpoint}record/v1/journalentry`,
+      method: 'POST',
+    };
+
+    const createJournalPayload: Record<string, unknown> = {
+      approved: true,
+      tranId: `Revenue Recognition Reversal - ${invoice.referenceNumber}`,
+      memo: `${invoice.referenceNumber}`,
+      entity: {
+        id: customerId,
+      },
+      line: {
+        items: [
+          {
+            memo: `${invoice.referenceNumber}`,
+            account: {
+              id: creditAccountId,
+            },
+            debit: invoiceTotal,
+          },
+          {
+            memo: `${invoice.referenceNumber}`,
+            account: {
+              id: debitAccountId,
+            },
+            credit: invoiceTotal,
+          },
+        ],
+      },
+    };
+
+    if (customSegmentId !== '4') {
+      createJournalPayload.cseg1 = {
+        id: customSegmentId,
+      };
+    }
+
+    try {
+      const res = await axios({
+        ...journalRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(journalRequestOpts, token)),
+        data: createJournalPayload,
+      } as AxiosRequestConfig);
+
+      const journalId = res?.headers?.location?.split('/').pop();
+      await this.patchInvoice({ ...data, journalId });
+      return journalId;
+    } catch (err) {
+      console.error(err);
+      return { err } as unknown;
+    }
+  }
+
   private async patchInvoice(data: { invoice: Invoice; journalId: string }) {
     const {
       connection: { config, oauth, token },
     } = this;
     const { invoice, journalId } = data;
 
+    const nsErpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
+      .find(Boolean);
+
     const invoiceRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
       method: 'PATCH',
     };
 
@@ -637,8 +774,16 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { originalInvoice } = data;
 
+    const originalNSErpReference = originalInvoice
+      .getErpReferences()
+      .getItems()
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
+      .find(Boolean);
+
     const creditNoteTransformOpts = {
-      url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${originalNSErpReference.value}/!transform/creditmemo`,
       method: 'POST',
     };
 

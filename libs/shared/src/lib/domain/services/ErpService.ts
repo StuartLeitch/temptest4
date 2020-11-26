@@ -46,10 +46,13 @@ export interface ErpRevRecResponse {
 }
 
 export interface ErpServiceContract {
-  readonly invoiceErpRefFieldName: string;
-  readonly invoiceRevenueRecRefFieldName: string;
+  readonly vendorName: string;
+  readonly referenceMappings?: Record<string, any>;
   registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse>;
   registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse>;
+  registerRevenueRecognitionReversal?(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse>;
   registerCreditNote?(data: any): Promise<any>;
@@ -57,12 +60,12 @@ export interface ErpServiceContract {
 }
 
 export class EmptyErpService implements ErpServiceContract {
-  get invoiceErpRefFieldName(): string {
-    return 'emptyErpInvoiceRef';
+  get vendorName(): string {
+    return 'emptyVendor';
   }
 
-  get invoiceRevenueRecRefFieldName(): string {
-    return 'emptyErpRecRef';
+  get referenceMappings(): Record<string, any> {
+    return {};
   }
 
   async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
@@ -86,6 +89,18 @@ export class EmptyErpService implements ErpServiceContract {
     };
   }
 
+  async registerRevenueRecognitionReversal?(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
+    return {
+      journal: {
+        id: '',
+      },
+      journalItem: null,
+      journalTags: null,
+      journalItemTag: null,
+    };
+  }
   async registerCreditNote?(data: any): Promise<any> {
     return '';
   }

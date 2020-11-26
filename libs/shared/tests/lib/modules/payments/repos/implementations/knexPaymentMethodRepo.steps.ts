@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { PaymentMethodId } from '../../../../../../src/lib/modules/payments/domain/PaymentMethodId';
 import { PaymentMethodMap } from '../../../../../../src/lib/modules/payments/mapper/PaymentMethod';

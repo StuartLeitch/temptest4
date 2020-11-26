@@ -1,13 +1,17 @@
 import { GetRecentCouponsSuccessResponse } from './../../usecases/getRecentCoupons/getRecentCouponsResponse';
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
+import { CouponAssignedCollection } from '../../domain/CouponAssignedCollection';
 import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
+import { CouponAssigned } from '../../domain/CouponAssigned';
 import { CouponCode } from '../../domain/CouponCode';
-import { CouponRepoContract } from '../couponRepo';
 import { CouponId } from '../../domain/CouponId';
 import { Coupon } from '../../domain/Coupon';
 
-export class MockCouponRepo extends BaseMockRepo<Coupon>
+import { CouponRepoContract } from '../couponRepo';
+
+export class MockCouponRepo
+  extends BaseMockRepo<Coupon>
   implements CouponRepoContract {
   private invoiceItemToCouponMapper: {
     [key: string]: string[];
@@ -28,7 +32,10 @@ export class MockCouponRepo extends BaseMockRepo<Coupon>
     };
   }
 
-  addMockCouponToInvoiceItem(coupon: Coupon, invoiceItemId: InvoiceItemId) {
+  addMockCouponToInvoiceItem(
+    coupon: Coupon,
+    invoiceItemId: InvoiceItemId
+  ): void {
     const invoiceIdValue = invoiceItemId.id.toString();
     if (!this.invoiceItemToCouponMapper[invoiceIdValue]) {
       this.invoiceItemToCouponMapper[invoiceIdValue] = [];
@@ -40,14 +47,25 @@ export class MockCouponRepo extends BaseMockRepo<Coupon>
 
   async getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<Coupon[]> {
+  ): Promise<CouponAssignedCollection> {
     const couponIds = this.invoiceItemToCouponMapper[
       invoiceItemId.id.toString()
     ];
     if (!couponIds) {
-      return [];
+      return CouponAssignedCollection.create();
     }
-    return this._items.filter((item) => couponIds.includes(item.id.toString()));
+    const coupons = this._items.filter((item) =>
+      couponIds.includes(item.id.toString())
+    );
+    return CouponAssignedCollection.create(
+      coupons.map((coupon) =>
+        CouponAssigned.create({
+          invoiceItemId,
+          coupon,
+          dateAssigned: null,
+        })
+      )
+    );
   }
 
   async getCouponById(couponId: CouponId): Promise<Coupon> {

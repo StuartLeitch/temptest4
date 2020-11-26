@@ -46,6 +46,7 @@ export const generateCompensatoryEvents: Resolvers<Context> = {
       const maybeResult = await getIdsUsecase.execute({
         invoiceIds,
         journalIds,
+        omitDeleted: true,
       });
 
       if (maybeResult.isLeft()) {

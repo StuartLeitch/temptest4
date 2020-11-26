@@ -14,12 +14,8 @@ export class MockErpService implements ErpServiceContract {
   public readonly accountRef: string = 'ACC_REF';
   public readonly revenueRef: string = 'REV_REF';
 
-  get invoiceErpRefFieldName(): string {
-    return 'erpReference';
-  }
-
-  get invoiceRevenueRecRefFieldName(): string {
-    return 'revenueRecognitionReference';
+  get vendorName(): string {
+    return 'vendorName';
   }
 
   async registerInvoice(data: ErpInvoiceRequest): Promise<ErpInvoiceResponse> {
@@ -35,6 +31,20 @@ export class MockErpService implements ErpServiceContract {
   }
 
   async registerRevenueRecognition(
+    data: ErpRevRecRequest
+  ): Promise<ErpRevRecResponse> {
+    const invoiceId = data.invoice.id.toString();
+    this.revenueMap[invoiceId] = data;
+
+    return {
+      journal: { id: this.revenueRef },
+      journalItem: null,
+      journalItemTag: null,
+      journalTags: null,
+    };
+  }
+
+  async registerRevenueRecognitionReversal(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
     const invoiceId = data.invoice.id.toString();

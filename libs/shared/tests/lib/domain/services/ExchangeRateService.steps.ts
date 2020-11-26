@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then } from 'cucumber';
+import { Given, When, Then } from '@cucumber/cucumber';
 
 import { ExchangeRateService } from '../../../../src/lib/domain/services/ExchangeRateService';
 

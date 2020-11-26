@@ -1,10 +1,11 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { Before, Given, When, Then, After } from 'cucumber';
+import { Before, Given, When, Then, After } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 
+import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
 import { UsecaseAuthorizationContext } from '../../../../../libs/shared/src/lib/domain/authorization';
 import { WaiverService } from '../../../../../libs/shared/src/lib/domain/services/WaiverService';
 
@@ -22,7 +23,6 @@ import { MockInvoiceRepo } from '../../../../../libs/shared/src/lib/modules/invo
 import { MockEditorRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
 import { MockCouponRepo } from '../../../../../libs/shared/src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from '../../../../../libs/shared/src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
 
 import { TransactionMap } from '../../../../../libs/shared/src/lib/modules/transactions/mappers/TransactionMap';
 import { ManuscriptMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ManuscriptMap';
@@ -91,7 +91,10 @@ Before(() => {
   context.repos.transaction = new MockTransactionRepo();
   context.repos.manuscript = new MockArticleRepo();
   context.repos.catalog = new MockCatalogRepo();
-  context.repos.invoice = new MockInvoiceRepo();
+  context.repos.invoice = new MockInvoiceRepo(
+    context.repos.manuscript,
+    context.repos.invoiceItem
+  );
   context.repos.coupon = new MockCouponRepo();
   context.repos.editor = new MockEditorRepo();
   context.repos.waiver = new MockWaiverRepo();
@@ -397,7 +400,7 @@ Then(
 
     const items = maybeInvoiceItems.value.getValue();
 
-    expect(items[0].waivers.length).to.equal(waiversCount);
+    expect(items[0].assignedWaivers.length).to.equal(waiversCount);
   }
 );
 

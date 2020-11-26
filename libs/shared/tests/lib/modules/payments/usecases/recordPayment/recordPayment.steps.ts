@@ -4,7 +4,7 @@ import {
   buildMockContext,
   MockContext,
 } from '../../../../../../specs/utils/mockContextBuilder';
-import { Given, When, Then, Before, After } from 'cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 import { RecordPaymentUsecase } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPayment';
 import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
 import { RecordPaymentDTO } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentDTO';
@@ -108,7 +108,6 @@ Given(
     let isFinalPayment = false;
 
     if (paymentType === 'final') {
-      console.log('setting final');
       isFinalPayment = true;
     }
 
@@ -148,7 +147,7 @@ Then(/^The payments are of type "Bank Transfer"$/, async () => {
   const paymentMethod = await context.repos.paymentMethod.getPaymentMethodByName(
     'Bank Transfer'
   );
-  for (let payment of payments) {
+  for (const payment of payments) {
     expect(payment.paymentMethodId.toString()).to.equal(
       paymentMethod.id.toString()
     );

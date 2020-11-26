@@ -16,7 +16,8 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
-import { Coupons } from '../../../coupons/domain/Coupons';
+import { WaiverAssignedCollection } from '../../../waivers/domain/WaiverAssignedCollection';
+import { CouponAssignedCollection } from '../../../coupons/domain/CouponAssignedCollection';
 import { InvoiceStatus } from '../../domain/Invoice';
 import { Invoice } from '../../domain/Invoice';
 
@@ -372,7 +373,7 @@ export class GenerateCompensatoryEventsUsecase
       return right(false);
     }
 
-    if (!payments || payments.length == 0) {
+    if (!payments || payments.length === 0) {
       return right(false);
     }
 
@@ -384,7 +385,7 @@ export class GenerateCompensatoryEventsUsecase
       const { payments, invoice } = request;
       let paymentDate: Date;
 
-      if (payments.length == 0) {
+      if (payments.length === 0) {
         paymentDate = invoice.dateIssued;
       } else {
         paymentDate = payments.reduce(
@@ -402,8 +403,8 @@ export class GenerateCompensatoryEventsUsecase
 
   private removeCouponsAndWaivers<T extends WithInvoiceItems>(request: T) {
     const invoiceItems = request.invoiceItems.map((item) => {
-      item.props.coupons = Coupons.create();
-      item.props.waivers = [];
+      item.props.assignedWaivers = WaiverAssignedCollection.create();
+      item.props.assignedCoupons = CouponAssignedCollection.create();
       return item;
     });
     return {
@@ -480,9 +481,6 @@ export class GenerateCompensatoryEventsUsecase
     return <T extends WithInvoice>(request: T) => {
       const { invoice } = request;
 
-      invoice.props.dateUpdated = useInvoice
-        ? invoice[useDate]
-        : request[useDate];
       invoice.status = InvoiceStatus[status];
 
       return {

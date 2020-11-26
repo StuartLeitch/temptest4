@@ -1,13 +1,13 @@
 import { WatchedList } from '../../../core/domain/WatchedList';
 import { Coupon } from './Coupon';
 
-export class Coupons extends WatchedList<Coupon> {
+export class CouponCollection extends WatchedList<Coupon> {
   private constructor(initialCoupons: Coupon[]) {
     super(initialCoupons);
   }
 
-  public static create(coupons?: Coupon[]): Coupons {
-    return new Coupons(coupons ? coupons : []);
+  public static create(coupons?: Coupon[]): CouponCollection {
+    return new CouponCollection(coupons ? coupons : []);
   }
 
   public compareItems(a: Coupon, b: Coupon): boolean {

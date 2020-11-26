@@ -207,8 +207,14 @@ class KnexMigrationSource {
     rebuild_materialized_views('20201027142115_rework_submissions_view', true),
     rebuild_materialized_views('20201027152115_acceptance_rates_fix', true),
     rebuild_materialized_views(
-      '20201028152115_acceptance_rates_fix_historical'
+      '20201028152115_acceptance_rates_fix_historical',
+      true
     ),
+    rebuild_materialized_views(
+      '20201118152115_journal_peer_review_model',
+      true
+    ),
+    rebuild_materialized_views('20201119152115_invoices_numbers_fix'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

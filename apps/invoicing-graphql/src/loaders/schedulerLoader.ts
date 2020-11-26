@@ -27,7 +27,6 @@ export const schedulerLoader: MicroframeworkLoader = async (
     const context: Context = settings.getData('context');
     const logger = context.loggerBuilder.getLogger();
     logger.setScope('SchedulingService');
-
     const {
       failedErpCronRetryTimeMinutes,
       failedErpCronRetryDisabled,

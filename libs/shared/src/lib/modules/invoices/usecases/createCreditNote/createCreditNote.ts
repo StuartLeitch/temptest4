@@ -73,7 +73,7 @@ export class CreateCreditNoteUsecase
     let invoice: Invoice;
     let items: InvoiceItem[];
 
-    console.info(request);
+    // console.info(request);
 
     // * build the InvoiceId
     const invoiceId = InvoiceId.create(
@@ -122,8 +122,8 @@ export class CreateCreditNoteUsecase
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          coupons.forEach((c) => item.addCoupon(c));
-          item.waivers = waivers;
+          item.addAssignedCoupons(coupons);
+          item.addAssignedWaivers(waivers);
         }
       } catch (err) {
         return left(
@@ -155,7 +155,7 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.nsRevRecReference = null;
       clonedRawInvoice.creationReason = request.reason;
 
-      console.info(clonedRawInvoice);
+      // console.info(clonedRawInvoice);
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {
@@ -166,12 +166,12 @@ export class CreateCreditNoteUsecase
           rawInvoiceItem.dateCreated = new Date();
           delete rawInvoiceItem.id;
 
-          invoiceItem.coupons.getItems().forEach((c) => {
+          invoiceItem.assignedCoupons.coupons.forEach((c) => {
             rawInvoiceItem.price -=
               ((invoiceItem.price * -1) / 100) * c.reduction;
           });
 
-          invoiceItem.waivers.forEach((w) => {
+          invoiceItem.assignedWaivers.waivers.forEach((w) => {
             rawInvoiceItem.price -=
               ((invoiceItem.price * -1) / 100) * w.reduction;
           });
@@ -190,6 +190,7 @@ export class CreateCreditNoteUsecase
 
       // * Assign the cancelled invoice reference
       // * This assignment will trigger an INVOICE_CREDITED event
+
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
       creditNote.markAsFinal();
 
@@ -208,10 +209,7 @@ export class CreateCreditNoteUsecase
           status: InvoiceStatus.DRAFT,
           dateMovedToFinal: null,
           invoiceNumber: null,
-          erpReference: null,
-          nsReference: null,
-          revenueRecognitionReference: null,
-          nsRevRecReference: null,
+          erpReferences: null,
           cancelledInvoiceReference: null,
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain
@@ -238,14 +236,14 @@ export class CreateCreditNoteUsecase
             await this.invoiceItemRepo.save(draftInvoiceItem);
 
             // * save coupons
-            invoiceItem.coupons.getItems().forEach(async (c) => {
+            invoiceItem.assignedCoupons.coupons.forEach(async (c) => {
               await this.couponRepo.assignCouponToInvoiceItem(
                 c,
                 draftInvoiceItem.invoiceItemId
               );
             });
 
-            waivers.push(...invoiceItem.waivers);
+            waivers.push(...invoiceItem.assignedWaivers.waivers);
           });
         }
 

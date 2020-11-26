@@ -45,12 +45,20 @@ export class PublishInvoiceCreatedUsecase
 
     const { messageTimestamp, invoiceItems, manuscript, invoice } = request;
 
+    const erpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
+      .find(Boolean);
+
     const data: InvoiceCreatedEvent = {
       ...EventUtils.createEventObject(),
 
       transactionId: invoice.transactionId.toString(),
       referenceNumber: invoice.referenceNumber,
-      erpReference: invoice.erpReference,
+      erpReference: erpReference?.value ?? null,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status,
       isCreditNote: false,

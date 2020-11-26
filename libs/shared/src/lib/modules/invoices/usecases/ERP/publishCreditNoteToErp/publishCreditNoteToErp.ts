@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-// import { getEuMembers } from 'is-eu-member';
-
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
@@ -16,24 +14,17 @@ import {
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-// import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
-// import { VATService } from '../../../../domain/services/VATService';
 import { PublishCreditNoteToErpResponse } from './publishCreditNoteToErpResponse';
-// import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 import { InvoiceId } from '../../../domain/InvoiceId';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
-// import { CatalogRepoContract } from '../../../journals/repos';
-// import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../../domain/Invoice';
-// import { PublisherRepoContract } from '../../../publishers/repos';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
-// import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-// import { PayerType } from '../../../payers/domain/Payer';
-// import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
+import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 export interface PublishCreditNoteToErpRequestDTO {
   creditNoteId?: string;
@@ -56,6 +47,7 @@ export class PublishCreditNoteToErpUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {}
@@ -91,6 +83,10 @@ export class PublishCreditNoteToErpUsecase
       );
 
       let invoiceItems = creditNote.invoiceItems.currentItems;
+      this.loggerService.debug(
+        'PublishCreditNoteToERP invoiceItems',
+        invoiceItems
+      );
 
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -102,7 +98,10 @@ export class PublishCreditNoteToErpUsecase
         const resp = await getItemsUsecase.execute({
           invoiceId: request.creditNoteId,
         });
-
+        this.loggerService.debug(
+          'PublishCreditNoteToERP getItemsUsecase response',
+          resp
+        );
         if (resp.isLeft()) {
           throw new Error(
             `CreditNote ${creditNote.id.toString()} has no invoice items.`
@@ -110,14 +109,18 @@ export class PublishCreditNoteToErpUsecase
         }
 
         invoiceItems = resp.value.getValue();
+        this.loggerService.debug(
+          'PublishCreditNoteToERP invoice items',
+          invoiceItems
+        );
 
         for (const item of invoiceItems) {
           const [coupons, waivers] = await Promise.all([
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          coupons.forEach((c) => item.addCoupon(c));
-          item.waivers = waivers;
+          item.addAssignedCoupons(coupons);
+          item.addAssignedWaivers(waivers);
         }
       }
 
@@ -128,24 +131,37 @@ export class PublishCreditNoteToErpUsecase
       creditNote.addItems(invoiceItems);
 
       try {
+        await this.invoiceRepo.update(creditNote);
+        this.loggerService.debug(
+          'PublishCreditNoteToERP full credit note',
+          creditNote
+        );
+
         const erpData = {
           creditNote,
           originalInvoice,
         };
 
-        const netSuiteResponse = await this.erpService.registerCreditNote(
-          erpData
-        );
+        const erpResponse = await this.erpService.registerCreditNote(erpData);
         this.loggerService.info(
           `Updating credit note ${creditNote.id.toString()}: creditNoteReference -> ${JSON.stringify(
-            netSuiteResponse
+            erpResponse
           )}`
         );
-        (creditNote as any).creditNoteReference = String(netSuiteResponse);
 
-        // this.loggerService.info('PublishCreditNoteToERP full credit note', creditNote);
-        await this.invoiceRepo.update(creditNote);
-        return right(netSuiteResponse);
+        if (erpResponse) {
+          const erpReference = ErpReferenceMap.toDomain({
+            entity_id: creditNote.invoiceId.id.toString(),
+            type: 'invoice',
+            vendor: this.erpService.vendorName,
+            attribute:
+              this.erpService?.referenceMappings?.creditNote || 'creditNote',
+            value: String(erpResponse),
+          });
+          await this.erpReferenceRepo.save(erpReference);
+        }
+
+        return right(erpResponse);
       } catch (err) {
         return left(err);
       }

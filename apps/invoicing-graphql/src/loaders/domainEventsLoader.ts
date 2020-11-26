@@ -1,5 +1,4 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-// /* eslint-disable max-len */
 
 import {
   MicroframeworkLoader,
@@ -12,12 +11,13 @@ import { PublishInvoiceDraftCreatedUseCase } from 'libs/shared/src/lib/modules/i
 import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
-// import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
+import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 // import { PublishInvoiceToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishPaymentToErpUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/publishPaymentToErp/publishPaymentToErp';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
+import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
@@ -29,13 +29,9 @@ import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/i
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
 import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules/payments/subscriptions/after-payment-completed';
 
-// import { AfterManuscriptPublishedEvent } from '../../../../libs/shared/src/lib/modules/manuscripts/subscriptions/AfterManuscriptPublishedEvent';
-
 import { Context } from '../builders';
 
 import { env } from '../env';
-
-// This feature is a copy from https://github.com/kadirahq/graphql-errors
 
 export const domainEventsRegisterLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -55,6 +51,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         coupon,
         waiver,
         payer,
+        erpReference,
       },
       services: {
         erp,
@@ -65,16 +62,17 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       },
     } = context;
 
-    // const publishCreditNoteToErp = env.app.erpRegisterCreditNotesEnabled
-    //   ? new PublishCreditNoteToErpUsecase(
-    //       invoice,
-    //       invoiceItem,
-    //       coupon,
-    //       waiver,
-    //       erp?.netsuite || null,
-    //       loggerService
-    //     )
-    //   : new NoOpUseCase();
+    const publishCreditNoteToErp = env.app.erpRegisterCreditNotesEnabled
+      ? new PublishCreditNoteToErpUsecase(
+          invoice,
+          invoiceItem,
+          coupon,
+          waiver,
+          erpReference,
+          erp?.netsuite || null,
+          loggerService
+        )
+      : new NoOpUseCase();
 
     const publishPaymentToErp = env.app.erpRegisterPaymentsEnabled
       ? new PublishPaymentToErpUsecase(
@@ -87,12 +85,27 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
           payer,
           manuscript,
           catalog,
+          erpReference,
           erp?.netsuite || null,
           publisher,
           loggerService
         )
       : new NoOpUseCase();
 
+    const publishRevenueRecognitionReversal = new PublishRevenueRecognitionReversalUsecase(
+      invoice,
+      invoiceItem,
+      coupon,
+      waiver,
+      payer,
+      address,
+      manuscript,
+      catalog,
+      publisher,
+      erpReference,
+      erp?.netsuite ?? null,
+      loggerService
+    );
     const publishInvoiceDraftCreated = new PublishInvoiceDraftCreatedUseCase(
       queue
     );
@@ -110,7 +123,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const publishInvoiceCredited = new PublishInvoiceCreditedUsecase(queue);
     const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
 
-    // Registering Invoice Events
+    // * Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceDraftCreatedEvent(
       invoice,
@@ -164,6 +177,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoiceCredited,
+      publishCreditNoteToErp,
+      publishRevenueRecognitionReversal,
       loggerService
     );
 
@@ -176,8 +191,6 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       address,
       manuscript,
       publishInvoiceConfirmed,
-      // publishSageInvoiceToErpUsecase,
-      // publishNetsuiteInvoiceToErpUsecase,
       schedulingService,
       loggerService,
       env.scheduler.creditControlReminderDelay,
@@ -217,7 +230,5 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // tslint:disable-next-line: no-unused-expression
     new AfterPaymentCompleted(invoice, loggerService, publishPaymentToErp);
-
-    // new AfterManuscriptPublishedEvent(logger, manuscript);
   }
 };

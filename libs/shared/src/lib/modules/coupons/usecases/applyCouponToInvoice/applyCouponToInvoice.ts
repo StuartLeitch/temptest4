@@ -56,6 +56,7 @@ import {
   CouponInactiveError,
 } from './applyCouponToInvoiceErrors';
 import { ApplyCouponToInvoiceResponse } from './applyCouponToInvoiceResponse';
+import { CouponAssigned } from '../../domain/CouponAssigned';
 
 export class ApplyCouponToInvoiceUsecase
   implements
@@ -142,12 +143,21 @@ export class ApplyCouponToInvoiceUsecase
         const existingCoupons = await this.couponRepo.getCouponsByInvoiceItemId(
           invoiceItem.invoiceItemId
         );
-        if (existingCoupons.some((c) => c.couponId.equals(coupon.couponId))) {
+        if (
+          existingCoupons.coupons.some((c) =>
+            c.couponId.equals(coupon.couponId)
+          )
+        ) {
           return left(new CouponAlreadyUsedForInvoiceError(request.couponCode));
         }
 
-        existingCoupons.forEach((ec) => invoiceItem.addCoupon(ec));
-        invoiceItem.addCoupon(coupon);
+        invoiceItem.addAssignedCoupons(existingCoupons);
+        const newCouponAssignment = CouponAssigned.create({
+          invoiceItemId: invoiceItem.invoiceItemId,
+          dateAssigned: null,
+          coupon,
+        });
+        invoiceItem.addAssignedCoupon(newCouponAssignment);
 
         await this.couponRepo.assignCouponToInvoiceItem(
           coupon,
