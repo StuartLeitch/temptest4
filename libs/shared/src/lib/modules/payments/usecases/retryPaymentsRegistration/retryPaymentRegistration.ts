@@ -18,6 +18,7 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
+import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { PublisherRepoContract } from './../../../publishers/repos/publisherRepo';
@@ -55,6 +56,7 @@ export class RetryPaymentsRegistrationToErpUsecase
     private payerRepo: PayerRepoContract,
     private manuscriptRepo: ManuscriptRepoContract,
     private catalogRepo: CatalogRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private netsuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
@@ -69,6 +71,7 @@ export class RetryPaymentsRegistrationToErpUsecase
       this.payerRepo,
       this.manuscriptRepo,
       this.catalogRepo,
+      this.erpReferenceRepo,
       this.netsuiteService,
       this.publisherRepo,
       this.loggerService
@@ -85,22 +88,22 @@ export class RetryPaymentsRegistrationToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryPaymentsRegistrationToErpResponse> {
     try {
-      const unregisteredErpPayments = await this.paymentRepo.getUnregisteredErpPayments();
+      const unregisteredErpPaymentsIds = await this.paymentRepo.getUnregisteredErpPayments();
       const registeredPayments: ErpInvoiceResponse[] = [];
 
-      if (unregisteredErpPayments.length === 0) {
+      if (unregisteredErpPaymentsIds.length === 0) {
         this.loggerService.info('No registered payments to be register!');
         return right(Result.ok<ErpInvoiceResponse[]>(registeredPayments));
       }
 
       this.loggerService.info(
-        `Retrying registration in NetSuite for payments: ${unregisteredErpPayments
+        `Retrying registration in NetSuite for payments: ${unregisteredErpPaymentsIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unregisteredPayment of unregisteredErpPayments) {
+      for (const unregisteredPayment of unregisteredErpPaymentsIds) {
         const publishedPaymentResponse = await this.publishPaymentToErpUsecase.execute(
           {
             invoiceId: unregisteredPayment.id.toString(),

@@ -1,3 +1,5 @@
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
@@ -77,31 +79,67 @@ export class KnexPaymentRepo
     return PaymentMap.toDomain(result);
   }
 
+  private withErpReferenceQuery(
+    alias: string,
+    associatedField: string,
+    type: string,
+    vendor: string,
+    attribute: string
+  ): any {
+    const { db } = this;
+    return (query) =>
+      query
+        .column({ [attribute]: `${alias}.value` })
+        .leftJoin({ [alias]: TABLES.ERP_REFERENCES }, function () {
+          this.on(`${alias}.entity_id`, associatedField)
+            .andOn(`${alias}.vendor`, db.raw('?', [vendor]))
+            .andOn(`${alias}.type`, db.raw('?', [type]))
+            .andOn(`${alias}.attribute`, db.raw('?', [attribute]));
+        });
+  }
+
+  private filterReadyForRegistration(): any {
+    return (query) =>
+      query
+        .where('payments.status', '=', 'COMPLETED')
+        .whereNotNull('payments.foreignPaymentId')
+        .whereNull('paymentrefs.value');
+  }
+
   async getUnregisteredErpPayments(): Promise<InvoiceId[]> {
     const LIMIT = 30;
     const { db, logger } = this;
 
-    const sql = db(TABLES.PAYMENTS)
-      .leftJoin(
-        'erp_references',
-        'payments.id',
-        '=',
-        'erp_references.entity_id'
-      )
-      .where('erp_references.type', '=', 'payment')
-      .where('erp_references.attribute', '=', 'erp')
-      .where('payments.status', '=', 'COMPLETED')
-      .whereNotNull('payments.foreignPaymentId')
+    const erpReferencesQuery = db(TABLES.PAYMENTS)
+      .column({ invoiceId: 'payments.invoiceId' })
+      .select();
+
+    const withPaymentReference = this.withErpReferenceQuery(
+      'paymentrefs',
+      'payments.id',
+      'payment',
+      'netsuite',
+      'payment'
+    );
+
+    // * SQL for retrieving results needed only for Sage registration
+    const filterPaymentsReadyForRegistration = this.filterReadyForRegistration();
+
+    const prepareIdsSQL = filterPaymentsReadyForRegistration(
+      withPaymentReference(erpReferencesQuery)
+    )
       .orderBy('payments.datePaid', 'desc')
       .limit(LIMIT);
 
-    logger.debug('select', {
-      sql: sql.toString(),
+    logger.debug('getUnregisteredErpPayments', {
+      sql: prepareIdsSQL.toString(),
     });
 
-    const payments = await sql;
+    const payments = await prepareIdsSQL;
 
-    return payments.map(PaymentMap.toDomain);
+    return payments.map((i) =>
+      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
+    );
   }
 
   async updatePayment(payment: Payment): Promise<Payment> {

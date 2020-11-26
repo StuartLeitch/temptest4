@@ -33,6 +33,7 @@ export class RegisterPaymentsCron {
         payer,
         payment,
         paymentMethod,
+        erpReference,
       },
       services: { erp, logger: loggerService },
     } = context;
@@ -47,6 +48,7 @@ export class RegisterPaymentsCron {
       payer,
       manuscript,
       catalog,
+      erpReference,
       erp?.netsuite || null,
       publisher,
       loggerService

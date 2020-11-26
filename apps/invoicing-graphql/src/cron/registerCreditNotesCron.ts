@@ -21,7 +21,7 @@ export class RegisterCreditNotesCron {
     }
 
     const {
-      repos: { invoiceItem, invoice, coupon, waiver },
+      repos: { invoiceItem, invoice, coupon, waiver, erpReference },
       services: { erp, logger: loggerService },
     } = context;
 
@@ -30,6 +30,7 @@ export class RegisterCreditNotesCron {
       invoiceItem,
       coupon,
       waiver,
+      erpReference,
       erp?.netsuite || null,
       loggerService
     );

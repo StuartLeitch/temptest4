@@ -32,6 +32,7 @@ export class RegisterInvoicesCron {
         coupon,
         waiver,
         payer,
+        erpReference,
       },
       services: { erp, logger: loggerService, vatService },
     } = context;
@@ -45,6 +46,7 @@ export class RegisterInvoicesCron {
       address,
       manuscript,
       catalog,
+      erpReference,
       erp?.netsuite || null,
       publisher,
       loggerService,

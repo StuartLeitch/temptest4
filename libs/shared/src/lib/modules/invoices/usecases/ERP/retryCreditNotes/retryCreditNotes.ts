@@ -18,6 +18,7 @@ import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErp';
 
 export type RetryCreditNotesResponse = Either<
@@ -43,6 +44,7 @@ export class RetryCreditNotesUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
@@ -51,6 +53,7 @@ export class RetryCreditNotesUsecase
       this.invoiceItemRepo,
       this.couponRepo,
       this.waiverRepo,
+      this.erpReferenceRepo,
       this.netsuiteService,
       this.loggerService
     );
