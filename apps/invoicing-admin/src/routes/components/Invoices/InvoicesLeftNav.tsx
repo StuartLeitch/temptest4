@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import MaskedInput from 'react-text-mask';
 import { useDebouncedCallback } from 'use-debounce';
 
 import {
@@ -22,7 +21,7 @@ const InvoicesLeftNav = (props) => {
   const journalId = props?.filters?.journalId || [];
   const referenceNumber = props?.filters?.referenceNumber || '';
   const customId = props?.filters?.customId || '';
-
+  
   const onFilterHandler = useDebouncedCallback((eventTarget: any) => {
     const value =
       eventTarget?.type === 'checkbox'
@@ -143,31 +142,20 @@ const InvoicesLeftNav = (props) => {
         <NavItem className='d-flex p-0'>
           <InputGroup>
             <Input
-              mask={[
-                /[0-9]/,
-                /\d/,
-                /\d/,
-                /\d/,
-                /\d/,
-                /\d/,
-                '/',
-                /1|2/,
-                /0|9/,
-                /\d/,
-                /\d/,
-              ]}
               className='form-control'
               placeholder='Enter a reference number'
+              maxLength={11}
+              onFocus={(e) => e.target.placeholder = "reference/year"} 
+              onBlur={(e) => e.target.placeholder = "Enter a reference number"}
               name='referenceNumber'
               type='input'
               value={referenceNumber}
-              onChange={(evt: any) =>
-                onFilterHandler.callback({
+              onChange={(evt: any) => 
+                {onFilterHandler.callback({
                   name: 'referenceNumber',
                   value: evt.target.value,
-                })
+                })}
               }
-              tag={MaskedInput}
               id='referenceNumber'
             />
             <InputGroupAddon addonType='append'>
