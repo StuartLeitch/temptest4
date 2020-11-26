@@ -73,7 +73,7 @@ export class CreateCreditNoteUsecase
     let invoice: Invoice;
     let items: InvoiceItem[];
 
-    console.info(request);
+    // console.info(request);
 
     // * build the InvoiceId
     const invoiceId = InvoiceId.create(
@@ -155,7 +155,7 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.nsRevRecReference = null;
       clonedRawInvoice.creationReason = request.reason;
 
-      console.info(clonedRawInvoice);
+      // console.info(clonedRawInvoice);
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {
@@ -190,6 +190,7 @@ export class CreateCreditNoteUsecase
 
       // * Assign the cancelled invoice reference
       // * This assignment will trigger an INVOICE_CREDITED event
+
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
       creditNote.markAsFinal();
 
@@ -208,10 +209,7 @@ export class CreateCreditNoteUsecase
           status: InvoiceStatus.DRAFT,
           dateMovedToFinal: null,
           invoiceNumber: null,
-          erpReference: null,
-          nsReference: null,
-          revenueRecognitionReference: null,
-          nsRevRecReference: null,
+          erpReferences: null,
           cancelledInvoiceReference: null,
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain

@@ -33,10 +33,11 @@ import { Resolvers, Invoice, PayerType } from '../schema';
 import { Context } from '../../builders';
 
 import { env } from '../../env';
+import { AnyPtrRecord } from 'dns';
 
 export const invoice: Resolvers<Context> = {
   Query: {
-    async invoice(parent, args, context) {
+    async invoice(parent, args, context): Promise<any> {
       const { repos } = context;
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
@@ -66,8 +67,8 @@ export const invoice: Resolvers<Context> = {
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
-        erpReference: invoiceDetails.erpReference,
-        revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
+        erpReferences: invoiceDetails.getErpReferences().getItems(),
+        // revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber:
@@ -361,10 +362,10 @@ export const invoice: Resolvers<Context> = {
         status: creditNoteDetails.status,
         charge: creditNoteDetails.charge,
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
-        erpReference: creditNoteDetails.erpReference,
-        creditNoteReference: creditNoteDetails.creditNoteReference,
-        revenueRecognitionReference:
-          creditNoteDetails.revenueRecognitionReference,
+        // erpReference: creditNoteDetails.erpReference,
+        // creditNoteReference: creditNoteDetails.creditNoteReference,
+        // revenueRecognitionReference:
+        //   creditNoteDetails.revenueRecognitionReference,
         creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
         referenceNumber:
@@ -563,8 +564,8 @@ export const invoice: Resolvers<Context> = {
         status: creditNote.status,
         charge: creditNote.charge,
         dateCreated: creditNote?.dateCreated?.toISOString(),
-        erpReference: creditNote.erpReference,
-        revenueRecognitionReference: creditNote.revenueRecognitionReference,
+        // erpReference: creditNote.erpReference,
+        // revenueRecognitionReference: creditNote.revenueRecognitionReference,
         creationReason: creditNote.creationReason,
         dateIssued: creditNote?.dateIssued?.toISOString(),
         referenceNumber:

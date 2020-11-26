@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { Amount } from './../../../../../src/lib/domain/Amount';
 import { Payment } from './../../../../../src/lib/modules/payments/domain/Payment';
@@ -13,23 +13,21 @@ let payload;
 
 Before(() => {
   payload = {
-    invoiceId: InvoiceId.create(
-      new UniqueEntityID('invoice-id')
-    ),
+    invoiceId: InvoiceId.create(new UniqueEntityID('invoice-id')),
     payerId: PayerId.create(new UniqueEntityID('payer-id')),
-    amount: Amount.create(100)
-  }
-})
+    amount: Amount.create(100),
+  };
+});
 
-Given('There is a Payment Domain Entity', function() {
+Given('There is a Payment Domain Entity', function () {
   return;
 });
 
-When('The Payment.create method is called', function() {
+When('The Payment.create method is called', function () {
   paymentOrError = Payment.create(payload);
 });
 
-Then('A new Payment is successfully created', function() {
+Then('A new Payment is successfully created', function () {
   expect(paymentOrError.isSuccess).to.equal(true);
   const payment = paymentOrError.getValue();
   expect(payment.invoiceId).to.equal(payload.invoiceId);

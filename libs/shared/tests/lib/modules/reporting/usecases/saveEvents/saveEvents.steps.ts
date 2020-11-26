@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { REPORTING_TABLES } from './../../../../../../src/lib/modules/reporting/constants';
 import { EventDTO } from './../../../../../../src/lib/modules/reporting/domain/EventDTO';

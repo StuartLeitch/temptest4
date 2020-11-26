@@ -21,6 +21,7 @@ import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts
 import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 import { GenerateDraftCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateDraftCompensatoryEvents';
 
@@ -35,6 +36,7 @@ interface Context {
     invoice: MockInvoiceRepo;
     coupon: MockCouponRepo;
     waiver: MockWaiverRepo;
+    erpReference: MockErpReferenceRepo;
   };
   services: {
     queueService: MockSqsPublishService;
@@ -55,7 +57,8 @@ let context: Context = null;
 Before(tag, () => {
   const invoiceItem = new MockInvoiceItemRepo();
   const manuscript = new MockArticleRepo();
-  const invoice = new MockInvoiceRepo(manuscript, invoiceItem);
+  const erpReference = new MockErpReferenceRepo();
+  const invoice = new MockInvoiceRepo(manuscript, invoiceItem, erpReference);
   const coupon = new MockCouponRepo();
   const waiver = new MockWaiverRepo();
 
@@ -69,6 +72,7 @@ Before(tag, () => {
       invoice,
       coupon,
       waiver,
+      erpReference,
     },
     services: {
       queueService,

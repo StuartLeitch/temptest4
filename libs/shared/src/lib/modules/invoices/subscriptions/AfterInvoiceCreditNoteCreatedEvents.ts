@@ -166,8 +166,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
       //Get Invoice ID
       const invoiceId = creditNote.cancelledInvoiceReference;
 
-      //Get Invoice
-
+      // * Get Invoice
       const maybeInvoice = await getInvoiceDetails.execute(
         {
           invoiceId,
@@ -180,7 +179,16 @@ export class AfterInvoiceCreditNoteCreatedEvent
       }
       const invoice = maybeInvoice.value.getValue();
 
-      if (manuscript.datePublished && invoice.nsRevRecReference) {
+      const nsRevRecReference = invoice
+        .getErpReferences()
+        .getItems()
+        .filter(
+          (er) =>
+            er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
+        )
+        .find(Boolean);
+
+      if (manuscript.datePublished && nsRevRecReference) {
         const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
           { invoiceId },
           defaultContext

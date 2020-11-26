@@ -13,13 +13,11 @@ import {
   Manuscript,
   Invoice,
   InvoiceItem,
-  LoggerBuilder,
   LoggerContract,
   LoggerBuilderContract,
 } from '@hindawi/shared';
 
 import {
-  // ErpServiceContract,
   ErpInvoiceRequest,
   ErpInvoiceResponse,
   ErpRevRecResponse,
@@ -34,29 +32,27 @@ type CustomerPayload = Record<string, string | boolean>;
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
-    private logger: LoggerContract
+    private logger: LoggerContract,
+    readonly referenceMappings?: Record<string, any>
   ) {}
 
-  get invoiceErpRefFieldName(): string {
-    return 'nsReference';
-  }
-
-  get invoiceRevenueRecRefFieldName(): string {
-    return 'nsRevRecReference';
+  get vendorName(): string {
+    return 'netsuite';
   }
 
   public static create(
     config: Record<string, unknown>,
     loggerBuilder: LoggerBuilderContract
   ): NetSuiteService {
+    const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
-      config: new ConnectionConfig(config.connection),
+      config: new ConnectionConfig(configConnection),
     });
 
-    let logger = loggerBuilder.getLogger();
+    const logger = loggerBuilder.getLogger();
     logger.setScope('NetSuiteService');
 
-    const service = new NetSuiteService(connection, logger);
+    const service = new NetSuiteService(connection, logger, referenceMappings);
 
     return service;
   }
@@ -480,8 +476,16 @@ export class NetSuiteService implements ErpServiceContract {
       'Bank Transfer': '347',
     };
 
+    const nsErpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
+      .find(Boolean);
+
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}/!transform/customerpayment`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}/!transform/customerpayment`,
       method: 'POST',
     };
 
@@ -508,6 +512,10 @@ export class NetSuiteService implements ErpServiceContract {
       // Amount due,
       payment: payment.amount.value,
     };
+
+    this.logger.info({
+      createPaymentPayload,
+    });
 
     try {
       const res = await axios({
@@ -723,8 +731,16 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { invoice, journalId } = data;
 
+    const nsErpReference = invoice
+      .getErpReferences()
+      .getItems()
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
+      .find(Boolean);
+
     const invoiceRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${invoice.nsReference}`,
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
       method: 'PATCH',
     };
 
@@ -758,8 +774,16 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { originalInvoice } = data;
 
+    const originalNSErpReference = originalInvoice
+      .getErpReferences()
+      .getItems()
+      .filter(
+        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+      )
+      .find(Boolean);
+
     const creditNoteTransformOpts = {
-      url: `${config.endpoint}record/v1/invoice/${originalInvoice.nsReference}/!transform/creditmemo`,
+      url: `${config.endpoint}record/v1/invoice/${originalNSErpReference.value}/!transform/creditmemo`,
       method: 'POST',
     };
 

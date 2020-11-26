@@ -1,7 +1,7 @@
 // tslint:disable: no-unused-expression
 
 import { expect } from 'chai';
-import { Before, Given, Then, When } from 'cucumber';
+import { Before, Given, Then, When } from '@cucumber/cucumber';
 
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 import { MockErpService } from '../../../../../../src/lib/domain/services/mocks/MockErpService';
@@ -18,6 +18,7 @@ import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mo
 import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 import {
@@ -35,6 +36,7 @@ import {
   WaiverMap,
 } from '../../../../../../src/lib/shared';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { ErpReferenceMap } from './../../../../../../src/lib/modules/vendors/mapper/ErpReference';
 
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
@@ -45,8 +47,9 @@ let mockWaiverRepo: MockWaiverRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockCatalogRepo: MockCatalogRepo;
 let mockSalesforceService: MockErpService;
-let mockNetsuiteService: MockErpService;
+// let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
 
 let useCase: PublishRevenueRecognitionToErpUsecase;
@@ -59,8 +62,6 @@ const context: UsecaseAuthorizationContext = {
 
 Before(function () {
   invoice = null;
-
-  mockInvoiceRepo = new MockInvoiceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockAddressRepo = new MockAddressRepo();
   mockPayerRepo = new MockPayerRepo();
@@ -68,10 +69,16 @@ Before(function () {
   mockWaiverRepo = new MockWaiverRepo();
   mockManuscriptRepo = new MockArticleRepo();
   mockCatalogRepo = new MockCatalogRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
   mockSalesforceService = new MockErpService();
-  mockNetsuiteService = new MockErpService();
+  // mockNetsuiteService = new MockErpService();
   mockPublisherRepo = new MockPublisherRepo();
   mockLogger = new MockLogger();
+  mockInvoiceRepo = new MockInvoiceRepo(
+    mockManuscriptRepo,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
 
   setupVatService();
 
@@ -85,6 +92,7 @@ Before(function () {
     mockManuscriptRepo,
     mockCatalogRepo,
     mockPublisherRepo,
+    mockErpReferenceRepo,
     mockSalesforceService,
     mockLogger
   );
@@ -132,11 +140,20 @@ Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
 
   invoice.addItems([invoiceItem]);
 
+  const erpReference = ErpReferenceMap.toDomain({
+    entity_id: invoiceId,
+    entity_type: 'invoice',
+    vendor: 'testVendor',
+    attribute: 'confirmation',
+    value: 'FOO',
+  });
+
   await mockInvoiceRepo.save(invoice);
   await mockInvoiceItemRepo.save(invoiceItem);
   await mockManuscriptRepo.save(manuscript);
   mockPublisherRepo.addMockItem(publisher);
   mockCatalogRepo.addMockItem(catalog);
+  mockErpReferenceRepo.addMockItem(erpReference);
 
   transaction.addInvoice(invoice);
 });
@@ -153,8 +170,8 @@ Given(
       invoiceId: invoice.invoiceId.id.toValue(),
       type: payerType,
     });
-    await mockPayerRepo.addMockItem(payer);
-    await mockAddressRepo.addMockItem(address);
+    mockPayerRepo.addMockItem(payer);
+    mockAddressRepo.addMockItem(address);
   }
 );
 
@@ -248,12 +265,14 @@ Then(
     const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.true;
 
-    const invoice = await mockInvoiceRepo.getInvoiceById(
+    const testInvoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
-    expect(invoice.revenueRecognitionReference).to.equal(
-      mockSalesforceService.revenueRef
-    );
+    const erpReferences = testInvoice.getErpReferences().getItems();
+
+    expect(
+      erpReferences.find((ef) => ef.attribute === 'confirmation').value
+    ).to.equal('FOO');
   }
 );
 
@@ -264,9 +283,14 @@ Then(
     const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.false;
 
-    const invoice = await mockInvoiceRepo.getInvoiceById(
+    const testInvoice = await mockInvoiceRepo.getInvoiceById(
       InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
     );
-    expect(invoice.erpReference).to.equal('NON_INVOICEABLE');
+    const erpReferences = testInvoice.getErpReferences().getItems();
+
+    expect(erpReferences.length).to.equal(1);
+
+    const [nonInvoiceable] = erpReferences;
+    expect(nonInvoiceable.value).to.equal('NON_INVOICEABLE');
   }
 );

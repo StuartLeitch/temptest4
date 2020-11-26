@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, BeforeAll, AfterAll } from 'cucumber';
+import { Given, When, Then, BeforeAll, AfterAll } from '@cucumber/cucumber';
 
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
@@ -8,6 +8,7 @@ import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repo
 import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
 import { MockEditorRepo } from './../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 import { InvoiceCollection } from './../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
@@ -32,6 +33,7 @@ let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
 let mockPausedReminderRepo: MockPausedReminderRepo;
 let mockEditorRepo: MockEditorRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 
 let mockWaiverService: WaiverService;
 
@@ -42,13 +44,18 @@ let transaction;
 let invoice;
 
 BeforeAll(function () {
-  mockInvoiceRepo = new MockInvoiceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockTransactionRepo = new MockTransactionRepo();
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockEditorRepo = new MockEditorRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
+  mockInvoiceRepo = new MockInvoiceRepo(
+    null,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
   mockWaiverService = new WaiverService(
     mockInvoiceItemRepo,
     mockEditorRepo,

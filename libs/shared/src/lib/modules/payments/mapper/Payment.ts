@@ -28,7 +28,6 @@ export class PaymentMap extends Mapper<Payment> {
         paymentProof: raw.paymentProof
           ? PaymentProof.create(raw.paymentProof)
           : null,
-        erpId: raw.erpId ?? null,
       },
       new UniqueEntityID(raw.id)
     );
@@ -47,7 +46,6 @@ export class PaymentMap extends Mapper<Payment> {
       amount: payment.amount.value,
       datePaid: payment.datePaid,
       foreignPaymentId: payment.foreignPaymentId ?? null,
-      erpId: payment.erpId ?? null,
       status: payment.status,
       paymentProof: payment.paymentProof?.toString(),
     };

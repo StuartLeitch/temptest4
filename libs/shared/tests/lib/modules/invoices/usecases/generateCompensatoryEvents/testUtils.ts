@@ -9,6 +9,7 @@ import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappe
 import { PaymentMap } from '../../../../../../src/lib/modules/payments/mapper/Payment';
 import { PayerMap } from '../../../../../../src/lib/modules/payers/mapper/Payer';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { ErpReferenceMap } from './../../../../../../src/lib/modules/vendors/mapper/ErpReference';
 
 import { MockPaymentMethodRepo } from '../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
@@ -19,6 +20,7 @@ import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 export function addInvoices(invoicesRepo: MockInvoiceRepo) {
   const invoicesProps = [
@@ -376,5 +378,71 @@ export function addBillingAddresses(addressRepo: MockAddressRepo) {
   for (const props of addressProps) {
     const address = AddressMap.toDomain(props);
     addressRepo.addMockItem(address);
+  }
+}
+
+export function addErpReferences(erpReferenceRepo: MockErpReferenceRepo): void {
+  const erpReferenceProps = [
+    {
+      entity_id: '1',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'confirmation',
+      value: 'FOO',
+    },
+    {
+      entity_id: '2',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'confirmation',
+      value: 'FOO',
+    },
+    {
+      entity_id: '3',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'confirmation',
+      value: 'FOO',
+    },
+    {
+      entity_id: '4',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'confirmation',
+      value: 'FOO',
+    },
+    {
+      entity_id: '5',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'confirmation',
+      value: 'FOO',
+    },
+    {
+      entity_id: '7',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'confirmation',
+      value: 'FOO',
+    },
+    {
+      entity_id: '7',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'revenueRecognition',
+      value: 'FOOBAR',
+    },
+    {
+      entity_id: '7',
+      type: 'invoice',
+      vendor: 'netsuite',
+      attribute: 'creditNote',
+      value: 'BAR',
+    },
+  ];
+
+  for (const props of erpReferenceProps) {
+    const erpReference = ErpReferenceMap.toDomain(props);
+    erpReferenceRepo.addMockItem(erpReference);
   }
 }
