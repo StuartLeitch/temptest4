@@ -21,10 +21,11 @@ import { CatalogRepoContract } from '../../../../journals/repos';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { VATService } from 'libs/shared/src/lib/domain/services/VATService';
+import { VATService } from '@hindawi/shared';
 
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 
@@ -57,6 +58,7 @@ export class RetryFailedSageErpInvoicesUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private sageService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
@@ -71,6 +73,7 @@ export class RetryFailedSageErpInvoicesUsecase
       this.addressRepo,
       this.manuscriptRepo,
       this.catalogRepo,
+      this.erpReferenceRepo,
       this.sageService,
       this.publisherRepo,
       this.loggerService,
@@ -88,25 +91,26 @@ export class RetryFailedSageErpInvoicesUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryFailedSageErpInvoicesResponse> {
     try {
-      const failedErpInvoices = await this.invoiceRepo.getFailedSageErpInvoices();
+      const failedErpInvoicesIds = await this.invoiceRepo.getFailedSageErpInvoices();
 
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
-      if (failedErpInvoices.length === 0) {
+      if (failedErpInvoicesIds.length === 0) {
         this.loggerService.info('No failed invoices to register in Sage');
         return right(updatedInvoices);
       }
       this.loggerService.info(
-        `Retrying sync with Sage for invoices: ${failedErpInvoices
-          .map((i) => i.invoiceId.id.toString())
+        `Retrying sync with Sage for invoices: ${failedErpInvoicesIds
+          .map((i) => i.id.toString())
           .join(', ')}`
       );
+
       const errs = [];
 
-      for (const failedInvoice of failedErpInvoices) {
+      for (const failedInvoice of failedErpInvoicesIds) {
         const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
           {
-            invoiceId: failedInvoice.invoiceId.id.toString(),
+            invoiceId: failedInvoice.id.toString(),
           }
         );
 
@@ -120,22 +124,18 @@ export class RetryFailedSageErpInvoicesUsecase
         }
         const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
-        // console.log('Assigned ERP Reference:');
-        // console.info('type ', typeof assignedErpReference);
-        // console.info(assignedErpReference);
-
         if (assignedErpReference) {
-          console.log(
+          this.loggerService.info(
             `Assigned successfully ${
               assignedErpReference?.tradeDocumentId
-            } to invoice ${failedInvoice.invoiceId.id.toString()}`
+            } to invoice ${failedInvoice.id.toString()}`
           );
           updatedInvoices.push(assignedErpReference);
         }
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs)));
       }
 

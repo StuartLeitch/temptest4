@@ -1,4 +1,4 @@
-import { Before, Given, Then, When } from 'cucumber';
+import { Before, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import {

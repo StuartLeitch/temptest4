@@ -254,6 +254,11 @@ export * from './modules/users/domain/User';
 export * from './modules/users/domain/UserId';
 export * from './modules/users/mappers/UserMap';
 
+// * Exporet ERP Reference
+export * from './modules/vendors/domain/ErpReference';
+export * from './modules/vendors/mapper/ErpReference';
+export * from './modules/vendors/repos';
+
 // ? Should we export this
 // * Infra
 export type { SchedulerContract } from './infrastructure/scheduler/Scheduler';

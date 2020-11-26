@@ -3,6 +3,8 @@ import { Mapper } from '../../../infrastructure/Mapper';
 
 import { Invoice } from '../domain/Invoice';
 import { TransactionId } from '../../transactions/domain/TransactionId';
+import { ErpReferenceMap } from './../../vendors/mapper/ErpReference';
+import { InvoiceErpReferences } from './../domain/InvoiceErpReferences';
 
 export class InvoiceMap extends Mapper<Invoice> {
   public static toDomain(raw: any): Invoice {
@@ -13,19 +15,21 @@ export class InvoiceMap extends Mapper<Invoice> {
         ),
         status: raw.status,
         invoiceNumber: raw.invoiceNumber?.toString(),
-        dateCreated: new Date(raw.dateCreated),
+        dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
         dateAccepted: raw.dateAccepted ? new Date(raw.dateAccepted) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
         dateMovedToFinal: raw.dateMovedToFinal
           ? new Date(raw.dateMovedToFinal)
           : null,
-        erpReference: raw.erpReference ?? null,
-        nsReference: raw.nsReference ?? null,
-        nsRevRecReference: raw.nsRevRecReference ?? null,
-        revenueRecognitionReference: raw.revenueRecognitionReference ?? null,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
-        creditNoteReference: raw.creditNoteReference ?? null,
         creationReason: raw.creationReason ?? null,
+        erpReferences:
+          raw.erpReferences &&
+          raw.erpReferences.every((ef) => ef.vendor && ef.type)
+            ? InvoiceErpReferences.create(
+                raw.erpReferences.map(ErpReferenceMap.toDomain)
+              )
+            : InvoiceErpReferences.create([]),
       },
       new UniqueEntityID(raw.id)
     );
@@ -45,13 +49,9 @@ export class InvoiceMap extends Mapper<Invoice> {
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
       dateMovedToFinal: invoice.dateMovedToFinal,
-      erpReference: invoice.erpReference ?? null,
-      nsReference: invoice.nsReference ?? null,
-      nsRevRecReference: invoice.nsRevRecReference ?? null,
-      creditNoteReference: invoice.creditNoteReference ?? null,
-      revenueRecognitionReference: invoice.revenueRecognitionReference ?? null,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
       creationReason: invoice.creationReason ?? null,
+      //  erpReferences: invoice.getErpReferences().getItems(),
     };
   }
 }

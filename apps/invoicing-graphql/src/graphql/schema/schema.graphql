@@ -38,6 +38,14 @@ type Transaction @model(id: "transactions") {
   status: String @filter(key: "transactionStatus")
 }
 
+type ErpReference {
+  entity_id: String
+  type: String
+  vendor: String
+  attribute: String
+  value: String
+}
+
 enum TransactionStatus {
   DRAFT
   ACTIVE
@@ -78,6 +86,7 @@ type Invoice @model(id: "invoices") {
   status: InvoiceStatus @filter(key: "invoiceStatus")
   payer: Payer
   erpReference: String
+  erpReferences: [ErpReference]
   revenueRecognitionReference: String
   creationReason: String
   referenceNumber: ReferenceNumber @filter

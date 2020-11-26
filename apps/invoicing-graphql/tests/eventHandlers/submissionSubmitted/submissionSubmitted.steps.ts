@@ -1,6 +1,6 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { Before, Given, When, Then, After } from 'cucumber';
+import { Before, Given, When, Then, After } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import { SubmissionSubmitted } from '@hindawi/phenom-events';

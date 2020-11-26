@@ -23,6 +23,7 @@ import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 
 import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
 import { JournalId } from '../../../../journals/domain/JournalId';
@@ -30,7 +31,7 @@ import { Address } from '../../../../addresses/domain/Address';
 import { Payer } from '../../../../payers/domain/Payer';
 import { InvoiceId } from '../../../domain/InvoiceId';
 import { Invoice } from '../../../domain/Invoice';
-
+import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
 import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
@@ -63,6 +64,7 @@ export class PublishRevenueRecognitionToErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {}
@@ -138,10 +140,6 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
-      // console.info(invoice);
-      // console.info(manuscript);
-      // console.info(referencedInvoicesByCustomId);
-
       const { customId } = manuscript;
 
       // * Get all invoices associated with this custom id
@@ -201,11 +199,20 @@ export class PublishRevenueRecognitionToErpUsecase
         );
       }
 
+      await this.invoiceRepo.update(invoice);
+
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {
-        invoice.erpReference = 'NON_INVOICEABLE';
-        invoice.nsReference = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(invoice);
+        const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute:
+            this.erpService?.referenceMappings?.revenueRecognition ||
+            'revenueRecognition',
+          value: 'NON_INVOICEABLE',
+        });
+        await this.erpReferenceRepo.save(nonInvoiceableErpReference);
         return right(Result.ok<any>(null));
       }
 
@@ -217,25 +224,30 @@ export class PublishRevenueRecognitionToErpUsecase
         invoiceTotal: netCharges,
       });
 
-      this.loggerService.info(
-        'ERP field',
-        this.erpService.invoiceRevenueRecRefFieldName
-      );
-      this.loggerService.info('ERP response', erpResponse);
-
-      this.loggerService.info(
-        `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
-          erpResponse
-        )}`
-      );
+      this.loggerService.debug('ERP response', erpResponse);
 
       if (erpResponse?.journal?.id) {
-        invoice[this.erpService.invoiceRevenueRecRefFieldName] = String(
-          erpResponse?.journal?.id
+        this.loggerService.info(
+          `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
+            erpResponse
+          )}`
+        );
+        const erpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute:
+            this.erpService?.referenceMappings?.revenueRecognition ||
+            'revenueRecognition',
+          value: String(erpResponse?.journal?.id),
+        });
+        await this.erpReferenceRepo.save(erpReference);
+        this.loggerService.info(
+          `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(
+            erpResponse
+          )}`
         );
       }
-
-      await this.invoiceRepo.update(invoice);
 
       return right(Result.ok<any>(erpResponse));
     } catch (err) {

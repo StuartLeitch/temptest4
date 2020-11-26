@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 import {
@@ -17,6 +17,7 @@ import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repo
 import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockPayerRepo } from './../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 import { GenerateCompensatoryEventsUsecase } from './../../../../../../src/lib/modules/invoices/usecases/generateCompensatoryEvents/generateCompensatoryEvents';
 
@@ -30,6 +31,7 @@ import {
   addCoupons,
   addWaivers,
   addPayers,
+  addErpReferences,
 } from './testUtils';
 
 import { Roles } from './../../../../../../src/lib/modules/users/domain/enums/Roles';
@@ -44,6 +46,7 @@ let mockPaymentRepo: MockPaymentRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
 let mockPayerRepo: MockPayerRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let loggerService: LoggerContract;
 
 let useCase: GenerateCompensatoryEventsUsecase;
@@ -58,11 +61,16 @@ Before(function () {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockManuscriptRepo = new MockArticleRepo();
   mockAddressRepo = new MockAddressRepo();
-  mockInvoiceRepo = new MockInvoiceRepo();
   mockPaymentRepo = new MockPaymentRepo();
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
   mockPayerRepo = new MockPayerRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
+  mockInvoiceRepo = new MockInvoiceRepo(
+    mockManuscriptRepo,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
 
   context = {
     roles: [Roles.ADMIN],
@@ -78,6 +86,7 @@ Before(function () {
   addCoupons(mockCouponRepo);
   addWaivers(mockWaiverRepo);
   addPayers(mockPayerRepo);
+  addErpReferences(mockErpReferenceRepo);
 
   useCase = new GenerateCompensatoryEventsUsecase(
     mockPaymentMethodRepo,

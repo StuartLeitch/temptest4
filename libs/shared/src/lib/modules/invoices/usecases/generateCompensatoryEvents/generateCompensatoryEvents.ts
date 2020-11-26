@@ -373,7 +373,7 @@ export class GenerateCompensatoryEventsUsecase
       return right(false);
     }
 
-    if (!payments || payments.length == 0) {
+    if (!payments || payments.length === 0) {
       return right(false);
     }
 
@@ -385,7 +385,7 @@ export class GenerateCompensatoryEventsUsecase
       const { payments, invoice } = request;
       let paymentDate: Date;
 
-      if (payments.length == 0) {
+      if (payments.length === 0) {
         paymentDate = invoice.dateIssued;
       } else {
         paymentDate = payments.reduce(

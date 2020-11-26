@@ -1,6 +1,6 @@
 import * as path from 'path';
 import Knex from 'knex';
-import knexTinyLogger from 'knex-tiny-logger';
+// import knexTinyLogger from 'knex-tiny-logger';
 
 export { Knex };
 
@@ -24,7 +24,8 @@ export enum TABLES {
   PUBLISHERS = 'publishers',
   PUBLISHER_CUSTOM_VALUES = 'publisher_custom_values',
   NOTIFICATIONS_SENT = 'notifications_sent',
-  PAUSED_REMINDERS = 'paused_reminders'
+  PAUSED_REMINDERS = 'paused_reminders',
+  ERP_REFERENCES = 'erp_references',
 }
 
 interface DbOptions {
@@ -32,7 +33,7 @@ interface DbOptions {
 }
 
 const defaultDbOptions: DbOptions = {
-  filename: ':memory:'
+  filename: ':memory:',
 };
 
 export async function makeDb(
@@ -41,16 +42,16 @@ export async function makeDb(
   const db = Knex({
     client: 'sqlite3',
     connection: {
-      filename: options.filename
+      filename: options.filename,
     },
     migrations: {
-      directory: path.join(__dirname, 'migrations')
+      directory: path.join(__dirname, 'migrations'),
     },
     seeds: {
-      directory: path.join(__dirname, 'seeds')
+      directory: path.join(__dirname, 'seeds'),
     },
     // pool: {min: 0, max: 10, idleTimeoutMillis: 500},
-    useNullAsDefault: true
+    useNullAsDefault: true,
   });
 
   await db.migrate.latest();
@@ -63,7 +64,7 @@ export async function destroyDb(db: Knex): Promise<void> {
 }
 
 export async function clearTable(db: Knex, ...tables: string[]): Promise<Knex> {
-  await Promise.all(tables.map(async table => await db(table).truncate()));
+  await Promise.all(tables.map(async (table) => await db(table).truncate()));
 
   return db;
 }
