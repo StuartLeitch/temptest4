@@ -61,7 +61,9 @@
     "src/lib/infrastructure/database/knex/migrations/20200818172244_drop_journals_table.js",
     "src/lib/infrastructure/database/knex/migrations/20200903103030_change_arxivId_to_preprintValue.js",
     "src/lib/infrastructure/database/knex/migrations/20200910125210_add_creditnotereference_to_invoices_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20201105134947_create_erp_table.js",
     "src/lib/infrastructure/database/knex/migrations/20201006093954_add_erpid_to_payments_table.js",
-    "src/lib/infrastructure/database/knex/migrations/20201103114325_add_reason_to_invoices_table.js"
+    "src/lib/infrastructure/database/knex/migrations/20201103114325_add_reason_to_invoices_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20201117160034_change_invoices_table_schema.js"
   ]
 }

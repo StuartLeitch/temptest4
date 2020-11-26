@@ -51,10 +51,10 @@ export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
           this.logger.info(
             `[AfterPaymentCompleted]: Successfully executed onPaymentCompleted use case`
           );
-        } catch (e) {
+        } catch (err) {
           this.logger.error(
             `While saving the invoice status an error ocurred`,
-            e
+            err
           );
         }
       }

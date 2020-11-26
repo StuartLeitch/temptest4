@@ -7,9 +7,11 @@ import { InvoiceRepoContract } from '../invoiceRepo';
 import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
 import { Invoice } from '../../domain/Invoice';
+import { InvoiceMap } from '../../mappers/InvoiceMap';
 import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
 import { TransactionId } from '../../../transactions/domain/TransactionId';
+import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 
 export class MockInvoiceRepo
   extends BaseMockRepo<Invoice>
@@ -18,18 +20,41 @@ export class MockInvoiceRepo
 
   constructor(
     private articleRepo?: ArticleRepoContract,
-    private invoiceItemRepo?: InvoiceItemRepoContract
+    private invoiceItemRepo?: InvoiceItemRepoContract,
+    private erpReferenceRepo?: ErpReferenceRepoContract
   ) {
     super();
   }
 
   public async getInvoiceById(invoiceId: InvoiceId): Promise<Invoice> {
-    const matches = this._items.filter((i) => i.invoiceId.equals(invoiceId));
-    if (matches.length !== 0) {
-      return cloneDeep(matches[0]);
-    } else {
+    let filterInvoiceById = null;
+
+    filterInvoiceById = this.filterInvoiceById(invoiceId);
+
+    if (!filterInvoiceById) {
+      // throw new Error(`No invoice with id ${invoiceId.id.toString()}`);
       return null;
     }
+
+    let erpReferences = [];
+    if (this.erpReferenceRepo) {
+      const foundReferences = this.erpReferenceRepo.filterBy({
+        where: [['entity_id', '=', invoiceId.id.toString()]],
+      });
+
+      erpReferences = erpReferences.concat(foundReferences);
+    }
+
+    return InvoiceMap.toDomain({
+      ...InvoiceMap.toPersistence(filterInvoiceById),
+      erpReferences: erpReferences.map((ef) => ({
+        entity_id: ef?.entity_id,
+        type: ef?.entityType,
+        vendor: ef?.vendor,
+        attribute: ef?.attribute,
+        value: ef?.value,
+      })),
+    });
   }
 
   public async getFailedSageErpInvoices(): Promise<Invoice[]> {
@@ -98,7 +123,7 @@ export class MockInvoiceRepo
       vatRegistrationNumber: '',
       foreignPaymentId: '',
       amount: null,
-      paymentDate: invoice.props.dateUpdated?.toISOString(),
+      paymentDate: invoice.props.dateAccepted?.toISOString(),
       paymentType: '',
     };
   }
@@ -106,7 +131,6 @@ export class MockInvoiceRepo
   public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
     let invoice = await this.getInvoiceById(invoiceId);
     if (invoice.invoiceNumber) {
-      console.log('Invoice number already set');
       return invoice;
     }
     invoice.invoiceNumber = String(this._items.length);
@@ -178,12 +202,40 @@ export class MockInvoiceRepo
 
   public async *getInvoicesIds(
     ids: string[],
-    journalIds: string[]
+    journalIds: string[],
+    omitDeleted: boolean
   ): AsyncGenerator<string, void, undefined> {
     yield* this._items.map((item) => item.id.toString());
+    if (!omitDeleted) {
+      yield* this.deletedItems.map((item) => item.id.toString());
+    }
   }
 
   async getUnrecognizedNetsuiteErpInvoices(): Promise<InvoiceId[]> {
+    const excludedCreditNotes = this.excludeCreditNotesForRevenueRecognition();
+
+    const [
+      filterArticlesByNotNullDatePublished,
+    ] = await this.articleRepo.filterBy({
+      whereNotNull: 'articles.datePublished',
+    });
+
+    // * search invoices through invoice items
+    const invoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+      filterArticlesByNotNullDatePublished.manuscriptId
+    );
+
+    const invoiceQueries = invoiceItems.reduce((aggr, ii) => {
+      aggr.push(this.getInvoiceById(ii.invoiceId));
+      return aggr;
+    }, []);
+
+    const invoicesWithPublishedManuscripts = await Promise.all(invoiceQueries);
+
+    return excludedCreditNotes(invoicesWithPublishedManuscripts);
+  }
+
+  async getUnrecognizedNetsuiteErpInvoicesDeprecated(): Promise<InvoiceId[]> {
     const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRevenueRecognition();
 
     const [filterArticlesByNotNullDatePublished] = this.articleRepo.filterBy({
@@ -233,6 +285,58 @@ export class MockInvoiceRepo
         },
         items
       );
+  }
+
+  public filterReadyForRevenueRecognitionThroughErpReferences() {
+    return (items) =>
+      this.filterBy(
+        {
+          // whereIn: [['status', ['ACTIVE', 'FINAL']]],
+          whereNull: [
+            // ['cancelledInvoiceReference'],
+            ['revenueRecognitionReference'],
+          ],
+          whereNotNull: ['erpReference'],
+          where: [
+            ['type', '=', 'invoice'],
+            ['attribute', '=', 'confirmation'],
+            // ['value', '<>', 'NON_INVOICEABLE'],
+            ['value', '<>', 'MigrationRef'],
+            ['value', '<>', 'migrationRef'],
+          ],
+        },
+        items
+      );
+  }
+
+  public excludeCreditNotesForRevenueRecognition() {
+    return (items) =>
+      this.filterBy(
+        {
+          whereIn: [['status', ['ACTIVE', 'FINAL']]],
+          whereNull: [
+            ['cancelledInvoiceReference'],
+            // ['revenueRecognitionReference'],
+          ],
+          // whereNotNull: ['erpReference'],
+          // where: [
+          //   ['erpReference', '<>', 'NON_INVOICEABLE'],
+          //   ['erpReference', '<>', 'MigrationRef'],
+          //   ['erpReference', '<>', 'migrationRef'],
+          // ],
+        },
+        items
+      );
+  }
+
+  private filterInvoiceById(invoiceId: InvoiceId) {
+    const found = this._items.find((item) => item.id.equals(invoiceId.id));
+
+    if (!found) {
+      return null;
+    }
+
+    return found;
   }
 
   public filterBy(criteria, items): Invoice[] {
@@ -292,5 +396,11 @@ export class MockInvoiceRepo
     }
 
     return found;
+  }
+
+  async isInvoiceDeleted(id: InvoiceId): Promise<boolean> {
+    const found = this.deletedItems.find((invoice) => invoice.id.equals(id.id));
+
+    return !!found;
   }
 }

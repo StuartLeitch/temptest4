@@ -1,13 +1,12 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
-import { PublishMessage } from './../../../../../../src/lib/domain/services/sqs/PublishMessage';
 import {
   LoggerContract,
   MockLogger,
 } from './../../../../../../src/lib/infrastructure/logging';
-import { SQSPublishServiceContract } from './../../../../../../src/lib/domain/services/SQSPublishService';
+import { MockSqsPublishService } from './../../../../../../src/lib/domain/services/SQSPublishService';
 
 import { MockPaymentMethodRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
@@ -18,6 +17,7 @@ import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repo
 import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockPayerRepo } from './../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 import { GenerateCompensatoryEventsUsecase } from './../../../../../../src/lib/modules/invoices/usecases/generateCompensatoryEvents/generateCompensatoryEvents';
 
@@ -31,20 +31,13 @@ import {
   addCoupons,
   addWaivers,
   addPayers,
+  addErpReferences,
 } from './testUtils';
 
 import { Roles } from './../../../../../../src/lib/modules/users/domain/enums/Roles';
 
-class MockSQSPublishService implements SQSPublishServiceContract {
-  messages: PublishMessage[] = [];
-
-  async publishMessage(message: PublishMessage): Promise<void> {
-    this.messages.push(message);
-  }
-}
-
 let mockPaymentMethodRepo: MockPaymentMethodRepo;
-let mockSqsPublishService: MockSQSPublishService;
+let mockSqsPublishService: MockSqsPublishService;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockAddressRepo: MockAddressRepo;
@@ -53,6 +46,7 @@ let mockPaymentRepo: MockPaymentRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
 let mockPayerRepo: MockPayerRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let loggerService: LoggerContract;
 
 let useCase: GenerateCompensatoryEventsUsecase;
@@ -62,16 +56,21 @@ let payload;
 let event;
 
 Before(function () {
-  mockSqsPublishService = new MockSQSPublishService();
+  mockSqsPublishService = new MockSqsPublishService();
   mockPaymentMethodRepo = new MockPaymentMethodRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockManuscriptRepo = new MockArticleRepo();
   mockAddressRepo = new MockAddressRepo();
-  mockInvoiceRepo = new MockInvoiceRepo();
   mockPaymentRepo = new MockPaymentRepo();
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
   mockPayerRepo = new MockPayerRepo();
+  mockErpReferenceRepo = new MockErpReferenceRepo();
+  mockInvoiceRepo = new MockInvoiceRepo(
+    mockManuscriptRepo,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
 
   context = {
     roles: [Roles.ADMIN],
@@ -87,6 +86,7 @@ Before(function () {
   addCoupons(mockCouponRepo);
   addWaivers(mockWaiverRepo);
   addPayers(mockPayerRepo);
+  addErpReferences(mockErpReferenceRepo);
 
   useCase = new GenerateCompensatoryEventsUsecase(
     mockPaymentMethodRepo,
@@ -141,9 +141,7 @@ When('I try to generate a compensatory event', async function () {
 });
 
 Then(/^It should send an (.+) Event$/, async function (eventName: string) {
-  event = mockSqsPublishService.messages.find(
-    (message) => message.event === eventName
-  );
+  event = mockSqsPublishService.findEvent(eventName);
   expect(Object.keys(event).length).to.be.greaterThan(0);
 });
 

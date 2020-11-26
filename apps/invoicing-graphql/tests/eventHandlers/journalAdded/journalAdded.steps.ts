@@ -1,7 +1,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import {
   // UniqueEntityID,

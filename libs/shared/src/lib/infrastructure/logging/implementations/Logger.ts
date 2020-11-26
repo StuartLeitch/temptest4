@@ -69,12 +69,12 @@ export class Logger implements LoggerContract {
           winston.format.colorize({ all: true }),
           winston.format.simple(),
           winston.format.printf(({ level, message, scope }) => {
-            let printableMessage;
-            if (typeof message === 'object') {
-              printableMessage = JSON.stringify(message, undefined, 2);
-            } else {
-              printableMessage = message;
-            }
+            // let printableMessage;
+            // if (typeof message === 'object') {
+            //   printableMessage = JSON.stringify(message, undefined, 2);
+            // } else {
+            //   printableMessage = message;
+            // }
             return `${scope ? `[${scope}] ` : ''}${level}: ${message}`;
           })
         ),

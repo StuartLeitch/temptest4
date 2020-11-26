@@ -80,6 +80,7 @@ export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
+export * from './modules/invoices/usecases/generateDraftCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
 export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
@@ -258,6 +259,11 @@ export * from './modules/payments/usecases/retryPaymentsRegistration/retryPaymen
 export * from './modules/invoices/usecases/ERP/retryCreditNotes/retryCreditNotes';
 export * from './modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
+
+// * Export ERP Reference
+export * from './modules/vendors/domain/ErpReference';
+export * from './modules/vendors/mapper/ErpReference';
+export * from './modules/vendors/repos';
 
 // ? Should we export this
 // * Infra

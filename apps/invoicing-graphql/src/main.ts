@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { banner } from './lib/banner';
-import { Logger } from './lib/logger';
+// import { Logger } from './lib/logger';
 // import './lib/logger/LoggerAspect';
 
 import { env } from './env';

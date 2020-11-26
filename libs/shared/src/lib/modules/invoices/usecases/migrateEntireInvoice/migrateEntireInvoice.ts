@@ -315,7 +315,6 @@ export class MigrateEntireInvoiceUsecase
       .then((request) => this.getInvoice(request.invoiceId))
       .map((invoice) => {
         invoice.props.dateCreated = new Date(request.submissionDate);
-        invoice.props.dateUpdated = new Date(request.submissionDate);
 
         return invoice;
       })
@@ -329,7 +328,7 @@ export class MigrateEntireInvoiceUsecase
       .map((transaction) => {
         if (transaction.status === TransactionStatus.DRAFT) {
           transaction.props.dateCreated = invoice.dateCreated;
-          transaction.props.dateUpdated = invoice.props.dateUpdated;
+          transaction.props.dateUpdated = invoice.props.dateCreated;
         }
 
         return transaction;
@@ -518,7 +517,6 @@ export class MigrateEntireInvoiceUsecase
 
           invoice.props.status = InvoiceStatus.DRAFT;
           invoice.props.dateAccepted = new Date(request.acceptanceDate);
-          invoice.props.dateUpdated = new Date(request.acceptanceDate);
           invoice.props.invoiceNumber = invoiceNumber;
           invoice.props.charge =
             request.apc.price - request.apc.discount + request.apc.vat;
@@ -621,11 +619,10 @@ export class MigrateEntireInvoiceUsecase
         ).toString();
         invoice.props.status = InvoiceStatus.ACTIVE;
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
-        invoice.props.dateUpdated = new Date(request.issueDate);
         invoice.props.dateIssued = new Date(request.issueDate);
-        invoice.props.revenueRecognitionReference =
-          request.revenueRecognitionReference || null;
-        invoice.props.erpReference = request.erpReference || null;
+        // invoice.props.revenueRecognitionReference =
+        //   request.revenueRecognitionReference ?? null;
+        // invoice.props.erpReference = request.erpReference ?? null;
         invoice.props.invoiceNumber = invoiceNumber;
         invoice.payerId = payer ? payer.payerId : null;
 
@@ -858,8 +855,7 @@ export class MigrateEntireInvoiceUsecase
       .then(this.getInvoice)
       .map((invoice) => {
         invoice.props.status = InvoiceStatus.FINAL;
-        invoice.props.dateUpdated = new Date(request.paymentDate);
-        invoice.dateMovedToFinal = invoice.props.dateUpdated;
+        invoice.dateMovedToFinal = new Date(request.paymentDate);
 
         return invoice;
       })

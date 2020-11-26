@@ -1,7 +1,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from 'cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import {
   EditorCollection,

@@ -38,6 +38,7 @@
   },
   "private": true,
   "dependencies": {
+    "@cucumber/cucumber": "^7.0.0-rc.0",
     "@fortawesome/fontawesome-free": "5.14.0",
     "@hindawi/phenom-charts": "0.2.0",
     "@hindawi/phenom-events": "1.13.0",
@@ -196,7 +197,6 @@
     "@types/chai": "4.2.14",
     "@types/color": "3.0.1",
     "@types/config": "0.0.36",
-    "@types/cucumber": "6.0.1",
     "@types/ejs": "3.0.5",
     "@types/express": "4.17.8",
     "@types/gm": "1.18.9",
@@ -227,7 +227,6 @@
     "babel-plugin-universal-import": "4.0.2",
     "chai": "4.2.0",
     "clear": "0.1.0",
-    "cucumber": "7.0.0-rc.0",
     "cucumber-html-reporter": "^5.2.0",
     "cucumber-junit-formatter": "^0.2.2",
     "cucumber-junit-reporter": "^0.0.1",

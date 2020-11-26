@@ -363,7 +363,6 @@ describe('migrate entire invoice usecase', () => {
       submissionDate: new Date('12-12-2018').toISOString(),
       paymentDate: null,
       issueDate: null,
-      erpReference: null,
       status: '',
       apc: {
         invoiceReference: '00001/2019',
@@ -420,7 +419,7 @@ describe('migrate entire invoice usecase', () => {
       submissionDate: new Date('12-12-2018').toISOString(),
       paymentDate: null,
       issueDate: null,
-      erpReference: null,
+      erpReferences: null,
       status: '',
       apc: {
         invoiceReference: null,

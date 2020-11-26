@@ -22,6 +22,7 @@ import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { PublisherRepoContract } from '../../../../publishers/repos';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
@@ -53,6 +54,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private sageService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
@@ -66,6 +68,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.publisherRepo,
+      this.erpReferenceRepo,
       this.sageService,
       this.loggerService
     );
@@ -82,6 +85,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
   ): Promise<RetryRevenueRecognitionSageErpInvoicesResponse> {
     try {
       const unrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedSageErpInvoices();
+
       const updatedInvoices: ErpInvoiceResponse[] = [];
 
       if (unrecognizedErpInvoices.length === 0) {
@@ -123,7 +127,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 

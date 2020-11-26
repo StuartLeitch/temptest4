@@ -44,7 +44,6 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
           }
 
           await helpers.updateManuscript(manuscript, data);
-          await helpers.updateWaivers(data);
         }
       } else {
         if (!(articleType in ManuscriptTypeNotInvoiceable)) {

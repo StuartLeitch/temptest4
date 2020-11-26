@@ -4,6 +4,8 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
 import { Waiver, WaiverType } from '../../domain/Waiver';
 
+import { WaiverAssignedCollection } from '../../domain/WaiverAssignedCollection';
+import { WaiverAssigned } from '../../domain/WaiverAssigned';
 import { WaiverRepoContract } from '../waiverRepo';
 
 export class MockWaiverRepo
@@ -11,6 +13,11 @@ export class MockWaiverRepo
   implements WaiverRepoContract {
   private invoiceItemToWaiverMapper: {
     [key: string]: UniqueEntityID[];
+  } = {};
+  private invoiceItemToWaiverAssignedDate: {
+    [key: string]: {
+      [key: string]: Date;
+    };
   } = {};
 
   constructor() {
@@ -47,27 +54,49 @@ export class MockWaiverRepo
 
   public addMockWaiverForInvoiceItem(
     newWaiver: Waiver,
-    invoiceItemId: InvoiceItemId
+    invoiceItemId: InvoiceItemId,
+    dateAssigned: Date = new Date()
   ): void {
     const invoiceIdValue = invoiceItemId.id.toString();
     if (!this.invoiceItemToWaiverMapper[invoiceIdValue]) {
       this.invoiceItemToWaiverMapper[invoiceIdValue] = [];
+      this.invoiceItemToWaiverAssignedDate[invoiceIdValue] = {};
     }
 
     this.invoiceItemToWaiverMapper[invoiceIdValue].push(newWaiver.id);
+    this.invoiceItemToWaiverAssignedDate[invoiceIdValue][
+      newWaiver.id.toString()
+    ] = dateAssigned;
     this.addMockItem(newWaiver);
   }
 
   public async getWaiversByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<Waiver[]> {
+  ): Promise<WaiverAssignedCollection> {
     const waiverIds = this.invoiceItemToWaiverMapper[
       invoiceItemId.id.toString()
     ];
     if (!waiverIds) {
-      return [];
+      return WaiverAssignedCollection.create();
     }
-    return this._items.filter((item) => waiverIds.includes(item.id));
+    const waivers = this._items.filter((item) => waiverIds.includes(item.id));
+
+    return WaiverAssignedCollection.create(
+      waivers.map((i) => {
+        let dateAssigned: Date = null;
+        const datesForItemWaiver = this.invoiceItemToWaiverAssignedDate[
+          invoiceItemId.id.toString()
+        ];
+        if (datesForItemWaiver) {
+          dateAssigned = datesForItemWaiver[i.id.toString()];
+        }
+        return WaiverAssigned.create({
+          invoiceItemId,
+          dateAssigned,
+          waiver: i,
+        });
+      })
+    );
   }
 
   public async attachWaiverToInvoiceItem(

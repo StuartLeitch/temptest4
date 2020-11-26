@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { InvoiceItemId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItemId';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
@@ -49,7 +49,7 @@ When(
 );
 
 Then('getInvoiceItemById returns invoice item', async () => {
-  expect(foundInvoiceItem).to.equal(invoiceItem);
+  expect(foundInvoiceItem.id.toValue).to.equal(invoiceItem.id.toValue);
 });
 
 When(
@@ -147,5 +147,5 @@ When('we call InvoiceItem.save on the invoice item object', async () => {
 });
 
 Then('the invoice item object should be saved', async () => {
-  expect(saveInvoiceItem).to.equal(invoiceItem);
+  expect(saveInvoiceItem.id.toValue).to.equal(invoiceItem.id.toValue);
 });

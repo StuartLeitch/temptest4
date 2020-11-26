@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from 'cucumber';
+import { Given, When, Then, Before } from '@cucumber/cucumber';
 
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
@@ -11,6 +11,7 @@ import { TransactionId } from './../../../../../../src/lib/modules/transactions/
 import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 function makeInvoiceData(overwrites?: any): Invoice {
   return InvoiceMap.toDomain({
@@ -24,6 +25,7 @@ function makeInvoiceData(overwrites?: any): Invoice {
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockArticleRepo: MockArticleRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let invoice: Invoice;
 let invoiceExists: boolean;
 let saveInvoice: Invoice;
@@ -33,7 +35,12 @@ let foundInvoice: Invoice;
 Before(async () => {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockArticleRepo = new MockArticleRepo();
-  mockInvoiceRepo = new MockInvoiceRepo(mockArticleRepo, mockInvoiceItemRepo);
+  mockErpReferenceRepo = new MockErpReferenceRepo();
+  mockInvoiceRepo = new MockInvoiceRepo(
+    mockArticleRepo,
+    mockInvoiceItemRepo,
+    mockErpReferenceRepo
+  );
 });
 
 Given(
@@ -59,7 +66,11 @@ When(
   /^we call getInvoiceById for an un-existent invoice "([\w-]+)"$/,
   async (wrongInvoiceId: string) => {
     const id = InvoiceId.create(new UniqueEntityID(wrongInvoiceId)).getValue();
-    foundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+    try {
+      foundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+    } catch (err) {
+      // do nothing yet
+    }
   }
 );
 
@@ -133,14 +144,16 @@ Then(/^update modifies the invoice "([\w-]+)"$/, async (invoiceId: string) => {
 When(/^we call exists for ([\w-]+) invoice id$/, async (invoiceId: string) => {
   const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
   foundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+
   if (!foundInvoice) {
-    foundInvoice = await makeInvoiceData({ id: invoiceId });
+    foundInvoice = makeInvoiceData({ id: invoiceId });
   }
+
   invoiceExists = await mockInvoiceRepo.exists(foundInvoice);
 });
 
 Then(/^Invoice.exists returns (.*)$/, async (exists: string) => {
-  expect(invoiceExists).to.equal(exists === 'true');
+  expect(String(invoiceExists)).to.equal(exists);
 });
 
 Given(

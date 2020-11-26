@@ -146,11 +146,21 @@ export class KnexInvoiceItemRepo
   }
 
   async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
-    const { db } = this;
+    const { db, logger } = this;
 
-    const items = await db(TABLES.INVOICE_ITEMS)
+    const sql = db(TABLES.INVOICE_ITEMS)
       .select()
       .where('invoiceId', invoiceId.id.toString());
+
+    const correlationId =
+      'correlationId' in this ? (this as any).correlationId : null;
+
+    logger.debug('getItemsByInvoiceId', {
+      correlationId,
+      sql: sql.toString(),
+    });
+
+    const items = await sql;
 
     if (!items) {
       throw RepoError.createEntityNotFoundError(

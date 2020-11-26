@@ -1,5 +1,9 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
+
+import { CouponAssignedProps, CouponAssigned } from '../domain/CouponAssigned';
+import { CouponAssignedCollection } from '../domain/CouponAssignedCollection';
+import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
 import { Coupon, CouponType } from '../domain/Coupon';
 import { CouponCode } from '../domain/CouponCode';
 
@@ -32,12 +36,28 @@ export class CouponMap extends Mapper<Coupon> {
         invoiceItemType: raw.invoiceItemType as any,
         redeemCount: raw.redeemCount,
         status: raw.status as any,
-        name: raw.name
+        name: raw.name,
       },
       new UniqueEntityID(raw.id)
     );
 
     return couponOrError.isSuccess ? couponOrError.getValue() : null;
+  }
+
+  public static toDomainCollection(raw: any[]): CouponAssignedCollection {
+    const domainItems = raw
+      .map((item) => {
+        return {
+          invoiceItemId: InvoiceItemId.create(
+            new UniqueEntityID(item.invoiceItemId)
+          ),
+          coupon: CouponMap.toDomain(item),
+          dateAssigned: item.dateAssigned,
+        };
+      })
+      .map((item: CouponAssignedProps) => CouponAssigned.create(item));
+
+    return CouponAssignedCollection.create(domainItems);
   }
 
   public static toPersistence(coupon: Coupon): CouponPersistenceDTO {
@@ -52,7 +72,7 @@ export class CouponMap extends Mapper<Coupon> {
       invoiceItemType: coupon.invoiceItemType,
       redeemCount: coupon.redeemCount,
       status: coupon.status,
-      name: coupon.name
+      name: coupon.name,
     };
   }
 
@@ -66,7 +86,7 @@ export class CouponMap extends Mapper<Coupon> {
       dateUpdated: coupon.dateUpdated,
       expirationDate: coupon.expirationDate,
       invoiceItemType: coupon.invoiceItemType,
-      name: coupon.name
+      name: coupon.name,
     };
   }
 }

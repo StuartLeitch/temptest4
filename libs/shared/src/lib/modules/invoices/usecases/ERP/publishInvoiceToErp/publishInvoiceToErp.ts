@@ -24,6 +24,8 @@ import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
+import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 
 import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
 import {
@@ -39,7 +41,6 @@ import { Invoice } from '../../../domain/Invoice';
 import { PayerType } from './../../../../payers/domain/Payer';
 
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
-
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
 
 export interface PublishInvoiceToErpRequestDTO {
@@ -67,6 +68,7 @@ export class PublishInvoiceToErpUsecase
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
@@ -128,9 +130,23 @@ export class PublishInvoiceToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (invoice.getInvoiceTotal() <= 0) {
-        // invoice.erpReference = 'NON_INVOICEABLE';
-        // invoice.nsReference = 'NON_INVOICEABLE';
-        await this.invoiceRepo.update(invoice);
+        const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute:
+            this.erpService?.referenceMappings?.invoiceConfirmation ||
+            'invoice',
+          value: 'NON_INVOICEABLE',
+        });
+
+        await this.erpReferenceRepo.save(nonInvoiceableErpReference);
+
+        this.loggerService.info(
+          `PublishInvoiceToERP Flag invoice ${invoice.invoiceId.id.toString()} as NON_INVOICEABLE`,
+          nonInvoiceableErpReference
+        );
+
         return right(null);
       }
 
@@ -233,6 +249,9 @@ export class PublishInvoiceToErpUsecase
       }
 
       try {
+        await this.invoiceRepo.update(invoice);
+        this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
+
         const erpData: ErpInvoiceRequest = {
           invoice,
           payer,
@@ -253,18 +272,22 @@ export class PublishInvoiceToErpUsecase
           `PublishInvoiceToERP ${this.erpService.constructor.name} response`,
           erpResponse
         );
-        this.loggerService.info(
-          `Updating invoice ${invoice.id.toString()}: ${
-            this.erpService.invoiceErpRefFieldName
-          } -> ${JSON.stringify(erpResponse)}`
-        );
 
-        invoice[this.erpService.invoiceErpRefFieldName] = String(
-          erpResponse.tradeDocumentId
-        );
+        if (erpResponse) {
+          // * Save ERP reference
+          const erpPaymentReference = ErpReferenceMap.toDomain({
+            entity_id: invoice.invoiceId.id.toString(),
+            type: 'invoice',
+            vendor: this.erpService.vendorName,
+            attribute:
+              this.erpService?.referenceMappings?.invoiceConfirmation ||
+              'invoice',
+            value: String(erpResponse.tradeDocumentId),
+          });
+          await this.erpReferenceRepo.save(erpPaymentReference);
+          this.loggerService.info(`Added ErpReference`, erpPaymentReference);
+        }
 
-        this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
-        await this.invoiceRepo.update(invoice);
         return right(erpResponse);
       } catch (err) {
         return left(new UnexpectedError(err, err.toString()));

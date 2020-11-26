@@ -1,5 +1,4 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-// /* eslint-disable max-len */
 
 import {
   MicroframeworkLoader,
@@ -11,9 +10,11 @@ import { PublishInvoiceDraftCreatedUseCase } from 'libs/shared/src/lib/modules/i
 import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishCreditNoteToErpUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
+import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
@@ -27,8 +28,6 @@ import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules
 
 import { Context } from '../builders';
 import { env } from '../env';
-
-// This feature is a copy from https://github.com/kadirahq/graphql-errors
 
 export const domainEventsRegisterLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -46,14 +45,27 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         coupon,
         waiver,
         payer,
+        erpReference,
+        catalog,
+        publisher,
       },
-      services: {
-        logger: loggerService,
-        schedulingService,
-        qq: queue,
-        // vatService,
-      },
+      services: { logger: loggerService, schedulingService, qq: queue, erp },
     } = context;
+
+    const publishRevenueRecognitionReversal = new PublishRevenueRecognitionReversalUsecase(
+      invoice,
+      invoiceItem,
+      coupon,
+      waiver,
+      payer,
+      address,
+      manuscript,
+      catalog,
+      publisher,
+      erpReference,
+      erp?.netsuite ?? null,
+      loggerService
+    );
 
     const publishInvoiceDraftCreated = new PublishInvoiceDraftCreatedUseCase(
       queue
@@ -126,6 +138,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoiceCredited,
+      // publishCreditNoteToErp,
+      publishRevenueRecognitionReversal,
       loggerService
     );
 
