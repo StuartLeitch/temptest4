@@ -1,8 +1,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
-// * Domain imports
-import { DomainEvents } from '../../../../../../libs/shared/src/lib/core/domain/events/DomainEvents';
+
 import {
   RestoreSoftDeleteDraftTransactionUsecase,
   GetInvoiceIdByManuscriptCustomIdUsecase,
@@ -12,7 +11,6 @@ import {
   GetItemsForInvoiceUsecase,
   UpdateInvoiceItemsUsecase,
   CreateTransactionUsecase,
-  GetInvoiceDetailsUsecase,
   CreateManuscriptUsecase,
   EditManuscriptUsecase,
   CreateManuscriptDTO,
