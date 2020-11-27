@@ -14,14 +14,14 @@ export class RegisterCreditNotesCron {
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
-    if (!FeatureFlags.isFeatureEnabled('erpRegisterCreditMemosEnabled')) {
+    if (!FeatureFlags.isFeatureEnabled('erpRegisterCreditNotesEnabled')) {
       return logger.debug(
         'Skipping the CRON Job credit notes registration scheduling...'
       );
     }
 
     const {
-      repos: { invoiceItem, invoice, coupon, waiver },
+      repos: { invoiceItem, invoice, coupon, waiver, erpReference },
       services: { erp, logger: loggerService },
     } = context;
 
@@ -30,6 +30,7 @@ export class RegisterCreditNotesCron {
       invoiceItem,
       coupon,
       waiver,
+      erpReference,
       erp?.netsuite || null,
       loggerService
     );

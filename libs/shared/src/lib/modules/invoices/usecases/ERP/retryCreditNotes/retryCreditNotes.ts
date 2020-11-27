@@ -16,6 +16,7 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErp';
@@ -43,6 +44,7 @@ export class RetryCreditNotesUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
@@ -51,6 +53,7 @@ export class RetryCreditNotesUsecase
       this.invoiceItemRepo,
       this.couponRepo,
       this.waiverRepo,
+      this.erpReferenceRepo,
       this.erpService,
       this.loggerService
     );
@@ -66,22 +69,22 @@ export class RetryCreditNotesUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryCreditNotesResponse> {
     try {
-      const unregisteredErpCreditNotes = await this.invoiceRepo.getUnregisteredErpCreditNotes();
+      const unregisteredErpCreditNotesIds = await this.invoiceRepo.getUnregisteredErpCreditNotes();
       const registeredCreditNotes: ErpInvoiceResponse[] = [];
 
-      if (unregisteredErpCreditNotes.length === 0) {
+      if (unregisteredErpCreditNotesIds.length === 0) {
         this.loggerService.info('No registered credit notes!');
         return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
       }
 
       this.loggerService.info(
-        `Retrying registration in NetSuite for credit notes: ${unregisteredErpCreditNotes
+        `Retrying registration in NetSuite for credit notes: ${unregisteredErpCreditNotesIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unregisteredCreditNote of unregisteredErpCreditNotes) {
+      for (const unregisteredCreditNote of unregisteredErpCreditNotesIds) {
         const publishedCreditNoteResponse = await this.publishCreditNoteToErpUsecase.execute(
           {
             creditNoteId: unregisteredCreditNote.id.toString(),
@@ -106,7 +109,7 @@ export class RetryCreditNotesUsecase
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 

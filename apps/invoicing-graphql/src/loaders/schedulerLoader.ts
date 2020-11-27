@@ -33,68 +33,6 @@ export const schedulerLoader: MicroframeworkLoader = async (
       failedErpCronRetryDisabled,
     } = env.app;
 
-    // const retryFailedSageErpInvoicesUsecase = new RetryFailedSageErpInvoicesUsecase(
-    //   invoice,
-    //   invoiceItem,
-    //   coupon,
-    //   waiver,
-    //   payer,
-    //   address,
-    //   manuscript,
-    //   catalog,
-    //   erpReference,
-    //   erp?.sage || null,
-    //   publisher,
-    //   loggerService,
-    //   vatService
-    // );
-
-    // const retryFailedNetsuiteErpInvoicesUsecase = new RetryFailedNetsuiteErpInvoicesUsecase(
-    //   invoice,
-    //   invoiceItem,
-    //   coupon,
-    //   waiver,
-    //   payer,
-    //   address,
-    //   manuscript,
-    //   catalog,
-    //   erpReference,
-    //   erp?.netsuite || null,
-    //   publisher,
-    //   loggerService,
-    //   vatService
-    // );
-
-    // const retryRevenueRecognizedInvoicesToSageErpUsecase = new RetryRevenueRecognitionSageErpInvoicesUsecase(
-    //   invoice,
-    //   invoiceItem,
-    //   coupon,
-    //   waiver,
-    //   payer,
-    //   address,
-    //   manuscript,
-    //   catalog,
-    //   publisher,
-    //   erpReference,
-    //   erp?.sage || null,
-    //   loggerService
-    // );
-
-    // const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
-    //   invoice,
-    //   invoiceItem,
-    //   coupon,
-    //   waiver,
-    //   payer,
-    //   address,
-    //   manuscript,
-    //   catalog,
-    //   publisher,
-    //   erpReference,
-    //   erp?.netsuite || null,
-    //   loggerService
-    // );
-
     const sageJobQueue = [
       RegisterInvoicesForSageCron,
       RegisterRevenueRecognitionsForSageCron,

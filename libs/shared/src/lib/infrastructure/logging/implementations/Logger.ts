@@ -8,7 +8,7 @@ import { LoggerContract } from '@hindawi/shared';
 import { LoggerOptions } from '../Logger';
 
 const logLevelIcons: any = {
-  DEBUG: '\u{1F6E1}',
+  DEBUG: '🛠️',
   INFO: '\u{2139}',
   WARNING: '\u{26A0}',
   ERROR: '\u{2757}',
@@ -58,37 +58,30 @@ export class Logger implements LoggerContract {
       this.setScope(scope);
     }
 
-    let transport: winston.transport;
-    const { logLevel = 'info', isDevelopment = false } = options;
-
-    if (isDevelopment) {
-      transport = new winston.transports.Console({
-        handleExceptions: true,
-        level: logLevel,
-        format: winston.format.combine(
-          winston.format.colorize({ all: true }),
-          winston.format.simple(),
-          winston.format.printf(({ level, message, scope }) => {
-            // let printableMessage;
-            // if (typeof message === 'object') {
-            //   printableMessage = JSON.stringify(message, undefined, 2);
-            // } else {
-            //   printableMessage = message;
-            // }
-            return `${scope ? `[${scope}] ` : ''}${level}: ${message}`;
-          })
-        ),
-      });
-    } else {
-      transport = new winston.transports.Console({
-        handleExceptions: true,
-        level: logLevel,
-      });
-    }
+    const { logLevel = 'info' } = options;
+    const transport: winston.transport = new winston.transports.Console({
+      handleExceptions: true,
+      level: logLevel,
+      format: winston.format.combine(
+        winston.format.colorize({ all: true }),
+        winston.format.simple(),
+        winston.format.printf(({ level, message, scope }) => {
+          const justLevel = level.replace(
+            // eslint-disable-next-line no-control-regex
+            /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+            ''
+          );
+          return `${logLevelIcons[justLevel.toUpperCase()]} ${
+            scope ? `[${scope}] ` : ''
+          } ➜ \x1b[37m${message}`;
+        })
+      ),
+    });
 
     const logger = winston.createLogger({
       transports: [transport],
     });
+
     this.protocol = logger;
   }
 
@@ -108,16 +101,10 @@ export class Logger implements LoggerContract {
     this.log('error', message, args);
   }
 
-  private formatScope(levelName: string, msg: string): string {
-    return `${
-      logLevelIcons[levelName.toUpperCase()]
-    } [${levelName}]: \x1b[37m${msg}`;
-  }
-  private log(level: string, message: any, args: any[]): void {
-    const formatter = this.formatScope(level, message);
+  private log(level: string, message: string, args: any[]): void {
+    const metadata: Record<string, any> = { scope: this.scope };
 
     if (this.protocol) {
-      const metadata: Record<string, any> = { scope: this.scope };
       if (args.length) {
         const newArgs = args.map((arg) => {
           if (arg instanceof Error) {
@@ -125,9 +112,9 @@ export class Logger implements LoggerContract {
           }
           return arg;
         });
-        this.protocol[level]({ formatter, args: newArgs }, metadata);
+        this.protocol[level]({ message, args: newArgs }, metadata);
       } else {
-        this.protocol[level](formatter, metadata);
+        this.protocol[level](message, metadata);
       }
     }
   }

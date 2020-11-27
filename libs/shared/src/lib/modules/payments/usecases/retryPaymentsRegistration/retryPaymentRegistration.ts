@@ -24,6 +24,7 @@ import { PublisherRepoContract } from './../../../publishers/repos/publisherRepo
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
 import { PayerRepoContract } from './../../../payers/repos/payerRepo';
+import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 
 import { PublishPaymentToErpUsecase } from '../publishPaymentToErp/publishPaymentToErp';
 
@@ -55,6 +56,7 @@ export class RetryPaymentsRegistrationToErpUsecase
     private payerRepo: PayerRepoContract,
     private manuscriptRepo: ManuscriptRepoContract,
     private catalogRepo: CatalogRepoContract,
+    private erpReferenceRepo: ErpReferenceRepoContract,
     private netsuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
@@ -69,6 +71,7 @@ export class RetryPaymentsRegistrationToErpUsecase
       this.payerRepo,
       this.manuscriptRepo,
       this.catalogRepo,
+      this.erpReferenceRepo,
       this.netsuiteService,
       this.publisherRepo,
       this.loggerService

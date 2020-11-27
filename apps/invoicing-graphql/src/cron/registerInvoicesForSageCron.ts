@@ -32,6 +32,7 @@ export class RegisterInvoicesForSageCron {
         coupon,
         waiver,
         payer,
+        erpReference,
       },
       services: { erp, logger: loggerService, vatService },
     } = context;
@@ -45,6 +46,7 @@ export class RegisterInvoicesForSageCron {
       address,
       manuscript,
       catalog,
+      erpReference,
       erp?.sage || null,
       publisher,
       loggerService,

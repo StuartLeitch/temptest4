@@ -4,8 +4,7 @@
 cronFlags:
   locales:
     - en-UK
-  erpRegisterInvoicesEnabled: true # If true, server will reload feature flags each minute.
+  erpRegisterInvoicesEnabled: false # If true, server will reload feature flags each minute.
+  erpRegisterRevenueRecognitionEnabled: false
   erpRegisterCreditNotesEnabled: true
-  erpRegisterRevenueRecognitionEnabled: true
-  erpRegisterCreditMemosEnabled: true
-  erpRegisterPaymentsEnabled: true
+  erpRegisterPaymentsEnabled: false
