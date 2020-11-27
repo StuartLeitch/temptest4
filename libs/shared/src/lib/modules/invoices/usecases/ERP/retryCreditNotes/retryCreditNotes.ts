@@ -93,15 +93,13 @@ export class RetryCreditNotesUsecase
         if (publishedCreditNoteResponse.isLeft()) {
           errs.push(publishedCreditNoteResponse.value.error);
         } else {
-          const assignedErpReference = (publishedCreditNoteResponse.value as any).getValue();
+          const assignedErpReference = publishedCreditNoteResponse.value;
 
           if (assignedErpReference === null) {
             // simply do nothing yet
           } else {
             this.loggerService.info(
-              `CreditNote ${unregisteredCreditNote.id.toString()} successfully registered ${
-                (assignedErpReference as any).journal?.id
-              }`
+              `CreditNote ${unregisteredCreditNote.id.toString()} successfully registered ${assignedErpReference}`
             );
             registeredCreditNotes.push(assignedErpReference);
           }

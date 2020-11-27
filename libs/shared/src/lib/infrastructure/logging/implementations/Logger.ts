@@ -62,20 +62,25 @@ export class Logger implements LoggerContract {
     const transport: winston.transport = new winston.transports.Console({
       handleExceptions: true,
       level: logLevel,
-      format: winston.format.combine(
-        winston.format.colorize({ all: true }),
-        winston.format.simple(),
-        winston.format.printf(({ level, message, scope }) => {
-          const justLevel = level.replace(
-            // eslint-disable-next-line no-control-regex
-            /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-            ''
-          );
-          return `${logLevelIcons[justLevel.toUpperCase()]} ${
-            scope ? `[${scope}] ` : ''
-          } ➜ \x1b[37m${message}`;
-        })
-      ),
+
+      // format: winston.format.combine(
+      //   winston.format.colorize({ all: false }),
+      //   winston.format.simple(),
+      //   winston.format.printf(
+      //     ({ level, message, scope }) =>
+      //       `${scope ? `[${scope}] ` : ''}${level}: ${message}`
+      //   ),
+      //   winston.format.printf(({ level, message, scope }) => {
+      //     const justLevel = level.replace(
+      //       // eslint-disable-next-line no-control-regex
+      //       /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+      //       ''
+      //     );
+      //     return `${logLevelIcons[justLevel.toUpperCase()]} ${
+      //       scope ? `[${scope}] ` : ''
+      //     } ➜ \x1b[37m${message}`;
+      //   })
+      // ),
     });
 
     const logger = winston.createLogger({

@@ -397,7 +397,8 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['FINAL'])
-        .whereNotNull('invoices.cancelledInvoiceReference');
+        .whereNotNull('invoices.cancelledInvoiceReference')
+        .whereNull('creditnoteref.value');
   }
 
   private async getUnrecognizedInvoices(vendor: string) {
@@ -511,9 +512,21 @@ export class KnexInvoiceRepo
   }
 
   async getUnregisteredErpCreditNotes(): Promise<InvoiceId[]> {
-    const { logger } = this;
+    const { db, logger } = this;
 
-    const detailsQuery = this.createBaseDetailsQuery();
+    const erpReferencesQuery = db(TABLES.INVOICES)
+      .column({ invoiceId: 'invoices.id' })
+      .select();
+
+    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
+
+    const withCreditNoteErpReference = this.withErpReferenceQuery(
+      'creditnoteref',
+      'invoices.id',
+      'invoice',
+      'netsuite',
+      'creditNote'
+    );
 
     // * SQL for retrieving results needed only for ERP registration
     const filterCreditNotesReadyForERP = this.filterCreditNotesReadyForErpRegistration();
@@ -522,7 +535,9 @@ export class KnexInvoiceRepo
       whereNotNull: 'articles.datePublished',
     });
     const prepareIdsSQL = filterArticlesByNotNullDatePublished(
-      filterCreditNotesReadyForERP(detailsQuery)
+      filterCreditNotesReadyForERP(
+        withCreditNoteErpReference(withInvoiceItems(erpReferencesQuery))
+      )
     );
 
     logger.debug('select', {
