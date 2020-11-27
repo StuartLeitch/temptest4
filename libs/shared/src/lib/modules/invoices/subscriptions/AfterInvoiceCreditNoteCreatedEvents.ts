@@ -28,7 +28,6 @@ import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publis
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
-import { PublishCreditNoteToErpUsecase } from './../usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
@@ -47,7 +46,6 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
-    private publishCreditNoteToErp: PublishCreditNoteToErpUsecase | NoOpUseCase,
     private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
@@ -160,13 +158,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
         `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`
       );
 
-      const publishToErpResult = await this.publishCreditNoteToErp.execute({
-        creditNoteId: creditNote.id.toString(),
-      });
-
-      this.loggerService.info('[PublishCreditNoteToERP]:', publishToErpResult);
-
-      //Get Invoice ID
+      // * Get Invoice ID
       const invoiceId = creditNote.cancelledInvoiceReference;
 
       // * Get Invoice
