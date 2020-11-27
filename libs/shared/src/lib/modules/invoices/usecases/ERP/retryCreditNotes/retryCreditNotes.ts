@@ -109,13 +109,13 @@ export class RetryCreditNotesUsecase
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
       return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

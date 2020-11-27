@@ -112,15 +112,13 @@ export class RetryPaymentsRegistrationToErpUsecase
         if (publishedPaymentResponse.isLeft()) {
           errs.push(publishedPaymentResponse.value.error);
         } else {
-          const assignedErpReference = (publishedPaymentResponse.value as any).getValue();
+          const assignedErpReference = publishedPaymentResponse.value;
 
           if (assignedErpReference === null) {
             // simply do nothing yet
           } else {
             this.loggerService.info(
-              `Payment ${unregisteredPayment.id.toString()} successfully registered ${
-                (assignedErpReference as any).journal?.id
-              }`
+              `Payment ${unregisteredPayment.id.toString()} successfully registered ${assignedErpReference}`
             );
             registeredPayments.push(assignedErpReference);
           }
@@ -128,13 +126,13 @@ export class RetryPaymentsRegistrationToErpUsecase
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
       return right(Result.ok<ErpInvoiceResponse[]>(registeredPayments));
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }
