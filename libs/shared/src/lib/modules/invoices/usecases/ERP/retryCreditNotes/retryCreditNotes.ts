@@ -45,7 +45,7 @@ export class RetryCreditNotesUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
-    private netsuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
     this.publishCreditNoteToErpUsecase = new PublishCreditNoteToErpUsecase(
@@ -54,7 +54,7 @@ export class RetryCreditNotesUsecase
       this.couponRepo,
       this.waiverRepo,
       this.erpReferenceRepo,
-      this.netsuiteService,
+      this.erpService,
       this.loggerService
     );
   }
@@ -69,22 +69,22 @@ export class RetryCreditNotesUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryCreditNotesResponse> {
     try {
-      const unregisteredErpCreditNotes = await this.invoiceRepo.getUnregisteredErpCreditNotes();
+      const unregisteredErpCreditNotesIds = await this.invoiceRepo.getUnregisteredErpCreditNotes();
       const registeredCreditNotes: ErpInvoiceResponse[] = [];
 
-      if (unregisteredErpCreditNotes.length === 0) {
+      if (unregisteredErpCreditNotesIds.length === 0) {
         this.loggerService.info('No registered credit notes!');
         return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
       }
 
       this.loggerService.info(
-        `Retrying registration in NetSuite for credit notes: ${unregisteredErpCreditNotes
+        `Retrying registration in NetSuite for credit notes: ${unregisteredErpCreditNotesIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unregisteredCreditNote of unregisteredErpCreditNotes) {
+      for (const unregisteredCreditNote of unregisteredErpCreditNotesIds) {
         const publishedCreditNoteResponse = await this.publishCreditNoteToErpUsecase.execute(
           {
             creditNoteId: unregisteredCreditNote.id.toString(),
@@ -93,15 +93,13 @@ export class RetryCreditNotesUsecase
         if (publishedCreditNoteResponse.isLeft()) {
           errs.push(publishedCreditNoteResponse.value.error);
         } else {
-          const assignedErpReference = (publishedCreditNoteResponse.value as any).getValue();
+          const assignedErpReference = publishedCreditNoteResponse.value;
 
           if (assignedErpReference === null) {
             // simply do nothing yet
           } else {
             this.loggerService.info(
-              `CreditNote ${unregisteredCreditNote.id.toString()} successfully registered ${
-                (assignedErpReference as any).journal?.id
-              }`
+              `CreditNote ${unregisteredCreditNote.id.toString()} successfully registered ${assignedErpReference}`
             );
             registeredCreditNotes.push(assignedErpReference);
           }
