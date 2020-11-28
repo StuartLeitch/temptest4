@@ -18,7 +18,6 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
-import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
 import { PublisherRepoContract } from './../../../publishers/repos/publisherRepo';
