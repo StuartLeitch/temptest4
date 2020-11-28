@@ -7,13 +7,11 @@ import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import { PaymentCompleted } from '../domain/events';
 import { InvoiceRepoContract } from '../../invoices/repos/invoiceRepo';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
-import { PublishPaymentToErpUsecase } from '../usecases/publishPaymentToErp/publishPaymentToErp';
 
 export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
-    private logger: LoggerContract,
-    private publishPaymentToErp: PublishPaymentToErpUsecase | NoOpUseCase
+    private logger: LoggerContract
   ) {
     this.setupSubscriptions();
   }

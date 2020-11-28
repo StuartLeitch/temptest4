@@ -25,6 +25,7 @@ import { PublisherRepoContract } from './../../../publishers/repos/publisherRepo
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
 import { PayerRepoContract } from './../../../payers/repos/payerRepo';
+import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 
 import { PublishPaymentToErpUsecase } from '../publishPaymentToErp/publishPaymentToErp';
 

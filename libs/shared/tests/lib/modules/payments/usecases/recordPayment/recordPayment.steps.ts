@@ -23,7 +23,6 @@ import {
   ArticleMap,
   AfterPaymentCompleted,
 } from '../../../../../../src';
-import { NoOpUseCase } from '../../../../../../src/lib/core/domain/NoOpUseCase';
 import { DomainEvents } from '../../../../../../src/lib/core/domain/events/DomainEvents';
 
 let usecase: RecordPaymentUsecase;
@@ -88,12 +87,10 @@ Before(async function () {
   await context.repos.invoiceItem.save(invoiceItem);
   await context.repos.payer.save(payer);
   await context.repos.manuscript.save(article);
-  const publishPaymentToErp = new NoOpUseCase();
 
   subscription = new AfterPaymentCompleted(
     context.repos.invoice,
-    context.services.logger,
-    publishPaymentToErp
+    context.services.logger
   );
 });
 
