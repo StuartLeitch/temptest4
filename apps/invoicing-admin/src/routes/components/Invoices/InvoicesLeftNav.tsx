@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
+import MaskedInput from 'react-text-mask';
+import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 import { useDebouncedCallback } from 'use-debounce';
 
 import {
@@ -21,7 +23,7 @@ const InvoicesLeftNav = (props) => {
   const journalId = props?.filters?.journalId || [];
   const referenceNumber = props?.filters?.referenceNumber || '';
   const customId = props?.filters?.customId || '';
-  
+
   const onFilterHandler = useDebouncedCallback((eventTarget: any) => {
     const value =
       eventTarget?.type === 'checkbox'
@@ -29,6 +31,26 @@ const InvoicesLeftNav = (props) => {
         : eventTarget.value;
     props.setFilter(eventTarget.name, value);
   }, 300);
+
+  const defaultMaskOptions = {
+    prefix: '',
+    includeThousandsSeparator: false,
+    allowDecimal: true,
+    decimalSymbol: '/',
+    decimalLimit: 4, 
+    integerLimit: 6,
+    allowNegative: false,
+    allowLeadingZeroes: true,
+  }
+
+  const ReferenceInput = ({ maskOptions, ...inputProps }) => {
+    const referenceMask = createNumberMask({
+      ...defaultMaskOptions,
+      ...maskOptions,
+    })
+  
+    return <MaskedInput mask={referenceMask} {...inputProps} />
+  }
 
   return (
     <React.Fragment>
@@ -141,20 +163,18 @@ const InvoicesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex p-0'>
           <InputGroup>
-            <Input
+            <ReferenceInput
+              maskOptions={defaultMaskOptions}
               className='form-control'
-              placeholder='Enter a reference number'
-              maxLength={11}
-              onFocus={(e) => e.target.placeholder = "reference/year"} 
-              onBlur={(e) => e.target.placeholder = "Enter a reference number"}
+              placeholder='reference/year'
               name='referenceNumber'
               type='input'
               value={referenceNumber}
-              onChange={(evt: any) => 
-                {onFilterHandler.callback({
+              onChange={(evt: any) =>
+                onFilterHandler.callback({
                   name: 'referenceNumber',
                   value: evt.target.value,
-                })}
+                })
               }
               id='referenceNumber'
             />
