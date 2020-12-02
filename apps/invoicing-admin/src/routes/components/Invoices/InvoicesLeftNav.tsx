@@ -166,7 +166,9 @@ const InvoicesLeftNav = (props) => {
             <ReferenceInput
               maskOptions={defaultMaskOptions}
               className='form-control'
-              placeholder='reference/year'
+              placeholder='Enter reference number..'
+              onFocus={(e) => (e.target.placeholder = 'reference/year')}
+              onBlur={(e) => (e.target.placeholder = 'Enter reference number..')}
               name='referenceNumber'
               type='input'
               value={referenceNumber}
