@@ -7,12 +7,21 @@ import winston from 'winston';
 import { LoggerContract } from '@hindawi/shared';
 import { LoggerOptions } from '../Logger';
 
-const logLevelIcons: any = {
-  DEBUG: '🛠️',
-  INFO: '\u{2139}',
-  WARNING: '\u{26A0}',
-  ERROR: '\u{2757}',
-  CRITICAL: '\u{203C}',
+const { combine, splat, timestamp, colorize, printf } = winston.format;
+
+const COLORS = {
+  info: '\x1b[36m',
+  error: '\x1b[31m',
+  warn: '\x1b[33m',
+  verbose: '\x1b[43m',
+};
+
+const LOG_ICONS: any = {
+  debug: '🛠️',
+  info: '\u{2139}',
+  warn: '\u{26A0}',
+  error: '\u{2757}',
+  critical: '\u{203C}',
 };
 
 /**
@@ -58,30 +67,47 @@ export class Logger implements LoggerContract {
       this.setScope(scope);
     }
 
-    const { logLevel = 'info' } = options;
-    const transport: winston.transport = new winston.transports.Console({
+    const { logLevel = 'info', isDevelopment = true } = options;
+
+    const consoleOptions = {
       handleExceptions: true,
       level: logLevel,
+      format: null,
+    };
 
-      // format: winston.format.combine(
-      //   winston.format.colorize({ all: false }),
-      //   winston.format.simple(),
-      //   winston.format.printf(
-      //     ({ level, message, scope }) =>
-      //       `${scope ? `[${scope}] ` : ''}${level}: ${message}`
-      //   ),
-      //   winston.format.printf(({ level, message, scope }) => {
-      //     const justLevel = level.replace(
-      //       // eslint-disable-next-line no-control-regex
-      //       /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-      //       ''
-      //     );
-      //     return `${logLevelIcons[justLevel.toUpperCase()]} ${
-      //       scope ? `[${scope}] ` : ''
-      //     } ➜ \x1b[37m${message}`;
-      //   })
-      // ),
+    const customFormat = printf(({ message, args, metadata, level }) => {
+      const { scope: metascope } = metadata;
+      const justLevel = level.replace(
+        // eslint-disable-next-line no-control-regex
+        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+        ''
+      );
+
+      const toShowArgs = args.length > 0;
+      const isError = args.length > 0 && args[0] && args[0].name === 'error';
+      return `${LOG_ICONS[justLevel]} ${
+        metascope ? `[${metascope}] ` : ''
+      } ➜ \x1b[37m${message} ${
+        toShowArgs && !isError ? JSON.stringify(args) : ''
+      } ${
+        isError
+          ? `${COLORS[justLevel]}Error: ${args[0].error}\nStack: ${args[0].stack}\x1b[0m`
+          : ''
+      }`;
     });
+
+    if (logLevel === 'debug' && isDevelopment) {
+      consoleOptions.format = combine(
+        colorize({ all: true }),
+        splat(),
+        timestamp(),
+        customFormat
+      );
+    }
+
+    const transport: winston.transport = new winston.transports.Console(
+      consoleOptions
+    );
 
     const logger = winston.createLogger({
       transports: [transport],
@@ -109,18 +135,17 @@ export class Logger implements LoggerContract {
   private log(level: string, message: string, args: any[]): void {
     const metadata: Record<string, any> = { scope: this.scope };
 
+    let newArgs = [];
     if (this.protocol) {
       if (args.length) {
-        const newArgs = args.map((arg) => {
+        newArgs = args.map((arg) => {
           if (arg instanceof Error) {
             return { ...arg, error: arg.message, stack: arg.stack };
           }
           return arg;
         });
-        this.protocol[level]({ message, args: newArgs }, metadata);
-      } else {
-        this.protocol[level](message, metadata);
       }
+      this.protocol[level]({ message, args: newArgs, metadata });
     }
   }
 }
