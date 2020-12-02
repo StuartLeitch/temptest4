@@ -6,7 +6,8 @@ import { Payment } from '../../domain/Payment';
 import { PaymentId } from '../../domain/PaymentId';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
-export class MockPaymentRepo extends BaseMockRepo<Payment>
+export class MockPaymentRepo
+  extends BaseMockRepo<Payment>
   implements PaymentRepoContract {
   constructor() {
     super();
@@ -37,6 +38,10 @@ export class MockPaymentRepo extends BaseMockRepo<Payment>
       item.invoiceId.equals(invoiceId)
     );
     return match;
+  }
+
+  public async getUnregisteredErpPayments(): Promise<InvoiceId[]> {
+    return null;
   }
 
   public async update(payment: Payment): Promise<Payment> {

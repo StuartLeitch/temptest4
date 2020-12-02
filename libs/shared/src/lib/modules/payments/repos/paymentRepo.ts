@@ -10,4 +10,5 @@ export interface PaymentRepoContract extends Repo<Payment> {
   // getPaymentCollection(params: string[]): Promise<Payment[]>;
   updatePayment(payment: Payment): Promise<Payment>;
   getPaymentByForeignId(foreignPaymentId: string): Promise<Payment>;
+  getUnregisteredErpPayments(): Promise<InvoiceId[]>;
 }
