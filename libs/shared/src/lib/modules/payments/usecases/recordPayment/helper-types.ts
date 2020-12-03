@@ -1,6 +1,7 @@
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
+import { Payment } from '../../domain/Payment';
 
 import {
   PaymentStrategy,
@@ -29,13 +30,17 @@ export interface PaymentData {
   payer: Payer;
 }
 
-export interface WithPayment {
+export interface WithPaymentDetails {
   paymentDetails: PaymentDetails;
   isFinalPayment?: boolean;
   datePaid?: string;
   invoice: Invoice;
   amount?: number;
   payer: Payer;
+}
+
+export interface WithPayment {
+  payment: Payment;
 }
 
 export interface WithForeignPaymentId {

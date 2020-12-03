@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 // * Core Domain
+import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -15,6 +15,8 @@ import {
 } from '../../../../domain/authorization';
 
 // * Usecase specific
+import { Payment } from '../../domain/Payment';
+
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -39,6 +41,7 @@ import { PaymentStatus } from '../../domain/Payment';
 
 import {
   WithPaymentMethodId,
+  WithPaymentDetails,
   SelectionData,
   WithInvoiceId,
   PaymentData,
@@ -71,6 +74,7 @@ export class RecordPaymentUsecase
     this.validateRequest = this.validateRequest.bind(this);
     this.attachStrategy = this.attachStrategy.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
+    this.updatePayment = this.updatePayment.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
     this.savePayment = this.savePayment.bind(this);
     this.pay = this.pay.bind(this);
@@ -241,16 +245,31 @@ export class RecordPaymentUsecase
         })
         .map((existingPayment) => ({
           ...request,
-          payment: existingPayment,
           existingPayment,
         }))
         .execute();
     };
   }
 
+  private async updatePayment<T extends WithPayment>(
+    request: T
+  ): Promise<Either<Errors.PaymentUpdateDbError, Payment>> {
+    try {
+      const updated = await this.paymentRepo.updatePayment(request.payment);
+      return right(updated);
+    } catch (err) {
+      return left(
+        new Errors.PaymentUpdateDbError(
+          request.payment.invoiceId.toString(),
+          err
+        )
+      );
+    }
+  }
+
   private savePayment(context: Context) {
-    return async <T extends WithPayment>(request: T) => {
-      const usecase = new CreatePaymentUsecase(this.paymentRepo);
+    return async <T extends WithPaymentDetails>(request: T) => {
+      const usecaseSave = new CreatePaymentUsecase(this.paymentRepo);
       const { paymentDetails, datePaid, invoice, amount, payer } = request;
 
       const dto: CreatePaymentDTO = {
@@ -264,19 +283,47 @@ export class RecordPaymentUsecase
         datePaid,
       };
 
-      // TODO: Update payment if payment already exists else create new payment
-      return new AsyncEither(dto)
-        .then(this.attachPaymentIfExists(context))
+      const maybeWithPayment = new AsyncEither(dto).then(
+        this.attachPaymentIfExists(context)
+      );
+
+      const maybeCreateNewPayment = await maybeWithPayment
         .advanceOrEnd(async (data) => {
-          if (data.payment) {
+          if (data.existingPayment) {
             return right(false);
           }
 
           return right(true);
         })
-        .then((data) => usecase.execute(data, context))
+        .then((data) => usecaseSave.execute(data, context))
         .map((payment) => ({ ...request, payment }))
         .execute();
+
+      const maybeUpdatePayment = await maybeWithPayment
+        .advanceOrEnd(async (data) => {
+          if (data.existingPayment) {
+            return right(true);
+          }
+          return right(false);
+        })
+        .map((request) => {
+          const { existingPayment, foreignPaymentId } = request;
+          existingPayment.foreignPaymentId = foreignPaymentId;
+
+          return { ...request, payment: existingPayment };
+        })
+        .then(this.updatePayment)
+        .map((payment) => ({ ...request, payment }))
+        .execute();
+
+      return flattenEither([maybeCreateNewPayment, maybeUpdatePayment]).map(
+        ([saveValue, updateValue]) => {
+          if (saveValue.payment) {
+            return saveValue;
+          }
+          return updateValue;
+        }
+      );
     };
   }
 
