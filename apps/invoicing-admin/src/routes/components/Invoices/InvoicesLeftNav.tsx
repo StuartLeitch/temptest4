@@ -34,7 +34,6 @@ const InvoicesLeftNav = (props) => {
   const referenceFilter = (eventTarget: any) => {
     const value = eventTarget.value;
     const validatedValue = regexRef.test(value) ? value : eventTarget.preventDefault()
-    
     props.setFilter(eventTarget.name, validatedValue)
   };
 
