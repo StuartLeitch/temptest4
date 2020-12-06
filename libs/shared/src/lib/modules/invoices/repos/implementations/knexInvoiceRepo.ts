@@ -380,6 +380,7 @@ export class KnexInvoiceRepo
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
         .whereNull('invoices.cancelledInvoiceReference')
         .whereNotNull('erprefs.value')
+        .where('erprefs.value', '<>', 'ERP_NOT_FOUND')
         .where('erprefs.value', '<>', 'NON_INVOICEABLE')
         .where('erprefs.value', '<>', 'MigrationRef')
         .where('erprefs.value', '<>', 'migrationRef')

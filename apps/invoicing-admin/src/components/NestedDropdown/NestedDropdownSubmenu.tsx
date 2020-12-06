@@ -3,7 +3,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Consumer } from './context';
 
@@ -36,7 +36,7 @@ class NestedDropdownSubmenu extends React.Component<NestedDropdownSubmenuProps> 
 
   id: string;
   componentDidMount() {
-      this.id = uuid();
+      this.id = uuidv4();
   }
 
   render() {
