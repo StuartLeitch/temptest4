@@ -88,22 +88,22 @@ export class RetryPaymentsRegistrationToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryPaymentsRegistrationToErpResponse> {
     try {
-      const unregisteredErpPayments = await this.paymentRepo.getUnregisteredErpPayments();
+      const unregisteredErpPaymentsIds = await this.paymentRepo.getUnregisteredErpPayments();
       const registeredPayments: ErpInvoiceResponse[] = [];
 
-      if (unregisteredErpPayments.length === 0) {
+      if (unregisteredErpPaymentsIds.length === 0) {
         this.loggerService.info('No registered payments to be register!');
         return right(Result.ok<ErpInvoiceResponse[]>(registeredPayments));
       }
 
       this.loggerService.info(
-        `Retrying registration in NetSuite for payments: ${unregisteredErpPayments
+        `Retrying registration in NetSuite for payments: ${unregisteredErpPaymentsIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unregisteredPayment of unregisteredErpPayments) {
+      for (const unregisteredPayment of unregisteredErpPaymentsIds) {
         const publishedPaymentResponse = await this.publishPaymentToErpUsecase.execute(
           {
             invoiceId: unregisteredPayment.id.toString(),
@@ -112,15 +112,13 @@ export class RetryPaymentsRegistrationToErpUsecase
         if (publishedPaymentResponse.isLeft()) {
           errs.push(publishedPaymentResponse.value.error);
         } else {
-          const assignedErpReference = (publishedPaymentResponse.value as any).getValue();
+          const assignedErpReference = publishedPaymentResponse.value;
 
           if (assignedErpReference === null) {
             // simply do nothing yet
           } else {
             this.loggerService.info(
-              `Payment ${unregisteredPayment.id.toString()} successfully registered ${
-                (assignedErpReference as any).journal?.id
-              }`
+              `Payment ${unregisteredPayment.id.toString()} successfully registered ${assignedErpReference}`
             );
             registeredPayments.push(assignedErpReference);
           }
@@ -128,13 +126,13 @@ export class RetryPaymentsRegistrationToErpUsecase
       }
 
       if (errs.length > 0) {
-        console.log(JSON.stringify(errs, null, 2));
+        errs.forEach(this.loggerService.error);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
       return right(Result.ok<ErpInvoiceResponse[]>(registeredPayments));
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

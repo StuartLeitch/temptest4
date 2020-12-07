@@ -89,9 +89,6 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerRevenueRecognition(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
-    // this.logger.log('registerRevenueRecognition Data:');
-    // this.logger.info(data);
-
     const {
       publisherCustomValues: { customSegmentId },
     } = data;
@@ -484,6 +481,13 @@ export class NetSuiteService implements ErpServiceContract {
       )
       .find(Boolean);
 
+    if (nsErpReference.value === 'NON_INVOICEABLE') {
+      this.logger.warn({
+        message: `Payment in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
+      });
+      return;
+    }
+
     const paymentRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}/!transform/customerpayment`,
       method: 'POST',
@@ -570,6 +574,7 @@ export class NetSuiteService implements ErpServiceContract {
 
   private async createRevenueRecognition(data: {
     invoice: Invoice;
+    manuscript: Manuscript;
     invoiceTotal: number;
     creditAccountId: string;
     debitAccountId: string;
@@ -581,6 +586,7 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const {
       invoice,
+      manuscript,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -595,11 +601,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Revenue Recognition - ${invoice.referenceNumber}`,
-      // trandate: format(
-      //   new Date(article.datePublished),
-      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      // ),
+      tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -653,6 +655,7 @@ export class NetSuiteService implements ErpServiceContract {
 
   private async createRevenueRecognitionReversal(data: {
     invoice: Invoice;
+    manuscript: Manuscript;
     invoiceTotal: number;
     creditAccountId: string;
     debitAccountId: string;
@@ -664,6 +667,7 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const {
       invoice,
+      manuscript,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -678,7 +682,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Revenue Recognition Reversal - ${invoice.referenceNumber}`,
+      tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -739,6 +743,13 @@ export class NetSuiteService implements ErpServiceContract {
       )
       .find(Boolean);
 
+    if (nsErpReference.value === 'NON_INVOICEABLE') {
+      this.logger.warn({
+        message: `Invoice patch in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
+      });
+      return;
+    }
+
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
       method: 'PATCH',
@@ -781,6 +792,13 @@ export class NetSuiteService implements ErpServiceContract {
         (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
       )
       .find(Boolean);
+
+    if (originalNSErpReference.value === 'NON_INVOICEABLE') {
+      this.logger.warn({
+        message: `CreditNote in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${originalInvoice.id.toString()}.`,
+      });
+      return;
+    }
 
     const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${originalNSErpReference.value}/!transform/creditmemo`,
@@ -881,36 +899,28 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const keep = ` ${manuscript.customId.toString()}`;
-    if (payer?.type !== PayerType.INSTITUTION) {
-      createCustomerPayload.isPerson = true;
-      let [firstName, ...lastNames] = payer?.name.toString().split(' ');
-      createCustomerPayload.firstName = firstName;
+    createCustomerPayload.isPerson = false;
+    // eslint-disable-next-line prefer-const
+    let [firstName, ...lastNames] = payer?.name.toString().split(' ');
 
-      lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length != 0);
+    lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
 
-      createCustomerPayload.lastName =
-        lastNames.length > 0
-          ? `${lastNames.join(' ')}${keep}`.trim()
-          : `${keep}`.trim();
+    let lastName =
+      lastNames.length > 0
+        ? `${lastNames.join(' ')}${keep}`.trim()
+        : `${keep}`.trim();
 
-      if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
-        createCustomerPayload.lastName =
-          createCustomerPayload?.lastName
-            ?.slice(0, MAX_LENGTH - keep.length)
-            .trim() + keep;
-      }
-    } else {
-      createCustomerPayload.isPerson = false;
-      createCustomerPayload.companyName = `${
-        payer?.organization.toString().trim() || payer?.name.toString().trim()
-      }${keep}`.trim();
-      if (createCustomerPayload.companyName.length > MAX_LENGTH) {
-        createCustomerPayload.companyName =
-          createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
-          keep;
-      }
-      createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
+    if (lastName?.length > MAX_LENGTH) {
+      lastName = lastName?.slice(0, MAX_LENGTH - keep.length).trim() + keep;
     }
+    createCustomerPayload.companyName = firstName.concat(' ', lastName);
+
+    if (createCustomerPayload.companyName.length > MAX_LENGTH) {
+      createCustomerPayload.companyName =
+        createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
+        keep;
+    }
+    createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
 
     return createCustomerPayload;
   }

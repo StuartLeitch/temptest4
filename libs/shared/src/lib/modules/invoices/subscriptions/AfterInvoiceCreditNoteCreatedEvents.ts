@@ -58,6 +58,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
       InvoiceCreditNoteCreatedEvent.name
     );
   }
+
   private async onInvoiceCreditNoteCreatedEvent(
     event: InvoiceCreditNoteCreatedEvent
   ): Promise<any> {

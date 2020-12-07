@@ -131,7 +131,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
 
       return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

@@ -19,3 +19,11 @@ export class InvoiceIdRequiredError extends UseCaseError {
     super(`Invoice id is required.`);
   }
 }
+
+export class PaymentUpdateDbError extends UseCaseError {
+  constructor(invoiceId: string, err: Error) {
+    super(
+      `While updating payment for invoice with id {${invoiceId}}, an error ocurred, with message: ${err.message} and stack ${err.stack}`
+    );
+  }
+}

@@ -16,9 +16,9 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
-import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErp';
 
 export type RetryCreditNotesResponse = Either<
@@ -113,7 +113,7 @@ export class RetryCreditNotesUsecase
 
       return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }
