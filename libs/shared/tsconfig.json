@@ -65,6 +65,7 @@
     "src/lib/infrastructure/database/knex/migrations/20201006093954_add_erpid_to_payments_table.js",
     "src/lib/infrastructure/database/knex/migrations/20201103114325_add_reason_to_invoices_table.js",
     "src/lib/infrastructure/database/knex/migrations/20201117160034_change_invoices_table_schema.js",
-    "src/lib/infrastructure/database/knex/migrations/20201204094931_add_timestamp_erp_references.js"
+    "src/lib/infrastructure/database/knex/migrations/20201204094931_add_timestamp_erp_references.js",
+    "src/lib/infrastructure/database/knex/migrations/20201207101958_create_indexes_erp_references.js"
   ]
 }
