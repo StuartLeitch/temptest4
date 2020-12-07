@@ -32,7 +32,7 @@ import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoic
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 export type RetryFailedSageErpInvoicesResponse = Either<
-  UnexpectedError | ErpInvoiceResponse,
+  UnexpectedError,
   ErpInvoiceResponse[]
 >;
 
@@ -141,7 +141,7 @@ export class RetryFailedSageErpInvoicesUsecase
 
       return right(updatedInvoices);
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

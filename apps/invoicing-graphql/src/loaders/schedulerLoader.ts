@@ -1,6 +1,7 @@
 /* eslint-disable no-useless-catch */
 /* eslint-disable no-inner-declarations */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+
 import {
   MicroframeworkLoader,
   MicroframeworkSettings,
@@ -10,11 +11,12 @@ import {
   // clearIntervalAsync
 } from 'set-interval-async/dynamic';
 
-import { NoOpUseCase } from '../../../../libs/shared/src/lib/core/domain/NoOpUseCase';
-import { RetryRevenueRecognitionNetsuiteErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryRevenueRecognizedNetsuiteErpInvoices/retryRevenueRecognitionNetsuiteErpInvoices';
-import { RetryRevenueRecognitionSageErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
-import { RetryFailedNetsuiteErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
-import { RetryFailedSageErpInvoicesUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
+import { RegisterInvoicesCron } from './../cron/registerInvoicesCron';
+import { RegisterInvoicesForSageCron } from './../cron/registerInvoicesForSageCron';
+import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecognitionsCron';
+import { RegisterRevenueRecognitionsForSageCron } from './../cron/registerRevenueRecognitionsForSageCron';
+import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
+import { RegisterCreditNotesCron } from './../cron/registerCreditNotesCron';
 
 import { env } from '../env';
 import { Context } from '../builders';
@@ -27,151 +29,28 @@ export const schedulerLoader: MicroframeworkLoader = async (
     const logger = context.loggerBuilder.getLogger();
     logger.setScope('SchedulingService');
     const {
-      repos: {
-        invoiceItem,
-        manuscript,
-        publisher,
-        address,
-        catalog,
-        invoice,
-        coupon,
-        waiver,
-        payer,
-        erpReference,
-      },
-      services: { erp, logger: loggerService, vatService },
-    } = context;
-    const {
       failedErpCronRetryTimeMinutes,
       failedErpCronRetryDisabled,
-      erpRegisterRevenueRecognitionEnabled,
     } = env.app;
 
-    const retryFailedSageErpInvoicesUsecase = new RetryFailedSageErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      erpReference,
-      erp?.sage || null,
-      publisher,
-      loggerService,
-      vatService
-    );
-
-    const retryFailedNetsuiteErpInvoicesUsecase = new RetryFailedNetsuiteErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      erpReference,
-      erp?.netsuite || null,
-      publisher,
-      loggerService,
-      vatService
-    );
-
-    const retryRevenueRecognizedInvoicesToSageErpUsecase = erpRegisterRevenueRecognitionEnabled
-      ? new RetryRevenueRecognitionSageErpInvoicesUsecase(
-          invoice,
-          invoiceItem,
-          coupon,
-          waiver,
-          payer,
-          address,
-          manuscript,
-          catalog,
-          publisher,
-          erpReference,
-          erp?.sage || null,
-          loggerService
-        )
-      : new NoOpUseCase();
-
-    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = erpRegisterRevenueRecognitionEnabled
-      ? new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
-          invoice,
-          invoiceItem,
-          coupon,
-          waiver,
-          payer,
-          address,
-          manuscript,
-          catalog,
-          publisher,
-          erpReference,
-          erp?.netsuite || null,
-          loggerService
-        )
-      : new NoOpUseCase();
-
     const sageJobQueue = [
-      async function retryFailedSageErpInvoicesJob() {
-        try {
-          const maybeResponse = await retryFailedSageErpInvoicesUsecase.execute();
-          const response = maybeResponse.value;
-          if (maybeResponse.isLeft()) {
-            // logger.error(response);
-            throw response;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
-      async function retryRevenueRecognizedInvoicesToSageErpJob() {
-        try {
-          const response = await retryRevenueRecognizedInvoicesToSageErpUsecase.execute();
-          if (response.isLeft()) {
-            logger.error(response.value.errorValue().message);
-            throw response.value.error;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
+      RegisterInvoicesForSageCron,
+      RegisterRevenueRecognitionsForSageCron,
     ];
 
     const netSuiteJobQueue = [
-      async function retryFailedNetsuiteErpInvoicesJob() {
-        try {
-          const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute();
-          const response = maybeResponse.value;
-          if (maybeResponse.isLeft()) {
-            // logger.error(response);
-            throw response;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
-
-      async function retryRevenueRecognizedInvoicesToNetsuiteErpJob() {
-        try {
-          const response = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
-          if (response.isLeft()) {
-            logger.error(response.value.errorValue().message);
-            throw response.value.error;
-          }
-        } catch (err) {
-          throw err;
-        }
-      },
+      RegisterInvoicesCron,
+      RegisterRevenueRecognitionsCron,
+      RegisterCreditNotesCron,
+      RegisterPaymentsCron,
     ];
 
-    // start scheduler
     const jobsQueue = [].concat(
       env.netSuite.netSuiteEnabled ? netSuiteJobQueue : [],
       env.salesForce.sageEnabled ? sageJobQueue : []
     );
 
+    // * Start scheduler
     async function processJobsQueue() {
       // * clones the jobs queue
       let queue = [...jobsQueue];
@@ -184,7 +63,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
         const head = queue[0];
         logger.debug('startProcessing', { job: head.name });
         try {
-          await head();
+          await head.schedule(context);
         } catch (err) {
           logger.error('Job Error: ', err);
         }

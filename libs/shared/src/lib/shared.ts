@@ -254,7 +254,13 @@ export * from './modules/users/domain/User';
 export * from './modules/users/domain/UserId';
 export * from './modules/users/mappers/UserMap';
 
-// * Exporet ERP Reference
+export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
+export * from './modules/payments/usecases/retryPaymentsRegistration/retryPaymentRegistration';
+export * from './modules/invoices/usecases/ERP/retryCreditNotes/retryCreditNotes';
+export * from './modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
+export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
+
+// * Export ERP Reference
 export * from './modules/vendors/domain/ErpReference';
 export * from './modules/vendors/mapper/ErpReference';
 export * from './modules/vendors/repos';

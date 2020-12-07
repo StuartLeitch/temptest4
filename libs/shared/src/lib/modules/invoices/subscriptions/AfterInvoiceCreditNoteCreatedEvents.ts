@@ -23,7 +23,6 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
-import { PublishCreditNoteToErpUsecase } from '../usecases/ERP/publishCreditNoteToErp/publishCreditNoteToErp';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
 import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
@@ -47,19 +46,19 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
-    private publishCreditNoteToErp: PublishCreditNoteToErpUsecase | NoOpUseCase,
     private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
   }
 
-  setupSubscriptions() {
+  setupSubscriptions(): void {
     DomainEvents.register(
       this.onInvoiceCreditNoteCreatedEvent.bind(this),
       InvoiceCreditNoteCreatedEvent.name
     );
   }
+
   private async onInvoiceCreditNoteCreatedEvent(
     event: InvoiceCreditNoteCreatedEvent
   ): Promise<any> {
@@ -100,6 +99,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
       let payer = await this.payerRepo.getPayerByInvoiceId(
         creditNote.invoiceId
       );
+
       if (!payer) {
         if (creditNote.cancelledInvoiceReference) {
           const invoiceId = InvoiceId.create(
@@ -122,6 +122,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
         this.paymentMethodRepo,
         this.loggerService
       );
+
       const paymentMethods = await paymentMethodsUsecase.execute();
 
       if (paymentMethods.isLeft()) {
@@ -157,13 +158,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
         `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`
       );
 
-      const publishToErpResult = await this.publishCreditNoteToErp.execute({
-        creditNoteId: creditNote.id.toString(),
-      });
-
-      this.loggerService.info('[PublishCreditNoteToERP]:', publishToErpResult);
-
-      //Get Invoice ID
+      // * Get Invoice ID
       const invoiceId = creditNote.cancelledInvoiceReference;
 
       // * Get Invoice

@@ -1,0 +1,10 @@
+# Easily toggle feature flags by modifying the values.
+# There's a CRON job which runs each minute to check for changes.
+
+cronFlags:
+  locales:
+    - en-UK
+  erpRegisterInvoicesEnabled: true # If true, server will reload feature flags each minute.
+  erpRegisterRevenueRecognitionEnabled: true
+  erpRegisterCreditNotesEnabled: true
+  erpRegisterPaymentsEnabled: true

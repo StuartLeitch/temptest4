@@ -8,22 +8,10 @@ import {
   PayPalOrderRequest as OrderRequest,
   PayPalOrderStatus as OrderStatus,
   PayPalServiceErrors as Errors,
-  GetPaymentsByInvoiceIdUsecase,
-  GetPaymentMethodByNameUsecase,
-  UsecaseAuthorizationContext,
-  PaymentMethodRepoContract,
-  InvoiceRepoContract,
-  PaymentRepoContract,
-  PaymentMethodNames,
   ExternalOrderId,
-  PaymentMethodId,
   LoggerContract,
-  PaymentStatus,
   PaymentProof,
-  UseCaseError,
-  AsyncEither,
   Either,
-  Roles,
   right,
   left,
 } from '@hindawi/shared';
@@ -42,15 +30,6 @@ import {
   Response,
 } from './types';
 
-interface WithInvoiceId {
-  invoiceId: string;
-}
-
-interface WithPaymentMethodId {
-  paymentMethodId: PaymentMethodId;
-  invoiceId: string;
-}
-
 export interface PayPalServiceData {
   clientSecret: string;
   environment: string;
@@ -60,24 +39,13 @@ export interface PayPalServiceData {
 export class PayPalService implements ServiceContract {
   private httpClient: PayPalHttpClient;
 
-  constructor(
-    connData: PayPalServiceData,
-    private paymentMethodRepo: PaymentMethodRepoContract,
-    private invoiceRepo: InvoiceRepoContract,
-    private paymentRepo: PaymentRepoContract,
-    private logger: LoggerContract
-  ) {
+  constructor(connData: PayPalServiceData, private logger: LoggerContract) {
     this.httpClient = new checkoutNodeJsSDK.core.PayPalHttpClient(
       this.createEnvironment(connData)
     );
 
-    this.attachOrderIdForExistingPayment = this.attachOrderIdForExistingPayment.bind(
-      this
-    );
     this.newCaptureOrderRequest = this.newCaptureOrderRequest.bind(this);
-    this.attachReusablePayment = this.attachReusablePayment.bind(this);
     this.newCreateOrderRequest = this.newCreateOrderRequest.bind(this);
-    this.attachPayPalMethodId = this.attachPayPalMethodId.bind(this);
     this.newGetOrderRequest = this.newGetOrderRequest.bind(this);
     this.sendOrderToPayPal = this.sendOrderToPayPal.bind(this);
     this.captureMoney = this.captureMoney.bind(this);
@@ -108,13 +76,9 @@ export class PayPalService implements ServiceContract {
       ExternalOrderId
     >
   > {
-    const execution = await new AsyncEither(request)
-      .then(this.attachOrderIdForExistingPayment)
-      .advanceOrEnd(async (data) => right(!data.orderId))
-      .then(this.sendOrderToPayPal)
-      .execute();
+    const maybeOrder = await this.sendOrderToPayPal(request);
 
-    return execution.map((data) => data.orderId);
+    return maybeOrder.map((data) => data.orderId);
   }
 
   async getOrder(
@@ -298,65 +262,5 @@ export class PayPalService implements ServiceContract {
     }
 
     return right({ orderId: ExternalOrderId.create(response.result.id) });
-  }
-
-  private async attachOrderIdForExistingPayment<T extends WithInvoiceId>(
-    request: T
-  ): Promise<Either<UseCaseError, T & { orderId: ExternalOrderId }>> {
-    const usecaseContext = {
-      roles: [Roles.SERVICE],
-    };
-
-    return new AsyncEither(request)
-      .then(this.attachPayPalMethodId(usecaseContext))
-      .then(this.attachReusablePayment(usecaseContext))
-      .advanceOrEnd(async (data) => right(!!data.payment))
-      .map((data) => ({
-        ...request,
-        orderId: ExternalOrderId.create(data.payment.foreignPaymentId),
-      }))
-      .execute();
-  }
-
-  private attachReusablePayment(context: UsecaseAuthorizationContext) {
-    const usecase = new GetPaymentsByInvoiceIdUsecase(
-      this.invoiceRepo,
-      this.paymentRepo
-    );
-
-    return async <T extends WithPaymentMethodId>(request: T) => {
-      return new AsyncEither(request)
-        .then(({ invoiceId }) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
-        .map((payments) =>
-          payments.filter(
-            (payment) =>
-              payment.paymentMethodId.equals(request.paymentMethodId) &&
-              payment.status === PaymentStatus.CREATED
-          )
-        )
-        .map((payments) => ({
-          ...request,
-          payment: payments.length > 0 ? payments[0] : null,
-        }))
-        .execute();
-    };
-  }
-
-  private attachPayPalMethodId(context: UsecaseAuthorizationContext) {
-    const usecase = new GetPaymentMethodByNameUsecase(this.paymentMethodRepo);
-
-    return async <T>(request: T) => {
-      return new AsyncEither({})
-        .then(() =>
-          usecase.execute({ name: PaymentMethodNames.PayPal }, context)
-        )
-        .map((response) => response.getValue())
-        .map((paymentMethod) => ({
-          ...request,
-          paymentMethodId: paymentMethod.paymentMethodId,
-        }))
-        .execute();
-    };
   }
 }

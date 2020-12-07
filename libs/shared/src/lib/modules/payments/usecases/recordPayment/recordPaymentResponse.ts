@@ -8,6 +8,7 @@ export type RecordPaymentResponse = Either<
   | Errors.InvoiceTotalLessThanZeroError
   | Errors.InvoiceIdRequiredError
   | Errors.InvoiceNotFountError
+  | Errors.PaymentUpdateDbError
   | UnexpectedError,
   Payment
 >;

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 // * Core Domain
+import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -15,6 +15,8 @@ import {
 } from '../../../../domain/authorization';
 
 // * Usecase specific
+import { Payment } from '../../domain/Payment';
+
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -29,29 +31,27 @@ import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsFo
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
-import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 import { CreatePaymentUsecase, CreatePaymentDTO } from '../createPayment';
+import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 
-import { PaymentDTO } from '../../domain/strategies/behaviors';
-import {
-  PaymentStrategySelectionData,
-  PaymentStrategyFactory,
-} from '../../domain/strategies/payment-strategy-factory';
+import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
 import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
+import { PaymentDTO } from '../../domain/strategies/behaviors';
+import { PaymentStatus } from '../../domain/Payment';
 
 import {
+  WithPaymentMethodId,
+  WithPaymentDetails,
   SelectionData,
   WithInvoiceId,
   PaymentData,
   WithInvoice,
   WithPayment,
-  WithForeignPaymentId,
 } from './helper-types';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
-import { PaymentStatus } from '../../domain/Payment';
 
 export class RecordPaymentUsecase
   implements
@@ -74,6 +74,7 @@ export class RecordPaymentUsecase
     this.validateRequest = this.validateRequest.bind(this);
     this.attachStrategy = this.attachStrategy.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
+    this.updatePayment = this.updatePayment.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
     this.savePayment = this.savePayment.bind(this);
     this.pay = this.pay.bind(this);
@@ -176,11 +177,11 @@ export class RecordPaymentUsecase
     request: T
   ): Promise<Either<void, T & { strategy: PaymentStrategy }>> {
     const { payerIdentification, paymentReference } = request;
-    const data: PaymentStrategySelectionData = {
+
+    const strategy = await this.strategyFactory.selectStrategy({
       payerIdentification,
       paymentReference,
-    };
-    const strategy = await this.strategyFactory.selectStrategy(data);
+    });
 
     return right({
       ...request,
@@ -221,7 +222,7 @@ export class RecordPaymentUsecase
       this.paymentRepo
     );
 
-    return async <T extends WithForeignPaymentId & WithInvoiceId>(
+    return async <T extends WithInvoiceId & WithPaymentMethodId>(
       request: T
     ) => {
       return new AsyncEither(request.invoiceId)
@@ -231,7 +232,8 @@ export class RecordPaymentUsecase
           return payments
             .filter((payment) => payment.status === PaymentStatus.CREATED)
             .filter(
-              (payment) => payment.foreignPaymentId === request.foreignPaymentId
+              (payment) =>
+                payment.paymentMethodId.toString() === request.paymentMethodId
             );
         })
         .map((payments) => {
@@ -243,16 +245,31 @@ export class RecordPaymentUsecase
         })
         .map((existingPayment) => ({
           ...request,
-          payment: existingPayment,
           existingPayment,
         }))
         .execute();
     };
   }
 
+  private async updatePayment<T extends WithPayment>(
+    request: T
+  ): Promise<Either<Errors.PaymentUpdateDbError, Payment>> {
+    try {
+      const updated = await this.paymentRepo.updatePayment(request.payment);
+      return right(updated);
+    } catch (err) {
+      return left(
+        new Errors.PaymentUpdateDbError(
+          request.payment.invoiceId.toString(),
+          err
+        )
+      );
+    }
+  }
+
   private savePayment(context: Context) {
-    return async <T extends WithPayment>(request: T) => {
-      const usecase = new CreatePaymentUsecase(this.paymentRepo);
+    return async <T extends WithPaymentDetails>(request: T) => {
+      const usecaseSave = new CreatePaymentUsecase(this.paymentRepo);
       const { paymentDetails, datePaid, invoice, amount, payer } = request;
 
       const dto: CreatePaymentDTO = {
@@ -266,18 +283,47 @@ export class RecordPaymentUsecase
         datePaid,
       };
 
-      return new AsyncEither(dto)
-        .then(this.attachPaymentIfExists(context))
+      const maybeWithPayment = new AsyncEither(dto).then(
+        this.attachPaymentIfExists(context)
+      );
+
+      const maybeCreateNewPayment = await maybeWithPayment
         .advanceOrEnd(async (data) => {
-          if (data.payment) {
+          if (data.existingPayment) {
             return right(false);
           }
 
           return right(true);
         })
-        .then((data) => usecase.execute(data, context))
+        .then((data) => usecaseSave.execute(data, context))
         .map((payment) => ({ ...request, payment }))
         .execute();
+
+      const maybeUpdatePayment = await maybeWithPayment
+        .advanceOrEnd(async (data) => {
+          if (data.existingPayment) {
+            return right(true);
+          }
+          return right(false);
+        })
+        .map((request) => {
+          const { existingPayment, foreignPaymentId } = request;
+          existingPayment.foreignPaymentId = foreignPaymentId;
+
+          return { ...request, payment: existingPayment };
+        })
+        .then(this.updatePayment)
+        .map((payment) => ({ ...request, payment }))
+        .execute();
+
+      return flattenEither([maybeCreateNewPayment, maybeUpdatePayment]).map(
+        ([saveValue, updateValue]) => {
+          if (saveValue.payment) {
+            return saveValue;
+          }
+          return updateValue;
+        }
+      );
     };
   }
 

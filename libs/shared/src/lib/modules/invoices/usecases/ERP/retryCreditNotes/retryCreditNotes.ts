@@ -17,25 +17,20 @@ import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
-import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
-import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
-import { CatalogRepoContract } from '../../../../journals/repos';
-import { PublisherRepoContract } from '../../../../publishers/repos';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { ErpReferenceRepoContract } from '../../../../vendors/repos';
-import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErp';
 
-export type RetryRevenueRecognitionNetsuiteErpInvoicesResponse = Either<
+export type RetryCreditNotesResponse = Either<
   UnexpectedError,
   Result<ErpInvoiceResponse[]>
 >;
 
-export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
+export class RetryCreditNotesUsecase
   implements
     UseCase<
       Record<string, unknown>,
-      Promise<RetryRevenueRecognitionNetsuiteErpInvoicesResponse>,
+      Promise<RetryCreditNotesResponse>,
       UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
@@ -43,33 +38,23 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
-  private publishRevenueRecognitionToErpUsecase: PublishRevenueRecognitionToErpUsecase;
+  private publishCreditNoteToErpUsecase: PublishCreditNoteToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private payerRepo: PayerRepoContract,
-    private addressRepo: AddressRepoContract,
-    private manuscriptRepo: ArticleRepoContract,
-    private catalogRepo: CatalogRepoContract,
-    private publisherRepo: PublisherRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
-    private netsuiteService: ErpServiceContract,
+    private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
-    this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
+    this.publishCreditNoteToErpUsecase = new PublishCreditNoteToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
       this.couponRepo,
       this.waiverRepo,
-      this.payerRepo,
-      this.addressRepo,
-      this.manuscriptRepo,
-      this.catalogRepo,
-      this.publisherRepo,
       this.erpReferenceRepo,
-      this.netsuiteService,
+      this.erpService,
       this.loggerService
     );
   }
@@ -82,44 +67,41 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
   public async execute(
     request?: Record<string, unknown>,
     context?: UsecaseAuthorizationContext
-  ): Promise<RetryRevenueRecognitionNetsuiteErpInvoicesResponse> {
+  ): Promise<RetryCreditNotesResponse> {
     try {
-      const unrecognizedErpInvoicesIds = await this.invoiceRepo.getUnrecognizedNetsuiteErpInvoices();
+      const unregisteredErpCreditNotesIds = await this.invoiceRepo.getUnregisteredErpCreditNotes();
+      const registeredCreditNotes: ErpInvoiceResponse[] = [];
 
-      const updatedInvoices: ErpInvoiceResponse[] = [];
-
-      if (unrecognizedErpInvoicesIds.length === 0) {
-        this.loggerService.info('No revenue unrecognized invoices');
-        return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
+      if (unregisteredErpCreditNotesIds.length === 0) {
+        this.loggerService.info('No registered credit notes!');
+        return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
       }
 
       this.loggerService.info(
-        `Retrying recognizing in NetSuite for invoices: ${unrecognizedErpInvoicesIds
+        `Retrying registration in NetSuite for credit notes: ${unregisteredErpCreditNotesIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unrecognizedInvoice of unrecognizedErpInvoicesIds) {
-        const updatedInvoiceResponse = await this.publishRevenueRecognitionToErpUsecase.execute(
+      for (const unregisteredCreditNote of unregisteredErpCreditNotesIds) {
+        const publishedCreditNoteResponse = await this.publishCreditNoteToErpUsecase.execute(
           {
-            invoiceId: unrecognizedInvoice.id.toString(),
+            creditNoteId: unregisteredCreditNote.id.toString(),
           }
         );
-        if (updatedInvoiceResponse.isLeft()) {
-          errs.push(updatedInvoiceResponse.value.error);
+        if (publishedCreditNoteResponse.isLeft()) {
+          errs.push(publishedCreditNoteResponse.value.error);
         } else {
-          const assignedErpReference = updatedInvoiceResponse.value.getValue();
+          const assignedErpReference = publishedCreditNoteResponse.value;
 
           if (assignedErpReference === null) {
             // simply do nothing yet
           } else {
             this.loggerService.info(
-              `Invoice ${unrecognizedInvoice.id.toString()} successfully recognized ${
-                (assignedErpReference as any).journal?.id
-              }`
+              `CreditNote ${unregisteredCreditNote.id.toString()} successfully registered ${assignedErpReference}`
             );
-            updatedInvoices.push(assignedErpReference);
+            registeredCreditNotes.push(assignedErpReference);
           }
         }
       }
@@ -129,7 +111,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
-      return right(Result.ok<ErpInvoiceResponse[]>(updatedInvoices));
+      return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
     } catch (err) {
       this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));

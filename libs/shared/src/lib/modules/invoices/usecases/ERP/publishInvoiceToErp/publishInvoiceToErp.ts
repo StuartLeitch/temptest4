@@ -290,10 +290,10 @@ export class PublishInvoiceToErpUsecase
 
         return right(erpResponse);
       } catch (err) {
-        return left(err);
+        return left(new UnexpectedError(err, err.toString()));
       }
     } catch (err) {
-      console.log(err);
+      this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

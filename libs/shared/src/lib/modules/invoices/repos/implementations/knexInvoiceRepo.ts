@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { Transform } from 'stream';
-import _ from 'lodash';
 
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
@@ -393,6 +392,15 @@ export class KnexInvoiceRepo
         );
   }
 
+  private filterCreditNotesReadyForErpRegistration(): any {
+    return (query) =>
+      query
+        .whereNot('invoices.deleted', 1)
+        .whereIn('invoices.status', ['FINAL'])
+        .whereNotNull('invoices.cancelledInvoiceReference')
+        .whereNull('creditnoteref.value');
+  }
+
   private async getUnrecognizedInvoices(vendor: string) {
     const LIMIT = 30;
     const { db, logger } = this;
@@ -501,6 +509,46 @@ export class KnexInvoiceRepo
 
   public async getFailedSageErpInvoices(): Promise<Invoice[]> {
     return this.getUnregisteredInvoices('sage');
+  }
+
+  async getUnregisteredErpCreditNotes(): Promise<InvoiceId[]> {
+    const { db, logger } = this;
+
+    const erpReferencesQuery = db(TABLES.INVOICES)
+      .column({ invoiceId: 'invoices.id' })
+      .select();
+
+    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
+
+    const withCreditNoteErpReference = this.withErpReferenceQuery(
+      'creditnoteref',
+      'invoices.id',
+      'invoice',
+      'netsuite',
+      'creditNote'
+    );
+
+    // * SQL for retrieving results needed only for ERP registration
+    const filterCreditNotesReadyForERP = this.filterCreditNotesReadyForErpRegistration();
+
+    const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
+      whereNotNull: 'articles.datePublished',
+    });
+    const prepareIdsSQL = filterArticlesByNotNullDatePublished(
+      filterCreditNotesReadyForERP(
+        withCreditNoteErpReference(withInvoiceItems(erpReferencesQuery))
+      )
+    );
+
+    logger.debug('select', {
+      unregisteredCreditNotes: prepareIdsSQL.toString(),
+    });
+
+    const creditNotes = await prepareIdsSQL;
+
+    return creditNotes.map((i) =>
+      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
+    );
   }
 
   async delete(invoice: Invoice): Promise<void> {
