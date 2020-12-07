@@ -21,7 +21,7 @@ const InvoicesLeftNav = (props) => {
   const journalId = props?.filters?.journalId || [];
   const referenceNumber = props?.filters?.referenceNumber || '';
   const customId = props?.filters?.customId || '';
-  const regexRef = new RegExp(/^[A-Za-z0-9/_-]*$/g)
+  const regexRef = new RegExp(/^[0-9/_-]*$/g)
 
   const onFilterHandler = useDebouncedCallback((eventTarget: any) => {
     const value =
@@ -151,7 +151,7 @@ const InvoicesLeftNav = (props) => {
             <Input
               className='form-control'
               placeholder='Enter reference number..'
-              maxLength={14}
+              maxLength={11}
               onFocus={(e) => (e.target.placeholder = 'reference/year')}
               onBlur={(e) => (e.target.placeholder = 'Enter reference number..')}
               name='referenceNumber'
