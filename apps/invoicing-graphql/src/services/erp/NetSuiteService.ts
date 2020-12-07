@@ -89,9 +89,6 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerRevenueRecognition(
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
-    // this.logger.log('registerRevenueRecognition Data:');
-    // this.logger.info(data);
-
     const {
       publisherCustomValues: { customSegmentId },
     } = data;
@@ -577,6 +574,7 @@ export class NetSuiteService implements ErpServiceContract {
 
   private async createRevenueRecognition(data: {
     invoice: Invoice;
+    manuscript: Manuscript;
     invoiceTotal: number;
     creditAccountId: string;
     debitAccountId: string;
@@ -588,6 +586,7 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const {
       invoice,
+      manuscript,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -602,11 +601,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Revenue Recognition - ${invoice.referenceNumber}`,
-      // trandate: format(
-      //   new Date(article.datePublished),
-      //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      // ),
+      tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -660,6 +655,7 @@ export class NetSuiteService implements ErpServiceContract {
 
   private async createRevenueRecognitionReversal(data: {
     invoice: Invoice;
+    manuscript: Manuscript;
     invoiceTotal: number;
     creditAccountId: string;
     debitAccountId: string;
@@ -671,6 +667,7 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const {
       invoice,
+      manuscript,
       invoiceTotal,
       creditAccountId,
       debitAccountId,
@@ -685,7 +682,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Revenue Recognition Reversal - ${invoice.referenceNumber}`,
+      tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -904,10 +901,11 @@ export class NetSuiteService implements ErpServiceContract {
     const keep = ` ${manuscript.customId.toString()}`;
     if (payer?.type !== PayerType.INSTITUTION) {
       createCustomerPayload.isPerson = true;
+      // eslint-disable-next-line prefer-const
       let [firstName, ...lastNames] = payer?.name.toString().split(' ');
       createCustomerPayload.firstName = firstName;
 
-      lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length != 0);
+      lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
 
       createCustomerPayload.lastName =
         lastNames.length > 0
