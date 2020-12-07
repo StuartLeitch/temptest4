@@ -111,7 +111,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     let creditAccountId;
     let debitAccountId;
-    if (customSegmentId !== '4') {
+    if (customSegmentId !== '1') {
       creditAccountId = idMap.Partnership.credit;
       debitAccountId = idMap.Partnership.debit;
     } else {
@@ -160,7 +160,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     let creditAccountId;
     let debitAccountId;
-    if (customSegmentId !== '4') {
+    if (customSegmentId !== '1') {
       creditAccountId = idMap.Partnership.credit;
       debitAccountId = idMap.Partnership.debit;
     } else {
@@ -424,8 +424,8 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '4') {
-      createInvoicePayload.cseg1 = {
+    if (customSegmentId !== '1') {
+      createInvoicePayload.csegcseg1 = {
         id: customSegmentId,
       };
     }
@@ -470,7 +470,7 @@ export class NetSuiteService implements ErpServiceContract {
     const accountMap = {
       Paypal: '213',
       'Credit Card': '216',
-      'Bank Transfer': '347',
+      'Bank Transfer': '221',
     };
 
     const nsErpReference = invoice
@@ -626,8 +626,8 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '4') {
-      createJournalPayload.cseg1 = {
+    if (customSegmentId !== '1') {
+      createJournalPayload.csegcseg1 = {
         id: customSegmentId,
       };
     }
@@ -707,8 +707,8 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '4') {
-      createJournalPayload.cseg1 = {
+    if (customSegmentId !== '1') {
+      createJournalPayload.csegcseg1 = {
         id: customSegmentId,
       };
     }
