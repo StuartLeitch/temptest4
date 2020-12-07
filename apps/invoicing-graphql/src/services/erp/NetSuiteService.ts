@@ -484,6 +484,13 @@ export class NetSuiteService implements ErpServiceContract {
       )
       .find(Boolean);
 
+    if (nsErpReference.value === 'NON_INVOICEABLE') {
+      this.logger.warn({
+        message: `Payment in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
+      });
+      return;
+    }
+
     const paymentRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}/!transform/customerpayment`,
       method: 'POST',
@@ -739,6 +746,13 @@ export class NetSuiteService implements ErpServiceContract {
       )
       .find(Boolean);
 
+    if (nsErpReference.value === 'NON_INVOICEABLE') {
+      this.logger.warn({
+        message: `Invoice patch in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
+      });
+      return;
+    }
+
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
       method: 'PATCH',
@@ -781,6 +795,13 @@ export class NetSuiteService implements ErpServiceContract {
         (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
       )
       .find(Boolean);
+
+    if (originalNSErpReference.value === 'NON_INVOICEABLE') {
+      this.logger.warn({
+        message: `CreditNote in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${originalInvoice.id.toString()}.`,
+      });
+      return;
+    }
 
     const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${originalNSErpReference.value}/!transform/creditmemo`,

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { YamlParser } from '../lib/YamlParser';
-import { FeatureFlags } from '../lib/FeatureFlags';
+// import { FeatureFlags } from '../lib/FeatureFlags';
 
 /**
  * @class  CronFeatureFlagsReader
