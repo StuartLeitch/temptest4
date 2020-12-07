@@ -899,37 +899,28 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const keep = ` ${manuscript.customId.toString()}`;
-    if (payer?.type !== PayerType.INSTITUTION) {
-      createCustomerPayload.isPerson = true;
-      // eslint-disable-next-line prefer-const
-      let [firstName, ...lastNames] = payer?.name.toString().split(' ');
-      createCustomerPayload.firstName = firstName;
+    createCustomerPayload.isPerson = false;
+    // eslint-disable-next-line prefer-const
+    let [firstName, ...lastNames] = payer?.name.toString().split(' ');
 
-      lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
+    lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
 
-      createCustomerPayload.lastName =
-        lastNames.length > 0
-          ? `${lastNames.join(' ')}${keep}`.trim()
-          : `${keep}`.trim();
+    let lastName =
+      lastNames.length > 0
+        ? `${lastNames.join(' ')}${keep}`.trim()
+        : `${keep}`.trim();
 
-      if (createCustomerPayload?.lastName?.length > MAX_LENGTH) {
-        createCustomerPayload.lastName =
-          createCustomerPayload?.lastName
-            ?.slice(0, MAX_LENGTH - keep.length)
-            .trim() + keep;
-      }
-    } else {
-      createCustomerPayload.isPerson = false;
-      createCustomerPayload.companyName = `${
-        payer?.organization.toString().trim() || payer?.name.toString().trim()
-      }${keep}`.trim();
-      if (createCustomerPayload.companyName.length > MAX_LENGTH) {
-        createCustomerPayload.companyName =
-          createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
-          keep;
-      }
-      createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
+    if (lastName?.length > MAX_LENGTH) {
+      lastName = lastName?.slice(0, MAX_LENGTH - keep.length).trim() + keep;
     }
+    createCustomerPayload.companyName = firstName.concat(' ', lastName);
+
+    if (createCustomerPayload.companyName.length > MAX_LENGTH) {
+      createCustomerPayload.companyName =
+        createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
+        keep;
+    }
+    createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
 
     return createCustomerPayload;
   }
