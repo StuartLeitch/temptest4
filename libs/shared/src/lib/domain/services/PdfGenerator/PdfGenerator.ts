@@ -6,7 +6,14 @@ import { format } from 'date-fns';
 import ejs from 'ejs';
 import countryList from 'country-list';
 import stateList from 'state-list';
-import base64Img from 'base64-img';
+import axios from 'axios';
+
+async function getBase64(url) {
+  const response = await axios.get(url, {
+    responseType: 'arraybuffer',
+  });
+  return Buffer.from(response.data, 'binary').toString('base64');
+}
 
 import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
 import { FormatUtils } from '../../../utils/FormatUtils';
@@ -31,16 +38,7 @@ export class PdfGeneratorService {
   } = {};
 
   static async convertLogo(url: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      base64Img.requestBase64(url, (err, res, body) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(body);
-      });
-    });
+    return await getBase64(url);
   }
 
   public async getInvoice(payload: InvoicePayload): Promise<Readable> {
