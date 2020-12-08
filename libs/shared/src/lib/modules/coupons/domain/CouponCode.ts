@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'crypto';
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ValueObject } from '../../../core/domain/ValueObject';
 import { Result } from '../../../core/logic/Result';
@@ -20,18 +20,6 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
       .fill(0)
       .map((v, i) => i + CouponCode.MIN_COUPON_CODE_LENGTH)
       .reduce((acc, v) => acc * v, 1);
-  }
-
-  get value(): string {
-    return this.props.value;
-  }
-
-  toString(): string {
-    return this.props.value;
-  }
-
-  private constructor(props: CouponCodeProps) {
-    super(props);
   }
 
   public static create(value: string): Result<CouponCode> {
@@ -71,7 +59,7 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
     const hash = createHash('sha256');
 
     hash.update(salt);
-    hash.update(uuid());
+    hash.update(uuidv4());
 
     const rawCode = hash
       .digest('base64')
@@ -80,5 +68,17 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
       .replace('+', '')
       .slice(0, CouponCode.getRandomCouponCodeLength());
     return CouponCode.create(rawCode).getValue();
+  }
+
+  get value(): string {
+    return this.props.value;
+  }
+
+  toString(): string {
+    return this.props.value;
+  }
+
+  private constructor(props: CouponCodeProps) {
+    super(props);
   }
 }

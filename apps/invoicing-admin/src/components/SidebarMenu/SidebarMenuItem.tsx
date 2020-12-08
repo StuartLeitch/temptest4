@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 import { MenuContext } from './MenuContext';
 
@@ -77,7 +77,7 @@ export class SidebarMenuItem extends React.Component<SidebarMenuItemProps> {
   constructor(props: SidebarMenuItemProps) {
     super(props);
 
-    this.id = uuid();
+    this.id = uuidv4();
   }
 
   componentDidMount() {
