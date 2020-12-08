@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import MaskedInput from 'react-text-mask';
 import { useDebouncedCallback } from 'use-debounce';
 
 import {
@@ -22,6 +21,7 @@ const InvoicesLeftNav = (props) => {
   const journalId = props?.filters?.journalId || [];
   const referenceNumber = props?.filters?.referenceNumber || '';
   const customId = props?.filters?.customId || '';
+  const regexRef = new RegExp(/^[0-9/_-]*$/g)
 
   const onFilterHandler = useDebouncedCallback((eventTarget: any) => {
     const value =
@@ -30,6 +30,12 @@ const InvoicesLeftNav = (props) => {
         : eventTarget.value;
     props.setFilter(eventTarget.name, value);
   }, 300);
+
+  const referenceFilter = (eventTarget: any) => {
+    const value = eventTarget.value;
+    const validatedValue = regexRef.test(value) ? value : eventTarget.preventDefault()
+    props.setFilter(eventTarget.name, validatedValue)
+  };
 
   return (
     <React.Fragment>
@@ -143,30 +149,20 @@ const InvoicesLeftNav = (props) => {
         <NavItem className='d-flex p-0'>
           <InputGroup>
             <Input
-              mask={[
-                /[0-9]/,
-                /\d/,
-                /\d/,
-                /\d/,
-                /\d/,
-                '/',
-                /1|2/,
-                /0|9/,
-                /\d/,
-                /\d/,
-              ]}
               className='form-control'
-              placeholder='Enter a reference number'
+              placeholder='Enter reference number..'
+              maxLength={11}
+              onFocus={(e) => (e.target.placeholder = 'reference/year')}
+              onBlur={(e) => (e.target.placeholder = 'Enter reference number..')}
               name='referenceNumber'
-              type='input'
+              type='text'
               value={referenceNumber}
               onChange={(evt: any) =>
-                onFilterHandler.callback({
+                referenceFilter({
                   name: 'referenceNumber',
                   value: evt.target.value,
                 })
               }
-              tag={MaskedInput}
               id='referenceNumber'
             />
             <InputGroupAddon addonType='append'>

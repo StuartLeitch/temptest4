@@ -128,7 +128,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     if (!this.props.invoiceNumber || !this.props.dateAccepted) {
       return null;
     }
-    const paddedNumber = this.props.invoiceNumber.toString().padStart(5, '0');
+    const paddedNumber = this.props.invoiceNumber.toString().padStart(6, '0');
     let creationYear = this.props.dateAccepted.getFullYear();
     if (
       this.props.dateIssued &&
