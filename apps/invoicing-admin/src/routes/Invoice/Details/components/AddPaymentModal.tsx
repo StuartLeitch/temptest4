@@ -75,9 +75,12 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
 
   useEffect(() => {
     const { paymentAmount, paymentReference } = bankTransferPaymentData;
+    console.log({ paymentAmount });
     setFields({
       paymentAmount: {
-        isValid: !!paymentAmount && /^[0-9]+$/.test(paymentAmount.toString()),
+        isValid:
+          !!paymentAmount &&
+          /^[1-9]\d*(\.\d{1,2})?$/.test(paymentAmount.toString()),
       },
       paymentReference: {
         isValid: !!paymentReference.length,
