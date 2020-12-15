@@ -13,7 +13,7 @@ import {
 } from "rxjs/operators";
 import { modalActions } from "../../../providers/modal";
 
-import { invoice } from "./selectors";
+import { coupons, invoice } from "./selectors";
 import { queries, mutations } from "./graphql";
 import {
   getInvoice,
@@ -103,13 +103,19 @@ const applyCouponEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
         couponCode: action.payload.couponCode,
       });
     }),
-    withLatestFrom(state$.pipe(map(invoice))),
-    mergeMap(([r, invoice]) =>
-      from([
-        applyCouponAction.success(r.data.applyCoupon),
-        getInvoice.request(invoice.invoiceId),
-      ]),
-    ),
+    withLatestFrom(state$.pipe(map(invoice)), state$.pipe(map(coupons))),
+    mergeMap(([r, invoice, coupons]) => {
+      let returnPipe: any[] = [applyCouponAction.success(r.data.applyCoupon)];
+
+      let totalReduction: number =
+        coupons.reduce((acc, curr) => acc + curr.reduction, 0) +
+        r.data.applyCoupon.reduction;
+
+      if (totalReduction >= 100) {
+        returnPipe.push(getInvoice.request(invoice.invoiceId));
+      }
+      return from(returnPipe);
+    }),
     catchError((error) => of(applyCouponAction.failure(error.message))),
   );
 };

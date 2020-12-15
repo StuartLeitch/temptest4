@@ -21,6 +21,11 @@ export const invoice = createSelector(
   (invoiceSlice) => invoiceSlice.invoice,
 );
 
+export const coupons = createSelector(_getInvoice, (invoiceSlice) => {
+  let coupons = invoiceSlice.invoice?.invoiceItem?.coupons || [];
+  return [...coupons];
+});
+
 export const invoiceCharge = createSelector(_getInvoice, (invoiceSlice) => {
   const { price, vat } = invoiceSlice.invoice.invoiceItem;
   const amount = round(price * ((100 + vat) / 100), 2);
