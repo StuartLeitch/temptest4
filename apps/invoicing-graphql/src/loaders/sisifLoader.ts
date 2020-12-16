@@ -3,14 +3,12 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { LoggerContract, LoggerBuilder } from '@hindawi/shared';
+import { LoggerContract } from '@hindawi/shared';
 import { Job } from '@hindawi/sisif';
 
 import { SisifHandlers } from '../sisif';
 import { Context } from '../builders';
 import { env } from '../env';
-
-let sisifLogger: LoggerContract;
 
 function jobHandlerDispatcher(context: Context, loggerService: LoggerContract) {
   return (job: Job) => {
@@ -19,7 +17,7 @@ function jobHandlerDispatcher(context: Context, loggerService: LoggerContract) {
     try {
       SisifHandlers.get(type)(data, context, loggerService);
     } catch (e) {
-      sisifLogger.error(
+      loggerService.error(
         `
           Error while handling job of type {${type}}, with data ${data}.
           Got error ${e.message}
@@ -34,7 +32,6 @@ export const sisifLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
-    const loggerBuilder = context.loggerBuilder;
 
     const { sisifEnabled } = env.loaders;
     const {

@@ -26,8 +26,10 @@ export const schedulerLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
-    const logger = context.loggerBuilder.getLogger();
-    logger.setScope('SchedulingService');
+    const {
+      services: { logger: loggerService },
+    } = context;
+    loggerService.setScope('SchedulingService');
     const {
       failedErpCronRetryTimeMinutes,
       failedErpCronRetryDisabled,
@@ -61,13 +63,13 @@ export const schedulerLoader: MicroframeworkLoader = async (
 
       while (queue.length) {
         const head = queue[0];
-        logger.debug('startProcessing', { job: head.name });
+        loggerService.debug('startProcessing', { job: head.name });
         try {
           await head.schedule(context);
         } catch (err) {
-          logger.error('Job Error: ', err);
+          loggerService.error('Job Error: ', err);
         }
-        logger.debug('doneProcessing', { job: head.name });
+        loggerService.debug('doneProcessing', { job: head.name });
         queue = queue.slice(1);
       }
     }

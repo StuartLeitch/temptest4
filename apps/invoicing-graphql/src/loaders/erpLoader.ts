@@ -13,15 +13,14 @@ import { NetSuiteService } from '../services/erp/NetSuiteService';
 import { SageService } from '../services/erp';
 
 import { env } from '../env';
-// import { Context } from '../builders';
 
 export const erpLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
     const context = settings.getData('context');
-    const emptyErp = new EmptyErpService();
 
+    const emptyErp = new EmptyErpService();
     const loggerBuilder = context.loggerBuilder;
 
     const netSuiteService = NetSuiteService.create(
@@ -49,6 +48,5 @@ export const erpLoader: MicroframeworkLoader = async (
       sage: env.salesForce.sageEnabled ? sageService : emptyErp,
       netsuite: env.netSuite.netSuiteEnabled ? netSuiteService : emptyErp,
     };
-    // settings.onShutdown(() => erpConnection.destroy());
   }
 };
