@@ -1,22 +1,23 @@
 // import { env } from '../env';
 import { RetryPaymentsRegistrationToErpUsecase } from '@hindawi/shared';
 
-import { Logger } from '../lib/logger';
 import { Context } from '../builders';
-
-const logger = new Logger();
-logger.setScope('cron:registerCreditMemos');
 
 import { FeatureFlags } from '../lib/FeatureFlags';
 import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
 export class RegisterPaymentsCron {
   public static async schedule(context: Context): Promise<any> {
+    const {
+      services: { logger: loggerService },
+    } = context;
+    loggerService.setScope('cron:registerPayments');
+
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
     if (!FeatureFlags.isFeatureEnabled('erpRegisterPaymentsEnabled')) {
-      return logger.debug(
+      return loggerService.debug(
         'Skipping the CRON Job payments registration scheduling...'
       );
     }
@@ -35,7 +36,7 @@ export class RegisterPaymentsCron {
         paymentMethod,
         erpReference,
       },
-      services: { erp, logger: loggerService },
+      services: { erp },
     } = context;
 
     const retryPaymentsToNetsuiteErpUsecase = new RetryPaymentsRegistrationToErpUsecase(
@@ -56,7 +57,7 @@ export class RegisterPaymentsCron {
 
     const maybeResponse = await retryPaymentsToNetsuiteErpUsecase.execute();
     if (maybeResponse.isLeft()) {
-      logger.error(maybeResponse.value.errorValue().message);
+      loggerService.error(maybeResponse.value.errorValue().message);
       throw maybeResponse.value;
     }
   }

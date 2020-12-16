@@ -1,10 +1,6 @@
 import { RetryRevenueRecognitionNetsuiteErpInvoicesUsecase } from '@hindawi/shared';
 
-import { Logger } from '../lib/logger';
 import { Context } from '../builders';
-
-const logger = new Logger();
-logger.setScope('cron:registerRevenueRecognition');
 
 import { FeatureFlags } from '../lib/FeatureFlags';
 import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
@@ -14,10 +10,15 @@ export class RegisterRevenueRecognitionsCron {
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
+    const {
+      services: { logger: loggerService },
+    } = context;
+    loggerService.setScope('cron:registerRevenueRecognition');
+
     if (
       !FeatureFlags.isFeatureEnabled('erpRegisterRevenueRecognitionEnabled')
     ) {
-      return logger.debug(
+      return loggerService.debug(
         'Skipping the CRON Job revenue recognitions registration scheduling...'
       );
     }
@@ -35,7 +36,7 @@ export class RegisterRevenueRecognitionsCron {
         payer,
         erpReference,
       },
-      services: { erp, logger: loggerService },
+      services: { erp },
     } = context;
 
     const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
@@ -55,7 +56,7 @@ export class RegisterRevenueRecognitionsCron {
 
     const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
     if (maybeResponse.isLeft()) {
-      logger.error(maybeResponse.value.errorValue().message);
+      loggerService.error(maybeResponse.value.errorValue().message);
       throw maybeResponse.value;
     }
   }

@@ -1,28 +1,29 @@
 import { RetryCreditNotesUsecase } from '@hindawi/shared';
 
-import { Logger } from '../lib/logger';
 import { Context } from '../builders';
-
-const logger = new Logger();
-logger.setScope('cron:registerCreditMemos');
 
 import { FeatureFlags } from '../lib/FeatureFlags';
 import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
 export class RegisterCreditNotesCron {
   public static async schedule(context: Context): Promise<any> {
+    const {
+      services: { logger: loggerService },
+    } = context;
+    loggerService.setScope('cron:registerCreditMemos');
+
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
     if (!FeatureFlags.isFeatureEnabled('erpRegisterCreditNotesEnabled')) {
-      return logger.debug(
+      return loggerService.debug(
         'Skipping the CRON Job credit notes registration scheduling...'
       );
     }
 
     const {
       repos: { invoiceItem, invoice, coupon, waiver, erpReference },
-      services: { erp, logger: loggerService },
+      services: { erp },
     } = context;
 
     const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryCreditNotesUsecase(
@@ -37,7 +38,7 @@ export class RegisterCreditNotesCron {
 
     const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
     if (maybeResponse.isLeft()) {
-      logger.error(maybeResponse.value.errorValue().message);
+      loggerService.error(maybeResponse.value.errorValue().message);
       throw maybeResponse.value;
     }
   }

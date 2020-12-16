@@ -1,22 +1,23 @@
 // import { env } from '../env';
 import { RetryFailedSageErpInvoicesUsecase } from '@hindawi/shared';
 
-import { Logger } from '../lib/logger';
 import { Context } from '../builders';
-
-const logger = new Logger();
-logger.setScope('cron:registerInvoicesForSage');
 
 import { FeatureFlags } from '../lib/FeatureFlags';
 import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
 export class RegisterInvoicesForSageCron {
   public static async schedule(context: Context): Promise<any> {
+    const {
+      services: { logger: loggerService },
+    } = context;
+    loggerService.setScope('cron:registerInvoicesForSage');
+
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
     if (!FeatureFlags.isFeatureEnabled('erpRegisterInvoicesEnabled')) {
-      return logger.debug(
+      return loggerService.debug(
         'Skipping the CRON Job invoices registration for Sage scheduling...'
       );
     }
@@ -34,7 +35,7 @@ export class RegisterInvoicesForSageCron {
         payer,
         erpReference,
       },
-      services: { erp, logger: loggerService, vatService },
+      services: { erp, vatService },
     } = context;
 
     const retryFailedSageErpInvoicesUsecase = new RetryFailedSageErpInvoicesUsecase(
@@ -55,7 +56,7 @@ export class RegisterInvoicesForSageCron {
 
     const maybeResponse = await retryFailedSageErpInvoicesUsecase.execute();
     if (maybeResponse.isLeft()) {
-      logger.error(maybeResponse.value.errorValue().message);
+      loggerService.error(maybeResponse.value.errorValue().message);
       throw maybeResponse.value;
     }
   }
