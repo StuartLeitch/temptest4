@@ -247,19 +247,13 @@ export class NetSuiteService implements ErpServiceContract {
         manuscript,
         customer: customerAlreadyExists,
       });
-
-      if (
-        (customerAlreadyExists.isperson === 'T' &&
-          payer.type === PayerType.INSTITUTION) ||
-        (customerAlreadyExists.isperson === 'F' &&
-          payer.type !== PayerType.INSTITUTION)
-      ) {
-        customerId = await this.createCustomer(data);
-      } else {
-        customerId = customerAlreadyExists.id;
-      }
+      customerId = customerAlreadyExists.id;
     } else {
       customerId = await this.createCustomer(data);
+      this.logger.info({
+        message: 'Newly created customer',
+        customerId,
+      });
     }
 
     return customerId;
@@ -281,11 +275,6 @@ export class NetSuiteService implements ErpServiceContract {
       'select id, companyName, email, isPerson, dateCreated from customer where email = ?',
       [customer.email]
     );
-    if (customer.lastName) {
-      query = queryBuilder.raw(`${query.toQuery()} and lastName = ?`, [
-        customer.lastName,
-      ]);
-    }
     if (customer.companyName) {
       query = queryBuilder.raw(`${query.toQuery()} and companyName = ?`, [
         customer.companyName,
