@@ -39,10 +39,10 @@ Install Dependencies:
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
     - apk add 'py3-botocore<1.18.0'
   services:
-    - name: docker:dind
+    - name: docker:19.03.12-dind
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
-  image: docker
+  image: docker:19.03.12
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - ./tools/scripts/dockerize-builder.sh
@@ -102,7 +102,7 @@ Build:
 Package Images:dev:
   interruptible: true
   stage: package
-  image: docker
+  image: docker:19.03.12
   variables:
     AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
     AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
@@ -111,7 +111,7 @@ Package Images:dev:
     - apk add --no-cache aws-cli
     - apk add 'py3-botocore<1.18.0'
   services:
-    - name: docker:dind
+    - name: docker:19.03.12-dind
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
   script:
