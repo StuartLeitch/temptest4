@@ -91,7 +91,7 @@ export class RetryCreditNotesUsecase
           }
         );
         if (publishedCreditNoteResponse.isLeft()) {
-          errs.push(publishedCreditNoteResponse.value.error);
+          errs.push(publishedCreditNoteResponse.value);
         } else {
           const assignedErpReference = publishedCreditNoteResponse.value;
 
@@ -107,7 +107,37 @@ export class RetryCreditNotesUsecase
       }
 
       if (errs.length > 0) {
-        errs.forEach(this.loggerService.error);
+        errs.forEach((err) => {
+          if (typeof err === 'object' && err?.isAxiosError) {
+            const errOut = {
+              message: '',
+              name: '',
+              stack: '',
+              config: '',
+              details: '',
+            };
+            const errJSON = err.toJSON();
+            if ('message' in errJSON) {
+              errOut.message = errJSON.message;
+            }
+            if ('name' in errJSON) {
+              errOut.name = errJSON.name;
+            }
+            if ('stack' in errJSON) {
+              errOut.stack = errJSON.stack;
+            }
+            if ('config' in errJSON) {
+              errOut.config = errJSON.config;
+            }
+            const details = err.response.data['o:errorDetails'];
+            errOut.details = details;
+
+            this.loggerService.error(errOut.message, errOut);
+          } else {
+            this.loggerService.error(err.error, err);
+          }
+        });
+
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
