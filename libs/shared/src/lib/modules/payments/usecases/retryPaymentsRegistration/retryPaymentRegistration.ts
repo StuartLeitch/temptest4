@@ -11,6 +11,7 @@ import { ErpInvoiceResponse } from '../../../../domain/services/ErpService';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { ErrorUtils } from '../../../../utils/ErrorUtils';
 
 import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PaymentRepoContract } from './../../repos/paymentRepo';
@@ -110,7 +111,7 @@ export class RetryPaymentsRegistrationToErpUsecase
           }
         );
         if (publishedPaymentResponse.isLeft()) {
-          errs.push(publishedPaymentResponse.value.error);
+          errs.push(publishedPaymentResponse.value);
         } else {
           const assignedErpReference = publishedPaymentResponse.value;
 
@@ -126,7 +127,7 @@ export class RetryPaymentsRegistrationToErpUsecase
       }
 
       if (errs.length > 0) {
-        errs.forEach(this.loggerService.error);
+        ErrorUtils.handleErpErrors(errs, this.loggerService);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 

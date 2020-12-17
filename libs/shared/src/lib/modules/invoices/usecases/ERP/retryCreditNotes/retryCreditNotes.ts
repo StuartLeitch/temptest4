@@ -11,6 +11,7 @@ import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
@@ -107,37 +108,7 @@ export class RetryCreditNotesUsecase
       }
 
       if (errs.length > 0) {
-        errs.forEach((err) => {
-          if (typeof err === 'object' && err?.isAxiosError) {
-            const errOut = {
-              message: '',
-              name: '',
-              stack: '',
-              config: '',
-              details: '',
-            };
-            const errJSON = err.toJSON();
-            if ('message' in errJSON) {
-              errOut.message = errJSON.message;
-            }
-            if ('name' in errJSON) {
-              errOut.name = errJSON.name;
-            }
-            if ('stack' in errJSON) {
-              errOut.stack = errJSON.stack;
-            }
-            if ('config' in errJSON) {
-              errOut.config = errJSON.config;
-            }
-            const details = err.response.data['o:errorDetails'];
-            errOut.details = details;
-
-            this.loggerService.error(errOut.message, errOut);
-          } else {
-            this.loggerService.error(err.error, err);
-          }
-        });
-
+        ErrorUtils.handleErpErrors(errs, this.loggerService);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 

@@ -4,6 +4,7 @@
 import { Either, right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
+import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
 // * Authorization Logic
 import {
@@ -121,6 +122,7 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
           typeof maybeUpdatedInvoiceResponse.isLeft === 'function' &&
           maybeUpdatedInvoiceResponse.isLeft()
         ) {
+          errs.push(updatedInvoiceResponse);
           return left(updatedInvoiceResponse);
         }
         const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
@@ -136,8 +138,8 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        errs.forEach(this.loggerService.error);
-        return left(new UnexpectedError(errs, JSON.stringify(errs)));
+        ErrorUtils.handleErpErrors(errs, this.loggerService);
+        return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
       return right(updatedInvoices);

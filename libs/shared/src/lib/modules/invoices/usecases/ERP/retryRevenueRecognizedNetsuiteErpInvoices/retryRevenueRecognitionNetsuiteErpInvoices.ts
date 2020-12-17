@@ -11,6 +11,7 @@ import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
@@ -107,7 +108,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
           }
         );
         if (updatedInvoiceResponse.isLeft()) {
-          errs.push(updatedInvoiceResponse.value.error);
+          errs.push(updatedInvoiceResponse.value);
         } else {
           const assignedErpReference = updatedInvoiceResponse.value.getValue();
 
@@ -125,7 +126,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
       }
 
       if (errs.length > 0) {
-        errs.forEach(this.loggerService.error);
+        ErrorUtils.handleErpErrors(errs, this.loggerService);
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
