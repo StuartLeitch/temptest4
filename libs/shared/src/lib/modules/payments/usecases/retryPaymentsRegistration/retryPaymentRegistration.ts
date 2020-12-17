@@ -115,13 +115,13 @@ export class RetryPaymentsRegistrationToErpUsecase
         } else {
           const assignedErpReference = publishedPaymentResponse.value;
 
-          if (assignedErpReference === null) {
-            // simply do nothing yet
-          } else {
+          if (assignedErpReference) {
             this.loggerService.info(
               `Payment ${unregisteredPayment.id.toString()} successfully registered ${assignedErpReference}`
             );
             registeredPayments.push(assignedErpReference);
+          } else {
+            // simply do nothing yet
           }
         }
       }

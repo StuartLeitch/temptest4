@@ -231,7 +231,6 @@ export class PublishPaymentToErpUsecase
           });
           await this.erpReferenceRepo.save(erpReference);
         }
-
         return right(erpResponse);
       } catch (err) {
         return left(err);
