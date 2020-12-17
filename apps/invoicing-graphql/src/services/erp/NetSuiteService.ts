@@ -272,11 +272,10 @@ export class NetSuiteService implements ErpServiceContract {
 
     const queryBuilder = knex({ client: 'pg' });
     let query = queryBuilder.raw(
-      'select id, companyName, email, isPerson, dateCreated from customer where email = ?',
-      [customer.email]
+      'select id, companyName, email, isPerson, dateCreated from customer'
     );
     if (customer.companyName) {
-      query = queryBuilder.raw(`${query.toQuery()} and companyName = ?`, [
+      query = queryBuilder.raw(`${query.toQuery()} where companyName = ?`, [
         customer.companyName,
       ]);
     }
@@ -523,39 +522,6 @@ export class NetSuiteService implements ErpServiceContract {
         message: 'Failed to create payment',
         response: err?.response?.data,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
-      throw err;
-    }
-  }
-
-  private async queryAccount(data: { payer: Payer }) {
-    const {
-      connection: { config, oauth, token },
-    } = this;
-    const { payer } = data;
-
-    // * Query customers
-    const queryAccountRequestOpts = {
-      url: `${config.endpoint}query/v1/suiteql`,
-      method: 'POST',
-    };
-
-    const queryAccountRequest = {
-      q: `SELECT id, companyName, email, dateCreated FROM account WHERE email = '${payer?.email?.toString()}'`,
-    };
-
-    try {
-      const res = await axios({
-        ...queryAccountRequestOpts,
-        headers: oauth.toHeader(
-          oauth.authorize(queryAccountRequestOpts, token)
-        ),
-        data: queryAccountRequest,
-      } as AxiosRequestConfig);
-
-      return res?.data?.items?.pop();
-    } catch (err) {
-      this.logger.error(err);
       // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }

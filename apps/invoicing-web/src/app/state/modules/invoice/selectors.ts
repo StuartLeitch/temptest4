@@ -21,6 +21,31 @@ export const invoice = createSelector(
   (invoiceSlice) => invoiceSlice.invoice,
 );
 
+export const coupons = createSelector(_getInvoice, (invoiceSlice) => {
+  let coupons = invoiceSlice.invoice?.invoiceItem?.coupons || [];
+  return [...coupons];
+});
+
+export const waivers = createSelector(_getInvoice, (invoiceSlice) => {
+  let waivers = invoiceSlice.invoice?.invoiceItem?.waivers || [];
+  return [...waivers];
+});
+
+export const reductions = createSelector(
+  coupons,
+  waivers,
+  (coupons, waivers) => {
+    let reductions: { reduction: number }[] = [];
+    for (const coupon of coupons) {
+      reductions.push({ reduction: coupon.reduction });
+    }
+    for (const waiver of waivers) {
+      reductions.push({ reduction: waiver.reduction });
+    }
+    return reductions;
+  },
+);
+
 export const invoiceCharge = createSelector(_getInvoice, (invoiceSlice) => {
   const { price, vat } = invoiceSlice.invoice.invoiceItem;
   const amount = round(price * ((100 + vat) / 100), 2);
