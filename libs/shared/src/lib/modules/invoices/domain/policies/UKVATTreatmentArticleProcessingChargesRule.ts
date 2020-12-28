@@ -1,6 +1,20 @@
 import { TaxRuleContract } from '../contracts/TaxRuleContract';
 import { Address } from './Address';
 
+export interface VATNote {
+  template: string;
+  tax: {
+    treatment: {
+      value: string;
+      text: string;
+    };
+    type: {
+      value: string;
+      text: string;
+    };
+  };
+}
+
 /**
  * * Customer Categories:
  * * - Private individual (not VAT registered)
@@ -126,6 +140,62 @@ export class UKVATTreatmentArticleProcessingChargesRule
   }
 
   public getVAT(): number {
+    // Remove on January 1st
+    if (!this.isBrexit()) {
+      return this.getLegacyVat();
+    }
+
+    // Inside UK
+    if (this.isUk(this.CountryCode)) {
+      return 20;
+    }
+
+    // Outside UK
+    return 0;
+  }
+
+  public getVATNote(): VATNote {
+    if (!this.isBrexit()) {
+      return this.getLegacyVATNote();
+    }
+
+    const VATNote: VATNote = {
+      template: '',
+      tax: null,
+    };
+
+    const isInUk = this.isUk(this.CountryCode);
+
+    if (this.AsBusiness) {
+      if (isInUk) {
+        VATNote.template = `UK VAT applies to this invoice as per Article 44 of 2006/112/EC. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)`;
+      } else {
+        VATNote.template = `Outside the scope of UK VAT as per Article 44 of 2006/112/EC`;
+      }
+    } else {
+      if (isInUk) {
+        VATNote.template = `UK VAT applies to this invoice as per Article 45 of 2006/112/EC. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)`;
+      } else {
+        VATNote.template = `Outside the scope of UK VAT as per Article 59 of 2006/112/EC`;
+      }
+    }
+
+    return VATNote;
+  }
+
+  // Remove on January 1st
+  private isBrexit(): boolean {
+    const brexitDate = new Date('2021-01-01 00:00:00');
+    const now = new Date();
+
+    if (process.env.FORCE_BREXIT === 'true' || brexitDate <= now) {
+      return true;
+    }
+    return false;
+  }
+
+  // Remove on January 1st
+  private getLegacyVat(): number {
     const europeanCountriesCodes = Object.keys(this.VATRules);
     let VATRate = 0;
 
@@ -143,9 +213,9 @@ export class UKVATTreatmentArticleProcessingChargesRule
     return VATRate;
   }
 
-  public getVATNote(): any {
+  private getLegacyVATNote(): VATNote {
     const europeanCountriesCodes = Object.keys(this.VATRules);
-    const VATNote = {
+    const VATNote: VATNote = {
       template: '',
       tax: {
         treatment: {
@@ -185,5 +255,9 @@ export class UKVATTreatmentArticleProcessingChargesRule
     }
 
     return VATNote;
+  }
+
+  private isUk(countryCode: string): boolean {
+    return countryCode === 'GB' || countryCode === 'UK';
   }
 }
