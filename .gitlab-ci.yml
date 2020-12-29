@@ -28,7 +28,7 @@ variables:
   VAT_VALIDATION_SERVICE_ENDPOINT: "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl"
   # AFFECTED_APPS: 'invoicing-graphql'
   AFFECTED_COMMAND: ""
-  AFFECTED_ARGS: "--base=origin/develop"
+  AFFECTED_ARGS: "--base=remotes/origin/develop"
   AFFECTED_APPS: "shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend"
 
 Install Dependencies:
