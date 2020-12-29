@@ -143,7 +143,8 @@ export class GetInvoicePdfUsecase
               countryCode: payload.address.country,
               stateCode: payload.address.state,
             },
-            payload.payer.type !== PayerType.INSTITUTION
+            payload.payer.type !== PayerType.INSTITUTION,
+            new Date(payload.invoice.dateIssued)
           );
 
           if (payload && payload.invoice && payload.invoice.dateIssued) {

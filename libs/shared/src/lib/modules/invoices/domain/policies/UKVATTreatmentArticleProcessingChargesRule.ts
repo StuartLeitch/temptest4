@@ -41,9 +41,10 @@ export interface VATNote {
  */
 export class UKVATTreatmentArticleProcessingChargesRule
   implements TaxRuleContract {
-  public AsBusiness: boolean;
-  public VATRegistered: boolean;
-  public CountryCode: string;
+  public asBusiness: boolean;
+  public vatRegistered: boolean;
+  public countryCode: string;
+  public issueDate: Date;
 
   /**
    * * All available tax rules and their exceptions.
@@ -132,11 +133,13 @@ export class UKVATTreatmentArticleProcessingChargesRule
   public constructor(
     address: Address,
     asBusiness = false,
-    VATRegistered = true
+    VATRegistered = true,
+    issueDate: Date
   ) {
-    this.CountryCode = address.countryCode;
-    this.AsBusiness = asBusiness;
-    this.VATRegistered = VATRegistered;
+    this.countryCode = address.countryCode;
+    this.asBusiness = asBusiness;
+    this.vatRegistered = VATRegistered;
+    this.issueDate = issueDate;
   }
 
   public getVAT(): number {
@@ -146,7 +149,7 @@ export class UKVATTreatmentArticleProcessingChargesRule
     }
 
     // Inside UK
-    if (this.isUk(this.CountryCode)) {
+    if (this.isUk(this.countryCode)) {
       return 20;
     }
 
@@ -164,9 +167,9 @@ export class UKVATTreatmentArticleProcessingChargesRule
       tax: null,
     };
 
-    const isInUk = this.isUk(this.CountryCode);
+    const isInUk = this.isUk(this.countryCode);
 
-    if (this.AsBusiness) {
+    if (this.asBusiness) {
       if (isInUk) {
         VATNote.template = `UK VAT applies to this invoice as per Article 44 of 2006/112/EC. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)`;
       } else {
@@ -185,10 +188,10 @@ export class UKVATTreatmentArticleProcessingChargesRule
 
   // Remove on January 1st
   private isBrexit(): boolean {
-    const brexitDate = new Date('2021-01-01 00:00:00');
-    const now = new Date();
+    const brexitDate = new Date('2021-01-01T00:00:00.000Z');
+    const issueDate = this.issueDate || new Date();
 
-    if (process.env.FORCE_BREXIT === 'true' || brexitDate <= now) {
+    if (brexitDate <= issueDate) {
       return true;
     }
     return false;
@@ -199,12 +202,12 @@ export class UKVATTreatmentArticleProcessingChargesRule
     const europeanCountriesCodes = Object.keys(this.VATRules);
     let VATRate = 0;
 
-    if (europeanCountriesCodes.includes(this.CountryCode)) {
+    if (europeanCountriesCodes.includes(this.countryCode)) {
       //  VATRate = this.VATRules[this.CountryCode].rate;
       if (
-        (!this.AsBusiness && !this.VATRegistered) ||
-        this.CountryCode === 'UK' ||
-        this.CountryCode === 'GB'
+        (!this.asBusiness && !this.vatRegistered) ||
+        this.countryCode === 'UK' ||
+        this.countryCode === 'GB'
       ) {
         VATRate = this.VATRules.UK.rate;
       }
@@ -229,17 +232,17 @@ export class UKVATTreatmentArticleProcessingChargesRule
       },
     };
 
-    if (!europeanCountriesCodes.includes(this.CountryCode)) {
+    if (!europeanCountriesCodes.includes(this.countryCode)) {
       VATNote.template = this.VATNote.TAX_TREATMENT_REST_OF_THE_WORLD_TEMPLATE;
       VATNote.tax.treatment.value = this.VATNote.TAX_REST_OF_THE_WORLD_TREATMENT_VALUE;
       VATNote.tax.treatment.text = this.VATNote.TAX_REST_OF_THE_WORLD_TREATMENT_TEXT;
       VATNote.tax.type.value = this.VATNote.TAX_REST_OF_THE_WORLD_TYPE_VALUE;
       VATNote.tax.type.text = this.VATNote.TAX_TYPE_EXEMPT_UK_TEXT;
     } else if (
-      europeanCountriesCodes.includes(this.CountryCode) &&
-      this.CountryCode !== 'UK' &&
-      this.CountryCode !== 'GB' &&
-      this.VATRegistered
+      europeanCountriesCodes.includes(this.countryCode) &&
+      this.countryCode !== 'UK' &&
+      this.countryCode !== 'GB' &&
+      this.vatRegistered
     ) {
       VATNote.template = this.VATNote.TAX_TREATMENT_REST_OF_THE_WORLD_TEMPLATE;
       VATNote.tax.treatment.value = this.VATNote.TAX_EU_ONLY_TREATMENT_VALUE;

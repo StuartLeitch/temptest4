@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 // import { ValidateVATErrors } from './../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
@@ -74,6 +74,46 @@ function formatPropertiesArrayTable(propArray: any) {
   }
   return result;
 }
+
+let oldDate = Date;
+
+Before({ tags: '@LegacyValidateVAT' }, () => {
+  const beforeBrexit = '2020-01-01T00:00:00.000Z';
+  class NewDate extends Date {
+    constructor(...options: any) {
+      if (options.length) {
+        // @ts-ignore
+        super(...options);
+      } else {
+        super(beforeBrexit);
+      }
+    }
+  }
+
+  // @ts-ignore
+  Date = NewDate;
+});
+
+Before({ tags: '@ValidateVAT' }, () => {
+  const afterBrexit = '2021-01-01T00:00:00.000Z';
+  class NewDate extends Date {
+    constructor(...options: any) {
+      if (options.length) {
+        // @ts-ignore
+        super(...options);
+      } else {
+        super(afterBrexit);
+      }
+    }
+  }
+
+  // @ts-ignore
+  Date = NewDate;
+});
+
+After({ tags: '@LegacyValidateVAT and @ValidateVAT' }, () => {
+  Date = oldDate;
+});
 
 Before(() => {
   payerId = 'test-payer';

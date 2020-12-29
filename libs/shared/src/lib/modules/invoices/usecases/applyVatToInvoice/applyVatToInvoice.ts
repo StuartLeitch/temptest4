@@ -57,7 +57,8 @@ export class ApplyVatToInvoiceUsecase
         stateCode: state,
         postalCode,
       },
-      payerType !== PayerType.INSTITUTION
+      payerType !== PayerType.INSTITUTION,
+      new Date()
     );
 
     const maybeApcItemsWithVat = (await this.getInvoiceItems(invoiceId)).map(

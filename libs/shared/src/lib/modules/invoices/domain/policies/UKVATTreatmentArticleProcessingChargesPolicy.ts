@@ -17,12 +17,14 @@ export class UKVATTreatmentArticleProcessingChargesPolicy
   public getVAT(
     address: Address,
     asBusiness = false,
-    VATRegistered = true
+    VATRegistered = true,
+    issueDate: Date
   ): UKVATTreatmentArticleProcessingChargesRule {
     return new UKVATTreatmentArticleProcessingChargesRule(
       address,
       asBusiness,
-      VATRegistered
+      VATRegistered,
+      issueDate
     );
   }
 

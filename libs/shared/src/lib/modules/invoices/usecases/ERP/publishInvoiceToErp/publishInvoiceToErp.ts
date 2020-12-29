@@ -200,7 +200,8 @@ export class PublishInvoiceToErpUsecase
           countryCode: address.country,
           stateCode: address.state,
         },
-        payer.type !== PayerType.INSTITUTION
+        payer.type !== PayerType.INSTITUTION,
+        invoice.dateIssued
       );
       this.loggerService.info('PublishInvoiceToERP vatNote', vatNote);
       const exchangeRateService = new ExchangeRateService();

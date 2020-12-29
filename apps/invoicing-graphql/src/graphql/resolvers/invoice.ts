@@ -187,7 +187,8 @@ export const invoice: Resolvers<Context> = {
           countryCode: args.country,
           stateCode: args.state,
         },
-        args.payerType !== PayerType.INSTITUTION
+        args.payerType !== PayerType.INSTITUTION,
+        invoiceDetails.dateIssued
       );
       const vatPercentage = vatService.calculateVAT(
         {
@@ -195,7 +196,8 @@ export const invoice: Resolvers<Context> = {
           countryCode: args.country,
           stateCode: args.state,
         },
-        args.payerType !== PayerType.INSTITUTION
+        args.payerType !== PayerType.INSTITUTION,
+        invoiceDetails.dateIssued
       );
       return {
         rate,
@@ -292,7 +294,8 @@ export const invoice: Resolvers<Context> = {
             countryCode: address.country,
             stateCode: address.state,
           },
-          payer.type !== PayerType.INSTITUTION
+          payer.type !== PayerType.INSTITUTION,
+          new Date(parent.dateIssued)
         );
         vatnote = template;
       }

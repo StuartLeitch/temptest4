@@ -92,22 +92,32 @@ export class VATService {
     return rates;
   }
 
-  public calculateVAT(address?: VATAddress, individualConfirmed?: boolean) {
+  public calculateVAT(
+    address: VATAddress,
+    individualConfirmed: boolean,
+    issueDate: Date
+  ) {
     const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
       address,
       !individualConfirmed,
       individualConfirmed ? false : true,
+      issueDate,
     ]);
 
     const VAT = calculateVAT.getVAT();
     return VAT;
   }
 
-  public getVATNote(address?: VATAddress, individualConfirmed?: boolean) {
+  public getVATNote(
+    address: VATAddress,
+    individualConfirmed: boolean,
+    issueDate: Date
+  ) {
     const calculateVAT = policiesRegister.applyPolicy(VATPolicy.getType(), [
       address,
       !individualConfirmed,
       individualConfirmed ? false : true,
+      issueDate,
     ]);
 
     const VATNote = calculateVAT.getVATNote();
