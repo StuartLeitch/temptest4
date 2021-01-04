@@ -34,16 +34,14 @@ export class InvoiceCanBeConfirmedNotificationTemplate {
     }, has been accepted for publication in the journal, ${
       catalogItem.journalTitle
     }. We will be in touch shortly to request electronic files for your manuscript.
-    <br/>
+    <br/> <br/>
     The publication process will begin upon the receipt of these files.
     <br/> <br/>
     As an open access journal, ${
       catalogItem.journalTitle
-    } has an associated Article Processing Charge of ${catalogItem.currency} ${
-      catalogItem.amount
-    }. The total charges for your manuscript ${
+    } has an associated Article Processing Charge. The total charges for your manuscript ${
       manuscript.customId
-    }, before any taxes, is ${catalogItem.currency} ${invoiceItem.price}.
+    }, before any taxes, are ${catalogItem.currency} ${invoiceItem.price}.
     <br/> <br/>
     VAT charges may apply depending on the country of the individual or institution being billed. Individuals resident in the UK or an EU Member state will be charged VAT. Institutions registered in the UK or an EU Member state should also provide their VAT number when completing the payer information. VAT is calculated at the applicable rate, currently 20%, on the net ${
       catalogItem.currency
