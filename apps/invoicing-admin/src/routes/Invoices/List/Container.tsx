@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import _ from 'lodash';
+
+import React from 'react';
 import { useQueryState } from 'react-router-use-location-state';
 import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
 import { toast } from 'react-toastify';
@@ -75,21 +75,12 @@ const InvoicesContainer: React.FC = () => {
     (defaultPagination as any).page
   );
 
-  // let cucu = useLocalStorage(
-  //   'invoicesList',
-  //   { pagination: defaultPagination}
-  // );
-
   if (!_.isEqual(defaultPagination, { page, offset: 0, limit: 10 })) {
     pagination = Object.assign({}, defaultPagination, {
       page,
       offset: page > 0 ? page - 1 : 0,
     });
   }
-
-  // useEffect(() => {
-  //   writeStorage('invoicesList', { filters, pagination });
-  // }, []);
 
   const copyToClipboard = (str) => {
     const el = document.createElement('textarea');
@@ -294,9 +285,5 @@ const InvoicesContainer: React.FC = () => {
     }
   }
 };
-
-// InvoicesContainer.propTypes = {
-//   match: PropTypes.object.isRequired,
-// };
 
 export default InvoicesContainer;
