@@ -9,14 +9,14 @@ module.exports = (nxConfig, context) => {
       global: true,
     },
   };
-  webpackConfig.module.rules[0].options.babelrcRoots = ["*"];
-  webpackConfig.module.rules[0].options.presets = ["@nrwl/web/babel"];
+  webpackConfig.module.rules[0].options.babelrcRoots = ['*'];
+  webpackConfig.module.rules[0].options.presets = ['@nrwl/web/babel'];
   webpackConfig.module.rules[0].options.plugins = [
-    ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["@babel/plugin-proposal-class-properties", { "loose": true }],
-    "@babel/plugin-syntax-dynamic-import",
-    "@babel/plugin-transform-runtime",
-    "universal-import"
+    ['@babel/plugin-proposal-decorators', { legacy: true }],
+    ['@babel/plugin-proposal-class-properties', { loose: true }],
+    '@babel/plugin-syntax-dynamic-import',
+    '@babel/plugin-transform-runtime',
+    'universal-import',
   ];
 
   getRollupBabelOptions(webpackConfig.module.rules[0].options);
@@ -43,29 +43,29 @@ module.exports = (nxConfig, context) => {
     }
   );
 
-  // Adjusting sass-loader options inherited from base webpack.config
-  // reason: beginning from sass-loader version 8.x.x options like includePaths, precision and fiber should stay inside sassOptions option
-  // debugging: you may use console.log for inspecting below rules in case of future compiling issues
-  delete webpackConfig.module.rules[3].oneOf[3].use[2].options.includePaths;
-  delete webpackConfig.module.rules[3].oneOf[3].use[2].options.precision;
-  delete webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber;
-  webpackConfig.module.rules[3].oneOf[3].use[2].options.sassOptions = {
-    includePaths:
-      webpackConfig.module.rules[3].oneOf[3].use[2].options.includePaths,
-    precision: webpackConfig.module.rules[3].oneOf[3].use[2].options.precision,
-    fiber: webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber,
-  };
+  // // Adjusting sass-loader options inherited from base webpack.config
+  // // reason: beginning from sass-loader version 8.x.x options like includePaths, precision and fiber should stay inside sassOptions option
+  // // debugging: you may use console.log for inspecting below rules in case of future compiling issues
+  // delete webpackConfig.module.rules[3].oneOf[3].use[2].options.includePaths;
+  // delete webpackConfig.module.rules[3].oneOf[3].use[2].options.precision;
+  // delete webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber;
+  // webpackConfig.module.rules[3].oneOf[3].use[2].options.sassOptions = {
+  //   includePaths:
+  //     webpackConfig.module.rules[3].oneOf[3].use[2].options.includePaths,
+  //   precision: webpackConfig.module.rules[3].oneOf[3].use[2].options.precision,
+  //   fiber: webpackConfig.module.rules[3].oneOf[3].use[2].options.fiber,
+  // };
 
-  // both sets are for sass-loader
-  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.includePaths;
-  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.precision;
-  delete webpackConfig.module.rules[3].oneOf[7].use[3].options.fiber;
-  webpackConfig.module.rules[3].oneOf[7].use[3].options.sassOptions = {
-    includePaths:
-      webpackConfig.module.rules[3].oneOf[7].use[3].options.includePaths,
-    precision: webpackConfig.module.rules[3].oneOf[7].use[3].options.precision,
-    fiber: webpackConfig.module.rules[3].oneOf[7].use[3].options.fiber,
-  };
+  // // both sets are for sass-loader
+  // delete webpackConfig.module.rules[3].oneOf[7].use[3].options.includePaths;
+  // delete webpackConfig.module.rules[3].oneOf[7].use[3].options.precision;
+  // delete webpackConfig.module.rules[3].oneOf[7].use[3].options.fiber;
+  // webpackConfig.module.rules[3].oneOf[7].use[3].options.sassOptions = {
+  //   includePaths:
+  //     webpackConfig.module.rules[3].oneOf[7].use[3].options.includePaths,
+  //   precision: webpackConfig.module.rules[3].oneOf[7].use[3].options.precision,
+  //   fiber: webpackConfig.module.rules[3].oneOf[7].use[3].options.fiber,
+  // };
 
   return webpackConfig;
 };
