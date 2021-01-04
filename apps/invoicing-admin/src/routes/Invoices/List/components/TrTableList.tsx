@@ -81,7 +81,7 @@ const TrTableInvoicesList = ({ invoices }) => (
             </Link>
           </td>
           <td className='align-middle text-nowrap'>
-            {dateIssued && format(new Date(dateIssued), 'dd MMMM yyyy')}
+            {dateIssued && format(new Date(dateIssued), 'dd MMM yyyy')}
           </td>
           <td className='align-middle'>
             <strong
@@ -92,12 +92,12 @@ const TrTableInvoicesList = ({ invoices }) => (
               {numeral(invoiceItem && invoiceItem.price).format('$0.00')}
             </strong>
           </td>
-          <td className='align-middle text-nowrap'>
+          <td className='align-left text-truncate' style={{maxWidth: 200}}>
             {invoiceItem?.article?.journalTitle}
           </td>
-          <td className='align-middle'>{invoiceItem?.article?.title}</td>
+          <td className='align-left text-truncate' style={{maxWidth: 200}}>{invoiceItem?.article?.title}</td>
           <td className='align-middle text-nowrap'>
-            {dateAccepted && format(new Date(dateAccepted), 'dd MMMM yyyy')}
+            {dateAccepted && format(new Date(dateAccepted), 'dd MMM yyyy')}
           </td>
         </tr>
       )

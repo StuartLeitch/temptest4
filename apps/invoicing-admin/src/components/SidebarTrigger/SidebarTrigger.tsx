@@ -3,7 +3,7 @@ import { NavLink } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { withPageConfig } from '../Layout';
 
-import { UncontrolledTooltip } from '..';
+import { UncontrolledTooltip } from 'reactstrap';
 
 const SidebarTrigger = props => {
   const { tag: Tag, pageConfig, ...otherProps } = props;

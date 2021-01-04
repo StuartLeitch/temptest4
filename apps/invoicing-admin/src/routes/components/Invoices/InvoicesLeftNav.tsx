@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import { useDebouncedCallback } from 'use-debounce';
+import useDebouncedCallback from "use-debounce/lib/useDebouncedCallback";
+
 
 import {
   Button,
@@ -28,7 +29,7 @@ const InvoicesLeftNav = (props) => {
       eventTarget?.type === 'checkbox'
         ? eventTarget.checked
         : eventTarget.value;
-    props.setFilter(eventTarget.name, value);
+      props.setFilter(eventTarget.name, value);
   }, 300);
 
   const referenceFilter = (eventTarget: any) => {

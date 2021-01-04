@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
-
 import {
   Button,
+  ButtonGroup,
   ButtonToolbar,
   DropdownMenu,
   DropdownItem,
@@ -12,10 +11,9 @@ import {
   Modal,
   ModalHeader,
   ModalFooter,
+  Spinner,
   UncontrolledButtonDropdown,
 } from 'reactstrap';
-import { Loading } from '../../routes/components';
-import { ButtonGroup, Spinner } from '..';
 
 export const ModalDropdown: React.FC<ModalDropdownProps> = ({
   className,
@@ -34,7 +32,7 @@ export const ModalDropdown: React.FC<ModalDropdownProps> = ({
       { text: 'openModal', value: 'openModal' },
     ],
   });
-  const classes = classNames(className, 'extended-dropdown');
+
   const onClose = () => setModalState({ ...modalState, open: false });
   const onChange = (event) => {
     const role = event.target.getAttribute('role');
