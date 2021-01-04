@@ -13,7 +13,11 @@ import {
 } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import {
+  ErpServiceContract,
+  RegisterPaymentRequest,
+  RegisterPaymentResponse,
+} from '../../../../domain/services/ErpService';
 import { PublishPaymentToErpResponse } from './publishPaymentToErpResponse';
 import { ErpReferenceRepoContract } from '../../../vendors/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -32,6 +36,8 @@ import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { CatalogItem } from '../../../journals/domain/CatalogItem';
 
 export interface PublishPaymentToErpRequestDTO {
   invoiceId?: string;
@@ -147,15 +153,25 @@ export class PublishPaymentToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no payers.`);
       }
 
-      const manuscript = await this.manuscriptRepo.findById(
-        invoiceItems[0].manuscriptId
+      let getManuscriptUsecase = new GetManuscriptByInvoiceIdUsecase(
+        this.manuscriptRepo,
+        this.invoiceItemRepo
       );
+      const maybeManuscript = await getManuscriptUsecase.execute(
+        { invoiceId: invoice.invoiceId.id.toString() },
+        context
+      );
+      if (maybeManuscript.isLeft()) {
+        throw new Error(maybeManuscript.value.errorValue().message);
+      }
+      let manuscript = maybeManuscript.value.getValue()[0];
       if (!manuscript) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
+
       this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
 
-      let catalog;
+      let catalog: CatalogItem;
       try {
         catalog = await this.catalogRepo.getCatalogItemByJournalId(
           JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
@@ -179,62 +195,70 @@ export class PublishPaymentToErpUsecase
         publisherCustomValues
       );
 
-      try {
-        const erpData = {
-          invoice,
-          payer,
-          paymentMethods,
-          payments,
-          total: request.total,
-          items: invoiceItems,
-          manuscript: manuscript as any,
-          tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          itemId: publisherCustomValues?.itemId,
-        };
-
-        const [payment] = payments;
-
-        let erpResponse;
+      let erpReferences: RegisterPaymentResponse[] = [];
+      let errors: Error[] = [];
+      for (const payment of payments) {
         try {
-          erpResponse = await this.erpService.registerPayment(erpData);
+          const erpData: RegisterPaymentRequest = {
+            invoice,
+            payer,
+            paymentMethods,
+            payment,
+            total: request.total,
+            items: invoiceItems,
+            manuscript: manuscript,
+            customSegmentId: publisherCustomValues?.customSegmentId,
+            itemId: publisherCustomValues?.itemId,
+            // tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
+            journalName: catalog.journalTitle,
+            taxRateId: null,
+          };
 
-          if (erpResponse) {
+          let erpResponse: RegisterPaymentResponse;
+          try {
+            erpResponse = await this.erpService.registerPayment(erpData);
+
+            if (erpResponse) {
+              this.loggerService.info(
+                `Updating invoice ${invoice.id.toString()}: paymentReference -> ${JSON.stringify(
+                  erpResponse
+                )}`
+              );
+            }
+          } catch (error) {
             this.loggerService.info(
-              `Updating invoice ${invoice.id.toString()}: paymentReference -> ${JSON.stringify(
-                erpResponse
-              )}`
+              `[PublishPaymentToERP]: Failed to register payment in NetSuite. Err: ${error}`
             );
           }
-        } catch (error) {
           this.loggerService.info(
-            `[PublishPaymentToERP]: Failed to register payment in NetSuite. Err: ${error}`
+            'PublishPaymentToERP NetSuite response',
+            erpResponse
           );
-        }
-        this.loggerService.info(
-          'PublishPaymentToERP NetSuite response',
-          erpResponse
-        );
 
-        this.loggerService.info('PublishPaymentToERP final payment', payment);
-        await this.paymentRepo.updatePayment(payment);
+          this.loggerService.info('PublishPaymentToERP final payment', payment);
+          await this.paymentRepo.updatePayment(payment);
 
-        if (erpResponse) {
-          const erpReference = ErpReferenceMap.toDomain({
-            entity_id: payment.paymentId.id.toString(),
-            type: 'payment',
-            vendor: this.erpService.vendorName,
-            attribute:
-              this.erpService?.referenceMappings?.paymentConfirmation ||
-              'payment',
-            value: String(erpResponse),
-          });
-          await this.erpReferenceRepo.save(erpReference);
+          if (erpResponse) {
+            const erpReference = ErpReferenceMap.toDomain({
+              entity_id: payment.paymentId.id.toString(),
+              type: 'payment',
+              vendor: this.erpService.vendorName,
+              attribute:
+                this.erpService?.referenceMappings?.paymentConfirmation ||
+                'payment',
+              value: String(erpResponse),
+            });
+            await this.erpReferenceRepo.save(erpReference);
+          }
+          erpReferences.push(erpResponse);
+        } catch (err) {
+          errors.push(err);
         }
-        return right(erpResponse);
-      } catch (err) {
-        return left(err);
       }
+      if (errors.length) {
+        return left(new UnexpectedError(errors));
+      }
+      return right(erpReferences);
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));

@@ -7,7 +7,10 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../domain/authorization';
-import { ErpInvoiceResponse } from '../../../../domain/services/ErpService';
+import {
+  ErpInvoiceResponse,
+  RegisterPaymentResponse,
+} from '../../../../domain/services/ErpService';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
@@ -31,7 +34,7 @@ import { PublishPaymentToErpUsecase } from '../publishPaymentToErp/publishPaymen
 
 export type RetryPaymentsRegistrationToErpResponse = Either<
   UnexpectedError,
-  Result<ErpInvoiceResponse[]>
+  Result<RegisterPaymentResponse[]>
 >;
 
 export class RetryPaymentsRegistrationToErpUsecase
@@ -89,39 +92,37 @@ export class RetryPaymentsRegistrationToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryPaymentsRegistrationToErpResponse> {
     try {
-      const unregisteredErpPaymentsIds = await this.paymentRepo.getUnregisteredErpPayments();
-      const registeredPayments: ErpInvoiceResponse[] = [];
+      const unregisteredInvoicesIds = await this.paymentRepo.getUnregisteredErpPayments();
+      const registeredPayments: RegisterPaymentResponse[] = [];
 
-      if (unregisteredErpPaymentsIds.length === 0) {
+      if (unregisteredInvoicesIds.length === 0) {
         this.loggerService.info('No registered payments to be register!');
-        return right(Result.ok<ErpInvoiceResponse[]>(registeredPayments));
+        return right(Result.ok<RegisterPaymentResponse[]>(registeredPayments));
       }
 
       this.loggerService.info(
-        `Retrying registration in NetSuite for payments: ${unregisteredErpPaymentsIds
+        `Retrying registration in NetSuite for payments: ${unregisteredInvoicesIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unregisteredPayment of unregisteredErpPaymentsIds) {
+      for (const unregisteredInvoiceId of unregisteredInvoicesIds) {
         const publishedPaymentResponse = await this.publishPaymentToErpUsecase.execute(
           {
-            invoiceId: unregisteredPayment.id.toString(),
+            invoiceId: unregisteredInvoiceId.id.toString(),
           }
         );
         if (publishedPaymentResponse.isLeft()) {
           errs.push(publishedPaymentResponse.value);
         } else {
-          const assignedErpReference = publishedPaymentResponse.value;
-
-          if (assignedErpReference) {
+          for (const paymentRegistrationResponse of publishedPaymentResponse.value) {
             this.loggerService.info(
-              `Payment ${unregisteredPayment.id.toString()} successfully registered ${assignedErpReference}`
+              `Payment ${unregisteredInvoiceId.id.toString()} successfully registered ${
+                paymentRegistrationResponse.paymentReference
+              }`
             );
-            registeredPayments.push(assignedErpReference);
-          } else {
-            // simply do nothing yet
+            registeredPayments.push(paymentRegistrationResponse);
           }
         }
       }
@@ -131,7 +132,7 @@ export class RetryPaymentsRegistrationToErpUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
-      return right(Result.ok<ErpInvoiceResponse[]>(registeredPayments));
+      return right(Result.ok<RegisterPaymentResponse[]>(registeredPayments));
     } catch (err) {
       this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
