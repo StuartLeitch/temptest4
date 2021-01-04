@@ -313,7 +313,7 @@ export class KnexInvoiceRepo
             select "invoiceReferenceNumber" as "invoiceNumber" from configurations
           ) referenceNumbers), 1)
         `,
-          [`${currentYear}-01-01`, `${currentYear}-12-31`]
+          [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
         ),
       });
 
