@@ -55,7 +55,8 @@ const InvoicesContainer: React.FC = () => {
     (defaultFilters as any).customId
   );
 
-  let [filters] = useLocalStorage('invoicesListFilters', defaultFilters);
+  const [listState] = useLocalStorage('invoicesList', { filters:defaultFilters, pagination: defaultPagination});
+  let { filters, pagination } = listState;
   const queryFilters = {
     invoiceStatus,
     transactionStatus,
@@ -74,10 +75,10 @@ const InvoicesContainer: React.FC = () => {
     (defaultPagination as any).page
   );
 
-  let [pagination] = useLocalStorage(
-    'invoicesListPagination',
-    defaultPagination
-  );
+  // let cucu = useLocalStorage(
+  //   'invoicesList',
+  //   { pagination: defaultPagination}
+  // );
 
   if (!_.isEqual(defaultPagination, { page, offset: 0, limit: 10 })) {
     pagination = Object.assign({}, defaultPagination, {
@@ -86,10 +87,9 @@ const InvoicesContainer: React.FC = () => {
     });
   }
 
-  useEffect(() => {
-    writeStorage('invoicesListFilters', filters);
-    writeStorage('invoicesListPagination', pagination);
-  }, []);
+  // useEffect(() => {
+  //   writeStorage('invoicesList', { filters, pagination });
+  // }, []);
 
   const copyToClipboard = (str) => {
     const el = document.createElement('textarea');
@@ -179,8 +179,7 @@ const InvoicesContainer: React.FC = () => {
               </ButtonGroup>
             </ButtonToolbar>
             <InvoicesList
-              filters={filters}
-              pagination={pagination}
+              state={listState}
               setPage={setFilter}
             />
           </Col>
@@ -208,15 +207,18 @@ const InvoicesContainer: React.FC = () => {
         } else {
           newStatus = [...filters.invoiceStatus, status];
         }
+
         setInvoiceStatus(newStatus);
-        writeStorage('invoicesListFilters', {
-          ...filters,
-          invoiceStatus: newStatus,
-        });
         setPage(1);
-        writeStorage('invoicesListPagination', {
-          ...pagination,
-          page: 1,
+        writeStorage('invoicesList', {
+          filters: {
+            ...filters,
+            invoiceStatus: newStatus,
+          },
+          pagination: {
+            ...pagination,
+            page: 1
+          }
         });
 
         break;
@@ -226,65 +228,68 @@ const InvoicesContainer: React.FC = () => {
           newTransactionStatus = filters.transactionStatus.filter(
             (s) => s !== status
           );
-          setTransactionStatus(newTransactionStatus);
         } else {
           newTransactionStatus = [...filters.transactionStatus, status];
-          setTransactionStatus(newTransactionStatus);
         }
-        writeStorage('invoicesListFilters', {
+        setTransactionStatus(newTransactionStatus);
+        setPage(1);
+
+        writeStorage('invoicesList', {
+          filters: {
           ...filters,
           transactionStatus: newTransactionStatus,
-        });
-        setPage(1);
-        writeStorage('invoicesListPagination', {
+        }, pagination: {
           ...pagination,
           page: 1,
-        });
+        }});
         break;
 
       case 'journalTitle':
         newJournalId = (value as any[]).map((j) => j.journalId);
         setJournalId(newJournalId);
-        writeStorage('invoicesListFilters', {
+        setPage(1);
+        writeStorage('invoicesList', { filters: {
           ...filters,
           journalId: newJournalId,
-        });
-        setPage(1);
-        writeStorage('invoicesListPagination', {
+        }, pagination: {
           ...pagination,
           page: 1,
-        });
+        }});
         break;
 
       case 'referenceNumber':
+        setPage(1);
         setReferenceNumber(value as string);
-        writeStorage('invoicesListFilters', {
+        writeStorage('invoicesList',{ filters: {
           ...filters,
           referenceNumber: value,
-        });
-        setPage(1);
-        writeStorage('invoicesListPagination', {
+        }, pagination: {
           ...pagination,
           page: 1,
-        });
+        }});
         break;
 
       case 'page':
         setPage(value as string);
-        writeStorage('invoicesListPagination', {
-          ...pagination,
-          page: value,
-          offset: Number(value) - 1,
+        writeStorage('invoicesList', {
+          filters,
+          pagination:{
+            ...pagination,
+            page: value,
+            offset: Number(value) - 1,
+          }
         });
         break;
 
       default:
         setCustomId(value as string);
-        writeStorage('invoicesListFilters', { ...filters, customId: value });
         setPage(1);
-        writeStorage('invoicesListPagination', {
-          ...pagination,
-          page: 1,
+        writeStorage('invoicesList', {
+          filters: { ...filters, customId: value },
+          pagination: {
+            ...pagination,
+            page: 1,
+          }
         });
     }
   }

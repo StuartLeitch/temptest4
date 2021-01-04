@@ -20,8 +20,8 @@ export class Filters {
         article: {
           journalId: src.journalId,
           customId: wrap(src.customId),
-        }
-      }
+        },
+      },
     };
   }
 }

@@ -17,11 +17,11 @@ import { Loading } from '../../components';
 import { INVOICES_QUERY } from './graphql';
 
 const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
-  const { pagination: defaultPaginator } = props;
+  const { pagination: defaultPaginator, filters } = props.state;
 
-  const [pagination] = useLocalStorage(
-    'invoicesListPagination',
-    defaultPaginator
+  const [{ pagination }] = useLocalStorage(
+    'invoicesList',
+    { pagination:  defaultPaginator, filters }
   );
 
   const [fetchInvoices, { loading, error, data }] = useManualQuery(
@@ -34,16 +34,16 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
 
   useEffect(() => {
     async function fetchData() {
-      const vars = {
-        filters: Filters.collect(props.filters),
-        pagination,
-      };
+      const { filters, pagination } = props.state;
       await fetchInvoices({
-        variables: vars,
+        variables: {
+          filters: Filters.collect(filters),
+          pagination,
+        },
       });
     }
     fetchData();
-  }, [props.filters, pagination, fetchInvoices]);
+  }, [fetchInvoices, props.state]);
 
   if (loading) return <Loading />;
 
@@ -86,18 +86,20 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
 };
 
 interface RecentInvoicesListProps {
-  pagination: {
-    page: number;
-    offset: number;
-    limit: number;
-  };
-  filters: {
-    invoiceStatus: string[];
-    transactionStatus: string[];
-    journalId: string[];
-    referenceNumber: string;
-    customId: string;
-  };
+  state: {
+    pagination: {
+      page: number;
+      offset: number;
+      limit: number;
+    },
+    filters: {
+      invoiceStatus: string[];
+      transactionStatus: string[];
+      journalId: string[];
+      referenceNumber: string;
+      customId: string;
+    }
+};
   setPage(key: string, value: string | boolean | any[]): void;
 }
 
