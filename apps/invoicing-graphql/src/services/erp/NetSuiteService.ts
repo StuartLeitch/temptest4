@@ -436,15 +436,9 @@ export class NetSuiteService implements ErpServiceContract {
 
   private async createPayment(data: {
     invoice: Invoice;
-    items: InvoiceItem[];
     payment: Payment;
     paymentMethods: PaymentMethod[];
     total: number;
-    manuscript: Manuscript;
-    journalName: string;
-    customSegmentId: string;
-    taxRateId: string;
-    itemId: string;
     customerId?: string;
   }): Promise<string> {
     const {

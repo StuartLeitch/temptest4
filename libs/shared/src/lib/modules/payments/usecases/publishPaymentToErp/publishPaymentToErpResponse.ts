@@ -4,5 +4,5 @@ import { RegisterPaymentResponse } from '../../../../domain/services/ErpService'
 
 export type PublishPaymentToErpResponse = Either<
   UnexpectedError,
-  RegisterPaymentResponse[]
+  RegisterPaymentResponse
 >;

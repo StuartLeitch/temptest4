@@ -92,38 +92,36 @@ export class RetryPaymentsRegistrationToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<RetryPaymentsRegistrationToErpResponse> {
     try {
-      const unregisteredInvoicesIds = await this.paymentRepo.getUnregisteredErpPayments();
+      const paymentIds = await this.paymentRepo.getUnregisteredErpPayments();
       const registeredPayments: RegisterPaymentResponse[] = [];
 
-      if (unregisteredInvoicesIds.length === 0) {
+      if (paymentIds.length === 0) {
         this.loggerService.info('No registered payments to be register!');
         return right(Result.ok<RegisterPaymentResponse[]>(registeredPayments));
       }
 
       this.loggerService.info(
-        `Retrying registration in NetSuite for payments: ${unregisteredInvoicesIds
+        `Retrying registration in NetSuite for payments: ${paymentIds
           .map((i) => i.id.toString())
           .join(', ')}`
       );
       const errs = [];
 
-      for (const unregisteredInvoiceId of unregisteredInvoicesIds) {
+      for (const paymentId of paymentIds) {
         const publishedPaymentResponse = await this.publishPaymentToErpUsecase.execute(
           {
-            invoiceId: unregisteredInvoiceId.id.toString(),
+            paymentId: paymentId.id.toString(),
           }
         );
         if (publishedPaymentResponse.isLeft()) {
           errs.push(publishedPaymentResponse.value);
         } else {
-          for (const paymentRegistrationResponse of publishedPaymentResponse.value) {
-            this.loggerService.info(
-              `Payment ${unregisteredInvoiceId.id.toString()} successfully registered ${
-                paymentRegistrationResponse.paymentReference
-              }`
-            );
-            registeredPayments.push(paymentRegistrationResponse);
-          }
+          this.loggerService.info(
+            `Payment ${paymentId.id.toString()} successfully registered ${
+              publishedPaymentResponse.value.paymentReference
+            }`
+          );
+          registeredPayments.push(publishedPaymentResponse.value);
         }
       }
 

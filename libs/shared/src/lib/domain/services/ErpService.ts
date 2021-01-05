@@ -57,14 +57,10 @@ export interface RegisterPaymentRequest {
   manuscript: Manuscript;
   payer: Payer;
   invoice: Invoice;
-  items: InvoiceItem[];
   payment: Payment;
   paymentMethods: PaymentMethod[];
   total: number;
-  journalName: string;
-  customSegmentId: string;
-  taxRateId: string;
-  itemId: string;
+  customerId?: string;
 }
 
 export interface RegisterPaymentResponse {

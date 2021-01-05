@@ -38,10 +38,11 @@ import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
+import { PaymentStatus } from '../../domain/Payment';
+import { PaymentId } from '../../domain/PaymentId';
 
 export interface PublishPaymentToErpRequestDTO {
-  invoiceId?: string;
-  total?: number;
+  paymentId: string;
 }
 
 export class PublishPaymentToErpUsecase
@@ -84,15 +85,18 @@ export class PublishPaymentToErpUsecase
     let invoice: Invoice;
 
     try {
-      invoice = await this.invoiceRepo.getInvoiceById(
-        InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
+      const payment = await this.paymentRepo.getPaymentById(
+        PaymentId.create(new UniqueEntityID(request.paymentId)).getValue()
       );
+
+      if (payment.status !== PaymentStatus.COMPLETED) {
+        return;
+      }
+
+      invoice = await this.invoiceRepo.getInvoiceById(payment.invoiceId);
       this.loggerService.info('PublishPaymentToERP invoice', invoice);
 
       const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
-      const payments = await this.paymentRepo.getPaymentsByInvoiceId(
-        invoice.invoiceId
-      );
 
       let invoiceItems = invoice.invoiceItems.currentItems;
 
@@ -104,7 +108,7 @@ export class PublishPaymentToErpUsecase
         );
 
         const resp = await getItemsUsecase.execute({
-          invoiceId: request.invoiceId,
+          invoiceId: invoice.invoiceId.id.toString(),
         });
         this.loggerService.info(
           'PublishInvoiceToERP getItemsUsecase response',
@@ -195,72 +199,55 @@ export class PublishPaymentToErpUsecase
         publisherCustomValues
       );
 
-      let erpReferences: RegisterPaymentResponse[] = [];
-      let errors: Error[] = [];
-      for (const payment of payments) {
+      try {
+        const erpData: RegisterPaymentRequest = {
+          invoice,
+          payer,
+          paymentMethods,
+          payment,
+          total: invoice.invoiceTotal,
+          manuscript: manuscript,
+        };
+
+        let erpResponse: RegisterPaymentResponse;
         try {
-          const erpData: RegisterPaymentRequest = {
-            invoice,
-            payer,
-            paymentMethods,
-            payment,
-            total: request.total,
-            items: invoiceItems,
-            manuscript: manuscript,
-            customSegmentId: publisherCustomValues?.customSegmentId,
-            itemId: publisherCustomValues?.itemId,
-            // tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-            journalName: catalog.journalTitle,
-            taxRateId: null,
-          };
-
-          let erpResponse: RegisterPaymentResponse;
-          try {
-            erpResponse = await this.erpService.registerPayment(erpData);
-
-            if (erpResponse) {
-              this.loggerService.info(
-                `Updating invoice ${invoice.id.toString()}: paymentReference -> ${JSON.stringify(
-                  erpResponse
-                )}`
-              );
-            }
-          } catch (error) {
-            this.loggerService.info(
-              `[PublishPaymentToERP]: Failed to register payment in NetSuite. Err: ${error}`
-            );
-          }
-          this.loggerService.info(
-            'PublishPaymentToERP NetSuite response',
-            erpResponse
-          );
-
-          this.loggerService.info('PublishPaymentToERP final payment', payment);
-          await this.paymentRepo.updatePayment(payment);
+          erpResponse = await this.erpService.registerPayment(erpData);
 
           if (erpResponse) {
-            const erpReference = ErpReferenceMap.toDomain({
-              entity_id: payment.paymentId.id.toString(),
-              type: 'payment',
-              vendor: this.erpService.vendorName,
-              attribute:
-                this.erpService?.referenceMappings?.paymentConfirmation ||
-                'payment',
-              value: String(erpResponse),
-            });
-            await this.erpReferenceRepo.save(erpReference);
+            this.loggerService.info(
+              `Updating invoice ${invoice.id.toString()}: paymentReference -> ${JSON.stringify(
+                erpResponse
+              )}`
+            );
           }
-          erpReferences.push(erpResponse);
         } catch (err) {
-          errors.push(err);
+          return left(new UnexpectedError(err, err.toString()));
         }
+        this.loggerService.info(
+          'PublishPaymentToERP NetSuite response',
+          erpResponse
+        );
+
+        this.loggerService.info('PublishPaymentToERP final payment', payment);
+        await this.paymentRepo.updatePayment(payment);
+
+        if (erpResponse) {
+          const erpReference = ErpReferenceMap.toDomain({
+            entity_id: payment.paymentId.id.toString(),
+            type: 'payment',
+            vendor: this.erpService.vendorName,
+            attribute:
+              this.erpService?.referenceMappings?.paymentConfirmation ||
+              'payment',
+            value: erpResponse.paymentReference,
+          });
+          await this.erpReferenceRepo.save(erpReference);
+        }
+        return right(erpResponse);
+      } catch (err) {
+        return left(new UnexpectedError(err, err.toString()));
       }
-      if (errors.length) {
-        return left(new UnexpectedError(errors));
-      }
-      return right(erpReferences);
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }
