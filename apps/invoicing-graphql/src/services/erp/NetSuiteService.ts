@@ -468,7 +468,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}/!transform/customerpayment`,
+      url: `${config.endpoint}record/v1/customerPayment`,
       method: 'POST',
     };
 
@@ -477,6 +477,7 @@ export class NetSuiteService implements ErpServiceContract {
     );
 
     const createPaymentPayload = {
+      autoApply: true,
       account: {
         id: accountMap[paymentAccount.name],
       },
@@ -484,7 +485,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
-      entity: {
+      customer: {
         id: customerId,
       },
       // Invoice reference number,
