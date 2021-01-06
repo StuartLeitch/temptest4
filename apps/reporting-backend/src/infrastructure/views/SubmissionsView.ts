@@ -44,6 +44,7 @@ SELECT
   qc_paused_dates.max as qc_paused_date,
   qc_unpaused_dates.max as qc_unpaused_date,
   qc_escalated_dates.max as qc_escalated_date,
+  peer_review_cycle_check_dates.max as peer_review_cycle_check_date
   accepted_dates.min as accepted_date,
   void_dates.max as void_date,
   void_dates.max is not null as is_void,
@@ -122,6 +123,7 @@ FROM (
   LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckingUnpaused' group by submission_id) qc_unpaused_dates on qc_unpaused_dates.submission_id = s.submission_id
   LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckingEscalated' group by submission_id) qc_escalated_dates on qc_escalated_dates.submission_id = s.submission_id
   LEFT JOIN (SELECT submission_id, min(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event in ('SubmissionQualityCheckPassed', 'SubmissionPeerReviewCycleCheckPassed') group by submission_id) accepted_dates on accepted_dates.submission_id = s.submission_id
+  LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'PeerReviewCycleCheckingProcessSentToPeerReview' group by submission_id) peer_review_cycle_check_dates on peer_review_cycle_check_dates.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSectionsView.getViewName()} js where js.section_id = s.section_id limit 1) sec on sec.section_id = s.section_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
 WITH DATA;
