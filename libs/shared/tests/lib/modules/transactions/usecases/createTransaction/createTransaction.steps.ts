@@ -131,6 +131,7 @@ When(
   async (manuscriptId: string, journalId: string) => {
     result = await usecase.execute(
       {
+        authorsEmails: ['test@test.com'],
         manuscriptId,
         journalId,
       },

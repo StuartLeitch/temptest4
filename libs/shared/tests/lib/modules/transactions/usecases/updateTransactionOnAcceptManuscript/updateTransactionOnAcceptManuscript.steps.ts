@@ -182,6 +182,7 @@ When(
     result = await usecase.execute(
       {
         manuscriptId: manuscriptTestId,
+        authorsEmails: ['test@test.com'],
         confirmationReminder: {
           queueName: 'test',
           delay: 0.001,
