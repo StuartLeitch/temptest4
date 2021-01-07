@@ -12,6 +12,12 @@ export class JournalIdRequiredError extends UseCaseError {
   }
 }
 
+export class AuthorsEmailsRequiredError extends UseCaseError {
+  constructor() {
+    super(`Authors emails are required.`);
+  }
+}
+
 export class TransactionCreatedError extends UseCaseError {
   constructor(err: Error) {
     super(`Can't create a new Transaction: ${err.message} \n ${err.stack}`);

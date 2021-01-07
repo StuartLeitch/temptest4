@@ -112,13 +112,14 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
       const result = await updateTransactionOnAcceptManuscript.execute(
         {
           manuscriptId: submissionId,
+          authorsEmails: authors.map((a) => a.email),
           customId,
           title,
           articleType: name,
-          authorEmail: email,
-          authorCountry: country,
-          authorSurname: surname,
-          authorFirstName: givenNames,
+          correspondingAuthorEmail: email,
+          correspondingAuthorCountry: country,
+          correspondingAuthorSurname: surname,
+          correspondingAuthorFirstName: givenNames,
           acceptanceDate: updated,
           bankTransferCopyReceiver:
             env.app.invoicePaymentEmailBankTransferCopyReceiver,

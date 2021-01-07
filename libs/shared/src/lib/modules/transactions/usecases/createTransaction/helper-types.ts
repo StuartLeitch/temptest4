@@ -12,6 +12,10 @@ export interface WithManuscript {
   manuscript: Manuscript;
 }
 
+export interface WithAuthorsEmails {
+  authorsEmails: string[];
+}
+
 export interface WithInvoice {
   invoice: Invoice;
 }

@@ -26,6 +26,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
         manuscripts: [
           {
             journalId,
+            authors,
             articleType: { name: articleType },
           },
         ],
@@ -52,6 +53,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
           logger.info('Manuscript Data', newManuscript);
 
           const newTransaction = await helpers.createTransaction(
+            authors.map((a) => a.email),
             submissionId,
             journalId
           );

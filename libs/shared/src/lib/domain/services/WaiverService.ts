@@ -12,7 +12,7 @@ import { SanctionedCountryPolicy } from '../reductions/policies/SanctionedCountr
 import { WaivedCountryPolicy } from '../reductions/policies/WaivedCountryPolicy';
 
 interface WaiverServiceDTO {
-  authorEmail: string;
+  allAuthorsEmails: string[];
   invoiceId: string;
   journalId: string;
   country: string;
@@ -25,7 +25,7 @@ export class WaiverService {
     private waiverRepo: WaiverRepoContract
   ) {}
   public async applyWaiver({
-    authorEmail,
+    allAuthorsEmails,
     invoiceId,
     journalId,
     country,
@@ -70,8 +70,8 @@ export class WaiverService {
       }
     }
 
-    const editorRoles = await this.editorRepo.getEditorRolesByEmail(
-      authorEmail
+    const editorRoles = await this.editorRepo.getEditorListRolesByEmails(
+      allAuthorsEmails
     );
 
     if (activeWaiverMap[WaiverType.WAIVED_CHIEF_EDITOR]) {

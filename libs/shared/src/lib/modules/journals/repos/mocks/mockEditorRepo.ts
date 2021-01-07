@@ -26,8 +26,12 @@ export class MockEditorRepo
     return match ? match : null;
   }
 
-  public async getEditorRolesByEmail(editorEmail: string): Promise<Editor[]> {
-    const match = this._items.filter((i) => i.email.value === editorEmail);
+  public async getEditorListRolesByEmails(
+    editorsEmails: string[]
+  ): Promise<Editor[]> {
+    const match = this._items.filter((i) =>
+      editorsEmails.includes(i.email.value)
+    );
     return match ? match : null;
   }
 

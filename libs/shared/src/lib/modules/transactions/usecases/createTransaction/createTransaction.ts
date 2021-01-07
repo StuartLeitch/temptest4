@@ -35,7 +35,9 @@ import { TransactionRepoContract } from '../../repos/transactionRepo';
 import { CreateTransactionResponse as Response } from './createTransactionResponse';
 import type { CreateTransactionRequestDTO as DTO } from './createTransactionDTO';
 import * as Errors from './createTransactionErrors';
+
 import {
+  WithAuthorsEmails,
   WithManuscriptId,
   WithInvoiceItem,
   WithTransaction,
@@ -114,6 +116,10 @@ export class CreateTransactionUsecase
 
     if (!data.journalId) {
       return left(new Errors.JournalIdRequiredError());
+    }
+
+    if (!data.authorsEmails) {
+      return left(new Errors.AuthorsEmailsRequiredError());
     }
 
     return right(data);
@@ -317,16 +323,18 @@ export class CreateTransactionUsecase
     }
   }
 
-  private async calculateWaivers<T extends WithManuscript & WithInvoice>(
+  private async calculateWaivers<
+    T extends WithManuscript & WithInvoice & WithAuthorsEmails
+  >(
     data: T
   ): Promise<Either<Errors.WaiversCalculationError, T & { waiver: Waiver }>> {
-    const { manuscript, invoice } = data;
+    const { manuscript, invoice, authorsEmails } = data;
     try {
       const waiver = await this.waiverService.applyWaiver({
-        authorEmail: manuscript.authorEmail,
         country: manuscript.authorCountry,
         invoiceId: invoice.id.toString(),
         journalId: manuscript.journalId,
+        allAuthorsEmails: authorsEmails,
       });
 
       return right({ ...data, waiver });

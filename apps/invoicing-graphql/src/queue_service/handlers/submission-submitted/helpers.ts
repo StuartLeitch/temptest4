@@ -254,6 +254,7 @@ function updateManuscript(context: Context) {
 
 function createTransaction(context: Context) {
   return async (
+    authorsEmails: string[],
     manuscriptId: string,
     journalId: string
   ): Promise<Transaction> => {
@@ -280,6 +281,7 @@ function createTransaction(context: Context) {
 
     const maybeTransaction = await createTransactionUsecase.execute(
       {
+        authorsEmails,
         manuscriptId,
         journalId,
       },
