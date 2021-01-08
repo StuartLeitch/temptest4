@@ -193,7 +193,12 @@ export class NetSuiteService implements ErpServiceContract {
     // this.logger.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
-    await this.patchCreditNote({ ...data, creditNoteId });
+
+    // * Only patch newly created credit notes
+    if (creditNoteId) {
+      await this.patchCreditNote({ ...data, creditNoteId });
+    }
+
     return creditNoteId;
   }
 
