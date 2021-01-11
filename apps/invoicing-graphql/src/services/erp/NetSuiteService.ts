@@ -786,14 +786,6 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'PATCH',
     };
 
-    let creationYear = creditNote.dateAccepted.getFullYear();
-    if (
-      creditNote.dateIssued &&
-      getYear(creditNote.dateIssued) < getYear(creditNote.dateAccepted)
-    ) {
-      creationYear = creditNote.dateIssued.getFullYear();
-    }
-
     const { creationReason } = creditNote;
     let memo = 'Other';
     switch (creationReason) {
@@ -812,7 +804,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     const patchCreditNotePayload: Record<string, any> = {
-      tranId: `CN-${creditNote.invoiceNumber}/${creationYear}`,
+      tranId: creditNote.creditNoteNumber,
       memo,
     };
 

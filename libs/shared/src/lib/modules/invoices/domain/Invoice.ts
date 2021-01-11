@@ -139,6 +139,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return `${paddedNumber}/${creationYear}`;
   }
 
+  get creditNoteNumber(): string {
+    if (!this.isCreditNote()) {
+      return null;
+    }
+
+    return `CN-${this.referenceNumber}`;
+  }
+
   get transactionId(): TransactionId {
     return this.props.transactionId;
   }

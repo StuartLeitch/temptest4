@@ -113,7 +113,7 @@ export class PublishInvoiceFinalizedUsecase
     if (!invoice.cancelledInvoiceReference) {
       return invoice.referenceNumber;
     } else {
-      return `CN-${invoice.referenceNumber}`;
+      return invoice.creditNoteNumber;
     }
   }
 
