@@ -44,7 +44,7 @@ SELECT
   qc_paused_dates.max as qc_paused_date,
   qc_unpaused_dates.max as qc_unpaused_date,
   qc_escalated_dates.max as qc_escalated_date,
-  peer_review_cycle_check_dates.max as peer_review_cycle_check_date
+  peer_review_cycle_check_dates.max as peer_review_cycle_check_date,
   accepted_dates.min as accepted_date,
   void_dates.max as void_date,
   void_dates.max is not null as is_void,
