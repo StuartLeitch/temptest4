@@ -26,7 +26,7 @@ let serviceDTO: WaiverServiceDTO = null;
 
 let serviceResponse: Waiver = null;
 
-Before(() => {
+Before({ tags: '@ValidateWaiverService' }, () => {
   invoiceItemRepo = new MockInvoiceItemRepo();
   editorRepo = new MockEditorRepo();
   waiverRepo = new MockWaiverRepo();
@@ -52,7 +52,7 @@ Before(() => {
   };
 });
 
-After(() => {
+After({ tags: '@ValidateWaiverService' }, () => {
   invoiceItemRepo = null;
   editorRepo = null;
   waiverRepo = null;
