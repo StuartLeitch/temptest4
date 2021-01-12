@@ -13,7 +13,11 @@ import {
 } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
+import {
+  ErpServiceContract,
+  RegisterPaymentRequest,
+  RegisterPaymentResponse,
+} from '../../../../domain/services/ErpService';
 import { PublishPaymentToErpResponse } from './publishPaymentToErpResponse';
 import { ErpReferenceRepoContract } from '../../../vendors/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -32,10 +36,13 @@ import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import { CatalogItem } from '../../../journals/domain/CatalogItem';
+import { PaymentStatus } from '../../domain/Payment';
+import { PaymentId } from '../../domain/PaymentId';
 
 export interface PublishPaymentToErpRequestDTO {
-  invoiceId?: string;
-  total?: number;
+  paymentId: string;
 }
 
 export class PublishPaymentToErpUsecase
@@ -78,15 +85,18 @@ export class PublishPaymentToErpUsecase
     let invoice: Invoice;
 
     try {
-      invoice = await this.invoiceRepo.getInvoiceById(
-        InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
+      const payment = await this.paymentRepo.getPaymentById(
+        PaymentId.create(new UniqueEntityID(request.paymentId)).getValue()
       );
+
+      if (payment.status !== PaymentStatus.COMPLETED) {
+        return;
+      }
+
+      invoice = await this.invoiceRepo.getInvoiceById(payment.invoiceId);
       this.loggerService.info('PublishPaymentToERP invoice', invoice);
 
       const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
-      const payments = await this.paymentRepo.getPaymentsByInvoiceId(
-        invoice.invoiceId
-      );
 
       let invoiceItems = invoice.invoiceItems.currentItems;
 
@@ -98,7 +108,7 @@ export class PublishPaymentToErpUsecase
         );
 
         const resp = await getItemsUsecase.execute({
-          invoiceId: request.invoiceId,
+          invoiceId: invoice.invoiceId.id.toString(),
         });
         this.loggerService.info(
           'PublishInvoiceToERP getItemsUsecase response',
@@ -147,15 +157,25 @@ export class PublishPaymentToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no payers.`);
       }
 
-      const manuscript = await this.manuscriptRepo.findById(
-        invoiceItems[0].manuscriptId
+      let getManuscriptUsecase = new GetManuscriptByInvoiceIdUsecase(
+        this.manuscriptRepo,
+        this.invoiceItemRepo
       );
+      const maybeManuscript = await getManuscriptUsecase.execute(
+        { invoiceId: invoice.invoiceId.id.toString() },
+        context
+      );
+      if (maybeManuscript.isLeft()) {
+        throw new Error(maybeManuscript.value.errorValue().message);
+      }
+      let manuscript = maybeManuscript.value.getValue()[0];
       if (!manuscript) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
+
       this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
 
-      let catalog;
+      let catalog: CatalogItem;
       try {
         catalog = await this.catalogRepo.getCatalogItemByJournalId(
           JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
@@ -180,22 +200,16 @@ export class PublishPaymentToErpUsecase
       );
 
       try {
-        const erpData = {
+        const erpData: RegisterPaymentRequest = {
           invoice,
           payer,
           paymentMethods,
-          payments,
-          total: request.total,
-          items: invoiceItems,
-          manuscript: manuscript as any,
-          tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          itemId: publisherCustomValues?.itemId,
+          payment,
+          total: invoice.invoiceTotal,
+          manuscript: manuscript,
         };
 
-        const [payment] = payments;
-
-        let erpResponse;
+        let erpResponse: RegisterPaymentResponse;
         try {
           erpResponse = await this.erpService.registerPayment(erpData);
 
@@ -206,10 +220,8 @@ export class PublishPaymentToErpUsecase
               )}`
             );
           }
-        } catch (error) {
-          this.loggerService.info(
-            `[PublishPaymentToERP]: Failed to register payment in NetSuite. Err: ${error}`
-          );
+        } catch (err) {
+          return left(new UnexpectedError(err, err.toString()));
         }
         this.loggerService.info(
           'PublishPaymentToERP NetSuite response',
@@ -227,16 +239,15 @@ export class PublishPaymentToErpUsecase
             attribute:
               this.erpService?.referenceMappings?.paymentConfirmation ||
               'payment',
-            value: String(erpResponse),
+            value: erpResponse.paymentReference,
           });
           await this.erpReferenceRepo.save(erpReference);
         }
         return right(erpResponse);
       } catch (err) {
-        return left(err);
+        return left(new UnexpectedError(err, err.toString()));
       }
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

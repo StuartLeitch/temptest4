@@ -18,8 +18,8 @@ Feature: Publish invoice to erp system
             | GB           | INSTITUTION | 7       |
             | UK           | INDIVIDUAL  | 7       |
             | UK           | INSTITUTION | 7       |
-            | RO           | INDIVIDUAL  | 7       |
-            | RO           | INSTITUTION | 6       |
+            | RO           | INDIVIDUAL  | 20      |
+            | RO           | INSTITUTION | 20      |
             | CH           | INDIVIDUAL  | 20      |
             | CH           | INSTITUTION | 20      |
 

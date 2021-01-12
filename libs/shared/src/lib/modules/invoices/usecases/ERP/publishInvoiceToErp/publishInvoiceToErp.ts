@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { getEuMembers } from 'is-eu-member';
-
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { right, left } from '../../../../../core/logic/Result';
@@ -233,16 +231,6 @@ export class PublishInvoiceToErpUsecase
       // * Calculate Tax Rate code
       // * id=20 E-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
       let taxRateId = '20';
-      const euCountries = getEuMembers();
-      if (euCountries.includes(address.country)) {
-        if (payer.type === PayerType.INSTITUTION) {
-          // * id=6 Z-GB = ECOutputServices_GB in Sage, i.e. Sales made outside UK but in EU where there is a EU VAT registration number
-          taxRateId = '6';
-        } else {
-          // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number
-          taxRateId = '7';
-        }
-      }
 
       if (address.country === 'UK' || address.country === 'GB') {
         // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number

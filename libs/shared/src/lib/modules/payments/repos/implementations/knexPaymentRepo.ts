@@ -106,12 +106,12 @@ export class KnexPaymentRepo
         .whereNull('paymentrefs.value');
   }
 
-  async getUnregisteredErpPayments(): Promise<InvoiceId[]> {
+  async getUnregisteredErpPayments(): Promise<PaymentId[]> {
     const LIMIT = 30;
     const { db, logger } = this;
 
     const erpReferencesQuery = db(TABLES.PAYMENTS)
-      .column({ invoiceId: 'payments.invoiceId' })
+      .column({ invoiceId: 'payments.invoiceId', paymentId: 'payments.id' })
       .select();
 
     const withPaymentReference = this.withErpReferenceQuery(
@@ -137,8 +137,8 @@ export class KnexPaymentRepo
 
     const payments = await prepareIdsSQL;
 
-    return payments.map((i) =>
-      InvoiceId.create(new UniqueEntityID(i.invoiceId)).getValue()
+    return payments.map((payment) =>
+      PaymentId.create(new UniqueEntityID(payment.paymentId)).getValue()
     );
   }
 

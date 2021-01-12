@@ -1,4 +1,12 @@
-import { Invoice, Payer, InvoiceItem, Address, Article } from '@hindawi/shared';
+import {
+  Invoice,
+  Payer,
+  InvoiceItem,
+  Address,
+  Article,
+  Payment,
+  PaymentMethod,
+} from '@hindawi/shared';
 import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { PublisherCustomValues } from '../../modules/publishers/domain/PublisherCustomValues';
 
@@ -45,6 +53,20 @@ export interface ErpRevRecResponse {
   journalItemTag: any;
 }
 
+export interface RegisterPaymentRequest {
+  manuscript: Manuscript;
+  payer: Payer;
+  invoice: Invoice;
+  payment: Payment;
+  paymentMethods: PaymentMethod[];
+  total: number;
+  customerId?: string;
+}
+
+export interface RegisterPaymentResponse {
+  paymentReference: string;
+}
+
 export interface ErpServiceContract {
   readonly vendorName: string;
   readonly referenceMappings?: Record<string, any>;
@@ -56,7 +78,9 @@ export interface ErpServiceContract {
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse>;
   registerCreditNote?(data: any): Promise<any>;
-  registerPayment?(data: any): Promise<any>;
+  registerPayment?(
+    data: RegisterPaymentRequest
+  ): Promise<RegisterPaymentResponse>;
 }
 
 export class EmptyErpService implements ErpServiceContract {

@@ -22,6 +22,8 @@ import {
   ErpInvoiceResponse,
   ErpRevRecResponse,
   ErpRevRecRequest,
+  RegisterPaymentRequest,
+  RegisterPaymentResponse,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
 import { Connection } from './netsuite/Connection';
@@ -193,23 +195,18 @@ export class NetSuiteService implements ErpServiceContract {
     // this.logger.info(data);
 
     const creditNoteId = await this.transformCreditNote(data);
-    await this.patchCreditNote({ ...data, creditNoteId });
+
+    // * Only patch newly created credit notes
+    if (creditNoteId) {
+      await this.patchCreditNote({ ...data, creditNoteId });
+    }
+
     return creditNoteId;
   }
 
-  public async registerPayment(data: {
-    manuscript: Manuscript;
-    payer: Payer;
-    invoice: Invoice;
-    items: InvoiceItem[];
-    payments: Payment[];
-    paymentMethods: PaymentMethod[];
-    total: number;
-    journalName: string;
-    customSegmentId: string;
-    taxRateId: string;
-    itemId: string;
-  }): Promise<ErpInvoiceResponse> {
+  public async registerPayment(
+    data: RegisterPaymentRequest
+  ): Promise<RegisterPaymentResponse> {
     // this.logger.log('registerPayment Data:');
     // this.logger.info(data);
 
@@ -223,12 +220,12 @@ export class NetSuiteService implements ErpServiceContract {
       this.logger.error(erorrMessage);
       throw new Error(erorrMessage);
     }
-    const paymentId = await this.createPayment({
+    const paymentReference = await this.createPayment({
       ...data,
       customerId: customerAlreadyExists.id,
     });
 
-    return paymentId;
+    return { paymentReference };
   }
 
   private async getCustomerId(data: { payer: Payer; manuscript: Manuscript }) {
@@ -439,21 +436,15 @@ export class NetSuiteService implements ErpServiceContract {
 
   private async createPayment(data: {
     invoice: Invoice;
-    items: InvoiceItem[];
-    payments: Payment[];
+    payment: Payment;
     paymentMethods: PaymentMethod[];
     total: number;
-    manuscript: Manuscript;
-    journalName: string;
-    customSegmentId: string;
-    taxRateId: string;
-    itemId: string;
     customerId?: string;
-  }) {
+  }): Promise<string> {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { invoice, payments, paymentMethods, total, customerId } = data;
+    const { invoice, payment, paymentMethods, total, customerId } = data;
 
     const accountMap = {
       Paypal: '213',
@@ -477,16 +468,16 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}/!transform/customerpayment`,
+      url: `${config.endpoint}record/v1/customerPayment`,
       method: 'POST',
     };
 
-    const [payment] = payments;
     const [paymentAccount] = paymentMethods.filter((pm) =>
       pm.id.equals(payment.paymentMethodId.id)
     );
 
     const createPaymentPayload = {
+      autoApply: true,
       account: {
         id: accountMap[paymentAccount.name],
       },
@@ -494,7 +485,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
-      entity: {
+      customer: {
         id: customerId,
       },
       // Invoice reference number,
