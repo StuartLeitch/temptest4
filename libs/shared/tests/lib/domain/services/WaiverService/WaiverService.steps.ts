@@ -46,8 +46,8 @@ Before(() => {
 
   serviceDTO = {
     invoiceId: 'testInvoice123',
-    journalId: 'testJournal123',
     allAuthorsEmails: [],
+    journalId: null,
     country: null,
   };
 });
@@ -75,18 +75,49 @@ Given(
   }
 );
 
-Given(/^A submitting author is from waived country$/, () => {
-  serviceDTO.country = 'AO';
-});
+Given(
+  /^A submitting author is from country with code "(\w+)"$/,
+  (countryCode: string) => {
+    serviceDTO.country = countryCode;
+  }
+);
 
-When(/^Waivers are applied$/, async () => {
-  serviceResponse = await waiverService.applyWaiver(serviceDTO);
-});
+When(
+  /^Waivers are applied for manuscript on journal "([\w\d-]+)"$/,
+  async (journalId: string) => {
+    serviceDTO.journalId = journalId;
+
+    serviceResponse = await waiverService.applyWaiver(serviceDTO);
+  }
+);
 
 Then(
   /^The applied waiver is of type "([\w_]+)" with reduction "(\d+)"$/,
   (waiverType: string, reduction: string) => {
+    expect(serviceResponse).to.exist;
     expect(serviceResponse.waiverType.toString()).to.equal(waiverType);
     expect(serviceResponse.reduction).to.equal(Number.parseFloat(reduction));
+  }
+);
+
+Given(
+  /^An editor with email "([\w\d_.@]+)" is on journal "([\w\d-]+)" with role "(\w+)"$/,
+  (email: string, journalId: string, roleType: string) => {
+    const editor = EditorMap.toDomain({
+      journalId,
+      roleType,
+      email,
+      roleLabel: 'roleLabel',
+      name: 'testEditor',
+    });
+
+    editorRepo.addMockItem(editor);
+  }
+);
+
+Given(
+  /^Manuscript has authors with emails "([\w\d_, .@]+)"$/,
+  (emails: string) => {
+    serviceDTO.allAuthorsEmails = emails.split(', ');
   }
 );
