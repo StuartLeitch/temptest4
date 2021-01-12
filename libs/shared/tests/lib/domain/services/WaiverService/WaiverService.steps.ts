@@ -1,7 +1,14 @@
 import { Before, After, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
-import { Waiver } from '../../../../../src/lib/modules/waivers/domain/Waiver';
+import { UniqueEntityID } from '../../../../../src/lib/core/domain/UniqueEntityID';
+
+import { InvoiceItemId } from '../../../../../src/lib/modules/invoices/domain/InvoiceItemId';
+import { InvoiceId } from '../../../../../src/lib/modules/invoices/domain/InvoiceId';
+import {
+  WaiverType,
+  Waiver,
+} from '../../../../../src/lib/modules/waivers/domain/Waiver';
 
 import { InvoiceItemMap } from '../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { EditorMap } from '../../../../../src/lib/modules/journals/mappers/EditorMap';
@@ -23,8 +30,17 @@ let waiverRepo: MockWaiverRepo = null;
 let waiverService: WaiverService = null;
 
 let serviceDTO: WaiverServiceDTO = null;
+let waiversToApply: Waiver[] = null;
 
 let serviceResponse: Waiver = null;
+
+const invoiceItemId = Object.freeze(
+  InvoiceItemId.create(new UniqueEntityID('testInvoiceItem'))
+);
+const invoiceId = Object.freeze(
+  InvoiceId.create(new UniqueEntityID('testInvoice')).getValue()
+);
+const manuscriptId = Object.freeze('testManuscript');
 
 Before({ tags: '@ValidateWaiverService' }, () => {
   invoiceItemRepo = new MockInvoiceItemRepo();
@@ -34,8 +50,9 @@ Before({ tags: '@ValidateWaiverService' }, () => {
   waiverService = new WaiverService(invoiceItemRepo, editorRepo, waiverRepo);
 
   const invoiceItem = InvoiceItemMap.toDomain({
-    manuscriptId: 'testManuscript123',
-    invoiceId: 'testInvoice123',
+    manuscriptId,
+    invoiceId: invoiceId.toString(),
+    id: invoiceItemId.toString(),
     dateCreated: new Date(),
     type: 'APC',
     price: 500,
@@ -44,8 +61,9 @@ Before({ tags: '@ValidateWaiverService' }, () => {
 
   invoiceItemRepo.addMockItem(invoiceItem);
 
+  waiversToApply = [];
   serviceDTO = {
-    invoiceId: 'testInvoice123',
+    invoiceId: invoiceId.toString(),
     allAuthorsEmails: [],
     journalId: null,
     country: null,
@@ -59,6 +77,7 @@ After({ tags: '@ValidateWaiverService' }, () => {
 
   waiverService = null;
 
+  waiversToApply = null;
   serviceDTO = null;
 });
 
@@ -93,10 +112,20 @@ When(
 
 Then(
   /^The applied waiver is of type "([\w_]+)" with reduction "(\d+)"$/,
-  (waiverType: string, reduction: string) => {
+  async (waiverType: string, reduction: string) => {
     expect(serviceResponse).to.exist;
     expect(serviceResponse.waiverType.toString()).to.equal(waiverType);
     expect(serviceResponse.reduction).to.equal(Number.parseFloat(reduction));
+
+    const appliedWaivers = await waiverRepo.getWaiversByInvoiceItemId(
+      invoiceItemId as InvoiceItemId
+    );
+
+    expect(appliedWaivers.length).to.equal(1);
+    expect(appliedWaivers.getItems()[0].waiver.waiverType).to.equal(waiverType);
+    expect(appliedWaivers.getItems()[0].waiver.reduction).to.equal(
+      Number.parseFloat(reduction)
+    );
   }
 );
 
@@ -121,3 +150,16 @@ Given(
     serviceDTO.allAuthorsEmails = emails.split(', ');
   }
 );
+
+Given(/^Waiver of type "([\w_]+)" should apply$/, async (type: string) => {
+  const waiver = await waiverRepo.getWaiverByType(WaiverType[type]);
+
+  waiversToApply.push(waiver);
+});
+
+When(/^applyHighestReductionWaiver is called$/, async () => {
+  serviceResponse = await waiverService.applyHighestReductionWaiver(
+    invoiceId as InvoiceId,
+    waiversToApply
+  );
+});

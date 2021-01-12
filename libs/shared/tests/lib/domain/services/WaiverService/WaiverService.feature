@@ -48,3 +48,10 @@ Feature: Waiver Service
     And Manuscript has authors with emails "author@test.com, editor@test.com"
     When Waivers are applied for manuscript on journal "submittionJournal"
     Then The applied waiver is of type "WAIVED_COUNTRY" with reduction "100"
+
+  @ValidateWaiverService
+  Scenario: applyHighestReductionWaiver should return the waiver with highest reduction
+    Given Waiver of type "WAIVED_COUNTRY" should apply
+    And Waiver of type "EDITOR_DISCOUNT" should apply
+    When applyHighestReductionWaiver is called
+    Then The applied waiver is of type "WAIVED_COUNTRY" with reduction "100"
