@@ -6,6 +6,7 @@ import journalSectionsView from './JournalSectionsView';
 import journalSpecialIssuesView from './JournalSpecialIssuesView';
 import journalsView from './JournalsView';
 import submissionDataView from './SubmissionDataView';
+import peerReviewDataView from './PeerReviewDataView';
 
 class SubmissionView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
@@ -123,7 +124,7 @@ FROM (
   LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckingUnpaused' group by submission_id) qc_unpaused_dates on qc_unpaused_dates.submission_id = s.submission_id
   LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionQualityCheckingEscalated' group by submission_id) qc_escalated_dates on qc_escalated_dates.submission_id = s.submission_id
   LEFT JOIN (SELECT submission_id, min(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event in ('SubmissionQualityCheckPassed', 'SubmissionPeerReviewCycleCheckPassed') group by submission_id) accepted_dates on accepted_dates.submission_id = s.submission_id
-  LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'PeerReviewCycleCheckingProcessSentToPeerReview' group by submission_id) peer_review_cycle_check_dates on peer_review_cycle_check_dates.submission_id = s.submission_id
+  LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${peerReviewDataView.getViewName()} where submission_event = 'PeerReviewCycleCheckingProcessSentToPeerReview' group by submission_id) peer_review_cycle_check_dates on peer_review_cycle_check_dates.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSectionsView.getViewName()} js where js.section_id = s.section_id limit 1) sec on sec.section_id = s.section_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
 WITH DATA;
@@ -150,5 +151,6 @@ const submissionView = new SubmissionView();
 submissionView.addDependency(journalsView);
 submissionView.addDependency(journalSectionsView);
 submissionView.addDependency(journalSpecialIssuesView);
+submissionView.addDependency(peerReviewDataView);
 
 export default submissionView;

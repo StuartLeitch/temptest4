@@ -6,3 +6,4 @@ export * from './UserMappingPolicy';
 export * from './ArticleMappingPolicy';
 export * from './CheckerMappingPolicy';
 export * from './SyndicationMappingPolicy';
+export * from './PeerReviewMappingPolicy';
