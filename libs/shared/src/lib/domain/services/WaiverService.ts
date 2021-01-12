@@ -11,7 +11,7 @@ import { PoliciesRegister as ReductionsPoliciesRegister } from '../reductions/po
 import { SanctionedCountryPolicy } from '../reductions/policies/SanctionedCountryPolicy';
 import { WaivedCountryPolicy } from '../reductions/policies/WaivedCountryPolicy';
 
-interface WaiverServiceDTO {
+export interface WaiverServiceDTO {
   allAuthorsEmails: string[];
   invoiceId: string;
   journalId: string;
@@ -110,6 +110,10 @@ export class WaiverService {
     invoiceId: InvoiceId,
     applicableWaivers: Waiver[]
   ): Promise<Waiver> {
+    if (!applicableWaivers.length) {
+      return;
+    }
+
     const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
       invoiceId
     );
@@ -119,9 +123,7 @@ export class WaiverService {
     }
 
     const item = invoiceItems[0];
-    if (!applicableWaivers.length) {
-      return;
-    }
+
     const existingWaivers = (
       await this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId)
     ).waivers;

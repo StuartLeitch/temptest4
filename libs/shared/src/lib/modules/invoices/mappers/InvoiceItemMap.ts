@@ -9,7 +9,6 @@ export interface InvoiceItemPersistenceDTO {
   invoiceId: string;
   manuscriptId: string;
   type?: InvoiceItemType;
-  name?: string;
   price?: number;
   vat?: number;
   dateCreated?: Date;
