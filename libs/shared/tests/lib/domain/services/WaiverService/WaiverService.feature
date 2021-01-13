@@ -8,13 +8,13 @@ Feature: Waiver Service
     And There is a waiver for "WAIVED_EDITOR" of "100" percent reduction
 
   @ValidateWaiverService
-  Scenario: Get WAIVED_COUNTRY waiver for correcponding author in waived countries
+  Scenario: Get WAIVED_COUNTRY waiver for corresponding author in waived countries
     Given A submitting author is from country with code "AO"
     When Waivers are applied for manuscript on journal "submittionJournal"
     Then The applied waiver is of type "WAIVED_COUNTRY" with reduction "100"
 
   @ValidateWaiverService
-  Scenario: Get SANCTIONED_COUNTRY waiver for correcponding author in waived countries
+  Scenario: Get SANCTIONED_COUNTRY waiver for corresponding author in waived countries
     Given A submitting author is from country with code "CU"
     When Waivers are applied for manuscript on journal "submittionJournal"
     Then The applied waiver is of type "SANCTIONED_COUNTRY" with reduction "100"
