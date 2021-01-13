@@ -69,7 +69,6 @@ class KnexMigrationSource {
     remove_submission_data_dates,
     create_article_events_table,
     create_checker_events_table,
-    create_peer_review_events_table,
     rebuild_materialized_views(
       '20200310150525_rebuild_materialized_views',
       true
@@ -218,11 +217,11 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views('20201119152115_invoices_numbers_fix', true),
-    rebuild_materialized_views(
-      '20210106114615_add_peer_review_cycle_check_date',
-      true
-    ),
+    create_peer_review_events_table,
     move_peer_review_events,
+    rebuild_materialized_views(
+      '20210106114615_add_peer_review_cycle_check_date'
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

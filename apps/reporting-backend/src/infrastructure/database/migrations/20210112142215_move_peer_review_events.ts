@@ -9,11 +9,18 @@ export async function up(knex: Knex): Promise<any> {
     ','
   );
   return knex.raw(`
-        insert into ${REPORTING_TABLES.DEFAULT} select * from ${REPORTING_TABLES.PEER_REVIEW} where type not in (${peerReviewEvents});
-        delete from ${REPORTING_TABLES.PEER_REVIEW} where type not in (${peerReviewEvents});
+        insert into ${REPORTING_TABLES.PEER_REVIEW} select * from ${REPORTING_TABLES.DEFAULT} where type in (${peerReviewEvents});
     `);
 }
 
-export async function down(knex: Knex): Promise<any> {}
+export async function down(knex: Knex): Promise<any> {
+  const peerReviewEvents = PEER_REVIEW_EVENTS.map((pre) => `'${pre}'`).join(
+    ','
+  );
+  return knex.raw(`
+        insert into ${REPORTING_TABLES.DEFAULT} select * from ${REPORTING_TABLES.PEER_REVIEW} where type in (${peerReviewEvents});
+        delete from ${REPORTING_TABLES.PEER_REVIEW} where type in (${peerReviewEvents});
+    `);
+}
 
 export const name = '20210112142215_move_peer_review_events';

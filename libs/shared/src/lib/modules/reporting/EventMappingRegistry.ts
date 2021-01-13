@@ -13,6 +13,7 @@ import {
   SubmissionMappingPolicy,
   UserMappingPolicy,
   SyndicationMappingPolicy,
+  PeerReviewMappingPolicy,
 } from './policies';
 import { DefaultMappingPolicy } from './policies/DefaultMappingPolicy';
 
@@ -61,5 +62,6 @@ defaultRegistry.addPolicy(new UserMappingPolicy());
 defaultRegistry.addPolicy(new ArticleMappingPolicy());
 defaultRegistry.addPolicy(new CheckerMappingPolicy());
 defaultRegistry.addPolicy(new SyndicationMappingPolicy());
+defaultRegistry.addPolicy(new PeerReviewMappingPolicy());
 
 export { defaultRegistry, emptyRegistry };

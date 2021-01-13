@@ -15,22 +15,19 @@ AS
 SELECT
     pre.id AS event_id,
     pre."time" AS event_timestamp,
-    pre."type" AS "event",
+    pre."type" AS "peer_review_event",
     author_view."customId" AS manuscript_custom_id,
     author_view."submissionId" AS submission_id
 FROM
 ${REPORTING_TABLES.PEER_REVIEW} pre,
-jsonb_to_record(pre.payload) AS author_view (
-    "customId" text,
-    "submissionId" text,
-)
+jsonb_to_record(pre.payload) AS author_view ("customId" text, "submissionId" text)
 WITH DATA;
         `;
   }
   postCreateQueries = [
     `create index on ${this.getViewName()} (event_id)`,
     `create index on ${this.getViewName()} (event_timestamp)`,
-    `create index on ${this.getViewName()} (event)`,
+    `create index on ${this.getViewName()} (peer_review_event)`,
     `create index on ${this.getViewName()} (manuscript_custom_id)`,
     `create index on ${this.getViewName()} (submission_id)`,
   ];
