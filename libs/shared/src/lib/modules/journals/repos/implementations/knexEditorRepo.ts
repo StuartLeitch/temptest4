@@ -10,14 +10,15 @@ import { EditorId } from '../../domain/EditorId';
 import { EditorMap } from '../../mappers/EditorMap';
 import { EditorRepoContract } from '../editorRepo';
 
-export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
+export class KnexEditorRepo
+  extends AbstractBaseDBRepo<Knex, Editor>
   implements EditorRepoContract {
-  async getEditorRolesByEmail(editorEmail: string): Promise<Editor[]> {
+  async getEditorListRolesByEmails(editorsEmails: string[]): Promise<Editor[]> {
     const { db } = this;
 
     const editors = await db(TABLES.EDITORS)
       .select()
-      .where('email', editorEmail)
+      .whereIn('email', editorsEmails)
       .where('deleted', 0);
 
     return editors.map((editor) => EditorMap.toDomain(editor));
@@ -60,7 +61,9 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
 
     const rawEditor = EditorMap.toPersistence(editor);
     const insert = db(TABLES.EDITORS).insert(rawEditor);
-    const update = db.queryBuilder().update({ ...rawEditor, deleted: 0, updatedAt: new Date() });
+    const update = db
+      .queryBuilder()
+      .update({ ...rawEditor, deleted: 0, updatedAt: new Date() });
     try {
       await db.raw(`? ON CONFLICT (id) DO ?`, [insert, update]);
     } catch (e) {
@@ -86,7 +89,11 @@ export class KnexEditorRepo extends AbstractBaseDBRepo<Knex, Editor>
 
     const deletedRows = await db(TABLES.EDITORS)
       .where('id', editor.id.toString())
-      .update({ ...EditorMap.toPersistence(editor), deleted: 1, updatedAt: new Date() });
+      .update({
+        ...EditorMap.toPersistence(editor),
+        deleted: 1,
+        updatedAt: new Date(),
+      });
 
     if (!deletedRows) {
       throw RepoError.createEntityNotFoundError('editor', editor.id.toString());

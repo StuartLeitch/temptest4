@@ -33,7 +33,6 @@ import { Resolvers, Invoice, PayerType } from '../schema';
 import { Context } from '../../builders';
 
 import { env } from '../../env';
-import { AnyPtrRecord } from 'dns';
 
 export const invoice: Resolvers<Context> = {
   Query: {
@@ -373,7 +372,7 @@ export const invoice: Resolvers<Context> = {
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
         referenceNumber:
           creditNoteDetails.invoiceNumber && creditNoteDetails.dateAccepted
-            ? `CN-${creditNoteDetails.referenceNumber}`
+            ? creditNoteDetails.creditNoteNumber
             : '---',
         // totalAmount: entity.totalAmount,
         // netAmount: entity.netAmount
@@ -573,7 +572,7 @@ export const invoice: Resolvers<Context> = {
         dateIssued: creditNote?.dateIssued?.toISOString(),
         referenceNumber:
           creditNote.invoiceNumber && creditNote.dateAccepted
-            ? `CN-${creditNote.referenceNumber}`
+            ? creditNote.creditNoteNumber
             : '---',
       };
     },

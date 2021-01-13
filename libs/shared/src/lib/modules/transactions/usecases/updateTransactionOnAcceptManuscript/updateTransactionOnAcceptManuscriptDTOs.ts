@@ -1,12 +1,13 @@
 export interface UpdateTransactionOnAcceptManuscriptDTO {
   manuscriptId: string;
+  authorsEmails: string[];
   customId?: string;
   title?: string;
   articleType?: string;
-  authorEmail?: string;
-  authorCountry?: string;
-  authorSurname?: string;
-  authorFirstName?: string;
+  correspondingAuthorEmail?: string;
+  correspondingAuthorCountry?: string;
+  correspondingAuthorSurname?: string;
+  correspondingAuthorFirstName?: string;
   emailSenderInfo?: {
     address?: string;
     name?: string;

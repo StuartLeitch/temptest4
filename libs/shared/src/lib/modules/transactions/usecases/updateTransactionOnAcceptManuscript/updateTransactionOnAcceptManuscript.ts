@@ -174,11 +174,11 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       transaction.markAsActive();
 
       // * get author details
-      manuscript.authorFirstName = request?.authorFirstName;
-      manuscript.authorCountry = request?.authorCountry;
-      manuscript.authorSurname = request?.authorSurname;
+      manuscript.authorFirstName = request?.correspondingAuthorFirstName;
+      manuscript.authorCountry = request?.correspondingAuthorCountry;
+      manuscript.authorSurname = request?.correspondingAuthorSurname;
       manuscript.articleType = request?.articleType;
-      manuscript.authorEmail = request?.authorEmail;
+      manuscript.authorEmail = request?.correspondingAuthorEmail;
       manuscript.customId = request?.customId;
       manuscript.title = request?.title;
 
@@ -189,7 +189,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         );
         await this.waiverService.applyWaiver({
           invoiceId: invoice.invoiceId.id.toString(),
-          authorEmail: manuscript.authorEmail,
+          allAuthorsEmails: request.authorsEmails,
           country: manuscript.authorCountry,
           journalId: manuscript.journalId,
         });

@@ -52,3 +52,13 @@ Feature: Submission Submitted event handled
       | customId | editorEmail     | authorEmail         | waiversApplied |
       | 111116   | editor@test.com | editor@test.com     | 1              |
       | 111117   | editor@test.com | not_editor@test.com | 0              |
+
+  Scenario: Article has waiver applied even if corresponding author is not eligible
+    Given There is an editor for Journal "foo-journal" with email "editor@test.com"
+    And There is a waiver for editors
+    And A "Research Article" with CustomId "111118" is submitted on journal "foo-journal"
+    And The corresponding author has email "author@test.com"
+    And There is an additional author with email "editor@test.com"
+    When The "Submission Submitted" event is triggered
+    Then The invoice for CustomId "111118" has "1" waivers applied
+    And The invoice for CustomId "111118" remains in DRAFT state

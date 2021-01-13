@@ -84,6 +84,7 @@ const defaultUsecaseContext: UsecaseAuthorizationContext = {
 
 let submittingManuscript: Manuscript = null;
 let event: SubmissionSubmitted = null;
+let additionalAuthors: { email: string; isCorresponding: false }[] = null;
 
 Before(() => {
   context.repos.pausedReminder = new MockPausedReminderRepo();
@@ -106,6 +107,7 @@ Before(() => {
     context.repos.waiver
   );
 
+  additionalAuthors = [];
   submittingManuscript = null;
   event = null;
 });
@@ -169,6 +171,7 @@ When(`The "Submission Submitted" event is triggered`, async () => {
             email: submittingManuscript.authorEmail,
             isCorresponding: true,
           },
+          ...additionalAuthors,
         ],
       },
     ],
@@ -455,5 +458,15 @@ Given(
       waiver,
       item.invoiceItemId
     );
+  }
+);
+
+Given(
+  /^There is an additional author with email "([\w_.@]+)"$/,
+  async (email: string) => {
+    additionalAuthors.push({
+      email,
+      isCorresponding: false,
+    });
   }
 );

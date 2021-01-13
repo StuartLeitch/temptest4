@@ -6,6 +6,7 @@ import { Transaction } from './../../domain/Transaction';
 import * as Errors from './createTransactionErrors';
 
 export type CreateTransactionResponse = Either<
+  | Errors.AuthorsEmailsRequiredError
   | Errors.ManuscriptIdRequiredError
   | Errors.CatalogItemNotFoundError
   | Errors.InvoiceItemCreatedError

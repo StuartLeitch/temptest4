@@ -11,8 +11,8 @@ import { PoliciesRegister as ReductionsPoliciesRegister } from '../reductions/po
 import { SanctionedCountryPolicy } from '../reductions/policies/SanctionedCountryPolicy';
 import { WaivedCountryPolicy } from '../reductions/policies/WaivedCountryPolicy';
 
-interface WaiverServiceDTO {
-  authorEmail: string;
+export interface WaiverServiceDTO {
+  allAuthorsEmails: string[];
   invoiceId: string;
   journalId: string;
   country: string;
@@ -25,7 +25,7 @@ export class WaiverService {
     private waiverRepo: WaiverRepoContract
   ) {}
   public async applyWaiver({
-    authorEmail,
+    allAuthorsEmails,
     invoiceId,
     journalId,
     country,
@@ -70,8 +70,8 @@ export class WaiverService {
       }
     }
 
-    const editorRoles = await this.editorRepo.getEditorRolesByEmail(
-      authorEmail
+    const editorRoles = await this.editorRepo.getEditorListRolesByEmails(
+      allAuthorsEmails
     );
 
     if (activeWaiverMap[WaiverType.WAIVED_CHIEF_EDITOR]) {
@@ -110,6 +110,10 @@ export class WaiverService {
     invoiceId: InvoiceId,
     applicableWaivers: Waiver[]
   ): Promise<Waiver> {
+    if (!applicableWaivers.length) {
+      return;
+    }
+
     const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
       invoiceId
     );
@@ -119,9 +123,7 @@ export class WaiverService {
     }
 
     const item = invoiceItems[0];
-    if (!applicableWaivers.length) {
-      return;
-    }
+
     const existingWaivers = (
       await this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId)
     ).waivers;

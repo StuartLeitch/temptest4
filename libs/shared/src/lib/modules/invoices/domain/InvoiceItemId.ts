@@ -1,5 +1,5 @@
-import {Entity} from '../../../core/domain/Entity';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
+import { Entity } from '../../../core/domain/Entity';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 
 export class InvoiceItemId extends Entity<any> {
   get id(): UniqueEntityID {
@@ -12,5 +12,9 @@ export class InvoiceItemId extends Entity<any> {
 
   public static create(id?: UniqueEntityID): InvoiceItemId {
     return new InvoiceItemId(id);
+  }
+
+  toString(): string {
+    return this.id.toString();
   }
 }
