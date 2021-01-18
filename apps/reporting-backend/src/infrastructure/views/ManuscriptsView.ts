@@ -112,7 +112,8 @@ AS select
       handling_editors.first_handling_editor_invited_date,
       handling_editors.first_handling_editor_accepted_date,
       last_editor_recommendation.recommendation last_editor_recommendation,
-      last_editor_recommendation.submitted_date as last_editor_recommendation_submitted_date
+      last_editor_recommendation.submitted_date as last_editor_recommendation_submitted_date,
+      submission_revision_requested_dates.max as last_requested_revision_date
     FROM ${submissionView.getViewName()} s
       LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_corresponding = true limit 1) a on a.manuscript_custom_id = s.manuscript_custom_id
       LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.manuscript_custom_id = s.manuscript_custom_id and a.is_submitting = true limit 1) a2 on a2.manuscript_custom_id = s.manuscript_custom_id
@@ -130,6 +131,7 @@ AS select
         'SubmissionRecommendationToPublishMade', 'SubmissionRecommendationToRejectMade', 'SubmissionRejected', 'SubmissionAccepted', 'SubmissionQualityCheckRTCd',
         'SubmissionQualityCheckPassed', 'SubmissionWithdrawn'
       ) order by event_timestamp desc limit 1) last_sd on last_sd.submission_id = s.submission_id
+      LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${submissionDataView.getViewName()} where submission_event = 'SubmissionRevisionRequested' group by submission_id) submission_revision_requested_dates on submission_revision_requested_dates.submission_id = s.submission_id
       LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'screener' limit 1) screener on screener.submission_id = s.submission_id
       LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id
       LEFT JOIN LATERAL (select * from ${manuscriptReviewsView.getViewName()} r where r.manuscript_custom_id = s.manuscript_custom_id and r.team_type = 'editor' order by submitted_date desc nulls last limit 1) last_editor_recommendation on last_editor_recommendation.manuscript_custom_id = s.manuscript_custom_id
