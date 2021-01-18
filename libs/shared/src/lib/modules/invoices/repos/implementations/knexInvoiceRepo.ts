@@ -532,13 +532,8 @@ export class KnexInvoiceRepo
     // * SQL for retrieving results needed only for ERP registration
     const filterCreditNotesReadyForERP = this.filterCreditNotesReadyForErpRegistration();
 
-    const filterArticlesByNotNullDatePublished = this.articleRepo.filterBy({
-      whereNotNull: 'articles.datePublished',
-    });
-    const prepareIdsSQL = filterArticlesByNotNullDatePublished(
-      filterCreditNotesReadyForERP(
-        withCreditNoteErpReference(withInvoiceItems(erpReferencesQuery))
-      )
+    const prepareIdsSQL = filterCreditNotesReadyForERP(
+      withCreditNoteErpReference(withInvoiceItems(erpReferencesQuery))
     );
 
     logger.debug('select', {
