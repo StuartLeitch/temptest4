@@ -18,8 +18,8 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
-  BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
-  LATEST_BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:latest
+  BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
+  LATEST_BUILD_IMAGE: $AW_SDEV_REGISTRY/belzebuth-runner:latest
   AWS_REGION: "eu-west-1"
   BT_ENVIRONMENT: "sandbox"
   BT_MERCHANT_ID: "test-merchant-id"
