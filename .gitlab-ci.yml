@@ -18,8 +18,8 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
   NODE_VERSION: 14.4.0
-  BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
-  LATEST_BUILD_IMAGE: $DEV_AWS_REGISTRY/belzebuth-runner:latest
+  BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
+  LATEST_BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:latest
   AWS_REGION: "eu-west-1"
   BT_ENVIRONMENT: "sandbox"
   BT_MERCHANT_ID: "test-merchant-id"
@@ -104,9 +104,9 @@ Package Images:dev:
   stage: package
   image: docker:19.03.12
   variables:
-    AWS_ACCESS_KEY_ID: $DEV_ACCESS_KEY
-    AWS_SECRET_ACCESS_KEY: $DEV_SECRET_KEY
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    AWS_ACCESS_KEY_ID: $AWS_DEV_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: $AWS_DEV_SECRET_ACCESS_KEY
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
   before_script:
     - apk add --no-cache aws-cli
     - apk add 'py3-botocore<1.18.0'
@@ -115,7 +115,7 @@ Package Images:dev:
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
   script:
-    - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
+    - $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/dockerize-apps.sh
   dependencies:
@@ -155,7 +155,7 @@ Deploy:dev:
     NODE_ENV: dev
     NAMESPACE: dev
     CLUSTER: hindawi-dev
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
 
 Deploy:qa:
@@ -170,7 +170,7 @@ Deploy:qa:
     NODE_ENV: qa
     NAMESPACE: qa
     CLUSTER: hindawi-dev
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
 
 Deploy:hindawi-demo:
@@ -185,7 +185,7 @@ Deploy:hindawi-demo:
     NODE_ENV: demo
     NAMESPACE: demo
     CLUSTER: hindawi-dev
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
 
 Deploy:gsw-demo:
@@ -200,7 +200,7 @@ Deploy:gsw-demo:
     NODE_ENV: demo
     NAMESPACE: demo-gsw
     CLUSTER: hindawi-dev
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
 
 Deploy:gsw-prod:
@@ -215,7 +215,7 @@ Deploy:gsw-prod:
     NODE_ENV: prod
     NAMESPACE: gsw-prod
     CLUSTER: hindawi-prod
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
 
 Deploy:hindawi-prod:
@@ -230,7 +230,7 @@ Deploy:hindawi-prod:
     NODE_ENV: prod
     NAMESPACE: prod-hindawi
     CLUSTER: hindawi-prod
-    AWS_REGISTRY: $DEV_AWS_REGISTRY
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
 # Pages:
 #   interruptible: true
