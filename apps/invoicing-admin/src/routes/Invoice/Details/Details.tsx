@@ -57,7 +57,7 @@ const Details: React.FC = (props) => {
   const { invoice, getPaymentMethods } = data;
   const { status, id: invoiceId, transaction } = invoice;
 
-  console.info(invoice);
+  // console.info(invoice);
 
   // * -> Net and total charges computing
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
@@ -81,22 +81,21 @@ const Details: React.FC = (props) => {
     statusClassName = 'success';
   }
 
-  const queryState = JSON.parse(localStorage.getItem('invoicesListFilters'));
-  const paginationState = JSON.parse(
-    localStorage.getItem('invoicesListPagination')
-  );
+  const queryState = JSON.parse(localStorage.getItem('invoicesList'));
+  const { filters, pagination } = queryState;
+
   const {
     invoiceStatus,
     transactionStatus,
     journalId,
     referenceNumber,
     customId,
-  } = queryState;
-  const { page } = paginationState;
+  } = filters;
+  const { page } = pagination;
 
   // * build the query string out of query state
   let queryString = '';
-  if (Object.keys(Object.assign({}, queryState, paginationState)).length) {
+  if (Object.keys(Object.assign({}, queryState, pagination)).length) {
     queryString += '?';
     queryString += invoiceStatus.reduce(
       (qs, is) => (qs += `invoiceStatus=${is}&`),
