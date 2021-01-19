@@ -220,7 +220,11 @@ class KnexMigrationSource {
     create_peer_review_events_table,
     move_peer_review_events,
     rebuild_materialized_views(
-      '20210106114615_add_peer_review_cycle_check_date'
+      '20210106114615_add_peer_review_cycle_check_date',
+      true
+    ),
+    rebuild_materialized_views(
+      '20210118140815_add_last_requested_revision_date'
     ),
   ].map(makeViewObject);
 
