@@ -105,6 +105,7 @@ AS select
       review_reports.review_reports_count,
       review_reports.last_review_report_submitted_date,
       review_reports.first_review_report_submitted_date,
+      review_reports.reviewer_count,
       handling_editors.invited_handling_editors_count,
       handling_editors.last_handling_editor_invited_date,
       handling_editors.current_handling_editor_accepted_date,
