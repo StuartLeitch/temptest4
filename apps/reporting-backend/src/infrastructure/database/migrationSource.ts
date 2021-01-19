@@ -224,7 +224,11 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views(
-      '20210118140815_add_last_requested_revision_date'
+      '20210118140815_add_last_requested_revision_date',
+      true
+    ),
+    rebuild_materialized_views(
+      '20210118150015_report_reviewer_update_on_manuscript_view'
     ),
   ].map(makeViewObject);
 

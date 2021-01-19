@@ -149,10 +149,10 @@ AS select
       ) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
       LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as pending_reviewers_count from ${manuscriptReviewers.getViewName()} where responded_date is null group by manuscript_custom_id, version) pending_reviewers on pending_reviewers.manuscript_custom_id = s.manuscript_custom_id and pending_reviewers."version" = s."version"
       LEFT JOIN (
-        SELECT manuscript_custom_id, "version", count(*) as review_reports_count, 
+        SELECT manuscript_custom_id, count(*) as review_reports_count, count (distinct team_member_email) as reviewer_count,
           max(submitted_date) as last_review_report_submitted_date,
           min(submitted_date) as first_review_report_submitted_date
-        from ${manuscriptReviewsView.getViewName()} where recommendation in ('publish', 'reject', 'minor', 'major') group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
+        from ${manuscriptReviewsView.getViewName()} where (manuscript_reviews.team_type = 'reviewer' and recommendation in ('publish', 'reject', 'minor', 'major')) group by manuscript_custom_id) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id
       LEFT JOIN (
         SELECT manuscript_custom_id, count(*) as invited_handling_editors_count, 
           min(invited_date) as first_handling_editor_invited_date,
