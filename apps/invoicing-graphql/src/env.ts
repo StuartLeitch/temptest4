@@ -59,6 +59,7 @@ export const env = {
     banner: toBool(getOsEnv('APP_BANNER')),
     tenantName: getOsEnv('TENANT_NAME'),
     tenantAddress: getOsEnv('TENANT_ADDRESS'),
+    tenantCountry: getOsEnv('TENANT_COUNTRY'),
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR'),
