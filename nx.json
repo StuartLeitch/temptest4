@@ -1,11 +1,34 @@
 {
-  "npmScope": "hindawi",
+  "npmScope": "steakhouse",
+  "affected": {
+    "defaultBase": "develop"
+  },
   "implicitDependencies": {
     "workspace.json": "*",
-    "package.json": "*",
-    "tsconfig.json": "*",
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
+    "tsconfig.base.json": "*",
     "tslint.json": "*",
+    ".eslintrc.json": "*",
     "nx.json": "*"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "accessToken": "YWJkZTZhMmMtNzEwNi00NDM2LTk1ZmQtOWRlMTNmMzQyZTRkfHJlYWQtd3JpdGU=",
+        "cacheableOperations": [
+          "build",
+          "test",
+          "lint",
+          "e2e"
+        ],
+        "canTrackAnalytics": false,
+        "showUsageWarnings": true
+      }
+    }
   },
   "projects": {
     "invoicing-graphql": {
