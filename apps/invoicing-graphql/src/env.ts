@@ -60,6 +60,7 @@ export const env = {
     tenantName: getOsEnv('TENANT_NAME'),
     tenantAddress: getOsEnv('TENANT_ADDRESS'),
     tenantCountry: getOsEnv('TENANT_COUNTRY'),
+    logoUrl: getOsEnv('LOGO_URL'),
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR'),
@@ -85,6 +86,8 @@ export const env = {
     creditControlReminderSenderName: getOsEnv(
       'CREDIT_CONTROL_REMINDER_SENDER_NAME'
     ),
+    assistanceEmail: getOsEnv('ASSISTANCE_EMAIL'),
+    doiNumber: getOsEnv('DOI_NUMBER'),
   },
   loaders: {
     knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
@@ -196,5 +199,28 @@ export const env = {
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),
+  },
+  bank: {
+    accountName: getOsEnv('BANK_ACCOUNT_NAME'),
+    accountNumber: getOsEnv('BANK_ACCOUNT_NUMBER'),
+    accountType: getOsEnv('BANK_ACCOUNT_TYPE'),
+    addressCity: getOsEnv('BANK_ADDRESS_CITY'),
+    addressCounty: getOsEnv('BANK_ADDRESS_COUNTY'),
+    addressLine1: getOsEnv('BANK_ADDRESS_LINE_1'),
+    addressLine2: getOsEnv('BANK_ADDRESS_LINE_2'),
+    addressLine3: getOsEnv('BANK_ADDRESS_LINE_3'),
+    addressPostcode: getOsEnv('BANK_ADDRESS_POSTCODE'),
+    beneficiaryAddressCity: getOsEnv('BANK_BENEFICIARY_ADDRESS_CITY'),
+    beneficiaryAddressLine1: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_1'),
+    beneficiaryAddressLine2: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_2'),
+    beneficiaryAddressPostcode: getOsEnv('BANK_BENEFICIARY_ADDRESS_POSTCODE'),
+    beneficiaryAddressState: getOsEnv('BANK_BENEFICIARY_ADDRESS_STATE'),
+    iban: getOsEnv('BANK_IBAN'),
+    sortCode: getOsEnv('BANK_SORT_CODE'),
+    swift: getOsEnv('BANK_SWIFT'),
+  },
+  company: {
+    companyRegistrationNumber: getOsEnv('COMPANY_REGISTRATION_NUMBER'),
+    companyVatNumber: getOsEnv('COMPANY_VAT_NUMBER'),
   },
 };
