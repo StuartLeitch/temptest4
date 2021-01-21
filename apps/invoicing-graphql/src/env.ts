@@ -109,7 +109,6 @@ export const env = {
     username: getOsEnvOptional('DB_USERNAME'),
     password: getOsEnvOptional('DB_PASSWORD'),
     database: getOsEnv('DB_DATABASE'),
-    logging: getOsEnv('DB_LOGGING'),
   },
   graphql: {
     enabled: toBool(getOsEnv('GRAPHQL_ENABLED')),
