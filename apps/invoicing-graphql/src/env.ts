@@ -86,7 +86,6 @@ export const env = {
     ),
   },
   loaders: {
-    winstonEnabled: toBool(getOsEnvOptional('WINSTON_LOADER_ENABLED')),
     knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
     contextEnabled: toBool(getOsEnvOptional('CONTEXT_LOADER_ENABLED')),
     expressEnabled: toBool(getOsEnvOptional('EXPRESS_LOADER_ENABLED')),
