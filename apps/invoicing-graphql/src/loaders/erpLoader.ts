@@ -5,12 +5,10 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-// import { LoggerBuilder } from '../../../../libs/shared/src/lib/infrastructure/logging/LoggerBuilder';
 import { EmptyErpService } from '../../../../libs/shared/src/lib/domain/services/ErpService';
 
 import { ErpReferenceAttributesMapping } from './../services/erp/ReferenceAttributesMap';
-import { NetSuiteService } from '../services/erp/NetSuiteService';
-import { SageService } from '../services/erp';
+import { NetSuiteService } from '../services/erp';
 
 import { env } from '../env';
 
@@ -38,14 +36,7 @@ export const erpLoader: MicroframeworkLoader = async (
       loggerBuilder
     );
 
-    const sageService = new SageService(
-      loggerBuilder.getLogger(),
-      env.salesForce,
-      ErpReferenceAttributesMapping.sage
-    );
-
     context.services.erp = {
-      sage: env.salesForce.sageEnabled ? sageService : emptyErp,
       netsuite: env.netSuite.netSuiteEnabled ? netSuiteService : emptyErp,
     };
   }

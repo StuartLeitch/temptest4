@@ -3,20 +3,15 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import {
-  MicroframeworkLoader,
   MicroframeworkSettings,
+  MicroframeworkLoader,
 } from 'microframework-w3tec';
-import {
-  setIntervalAsync,
-  // clearIntervalAsync
-} from 'set-interval-async/dynamic';
+import { setIntervalAsync } from 'set-interval-async/dynamic';
 
-import { RegisterInvoicesCron } from './../cron/registerInvoicesCron';
-import { RegisterInvoicesForSageCron } from './../cron/registerInvoicesForSageCron';
 import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecognitionsCron';
-import { RegisterRevenueRecognitionsForSageCron } from './../cron/registerRevenueRecognitionsForSageCron';
-import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
 import { RegisterCreditNotesCron } from './../cron/registerCreditNotesCron';
+import { RegisterInvoicesCron } from './../cron/registerInvoicesCron';
+import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
 
 import { env } from '../env';
 import { Context } from '../builders';
@@ -35,11 +30,6 @@ export const schedulerLoader: MicroframeworkLoader = async (
       failedErpCronRetryDisabled,
     } = env.app;
 
-    const sageJobQueue = [
-      RegisterInvoicesForSageCron,
-      RegisterRevenueRecognitionsForSageCron,
-    ];
-
     const netSuiteJobQueue = [
       RegisterInvoicesCron,
       RegisterRevenueRecognitionsCron,
@@ -48,8 +38,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
     ];
 
     const jobsQueue = [].concat(
-      env.netSuite.netSuiteEnabled ? netSuiteJobQueue : [],
-      env.salesForce.sageEnabled ? sageJobQueue : []
+      env.netSuite.netSuiteEnabled ? netSuiteJobQueue : []
     );
 
     // * Start scheduler

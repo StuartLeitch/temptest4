@@ -3,9 +3,11 @@ import { cloneDeep } from 'lodash';
 // * Core Domain
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { Either, right, left } from '../../../../core/logic/Result';
+import { UseCaseError } from '../../../../core/logic/UseCaseError';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
@@ -40,7 +42,7 @@ import { PublishInvoiceDraftDeletedUseCase } from '../publishEvents/publishInvoi
 
 // * Usecase specific
 import { GenerateDraftCompensatoryEventsResponse as Response } from './generate-draft-compensatory-events.response';
-import { GenerateDraftCompensatoryEventsDTO as DTO } from './generate-draft-compensatory-events.dto';
+import type { GenerateDraftCompensatoryEventsDTO as DTO } from './generate-draft-compensatory-events.dto';
 import * as Errors from './generate-draft-compensatory-events.errors';
 
 type Context = UsecaseAuthorizationContext;
@@ -114,7 +116,7 @@ export class GenerateDraftCompensatoryEventsUsecase
         .then(this.sendDeleted(context))
         .execute();
 
-      return execution.map(() => null);
+      return execution.map(() => null) as any;
     } catch (e) {
       return left(
         new UnexpectedError(
@@ -177,13 +179,17 @@ export class GenerateDraftCompensatoryEventsUsecase
       const maybeManuscript = await usecase.execute({ invoiceId }, context);
       return maybeManuscript
         .map((result) => result.getValue())
-        .chain((manuscripts) => {
-          if (manuscripts.length === 0) {
-            return left(new Errors.InvoiceHasNoManuscript(invoiceId));
-          }
+        .chain(
+          (
+            manuscripts
+          ): Either<Errors.InvoiceHasNoManuscript, Manuscript[]> => {
+            if (manuscripts.length === 0) {
+              return left(new Errors.InvoiceHasNoManuscript(invoiceId));
+            }
 
-          return right(manuscripts);
-        })
+            return right(manuscripts);
+          }
+        )
         .map((manuscripts) => manuscripts[0])
         .map((manuscript) => ({ ...request, manuscript }));
     };
@@ -271,7 +277,7 @@ export class GenerateDraftCompensatoryEventsUsecase
 
       const originalItems = cloneDeep(invoiceItems);
 
-      let finalResp = right(null);
+      let finalResp = right<Result<UseCaseError>, void>(null);
 
       allReductionDates.forEach(async (date) => {
         const it = cloneDeep(originalItems);

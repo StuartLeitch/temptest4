@@ -181,13 +181,6 @@ export const env = {
     clientId: getOsEnv('PP_CLIENT_ID'),
     clientSecret: getOsEnv('PP_CLIENT_SECRET'),
   },
-  salesForce: {
-    loginUrl: getOsEnv('SAGE_LOGIN_URL'),
-    user: getOsEnv('SAGE_USER'),
-    password: getOsEnv('SAGE_PASSWORD'),
-    securityToken: getOsEnv('SAGE_SECURITY_TOKEN'),
-    sageEnabled: toBool(getOsEnv('SAGE_ENABLED')),
-  },
   netSuite: {
     account: getOsEnv('NETSUITE_REALM'),
     endpoint: getOsEnv('NETSUITE_REST_ENDPOINT'),
