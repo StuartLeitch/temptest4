@@ -45,7 +45,6 @@ const ApplyCouponModal: React.FC<ApplyCouponModalProps> = ({
 
       const error = (applyCouponResult?.error?.graphQLErrors[0] as any)
         ?.message;
-      console.log('****', error);
       if (!error) {
         onSuccessCallback();
       } else {

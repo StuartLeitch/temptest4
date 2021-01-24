@@ -43,8 +43,6 @@ const Paypal: React.FunctionComponent<Props> = ({
             return a;
           },
           onApprove: async (data, actions) => {
-            console.log(data);
-            // onSuccess(payment);
             onSuccess({ orderId: data.orderID });
           },
           onError,

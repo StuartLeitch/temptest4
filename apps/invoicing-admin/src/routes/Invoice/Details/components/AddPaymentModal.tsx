@@ -75,7 +75,6 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
 
   useEffect(() => {
     const { paymentAmount, paymentReference } = bankTransferPaymentData;
-    console.log({ paymentAmount });
     setFields({
       paymentAmount: {
         isValid:
