@@ -628,7 +628,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
+      tranId: `Article ${manuscript.customId} - CN-${invoice.referenceNumber}`,
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -665,7 +665,6 @@ export class NetSuiteService implements ErpServiceContract {
         headers: oauth.toHeader(oauth.authorize(journalRequestOpts, token)),
         data: createJournalPayload,
       } as AxiosRequestConfig);
-
       const journalId = res?.headers?.location?.split('/').pop();
       await this.patchInvoice({ ...data, journalId });
       return journalId;
