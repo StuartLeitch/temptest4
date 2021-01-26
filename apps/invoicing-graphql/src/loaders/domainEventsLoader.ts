@@ -33,6 +33,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
+    console.info(context.services);
     const {
       repos: {
         paymentMethod,
@@ -50,6 +51,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       },
       services: { logger: loggerService, schedulingService, qq: queue, erp },
     } = context;
+    console.info(queue);
 
     const publishRevenueRecognitionReversal = new PublishRevenueRecognitionReversalUsecase(
       invoice,

@@ -199,6 +199,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
         );
       }
     } catch (err) {
+      console.error(err);
       console.log(
         `[AfterInvoiceCreditNoteCreated]: Failed to execute onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent. Err: ${err}`
       );
