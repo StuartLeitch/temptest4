@@ -1,9 +1,5 @@
-import config from 'config';
-import _ from 'lodash';
-
 import * as pkg from '../../../package.json';
 import {
-  // getOsEnvWithDefault,
   getOsEnvOptional,
   normalizePort,
   getOsPath,
@@ -12,23 +8,7 @@ import {
   toArray,
   toFloat,
   toBool,
-  // getOsPaths,
 } from './lib/env';
-
-function customizer(objValue, srcValue) {
-  return objValue || srcValue;
-}
-
-// * Simply merge the process.env object with the config isObject
-// * The keys that are duplicated across the objects are ‘overwritten’
-// * by subsequent objects with the same key.
-if (Object.keys(config).length !== 0) {
-  _.mergeWith(process.env, config, customizer);
-}
-
-/**
- * Environment variables
- */
 
 export const env = {
   node: process.env.NODE_ENV || 'development',
