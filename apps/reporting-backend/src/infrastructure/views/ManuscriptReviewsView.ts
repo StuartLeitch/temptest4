@@ -50,7 +50,7 @@ AS SELECT
   LEFT JOIN LATERAL (SELECT * FROM ${manuscriptEditorsView.getViewName()} e where e.id = reviews.team_member_id limit 1) editors on editors.id = reviews.team_member_id
   LEFT JOIN LATERAL (SELECT * FROM ${manuscriptReviewers.getViewName()} r where r.reviewer_id = reviews.team_member_id limit 1) reviewers on reviewers.reviewer_id = reviews.team_member_id
   LEFT JOIN LATERAL (SELECT * FROM ${authorsView.getViewName()} a where a.id = reviews.team_member_id limit 1) authors on authors.id = reviews.team_member_id
-WITH DATA;
+WITH NO DATA;
 `;
   }
 

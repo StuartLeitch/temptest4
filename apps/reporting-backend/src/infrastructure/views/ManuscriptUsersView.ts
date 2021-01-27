@@ -8,7 +8,8 @@ import manuscriptReviewers from './ManuscriptReviewersView';
 import manuscriptsView from './ManuscriptsView';
 import usersDataView from './UsersDataView';
 
-class ManuscriptsUsersView extends AbstractEventView
+class ManuscriptsUsersView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -53,7 +54,7 @@ AS SELECT
       ${manuscriptReviewers.getViewName()} mr) AS users
   JOIN ${manuscriptsView.getViewName()} m ON m.manuscript_custom_id = users.manuscript_custom_id
   LEFT JOIN LATERAL ( select * from ${usersDataView.getViewName()} where email = users.email and orcid is not null limit 1) user_identities ON user_identities.email = users.email
-WITH DATA;`;
+WITH NO DATA;`;
   }
 
   postCreateQueries = [

@@ -39,7 +39,7 @@ FROM
 		"specialIssueId" text,
 		"submissionId" text,
 		title text)
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

@@ -177,7 +177,7 @@ AS select
         d.manuscript_custom_id = s.manuscript_custom_id
       LIMIT 1) deleted_manuscripts on deleted_manuscripts.manuscript_custom_id = s.manuscript_custom_id
   ) m
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

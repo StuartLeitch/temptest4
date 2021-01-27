@@ -55,7 +55,7 @@ from ${REPORTING_TABLES.SUBMISSION} se
     responded text,
     status text
   ) 
-WITH DATA;
+WITH NO DATA;
 `;
   }
 

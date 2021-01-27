@@ -21,7 +21,7 @@ SELECT
 FROM
 ${REPORTING_TABLES.PEER_REVIEW} pre,
 jsonb_to_record(pre.payload) AS author_view ("customId" text, "submissionId" text)
-WITH DATA;
+WITH NO DATA;
         `;
   }
   postCreateQueries = [

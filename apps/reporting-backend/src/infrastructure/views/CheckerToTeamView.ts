@@ -1,10 +1,10 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import {
   REPORTING_TABLES,
-  CHECKER_TEAM_EVENTS
+  CHECKER_TEAM_EVENTS,
 } from 'libs/shared/src/lib/modules/reporting/constants';
 import checkerTeamDataView from './CheckerTeamDataView';
 
@@ -55,7 +55,7 @@ SELECT
       ) ce ON c.event_id = ce.event_id
 WHERE
 	c.rn = 1
-WITH DATA;
+WITH NO DATA;
     `;
   }
 
@@ -67,7 +67,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (team_type)`,
     `create index on ${this.getViewName()} (checker_id)`,
     `create index on ${this.getViewName()} (checker_role)`,
-    `create index on ${this.getViewName()} (checker_email)`
+    `create index on ${this.getViewName()} (checker_email)`,
   ];
 
   getViewName(): string {

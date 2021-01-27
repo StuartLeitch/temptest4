@@ -22,7 +22,7 @@ AS SELECT journal_events.id AS event_id,
     coalesce(journal_events.time, cast_to_timestamp(journal_events.payload ->> 'updated'::text), cast_to_timestamp('1980-01-01')) as event_date,
     cast_to_timestamp(journal_events.payload ->> 'updated'::text) AS updated_date
     FROM ${REPORTING_TABLES.JOURNAL}
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

@@ -1,14 +1,15 @@
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import {
   REPORTING_TABLES,
-  CHECKER_SUBMISSION_EVENTS
+  CHECKER_SUBMISSION_EVENTS,
 } from 'libs/shared/src/lib/modules/reporting/constants';
 import checkerSubmissionData from './CheckerSubmissionDataView';
 
-class CheckerToSubmission extends AbstractEventView
+class CheckerToSubmission
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -33,7 +34,7 @@ FROM (
 		${checkerSubmissionData.getViewName()}) c
 WHERE
 	c.rn = 1
-WITH DATA;
+WITH NO DATA;
     `;
   }
 
@@ -48,7 +49,7 @@ WITH DATA;
     `create index on ${this.getViewName()} (assignation_date)`,
     `create index on ${this.getViewName()} (submission_id, assignation_date)`,
     `create index on ${this.getViewName()} (checker_role)`,
-    `create index on ${this.getViewName()} (checker_email)`
+    `create index on ${this.getViewName()} (checker_email)`,
   ];
 
   getViewName(): string {

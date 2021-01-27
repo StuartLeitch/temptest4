@@ -128,7 +128,7 @@ AS SELECT
       event_timestamp DESC nulls LAST
     LIMIT 1
   ) first_invoice_event on first_invoice_event.invoice_id = inv.invoice_id
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

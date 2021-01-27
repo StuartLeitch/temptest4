@@ -127,7 +127,7 @@ FROM (
   LEFT JOIN (SELECT submission_id, max(event_timestamp) FROM ${peerReviewDataView.getViewName()} where peer_review_event = 'PeerReviewCycleCheckingProcessSentToPeerReview' group by submission_id) peer_review_cycle_check_dates on peer_review_cycle_check_dates.submission_id = s.submission_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSectionsView.getViewName()} js where js.section_id = s.section_id limit 1) sec on sec.section_id = s.section_id
   LEFT JOIN LATERAL (SELECT * FROM ${journalSpecialIssuesView.getViewName()} jsi where jsi.special_issue_id = s.special_issue_id limit 1) spec on spec.special_issue_id = s.special_issue_id
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

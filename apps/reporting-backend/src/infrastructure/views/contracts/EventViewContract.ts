@@ -9,6 +9,7 @@ export interface EventViewContract extends WithDependencies {
 
 export abstract class AbstractEventView implements WithDependencies {
   private dependecies = [] as EventViewContract[];
+  public shouldRefresh: boolean = true;
   abstract postCreateQueries = [];
   abstract getViewName(): string;
   abstract getCreateQuery(): string;

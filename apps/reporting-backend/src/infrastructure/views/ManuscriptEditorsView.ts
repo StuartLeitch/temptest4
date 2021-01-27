@@ -67,7 +67,7 @@ AS SELECT
       aff text,
       role jsonb
     )
-WITH DATA;
+WITH NO DATA;
 `;
   }
 
