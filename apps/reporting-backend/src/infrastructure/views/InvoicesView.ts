@@ -119,15 +119,11 @@ AS SELECT
       where deleted_invoices.invoice_id = inv.invoice_id
         and event = 'InvoiceDraftDeleted'
       limit 1) deleted_invoices on deleted_invoices.invoice_id = inv.invoice_id
-  LEFT JOIN LATERAL (
-    SELECT * FROM ${invoiceDataView.getViewName()} id 
-    where id.invoice_id = inv.invoice_id 
-        AND id.event IN ('InvoiceDraftCreated', 'InvoiceCreated')
-    ORDER BY 
-      CASE WHEN event = 'InvoiceDraftCreated' THEN 1 ELSE 2 END ASC,
-      event_timestamp DESC nulls LAST
-    LIMIT 1
-  ) first_invoice_event on first_invoice_event.invoice_id = inv.invoice_id
+  LEFT JOIN (
+    SELECT *, row_number() over (PARTITION by invoice_id order by CASE WHEN event = 'InvoiceDraftCreated' THEN 1 ELSE 2 END ASC,
+      event_timestamp DESC nulls LAST) as rn FROM ${invoiceDataView.getViewName()} id 
+    where id.event IN ('InvoiceDraftCreated', 'InvoiceCreated')
+  ) first_invoice_event on first_invoice_event.invoice_id = inv.invoice_id and first_invoice_event.rn = 1
 WITH NO DATA;
     `;
   }
