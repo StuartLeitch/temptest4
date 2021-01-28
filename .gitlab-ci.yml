@@ -144,8 +144,9 @@ Package Images:others:
     - $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}")
     - ./tools/scripts/dockerize-iris.sh
 
-Deploy Iris:dev: &script_deploy
+Deploy Iris:dev:
   when: manual
+  image: alpine
   tags:
     - 'cluster:hindawi-dev'
   stage: deploy
@@ -162,7 +163,7 @@ Deploy Iris:dev: &script_deploy
     - helm plugin install https://github.com/zendesk/helm-secrets
   script:
     - cd $HOME/apps/iris
-    - helm secrets upgrade iris ./chart -f ./values/secrets.dev.yaml --namespace dev
+    - helm secrets upgrade iris ./chart -f ./values/secrets.dev.yaml --namespace dev --set image.tag=$CI_COMMIT_SHA
 # .deploy_base: &script_deploy
 #   when: manual
 #   before_script:
