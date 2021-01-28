@@ -160,7 +160,7 @@ Deploy Iris:dev:
     - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | sh
     - helm plugin install https://github.com/zendesk/helm-secrets
   script:
-    - cd $HOME/apps/iris
+    - cd apps/iris
     - helm secrets upgrade iris ./chart -f ./values/secrets.dev.yaml --namespace dev --set image.tag=$CI_COMMIT_SHA
 # .deploy_base: &script_deploy
 #   when: manual
