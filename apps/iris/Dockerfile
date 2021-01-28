@@ -1,4 +1,4 @@
-FROM amancevice/superset:0.38.0
+FROM amancevice/superset:1.0.0
 
 USER root
 RUN pip install flask_oidc
