@@ -153,13 +153,11 @@ Deploy Iris:dev:
   dependencies:
     - Package Images:others
   before_script:
-    - apk add python3
-    - pip3 install --upgrade awscli
-    - apk add --no-cache curl
+    - apk add python3 py3-pip openssl curl git bash
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
-    - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+    - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | sh
     - helm plugin install https://github.com/zendesk/helm-secrets
   script:
     - cd $HOME/apps/iris
