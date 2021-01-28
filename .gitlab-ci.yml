@@ -153,7 +153,7 @@ Deploy Iris:dev:
   dependencies:
     - Package Images:others
   before_script:
-    - apk add python3 py3-pip openssl curl git bash
+    - apk add python3 py3-pip openssl curl git bash aws-cli
     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
@@ -161,6 +161,7 @@ Deploy Iris:dev:
     - helm plugin install https://github.com/zendesk/helm-secrets
   script:
     - cd apps/iris
+    - aws sts get-caller-identity
     - helm secrets upgrade iris ./chart -f ./values/secrets.dev.yaml --namespace dev --set image.tag=$CI_COMMIT_SHA
 # .deploy_base: &script_deploy
 #   when: manual
