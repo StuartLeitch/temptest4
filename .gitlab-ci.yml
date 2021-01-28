@@ -158,11 +158,11 @@ Deploy Iris:dev:
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
     - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | sh
-    - helm plugin install https://github.com/zendesk/helm-secrets
   script:
     - cd apps/iris
-    - aws sts get-caller-identity
-    - helm secrets upgrade iris ./chart -f ./values/secrets.dev.yaml --namespace dev --set image.tag=$CI_COMMIT_SHA
+    - mkdir ~/.aws
+    - touch ~/.aws/credentials
+    - helm upgrade iris ./chart --reuse-values --namespace dev --set image.tag=$CI_COMMIT_SHA
 # .deploy_base: &script_deploy
 #   when: manual
 #   before_script:
