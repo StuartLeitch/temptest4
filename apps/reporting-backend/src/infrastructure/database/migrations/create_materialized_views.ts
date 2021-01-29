@@ -26,21 +26,6 @@ export async function up(knex: Knex): Promise<any> {
         queryStart
       )} seconds`
     );
-    if (view.shouldRefresh) {
-      queryStart = new Date();
-
-      // avoid running concurent queries that will break if ran first
-      await knex.raw(
-        `REFRESH MATERIALIZED VIEW ${view.getViewName()} WITH DATA`
-      );
-      logger.info(
-        `Refreshing table ${view.getViewName()} took ${differenceInSeconds(
-          queryStart
-        )} seconds`
-      );
-    } else {
-      logger.info(`Skipping refresh for ${view.getViewName()}`);
-    }
   }
 }
 
