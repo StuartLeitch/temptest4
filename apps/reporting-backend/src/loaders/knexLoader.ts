@@ -28,16 +28,15 @@ export const knexLoader: MicroframeworkLoader = async (
 
   await knex.migrate.latest().then(async () => {
     let queries: string[] = [];
+    console.log('Started refresh');
     for (let view of materializedViewList) {
       if (view.shouldRefresh) {
         // avoid running concurent queries that will break if ran first
-        queries.push(
+        await knex.raw(
           `REFRESH MATERIALIZED VIEW ${view.getViewName()} WITH DATA;`
         );
       }
     }
-    console.log('Started refresh');
-    await knex.raw(queries.join('\n'));
     console.log('Finished refresh');
   });
 
