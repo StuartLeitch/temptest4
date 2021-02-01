@@ -481,6 +481,10 @@ export class NetSuiteService implements ErpServiceContract {
       account: {
         id: accountMap[paymentAccount.name],
       },
+      tranDate: format(
+        new Date(invoice.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
       createdDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -548,6 +552,10 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
+      tranDate: format(
+        new Date(invoice.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -629,6 +637,10 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Article ${manuscript.customId} - CN-${invoice.referenceNumber}`,
+      tranDate: format(
+        new Date(invoice.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
@@ -750,13 +762,20 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const creditNotePayload: Record<string, any> = {
+      tranDate: format(
+        new Date(originalInvoice.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
+    };
+
     try {
       const res = await axios({
         ...creditNoteTransformOpts,
         headers: oauth.toHeader(
           oauth.authorize(creditNoteTransformOpts, token)
         ),
-        data: {},
+        data: creditNotePayload,
       } as AxiosRequestConfig);
 
       return res?.headers?.location?.split('/').pop();
@@ -804,6 +823,10 @@ export class NetSuiteService implements ErpServiceContract {
 
     const patchCreditNotePayload: Record<string, any> = {
       tranId: creditNote.creditNoteNumber,
+      tranDate: format(
+        new Date(creditNote.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
       memo,
     };
 
