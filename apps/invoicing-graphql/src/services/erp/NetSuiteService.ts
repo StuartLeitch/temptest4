@@ -844,8 +844,25 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const keep = ` ${manuscript.customId.toString()}`;
+    // eslint-disable-next-line prefer-const
+    let [firstName, ...lastNames] = payer?.name.toString().split(' ');
 
-    createCustomerPayload.companyName = payer?.organization.toString();
+    lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
+
+    let lastName =
+      lastNames.length > 0
+        ? `${lastNames.join(' ')}${keep}`.trim()
+        : `${keep}`.trim();
+
+    if (lastName?.length > MAX_LENGTH) {
+      lastName = lastName?.slice(0, MAX_LENGTH - keep.length).trim() + keep;
+    }
+    if (payer.type === 'INSTITUTION') {
+      createCustomerPayload.companyName = payer?.organization.toString();
+    } else {
+      createCustomerPayload.companyName = firstName.concat(' ', lastName);
+    }
+
     if (createCustomerPayload.companyName.length > MAX_LENGTH) {
       createCustomerPayload.companyName =
         createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
