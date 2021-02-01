@@ -9,7 +9,8 @@ import {
 
 const checkerSubmissionEvents = CHECKER_SUBMISSION_EVENTS.map((e) => `'${e}'`);
 
-class CheckerSubmissionData extends AbstractEventView
+class CheckerSubmissionData
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -42,7 +43,7 @@ AS SELECT
     )
   WHERE
     ce."type" in (${checkerSubmissionEvents.join(',')})
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

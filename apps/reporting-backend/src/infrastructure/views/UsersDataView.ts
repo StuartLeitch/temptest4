@@ -40,7 +40,7 @@ FROM (
 			identities
 		WHERE
 			TYPE = 'orcid') AS orcid_identity ON local_identity.unique_id = orcid_identity.unique_id)
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

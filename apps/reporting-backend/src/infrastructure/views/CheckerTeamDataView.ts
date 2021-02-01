@@ -30,7 +30,7 @@ AS SELECT
     )
   WHERE
     ce."type" in (${checkerTeamEvents.join(',')})
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

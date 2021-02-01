@@ -38,7 +38,7 @@ AS SELECT ie.id as event_id,
     (ie.payload -> 'payer' ->> 'billingAddress'::text) AS payer_address,
     (ie.payload -> 'payer' ->> 'organization'::text) as organization
    FROM ${REPORTING_TABLES.INVOICE} ie
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

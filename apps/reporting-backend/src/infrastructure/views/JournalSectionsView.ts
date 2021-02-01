@@ -1,11 +1,12 @@
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 import {
   AbstractEventView,
-  EventViewContract
+  EventViewContract,
 } from './contracts/EventViewContract';
 import uniqueJournalsView from './JournalsView';
 
-class JournalSectionsView extends AbstractEventView
+class JournalSectionsView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -26,7 +27,7 @@ FROM
   ${REPORTING_TABLES.JOURNAL} je 
   JOIN ${uniqueJournalsView.getViewName()} uj on je.id = uj.event_id,
   LATERAL jsonb_to_recordset(je.payload -> 'sections') as section_view(id text, name text, created timestamp, updated timestamp, "specialIssues" jsonb, editors jsonb)
-WITH DATA;
+WITH NO DATA;
     `;
   }
 
@@ -35,7 +36,7 @@ WITH DATA;
     `CREATE INDEX ON ${this.getViewName()} (journal_name)`,
     `CREATE INDEX ON ${this.getViewName()} (event_date)`,
     `CREATE INDEX ON ${this.getViewName()} (journal_code)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_issn)`
+    `CREATE INDEX ON ${this.getViewName()} (journal_issn)`,
   ];
 
   getViewName(): string {

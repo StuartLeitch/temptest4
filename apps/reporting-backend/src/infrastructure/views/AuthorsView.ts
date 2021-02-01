@@ -43,7 +43,7 @@ AS SELECT
       aff text
     )
     LEFT JOIN countries c on upper(author_view.country) = c.iso
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

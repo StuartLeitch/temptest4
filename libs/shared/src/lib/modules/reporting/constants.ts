@@ -4,6 +4,7 @@ export enum REPORTING_TABLES {
   USER = 'user_events',
   INVOICE = 'invoice_events',
   ARTICLE = 'article_events',
+  PEER_REVIEW = 'peer_review_events',
   CHECKER = 'checker_events',
   SYNDICATION = 'syndication_events',
   DEFAULT = 'dump_events',
@@ -59,3 +60,7 @@ export const JOURNAL_EVENTS = [
 ];
 
 export const ARTICLE_PUBLISHED_EVENTS = ['ArticlePublished'];
+
+export const PEER_REVIEW_EVENTS = [
+  'PeerReviewCycleCheckingProcessSentToPeerReview',
+];

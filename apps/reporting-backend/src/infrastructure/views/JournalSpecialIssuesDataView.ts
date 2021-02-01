@@ -6,7 +6,8 @@ import {
 import uniqueJournalsView from './JournalsView';
 import journalSectionsView from './JournalSectionsView';
 
-class JournalSpecialIssuesDataView extends AbstractEventView
+class JournalSpecialIssuesDataView
+  extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
@@ -38,7 +39,7 @@ class JournalSpecialIssuesDataView extends AbstractEventView
       special_issues_view.editors as editors_json
     FROM ${journalSectionsView.getViewName()} j,
     LATERAL jsonb_to_recordset(j.special_issues_json) as special_issues_view(${this.getSpecialViewFields()})
-  WITH DATA
+  WITH NO DATA
     `;
   }
 

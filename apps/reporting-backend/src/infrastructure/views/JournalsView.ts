@@ -28,7 +28,7 @@ AS SELECT j1.event,
   LEFT JOIN (SELECT journal_id, "month", avg(journal_rate) as journal_rate from ${acceptanceRatesView.getViewName()} group by journal_id, "month") individual_ar on individual_ar."month" = to_char(now(), 'YYYY-MM-01')::date and j1.journal_id = individual_ar.journal_id
   LEFT JOIN (SELECT "month", avg(journal_rate) as journal_rate from ${acceptanceRatesView.getViewName()} where journal_rate is not null group by "month") global_ar on global_ar."month" = to_char(now(), 'YYYY-MM-01')::date
   WHERE rn = 1
-WITH DATA;
+WITH NO DATA;
     `;
   }
 

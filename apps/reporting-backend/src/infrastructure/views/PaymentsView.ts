@@ -29,7 +29,7 @@ FROM (SELECT ie.payload, last_inv.*
 ) last_inv, 
   jsonb_to_recordset(last_inv.payload -> 'payments')
     AS payment_view("foreignPaymentId" text, "paymentAmount" float, "paymentType" text, "paymentDate" text)
-WITH DATA;
+WITH NO DATA;
 `;
   }
 

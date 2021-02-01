@@ -83,7 +83,7 @@ FROM
 		ROLE jsonb)
 WHERE
 	jsonb_array_length(j.editors) > 0
-WITH DATA `;
+WITH NO DATA `;
   }
 
   postCreateQueries = [

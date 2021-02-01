@@ -1,13 +1,31 @@
 import * as Knex from 'knex';
+import { differenceInSeconds } from '../../../utils/utils';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 import { materializedViewList } from '../../views';
+
+const logger = new Logger(__filename);
 
 export async function up(knex: Knex): Promise<any> {
   for (const view of materializedViewList) {
-    console.log('Migrating view: ', view.getViewName());
+    logger.info('Migrating view: ' + view.getViewName());
+    let queryStart = new Date();
+
     await knex.raw(view.getCreateQuery());
     for (const indexQuery of view.getPostCreateQueries()) {
+      const indexQueryStart = new Date();
       await knex.raw(indexQuery);
+      logger.debug(
+        `Creating indices ${indexQuery} took ${differenceInSeconds(
+          indexQueryStart
+        )} seconds`
+      );
     }
+
+    logger.info(
+      `Creating table and indices ${view.getViewName()} took ${differenceInSeconds(
+        queryStart
+      )} seconds`
+    );
   }
 }
 

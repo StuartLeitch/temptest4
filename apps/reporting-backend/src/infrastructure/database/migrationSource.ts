@@ -17,6 +17,8 @@ import * as create_syndication_events_table from './migrations/20200629123541_ad
 import * as add_deleted_manuscripts_table from './migrations/20200703082115_add_deleted_manuscripts_table';
 import * as add_preprint_value_to_submission_data from './migrations/20200831162115_add_preprint_value_to_submission_data';
 import * as move_article_events from './migrations/20201012162115_move_article_events';
+import * as create_peer_review_events_table from './migrations/20210111133315_create_peer_review_events_table';
+import * as move_peer_review_events from './migrations/20210112142215_move_peer_review_events';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -214,7 +216,20 @@ class KnexMigrationSource {
       '20201118152115_journal_peer_review_model',
       true
     ),
-    rebuild_materialized_views('20201119152115_invoices_numbers_fix'),
+    rebuild_materialized_views('20201119152115_invoices_numbers_fix', true),
+    create_peer_review_events_table,
+    move_peer_review_events,
+    rebuild_materialized_views(
+      '20210106114615_add_peer_review_cycle_check_date',
+      true
+    ),
+    rebuild_materialized_views(
+      '20210118140815_add_last_requested_revision_date',
+      true
+    ),
+    rebuild_materialized_views(
+      '20210118150015_report_reviewer_update_on_manuscript_view'
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

@@ -4,8 +4,13 @@ import {
 } from './contracts/EventViewContract';
 import manuscriptsView from './ManuscriptsView';
 
-class ManuscriptVendorsView extends AbstractEventView
+class ManuscriptVendorsView
+  extends AbstractEventView
   implements EventViewContract {
+  constructor() {
+    super();
+    this.shouldRefresh = false;
+  }
   getCreateQuery(): string {
     return `
 CREATE OR REPLACE VIEW ${this.getViewName()}

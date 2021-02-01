@@ -48,7 +48,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()} AS
     ORDER BY invited_date desc nulls last
     LIMIT 1
   ) lead_guest_editor on lead_guest_editor.special_issue_id = si_data.special_issue_id
-WITH DATA
+WITH NO DATA
     `;
   }
 
