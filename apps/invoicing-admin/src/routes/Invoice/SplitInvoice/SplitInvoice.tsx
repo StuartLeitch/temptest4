@@ -76,7 +76,7 @@ const SplitInvoice: React.FC = () => {
 
   const splitInvoice = () => {
     // TODO: split invoice
-    console.log(payers);
+    // console.log(payers);
   };
 
   const splitEqually = () => {

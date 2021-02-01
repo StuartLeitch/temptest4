@@ -20,7 +20,7 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
 import { IsInvoiceDeletedResponse as Response } from './is-invoice-deleted.response';
-import { IsInvoiceDeletedDTO as DTO } from './is-invoice-deleted.dto';
+import type { IsInvoiceDeletedDTO as DTO } from './is-invoice-deleted.dto';
 import * as Errors from './is-invoice-deleted.errors';
 
 type Context = UsecaseAuthorizationContext;

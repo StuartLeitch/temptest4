@@ -24,12 +24,7 @@ import {
 
 import { PhenomSqsServiceContract } from '../queue_service/phenom-queue-service';
 
-import {
-  BraintreeService,
-  NetSuiteService,
-  PayPalService,
-  SageService,
-} from '../services';
+import { BraintreeService, NetSuiteService, PayPalService } from '../services';
 
 import { env } from '../env';
 
@@ -46,7 +41,6 @@ export interface Services {
   paymentStrategyFactory: PaymentStrategyFactory;
   qq: PhenomSqsServiceContract;
   erp: {
-    sage: SageService;
     netsuite: NetSuiteService;
   };
 }

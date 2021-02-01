@@ -1,9 +1,5 @@
-import config from 'config';
-import _ from 'lodash';
-
 import * as pkg from '../../../package.json';
 import {
-  // getOsEnvWithDefault,
   getOsEnvOptional,
   normalizePort,
   getOsPath,
@@ -12,23 +8,7 @@ import {
   toArray,
   toFloat,
   toBool,
-  // getOsPaths,
 } from './lib/env';
-
-function customizer(objValue, srcValue) {
-  return objValue || srcValue;
-}
-
-// * Simply merge the process.env object with the config isObject
-// * The keys that are duplicated across the objects are ‘overwritten’
-// * by subsequent objects with the same key.
-if (Object.keys(config).length !== 0) {
-  _.mergeWith(process.env, config, customizer);
-}
-
-/**
- * Environment variables
- */
 
 export const env = {
   node: process.env.NODE_ENV || 'development',
@@ -39,8 +19,9 @@ export const env = {
     name: getOsEnv('SERVICE_NAME'),
     version: (pkg as any).version,
     description: (pkg as any).description,
-    host: getOsEnv('APP_HOST'),
     schema: getOsEnv('APP_SCHEMA'),
+    host: getOsEnv('APP_HOST'),
+    port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     routePrefix: getOsEnv('APP_ROUTE_PREFIX'),
     FERoot: getOsEnv('FE_ROOT'),
     eventNamespace: getOsEnv('EVENT_NAMESPACE'),
@@ -55,21 +36,11 @@ export const env = {
     ),
     skippingSeeding: toBool(getOsEnv('SKIPPING_SEEDING')),
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
-    erpRegisterInvoicesEnabled: toBool(
-      getOsEnv('ERP_REGISTER_INVOICES_ENABLED')
-    ),
-    erpRegisterCreditNotesEnabled: toBool(
-      getOsEnv('ERP_REGISTER_CREDIT_NOTES_ENABLED')
-    ),
-    erpRegisterRevenueRecognitionEnabled: toBool(
-      getOsEnv('ERP_REGISTER_REVENUE_RECOGNITION_ENABLED')
-    ),
-    erpRegisterPaymentsEnabled: toBool(
-      getOsEnv('ERP_REGISTER_PAYMENTS_ENABLED')
-    ),
-    port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     banner: toBool(getOsEnv('APP_BANNER')),
     tenantName: getOsEnv('TENANT_NAME'),
+    tenantAddress: getOsEnv('TENANT_ADDRESS'),
+    tenantCountry: getOsEnv('TENANT_COUNTRY'),
+    logoUrl: getOsEnv('LOGO_URL'),
     dirs: {
       migrationsDir: getOsPath('DB_MIGRATIONS_DIR'),
       seedsDir: getOsPath('DB_SEEDS_DIR'),
@@ -95,9 +66,10 @@ export const env = {
     creditControlReminderSenderName: getOsEnv(
       'CREDIT_CONTROL_REMINDER_SENDER_NAME'
     ),
+    assistanceEmail: getOsEnv('ASSISTANCE_EMAIL'),
+    doiNumber: getOsEnv('DOI_NUMBER'),
   },
   loaders: {
-    winstonEnabled: toBool(getOsEnvOptional('WINSTON_LOADER_ENABLED')),
     knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
     contextEnabled: toBool(getOsEnvOptional('CONTEXT_LOADER_ENABLED')),
     expressEnabled: toBool(getOsEnvOptional('EXPRESS_LOADER_ENABLED')),
@@ -121,7 +93,6 @@ export const env = {
     username: getOsEnvOptional('DB_USERNAME'),
     password: getOsEnvOptional('DB_PASSWORD'),
     database: getOsEnv('DB_DATABASE'),
-    logging: getOsEnv('DB_LOGGING'),
   },
   graphql: {
     enabled: toBool(getOsEnv('GRAPHQL_ENABLED')),
@@ -190,13 +161,6 @@ export const env = {
     clientId: getOsEnv('PP_CLIENT_ID'),
     clientSecret: getOsEnv('PP_CLIENT_SECRET'),
   },
-  salesForce: {
-    loginUrl: getOsEnv('SAGE_LOGIN_URL'),
-    user: getOsEnv('SAGE_USER'),
-    password: getOsEnv('SAGE_PASSWORD'),
-    securityToken: getOsEnv('SAGE_SECURITY_TOKEN'),
-    sageEnabled: toBool(getOsEnv('SAGE_ENABLED')),
-  },
   netSuite: {
     account: getOsEnv('NETSUITE_REALM'),
     endpoint: getOsEnv('NETSUITE_REST_ENDPOINT'),
@@ -208,5 +172,28 @@ export const env = {
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),
+  },
+  bank: {
+    accountName: getOsEnv('BANK_ACCOUNT_NAME'),
+    accountNumber: getOsEnv('BANK_ACCOUNT_NUMBER'),
+    accountType: getOsEnv('BANK_ACCOUNT_TYPE'),
+    addressCity: getOsEnv('BANK_ADDRESS_CITY'),
+    addressCounty: getOsEnv('BANK_ADDRESS_COUNTY'),
+    addressLine1: getOsEnv('BANK_ADDRESS_LINE_1'),
+    addressLine2: getOsEnv('BANK_ADDRESS_LINE_2'),
+    addressLine3: getOsEnv('BANK_ADDRESS_LINE_3'),
+    addressPostcode: getOsEnv('BANK_ADDRESS_POSTCODE'),
+    beneficiaryAddressCity: getOsEnv('BANK_BENEFICIARY_ADDRESS_CITY'),
+    beneficiaryAddressLine1: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_1'),
+    beneficiaryAddressLine2: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_2'),
+    beneficiaryAddressPostcode: getOsEnv('BANK_BENEFICIARY_ADDRESS_POSTCODE'),
+    beneficiaryAddressState: getOsEnv('BANK_BENEFICIARY_ADDRESS_STATE'),
+    iban: getOsEnv('BANK_IBAN'),
+    sortCode: getOsEnv('BANK_SORT_CODE'),
+    swift: getOsEnv('BANK_SWIFT'),
+  },
+  company: {
+    companyRegistrationNumber: getOsEnv('COMPANY_REGISTRATION_NUMBER'),
+    companyVatNumber: getOsEnv('COMPANY_VAT_NUMBER'),
   },
 };
