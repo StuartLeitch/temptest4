@@ -228,8 +228,10 @@ class KnexMigrationSource {
       true
     ),
     rebuild_materialized_views(
-      '20210118150015_report_reviewer_update_on_manuscript_view'
+      '20210118150015_report_reviewer_update_on_manuscript_view',
+      true
     ),
+    rebuild_materialized_views('20210202150015_restore_review_report_count'),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
