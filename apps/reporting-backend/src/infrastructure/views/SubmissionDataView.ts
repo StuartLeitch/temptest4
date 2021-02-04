@@ -4,7 +4,8 @@ import {
 } from './contracts/EventViewContract';
 import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 
-class SubmissionDataView extends AbstractEventView
+class SubmissionDataView
+  extends AbstractEventView
   implements EventViewContract {
   private insertTrigger = 'after_se_insert';
   private updateTrigger = 'after_se_update';
@@ -60,21 +61,23 @@ execute procedure ${this.getTriggerName()}();
       _last_version_index int;
     begin
       SELECT
-            t.manuscripts_array_index - 1 into _last_version_index
-          from
-            (
-            SELECT
-              sd.version_arr,
-              row_number() over(partition by sd.event_id)::int as manuscripts_array_index,
-              row_number() over(partition by sd.event_id order by sd.version_arr desc)::int as rn
-            FROM(
-              select
-                NEW.id as event_id,
-                string_to_array("version", '.')::int[] as version_arr
-              FROM
-                jsonb_to_recordset(((NEW.payload -> 'manuscripts'))) as manuscripts_view("version" text)) sd 
-            ) t
-            WHERE t.rn = 1;
+        t.manuscripts_array_index - 1 into _last_version_index
+      from (
+        select 
+          *, row_number() over(partition by sd.event_id order by sd.version_arr desc)::int as rn
+        from (
+          SELECT
+            sd.event_id,
+            sd.version_arr,
+            row_number() over(partition by sd.event_id)::int as manuscripts_array_index
+          FROM(
+            select
+              NEW.id as event_id,
+              string_to_array("version", '.')::int[] as version_arr
+            FROM
+              jsonb_to_recordset(((NEW.payload -> 'manuscripts'))) as manuscripts_view("version" text)) sd 
+          ) sd
+        ) t WHERE t.rn = 1;
     
         insert into ${this.getViewName()} values(NEW.id,
           coalesce(NEW.time, cast_to_timestamp(((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'updated'), '1980-01-01'),
