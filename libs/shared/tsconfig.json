@@ -67,5 +67,5 @@
     "src/lib/infrastructure/database/knex/migrations/20201117160034_change_invoices_table_schema.js",
     "src/lib/infrastructure/database/knex/migrations/20201204094931_add_timestamp_erp_references.js",
     "src/lib/infrastructure/database/knex/migrations/20201207101958_create_indexes_erp_references.js",
-    "src/lib/infrastructure/database/knex/migrations/20210204164831_add_persistentInvoiceNumber_to_invoices.js"  ]
+    "src/lib/infrastructure/database/knex/migrations/20210204164831_add_persistentReferenceNumber_to_invoices.js"  ]
 }

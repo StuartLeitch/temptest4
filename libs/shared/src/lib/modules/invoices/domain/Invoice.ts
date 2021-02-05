@@ -21,8 +21,6 @@ import { InvoiceCreditNoteCreated } from './events/invoiceCreditNoteCreated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentId } from '../../payments/domain/PaymentId';
-// import {PayerType} from '../../payers/domain/PayerType';
-// import {Coupon} from '../../coupons/domain/Coupon';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
@@ -51,6 +49,7 @@ interface InvoiceProps {
   creationReason?: string;
   cancelledInvoiceReference?: string;
   erpReferences?: InvoiceErpReferences;
+  referenceNumber: string;
 }
 
 export type InvoiceCollection = Invoice[];
@@ -125,18 +124,23 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   get referenceNumber(): string {
-    if (!this.props.invoiceNumber || !this.props.dateAccepted) {
-      return null;
-    }
-    const paddedNumber = this.props.invoiceNumber.toString().padStart(6, '0');
-    let creationYear = this.props.dateAccepted.getFullYear();
-    if (
-      this.props.dateIssued &&
-      getYear(this.props.dateIssued) < getYear(this.props.dateAccepted)
-    ) {
-      creationYear = this.props.dateIssued.getFullYear();
-    }
-    return `${paddedNumber}/${creationYear}`;
+    // if (!this.props.invoiceNumber || !this.props.dateAccepted) {
+    //   return null;
+    // }
+    // const paddedNumber = this.props.invoiceNumber.toString().padStart(6, '0');
+    // let creationYear = this.props.dateAccepted.getFullYear();
+    // if (
+    //   this.props.dateIssued &&
+    //   getYear(this.props.dateIssued) < getYear(this.props.dateAccepted)
+    // ) {
+    //   creationYear = this.props.dateIssued.getFullYear();
+    // }
+    // return `${paddedNumber}/${creationYear}`;
+    return this.props.referenceNumber;
+  }
+
+  set referenceNumber(referenceNumber: string) {
+    this.props.referenceNumber = referenceNumber;
   }
 
   get creditNoteNumber(): string {

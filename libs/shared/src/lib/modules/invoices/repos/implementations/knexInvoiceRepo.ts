@@ -172,6 +172,7 @@ export class KnexInvoiceRepo
 
     return InvoiceMap.toDomain({
       ...invoice,
+      referenceNumber: invoice.persistentReferenceNumber,
       erpReferences,
     });
   }
