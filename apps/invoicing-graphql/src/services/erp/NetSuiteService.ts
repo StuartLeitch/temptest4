@@ -400,6 +400,9 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
+      [this.customSegmentFieldName]: {
+        id: customSegmentId,
+      },
       item: {
         items: [
           {
@@ -419,12 +422,6 @@ export class NetSuiteService implements ErpServiceContract {
         ],
       },
     };
-
-    if (customSegmentId !== '1') {
-      createInvoicePayload[this.customSegmentFieldName] = {
-        id: customSegmentId,
-      };
-    }
 
     try {
       const res = await axios({
@@ -567,6 +564,9 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
+      [this.customSegmentFieldName]: {
+        id: customSegmentId,
+      },
       line: {
         items: [
           {
@@ -586,12 +586,6 @@ export class NetSuiteService implements ErpServiceContract {
         ],
       },
     };
-
-    if (customSegmentId !== '1') {
-      createJournalPayload[this.customSegmentFieldName] = {
-        id: customSegmentId,
-      };
-    }
 
     try {
       const res = await axios({
@@ -652,6 +646,9 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
+      [this.customSegmentFieldName]: {
+        id: customSegmentId,
+      },
       line: {
         items: [
           {
@@ -671,12 +668,6 @@ export class NetSuiteService implements ErpServiceContract {
         ],
       },
     };
-
-    if (customSegmentId !== '1') {
-      createJournalPayload[this.customSegmentFieldName] = {
-        id: customSegmentId,
-      };
-    }
 
     try {
       const res = await axios({
