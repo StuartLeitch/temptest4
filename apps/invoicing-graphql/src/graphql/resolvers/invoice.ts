@@ -39,6 +39,8 @@ export const invoice: Resolvers<Context> = {
   Query: {
     async invoice(parent, args, context): Promise<any> {
       const { repos } = context;
+
+      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(repos.invoice);
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
@@ -60,6 +62,18 @@ export const invoice: Resolvers<Context> = {
       // There is a TSLint error for when try to use a shadowed variable!
       const invoiceDetails = result.value.getValue();
 
+
+      let assocInvoice = null;
+      // * this is a credit note, let's ask for the reference number of the associated invoice
+      if (invoiceDetails.cancelledInvoiceReference) {
+        const result = await getCreditNoteByInvoiceIdUsecase.execute({ invoiceId: invoiceDetails.cancelledInvoiceReference }, usecaseContext);
+        if (result.isLeft()) {
+          return undefined;
+        }
+        const invoice = result.value.getValue();
+        assocInvoice = InvoiceMap.toPersistence(invoice);
+      }
+
       return {
         invoiceId: invoiceDetails.id.toString(),
         status: invoiceDetails.status,
@@ -70,7 +84,7 @@ export const invoice: Resolvers<Context> = {
         erpReferences: invoiceDetails.getErpReferences().getItems(),
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-        referenceNumber: invoiceDetails.referenceNumber ?? '---'
+        persistentReferenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
       };
     },
 
@@ -112,7 +126,7 @@ export const invoice: Resolvers<Context> = {
           dateCreated: invoiceDetails?.dateCreated?.toISOString(),
           dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
           dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-          referenceNumber: assocInvoice ? assocInvoice.referenceNumber : invoiceDetails.referenceNumber,
+          persistentReferenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
         })
       }));
 

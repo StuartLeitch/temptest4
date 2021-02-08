@@ -49,7 +49,7 @@ interface InvoiceProps {
   creationReason?: string;
   cancelledInvoiceReference?: string;
   erpReferences?: InvoiceErpReferences;
-  referenceNumber: string;
+  persistentReferenceNumber?: string;
 }
 
 export type InvoiceCollection = Invoice[];
@@ -123,7 +123,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.invoiceNumber = invoiceNumber;
   }
 
-  get referenceNumber(): string {
+  get persistentReferenceNumber(): string {
     // if (!this.props.invoiceNumber || !this.props.dateAccepted) {
     //   return null;
     // }
@@ -136,11 +136,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     //   creationYear = this.props.dateIssued.getFullYear();
     // }
     // return `${paddedNumber}/${creationYear}`;
-    return this.props.referenceNumber;
+    return this.props.persistentReferenceNumber;
   }
 
-  set referenceNumber(referenceNumber: string) {
-    this.props.referenceNumber = referenceNumber;
+  set persistentReferenceNumber(referenceNumber: string) {
+    this.props.persistentReferenceNumber = referenceNumber;
   }
 
   get creditNoteNumber(): string {
@@ -148,7 +148,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       return null;
     }
 
-    return `CN-${this.referenceNumber}`;
+    return `CN-${this.persistentReferenceNumber}`;
   }
 
   get transactionId(): TransactionId {
@@ -277,6 +277,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     const now = new Date();
     this.props.status = InvoiceStatus.ACTIVE;
     this.props.dateIssued = new Date();
+    this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
+
     this.addDomainEvent(new InvoiceConfirmed(this, now));
   }
 
@@ -294,6 +296,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     if (this.props.dateIssued === null) {
       this.props.dateIssued = new Date();
     }
+    this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
     this.addDomainEvent(new InvoiceFinalizedEvent(this, now));
   }
 

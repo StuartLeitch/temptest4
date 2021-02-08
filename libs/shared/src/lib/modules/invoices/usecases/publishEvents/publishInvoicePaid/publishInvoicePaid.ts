@@ -72,7 +72,7 @@ export class PublishInvoicePaidUsecase
     const data: InvoicePaidEvent = {
       ...EventUtils.createEventObject(),
 
-      referenceNumber: invoice.referenceNumber,
+      referenceNumber: invoice.persistentReferenceNumber,
       transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: invoice.id.toString(),

@@ -111,7 +111,7 @@ export class PublishInvoiceFinalizedUsecase
 
   private formatReferenceNumber(invoice: Invoice): string {
     if (!invoice.cancelledInvoiceReference) {
-      return invoice.referenceNumber;
+      return invoice.persistentReferenceNumber;
     } else {
       return invoice.creditNoteNumber;
     }
