@@ -481,7 +481,7 @@ export class NetSuiteService implements ErpServiceContract {
       account: {
         id: accountMap[paymentAccount.name],
       },
-      tranDate: format(
+      custbody_phenom_publish_date: format(
         new Date(invoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
@@ -552,7 +552,7 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
-      tranDate: format(
+      custbody_phenom_publish_date: format(
         new Date(invoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
@@ -637,7 +637,7 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Article ${manuscript.customId} - CN-${invoice.referenceNumber}`,
-      tranDate: format(
+      custbody_phenom_publish_date: format(
         new Date(invoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
@@ -763,7 +763,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const creditNotePayload: Record<string, any> = {
-      tranDate: format(
+      custbody_phenom_publish_date: format(
         new Date(originalInvoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
@@ -823,7 +823,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const patchCreditNotePayload: Record<string, any> = {
       tranId: creditNote.creditNoteNumber,
-      tranDate: format(
+      custbody_phenom_publish_date: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
