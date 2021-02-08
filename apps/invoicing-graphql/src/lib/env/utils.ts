@@ -10,7 +10,7 @@ export function getOsEnv(key: string): string {
 
 export function nonEmptyOsEnv(key: string) {
   const value = getOsEnv(key);
-  if (!!value) {
+  if (!value) {
     throw new Error(`Value of environment variable ${key} is an empty string.`);
   }
   return value;
