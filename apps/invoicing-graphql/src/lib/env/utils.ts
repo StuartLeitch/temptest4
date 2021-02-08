@@ -13,6 +13,7 @@ export function nonEmptyOsEnv(key: string) {
   if (!!value) {
     throw new Error(`Value of environment variable ${key} is an empty string.`);
   }
+  return value;
 }
 
 export function getOsEnvOptional(key: string): string | undefined {
