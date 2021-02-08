@@ -5,6 +5,7 @@ module.exports = (config, context) => {
     test: /\.graphql?$/,
     loader: 'webpack-graphql-loader',
   });
-
+  config.stats.env = true;
+  config.stats.timings = true;
   return config;
 };
