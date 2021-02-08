@@ -197,5 +197,5 @@ export const env = {
   company: {
     companyRegistrationNumber: getOsEnv('COMPANY_REGISTRATION_NUMBER'),
     companyVatNumber: getOsEnv('COMPANY_VAT_NUMBER'),
-  },
+  }
 };
