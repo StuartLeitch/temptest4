@@ -170,7 +170,7 @@ export const env = {
     tokenId: getOsEnv('NETSUITE_TOKEN_ID'),
     tokenSecret: getOsEnv('NETSUITE_TOKEN_SECRET'),
     netSuiteEnabled: toBool(getOsEnv('NETSUITE_ENABLED')),
-    customSegmentFieldName: nonEmptyOsEnv('CUSTOM_SEGMENT_FIELD_NAME'),
+    customSegmentFieldName: nonEmptyOsEnv('NETSUITE_CUSTOM_SEGMENT_FIELD_NAME'),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),
@@ -197,5 +197,5 @@ export const env = {
   company: {
     companyRegistrationNumber: getOsEnv('COMPANY_REGISTRATION_NUMBER'),
     companyVatNumber: getOsEnv('COMPANY_VAT_NUMBER'),
-  }
+  },
 };
