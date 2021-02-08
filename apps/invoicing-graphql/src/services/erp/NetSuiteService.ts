@@ -1,33 +1,32 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { format, getYear } from 'date-fns';
+import axios, { AxiosRequestConfig } from 'axios';
+import { format } from 'date-fns';
 import knex from 'knex';
 
 import {
+  LoggerBuilderContract,
   ErpServiceContract,
-  PayerType,
-  Payer,
-  Payment,
+  LoggerContract,
   PaymentMethod,
+  InvoiceItem,
   Manuscript,
   Invoice,
-  InvoiceItem,
-  LoggerContract,
-  LoggerBuilderContract,
+  Payment,
+  Payer,
 } from '@hindawi/shared';
 
 import {
-  ErpInvoiceRequest,
+  RegisterPaymentResponse,
+  RegisterPaymentRequest,
   ErpInvoiceResponse,
+  ErpInvoiceRequest,
   ErpRevRecResponse,
   ErpRevRecRequest,
-  RegisterPaymentRequest,
-  RegisterPaymentResponse,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
-import { Connection } from './netsuite/Connection';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
+import { Connection } from './netsuite/Connection';
 
 type CustomerPayload = {
   email: string;
@@ -40,6 +39,7 @@ export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
     private logger: LoggerContract,
+    private customSegmentFieldName: string,
     readonly referenceMappings?: Record<string, any>
   ) {}
 
@@ -49,7 +49,8 @@ export class NetSuiteService implements ErpServiceContract {
 
   public static create(
     config: Record<string, unknown>,
-    loggerBuilder: LoggerBuilderContract
+    loggerBuilder: LoggerBuilderContract,
+    customSegmentFieldName: string
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
@@ -59,7 +60,12 @@ export class NetSuiteService implements ErpServiceContract {
     const logger = loggerBuilder.getLogger();
     logger.setScope('NetSuiteService');
 
-    const service = new NetSuiteService(connection, logger, referenceMappings);
+    const service = new NetSuiteService(
+      connection,
+      logger,
+      customSegmentFieldName,
+      referenceMappings
+    );
 
     return service;
   }
@@ -415,7 +421,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     if (customSegmentId !== '1') {
-      createInvoicePayload.csegcseg1 = {
+      createInvoicePayload[this.customSegmentFieldName] = {
         id: customSegmentId,
       };
     }
@@ -582,7 +588,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     if (customSegmentId !== '1') {
-      createJournalPayload.csegcseg1 = {
+      createJournalPayload[this.customSegmentFieldName] = {
         id: customSegmentId,
       };
     }
@@ -667,7 +673,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     if (customSegmentId !== '1') {
-      createJournalPayload.csegcseg1 = {
+      createJournalPayload[this.customSegmentFieldName] = {
         id: customSegmentId,
       };
     }

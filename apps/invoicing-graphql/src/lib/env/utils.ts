@@ -8,6 +8,13 @@ export function getOsEnv(key: string): string {
   return process.env[key] as string;
 }
 
+export function nonEmptyOsEnv(key: string) {
+  const value = getOsEnv(key);
+  if (!!value) {
+    throw new Error(`Value of environment variable ${key} is an empty string.`);
+  }
+}
+
 export function getOsEnvOptional(key: string): string | undefined {
   return process.env[key];
 }
