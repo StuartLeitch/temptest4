@@ -84,7 +84,7 @@ export const invoice: Resolvers<Context> = {
         erpReferences: invoiceDetails.getErpReferences().getItems(),
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-        persistentReferenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
+        referenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
       };
     },
 
@@ -126,7 +126,7 @@ export const invoice: Resolvers<Context> = {
           dateCreated: invoiceDetails?.dateCreated?.toISOString(),
           dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
           dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-          persistentReferenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
+          referenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
         })
       }));
 
