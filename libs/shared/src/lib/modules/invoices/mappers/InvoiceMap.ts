@@ -52,7 +52,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       dateMovedToFinal: invoice.dateMovedToFinal,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
       creationReason: invoice.creationReason ?? null,
-      referenceNUmber: invoice.referenceNumber ?? null
+      referenceNumber: invoice.referenceNumber ?? null
       //  erpReferences: invoice.getErpReferences().getItems(),
     };
   }

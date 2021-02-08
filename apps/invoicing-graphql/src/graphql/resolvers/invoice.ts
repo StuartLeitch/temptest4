@@ -26,6 +26,7 @@ import {
   WaiverMap,
   PayerMap,
   Roles,
+  GetInvoicesIdsErrors,
 } from '@hindawi/shared';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
@@ -67,20 +68,15 @@ export const invoice: Resolvers<Context> = {
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
         erpReferences: invoiceDetails.getErpReferences().getItems(),
-        // revenueRecognitionReference: invoiceDetails.revenueRecognitionReference,
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-        referenceNumber:
-          invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
-            ? invoiceDetails.referenceNumber
-            : '---',
-        // totalAmount: entity.totalAmount,
-        // netAmount: entity.netAmount
+        referenceNumber: invoiceDetails.referenceNumber ?? '---'
       };
     },
 
     async invoices(parent, args, context) {
       const { repos } = context;
+      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(repos.invoice);
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
         roles: [Roles.ADMIN],
@@ -92,21 +88,37 @@ export const invoice: Resolvers<Context> = {
 
       const invoicesList = result.value.getValue();
 
-      return {
-        totalCount: invoicesList.totalCount,
-        invoices: invoicesList.invoices.map((invoiceDetails) => ({
+      const retrieveAssociatedInvoice = async (item: any) => {
+        const result = await getCreditNoteByInvoiceIdUsecase.execute({ invoiceId: item.cancelledInvoiceReference }, usecaseContext);
+        if (result.isLeft()) {
+          return undefined;
+        }
+        const invoice = result.value.getValue();
+        return InvoiceMap.toPersistence(invoice);
+      }
+
+      const getInvoices = async () => Promise.all(invoicesList.invoices.map(async (invoiceDetails: any) => {
+        let assocInvoice = null;
+        if (invoiceDetails.cancelledInvoiceReference) {
+
+          // * this is a credit note, let's ask for the reference number of the associated invoice
+          assocInvoice = await retrieveAssociatedInvoice(invoiceDetails);
+        }
+
+
+        return ({
           ...InvoiceMap.toPersistence(invoiceDetails),
           invoiceId: invoiceDetails.id.toString(),
-          // status: invoiceDetails.status,
-          // charge: invoiceDetails.charge,
           dateCreated: invoiceDetails?.dateCreated?.toISOString(),
           dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
           dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-          referenceNumber:
-            invoiceDetails.invoiceNumber && invoiceDetails.dateAccepted
-              ? invoiceDetails.referenceNumber
-              : null,
-        })),
+          referenceNumber: assocInvoice ? assocInvoice.referenceNumber : invoiceDetails.referenceNumber,
+        })
+      }));
+
+      return {
+        totalCount: invoicesList.totalCount,
+        invoices: await getInvoices()
       };
     },
 
@@ -364,18 +376,9 @@ export const invoice: Resolvers<Context> = {
         status: creditNoteDetails.status,
         charge: creditNoteDetails.charge,
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
-        // erpReference: creditNoteDetails.erpReference,
-        // creditNoteReference: creditNoteDetails.creditNoteReference,
-        // revenueRecognitionReference:
-        //   creditNoteDetails.revenueRecognitionReference,
         creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
-        referenceNumber:
-          creditNoteDetails.invoiceNumber && creditNoteDetails.dateAccepted
-            ? creditNoteDetails.creditNoteNumber
-            : '---',
-        // totalAmount: entity.totalAmount,
-        // netAmount: entity.netAmount
+        referenceNumber: creditNoteDetails.referenceNumber ?? '---',
       };
     },
     async transaction(parent: Invoice, args, context) {

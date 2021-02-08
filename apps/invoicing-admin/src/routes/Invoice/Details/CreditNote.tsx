@@ -53,6 +53,7 @@ const Details: React.FC = () => {
   if (error) return <div>Something Bad Happened</div>;
 
   const { invoice } = data;
+  console.info(invoice)
   const { status: invoiceStatus, id: invoiceId } = invoice;
 
   const { coupons, waivers, price } = invoice?.invoiceItem;

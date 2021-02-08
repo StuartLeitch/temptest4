@@ -140,19 +140,15 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.transactionId = transaction.transactionId.id.toString();
       clonedRawInvoice.dateCreated = new Date();
       clonedRawInvoice.dateIssued = new Date();
-      if (
-        invoice.dateIssued &&
-        getYear(invoice.dateIssued) < getYear(invoice.dateAccepted)
-      ) {
-        clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateIssued));
-      } else {
-        clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateAccepted));
-      }
-      clonedRawInvoice.erpReference = null;
+      // if (
+      //   invoice.dateIssued &&
+      //   getYear(invoice.dateIssued) < getYear(invoice.dateAccepted)
+      // ) {
+      //   clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateIssued));
+      // } else {
+      //   clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateAccepted));
+      // }
       clonedRawInvoice.cancelledInvoiceReference = null;
-      clonedRawInvoice.nsReference = null;
-      clonedRawInvoice.revenueRecognitionReference = null;
-      clonedRawInvoice.nsRevRecReference = null;
       clonedRawInvoice.creationReason = request.reason;
 
       // console.info(clonedRawInvoice);
@@ -190,7 +186,6 @@ export class CreateCreditNoteUsecase
 
       // * Assign the cancelled invoice reference
       // * This assignment will trigger an INVOICE_CREDITED event
-
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
       creditNote.markAsFinal();
 
