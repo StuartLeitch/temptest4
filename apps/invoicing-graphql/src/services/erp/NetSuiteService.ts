@@ -807,25 +807,22 @@ export class NetSuiteService implements ErpServiceContract {
 
     lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
 
-    let lastName =
-      lastNames.length > 0
-        ? `${lastNames.join(' ')}${keep}`.trim()
-        : `${keep}`.trim();
+    let sendingName = '';
 
-    if (lastName?.length > MAX_LENGTH) {
-      lastName = lastName?.slice(0, MAX_LENGTH - keep.length).trim() + keep;
-    }
     if (payer.type === 'INSTITUTION') {
-      createCustomerPayload.companyName = payer?.organization.toString();
+      sendingName = payer?.organization.toString();
     } else {
-      createCustomerPayload.companyName = firstName.concat(' ', lastName);
+      sendingName = firstName.concat(' ', lastNames.join(' '));
     }
 
-    if (createCustomerPayload.companyName.length > MAX_LENGTH) {
-      createCustomerPayload.companyName =
-        createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
-        keep;
+    const cpy = sendingName;
+    sendingName = sendingName + keep;
+
+    if (sendingName?.length > MAX_LENGTH) {
+      sendingName = cpy?.slice(0, MAX_LENGTH - keep.length).trim() + keep;
     }
+
+    createCustomerPayload.companyName = sendingName;
     createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
 
     return createCustomerPayload;
