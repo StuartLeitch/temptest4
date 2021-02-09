@@ -780,7 +780,7 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditNote, creditNoteId } = data;
+    const { creditNote, originalInvoice, creditNoteId } = data;
 
     const creditNoteRequestOpts = {
       url: `${config.endpoint}record/v1/creditmemo/${creditNoteId}`,
@@ -805,7 +805,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     const patchCreditNotePayload: Record<string, any> = {
-      tranId: creditNote.creditNoteNumber,
+      tranId: `CN-${originalInvoice.persistentReferenceNumber}`,
       memo,
     };
 

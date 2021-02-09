@@ -544,8 +544,6 @@ export const invoice: Resolvers<Context> = {
         services: { waiverService },
       } = context;
 
-      console.info(args);
-
       const { invoiceId, createDraft, reason } = args;
 
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
@@ -577,6 +575,15 @@ export const invoice: Resolvers<Context> = {
 
       const creditNote = result.value.getValue();
 
+      const getInvoiceUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
+      const retrieveInvoice = await getInvoiceUsecase.execute({ invoiceId });
+
+      if (retrieveInvoice.isLeft()) {
+        console.log('Error getting associate invoice', invoiceId);
+      }
+
+      const invoice = result.value.getValue();
+
       return {
         id: creditNote.invoiceId.id.toString(),
         cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
@@ -588,8 +595,8 @@ export const invoice: Resolvers<Context> = {
         creationReason: creditNote.creationReason,
         dateIssued: creditNote?.dateIssued?.toISOString(),
         referenceNumber:
-          creditNote.invoiceNumber && creditNote.dateAccepted
-            ? creditNote.creditNoteNumber
+          invoice
+            ? `CN-${invoice.persistentReferenceNumber}`
             : '---',
       };
     },
