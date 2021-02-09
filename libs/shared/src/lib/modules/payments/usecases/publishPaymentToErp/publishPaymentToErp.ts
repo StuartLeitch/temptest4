@@ -23,12 +23,10 @@ import { ErpReferenceRepoContract } from '../../../vendors/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { ErpReferenceMap } from '../../../vendors/mapper/ErpReference';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { CatalogRepoContract } from '../../../journals/repos';
 import { JournalId } from '../../../journals/domain/JournalId';
-import { PublisherRepoContract } from '../../../publishers/repos';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { PaymentRepoContract } from './../../repos/paymentRepo';
@@ -69,7 +67,6 @@ export class PublishPaymentToErpUsecase
     private catalogRepo: CatalogRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
-    private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {}
 
@@ -187,17 +184,6 @@ export class PublishPaymentToErpUsecase
       } catch (err) {
         return err;
       }
-
-      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        catalog?.publisherId
-      );
-      if (!publisherCustomValues) {
-        throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
-      }
-      this.loggerService.info(
-        'PublishInvoiceToERP publisher data',
-        publisherCustomValues
-      );
 
       try {
         const erpData: RegisterPaymentRequest = {

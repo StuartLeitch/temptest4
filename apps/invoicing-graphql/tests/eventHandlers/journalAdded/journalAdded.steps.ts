@@ -28,11 +28,8 @@ let context = {};
 
 const defaultPublisher = {
   customValues: {
-    journalItemReference: '',
-    tradeDocumentItem: '',
-    journalReference: '',
-    journalItemTag: '',
-    journalTag: '',
+    customSegmentId: '',
+    itemId: '',
   },
   dateCreated: null,
   dateUpdated: null,

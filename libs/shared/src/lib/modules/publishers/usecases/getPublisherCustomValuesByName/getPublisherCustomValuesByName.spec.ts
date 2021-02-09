@@ -17,7 +17,7 @@ describe('GetPublisherCustomValuesByNameUsecase', () => {
 
   it('should get the correct publisher custom values by name', async () => {
     const request: GetPublisherCustomValuesByNameDTO = {
-      publisherName: 'Hindawi'
+      publisherName: 'Hindawi',
     };
 
     const maybeResult = await usecase.execute(request);
@@ -26,12 +26,12 @@ describe('GetPublisherCustomValuesByNameUsecase', () => {
       fail(maybeResult.value.errorValue());
     }
     const value = maybeResult.value.getValue();
-    expect(value.journalItemReference).toBe('Hindawi');
+    expect(value.customSegmentId).toBe('Hindawi');
   });
 
   it('should get error if name does not exist', async () => {
     const request: GetPublisherCustomValuesByNameDTO = {
-      publisherName: '3'
+      publisherName: '3',
     };
 
     const maybeResult = await usecase.execute(request);
@@ -54,30 +54,24 @@ function addPublishers(publisherRepo: MockPublisherRepo) {
   const publisherProps: RawPublisher[] = [
     {
       customValues: {
-        journalItemReference: 'Hindawi',
-        tradeDocumentItem: 'Hindawi',
-        journalReference: 'Hindawi',
-        journalItemTag: 'Hindawi',
-        journalTag: 'Hindawi'
+        customSegmentId: 'Hindawi',
+        itemId: 'Hindawi',
       },
       dateCreated: new Date().toISOString(),
       dateUpdated: new Date().toISOString(),
       name: 'Hindawi',
-      id: '1'
+      id: '1',
     },
     {
       customValues: {
-        journalItemReference: 'Wiley',
-        tradeDocumentItem: 'Wiley',
-        journalReference: 'Wiley',
-        journalItemTag: 'Wiley',
-        journalTag: 'Wiley'
+        customSegmentId: 'Wiley',
+        itemId: 'Wiley',
       },
       dateCreated: new Date().toISOString(),
       dateUpdated: new Date().toISOString(),
       name: 'Wiley',
-      id: '2'
-    }
+      id: '2',
+    },
   ];
 
   for (const props of publisherProps) {
