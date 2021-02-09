@@ -255,7 +255,7 @@ export class SageService implements ErpServiceContract {
     let referenceNumber;
 
     if (invoice.invoiceNumber && invoice.dateAccepted) {
-      referenceNumber = invoice.referenceNumber;
+      referenceNumber = invoice.persistentReferenceNumber;
     }
 
     const description = `${journalName} - Article Processing Charges for article ${manuscript.customId}`;
@@ -425,7 +425,7 @@ export class SageService implements ErpServiceContract {
     const existingJournalTags = await connection
       .sobject('s2cor__Sage_ACC_Tag__c')
       .select({ Id: true })
-      .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
+      .where({ Name: invoice.persistentReferenceNumber, s2cor__Company__c: companyId })
       .execute();
     // this.logger.info('Existing Tags by Invoice Number: ', existingJournalTags);
 
@@ -433,9 +433,9 @@ export class SageService implements ErpServiceContract {
       return null;
     }
 
-    const journalReference = `${publisherCustomValues.journalReference} ${manuscript.customId} ${invoice.referenceNumber}`;
+    const journalReference = `${publisherCustomValues.journalReference} ${manuscript.customId} ${invoice.persistentReferenceNumber}`;
     const journalData = {
-      name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
+      name: `Article ${manuscript.customId} - Invoice ${invoice.persistentReferenceNumber}`,
       s2cor__Reference__c: journalReference,
       s2cor__Approval_Status__c: 'Unposted',
       s2cor__Date__c: manuscript.datePublished,
@@ -501,9 +501,9 @@ export class SageService implements ErpServiceContract {
     } = this;
 
     const journalItemData = {
-      Name: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
+      Name: `Article ${manuscript.customId} - Invoice ${invoice.persistentReferenceNumber}`,
       s2cor__Journal__c: journal.id,
-      s2cor__Reference__c: `${publisherCustomValues.journalItemReference} ${manuscript.customId} ${invoice.referenceNumber}`,
+      s2cor__Reference__c: `${publisherCustomValues.journalItemReference} ${manuscript.customId} ${invoice.persistentReferenceNumber}`,
       s2cor__Journal_Type__c: journalType,
       s2cor__Amount__c: invoiceTotal,
       s2cor__Date__c: manuscript.datePublished,
@@ -567,7 +567,7 @@ export class SageService implements ErpServiceContract {
     const existingJournalTags = await connection
       .sobject('s2cor__Sage_ACC_Tag__c')
       .select({ Id: true, Name: true })
-      .where({ Name: invoice.referenceNumber, s2cor__Company__c: companyId })
+      .where({ Name: invoice.persistentReferenceNumber, s2cor__Company__c: companyId })
       .execute();
     // this.logger.info('Existing Journal Tags: ', existingJournalTags);
 

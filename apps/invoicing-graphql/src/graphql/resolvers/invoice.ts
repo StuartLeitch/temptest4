@@ -392,7 +392,7 @@ export const invoice: Resolvers<Context> = {
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
         creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
-        referenceNumber: creditNoteDetails.referenceNumber ?? '---',
+        referenceNumber: creditNoteDetails.persistentReferenceNumber ?? '---',
       };
     },
     async transaction(parent: Invoice, args, context) {

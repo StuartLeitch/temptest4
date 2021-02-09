@@ -385,7 +385,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
-      tranId: invoice.referenceNumber,
+      tranId: invoice.persistentReferenceNumber,
       entity: {
         id: customerId,
       },
@@ -489,7 +489,7 @@ export class NetSuiteService implements ErpServiceContract {
         id: customerId,
       },
       // Invoice reference number,
-      refName: `Invoice #${invoice.referenceNumber}`,
+      refName: `Invoice #${invoice.persistentReferenceNumber}`,
       // Original amount,
       total,
       // Amount due,
@@ -547,22 +547,22 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
-      memo: `${invoice.referenceNumber}`,
+      tranId: `Article ${manuscript.customId} - Invoice ${invoice.persistentReferenceNumber}`,
+      memo: `${invoice.persistentReferenceNumber}`,
       entity: {
         id: customerId,
       },
       line: {
         items: [
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${invoice.persistentReferenceNumber}`,
             account: {
               id: debitAccountId,
             },
             debit: invoiceTotal,
           },
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${invoice.persistentReferenceNumber}`,
             account: {
               id: creditAccountId,
             },
@@ -626,24 +626,26 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const { persistentReferenceNumber: referenceNumber } = invoice;
+
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Article ${manuscript.customId} - CN-${invoice.referenceNumber}`,
-      memo: `${invoice.referenceNumber}`,
+      tranId: `Article ${manuscript.customId} - CN-${referenceNumber}`,
+      memo: `${referenceNumber}`,
       entity: {
         id: customerId,
       },
       line: {
         items: [
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${referenceNumber}`,
             account: {
               id: creditAccountId,
             },
             debit: invoiceTotal,
           },
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${referenceNumber}`,
             account: {
               id: debitAccountId,
             },
