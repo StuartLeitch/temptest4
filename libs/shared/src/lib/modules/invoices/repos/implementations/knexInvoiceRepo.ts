@@ -305,11 +305,11 @@ export class KnexInvoiceRepo
 
     const updated = await db(TABLES.INVOICES)
       .where({ id: invoiceId.id.toString() })
-      .update({ dateAccepted: new Date() })
+      .update({ dateIssued: new Date() })
       .update({
         invoiceNumber: db.raw(
           `coalesce((select max("invoiceNumber") + 1 as max from (
-          select max("invoiceNumber") as "invoiceNumber" from invoices where "dateAccepted" BETWEEN ? AND ?
+          select max("invoiceNumber") as "invoiceNumber" from invoices where "dateIssued" BETWEEN ? AND ?
             union
             select "invoiceReferenceNumber" as "invoiceNumber" from configurations
           ) referenceNumbers), 1)
