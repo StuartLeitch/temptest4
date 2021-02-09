@@ -58,6 +58,8 @@ function addPublishers(publisherRepo: MockPublisherRepo) {
       customValues: {
         customSegmentId: 'Hindawi',
         itemId: 'Hindawi',
+        creditAccountId: '10',
+        debitAccountId: '11',
       },
       dateCreated: new Date().toISOString(),
       dateUpdated: new Date().toISOString(),
@@ -68,6 +70,8 @@ function addPublishers(publisherRepo: MockPublisherRepo) {
       customValues: {
         customSegmentId: 'Wiley',
         itemId: 'Wiley',
+        creditAccountId: '20',
+        debitAccountId: '21',
       },
       dateCreated: new Date().toISOString(),
       dateUpdated: new Date().toISOString(),

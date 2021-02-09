@@ -18,6 +18,8 @@ export class KnexPublisherRepo
   ): Promise<PublisherCustomValues> {
     const emptyValues: PublisherCustomValues = {
       customSegmentId: '',
+      creditAccountId: '',
+      debitAccountId: '',
       itemId: '',
     };
     const data = await this.db(TABLES.PUBLISHER_CUSTOM_VALUES)

@@ -30,6 +30,8 @@ const defaultPublisher = {
   customValues: {
     customSegmentId: '',
     itemId: '',
+    creditAccountId: '',
+    debitAccountId: '',
   },
   dateCreated: null,
   dateUpdated: null,
