@@ -486,10 +486,6 @@ export class NetSuiteService implements ErpServiceContract {
       account: {
         id: accountMap[paymentAccount.name],
       },
-      custbody_phenom_publish_date: format(
-        new Date(invoice.dateIssued),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ), // '2020-07-01T14:09:00Z',
       createdDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -558,7 +554,7 @@ export class NetSuiteService implements ErpServiceContract {
       approved: true,
       tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
       custbody_phenom_publish_date: format(
-        new Date(invoice.dateIssued),
+        new Date(manuscript.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       memo: `${invoice.referenceNumber}`,
@@ -642,10 +638,6 @@ export class NetSuiteService implements ErpServiceContract {
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
       tranId: `Article ${manuscript.customId} - CN-${invoice.referenceNumber}`,
-      custbody_phenom_publish_date: format(
-        new Date(invoice.dateIssued),
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ), // '2020-07-01T14:09:00Z',
       memo: `${invoice.referenceNumber}`,
       entity: {
         id: customerId,
