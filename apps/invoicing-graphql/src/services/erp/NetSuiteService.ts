@@ -639,6 +639,10 @@ export class NetSuiteService implements ErpServiceContract {
       approved: true,
       tranId: `Article ${manuscript.customId} - CN-${invoice.referenceNumber}`,
       memo: `${invoice.referenceNumber}`,
+      custbody_phenom_publish_date: format(
+        new Date(manuscript.datePublished),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ),
       entity: {
         id: customerId,
       },
