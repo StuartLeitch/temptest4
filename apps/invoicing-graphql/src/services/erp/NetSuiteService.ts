@@ -486,7 +486,7 @@ export class NetSuiteService implements ErpServiceContract {
       account: {
         id: accountMap[paymentAccount.name],
       },
-      createdDate: format(
+      tranDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
@@ -764,7 +764,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const creditNotePayload: Record<string, any> = {
-      custbody_phenom_publish_date: format(
+      tranDate: format(
         new Date(originalInvoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
