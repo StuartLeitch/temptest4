@@ -140,23 +140,6 @@ export class AfterInvoiceCreditNoteCreatedEvent
       const billingAddress = await this.addressRepo.findById(
         payer.billingAddressId
       );
-      const publishResult = await this.publishInvoiceCredited.execute({
-        paymentMethods: paymentMethods.value.getValue(),
-        invoiceItems,
-        billingAddress,
-        manuscript,
-        payments,
-        creditNote,
-        payer,
-      });
-
-      if (publishResult.isLeft()) {
-        throw publishResult.value.errorValue();
-      }
-
-      this.loggerService.info(
-        `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`
-      );
 
       // * Get Invoice ID
       const invoiceId = creditNote.cancelledInvoiceReference;
@@ -173,6 +156,25 @@ export class AfterInvoiceCreditNoteCreatedEvent
         throw new Error(`Couldn't find Invoice Values for ID: ${invoiceId}`);
       }
       const invoice = maybeInvoice.value.getValue();
+
+      const publishResult = await this.publishInvoiceCredited.execute({
+        paymentMethods: paymentMethods.value.getValue(),
+        invoiceItems,
+        billingAddress,
+        manuscript,
+        payments,
+        creditNote,
+        payer,
+        cancelledInvoice: invoice
+      });
+
+      if (publishResult.isLeft()) {
+        throw publishResult.value.errorValue();
+      }
+
+      this.loggerService.info(
+        `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`
+      );
 
       const nsRevRecReference = invoice
         .getErpReferences()
