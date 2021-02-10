@@ -2,7 +2,7 @@ export interface InvoicePaymentInfo {
   invoiceId: string;
   transactionId: string;
   invoiceStatus: string;
-  invoiceNumber: string;
+  invoiceNumber: number;
   invoiceIssueDate: string;
   payerName: string;
   payerEmail: string;

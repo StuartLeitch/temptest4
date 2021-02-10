@@ -245,10 +245,12 @@ export class CreateCreditNoteUsecase
         // console.log('Draft Invoice:');
         // console.info(draftInvoice);
         await this.invoiceRepo.save(draftInvoice);
-        draftInvoice = await this.invoiceRepo.assignInvoiceNumber(
-          draftInvoice.invoiceId
-        );
+
+        const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
+        draftInvoice.dateIssued = new Date();
+        draftInvoice.assignInvoiceNumber(lastInvoiceNumber);
         draftInvoice.dateAccepted = creditNote.dateAccepted;
+
         await this.invoiceRepo.update(draftInvoice);
 
         //* create notificationPause

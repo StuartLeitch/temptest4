@@ -292,40 +292,40 @@ export class KnexInvoiceRepo
     return InvoiceMap.toDomain(invoice);
   }
 
-  async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
+  async getCurrentInvoiceNumber(): Promise<number> {
     const { db, logger } = this;
-
-    const invoice = await this.getInvoiceById(invoiceId);
-    if (invoice.invoiceNumber) {
-      logger.warning('Invoice number already set');
-      return invoice;
-    }
 
     const currentYear = new Date().getFullYear();
 
-    const updated = await db(TABLES.INVOICES)
-      .where({ id: invoiceId.id.toString() })
-      .update({ dateIssued: new Date() })
-      .update({
-        invoiceNumber: db.raw(
-          `coalesce((select max("invoiceNumber") + 1 as max from (
-          select max("invoiceNumber") as "invoiceNumber" from invoices where "dateIssued" BETWEEN ? AND ?
-            union
-            select "invoiceReferenceNumber" as "invoiceNumber" from configurations
-          ) referenceNumbers), 1)
-        `,
-          [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
-        ),
-      });
+    // const updated = await db(TABLES.INVOICES)
+    //   .where({ id: invoiceId.id.toString() })
+    //   .update({ dateIssued: new Date() })
+    //   .update({
+    //     invoiceNumber: db.raw(
+    //       `coalesce((select max("invoiceNumber") + 1 as max from (
+    //       select max("invoiceNumber") as "invoiceNumber" from invoices where "dateIssued" BETWEEN ? AND ?
+    //         union
+    //         select "invoiceReferenceNumber" as "invoiceNumber" from configurations
+    //       ) referenceNumbers), 1)
+    //     `,
+    //       [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
+    //     ),
+    //   });
+    const getLastInvoiceNumber = await db.raw(
+      `coalesce((select max("invoiceNumber") + 1 as max from (
+        select max("invoiceNumber") as "invoiceNumber" from invoices where "dateIssued" BETWEEN ? AND ?
+          union
+          select "invoiceReferenceNumber" as "invoiceNumber" from configurations
+        ) referenceNumbers), 1)
+      `,
+      [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
+    );
 
-    if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice',
-        invoiceId.id.toString()
-      );
-    }
+    logger.debug('lastInvoiceNumber', {
+      value: getLastInvoiceNumber
+    });
 
-    return this.getInvoiceById(invoiceId);
+    return getLastInvoiceNumber;
   }
 
   async getInvoicePaymentInfo(

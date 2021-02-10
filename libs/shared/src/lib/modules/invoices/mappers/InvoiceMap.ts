@@ -45,7 +45,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       id: invoice.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
       status: invoice.status,
-      invoiceNumber: Number.parseInt(invoice.invoiceNumber, 10) || null,
+      invoiceNumber: invoice.invoiceNumber || null,
       dateCreated: invoice.dateCreated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,

@@ -8,6 +8,7 @@ import { Result } from '../../../core/logic/Result';
 // * Subdomains
 import { InvoiceId } from './InvoiceId';
 import { InvoiceItem } from './InvoiceItem';
+import { InvoiceNumber } from './InvoiceNumber';
 import { InvoiceItems } from './InvoiceItems';
 import { InvoiceErpReferences } from './InvoiceErpReferences';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
@@ -35,7 +36,7 @@ function twoDigitPrecision(n: number): number {
 
 interface InvoiceProps {
   status: InvoiceStatus;
-  invoiceNumber?: string;
+  invoiceNumber?: number;
   transactionId: TransactionId;
   payerId?: PayerId;
   invoiceItems?: InvoiceItems;
@@ -115,40 +116,20 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.props.invoiceItems;
   }
 
-  get invoiceNumber(): string {
+  get invoiceNumber(): number {
     return this.props.invoiceNumber;
   }
 
-  set invoiceNumber(invoiceNumber: string) {
+  set invoiceNumber(invoiceNumber: number) {
     this.props.invoiceNumber = invoiceNumber;
   }
 
   get persistentReferenceNumber(): string {
-    // if (!this.props.invoiceNumber || !this.props.dateAccepted) {
-    //   return null;
-    // }
-    // const paddedNumber = this.props.invoiceNumber.toString().padStart(6, '0');
-    // let creationYear = this.props.dateAccepted.getFullYear();
-    // if (
-    //   this.props.dateIssued &&
-    //   getYear(this.props.dateIssued) < getYear(this.props.dateAccepted)
-    // ) {
-    //   creationYear = this.props.dateIssued.getFullYear();
-    // }
-    // return `${paddedNumber}/${creationYear}`;
     return this.props.persistentReferenceNumber;
   }
 
   set persistentReferenceNumber(referenceNumber: string) {
     this.props.persistentReferenceNumber = referenceNumber;
-  }
-
-  get creditNoteNumber(): string {
-    if (!this.isCreditNote()) {
-      return null;
-    }
-
-    return `CN-${this.persistentReferenceNumber}`;
   }
 
   get transactionId(): TransactionId {
@@ -247,6 +228,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
     return Result.ok<Invoice>(invoice);
   }
+
   public generateInvoiceDraftCreatedEvent(): void {
     if (this.props.status === InvoiceStatus.DRAFT) {
       const now = new Date();
@@ -374,5 +356,17 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   public isCreditNote(): boolean {
     return !!this.props.cancelledInvoiceReference;
+  }
+
+  public assignInvoiceNumber(lastInvoiceNumber: number) {
+    const now = new Date();
+    const nextInvoiceNumber = InvoiceNumber.create({ value: lastInvoiceNumber }).getValue();
+
+    // * incremental human-readable value
+    this.props.invoiceNumber = Number(nextInvoiceNumber.value + 1);
+
+    if (this.props.dateIssued) {
+      this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
+    }
   }
 }
