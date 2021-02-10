@@ -48,7 +48,7 @@ const Name: React.FC<NameProps> = ({
             onChange={(e) =>
               update('name', { value: e.target.value, isValid: true })
             }
-            maxLength='255'
+            maxLength={255}
           />
         </InputGroup>
 

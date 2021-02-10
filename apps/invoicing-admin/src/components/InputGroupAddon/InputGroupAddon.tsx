@@ -25,9 +25,9 @@ const InputGroupAddon = (props) => {
         </BsInputGroupAddon>
     );
 }
-InputGroupAddon.propTypes = {
-    ...BsInputGroupAddon.propTypes
-};
-InputGroupAddon.defaultProps = BsInputGroupAddon.defaultProps;
+// InputGroupAddon.propTypes = {
+//     ...BsInputGroupAddon.propTypes
+// };
+// InputGroupAddon.defaultProps = BsInputGroupAddon.defaultProps;
 
 export { InputGroupAddon };

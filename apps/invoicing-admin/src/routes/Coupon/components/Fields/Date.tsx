@@ -64,7 +64,7 @@ const Date: React.FC<DateProps> = ({
 
 const Pick = ({ value = '', onClick = noop() }: PickProps) => {
   return (
-    <Button outline onClick={onClick}>
+    <Button outline onClick={() => onClick}>
       <i className='fas fa-fw fa-calendar mr-1' />
       {value}
     </Button>
