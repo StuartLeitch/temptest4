@@ -1,4 +1,3 @@
-// import { env } from '../env';
 import { RetryPaymentsRegistrationToErpUsecase } from '@hindawi/shared';
 
 import { Context } from '../builders';
@@ -26,7 +25,6 @@ export class RegisterPaymentsCron {
       repos: {
         invoiceItem,
         manuscript,
-        publisher,
         catalog,
         invoice,
         coupon,
@@ -51,7 +49,6 @@ export class RegisterPaymentsCron {
       catalog,
       erpReference,
       erp?.netsuite || null,
-      publisher,
       loggerService
     );
 

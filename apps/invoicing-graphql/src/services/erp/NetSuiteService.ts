@@ -1,40 +1,45 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { format, getYear } from 'date-fns';
+import axios, { AxiosRequestConfig } from 'axios';
+import { format } from 'date-fns';
 import knex from 'knex';
 
 import {
+  LoggerBuilderContract,
   ErpServiceContract,
-  PayerType,
-  Payer,
-  Payment,
+  LoggerContract,
   PaymentMethod,
+  InvoiceItem,
   Manuscript,
   Invoice,
-  InvoiceItem,
-  LoggerContract,
-  LoggerBuilderContract,
+  Payment,
+  Payer,
 } from '@hindawi/shared';
 
 import {
-  ErpInvoiceRequest,
+  RegisterPaymentResponse,
+  RegisterPaymentRequest,
   ErpInvoiceResponse,
+  ErpInvoiceRequest,
   ErpRevRecResponse,
   ErpRevRecRequest,
-  RegisterPaymentRequest,
-  RegisterPaymentResponse,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
-import { Connection } from './netsuite/Connection';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
+import { Connection } from './netsuite/Connection';
 
-type CustomerPayload = Record<string, string | boolean>;
+type CustomerPayload = {
+  email: string;
+  isPerson: boolean;
+  companyName: string;
+  vatRegNumber: string;
+};
 
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
     private logger: LoggerContract,
+    private customSegmentFieldName: string,
     readonly referenceMappings?: Record<string, any>
   ) {}
 
@@ -44,7 +49,8 @@ export class NetSuiteService implements ErpServiceContract {
 
   public static create(
     config: Record<string, unknown>,
-    loggerBuilder: LoggerBuilderContract
+    loggerBuilder: LoggerBuilderContract,
+    customSegmentFieldName: string
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
@@ -54,7 +60,12 @@ export class NetSuiteService implements ErpServiceContract {
     const logger = loggerBuilder.getLogger();
     logger.setScope('NetSuiteService');
 
-    const service = new NetSuiteService(connection, logger, referenceMappings);
+    const service = new NetSuiteService(
+      connection,
+      logger,
+      customSegmentFieldName,
+      referenceMappings
+    );
 
     return service;
   }
@@ -62,8 +73,6 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerInvoice(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    // this.logger.log('ERP Data:');
-    // this.logger.info(data);
     this.logger.info({
       message: 'New Erp request',
       request: data,
@@ -92,41 +101,20 @@ export class NetSuiteService implements ErpServiceContract {
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
     const {
-      publisherCustomValues: { customSegmentId },
+      publisherCustomValues: {
+        customSegmentId,
+        creditAccountId,
+        debitAccountId,
+      },
     } = data;
     const customerId = await this.getCustomerId(data);
 
-    /**
-     * * Hindawi will be accounts: debit id "376", credit id: "401"
-     * * Partnerships will be accounts: debit id "377", credit id: "402"
-     **/
-    const idMap = {
-      Hindawi: {
-        debit: 376,
-        credit: 401,
-      },
-      Partnership: {
-        debit: 377,
-        credit: 402,
-      },
-    };
-
-    let creditAccountId;
-    let debitAccountId;
-    if (customSegmentId !== '1') {
-      creditAccountId = idMap.Partnership.credit;
-      debitAccountId = idMap.Partnership.debit;
-    } else {
-      creditAccountId = idMap.Hindawi.credit;
-      debitAccountId = idMap.Hindawi.debit;
-    }
-
     const revenueRecognition = await this.createRevenueRecognition({
       ...data,
-      customerId,
       creditAccountId,
-      debitAccountId,
       customSegmentId,
+      debitAccountId,
+      customerId,
     });
 
     return {
@@ -141,42 +129,21 @@ export class NetSuiteService implements ErpServiceContract {
     data: ErpRevRecRequest
   ): Promise<ErpRevRecResponse> {
     const {
-      publisherCustomValues: { customSegmentId },
+      publisherCustomValues: {
+        customSegmentId,
+        creditAccountId,
+        debitAccountId,
+      },
     } = data;
     const customerId = await this.getCustomerId(data);
-
-    /**
-     * * Hindawi will be accounts: debit id "376", credit id: "401"
-     * * Partnerships will be accounts: debit id "377", credit id: "402"
-     **/
-    const idMap = {
-      Hindawi: {
-        debit: 376,
-        credit: 401,
-      },
-      Partnership: {
-        debit: 377,
-        credit: 402,
-      },
-    };
-
-    let creditAccountId;
-    let debitAccountId;
-    if (customSegmentId !== '1') {
-      creditAccountId = idMap.Partnership.credit;
-      debitAccountId = idMap.Partnership.debit;
-    } else {
-      creditAccountId = idMap.Hindawi.credit;
-      debitAccountId = idMap.Hindawi.debit;
-    }
 
     const revenueRecognitionReversal = await this.createRevenueRecognitionReversal(
       {
         ...data,
         creditAccountId,
+        customSegmentId,
         debitAccountId,
         customerId,
-        customSegmentId,
       }
     );
 
@@ -191,9 +158,6 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerCreditNote(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    // this.logger.log('registerCreditNote Data:');
-    // this.logger.info(data);
-
     const creditNoteId = await this.transformCreditNote(data);
 
     // * Only patch newly created credit notes
@@ -207,18 +171,15 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerPayment(
     data: RegisterPaymentRequest
   ): Promise<RegisterPaymentResponse> {
-    // this.logger.log('registerPayment Data:');
-    // this.logger.info(data);
-
     const { payer, manuscript } = data;
 
     const customerAlreadyExists = await this.queryCustomer(
       this.getCustomerPayload(payer, manuscript)
     );
     if (!customerAlreadyExists) {
-      const erorrMessage = `Customer does not exists for article: ${manuscript.customId}.`;
-      this.logger.error(erorrMessage);
-      throw new Error(erorrMessage);
+      const errorMessage = `Customer does not exists for article: ${manuscript.customId}.`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
     const paymentReference = await this.createPayment({
       ...data,
@@ -299,7 +260,6 @@ export class NetSuiteService implements ErpServiceContract {
       return res?.data?.items?.pop();
     } catch (err) {
       this.logger.error(err?.request?.data);
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }
   }
@@ -342,7 +302,6 @@ export class NetSuiteService implements ErpServiceContract {
         response: err?.response?.data,
         request: createCustomerPayload,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       return { err, isAuthError: true } as unknown;
     }
   }
@@ -389,6 +348,9 @@ export class NetSuiteService implements ErpServiceContract {
       entity: {
         id: customerId,
       },
+      [this.customSegmentFieldName]: {
+        id: customSegmentId,
+      },
       item: {
         items: [
           {
@@ -409,12 +371,6 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '1') {
-      createInvoicePayload.csegcseg1 = {
-        id: customSegmentId,
-      };
-    }
-
     try {
       const res = await axios({
         ...invoiceRequestOpts,
@@ -429,7 +385,6 @@ export class NetSuiteService implements ErpServiceContract {
         response: err?.response?.data,
         request: createInvoicePayload,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }
   }
@@ -481,7 +436,7 @@ export class NetSuiteService implements ErpServiceContract {
       account: {
         id: accountMap[paymentAccount.name],
       },
-      createdDate: format(
+      tranDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
@@ -513,7 +468,6 @@ export class NetSuiteService implements ErpServiceContract {
         message: 'Failed to create payment',
         response: err?.response?.data,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }
   }
@@ -549,8 +503,15 @@ export class NetSuiteService implements ErpServiceContract {
       approved: true,
       tranId: `Article ${manuscript.customId} - Invoice ${invoice.persistentReferenceNumber}`,
       memo: `${invoice.persistentReferenceNumber}`,
+      custbody_phenom_publish_date: format(
+        new Date(manuscript.datePublished),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
       entity: {
         id: customerId,
+      },
+      [this.customSegmentFieldName]: {
+        id: customSegmentId,
       },
       line: {
         items: [
@@ -572,12 +533,6 @@ export class NetSuiteService implements ErpServiceContract {
       },
     };
 
-    if (customSegmentId !== '1') {
-      createJournalPayload.csegcseg1 = {
-        id: customSegmentId,
-      };
-    }
-
     try {
       const res = await axios({
         ...journalRequestOpts,
@@ -594,7 +549,6 @@ export class NetSuiteService implements ErpServiceContract {
         response: err?.response?.data,
         request: createJournalPayload,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }
   }
@@ -632,8 +586,15 @@ export class NetSuiteService implements ErpServiceContract {
       approved: true,
       tranId: `Article ${manuscript.customId} - CN-${referenceNumber}`,
       memo: `${referenceNumber}`,
+      custbody_phenom_publish_date: format(
+        new Date(manuscript.datePublished),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ),
       entity: {
         id: customerId,
+      },
+      [this.customSegmentFieldName]: {
+        id: customSegmentId,
       },
       line: {
         items: [
@@ -654,12 +615,6 @@ export class NetSuiteService implements ErpServiceContract {
         ],
       },
     };
-
-    if (customSegmentId !== '1') {
-      createJournalPayload.csegcseg1 = {
-        id: customSegmentId,
-      };
-    }
 
     try {
       const res = await axios({
@@ -721,7 +676,6 @@ export class NetSuiteService implements ErpServiceContract {
         response: err?.response?.data,
         request: patchInvoicePayload,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }
   }
@@ -752,13 +706,20 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const creditNotePayload: Record<string, any> = {
+      tranDate: format(
+        new Date(originalInvoice.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
+    };
+
     try {
       const res = await axios({
         ...creditNoteTransformOpts,
         headers: oauth.toHeader(
           oauth.authorize(creditNoteTransformOpts, token)
         ),
-        data: {},
+        data: creditNotePayload,
       } as AxiosRequestConfig);
 
       return res?.headers?.location?.split('/').pop();
@@ -768,7 +729,6 @@ export class NetSuiteService implements ErpServiceContract {
         response: err?.response?.data,
         requestOptions: creditNoteTransformOpts,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }
   }
@@ -776,6 +736,7 @@ export class NetSuiteService implements ErpServiceContract {
   private async patchCreditNote(data: {
     creditNote?: Invoice;
     creditNoteId?: string;
+    originalInvoice?: Invoice
   }) {
     const {
       connection: { config, oauth, token },
@@ -806,6 +767,10 @@ export class NetSuiteService implements ErpServiceContract {
 
     const patchCreditNotePayload: Record<string, any> = {
       tranId: `CN-${originalInvoice.persistentReferenceNumber}`,
+      custbody_phenom_publish_date: format(
+        new Date(creditNote.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
       memo,
     };
 
@@ -823,7 +788,6 @@ export class NetSuiteService implements ErpServiceContract {
         response: err?.response?.data,
         request: patchCreditNotePayload,
       });
-      // throw new Error('Unable to establish a login session.'); // here I'd like to send the error to the user instead
       throw err;
     }
   }
@@ -833,32 +797,35 @@ export class NetSuiteService implements ErpServiceContract {
     manuscript: Manuscript
   ): CustomerPayload {
     const MAX_LENGTH = 32;
-    const createCustomerPayload: Record<string, string | boolean> = {
+    const createCustomerPayload: CustomerPayload = {
       email: payer?.email.toString(),
+      isPerson: false,
+      companyName: '',
+      vatRegNumber: '',
     };
 
     const keep = ` ${manuscript.customId.toString()}`;
-    createCustomerPayload.isPerson = false;
-    // eslint-disable-next-line prefer-const
+
     let [firstName, ...lastNames] = payer?.name.toString().split(' ');
 
     lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
 
-    let lastName =
-      lastNames.length > 0
-        ? `${lastNames.join(' ')}${keep}`.trim()
-        : `${keep}`.trim();
+    let sendingName = '';
 
-    if (lastName?.length > MAX_LENGTH) {
-      lastName = lastName?.slice(0, MAX_LENGTH - keep.length).trim() + keep;
+    if (payer.type === 'INSTITUTION') {
+      sendingName = payer?.organization.toString();
+    } else {
+      sendingName = firstName.concat(' ', lastNames.join(' '));
     }
-    createCustomerPayload.companyName = firstName.concat(' ', lastName);
 
-    if (createCustomerPayload.companyName.length > MAX_LENGTH) {
-      createCustomerPayload.companyName =
-        createCustomerPayload.companyName.slice(0, MAX_LENGTH - keep.length) +
-        keep;
+    const cpy = sendingName;
+    sendingName = sendingName + keep;
+
+    if (sendingName?.length > MAX_LENGTH) {
+      sendingName = cpy?.slice(0, MAX_LENGTH - keep.length).trim() + keep;
     }
+
+    createCustomerPayload.companyName = sendingName;
     createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
 
     return createCustomerPayload;

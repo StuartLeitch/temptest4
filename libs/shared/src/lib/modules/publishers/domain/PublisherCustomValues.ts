@@ -1,9 +1,6 @@
 export interface PublisherCustomValues {
-  journalItemReference: string;
-  tradeDocumentItem: string;
-  journalReference: string;
-  journalItemTag: string;
-  journalTag: string;
-  customSegmentId?: string;
-  itemId?: string;
+  customSegmentId: string;
+  creditAccountId: string;
+  debitAccountId: string;
+  itemId: string;
 }

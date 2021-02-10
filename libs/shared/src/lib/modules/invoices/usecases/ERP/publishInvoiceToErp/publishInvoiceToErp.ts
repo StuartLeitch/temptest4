@@ -250,9 +250,8 @@ export class PublishInvoiceToErpUsecase
           journalName: catalog.journalTitle,
           vatNote,
           exchangeRate: finalExchangeRate,
-          tradeDocumentItemProduct: publisherCustomValues.tradeDocumentItem,
-          customSegmentId: publisherCustomValues?.customSegmentId,
-          itemId: publisherCustomValues?.itemId,
+          customSegmentId: publisherCustomValues.customSegmentId,
+          itemId: publisherCustomValues.itemId,
           taxRateId,
         };
 
