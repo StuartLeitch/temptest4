@@ -750,7 +750,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const patchCreditNotePayload: Record<string, any> = {
       tranId: creditNote.creditNoteNumber,
-      custbody_phenom_publish_date: format(
+      tranDate: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
