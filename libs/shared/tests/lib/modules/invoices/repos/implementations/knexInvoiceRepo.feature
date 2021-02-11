@@ -47,6 +47,6 @@ Feature: Invoice  Repo
         When we call Invoice.assignInvoiceNumber on the invoice "foo-invoice"
         Then the invoice number of "foo-invoice" should be 1
 
-        Given a invoice with the id "foo-invoice1" and transaction id "foo-transaction"
-        When we call Invoice.assignInvoiceNumber on the invoice "foo-invoice1"
-        Then the invoice number of "foo-invoice1" should be 2
+        # Given a invoice with the id "foo-invoice1" and transaction id "foo-transaction"
+        # When we call Invoice.assignInvoiceNumber on the invoice "foo-invoice1"
+        # Then the invoice number of "foo-invoice1" should be 2

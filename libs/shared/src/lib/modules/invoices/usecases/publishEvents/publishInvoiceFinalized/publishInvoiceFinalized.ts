@@ -47,8 +47,9 @@ export class PublishInvoiceFinalizedUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<Response> {
     const validRequest = this.verifyInput(request);
+
     if (validRequest.isLeft()) {
-      return validRequest;
+     return validRequest;
     }
 
     const {
@@ -87,13 +88,9 @@ export class PublishInvoiceFinalizedUsecase
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
 
       costs: formatCosts(invoiceItems, payments, invoice),
-
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
-
       payer: payer ? formatPayer(payer, billingAddress) : null,
-
       payments: payments ? formatPayments(payments, paymentMethods) : null,
-
       preprintValue: manuscript.preprintValue,
     };
 
