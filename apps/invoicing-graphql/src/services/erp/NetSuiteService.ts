@@ -695,6 +695,10 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(originalInvoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
+      saleseffectivedate: format(
+        new Date(originalInvoice.dateAccepted),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ),
     };
 
     try {
@@ -754,6 +758,10 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
+      saleseffectivedate: format(
+        new Date(creditNote.dateAccepted),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ),
       memo,
     };
 
