@@ -107,14 +107,12 @@ export class NetSuiteService implements ErpServiceContract {
         debitAccountId,
       },
     } = data;
-    const customerId = await this.getCustomerId(data);
 
     const revenueRecognition = await this.createRevenueRecognition({
       ...data,
       creditAccountId,
       customSegmentId,
       debitAccountId,
-      customerId,
     });
 
     return {
@@ -135,7 +133,6 @@ export class NetSuiteService implements ErpServiceContract {
         debitAccountId,
       },
     } = data;
-    const customerId = await this.getCustomerId(data);
 
     const revenueRecognitionReversal = await this.createRevenueRecognitionReversal(
       {
@@ -143,7 +140,6 @@ export class NetSuiteService implements ErpServiceContract {
         creditAccountId,
         customSegmentId,
         debitAccountId,
-        customerId,
       }
     );
 
@@ -478,7 +474,6 @@ export class NetSuiteService implements ErpServiceContract {
     invoiceTotal: number;
     creditAccountId: string;
     debitAccountId: string;
-    customerId: string;
     customSegmentId: string;
   }) {
     const {
@@ -490,7 +485,6 @@ export class NetSuiteService implements ErpServiceContract {
       invoiceTotal,
       creditAccountId,
       debitAccountId,
-      customerId,
       customSegmentId,
     } = data;
 
@@ -507,9 +501,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(manuscript.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
-      entity: {
-        id: customerId,
-      },
+      memo: `${invoice.persistentReferenceNumber}`,
       [this.customSegmentFieldName]: {
         id: customSegmentId,
       },
@@ -559,7 +551,6 @@ export class NetSuiteService implements ErpServiceContract {
     invoiceTotal: number;
     creditAccountId: string;
     debitAccountId: string;
-    customerId: string;
     customSegmentId: string;
   }) {
     const {
@@ -571,7 +562,6 @@ export class NetSuiteService implements ErpServiceContract {
       invoiceTotal,
       creditAccountId,
       debitAccountId,
-      customerId,
       customSegmentId,
     } = data;
 
@@ -590,9 +580,6 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(manuscript.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
-      entity: {
-        id: customerId,
-      },
       [this.customSegmentFieldName]: {
         id: customSegmentId,
       },
@@ -711,6 +698,10 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(originalInvoice.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
+      saleseffectivedate: format(
+        new Date(originalInvoice.dateAccepted),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ),
     };
 
     try {
@@ -767,10 +758,14 @@ export class NetSuiteService implements ErpServiceContract {
 
     const patchCreditNotePayload: Record<string, any> = {
       tranId: `CN-${originalInvoice.persistentReferenceNumber}`,
-      custbody_phenom_publish_date: format(
+      tranDate: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
+      saleseffectivedate: format(
+        new Date(creditNote.dateAccepted),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ),
       memo,
     };
 
