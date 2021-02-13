@@ -1,4 +1,6 @@
 import { getYear } from 'date-fns';
+import isAfter from 'date-fns/isAfter';
+import isBefore from 'date-fns/isBefore';
 
 // * Core Domain
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
@@ -22,6 +24,7 @@ import { InvoiceCreditNoteCreated } from './events/invoiceCreditNoteCreated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentId } from '../../payments/domain/PaymentId';
+import { After } from '@cucumber/cucumber';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
@@ -125,7 +128,13 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   get persistentReferenceNumber(): string {
-    return this.props.persistentReferenceNumber;
+    // * it it set already through persistence layer, just return it
+    if (this.props.persistentReferenceNumber) {
+      return this.props.persistentReferenceNumber;
+    }
+
+    // * otherwise try to build it
+    return this.computeReferenceNumber();
   }
 
   set persistentReferenceNumber(referenceNumber: string) {
@@ -259,7 +268,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     const now = new Date();
     this.props.status = InvoiceStatus.ACTIVE;
     this.props.dateIssued = new Date();
-    this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
 
     this.addDomainEvent(new InvoiceConfirmed(this, now));
   }
@@ -278,7 +286,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     if (this.props.dateIssued === null) {
       this.props.dateIssued = new Date();
     }
-    this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
+    // this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
     this.addDomainEvent(new InvoiceFinalizedEvent(this, now));
   }
 
@@ -365,8 +373,40 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     // * incremental human-readable value
     this.props.invoiceNumber = Number(nextInvoiceNumber.value + 1);
 
-    if (this.props.dateIssued) {
+    if (this.props.dateIssued && !this.props.persistentReferenceNumber) {
       this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
     }
+  }
+
+  computeReferenceNumber() {
+    let referenceNumberPadded = null;
+    let referenceYear = null;
+
+
+    if (!this.props.invoiceNumber) {
+      return null;
+    }
+
+    if (this.props.invoiceNumber && !this.props.dateIssued) {
+      return null;
+    }
+
+    // * should check against dateAccepted
+    if (isBefore(this.props.dateIssued, new Date(2020, 11, 8))) {
+      referenceNumberPadded = this.props.invoiceNumber.toString().padStart(5, '0');
+      referenceYear = getYear(this.props.dateAccepted);
+    }
+    // * should also check against dateAccepted
+    else if (isAfter(new Date(2020, 11, 8), this.props.dateIssued) && isBefore(this.props.dateIssued, new Date(2021, 0, 1))) {
+      referenceNumberPadded = this.props.invoiceNumber.toString().padStart(6, '0');
+      referenceYear = getYear(this.props.dateAccepted);
+
+    } else {
+      // * should check against dateIssued
+      referenceNumberPadded = this.props.invoiceNumber.toString().padStart(6, '0');
+      referenceYear = getYear(this.props.dateIssued);
+    };
+
+    return `${referenceNumberPadded}/${referenceYear}`;
   }
 }
