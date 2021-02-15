@@ -501,7 +501,6 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(manuscript.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
-      memo: `${invoice.persistentReferenceNumber}`,
       [this.customSegmentFieldName]: {
         id: customSegmentId,
       },

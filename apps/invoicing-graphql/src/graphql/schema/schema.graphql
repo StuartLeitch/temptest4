@@ -277,6 +277,12 @@ input InvoiceFilters {
   invoiceItem: InvoiceItemFilters
 }
 
+input StatisticsInvoiceFilters {
+  status: [InvoiceStatus]
+  from: String!
+  to: String!
+}
+
 input Pagination {
   page: Int
   offset: Int
@@ -329,6 +335,11 @@ type Query {
   echo(value: String): String
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]
+  countInvoices(filters: StatisticsInvoiceFilters):  Statistics
+}
+
+type Statistics {
+  draftInvoicesCount: Int
 }
 
 type Mutation {

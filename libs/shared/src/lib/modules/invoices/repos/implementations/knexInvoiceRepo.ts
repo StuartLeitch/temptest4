@@ -689,4 +689,24 @@ export class KnexInvoiceRepo
       return join[condition](field);
     };
   }
+
+  public async countInvoices(criteria: any): Promise<number> {
+    const { db, logger } = this;
+
+    const countInvoicesSQL = db(TABLES.INVOICES)
+      .count('id as CNT')
+      .whereNull('cancelledInvoiceReference')
+      .where('status', criteria.status)
+      .where('dateCreated', '>=', criteria.range.from.toString())
+      .where('dateCreated', '<=', criteria.range.to.toString())
+      .first();
+
+      logger.debug('select', {
+        [`countInvoices_SQL`]: countInvoicesSQL.toString(),
+      });
+
+      const { CNT } = await countInvoicesSQL;
+
+      return Number(CNT);
+  }
 }
