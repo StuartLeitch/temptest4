@@ -35,6 +35,11 @@ type CustomerPayload = {
   vatRegNumber: string;
 };
 
+
+type CustomerPaymentPayload = {
+  refName: string;
+}
+
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
@@ -169,17 +174,19 @@ export class NetSuiteService implements ErpServiceContract {
   ): Promise<RegisterPaymentResponse> {
     const { payer, manuscript } = data;
 
-    const customerAlreadyExists = await this.queryCustomer(
-      this.getCustomerPayload(payer, manuscript)
-    );
-    if (!customerAlreadyExists) {
-      const errorMessage = `Customer does not exists for article: ${manuscript.customId}.`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    // const customerAlreadyExists = await this.queryCustomer(
+    //   this.getCustomerPayload(payer, manuscript)
+    // );
+
+    // if (!customerAlreadyExists) {
+    //   const errorMessage = `Customer does not exists for article: ${manuscript.customId}.`;
+    //   this.logger.error(errorMessage);
+    //   throw new Error(errorMessage);
+    // }
+
     const paymentReference = await this.createPayment({
       ...data,
-      customerId: customerAlreadyExists.id,
+      customerId: 'Jing Jeg', // customerAlreadyExists.id,
     });
 
     return { paymentReference };
@@ -388,6 +395,7 @@ export class NetSuiteService implements ErpServiceContract {
   private async createPayment(data: {
     invoice: Invoice;
     payment: Payment;
+    payer: Payer;
     paymentMethods: PaymentMethod[];
     total: number;
     customerId?: string;
@@ -395,7 +403,7 @@ export class NetSuiteService implements ErpServiceContract {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { invoice, payment, paymentMethods, total, customerId } = data;
+    const { invoice, payment, payer, paymentMethods, total, customerId } = data;
 
     const accountMap = {
       Paypal: '213',
@@ -411,12 +419,13 @@ export class NetSuiteService implements ErpServiceContract {
       )
       .find(Boolean);
 
-    if (nsErpReference.value === 'NON_INVOICEABLE') {
+    if (nsErpReference?.value === 'NON_INVOICEABLE') {
       this.logger.warn({
         message: `Payment in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
       });
       return;
     }
+
 
     const paymentRequestOpts = {
       url: `${config.endpoint}record/v1/customerPayment`,
@@ -427,6 +436,22 @@ export class NetSuiteService implements ErpServiceContract {
       pm.id.equals(payment.paymentMethodId.id)
     );
 
+
+    let refName = `Invoice #${invoice.referenceNumber}`;
+    // * Computes refName value
+    if (paymentAccount.name !== 'Bank Transfer') {
+      refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
+    } else {
+      const paymentRequestOpts = {
+        url: `${config.endpoint}record/v1/customerPayment`,
+        method: 'GET',
+      };
+
+      // * validate reference field
+      refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
+    }
+
+
     const createPaymentPayload = {
       autoApply: true,
       account: {
@@ -435,24 +460,28 @@ export class NetSuiteService implements ErpServiceContract {
       tranDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
-      customer: {
-        id: customerId,
-      },
-      // Invoice reference number,
-      refName: `Invoice #${invoice.referenceNumber}`,
-      // Original amount,
-      total,
-      // Amount due,
-      payment: payment.amount.value,
-    };
+        ),
+        customer: {
+          id: customerId,
+        },
+        refName,
+        // Original amount,
+        total,
+        // Amount due,
+        payment: payment.amount.value,
+      };
 
-    this.logger.info({
-      createPaymentPayload,
-    });
+      this.logger.info({
+        createPaymentPayload,
+      });
 
-    try {
-      const res = await axios({
+
+      console.info('PAYMENT PAYLOAD');
+      console.info(createPaymentPayload);
+      process.exit();
+
+      try {
+        const res = await axios({
         ...paymentRequestOpts,
         headers: oauth.toHeader(oauth.authorize(paymentRequestOpts, token)),
         data: createPaymentPayload,
@@ -467,6 +496,54 @@ export class NetSuiteService implements ErpServiceContract {
       throw err;
     }
   }
+
+  private async queryCustomerPayment(customerPaymentPayload: CustomerPaymentPayload) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    // * Query customers
+    const queryCustomerRequestOpts = {
+      url: `${config.endpoint}query/v1/suiteql`,
+      method: 'POST',
+    };
+
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      'select refName from customerpayment'
+    );
+    // if (customer.companyName) {
+    //   query = queryBuilder.raw(`${query.toQuery()} where companyName = ?`, [
+    //     customer.companyName,
+    //   ]);
+    // }
+
+    const queryCustomerRequest = {
+      q: query.toQuery(),
+    };
+
+    this.logger.debug({
+      message: 'Query builder for get customer',
+      request: queryCustomerRequest,
+    });
+
+    try {
+      const res = await axios({
+        ...queryCustomerRequestOpts,
+        headers: {
+          prefer: 'transient',
+          ...oauth.toHeader(oauth.authorize(queryCustomerRequestOpts, token)),
+        },
+        data: queryCustomerRequest,
+      } as AxiosRequestConfig);
+
+      return res?.data?.items?.pop();
+    } catch (err) {
+      this.logger.error(err?.request?.data);
+      throw err;
+    }
+  }
+
 
   private async createRevenueRecognition(data: {
     invoice: Invoice;

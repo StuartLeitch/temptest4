@@ -117,6 +117,9 @@ export class RetryPaymentsRegistrationToErpUsecase
           );
           registeredPayments.push(publishedPaymentResponse.value);
         }
+
+        // ! Only process one payment!
+        process.exit();
       }
 
       if (errs.length > 0) {
