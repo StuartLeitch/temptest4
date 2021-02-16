@@ -24,7 +24,6 @@ import { InvoiceCreditNoteCreated } from './events/invoiceCreditNoteCreated';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentId } from '../../payments/domain/PaymentId';
-import { After } from '@cucumber/cucumber';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
