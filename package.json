@@ -39,7 +39,6 @@
     "@fortawesome/fontawesome-free": "5.14.0",
     "@hindawi/phenom-charts": "0.2.0",
     "@hindawi/phenom-events": "1.13.0",
-    "@hindawi/phenom-ui": "^0.1.0-beta.1",
     "@hindawi/queue-service": "1.3.4",
     "@owczar/dashboard-style--airframe": "0.1.23",
     "@paypal/checkout-server-sdk": "1.0.2",
