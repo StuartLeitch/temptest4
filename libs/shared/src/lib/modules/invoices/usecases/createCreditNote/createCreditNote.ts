@@ -239,8 +239,9 @@ export class CreateCreditNoteUsecase
         await this.invoiceRepo.save(draftInvoice);
 
         const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-        draftInvoice.dateIssued = new Date();
-        draftInvoice.assignInvoiceNumber(lastInvoiceNumber);
+        // * As DRAFT invoice, no `dateIssued` and `invoiceNumber` should be assigned
+        // draftInvoice.dateIssued = new Date();
+        // draftInvoice.assignInvoiceNumber(lastInvoiceNumber);
         draftInvoice.dateAccepted = creditNote.dateAccepted;
 
         await this.invoiceRepo.update(draftInvoice);

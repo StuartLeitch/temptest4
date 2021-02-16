@@ -11,22 +11,20 @@ let invoiceOrError: Result<Invoice>;
 let invoice = null;
 let invoiceNumber = null;
 let lastInvoiceNumber = 1;
-let currentYear = (new Date()).getFullYear();
 
 Before(function () {
   invoiceOrError = null;
 });
 
-Given(/^The last generated invoice number for "([\w-]+)" is "([\w-]+)"$/,
-  function (year: string, setInvoiceNumber: string) {
-    currentYear = Number(year);
+Given(/^The last generated invoice number is "([\w-]+)"$/,
+  function (setInvoiceNumber: string) {
     lastInvoiceNumber = Number.parseInt(setInvoiceNumber, 10);
   }
 );
 
 When(
-  /^I ask for an invoiceNumber for ID "([\w-]+)" on "([\d-]+)"$/,
-  function (testInvoiceId: string, dateIssued: string) {
+  /^I ask for an invoiceNumber for ID "([\w-]+)"$/,
+  function (testInvoiceId: string) {
     const invoiceId = new UniqueEntityID(testInvoiceId);
 
     invoice = InvoiceMap.toDomain({
