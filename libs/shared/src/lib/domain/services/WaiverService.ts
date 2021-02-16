@@ -56,19 +56,9 @@ export class WaiverService {
       }
     }
 
-    if (activeWaiverMap[WaiverType.SANCTIONED_COUNTRY]) {
-      const sanctionedCountryPolicy: SanctionedCountryPolicy = new SanctionedCountryPolicy();
-      reductionsPoliciesRegister.registerPolicy(sanctionedCountryPolicy);
-
-      const sanctionedCountryWaiver = reductionsPoliciesRegister.applyPolicy(
-        sanctionedCountryPolicy.getType(),
-        [country]
-      );
-
-      if (sanctionedCountryWaiver && sanctionedCountryWaiver.getReduction()) {
-        waiversToApply.push(sanctionedCountryWaiver.getReduction().waiverType);
-      }
-    }
+    // this is removed because it is only used in confirm and not the rest
+    // of the places waivers are applied
+    // if (activeWaiverMap[WaiverType.SANCTIONED_COUNTRY]) {}
 
     const editorRoles = await this.editorRepo.getEditorListRolesByEmails(
       allAuthorsEmails
