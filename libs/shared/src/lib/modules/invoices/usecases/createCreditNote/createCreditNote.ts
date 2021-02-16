@@ -140,18 +140,10 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.transactionId = transaction.transactionId.id.toString();
       clonedRawInvoice.dateCreated = new Date();
       clonedRawInvoice.dateIssued = new Date();
-      // if (
-      //   invoice.dateIssued &&
-      //   getYear(invoice.dateIssued) < getYear(invoice.dateAccepted)
-      // ) {
-      //   clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateIssued));
-      // } else {
-      //   clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateAccepted));
-      // }
+      clonedRawInvoice.persistentReferenceNumber = null;
       clonedRawInvoice.cancelledInvoiceReference = null;
       clonedRawInvoice.creationReason = request.reason;
 
-      // console.info(clonedRawInvoice);
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {

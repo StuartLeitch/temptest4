@@ -269,6 +269,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.props.status = InvoiceStatus.ACTIVE;
     this.props.dateIssued = new Date();
 
+    if (this.props.invoiceNumber && this.props.dateIssued && !this.props.persistentReferenceNumber) {
+      this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
+    }
+
     this.addDomainEvent(new InvoiceConfirmed(this, now));
   }
 
@@ -286,7 +290,11 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     if (this.props.dateIssued === null) {
       this.props.dateIssued = new Date();
     }
-    // this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
+
+    if (this.props.invoiceNumber && this.props.dateIssued && !this.props.persistentReferenceNumber) {
+      this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
+    }
+
     this.addDomainEvent(new InvoiceFinalizedEvent(this, now));
   }
 
@@ -373,9 +381,9 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     // * incremental human-readable value
     this.props.invoiceNumber = Number(nextInvoiceNumber.value + 1);
 
-    if (this.props.dateIssued && !this.props.persistentReferenceNumber) {
-      this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
-    }
+    // if (this.props.dateIssued && !this.props.persistentReferenceNumber) {
+    //   this.props.persistentReferenceNumber = `${this.props.invoiceNumber}/${getYear(this.props.dateIssued)}`;
+    // }
   }
 
   computeReferenceNumber() {
