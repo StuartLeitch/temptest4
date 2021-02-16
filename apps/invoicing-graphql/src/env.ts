@@ -1,6 +1,7 @@
 import * as pkg from '../../../package.json';
 import {
   getOsEnvOptional,
+  nonEmptyOsEnv,
   normalizePort,
   getOsPath,
   getOsEnv,
@@ -169,6 +170,7 @@ export const env = {
     tokenId: getOsEnv('NETSUITE_TOKEN_ID'),
     tokenSecret: getOsEnv('NETSUITE_TOKEN_SECRET'),
     netSuiteEnabled: toBool(getOsEnv('NETSUITE_ENABLED')),
+    customSegmentFieldName: nonEmptyOsEnv('NETSUITE_CUSTOM_SEGMENT_FIELD_NAME'),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),

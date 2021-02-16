@@ -10,17 +10,17 @@ import { PublisherId } from '../../domain/PublisherId';
 import { Publisher } from '../../domain/Publisher';
 import { PublisherMap } from '../../mappers/PublisherMap';
 
-export class KnexPublisherRepo extends AbstractBaseDBRepo<Knex, Publisher>
+export class KnexPublisherRepo
+  extends AbstractBaseDBRepo<Knex, Publisher>
   implements PublisherRepoContract {
   async getCustomValuesByPublisherId(
     id: PublisherId
   ): Promise<PublisherCustomValues> {
     const emptyValues: PublisherCustomValues = {
-      journalItemReference: '',
-      tradeDocumentItem: '',
-      journalReference: '',
-      journalItemTag: '',
-      journalTag: '',
+      customSegmentId: '',
+      creditAccountId: '',
+      debitAccountId: '',
+      itemId: '',
     };
     const data = await this.db(TABLES.PUBLISHER_CUSTOM_VALUES)
       .select('name', 'value')

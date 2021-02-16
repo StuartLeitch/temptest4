@@ -33,7 +33,8 @@ export const erpLoader: MicroframeworkLoader = async (
         },
         referenceMappings: ErpReferenceAttributesMapping.netsuite,
       },
-      loggerBuilder
+      loggerBuilder,
+      env.netSuite.customSegmentFieldName
     );
 
     context.services.erp = {

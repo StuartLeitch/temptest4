@@ -28,11 +28,10 @@ let context = {};
 
 const defaultPublisher = {
   customValues: {
-    journalItemReference: '',
-    tradeDocumentItem: '',
-    journalReference: '',
-    journalItemTag: '',
-    journalTag: '',
+    customSegmentId: '',
+    itemId: '',
+    creditAccountId: '',
+    debitAccountId: '',
   },
   dateCreated: null,
   dateUpdated: null,

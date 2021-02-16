@@ -7,10 +7,7 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../domain/authorization';
-import {
-  ErpInvoiceResponse,
-  RegisterPaymentResponse,
-} from '../../../../domain/services/ErpService';
+import { RegisterPaymentResponse } from '../../../../domain/services/ErpService';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { right, Result, left, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
@@ -24,7 +21,6 @@ import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { PublisherRepoContract } from './../../../publishers/repos/publisherRepo';
 import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
 import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
 import { PayerRepoContract } from './../../../payers/repos/payerRepo';
@@ -62,7 +58,6 @@ export class RetryPaymentsRegistrationToErpUsecase
     private catalogRepo: CatalogRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
     private netsuiteService: ErpServiceContract,
-    private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract
   ) {
     this.publishPaymentToErpUsecase = new PublishPaymentToErpUsecase(
@@ -77,7 +72,6 @@ export class RetryPaymentsRegistrationToErpUsecase
       this.catalogRepo,
       this.erpReferenceRepo,
       this.netsuiteService,
-      this.publisherRepo,
       this.loggerService
     );
   }
