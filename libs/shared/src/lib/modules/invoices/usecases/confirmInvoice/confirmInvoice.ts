@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { Either, left, Result, right } from '../../../../core/logic/Result';
-import { chain } from '../../../../core/logic/EitherChain';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
+import { Result } from '../../../../core/logic/Result';
 
 // * Authorization Logic
 import {
@@ -33,6 +32,7 @@ import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { ChangeInvoiceStatusErrors } from '../changeInvoiceStatus/changeInvoiceStatusErrors';
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
@@ -90,6 +90,23 @@ export class ConfirmInvoiceUsecase
     this.reductionsPoliciesRegister.registerPolicy(
       this.sanctionedCountryPolicy
     );
+
+    this.isPayerFromSanctionedCountry = this.isPayerFromSanctionedCountry.bind(
+      this
+    );
+    this.markInvoiceAsPending = this.markInvoiceAsPending.bind(this);
+    this.markInvoiceAsActive = this.markInvoiceAsActive.bind(this);
+    this.updateInvoiceStatus = this.updateInvoiceStatus.bind(this);
+    this.markInvoiceAsFinal = this.markInvoiceAsFinal.bind(this);
+    this.applyVatToInvoice = this.applyVatToInvoice.bind(this);
+    this.getInvoiceDetails = this.getInvoiceDetails.bind(this);
+    this.getInvoiceItems = this.getInvoiceItems.bind(this);
+    this.dispatchEvents = this.dispatchEvents.bind(this);
+    this.createAddress = this.createAddress.bind(this);
+    this.savePayerData = this.savePayerData.bind(this);
+    this.createPayer = this.createPayer.bind(this);
+    this.checkVatId = this.checkVatId.bind(this);
+    this.sendEmail = this.sendEmail.bind(this);
   }
 
   // @Authorize('payer:read')
@@ -108,15 +125,12 @@ export class ConfirmInvoiceUsecase
     await this.checkVatId(payerInput);
     const maybePayerData = await this.savePayerData(payerInput);
 
-    await chain(
-      [
-        this.assignInvoiceNumber.bind(this),
-        this.updateInvoiceStatus.bind(this),
-        this.applyVatToInvoice.bind(this),
-        this.dispatchEvents.bind(this),
-      ],
-      maybePayerData
-    );
+    const aa = await new AsyncEither(maybePayerData)
+      .then(this.assignInvoiceNumber.bind(this))
+      .then(this.updateInvoiceStatus.bind(this))
+      .then(this.applyVatToInvoice.bind(this))
+      .then(this.dispatchEvents.bind(this))
+      .execute();
 
     return maybePayerData.map(({ payer }) => Result.ok(payer));
   }
@@ -155,7 +169,13 @@ export class ConfirmInvoiceUsecase
 
   private async updateInvoiceStatus(
     payerData: PayerDataDomain
-  ): Promise<Either<unknown, PayerDataDomain>> {
+  ): Promise<
+    Either<
+      | ChangeInvoiceStatusErrors.ChangeStatusError
+      | ChangeInvoiceStatusErrors.InvoiceNotFoundError,
+      PayerDataDomain
+    >
+  > {
     const { invoice, address } = payerData;
     this.loggerService.info(
       `Update status for Invoice with id {${payerData?.invoice.id}}`
@@ -198,83 +218,74 @@ export class ConfirmInvoiceUsecase
       invoice: null,
       payer: null,
     };
-    return await chain(
-      [
-        this.getInvoiceDetails.bind(this, payerInput),
-        this.getInvoiceItems.bind(this, payerInput),
-        this.createAddress.bind(this, payerInput),
-        this.createPayer.bind(this, payerInput),
-      ],
-      emptyPayload
-    );
+
+    return await new AsyncEither(emptyPayload)
+      .then(this.getInvoiceDetails(payerInput))
+      .then(this.getInvoiceItems(payerInput))
+      .then(this.createAddress(payerInput))
+      .then(this.createPayer(payerInput))
+      .execute();
   }
 
-  private async getInvoiceDetails(
-    { invoiceId }: PayerInput,
-    payerData: PayerDataDomain
-  ) {
-    this.loggerService.info(`Get Invoice details for id ${invoiceId}`);
-    const getInvoiceDetailsUseCase = new GetInvoiceDetailsUsecase(
-      this.invoiceRepo
-    );
-    const maybeDetails = await getInvoiceDetailsUseCase.execute(
-      { invoiceId },
-      this.authorizationContext
-    );
-    return maybeDetails.map((invoiceResult) => ({
-      ...payerData,
-      invoice: invoiceResult.getValue(),
-    }));
-  }
-
-  private async getInvoiceItems(
-    { invoiceId }: PayerInput,
-    payerData: PayerDataDomain
-  ) {
-    this.loggerService.info(`Get Invoice Items for id {${invoiceId}}`);
-    const getInvoiceItemsUsecase = new GetItemsForInvoiceUsecase(
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo
-    );
-    const maybeDetails = await getInvoiceItemsUsecase.execute(
-      { invoiceId },
-      this.authorizationContext
-    );
-    return maybeDetails.map((invoiceItemsResult) => {
-      const items = invoiceItemsResult.getValue();
-      items.forEach((ii) => payerData.invoice.addInvoiceItem(ii));
-      return payerData;
-    });
-  }
-
-  private async createPayer(
-    payerInput: PayerInput,
-    payerData: PayerDataDomain
-  ) {
-    this.loggerService.info(`Create Payer for ${payerInput.name}`);
-    const createPayerUseCase = new CreatePayerUsecase(this.payerRepo);
-    const payerDTO: CreatePayerRequestDTO = {
-      invoiceId: payerInput.invoiceId,
-      type: payerInput.type,
-      name: payerInput.name,
-      email: payerInput.email,
-      vatId: payerInput.vatId,
-      organization: payerInput.organization || ' ',
-      addressId: payerData.address.addressId.id.toString(),
+  private getInvoiceDetails({ invoiceId }: PayerInput) {
+    return async (payerData: PayerDataDomain) => {
+      this.loggerService.info(`Get Invoice details for id ${invoiceId}`);
+      const getInvoiceDetailsUseCase = new GetInvoiceDetailsUsecase(
+        this.invoiceRepo
+      );
+      const maybeDetails = await getInvoiceDetailsUseCase.execute(
+        { invoiceId },
+        this.authorizationContext
+      );
+      return maybeDetails.map((invoiceResult) => ({
+        ...payerData,
+        invoice: invoiceResult.getValue(),
+      }));
     };
-
-    return (
-      await createPayerUseCase.execute(payerDTO, this.authorizationContext)
-    ).map((payerResult) => ({ ...payerData, payer: payerResult.getValue() }));
   }
 
-  private async createAddress(
-    { address }: PayerInput,
-    payerData: PayerDataDomain
-  ) {
-    this.loggerService.info(`Create Address for ${address}`);
-    const createAddressUseCase = new CreateAddress(this.addressRepo);
+  private getInvoiceItems({ invoiceId }: PayerInput) {
+    return async (payerData: PayerDataDomain) => {
+      this.loggerService.info(`Get Invoice Items for id {${invoiceId}}`);
+      const getInvoiceItemsUsecase = new GetItemsForInvoiceUsecase(
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo
+      );
+      const maybeDetails = await getInvoiceItemsUsecase.execute(
+        { invoiceId },
+        this.authorizationContext
+      );
+      return maybeDetails.map((invoiceItemsResult) => {
+        const items = invoiceItemsResult.getValue();
+        items.forEach((ii) => payerData.invoice.addInvoiceItem(ii));
+        return payerData;
+      });
+    };
+  }
+
+  private createPayer(payerInput: PayerInput) {
+    return async (payerData: PayerDataDomain) => {
+      this.loggerService.info(`Create Payer for ${payerInput.name}`);
+      const createPayerUseCase = new CreatePayerUsecase(this.payerRepo);
+      const payerDTO: CreatePayerRequestDTO = {
+        invoiceId: payerInput.invoiceId,
+        type: payerInput.type,
+        name: payerInput.name,
+        email: payerInput.email,
+        vatId: payerInput.vatId,
+        organization: payerInput.organization || ' ',
+        addressId: payerData.address.addressId.id.toString(),
+      };
+
+      return (
+        await createPayerUseCase.execute(payerDTO, this.authorizationContext)
+      ).map((payerResult) => ({ ...payerData, payer: payerResult.getValue() }));
+    };
+  }
+
+  private createAddress({ address }: PayerInput) {
+    const usecase = new CreateAddress(this.addressRepo);
     const addressDTO = {
       addressLine1: address.addressLine1,
       country: address.country,
@@ -283,14 +294,13 @@ export class ConfirmInvoiceUsecase
       city: address.city,
     };
 
-    return (await createAddressUseCase.execute(addressDTO)).map(
-      (addressResult) => {
-        return {
-          ...payerData,
-          address: addressResult.getValue(),
-        };
-      }
-    );
+    return async (payerData: PayerDataDomain) => {
+      this.loggerService.info(`Create Address for ${address}`);
+      return new AsyncEither(addressDTO)
+        .then((data) => usecase.execute(data))
+        .map((result) => ({ ...payerData, address: result.getValue() }))
+        .execute();
+    };
   }
 
   private async checkVatId(payer: PayerInput) {
