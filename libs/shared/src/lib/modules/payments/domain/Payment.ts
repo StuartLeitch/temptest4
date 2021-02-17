@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 
+import { cloneDeep } from 'lodash';
+
 // * Core Domain
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
@@ -104,9 +106,25 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return Result.ok<Payment>(payment);
   }
 
-  public movedToCompleted(isFinal: boolean = true): void {
+  public markAsFailed(): void {
+    this.status = PaymentStatus.FAILED;
+    this.props.datePaid = new Date();
+  }
+
+  public markAsCompleted(isFinal: boolean = true): void {
+    this.status = PaymentStatus.COMPLETED;
+    this.props.datePaid = new Date();
+    this.addCompletedEvent(isFinal);
+  }
+
+  public markAsPending(): void {
+    this.status = PaymentStatus.PENDING;
+    this.props.datePaid = new Date();
+  }
+
+  public addCompletedEvent(isFinal: boolean = true): void {
     if (this.status === PaymentStatus.COMPLETED) {
-      this.addDomainEvent(new PaymentCompleted(this, isFinal));
+      this.addDomainEvent(new PaymentCompleted(cloneDeep(this), isFinal));
     }
   }
 }
