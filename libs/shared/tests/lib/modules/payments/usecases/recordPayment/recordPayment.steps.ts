@@ -8,22 +8,23 @@ import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 import { RecordPaymentUsecase } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPayment';
 import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
 import { RecordPaymentDTO } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentDTO';
+
 import {
-  Roles,
   UsecaseAuthorizationContext,
+  Roles,
 } from '../../../../../../src/lib/domain/authorization';
-import {
-  InvoiceMap,
-  InvoiceItemMap,
-  Payment,
-  InvoiceId,
-  UniqueEntityID,
-  PayerMap,
-  PaymentMethodMap,
-  ArticleMap,
-  AfterPaymentCompleted,
-} from '../../../../../../src';
 import { DomainEvents } from '../../../../../../src/lib/core/domain/events/DomainEvents';
+
+import {
+  AfterPaymentCompleted,
+  PaymentMethodMap,
+  InvoiceItemMap,
+  UniqueEntityID,
+  ArticleMap,
+  InvoiceMap,
+  InvoiceId,
+  PayerMap,
+} from '../../../../../../src';
 
 let usecase: RecordPaymentUsecase;
 let context: MockContext;
@@ -114,6 +115,7 @@ Given(
       amount,
       isFinalPayment,
       paymentReference: '123',
+      datePaid: '2021-02-12',
     };
 
     await context.repos.paymentMethod.save(
