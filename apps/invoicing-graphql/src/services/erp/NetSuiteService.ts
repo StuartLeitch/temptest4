@@ -475,6 +475,12 @@ export class NetSuiteService implements ErpServiceContract {
         createPaymentPayload,
       });
 
+      const pipilet = await this.queryCustomerPayment({ refName });
+
+      if (pipilet) {
+        console.log("PIPILET\n");
+        console.info(pipilet);
+      }
 
       console.info('PAYMENT PAYLOAD');
       console.info(createPaymentPayload);
@@ -502,42 +508,50 @@ export class NetSuiteService implements ErpServiceContract {
       connection: { config, oauth, token },
     } = this;
 
-    // * Query customers
+    // // * Query customers
     const queryCustomerRequestOpts = {
-      url: `${config.endpoint}query/v1/suiteql`,
+      url: `${config.endpoint}record/v1/invoice/315265/!transform/creditmemo`,
       method: 'POST',
     };
 
-    const queryBuilder = knex({ client: 'pg' });
-    let query = queryBuilder.raw(
-      'select refName from customerpayment'
-    );
-    // if (customer.companyName) {
-    //   query = queryBuilder.raw(`${query.toQuery()} where companyName = ?`, [
-    //     customer.companyName,
-    //   ]);
+    // const queryBuilder = knex({ client: 'pg' });
+    // let query = queryBuilder.raw(
+    //   "SELECT * FROM transaction WHERE recordtype = 'customerpayment'"
+    // );
+    // if (customerPaymentPayload) {
+    //   query = queryBuilder.raw(`${query.toQuery()} AND refName = ?`, customerPaymentPayload.refName);
     // }
 
-    const queryCustomerRequest = {
-      q: query.toQuery(),
-    };
+    // const queryCustomerRequest = {
+    //   q: query.toQuery(),
+    // };
+    const queryCustomerRequest = {};
 
-    this.logger.debug({
-      message: 'Query builder for get customer',
-      request: queryCustomerRequest,
-    });
+    // this.logger.debug({
+    //   message: 'Query builder for get customer',
+    //   request: queryCustomerRequest,
+    // });
+
+    // console.log('Query builder for get customer');
+    // console.info(queryCustomerRequest)
 
     try {
+      console.info(queryCustomerRequestOpts);
+      console.info(queryCustomerRequest);
+
       const res = await axios({
         ...queryCustomerRequestOpts,
         headers: {
-          prefer: 'transient',
           ...oauth.toHeader(oauth.authorize(queryCustomerRequestOpts, token)),
         },
         data: queryCustomerRequest,
       } as AxiosRequestConfig);
 
-      return res?.data?.items?.pop();
+      console.info(res);
+      const bau = res?.headers?.location?.split('/').pop();
+      console.log("BAU\n");
+
+      return res?.headers?.location?.split('/').pop();
     } catch (err) {
       this.logger.error(err?.request?.data);
       throw err;
