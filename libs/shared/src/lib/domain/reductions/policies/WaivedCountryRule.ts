@@ -71,7 +71,11 @@ const WAIVER_POLICY_COUNTRIES = {
   VN: { country: 'Vietnam' },
   YE: { country: 'Yemen' },
   ZM: { country: 'Zambia' },
-  ZW: { country: 'Zimbabwe' }
+  ZW: { country: 'Zimbabwe' },
+  CU: { country: 'Cuba' },
+  GE: { country: 'Georgia' },
+  IR: { country: 'Iran' },
+  LK: { country: 'Sri Lanka' },
 };
 
 export class WaivedCountryRule implements ReductionRuleContract<Waiver> {
@@ -85,7 +89,7 @@ export class WaivedCountryRule implements ReductionRuleContract<Waiver> {
     ) {
       return Waiver.create({
         reduction: -1,
-        waiverType: WaiverType.WAIVED_COUNTRY
+        waiverType: WaiverType.WAIVED_COUNTRY,
       }).getValue();
     }
   }

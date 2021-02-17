@@ -14,12 +14,6 @@ Feature: Waiver Service
     Then The applied waiver is of type "WAIVED_COUNTRY" with reduction "100"
 
   @ValidateWaiverService
-  Scenario: Get SANCTIONED_COUNTRY waiver for corresponding author in waived countries
-    Given A submitting author is from country with code "CU"
-    When Waivers are applied for manuscript on journal "submittionJournal"
-    Then The applied waiver is of type "SANCTIONED_COUNTRY" with reduction "100"
-
-  @ValidateWaiverService
   Scenario Outline: Editors discount
     Given An editor with email "<editorEmail>" is on journal "<editorJournal>" with role "<editorRole>"
     And Manuscript has authors with emails "author1@test.com, editor@test.com"
