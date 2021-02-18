@@ -428,7 +428,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     const paymentRequestOpts = {
-      url: `${config.endpoint}record/v1/customerPayment`,
+      url: `${config.endpoint}record/v1/customerpayment`,
       method: 'POST',
     };
 
@@ -442,15 +442,15 @@ export class NetSuiteService implements ErpServiceContract {
     if (paymentAccount.name !== 'Bank Transfer') {
       refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
     } else {
-      const paymentRequestOpts = {
-        url: `${config.endpoint}record/v1/customerPayment`,
-        method: 'GET',
-      };
-
       // * validate reference field
       refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
-    }
 
+      // const paymentRequestOpts = {
+      //   url: `${config.endpoint}record/v1/customerpayment`,
+      //   method: 'GET',
+      // };
+      // await this.queryCustomerPayment();
+    }
 
     const createPaymentPayload = {
       autoApply: true,
@@ -475,17 +475,6 @@ export class NetSuiteService implements ErpServiceContract {
         createPaymentPayload,
       });
 
-      const pipilet = await this.queryCustomerPayment({ refName });
-
-      if (pipilet) {
-        console.log("PIPILET\n");
-        console.info(pipilet);
-      }
-
-      console.info('PAYMENT PAYLOAD');
-      console.info(createPaymentPayload);
-      process.exit();
-
       try {
         const res = await axios({
         ...paymentRequestOpts,
@@ -508,37 +497,30 @@ export class NetSuiteService implements ErpServiceContract {
       connection: { config, oauth, token },
     } = this;
 
-    // // * Query customers
-    const queryCustomerRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/315265/!transform/creditmemo`,
-      method: 'POST',
-    };
-
+    // * Query customer payments
     const queryBuilder = knex({ client: 'pg' });
     let query = queryBuilder.raw(
       "SELECT * FROM transaction WHERE recordtype = 'customerpayment'"
     );
     if (customerPaymentPayload) {
-      query = queryBuilder.raw(`${query.toQuery()} AND refName = ?`, customerPaymentPayload.refName);
+      query = queryBuilder.raw(`${query.toQuery()} AND memo = ?`, customerPaymentPayload.refName);
     }
 
-    // const queryCustomerRequest = {
-    //   q: query.toQuery(),
-    // };
-    const queryCustomerRequest = {};
+    const queryCustomerRequest = {
+      q: query.toQuery(),
+    };
 
-    // this.logger.debug({
-    //   message: 'Query builder for get customer',
-    //   request: queryCustomerRequest,
-    // });
+    this.logger.debug({
+      message: 'Query builder for get customer',
+      request: queryCustomerRequest,
+    });
 
-    // console.log('Query builder for get customer');
-    // console.info(queryCustomerRequest)
+    const queryCustomerRequestOpts = {
+      url: `${config.endpoint}record/v1/invoice/315265/!transform/creditmemo`,
+      method: 'POST',
+    };
 
     try {
-      console.info(queryCustomerRequestOpts);
-      console.info(queryCustomerRequest);
-
       const res = await axios({
         ...queryCustomerRequestOpts,
         headers: {
@@ -547,9 +529,9 @@ export class NetSuiteService implements ErpServiceContract {
         data: queryCustomerRequest,
       } as AxiosRequestConfig);
 
-      console.info(res);
-      const bau = res?.headers?.location?.split('/').pop();
-      console.log("BAU\n");
+      // console.info(res);
+      // const bau = res?.headers?.location?.split('/').pop();
+      // console.log("BAU\n");
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
@@ -911,5 +893,32 @@ export class NetSuiteService implements ErpServiceContract {
     createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
 
     return createCustomerPayload;
+  }
+
+  public async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    const invoiceExistsRequestOpts = {
+      url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
+      method: 'GET',
+    }
+
+    try {
+      await axios({
+        ...invoiceExistsRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        data: {},
+      } as AxiosRequestConfig);
+    } catch (err) {
+      this.logger.error({
+        message: 'No invoice found.',
+        response: err?.response?.data,
+      });
+      return false; // no invoice found
+    }
+
+    return true;
   }
 }
