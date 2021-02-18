@@ -843,4 +843,31 @@ export class NetSuiteService implements ErpServiceContract {
 
     return createCustomerPayload;
   }
+
+  public async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    const invoiceExistsRequestOpts = {
+      url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
+      method: 'GET',
+    }
+
+    try {
+      await axios({
+        ...invoiceExistsRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        data: {},
+      } as AxiosRequestConfig);
+    } catch (err) {
+      this.logger.error({
+        message: 'No invoice found.',
+        response: err?.response?.data,
+      });
+      return false; // no invoice found
+    }
+
+    return true;
+  }
 }
