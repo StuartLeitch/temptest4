@@ -3,6 +3,6 @@ export interface RecordPaymentDTO {
   paymentReference?: string;
   isFinalPayment?: boolean;
   invoiceId: string;
-  datePaid?: string;
+  datePaid: string;
   amount?: number;
 }

@@ -142,6 +142,32 @@ export class PublishCreditNoteToErpUsecase
           originalInvoice,
         };
 
+        const originalNSErpReference = originalInvoice
+          .getErpReferences()
+          .getItems()
+          .filter(
+            (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+          )
+          .find(Boolean);
+
+        const isOriginalInvoiceRegistered = await this.erpService.checkInvoiceExists(originalNSErpReference.value);
+
+        if (!isOriginalInvoiceRegistered) {
+          const erpReference = ErpReferenceMap.toDomain({
+            entity_id: creditNote.invoiceId.id.toString(),
+            type: 'invoice',
+            vendor: this.erpService.vendorName,
+            attribute:
+              this.erpService?.referenceMappings?.creditNote || 'creditNote',
+            value: String('NONEXISTENT_INVOICE'),
+          });
+          await this.erpReferenceRepo.save(erpReference);
+
+          return left(new UnexpectedError('Non-existent invoice',
+            `Referenced credit note's invoice having reference ${originalNSErpReference.value} does not exist in the ERP system.`
+          )); // this business is done
+        }
+
         const erpResponse = await this.erpService.registerCreditNote(erpData);
         this.loggerService.info(
           `Updating credit note ${creditNote.id.toString()}: creditNoteReference -> ${JSON.stringify(

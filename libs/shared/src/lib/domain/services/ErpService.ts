@@ -80,6 +80,7 @@ export interface ErpServiceContract {
   registerPayment?(
     data: RegisterPaymentRequest
   ): Promise<RegisterPaymentResponse>;
+  checkInvoiceExists(invoiceErpReference: string): Promise<boolean>;
 }
 
 export class EmptyErpService implements ErpServiceContract {
@@ -134,5 +135,9 @@ export class EmptyErpService implements ErpServiceContract {
       tradeItemIds: [''],
       accountId: '',
     };
+  }
+
+  async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+    return true;
   }
 }
