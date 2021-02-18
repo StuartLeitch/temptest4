@@ -6,6 +6,7 @@ import * as Errors from './recordPaymentErrors';
 
 export type RecordPaymentResponse = Either<
   | Errors.InvoiceTotalLessThanZeroError
+  | Errors.PaymentDateRequiredError
   | Errors.InvoiceIdRequiredError
   | Errors.InvoiceNotFountError
   | Errors.PaymentUpdateDbError

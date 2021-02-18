@@ -37,7 +37,7 @@ type CustomerPayload = {
 
 
 type CustomerPaymentPayload = {
-  memo: string;
+  refName: string;
 }
 
 export class NetSuiteService implements ErpServiceContract {
@@ -437,10 +437,10 @@ export class NetSuiteService implements ErpServiceContract {
     );
 
 
-    let memo = `Invoice #${invoice.referenceNumber}`;
+    let refName = `Invoice #${invoice.referenceNumber}`;
     // * Computes refName value
     if (paymentAccount.name !== 'Bank Transfer') {
-      memo = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
+      refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
     } else {
       const paymentRequestOpts = {
         url: `${config.endpoint}record/v1/customerPayment`,
@@ -448,7 +448,7 @@ export class NetSuiteService implements ErpServiceContract {
       };
 
       // * validate reference field
-      memo = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
+      refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
     }
 
 
@@ -460,34 +460,34 @@ export class NetSuiteService implements ErpServiceContract {
       tranDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
-      customer: {
-        id: customerId,
-      },
-      memo,
-      // Original amount,
-      total,
-      // Amount due,
-      payment: payment.amount.value,
-    };
+        ),
+        customer: {
+          id: customerId,
+        },
+        refName,
+        // Original amount,
+        total,
+        // Amount due,
+        payment: payment.amount.value,
+      };
 
-    this.logger.info({
-      createPaymentPayload,
-    });
+      this.logger.info({
+        createPaymentPayload,
+      });
 
-    const pipilet = await this.queryCustomerPayment({ memo });
+      const pipilet = await this.queryCustomerPayment({ refName });
 
-    if (pipilet) {
-      console.log("PIPILET\n");
-      console.info(pipilet);
-    }
+      if (pipilet) {
+        console.log("PIPILET\n");
+        console.info(pipilet);
+      }
 
-    console.info('PAYMENT PAYLOAD');
-    console.info(createPaymentPayload);
-    process.exit();
+      console.info('PAYMENT PAYLOAD');
+      console.info(createPaymentPayload);
+      process.exit();
 
-    try {
-      const res = await axios({
+      try {
+        const res = await axios({
         ...paymentRequestOpts,
         headers: oauth.toHeader(oauth.authorize(paymentRequestOpts, token)),
         data: createPaymentPayload,
@@ -503,7 +503,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async queryCustomerPayment(memo: CustomerPaymentPayload) {
+  private async queryCustomerPayment(customerPaymentPayload: CustomerPaymentPayload) {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -522,21 +522,22 @@ export class NetSuiteService implements ErpServiceContract {
       query = queryBuilder.raw(`${query.toQuery()} AND refName = ?`, customerPaymentPayload.refName);
     }
 
-    const queryCustomerRequest = {
-      q: query.toQuery(),
-    };
+    // const queryCustomerRequest = {
+    //   q: query.toQuery(),
+    // };
+    const queryCustomerRequest = {};
 
-    this.logger.debug({
-      message: 'Query builder for get customer',
-      request: queryCustomerRequest,
-    });
+    // this.logger.debug({
+    //   message: 'Query builder for get customer',
+    //   request: queryCustomerRequest,
+    // });
 
-    console.log('Query builder for get customer');
-    console.info(queryCustomerRequest)
+    // console.log('Query builder for get customer');
+    // console.info(queryCustomerRequest)
 
-    // try {
-    //   console.info(queryCustomerRequestOpts);
-    //   console.info(queryCustomerRequest);
+    try {
+      console.info(queryCustomerRequestOpts);
+      console.info(queryCustomerRequest);
 
       const res = await axios({
         ...queryCustomerRequestOpts,
