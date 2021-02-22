@@ -436,21 +436,13 @@ export class NetSuiteService implements ErpServiceContract {
       pm.id.equals(payment.paymentMethodId.id)
     );
 
+    let refName = `${invoice.id}/${payment.foreignPaymentId}`;
 
-    let refName = `Invoice #${invoice.referenceNumber}`;
-    // * Computes refName value
-    if (paymentAccount.name !== 'Bank Transfer') {
-      refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
-    } else {
-      // * validate reference field
-      refName = `${invoice.id}/${payer.name.value}/${payment.foreignPaymentId}`;
-
-      // const paymentRequestOpts = {
-      //   url: `${config.endpoint}record/v1/customerpayment`,
-      //   method: 'GET',
-      // };
-      // await this.queryCustomerPayment();
-    }
+    // const paymentRequestOpts = {
+    //   url: `${config.endpoint}record/v1/customerpayment`,
+    //   method: 'GET',
+    // };
+    // await this.queryCustomerPayment();
 
     const createPaymentPayload = {
       autoApply: true,
@@ -474,6 +466,9 @@ export class NetSuiteService implements ErpServiceContract {
       this.logger.info({
         createPaymentPayload,
       });
+
+      console.info(createPaymentPayload);
+      process.exit(1)
 
       try {
         const res = await axios({
@@ -895,25 +890,26 @@ export class NetSuiteService implements ErpServiceContract {
     return createCustomerPayload;
   }
 
-  public async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+
+  public async checkRecordExists(recordType: string, erpReference: string): Promise<boolean> {
     const {
       connection: { config, oauth, token },
     } = this;
 
-    const invoiceExistsRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
+    const recordExistsRequestOpts = {
+      url: `${config.endpoint}record/v1/${recordType}/${erpReference}`,
       method: 'GET',
     }
 
     try {
       await axios({
-        ...invoiceExistsRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        ...recordExistsRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(recordExistsRequestOpts, token)),
         data: {},
       } as AxiosRequestConfig);
     } catch (err) {
       this.logger.error({
-        message: 'No invoice found.',
+        message: `No ${recordType} found.`,
         response: err?.response?.data,
       });
       return false; // no invoice found

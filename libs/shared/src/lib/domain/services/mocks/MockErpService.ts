@@ -66,7 +66,7 @@ export class MockErpService implements ErpServiceContract {
     return this.revenueMap[invoiceId];
   }
 
-  public async checkInvoiceExists(invoiceId: string): Promise<boolean> {
+  public async checkRecordExists(recordType: string, erpReference: string): Promise<boolean> {
     return true;
   }
 }

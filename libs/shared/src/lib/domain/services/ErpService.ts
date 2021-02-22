@@ -80,7 +80,7 @@ export interface ErpServiceContract {
   registerPayment?(
     data: RegisterPaymentRequest
   ): Promise<RegisterPaymentResponse>;
-  checkInvoiceExists(invoiceErpReference: string): Promise<boolean>;
+  checkRecordExists(recordType: string, erpReference: string): Promise<boolean>;
 }
 
 export class EmptyErpService implements ErpServiceContract {
