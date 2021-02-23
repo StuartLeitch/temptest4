@@ -107,7 +107,7 @@ export class KnexPaymentRepo
   }
 
   async getUnregisteredErpPayments(): Promise<PaymentId[]> {
-    const LIMIT = 30;
+    const LIMIT = 25;
     const { db, logger } = this;
 
     const erpReferencesQuery = db(TABLES.PAYMENTS)

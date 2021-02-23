@@ -7,4 +7,4 @@ cronFlags:
   erpRegisterInvoicesEnabled: true # If true, server will reload feature flags each minute.
   erpRegisterRevenueRecognitionEnabled: false
   erpRegisterCreditNotesEnabled: false
-  erpRegisterPaymentsEnabled: false
+  erpRegisterPaymentsEnabled: true
