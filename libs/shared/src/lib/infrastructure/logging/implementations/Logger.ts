@@ -136,6 +136,7 @@ export class Logger implements LoggerContract {
     const metadata: Record<string, any> = { scope: this.scope };
 
     let newArgs = [];
+
     if (this.protocol) {
       if (args.length) {
         newArgs = args.map((arg) => {

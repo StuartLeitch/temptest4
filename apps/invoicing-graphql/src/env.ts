@@ -171,6 +171,8 @@ export const env = {
     tokenSecret: getOsEnv('NETSUITE_TOKEN_SECRET'),
     netSuiteEnabled: toBool(getOsEnv('NETSUITE_ENABLED')),
     customSegmentFieldName: nonEmptyOsEnv('NETSUITE_CUSTOM_SEGMENT_FIELD_NAME'),
+    customExternalPaymentReference: nonEmptyOsEnv('NETSUITE_CUSTOM_EXTERNAL_PAYMENT_REFERENCE'),
+    customUniquePaymentReference: nonEmptyOsEnv('NETSUITE_CUSTOM_UNIQUE_PAYMENT_REFERENCE'),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),

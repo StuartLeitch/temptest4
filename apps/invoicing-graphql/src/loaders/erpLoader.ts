@@ -34,7 +34,9 @@ export const erpLoader: MicroframeworkLoader = async (
         referenceMappings: ErpReferenceAttributesMapping.netsuite,
       },
       loggerBuilder,
-      env.netSuite.customSegmentFieldName
+      env.netSuite.customSegmentFieldName,
+      env.netSuite.customExternalPaymentReference,
+      env.netSuite.customUniquePaymentReference
     );
 
     context.services.erp = {

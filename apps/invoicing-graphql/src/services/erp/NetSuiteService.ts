@@ -14,7 +14,9 @@ import {
   Invoice,
   Payment,
   Payer,
+  RemoveEditorsFromJournalUsecase,
 } from '@hindawi/shared';
+
 
 import {
   RegisterPaymentResponse,
@@ -25,26 +27,17 @@ import {
   ErpRevRecRequest,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
+// import { NetSuiteHttpApi } from './netsuite/HttpApi';
+import { CustomerPayload, CustomerPaymentPayload } from './netsuite/typings'
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
 import { Connection } from './netsuite/Connection';
-
-type CustomerPayload = {
-  email: string;
-  isPerson: boolean;
-  companyName: string;
-  vatRegNumber: string;
-};
-
-
-type CustomerPaymentPayload = {
-  refName: string;
-}
-
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
     private logger: LoggerContract,
     private customSegmentFieldName: string,
+    private customExternalPaymentReference: string,
+    private customUniquePaymentReference: string,
     readonly referenceMappings?: Record<string, any>
   ) {}
 
@@ -55,7 +48,9 @@ export class NetSuiteService implements ErpServiceContract {
   public static create(
     config: Record<string, unknown>,
     loggerBuilder: LoggerBuilderContract,
-    customSegmentFieldName: string
+    customSegmentFieldName: string,
+    customExternalPaymentReference: string,
+    customUniquePaymentReference: string,
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
@@ -69,6 +64,8 @@ export class NetSuiteService implements ErpServiceContract {
       connection,
       logger,
       customSegmentFieldName,
+      customExternalPaymentReference,
+      customUniquePaymentReference,
       referenceMappings
     );
 
@@ -400,11 +397,12 @@ export class NetSuiteService implements ErpServiceContract {
     paymentMethods: PaymentMethod[];
     total: number;
     customerId?: string;
+    invoicePayments?: any[];
   }): Promise<string> {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { invoice, payment, payer, paymentMethods, total, customerId } = data;
+    const { invoice, payment, payer, paymentMethods, total, customerId, invoicePayments } = data;
 
     const accountMap = {
       Paypal: '213',
@@ -438,6 +436,8 @@ export class NetSuiteService implements ErpServiceContract {
 
     let refName = `${invoice.id}/${payment.foreignPaymentId}`;
 
+    const paymentAlreadyExists = await this.checkRecordExists('customerpayment', refName, { invoicePayments });
+
     // const paymentRequestOpts = {
     //   url: `${config.endpoint}record/v1/customerpayment`,
     //   method: 'GET',
@@ -457,6 +457,8 @@ export class NetSuiteService implements ErpServiceContract {
           id: customerId,
         },
         refName,
+        [this.customExternalPaymentReference]: payment.foreignPaymentId,
+        // [this.customUniquePaymentReference]: `${invoice.id}/${payment.foreignPaymentId}`,
         // Original amount,
         total,
         // Amount due,
@@ -486,55 +488,6 @@ export class NetSuiteService implements ErpServiceContract {
       throw err;
     }
   }
-
-  private async queryCustomerPayment(customerPaymentPayload: CustomerPaymentPayload) {
-    const {
-      connection: { config, oauth, token },
-    } = this;
-
-    // * Query customer payments
-    const queryBuilder = knex({ client: 'pg' });
-    let query = queryBuilder.raw(
-      "SELECT * FROM transaction WHERE recordtype = 'customerpayment'"
-    );
-    if (customerPaymentPayload) {
-      query = queryBuilder.raw(`${query.toQuery()} AND memo = ?`, customerPaymentPayload.refName);
-    }
-
-    const queryCustomerRequest = {
-      q: query.toQuery(),
-    };
-
-    this.logger.debug({
-      message: 'Query builder for get customer',
-      request: queryCustomerRequest,
-    });
-
-    const queryCustomerRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/315265/!transform/creditmemo`,
-      method: 'POST',
-    };
-
-    try {
-      const res = await axios({
-        ...queryCustomerRequestOpts,
-        headers: {
-          ...oauth.toHeader(oauth.authorize(queryCustomerRequestOpts, token)),
-        },
-        data: queryCustomerRequest,
-      } as AxiosRequestConfig);
-
-      // console.info(res);
-      // const bau = res?.headers?.location?.split('/').pop();
-      // console.log("BAU\n");
-
-      return res?.headers?.location?.split('/').pop();
-    } catch (err) {
-      this.logger.error(err?.request?.data);
-      throw err;
-    }
-  }
-
 
   private async createRevenueRecognition(data: {
     invoice: Invoice;
@@ -702,6 +655,11 @@ export class NetSuiteService implements ErpServiceContract {
         message: `Invoice patch in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
       });
       return;
+    }
+
+    const invoiceExists = await this.checkRecordExists('invoice', nsErpReference.value);
+    if (invoiceExists) {
+      return; // do nothing yet and do not create a duplicate
     }
 
     const invoiceRequestOpts = {
@@ -891,21 +849,54 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
 
-  public async checkRecordExists(recordType: string, erpReference: string): Promise<boolean> {
+  public async checkRecordExists(recordType: string, erpReference: string, recordContextData?: any): Promise<boolean> {
     const {
       connection: { config, oauth, token },
+      customUniquePaymentReference
     } = this;
 
-    const recordExistsRequestOpts = {
+    let recordExistsRequestOpts = {
       url: `${config.endpoint}record/v1/${recordType}/${erpReference}`,
       method: 'GET',
+    }
+
+    const payloads = {
+      invoice: {},
+      customerPayment: {}
+    }
+
+    if (recordType === 'customerpayment') {
+      recordExistsRequestOpts = {
+        url: `${config.endpoint}query/v1/suiteql`,
+        method: 'POST'
+      }
+
+      // * Query customer payments
+      const queryBuilder = knex({ client: 'pg' });
+      let query = queryBuilder.raw(
+        "SELECT * FROM transaction WHERE recordtype = 'customerpayment'"
+      );
+      if (erpReference) {
+        query = queryBuilder.raw(`${query.toQuery()} AND ${customUniquePaymentReference} = ?`, erpReference);
+      }
+
+      const queryRequest = {
+        q: query.toQuery(),
+      };
+
+      this.logger.debug({
+        message: 'Query builder for checking against payments',
+        request: queryRequest,
+      });
+
+      payloads.customerPayment = { "q": queryRequest };
     }
 
     try {
       await axios({
         ...recordExistsRequestOpts,
         headers: oauth.toHeader(oauth.authorize(recordExistsRequestOpts, token)),
-        data: {},
+        data: payloads[recordType],
       } as AxiosRequestConfig);
     } catch (err) {
       this.logger.error({

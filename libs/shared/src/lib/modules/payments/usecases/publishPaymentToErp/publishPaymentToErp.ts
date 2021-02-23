@@ -90,8 +90,8 @@ export class PublishPaymentToErpUsecase
         return;
       }
 
-      invoice = await this.invoiceRepo.getInvoiceById(payment.invoiceId);
-      this.loggerService.info('PublishPaymentToERP invoice', invoice);
+      const invoicePayments = await this.invoiceRepo.getInvoicePayments(payment.invoiceId);
+      this.loggerService.info('PublishPaymentToERP payments', invoicePayments);
 
       const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
 
@@ -193,6 +193,7 @@ export class PublishPaymentToErpUsecase
           payment,
           total: invoice.invoiceTotal,
           manuscript: manuscript,
+          invoicePayments
         };
 
         let erpResponse: RegisterPaymentResponse;

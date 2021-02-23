@@ -99,11 +99,26 @@ export class KnexPaymentRepo
   }
 
   private filterReadyForRegistration(): any {
+    const { db } = this;
+
     return (query) =>
       query
         .where('payments.status', '=', 'COMPLETED')
         .whereNotNull('payments.foreignPaymentId')
-        .whereNull('paymentrefs.value');
+        .whereNull('paymentrefs.value')
+        .whereIn(
+          'invoiceId',
+          db.raw(
+           `SELECT entity_id AS "invoiceId" FROM "erp_references" AS "erprefs2"
+            WHERE "erprefs2"."vendor" = 'netsuite'
+            AND "erprefs2"."type" = 'invoice'
+            AND "erprefs2"."attribute" = 'confirmation'
+            AND "erprefs2"."value" IS NOT NULL
+            AND "erprefs2"."value" <> 'NON_INVOICEABLE'
+            AND "erprefs2"."value" <> 'ERP_NOT_FOUND'
+            AND "erprefs2"."value" <> 'migrationRef'
+           `)
+        );
   }
 
   async getUnregisteredErpPayments(): Promise<PaymentId[]> {

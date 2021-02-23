@@ -60,6 +60,7 @@ export interface RegisterPaymentRequest {
   paymentMethods: PaymentMethod[];
   total: number;
   customerId?: string;
+  invoicePayments?: any[];
 }
 
 export interface RegisterPaymentResponse {
@@ -137,7 +138,7 @@ export class EmptyErpService implements ErpServiceContract {
     };
   }
 
-  async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+  async checkRecordExists(recordType: string, erpReference: string): Promise<boolean> {
     return true;
   }
 }

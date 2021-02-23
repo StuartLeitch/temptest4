@@ -371,6 +371,38 @@ export class KnexInvoiceRepo
     return result[0];
   }
 
+  async getInvoicePayments(
+    invoiceId: InvoiceId
+  ): Promise<any[]> {
+    const results = await this.db
+      .select(
+        'invoices.id as invoiceId',
+        'invoices.transactionId as transactionId',
+        'payments.foreignPaymentId as foreignPaymentId',
+        'payments.amount as amount',
+        'payments.datePaid as paymentDate',
+        'payment_methods.name as paymentType'
+      )
+      .from('invoices')
+      .leftJoin('payments', 'payments.invoiceId', '=', 'invoices.id')
+      .leftJoin(
+        'payment_methods',
+        'payment_methods.id',
+        '=',
+        'payments.paymentMethodId'
+      )
+      .where({ 'invoices.id': invoiceId.id.toString() });
+
+    if (results.length === 0) {
+      throw RepoError.createEntityNotFoundError(
+        'invoice',
+        invoiceId.id.toString()
+      );
+    }
+
+    return results;
+  }
+
   private filterReadyForRevenueRecognition(): any {
     const { db } = this;
 
