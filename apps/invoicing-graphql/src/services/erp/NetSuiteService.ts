@@ -190,10 +190,8 @@ export class NetSuiteService implements ErpServiceContract {
 
     let customerId;
 
-    const customerPayload = this.getCustomerPayload(payer, manuscript);
-    this.logger.info(`Trying to find payer with data ${JSON.stringify(customerPayload)}`);
     const customerAlreadyExists = await this.queryCustomer(
-      customerPayload
+      this.getCustomerPayload(payer, manuscript)
     );
 
     if (customerAlreadyExists) {
