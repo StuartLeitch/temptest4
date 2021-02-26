@@ -7,8 +7,6 @@ import { Connection } from './Connection';
 
 const {
   RECORD_TYPE,
-  BATCH_SIZE,
-  DELAY,
   NETSUITE_REALM,
   NETSUITE_REST_ENDPOINT,
   NETSUITE_CONSUMER_KEY,
@@ -16,6 +14,9 @@ const {
   NETSUITE_TOKEN_ID,
   NETSUITE_TOKEN_SECRET
 } = process.env;
+
+const BATCH_SIZE = process.env.BATCH_SIZE || 200;
+const DELAY = process.env.DELAY || 200;
 
 const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
