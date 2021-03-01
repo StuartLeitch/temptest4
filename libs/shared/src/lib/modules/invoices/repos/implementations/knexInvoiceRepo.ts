@@ -404,7 +404,7 @@ export class KnexInvoiceRepo
   }
 
   private async getUnrecognizedInvoices(vendor: string) {
-    const LIMIT = 30;
+    const LIMIT = 25;
     const { db, logger } = this;
 
     const erpReferencesQuery = db(TABLES.INVOICES)
@@ -471,7 +471,7 @@ export class KnexInvoiceRepo
   }
 
   private async getUnregisteredInvoices(vendor: string) {
-    const LIMIT = 30;
+    const LIMIT = 25;
     const { db, logger } = this;
 
     const erpReferencesQuery = db(TABLES.INVOICES)

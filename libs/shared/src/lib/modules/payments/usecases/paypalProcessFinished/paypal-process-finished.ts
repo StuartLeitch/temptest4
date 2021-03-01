@@ -42,7 +42,7 @@ export class PayPalProcessFinishedUsecase
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private paymentRepo: PaymentRepoContract) {
-    this.setAndDispatchEvents = this.setAndDispatchEvents.bind(this);
+    this.dispatchEvents = this.dispatchEvents.bind(this);
     this.updatePaymentStatus = this.updatePaymentStatus.bind(this);
     this.savePaymentChanges = this.savePaymentChanges.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
@@ -62,7 +62,7 @@ export class PayPalProcessFinishedUsecase
         .advanceOrEnd(this.shouldUpdatePaymentStatus)
         .map(this.updatePaymentStatus)
         .then(this.savePaymentChanges)
-        .map(this.setAndDispatchEvents)
+        .map(this.dispatchEvents)
         .map(() => null)
         .execute();
       return result;
@@ -104,21 +104,15 @@ export class PayPalProcessFinishedUsecase
   private updatePaymentStatus<T extends WithPayPalEvent & WithPayment>(
     request: T
   ) {
-    let paymentStatus: PaymentStatus;
-
     if (request.payPalEvent === 'PAYMENT.CAPTURE.COMPLETED') {
-      paymentStatus = PaymentStatus.COMPLETED;
+      request.payment.markAsCompleted();
     } else if (
       request.payPalEvent === 'PAYMENT.CAPTURE.REFUNDED' ||
       request.payPalEvent === 'PAYMENT.CAPTURE.REVERSED' ||
       request.payPalEvent === 'PAYMENT.CAPTURE.DENIED'
     ) {
-      paymentStatus = PaymentStatus.FAILED;
-    } else {
-      return request;
+      request.payment.markAsFailed();
     }
-
-    request.payment.status = paymentStatus;
 
     return request;
   }
@@ -148,12 +142,8 @@ export class PayPalProcessFinishedUsecase
     }
   }
 
-  private setAndDispatchEvents<T extends WithPayment>(request: T) {
+  private dispatchEvents<T extends WithPayment>(request: T) {
     const { payment } = request;
-
-    if (payment.status === PaymentStatus.COMPLETED) {
-      payment.movedToCompleted();
-    }
 
     DomainEvents.dispatchEventsForAggregate(payment.id);
 

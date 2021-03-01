@@ -90,6 +90,7 @@ export const payments: Resolvers<Context> = {
       const result = await usecase.execute(
         {
           payerIdentification: paymentMethodNonce,
+          datePaid: new Date().toISOString(),
           invoiceId,
         },
         usecaseContext
@@ -143,6 +144,7 @@ export const payments: Resolvers<Context> = {
 
       const result = await usecase.execute(
         {
+          datePaid: new Date().toISOString(),
           invoiceId,
         },
         usecaseContext

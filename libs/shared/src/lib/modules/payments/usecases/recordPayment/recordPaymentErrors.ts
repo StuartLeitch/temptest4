@@ -20,6 +20,12 @@ export class InvoiceIdRequiredError extends UseCaseError {
   }
 }
 
+export class PaymentDateRequiredError extends UseCaseError {
+  constructor() {
+    super('payment date is required.');
+  }
+}
+
 export class PaymentUpdateDbError extends UseCaseError {
   constructor(invoiceId: string, err: Error) {
     super(

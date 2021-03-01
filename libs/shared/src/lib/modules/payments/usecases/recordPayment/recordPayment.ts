@@ -93,7 +93,7 @@ export class RecordPaymentUsecase
         .then(this.savePayment(context))
         .map((data) => data.payment)
         .execute();
-      return result;
+      return result as Response;
     } catch (e) {
       return left(this.newUnexpectedError(e, request.invoiceId));
     }
@@ -104,6 +104,10 @@ export class RecordPaymentUsecase
   ): Promise<Either<Errors.InvoiceIdRequiredError, T>> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
+    }
+
+    if (!request.datePaid) {
+      return left(new Errors.PaymentDateRequiredError());
     }
 
     return right(request);
@@ -175,7 +179,7 @@ export class RecordPaymentUsecase
 
   private async attachStrategy<T extends SelectionData>(
     request: T
-  ): Promise<Either<void, T & { strategy: PaymentStrategy }>> {
+  ): Promise<Either<null, T & { strategy: PaymentStrategy }>> {
     const { payerIdentification, paymentReference } = request;
 
     const strategy = await this.strategyFactory.selectStrategy({

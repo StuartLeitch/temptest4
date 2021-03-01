@@ -70,14 +70,16 @@ export class PayPalPaymentApprovedUsecase
   @Authorize('payments:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      return new AsyncEither(request)
+      const result = new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.captureMoney)
         .then(this.attachPayment(context))
         .map(this.updatePaymentStatus)
         .then(this.savePaymentChanges)
-        .map(() => null)
+        .map((): void => null)
         .execute();
+
+      return result;
     } catch (err) {
       return left(new UnexpectedError(err));
     }
@@ -136,7 +138,11 @@ export class PayPalPaymentApprovedUsecase
     return request;
   }
 
-  private async savePaymentChanges<T extends WithPayment>(request: T) {
+  private async savePaymentChanges<T extends WithPayment>(
+    request: T
+  ): Promise<
+    Either<Errors.SavingNewStatusForPaymentDbError, T & { payment: Payment }>
+  > {
     try {
       const payment = await this.paymentRepo.updatePayment(request.payment);
       return right({ ...request, payment });

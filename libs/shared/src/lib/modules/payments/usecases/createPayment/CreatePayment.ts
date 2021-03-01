@@ -138,7 +138,7 @@ export class CreatePaymentUsecase
     const { payment, status, isFinalPayment } = request;
 
     if (status === PaymentStatus.COMPLETED) {
-      payment.movedToCompleted(isFinalPayment);
+      payment.addCompletedEvent(isFinalPayment);
     }
 
     DomainEvents.dispatchEventsForAggregate(payment.id);
@@ -146,7 +146,9 @@ export class CreatePaymentUsecase
     return request;
   }
 
-  private async savePayment<T extends WithPayment>(request: T) {
+  private async savePayment<T extends WithPayment>(
+    request: T
+  ): Promise<Either<Errors.PaymentSavingDbError, T & { payment: Payment }>> {
     try {
       const payment = await this.paymentRepo.save(request.payment);
       return right({ ...request, payment });

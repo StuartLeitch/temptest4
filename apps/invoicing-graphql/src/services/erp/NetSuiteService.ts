@@ -532,7 +532,10 @@ export class NetSuiteService implements ErpServiceContract {
       } as AxiosRequestConfig);
 
       const journalId = res?.headers?.location?.split('/').pop();
-      await this.patchInvoice({ ...data, journalId });
+
+      // // * check first if the invoice exists
+      // await this.patchInvoice({ ...data, journalId });
+
       return journalId;
     } catch (err) {
       this.logger.error({
@@ -609,7 +612,7 @@ export class NetSuiteService implements ErpServiceContract {
         data: createJournalPayload,
       } as AxiosRequestConfig);
       const journalId = res?.headers?.location?.split('/').pop();
-      await this.patchInvoice({ ...data, journalId });
+      // await this.patchInvoice({ ...data, journalId });
       return journalId;
     } catch (err) {
       console.error(err);
@@ -636,6 +639,25 @@ export class NetSuiteService implements ErpServiceContract {
         message: `Invoice patch in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
       });
       return;
+    }
+
+    const invoiceExistsRequestOpts = {
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
+      method: 'GET',
+    }
+
+    try {
+      await axios({
+        ...invoiceExistsRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        data: {},
+      } as AxiosRequestConfig);
+    } catch (err) {
+      this.logger.error({
+        message: 'No invoice found.',
+        response: err?.response?.data,
+      });
+      return; // no business to be done
     }
 
     const invoiceRequestOpts = {
@@ -823,5 +845,32 @@ export class NetSuiteService implements ErpServiceContract {
     createCustomerPayload.vatRegNumber = payer.VATId?.slice(0, 20);
 
     return createCustomerPayload;
+  }
+
+  public async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    const invoiceExistsRequestOpts = {
+      url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
+      method: 'GET',
+    }
+
+    try {
+      await axios({
+        ...invoiceExistsRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        data: {},
+      } as AxiosRequestConfig);
+    } catch (err) {
+      this.logger.error({
+        message: 'No invoice found.',
+        response: err?.response?.data,
+      });
+      return false; // no invoice found
+    }
+
+    return true;
   }
 }
