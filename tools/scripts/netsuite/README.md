@@ -22,7 +22,7 @@ DELAY=<awaiting time between batches, default is 200>
 You can use the following command:
 
 ```bash
-RECORD_TYPE=invoice BATCH_SIZE=200 DELAY=200 NETSUITE_REALM=6416429_SB1 NETSUITE_REST_ENDPOINT=https://6416429-sb1.suitetalk.api.netsuite.com/services/rest/ NETSUITE_CONSUMER_KEY=<consumer key > NETSUITE_CONSUMER_SECRET=<consumer secret> NETSUITE_TOKEN_ID=<token id> NETSUITE_TOKEN_SECRET=<token secret> npx ts-node terminator.ts
+RECORD_TYPE=invoice BATCH_SIZE=200 DELAY=200 NETSUITE_REALM=6416429_SB1 NETSUITE_REST_ENDPOINT=https://6416429-sb1.suitetalk.api.netsuite.com/services/rest/ NETSUITE_CONSUMER_KEY=<consumer key> NETSUITE_CONSUMER_SECRET=<consumer secret> NETSUITE_TOKEN_ID=<token id> NETSUITE_TOKEN_SECRET=<token secret> npx ts-node terminator.ts
 ```
 
 ## Data files mapping
