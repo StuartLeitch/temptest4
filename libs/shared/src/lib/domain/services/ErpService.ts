@@ -81,6 +81,10 @@ export interface ErpServiceContract {
     data: RegisterPaymentRequest
   ): Promise<RegisterPaymentResponse>;
   checkInvoiceExists(invoiceErpReference: string): Promise<boolean>;
+  checkRevenueRecognitionExists(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<boolean>;
 }
 
 export class EmptyErpService implements ErpServiceContract {
@@ -138,6 +142,13 @@ export class EmptyErpService implements ErpServiceContract {
   }
 
   async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+    return true;
+  }
+
+  async checkRevenueRecognitionExists(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<boolean> {
     return true;
   }
 }

@@ -216,6 +216,13 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
+      const revenueRecognitionExists = await this.erpService.checkRevenueRecognitionExists(
+        invoice.referenceNumber,
+        manuscript.customId
+      );
+
+      console.log('------------------------------', revenueRecognitionExists);
+
       const erpResponse = await this.erpService.registerRevenueRecognition({
         manuscript,
         invoice,

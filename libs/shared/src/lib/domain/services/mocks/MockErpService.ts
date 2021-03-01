@@ -69,4 +69,11 @@ export class MockErpService implements ErpServiceContract {
   public async checkInvoiceExists(invoiceId: string): Promise<boolean> {
     return true;
   }
+
+  public async checkRevenueRecognitionExists(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<boolean> {
+    return true;
+  }
 }

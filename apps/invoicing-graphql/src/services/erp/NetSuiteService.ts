@@ -642,12 +642,14 @@ export class NetSuiteService implements ErpServiceContract {
     const invoiceExistsRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
       method: 'GET',
-    }
+    };
 
     try {
       await axios({
         ...invoiceExistsRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        headers: oauth.toHeader(
+          oauth.authorize(invoiceExistsRequestOpts, token)
+        ),
         data: {},
       } as AxiosRequestConfig);
     } catch (err) {
@@ -844,7 +846,9 @@ export class NetSuiteService implements ErpServiceContract {
     return createCustomerPayload;
   }
 
-  public async checkInvoiceExists(invoiceErpReference: string): Promise<boolean> {
+  public async checkInvoiceExists(
+    invoiceErpReference: string
+  ): Promise<boolean> {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -852,12 +856,14 @@ export class NetSuiteService implements ErpServiceContract {
     const invoiceExistsRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
       method: 'GET',
-    }
+    };
 
     try {
       await axios({
         ...invoiceExistsRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        headers: oauth.toHeader(
+          oauth.authorize(invoiceExistsRequestOpts, token)
+        ),
         data: {},
       } as AxiosRequestConfig);
     } catch (err) {
@@ -869,5 +875,51 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     return true;
+  }
+
+  public async checkRevenueRecognitionExists(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<boolean> {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    // Query revenue recognition transactions
+    const revenueRecognitionRequestOpts = {
+      url: `${config.endpoint}query/v1/suiteql`,
+      method: 'POST',
+    };
+
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      `SELECT * FROM transaction WHERE recordtype = 'creditmemo' AND tranid = 'Article ${invoiceRefNumber} - Invoice ${manuscriptCustomId}'`
+    );
+
+    const revenueRecognitionRequest = {
+      q: query.toQuery(),
+    };
+    console.log('IS IT WORKIIIIIING');
+    this.logger.debug({
+      message: 'Query builder for get revenue recognition',
+      request: revenueRecognitionRequest,
+    });
+
+    try {
+      const res = await axios({
+        ...revenueRecognitionRequestOpts,
+        headers: {
+          prefer: 'transient',
+          ...oauth.toHeader(
+            oauth.authorize(revenueRecognitionRequestOpts, token)
+          ),
+        },
+        data: revenueRecognitionRequest,
+      } as AxiosRequestConfig);
+      return res.data.count === 0 ? false : true;
+    } catch (err) {
+      this.logger.error(err?.request?.data);
+      throw err;
+    }
   }
 }
