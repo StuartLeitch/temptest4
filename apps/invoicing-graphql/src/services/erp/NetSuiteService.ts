@@ -553,7 +553,10 @@ export class NetSuiteService implements ErpServiceContract {
       } as AxiosRequestConfig);
 
       const journalId = res?.headers?.location?.split('/').pop();
-      await this.patchInvoice({ ...data, journalId });
+
+      // // * check first if the invoice exists
+      // await this.patchInvoice({ ...data, journalId });
+
       return journalId;
     } catch (err) {
       this.logger.error({
@@ -628,7 +631,7 @@ export class NetSuiteService implements ErpServiceContract {
         data: createJournalPayload,
       } as AxiosRequestConfig);
       const journalId = res?.headers?.location?.split('/').pop();
-      await this.patchInvoice({ ...data, journalId });
+      // await this.patchInvoice({ ...data, journalId });
       return journalId;
     } catch (err) {
       console.error(err);
