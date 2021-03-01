@@ -92,7 +92,8 @@ execute procedure ${this.getTriggerName()}();
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'version'),
           (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'id'),
           _last_version_index, 
-          (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'preprintValue')) ON CONFLICT (event_id) DO UPDATE set
+          (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'preprintValue'),
+          (((NEW.payload -> 'manuscripts') -> _last_version_index) ->> 'sourceJournal'::text) ->> 'name'::text) ON CONFLICT (event_id) DO UPDATE set
             event_timestamp = excluded.event_timestamp,
             submission_event = excluded.submission_event,
             submission_id = excluded.submission_id,
@@ -105,7 +106,8 @@ execute procedure ${this.getTriggerName()}();
             "version" = excluded."version",
             manuscript_version_id = excluded.manuscript_version_id,
             last_version_index = excluded.last_version_index,
-            preprint_value = excluded.preprint_value;
+            preprint_value = excluded.preprint_value,
+            source_journal = excluded.source_journal;
         RETURN NEW;
     END
     $$
