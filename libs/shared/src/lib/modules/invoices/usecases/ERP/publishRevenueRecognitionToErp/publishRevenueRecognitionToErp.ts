@@ -223,40 +223,41 @@ export class PublishRevenueRecognitionToErpUsecase
 
       console.log('------------------------------', revenueRecognitionExists);
 
-      const erpResponse = await this.erpService.registerRevenueRecognition({
-        manuscript,
-        invoice,
-        payer,
-        publisherCustomValues,
-        invoiceTotal: netCharges,
-      });
-
-      this.loggerService.debug('ERP response', erpResponse);
-
-      if (erpResponse?.journal?.id) {
-        this.loggerService.info(
-          `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
-            erpResponse
-          )}`
-        );
-        const erpReference = ErpReferenceMap.toDomain({
-          entity_id: invoice.invoiceId.id.toString(),
-          type: 'invoice',
-          vendor: this.erpService.vendorName,
-          attribute:
-            this.erpService?.referenceMappings?.revenueRecognition ||
-            'revenueRecognition',
-          value: String(erpResponse?.journal?.id),
+      if (!revenueRecognitionExists) {
+        const erpResponse = await this.erpService.registerRevenueRecognition({
+          manuscript,
+          invoice,
+          payer,
+          publisherCustomValues,
+          invoiceTotal: netCharges,
         });
-        await this.erpReferenceRepo.save(erpReference);
-        this.loggerService.info(
-          `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(
-            erpResponse
-          )}`
-        );
-      }
 
-      return right(Result.ok<any>(erpResponse));
+        this.loggerService.debug('ERP response', erpResponse);
+
+        if (erpResponse?.journal?.id) {
+          this.loggerService.info(
+            `ERP Revenue Recognized Invoice ${invoice.id.toString()}: revenueRecognitionReference -> ${JSON.stringify(
+              erpResponse
+            )}`
+          );
+          const erpReference = ErpReferenceMap.toDomain({
+            entity_id: invoice.invoiceId.id.toString(),
+            type: 'invoice',
+            vendor: this.erpService.vendorName,
+            attribute:
+              this.erpService?.referenceMappings?.revenueRecognition ||
+              'revenueRecognition',
+            value: String(erpResponse?.journal?.id),
+          });
+          await this.erpReferenceRepo.save(erpReference);
+          this.loggerService.info(
+            `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(
+              erpResponse
+            )}`
+          );
+        }
+        return right(Result.ok<any>(erpResponse));
+      }
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));
