@@ -257,6 +257,22 @@ export class PublishRevenueRecognitionToErpUsecase
           );
         }
         return right(Result.ok<any>(erpResponse));
+      } else {
+        const journalId = await this.erpService.getRevenueRecognitionId(
+          invoice.referenceNumber,
+          manuscript.customId
+        );
+        const erpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute:
+            this.erpService?.referenceMappings?.revenueRecognition ||
+            'revenueRecognition',
+          value: String(journalId),
+        });
+        await this.erpReferenceRepo.save(erpReference);
+        return right(Result.ok<any>(null));
       }
     } catch (err) {
       console.log(err);

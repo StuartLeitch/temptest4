@@ -85,6 +85,10 @@ export interface ErpServiceContract {
     invoiceRefNumber: string,
     manuscriptCustomId: string
   ): Promise<boolean>;
+  getRevenueRecognitionId(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<string>;
 }
 
 export class EmptyErpService implements ErpServiceContract {
@@ -150,5 +154,12 @@ export class EmptyErpService implements ErpServiceContract {
     manuscriptCustomId: string
   ): Promise<boolean> {
     return true;
+  }
+
+  async getRevenueRecognitionId(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<string> {
+    return '';
   }
 }

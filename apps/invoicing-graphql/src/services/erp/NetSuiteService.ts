@@ -899,7 +899,6 @@ export class NetSuiteService implements ErpServiceContract {
     const revenueRecognitionRequest = {
       q: query.toQuery(),
     };
-    console.log('IS IT WORKIIIIIING');
     this.logger.debug({
       message: 'Query builder for get revenue recognition',
       request: revenueRecognitionRequest,
@@ -917,6 +916,51 @@ export class NetSuiteService implements ErpServiceContract {
         data: revenueRecognitionRequest,
       } as AxiosRequestConfig);
       return res.data.count === 0 ? false : true;
+    } catch (err) {
+      this.logger.error(err?.request?.data);
+      throw err;
+    }
+  }
+
+  public async getRevenueRecognitionId(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<string> {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    // Query revenue recognition transaction
+    const revenueRecognitionRequestOpts = {
+      url: `${config.endpoint}query/v1/suiteql`,
+      method: 'POST',
+    };
+
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      `SELECT id FROM transaction WHERE recordtype = 'journalentry' AND tranid = 'Article ${invoiceRefNumber} - Invoice ${manuscriptCustomId}'`
+    );
+
+    const revenueRecognitionRequest = {
+      q: query.toQuery(),
+    };
+    this.logger.debug({
+      message: 'Query builder for get revenue recognition id',
+      request: revenueRecognitionRequest,
+    });
+
+    try {
+      const res = await axios({
+        ...revenueRecognitionRequestOpts,
+        headers: {
+          prefer: 'transient',
+          ...oauth.toHeader(
+            oauth.authorize(revenueRecognitionRequestOpts, token)
+          ),
+        },
+        data: revenueRecognitionRequest,
+      } as AxiosRequestConfig);
+      return res.data.items.id;
     } catch (err) {
       this.logger.error(err?.request?.data);
       throw err;
