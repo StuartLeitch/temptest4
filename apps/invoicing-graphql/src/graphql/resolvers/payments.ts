@@ -214,6 +214,14 @@ export const payments: Resolvers<Context> = {
         amount,
       } = args;
 
+      // check if the payment reference is already used
+      let checkPaymentReferenceAlreadyUsed = false;
+      // let res = await paymentRepo.getPaymentByForeignId(paymentReference);
+      const res = 666;
+      if (res) {
+        throw new Error('Payment reference already used!');
+      }
+
       const usecaseContext = { roles: [Roles.PAYER] };
       const usecase = new RecordPaymentUsecase(
         paymentStrategyFactory,
