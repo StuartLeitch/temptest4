@@ -67,7 +67,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
 
     if (x.error) {
       let failure = x?.error;
-      let fail = failure;
+      let fail: any = failure;
 
       if (failure.graphQLErrors) {
         fail = failure.graphQLErrors.shift() as any;
