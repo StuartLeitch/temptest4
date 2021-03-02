@@ -64,8 +64,18 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
         markInvoiceAsPaid,
       },
     });
+
     if (x.error) {
-      toast.error(ErrorPaymentToast);
+      let failure = x?.error;
+      let fail = failure;
+
+      if (failure.graphQLErrors) {
+        fail = failure.graphQLErrors.shift() as any;
+        toast.error(<ErrorPaymentToast closeToast={() => ({})} text={fail.message} />);
+      } else {
+        toast.error(ErrorPaymentToast);
+      }
+
     } else {
       onSuccessCallback();
       setIsModalOpen(false);

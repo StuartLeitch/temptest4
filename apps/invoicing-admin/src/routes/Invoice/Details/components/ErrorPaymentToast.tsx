@@ -4,6 +4,7 @@ import { Button, Media } from '../../../../components';
 
 const ErrorPaymentToast: React.FC<ErrorPaymentToastProps> = ({
   closeToast,
+  text = 'Bank transfer payment failed'
 }) => (
   <Media>
     <Media middle left className='mr-3'>
@@ -13,7 +14,7 @@ const ErrorPaymentToast: React.FC<ErrorPaymentToastProps> = ({
       <Media heading tag='h6'>
         Failed!
       </Media>
-      <p>Bank transfer payment failed.</p>
+      <p>{ text }</p>
       <div className='d-flex mt-2'>
         <Button
           color='danger'
@@ -39,6 +40,7 @@ const ErrorPaymentToast: React.FC<ErrorPaymentToastProps> = ({
 
 interface ErrorPaymentToastProps {
   closeToast(): void;
+  text: string;
 }
 
 export default ErrorPaymentToast;

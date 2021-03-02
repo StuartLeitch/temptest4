@@ -215,10 +215,14 @@ export const payments: Resolvers<Context> = {
       } = args;
 
       // check if the payment reference is already used
-      let checkPaymentReferenceAlreadyUsed = false;
-      // let res = await paymentRepo.getPaymentByForeignId(paymentReference);
-      const res = 666;
-      if (res) {
+      let alreadyUsedPaymentReference;
+      try {
+        alreadyUsedPaymentReference = await paymentRepo.getPaymentByForeignId(paymentReference);
+      } catch (err) {
+        // do nothing, just let it go
+      }
+
+      if (alreadyUsedPaymentReference) {
         throw new Error('Payment reference already used!');
       }
 
