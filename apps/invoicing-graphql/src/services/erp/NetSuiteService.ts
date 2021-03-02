@@ -169,6 +169,7 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerPayment(
     data: RegisterPaymentRequest
   ): Promise<RegisterPaymentResponse> {
+
     const { payer, manuscript } = data;
 
     const customerAlreadyExists = await this.queryCustomer(
@@ -183,8 +184,8 @@ export class NetSuiteService implements ErpServiceContract {
 
     const paymentReference = await this.createPayment({
       ...data,
-      // customerId: customerAlreadyExists.id,
-      customerId: '786442', // Queen's University Belfa 6682657
+      customerId: customerAlreadyExists.id,
+      // customerId: '790701', // Silvestru Testeru
     });
 
     return { paymentReference };
@@ -436,13 +437,10 @@ export class NetSuiteService implements ErpServiceContract {
 
     let refName = `${invoice.id}/${payment.foreignPaymentId}`;
 
-    const paymentAlreadyExists = await this.checkRecordExists('customerpayment', refName, { invoicePayments });
-
-    // const paymentRequestOpts = {
-    //   url: `${config.endpoint}record/v1/customerpayment`,
-    //   method: 'GET',
-    // };
-    // await this.queryCustomerPayment();
+    const paymentAlreadyExists = await this.checkCustomerPaymentExists(refName);
+    if (paymentAlreadyExists.alreadyExists) {
+      return paymentAlreadyExists.id;
+    }
 
     const createPaymentPayload = {
       autoApply: true,
@@ -452,32 +450,29 @@ export class NetSuiteService implements ErpServiceContract {
       tranDate: format(
         new Date(payment.datePaid),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-        ),
-        customer: {
-          id: customerId,
-        },
-        refName,
-        [this.customExternalPaymentReference]: payment.foreignPaymentId,
-        // [this.customUniquePaymentReference]: `${invoice.id}/${payment.foreignPaymentId}`,
-        // Original amount,
-        total,
-        // Amount due,
-        payment: payment.amount.value,
-      };
+      ),
+      customer: {
+        id: customerId,
+      },
+      refName,
+      [this.customExternalPaymentReference]: payment.foreignPaymentId,
+      [this.customUniquePaymentReference]: refName,
+      // Original amount,
+      total,
+      // Amount due,
+      payment: payment.amount.value,
+    };
 
-      this.logger.info({
-        createPaymentPayload,
-      });
+    this.logger.info({
+      createPaymentPayload,
+    });
 
-      console.info(createPaymentPayload);
-      process.exit(1)
-
-      try {
-        const res = await axios({
-        ...paymentRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(paymentRequestOpts, token)),
-        data: createPaymentPayload,
-      } as AxiosRequestConfig);
+    try {
+      const res = await axios({
+      ...paymentRequestOpts,
+      headers: oauth.toHeader(oauth.authorize(paymentRequestOpts, token)),
+      data: createPaymentPayload,
+    } as AxiosRequestConfig);
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
@@ -660,7 +655,7 @@ export class NetSuiteService implements ErpServiceContract {
       return;
     }
 
-    const invoiceExists = await this.checkRecordExists('invoice', nsErpReference.value);
+    const invoiceExists = await this.checkInvoiceExists(nsErpReference.value);
     if (invoiceExists) {
       return; // do nothing yet and do not create a duplicate
     }
@@ -851,64 +846,85 @@ export class NetSuiteService implements ErpServiceContract {
     return createCustomerPayload;
   }
 
+  public async checkInvoiceExists(erpReference: string) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
 
-  public async checkRecordExists(recordType: string, erpReference: string, recordContextData?: any): Promise<boolean> {
+    let invoiceExistsRequestOpts = {
+      url: `${config.endpoint}record/v1/invoice/${erpReference}`,
+      method: 'GET',
+    }
+
+    try {
+      const checker = await axios({
+        ...invoiceExistsRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        data: {},
+      } as AxiosRequestConfig);
+
+      return checker?.data.count > 0;
+
+    } catch (err) {
+      this.logger.error({
+        message: `Error checking if invoice is already registered in NetSuite.`,
+        response: err?.response?.data['o:errorDetails'],
+      });
+    }
+  }
+
+
+  public async checkCustomerPaymentExists(refName: string): Promise<any> {
     const {
       connection: { config, oauth, token },
       customUniquePaymentReference
     } = this;
 
+
     let recordExistsRequestOpts = {
-      url: `${config.endpoint}record/v1/${recordType}/${erpReference}`,
-      method: 'GET',
+      url: `${config.endpoint}query/v1/suiteql`,
+      method: 'POST'
     }
 
-    const payloads = {
-      invoice: {},
-      customerPayment: {}
-    }
-
-    if (recordType === 'customerpayment') {
-      recordExistsRequestOpts = {
-        url: `${config.endpoint}query/v1/suiteql`,
-        method: 'POST'
-      }
-
-      // * Query customer payments
-      const queryBuilder = knex({ client: 'pg' });
-      let query = queryBuilder.raw(
-        "SELECT * FROM transaction WHERE recordtype = 'customerpayment'"
+    // * Query customer payments
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      "SELECT * FROM transaction WHERE recordtype = 'customerpayment'"
       );
-      if (erpReference) {
-        query = queryBuilder.raw(`${query.toQuery()} AND ${customUniquePaymentReference} = ?`, erpReference);
-      }
-
-      const queryRequest = {
-        q: query.toQuery(),
-      };
-
-      this.logger.debug({
-        message: 'Query builder for checking against payments',
-        request: queryRequest,
-      });
-
-      payloads.customerPayment = { "q": queryRequest };
+    if (refName) {
+      query = queryBuilder.raw(`${query.toQuery()} AND ${customUniquePaymentReference} = ?`, refName);
     }
+
+    this.logger.debug({
+      message: 'Query builder for checking against payments',
+      request: query.toQuery(),
+    });
 
     try {
-      await axios({
+      const checker = await axios({
         ...recordExistsRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(recordExistsRequestOpts, token)),
-        data: payloads[recordType],
+        headers: {
+          prefer: 'transient',
+          ...oauth.toHeader(oauth.authorize(recordExistsRequestOpts, token))
+        },
+        data: { "q": query.toQuery() },
       } as AxiosRequestConfig);
-    } catch (err) {
-      this.logger.error({
-        message: `No ${recordType} found.`,
-        response: err?.response?.data,
-      });
-      return false; // no invoice found
-    }
 
-    return true;
+      if (checker?.data.count > 0) {
+        return {
+          alreadyExists: true,
+          id: checker.data.items[0].id
+        }
+      } else {
+        return {
+          alreadyExists: false
+        }
+      }
+    } catch (err) {
+      this.logger.warn({
+        message: `Error checking if customer payment is already registered in NetSuite.`,
+        response: err?.response?.data['o:errorDetails'],
+      });
+    }
   }
 }

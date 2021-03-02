@@ -81,7 +81,8 @@ export interface ErpServiceContract {
   registerPayment?(
     data: RegisterPaymentRequest
   ): Promise<RegisterPaymentResponse>;
-  checkRecordExists(recordType: string, erpReference: string): Promise<boolean>;
+  checkInvoiceExists(erpReference: string): Promise<boolean>;
+  checkCustomerPaymentExists(erpReference: string): Promise<boolean>;
 }
 
 export class EmptyErpService implements ErpServiceContract {
@@ -138,7 +139,11 @@ export class EmptyErpService implements ErpServiceContract {
     };
   }
 
-  async checkRecordExists(recordType: string, erpReference: string): Promise<boolean> {
+  async checkInvoiceExists(erpReference: string): Promise<any> {
+    return true;
+  }
+
+  async checkCustomerPaymentExists(erpReference: string): Promise<any> {
     return true;
   }
 }

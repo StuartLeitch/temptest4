@@ -403,4 +403,8 @@ export class MockInvoiceRepo
 
     return !!found;
   }
+
+  async getInvoicePayments(invoiceId: InvoiceId): Promise<any[]> {
+    return [];
+  }
 }

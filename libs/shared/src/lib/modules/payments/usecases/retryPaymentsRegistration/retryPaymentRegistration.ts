@@ -99,6 +99,7 @@ export class RetryPaymentsRegistrationToErpUsecase
           .map((i) => i.id.toString())
           .join(', ')}`
       );
+
       const errs = [];
 
       for (const paymentId of paymentIds) {
@@ -119,7 +120,7 @@ export class RetryPaymentsRegistrationToErpUsecase
         }
 
         // ! Only process one payment!
-        process.exit();
+        // process.exit();
       }
 
       if (errs.length > 0) {

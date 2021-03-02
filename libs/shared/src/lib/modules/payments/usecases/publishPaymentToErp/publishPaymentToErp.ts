@@ -80,7 +80,6 @@ export class PublishPaymentToErpUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<PublishPaymentToErpResponse> {
     let invoice: Invoice;
-
     try {
       const payment = await this.paymentRepo.getPaymentById(
         PaymentId.create(new UniqueEntityID(request.paymentId)).getValue()
@@ -93,24 +92,25 @@ export class PublishPaymentToErpUsecase
       const invoicePayments = await this.invoiceRepo.getInvoicePayments(payment.invoiceId);
       this.loggerService.info('PublishPaymentToERP payments', invoicePayments);
 
-      const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
+      const invoice = await this.invoiceRepo.getInvoiceById(payment.invoiceId);
+      this.loggerService.info('PublishPaymentToERP invoice', invoice);
 
-      let invoiceItems = invoice.invoiceItems.currentItems;
+      let invoiceItems = invoice?.invoiceItems?.currentItems;
 
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
           this.invoiceItemRepo,
           this.couponRepo,
           this.waiverRepo
-        );
+          );
 
-        const resp = await getItemsUsecase.execute({
-          invoiceId: invoice.invoiceId.id.toString(),
-        });
-        this.loggerService.info(
-          'PublishInvoiceToERP getItemsUsecase response',
-          resp
-        );
+          const resp = await getItemsUsecase.execute({
+            invoiceId: invoice.invoiceId.id.toString(),
+          });
+          this.loggerService.info(
+            'PublishInvoiceToERP getItemsUsecase response',
+            resp
+            );
         if (resp.isLeft()) {
           throw new Error(
             `Invoice ${invoice.id.toString()} has no invoice items.`
@@ -148,6 +148,9 @@ export class PublishPaymentToErpUsecase
         await this.erpReferenceRepo.save(nonInvoiceableErpReference);
         return right(null);
       }
+
+      const paymentMethods = await this.paymentMethodRepo.getPaymentMethods();
+
 
       const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
       if (!payer) {
