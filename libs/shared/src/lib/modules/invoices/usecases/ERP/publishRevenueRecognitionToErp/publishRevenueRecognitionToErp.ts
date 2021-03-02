@@ -221,8 +221,6 @@ export class PublishRevenueRecognitionToErpUsecase
         manuscript.customId
       );
 
-      console.log('------------------------------', revenueRecognitionExists);
-
       if (!revenueRecognitionExists) {
         const erpResponse = await this.erpService.registerRevenueRecognition({
           manuscript,
