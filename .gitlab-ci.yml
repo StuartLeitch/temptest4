@@ -15,9 +15,6 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
 
 license_scanning:
-  stage: test
-  variables:
-    ASDF_NODEJS_VERSION: "12.0.0"
   rules:
     - if: '$CI_COMMIT_BRANCH == "develop"'
 
