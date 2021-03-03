@@ -273,7 +273,7 @@ export class GenerateCompensatoryEventsUsecase
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
         .map((result) => ({
           ...request,
-          payments: result.getValue(),
+          payments: result,
         }))
         .execute();
     };

@@ -52,6 +52,7 @@ import {
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
+import { ExternalOrderId } from '../../domain/external-order-id';
 
 export class RecordPaymentUsecase
   implements
@@ -231,7 +232,7 @@ export class RecordPaymentUsecase
     ) => {
       return new AsyncEither(request.invoiceId)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
+        .map((result) => result)
         .map((payments) => {
           return payments
             .filter((payment) => payment.status === PaymentStatus.CREATED)
@@ -312,7 +313,9 @@ export class RecordPaymentUsecase
         })
         .map((request) => {
           const { existingPayment, foreignPaymentId } = request;
-          existingPayment.foreignPaymentId = foreignPaymentId;
+          existingPayment.foreignPaymentId = ExternalOrderId.create(
+            foreignPaymentId
+          );
 
           return { ...request, payment: existingPayment };
         })

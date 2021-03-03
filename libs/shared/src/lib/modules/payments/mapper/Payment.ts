@@ -2,10 +2,10 @@ import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { Mapper } from '../../../infrastructure/Mapper';
 import { Amount } from '../../../domain/Amount';
 
-import { Payment, PaymentStatus } from '../domain/Payment';
-import { PaymentMethodId } from '../domain/PaymentMethodId';
+import { ExternalOrderId } from '../domain/external-order-id';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
-import { PaymentProof } from '../domain/payment-proof';
+import { PaymentMethodId } from '../domain/PaymentMethodId';
+import { Payment, PaymentStatus } from '../domain/Payment';
 import { PayerId } from '../../payers/domain/PayerId';
 
 export class PaymentMap extends Mapper<Payment> {
@@ -22,11 +22,13 @@ export class PaymentMap extends Mapper<Payment> {
         paymentMethodId: PaymentMethodId.create(
           new UniqueEntityID(raw.paymentMethodId)
         ),
-        foreignPaymentId: raw.foreignPaymentId ?? null,
+        foreignPaymentId: raw.foreignPaymentId
+          ? ExternalOrderId.create(raw.foreignPaymentId)
+          : null,
         datePaid: raw.datePaid ? new Date(raw.datePaid) : new Date(),
         status: raw.status ? raw.status : PaymentStatus.COMPLETED,
         paymentProof: raw.paymentProof
-          ? PaymentProof.create(raw.paymentProof)
+          ? ExternalOrderId.create(raw.paymentProof)
           : null,
       },
       new UniqueEntityID(raw.id)
@@ -45,8 +47,8 @@ export class PaymentMap extends Mapper<Payment> {
       paymentMethodId: payment.paymentMethodId.id.toString(),
       amount: payment.amount.value,
       datePaid: payment.datePaid,
-      foreignPaymentId: payment.foreignPaymentId ?? null,
       status: payment.status,
+      foreignPaymentId: payment.foreignPaymentId?.toString(),
       paymentProof: payment.paymentProof?.toString(),
     };
   }
