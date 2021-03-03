@@ -877,10 +877,10 @@ export class NetSuiteService implements ErpServiceContract {
     return true;
   }
 
-  public async checkRevenueRecognitionExists(
+  public async getExistingRevenueRecognition(
     invoiceRefNumber: string,
     manuscriptCustomId: string
-  ): Promise<boolean> {
+  ): Promise<any> {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -915,55 +915,12 @@ export class NetSuiteService implements ErpServiceContract {
         },
         data: revenueRecognitionRequest,
       } as AxiosRequestConfig);
-      return res.data.count === 0 ? false : true;
+      return { count: res.data.count, id: res.data.items.id };
     } catch (err) {
-      this.logger.error(err?.request?.data);
-      throw err;
-    }
-  }
-
-  public async getRevenueRecognitionId(
-    invoiceRefNumber: string,
-    manuscriptCustomId: string
-  ): Promise<string> {
-    const {
-      connection: { config, oauth, token },
-    } = this;
-
-    // Query revenue recognition transaction
-    const revenueRecognitionRequestOpts = {
-      url: `${config.endpoint}query/v1/suiteql`,
-      method: 'POST',
-    };
-
-    const queryBuilder = knex({ client: 'pg' });
-    let query = queryBuilder.raw(
-      `SELECT id FROM transaction WHERE recordtype = 'journalentry' AND tranid = 'Article ${invoiceRefNumber} - Invoice ${manuscriptCustomId}'`
-    );
-
-    const revenueRecognitionRequest = {
-      q: query.toQuery(),
-    };
-    this.logger.debug({
-      message: 'Query builder for get revenue recognition id',
-      request: revenueRecognitionRequest,
-    });
-
-    try {
-      const res = await axios({
-        ...revenueRecognitionRequestOpts,
-        headers: {
-          prefer: 'transient',
-          ...oauth.toHeader(
-            oauth.authorize(revenueRecognitionRequestOpts, token)
-          ),
-        },
-        data: revenueRecognitionRequest,
-      } as AxiosRequestConfig);
-      return res.data.items.id;
-    } catch (err) {
-      this.logger.error(err?.request?.data);
-      throw err;
+      this.logger.error({
+        message: 'No Revenue Recognition found.',
+        response: err?.response?.data,
+      });
     }
   }
 }
