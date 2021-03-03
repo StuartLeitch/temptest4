@@ -19,11 +19,11 @@ license_scanning:
   variables:
     ASDF_NODEJS_VERSION: "12.0.0"
   rules:
-    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME'
+    - if: '$CI_COMMIT_BRANCH == "develop"'
 
 gemnasium-dependency_scanning:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME'
+    - if: '$CI_COMMIT_BRANCH == "develop"'
 
 
 variables:
