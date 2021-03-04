@@ -36,6 +36,7 @@ import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 
 import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
 import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
+import { ExternalOrderId } from '../../domain/external-order-id';
 import { PaymentDTO } from '../../domain/strategies/behaviors';
 import { PaymentStatus } from '../../domain/Payment';
 
@@ -52,7 +53,6 @@ import {
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
-import { ExternalOrderId } from '../../domain/external-order-id';
 
 export class RecordPaymentUsecase
   implements

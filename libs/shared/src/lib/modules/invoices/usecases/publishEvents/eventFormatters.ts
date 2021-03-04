@@ -131,8 +131,8 @@ export function formatPayments(
     .filter((payment) => payment.status === PaymentStatus.COMPLETED)
     .map((payment) => ({
       paymentType: methods[payment.paymentMethodId.toString()].name,
+      foreignPaymentId: payment.foreignPaymentId.toString(),
       paymentDate: payment?.datePaid?.toISOString(),
-      foreignPaymentId: payment.foreignPaymentId,
       paymentAmount: payment.amount.value,
     }));
 }

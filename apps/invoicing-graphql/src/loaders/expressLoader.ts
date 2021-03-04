@@ -21,8 +21,11 @@ import {
 
 import { env } from '../env';
 
-function extractOrderId(data: PayPalPaymentCapture): string {
-  const orderLink = data.links.find((link) => link.href.indexOf('orders') > -1);
+function extractCaptureId(data: PayPalPaymentCapture): string {
+  const orderLink = data.links.find(
+    (link) =>
+      link.href.indexOf('captures') > -1 && link.href.indexOf('refund') === -1
+  );
   const linkPathSplitted = orderLink.href.split('/');
   const orderId = linkPathSplitted[linkPathSplitted.length - 1];
   return orderId;
@@ -91,7 +94,7 @@ export const expressLoader: MicroframeworkLoader = (
       try {
         const result = await usecase.execute(
           {
-            payPalOrderId: extractOrderId(data.resource),
+            payPalOrderId: extractCaptureId(data.resource),
             payPalEvent: data.event_type,
           },
           authContext

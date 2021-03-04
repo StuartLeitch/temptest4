@@ -18,6 +18,7 @@ import {
 import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { PaymentStatus, PaymentProps, Payment } from '../../domain/Payment';
+import { ExternalOrderId } from '../../domain/external-order-id';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
 import { PayerId } from '../../../payers/domain/PayerId';
@@ -123,7 +124,7 @@ export class CreatePaymentUsecase
       datePaid: request.datePaid ? new Date(request.datePaid) : null,
       payerId: PayerId.create(new UniqueEntityID(request.payerId)),
       amount: Amount.create(request.amount).getValue(),
-      foreignPaymentId: request.foreignPaymentId,
+      foreignPaymentId: ExternalOrderId.create(request.foreignPaymentId),
       status: PaymentStatus[request.status],
     };
 
