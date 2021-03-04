@@ -315,7 +315,7 @@ export class KnexInvoiceRepo
       `SELECT
         COALESCE((
           SELECT
-            max("invoiceNumber") + 1 AS max FROM (
+            max("invoiceNumber") AS max FROM (
               SELECT
                 max("invoiceNumber") AS "invoiceNumber" FROM invoices
               WHERE
