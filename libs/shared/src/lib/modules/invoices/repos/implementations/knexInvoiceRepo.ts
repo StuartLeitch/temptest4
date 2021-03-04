@@ -312,11 +312,18 @@ export class KnexInvoiceRepo
     //     ),
     //   });
     const getLastInvoiceNumber = await db.raw(
-      `coalesce((select max("invoiceNumber") + 1 as max from (
-        select max("invoiceNumber") as "invoiceNumber" from invoices where "dateIssued" BETWEEN ? AND ?
-          union
-          select "invoiceReferenceNumber" as "invoiceNumber" from configurations
-        ) referenceNumbers), 1)
+      `SELECT
+      COALESCE((
+        SELECT
+          max("invoiceNumber") + 1 AS max FROM (
+            SELECT
+              max("invoiceNumber") AS "invoiceNumber" FROM invoices
+            WHERE
+              "dateIssued" BETWEEN ?
+              AND ?
+            UNION
+            SELECT
+              "invoiceReferenceNumber" AS "invoiceNumber" FROM configurations) referenceNumbers), 1)
       `,
       [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
     );
