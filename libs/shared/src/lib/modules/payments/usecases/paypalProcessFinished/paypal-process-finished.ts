@@ -93,6 +93,7 @@ export class PayPalProcessFinishedUsecase
   private async shouldUpdatePaymentStatus<T extends WithPayment>(request: T) {
     if (
       request.payment.status === PaymentStatus.COMPLETED ||
+      request.payment.status === PaymentStatus.CREATED ||
       request.payment.status === PaymentStatus.FAILED
     ) {
       return right(false);
