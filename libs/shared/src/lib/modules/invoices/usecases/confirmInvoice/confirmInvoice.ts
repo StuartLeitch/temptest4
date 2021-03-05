@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { Either, Result, right } from '../../../../core/logic/Result';
+import { Either, left, Result, right } from '../../../../core/logic/Result';
 import { chain } from '../../../../core/logic/EitherChain';
 import { UseCase } from '../../../../core/domain/UseCase';
 
@@ -46,6 +46,7 @@ import {
 
 import { ConfirmInvoiceDTO, PayerInput } from './confirmInvoiceDTO';
 import { ConfirmInvoiceResponse } from './confirmInvoiceResponse';
+import { ConfirmInvoiceErrors } from './confirmInvoiceErrors';
 
 interface PayerDataDomain {
   address: Address;
@@ -109,6 +110,7 @@ export class ConfirmInvoiceUsecase
 
     await chain(
       [
+        this.assignInvoiceNumber.bind(this),
         this.updateInvoiceStatus.bind(this),
         this.applyVatToInvoice.bind(this),
         this.dispatchEvents.bind(this),
@@ -126,6 +128,29 @@ export class ConfirmInvoiceUsecase
     );
 
     return reductions?.getReduction()?.props.reduction < 0;
+  }
+
+  private async assignInvoiceNumber(
+    payerData: PayerDataDomain
+  ): Promise<
+    Either<ConfirmInvoiceErrors.InvoiceNumberAssignationError, PayerDataDomain>
+  > {
+    const { invoice } = payerData;
+
+    try {
+      const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
+      invoice.assignInvoiceNumber(lastInvoiceNumber);
+      payerData.invoice = await this.invoiceRepo.update(invoice);
+    } catch (e) {
+      return left(
+        new ConfirmInvoiceErrors.InvoiceNumberAssignationError(
+          invoice.id.toString(),
+          e
+        )
+      );
+    }
+
+    return right(payerData);
   }
 
   private async updateInvoiceStatus(
