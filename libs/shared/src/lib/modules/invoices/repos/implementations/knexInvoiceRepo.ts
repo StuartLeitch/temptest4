@@ -329,10 +329,10 @@ export class KnexInvoiceRepo
     );
 
     logger.debug('lastInvoiceNumber', {
-      value: getLastInvoiceNumber
+      value: getLastInvoiceNumber,
     });
 
-    return getLastInvoiceNumber;
+    return getLastInvoiceNumber.rows[0].coalesce;
   }
 
   async getInvoicePaymentInfo(
@@ -708,12 +708,12 @@ export class KnexInvoiceRepo
       .where('dateCreated', '<=', criteria.range.to.toString())
       .first();
 
-      logger.debug('select', {
-        [`countInvoices_SQL`]: countInvoicesSQL.toString(),
-      });
+    logger.debug('select', {
+      [`countInvoices_SQL`]: countInvoicesSQL.toString(),
+    });
 
-      const { CNT } = await countInvoicesSQL;
+    const { CNT } = await countInvoicesSQL;
 
-      return Number(CNT);
+    return Number(CNT);
   }
 }
