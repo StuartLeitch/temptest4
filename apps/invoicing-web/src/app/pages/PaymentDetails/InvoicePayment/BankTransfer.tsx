@@ -4,6 +4,7 @@ import { Flex, Label, Title, Text } from "@hindawi/react-components";
 import { config } from "../../../../config";
 
 interface Props {
+  invoiceReference?: string;
   accountName?: string;
   accountType?: string;
   accountNumber?: string;
@@ -26,6 +27,7 @@ const BankTransferRow = ({ label, value }: any) => (
 );
 
 const BankTransfer: React.FunctionComponent<Props> = ({
+  invoiceReference,
   accountName,
   accountType,
   accountNumber,
@@ -47,6 +49,7 @@ const BankTransfer: React.FunctionComponent<Props> = ({
       <BankTransferRow label="IBAN" value={iban} />
       <BankTransferRow label="Bank Address" value={bankAddress} />
       <BankTransferRow label="Beneficiary Address" value={beneficiaryAddress} />
+      <BankTransferRow label="Invoice Reference" value={invoiceReference} />
     </Fragment>
   );
 };
