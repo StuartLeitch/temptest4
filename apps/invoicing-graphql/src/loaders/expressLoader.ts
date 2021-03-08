@@ -90,12 +90,17 @@ export const expressLoader: MicroframeworkLoader = (
       } = context;
       const authContext = { roles: [Roles.PAYER] };
       const usecase = new PayPalProcessFinishedUsecase(payment);
+      const payPalOrderId = extractCaptureId(data.resource);
+
+      logger.info(
+        `Try to handle PayPal webhook for transaction finished, for transaction with foreignPaymentId on ${payPalOrderId}`
+      );
 
       try {
         const result = await usecase.execute(
           {
-            payPalOrderId: extractCaptureId(data.resource),
             payPalEvent: data.event_type,
+            payPalOrderId,
           },
           authContext
         );

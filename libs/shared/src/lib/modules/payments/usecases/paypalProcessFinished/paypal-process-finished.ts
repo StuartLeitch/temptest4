@@ -59,7 +59,7 @@ export class PayPalProcessFinishedUsecase
       const result = await new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.attachPayment(context))
-        .advanceOrEnd(this.shouldUpdatePaymentStatus)
+        .then(this.shouldUpdatePaymentStatus)
         .map(this.updatePaymentStatus)
         .then(this.savePaymentChanges)
         .map(this.dispatchEvents)
@@ -90,16 +90,27 @@ export class PayPalProcessFinishedUsecase
     return right(request);
   }
 
-  private async shouldUpdatePaymentStatus<T extends WithPayment>(request: T) {
+  private async shouldUpdatePaymentStatus<T extends WithPayment>(
+    request: T
+  ): Promise<
+    Either<Errors.PaymentNotInCorrectStatusForTransitionToCompletedError, T>
+  > {
+    const { payment } = request;
+
     if (
-      request.payment.status === PaymentStatus.COMPLETED ||
-      request.payment.status === PaymentStatus.CREATED ||
-      request.payment.status === PaymentStatus.FAILED
+      payment.status === PaymentStatus.COMPLETED ||
+      payment.status === PaymentStatus.CREATED ||
+      payment.status === PaymentStatus.FAILED
     ) {
-      return right(false);
+      return left(
+        new Errors.PaymentNotInCorrectStatusForTransitionToCompletedError(
+          payment.invoiceId.toString(),
+          payment.status
+        )
+      );
     }
 
-    return right(true);
+    return right(request);
   }
 
   private updatePaymentStatus<T extends WithPayPalEvent & WithPayment>(
