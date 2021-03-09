@@ -28,25 +28,15 @@ export class InvoiceCanBeConfirmedNotificationTemplate {
     } = data;
     const subject = `${manuscript.customId}: Article Processing Charges`;
     const paragraph = `
-    <p>Dear ${manuscript.authorFirstName} ${manuscript.authorSurname},</p>
+    <p>Dear Dr. ${manuscript.authorFirstName} ${manuscript.authorSurname},</p>
     <h4>Thank you for choosing ${publisherName} to publish your manuscript</h4>
-    We are pleased to inform you that your manuscript, ${
-      manuscript.title
-    }, has been accepted for publication in the journal, ${
-      catalogItem.journalTitle
-    }. We will be in touch shortly to request electronic files for your manuscript.
+    We are pleased to inform you that your manuscript, ${manuscript.title}, has been accepted for publication in the journal, ${catalogItem.journalTitle}. We will be in touch shortly to request electronic files for your manuscript.
     <br/> <br/>
     The publication process will begin upon the receipt of these files.
     <br/> <br/>
-    As an open access journal, ${
-      catalogItem.journalTitle
-    } has an associated Article Processing Charge. The total charges for your manuscript ${
-      manuscript.customId
-    }, before any taxes, are ${catalogItem.currency} ${invoiceItem.price}.
+    As an open access journal, ${catalogItem.journalTitle} has an associated Article Processing Charge. The total charges for your manuscript ${manuscript.customId}, before any taxes, are ${catalogItem.currency} ${invoiceItem.price}.
     <br/> <br/>
-    VAT charges may apply depending on the country of the individual or institution being billed. Individuals resident in the UK or an EU Member state will be charged VAT. Institutions registered in the UK or an EU Member state should also provide their VAT number when completing the payer information. VAT is calculated at the applicable rate, currently 20%, on the net ${
-      catalogItem.currency
-    } amount and this VAT charge will be available for review on the invoice prior to confirmation.
+    VAT charges will be applied for individuals resident in the UK and for institutions registered in the UK. VAT is calculated at the applicable rate, currently 20%, on the net ${catalogItem.currency} amount and this VAT charge will be available for review on the invoice prior to confirmation.
     <br/> <br/>
     <h4>What to do next?</h4>
     This invoice is payable upon receipt. You can view the invoice for your article, confirm billing details, apply coupons and make payment through the following URL:
