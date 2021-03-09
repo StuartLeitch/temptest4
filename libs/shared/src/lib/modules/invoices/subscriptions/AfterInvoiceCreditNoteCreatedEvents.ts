@@ -159,13 +159,13 @@ export class AfterInvoiceCreditNoteCreatedEvent
 
       const publishResult = await this.publishInvoiceCredited.execute({
         paymentMethods: paymentMethods.value.getValue(),
-        invoiceItems,
         billingAddress,
+        invoiceItems,
+        creditNote,
         manuscript,
         payments,
-        creditNote,
+        invoice,
         payer,
-        cancelledInvoice: invoice
       });
 
       if (publishResult.isLeft()) {

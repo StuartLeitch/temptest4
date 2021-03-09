@@ -417,7 +417,9 @@ export const invoice: Resolvers<Context> = {
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
         creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
-        referenceNumber: assocInvoice.persistentReferenceNumber ?? '---',
+        referenceNumber: assocInvoice.persistentReferenceNumber
+          ? `CN-${assocInvoice.persistentReferenceNumber}`
+          : '---',
       };
     },
     async transaction(parent: Invoice, args, context) {
@@ -601,7 +603,10 @@ export const invoice: Resolvers<Context> = {
       const creditNote = result.value.getValue();
 
       const getInvoiceUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
-      const retrieveInvoice = await getInvoiceUsecase.execute({ invoiceId });
+      const retrieveInvoice = await getInvoiceUsecase.execute(
+        { invoiceId },
+        usecaseContext
+      );
 
       if (retrieveInvoice.isLeft()) {
         console.log('Error getting associate invoice', invoiceId);
