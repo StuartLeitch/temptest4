@@ -40,7 +40,9 @@ export const invoice: Resolvers<Context> = {
     async invoice(parent, args, context): Promise<any> {
       const { repos } = context;
 
-      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(repos.invoice);
+      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
+        repos.invoice
+      );
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
@@ -62,11 +64,13 @@ export const invoice: Resolvers<Context> = {
       // There is a TSLint error for when try to use a shadowed variable!
       const invoiceDetails = result.value.getValue();
 
-
       let assocInvoice = null;
       // * this is a credit note, let's ask for the reference number of the associated invoice
       if (invoiceDetails.cancelledInvoiceReference) {
-        const result = await getCreditNoteByInvoiceIdUsecase.execute({ invoiceId: invoiceDetails.cancelledInvoiceReference }, usecaseContext);
+        const result = await getCreditNoteByInvoiceIdUsecase.execute(
+          { invoiceId: invoiceDetails.cancelledInvoiceReference },
+          usecaseContext
+        );
         if (result.isLeft()) {
           return undefined;
         }
@@ -84,13 +88,17 @@ export const invoice: Resolvers<Context> = {
         erpReferences: invoiceDetails.getErpReferences().getItems(),
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-        referenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
+        referenceNumber: assocInvoice
+          ? assocInvoice.persistentReferenceNumber
+          : invoiceDetails.persistentReferenceNumber,
       };
     },
 
     async invoices(parent, args, context) {
       const { repos } = context;
-      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(repos.invoice);
+      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
+        repos.invoice
+      );
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
         roles: [Roles.ADMIN],
@@ -103,36 +111,42 @@ export const invoice: Resolvers<Context> = {
       const invoicesList = result.value.getValue();
 
       const retrieveAssociatedInvoice = async (item: any) => {
-        const result = await getCreditNoteByInvoiceIdUsecase.execute({ invoiceId: item.cancelledInvoiceReference }, usecaseContext);
+        const result = await getCreditNoteByInvoiceIdUsecase.execute(
+          { invoiceId: item.cancelledInvoiceReference },
+          usecaseContext
+        );
         if (result.isLeft()) {
           return undefined;
         }
         const invoice = result.value.getValue();
         return InvoiceMap.toPersistence(invoice);
-      }
+      };
 
-      const getInvoices = async () => Promise.all(invoicesList.invoices.map(async (invoiceDetails: any) => {
-        let assocInvoice = null;
-        if (invoiceDetails.cancelledInvoiceReference) {
+      const getInvoices = async () =>
+        Promise.all(
+          invoicesList.invoices.map(async (invoiceDetails: any) => {
+            let assocInvoice = null;
+            if (invoiceDetails.cancelledInvoiceReference) {
+              // * this is a credit note, let's ask for the reference number of the associated invoice
+              assocInvoice = await retrieveAssociatedInvoice(invoiceDetails);
+            }
 
-          // * this is a credit note, let's ask for the reference number of the associated invoice
-          assocInvoice = await retrieveAssociatedInvoice(invoiceDetails);
-        }
-
-
-        return ({
-          ...InvoiceMap.toPersistence(invoiceDetails),
-          invoiceId: invoiceDetails.id.toString(),
-          dateCreated: invoiceDetails?.dateCreated?.toISOString(),
-          dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
-          dateIssued: invoiceDetails?.dateIssued?.toISOString(),
-          referenceNumber: assocInvoice ? assocInvoice.persistentReferenceNumber : invoiceDetails.persistentReferenceNumber,
-        })
-      }));
+            return {
+              ...InvoiceMap.toPersistence(invoiceDetails),
+              invoiceId: invoiceDetails.id.toString(),
+              dateCreated: invoiceDetails?.dateCreated?.toISOString(),
+              dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
+              dateIssued: invoiceDetails?.dateIssued?.toISOString(),
+              referenceNumber: assocInvoice
+                ? assocInvoice.persistentReferenceNumber
+                : invoiceDetails.persistentReferenceNumber,
+            };
+          })
+        );
 
       return {
         totalCount: invoicesList.totalCount,
-        invoices: await getInvoices()
+        invoices: await getInvoices(),
       };
     },
 
@@ -366,6 +380,7 @@ export const invoice: Resolvers<Context> = {
         repos: { invoice: invoiceRepo },
       } = context;
       const usecase = new GetCreditNoteByInvoiceIdUsecase(invoiceRepo);
+      const getAssocInvoice = new GetInvoiceDetailsUsecase(invoiceRepo);
 
       const request: GetInvoiceDetailsDTO = {
         invoiceId: parent.invoiceId,
@@ -384,6 +399,16 @@ export const invoice: Resolvers<Context> = {
       // There is a TSLint error for when try to use a shadowed variable!
       const creditNoteDetails = result.value.getValue();
 
+      const assocInvoiceResponse = await getAssocInvoice.execute(
+        { invoiceId: creditNoteDetails.cancelledInvoiceReference },
+        usecaseContext
+      );
+      if (assocInvoiceResponse.isLeft()) {
+        return undefined;
+      }
+
+      const assocInvoice = assocInvoiceResponse.value.getValue();
+
       return {
         invoiceId: creditNoteDetails.id.toString(),
         cancelledInvoiceReference: creditNoteDetails.cancelledInvoiceReference,
@@ -392,7 +417,7 @@ export const invoice: Resolvers<Context> = {
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
         creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
-        referenceNumber: creditNoteDetails.persistentReferenceNumber ?? '---',
+        referenceNumber: assocInvoice.persistentReferenceNumber ?? '---',
       };
     },
     async transaction(parent: Invoice, args, context) {
@@ -594,10 +619,9 @@ export const invoice: Resolvers<Context> = {
         // revenueRecognitionReference: creditNote.revenueRecognitionReference,
         creationReason: creditNote.creationReason,
         dateIssued: creditNote?.dateIssued?.toISOString(),
-        referenceNumber:
-          invoice
-            ? `CN-${invoice.persistentReferenceNumber}`
-            : '---',
+        referenceNumber: invoice
+          ? `CN-${invoice.persistentReferenceNumber}`
+          : '---',
       };
     },
   },

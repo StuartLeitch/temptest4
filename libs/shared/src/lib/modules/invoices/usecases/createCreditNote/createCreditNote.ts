@@ -132,9 +132,10 @@ export class CreateCreditNoteUsecase
       delete clonedRawInvoice.id;
       clonedRawInvoice.transactionId = transaction.transactionId.id.toString();
       clonedRawInvoice.dateCreated = new Date();
-      clonedRawInvoice.dateIssued = new Date();
+      clonedRawInvoice.dateIssued = null;
       clonedRawInvoice.persistentReferenceNumber = null;
       clonedRawInvoice.cancelledInvoiceReference = null;
+      clonedRawInvoice.invoiceNumber = null;
       clonedRawInvoice.creationReason = request.reason;
 
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
@@ -165,7 +166,9 @@ export class CreateCreditNoteUsecase
 
       // * Assign the cancelled invoice reference
       // * This assignment will trigger an INVOICE_CREDITED event
+
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
+      creditNote.dateIssued = creditNote.dateCreated;
       creditNote.markAsFinal();
 
       await this.invoiceRepo.save(creditNote);
@@ -179,6 +182,7 @@ export class CreateCreditNoteUsecase
           invoiceNumber: null,
           erpReferences: null,
           cancelledInvoiceReference: null,
+          persistentReferenceNumber: null,
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain
 
