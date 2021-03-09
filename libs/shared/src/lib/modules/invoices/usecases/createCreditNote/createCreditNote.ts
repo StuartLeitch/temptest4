@@ -111,8 +111,6 @@ export class CreateCreditNoteUsecase
       // * set the invoice status to FINAL
       invoice.markAsFinal();
 
-      // console.log('Original Invoice:');
-      // console.info(invoice);
       await this.invoiceRepo.update(invoice);
 
       try {
@@ -126,12 +124,7 @@ export class CreateCreditNoteUsecase
           item.addAssignedWaivers(waivers);
         }
       } catch (err) {
-        return left(
-          // new GetItemsForInvoiceErrors.InvoiceNotFoundError(
-          //   invoiceId.id.toString()
-          // )
-          new UnexpectedError('Bad Invoice Items!')
-        );
+        return left(new UnexpectedError('Bad Invoice Items!'));
       }
 
       // * actually create the Credit Note
@@ -164,14 +157,8 @@ export class CreateCreditNoteUsecase
               ((invoiceItem.price * -1) / 100) * w.reduction;
           });
 
-          // const vat = (invoiceItem.price / 100) * rawInvoiceItem?.vat;
-          // rawInvoiceItem.price += vat;
-
           const creditNoteInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
-          // creditNote.addInvoiceItem(invoiceItem);
 
-          // console.log('Anti Invoice Item:');
-          // console.info(creditNoteInvoiceItem);
           await this.invoiceItemRepo.save(creditNoteInvoiceItem);
         });
       }
@@ -181,13 +168,7 @@ export class CreateCreditNoteUsecase
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
       creditNote.markAsFinal();
 
-      // console.log('New Credit Note:');
-      // console.info(creditNote);
       await this.invoiceRepo.save(creditNote);
-      // transaction.addInvoice(creditNote);
-
-      // console.log('ITEMS = ');
-      // console.info(creditNote);
 
       // ? should generate a DRAFT invoice
       if (request.createDraft) {
@@ -202,7 +183,6 @@ export class CreateCreditNoteUsecase
         } as any; // TODO: should reference the real invoice props, as in its domain
 
         // * System creates DRAFT invoice
-        // console.info(invoiceProps);
 
         // This is where all the magic happens
         let draftInvoice = InvoiceMap.toDomain(invoiceProps);
@@ -218,8 +198,6 @@ export class CreateCreditNoteUsecase
             const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
             draftInvoice.addInvoiceItem(draftInvoiceItem);
 
-            // console.log('Draft Invoice Item:');
-            // console.info(draftInvoiceItem);
             await this.invoiceItemRepo.save(draftInvoiceItem);
 
             // * save coupons
@@ -234,14 +212,8 @@ export class CreateCreditNoteUsecase
           });
         }
 
-        // console.log('Draft Invoice:');
-        // console.info(draftInvoice);
         await this.invoiceRepo.save(draftInvoice);
 
-        // const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-        // * As DRAFT invoice, no `dateIssued` and `invoiceNumber` should be assigned
-        // draftInvoice.dateIssued = new Date();
-        // draftInvoice.assignInvoiceNumber(lastInvoiceNumber);
         draftInvoice.dateAccepted = creditNote.dateAccepted;
 
         await this.invoiceRepo.update(draftInvoice);

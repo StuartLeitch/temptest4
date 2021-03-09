@@ -134,9 +134,6 @@ export class SetTransactionToActiveByCustomIdUsecase
       transaction.markAsActive();
 
       await this.transactionRepo.update(transaction);
-      // const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-      // invoice.dateIssued = new Date();
-      // invoice.assignInvoiceNumber(lastInvoiceNumber);
       await this.invoiceRepo.update(invoice);
 
       invoice.generateCreatedEvent();
