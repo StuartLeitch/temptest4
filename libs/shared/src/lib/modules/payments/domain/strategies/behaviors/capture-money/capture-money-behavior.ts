@@ -2,7 +2,7 @@ import { StrategyError } from '../../../../../../core/logic/strategy-error';
 import { Behavior } from '../../../../../../core/logic/strategy';
 import { Either } from '../../../../../../core/logic/Either';
 
-import { PaymentProof } from '../../../payment-proof';
+import { ExternalOrderId } from '../../../external-order-id';
 
 export interface CaptureMoneyDTO {
   orderId: string;
@@ -13,5 +13,5 @@ export abstract class CaptureMoneyBehavior implements Behavior {
 
   abstract captureMoney(
     request: CaptureMoneyDTO
-  ): Promise<Either<StrategyError, PaymentProof>>;
+  ): Promise<Either<StrategyError, ExternalOrderId>>;
 }

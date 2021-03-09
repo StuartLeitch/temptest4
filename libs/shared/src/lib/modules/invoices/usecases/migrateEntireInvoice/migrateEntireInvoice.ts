@@ -579,7 +579,7 @@ export class MigrateEntireInvoiceUsecase
 
     return new AsyncEither(invoiceId.id.toString())
       .then((invoiceId) => usecase.execute({ invoiceId }, context))
-      .map((result) => result.getValue())
+      .map((result) => result)
       .execute();
   }
 

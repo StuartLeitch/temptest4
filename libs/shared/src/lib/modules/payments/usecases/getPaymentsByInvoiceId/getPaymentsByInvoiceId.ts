@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Result';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -63,7 +63,7 @@ export class GetPaymentsByInvoiceIdUsecase
         const payments = await this.paymentRepo.getPaymentsByInvoiceId(
           invoiceId
         );
-        return right(Result.ok(payments));
+        return right(payments);
       } catch (err) {
         return left(
           new Errors.RetrievingPaymentsDbError(request.invoiceId, err)
