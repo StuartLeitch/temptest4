@@ -28,6 +28,10 @@ export class ExternalOrderId extends ValueObject<ExternalOrderIdProps> {
     });
   }
 
+  public toString(): string {
+    return this.id;
+  }
+
   private constructor(props: ExternalOrderIdProps) {
     super(props);
   }

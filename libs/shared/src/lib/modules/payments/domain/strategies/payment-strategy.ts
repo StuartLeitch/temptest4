@@ -6,7 +6,6 @@ import { PaymentClientToken } from '../../../../domain/PaymentClientToken';
 
 import { ExternalOrderId } from '../external-order-id';
 import { PaymentMethodId } from '../PaymentMethodId';
-import { PaymentProof } from '../payment-proof';
 import { PaymentStatus } from '../Payment';
 
 import {
@@ -58,7 +57,7 @@ export class PaymentStrategy implements Strategy {
 
   async captureMoney(
     request: CaptureMoneyDTO
-  ): Promise<Either<StrategyError, PaymentProof>> {
+  ): Promise<Either<StrategyError, ExternalOrderId>> {
     return this.captureBehavior.captureMoney(request);
   }
 

@@ -12,8 +12,8 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
+import { ExternalOrderId } from '../../domain/external-order-id';
 import { PaymentStatus, Payment } from '../../domain/Payment';
-import { PaymentProof } from '../../domain/payment-proof';
 
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { PaymentRepoContract } from '../../repos/paymentRepo';
@@ -38,7 +38,7 @@ interface WithInvoiceIdAndOrderId extends WithOrderId {
 }
 
 interface WithProof {
-  paymentProof: PaymentProof;
+  paymentProof: ExternalOrderId;
 }
 
 interface WithPayment {
@@ -113,6 +113,7 @@ export class PayPalPaymentApprovedUsecase
 
   private attachPayment(context: Context) {
     return async <T extends WithInvoiceIdAndOrderId>(request: T) => {
+      const paypalOrderId = ExternalOrderId.create(request.payPalOrderId);
       const usecase = new GetPaymentsByInvoiceIdUsecase(
         this.invoiceRepo,
         this.paymentRepo
@@ -120,10 +121,9 @@ export class PayPalPaymentApprovedUsecase
 
       return new AsyncEither(request.invoiceId)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
         .map((payments) =>
-          payments.find(
-            (payment) => payment.foreignPaymentId === request.payPalOrderId
+          payments.find((payment) =>
+            payment.foreignPaymentId.equals(paypalOrderId)
           )
         )
         .map((payment) => ({ ...request, payment }))
@@ -132,7 +132,11 @@ export class PayPalPaymentApprovedUsecase
   }
 
   private updatePaymentStatus<T extends WithPayment & WithProof>(request: T) {
-    request.payment.paymentProof = request.paymentProof;
+    // Use as `foreignPaymentId` the transaction id from paypal to hindawi
+    const tmp = request.payment.foreignPaymentId;
+    request.payment.foreignPaymentId = request.paymentProof;
+    request.payment.paymentProof = tmp;
+
     request.payment.status = PaymentStatus.PENDING;
 
     return request;

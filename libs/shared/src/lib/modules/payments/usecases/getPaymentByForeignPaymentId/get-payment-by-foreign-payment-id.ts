@@ -12,6 +12,7 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
+import { ExternalOrderId } from '../../domain/external-order-id';
 import { Payment } from '../../domain/Payment';
 
 import { PaymentRepoContract } from '../../repos/paymentRepo';
@@ -68,7 +69,7 @@ export class GetPaymentByForeignPaymentIdUsecase
   ): Promise<Either<Errors.DbCommunicationError, T & { payment: Payment }>> {
     try {
       const payment = await this.paymentRepo.getPaymentByForeignId(
-        request.foreignPaymentId
+        ExternalOrderId.create(request.foreignPaymentId)
       );
 
       return right({ ...request, payment });
