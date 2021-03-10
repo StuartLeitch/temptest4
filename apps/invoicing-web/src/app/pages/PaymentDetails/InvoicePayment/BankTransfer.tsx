@@ -49,7 +49,7 @@ const BankTransfer: React.FunctionComponent<Props> = ({
       <BankTransferRow label="IBAN" value={iban} />
       <BankTransferRow label="Bank Address" value={bankAddress} />
       <BankTransferRow label="Beneficiary Address" value={beneficiaryAddress} />
-      <BankTransferRow label="Invoice Reference" value={invoiceReference} />
+      <BankTransferRow label="Reference Number" value={invoiceReference} />
     </Fragment>
   );
 };
