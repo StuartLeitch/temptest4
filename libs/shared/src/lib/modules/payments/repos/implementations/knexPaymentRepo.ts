@@ -1,14 +1,17 @@
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
-import { PaymentMap } from './../../mapper/Payment';
 import { PaymentRepoContract } from './../paymentRepo';
+
+import { ExternalOrderId } from '../../domain/external-order-id';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { PaymentId } from './../../domain/PaymentId';
 import { Payment } from './../../domain/Payment';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+
+import { PaymentMap } from './../../mapper/Payment';
 
 export class KnexPaymentRepo
   extends AbstractBaseDBRepo<Knex, Payment>
@@ -63,16 +66,18 @@ export class KnexPaymentRepo
     }, []);
   }
 
-  async getPaymentByForeignId(foreignPaymentId: string): Promise<Payment> {
+  async getPaymentByForeignId(
+    foreignPaymentId: ExternalOrderId
+  ): Promise<Payment> {
     const result = await this.db(TABLES.PAYMENTS)
       .select()
-      .where({ foreignPaymentId })
+      .where({ foreignPaymentId: foreignPaymentId.toString() })
       .first();
 
     if (!result) {
       throw RepoError.createEntityNotFoundError(
         'payment by foreignPaymentId',
-        foreignPaymentId
+        foreignPaymentId.toString()
       );
     }
 

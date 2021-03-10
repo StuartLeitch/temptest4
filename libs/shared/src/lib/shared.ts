@@ -158,7 +158,6 @@ export * from './modules/journals/usecases/journals/getJournal/getJournal';
 export * from './modules/journals/usecases/journals/getJournal/getJournalDTO';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 export * from './modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
-// export * from './modules/catalogs/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogUseCase';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
@@ -169,7 +168,6 @@ export * from './modules/payments/domain/PaymentId';
 export * from './modules/payments/domain/PaymentMethod';
 export * from './modules/payments/domain/PaymentMethodId';
 export * from './modules/payments/domain/external-order-id';
-export * from './modules/payments/domain/payment-proof';
 
 export * from './modules/payments/mapper/Payment';
 export * from './modules/payments/mapper/PaymentMethod';

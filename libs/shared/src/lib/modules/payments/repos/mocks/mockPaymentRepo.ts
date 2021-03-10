@@ -1,10 +1,12 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
-import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { PaymentRepoContract } from '../paymentRepo';
-import { Payment } from '../../domain/Payment';
-import { PaymentId } from '../../domain/PaymentId';
+
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { ExternalOrderId } from '../../domain/external-order-id';
+import { PaymentId } from '../../domain/PaymentId';
+import { Payment } from '../../domain/Payment';
 
 export class MockPaymentRepo
   extends BaseMockRepo<Payment>
@@ -59,15 +61,17 @@ export class MockPaymentRepo
     return payment;
   }
 
-  async getPaymentByForeignId(foreignPaymentId: string): Promise<Payment> {
-    const result = this._items.find(
-      (item) => item.foreignPaymentId === foreignPaymentId
+  async getPaymentByForeignId(
+    foreignPaymentId: ExternalOrderId
+  ): Promise<Payment> {
+    const result = this._items.find((item) =>
+      item.foreignPaymentId.equals(foreignPaymentId)
     );
 
     if (!result) {
       throw RepoError.createEntityNotFoundError(
         'payment by foreignPaymentId',
-        foreignPaymentId
+        foreignPaymentId.toString()
       );
     }
 

@@ -10,7 +10,6 @@ import {
   PayPalServiceErrors as Errors,
   ExternalOrderId,
   LoggerContract,
-  PaymentProof,
   Either,
   right,
   left,
@@ -124,7 +123,7 @@ export class PayPalService implements ServiceContract {
   ): Promise<
     Either<
       Errors.UnsuccessfulOrderCapture | Errors.UnexpectedError,
-      PaymentProof
+      ExternalOrderId
     >
   > {
     let response: Response<PayPalOrderResponse>;
@@ -148,7 +147,7 @@ export class PayPalService implements ServiceContract {
     }
 
     return right(
-      PaymentProof.create(
+      ExternalOrderId.create(
         response.result.purchase_units[0].payments.captures[0].id
       )
     );

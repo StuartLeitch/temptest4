@@ -21,8 +21,11 @@ import {
 
 import { env } from '../env';
 
-function extractOrderId(data: PayPalPaymentCapture): string {
-  const orderLink = data.links.find((link) => link.href.indexOf('orders') > -1);
+function extractCaptureId(data: PayPalPaymentCapture): string {
+  const orderLink = data.links.find(
+    (link) =>
+      link.href.indexOf('captures') > -1 && link.href.indexOf('refund') === -1
+  );
   const linkPathSplitted = orderLink.href.split('/');
   const orderId = linkPathSplitted[linkPathSplitted.length - 1];
   return orderId;
@@ -87,12 +90,17 @@ export const expressLoader: MicroframeworkLoader = (
       } = context;
       const authContext = { roles: [Roles.PAYER] };
       const usecase = new PayPalProcessFinishedUsecase(payment);
+      const payPalOrderId = extractCaptureId(data.resource);
+
+      logger.info(
+        `Try to handle PayPal webhook for transaction finished, for transaction with foreignPaymentId on ${payPalOrderId}`
+      );
 
       try {
         const result = await usecase.execute(
           {
-            payPalOrderId: extractOrderId(data.resource),
             payPalEvent: data.event_type,
+            payPalOrderId,
           },
           authContext
         );
