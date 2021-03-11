@@ -238,9 +238,10 @@ class KnexMigrationSource {
       true
     ),
     fix_submission_data_version,
-    // add_source_journal_to_submission_data,
+    add_source_journal_to_submission_data,
     rebuild_materialized_views(
       '20210301162115_add_source_journal_to_submission_data',
+      true
     ),
   ].map(makeViewObject);
 
