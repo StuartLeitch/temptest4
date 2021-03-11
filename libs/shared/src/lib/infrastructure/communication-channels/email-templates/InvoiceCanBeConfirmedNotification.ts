@@ -28,7 +28,6 @@ export class InvoiceCanBeConfirmedNotificationTemplate {
     } = data;
     const subject = `${manuscript.customId}: Article Processing Charges`;
     const paragraph = `
-    <p>Dear Dr. ${manuscript.authorFirstName} ${manuscript.authorSurname},</p>
     <h4>Thank you for choosing ${publisherName} to publish your manuscript</h4>
     We are pleased to inform you that your manuscript, ${manuscript.title}, has been accepted for publication in the journal, ${catalogItem.journalTitle}. We will be in touch shortly to request electronic files for your manuscript.
     <br/> <br/>
