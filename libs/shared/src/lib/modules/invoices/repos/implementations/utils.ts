@@ -85,10 +85,9 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
         break;
 
       case '/referenceNumber':
+        // [invoiceNumber, creationYear] = ParseUtils.parseRefNumber(filter[0]);
         const invoiceRef = filter[0];
-        here = here.whereRaw(
-          `"${TABLES.INVOICES}"."persistentReferenceNumber" = ${invoiceRef}`
-        );
+        here = here.where({ persistentReferenceNumber: invoiceRef });
         break;
     }
   }
