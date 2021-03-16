@@ -915,7 +915,7 @@ export class NetSuiteService implements ErpServiceContract {
         },
         data: revenueRecognitionRequest,
       } as AxiosRequestConfig);
-      return { count: res.data.count, id: res.data.items.id };
+      return { count: res.data.count, id: res.data.items[0].id };
     } catch (err) {
       this.logger.error({
         message: 'No Revenue Recognition found.',
