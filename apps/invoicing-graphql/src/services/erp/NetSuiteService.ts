@@ -893,7 +893,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const queryBuilder = knex({ client: 'pg' });
     let query = queryBuilder.raw(
-      `SELECT * FROM transaction WHERE recordtype = 'journalentry' AND tranid = 'Article ${invoiceRefNumber} - Invoice ${manuscriptCustomId}'`
+      `SELECT * FROM transaction WHERE recordtype = 'journalentry' AND tranid = 'Article ${manuscriptCustomId} - Invoice ${invoiceRefNumber}'`
     );
 
     const revenueRecognitionRequest = {
