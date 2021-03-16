@@ -107,7 +107,7 @@ export const payments: Resolvers<Context> = {
         id: confirmedPayment.paymentId.id.toString(),
         invoiceId: confirmedPayment.invoiceId.id.toString(),
         paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
-        foreignPaymentId: confirmedPayment.foreignPaymentId,
+        foreignPaymentId: confirmedPayment.foreignPaymentId.toString(),
         amount: confirmedPayment.amount.value,
         datePaid: confirmedPayment.datePaid.toISOString(),
         status: confirmedPayment.status,
@@ -158,7 +158,7 @@ export const payments: Resolvers<Context> = {
       const confirmedPayment = result.value;
 
       return {
-        id: confirmedPayment.foreignPaymentId,
+        id: confirmedPayment.foreignPaymentId.toString(),
       };
     },
 
@@ -248,7 +248,7 @@ export const payments: Resolvers<Context> = {
       return {
         paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
         invoiceId: confirmedPayment.invoiceId.id.toString(),
-        foreignPaymentId: confirmedPayment.foreignPaymentId,
+        foreignPaymentId: confirmedPayment.foreignPaymentId.toString(),
         datePaid: confirmedPayment.datePaid.toISOString(),
         id: confirmedPayment.paymentId.id.toString(),
         amount: confirmedPayment.amount.value,

@@ -1,7 +1,6 @@
 import { Either } from '../../../../core/logic/Either';
 
 import { ExternalOrderId } from '../../../../modules/payments/domain/external-order-id';
-import { PaymentProof } from '../../../../modules/payments/domain/payment-proof';
 
 import {
   UnsuccessfulOrderRetrieval,
@@ -48,7 +47,7 @@ interface Service {
   >;
   captureMoney(
     orderId: string
-  ): Promise<Either<UnsuccessfulOrderCapture, PaymentProof>>;
+  ): Promise<Either<UnsuccessfulOrderCapture, ExternalOrderId>>;
 }
 
 export {

@@ -181,7 +181,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                 />
               )}
               {methods[values.paymentMethodId] === "Bank Transfer" && (
-                <BankTransfer />
+                <BankTransfer invoiceReference={invoice.referenceNumber}/>
               )}
               {methods[values.paymentMethodId] === "Paypal" && (
                 <Paypal

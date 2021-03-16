@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -153,9 +153,9 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.publishInvoicePayed(context))
         .then(this.publishInvoiceCredited(context))
         .then(this.publishInvoiceFinalized(context))
-        .map(() => Result.ok<void>(null))
+        .map((): void => null)
         .execute();
-      return execution;
+      return execution as Response;
     } catch (err) {
       return left(new UnexpectedError(err));
     }
@@ -273,7 +273,7 @@ export class GenerateCompensatoryEventsUsecase
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
         .map((result) => ({
           ...request,
-          payments: result.getValue(),
+          payments: result,
         }))
         .execute();
     };

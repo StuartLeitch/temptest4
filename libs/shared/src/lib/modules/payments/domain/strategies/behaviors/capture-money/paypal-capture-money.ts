@@ -1,14 +1,20 @@
 import { StrategyError } from '../../../../../../core/logic/strategy-error';
-import { Either } from '../../../../../../core/logic/Either';
+import { Either, right, left } from '../../../../../../core/logic/Either';
 
 import { PayPalServiceContract } from '../../../../../../domain/services/payment/paypal-service';
 
-import { PaymentProof } from '../../../payment-proof';
+import { ExternalOrderId } from '../../../external-order-id';
 
 import {
   CaptureMoneyBehavior,
   CaptureMoneyDTO,
 } from './capture-money-behavior';
+
+class UnsuccessfulOrderCapture extends StrategyError {
+  constructor(message: string) {
+    super(message, 'Paypal.captureMoney');
+  }
+}
 
 export class PayPalCaptureMoney extends CaptureMoneyBehavior {
   constructor(private paypalService: PayPalServiceContract) {
@@ -17,7 +23,13 @@ export class PayPalCaptureMoney extends CaptureMoneyBehavior {
 
   async captureMoney(
     request: CaptureMoneyDTO
-  ): Promise<Either<StrategyError, PaymentProof>> {
-    return this.paypalService.captureMoney(request.orderId);
+  ): Promise<Either<StrategyError, ExternalOrderId>> {
+    const response = await this.paypalService.captureMoney(request.orderId);
+
+    if (response.isLeft()) {
+      return left(new UnsuccessfulOrderCapture(response.value.message));
+    } else {
+      return right(response.value);
+    }
   }
 }
