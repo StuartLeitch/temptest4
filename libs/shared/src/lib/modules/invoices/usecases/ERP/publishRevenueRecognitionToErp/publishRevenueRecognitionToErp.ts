@@ -217,7 +217,7 @@ export class PublishRevenueRecognitionToErpUsecase
       }
 
       const existingRevenueRecognition = await this.erpService.getExistingRevenueRecognition(
-        invoice.referenceNumber,
+        invoice.persistentReferenceNumber,
         manuscript.customId
       );
 
