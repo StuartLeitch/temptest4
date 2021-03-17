@@ -1,3 +1,0 @@
-Superset can be accessed via port {{ .Values.service.port }} on the following DNS name from within your cluster:
-- {{ include "superset.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
-- https://{{.Values.ingress.host}}

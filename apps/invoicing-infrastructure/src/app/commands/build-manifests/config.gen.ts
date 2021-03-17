@@ -12,6 +12,7 @@ import { values as qaInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart
 import { values as qaInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/qa';
 import { values as qaInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/qa';
 import { values as qaReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/qa';
+import { values as qaIrisValues } from 'apps/iris/chart/hindawi/qa';
 
 import { values as demoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/demo';
 import { values as demoInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/demo';
@@ -53,6 +54,7 @@ const masterConfig: {
       [App.admin]: qaInvoicingAdminValues,
       [App.web]: qaInvoicingWebValues,
       [App.reporting]: qaReportingBackendValues,
+      [App.iris]: qaIrisValues,
     },
     dev: {
       [App.admin]: devInvoicingAdminValues,

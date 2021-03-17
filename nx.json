@@ -20,7 +20,6 @@
       "options": {
         "accessToken": "YWJkZTZhMmMtNzEwNi00NDM2LTk1ZmQtOWRlMTNmMzQyZTRkfHJlYWQtd3JpdGU=",
         "cacheableOperations": [
-          "build",
           "test",
           "lint",
           "e2e"

@@ -3,6 +3,7 @@ export enum App {
   graphql = 'invoicing-graphql',
   web = 'invoicing-web',
   reporting = 'reporting-backend',
+  iris = 'iris'
 }
 
 export enum Tenant {

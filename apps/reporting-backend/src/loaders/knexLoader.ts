@@ -35,7 +35,7 @@ export const knexLoader: MicroframeworkLoader = async (
     for (let view of materializedViewList) {
       if (view.shouldRefresh) {
         console.log(`Refreshing ${view.getViewName()}`);
-        // avoid running concurent queries that will break if ran first
+        // avoid running concurrent queries that will break if ran first
         await knex.raw(
           `REFRESH MATERIALIZED VIEW ${view.getViewName()} WITH DATA;`
         );

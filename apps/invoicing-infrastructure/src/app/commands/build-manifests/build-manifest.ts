@@ -16,6 +16,7 @@ function makeAppEnum(app: string): App | null {
     case App.graphql:
     case App.web:
     case App.reporting:
+    case App.iris:
       return app as App;
 
     default:
