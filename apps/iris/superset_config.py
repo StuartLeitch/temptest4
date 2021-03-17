@@ -5,39 +5,41 @@ from security import OIDCSecurityManager
 
 if os.getenv('OIDC_CLIENT_SECRETS_PATH', '') != '':
   AUTH_TYPE = AUTH_OID
+  host = os.getenv('KEYCLOAK_HOST')
+  realmKey = os.getenv('KEYCLOAK_REALM_KEY')
+  clientId = os.getenv('KEYCLOAK_CLIENT_ID')
+  clientSecret = os.getenv('KEYCLOAK_CLIENT_SECRET')
+  redirectUrls = os.getenv('KEYCLOAK_REDIRECT_URLS')
+  
   secrets = {
     "web": {
-      "realm_public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhIMUjeULMkAAky57vRW2pX7hH7Ib9/vi6q1GvhsFIhFUQQ3tNVv4Hg6xUyUtoAvwKLSL6rSoSPTdPYXGcQpiepLu2qN6r2Lj/bbc92T5JftEyYRLZ/awc/hbotXcild+o22ei46qFFCgxhB+05ANBMkrxRgw6te4j76RY2xLGyQKQNEFHSWKsDB8jE9nvT8SW3+h61H7DDkbX5eiQao9Hl14xVxjKYqYMxkXBhQTUes/hCoFuvNQrlQnFUjzP+8bx022S00mbc51/NpYKH/peH+rH5zQyjlT5H0nuPjsKt3xSOsTKEUaPkU12fIh0fUBbAWI8+IeZI5oNcljKo7m0QIDAQAB",
-      "issuer": "https://sso.dev.phenom.pub/auth/realms/Phenom",
-      "auth_uri": "https://sso.dev.phenom.pub/auth/realms/Phenom/protocol/openid-connect/auth",
-      "client_id": "reporting",
-      "client_secret": "48334739-f946-475d-8d11-24d2c78d9739",
-      "redirect_urls": ["reporting.qa.phenom.pub"],
-      "userinfo_uri": "https://sso.dev.phenom.pub/auth/realms/Phenom/protocol/openid-connect/userinfo",
-      "token_uri": "https://sso.dev.phenom.pub/auth/realms/Phenom/protocol/openid-connect/token",
-      "token_introspection_uri": "https://sso.dev.phenom.pub/auth/realms/Phenom/protocol/openid-connect/token/introspect"
+      "realm_public_key": realmKey,
+      "issuer": host,
+      "auth_uri": f'{host}/protocol/openid-connect/auth',
+      "client_id": clientId,
+      "client_secret": clientSecret,
+      "redirect_urls": [redirectUrls],
+      "userinfo_uri": f'{host}/protocol/openid-connect/userinfo',
+      "token_uri": f'{host}/protocol/openid-connect/token',
+      "token_introspection_uri": f'{host}/protocol/openid-connect/token/introspect'
    }
   }
 
-  # curpath = os.path.abspath(os.curdir)
-  # packet_file = "%s/%s/%s/%s.mol2" % ("dir", "dir2", "dir3", "some_file")
-  # print("Current path is: %s" % (curpath))
-  # print("Trying to open: %s" % (os.path.join(curpath, packet_file)))
-
   filePath = os.path.join(os.getenv('OIDC_CLIENT_SECRETS_PATH', os.getcwd()), 'config.json')
 
-  print("File path")
-  print(filePath)
+  print(secrets)
 
-  with open(filePath, "w+") as configjzon: 
-    # Writing data to a file  
-    configjzon.writelines(json.dumps(secrets))
-    OIDC_CLIENT_SECRETS = os.path.join(os.getenv('OIDC_CLIENT_SECRETS_PATH', os.getcwd()), 'config.json')
-    OIDC_ID_TOKEN_COOKIE_SECURE = False
-    OIDC_REQUIRE_VERIFIED_EMAIL = False
-    AUTH_USER_REGISTRATION = True
-    AUTH_USER_REGISTRATION_ROLE = 'Public'
-    CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
+  # Writing data  
+  configjzon = open(filePath, "w+") 
+  json.dump(secrets, configjzon)
+  configjzon.close()
+    
+  OIDC_CLIENT_SECRETS = os.path.join(os.getenv('OIDC_CLIENT_SECRETS_PATH', os.getcwd()), 'config.json')
+  OIDC_ID_TOKEN_COOKIE_SECURE = False
+  OIDC_REQUIRE_VERIFIED_EMAIL = False
+  AUTH_USER_REGISTRATION = True
+  AUTH_USER_REGISTRATION_ROLE = 'Public'
+  CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
 
 LOG_FORMAT = '%(asctime)s:%(levelname)s:%(name)s:%(message)s'
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
@@ -47,7 +49,7 @@ ENABLE_ROW_LEVEL_SECURITY = True
 
 # Replace this with SecretsManager or SSM Parameter Store.
 # TODO - Move to env
-SECRET_KEY = os.environ['SECRET_KEY']
+# SECRET_KEY = os.environ['SECRET_KEY']
 
 # Replace this with IAM authentication or SecretsManager
 # SQLALCHEMY_CUSTOM_PASSWORD_STORE

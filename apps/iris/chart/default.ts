@@ -9,7 +9,7 @@ const defaultValues: WithAwsSecretsServiceProps = {
     image: {
       repository:
         '916437579680.dkr.ecr.eu-west-1.amazonaws.com/iris',
-      tag: 'ciuciu3',
+      tag: 'ciuciu10',
     },
     replicaCount: 1,
     containerPort: 8088,
