@@ -13,10 +13,10 @@ const Nav: React.FC<NavProps> = ({ accent, className, ...otherProps }) => (
   />
 )
 
-Nav.propTypes = {
-    ...BsNav.propTypes,
-    accent: PropTypes.bool,
-};
+// Nav.propTypes = {
+//     ...BsNav.propTypes,
+//     accent: PropTypes.bool,
+// };
 Nav.defaultProps = {
     accent: false
 };
@@ -24,6 +24,7 @@ Nav.defaultProps = {
 interface NavProps {
   accent?: boolean;
   className?: string;
+  children: Element | Element[] | JSX.Element | JSX.Element[];
   [propName: string]: any;
 }
 

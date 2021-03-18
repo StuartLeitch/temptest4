@@ -15,4 +15,5 @@ export interface PublishInvoiceCreditedDTO {
   payments?: Payment[];
   creditNote: Invoice;
   payer?: Payer;
+  invoice?: Invoice;
 }

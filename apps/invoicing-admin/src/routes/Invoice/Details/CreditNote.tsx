@@ -85,7 +85,7 @@ const Details: React.FC = () => {
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain
-          title={`Credit Note #CN-${invoice.referenceNumber}`}
+          title={`Credit Note #CN-${invoice.referenceNumber ?? '---'}`}
           className='mb-5 mt-4'
         />
         {/* START Header 1 */}

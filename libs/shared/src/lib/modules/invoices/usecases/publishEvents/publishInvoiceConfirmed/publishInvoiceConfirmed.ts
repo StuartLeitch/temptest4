@@ -69,7 +69,7 @@ export class PublishInvoiceConfirmedUsecase
       ...EventUtils.createEventObject(),
 
       transactionId: invoice.transactionId.toString(),
-      referenceNumber: invoice.referenceNumber,
+      referenceNumber: invoice.persistentReferenceNumber,
       erpReference: erpReference?.value ?? null,
       invoiceId: invoice.id.toString(),
       invoiceStatus: invoice.status,

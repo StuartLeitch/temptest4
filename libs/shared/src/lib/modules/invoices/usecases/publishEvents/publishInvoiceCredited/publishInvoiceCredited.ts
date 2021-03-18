@@ -58,6 +58,7 @@ export class PublishInvoiceCreditedUsecase
       manuscript,
       payments,
       payer,
+      invoice
     } = request;
 
     const erpReference = creditNote
@@ -70,7 +71,7 @@ export class PublishInvoiceCreditedUsecase
       ...EventUtils.createEventObject(),
 
       creditNoteForInvoice: creditNote.cancelledInvoiceReference,
-      referenceNumber: creditNote.creditNoteNumber,
+      referenceNumber: `CN-${invoice.persistentReferenceNumber}` ?? null,
       transactionId: creditNote.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: creditNote.id.toString(),

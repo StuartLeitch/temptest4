@@ -172,6 +172,7 @@ export class KnexInvoiceRepo
 
     return InvoiceMap.toDomain({
       ...invoice,
+      referenceNumber: invoice.persistentReferenceNumber,
       erpReferences,
     });
   }
@@ -291,40 +292,33 @@ export class KnexInvoiceRepo
     return InvoiceMap.toDomain(invoice);
   }
 
-  async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
+  async getCurrentInvoiceNumber(): Promise<number> {
     const { db, logger } = this;
-
-    const invoice = await this.getInvoiceById(invoiceId);
-    if (invoice.invoiceNumber) {
-      logger.warning('Invoice number already set');
-      return invoice;
-    }
 
     const currentYear = new Date().getFullYear();
 
-    const updated = await db(TABLES.INVOICES)
-      .where({ id: invoiceId.id.toString() })
-      .update({ dateAccepted: new Date() })
-      .update({
-        invoiceNumber: db.raw(
-          `coalesce((select max("invoiceNumber") + 1 as max from (
-          select max("invoiceNumber") as "invoiceNumber" from invoices where "dateAccepted" BETWEEN ? AND ?
-            union
-            select "invoiceReferenceNumber" as "invoiceNumber" from configurations
-          ) referenceNumbers), 1)
-        `,
-          [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
-        ),
-      });
+    const getLastInvoiceNumber = await db.raw(
+      `SELECT
+        COALESCE((
+          SELECT
+            max("invoiceNumber") AS max FROM (
+              SELECT
+                max("invoiceNumber") AS "invoiceNumber" FROM invoices
+              WHERE
+                "dateIssued" BETWEEN ?
+                AND ?
+              UNION
+              SELECT
+                "invoiceReferenceNumber" AS "invoiceNumber" FROM configurations) referenceNumbers), 1)
+      `,
+      [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
+    );
 
-    if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice',
-        invoiceId.id.toString()
-      );
-    }
+    logger.debug('lastInvoiceNumber', {
+      value: getLastInvoiceNumber,
+    });
 
-    return this.getInvoiceById(invoiceId);
+    return getLastInvoiceNumber.rows[0].coalesce;
   }
 
   async getInvoicePaymentInfo(
@@ -687,5 +681,25 @@ export class KnexInvoiceRepo
 
       return join[condition](field);
     };
+  }
+
+  public async countInvoices(criteria: any): Promise<number> {
+    const { db, logger } = this;
+
+    const countInvoicesSQL = db(TABLES.INVOICES)
+      .count('id as CNT')
+      .whereNull('cancelledInvoiceReference')
+      .where('status', criteria.status)
+      .where('dateCreated', '>=', criteria.range.from.toString())
+      .where('dateCreated', '<=', criteria.range.to.toString())
+      .first();
+
+    logger.debug('select', {
+      [`countInvoices_SQL`]: countInvoicesSQL.toString(),
+    });
+
+    const { CNT } = await countInvoicesSQL;
+
+    return Number(CNT);
   }
 }

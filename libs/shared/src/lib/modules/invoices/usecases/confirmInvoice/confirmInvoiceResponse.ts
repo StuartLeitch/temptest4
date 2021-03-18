@@ -6,6 +6,8 @@ import { Invoice } from '../../domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
 
 export type ConfirmInvoiceResponse = Either<
-  ConfirmInvoiceErrors.InvoiceNotFoundError | UnexpectedError,
+  | ConfirmInvoiceErrors.InvoiceNumberAssignationError
+  | ConfirmInvoiceErrors.InvoiceNotFoundError
+  | UnexpectedError,
   Result<Payer>
 >;
