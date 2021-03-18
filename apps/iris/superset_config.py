@@ -27,8 +27,6 @@ if os.getenv('OIDC_CLIENT_SECRETS_PATH', '') != '':
 
   filePath = os.path.join(os.getenv('OIDC_CLIENT_SECRETS_PATH', os.getcwd()), 'config.json')
 
-  print(secrets)
-
   # Writing data  
   configjzon = open(filePath, "w+") 
   json.dump(secrets, configjzon)
@@ -38,7 +36,7 @@ if os.getenv('OIDC_CLIENT_SECRETS_PATH', '') != '':
   OIDC_ID_TOKEN_COOKIE_SECURE = False
   OIDC_REQUIRE_VERIFIED_EMAIL = False
   AUTH_USER_REGISTRATION = True
-  AUTH_USER_REGISTRATION_ROLE = 'Public'
+  AUTH_USER_REGISTRATION_ROLE = 'Gamma'
   CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
 
 LOG_FORMAT = '%(asctime)s:%(levelname)s:%(name)s:%(message)s'

@@ -22,6 +22,13 @@ Multi purpose utility app, usecases: pull events from s3 and write them to sqs, 
 
 In Greek mythology, Iris (/ˈaɪrɪs/; Greek: Ίρις Ancient Greek: [îːris]) is the personification and goddess of the rainbow and messenger of the gods.
 
+## Instructions
+### QA and DEV environment
+* `docker build -t 916437579680.dkr.ecr.eu-west-1.amazonaws.com/iris:latest -f apps/iris/Dockerfile .`
+* `docker push 916437579680.dkr.ecr.eu-west-1.amazonaws.com/iris:latest`
+* `TENANT=hindawi NODE_ENV=qa NAMESPACE=qa CLUSTER=hindawi-dev COMMAND=build-manifests AWS_REGISTRY=916437579680.dkr.ecr.eu-west-1.amazonaws.com CI_COMMIT_SHA=latest AFFECTED_APPS=iris AWS_PROFILE=dev-k8s node dist/apps/invoicing-infrastructure/main.js`
+* `kubectl apply -f ./dist-k8s/ --namespace=qa`
+
 https://superset.incubator.apache.org/
 
 # Sisif - job scheduling system
