@@ -750,7 +750,7 @@ export class NetSuiteService implements ErpServiceContract {
   private async patchCreditNote(data: {
     creditNote?: Invoice;
     creditNoteId?: string;
-    originalInvoice?: Invoice
+    originalInvoice?: Invoice;
   }) {
     const {
       connection: { config, oauth, token },
@@ -883,7 +883,7 @@ export class NetSuiteService implements ErpServiceContract {
   public async getExistingRevenueRecognition(
     invoiceRefNumber: string,
     manuscriptCustomId: string
-  ): Promise<any> {
+  ): Promise<{ count: number; id?: string }> {
     const {
       connection: { config, oauth, token },
     } = this;
@@ -918,12 +918,17 @@ export class NetSuiteService implements ErpServiceContract {
         },
         data: revenueRecognitionRequest,
       } as AxiosRequestConfig);
-      return { count: res.data.count, id: res.data.items[0].id };
+      if (res.data.count === 0) {
+        return { count: res.data.count };
+      } else {
+        return { count: res.data.count, id: res.data.items[0].id };
+      }
     } catch (err) {
       this.logger.error({
         message: 'No Revenue Recognition found.',
         response: err?.response?.data,
       });
+      throw new Error(err);
     }
   }
 }

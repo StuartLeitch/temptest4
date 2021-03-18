@@ -148,7 +148,7 @@ export class EmptyErpService implements ErpServiceContract {
   async getExistingRevenueRecognition(
     invoiceRefNumber: string,
     manuscriptCustomId: string
-  ): Promise<any> {
+  ): Promise<{ count: number; id?: string }> {
     return { count: null, id: '' };
   }
 }
