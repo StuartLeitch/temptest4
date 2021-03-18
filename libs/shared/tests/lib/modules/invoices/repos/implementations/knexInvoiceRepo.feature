@@ -43,10 +43,11 @@ Feature: Invoice  Repo
         Then the invoice object should be saved
 
     Scenario: Test Invoice.assignInvoiceNumber()
-        Given a invoice with the id "foo-invoice" and transaction id "foo-transaction"
-        When we call Invoice.assignInvoiceNumber on the invoice "foo-invoice"
+        Given the invoice number counter resets to 0
+        When we add an invoice object with the id "foo-invoice"
+        And we call Invoice.assignInvoiceNumber on the invoice "foo-invoice"
         Then the invoice number of "foo-invoice" should be 1
 
-        Given a invoice with the id "foo-invoice1" and transaction id "foo-transaction"
+        Given a invoice with the id "foo-invoice1" and transaction id "foo-transaction1"
         When we call Invoice.assignInvoiceNumber on the invoice "foo-invoice1"
         Then the invoice number of "foo-invoice1" should be 2

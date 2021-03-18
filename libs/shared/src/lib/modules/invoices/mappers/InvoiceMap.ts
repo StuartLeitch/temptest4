@@ -23,9 +23,10 @@ export class InvoiceMap extends Mapper<Invoice> {
           : null,
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
         creationReason: raw.creationReason ?? null,
+        persistentReferenceNumber: raw.persistentReferenceNumber ?? null,
         erpReferences:
           raw.erpReferences &&
-          raw.erpReferences.every((ef) => ef.vendor && ef.type)
+          raw.erpReferences.every((ef: { vendor: any; type: any; }) => ef.vendor && ef.type)
             ? InvoiceErpReferences.create(
                 raw.erpReferences.map(ErpReferenceMap.toDomain)
               )
@@ -44,14 +45,14 @@ export class InvoiceMap extends Mapper<Invoice> {
       id: invoice.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
       status: invoice.status,
-      invoiceNumber: Number.parseInt(invoice.invoiceNumber, 10) || null,
+      invoiceNumber: invoice.invoiceNumber || null,
       dateCreated: invoice.dateCreated,
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
       dateMovedToFinal: invoice.dateMovedToFinal,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
       creationReason: invoice.creationReason ?? null,
-      //  erpReferences: invoice.getErpReferences().getItems(),
+      persistentReferenceNumber: invoice.persistentReferenceNumber ?? null
     };
   }
 }

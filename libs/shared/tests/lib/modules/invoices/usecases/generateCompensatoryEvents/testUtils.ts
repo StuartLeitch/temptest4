@@ -242,6 +242,16 @@ export function addPayers(payerRepo: MockPayerRepo) {
       title: 'Mr',
       id: '6',
     },
+    {
+      shippingAddressId: '6',
+      email: 'test@test.com',
+      billingAddressId: '6',
+      type: 'INDIVIDUAL',
+      invoiceId: '7',
+      name: 'Test7',
+      title: 'Mrs',
+      id: '7',
+    },
   ];
 
   for (const props of payersProps) {

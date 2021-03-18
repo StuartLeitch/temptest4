@@ -112,7 +112,7 @@ export class MockInvoiceRepo
       invoiceId: invoiceId.id.toString(),
       transactionId: invoice.transactionId.id.toString(),
       invoiceStatus: invoice.status,
-      invoiceNumber: invoice.invoiceNumber,
+      invoiceNumber: Number(invoice.invoiceNumber),
       invoiceIssueDate: invoice.dateIssued?.toISOString(),
       payerName: '',
       payerEmail: '',
@@ -128,14 +128,8 @@ export class MockInvoiceRepo
     };
   }
 
-  public async assignInvoiceNumber(invoiceId: InvoiceId): Promise<Invoice> {
-    let invoice = await this.getInvoiceById(invoiceId);
-    if (invoice.invoiceNumber) {
-      return invoice;
-    }
-    invoice.invoiceNumber = String(this._items.length);
-    invoice = await this.save(invoice);
-    return invoice;
+  public async getCurrentInvoiceNumber(): Promise<number> {
+    return Number(this._items.length) + 1;
   }
 
   public async save(invoice: Invoice): Promise<Invoice> {

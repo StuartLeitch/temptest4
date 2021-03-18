@@ -12,6 +12,6 @@ const CustomInput = (props) => {
         <RSCustomInput className={ inputClass } { ...otherProps } />
     );
 }
-CustomInput.propTypes = { ...RSCustomInput.propTypes };
+// CustomInput.propTypes = { ...RSCustomInput.propTypes };
 
 export { CustomInput };

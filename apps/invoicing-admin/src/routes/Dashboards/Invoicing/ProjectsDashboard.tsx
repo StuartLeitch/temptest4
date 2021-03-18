@@ -162,7 +162,7 @@ const ProjectsDashboard = () => (
         </Table>
       </Col>
     </Row>
-    <Row>
+    {/* <Row>
       <Col lg={12}>
         <div className='hr-text hr-text-center mt-4 mb-4'>
           <span>Your Cash</span>
@@ -360,7 +360,7 @@ const ProjectsDashboard = () => (
           </ListGroup>
         </Card>
       </Col>
-    </Row>
+    </Row> */}
   </Container>
 );
 

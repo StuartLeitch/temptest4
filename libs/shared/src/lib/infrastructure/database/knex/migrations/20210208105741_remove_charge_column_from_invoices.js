@@ -1,5 +1,9 @@
-/* eslint-disable no-undef */
+exports.up = function(knex) {
+  return knex.schema.table('invoices', function(table) {
+    table.dropColumn('charge');
+  });
+};
 
-module.exports.up = function () {};
+exports.down = function(knex) {
 
-module.exports.down = function () {};
+};

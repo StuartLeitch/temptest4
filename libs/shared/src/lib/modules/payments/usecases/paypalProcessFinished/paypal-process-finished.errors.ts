@@ -19,3 +19,11 @@ export class UpdatePaymentStatusDbError extends UseCaseError {
     );
   }
 }
+
+export class PaymentNotInCorrectStatusForTransitionToCompletedError extends UseCaseError {
+  constructor(invoiceId: string, currentStatus: string) {
+    super(
+      `Payment for invoice with id ${invoiceId} has status ${currentStatus} which is not correct for transition to COMPLETED`
+    );
+  }
+}

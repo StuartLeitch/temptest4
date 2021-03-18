@@ -63,8 +63,7 @@ export const generateCompensatoryEvents: Resolvers<Context> = {
       for await (const invoiceId of ids) {
         const result = await usecase.execute({ invoiceId }, usecaseContext);
         if (result.isLeft()) {
-          errors.push(result.value.errorValue());
-          // throw new Error(result.value.errorValue().message);
+          errors.push(result.value);
         }
       }
 

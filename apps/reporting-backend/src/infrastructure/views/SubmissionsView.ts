@@ -63,7 +63,11 @@ SELECT
   j.journal_name,
   j.apc as journal_apc,
   j.publisher_name,
-  j.journal_code
+  j.journal_code,
+  case 
+  WHEN s.source_journal = 'null' then null
+  ELSE s.source_journal
+end source_journal
 FROM (
   SELECT 
     t.event_id,
@@ -79,7 +83,8 @@ FROM (
     t.title,
     t.last_version_index,
     t.special_issue_id,
-    t.section_id
+    t.section_id,
+    t.source_journal
   FROM (
     SELECT
     sd.*,
@@ -98,7 +103,8 @@ FROM (
         s.title,
         s.last_version_index,
         s.special_issue_id,
-        s.section_id
+        s.section_id,
+        s.source_journal
       FROM ${submissionDataView.getViewName()} s
       WHERE s.manuscript_custom_id is not null
       AND s.submission_event not like 'SubmissionQualityCheck%' and s.submission_event not like 'SubmissionScreening%' and s.submission_event != 'SubmissionPeerReviewCycleCheckPassed'
@@ -140,6 +146,7 @@ WITH NO DATA;
     `create index on ${this.getViewName()} (journal_id)`,
     `create index on ${this.getViewName()} (journal_name)`,
     `create index on ${this.getViewName()} (preprint_value)`,
+    `create index on ${this.getViewName()} (source_journal)`,
   ];
 
   getViewName(): string {

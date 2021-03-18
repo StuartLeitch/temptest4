@@ -20,11 +20,5 @@ const CardHeader = (props) => {
         </BsCardHeader>
     );
 };
-CardHeader.propTypes = {
-    type: PropTypes.string,
-    color: PropTypes.string,
-    className: PropTypes.string,
-    ...BsCardHeader.propTypes
-};
 
 export { CardHeader };

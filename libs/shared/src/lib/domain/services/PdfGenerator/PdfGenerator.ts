@@ -95,10 +95,10 @@ export class PdfGeneratorService {
       await page.setContent(htmlTemplate, {
         waitUntil: 'domcontentloaded',
         args: ['--disable-dev-shm-usage'],
-      });
+      } as any);
 
       const buffer = await page.pdf({
-        format: 'A4',
+        format: 'a4',
         margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
         printBackground: true,
       });

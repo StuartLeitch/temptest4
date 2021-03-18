@@ -1,35 +1,36 @@
-import { getYear } from 'date-fns';
-
 // * Core Domain
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-
-import { Invoice, InvoiceStatus } from '../../domain/Invoice';
-import { Waiver } from '../../../../modules/waivers/domain/Waiver';
-import { WaiverService } from '../../../../domain/services/WaiverService';
-import { InvoiceId } from '../../domain/InvoiceId';
-import { InvoiceMap } from '../../mappers/InvoiceMap';
-import { InvoiceItem } from '../../domain/InvoiceItem';
-import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
-import { InvoiceRepoContract } from '../../repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
-import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
-import { Transaction } from '../../../transactions/domain/Transaction';
-import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
-import { NotificationPause } from '../../../notifications/domain/NotificationPause';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
+
+import { NotificationPause } from '../../../notifications/domain/NotificationPause';
+import { Transaction } from '../../../transactions/domain/Transaction';
+import { Waiver } from '../../../../modules/waivers/domain/Waiver';
+import { InvoiceStatus, Invoice } from '../../domain/Invoice';
+import { InvoiceItem } from '../../domain/InvoiceItem';
+import { InvoiceId } from '../../domain/InvoiceId';
+
+import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
+import { InvoiceMap } from '../../mappers/InvoiceMap';
+
+import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
+import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
+
+import { WaiverService } from '../../../../domain/services/WaiverService';
 
 import type { CreateCreditNoteRequestDTO } from './createCreditNoteDTO';
 import { CreateCreditNoteResponse } from './createCreditNoteResponse';
@@ -111,8 +112,6 @@ export class CreateCreditNoteUsecase
       // * set the invoice status to FINAL
       invoice.markAsFinal();
 
-      // console.log('Original Invoice:');
-      // console.info(invoice);
       await this.invoiceRepo.update(invoice);
 
       try {
@@ -126,12 +125,7 @@ export class CreateCreditNoteUsecase
           item.addAssignedWaivers(waivers);
         }
       } catch (err) {
-        return left(
-          // new GetItemsForInvoiceErrors.InvoiceNotFoundError(
-          //   invoiceId.id.toString()
-          // )
-          new UnexpectedError('Bad Invoice Items!')
-        );
+        return left(new UnexpectedError('Bad Invoice Items!'));
       }
 
       // * actually create the Credit Note
@@ -139,23 +133,12 @@ export class CreateCreditNoteUsecase
       delete clonedRawInvoice.id;
       clonedRawInvoice.transactionId = transaction.transactionId.id.toString();
       clonedRawInvoice.dateCreated = new Date();
-      clonedRawInvoice.dateIssued = new Date();
-      if (
-        invoice.dateIssued &&
-        getYear(invoice.dateIssued) < getYear(invoice.dateAccepted)
-      ) {
-        clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateIssued));
-      } else {
-        clonedRawInvoice.dateIssued.setFullYear(getYear(invoice.dateAccepted));
-      }
-      clonedRawInvoice.erpReference = null;
+      clonedRawInvoice.dateIssued = null;
+      clonedRawInvoice.persistentReferenceNumber = null;
       clonedRawInvoice.cancelledInvoiceReference = null;
-      clonedRawInvoice.nsReference = null;
-      clonedRawInvoice.revenueRecognitionReference = null;
-      clonedRawInvoice.nsRevRecReference = null;
+      clonedRawInvoice.invoiceNumber = null;
       clonedRawInvoice.creationReason = request.reason;
 
-      // console.info(clonedRawInvoice);
       const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
 
       if (items.length) {
@@ -176,14 +159,8 @@ export class CreateCreditNoteUsecase
               ((invoiceItem.price * -1) / 100) * w.reduction;
           });
 
-          // const vat = (invoiceItem.price / 100) * rawInvoiceItem?.vat;
-          // rawInvoiceItem.price += vat;
-
           const creditNoteInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
-          // creditNote.addInvoiceItem(invoiceItem);
 
-          // console.log('Anti Invoice Item:');
-          // console.info(creditNoteInvoiceItem);
           await this.invoiceItemRepo.save(creditNoteInvoiceItem);
         });
       }
@@ -192,15 +169,10 @@ export class CreateCreditNoteUsecase
       // * This assignment will trigger an INVOICE_CREDITED event
 
       creditNote.cancelledInvoiceReference = invoiceId.id.toString();
+      creditNote.dateIssued = creditNote.dateCreated;
       creditNote.markAsFinal();
 
-      // console.log('New Credit Note:');
-      // console.info(creditNote);
       await this.invoiceRepo.save(creditNote);
-      // transaction.addInvoice(creditNote);
-
-      // console.log('ITEMS = ');
-      // console.info(creditNote);
 
       // ? should generate a DRAFT invoice
       if (request.createDraft) {
@@ -211,11 +183,11 @@ export class CreateCreditNoteUsecase
           invoiceNumber: null,
           erpReferences: null,
           cancelledInvoiceReference: null,
+          persistentReferenceNumber: null,
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain
 
         // * System creates DRAFT invoice
-        // console.info(invoiceProps);
 
         // This is where all the magic happens
         let draftInvoice = InvoiceMap.toDomain(invoiceProps);
@@ -231,8 +203,6 @@ export class CreateCreditNoteUsecase
             const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
             draftInvoice.addInvoiceItem(draftInvoiceItem);
 
-            // console.log('Draft Invoice Item:');
-            // console.info(draftInvoiceItem);
             await this.invoiceItemRepo.save(draftInvoiceItem);
 
             // * save coupons
@@ -247,13 +217,10 @@ export class CreateCreditNoteUsecase
           });
         }
 
-        // console.log('Draft Invoice:');
-        // console.info(draftInvoice);
         await this.invoiceRepo.save(draftInvoice);
-        draftInvoice = await this.invoiceRepo.assignInvoiceNumber(
-          draftInvoice.invoiceId
-        );
+
         draftInvoice.dateAccepted = creditNote.dateAccepted;
+
         await this.invoiceRepo.update(draftInvoice);
 
         //* create notificationPause

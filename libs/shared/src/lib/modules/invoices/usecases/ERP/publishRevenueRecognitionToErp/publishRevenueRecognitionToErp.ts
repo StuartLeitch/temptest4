@@ -216,6 +216,25 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(Result.ok<any>(null));
       }
 
+      const existingRevenueRecognition = await this.erpService.getExistingRevenueRecognition(
+        invoice.persistentReferenceNumber,
+        manuscript.customId
+      );
+
+      if (existingRevenueRecognition.count === 1) {
+        const erpReference = ErpReferenceMap.toDomain({
+          entity_id: invoice.invoiceId.id.toString(),
+          type: 'invoice',
+          vendor: this.erpService.vendorName,
+          attribute:
+            this.erpService?.referenceMappings?.revenueRecognition ||
+            'revenueRecognition',
+          value: String(existingRevenueRecognition.id),
+        });
+        await this.erpReferenceRepo.save(erpReference);
+        return right(Result.ok<any>(null));
+      }
+
       const erpResponse = await this.erpService.registerRevenueRecognition({
         manuscript,
         invoice,
@@ -248,7 +267,6 @@ export class PublishRevenueRecognitionToErpUsecase
           )}`
         );
       }
-
       return right(Result.ok<any>(erpResponse));
     } catch (err) {
       console.log(err);

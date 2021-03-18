@@ -153,7 +153,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
                     const { value } = e.target;
                     setBankTransferPaymentData({
                       ...bankTransferPaymentData,
-                      paymentAmount: value,
+                      paymentAmount: Number(value),
                     });
                   }}
                 />

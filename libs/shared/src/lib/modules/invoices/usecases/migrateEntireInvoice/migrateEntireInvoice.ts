@@ -517,7 +517,7 @@ export class MigrateEntireInvoiceUsecase
 
           invoice.props.status = InvoiceStatus.DRAFT;
           invoice.props.dateAccepted = new Date(request.acceptanceDate);
-          invoice.props.invoiceNumber = invoiceNumber;
+          invoice.props.invoiceNumber = Number.parseInt(invoiceNumber, 10);
           invoice.props.charge =
             request.apc.price - request.apc.discount + request.apc.vat;
         }
@@ -579,7 +579,7 @@ export class MigrateEntireInvoiceUsecase
 
     return new AsyncEither(invoiceId.id.toString())
       .then((invoiceId) => usecase.execute({ invoiceId }, context))
-      .map((result) => result.getValue())
+      .map((result) => result)
       .execute();
   }
 
@@ -617,13 +617,14 @@ export class MigrateEntireInvoiceUsecase
           request.apc.invoiceReference,
           10
         ).toString();
+
         invoice.props.status = InvoiceStatus.ACTIVE;
         invoice.props.dateAccepted = new Date(request.acceptanceDate);
         invoice.props.dateIssued = new Date(request.issueDate);
         // invoice.props.revenueRecognitionReference =
         //   request.revenueRecognitionReference ?? null;
         // invoice.props.erpReference = request.erpReference ?? null;
-        invoice.props.invoiceNumber = invoiceNumber;
+        invoice.props.invoiceNumber = Number.parseInt(invoiceNumber, 10);
         invoice.payerId = payer ? payer.payerId : null;
 
         return invoice;

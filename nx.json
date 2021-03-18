@@ -1,14 +1,9 @@
 {
   "npmScope": "steakhouse",
-  "affected": {
-    "defaultBase": "develop"
-  },
+  "affected": { "defaultBase": "develop" },
   "implicitDependencies": {
     "workspace.json": "*",
-    "package.json": {
-      "dependencies": "*",
-      "devDependencies": "*"
-    },
+    "package.json": { "dependencies": "*", "devDependencies": "*" },
     "tsconfig.base.json": "*",
     "tslint.json": "*",
     ".eslintrc.json": "*",
@@ -19,56 +14,25 @@
       "runner": "@nrwl/nx-cloud",
       "options": {
         "accessToken": "YWJkZTZhMmMtNzEwNi00NDM2LTk1ZmQtOWRlMTNmMzQyZTRkfHJlYWQtd3JpdGU=",
-        "cacheableOperations": [
-          "build",
-          "test",
-          "lint",
-          "e2e"
-        ],
+        "cacheableOperations": ["build", "test", "lint", "e2e"],
         "canTrackAnalytics": false,
         "showUsageWarnings": true
       }
     }
   },
   "projects": {
-    "invoicing-graphql": {
-      "tags": []
-    },
-    "shared": {
-      "tags": []
-    },
-    "react-components": {
-      "tags": []
-    },
-    "invoicing-web": {
-      "tags": []
-    },
-    "invoicing-web-e2e": {
-      "tags": []
-    },
-    "invoicing-admin": {
-      "tags": []
-    },
-    "invoicing-admin-e2e": {
-      "tags": []
-    },
-    "reporting-backend": {
-      "tags": []
-    },
-    "eve": {
-      "tags": []
-    },
-    "reporting-pull-historic-events": {
-      "tags": []
-    },
-    "sisif": {
-      "tags": []
-    },
-    "sisif-test": {
-      "tags": []
-    },
-    "invoicing-infrastructure": {
-      "tags": []
-    }
+    "invoicing-graphql": { "tags": [] },
+    "shared": { "tags": [] },
+    "react-components": { "tags": [] },
+    "invoicing-web": { "tags": [] },
+    "invoicing-web-e2e": { "tags": [] },
+    "invoicing-admin": { "tags": [] },
+    "invoicing-admin-e2e": { "tags": [] },
+    "reporting-backend": { "tags": [] },
+    "eve": { "tags": [] },
+    "reporting-pull-historic-events": { "tags": [] },
+    "sisif": { "tags": [] },
+    "sisif-test": { "tags": [] },
+    "invoicing-infrastructure": { "tags": [] }
   }
 }

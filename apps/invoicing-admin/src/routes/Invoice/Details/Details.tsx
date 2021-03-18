@@ -130,7 +130,7 @@ const Details: React.FC = (props) => {
           <i className='fas fa-angle-left mr-2' /> Back to invoices list
         </Link>
         <HeaderMain
-          title={`Invoice #${invoice.referenceNumber}`}
+          title={`Invoice #${invoice.referenceNumber ?? '---'}`}
           className='mb-1 mt-0'
         />
         <Row>

@@ -20,6 +20,7 @@ import * as move_article_events from './migrations/20201012162115_move_article_e
 import * as create_peer_review_events_table from './migrations/20210111133315_create_peer_review_events_table';
 import * as move_peer_review_events from './migrations/20210112142215_move_peer_review_events';
 import * as fix_submission_data_version from './migrations/20210204150015_fix_submission_data_version';
+import * as add_source_journal_to_submission_data from './migrations/20210301162115_add_source_journal_to_submission_data';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -237,6 +238,11 @@ class KnexMigrationSource {
       true
     ),
     fix_submission_data_version,
+    add_source_journal_to_submission_data,
+    rebuild_materialized_views(
+      '20210301162115_add_source_journal_to_submission_data',
+      true
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

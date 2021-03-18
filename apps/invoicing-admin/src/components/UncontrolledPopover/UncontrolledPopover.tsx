@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import {
-    Popover
+  Popover
 } from 'reactstrap';
+import * as Popper from 'popper.js';
 
 class UncontrollerPopover extends React.Component<UncontrolledPopoverProps, UncontrolledPopoverState> {
   static propTypes = {
@@ -75,7 +76,7 @@ class UncontrollerPopover extends React.Component<UncontrolledPopoverProps, Unco
 interface UncontrolledPopoverProps {
   activateTrigger?: boolean;
   activeClassName?: string;
-  placement?: string;
+  placement?: Popper.Placement;
   target: string;
 };
 

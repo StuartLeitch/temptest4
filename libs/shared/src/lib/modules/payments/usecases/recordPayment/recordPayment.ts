@@ -36,6 +36,7 @@ import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 
 import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
 import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
+import { ExternalOrderId } from '../../domain/external-order-id';
 import { PaymentDTO } from '../../domain/strategies/behaviors';
 import { PaymentStatus } from '../../domain/Payment';
 
@@ -203,7 +204,7 @@ export class RecordPaymentUsecase
     } = request;
     const makePaymentData: PaymentDTO = {
       netAmountBeforeDiscount: invoice.netTotalBeforeDiscount,
-      invoiceReferenceNumber: invoice.referenceNumber,
+      invoiceReferenceNumber: invoice.persistentReferenceNumber,
       discountAmount: invoice.invoiceDiscountTotal,
       manuscriptCustomId: manuscript.customId,
       invoiceTotal: invoice.invoiceTotal,
@@ -231,7 +232,7 @@ export class RecordPaymentUsecase
     ) => {
       return new AsyncEither(request.invoiceId)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
+        .map((result) => result)
         .map((payments) => {
           return payments
             .filter((payment) => payment.status === PaymentStatus.CREATED)
@@ -312,7 +313,9 @@ export class RecordPaymentUsecase
         })
         .map((request) => {
           const { existingPayment, foreignPaymentId } = request;
-          existingPayment.foreignPaymentId = foreignPaymentId;
+          existingPayment.foreignPaymentId = ExternalOrderId.create(
+            foreignPaymentId
+          );
 
           return { ...request, payment: existingPayment };
         })

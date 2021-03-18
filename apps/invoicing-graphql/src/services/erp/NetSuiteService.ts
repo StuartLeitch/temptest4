@@ -346,7 +346,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T12:00:12.857Z',
-      tranId: invoice.referenceNumber,
+      tranId: invoice.persistentReferenceNumber,
       entity: {
         id: customerId,
       },
@@ -454,9 +454,8 @@ export class NetSuiteService implements ErpServiceContract {
       customer: {
         id: customerId,
       },
-      refName,
-      [this.customExternalPaymentReference]: payment.foreignPaymentId,
-      [this.customUniquePaymentReference]: refName,
+      // Invoice reference number,
+      refName: `Invoice #${invoice.persistentReferenceNumber}`,
       // Original amount,
       total,
       // Amount due,
@@ -511,26 +510,26 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Article ${manuscript.customId} - Invoice ${invoice.referenceNumber}`,
+      tranId: `Article ${manuscript.customId} - Invoice ${invoice.persistentReferenceNumber}`,
+      memo: `${invoice.persistentReferenceNumber}`,
       custbody_phenom_publish_date: format(
         new Date(manuscript.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
-      memo: `${invoice.referenceNumber}`,
       [this.customSegmentFieldName]: {
         id: customSegmentId,
       },
       line: {
         items: [
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${invoice.persistentReferenceNumber}`,
             account: {
               id: debitAccountId,
             },
             debit: invoiceTotal,
           },
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${invoice.persistentReferenceNumber}`,
             account: {
               id: creditAccountId,
             },
@@ -588,10 +587,12 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'POST',
     };
 
+    const { persistentReferenceNumber: referenceNumber } = invoice;
+
     const createJournalPayload: Record<string, unknown> = {
       approved: true,
-      tranId: `Article ${manuscript.customId} - CN-${invoice.referenceNumber}`,
-      memo: `${invoice.referenceNumber}`,
+      tranId: `Article ${manuscript.customId} - CN-${referenceNumber}`,
+      memo: `${referenceNumber}`,
       custbody_phenom_publish_date: format(
         new Date(manuscript.datePublished),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -602,14 +603,14 @@ export class NetSuiteService implements ErpServiceContract {
       line: {
         items: [
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${referenceNumber}`,
             account: {
               id: creditAccountId,
             },
             debit: invoiceTotal,
           },
           {
-            memo: `${invoice.referenceNumber}`,
+            memo: `${referenceNumber}`,
             account: {
               id: debitAccountId,
             },
@@ -655,9 +656,25 @@ export class NetSuiteService implements ErpServiceContract {
       return;
     }
 
-    const invoiceExists = await this.checkInvoiceExists(nsErpReference.value);
-    if (invoiceExists) {
-      return; // do nothing yet and do not create a duplicate
+    const invoiceExistsRequestOpts = {
+      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
+      method: 'GET',
+    };
+
+    try {
+      await axios({
+        ...invoiceExistsRequestOpts,
+        headers: oauth.toHeader(
+          oauth.authorize(invoiceExistsRequestOpts, token)
+        ),
+        data: {},
+      } as AxiosRequestConfig);
+    } catch (err) {
+      this.logger.error({
+        message: 'No invoice found.',
+        response: err?.response?.data,
+      });
+      return; // no business to be done
     }
 
     const invoiceRequestOpts = {
@@ -748,11 +765,12 @@ export class NetSuiteService implements ErpServiceContract {
   private async patchCreditNote(data: {
     creditNote?: Invoice;
     creditNoteId?: string;
+    originalInvoice?: Invoice;
   }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditNote, creditNoteId } = data;
+    const { creditNote, originalInvoice, creditNoteId } = data;
 
     const creditNoteRequestOpts = {
       url: `${config.endpoint}record/v1/creditmemo/${creditNoteId}`,
@@ -777,7 +795,7 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     const patchCreditNotePayload: Record<string, any> = {
-      tranId: creditNote.creditNoteNumber,
+      tranId: `CN-${originalInvoice.persistentReferenceNumber}`,
       tranDate: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -846,20 +864,24 @@ export class NetSuiteService implements ErpServiceContract {
     return createCustomerPayload;
   }
 
-  public async checkInvoiceExists(erpReference: string) {
+  public async checkInvoiceExists(
+    invoiceErpReference: string
+  ): Promise<boolean> {
     const {
       connection: { config, oauth, token },
     } = this;
 
     let invoiceExistsRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${erpReference}`,
+      url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
       method: 'GET',
-    }
+    };
 
     try {
       const checker = await axios({
         ...invoiceExistsRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(invoiceExistsRequestOpts, token)),
+        headers: oauth.toHeader(
+          oauth.authorize(invoiceExistsRequestOpts, token)
+        ),
         data: {},
       } as AxiosRequestConfig);
 
@@ -925,6 +947,58 @@ export class NetSuiteService implements ErpServiceContract {
         message: `Error checking if customer payment is already registered in NetSuite.`,
         response: err?.response?.data['o:errorDetails'],
       });
+    }
+  }
+
+  public async getExistingRevenueRecognition(
+    invoiceRefNumber: string,
+    manuscriptCustomId: string
+  ): Promise<{ count: number; id?: string }> {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+
+    // Query revenue recognition transactions
+    const revenueRecognitionRequestOpts = {
+      url: `${config.endpoint}query/v1/suiteql`,
+      method: 'POST',
+    };
+
+    const queryBuilder = knex({ client: 'pg' });
+    let query = queryBuilder.raw(
+      `SELECT * FROM transaction WHERE recordtype = 'journalentry' AND tranid = 'Article ${manuscriptCustomId} - Invoice ${invoiceRefNumber}'`
+    );
+
+    const revenueRecognitionRequest = {
+      q: query.toQuery(),
+    };
+    this.logger.debug({
+      message: 'Query builder for get revenue recognition',
+      request: revenueRecognitionRequest,
+    });
+
+    try {
+      const res = await axios({
+        ...revenueRecognitionRequestOpts,
+        headers: {
+          prefer: 'transient',
+          ...oauth.toHeader(
+            oauth.authorize(revenueRecognitionRequestOpts, token)
+          ),
+        },
+        data: revenueRecognitionRequest,
+      } as AxiosRequestConfig);
+      if (res.data.count === 0) {
+        return { count: res.data.count };
+      } else {
+        return { count: res.data.count, id: res.data.items[0].id };
+      }
+    } catch (err) {
+      this.logger.error({
+        message: 'No Revenue Recognition found.',
+        response: err?.response?.data,
+      });
+      throw new Error(err);
     }
   }
 }

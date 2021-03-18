@@ -10,9 +10,9 @@ import { Amount } from '../../../domain/Amount';
 
 // * Subdomain
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
+import { ExternalOrderId } from './external-order-id';
 import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentMethodId } from './PaymentMethodId';
-import { PaymentProof } from './payment-proof';
 import { PaymentId } from './PaymentId';
 
 export enum PaymentStatus {
@@ -25,14 +25,14 @@ export enum PaymentStatus {
 import { PaymentCompleted } from './events';
 
 export interface PaymentProps {
+  status: PaymentStatus;
   invoiceId: InvoiceId;
   payerId: PayerId;
   amount: Amount;
+  foreignPaymentId?: ExternalOrderId;
   paymentMethodId?: PaymentMethodId;
-  foreignPaymentId?: string;
+  paymentProof?: ExternalOrderId;
   datePaid?: Date;
-  paymentProof?: PaymentProof;
-  status: PaymentStatus;
 }
 
 export class Payment extends AggregateRoot<PaymentProps> {
@@ -56,11 +56,11 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return this.props.paymentMethodId;
   }
 
-  get paymentProof(): PaymentProof {
+  get paymentProof(): ExternalOrderId {
     return this.props.paymentProof;
   }
 
-  set paymentProof(paymentProof: PaymentProof) {
+  set paymentProof(paymentProof: ExternalOrderId) {
     this.props.paymentProof = paymentProof;
   }
 
@@ -72,11 +72,11 @@ export class Payment extends AggregateRoot<PaymentProps> {
     return this.props.datePaid;
   }
 
-  set foreignPaymentId(paymentId: string) {
+  set foreignPaymentId(paymentId: ExternalOrderId) {
     this.props.foreignPaymentId = paymentId;
   }
 
-  get foreignPaymentId(): string {
+  get foreignPaymentId(): ExternalOrderId {
     return this.props.foreignPaymentId;
   }
 

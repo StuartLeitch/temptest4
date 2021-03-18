@@ -7,6 +7,12 @@ import {
 
 import classes from './Card.scss';
 
+// interfaceCard.propTypes = {
+//   ...BsCard.propTypes,
+//   type: PropTypes.string,
+//   color: PropTypes.string
+// };
+
 const Card = (props) => {
     const { children, type, color, className, ...otherProps } = props;
     const cardClass = classNames(className,
@@ -20,11 +26,7 @@ const Card = (props) => {
         </BsCard>
     );
 }
-Card.propTypes = {
-    ...BsCard.propTypes,
-    type: PropTypes.string,
-    color: PropTypes.string
-};
+
 Card.defaultProps = {
     type: 'border',
     color: null
