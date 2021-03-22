@@ -11,6 +11,7 @@ import {
   Roles,
 } from '@hindawi/shared';
 
+import { ExternalOrderId } from '../../../../../libs/shared/src/lib/modules/payments/domain/external-order-id';
 import { Context } from '../../builders';
 import { Resolvers } from '../schema';
 
@@ -217,7 +218,9 @@ export const payments: Resolvers<Context> = {
       // check if the payment reference is already used
       let alreadyUsedPaymentReference;
       try {
-        alreadyUsedPaymentReference = await paymentRepo.getPaymentByForeignId(paymentReference);
+        alreadyUsedPaymentReference = await paymentRepo.getPaymentByForeignId(
+          ExternalOrderId.create(paymentReference)
+        );
       } catch (err) {
         // do nothing, just let it go
       }
