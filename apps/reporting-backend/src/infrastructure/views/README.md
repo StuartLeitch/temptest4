@@ -2,9 +2,9 @@
 
 - zzz_events - contains the id, timestamps, type, payloads of events
 - zzz_data (ex: invoices_data) - contains fields extracted from table above
-- zzz (plural, ex: invoices) - contains the information from last event, sometimes agregated from multiple views
+- zzz (plural, ex: invoices) - contains the information from last event, sometimes aggregated from multiple views
 
-zzz is placeholder for entity (i.e. invoices, manuscripts, etc.)
+zzz is placeholder for entity (i.e. Invoice, Manuscript, etc.)
 
 # Adding new fields to an existing view
 
@@ -42,7 +42,7 @@ This will create the dependency tree which is used when refreshing views.
 ```
 
 4. Add the skip parameter (2nd parameter = true) to the previously last rebuild_materialized_views.
-   Sometimes you add tables migrations that become dependecies to views. If you would run rebuild_materialized_views before create_journal_to_publisher_table migration, the script will break. It also skips unnecessary migrations to new databases.
+   Sometimes you add tables migrations that become dependencies to views. If you would run rebuild_materialized_views before create_journal_to_publisher_table migration, the script will break. It also skips unnecessary migrations to new databases.
 
 # Adding a new view
 
@@ -60,7 +60,7 @@ Ex: manuscript_vendors are used to restrict vendors to only in progress manuscri
 
 The view `manuscript_vendors_full_access` will only be used for filter charts (you should be able to filter by a manuscript type that has no entries in progress for a certain value).
 
-# Solving circular dependecies
+# Solving circular dependencies
 
 Making a materialized view depend on another will cause a runtime exception. This can be avoid by using tables and controlling the refresh flow manually.
 

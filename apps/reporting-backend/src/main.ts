@@ -32,11 +32,11 @@ bootstrapMicroframework({
    */
   loaders: [
     knexLoader,
-    contextLoader,
-    handlerLoader,
-    queueServiceLoader,
-    expressLoader,
-    cronLoader,
+    // contextLoader,
+    // handlerLoader,
+    // queueServiceLoader,
+    // expressLoader,
+    // cronLoader,
   ],
 })
   .then(() => banner(log))

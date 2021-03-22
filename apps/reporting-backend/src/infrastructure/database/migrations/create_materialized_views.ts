@@ -11,6 +11,7 @@ export async function up(knex: Knex): Promise<any> {
     let queryStart = new Date();
 
     await knex.raw(view.getCreateQuery());
+
     for (const indexQuery of view.getPostCreateQueries()) {
       const indexQueryStart = new Date();
       await knex.raw(indexQuery);

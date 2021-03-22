@@ -8,15 +8,14 @@ import { env } from '../env';
 
 import { knexMigrationSource } from '../infrastructure/database/migrationSource';
 import { materializedViewList } from '../infrastructure/views';
+// import * as create_materialized_views from '../infrastructure/database/migrations/create_materialized_views';
 
 export const knexLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
+
   const knex = Knex({
     client: 'pg',
-    migrations: {
-      migrationSource: knexMigrationSource,
-    },
     connection: {
       host: env.db.host,
       user: env.db.username,
@@ -26,23 +25,43 @@ export const knexLoader: MicroframeworkLoader = async (
     // debug: true
   });
 
-  await knex.migrate.latest().then(async ([_, migrationsList]) => {
-    if (migrationsList.length === 0) {
-      console.log('Skipping after migration refresh');
-      return;
-    }
-    console.log('Started refresh');
-    for (let view of materializedViewList) {
-      if (view.shouldRefresh) {
-        console.log(`Refreshing ${view.getViewName()}`);
-        // avoid running concurent queries that will break if ran first
-        await knex.raw(
-          `REFRESH MATERIALIZED VIEW ${view.getViewName()} WITH DATA;`
-        );
-      }
-    }
-    console.log('Finished refresh');
+  // console.info(materializedViewList);
+  // process.exit(0);
+
+  await knex.migrate.latest({
+    migrationSource: knexMigrationSource,
+  }).then(async ([_, migrationsList]) => {
+    // if (migrationsList.length === 0) {
+    //   console.log('Skipping after migration refresh');
+    //   return;
+    // }
+
+    // // create_materialized_views.up(knex)
   });
+
+  // console.log('Started refresh');
+  // for (let view of materializedViewList) {
+  //     if (view.shouldRefresh) {
+  //       console.log(`Refreshing ${view.getViewName()}`);
+  //       // avoid running concurrent queries that will break if ran first
+  //       await knex.raw(
+  //         `REFRESH MATERIALIZED VIEW ${view.getViewName()} WITH DATA;`
+  //       );
+  //     }
+  // }
+  // console.log('Finished refresh');
+
+  console.log('Started refresh');
+  for (let view of ['invoices_data', 'article_data', 'users_data', 'checker_submission_data', 'checker_team_data', 'journals_data', 'peer_review_data']) {
+    console.log(`Refreshing ${view}`);
+    // avoid running concurrent queries that will break if ran first
+    await knex.raw(
+      `REFRESH MATERIALIZED VIEW ${view} WITH DATA;`
+    );
+  }
+  console.log('Finished refresh');
+
+
 
   if (settings) {
     settings.setData('connection', knex);

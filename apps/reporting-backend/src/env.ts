@@ -47,6 +47,7 @@ export const env = {
     password: getOsEnvOptional('DB_PASSWORD'),
     database: getOsEnv('DB_DATABASE'),
     logging: getOsEnv('DB_LOGGING'),
+    migrationsDir: getOsEnv('DB_MIGRATIONS_DIR'),
   },
   aws: {
     region: getOsEnv('AWS_SNS_SQS_REGION'),

@@ -12,6 +12,14 @@ const defaultValues: WithAwsSecretsServiceProps = {
       tag: 'latest',
     },
     replicaCount: 1,
+    containerPort: 3000,
+    envVars: {
+      PORT: '3000',
+    },
+    service: {
+      port: 80,
+      type: ServiceType.NODE_PORT,
+    },
     labels: {
       owner: 'belzebuth',
       tier: 'backend',

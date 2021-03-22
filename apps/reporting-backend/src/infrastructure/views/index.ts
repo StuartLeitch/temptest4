@@ -1,12 +1,12 @@
 import { OrderUtils } from '../../../../../libs/shared/src/lib/utils/Order';
+import { AbstractEventView } from './contracts/EventViewContract';
+import invoicesDataView from './InvoicesDataView';
 import articleDataView from './ArticleDataView';
 import authorsView from './AuthorsView';
 import checkerSubmissionData from './CheckerSubmissionDataView';
 import checkerTeamData from './CheckerTeamDataView';
 import checkerToSubmission from './CheckerToSubmissionView';
 import checkerToTeamView from './CheckerToTeamView';
-import { AbstractEventView } from './contracts/EventViewContract';
-import invoicesDataView from './InvoicesDataView';
 import invoicesView from './InvoicesView';
 import journalEditorialBoardView from './JournalEditorialBoardView';
 import journalsDataView from './JournalsDataView';

@@ -105,12 +105,12 @@ LEFT JOIN LATERAL (
 BEGIN;
 DELETE FROM ${this.getViewName()};
 INSERT INTO ${this.getViewName()} ${this.getSelectQuery()};
-COMMIT;    
+COMMIT;
 `;
   }
 
   public getDeleteQuery(): string {
-    return `drop table ${acceptanceRatesView.getViewName()} cascade`;
+    return `DROP table ${acceptanceRatesView.getViewName()} cascade`;
   }
 
   public getViewName(): string {
