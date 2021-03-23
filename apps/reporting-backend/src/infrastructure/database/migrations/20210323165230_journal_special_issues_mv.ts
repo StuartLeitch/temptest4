@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<any> {
   const journalEditorialBoardViewName = 'journal_editorial_board';
 
   await knex.raw(`
-  CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()} AS
+  CREATE MATERIALIZED VIEW IF NOT EXISTS journal_special_issues AS
     SELECT 
     si_data.journal_id,
     si_data.journal_name,
