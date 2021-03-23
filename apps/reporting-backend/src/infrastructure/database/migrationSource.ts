@@ -34,6 +34,7 @@ import * as create_journals_mv from './migrations/20210323132000_create_journals
 import * as create_payments_mv from './migrations/20210323144445_create_payments_mv';
 import * as create_journal_sections_mv from './migrations/20210323150600_create_journal_sections_mv';
 import * as create_journal_special_issues_data_mv from './migrations/20210323153400_create_journal_special_issues_data_mv';
+import * as create_submissions_mv from './migrations/202103023165300_create_submission_mv';
 import * as create_journal_editorial_board_mv from './migrations/20210323155100_journal_editorial_board_mv';
 import * as create_journal_special_issues_mv from './migrations/20210323165230_journal_special_issues_mv';
 import * as create_authors_mv from './migrations/20210323172634_create_authors_mv';
@@ -275,6 +276,7 @@ class KnexMigrationSource {
     create_payments_mv,
     create_journals_mv,
     create_journal_sections_mv,
+    create_submissions_mv,
     create_journal_special_issues_data_mv,
     create_journal_editorial_board_mv,
     create_journal_special_issues_mv,
