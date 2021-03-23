@@ -9,7 +9,10 @@ export async function up(knex: Knex): Promise<any> {
   logger.info('Migrating view: journal_editorial_board');
   let queryStart = new Date();
 
-  // * journal_editorial_board is dependant on: journals, journal_sections, journal_special_issues_data
+  // * journal_editorial_board is dependant on:
+  // * - journals
+  // * - journal_sections
+  // * - journal_special_issues_data
 
   const journalsViewName = 'journals';
   const journalSectionViewName = 'journal_sections';
