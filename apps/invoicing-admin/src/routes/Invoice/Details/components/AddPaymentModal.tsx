@@ -59,7 +59,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
           (pm) => pm.name === 'Bank Transfer'
         ).id,
         amount: parseFloat(bankTransferPaymentData.paymentAmount + ''),
-        paymentReference: bankTransferPaymentData.paymentReference,
+        paymentReference: bankTransferPaymentData.paymentReference.trim(),
         datePaid: bankTransferPaymentData.paymentDate.toISOString(),
         markInvoiceAsPaid,
       },
@@ -181,9 +181,10 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
                 invalid={touched && !fields['paymentReference'].isValid}
                 onChange={(e) => {
                   const { value } = e.target;
+                  e.target.value = value.trim();
                   setBankTransferPaymentData({
                     ...bankTransferPaymentData,
-                    paymentReference: value,
+                    paymentReference: value.trim(),
                   });
                 }}
               />

@@ -452,7 +452,8 @@ export class NetSuiteService implements ErpServiceContract {
       },
       // Invoice reference number,
       refName: `Invoice #${invoice.persistentReferenceNumber}`,
-      [this.customExternalPaymentReference]: payment.foreignPaymentId,
+      [this
+        .customExternalPaymentReference]: payment.foreignPaymentId.toString(),
       [this.customUniquePaymentReference]: refName,
       // Original amount,
       total,
