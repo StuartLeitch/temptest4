@@ -29,6 +29,7 @@ import * as create_checker_team_data_mv from './migrations/20210322153600_create
 import * as create_journals_data_mv from './migrations/20210322155500_create_journals_data_mv';
 import * as create_peer_review_data_mv from './migrations/20210322160500_create_peer_review_data_mv';
 import * as create_checker_to_submission_mv from './migrations/20210322162600_create_checker_to_submission';
+import * as create_checker_to_team_mv from './migrations/20210323123600_create_checker_to_team';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -262,7 +263,8 @@ class KnexMigrationSource {
     create_checker_team_data_mv,
     create_journals_data_mv,
     create_peer_review_data_mv,
-    create_checker_to_submission_mv
+    create_checker_to_submission_mv,
+    // create_checker_to_team_mv
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

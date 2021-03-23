@@ -39,17 +39,17 @@ WITH NO DATA;
   }
 
   postCreateQueries = [
-    `create index on ${this.getViewName()} (event_id)`,
-    `create index on ${this.getViewName()} (event)`,
-    `create index on ${this.getViewName()} (event, event_timestamp)`,
-    `create index on ${this.getViewName()} (event_timestamp)`,
-    `create index on ${this.getViewName()} (submission_id)`,
-    `create index on ${this.getViewName()} (checker_id)`,
-    `create index on ${this.getViewName()} (team_id)`,
-    `create index on ${this.getViewName()} (assignation_date)`,
-    `create index on ${this.getViewName()} (submission_id, assignation_date)`,
-    `create index on ${this.getViewName()} (checker_role)`,
-    `create index on ${this.getViewName()} (checker_email)`,
+    `CREATE index on ${this.getViewName()} (event_id)`,
+    `CREATE index on ${this.getViewName()} (event)`,
+    `CREATE index on ${this.getViewName()} (event, event_timestamp)`,
+    `CREATE index on ${this.getViewName()} (event_timestamp)`,
+    `CREATE index on ${this.getViewName()} (submission_id)`,
+    `CREATE index on ${this.getViewName()} (checker_id)`,
+    `CREATE index on ${this.getViewName()} (team_id)`,
+    `CREATE index on ${this.getViewName()} (assignation_date)`,
+    `CREATE index on ${this.getViewName()} (submission_id, assignation_date)`,
+    `CREATE index on ${this.getViewName()} (checker_role)`,
+    `CREATE index on ${this.getViewName()} (checker_email)`,
   ];
 
   getViewName(): string {

@@ -52,7 +52,18 @@ export const knexLoader: MicroframeworkLoader = async (
   // console.log('Finished refresh');
 
   console.log('Started refresh');
-  for (let view of ['invoices_data', 'article_data', 'users_data', 'checker_submission_data', 'checker_team_data', 'journals_data', 'peer_review_data']) {
+  const matViews = [
+    'invoices_data',
+    'article_data',
+    'users_data',
+    'checker_submission_data',
+    'checker_team_data',
+    'journals_data',
+    'peer_review_data',
+    'checker_to_submission',
+    // 'checker_to_team',
+  ];
+  for (let view of matViews) {
     console.log(`Refreshing ${view}`);
     // avoid running concurrent queries that will break if ran first
     await knex.raw(
