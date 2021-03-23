@@ -63,20 +63,20 @@ WITH NO DATA;
 `);
 
   const postCreateQueries = [
-    `create index on ${this.getViewName()} (manuscript_custom_id)`,
-    `create index on ${this.getViewName()} (manuscript_custom_id, version)`,
-    `create index on ${this.getViewName()} (version)`,
-    `create index on ${this.getViewName()} (reviewer_id)`,
-    `create index on ${this.getViewName()} (responded_date)`,
-    `create index on ${this.getViewName()} (created_date)`,
-    `create index on ${this.getViewName()} (expired_date)`,
-    `create index on ${this.getViewName()} (invited_date)`,
-    `create index on ${this.getViewName()} (accepted_date)`,
-    `create index on ${this.getViewName()} (declined_date)`,
-    `create index on ${this.getViewName()} (status)`,
-    `create index on ${this.getViewName()} (email)`,
-    `create index on ${this.getViewName()} (user_id)`,
-    `create index on ${this.getViewName()} (event_id)`,
+    `create index on manuscript_reviewers (manuscript_custom_id)`,
+    `create index on manuscript_reviewers (manuscript_custom_id, version)`,
+    `create index on manuscript_reviewers (version)`,
+    `create index on manuscript_reviewers (reviewer_id)`,
+    `create index on manuscript_reviewers (responded_date)`,
+    `create index on manuscript_reviewers (created_date)`,
+    `create index on manuscript_reviewers (expired_date)`,
+    `create index on manuscript_reviewers (invited_date)`,
+    `create index on manuscript_reviewers (accepted_date)`,
+    `create index on manuscript_reviewers (declined_date)`,
+    `create index on manuscript_reviewers (status)`,
+    `create index on manuscript_reviewers (email)`,
+    `create index on manuscript_reviewers (user_id)`,
+    `create index on manuscript_reviewers (event_id)`,
   ];
 
   for (const indexQuery of postCreateQueries) {
