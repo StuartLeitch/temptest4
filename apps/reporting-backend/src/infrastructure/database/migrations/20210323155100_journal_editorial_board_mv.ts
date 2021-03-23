@@ -117,4 +117,4 @@ WITH NO DATA `);
 }
 export async function down(knex: Knex): Promise<any> {}
 
-export const name = '202103023155100_journal_editorial_board.mv.ts';
+export const name = '20210323155100_journal_editorial_board.mv.ts';
