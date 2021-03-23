@@ -32,6 +32,7 @@ import * as create_checker_to_submission_mv from './migrations/20210322162600_cr
 import * as create_checker_to_team_mv from './migrations/20210323123600_create_checker_to_team_mv';
 import * as create_journals_mv from './migrations/20210323132000_create_journals_mv';
 import * as create_payments_mv from './migrations/20210323144445_create_payments_mv';
+import * as create_journal_sections_mv from './migrations/20210323150600_create_journal_sections_mv';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -269,6 +270,7 @@ class KnexMigrationSource {
     create_checker_to_team_mv,
     create_journals_mv,
     create_payments_mv,
+    create_journal_sections_mv,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
