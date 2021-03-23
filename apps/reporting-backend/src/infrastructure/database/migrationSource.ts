@@ -276,10 +276,10 @@ class KnexMigrationSource {
     create_payments_mv,
     create_journals_mv,
     create_journal_sections_mv,
-    create_submissions_mv,
     create_journal_special_issues_data_mv,
     create_journal_editorial_board_mv,
     create_journal_special_issues_mv,
+    create_submissions_mv,
     create_authors_mv,
   ].map(makeViewObject);
 
