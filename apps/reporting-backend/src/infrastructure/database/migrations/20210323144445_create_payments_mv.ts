@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<any> {
   // * payments is dependent on invoice_data
 
   await knex.raw(`
-  CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
+  CREATE MATERIALIZED VIEW IF NOT EXISTS payments
   AS
   SELECT
     last_inv.event_id,
