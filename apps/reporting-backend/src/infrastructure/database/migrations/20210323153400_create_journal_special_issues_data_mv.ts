@@ -61,8 +61,7 @@ export async function up(knex: Knex): Promise<any> {
     FROM journal_sections j,
     LATERAL jsonb_to_recordset(j.special_issues_json) as special_issues_view(id text, name text, "isActive" bool, "isCancelled" bool, "endDate" text, "startDate" text, "cancelReason" text, created text, updated text, "customId" text, editors jsonb)
   WITH NO DATA
-  `
-  );
+  `);
 
   const postCreateQueries = [
     `CREATE INDEX ON journal_special_issues_data (journal_id)`,
@@ -86,7 +85,7 @@ export async function up(knex: Knex): Promise<any> {
   }
 
   logger.info(
-    `Creating table and indices journal_sections took ${differenceInSeconds(
+    `Creating table and indices journal_special_issues_data took ${differenceInSeconds(
       queryStart
     )} seconds`
   );
