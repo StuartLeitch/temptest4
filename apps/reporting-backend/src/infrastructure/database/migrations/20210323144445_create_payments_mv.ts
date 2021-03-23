@@ -11,27 +11,32 @@ export async function up(knex: Knex): Promise<any> {
 
   // * payments is dependent on invoice_data
 
+  const invoiceDataAlias = 'id';
+  const getViewName = 'invoices_data';
+  const getPartitionQuery = `partition by ${invoiceDataAlias}.invoice_id ORDER BY case when ${invoiceDataAlias}.status = 'FINAL' then 1 when ${invoiceDataAlias}.status = 'ACTIVE' then 2 else 3 end, ${invoiceDataAlias}.event_timestamp desc nulls last`;
+
   await knex.raw(`
-  CREATE MATERIALIZED VIEW IF NOT EXISTS payments
-  AS
-  SELECT
-    last_inv.event_id,
-    last_inv.invoice_id,
-    last_inv.manuscript_custom_id,
-    last_inv.reference_number,
-    last_inv.invoice_issue_date,
-    payment_view."paymentType" AS payment_type,
-    payment_view."foreignPaymentId" AS payment_reference,
-    cast_to_timestamp(payment_view. "paymentDate") AS payment_date,
-    payment_view."paymentAmount"::float AS payment_amount
-  FROM (SELECT ie.payload, last_inv.*	
-    FROM (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (partition by id.invoice_id ORDER BY case when id.status = 'FINAL' then 1 when id.status = 'ACTIVE' then 2 else 3 end, id.event_timestamp desc nulls last) AS rn FROM invoice_data id) i
-      WHERE	rn = 1) last_inv
-    JOIN ${REPORTING_TABLES.INVOICE} ie ON ie.id = last_inv.event_id
-  ) last_inv, 
-    jsonb_to_recordset(last_inv.payload -> 'payments')
-      AS payment_view("foreignPaymentId" text, "paymentAmount" float, "paymentType" text, "paymentDate" text)
-  WITH NO DATA;
+  CREATE MATERIALIZED VIEW IF NOT EXISTS ${getViewName}
+AS
+SELECT
+  last_inv.event_id,
+  last_inv.invoice_id,
+  last_inv.manuscript_custom_id,
+  last_inv.reference_number,
+  last_inv.invoice_issue_date,
+  payment_view."paymentType" AS payment_type,
+  payment_view."foreignPaymentId" AS payment_reference,
+  cast_to_timestamp(payment_view. "paymentDate") AS payment_date,
+  payment_view."paymentAmount"::float AS payment_amount
+FROM (SELECT ie.payload, last_inv.*	
+  FROM (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (${getPartitionQuery}) AS rn FROM ${getViewName} id) i
+    WHERE	rn = 1) last_inv
+  JOIN ${REPORTING_TABLES.INVOICE} ie ON ie.id = last_inv.event_id
+) last_inv, 
+  jsonb_to_recordset(last_inv.payload -> 'payments')
+    AS payment_view("foreignPaymentId" text, "paymentAmount" float, "paymentType" text, "paymentDate" text)
+WITH NO DATA;
+
   `);
 
   const postCreateQueries = [
