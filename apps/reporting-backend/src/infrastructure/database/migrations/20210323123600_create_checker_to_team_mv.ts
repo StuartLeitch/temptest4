@@ -90,4 +90,4 @@ WITH NO DATA;
 
 export async function down(knex: Knex): Promise<any> {}
 
-export const name = '20210323123600_create_checker_to_team.ts';
+export const name = '20210323123600_create_checker_to_team_mv.ts';

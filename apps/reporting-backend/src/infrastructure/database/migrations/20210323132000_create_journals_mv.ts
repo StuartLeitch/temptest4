@@ -1,7 +1,6 @@
 import * as Knex from 'knex';
 import { differenceInSeconds } from '../../../utils/utils';
 import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
-import { REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 
 const logger = new Logger(__filename);
 
@@ -11,7 +10,6 @@ export async function up(knex: Knex): Promise<any> {
 
   // * journals is dependant on:
   // * - journals_data
-  // * - acceptance_rates
 
   await knex.raw(`
   CREATE MATERIALIZED VIEW IF NOT EXISTS journals
@@ -39,14 +37,12 @@ WITH NO DATA;
   );
 
   const postCreateQueries = [
-    `CREATE index on checker_to_team (event_id)`,
-    `CREATE index on checker_to_team (event)`,
-    `CREATE index on checker_to_team (event_timestamp)`,
-    `CREATE index on checker_to_team (team_id)`,
-    `CREATE index on checker_to_team (team_type)`,
-    `CREATE index on checker_to_team (checker_id)`,
-    `CREATE index on checker_to_team (checker_role)`,
-    `CREATE index on checker_to_team (checker_email)`,
+    `CREATE INDEX ON journals USING btree (journal_id)`,
+    `CREATE INDEX ON journals USING btree (journal_id, event_date)`,
+    `CREATE INDEX ON journals USING btree (journal_code)`,
+    `CREATE INDEX ON journals USING btree (journal_name)`,
+    `CREATE INDEX ON journals USING btree (publisher_name)`,
+    `CREATE INDEX ON journals USING btree (journal_issn)`,
   ];
 
   for (const indexQuery of postCreateQueries) {
@@ -60,7 +56,7 @@ WITH NO DATA;
   }
 
   logger.info(
-    `Creating table and indices checker_to_team took ${differenceInSeconds(
+    `Creating table and indices journals took ${differenceInSeconds(
       queryStart
     )} seconds`
   );
@@ -68,4 +64,4 @@ WITH NO DATA;
 
 export async function down(knex: Knex): Promise<any> {}
 
-export const name = '20210323123600_create_checker_to_team.ts';
+export const name = '20210323132000_create_journals_mv.ts';

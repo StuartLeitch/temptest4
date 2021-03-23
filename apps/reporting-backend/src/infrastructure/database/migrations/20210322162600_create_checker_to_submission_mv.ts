@@ -69,4 +69,4 @@ export async function up(knex: Knex): Promise<any> {
 
 export async function down(knex: Knex): Promise<any> {}
 
-export const name = '20210322162600_create_checker_to_submission.ts';
+export const name = '20210322162600_create_checker_to_submission_mv.ts';
