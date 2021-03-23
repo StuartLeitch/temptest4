@@ -13,7 +13,7 @@ export async function up(knex: Knex): Promise<any> {
   // * - journals
 
   await knex.raw(`
-  CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
+  CREATE MATERIALIZED VIEW IF NOT EXISTS journal_sections
   AS SELECT
     uj.journal_id,
     uj.journal_name,
@@ -31,8 +31,7 @@ export async function up(knex: Knex): Promise<any> {
     JOIN journals uj on je.id = uj.event_id,
     LATERAL jsonb_to_recordset(je.payload -> 'sections') as section_view(id text, name text, created timestamp, updated timestamp, "specialIssues" jsonb, editors jsonb)
   WITH NO DATA;
-  `
-  );
+  `);
 
   const postCreateQueries = [
     `CREATE INDEX ON journal_sections (journal_id)`,
