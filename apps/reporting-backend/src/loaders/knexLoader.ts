@@ -14,7 +14,6 @@ import { materializedViewList } from '../infrastructure/views';
 export const knexLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
-
   const knex = Knex({
     client: 'pg',
     connection: {
@@ -29,16 +28,17 @@ export const knexLoader: MicroframeworkLoader = async (
   // console.info(materializedViewList);
   // process.exit(0);
 
-  await knex.migrate.latest({
-    migrationSource: knexMigrationSource,
-  }).then(async ([_, migrationsList]) => {
-    // if (migrationsList.length === 0) {
-    //   console.log('Skipping after migration refresh');
-    //   return;
-    // }
-
-    // // create_materialized_views.up(knex)
-  });
+  await knex.migrate
+    .latest({
+      migrationSource: knexMigrationSource,
+    })
+    .then(async ([_, migrationsList]) => {
+      // if (migrationsList.length === 0) {
+      //   console.log('Skipping after migration refresh');
+      //   return;
+      // }
+      // // create_materialized_views.up(knex)
+    });
 
   // console.log('Started refresh');
   // for (let view of materializedViewList) {
@@ -70,20 +70,22 @@ export const knexLoader: MicroframeworkLoader = async (
     'journal_special_issues_data',
     'journal_editorial_board',
     'journal_special_issues',
-    'submissions'
+    'submissions',
+    'authors',
+    'manuscript_editors',
   ];
 
   for (let view of matViews) {
     const indexQueryStart = new Date();
     console.log(`Refreshing ${view}`);
     // avoid running concurrent queries that will break if ran first
-    await knex.raw(
-      `REFRESH MATERIALIZED VIEW ${view} WITH DATA;`
-      );
+    await knex.raw(`REFRESH MATERIALIZED VIEW ${view} WITH DATA;`);
     console.log(
-      `Refresh materialized view "${view}" took ${differenceInSeconds(indexQueryStart)}`
-      )
-    }
+      `Refresh materialized view "${view}" took ${differenceInSeconds(
+        indexQueryStart
+      )}`
+    );
+  }
   console.log('Finished refresh');
 
   if (settings) {
