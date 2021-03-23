@@ -4,6 +4,7 @@ import {
 } from 'microframework-w3tec';
 import Knex from 'knex';
 
+import { differenceInSeconds } from '../utils/utils';
 import { env } from '../env';
 
 import { knexMigrationSource } from '../infrastructure/database/migrationSource';
@@ -52,10 +53,11 @@ export const knexLoader: MicroframeworkLoader = async (
   // console.log('Finished refresh');
 
   console.log('Started refresh');
+  const refreshStart = new Date();
   const matViews = [
     'invoices_data',
-    'article_data',
     'users_data',
+    'article_data',
     'checker_submission_data',
     'checker_team_data',
     'journals_data',
@@ -63,20 +65,26 @@ export const knexLoader: MicroframeworkLoader = async (
     'checker_to_submission',
     'checker_to_team',
     'journals',
+    'payments',
     'journal_sections',
     'journal_special_issues_data',
+    'journal_editorial_board',
+    'journal_special_issues',
     'submissions'
   ];
+
   for (let view of matViews) {
+    const indexQueryStart = new Date();
     console.log(`Refreshing ${view}`);
     // avoid running concurrent queries that will break if ran first
     await knex.raw(
       `REFRESH MATERIALIZED VIEW ${view} WITH DATA;`
-    );
-  }
+      );
+    console.log(
+      `Refresh materialized view "${view}" took ${differenceInSeconds(indexQueryStart)}`
+      )
+    }
   console.log('Finished refresh');
-
-
 
   if (settings) {
     settings.setData('connection', knex);
