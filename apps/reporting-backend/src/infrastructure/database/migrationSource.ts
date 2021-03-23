@@ -264,7 +264,7 @@ class KnexMigrationSource {
     create_journals_data_mv,
     create_peer_review_data_mv,
     create_checker_to_submission_mv,
-    // create_checker_to_team_mv
+    create_checker_to_team_mv
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
