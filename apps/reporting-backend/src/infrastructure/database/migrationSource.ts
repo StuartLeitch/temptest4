@@ -34,7 +34,8 @@ import * as create_journals_mv from './migrations/20210323132000_create_journals
 import * as create_payments_mv from './migrations/20210323144445_create_payments_mv';
 import * as create_journal_sections_mv from './migrations/20210323150600_create_journal_sections_mv';
 import * as create_journal_special_issues_data_mv from './migrations/20210323153400_create_journal_special_issues_data_mv';
-import * as create_journal_editorial_board from './migrations/202103023155100_journal_editorial_board_mv';
+import * as create_journal_editorial_board from './migrations/202103023155100_create_journal_editorial_board_mv';
+import * as create_submissions_mv from './migrations/202103023165300_create_submission_mv';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -275,6 +276,7 @@ class KnexMigrationSource {
     create_payments_mv,
     create_journal_sections_mv,
     create_journal_editorial_board,
+    create_submissions_mv
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
