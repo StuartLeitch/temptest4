@@ -17,7 +17,6 @@ import {
   RemoveEditorsFromJournalUsecase,
 } from '@hindawi/shared';
 
-
 import {
   RegisterPaymentResponse,
   RegisterPaymentRequest,
@@ -28,7 +27,7 @@ import {
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
 // import { NetSuiteHttpApi } from './netsuite/HttpApi';
-import { CustomerPayload, CustomerPaymentPayload } from './netsuite/typings'
+import { CustomerPayload, CustomerPaymentPayload } from './netsuite/typings';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
 import { Connection } from './netsuite/Connection';
 export class NetSuiteService implements ErpServiceContract {
@@ -50,7 +49,7 @@ export class NetSuiteService implements ErpServiceContract {
     loggerBuilder: LoggerBuilderContract,
     customSegmentFieldName: string,
     customExternalPaymentReference: string,
-    customUniquePaymentReference: string,
+    customUniquePaymentReference: string
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
@@ -169,7 +168,6 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerPayment(
     data: RegisterPaymentRequest
   ): Promise<RegisterPaymentResponse> {
-
     const { payer, manuscript } = data;
 
     const customerAlreadyExists = await this.queryCustomer(
@@ -394,16 +392,14 @@ export class NetSuiteService implements ErpServiceContract {
   private async createPayment(data: {
     invoice: Invoice;
     payment: Payment;
-    payer: Payer;
     paymentMethods: PaymentMethod[];
     total: number;
     customerId?: string;
-    invoicePayments?: any[];
   }): Promise<string> {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { invoice, payment, payer, paymentMethods, total, customerId, invoicePayments } = data;
+    const { invoice, payment, paymentMethods, total, customerId } = data;
 
     const accountMap = {
       Paypal: '213',
@@ -456,6 +452,8 @@ export class NetSuiteService implements ErpServiceContract {
       },
       // Invoice reference number,
       refName: `Invoice #${invoice.persistentReferenceNumber}`,
+      [this.customExternalPaymentReference]: payment.foreignPaymentId,
+      [this.customUniquePaymentReference]: refName,
       // Original amount,
       total,
       // Amount due,
@@ -468,10 +466,10 @@ export class NetSuiteService implements ErpServiceContract {
 
     try {
       const res = await axios({
-      ...paymentRequestOpts,
-      headers: oauth.toHeader(oauth.authorize(paymentRequestOpts, token)),
-      data: createPaymentPayload,
-    } as AxiosRequestConfig);
+        ...paymentRequestOpts,
+        headers: oauth.toHeader(oauth.authorize(paymentRequestOpts, token)),
+        data: createPaymentPayload,
+      } as AxiosRequestConfig);
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
@@ -886,7 +884,6 @@ export class NetSuiteService implements ErpServiceContract {
       } as AxiosRequestConfig);
 
       return checker?.data.count > 0;
-
     } catch (err) {
       this.logger.error({
         message: `Error checking if invoice is already registered in NetSuite.`,
@@ -895,26 +892,27 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-
   public async checkCustomerPaymentExists(refName: string): Promise<any> {
     const {
       connection: { config, oauth, token },
-      customUniquePaymentReference
+      customUniquePaymentReference,
     } = this;
-
 
     let recordExistsRequestOpts = {
       url: `${config.endpoint}query/v1/suiteql`,
-      method: 'POST'
-    }
+      method: 'POST',
+    };
 
     // * Query customer payments
     const queryBuilder = knex({ client: 'pg' });
     let query = queryBuilder.raw(
       "SELECT * FROM transaction WHERE recordtype = 'customerpayment'"
-      );
+    );
     if (refName) {
-      query = queryBuilder.raw(`${query.toQuery()} AND ${customUniquePaymentReference} = ?`, refName);
+      query = queryBuilder.raw(
+        `${query.toQuery()} AND ${customUniquePaymentReference} = ?`,
+        refName
+      );
     }
 
     this.logger.debug({
@@ -927,20 +925,20 @@ export class NetSuiteService implements ErpServiceContract {
         ...recordExistsRequestOpts,
         headers: {
           prefer: 'transient',
-          ...oauth.toHeader(oauth.authorize(recordExistsRequestOpts, token))
+          ...oauth.toHeader(oauth.authorize(recordExistsRequestOpts, token)),
         },
-        data: { "q": query.toQuery() },
+        data: { q: query.toQuery() },
       } as AxiosRequestConfig);
 
       if (checker?.data.count > 0) {
         return {
           alreadyExists: true,
-          id: checker.data.items[0].id
-        }
+          id: checker.data.items[0].id,
+        };
       } else {
         return {
-          alreadyExists: false
-        }
+          alreadyExists: false,
+        };
       }
     } catch (err) {
       this.logger.warn({
