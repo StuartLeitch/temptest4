@@ -62,6 +62,8 @@ export const knexLoader: MicroframeworkLoader = async (
     'peer_review_data',
     'checker_to_submission',
     'checker_to_team',
+    'journals',
+    'journal_sections'
   ];
   for (let view of matViews) {
     console.log(`Refreshing ${view}`);
