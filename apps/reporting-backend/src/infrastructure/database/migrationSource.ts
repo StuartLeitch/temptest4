@@ -42,6 +42,7 @@ import * as create_manuscript_editors_mv from './migrations/20210323180631_creat
 import * as create_manuscript_reviewers_mv from './migrations/20210323181823_create_manuscript_reviewers_mv';
 import * as create_invoices_mv from './migrations/20210324091900_create_invoices_mv';
 import * as create_manuscript_reviews_mv from './migrations/20210324093800_create_manuscript_reviews_mv';
+import * as create_manuscripts_mv from './migrations/20210324094400_create_manuscripts_mv';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -288,7 +289,8 @@ class KnexMigrationSource {
     create_manuscript_editors_mv,
     create_manuscript_reviewers_mv,
     create_invoices_mv,
-    create_manuscript_reviews_mv
+    create_manuscript_reviews_mv,
+    create_manuscripts_mv
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

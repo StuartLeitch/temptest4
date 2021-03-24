@@ -25,11 +25,11 @@ class ManuscriptsView extends AbstractEventView implements EventViewContract {
   getCreateQuery(): string {
     return `
 CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS select 
+AS select
   m.*,
-  case 
-    when m.event_timestamp is null 
-      then m.acceptance_chance * coalesce(m.net_apc, m.journal_apc::float) 
+  case
+    when m.event_timestamp is null
+      then m.acceptance_chance * coalesce(m.net_apc, m.journal_apc::float)
     else m.net_apc
   end as current_expected_revenue,
   m.acceptance_chance * coalesce(m.net_apc, m.journal_apc::float) as raw_expected_revenue
@@ -41,12 +41,12 @@ AS select
       last_sd.event_timestamp as last_event_date,
       sd.event_timestamp as final_decision_date,
       sd.submission_event as final_decision_type,
-      case 
+      case
         when i.apc is not null then i.apc
         when s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') then 'free'
         else 'paid'
       end as apc,
-      case 
+      case
         when i.submission_pricing_status is not null then i.submission_pricing_status
         when s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') then 'non-priced'
         else 'priced'
@@ -63,8 +63,8 @@ AS select
         WHEN s.special_issue_id is NULL THEN 'regular'::text
         ELSE 'special'::text
       END AS issue_type,
-      case 
-        when i.submission_pricing_status is null and s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor') 
+      case
+        when i.submission_pricing_status is null and s.article_type in ('Editorial', 'Corrigendum', 'Erratum', 'Retraction', 'Letter to the Editor')
           then coalesce(individual_ar.free_rate, avg_rate.journal_rate, individual_ar.journal_rate)
         when i.submission_pricing_status = 'non-priced'
           then coalesce(individual_ar.free_rate, avg_rate.journal_rate, individual_ar.journal_rate)
@@ -137,7 +137,7 @@ AS select
       LEFT JOIN LATERAL (SELECT * FROM ${checkerToSubmissionView.getViewName()} c where c.submission_id = s.submission_id and c.checker_role = 'qualityChecker' limit 1) quality_checker on quality_checker.submission_id = s.submission_id
       LEFT JOIN LATERAL (select * from ${manuscriptReviewsView.getViewName()} r where r.manuscript_custom_id = s.manuscript_custom_id and r.team_type = 'editor' order by submitted_date desc nulls last limit 1) last_editor_recommendation on last_editor_recommendation.manuscript_custom_id = s.manuscript_custom_id
       LEFT JOIN (
-        SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count, 
+        SELECT manuscript_custom_id, "version", count(*) as invited_reviewers_count,
           max(invited_date) as last_reviewer_invitation_date,
           min(invited_date) as first_reviewer_invitation_date
         from ${manuscriptReviewers.getViewName()} group by manuscript_custom_id, "version"
@@ -147,25 +147,25 @@ AS select
         from ${manuscriptReviewers.getViewName()} where status = 'submitted' group by manuscript_custom_id
       ) submitting_reviewers on submitting_reviewers.manuscript_custom_id = s.manuscript_custom_id
       LEFT JOIN (
-        SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count, 
+        SELECT manuscript_custom_id, "version", count(*) as accepted_reviewers_count,
           min(accepted_date) as first_reviewer_accepted_date,
-          max(accepted_date) as last_reviewer_accepted_date 
+          max(accepted_date) as last_reviewer_accepted_date
         from ${manuscriptReviewers.getViewName()} where status = 'accepted' group by manuscript_custom_id, version
       ) accepted_reviewers on accepted_reviewers.manuscript_custom_id = s.manuscript_custom_id and accepted_reviewers."version" = s."version"
       LEFT JOIN (SELECT manuscript_custom_id, "version", count(*) as pending_reviewers_count from ${manuscriptReviewers.getViewName()} where responded_date is null group by manuscript_custom_id, version) pending_reviewers on pending_reviewers.manuscript_custom_id = s.manuscript_custom_id and pending_reviewers."version" = s."version"
       LEFT JOIN (
-        SELECT manuscript_custom_id, "version", count(*) as review_reports_count, 
+        SELECT manuscript_custom_id, "version", count(*) as review_reports_count,
           max(submitted_date) as last_review_report_submitted_date,
           min(submitted_date) as first_review_report_submitted_date
         from ${manuscriptReviewsView.getViewName()} where recommendation in ('publish', 'reject', 'minor', 'major') group by manuscript_custom_id, version) review_reports on review_reports.manuscript_custom_id = s.manuscript_custom_id and review_reports."version" = s."version"
       LEFT JOIN (
-        SELECT manuscript_custom_id, count(*) as invited_handling_editors_count, 
+        SELECT manuscript_custom_id, count(*) as invited_handling_editors_count,
           min(invited_date) as first_handling_editor_invited_date,
-          max(invited_date) as last_handling_editor_invited_date, 
-          min(accepted_date) first_handling_editor_accepted_date, 
-          max(accepted_date) current_handling_editor_accepted_date, 
+          max(invited_date) as last_handling_editor_invited_date,
+          min(accepted_date) first_handling_editor_accepted_date,
+          max(accepted_date) current_handling_editor_accepted_date,
           max(declined_date) as last_handling_editor_declined_date
-        from ${manuscriptEditorsView.getViewName()} 
+        from ${manuscriptEditorsView.getViewName()}
         where role_type = 'academicEditor' group by manuscript_custom_id
       ) handling_editors on handling_editors.manuscript_custom_id = s.manuscript_custom_id
       LEFT JOIN ${acceptanceRatesView.getViewName()} individual_ar on individual_ar."month" = to_char(s.submission_date, 'YYYY-MM-01')::date and s.journal_id = individual_ar.journal_id
@@ -215,7 +215,7 @@ manuscriptsView.addDependency(authorsView);
 manuscriptsView.addDependency(invoicesView);
 manuscriptsView.addDependency(journalSectionsView);
 manuscriptsView.addDependency(journalSpecialIssuesView);
-manuscriptsView.addDependency(manuscriptEditorsView);
+// manuscriptsView.addDependency(manuscriptEditorsView);
 manuscriptsView.addDependency(submissionView);
 manuscriptsView.addDependency(checkerToSubmissionView);
 manuscriptsView.addDependency(manuscriptReviewers);
