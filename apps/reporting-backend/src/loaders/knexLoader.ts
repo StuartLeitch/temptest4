@@ -74,6 +74,7 @@ export const knexLoader: MicroframeworkLoader = async (
     'authors',
     'manuscript_editors',
     'manuscript_reviewers',
+    'invoices',
   ];
 
   for (let view of matViews) {
