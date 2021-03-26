@@ -704,11 +704,14 @@ export class NetSuiteService implements ErpServiceContract {
     }
   }
 
-  private async transformCreditNote(data: { originalInvoice?: Invoice }) {
+  private async transformCreditNote(data: {
+    originalInvoice?: Invoice;
+    creditNote?: Invoice;
+  }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { originalInvoice } = data;
+    const { originalInvoice, creditNote } = data;
 
     const originalNSErpReference = originalInvoice
       .getErpReferences()
@@ -732,7 +735,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const creditNotePayload: Record<string, any> = {
       tranDate: format(
-        new Date(originalInvoice.dateIssued),
+        new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
