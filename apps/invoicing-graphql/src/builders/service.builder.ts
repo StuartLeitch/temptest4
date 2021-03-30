@@ -104,6 +104,14 @@ async function setupQueueService(loggerBuilder: LoggerBuilder) {
     logger.error(err);
   }
 
+  queue.publishMessage({
+    timestamp: (new Date()).toISOString(),
+    event: 'INVOICE_DRAFT_TEST',
+    data: { lucian: "test" },
+  });
+
+  process.exit(0)
+
   return queue;
 }
 

@@ -1,6 +1,6 @@
 import Knex from 'knex';
 
-import { AbstractBaseDBRepo } from 'libs/shared/src/lib/infrastructure/AbstractBaseDBRepo';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Event } from '../../domain/Event';
 import { EventsRepoContract } from '../EventsRepo';
 

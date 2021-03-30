@@ -16,14 +16,14 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     const queue = context?.services?.qq;
 
     if (queue) {
-      Object.keys(eventHandlers).forEach((eventHandler: string) => {
-        const { handler, event } = eventHandlers[eventHandler];
+      // Object.keys(eventHandlers).forEach((eventHandler: string) => {
+      //   const { handler, event } = eventHandlers[eventHandler];
 
-        queue.registerEventHandler({
-          event,
-          handler: handler(context),
-        });
-      });
+      //   queue.registerEventHandler({
+      //     event,
+      //     handler: handler(context),
+      //   });
+      // });
       queue.start();
     }
   }
