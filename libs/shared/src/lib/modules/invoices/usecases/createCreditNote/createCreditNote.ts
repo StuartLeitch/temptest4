@@ -191,7 +191,6 @@ export class CreateCreditNoteUsecase
 
         // This is where all the magic happens
         let draftInvoice = InvoiceMap.toDomain(invoiceProps);
-        const waivers: Waiver[] = [];
         if (items.length) {
           items.forEach(async (invoiceItem) => {
             const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
@@ -204,16 +203,6 @@ export class CreateCreditNoteUsecase
             draftInvoice.addInvoiceItem(draftInvoiceItem);
 
             await this.invoiceItemRepo.save(draftInvoiceItem);
-
-            // * save coupons
-            invoiceItem.assignedCoupons.coupons.forEach(async (c) => {
-              await this.couponRepo.assignCouponToInvoiceItem(
-                c,
-                draftInvoiceItem.invoiceItemId
-              );
-            });
-
-            waivers.push(...invoiceItem.assignedWaivers.waivers);
           });
         }
 
@@ -230,12 +219,6 @@ export class CreateCreditNoteUsecase
           payment: false,
         };
         await this.pausedReminderRepo.save(reminderPause);
-
-        // * save waivers
-        await this.waiverService.applyHighestReductionWaiver(
-          draftInvoice.invoiceId,
-          waivers
-        );
 
         draftInvoice.generateCreatedEvent();
         DomainEvents.dispatchEventsForAggregate(draftInvoice.id);
