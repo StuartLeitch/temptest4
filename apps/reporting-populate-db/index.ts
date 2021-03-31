@@ -11,6 +11,7 @@ import {
   // CounterConsumer,
 } from '../../libs/eve/src';
 // import { LoggerBuilder } from '../../libs/shared/src';
+import {REPORTING_TABLES} from '../../libs/shared/src/lib/modules/reporting/constants';
 import { defaultRegistry } from '../../libs/shared/src/lib/modules/reporting/EventMappingRegistry';
 import { FilterEventsService } from '../../libs/shared/src/lib/modules/reporting/services/FilterEventsService';
 import { SaveEventsUsecase } from '../../libs/shared/src/lib/modules/reporting/usecases/saveEvents/saveEvents';
@@ -21,6 +22,11 @@ const kill = (babalache: unknown): void => {
   console.info(babalache);
   process.exit(0);
 };
+
+const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+const logWithTime = (val) => console.log(new Date().toJSON().substr(11, 12), val);
 
 const { env } = process;
 
@@ -75,41 +81,59 @@ const saveSqsEventsUsecase = new SaveSqsEventsUsecase(
   saveEventsUsecase,
   filterEventsServiceLogger
 );
-const consumer = new UsecasePublishConsumer<any>(saveSqsEventsUsecase); // saveSqsEventsUsecase support both EveEvent and SqsEvent
+
+const mapCount = Object.values(REPORTING_TABLES).reduce((acc, table) => {
+  acc[table] = 0;
+  return acc;
+}, {});
+
+const consumer = new UsecasePublishConsumer<any>(saveSqsEventsUsecase, mapCount); // saveSqsEventsUsecase support both EveEvent and SqsEvent
+consumer.setTotalLimitPerTable(Number(env.TOTAL_EVENTS_PER_TABLE_LIMIT));
+
+let total_limit_break = false;
+if (env.ENABLE_TOTAL_LIMIT === 'true') {
+  total_limit_break = true;
+}
+const isAboveThreshold = (currentValue) => currentValue > env.TOTAL_EVENTS_PER_TABLE_LIMIT;
 
 const main = async () => {
-  // console.info(producer);
+  logWithTime('Start');
 
   if (Number(env.WORKER_COUNT) === 1) {
     // for await (const event of producer.produce()) {
     //  await consumer.consume(event);
     // }
   } else {
-    const LIMIT = 100;
+    const LIMIT = Number(env.TOTAL_EVENTS_LIMIT);
     let counter = 0;
     for await (const event of producer.produce()) {
-      console.info('Counter = %d', counter)
-      console.info('Processing %d events', event.length)
 
-      if (counter > LIMIT) {
+      if (total_limit_break && counter > LIMIT) {
         break;
       }
 
-      // // * queue task
-      // tasks.push(consumer.consume(event));
+      if (Object.values(mapCount).every(isAboveThreshold)) {
+        break;
+      }
 
-      // if (tasks.length >= Number(env.WORKER_COUNT)) {
-      //   await Promise.all(tasks);
-      //   tasks = [];
-      // }
+      // * queue task
+      tasks.push(consumer.consume(event));
+
+      if (tasks.length >= Number(env.WORKER_COUNT)) {
+        await Promise.all(tasks);
+        tasks = [];
+      }
 
       counter += event.length;
+
+      logWithTime(mapCount);
     }
 
     // * finish all tasks
     await Promise.all(tasks);
   }
 
+  logWithTime('Start');
   process.exit(0);
 };
 

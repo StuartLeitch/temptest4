@@ -39,15 +39,21 @@ export class SaveEventsUsecase
 
   public async execute(
     request: SaveEventsDTO,
-    context?: UsecaseAuthorizationContext
+    context?: UsecaseAuthorizationContext & { totalLimitPerTable: number , mapCount: object}
   ): Promise<SaveEventsResponse> {
+
     try {
       if (request.events.length === 0) {
         console.log('No events to save');
         return right(null);
       }
+
+      // console.info(context);
+      const { mapCount, totalLimitPerTable } = context;
+
       await Promise.all(
         this.policyRegistry.mapEvents(request.events).map((mapping) => {
+
           const persistenceEvents = mapping.events.map((raw) => {
             return EventMap.toDomain({
               id: raw.id,
@@ -56,7 +62,12 @@ export class SaveEventsUsecase
               payload: JSON.stringify(raw.data),
             });
           });
-          return this.eventsRepo.upsertEvents(mapping.table, persistenceEvents);
+
+          if (mapCount[mapping.table] < totalLimitPerTable) {
+            mapCount[mapping.table] += persistenceEvents.length;
+            return [];
+            // return this.eventsRepo.upsertEvents(mapping.table, persistenceEvents);
+          }
         })
       );
     } catch (error) {

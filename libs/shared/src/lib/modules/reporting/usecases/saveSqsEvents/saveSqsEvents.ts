@@ -22,11 +22,11 @@ export class SaveSqsEventsUsecase
     UseCase<
       SaveSqsEventsDTO,
       SaveSqsEventsResponse,
-      UsecaseAuthorizationContext
+      UsecaseAuthorizationContext & { totalLimitPerTable: number }
     >,
     AccessControlledUsecase<
       SaveSqsEventsDTO,
-      UsecaseAuthorizationContext,
+      UsecaseAuthorizationContext & { totalLimitPerTable: number },
       AccessControlContext
     > {
   authorizationContext: UsecaseAuthorizationContext;
@@ -41,7 +41,7 @@ export class SaveSqsEventsUsecase
 
   public async execute(
     request: SaveSqsEventsDTO,
-    context?: UsecaseAuthorizationContext
+    context?: UsecaseAuthorizationContext & { totalLimitPerTable: number, mapCount: object }
   ): Promise<SaveSqsEventsResponse> {
     const start = new Date();
     try {
@@ -51,7 +51,7 @@ export class SaveSqsEventsUsecase
 
       await this.saveEventsUsecase.execute({
         events: filteredEvents,
-      });
+      }, context);
       this.logger.info(
         `Saving ${filteredEvents.length} events took ${
           (new Date().getTime() - start.getTime()) / 1000
