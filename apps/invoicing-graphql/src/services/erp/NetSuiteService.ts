@@ -887,6 +887,12 @@ export class NetSuiteService implements ErpServiceContract {
         data: {},
       } as AxiosRequestConfig);
 
+      this.logger.debug(
+        `While checking if invoice exists in Netsuite, we got response: ${JSON.stringify(
+          checker
+        )}`
+      );
+
       return checker?.data.count > 0;
     } catch (err) {
       this.logger.error({
