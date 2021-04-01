@@ -898,6 +898,7 @@ export class NetSuiteService implements ErpServiceContract {
       this.logger.error({
         message: `Error checking if invoice is already registered in NetSuite.`,
         response: err?.response?.data['o:errorDetails'],
+        error: err,
       });
     }
   }
