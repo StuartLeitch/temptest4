@@ -889,12 +889,13 @@ export class NetSuiteService implements ErpServiceContract {
         data: {},
       } as AxiosRequestConfig);
       console.log('call finished');
+      console.log(checker);
 
-      this.logger.debug(
-        `While checking if invoice exists in Netsuite, we got response: ${JSON.stringify(
-          checker
-        )}`
-      );
+      // this.logger.debug(
+      //   `While checking if invoice exists in Netsuite, we got response: ${JSON.stringify(
+      //     checker
+      //   )}`
+      // );
 
       return checker?.data.count > 0;
     } catch (err) {
