@@ -878,26 +878,20 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     try {
-      console.log('preparing for call');
       const headers = oauth.toHeader(
         oauth.authorize(invoiceExistsRequestOpts, token)
       );
-      console.log('headers created');
       const checker = await axios({
         ...invoiceExistsRequestOpts,
         headers,
         data: {},
       } as AxiosRequestConfig);
-      console.log('call finished');
-      console.log(checker);
 
-      // this.logger.debug(
-      //   `While checking if invoice exists in Netsuite, we got response: ${JSON.stringify(
-      //     checker
-      //   )}`
-      // );
-
-      return checker?.data.count > 0;
+      const invoiceExists = checker?.data?.links?.length > 0;
+      this.logger.debug(
+        `Credit Note sanity check if invoice exists result is ${invoiceExists}`
+      );
+      return invoiceExists;
     } catch (err) {
       this.logger.error({
         message: `Error checking if invoice is already registered in NetSuite.`,
