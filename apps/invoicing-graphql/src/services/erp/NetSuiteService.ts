@@ -14,7 +14,6 @@ import {
   Invoice,
   Payment,
   Payer,
-  RemoveEditorsFromJournalUsecase,
 } from '@hindawi/shared';
 
 import {
@@ -26,10 +25,10 @@ import {
   ErpRevRecRequest,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
-// import { NetSuiteHttpApi } from './netsuite/HttpApi';
-import { CustomerPayload, CustomerPaymentPayload } from './netsuite/typings';
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
+import { CustomerPayload } from './netsuite/typings';
 import { Connection } from './netsuite/Connection';
+
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
@@ -879,13 +878,17 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     try {
+      console.log('preparing for call');
+      const headers = oauth.toHeader(
+        oauth.authorize(invoiceExistsRequestOpts, token)
+      );
+      console.log('headers created');
       const checker = await axios({
         ...invoiceExistsRequestOpts,
-        headers: oauth.toHeader(
-          oauth.authorize(invoiceExistsRequestOpts, token)
-        ),
+        headers,
         data: {},
       } as AxiosRequestConfig);
+      console.log('call finished');
 
       this.logger.debug(
         `While checking if invoice exists in Netsuite, we got response: ${JSON.stringify(
