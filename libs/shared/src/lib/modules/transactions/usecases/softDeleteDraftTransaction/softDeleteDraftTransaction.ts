@@ -12,7 +12,7 @@ import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
 import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
-import { Transaction } from '../../domain/Transaction';
+import { Transaction, TransactionStatus } from '../../domain/Transaction';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
 import { Manuscript } from './../../../manuscripts/domain/Manuscript';
 import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
@@ -108,6 +108,10 @@ export class SoftDeleteDraftTransactionUsecase
       }
 
       // This is where all the magic happens!
+
+      if (transaction.status === TransactionStatus.ACTIVE) {
+        return right(null);
+      }
 
       // * System soft deletes transaction
       await this.transactionRepo.delete(transaction);
