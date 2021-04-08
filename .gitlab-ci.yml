@@ -55,7 +55,6 @@ Install Dependencies:
       command: ["dockerd-entrypoint.sh"]
   image: docker:19.03.12
   script:
-    - echo $BUILD_IMAGE
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - ./tools/scripts/dockerize-builder.sh
 
