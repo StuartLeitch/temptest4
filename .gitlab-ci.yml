@@ -49,13 +49,14 @@ Install Dependencies:
     - echo $BUILD_IMAGE
     - echo $AWS_REGION
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
-    - apk add 'py3-botocore<2.0.0'
+    # - apk add 'py3-botocore<2.0.0'
   services:
     - name: docker:19.03.12-dind
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
   image: docker:dind
   script:
+    - which aws
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - ./tools/scripts/dockerize-builder.sh
 
