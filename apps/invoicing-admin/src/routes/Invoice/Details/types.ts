@@ -32,20 +32,27 @@ export interface CreditNote {
   creationReason?: string;
 }
 
+export interface ERPReferences {
+  entityId: string;
+  type: string;
+  vendor: string;
+  attribute: string;
+  value: string;
+}
 export interface Invoice {
   cancelledInvoiceReference: string | null;
   creditNote: CreditNote | null;
   dateCreated: string;
   dateIssued: string;
   dateMovedToFinal: string | null;
-  erpReference: string | null;
+  erpReferences: ERPReferences[];
   id: string;
   invoiceId: string;
   invoiceItem: InvoiceItem | null;
   payer: Payer | null;
   payments: Payment[] | null;
   referenceNumber: string | null;
-  revenueRecognitionReference: string | null;
+  // revenueRecognitionReference: string | null;
   status: 'DRAFT' | 'ACTIVE' | 'FINAL' | 'PENDING' | null;
 }
 
