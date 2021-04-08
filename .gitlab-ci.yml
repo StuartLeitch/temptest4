@@ -47,6 +47,7 @@ Install Dependencies:
   stage: setup
   before_script:
     - apk add --no-cache py3-pip
+    - pip3 install awscli 
     - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
     # - apk add 'py3-botocore<2.0.0'
   services:
