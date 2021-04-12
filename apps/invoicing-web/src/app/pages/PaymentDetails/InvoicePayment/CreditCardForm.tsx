@@ -36,7 +36,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   };
 
   onError(error: any) {
-    this.setState({ error, loading: false });
+    this.setState({ error });
   }
 
   getToken() {

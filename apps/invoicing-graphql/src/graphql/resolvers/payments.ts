@@ -10,7 +10,6 @@ import {
   CorrelationID,
   Roles,
 } from '@hindawi/shared';
-import { info } from 'winston';
 
 import { ExternalOrderId } from '../../../../../libs/shared/src/lib/modules/payments/domain/external-order-id';
 import { Context } from '../../builders';
@@ -99,12 +98,8 @@ export const payments: Resolvers<Context> = {
       );
 
       if (result.isLeft()) {
-        console.log(result.value.message);
+        console.error(result.value.message);
         throw new Error(result.value.message);
-        // return {
-        //   invoiceId,
-        //   id: null
-        // };
       }
 
       const confirmedPayment = result.value;

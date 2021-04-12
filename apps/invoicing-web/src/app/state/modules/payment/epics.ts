@@ -3,11 +3,8 @@ import {
   catchError,
   switchMap,
   mergeMap,
-  take,
   filter,
   map,
-  tap,
-  takeUntil
 } from "rxjs/operators";
 import { isActionOf, RootEpic } from "typesafe-actions";
 import { ajax } from "rxjs/ajax";

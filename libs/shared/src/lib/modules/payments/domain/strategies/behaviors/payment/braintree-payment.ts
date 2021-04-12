@@ -30,16 +30,6 @@ export class BraintreePayment extends PaymentBehavior {
       paymentTotal: request.invoiceTotal,
     };
 
-    // return new AsyncEither(transactionData)
-    //   .then(data => {
-    //   return this.braintreeService.createTransaction(data);
-    // })
-    //   .map((foreignPaymentId) => ({
-    //     status: PaymentStatus.COMPLETED,
-    //     foreignPaymentId,
-    //   }))
-    //   .execute();
-
     let result = await this.braintreeService.createTransaction(transactionData);
 
     if (result.isLeft()) {
@@ -53,13 +43,5 @@ export class BraintreePayment extends PaymentBehavior {
       status: PaymentStatus.COMPLETED,
       foreignPaymentId: result.value
     });
-
-
-    // if (result.success) {
-    //   return right({
-    //     status: PaymentStatus.COMPLETED,
-    //     foreignPaymentId
-    // });
-
   }
 }
