@@ -54,39 +54,16 @@ const creditCardPaymentEpic: RootEpic = (
   state$,
   { graphqlAdapter },
 ) => action$.pipe(
-    // tap(ev => console.info(ev)),
-    // filter(isActionOf(recordCardPayment.request)),
-    // switchMap((action) => {
-    //   const {
-    //     invoiceId,
-    //     payerId,
-    //     paymentMethodId,
-    //     paymentMethodNonce,
-    //     amount,
-    //   } = action.payload;
-
-    //   return graphqlAdapter.send(mutations.creditCardPayment, {
-    //     invoiceId,
-    //     payerId,
-    //     paymentMethodId,
-    //     paymentMethodNonce,
-    //     amount,
-    //   });
-    // }),
-    // withLatestFrom(state$.pipe(map(invoice))),
-    // mergeMap(([r, invoice]) => {
-    //   return from([
-    //     recordCardPayment.success(r.data.creditCardPayment),
-    //     getInvoice.request(invoice.invoiceId),
-    //   ]);
-    // }),
-    // // takeUntil(action$.pipe(filter(isActionOf(recordCardPayment.failure)))),
-    // // take(1),
-    // catchError((err) => of(recordCardPayment.failure(err.message))),
     filter(isActionOf(recordCardPayment.request)),
     switchMap((action) =>
       from(graphqlAdapter.send(mutations.creditCardPayment, action.payload)).pipe(
-        map(recordCardPayment.success),
+        withLatestFrom(state$.pipe(map(invoice))),
+        mergeMap(([r, invoice]) => {
+          return from([
+            recordCardPayment.success(r.data.creditCardPayment),
+            getInvoice.request(invoice.invoiceId),
+          ]);
+        }),
         catchError(err => {
           return of(recordCardPayment.failure(err.message));
         })
@@ -103,10 +80,7 @@ const recordPayPalPaymentEpic: RootEpic = (
     filter(isActionOf(recordPayPalPayment.request)),
     switchMap((action) => {
       const { invoiceId, orderId } = action.payload;
-      return graphqlAdapter.send(mutations.recordPayPalPayment, {
-        invoiceId,
-        orderId,
-      });
+      return graphqlAdapter.send(mutations.recordPayPalPayment, action.payload);
     }),
     withLatestFrom(state$.pipe(map(invoice))),
     mergeMap(([r, invoice]) => {
