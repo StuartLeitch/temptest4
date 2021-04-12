@@ -44,6 +44,7 @@ export interface WithPayment {
 }
 
 export interface UpdatePayment extends WithPayment {
+  paymentDetails: PaymentDetails;
   isFinalPayment: boolean;
 }
 
