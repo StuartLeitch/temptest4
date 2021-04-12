@@ -3,8 +3,11 @@ import {
   catchError,
   switchMap,
   mergeMap,
+  take,
   filter,
   map,
+  tap,
+  takeUntil
 } from "rxjs/operators";
 import { isActionOf, RootEpic } from "typesafe-actions";
 import { ajax } from "rxjs/ajax";
@@ -50,36 +53,46 @@ const creditCardPaymentEpic: RootEpic = (
   action$,
   state$,
   { graphqlAdapter },
-) => {
-  return action$.pipe(
-    filter(isActionOf(recordCardPayment.request)),
-    switchMap((action) => {
-      const {
-        paymentMethodId,
-        invoiceId,
-        payerId,
-        paymentMethodNonce,
-        amount,
-      } = action.payload;
+) => action$.pipe(
+    // tap(ev => console.info(ev)),
+    // filter(isActionOf(recordCardPayment.request)),
+    // switchMap((action) => {
+    //   const {
+    //     invoiceId,
+    //     payerId,
+    //     paymentMethodId,
+    //     paymentMethodNonce,
+    //     amount,
+    //   } = action.payload;
 
-      return graphqlAdapter.send(mutations.creditCardPayment, {
-        invoiceId,
-        payerId,
-        paymentMethodId,
-        paymentMethodNonce,
-        amount,
-      });
-    }),
-    withLatestFrom(state$.pipe(map(invoice))),
-    mergeMap(([r, invoice]) => {
-      return from([
-        recordCardPayment.success(r.data.creditCardPayment),
-        getInvoice.request(invoice.invoiceId),
-      ]);
-    }),
-    catchError((err) => of(recordCardPayment.failure(err.message))),
+    //   return graphqlAdapter.send(mutations.creditCardPayment, {
+    //     invoiceId,
+    //     payerId,
+    //     paymentMethodId,
+    //     paymentMethodNonce,
+    //     amount,
+    //   });
+    // }),
+    // withLatestFrom(state$.pipe(map(invoice))),
+    // mergeMap(([r, invoice]) => {
+    //   return from([
+    //     recordCardPayment.success(r.data.creditCardPayment),
+    //     getInvoice.request(invoice.invoiceId),
+    //   ]);
+    // }),
+    // // takeUntil(action$.pipe(filter(isActionOf(recordCardPayment.failure)))),
+    // // take(1),
+    // catchError((err) => of(recordCardPayment.failure(err.message))),
+    filter(isActionOf(recordCardPayment.request)),
+    switchMap((action) =>
+      from(graphqlAdapter.send(mutations.creditCardPayment, action.payload)).pipe(
+        map(recordCardPayment.success),
+        catchError(err => {
+          return of(recordCardPayment.failure(err.message));
+        })
+      )
+    )
   );
-};
 
 const recordPayPalPaymentEpic: RootEpic = (
   action$,

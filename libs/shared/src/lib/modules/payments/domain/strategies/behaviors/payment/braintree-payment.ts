@@ -1,6 +1,6 @@
 import { StrategyError } from '../../../../../../core/logic/strategy-error';
 import { AsyncEither } from '../../../../../../core/logic/AsyncEither';
-import { Either } from '../../../../../../core/logic/Either';
+import { Either, right, left } from '../../../../../../core/logic/Either';
 
 import {
   BraintreeTransactionRequest,
@@ -30,12 +30,36 @@ export class BraintreePayment extends PaymentBehavior {
       paymentTotal: request.invoiceTotal,
     };
 
-    return new AsyncEither(transactionData)
-      .then((data) => this.braintreeService.createTransaction(data))
-      .map((foreignPaymentId) => ({
-        status: PaymentStatus.COMPLETED,
-        foreignPaymentId,
-      }))
-      .execute();
+    // return new AsyncEither(transactionData)
+    //   .then(data => {
+    //   return this.braintreeService.createTransaction(data);
+    // })
+    //   .map((foreignPaymentId) => ({
+    //     status: PaymentStatus.COMPLETED,
+    //     foreignPaymentId,
+    //   }))
+    //   .execute();
+
+    let result = await this.braintreeService.createTransaction(transactionData);
+
+    if (result.isLeft()) {
+      return left({
+        message: result.value.message,
+        behavior: result.value.originatingService
+      });
+    }
+
+    return right({
+      status: PaymentStatus.COMPLETED,
+      foreignPaymentId: result.value
+    });
+
+
+    // if (result.success) {
+    //   return right({
+    //     status: PaymentStatus.COMPLETED,
+    //     foreignPaymentId
+    // });
+
   }
 }

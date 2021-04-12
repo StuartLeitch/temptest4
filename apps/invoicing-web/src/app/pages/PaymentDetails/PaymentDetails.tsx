@@ -123,10 +123,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
     getClientToken();
   }, [invoiceId, getInvoice, getPaymentMethods, getClientToken]);
 
-  const payByCard = useCallback(
-    (values) => payWithCard({ invoiceId, ...values }),
-    [invoiceId, payWithCard],
-  );
+  const payByCard = (values: any) => payWithCard.call(null, { invoiceId, ...values });
 
   const paymentContent = () => {
     const invoiceTransactionIsNotDraft = invoice.transaction.status !== "DRAFT";

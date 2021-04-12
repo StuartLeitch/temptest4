@@ -195,7 +195,7 @@ export type CreditCardInput = {
 
 export type Payment = {
   __typename?: 'Payment';
-  id: Scalars['String'];
+  id?: Maybe<Scalars['String']>;
   status?: Maybe<PaymentStatus>;
   invoiceId?: Maybe<Scalars['String']>;
   payerId?: Maybe<Scalars['String']>;
@@ -889,7 +889,7 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type PaymentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['PaymentStatus']>, ParentType, ContextType>;
   invoiceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   payerId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
