@@ -44,10 +44,10 @@ import {
   WithPaymentMethodId,
   WithPaymentDetails,
   SelectionData,
+  UpdatePayment,
   WithInvoiceId,
   PaymentData,
   WithInvoice,
-  WithPayment,
 } from './helper-types';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
@@ -256,11 +256,14 @@ export class RecordPaymentUsecase
     };
   }
 
-  private async updatePayment<T extends WithPayment>(
+  private async updatePayment<T extends UpdatePayment>(
     request: T
   ): Promise<Either<Errors.PaymentUpdateDbError, Payment>> {
     try {
       const updated = await this.paymentRepo.updatePayment(request.payment);
+      if (updated.status === PaymentStatus.COMPLETED) {
+        updated.addCompletedEvent(request.isFinalPayment);
+      }
       return right(updated);
     } catch (err) {
       return left(
