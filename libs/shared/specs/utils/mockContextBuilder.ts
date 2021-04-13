@@ -25,6 +25,7 @@ import {
   PaymentStrategyFactory,
   PayPalCaptureMoney,
   PayPalPayment,
+  MockPayPalService,
 } from '../../src';
 
 export interface MockRepos {
@@ -56,7 +57,7 @@ export interface MockContext {
 }
 
 export function buildMockServices(repos: MockRepos): MockServices {
-  const paypalService = sinon.spy();
+  const paypalService = new MockPayPalService();
   const braintreeService = sinon.spy();
 
   const braintreeClientToken = new BraintreeClientToken(braintreeService);

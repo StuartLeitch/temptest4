@@ -1,19 +1,16 @@
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import {
   buildMockContext,
   MockContext,
 } from '../../../../../../specs/utils/mockContextBuilder';
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
-import { RecordPaymentUsecase } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPayment';
-import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
-import { RecordPaymentDTO } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentDTO';
 
+import { DomainEvents } from '../../../../../../src/lib/core/domain/events/DomainEvents';
 import {
   UsecaseAuthorizationContext,
   Roles,
 } from '../../../../../../src/lib/domain/authorization';
-import { DomainEvents } from '../../../../../../src/lib/core/domain/events/DomainEvents';
 
 import {
   AfterPaymentCompleted,
@@ -26,17 +23,23 @@ import {
   PayerMap,
 } from '../../../../../../src';
 
-let usecase: RecordPaymentUsecase;
-let context: MockContext;
-let response: RecordPaymentResponse;
-let request: RecordPaymentDTO;
+import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
+import { RecordPaymentUsecase } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPayment';
+import { RecordPaymentDTO } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentDTO';
+
 const authContext: UsecaseAuthorizationContext = {
   roles: [Roles.PAYER],
 };
+
 let subscription: AfterPaymentCompleted;
+let response: RecordPaymentResponse;
+let usecase: RecordPaymentUsecase;
+let request: RecordPaymentDTO;
+let testPaymentId: string;
+let context: MockContext;
+
 const testInvoiceId = 'test-invoice';
 const testManuscriptCustomId = '88888';
-let testPaymentId;
 
 Before(async function () {
   context = buildMockContext();
@@ -100,7 +103,7 @@ After(function () {
   DomainEvents.clearMarkedAggregates();
 });
 
-Given(
+When(
   /^1 "([\w-]+)" Bank Transfer payment with the amount (\d+) is applied$/,
   async function (paymentType: string, amount: number) {
     let isFinalPayment = false;
@@ -115,6 +118,30 @@ Given(
       amount,
       isFinalPayment,
       paymentReference: '123',
+      datePaid: '2021-02-12',
+    };
+
+    await context.repos.paymentMethod.save(
+      PaymentMethodMap.toDomain({
+        id: testPaymentId,
+        name: testPaymentId,
+        isActive: true,
+      })
+    );
+    response = await usecase.execute(request, authContext);
+  }
+);
+
+When(
+  /^1 PayPal payment with the amount (\d+) is applied$/,
+  async function (amount: number) {
+    let isFinalPayment = true;
+
+    testPaymentId = 'Paypal';
+    request = {
+      invoiceId: testInvoiceId,
+      amount,
+      isFinalPayment,
       datePaid: '2021-02-12',
     };
 
@@ -154,9 +181,17 @@ Then(/^The payments are of type "Bank Transfer"$/, async () => {
 });
 
 Then(/^The paid invoice has the status "([\w-]+)"$/, async (status: string) => {
+  console.log(response);
   expect(response.isRight()).to.eq(true);
   const invoice = await context.repos.invoice.getInvoiceById(
     InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
   );
   expect(invoice.status).to.equal(status);
+});
+
+Then(/^The payment is in status "([\w-]+)"$/, async (status: string) => {
+  expect(response.isRight()).to.eq(true);
+  if (response.isRight()) {
+    expect(response.value.status).to.equal(status);
+  }
 });
