@@ -71,13 +71,21 @@ export const invoice: Resolvers<Context> = {
           { invoiceId: invoiceDetails.cancelledInvoiceReference },
           usecaseContext
         );
+
         if (result.isLeft()) {
           return undefined;
         }
         const invoice = result.value.getValue();
         assocInvoice = InvoiceMap.toPersistence(invoice);
       }
+      const payments = await repos.payment.getPaymentsByInvoiceId(
+        invoiceDetails.invoiceId
+      );
+      const paymentsIds = payments.map((p) => p.id);
 
+      const erpPaymentReferences = await repos.erpReference.getErpReferenceById(
+        paymentsIds
+      );
       return {
         invoiceId: invoiceDetails.id.toString(),
         status: invoiceDetails.status,
@@ -85,7 +93,10 @@ export const invoice: Resolvers<Context> = {
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
-        erpReferences: invoiceDetails.getErpReferences().getItems(),
+        erpReferences: invoiceDetails
+          .getErpReferences()
+          .getItems()
+          .concat(erpPaymentReferences),
         cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber: assocInvoice
@@ -347,7 +358,7 @@ export const invoice: Resolvers<Context> = {
     },
     async payment(parent: Invoice, args, context) {
       const {
-        repos: { payment: paymentRepo },
+        repos: { payment: paymentRepo, erpReference: erpReferenceRepo },
       } = context;
       const invoiceId = InvoiceId.create(
         new UniqueEntityID(parent.invoiceId)
@@ -377,7 +388,7 @@ export const invoice: Resolvers<Context> = {
     },
     async creditNote(parent: Invoice, args, context) {
       const {
-        repos: { invoice: invoiceRepo },
+        repos: { invoice: invoiceRepo, erpReference: erpReferenceRepo },
       } = context;
       const usecase = new GetCreditNoteByInvoiceIdUsecase(invoiceRepo);
       const getAssocInvoice = new GetInvoiceDetailsUsecase(invoiceRepo);
@@ -399,6 +410,10 @@ export const invoice: Resolvers<Context> = {
       // There is a TSLint error for when try to use a shadowed variable!
       const creditNoteDetails = result.value.getValue();
 
+      let erpRef = await erpReferenceRepo.getErpReferencesByInvoiceId(
+        creditNoteDetails.invoiceId
+      );
+
       const assocInvoiceResponse = await getAssocInvoice.execute(
         { invoiceId: creditNoteDetails.cancelledInvoiceReference },
         usecaseContext
@@ -415,6 +430,7 @@ export const invoice: Resolvers<Context> = {
         status: creditNoteDetails.status,
         charge: creditNoteDetails.charge,
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
+        erpReferences: erpRef.getItems(),
         creationReason: creditNoteDetails.creationReason,
         dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
         referenceNumber: assocInvoice.persistentReferenceNumber

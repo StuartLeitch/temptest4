@@ -9,6 +9,7 @@ import { ErpReference } from '../../domain/ErpReference';
 import { ErpReferenceRepoContract } from '../ErpReferenceRepo';
 import { InvoiceErpReferences } from './../../../invoices/domain/InvoiceErpReferences';
 import { ErpReferenceMap } from './../../mapper/ErpReference';
+import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class KnexErpReferenceRepo
   extends AbstractBaseDBRepo<Knex, ErpReference>
@@ -42,6 +43,28 @@ export class KnexErpReferenceRepo
     return InvoiceErpReferences.create(
       erpReferences.map((ef) => ErpReferenceMap.toDomain(ef))
     );
+  }
+
+  public async getErpReferenceById(
+    ids: UniqueEntityID[]
+  ): Promise<ErpReference> {
+    const { db, logger } = this;
+    const idList = ids.map((i) => i.toString());
+
+    const sql = db(TABLES.ERP_REFERENCES).select().whereIn('entity_id', idList);
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    let erpReferences;
+    try {
+      erpReferences = await sql;
+      console.log(erpReferences);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+    return erpReferences;
   }
 
   async delete(erpReference: ErpReference): Promise<void> {

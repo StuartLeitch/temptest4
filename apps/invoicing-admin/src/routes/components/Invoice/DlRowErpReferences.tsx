@@ -1,12 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const DlRowErpReferences = (props) => console.log(props) ||( 
+const DlRowErpReferences = (props) => console.log(props) || ( 
     <React.Fragment>
         <dl className='row'>
-            <dt className={`col-sm-1 h5 text-muted ${props.leftSideClassName}`}>Invoice</dt>
-            <dd className={`col-sm-9 ${props.rightSideClassName}`}>
-                <strong className='text-black-50'>{props.erpReference}</strong>
+            <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Invoice</dt>
+            <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
+                {props.erpReferences?.map(e => e.attribute === 'confirmation' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
+            </dd>
+        </dl>
+
+        <dl className='row'>
+            <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Payment</dt>
+            <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
+                {props.erpReferences?.map(e => e.attribute === 'payment' ? <strong className='text-black-50 ml-5'>{e.value}, </strong> : '' )}
+            </dd>
+        </dl>
+
+        <dl className='row'>
+            <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Revenue Recognition</dt>
+            <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
+                {props.erpReferences?.map(e => e.attribute === 'revenueRecognition' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
+            </dd>
+        </dl>
+
+        <dl className='row'>
+            <dt className={` col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Credit Note</dt>
+            <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
+                {props.creditNote?.erpReferences?.map(e => e.attribute === 'creditNote' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
+            </dd>
+        </dl>
+
+        <dl className='row'>
+            <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Revenue Recognition Reversal</dt>
+            <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
+                {props.erpReferences?.map(e => e.attribute === 'revenueRecognitionReversal' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
             </dd>
         </dl>
     </React.Fragment>

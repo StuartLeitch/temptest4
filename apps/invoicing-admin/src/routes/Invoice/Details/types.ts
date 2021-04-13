@@ -30,6 +30,7 @@ export interface CreditNote {
   invoiceId: string;
   referenceNumber: string;
   creationReason?: string;
+  erpReferences: ERPReferences[];
 }
 
 export interface ERPReferences {

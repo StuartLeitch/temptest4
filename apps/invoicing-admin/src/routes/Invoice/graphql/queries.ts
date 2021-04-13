@@ -120,6 +120,9 @@ export const INVOICE_QUERY = `
     cancelledInvoiceReference
     referenceNumber
     creationReason
+    erpReferences {
+     ...erpReferenceFragment
+    }
   }
   fragment transactionFragment on Transaction {
     id
