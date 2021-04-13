@@ -113,26 +113,6 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
               <Input plaintext readOnly value={invoice.referenceNumber} />
             </Col>
           </FormGroup>
-          <FormGroup row>
-            <Label for='staticText' sm={5}>
-              ERP Reference
-            </Label>
-            <Col sm={7}>
-              <Input plaintext readOnly value={invoice.erpReference} />
-            </Col>
-          </FormGroup>
-          <FormGroup row>
-            <Label for='staticText' sm={5}>
-              Rev. Rec. ERP Ref.
-            </Label>
-            <Col sm={7}>
-              <Input
-                plaintext
-                readOnly
-                value={invoice.revenueRecognitionReference}
-              />
-            </Col>
-          </FormGroup>
         </div>
       </Form>
     </>

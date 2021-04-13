@@ -6,35 +6,35 @@ const DlRowErpReferences = (props) => (
         <dl className='row'>
             <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Invoice</dt>
             <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
-                {props.erpReferences?.map(e => e.attribute === 'confirmation' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
+                {props.erpReferences?.map(e => e.attribute === 'confirmation' ? <strong key='invoice' className='text-black-50 ml-5'>{e.value}</strong> : '' )}
             </dd>
         </dl>
 
         <dl className='row'>
             <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Payment</dt>
             <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
-                {props.erpReferences?.map(e => e.attribute === 'payment' ? <strong className='text-black-50 ml-5'>{e.value}, </strong> : '' )}
+                {props.erpReferences?.map(e => e.attribute === 'payment' ? <strong key='payment' className='text-black-50 ml-5'>{e.value}, </strong> : '' )}
             </dd>
         </dl>
 
         <dl className='row'>
             <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Revenue Recognition</dt>
             <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
-                {props.erpReferences?.map(e => e.attribute === 'revenueRecognition' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
+                {props.erpReferences?.map(e => e.attribute === 'revenueRecognition' ? <strong key='revenue-recognition' className='text-black-50 ml-5'>{e.value}</strong> : '' )}
             </dd>
         </dl>
 
         <dl className='row'>
             <dt className={` col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Credit Note</dt>
             <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
-                {props.creditNote?.erpReferences?.map(e => e.attribute === 'creditNote' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
+                {props.creditNote?.erpReferences?.map(e => e.attribute === 'creditNote' ? <strong key='credit-note' className='text-black-50 ml-5'>{e.value}</strong> : '' )}
             </dd>
         </dl>
 
         <dl className='row'>
             <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Revenue Recognition Reversal</dt>
             <dd className={`col-sm-3 ml-5 ${props.rightSideClassName}`}>
-                {props.erpReferences?.map(e => e.attribute === 'revenueRecognitionReversal' ? <strong className='text-black-50 ml-5'>{e.value}</strong> : '' )}
+                {props.erpReferences?.map(e => e.attribute === 'revenueRecognitionReversal' ? <strong key='rev-rec-reversal' className='text-black-50 ml-5'>{e.value}</strong> : '' )}
             </dd>
         </dl>
     </React.Fragment>
