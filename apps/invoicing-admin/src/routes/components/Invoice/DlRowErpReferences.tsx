@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const DlRowErpReferences = (props) => console.log(props) || ( 
+const DlRowErpReferences = (props) => ( 
     <React.Fragment>
         <dl className='row'>
             <dt className={`col-sm-4 mr-5 h5 text-muted ${props.leftSideClassName}`}>Invoice</dt>
