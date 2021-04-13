@@ -9,7 +9,7 @@ import { ErpReference } from '../../domain/ErpReference';
 import { ErpReferenceRepoContract } from '../ErpReferenceRepo';
 import { InvoiceErpReferences } from './../../../invoices/domain/InvoiceErpReferences';
 import { ErpReferenceMap } from './../../mapper/ErpReference';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 export class KnexErpReferenceRepo
   extends AbstractBaseDBRepo<Knex, ErpReference>
