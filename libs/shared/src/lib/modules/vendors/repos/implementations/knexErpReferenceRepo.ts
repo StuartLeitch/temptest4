@@ -60,7 +60,6 @@ export class KnexErpReferenceRepo
     let erpReferences;
     try {
       erpReferences = await sql;
-      console.log(erpReferences);
     } catch (e) {
       throw new Error(e.message);
     }
