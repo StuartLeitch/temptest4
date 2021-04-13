@@ -210,13 +210,13 @@ Then(/^The payment is in status "([\w-]+)"$/, async (status: string) => {
 });
 
 Given(
-  /^There is a PayPal payment with the amount (\d+) with status "([\w-]+)" and order id "([\w-]+)"$/,
-  async (amount: number, status: string, orderId: string) => {
+  /^There is a "([\w- ]+)" payment with the amount (\d+) with status "([\w-]+)" and order id "([\w-]+)"$/,
+  async (method: string, amount: number, status: string, orderId: string) => {
     const payment = PaymentMap.toDomain({
       payerId: testPayerId,
       invoiceId: testInvoiceId,
       amount: amount,
-      paymentMethodId: 'Paypal',
+      paymentMethodId: method,
       foreignPaymentId: orderId,
       datePaid: '2021-02-01',
       status: status,
