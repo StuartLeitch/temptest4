@@ -1,4 +1,4 @@
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
+import { Before, After, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import {
@@ -21,6 +21,7 @@ import {
   InvoiceMap,
   InvoiceId,
   PayerMap,
+  PaymentMap,
 } from '../../../../../../src';
 
 import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
@@ -38,8 +39,9 @@ let request: RecordPaymentDTO;
 let testPaymentId: string;
 let context: MockContext;
 
-const testInvoiceId = 'test-invoice';
 const testManuscriptCustomId = '88888';
+const testInvoiceId = 'test-invoice';
+const testPayerId = 'test-payer';
 
 Before(async function () {
   context = buildMockContext();
@@ -86,6 +88,7 @@ Before(async function () {
   const payer = PayerMap.toDomain({
     invoiceId: testInvoiceId,
     name: 'Belzebut',
+    id: testPayerId,
   });
   await context.repos.invoice.save(invoice);
   await context.repos.invoiceItem.save(invoiceItem);
@@ -132,29 +135,40 @@ When(
   }
 );
 
-When(
-  /^1 PayPal payment with the amount (\d+) is applied$/,
-  async function (amount: number) {
-    let isFinalPayment = true;
+When(/^1 PayPal payment is applied$/, async function () {
+  testPaymentId = 'Paypal';
+  request = {
+    invoiceId: testInvoiceId,
+    datePaid: '2021-02-12',
+  };
 
-    testPaymentId = 'Paypal';
-    request = {
-      invoiceId: testInvoiceId,
-      amount,
-      isFinalPayment,
-      datePaid: '2021-02-12',
-    };
+  await context.repos.paymentMethod.save(
+    PaymentMethodMap.toDomain({
+      id: testPaymentId,
+      name: testPaymentId,
+      isActive: true,
+    })
+  );
+  response = await usecase.execute(request, authContext);
+});
 
-    await context.repos.paymentMethod.save(
-      PaymentMethodMap.toDomain({
-        id: testPaymentId,
-        name: testPaymentId,
-        isActive: true,
-      })
-    );
-    response = await usecase.execute(request, authContext);
-  }
-);
+When(/^1 Credit Card payment is applied$/, async function () {
+  testPaymentId = 'Credit Card';
+  request = {
+    invoiceId: testInvoiceId,
+    payerIdentification: 'test-credit-card',
+    datePaid: '2021-02-12',
+  };
+
+  await context.repos.paymentMethod.save(
+    PaymentMethodMap.toDomain({
+      id: testPaymentId,
+      name: testPaymentId,
+      isActive: true,
+    })
+  );
+  response = await usecase.execute(request, authContext);
+});
 
 Then(/^The payment amount is (\d+)$/, async (amount: number) => {
   expect(response.isRight()).to.eq(true);
@@ -181,7 +195,6 @@ Then(/^The payments are of type "Bank Transfer"$/, async () => {
 });
 
 Then(/^The paid invoice has the status "([\w-]+)"$/, async (status: string) => {
-  console.log(response);
   expect(response.isRight()).to.eq(true);
   const invoice = await context.repos.invoice.getInvoiceById(
     InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
@@ -194,4 +207,37 @@ Then(/^The payment is in status "([\w-]+)"$/, async (status: string) => {
   if (response.isRight()) {
     expect(response.value.status).to.equal(status);
   }
+});
+
+Given(
+  /^There is a PayPal payment with the amount (\d+) with status "([\w-]+)" and order id "([\w-]+)"$/,
+  async (amount: number, status: string, orderId: string) => {
+    const payment = PaymentMap.toDomain({
+      payerId: testPayerId,
+      invoiceId: testInvoiceId,
+      amount: amount,
+      paymentMethodId: 'Paypal',
+      foreignPaymentId: orderId,
+      datePaid: '2021-02-01',
+      status: status,
+    });
+
+    await context.repos.payment.save(payment);
+  }
+);
+
+Then(
+  /^There is only one payment with the payment proof not equal to "([\w-]+)"$/,
+  async (orderId) => {
+    const payments = await context.repos.payment.getPaymentsByInvoiceId(
+      InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+    );
+
+    expect(payments.length).to.equal(1);
+    expect(payments[0].foreignPaymentId).to.not.equal(orderId);
+  }
+);
+
+Then(/^The payment recording fails$/, () => {
+  expect(response.isLeft()).to.equal(true);
 });

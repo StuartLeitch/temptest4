@@ -22,6 +22,23 @@ Feature: Payment tests
         Then The paid invoice has the status "FINAL"
 
     Scenario: First PayPal payment
-        When 1 PayPal payment with the amount 1000 is applied
+        When 1 PayPal payment is applied
         Then The paid invoice has the status "ACTIVE"
         And The payment is in status "CREATED"
+
+    Scenario: PayPal payment after a previous PayPal paymetn with status CREATED
+        Given There is a PayPal payment with the amount 1000 with status "CREATED" and order id "test-2"
+        When 1 PayPal payment is applied
+        Then The paid invoice has the status "ACTIVE"
+        And The payment is in status "CREATED"
+        And There is only one payment with the payment proof not equal to "test-2"
+
+    # will be uncommented after we add checks to prevent multiple payments after the invoice is FINAL or if a pending payment exists
+    # Scenario: PayPal payment is rejected if a previous PayPal payments is with status PENDING
+    #     Given There is a PayPal payment with the amount 1000 with status "PENDING" and order id "test-2"
+    #     When 1 PayPal payment is applied
+    #     Then The payment recording fails
+
+    Scenario: Full credit card payment
+        When 1 Credit Card payment is applied
+        Then The paid invoice has the status "FINAL"
