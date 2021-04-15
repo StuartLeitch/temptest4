@@ -45,20 +45,10 @@ Install Dependencies:
   interruptible: true
   allow_failure: false
   stage: setup
-  # before_script:
-  #   - apk add --no-cache py3-pip
-  #   - pip3 install awscli 
-  #   - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
-  # services:
-  #   - name: docker:19.03.12-dind
-  #     entrypoint: ["env", "-u", "DOCKER_HOST"]
-  #     command: ["dockerd-entrypoint.sh"]
-  # image: docker:dind
   before_script:
     - apk add --no-cache py3-pip
     - apk add --no-cache aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
     - pip3 install awscli 
-    # - apk add 'py3-botocore<1.20.0'
   services:
     - name: docker:19.03.12-dind
       entrypoint: ["env", "-u", "DOCKER_HOST"]
