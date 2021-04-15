@@ -47,13 +47,13 @@ Install Dependencies:
   stage: setup
   before_script:
     - apk add --no-cache py3-pip
+    - apk add --no-cache aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
     - pip3 install awscli 
-    - apk add aws-cli --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
   services:
     - name: docker:19.03.12-dind
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
-  image: docker:dind
+  image: docker:19.03.12
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - ./tools/scripts/dockerize-builder.sh
@@ -63,6 +63,8 @@ Test:
   allow_failure: false
   stage: test
   before_script:
+    - echo $CI_COMMIT_BRANCH 
+    - echo $CI_COMMIT_REF_NAME 
     - cd $HOME/reports
     - mkdir -p coverage
     - mkdir -p cucumber
