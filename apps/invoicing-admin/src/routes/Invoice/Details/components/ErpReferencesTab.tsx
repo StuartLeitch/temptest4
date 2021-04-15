@@ -4,12 +4,12 @@ import {DlRowErpReferences} from '../../../components/Invoice/DlRowErpReferences
 import {Invoice} from '../types'
 
 const ErpReferenceTab: React.FC<ErpReferenceTabProps> = ({invoice}) => (
-    <Card body className='boreder-top-0'>
+    <Card body className='border-top-0'>
         <CardBody>
-            <CardTitle tag='h5' className='mb-4'>
+            <CardTitle tag='h6' className='mb-4'>
                 ERP References
             </CardTitle>
-            <DlRowErpReferences { ...invoice} leftSideClassName='text-lg-right' rightSideClassName='text-inverse' />
+            <DlRowErpReferences { ...invoice} leftSideClassName='text-lg-left' rightSideClassName='text-inverse' />
         </CardBody>
     </Card>
 )
