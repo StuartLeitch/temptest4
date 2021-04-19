@@ -72,7 +72,11 @@ const TrTableInvoicesList = ({ invoices }) => (
           </td>
           <td className='align-middle'>
             <Link
-              to={`/invoices/details/${id}`}
+              to={
+                cancelledInvoiceReference
+                  ? `/credit-notes/details/${id}`
+                  : `/invoices/details/${id}`
+              }
               className='text-decoration-none'
             >
               <span className='text-secondary'>
