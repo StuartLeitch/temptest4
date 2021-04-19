@@ -15,15 +15,7 @@ interface Props extends LayoutProps, SpaceProps, FlexProps {
 
 const vatInfoText = {
   Hindawi: `
-Hindawi Limited is based in the United Kingdom and must charge a 20% Value Added Tax (VAT) on qualifying transactions.
-
-UK VAT applies when we supply services to any individual or organization based in the UK.
-
-When our customer is a non-VAT registered individual or organization based outside the UK but within the EU, Article 45 of 2006/112/EC applies. The place of supply is where the supplier, Hindawi Limited, is established and UK VAT therefore applies.
-
-When our customer is a VAT-registered individual or organization based outside the UK but within the EU, Article 44 of the 2006/112/EC applies. The place of supply is where the customer is established, which puts the invoice outside the scope of UK VAT.
-
-When our customer is an individual or organization based outside of the EU, all transactions are outside the scope of UK VAT.
+  VAT charges will be applied for individuals resident in the UK and for institutions registered in the UK. VAT is calculated at the applicable rate, currently 20%, on the net USD amount and this VAT charge will be available for review on the invoice prior to confirmation.
 `,
   GeoScienceWorld: `
 The service recipient is liable to pay the entire amount of any Sales, VAT or GST tax.
