@@ -12,8 +12,8 @@ const DlRowErpReferences = (props) => (
 
         <dl className='row'>
             <dt className={`col-sm-5 ${props.leftSideClassName}`}>Payment</dt>
-            <dd className={`col-sm-5 mr-1 ${props.rightSideClassName}`}>
-                {props.erpReferences?.map(e => e.attribute === 'payment' ? <strong key='payment' className='text-black-50 ml-5'>{e.value}, </strong> : '' )}
+            <dd className={`col-sm-5 ${props.rightSideClassName}`}>
+            <dd className='ml-5'>{props.erpReferences?.map(e => e.attribute === 'payment' ? <strong key='payment' className='text-black-50 mr-1'>{e.value}, </strong> : '' )}</dd>
             </dd>
         </dl>
 
