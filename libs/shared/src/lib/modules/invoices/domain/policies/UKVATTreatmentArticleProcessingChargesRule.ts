@@ -171,15 +171,15 @@ export class UKVATTreatmentArticleProcessingChargesRule
 
     if (this.asBusiness) {
       if (isInUk) {
-        VATNote.template = `UK VAT applies to this invoice as per Article 44 of 2006/112/EC. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)`;
+        VATNote.template = `UK VAT applies to this invoice. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)`;
       } else {
-        VATNote.template = `Outside the scope of UK VAT as per Article 44 of 2006/112/EC`;
+        VATNote.template = ``;
       }
     } else {
       if (isInUk) {
-        VATNote.template = `UK VAT applies to this invoice as per Article 45 of 2006/112/EC. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)`;
+        VATNote.template = `UK VAT applies to this invoice. (VAT amount in GBP is {Vat/Rate} GBP, 1 GBP = {Rate} USD)`;
       } else {
-        VATNote.template = `Outside the scope of UK VAT as per Article 59 of 2006/112/EC`;
+        VATNote.template = ``;
       }
     }
 
