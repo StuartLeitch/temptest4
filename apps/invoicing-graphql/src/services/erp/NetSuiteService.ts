@@ -363,13 +363,14 @@ export class NetSuiteService implements ErpServiceContract {
             item: {
               id: itemId,
             },
-            // taxCode: taxRateId,
-            taxDetails: {
-              items: [
-                {
-                  taxCode: taxRateId,
-                },
-              ],
+          },
+        ],
+      },
+      taxDetails: {
+        items: [
+          {
+            taxCode: {
+              id: taxRateId,
             },
           },
         ],
