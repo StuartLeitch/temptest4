@@ -96,7 +96,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                 >
                   {
                     <span className='ml-1 font-weight-bold text-warning'>
-                      Credit Note #{invoice.creditNote.referenceNumber}
+                     {invoice.creditNote.referenceNumber}
                     </span>
                   }
                 </Link>
