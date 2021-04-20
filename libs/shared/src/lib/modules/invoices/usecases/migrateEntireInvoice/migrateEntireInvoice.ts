@@ -518,8 +518,6 @@ export class MigrateEntireInvoiceUsecase
           invoice.props.status = InvoiceStatus.DRAFT;
           invoice.props.dateAccepted = new Date(request.acceptanceDate);
           invoice.props.invoiceNumber = Number.parseInt(invoiceNumber, 10);
-          invoice.props.charge =
-            request.apc.price - request.apc.discount + request.apc.vat;
         }
         return invoice;
       })

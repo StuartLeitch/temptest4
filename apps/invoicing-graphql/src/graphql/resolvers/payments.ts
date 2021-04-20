@@ -98,8 +98,8 @@ export const payments: Resolvers<Context> = {
       );
 
       if (result.isLeft()) {
-        console.log(result.value.message);
-        return null;
+        console.error(result.value.message);
+        throw new Error(result.value.message);
       }
 
       const confirmedPayment = result.value;

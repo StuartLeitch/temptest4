@@ -5,6 +5,6 @@ export class FormatUtils {
         maximumFractionDigits: 2,
         minimumFractionDigits: 2,
       })
-      .replace(",", " ");
+      .replace(",", "");
   }
 }

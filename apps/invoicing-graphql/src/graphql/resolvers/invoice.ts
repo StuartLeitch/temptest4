@@ -89,7 +89,6 @@ export const invoice: Resolvers<Context> = {
       return {
         invoiceId: invoiceDetails.id.toString(),
         status: invoiceDetails.status,
-        charge: invoiceDetails.charge,
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
@@ -428,7 +427,6 @@ export const invoice: Resolvers<Context> = {
         invoiceId: creditNoteDetails.id.toString(),
         cancelledInvoiceReference: creditNoteDetails.cancelledInvoiceReference,
         status: creditNoteDetails.status,
-        charge: creditNoteDetails.charge,
         dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
         erpReferences: erpRef.getItems(),
         creationReason: creditNoteDetails.creationReason,
@@ -634,7 +632,6 @@ export const invoice: Resolvers<Context> = {
         id: creditNote.invoiceId.id.toString(),
         cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
         status: creditNote.status,
-        charge: creditNote.charge,
         dateCreated: creditNote?.dateCreated?.toISOString(),
         // erpReference: creditNote.erpReference,
         // revenueRecognitionReference: creditNote.revenueRecognitionReference,

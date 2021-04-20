@@ -50,36 +50,23 @@ const creditCardPaymentEpic: RootEpic = (
   action$,
   state$,
   { graphqlAdapter },
-) => {
-  return action$.pipe(
+) => action$.pipe(
     filter(isActionOf(recordCardPayment.request)),
-    switchMap((action) => {
-      const {
-        paymentMethodId,
-        invoiceId,
-        payerId,
-        paymentMethodNonce,
-        amount,
-      } = action.payload;
-
-      return graphqlAdapter.send(mutations.creditCardPayment, {
-        invoiceId,
-        payerId,
-        paymentMethodId,
-        paymentMethodNonce,
-        amount,
-      });
-    }),
-    withLatestFrom(state$.pipe(map(invoice))),
-    mergeMap(([r, invoice]) => {
-      return from([
-        recordCardPayment.success(r.data.creditCardPayment),
-        getInvoice.request(invoice.invoiceId),
-      ]);
-    }),
-    catchError((err) => of(recordCardPayment.failure(err.message))),
+    switchMap((action) =>
+      from(graphqlAdapter.send(mutations.creditCardPayment, action.payload)).pipe(
+        withLatestFrom(state$.pipe(map(invoice))),
+        mergeMap(([r, invoice]) => {
+          return from([
+            recordCardPayment.success(r.data.creditCardPayment),
+            getInvoice.request(invoice.invoiceId),
+          ]);
+        }),
+        catchError(err => {
+          return of(recordCardPayment.failure(err.message));
+        })
+      )
+    )
   );
-};
 
 const recordPayPalPaymentEpic: RootEpic = (
   action$,
@@ -90,10 +77,7 @@ const recordPayPalPaymentEpic: RootEpic = (
     filter(isActionOf(recordPayPalPayment.request)),
     switchMap((action) => {
       const { invoiceId, orderId } = action.payload;
-      return graphqlAdapter.send(mutations.recordPayPalPayment, {
-        invoiceId,
-        orderId,
-      });
+      return graphqlAdapter.send(mutations.recordPayPalPayment, action.payload);
     }),
     withLatestFrom(state$.pipe(map(invoice))),
     mergeMap(([r, invoice]) => {

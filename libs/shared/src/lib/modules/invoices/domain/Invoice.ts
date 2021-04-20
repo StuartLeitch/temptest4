@@ -46,7 +46,6 @@ interface InvoiceProps {
   dateAccepted?: Date;
   dateIssued?: Date;
   dateMovedToFinal?: Date;
-  charge?: number;
   totalNumInvoiceItems?: number;
   vatnote?: string;
   creationReason?: string;
@@ -76,14 +75,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   set status(status: InvoiceStatus) {
     this.props.status = status;
-  }
-
-  get charge(): number {
-    return this.props.charge;
-  }
-
-  set charge(charge: number) {
-    this.props.charge = charge;
   }
 
   get dateIssued(): Date {

@@ -6,6 +6,7 @@ import { SubmissionSubmittedHandler } from './submission-submitted';
 import { ArticlePublishedHandler } from './ArticlePublished';
 import { SubmissionWithdrawn } from './SubmissionWithdrawn';
 import { SubmissionRejected } from './SubmissionRejected';
+import { SubmissionScreeningVoid } from './SubmissionScreeningVoid';
 import { JournalUpdatedHandler } from './JournalUpdated';
 import { JournalAddedHandler } from './JournalAdded';
 import {
@@ -32,4 +33,5 @@ export {
   JournalAddedHandler,
   SubmissionWithdrawn,
   SubmissionRejected,
+  SubmissionScreeningVoid,
 };
