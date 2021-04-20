@@ -169,7 +169,7 @@ input CreditCardInput {
 }
 
 type Payment {
-  id: String!
+  id: String
   status: PaymentStatus
   invoiceId: String
   payerId: String

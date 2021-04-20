@@ -10,7 +10,7 @@ interface Props {
 }
 
 const SuccessfulPayment: React.FunctionComponent<Props> = ({
-  title = "Payment was sent successfuly",
+  title = "Payment was sent successfully",
   onViewInvoice,
   payerId,
 }) => (
