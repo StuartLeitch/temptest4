@@ -42,7 +42,7 @@ export const payer: Resolvers<Context> = {
         throw new Error(`Error: ${updatedPayer.value.errorValue().message}`);
       }
 
-      return PayerMap.toPersistence(updatedPayer.value.getValue());
+      return PayerMap.toPersistence(updatedPayer.value);
     },
   },
   Payer: {
