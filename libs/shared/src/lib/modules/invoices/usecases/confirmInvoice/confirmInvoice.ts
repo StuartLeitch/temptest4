@@ -3,6 +3,7 @@ import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Either, right, left } from '../../../../core/logic/Either';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
+import { Right } from '../../../../core/logic/Right';
 
 // * Authorization Logic
 import {
@@ -48,7 +49,6 @@ import {
 import { ConfirmInvoiceResponse as Response } from './confirmInvoiceResponse';
 import { ConfirmInvoiceDTO as DTO, PayerInput } from './confirmInvoiceDTO';
 import { ConfirmInvoiceErrors as Errors } from './confirmInvoiceErrors';
-import { Right } from 'libs/shared/src/lib/core/logic/Right';
 
 interface PayerDataDomain {
   address: Address;
