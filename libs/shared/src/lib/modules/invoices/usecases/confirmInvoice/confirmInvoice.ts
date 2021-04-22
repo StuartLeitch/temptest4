@@ -10,7 +10,6 @@ import {
   UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
-  Roles,
 } from '../../../../domain/authorization';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
@@ -60,9 +59,6 @@ export class ConfirmInvoiceUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  authorizationContext: Context;
-  sanctionedCountryPolicy: SanctionedCountryPolicy;
-  reductionsPoliciesRegister: PoliciesRegister;
   receiverEmail: string;
   senderEmail: string;
 
@@ -77,17 +73,7 @@ export class ConfirmInvoiceUsecase
     private vatService: VATService,
     private loggerService: LoggerContract
   ) {
-    this.authorizationContext = { roles: [Roles.PAYER] };
-
-    this.sanctionedCountryPolicy = new SanctionedCountryPolicy();
-    this.reductionsPoliciesRegister = new PoliciesRegister();
-    this.reductionsPoliciesRegister.registerPolicy(
-      this.sanctionedCountryPolicy
-    );
-
-    this.isPayerFromSanctionedCountry = this.isPayerFromSanctionedCountry.bind(
-      this
-    );
+    this.isFromSanctionedCountry = this.isFromSanctionedCountry.bind(this);
     this.markInvoiceAsPending = this.markInvoiceAsPending.bind(this);
     this.assignInvoiceNumber = this.assignInvoiceNumber.bind(this);
     this.markInvoiceAsActive = this.markInvoiceAsActive.bind(this);
@@ -117,10 +103,10 @@ export class ConfirmInvoiceUsecase
     await this.checkVatId(payerInput);
 
     const maybePayer = await new AsyncEither(payerInput)
-      .then(this.savePayerData)
-      .then(this.assignInvoiceNumber)
-      .then(this.updateInvoiceStatus)
-      .then(this.applyVatToInvoice)
+      .then(this.savePayerData(context))
+      .then(this.assignInvoiceNumber(context))
+      .then(this.updateInvoiceStatus(context))
+      .then(this.applyVatToInvoice(context))
       .then(this.dispatchEvents)
       .map((data) => data.payer)
       .execute();
@@ -128,70 +114,82 @@ export class ConfirmInvoiceUsecase
     return maybePayer;
   }
 
-  private isPayerFromSanctionedCountry({ country }: Address): boolean {
-    const reductions = this.reductionsPoliciesRegister.applyPolicy(
-      this.sanctionedCountryPolicy.getType(),
+  private isFromSanctionedCountry({ country }: Address): boolean {
+    const sanctionedCountryPolicy = new SanctionedCountryPolicy();
+    const policiesRegister = new PoliciesRegister();
+    policiesRegister.registerPolicy(sanctionedCountryPolicy);
+
+    const reductions = policiesRegister.applyPolicy(
+      sanctionedCountryPolicy.getType(),
       [country]
     );
 
     return reductions?.getReduction()?.props.reduction < 0;
   }
 
-  private async assignInvoiceNumber(
-    payerData: PayerDataDomain
-  ): Promise<Either<Errors.InvoiceNumberAssignationError, PayerDataDomain>> {
-    const { invoice } = payerData;
+  private assignInvoiceNumber(context: Context) {
+    return async (
+      payerData: PayerDataDomain
+    ): Promise<
+      Either<Errors.InvoiceNumberAssignationError, PayerDataDomain>
+    > => {
+      const { invoice } = payerData;
 
-    try {
-      const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-      invoice.assignInvoiceNumber(lastInvoiceNumber);
-      payerData.invoice = await this.invoiceRepo.update(invoice);
-    } catch (e) {
-      return left(
-        new Errors.InvoiceNumberAssignationError(invoice.id.toString(), e)
-      );
-    }
+      try {
+        const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
+        invoice.assignInvoiceNumber(lastInvoiceNumber);
+        payerData.invoice = await this.invoiceRepo.update(invoice);
+      } catch (e) {
+        return left(
+          new Errors.InvoiceNumberAssignationError(invoice.id.toString(), e)
+        );
+      }
 
-    return right(payerData);
+      return right(payerData);
+    };
   }
 
-  private async updateInvoiceStatus(
-    payerData: PayerDataDomain
-  ): Promise<
-    Either<
-      | ChangeInvoiceStatusErrors.ChangeStatusError
-      | ChangeInvoiceStatusErrors.InvoiceNotFoundError,
-      PayerDataDomain
-    >
-  > {
-    const { invoice, address } = payerData;
-    this.loggerService.info(
-      `Update status for Invoice with id {${payerData?.invoice.id}}`
-    );
+  private updateInvoiceStatus(context: Context) {
+    return async (
+      payerData: PayerDataDomain
+    ): Promise<
+      Either<
+        | ChangeInvoiceStatusErrors.ChangeStatusError
+        | ChangeInvoiceStatusErrors.InvoiceNotFoundError,
+        PayerDataDomain
+      >
+    > => {
+      const { invoice, address } = payerData;
+      this.loggerService.info(
+        `Update status for Invoice with id {${payerData?.invoice.id}}`
+      );
 
-    if (invoice.getInvoiceTotal() === 0) {
-      return (await this.markInvoiceAsFinal(invoice)).map((activeInvoice) => ({
-        ...payerData,
-        invoice: activeInvoice,
-      }));
-    } else if (this.isPayerFromSanctionedCountry(address)) {
-      return (await this.markInvoiceAsPending(invoice))
-        .map((pendingInvoice) => this.sendEmail(pendingInvoice))
-        .map((pendingInvoice) => ({
-          ...payerData,
-          invoice: pendingInvoice,
-        }));
-    } else {
-      if (invoice.status !== InvoiceStatus.ACTIVE) {
-        return (await this.markInvoiceAsActive(invoice)).map(
+      if (invoice.getInvoiceTotal() === 0) {
+        return (await this.markInvoiceAsFinal(invoice)).map(
           (activeInvoice) => ({
             ...payerData,
             invoice: activeInvoice,
           })
         );
+      } else if (this.isFromSanctionedCountry(address)) {
+        return (await this.markInvoiceAsPending(invoice))
+          .map((pendingInvoice) => this.sendEmail(pendingInvoice))
+          .map((pendingInvoice) => ({
+            ...payerData,
+            invoice: pendingInvoice,
+          }));
+      } else {
+        if (invoice.status !== InvoiceStatus.ACTIVE) {
+          return (await this.markInvoiceAsActive(invoice)).map(
+            (activeInvoice) => ({
+              ...payerData,
+              invoice: activeInvoice,
+            })
+          );
+        }
       }
-    }
-    return right(payerData);
+      return right(payerData);
+    };
   }
 
   private async dispatchEvents(
@@ -201,23 +199,25 @@ export class ConfirmInvoiceUsecase
     return right(data);
   }
 
-  private async savePayerData(payerInput: PayerInput) {
-    this.loggerService.info(`Save payer ${payerInput.name} data`);
-    const emptyPayload: PayerDataDomain = {
-      address: null,
-      invoice: null,
-      payer: null,
-    };
+  private savePayerData(context: Context) {
+    return async (payerInput: PayerInput) => {
+      this.loggerService.info(`Save payer ${payerInput.name} data`);
+      const emptyPayload: PayerDataDomain = {
+        address: null,
+        invoice: null,
+        payer: null,
+      };
 
-    return await new AsyncEither(emptyPayload)
-      .then(this.getInvoiceDetails(payerInput))
-      .then(this.getInvoiceItems(payerInput))
-      .then(this.createAddress(payerInput))
-      .then(this.createPayer(payerInput))
-      .execute();
+      return await new AsyncEither(emptyPayload)
+        .then(this.getInvoiceDetails(payerInput, context))
+        .then(this.getInvoiceItems(payerInput, context))
+        .then(this.createAddress(payerInput))
+        .then(this.createPayer(payerInput, context))
+        .execute();
+    };
   }
 
-  private getInvoiceDetails({ invoiceId }: PayerInput) {
+  private getInvoiceDetails({ invoiceId }: PayerInput, context: Context) {
     return async (payerData: PayerDataDomain) => {
       this.loggerService.info(`Get Invoice details for id ${invoiceId}`);
       const getInvoiceDetailsUseCase = new GetInvoiceDetailsUsecase(
@@ -225,7 +225,7 @@ export class ConfirmInvoiceUsecase
       );
       const maybeDetails = await getInvoiceDetailsUseCase.execute(
         { invoiceId },
-        this.authorizationContext
+        context
       );
       return maybeDetails.map((invoiceResult) => ({
         ...payerData,
@@ -234,7 +234,7 @@ export class ConfirmInvoiceUsecase
     };
   }
 
-  private getInvoiceItems({ invoiceId }: PayerInput) {
+  private getInvoiceItems({ invoiceId }: PayerInput, context: Context) {
     return async (payerData: PayerDataDomain) => {
       this.loggerService.info(`Get Invoice Items for id {${invoiceId}}`);
       const getInvoiceItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -244,7 +244,7 @@ export class ConfirmInvoiceUsecase
       );
       const maybeDetails = await getInvoiceItemsUsecase.execute(
         { invoiceId },
-        this.authorizationContext
+        context
       );
       return maybeDetails.map((invoiceItemsResult) => {
         const items = invoiceItemsResult.getValue();
@@ -254,7 +254,7 @@ export class ConfirmInvoiceUsecase
     };
   }
 
-  private createPayer(payerInput: PayerInput) {
+  private createPayer(payerInput: PayerInput, context: Context) {
     return async (payerData: PayerDataDomain) => {
       this.loggerService.info(`Create Payer for ${payerInput.name}`);
       const createPayerUseCase = new CreatePayerUsecase(this.payerRepo);
@@ -269,7 +269,7 @@ export class ConfirmInvoiceUsecase
       };
 
       return (
-        await createPayerUseCase.execute(payerDTO, this.authorizationContext)
+        await createPayerUseCase.execute(payerDTO, context)
       ).map((payerResult) => ({ ...payerData, payer: payerResult.getValue() }));
     };
   }
@@ -357,25 +357,23 @@ export class ConfirmInvoiceUsecase
     ).map((resultInvoice) => resultInvoice.getValue());
   }
 
-  private async applyVatToInvoice({
-    invoice,
-    address,
-    payer,
-  }: PayerDataDomain) {
-    const applyVatToInvoice = new ApplyVatToInvoiceUsecase(
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo,
-      this.vatService
-    );
-    const maybeAppliedVat = await applyVatToInvoice.execute({
-      invoiceId: invoice.id.toString(),
-      postalCode: address.postalCode,
-      country: address.country,
-      payerType: payer.type,
-      state: address.state,
-    });
-    return maybeAppliedVat.map(() => ({ invoice, address, payer }));
+  private applyVatToInvoice(context: Context) {
+    return async ({ invoice, address, payer }: PayerDataDomain) => {
+      const applyVatToInvoice = new ApplyVatToInvoiceUsecase(
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo,
+        this.vatService
+      );
+      const maybeAppliedVat = await applyVatToInvoice.execute({
+        invoiceId: invoice.id.toString(),
+        postalCode: address.postalCode,
+        country: address.country,
+        payerType: payer.type,
+        state: address.state,
+      });
+      return maybeAppliedVat.map(() => ({ invoice, address, payer }));
+    };
   }
 
   private sendEmail(invoice: Invoice) {
