@@ -7,7 +7,7 @@ import { Result } from '../../../../core/logic/Result';
 
 // * Authorization Logic
 import {
-  UsecaseAuthorizationContext,
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
   Roles,
@@ -32,11 +32,13 @@ import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
-import { ChangeInvoiceStatusErrors } from '../changeInvoiceStatus/changeInvoiceStatusErrors';
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
-import { ChangeInvoiceStatus } from '../changeInvoiceStatus/changeInvoiceStatus';
 import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
+import {
+  ChangeInvoiceStatusErrors,
+  ChangeInvoiceStatus,
+} from '../changeInvoiceStatus/';
 import {
   CreatePayerRequestDTO,
   CreatePayerUsecase,
@@ -44,9 +46,10 @@ import {
 
 // * Usecase specific
 
-import { ConfirmInvoiceDTO, PayerInput } from './confirmInvoiceDTO';
-import { ConfirmInvoiceResponse } from './confirmInvoiceResponse';
-import { ConfirmInvoiceErrors } from './confirmInvoiceErrors';
+import { ConfirmInvoiceResponse as Response } from './confirmInvoiceResponse';
+import { ConfirmInvoiceDTO as DTO, PayerInput } from './confirmInvoiceDTO';
+import { ConfirmInvoiceErrors as Errors } from './confirmInvoiceErrors';
+import { Right } from 'libs/shared/src/lib/core/logic/Right';
 
 interface PayerDataDomain {
   address: Address;
@@ -56,17 +59,9 @@ interface PayerDataDomain {
 
 export class ConfirmInvoiceUsecase
   implements
-    UseCase<
-      ConfirmInvoiceDTO,
-      Promise<ConfirmInvoiceResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      ConfirmInvoiceDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  authorizationContext: UsecaseAuthorizationContext;
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  authorizationContext: Context;
   sanctionedCountryPolicy: SanctionedCountryPolicy;
   reductionsPoliciesRegister: PoliciesRegister;
   receiverEmail: string;
@@ -107,13 +102,11 @@ export class ConfirmInvoiceUsecase
     this.createPayer = this.createPayer.bind(this);
     this.checkVatId = this.checkVatId.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
+    this.assignInvoiceNumber = this.assignInvoiceNumber.bind(this);
   }
 
   // @Authorize('payer:read')
-  public async execute(
-    request: ConfirmInvoiceDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<ConfirmInvoiceResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
       payer: payerInput,
       sanctionedCountryNotificationReceiver,
@@ -123,16 +116,17 @@ export class ConfirmInvoiceUsecase
     this.senderEmail = sanctionedCountryNotificationSender;
 
     await this.checkVatId(payerInput);
-    const maybePayerData = await this.savePayerData(payerInput);
 
-    const aa = await new AsyncEither(maybePayerData)
-      .then(this.assignInvoiceNumber.bind(this))
-      .then(this.updateInvoiceStatus.bind(this))
-      .then(this.applyVatToInvoice.bind(this))
-      .then(this.dispatchEvents.bind(this))
+    const aa = await new AsyncEither(payerInput)
+      .then(this.savePayerData)
+      .then(this.assignInvoiceNumber)
+      .then(this.updateInvoiceStatus)
+      .then(this.applyVatToInvoice)
+      .then(this.dispatchEvents)
+      .map((data) => Result.ok(data.payer))
       .execute();
 
-    return maybePayerData.map(({ payer }) => Result.ok(payer));
+    return aa;
   }
 
   private isPayerFromSanctionedCountry({ country }: Address): boolean {
@@ -146,9 +140,7 @@ export class ConfirmInvoiceUsecase
 
   private async assignInvoiceNumber(
     payerData: PayerDataDomain
-  ): Promise<
-    Either<ConfirmInvoiceErrors.InvoiceNumberAssignationError, PayerDataDomain>
-  > {
+  ): Promise<Either<Errors.InvoiceNumberAssignationError, PayerDataDomain>> {
     const { invoice } = payerData;
 
     try {
@@ -157,10 +149,7 @@ export class ConfirmInvoiceUsecase
       payerData.invoice = await this.invoiceRepo.update(invoice);
     } catch (e) {
       return left(
-        new ConfirmInvoiceErrors.InvoiceNumberAssignationError(
-          invoice.id.toString(),
-          e
-        )
+        new Errors.InvoiceNumberAssignationError(invoice.id.toString(), e)
       );
     }
 
@@ -206,9 +195,11 @@ export class ConfirmInvoiceUsecase
     return right(payerData);
   }
 
-  private async dispatchEvents({ invoice }: PayerDataDomain) {
-    DomainEvents.dispatchEventsForAggregate(invoice.id);
-    return right<undefined, void>(null);
+  private async dispatchEvents(
+    data: PayerDataDomain
+  ): Promise<Right<null, PayerDataDomain>> {
+    DomainEvents.dispatchEventsForAggregate(data.invoice.id);
+    return right(data);
   }
 
   private async savePayerData(payerInput: PayerInput) {
