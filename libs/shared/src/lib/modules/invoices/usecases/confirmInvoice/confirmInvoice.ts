@@ -3,7 +3,6 @@ import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Either, right, left } from '../../../../core/logic/Either';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result } from '../../../../core/logic/Result';
 
 // * Authorization Logic
 import {
@@ -90,6 +89,7 @@ export class ConfirmInvoiceUsecase
       this
     );
     this.markInvoiceAsPending = this.markInvoiceAsPending.bind(this);
+    this.assignInvoiceNumber = this.assignInvoiceNumber.bind(this);
     this.markInvoiceAsActive = this.markInvoiceAsActive.bind(this);
     this.updateInvoiceStatus = this.updateInvoiceStatus.bind(this);
     this.markInvoiceAsFinal = this.markInvoiceAsFinal.bind(this);
@@ -102,7 +102,6 @@ export class ConfirmInvoiceUsecase
     this.createPayer = this.createPayer.bind(this);
     this.checkVatId = this.checkVatId.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
-    this.assignInvoiceNumber = this.assignInvoiceNumber.bind(this);
   }
 
   // @Authorize('payer:read')
@@ -117,16 +116,16 @@ export class ConfirmInvoiceUsecase
 
     await this.checkVatId(payerInput);
 
-    const aa = await new AsyncEither(payerInput)
+    const maybePayer = await new AsyncEither(payerInput)
       .then(this.savePayerData)
       .then(this.assignInvoiceNumber)
       .then(this.updateInvoiceStatus)
       .then(this.applyVatToInvoice)
       .then(this.dispatchEvents)
-      .map((data) => Result.ok(data.payer))
+      .map((data) => data.payer)
       .execute();
 
-    return aa;
+    return maybePayer;
   }
 
   private isPayerFromSanctionedCountry({ country }: Address): boolean {
