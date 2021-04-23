@@ -24,17 +24,20 @@ import {
   WaiverMap,
   Roles,
   UsecaseAuthorizationContext,
+  MockTransactionRepo,
+  TransactionMap,
 } from '../../../../../../src/lib/shared';
 import { ConfirmInvoiceResponse } from '../../../../../../src/lib/modules/invoices/usecases/confirmInvoice/confirmInvoiceResponse';
 
-let mockInvoiceRepo: MockInvoiceRepo;
+let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
+let mockTransactionRepo: MockTransactionRepo;
+let mockInvoiceRepo: MockInvoiceRepo;
 let mockAddressRepo: MockAddressRepo;
 let mockArticleRepo: MockArticleRepo;
-let mockPayerRepo: MockPayerRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
-let mockErpReferenceRepo: MockErpReferenceRepo;
+let mockPayerRepo: MockPayerRepo;
 
 let mockLogger: MockLogger;
 let mockEmailService: any;
@@ -69,42 +72,53 @@ Before(function () {
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
   mockLogger = new MockLogger();
+  mockTransactionRepo = new MockTransactionRepo();
 
   useCase = new ConfirmInvoiceUsecase(
     mockInvoiceItemRepo,
+    mockTransactionRepo,
     mockAddressRepo,
     mockInvoiceRepo,
-    mockPayerRepo,
     mockCouponRepo,
     mockWaiverRepo,
+    mockPayerRepo,
+    mockLogger,
     mockEmailService,
-    mockVatService,
-    mockLogger
+    mockVatService
   );
 });
 
-Given(/^There is an Invoice with the ID "([\w-]+)"$/, async function (
-  testInvoiceId: string
-) {
-  const invoice = InvoiceMap.toDomain({
-    transactionId: 'transaction-id',
-    dateCreated: new Date(),
-    id: testInvoiceId,
-  });
-  const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: testInvoiceId,
-    manuscriptId: '8888',
-    price: 100,
-  });
-  await mockInvoiceRepo.save(invoice);
-  await mockInvoiceItemRepo.save(invoiceItem);
-});
+Given(
+  /^There is an Invoice with the ID "([\w-]+)"$/,
+  async function (testInvoiceId: string) {
+    const invoice = InvoiceMap.toDomain({
+      transactionId: 'transaction-id',
+      status: 'DRAFT',
+      dateCreated: new Date(),
+      id: testInvoiceId,
+    });
+    const invoiceItem = InvoiceItemMap.toDomain({
+      invoiceId: testInvoiceId,
+      manuscriptId: '8888',
+      price: 100,
+    });
+    const transaction = TransactionMap.toDomain({
+      id: 'transaction-id',
+      status: 'ACTIVE',
+    });
+
+    await mockInvoiceRepo.save(invoice);
+    await mockInvoiceItemRepo.save(invoiceItem);
+    await mockTransactionRepo.save(transaction);
+  }
+);
 
 Given(
   /^There is a fully discounted Invoice with the ID "([\w-]+)"$/,
   async function (testInvoiceId: string) {
     const invoice = InvoiceMap.toDomain({
       transactionId: 'transaction-id',
+      status: 'DRAFT',
       dateCreated: new Date(),
       id: testInvoiceId,
     });
@@ -115,9 +129,14 @@ Given(
       price: 100,
       vat: 0,
     });
+    const transaction = TransactionMap.toDomain({
+      id: 'transaction-id',
+      status: 'ACTIVE',
+    });
 
     await mockInvoiceRepo.save(invoice);
     await mockInvoiceItemRepo.save(invoiceItem);
+    await mockTransactionRepo.save(transaction);
 
     mockCouponRepo.addMockCouponToInvoiceItem(
       CouponMap.toDomain({
@@ -161,7 +180,7 @@ When(
   }
 );
 
-Then('The result is successfull', function () {
+Then('The result is successful', function () {
   expect(response.isRight()).to.equal(
     true,
     `Expected success, got ${response.value}`
@@ -195,17 +214,15 @@ Then(
     const invoice = await mockInvoiceRepo.getInvoiceById(id);
 
     invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
-    // console.log(invoice.invoiceItems.currentItems);
-    // console.log(invoice.invoiceVatTotal);
-    // console.log(vatAmount);
     expect(invoice.invoiceVatTotal).to.be.greaterThan(vatAmount);
   }
 );
 
-Then(/^The Invoice for "([\w-]+)" is sent by email$/, async function (
-  invoiceId: string
-) {
-  expect(mockEmailService.createInvoicePendingNotification.callCount).to.equal(
-    1
-  );
-});
+Then(
+  /^The Invoice for "([\w-]+)" is sent by email$/,
+  async function (invoiceId: string) {
+    expect(
+      mockEmailService.createInvoicePendingNotification.callCount
+    ).to.equal(1);
+  }
+);

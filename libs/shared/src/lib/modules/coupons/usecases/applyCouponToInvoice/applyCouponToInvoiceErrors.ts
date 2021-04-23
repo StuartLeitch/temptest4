@@ -80,3 +80,9 @@ export class ManuscriptNotFoundError extends Result<UseCaseError> {
     });
   }
 }
+
+export class InvoiceConfirmationFailed extends Result<UseCaseError> {
+  constructor(message: string) {
+    super(false, { message });
+  }
+}

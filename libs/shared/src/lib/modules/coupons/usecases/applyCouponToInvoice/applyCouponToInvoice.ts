@@ -43,20 +43,21 @@ import { GetTransactionUsecase } from '../../../transactions/usecases/getTransac
 import { GetManuscriptByManuscriptIdUsecase } from './../../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
 import { Coupon, CouponType, CouponStatus } from '../../domain/Coupon';
 import { CouponCode } from '../../domain/CouponCode';
+import { CouponAssigned } from '../../domain/CouponAssigned';
 
+import { ApplyCouponToInvoiceResponse } from './applyCouponToInvoiceResponse';
 import { ApplyCouponToInvoiceDTO } from './applyCouponToInvoiceDTO';
 import {
-  InvoiceNotFoundError,
-  InvoiceStatusInvalidError,
-  CouponNotFoundError,
-  CouponAlreadyUsedError,
-  CouponExpiredError,
   CouponAlreadyUsedForInvoiceError,
-  CouponInvalidError,
+  InvoiceConfirmationFailed,
+  InvoiceStatusInvalidError,
+  CouponAlreadyUsedError,
+  InvoiceNotFoundError,
   CouponInactiveError,
+  CouponNotFoundError,
+  CouponExpiredError,
+  CouponInvalidError,
 } from './applyCouponToInvoiceErrors';
-import { ApplyCouponToInvoiceResponse } from './applyCouponToInvoiceResponse';
-import { CouponAssigned } from '../../domain/CouponAssigned';
 
 export class ApplyCouponToInvoiceUsecase
   implements
@@ -91,6 +92,7 @@ export class ApplyCouponToInvoiceUsecase
     const {
       // manuscriptRepo,
       invoiceItemRepo,
+      transactionRepo,
       invoiceRepo,
       addressRepo,
       payerRepo,
@@ -188,7 +190,7 @@ export class ApplyCouponToInvoiceUsecase
 
         const manuscriptResult = await this.getManuscript(manuscriptId);
         if (manuscriptResult instanceof Error) {
-          return left(manuscriptResult);
+          return left(manuscriptResult as any);
         }
 
         const manuscript = manuscriptResult as Manuscript;
@@ -196,14 +198,15 @@ export class ApplyCouponToInvoiceUsecase
         // * but we can auto-confirm it
         const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
           invoiceItemRepo,
+          transactionRepo,
           addressRepo,
           invoiceRepo,
-          payerRepo,
           couponRepo,
           waiverRepo,
+          payerRepo,
+          loggerService,
           emailService,
-          vatService,
-          loggerService
+          vatService
         );
 
         // * create new address
@@ -233,17 +236,28 @@ export class ApplyCouponToInvoiceUsecase
 
         const transaction = await this.getTransaction(invoice);
         if (transaction instanceof Error) {
-          return left(transaction);
+          return left(transaction as any);
         }
 
         // * if transaction is ACTIVE
         if (transaction.status === TransactionStatus.ACTIVE) {
           // * Confirm the invoice automagically
           try {
-            await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
+            const result = await confirmInvoiceUsecase.execute(
+              confirmInvoiceArgs,
+              context
+            );
+
+            if (result.isLeft()) {
+              return left(
+                new InvoiceConfirmationFailed(result.value.errorValue().message)
+              );
+            }
           } catch (err) {
             console.error(err);
-            return left(new Error('confirmUsecase inside applyCoupon failed.'));
+            return left(
+              new Error('confirmUsecase inside applyCoupon failed.') as any
+            );
           }
         }
       }

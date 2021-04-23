@@ -1,9 +1,9 @@
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Either, right, left } from '../../../../core/logic/Either';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Right } from '../../../../core/logic/Right';
 
 // * Authorization Logic
 import {
@@ -22,15 +22,21 @@ import { VATService } from '../../../../domain/services/VATService';
 import { Payer, PayerType } from '../../../payers/domain/Payer';
 import { Invoice, InvoiceStatus } from '../../domain/Invoice';
 import { Address } from '../../../addresses/domain/Address';
+import {
+  TransactionStatus,
+  Transaction,
+} from '../../../transactions/domain/Transaction';
 
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
+import { TransactionRepoContract } from '../../../transactions/repos';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
+import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
@@ -47,7 +53,7 @@ import {
 
 import { ConfirmInvoiceResponse as Response } from './confirmInvoiceResponse';
 import { ConfirmInvoiceDTO as DTO, PayerInput } from './confirmInvoiceDTO';
-import { ConfirmInvoiceErrors as Errors } from './confirmInvoiceErrors';
+import * as Errors from './confirmInvoiceErrors';
 
 interface PayerDataDomain {
   address: Address;
@@ -64,17 +70,20 @@ export class ConfirmInvoiceUsecase
 
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private transactionRepo: TransactionRepoContract,
     private addressRepo: AddressRepoContract,
     private invoiceRepo: InvoiceRepoContract,
-    private payerRepo: PayerRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private payerRepo: PayerRepoContract,
+    private loggerService: LoggerContract,
     private emailService: EmailService,
-    private vatService: VATService,
-    private loggerService: LoggerContract
+    private vatService: VATService
   ) {
     this.isFromSanctionedCountry = this.isFromSanctionedCountry.bind(this);
+    this.getTransactionDetails = this.getTransactionDetails.bind(this);
     this.markInvoiceAsPending = this.markInvoiceAsPending.bind(this);
+    this.shouldConfirmInvoice = this.shouldConfirmInvoice.bind(this);
     this.assignInvoiceNumber = this.assignInvoiceNumber.bind(this);
     this.markInvoiceAsActive = this.markInvoiceAsActive.bind(this);
     this.updateInvoiceStatus = this.updateInvoiceStatus.bind(this);
@@ -100,18 +109,27 @@ export class ConfirmInvoiceUsecase
     this.receiverEmail = sanctionedCountryNotificationReceiver;
     this.senderEmail = sanctionedCountryNotificationSender;
 
-    await this.checkVatId(payerInput);
+    try {
+      await this.checkVatId(payerInput);
 
-    const maybePayer = await new AsyncEither(payerInput)
-      .then(this.savePayerData(context))
-      .then(this.assignInvoiceNumber(context))
-      .then(this.updateInvoiceStatus(context))
-      .then(this.applyVatToInvoice(context))
-      .then(this.dispatchEvents)
-      .map((data) => data.payer)
-      .execute();
+      const maybePayer = await new AsyncEither(payerInput)
+        .then(this.savePayerData(context))
+        .then(this.assignInvoiceNumber(context))
+        .then(this.updateInvoiceStatus(context))
+        .then(this.applyVatToInvoice(context))
+        .map(this.dispatchEvents)
+        .map((data) => data.payer)
+        .execute();
 
-    return maybePayer;
+      return maybePayer;
+    } catch (err) {
+      return left(
+        new UnexpectedError(
+          err,
+          `While confirming invoice with id ${request.payer.invoiceId} an error ocurred`
+        )
+      );
+    }
   }
 
   private isFromSanctionedCountry({ country }: Address): boolean {
@@ -192,11 +210,34 @@ export class ConfirmInvoiceUsecase
     };
   }
 
-  private async dispatchEvents(
-    data: PayerDataDomain
-  ): Promise<Right<null, PayerDataDomain>> {
+  private dispatchEvents(data: PayerDataDomain): PayerDataDomain {
     DomainEvents.dispatchEventsForAggregate(data.invoice.id);
-    return right(data);
+    return data;
+  }
+
+  private getTransactionDetails(context: Context) {
+    return async <T>(
+      data: T & { invoice: Invoice }
+    ): Promise<
+      Either<Errors.TransactionNotFoundError, T & { transaction: Transaction }>
+    > => {
+      const { invoice } = data;
+      const transactionId = invoice.transactionId.toString();
+      const usecase = new GetTransactionUsecase(this.transactionRepo);
+
+      const result = await usecase.execute({ transactionId }, context);
+
+      if (result.isFailure) {
+        return left(
+          new Errors.TransactionNotFoundError(
+            transactionId,
+            result.errorValue() as any
+          )
+        );
+      }
+
+      return right({ ...data, transaction: result.getValue() });
+    };
   }
 
   private savePayerData(context: Context) {
@@ -210,11 +251,36 @@ export class ConfirmInvoiceUsecase
 
       return await new AsyncEither(emptyPayload)
         .then(this.getInvoiceDetails(payerInput, context))
+        .then(this.getTransactionDetails(context))
+        .then(this.shouldConfirmInvoice)
         .then(this.getInvoiceItems(payerInput, context))
         .then(this.createAddress(payerInput))
         .then(this.createPayer(payerInput, context))
         .execute();
     };
+  }
+
+  private async shouldConfirmInvoice<T>(
+    data: T & { invoice: Invoice; transaction: Transaction }
+  ): Promise<
+    Either<
+      Errors.InvoiceAlreadyConfirmedError | Errors.ManuscriptNotAcceptedError,
+      T
+    >
+  > {
+    const { invoice, transaction } = data;
+
+    if (transaction.status === TransactionStatus.DRAFT) {
+      return left(new Errors.ManuscriptNotAcceptedError(invoice.id.toString()));
+    }
+
+    if (invoice.status !== InvoiceStatus.DRAFT) {
+      return left(
+        new Errors.InvoiceAlreadyConfirmedError(invoice.id.toString())
+      );
+    }
+
+    return right(data);
   }
 
   private getInvoiceDetails({ invoiceId }: PayerInput, context: Context) {

@@ -30,6 +30,7 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
           address: addressRepo,
           coupon: couponRepo,
           waiver: waiverRepo,
+          transaction: transactionRepo,
         },
         services: { emailService, vatService, logger },
       } = context;
@@ -52,6 +53,7 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
 
       const epicOnArticlePublishedUsecase = new EpicOnArticlePublishedUsecase(
         invoiceItemRepo,
+        transactionRepo,
         manuscriptRepo,
         invoiceRepo,
         payerRepo,

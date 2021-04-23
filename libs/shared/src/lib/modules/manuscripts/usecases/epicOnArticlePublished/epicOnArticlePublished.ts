@@ -12,6 +12,7 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
@@ -52,6 +53,7 @@ export class EpicOnArticlePublishedUsecase
     AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
+    private transactionRepo: TransactionRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private payerRepo: PayerRepoContract,
@@ -75,6 +77,7 @@ export class EpicOnArticlePublishedUsecase
 
     const {
       manuscriptRepo,
+      transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
       addressRepo,
@@ -197,14 +200,15 @@ export class EpicOnArticlePublishedUsecase
       if (invoice.status === InvoiceStatus.DRAFT) {
         const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
           invoiceItemRepo,
+          transactionRepo,
           addressRepo,
           invoiceRepo,
-          payerRepo,
           couponRepo,
           waiverRepo,
+          payerRepo,
+          loggerService,
           emailService,
-          vatService,
-          loggerService
+          vatService
         );
 
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {

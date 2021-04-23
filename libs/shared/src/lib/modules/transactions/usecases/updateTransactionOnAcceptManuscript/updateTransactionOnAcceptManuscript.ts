@@ -238,14 +238,15 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         // * but we can auto-confirm it
         const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
           this.invoiceItemRepo,
+          this.transactionRepo,
           this.addressRepo,
           this.invoiceRepo,
-          this.payerRepo,
           this.couponRepo,
           this.waiverRepo,
+          this.payerRepo,
+          this.loggerService,
           this.emailService,
-          this.vatService,
-          this.loggerService
+          this.vatService
         );
 
         // * create new address

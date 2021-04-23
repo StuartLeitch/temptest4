@@ -3,17 +3,31 @@ import { Either, Result } from '../../../../core/logic/Result';
 import { Coupon } from '../../../../modules/coupons/domain/Coupon';
 
 import {
-  InvoiceNotFoundError,
-  CouponNotFoundError,
+  CouponAlreadyUsedForInvoiceError,
+  InvoiceConfirmationFailed,
+  InvoiceStatusInvalidError,
   TransactionNotFoundError,
   ManuscriptNotFoundError,
+  CouponAlreadyUsedError,
+  InvoiceNotFoundError,
+  CouponInactiveError,
+  CouponNotFoundError,
+  CouponExpiredError,
+  CouponInvalidError,
 } from './applyCouponToInvoiceErrors';
 
 export type ApplyCouponToInvoiceResponse = Either<
-  | InvoiceNotFoundError
-  | CouponNotFoundError
+  | CouponAlreadyUsedForInvoiceError
+  | InvoiceConfirmationFailed
+  | InvoiceStatusInvalidError
   | TransactionNotFoundError
   | ManuscriptNotFoundError
+  | CouponAlreadyUsedError
+  | InvoiceNotFoundError
+  | CouponInactiveError
+  | CouponNotFoundError
+  | CouponExpiredError
+  | CouponInvalidError
   | UnexpectedError,
   Result<Coupon>
 >;

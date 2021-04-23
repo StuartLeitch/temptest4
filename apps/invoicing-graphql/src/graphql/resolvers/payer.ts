@@ -21,14 +21,15 @@ export const payer: Resolvers<Context> = {
 
       const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
         repos.invoiceItem,
+        repos.transaction,
         repos.address,
         repos.invoice,
-        repos.payer,
         repos.coupon,
         repos.waiver,
+        repos.payer,
+        loggerService,
         emailService,
-        vatService,
-        loggerService
+        vatService
       );
       const updatedPayer = await confirmInvoiceUsecase.execute({
         payer: inputPayer,

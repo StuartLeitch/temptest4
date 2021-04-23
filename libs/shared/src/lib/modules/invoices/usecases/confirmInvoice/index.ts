@@ -1,4 +1,4 @@
+export * as ConfirmInvoiceErrors from './confirmInvoiceErrors';
 export * from './confirmInvoiceResponse';
-export * from './confirmInvoiceErrors';
 export * from './confirmInvoiceDTO';
 export * from './confirmInvoice';
