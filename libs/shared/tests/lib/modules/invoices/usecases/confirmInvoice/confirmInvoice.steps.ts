@@ -26,6 +26,8 @@ import {
   UsecaseAuthorizationContext,
   MockTransactionRepo,
   TransactionMap,
+  TransactionId,
+  TransactionStatus,
 } from '../../../../../../src/lib/shared';
 import { ConfirmInvoiceResponse } from '../../../../../../src/lib/modules/invoices/usecases/confirmInvoice/confirmInvoiceResponse';
 
@@ -165,6 +167,19 @@ Given(
   }
 );
 
+Given(/^The transaction has status "([\w]+)"$/, async (status) => {
+  const transactionId = TransactionId.create(
+    new UniqueEntityID('transaction-id')
+  );
+  const transaction = await mockTransactionRepo.getTransactionById(
+    transactionId
+  );
+
+  transaction.props.status = TransactionStatus[status];
+
+  await mockTransactionRepo.update(transaction);
+});
+
 When(
   /^The Payer "([\w-]+)" from "([\w-]+)" confirms the invoice with the ID "([\w-]+)"$/,
   async function (payerName: string, payerCountry: string, invoiceId: string) {
@@ -226,3 +241,8 @@ Then(
     ).to.equal(1);
   }
 );
+
+Then(/^The response is error "([\w]+)"$/, (errorName) => {
+  expect(response.isLeft()).to.be.true;
+  expect(response.value.constructor.name).to.equal(errorName);
+});
