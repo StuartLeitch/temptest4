@@ -3,10 +3,12 @@ FROM nginx:alpine
 # Add bash
 RUN apk add --no-cache bash
 
-COPY dist/apps/invoicing-admin /usr/share/nginx/html
-
 RUN rm /etc/nginx/conf.d/default.conf
 COPY dist/apps/invoicing-admin/nginx.conf /etc/nginx/conf.d
+COPY dist/apps/invoicing-admin /usr/share/nginx/html
+
+# Delete nginx.conf file from public directory
+RUN rm -f /usr/share/nginx/html/nginx.conf
 
 EXPOSE 80 443 3000
 
