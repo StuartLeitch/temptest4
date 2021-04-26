@@ -14,6 +14,26 @@ export class InvoiceTotalLessThanZeroError extends UseCaseError {
   }
 }
 
+export class InvoiceAlreadyPaidError extends UseCaseError {
+  constructor(id: string) {
+    super(`Invoice with id {${id}} has already been paid.`);
+  }
+}
+
+export class InvoiceCannotBePaidError extends UseCaseError {
+  constructor(id: string) {
+    super(`Invoice with id {${id}} cannot be paid.`);
+  }
+}
+
+export class PaymentPendingError extends UseCaseError {
+  constructor(id: string) {
+    super(
+      `Invoice with id {${id}} has a pending payment and cannot pe paid again.`
+    );
+  }
+}
+
 export class InvoiceIdRequiredError extends UseCaseError {
   constructor() {
     super(`Invoice id is required.`);

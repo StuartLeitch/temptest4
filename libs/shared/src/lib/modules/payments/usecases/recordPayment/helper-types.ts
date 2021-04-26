@@ -1,4 +1,5 @@
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
 import { Payment } from '../../domain/Payment';
@@ -13,6 +14,12 @@ export interface WithInvoiceId {
 }
 
 export interface WithInvoice {
+  invoice: Invoice;
+}
+
+export interface WithExistingPayments {
+  existingPayments: Payment[];
+  invoiceItems: InvoiceItem[];
   invoice: Invoice;
 }
 

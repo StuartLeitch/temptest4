@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 // * Core Domain
 import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -32,8 +30,8 @@ import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsFo
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
-import { CreatePaymentUsecase, CreatePaymentDTO } from '../createPayment';
 import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
+import { CreatePaymentUsecase } from '../createPayment';
 
 import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
 import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
@@ -42,6 +40,7 @@ import { PaymentDTO } from '../../domain/strategies/behaviors';
 import { PaymentStatus } from '../../domain/Payment';
 
 import {
+  WithExistingPayments,
   WithPaymentMethodId,
   WithPaymentDetails,
   SelectionData,
@@ -54,6 +53,7 @@ import {
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
+import { InvoiceStatus } from '../../../invoices/domain/Invoice';
 
 export class RecordPaymentUsecase
   implements
@@ -70,9 +70,11 @@ export class RecordPaymentUsecase
     private payerRepo: PayerRepoContract,
     private logger: LoggerContract
   ) {
+    this.attachExistingPayments = this.attachExistingPayments.bind(this);
     this.attachPaymentIfExists = this.attachPaymentIfExists.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
     this.attachManuscript = this.attachManuscript.bind(this);
+    this.shouldPayInvoice = this.shouldPayInvoice.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.attachStrategy = this.attachStrategy.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
@@ -88,6 +90,8 @@ export class RecordPaymentUsecase
         .then(this.validateRequest)
         .then(this.attachInvoice(context))
         .then(this.attachInvoiceItems(context))
+        .then(this.attachExistingPayments(context))
+        .then(this.shouldPayInvoice)
         .then(this.attachPayer(context))
         .then(this.attachManuscript(context))
         .then(this.attachStrategy)
@@ -143,10 +147,56 @@ export class RecordPaymentUsecase
         .map((result) => result.getValue())
         .map((items) => {
           request.invoice.addItems(items);
-          return request;
+          return { ...request, invoiceItems: items };
         })
         .execute();
     };
+  }
+
+  private attachExistingPayments(context: Context) {
+    return async <T extends WithInvoiceId>(request: T) => {
+      const usecase = new GetPaymentsByInvoiceIdUsecase(
+        this.invoiceRepo,
+        this.paymentRepo
+      );
+
+      return new AsyncEither(request.invoiceId)
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((existingPayments) => ({ ...request, existingPayments }))
+        .execute();
+    };
+  }
+
+  private async shouldPayInvoice<T extends WithExistingPayments>(
+    request: T
+  ): Promise<
+    Either<
+      | Errors.InvoiceCannotBePaidError
+      | Errors.InvoiceAlreadyPaidError
+      | Errors.PaymentPendingError,
+      T
+    >
+  > {
+    const { existingPayments, invoiceItems, invoice } = request;
+    const invoiceId = invoice.id.toString();
+
+    if (invoice.status !== InvoiceStatus.ACTIVE) {
+      return left(new Errors.InvoiceCannotBePaidError(invoiceId));
+    }
+
+    if (existingPayments.some((p) => p.status === PaymentStatus.PENDING)) {
+      return left(new Errors.PaymentPendingError(invoiceId));
+    }
+
+    const paidTotal = existingPayments
+      .filter((p) => p.status === PaymentStatus.COMPLETED)
+      .reduce((sum, p) => sum + p.amount.value, 0);
+
+    if (paidTotal >= invoice.invoiceTotal) {
+      return left(new Errors.InvoiceAlreadyPaidError(invoiceId));
+    }
+
+    return right(request);
   }
 
   private attachPayer(context: Context) {
