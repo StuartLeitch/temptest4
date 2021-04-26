@@ -30,6 +30,7 @@ import InvoiceDetailsTab from './components/InvoiceDetailsTab';
 import ArticleDetailsTab from './components/ArticleDetailsTab';
 import PayerDetailsTab from './components/PayerDetailsTab';
 import InvoiceTimeline from './components/InvoiceTimeline';
+import ErpReferencesTab from './components/ErpReferencesTab'
 
 import { INVOICE_QUERY } from '../graphql';
 import AddPaymentModal from './components/AddPaymentModal';
@@ -228,6 +229,11 @@ const Details: React.FC = (props) => {
                     Reminders
                   </UncontrolledTabs.NavLink>
                 </NavItem>
+                <NavItem>
+                  <UncontrolledTabs.NavLink tabId='references'>
+                    ERP References
+                  </UncontrolledTabs.NavLink>
+                </NavItem>
               </Nav>
 
               <UncontrolledTabs.TabContent>
@@ -248,6 +254,9 @@ const Details: React.FC = (props) => {
                 </TabPane>
                 <TabPane tabId='reminders'>
                   <InvoiceReminders />
+                </TabPane>
+                <TabPane tabId='references'>
+                  <ErpReferencesTab invoice={invoice} />
                 </TabPane>
               </UncontrolledTabs.TabContent>
             </UncontrolledTabs>

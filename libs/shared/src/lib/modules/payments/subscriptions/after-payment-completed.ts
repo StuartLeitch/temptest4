@@ -1,12 +1,13 @@
-import { NoOpUseCase } from '../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { Roles } from '../../users/domain/enums/Roles';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
+import { Roles } from '../../users/domain/enums/Roles';
+
 import { PaymentCompleted } from '../domain/events';
-import { InvoiceRepoContract } from '../../invoices/repos/invoiceRepo';
+
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
+import { InvoiceRepoContract } from '../../invoices/repos/invoiceRepo';
 
 export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
   constructor(

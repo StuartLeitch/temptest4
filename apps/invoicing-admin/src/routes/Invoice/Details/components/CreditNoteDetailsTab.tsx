@@ -48,6 +48,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
             <Label sm={5}>Credit Note Issue Date</Label>
             <Col sm={7}>
               <DatePicker
+              disabled
                 customInput={<ButtonInput />}
                 selected={new Date(invoice.dateIssued)}
               />
@@ -74,8 +75,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
                 >
                   {
                     <span className='ml-1 font-weight-bold text-warning'>
-                      Cancelled Invoice #
-                      {invoice.cancelledInvoiceReference}
+                      {invoice.referenceNumber}
                     </span>
                   }
                 </Link>

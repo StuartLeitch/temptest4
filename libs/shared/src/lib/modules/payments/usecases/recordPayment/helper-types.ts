@@ -43,6 +43,11 @@ export interface WithPayment {
   payment: Payment;
 }
 
+export interface UpdatePayment extends WithPayment {
+  paymentDetails: PaymentDetails;
+  isFinalPayment: boolean;
+}
+
 export interface WithForeignPaymentId {
   foreignPaymentId: string;
 }

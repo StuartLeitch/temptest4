@@ -3,6 +3,7 @@
 // * Core Domain
 import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -44,10 +45,10 @@ import {
   WithPaymentMethodId,
   WithPaymentDetails,
   SelectionData,
+  UpdatePayment,
   WithInvoiceId,
   PaymentData,
   WithInvoice,
-  WithPayment,
 } from './helper-types';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
@@ -256,11 +257,20 @@ export class RecordPaymentUsecase
     };
   }
 
-  private async updatePayment<T extends WithPayment>(
+  private async updatePayment<T extends UpdatePayment>(
     request: T
   ): Promise<Either<Errors.PaymentUpdateDbError, Payment>> {
     try {
+      if (request.paymentDetails.status !== request.payment.status) {
+        request.payment.status = request.paymentDetails.status;
+      }
+
       const updated = await this.paymentRepo.updatePayment(request.payment);
+
+      if (updated.status === PaymentStatus.COMPLETED) {
+        updated.addCompletedEvent(request.isFinalPayment);
+      }
+      DomainEvents.dispatchEventsForAggregate(updated.id);
       return right(updated);
     } catch (err) {
       return left(
@@ -277,11 +287,12 @@ export class RecordPaymentUsecase
       const usecaseSave = new CreatePaymentUsecase(this.paymentRepo);
       const { paymentDetails, datePaid, invoice, amount, payer } = request;
 
-      const dto: CreatePaymentDTO = {
+      const dto = {
         foreignPaymentId: paymentDetails.foreignPaymentId.id.trim(),
         paymentMethodId: paymentDetails.paymentMethodId.toString(),
         isFinalPayment: request.isFinalPayment ?? true,
         amount: amount ?? invoice.invoiceTotal,
+        paymentDetails: request.paymentDetails,
         invoiceId: invoice.id.toString(),
         status: paymentDetails.status,
         payerId: payer.id.toString(),
