@@ -1,9 +1,10 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
-  PayerMap,
-  AddressMap,
-  GetAddressUseCase,
   ConfirmInvoiceUsecase,
+  GetAddressUseCase,
+  AddressMap,
+  PayerMap,
+  Roles,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -31,13 +32,21 @@ export const payer: Resolvers<Context> = {
         emailService,
         vatService
       );
-      const updatedPayer = await confirmInvoiceUsecase.execute({
-        payer: inputPayer,
-        sanctionedCountryNotificationReceiver:
-          env.app.sanctionedCountryNotificationReceiver,
-        sanctionedCountryNotificationSender:
-          env.app.sanctionedCountryNotificationSender,
-      });
+
+      const usecaseContext = {
+        roles: [Roles.PAYER],
+      };
+
+      const updatedPayer = await confirmInvoiceUsecase.execute(
+        {
+          payer: inputPayer,
+          sanctionedCountryNotificationReceiver:
+            env.app.sanctionedCountryNotificationReceiver,
+          sanctionedCountryNotificationSender:
+            env.app.sanctionedCountryNotificationSender,
+        },
+        usecaseContext
+      );
 
       if (updatedPayer.isLeft()) {
         throw new Error(`Error: ${updatedPayer.value.errorValue().message}`);
