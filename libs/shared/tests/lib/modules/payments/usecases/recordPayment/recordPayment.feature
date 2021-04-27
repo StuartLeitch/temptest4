@@ -33,11 +33,25 @@ Feature: Payment tests
         And The payment is in status "CREATED"
         And There is only one payment with the payment proof not equal to "test-2"
 
-    # will be uncommented after we add checks to prevent multiple payments after the invoice is FINAL or if a pending payment exists
-    # Scenario: PayPal payment is rejected if a previous PayPal payments is with status PENDING
-    #     Given There is a "Paypal" payment with the amount 1000 with status "PENDING" and order id "test-2"
-    #     When 1 PayPal payment is applied
-    #     Then The payment recording fails
+    Scenario: PayPal payment is rejected if a previous PayPal payments is with status PENDING
+        Given There is a "Paypal" payment with the amount 1000 with status "PENDING" and order id "test-2"
+        When 1 PayPal payment is applied
+        Then The payment recording fails
+
+    Scenario: PayPal payment is rejected if a previous PayPal payments is with status COMPLETED
+        Given There is a "Paypal" payment with the amount 1000 with status "COMPLETED" and order id "test-2"
+        When 1 PayPal payment is applied
+        Then The payment recording fails
+
+    Scenario: PayPal payment is rejected if the invoice is in status DRAFT
+        Given There is an invoice with status "DRAFT"
+        When 1 PayPal payment is applied
+        Then The payment recording fails
+
+    Scenario: PayPal payment is rejected if the invoice is in status FINAL
+        Given There is an invoice with status "FINAL"
+        When 1 PayPal payment is applied
+        Then The payment recording fails
 
     Scenario: Full credit card payment
         When 1 Credit Card payment is applied

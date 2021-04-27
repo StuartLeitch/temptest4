@@ -17,11 +17,12 @@ import {
   PaymentMethodMap,
   InvoiceItemMap,
   UniqueEntityID,
+  InvoiceStatus,
   ArticleMap,
   InvoiceMap,
+  PaymentMap,
   InvoiceId,
   PayerMap,
-  PaymentMap,
 } from '../../../../../../src';
 
 import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
@@ -240,4 +241,14 @@ Then(
 
 Then(/^The payment recording fails$/, () => {
   expect(response.isLeft()).to.equal(true);
+});
+
+Given(/^There is an invoice with status "([\w]+)"$/, async (status: string) => {
+  const invoice = await context.repos.invoice.getInvoiceById(
+    InvoiceId.create(new UniqueEntityID('test-invoice')).getValue()
+  );
+
+  invoice.props.status = InvoiceStatus[status];
+
+  await context.repos.invoice.update(invoice);
 });
