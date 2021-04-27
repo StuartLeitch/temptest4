@@ -35,6 +35,8 @@ accessControl
   .action('create')
   .action('update')
   .action('read')
+  .resource('transaction')
+  .action('read')
   // .where(userOwnsEntity)
   .grant(Roles.AUTHOR)
   .inherits(Roles.CUSTOMER)

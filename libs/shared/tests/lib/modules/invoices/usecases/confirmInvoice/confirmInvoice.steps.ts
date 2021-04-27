@@ -50,7 +50,7 @@ const mockVatService: VATService = new VATService();
 let useCase: ConfirmInvoiceUsecase;
 let response: ConfirmInvoiceResponse;
 const context: UsecaseAuthorizationContext = {
-  roles: [Roles.ADMIN],
+  roles: [Roles.PAYER],
 };
 
 Before(function () {
