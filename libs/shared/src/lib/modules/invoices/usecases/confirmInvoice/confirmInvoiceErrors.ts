@@ -18,9 +18,9 @@ export class InvoiceNumberAssignationError extends Result<UseCaseError> {
 }
 
 export class InvoiceAlreadyConfirmedError extends Result<UseCaseError> {
-  constructor(invoiceId: string) {
+  constructor(refNumber: string) {
     super(false, {
-      message: `Invoice with id ${invoiceId} cannot be confirmed a second time.`,
+      message: `Invoice with reference number ${refNumber} cannot be confirmed a second time.`,
     });
   }
 }

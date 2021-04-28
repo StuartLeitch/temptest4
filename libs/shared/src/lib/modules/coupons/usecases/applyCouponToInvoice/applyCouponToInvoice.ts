@@ -325,7 +325,7 @@ export class ApplyCouponToInvoiceUsecase
     if (invoice.status !== InvoiceStatus.DRAFT) {
       return new InvoiceStatusInvalidError(
         request.couponCode,
-        request.invoiceId
+        invoice.persistentReferenceNumber
       );
     }
 

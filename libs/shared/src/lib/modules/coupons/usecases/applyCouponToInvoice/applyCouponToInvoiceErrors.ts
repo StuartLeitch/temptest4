@@ -58,9 +58,9 @@ export class CouponInactiveError extends Result<UseCaseError> {
 }
 
 export class InvoiceStatusInvalidError extends Result<UseCaseError> {
-  constructor(couponCode: string, invoiceId: string) {
+  constructor(couponCode: string, invoiceReferenceNumber: string) {
     super(false, {
-      message: `Coupon ${couponCode} can not be assigned to invoice ${invoiceId}.`,
+      message: `Coupon ${couponCode} can not be assigned to invoice ${invoiceReferenceNumber} as it is already confirmed, please refresh the page.`,
     });
   }
 }

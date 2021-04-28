@@ -12,8 +12,30 @@ import {
 interface Props {
   onAccept: any;
   onCancel: any;
+  onRefresh: any;
   loading: boolean;
   error: string;
+}
+
+function buttons(error, onCancel, onAccept, onRefresh) {
+  if(!error) {
+    return (<Fragment>
+            <Button type="outline" onClick={onCancel} mr={3}>
+              CANCEL
+            </Button>
+            <Button type="primary" onClick={onAccept} ml={3}>
+              YES, CONFIRM
+            </Button>
+          </Fragment>)
+  } else {
+    return (
+      <Fragment>
+        <Button type="primary" onClick={onRefresh} ml={3}>
+              OK
+            </Button>
+      </Fragment>
+    )
+  }
 }
 
 const ConfirmationModal: React.FunctionComponent<Props> = ({
@@ -21,13 +43,14 @@ const ConfirmationModal: React.FunctionComponent<Props> = ({
   error,
   onAccept,
   onCancel,
+  onRefresh
 }: any) => {
   return (
     <Root>
       <Title mt={10}>Confirm Invoice?</Title>
       <Text mt={6}>Once confirmed, the payment details can't be modified.</Text>
       {error && (
-        <Text mt={4} type="warning">
+        <Text padding={4} mt={4} type="warning">
           {error}
         </Text>
       )}
@@ -35,16 +58,7 @@ const ConfirmationModal: React.FunctionComponent<Props> = ({
       <Flex mt={6} mb={10}>
         {loading ? (
           <Loader size={8} />
-        ) : (
-          <Fragment>
-            <Button type="outline" onClick={onCancel} mr={3}>
-              CANCEL
-            </Button>
-            <Button type="primary" onClick={onAccept} ml={3}>
-              YES, CONFIRM
-            </Button>
-          </Fragment>
-        )}
+        ) : (buttons(error, onCancel, onAccept, onRefresh))}
       </Flex>
     </Root>
   );

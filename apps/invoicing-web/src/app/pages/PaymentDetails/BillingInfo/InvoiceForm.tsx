@@ -303,6 +303,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                 loading={loading}
                 onCancel={hideModal}
                 onAccept={handleSubmit}
+                onRefresh={refreshInvoice}
               />
             </Modal>
           </Fragment>

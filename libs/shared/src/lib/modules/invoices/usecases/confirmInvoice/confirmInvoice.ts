@@ -276,7 +276,9 @@ export class ConfirmInvoiceUsecase
 
     if (invoice.status !== InvoiceStatus.DRAFT) {
       return left(
-        new Errors.InvoiceAlreadyConfirmedError(invoice.id.toString())
+        new Errors.InvoiceAlreadyConfirmedError(
+          invoice.persistentReferenceNumber
+        )
       );
     }
 

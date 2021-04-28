@@ -146,7 +146,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 applyCoupon={(invoiceId, couponCode) => {
                   applyCoupon({ invoiceId, couponCode });
                 }}
-                refreshInvoice={(invoiceId) => getInvoice(invoiceId)}
+                refreshInvoice={() => getInvoice(invoice.invoiceId)}
                 couponError={couponError}
                 onVatFieldChange={(country, state, postalCode, payerType) =>
                   getInvoiceVAT({
