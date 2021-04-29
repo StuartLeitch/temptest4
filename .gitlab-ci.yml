@@ -203,6 +203,21 @@ Deploy:hindawi-demo:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
 
+Deploy:hindawi-demo-sales:
+  tags:
+    - "cluster:hindawi-dev"
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: demo-sales
+    NAMESPACE: demo-sales
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+
 Deploy:gsw-demo:
   tags:
     - "cluster:hindawi-dev"
