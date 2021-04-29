@@ -180,8 +180,14 @@ export class RecordPaymentUsecase
     const { existingPayments, invoiceItems, invoice } = request;
     const invoiceId = invoice.id.toString();
 
-    if (invoice.status !== InvoiceStatus.ACTIVE) {
+    if (invoice.status === InvoiceStatus.DRAFT) {
       return left(new Errors.InvoiceCannotBePaidError(invoiceId));
+    }
+
+    if (invoice.status !== InvoiceStatus.ACTIVE) {
+      return left(
+        new Errors.InvoiceAlreadyPaidError(invoice.persistentReferenceNumber)
+      );
     }
 
     if (existingPayments.some((p) => p.status === PaymentStatus.PENDING)) {
@@ -193,7 +199,9 @@ export class RecordPaymentUsecase
       .reduce((sum, p) => sum + p.amount.value, 0);
 
     if (paidTotal >= invoice.invoiceTotal) {
-      return left(new Errors.InvoiceAlreadyPaidError(invoiceId));
+      return left(
+        new Errors.InvoiceAlreadyPaidError(invoice.persistentReferenceNumber)
+      );
     }
 
     return right(request);

@@ -15,14 +15,16 @@ export class InvoiceTotalLessThanZeroError extends UseCaseError {
 }
 
 export class InvoiceAlreadyPaidError extends UseCaseError {
-  constructor(id: string) {
-    super(`Invoice with id {${id}} has already been paid.`);
+  constructor(refNumber: string) {
+    super(`Invoice with reference number ${refNumber} has already been paid.`);
   }
 }
 
 export class InvoiceCannotBePaidError extends UseCaseError {
   constructor(id: string) {
-    super(`Invoice with id {${id}} cannot be paid.`);
+    super(
+      `Invoice with id {${id}} cannot be paid, because it is not confirmed.`
+    );
   }
 }
 
