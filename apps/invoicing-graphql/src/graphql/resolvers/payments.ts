@@ -153,7 +153,7 @@ export const payments: Resolvers<Context> = {
 
       if (result.isLeft()) {
         console.log(result.value.message);
-        return null;
+        throw new Error(result.value.message);
       }
 
       const confirmedPayment = result.value;
@@ -255,7 +255,7 @@ export const payments: Resolvers<Context> = {
 
       if (result.isLeft()) {
         console.log(result.value);
-        throw result.value;
+        throw result.value.message;
       }
 
       const confirmedPayment = result.value;
