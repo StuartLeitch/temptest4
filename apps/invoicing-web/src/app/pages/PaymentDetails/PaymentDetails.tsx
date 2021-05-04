@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useCallback } from "react";
+import React, { Fragment, useEffect, useCallback, useState } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { RootState } from "typesafe-actions";
@@ -75,12 +75,16 @@ const createPayPalOrder: ASTNode = gql`
   }
 `;
 
-const createPayPalOrderAction = (invoice) => {
+const createPayPalOrderAction = (invoice, setError) => {
   return async () => {
-    const aa: any = await oneContext.graphqlAdapter.send(createPayPalOrder, {
-      invoiceId: invoice.invoiceId,
-    });
-    return aa.data.createPayPalOrder.id;
+    try{
+      const aa: any = await oneContext.graphqlAdapter.send(createPayPalOrder, {
+        invoiceId: invoice.invoiceId,
+      });
+      return aa.data.createPayPalOrder.id;
+    } catch (err)  {
+      console.log('in creation', err.message)
+    }
   };
 };
 
@@ -115,6 +119,7 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   token,
 }) => {
   const { invoiceId } = useParams() as any;
+  const [paypalInvoiceCreationError, setPaypalInvoiceCreationError] = useState(null)
 
   // * This will only run once
   useEffect(() => {
@@ -162,9 +167,9 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 ccToken={token}
                 methods={paymentMethods}
                 invoiceStatus={invoice.status}
-                createPayPalOrder={createPayPalOrderAction(invoice)}
+                createPayPalOrder={createPayPalOrderAction(invoice, setPaypalInvoiceCreationError)}
                 paymentStatus={invoice.payments.map((p) => p.status)}
-                error={creditCardPaymentError || payPalPaymentError}
+                error={creditCardPaymentError || payPalPaymentError  || paypalInvoiceCreationError}
                 payByCardSubmit={payByCard}
                 payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
                 loading={creditCardPaymentLoading || payPalPaymentLoading}
