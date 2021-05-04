@@ -174,7 +174,10 @@ export class NetSuiteService implements ErpServiceContract {
     );
 
     if (!customerAlreadyExists) {
-      const errorMessage = `Customer does not exists for article: ${manuscript.customId}.`;
+      const errorMessage = `Customer with name "${this.getCustomerPayload(
+        payer,
+        manuscript
+      )}" does not exists for article: ${manuscript.customId}.`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -182,7 +185,6 @@ export class NetSuiteService implements ErpServiceContract {
     const paymentReference = await this.createPayment({
       ...data,
       customerId: customerAlreadyExists.id,
-      // customerId: '790701', // Silvestru Testeru
     });
 
     return { paymentReference };
