@@ -174,10 +174,9 @@ export class NetSuiteService implements ErpServiceContract {
     );
 
     if (!customerAlreadyExists) {
-      const errorMessage = `Customer with name "${this.getCustomerPayload(
-        payer,
-        manuscript
-      )}" does not exists for article: ${manuscript.customId}.`;
+      const errorMessage = `Customer with name "${
+        this.getCustomerPayload(payer, manuscript).companyName
+      }" does not exists for article: ${manuscript.customId}.`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
