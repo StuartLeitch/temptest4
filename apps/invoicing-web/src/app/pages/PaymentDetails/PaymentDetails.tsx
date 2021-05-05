@@ -83,7 +83,7 @@ const createPayPalOrderAction = (invoice, setError) => {
       });
       return aa.data.createPayPalOrder.id;
     } catch (err)  {
-      console.log('in creation', err.message)
+      setError(err.message)
     }
   };
 };
