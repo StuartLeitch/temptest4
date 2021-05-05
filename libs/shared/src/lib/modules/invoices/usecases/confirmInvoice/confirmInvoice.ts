@@ -295,6 +295,13 @@ export class ConfirmInvoiceUsecase
         { invoiceId },
         context
       );
+      console.log(
+        '------------------------------------------------------------------------'
+      );
+      console.log(maybeDetails);
+      console.log(
+        '------------------------------------------------------------------------'
+      );
       return maybeDetails.map((invoiceResult) => ({
         ...payerData,
         invoice: invoiceResult.getValue(),

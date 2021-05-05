@@ -222,9 +222,21 @@ export class EpicOnArticlePublishedUsecase
 
         // * Confirm the invoice automagically
         try {
-          await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
+          const resp = await confirmInvoiceUsecase.execute(
+            confirmInvoiceArgs,
+            context
+          );
+          if (resp.isLeft()) {
+            this.loggerService.error(
+              `While auto-confirming on article published an error ocurred: ${JSON.stringify(
+                resp.value
+              )}`
+            );
+          }
         } catch (err) {
-          // do nothing yet
+          this.loggerService.error(
+            `While auto-confirming on article published an error ocurred: ${err.message}, stack: ${err.stack}`
+          );
         }
       }
 
