@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import PaymentIcon from "./PaymentIcon";
-import { Flex, Label, Button, th } from "@hindawi/react-components";
+import { Flex, Label, Button, Text, th } from "@hindawi/react-components";
 import { Braintree, HostedField } from "react-braintree-fields";
 
 interface Props {
@@ -33,6 +33,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   state = {
     isBraintreeReady: false,
     numberFocused: false,
+    error: null
   };
 
   onError(error: any) {
@@ -69,6 +70,45 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         <pre>{JSON.stringify(obj, null, 4)}</pre>
       </div>
     );
+  }
+
+  renderError(title: string, obj: any) {
+    if (!obj) {
+      return null;
+    }
+
+    if (obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
+      return (
+        <Text type="warning">{obj.message}</Text>
+        );
+      }
+
+      if (obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
+      const map = []
+      if (obj.details && 'invalidFields' in obj.details) {
+        const invalids = Object.values(obj.details.invalidFieldKeys).reduce((acc: any[], invalidFieldKey) => {
+          let txt = '';
+          if (invalidFieldKey === 'number') {
+            txt = 'Please enter a valid credit card number'
+          }
+          if (invalidFieldKey === 'expirationDate') {
+            txt = 'Please enter a valid expiration date'
+          }
+          if (invalidFieldKey === 'cvv') {
+            txt = 'Please enter a valid CVV'
+          }
+          if (invalidFieldKey === 'postalCode') {
+            txt = 'Please enter a valid postal code'
+          }
+          acc.push(<Text type="warning">{txt}</Text>)
+          return acc;
+        }, []);
+
+        return ([
+          <Text key={'msg'} type="warning">{obj.message}</Text>
+        ] as any).concat(invalids)
+      }
+    }
   }
 
   onAuthorizationSuccess() {
@@ -159,6 +199,8 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
             </Button>
           </CardContainer>
         </Braintree>
+
+        {this.renderError('Error', this.state.error)}
       </Flex>
     );
   }

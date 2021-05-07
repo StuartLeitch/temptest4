@@ -193,7 +193,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                 <Text type="warning">
                   {error.indexOf("INSTRUMENT_DECLINED") > -1
                     ? "Payment declined, please chose other payment method from PayPal or chose Credit Card payment."
-                    : error}
+                    : 'Your credit card was declined by the supplier'}
                 </Text>
               )}
             </Root>
