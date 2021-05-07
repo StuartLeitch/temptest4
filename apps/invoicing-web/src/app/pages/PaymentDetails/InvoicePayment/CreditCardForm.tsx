@@ -79,7 +79,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
     if (obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
       return (
-        <Text type="warning">{obj.message}</Text>
+        <Text type="warning">{'All fields are empty'}</Text>
         );
       }
 
@@ -89,23 +89,23 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         const invalids = Object.values(obj.details.invalidFieldKeys).reduce((acc: any[], invalidFieldKey) => {
           let txt = '';
           if (invalidFieldKey === 'number') {
-            txt = 'Please enter a valid credit card number'
+            txt = '\u2022 Please enter a valid credit card number'
           }
           if (invalidFieldKey === 'expirationDate') {
-            txt = 'Please enter a valid expiration date'
+            txt = '\u2022 Please enter a valid expiration date'
           }
           if (invalidFieldKey === 'cvv') {
-            txt = 'Please enter a valid CVV'
+            txt = '\u2022 Please enter a valid CVV'
           }
           if (invalidFieldKey === 'postalCode') {
-            txt = 'Please enter a valid postal code'
+            txt = '\u2022 Please enter a valid postal code'
           }
           acc.push(<Text type="warning">{txt}</Text>)
           return acc;
         }, []);
 
         return ([
-          <Text key={'msg'} type="warning">{obj.message}</Text>
+          <Text key={'msg'} type="warning">{'Some payment input fields are invalid: '}</Text>
         ] as any).concat(invalids)
       }
     }

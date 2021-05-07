@@ -107,13 +107,9 @@ const renderError = (error) => {
 
   let errorText = error;
 
-  if (error === 'Processor Declined') {
-    errorText = 'Your credit card was declined by the supplier.';
-  }
-
   // Eliminate duplicated text, as this is how it's being returned from Braintree
   if (error.indexOf('Postal code can only contain letters, numbers, spaces, and hyphens') > -1) {
-    errorText = 'Postal code can only contain letters, numbers, spaces, and hyphens.';
+    errorText = 'Postal code can only contain letters, numbers, spaces and hyphens.';
   }
 
   if (error.indexOf("INSTRUMENT_DECLINED") > -1) {
@@ -137,7 +133,6 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   createPayPalOrder,
   ccToken,
 }) => {
-  console.info(error);
   const parsedMethods = useMemo(
     () =>
       Object.entries(methods).map(([id, name]) => ({
