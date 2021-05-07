@@ -99,7 +99,6 @@ const InvoiceDownloadLink = ({ payer }) => {
 };
 
 const renderError = (error) => {
-  console.info(error);
 
   if (!error) {
     return null;
