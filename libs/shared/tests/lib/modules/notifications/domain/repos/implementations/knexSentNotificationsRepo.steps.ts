@@ -32,6 +32,7 @@ let mockSentNotificationRepo: MockSentNotificationRepo;
 let notification: Notification;
 let notificationList: Notification[];
 let foundNotification: Notification;
+let addedNotification: Notification;
 
 Before(async () => {
   mockSentNotificationRepo = new MockSentNotificationRepo();
@@ -128,4 +129,19 @@ Then(
 
 Then(/^getNotificationsByType returns null/, async () => {
   expect(notificationList).to.equal(null);
+});
+
+When(/^we call addNotification with a new notification/, async () => {
+  const newNotification = makeNotificationData(
+    'new-test-notification',
+    'new-test-id'
+  );
+  addedNotification = await mockSentNotificationRepo.addNotification(
+    newNotification
+  );
+  notificationList.push(addedNotification);
+});
+
+Then(/^a new notification should be added/, async () => {
+  expect(notificationList.length).to.equal(3);
 });

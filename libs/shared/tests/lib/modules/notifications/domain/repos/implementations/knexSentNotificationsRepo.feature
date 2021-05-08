@@ -28,3 +28,10 @@ Feature: Sent Notifications Repo
         Then getNotificationsByType returns the 2 notifications
         When we call getNotificationsByType with "INVOICE_CREATED"
         Then getNotificationsByType returns null
+
+    Scenario: Test Notification.addNotification
+        Given a notification with the id "test-notification" and invoice id "test-invoice"
+        And a notification with the id "test-notification-1" and invoice id "test-invoice"
+        When we call getNotificationsByInvoiceId with "test-invoice"
+        When we call addNotification with a new notification
+        Then a new notification should be added
