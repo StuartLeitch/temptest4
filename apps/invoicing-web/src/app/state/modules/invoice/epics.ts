@@ -97,26 +97,27 @@ const getInvoiceVatEpic: RootEpic = (action$, _, { graphqlAdapter }) => {
 const applyCouponEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(applyCouponAction.request)),
-    switchMap((action) => {
-      return graphqlAdapter.send(mutations.applyCoupon, {
+    switchMap((action) =>
+      from(graphqlAdapter.send(mutations.applyCoupon, {
         invoiceId: action.payload.invoiceId,
         couponCode: action.payload.couponCode,
-      });
-    }),
-    withLatestFrom(state$.pipe(map(invoice)), state$.pipe(map(reductions))),
-    mergeMap(([r, invoice, reductions]) => {
-      let returnPipe: any[] = [applyCouponAction.success(r.data.applyCoupon)];
+      })).pipe(
+        withLatestFrom(state$.pipe(map(invoice)), state$.pipe(map(reductions))),
+        mergeMap(([r, invoice, reductions]) => {
+          let returnPipe: any[] = [applyCouponAction.success(r.data.applyCoupon)];
 
-      let totalReduction: number =
-        reductions.reduce((acc, curr) => acc + curr.reduction, 0) +
-        r.data.applyCoupon.reduction;
+          let totalReduction: number =
+            reductions.reduce((acc, curr) => acc + curr.reduction, 0) +
+            r.data.applyCoupon.reduction;
 
-      if (totalReduction >= 100) {
-        returnPipe.push(getInvoice.request(invoice.invoiceId));
-      }
-      return from(returnPipe);
-    }),
-    catchError((error) => of(applyCouponAction.failure(error.message))),
+          if (totalReduction >= 100) {
+            returnPipe.push(getInvoice.request(invoice.invoiceId));
+          }
+          return from(returnPipe);
+        }),
+        catchError((error) => of(applyCouponAction.failure(error.message)))
+      )
+    )
   );
 };
 
