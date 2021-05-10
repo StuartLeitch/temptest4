@@ -118,7 +118,6 @@ export class AreNotificationsPausedUsecase
       const result = await this.pausedReminderRepo.getNotificationPausedStatus(
         invoiceId
       );
-
       return right(result);
     } catch (e) {
       return left(new Errors.EncounteredDbError(invoiceId.id.toString(), e));

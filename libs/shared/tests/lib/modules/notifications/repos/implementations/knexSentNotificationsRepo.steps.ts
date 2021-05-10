@@ -109,8 +109,8 @@ Then(/^getNotificationsByRecipient returns null/, async () => {
 
 When(
   /^we call getNotificationsByType with "([\w-]+)"$/,
-  async (testEmail: string) => {
-    if (testEmail === NotificationType.REMINDER_CONFIRMATION) {
+  async (testType: string) => {
+    if (testType === NotificationType.REMINDER_CONFIRMATION) {
       notificationList = await mockSentNotificationRepo.getNotificationsByType(
         NotificationType.REMINDER_CONFIRMATION
       );
