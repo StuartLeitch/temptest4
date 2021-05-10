@@ -1,17 +1,17 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
-import { UniqueEntityID } from '../../../../../../../src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
-import { InvoiceId } from '../../../../../../../src/lib/modules/invoices/domain/InvoiceId';
+import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import {
   Notification,
   NotificationType,
-} from '../../../../../../../src/lib/modules/notifications/domain/Notification';
-import { NotificationId } from '../../../../../../../src/lib/modules/notifications/domain/NotificationId';
-import { NotificationMap } from '../../../../../../../src/lib/modules/notifications/mappers/NotificationMap';
+} from '../../../../../../src/lib/modules/notifications/domain/Notification';
+import { NotificationId } from '../../../../../../src/lib/modules/notifications/domain/NotificationId';
+import { NotificationMap } from '../../../../../../src/lib/modules/notifications/mappers/NotificationMap';
 
-import { MockSentNotificationRepo } from '../../../../../../../src/lib/modules/notifications/repos/mocks/mockSentNotificationRepo';
+import { MockSentNotificationRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockSentNotificationRepo';
 
 function makeNotificationData(
   id: string,

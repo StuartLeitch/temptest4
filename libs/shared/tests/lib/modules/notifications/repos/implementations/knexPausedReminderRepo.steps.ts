@@ -1,18 +1,16 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
-import { UniqueEntityID } from '../../../../../../../src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
-import { InvoiceId } from '../../../../../../../src/lib/modules/invoices/domain/InvoiceId';
-import { NotificationPause } from '../../../../../../../src/lib/modules/notifications/domain/NotificationPause';
-import { NotificationType } from '../../../../../../../src/lib/modules/notifications/domain/Notification';
-import { MockPausedReminderRepo } from '../../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
+import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
+import { NotificationPause } from '../../../../../../src/lib/modules/notifications/domain/NotificationPause';
+import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
 
 let mockPausedReminderRepo: MockPausedReminderRepo;
 let pausedNotification: NotificationPause;
 let foundPausedNotification: NotificationPause;
 let savedPausedNotification: NotificationPause;
-let pauseState;
 
 Before(async () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
