@@ -74,9 +74,6 @@ Given(
 When(
   /^I try to get paused reminders for invoice id "([\w-]+)"/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
     response = await usecase.execute(
       {
         invoiceId: testInvoiceId,
