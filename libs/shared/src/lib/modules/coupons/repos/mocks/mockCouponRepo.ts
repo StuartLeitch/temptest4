@@ -110,7 +110,7 @@ export class MockCouponRepo
   }
 
   public async save(coupon: Coupon): Promise<Coupon> {
-    if (this.exists(coupon)) {
+    if (await this.exists(coupon)) {
       throw Error('duplicate coupon');
     }
 
