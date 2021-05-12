@@ -1,5 +1,6 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import { AuthenticationError, ForbiddenError } from 'apollo-server'
 import {
   GetInvoiceIdByManuscriptCustomIdUsecase,
   GetInvoiceIdByManuscriptCustomIdDTO,
@@ -122,15 +123,28 @@ export const invoice: Resolvers<Context> = {
     },
 
     async invoices(parent, args, context) {
+      if (!(context as any).kauth.accessToken) {
+        throw new AuthenticationError('You must be logged in!');
+      }
+
+      const authRoles = (context as any).kauth.accessToken.content.resource_access['invoicing-admin'].roles;
+      const contextRoles = authRoles.map(role => Roles[role.toUpperCase()]);
+      // const contextRoles = [ 'foo' /*Roles.ADMIN*/ ];
+
       const { repos } = context;
       const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
         repos.invoice
       );
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles: contextRoles,
       };
       const result = await usecase.execute(args, usecaseContext);
+
+      if (result && (result as any).isFailure && (result as any).error === 'UNAUTHORIZED'){
+        throw new ForbiddenError('You must be authorized');
+      }
+
       if (result.isLeft()) {
         return undefined;
       }
