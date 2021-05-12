@@ -98,6 +98,26 @@ const InvoiceDownloadLink = ({ payer }) => {
   return null;
 };
 
+const renderError = (error) => {
+
+  if (!error) {
+    return null;
+  }
+
+  let errorText = error;
+
+  // Eliminate duplicated text, as this is how it's being returned from Braintree
+  if (error.indexOf('Postal code can only contain letters, numbers, spaces, and hyphens') > -1) {
+    errorText = 'Postal code can only contain letters, numbers, spaces and hyphens.';
+  }
+
+  if (error.indexOf("INSTRUMENT_DECLINED") > -1) {
+    errorText = 'Payment declined, please choose other payment method from PayPal or choose Credit Card payment.';
+  }
+
+  return (<Text type="warning">{errorText}</Text>);
+}
+
 const InvoicePayment: React.FunctionComponent<Props> = ({
   invoice,
   error,
@@ -189,13 +209,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
                   onSuccess={payByPayPalSubmit}
                 />
               )}
-              {error && (
-                <Text type="warning">
-                  {error.indexOf("INSTRUMENT_DECLINED") > -1
-                    ? "Payment declined, please chose other payment method from PayPal or chose Credit Card payment."
-                    : error}
-                </Text>
-              )}
+              {error && renderError(error)}
             </Root>
           );
         }}

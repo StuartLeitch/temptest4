@@ -7,9 +7,9 @@ import { UseCase } from '../../../../core/domain/UseCase';
 // * Authorization Logic
 import {
   AccessControlledUsecase,
+  AccessControlContext,
   AuthorizationContext,
   Roles,
-  AccessControlContext,
 } from '../../../../domain/authorization';
 
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
@@ -28,19 +28,20 @@ import { PayerMap } from '../../../payers/mapper/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 // TODO: Move ManuscriptId to manuscripts domain
 import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
 import { PayerType } from '../../../payers/domain/Payer';
-import { Invoice } from '../../../invoices/domain/Invoice';
 
 // * Usecase specific
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
+import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
+import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/confirmInvoiceDTO';
+
+import { EmailService } from '../../../../infrastructure/communication-channels';
+import { VATService } from '../../../../domain/services/VATService';
+
 import { EpicOnArticlePublishedResponse as Response } from './epicOnArticlePublishedResponse';
 import { EpicOnArticlePublishedErrors as Errors } from './epicOnArticlePublishedErrors';
 import { EpicOnArticlePublishedDTO as DTO } from './epicOnArticlePublishedDTO';
-import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
-import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/confirmInvoiceDTO';
-import { EmailService } from '../../../../infrastructure/communication-channels';
-import { VATService } from '../../../../domain/services/VATService';
 
 interface CorrelationContext {
   correlationId: string;
@@ -72,20 +73,11 @@ export class EpicOnArticlePublishedUsecase
   // @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
-    let invoiceItems: InvoiceItem[];
-    let invoice: Invoice;
 
     const {
       manuscriptRepo,
-      transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
-      addressRepo,
-      payerRepo,
-      couponRepo,
-      waiverRepo,
-      emailService,
-      vatService,
       loggerService,
     } = this;
     const {
@@ -124,91 +116,113 @@ export class EpicOnArticlePublishedUsecase
       try {
         await manuscriptRepo.update(manuscript);
       } catch (e) {
-        // do nothing yet
+        this.loggerService.error(
+          `While updating the manuscript with it's published date an error ocurred: ${e.message}, with stack: ${e.stack}`
+        );
       }
 
-      loggerService.info('Find Invoice Item by Manuscript Id', {
+      const maybeAutoConfirmed = await this.autoConfirmInvoices(
+        manuscript,
+        sanctionedCountryNotificationReceiver,
+        sanctionedCountryNotificationSender,
+        context
+      );
+
+      if (maybeAutoConfirmed.isLeft()) {
+        this.loggerService.error(
+          `While auto-confirming on article published an error ocurred: ${
+            maybeAutoConfirmed.value.errorValue().message
+          }`
+        );
+      }
+
+      return right(Result.ok<void>());
+    } catch (err) {
+      return left(new UnexpectedError(err));
+    }
+  }
+
+  private async autoConfirmInvoices(
+    manuscript: Manuscript,
+    emailReceiver: string,
+    emailSender: string,
+    context: Context
+  ) {
+    const getInvoiceIds = new GetInvoiceIdByManuscriptCustomIdUsecase(
+      this.manuscriptRepo,
+      this.invoiceItemRepo
+    );
+
+    this.loggerService.info('Find Invoice Ids by Manuscript Id', {
+      correlationId: context.correlationId,
+      manuscriptId: manuscript.id.toString(),
+    });
+
+    const maybeInvoiceIds = await getInvoiceIds.execute({
+      customId: manuscript.customId,
+    });
+
+    if (maybeInvoiceIds.isLeft()) {
+      return maybeInvoiceIds;
+    }
+
+    const invoiceIds = maybeInvoiceIds.value.getValue();
+
+    for (const invoiceId of invoiceIds) {
+      this.loggerService.info('Get invoice details', {
         correlationId: context.correlationId,
-        manuscriptId: manuscriptId.id.toString(),
+        invoiceId: invoiceId.toString(),
       });
-      try {
-        // * System identifies Invoice Item by Manuscript Id
-        invoiceItems = await invoiceItemRepo.getInvoiceItemByManuscriptId(
-          manuscript.manuscriptId
-        );
-      } catch (e) {
-        return left(
-          new Errors.InvoiceItemNotFoundError(
-            manuscript.manuscriptId.id.toString()
-          )
-        );
-      }
 
-      const [invoiceId] = invoiceItems.map((ii) => ii.invoiceId);
+      const invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
 
-      try {
-        invoice = await invoiceRepo.getInvoiceById(invoiceId);
-      } catch (err) {
-        return left(new Errors.InvoiceIdRequired());
-      }
+      if (
+        !invoice.cancelledInvoiceReference &&
+        invoice.status === InvoiceStatus.DRAFT
+      ) {
+        if (typeof manuscript.authorCountry === 'undefined') {
+          this.loggerService.info('sendEmail', {
+            correlationId: context.correlationId,
+            invoiceId: invoiceId.id.toString(),
+            manuscriptIdId: manuscript.manuscriptId.id.toString(),
+            sanctionedCountryNotificationReceiver: emailReceiver,
+            sanctionedCountryNotificationSender: emailSender,
+          });
+          this.emailService
+            .autoConfirmMissingCountryNotification(
+              invoice,
+              manuscript,
+              emailReceiver,
+              emailSender
+            )
+            .sendEmail();
+        }
 
-      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
-
-      if (invoice.getInvoiceTotal() === 0) {
-        return right(Result.ok<void>());
-      }
-
-      if (typeof manuscript.authorCountry === 'undefined') {
-        loggerService.info('sendEmail', {
-          correlationId: context.correlationId,
-          invoiceId: invoiceId.id.toString(),
-          manuscriptIdId: manuscript.manuscriptId.id.toString(),
-          sanctionedCountryNotificationReceiver,
-          sanctionedCountryNotificationSender,
+        const newAddress = AddressMap.toDomain({
+          country: manuscript.authorCountry,
         });
-        emailService
-          .autoConfirmMissingCountryNotification(
-            invoice,
-            manuscript,
-            sanctionedCountryNotificationReceiver,
-            sanctionedCountryNotificationSender
-          )
-          .sendEmail();
-      }
 
-      // * create new address
-      const newAddress = AddressMap.toDomain({
-        country: manuscript.authorCountry,
-        // ? city: city,
-        // ? state: state,
-        // ? postalCode: raw.postalCode,
-        // ? addressLine1: raw.addressLine1
-      });
+        // * create new payer
+        const newPayer = PayerMap.toDomain({
+          invoiceId: invoiceId.id.toString(),
+          name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
+          email: manuscript.authorEmail,
+          addressId: newAddress.addressId.id.toString(),
+          organization: ' ',
+          type: PayerType.INDIVIDUAL,
+        });
 
-      // * create new payer
-      const newPayer = PayerMap.toDomain({
-        // associate payer to the invoice
-        invoiceId: invoiceId.id.toString(),
-        name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
-        email: manuscript.authorEmail,
-        addressId: newAddress.addressId.id.toString(),
-        organization: ' ',
-        type: PayerType.INDIVIDUAL,
-        // ? vatId: payer.vatRegistrationNumber,
-      });
-
-      if (invoice.status === InvoiceStatus.DRAFT) {
         const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
-          invoiceItemRepo,
-          transactionRepo,
-          addressRepo,
-          invoiceRepo,
-          couponRepo,
-          waiverRepo,
-          payerRepo,
-          loggerService,
-          emailService,
-          vatService
+          this.invoiceItemRepo,
+          this.transactionRepo,
+          this.addressRepo,
+          this.invoiceRepo,
+          this.couponRepo,
+          this.waiverRepo,
+          this.payerRepo,
+          this.loggerService,
+          this.emailService,
+          this.vatService
         );
 
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {
@@ -216,21 +230,36 @@ export class EpicOnArticlePublishedUsecase
             ...PayerMap.toPersistence(newPayer),
             address: AddressMap.toPersistence(newAddress),
           },
-          sanctionedCountryNotificationReceiver,
-          sanctionedCountryNotificationSender,
+          sanctionedCountryNotificationReceiver: emailReceiver,
+          sanctionedCountryNotificationSender: emailSender,
         };
+
+        this.loggerService.info('Try to auto-confirm invoice', {
+          correlationId: context.correlationId,
+          invoiceId: invoiceId.toString(),
+        });
 
         // * Confirm the invoice automagically
         try {
-          await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
+          const resp = await confirmInvoiceUsecase.execute(
+            confirmInvoiceArgs,
+            context
+          );
+          if (resp.isLeft()) {
+            return left(
+              new UnexpectedError(
+                new Error(
+                  `While auto-confirming on article published an error ocurred: ${JSON.stringify(
+                    resp.value
+                  )}`
+                )
+              )
+            );
+          }
         } catch (err) {
-          // do nothing yet
+          return left(new UnexpectedError(err));
         }
       }
-
-      return right(Result.ok<void>());
-    } catch (err) {
-      return left(new UnexpectedError(err));
     }
   }
 }

@@ -8,6 +8,7 @@ import {
   EpicOnArticlePublishedUsecase,
   EpicOnArticlePublishedDTO,
 } from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
+import { Roles } from '@hindawi/shared';
 
 import { Context } from '../../builders';
 
@@ -74,7 +75,7 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
 
       const result = await epicOnArticlePublishedUsecase.execute(args, {
         correlationId,
-        roles: [],
+        roles: [Roles.SUPER_ADMIN],
       });
 
       if (result.isLeft()) {
