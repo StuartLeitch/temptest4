@@ -4,7 +4,6 @@ import { Given, When, Then, Before } from '@cucumber/cucumber';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
 import { CouponAssignedCollection } from '../../../../../../src/lib/modules/coupons/domain/CouponAssignedCollection';
-import { CouponAssigned } from '../../../../../../src/lib/modules/coupons/domain/CouponAssigned';
 import { CouponCode } from '../../../../../../src/lib/modules/coupons/domain/CouponCode';
 import { CouponId } from '../../../../../../src/lib/modules/coupons/domain/CouponId';
 import { Coupon } from '../../../../../../src/lib/modules/coupons/domain/Coupon';
