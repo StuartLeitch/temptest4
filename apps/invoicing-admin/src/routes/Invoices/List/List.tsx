@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useManualQuery } from 'graphql-hooks';
+import React, { useEffect, useContext } from 'react';
+import { useManualQuery, ClientContext } from 'graphql-hooks';
 import { Filters } from '@utils';
 import { useLocalStorage } from '@rehooks/local-storage';
 
@@ -15,9 +15,19 @@ import { TrTableInvoicesList } from './components/TrTableList';
 import { Loading } from '../../components';
 
 import { INVOICES_QUERY } from './graphql';
+import { useAuth } from '../../../contexts/Auth';
 
 const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   const { pagination: defaultPaginator, filters } = props.state;
+
+  const auth = useAuth();
+  if (!auth) {
+    return null;
+  }
+  const { token } = auth.data;
+
+  const client = useContext(ClientContext);
+  client.setHeader('Authorization', `Bearer ${token}`)
 
   const [{ pagination }] = useLocalStorage(
     'invoicesList',
@@ -32,8 +42,10 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
     props.setPage('page', currentPage);
   };
 
+
   useEffect(() => {
     async function fetchData() {
+
       const { filters, pagination } = props.state;
       await fetchInvoices({
         variables: {
