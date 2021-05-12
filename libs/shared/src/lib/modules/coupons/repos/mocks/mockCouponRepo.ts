@@ -83,6 +83,11 @@ export class MockCouponRepo
     if (!match) {
       throw Error('not existing');
     }
+    Object.defineProperty(match, 'redeemCount', {
+      value: match.redeemCount + 1,
+      writable: true,
+    });
+
     return match;
   }
 

@@ -18,6 +18,7 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
     id,
     code,
     status: 'ACTIVE',
+    redeemCount: 1,
     dateCreated: new Date(),
     ...overwrites,
   });
@@ -25,8 +26,11 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
 
 let mockCouponRepo: MockCouponRepo;
 let coupon: Coupon;
+let incrementedCoupon: Coupon;
+let updatedCoupon: Coupon;
 let couponList: Coupon[];
 let result: CouponAssignedCollection;
+let resultUsedCode: boolean;
 
 Before(async () => {
   mockCouponRepo = new MockCouponRepo();
@@ -57,7 +61,7 @@ When(/^we call getCouponsByInvoiceItemId/, async () => {
   result = await mockCouponRepo.getCouponsByInvoiceItemId(invoiceItemId);
 });
 
-Then(/^it should add the coupon to invoice item/, () => {
+Then(/^it should add the coupons to invoice item/, () => {
   expect(result.length).to.be.greaterThan(0);
 });
 
@@ -77,3 +81,28 @@ When(
     coupon = await mockCouponRepo.getCouponByCode(codeCoupon);
   }
 );
+
+When(/^we call incrementRedeemedCount/, async () => {
+  incrementedCoupon = await mockCouponRepo.incrementRedeemedCount(coupon);
+});
+
+Then(/^redeem count should be higher with 1/, () => {
+  expect(incrementedCoupon.redeemCount).to.equal(2);
+});
+
+When(/^we call update method/, async () => {
+  updatedCoupon = await mockCouponRepo.update(coupon);
+});
+
+Then(/^the coupon "([\w-]+)" should be updated/, (testCoupon: string) => {
+  expect(!!updatedCoupon).to.be.true;
+  expect(coupon.code).to.equal(updatedCoupon.code);
+});
+
+When(/^we call isCodeUsed with "([\w-]+)"/, async (testCode: string) => {
+  resultUsedCode = await mockCouponRepo.isCodeUsed(testCode);
+});
+
+Then(/^it should return true/, () => {
+  expect(resultUsedCode).to.be.true;
+});
