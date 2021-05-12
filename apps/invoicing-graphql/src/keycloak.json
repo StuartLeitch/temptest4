@@ -1,0 +1,9 @@
+{
+  "realm": "Hindawi",
+  "auth-server-url": "https://sso.hindawi.com/auth",
+  "ssl-required": "none",
+  "resource": "invoicing",
+  "public-client": true,
+  "use-resource-role-mappings": true,
+  "confidential-port": 0
+}
