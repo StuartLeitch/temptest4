@@ -13,6 +13,7 @@ interface Props {
   paymentMethodId: string;
   payerId: string;
   total: number;
+  clearServerErrors: () => void;
 }
 
 class CreditCardForm extends React.PureComponent<Props, {}> {
@@ -76,6 +77,8 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     if (!obj) {
       return null;
     }
+
+    this.props.clearServerErrors();
 
     if (obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
       return (

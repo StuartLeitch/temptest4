@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { RootState } from "typesafe-actions";
 import { Formik } from "formik";
@@ -20,6 +20,7 @@ import CreditCardForm from "./CreditCardForm";
 import SuccessfulPayment from "./SuccessfulPayment";
 
 import { invoiceSelectors } from "../../../state/modules/invoice";
+import { isLeafType } from "graphql";
 
 type PaymentStatus = "CREATED" | "PENDING" | "FAILED" | "COMPLETED";
 
@@ -100,6 +101,13 @@ const InvoiceDownloadLink = ({ payer }) => {
 
 const renderError = (error) => {
 
+  console.info('serverError');
+  console.info(error);
+
+  // if (!serverErrors) {
+  //   return null;
+  // }
+
   if (!error) {
     return null;
   }
@@ -117,6 +125,10 @@ const renderError = (error) => {
 
   return (<Text type="warning">{errorText}</Text>);
 }
+
+const ServerErrorContext = React.createContext({
+  serverError: null
+});
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
   invoice,
@@ -141,6 +153,18 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       })),
     [methods],
   );
+
+  // Declare a new state variable, which we'll call "serverError"
+  let [serverError, setServerError] = useState(error);
+
+  // * if initial error, work with it
+  if (error) {
+    serverError = error;
+  }
+
+  const updateServerError = () => {
+    setServerError(' ');
+  };
 
   let body = null;
   if (invoiceStatus === "PENDING") {
@@ -184,33 +208,38 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       >
         {({ setFieldValue, values }) => {
           return (
-            <Root>
-              <ChoosePayment
-                methods={parsedMethods}
-                setFieldValue={setFieldValue}
-                values={values}
-              />
-              {methods[values.paymentMethodId] === "Credit Card" && (
-                <CreditCardForm
-                  ccToken={ccToken}
-                  payerId={invoice && invoice.payer && invoice.payer.id}
-                  paymentMethodId={values.paymentMethodId}
-                  handleSubmit={payByCardSubmit}
-                  total={calculateTotalToBePaid(invoice)}
-                  loading={loading}
-                />
-              )}
-              {methods[values.paymentMethodId] === "Bank Transfer" && (
-                <BankTransfer invoiceReference={invoice.referenceNumber}/>
-              )}
-              {methods[values.paymentMethodId] === "Paypal" && (
-                <Paypal
-                  createPayPalOrder={createPayPalOrder}
-                  onSuccess={payByPayPalSubmit}
-                />
-              )}
-              {error && renderError(error)}
-            </Root>
+              <Root>
+                <ServerErrorContext.Provider value={{ serverError: 'Italia' }}>
+                  <ChoosePayment
+                    methods={parsedMethods}
+                    setFieldValue={setFieldValue}
+                    values={values}
+                  />
+                  {methods[values.paymentMethodId] === "Credit Card" && [
+                    <CreditCardForm
+                      ccToken={ccToken}
+                      payerId={invoice && invoice.payer && invoice.payer.id}
+                      paymentMethodId={values.paymentMethodId}
+                      handleSubmit={payByCardSubmit}
+                      total={calculateTotalToBePaid(invoice)}
+                      clearServerErrors={updateServerError}
+                      loading={loading}
+                    />,
+                    renderError(serverError)
+                  ]}
+                  {methods[values.paymentMethodId] === "Bank Transfer" && [
+                    <BankTransfer invoiceReference={invoice.referenceNumber}/>,
+                    renderError(error)
+                  ]}
+                  {methods[values.paymentMethodId] === "Paypal" && [
+                    <Paypal
+                      createPayPalOrder={createPayPalOrder}
+                      onSuccess={payByPayPalSubmit}
+                    />,
+                    renderError(error)
+                  ]}
+                </ServerErrorContext.Provider>
+              </Root>
           );
         }}
       </Formik>,
