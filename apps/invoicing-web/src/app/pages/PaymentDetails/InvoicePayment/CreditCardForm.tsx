@@ -13,7 +13,7 @@ interface Props {
   paymentMethodId: string;
   payerId: string;
   total: number;
-  clearServerErrors: () => void;
+  serverError: string;
 }
 
 class CreditCardForm extends React.PureComponent<Props, {}> {
@@ -74,19 +74,15 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   }
 
   renderError(title: string, obj: any) {
-    if (!obj) {
+    if (!obj && !this.props.serverError) {
       return null;
     }
 
-    this.props.clearServerErrors();
-
-    if (obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
+    if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
       return (
         <Text type="warning">{'All fields are empty'}</Text>
         );
-      }
-
-      if (obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
+    } else if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
       const map = []
       if (obj.details && 'invalidFields' in obj.details) {
         const invalids = Object.values(obj.details.invalidFieldKeys).reduce((acc: any[], invalidFieldKey) => {
@@ -111,6 +107,16 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           <Text key={'msg'} type="warning">{'Some payment input fields are invalid: '}</Text>
         ] as any).concat(invalids)
       }
+    } else if (this.props.serverError && !obj && !obj) {
+      let errorText = this.props.serverError;
+      // Eliminate duplicated text, as this is how it's being returned from Braintree
+      if (this.props.serverError.indexOf('Postal code can only contain letters, numbers, spaces, and hyphens') > -1) {
+        errorText = 'Postal code can only contain letters, numbers, spaces and hyphens.';
+      }
+
+      return (
+        <Text type="warning">{errorText}</Text>
+      );
     }
   }
 

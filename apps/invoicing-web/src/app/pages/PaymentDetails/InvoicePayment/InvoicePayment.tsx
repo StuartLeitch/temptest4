@@ -100,24 +100,11 @@ const InvoiceDownloadLink = ({ payer }) => {
 };
 
 const renderError = (error) => {
-
-  console.info('serverError');
-  console.info(error);
-
-  // if (!serverErrors) {
-  //   return null;
-  // }
-
   if (!error) {
     return null;
   }
 
   let errorText = error;
-
-  // Eliminate duplicated text, as this is how it's being returned from Braintree
-  if (error.indexOf('Postal code can only contain letters, numbers, spaces, and hyphens') > -1) {
-    errorText = 'Postal code can only contain letters, numbers, spaces and hyphens.';
-  }
 
   if (error.indexOf("INSTRUMENT_DECLINED") > -1) {
     errorText = 'Payment declined, please choose other payment method from PayPal or choose Credit Card payment.';
@@ -155,15 +142,10 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
   );
 
   // Declare a new state variable, which we'll call "serverError"
-  let [serverError, setServerError] = useState(error);
-
-  // * if initial error, work with it
-  if (error) {
-    serverError = error;
-  }
+  let [creditCardServerError, setCreditCardServerError] = useState(null);
 
   const updateServerError = () => {
-    setServerError(' ');
+    setCreditCardServerError(' ');
   };
 
   let body = null;
@@ -192,57 +174,56 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     );
   } else {
     body = [
-      <Label key={"invoice-download-link"} my="4" ml="4">
-        Your Invoice
-        <InvoiceDownloadLink payer={invoice.payer} />
-      </Label>,
-      <Formik
-        key={"invoice-payment-form"}
-        validate={validateFn(methods)}
-        initialValues={{
-          paymentMethodId: null,
-          payerId: invoice && invoice.payer && invoice.payer.id,
-          amount: invoiceCharge,
-        }}
-        onSubmit={payByCardSubmit}
-      >
-        {({ setFieldValue, values }) => {
-          return (
-              <Root>
-                <ServerErrorContext.Provider value={{ serverError: 'Italia' }}>
-                  <ChoosePayment
-                    methods={parsedMethods}
-                    setFieldValue={setFieldValue}
-                    values={values}
-                  />
-                  {methods[values.paymentMethodId] === "Credit Card" && [
-                    <CreditCardForm
-                      ccToken={ccToken}
-                      payerId={invoice && invoice.payer && invoice.payer.id}
-                      paymentMethodId={values.paymentMethodId}
-                      handleSubmit={payByCardSubmit}
-                      total={calculateTotalToBePaid(invoice)}
-                      clearServerErrors={updateServerError}
-                      loading={loading}
-                    />,
-                    renderError(serverError)
-                  ]}
-                  {methods[values.paymentMethodId] === "Bank Transfer" && [
-                    <BankTransfer invoiceReference={invoice.referenceNumber}/>,
-                    renderError(error)
-                  ]}
-                  {methods[values.paymentMethodId] === "Paypal" && [
-                    <Paypal
-                      createPayPalOrder={createPayPalOrder}
-                      onSuccess={payByPayPalSubmit}
-                    />,
-                    renderError(error)
-                  ]}
-                </ServerErrorContext.Provider>
-              </Root>
-          );
-        }}
-      </Formik>,
+      <ServerErrorContext.Provider value={{ serverError: 'Italia' }}>,
+        <Label key={"invoice-download-link"} my="4" ml="4">
+          Your Invoice
+          <InvoiceDownloadLink payer={invoice.payer} />
+        </Label>
+        <Formik
+          key={"invoice-payment-form"}
+          validate={validateFn(methods)}
+          initialValues={{
+            paymentMethodId: null,
+            payerId: invoice && invoice.payer && invoice.payer.id,
+            amount: invoiceCharge,
+          }}
+          onSubmit={payByCardSubmit}
+        >
+          {({ setFieldValue, values }) => {
+            return (
+                <Root>
+                    <ChoosePayment
+                      methods={parsedMethods}
+                      setFieldValue={setFieldValue}
+                      values={values}
+                    />
+                    {methods[values.paymentMethodId] === "Credit Card" && [
+                      <CreditCardForm
+                        ccToken={ccToken}
+                        payerId={invoice && invoice.payer && invoice.payer.id}
+                        paymentMethodId={values.paymentMethodId}
+                        handleSubmit={payByCardSubmit}
+                        total={calculateTotalToBePaid(invoice)}
+                        serverError={error}
+                        loading={loading}
+                      />
+                    ]}
+                    {methods[values.paymentMethodId] === "Bank Transfer" && [
+                      <BankTransfer invoiceReference={invoice.referenceNumber}/>,
+                      renderError(error)
+                    ]}
+                    {methods[values.paymentMethodId] === "Paypal" && [
+                      <Paypal
+                        createPayPalOrder={createPayPalOrder}
+                        onSuccess={payByPayPalSubmit}
+                      />,
+                      renderError(error)
+                    ]}
+                </Root>
+            );
+          }}
+        </Formik>
+      </ServerErrorContext.Provider>
     ];
   }
 
