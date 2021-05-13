@@ -75,6 +75,9 @@ export class MockCouponRepo
 
   async getCouponByCode(code: CouponCode): Promise<Coupon> {
     const match = this._items.find((item) => item.code.equals(code));
+    if (!match) {
+      throw Error('Coupon not found');
+    }
     return match || null;
   }
 

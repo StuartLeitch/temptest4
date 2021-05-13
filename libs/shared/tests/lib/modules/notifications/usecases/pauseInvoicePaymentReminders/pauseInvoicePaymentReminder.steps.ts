@@ -90,6 +90,7 @@ Given(
       new UniqueEntityID(testInvoiceId)
     ).getValue();
     await mockInvoiceRepo.save(invoice);
+
     notification = makeNotificationData(testNotificationId, testInvoiceId);
     notification = await mockSentNotificationRepo.save(notification);
 
