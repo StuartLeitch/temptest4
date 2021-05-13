@@ -3,6 +3,7 @@ Feature: Coupons Repo test
     Background: 
         Given a coupon "coupon1" with code "CA02T0A1"
         And a coupon "coupon2" with code "8DAN6R7GB"
+        And a coupon "coupon3" with code "8DAN6R7GB"
     
     Scenario: Obtain a coupon collection
         When we call getCouponCollection
@@ -29,5 +30,5 @@ Feature: Coupons Repo test
         Then the coupon "coupon1" should be updated
 
     Scenario: Check if code its used 
-        When we call isCodeUsed with "USEDCODE233"
+        When we call isCodeUsed with "8DAN6R7GB"
         Then it should return true

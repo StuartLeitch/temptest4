@@ -125,7 +125,8 @@ export class MockCouponRepo
 
   async isCodeUsed(code: CouponCode | string): Promise<boolean> {
     const val = typeof code === 'string' ? code : code.value;
-    return !this._items.some((item) => item.code.value === val);
+    const found = this._items.filter((item) => item.code.value === val);
+    return found.length !== 0;
   }
 
   public async exists(coupon: Coupon): Promise<boolean> {

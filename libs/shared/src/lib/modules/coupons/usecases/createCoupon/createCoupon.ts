@@ -75,7 +75,6 @@ export class CreateCouponUsecase
 
   private async createCoupon(request: CreateCouponDTO): Promise<Coupon> {
     const { code, invoiceItemType, expirationDate, type, status } = request;
-
     const couponCode = CouponCode.create(code).getValue();
     const now = new Date();
     const props: CouponProps = {
