@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { connect } from "react-redux";
 import { RootState } from "typesafe-actions";
 import { Formik } from "formik";
@@ -20,7 +20,6 @@ import CreditCardForm from "./CreditCardForm";
 import SuccessfulPayment from "./SuccessfulPayment";
 
 import { invoiceSelectors } from "../../../state/modules/invoice";
-import { isLeafType } from "graphql";
 
 type PaymentStatus = "CREATED" | "PENDING" | "FAILED" | "COMPLETED";
 
@@ -141,13 +140,6 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
 
-  // Declare a new state variable, which we'll call "serverError"
-  let [creditCardServerError, setCreditCardServerError] = useState(null);
-
-  const updateServerError = () => {
-    setCreditCardServerError(' ');
-  };
-
   let body = null;
   if (invoiceStatus === "PENDING") {
     body = (
@@ -174,11 +166,10 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     );
   } else {
     body = [
-      <ServerErrorContext.Provider value={{ serverError: 'Italia' }}>,
         <Label key={"invoice-download-link"} my="4" ml="4">
           Your Invoice
           <InvoiceDownloadLink payer={invoice.payer} />
-        </Label>
+        </Label>,
         <Formik
           key={"invoice-payment-form"}
           validate={validateFn(methods)}
@@ -223,7 +214,6 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
             );
           }}
         </Formik>
-      </ServerErrorContext.Provider>
     ];
   }
 
