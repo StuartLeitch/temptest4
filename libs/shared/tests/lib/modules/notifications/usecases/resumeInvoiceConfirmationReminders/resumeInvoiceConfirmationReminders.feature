@@ -1,4 +1,4 @@
-Feature: ResumeInvoiceConfirmationReminderUsecase test 
+Feature: resumeInvoiceConfirmationReminderUsecase test 
 
     Scenario: Resume confirmation reminders for given invoice
         Given the invoice "test-invoice"

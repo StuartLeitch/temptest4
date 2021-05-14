@@ -1,4 +1,4 @@
-Feature: ResumeInvoicePaymentReminderUsecase test
+Feature: resumeInvoicePaymentReminderUsecase test
 
     Scenario: Resume payment reminders for given invoice
         Given an invoice "test-invoice"

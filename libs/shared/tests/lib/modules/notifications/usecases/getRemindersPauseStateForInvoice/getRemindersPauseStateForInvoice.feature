@@ -1,4 +1,4 @@
-Feature: Test GetRemindersPauseStateForInvoiceUsecase
+Feature: getRemindersPauseStateForInvoiceUsecase test
 
     Scenario: Fetch reminders for a certain invoice
         Given an invoice "test-invoice"

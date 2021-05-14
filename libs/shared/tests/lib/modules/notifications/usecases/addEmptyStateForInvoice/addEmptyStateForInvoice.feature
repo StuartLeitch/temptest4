@@ -1,4 +1,4 @@
-Feature: Add Empty Reminder State for Invoice use case
+Feature: addEmptyStateForInvoiceUsecase test
 
     Scenario: Add empty pause state for an invoice reminder
         Given an invoice with the id "test-invoice"

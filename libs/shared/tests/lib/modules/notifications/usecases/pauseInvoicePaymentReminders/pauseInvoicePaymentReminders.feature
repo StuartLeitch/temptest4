@@ -1,4 +1,4 @@
-Feature: Test PauseInvoicePaymentReminderUsecase
+Feature: pauseInvoicePaymentReminderUsecase test
 
     Scenario: Pause payment reminders for invoice
         Given a notification "test-notification" and invoice "test-invoice"

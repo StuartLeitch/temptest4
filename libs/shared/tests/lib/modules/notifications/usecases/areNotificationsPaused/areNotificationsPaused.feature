@@ -1,4 +1,4 @@
-Feature: AreNotificationsPausedUsacase test 
+Feature: areNotificationsPausedUsecase test 
 
     Scenario: For a given invoice with a notification type return paused state
         Given an invoice with id "test-invoice" with confirmation reminder notification

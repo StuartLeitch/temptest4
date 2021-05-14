@@ -1,4 +1,4 @@
-Feature: Test PauseInvoiceConfirmationRemindersUsecase
+Feature: pauseInvoiceConfirmationRemindersUsecase test
 
     Scenario: Pause confirmation reminders
         Given a notification "test-notification" and an invoice "test-invoice"

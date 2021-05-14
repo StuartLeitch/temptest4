@@ -1,4 +1,4 @@
-Feature: Test getSentNotificationForInvoice usecase
+Feature: getSentNotificationForInvoiceUsecase test
 
     Scenario: Receive notifications for given invoice
         Given a notification with "test-notification" id and invoice id "test-invoice"
