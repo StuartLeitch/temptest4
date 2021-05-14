@@ -8,8 +8,7 @@ import { EditorRepoContract } from '../../modules/journals/repos';
 import { WaiverRepoContract } from '../../modules/waivers/repos';
 
 import { PoliciesRegister as ReductionsPoliciesRegister } from '../reductions/policies/PoliciesRegister';
-import { SanctionedCountryPolicy } from '../reductions/policies/SanctionedCountryPolicy';
-import { WaivedCountryPolicy } from '../reductions/policies/WaivedCountryPolicy';
+import { WaivedCountry100Policy } from '../reductions/policies/WaivedCountry100Policy';
 
 export interface WaiverServiceDTO {
   allAuthorsEmails: string[];
@@ -42,8 +41,8 @@ export class WaiverService {
         return acc;
       }, {});
 
-    if (activeWaiverMap[WaiverType.WAIVED_COUNTRY]) {
-      const waivedCountryPolicy: WaivedCountryPolicy = new WaivedCountryPolicy();
+    if (activeWaiverMap[WaiverType.WAIVED_COUNTRY_100]) {
+      const waivedCountryPolicy: WaivedCountry100Policy = new WaivedCountry100Policy();
       reductionsPoliciesRegister.registerPolicy(waivedCountryPolicy);
 
       const waivedCountryWaiver = reductionsPoliciesRegister.applyPolicy(
@@ -55,10 +54,6 @@ export class WaiverService {
         waiversToApply.push(waivedCountryWaiver.getReduction().waiverType);
       }
     }
-
-    // this is removed because it is only used in confirm and not the rest
-    // of the places waivers are applied
-    // if (activeWaiverMap[WaiverType.SANCTIONED_COUNTRY]) {}
 
     const editorRoles = await this.editorRepo.getEditorListRolesByEmails(
       allAuthorsEmails
