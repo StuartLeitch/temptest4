@@ -98,7 +98,7 @@ export class WaivedCountry100Rule implements ReductionRuleContract<Waiver> {
     ) {
       return Waiver.create({
         reduction: -1,
-        waiverType: WaiverType.WAIVED_COUNTRY_100,
+        waiverType: WaiverType.WAIVED_COUNTRY,
       }).getValue();
     }
   }

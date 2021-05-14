@@ -9,6 +9,7 @@ import { WaiverRepoContract } from '../../modules/waivers/repos';
 
 import { PoliciesRegister as ReductionsPoliciesRegister } from '../reductions/policies/PoliciesRegister';
 import { WaivedCountry100Policy } from '../reductions/policies/WaivedCountry100Policy';
+import { WaivedCountry50Policy } from '../reductions/policies/WaivedCountry50Policy';
 
 export interface WaiverServiceDTO {
   allAuthorsEmails: string[];
@@ -41,12 +42,26 @@ export class WaiverService {
         return acc;
       }, {});
 
-    if (activeWaiverMap[WaiverType.WAIVED_COUNTRY_100]) {
-      const waivedCountryPolicy: WaivedCountry100Policy = new WaivedCountry100Policy();
-      reductionsPoliciesRegister.registerPolicy(waivedCountryPolicy);
+    if (activeWaiverMap[WaiverType.WAIVED_COUNTRY]) {
+      const waivedCountry100Policy: WaivedCountry100Policy = new WaivedCountry100Policy();
+      reductionsPoliciesRegister.registerPolicy(waivedCountry100Policy);
 
       const waivedCountryWaiver = reductionsPoliciesRegister.applyPolicy(
-        waivedCountryPolicy.getType(),
+        waivedCountry100Policy.getType(),
+        [country]
+      );
+
+      if (waivedCountryWaiver && waivedCountryWaiver.getReduction()) {
+        waiversToApply.push(waivedCountryWaiver.getReduction().waiverType);
+      }
+    }
+
+    if (activeWaiverMap[WaiverType.WAIVED_COUNTRY_50]) {
+      const waivedCountry50Policy: WaivedCountry50Policy = new WaivedCountry50Policy();
+      reductionsPoliciesRegister.registerPolicy(waivedCountry50Policy);
+
+      const waivedCountryWaiver = reductionsPoliciesRegister.applyPolicy(
+        waivedCountry50Policy.getType(),
         [country]
       );
 

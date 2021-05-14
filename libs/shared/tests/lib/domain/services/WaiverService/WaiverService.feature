@@ -3,8 +3,9 @@ Feature: Waiver Service
   Background:
     Given There is a waiver for "WAIVED_CHIEF_EDITOR" of "100" percent reduction
     And There is a waiver for "SANCTIONED_COUNTRY" of "100" percent reduction
-    And There is a waiver for "EDITOR_DISCOUNT" of "50" percent reduction
     And There is a waiver for "WAIVED_COUNTRY" of "100" percent reduction
+    And There is a waiver for "WAIVED_COUNTRY_50" of "50" percent reduction
+    And There is a waiver for "EDITOR_DISCOUNT" of "50" percent reduction
     And There is a waiver for "WAIVED_EDITOR" of "100" percent reduction
 
   @ValidateWaiverService

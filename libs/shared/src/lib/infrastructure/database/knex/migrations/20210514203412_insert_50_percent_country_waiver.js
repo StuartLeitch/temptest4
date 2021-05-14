@@ -1,13 +1,12 @@
 exports.up = function(knex) {
-  return knex
-    .insert([
+  return knex('waivers')
+    .insert(
       {
         type_id: 'WAIVED_COUNTRY_50',
         reduction: 50,
         isActive: true
       }
-    ])
-    .into('waivers');
+    ).onConflict('type_id').ignore();
 };
 
 exports.down = function(knex) {};

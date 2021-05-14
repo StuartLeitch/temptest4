@@ -95,7 +95,7 @@
     "jsonwebtoken": "8.5.1",
     "jsvat": "2.4.0",
     "keycloak-js": "10.0.2",
-    "knex": "0.21.5",
+    "knex": "^0.21.5",
     "lodash": "4.17.20",
     "microframework-w3tec": "^0.6.3",
     "node-fetch": "2.6.0",
