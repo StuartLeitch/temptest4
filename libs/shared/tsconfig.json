@@ -68,6 +68,7 @@
     "src/lib/infrastructure/database/knex/migrations/20201204094931_add_timestamp_erp_references.js",
     "src/lib/infrastructure/database/knex/migrations/20201207101958_create_indexes_erp_references.js",
     "src/lib/infrastructure/database/knex/migrations/20210208105741_remove_charge_column_from_invoices.js",
-    "src/lib/infrastructure/database/knex/migrations/20210204164831_add_persistentReferenceNumber_to_invoices.js"
+    "src/lib/infrastructure/database/knex/migrations/20210204164831_add_persistentReferenceNumber_to_invoices.js",
+    "src/lib/infrastructure/database/knex/migrations/20210514203412_insert_50_percent_country_waiver.js"
   ]
 }
