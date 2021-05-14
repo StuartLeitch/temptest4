@@ -10,4 +10,4 @@ Feature: resumeInvoiceConfirmationReminderUsecase test
         Given one invoice with id "confirmed-invoice"
         And the notification "test-notification" for confirmed invoice "confirmed-invoice"
         When I try to resume confirmation reminders for "confirmed-invoice"
-        Then it should return an error
+        Then it should return an error that the confirmation reminders were not paused

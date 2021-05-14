@@ -77,19 +77,22 @@ Before(() => {
   );
 });
 
-Given(
-  /^a notification "([\w-]+)" and invoice "([\w-]+)"/,
-  async (testNotificationId: string, testInvoiceId: string) => {
-    const invoice = InvoiceMap.toDomain({
-      transactionId: 'transaction-id',
-      dateCreated: new Date(),
-      id: testInvoiceId,
-    });
+Given(/^invoice with the "([\w-]+)" id/, async (testInvoiceId: string) => {
+  const invoice = InvoiceMap.toDomain({
+    transactionId: 'transaction-id',
+    dateCreated: new Date(),
+    id: testInvoiceId,
+  });
 
+  await mockInvoiceRepo.save(invoice);
+});
+
+Given(
+  /^a notification with "([\w-]+)" id for the invoice "([\w-]+)"/,
+  async (testNotificationId: string, testInvoiceId: string) => {
     const invoiceId = InvoiceId.create(
       new UniqueEntityID(testInvoiceId)
     ).getValue();
-    await mockInvoiceRepo.save(invoice);
 
     notification = makeNotificationData(testNotificationId, testInvoiceId);
     notification = await mockSentNotificationRepo.save(notification);
@@ -110,6 +113,9 @@ Then(/^the payment reminder should be paused/, () => {
   expect(response.isRight()).to.be.true;
 });
 
-Then(/^an error should appear/, () => {
+Then(/^the error that no pause state exists for reminder occurs/, () => {
   expect(response.isLeft()).to.be.true;
+  expect(response.value.error)
+    .to.have.property('message')
+    .to.equal('While saving the pause state an error ocurred: does not exist');
 });

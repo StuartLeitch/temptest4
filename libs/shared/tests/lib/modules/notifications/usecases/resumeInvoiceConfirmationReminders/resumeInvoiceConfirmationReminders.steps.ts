@@ -198,6 +198,14 @@ Then(/^it should resume the reminders of type confirmation/, () => {
   expect(response.isRight()).to.be.true;
 });
 
-Then(/^it should return an error/, () => {
-  expect(response.isLeft()).to.be.true;
-});
+Then(
+  /^it should return an error that the confirmation reminders were not paused/,
+  () => {
+    expect(response.isLeft()).to.be.true;
+    expect(response.value.error)
+      .to.have.property('message')
+      .to.equal(
+        'The confirmation reminders for invoice with id {confirmed-invoice} wore not paused.'
+      );
+  }
+);
