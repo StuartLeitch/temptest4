@@ -16,9 +16,8 @@ import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendor
 import {
   Roles,
   UsecaseAuthorizationContext,
-  InvoiceMap,
-  Invoice,
 } from '../../../../../../src/lib/shared';
+import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
@@ -55,21 +54,27 @@ Before(() => {
   );
 });
 
-Given(/^an invoice id "([\w-]+)"/, async (testInvoiceId: string) => {
+Given(/^invoice with "([\w-]+)" id/, async (testId: string) => {
   const invoice = InvoiceMap.toDomain({
-    transactionId: 'transaction-id',
+    transactionId: 'transactionTest',
     dateCreated: new Date(),
-    id: testInvoiceId,
+    id: testId,
   });
 
-  const invoiceId = InvoiceId.create(
-    new UniqueEntityID(testInvoiceId)
-  ).getValue();
   await mockInvoiceRepo.save(invoice);
-  pausedReminderState = { invoiceId, confirmation: false, payment: false };
-  pausedReminderState = await mockPausedReminderRepo.save(pausedReminderState);
 });
 
+Given(
+  /^the paused state reminders for invoice "([\w-]+)"/,
+  async (testId: string) => {
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testId)).getValue();
+
+    pausedReminderState = { invoiceId, confirmation: false, payment: false };
+    pausedReminderState = await mockPausedReminderRepo.save(
+      pausedReminderState
+    );
+  }
+);
 When(
   /^I try to fetch paused reminders for invoice "([\w-]+)"/,
   async (testInvoiceId: string) => {
@@ -78,11 +83,16 @@ When(
 );
 
 Then(/^I should receive reminders/, () => {
-  // expect(response.isRight()).to.be.true;
-  // expect(!!pausedReminderState).to.be.true;
+  expect(response.isRight()).to.be.true;
+  expect(response.value.getValue())
+    .to.have.property('confirmation')
+    .to.equal(false);
+  expect(response.value.getValue()).to.have.property('payment').to.equal(false);
 });
 
-Then(/^I should obtain an error/, () => {
-  expect(response.isLeft()).to.be.true;
-  expect(!!pausedReminderState).to.be.false;
+Then(/^I should obtain an error that the pause state does not exist/, () => {
+  expect(response.value.isFailure).to.equal(true);
+  expect(response.value.error)
+    .to.have.property('message')
+    .to.equal('While getting the pause state an error ocurred: does not exist');
 });

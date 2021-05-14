@@ -1,11 +1,12 @@
 Feature: getRemindersPauseStateForInvoiceUsecase test
 
     Scenario: Fetch reminders for a certain invoice
-        Given an invoice "test-invoice"
-        When I try to fetch paused reminders for invoice "test-invoice"
+        Given invoice with "reminders-invoice" id
+        And the paused state reminders for invoice "reminders-invoice"
+        When I try to fetch paused reminders for invoice "reminders-invoice"
         Then I should receive reminders
 
-    Scenario: Calling the usecase for a different invoice
-         Given an invoice "test-invoice"
-         When I try to fetch paused reminders for invoice "different-invoice"
-         Then I should obtain an error
+    Scenario: Calling the usecase for an invoice without reminder state
+         Given invoice with "nostate-invoice" id
+         When I try to fetch paused reminders for invoice "nostate-invoice"
+         Then I should obtain an error that the pause state does not exist

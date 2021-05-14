@@ -108,7 +108,7 @@ Before(() => {
   );
 });
 
-Given(/^an invoice "([\w-]+)"/, async (testInvoiceId: string) => {
+Given(/^the invoice with the id "([\w-]+)"/, async (testInvoiceId: string) => {
   const transaction = TransactionMap.toDomain({
     status: TransactionStatus.ACTIVE,
     deleted: 0,

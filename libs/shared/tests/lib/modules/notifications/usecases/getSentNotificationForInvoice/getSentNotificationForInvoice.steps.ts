@@ -74,8 +74,8 @@ Before(() => {
 });
 
 Given(
-  /^a notification with "([\w-]+)" id and invoice id "([\w-]+)"/,
-  async (testNotificationId: string, testInvoiceId: string) => {
+  /^the invoice with given id "([\w-]+)"/,
+  async (testInvoiceId: string) => {
     const invoice = InvoiceMap.toDomain({
       transactionId: 'transaction-id',
       dateCreated: new Date(),
@@ -83,11 +83,16 @@ Given(
     });
 
     await mockInvoiceRepo.save(invoice);
+  }
+);
+
+Given(
+  /^the notification with "([\w-]+)" id for "([\w-]+)"/,
+  async (testNotificationId: string, testInvoiceId: string) => {
     notification = makeNotificationData(testNotificationId, testInvoiceId);
     notification = await mockSentNotificationRepo.save(notification);
   }
 );
-
 When(
   /^I try to fetch notifications for invoice "([\w-]+)"/,
   async (testInvoiceId: string) => {
@@ -108,9 +113,12 @@ Then(
     );
     expect(!!notificationList).to.be.true;
     expect(notificationList.length).to.equal(2);
+
+    expect(response.value.getValue()).to.not.equal(null);
   }
 );
 
-Then(/^I should receive error/, () => {
-  expect(response.isLeft()).to.be.true;
+Then(/^I should not receive any notifications/, () => {
+  expect(response.isRight()).to.be.true;
+  expect(response.value.getValue()).to.equal(null);
 });
