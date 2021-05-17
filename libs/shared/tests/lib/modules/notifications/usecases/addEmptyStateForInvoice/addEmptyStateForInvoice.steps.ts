@@ -88,6 +88,6 @@ Then(
   }
 );
 
-Then(/^I should receive an error/, () => {
+Then(/^I should receive an error that the invoice was not found/, () => {
   expect(response.value.isFailure).to.equal(true);
 });

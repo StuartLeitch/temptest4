@@ -8,4 +8,4 @@ Feature: addEmptyStateForInvoiceUsecase test
     Scenario: Reminder not added for unknown invoice
         Given an invoice with the id "test-invoice"
          When I try to insert a new empty pause reminder with invoice id "test-2"
-         Then I should receive an error
+         Then I should receive an error that the invoice was not found
