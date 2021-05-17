@@ -58,11 +58,12 @@ When(
   }
 );
 
-Then(/^getNotificationById returns the Notification/, async () => {
-  expect(foundNotification.id.toValue()).to.equal(
-    notification.notificationId.id.toValue()
-  );
-});
+Then(
+  /^getNotificationById returns the Notification "([\w-]+)"/,
+  async (testNotificationId: string) => {
+    expect(foundNotification.id.toValue()).to.equal(testNotificationId);
+  }
+);
 
 When(
   /^we call getNotificationsByInvoiceId with "([\w-]+)"$/,
