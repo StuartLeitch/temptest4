@@ -15,11 +15,11 @@ Feature: Coupons Repo test
 
     Scenario: Obtain coupon by couponId
         When we call getCouponById for "coupon1"
-        Then it should return the coupon
+        Then it should return the coupon "coupon1"
 
     Scenario: Obtain coupon by coupon code
         When we call getCouponByCode for code "CA02T0A1"
-        Then it should return the coupon
+        Then it should return the coupon "coupon1"
 
     Scenario: Increment redeem count for coupon
         When we call incrementRedeemedCount

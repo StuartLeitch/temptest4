@@ -69,8 +69,9 @@ When(/^we call getCouponById for "([\w-]+)"/, async (testCouponId: string) => {
   coupon = await mockCouponRepo.getCouponById(couponId);
 });
 
-Then(/^it should return the coupon/, () => {
+Then(/^it should return the coupon "([\w-]+)"/, (testCouponId: string) => {
   expect(!!coupon).to.be.true;
+  expect(coupon.id.toValue()).to.equal(testCouponId);
 });
 
 When(
