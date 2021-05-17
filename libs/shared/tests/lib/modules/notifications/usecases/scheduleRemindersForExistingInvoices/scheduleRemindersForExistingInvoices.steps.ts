@@ -227,19 +227,22 @@ Given(
   }
 );
 
-When(/^I execute the use-case/, async () => {
-  response = await usecase.execute(
-    {
-      creditControlDisabled: false,
-      confirmationQueueName: 'test-confirmation',
-      creditControlDelay: 5,
-      confirmationDelay: 5,
-      paymentQueueName: 'test-payment',
-      paymentDelay: 5,
-    },
-    context
-  );
-});
+When(
+  /^I execute the use-case scheduleRemindersForExistingInvoicesUsecase/,
+  async () => {
+    response = await usecase.execute(
+      {
+        creditControlDisabled: false,
+        confirmationQueueName: 'test-confirmation',
+        creditControlDelay: 5,
+        confirmationDelay: 5,
+        paymentQueueName: 'test-payment',
+        paymentDelay: 5,
+      },
+      context
+    );
+  }
+);
 
 Then(/^it should schedule the reminders for the Invoice/, () => {
   expect(response.isRight()).to.be.true;
