@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 
@@ -40,22 +40,22 @@ function makeNotificationData(
   });
 }
 
-let mockSentNotificationRepo: MockSentNotificationRepo;
-let mockInvoiceRepo: MockInvoiceRepo;
-let mockInvoiceItemRepo: MockInvoiceItemRepo;
-let mockArticleRepo: MockArticleRepo;
-let mockErpReferenceRepo: MockErpReferenceRepo;
-let mockLogger: MockLogger;
-let notification: Notification;
-let notificationList: Notification[];
-let response: GetSentNotificationForInvoiceResponse;
-let usecase: GetSentNotificationForInvoiceUsecase;
+let mockSentNotificationRepo: MockSentNotificationRepo = null;
+let mockInvoiceRepo: MockInvoiceRepo = null;
+let mockInvoiceItemRepo: MockInvoiceItemRepo = null;
+let mockArticleRepo: MockArticleRepo = null;
+let mockErpReferenceRepo: MockErpReferenceRepo = null;
+let mockLogger: MockLogger = null;
+let notification: Notification = null;
+let notificationList: Notification[] = null;
+let response: GetSentNotificationForInvoiceResponse = null;
+let usecase: GetSentNotificationForInvoiceUsecase = null;
 
 const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-Before(() => {
+Before({ tags: '@ValidateGetSentNotificationForInvoice' }, () => {
   mockSentNotificationRepo = new MockSentNotificationRepo();
   mockArticleRepo = new MockArticleRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
@@ -71,6 +71,15 @@ Before(() => {
     mockInvoiceRepo,
     mockLogger
   );
+});
+
+After({ tags: '@ValidateGetSentNotificationForInvoice' }, () => {
+  mockSentNotificationRepo = null;
+  mockArticleRepo = null;
+  mockErpReferenceRepo = null;
+  mockLogger = null;
+  mockInvoiceRepo = null;
+  usecase = null;
 });
 
 Given(

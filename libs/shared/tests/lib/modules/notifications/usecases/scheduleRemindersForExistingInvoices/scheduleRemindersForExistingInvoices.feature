@@ -1,5 +1,6 @@
 Feature: scheduleRemindersForExistingInvoicesUsecase test
 
+    @ValidateScheduleReminders
     Scenario: Schedule Reminders for Invoice
         Given the Invoice "test-invoice"
         And a confirmation notification "confirmation-notification" for invoice "test-invoice"

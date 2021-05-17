@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 
@@ -37,17 +37,17 @@ function makeNotificationData(
   });
 }
 
-let mockPausedReminderRepo: MockPausedReminderRepo;
-let mockSentNotificationRepo: MockSentNotificationRepo;
-let mockLogger: MockLogger;
-let usecase: AreNotificationsPausedUsecase;
-let response: AreNotificationsPausedResponse;
-let pausedNotification: NotificationPause;
-let notification: Notification;
+let mockPausedReminderRepo: MockPausedReminderRepo = null;
+let mockSentNotificationRepo: MockSentNotificationRepo = null;
+let mockLogger: MockLogger = null;
+let usecase: AreNotificationsPausedUsecase = null;
+let response: AreNotificationsPausedResponse = null;
+let pausedNotification: NotificationPause = null;
+let notification: Notification = null;
 
 const context: UsecaseAuthorizationContext = { roles: [Roles.ADMIN] };
 
-Before(() => {
+Before({ tags: '@ValidateNotificationsPaused' }, () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockSentNotificationRepo = new MockSentNotificationRepo();
   mockLogger = new MockLogger();
@@ -57,6 +57,12 @@ Before(() => {
   );
 });
 
+After({ tags: '@ValidateNotificationsPaused' }, () => {
+  mockPausedReminderRepo = null;
+  mockSentNotificationRepo = null;
+  mockLogger = null;
+  usecase = null;
+});
 Given(
   /^an invoice with id "([\w-]+)" with confirmation reminder notification/,
   async (testInvoiceId: string) => {

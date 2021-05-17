@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 
@@ -21,21 +21,21 @@ import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
-let mockPausedReminderRepo: MockPausedReminderRepo;
-let mockInvoiceRepo: MockInvoiceRepo;
-let mockInvoiceItemRepo: MockInvoiceItemRepo;
-let mockArticleRepo: MockArticleRepo;
-let mockErpReferenceRepo: MockErpReferenceRepo;
-let mockLogger: MockLogger;
-let pausedReminderState: NotificationPause;
-let response: GetRemindersPauseStateForInvoiceResponse;
-let usecase: GetRemindersPauseStateForInvoiceUsecase;
+let mockPausedReminderRepo: MockPausedReminderRepo = null;
+let mockInvoiceRepo: MockInvoiceRepo = null;
+let mockInvoiceItemRepo: MockInvoiceItemRepo = null;
+let mockArticleRepo: MockArticleRepo = null;
+let mockErpReferenceRepo: MockErpReferenceRepo = null;
+let mockLogger: MockLogger = null;
+let pausedReminderState: NotificationPause = null;
+let response: GetRemindersPauseStateForInvoiceResponse = null;
+let usecase: GetRemindersPauseStateForInvoiceUsecase = null;
 
 const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-Before(() => {
+Before({ tags: '@ValidateGetRemindersPauseState' }, () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockArticleRepo = new MockArticleRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
@@ -52,6 +52,16 @@ Before(() => {
     mockInvoiceRepo,
     mockLogger
   );
+});
+
+After({ tags: '@ValidateGetRemindersPauseState' }, () => {
+  mockPausedReminderRepo = null;
+  mockArticleRepo = null;
+  mockErpReferenceRepo = null;
+  mockInvoiceItemRepo = null;
+  mockLogger = null;
+  mockInvoiceRepo = null;
+  usecase = null;
 });
 
 Given(/^invoice with "([\w-]+)" id/, async (testId: string) => {

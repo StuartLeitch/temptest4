@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 
@@ -20,21 +20,21 @@ import {
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
-let mockPausedReminderRepo: MockPausedReminderRepo;
-let mockInvoiceRepo: MockInvoiceRepo;
-let mockInvoiceItemRepo: MockInvoiceItemRepo;
-let mockArticleRepo: MockArticleRepo;
-let mockErpReferenceRepo: MockErpReferenceRepo;
-let mockLogger: MockLogger;
-let pausedReminderState: NotificationPause;
-let response: AddEmptyPauseStateForInvoiceResponse;
-let usecase: AddEmptyPauseStateForInvoiceUsecase;
+let mockPausedReminderRepo: MockPausedReminderRepo = null;
+let mockInvoiceRepo: MockInvoiceRepo = null;
+let mockInvoiceItemRepo: MockInvoiceItemRepo = null;
+let mockArticleRepo: MockArticleRepo = null;
+let mockErpReferenceRepo: MockErpReferenceRepo = null;
+let mockLogger: MockLogger = null;
+let pausedReminderState: NotificationPause = null;
+let response: AddEmptyPauseStateForInvoiceResponse = null;
+let usecase: AddEmptyPauseStateForInvoiceUsecase = null;
 
 const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-Before(() => {
+Before({ tags: '@ValidateEmptyStateForInvoice' }, () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockArticleRepo = new MockArticleRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
@@ -51,6 +51,16 @@ Before(() => {
     mockInvoiceRepo,
     mockLogger
   );
+});
+
+After({ tags: '@ValidateEmptyStateForInvoice' }, () => {
+  mockPausedReminderRepo = null;
+  mockArticleRepo = null;
+  mockErpReferenceRepo = null;
+  mockInvoiceItemRepo = null;
+  mockLogger = null;
+  mockInvoiceRepo = null;
+  usecase = null;
 });
 
 Given(/^an invoice with the id "([\w-]+)"/, async (testInvoiceId: string) => {

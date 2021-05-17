@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { SchedulerContract } from '../../../../../../src/lib/infrastructure/scheduler/Scheduler';
@@ -57,30 +57,30 @@ function makeNotificationData(
   });
 }
 
-let mockPausedReminderRepo: MockPausedReminderRepo;
-let mockSentNotificationRepo: MockSentNotificationRepo;
-let mockInvoiceRepo: MockInvoiceRepo;
-let mockInvoiceItemRepo: MockInvoiceItemRepo;
-let mockArticleRepo: MockArticleRepo;
-let mockErpReferenceRepo: MockErpReferenceRepo;
-let mockPayerRepo: MockPayerRepo;
-let mockLogger: MockLogger;
-let mockAddressRepo: MockAddressRepo;
-let mockTransactionRepo: MockTransactionRepo;
-let mockCatalogRepo: MockCatalogRepo;
-let mockPublisherRepo: MockPublisherRepo;
-let scheduler: SchedulerContract;
-let notification: Notification;
-let pausedReminder: NotificationPause;
+let mockPausedReminderRepo: MockPausedReminderRepo = null;
+let mockSentNotificationRepo: MockSentNotificationRepo = null;
+let mockInvoiceRepo: MockInvoiceRepo = null;
+let mockInvoiceItemRepo: MockInvoiceItemRepo = null;
+let mockArticleRepo: MockArticleRepo = null;
+let mockErpReferenceRepo: MockErpReferenceRepo = null;
+let mockPayerRepo: MockPayerRepo = null;
+let mockLogger: MockLogger = null;
+let mockAddressRepo: MockAddressRepo = null;
+let mockTransactionRepo: MockTransactionRepo = null;
+let mockCatalogRepo: MockCatalogRepo = null;
+let mockPublisherRepo: MockPublisherRepo = null;
+let scheduler: SchedulerContract = null;
+let notification: Notification = null;
+let pausedReminder: NotificationPause = null;
 
-let response: ResumeInvoicePaymentRemindersResponse;
-let usecase: ResumeInvoicePaymentReminderUsecase;
+let response: ResumeInvoicePaymentRemindersResponse = null;
+let usecase: ResumeInvoicePaymentReminderUsecase = null;
 
 const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-Before(() => {
+Before({ tags: '@ValidateResumeInvoicePaymentReminders' }, () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockSentNotificationRepo = new MockSentNotificationRepo();
   mockArticleRepo = new MockArticleRepo();
@@ -108,6 +108,20 @@ Before(() => {
   );
 });
 
+After({ tags: '@ValidateResumeInvoicePaymentReminders' }, () => {
+  mockPausedReminderRepo = null;
+  mockSentNotificationRepo = null;
+  mockArticleRepo = null;
+  mockErpReferenceRepo = null;
+  mockLogger = null;
+  mockInvoiceRepo = null;
+  mockPublisherRepo = null;
+  mockCatalogRepo = null;
+  mockInvoiceItemRepo = null;
+  mockTransactionRepo = null;
+  mockPayerRepo = null;
+  mockAddressRepo = null;
+});
 Given(/^the invoice with the id "([\w-]+)"/, async (testInvoiceId: string) => {
   const transaction = TransactionMap.toDomain({
     status: TransactionStatus.ACTIVE,

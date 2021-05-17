@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { SchedulerContract } from '../../../../../../src/lib/infrastructure/scheduler/Scheduler';
@@ -29,7 +29,6 @@ import {
   ArticleMap,
   CatalogMap,
   InvoiceItemMap,
-  MockAddressRepo,
   Roles,
   TransactionMap,
   TransactionStatus,
@@ -54,27 +53,27 @@ function makeNotificationData(
   });
 }
 
-let mockPausedReminderRepo: MockPausedReminderRepo;
-let mockSentNotificationRepo: MockSentNotificationRepo;
-let mockInvoiceRepo: MockInvoiceRepo;
-let mockInvoiceItemRepo: MockInvoiceItemRepo;
-let mockArticleRepo: MockArticleRepo;
-let mockErpReferenceRepo: MockErpReferenceRepo;
-let mockLogger: MockLogger;
-let mockTransactionRepo: MockTransactionRepo;
-let mockCatalogRepo: MockCatalogRepo;
-let mockPublisherRepo: MockPublisherRepo;
-let scheduler: SchedulerContract;
-let notification: Notification;
-let pausedReminder: NotificationPause;
-let response: ResumeInvoiceConfirmationRemindersResponse;
-let usecase: ResumeInvoiceConfirmationReminderUsecase;
+let mockPausedReminderRepo: MockPausedReminderRepo = null;
+let mockSentNotificationRepo: MockSentNotificationRepo = null;
+let mockInvoiceRepo: MockInvoiceRepo = null;
+let mockInvoiceItemRepo: MockInvoiceItemRepo = null;
+let mockArticleRepo: MockArticleRepo = null;
+let mockErpReferenceRepo: MockErpReferenceRepo = null;
+let mockLogger: MockLogger = null;
+let mockTransactionRepo: MockTransactionRepo = null;
+let mockCatalogRepo: MockCatalogRepo = null;
+let mockPublisherRepo: MockPublisherRepo = null;
+let scheduler: SchedulerContract = null;
+let notification: Notification = null;
+let pausedReminder: NotificationPause = null;
+let response: ResumeInvoiceConfirmationRemindersResponse = null;
+let usecase: ResumeInvoiceConfirmationReminderUsecase = null;
 
 const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-Before(() => {
+Before({ tags: '@ValidateResumeInvoiceConfirmationReminders' }, () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockSentNotificationRepo = new MockSentNotificationRepo();
   mockArticleRepo = new MockArticleRepo();
@@ -99,6 +98,19 @@ Before(() => {
     mockLogger,
     scheduler
   );
+});
+
+After({ tags: '@ValidateResumeInvoiceConfirmationReminders' }, () => {
+  mockPausedReminderRepo = null;
+  mockSentNotificationRepo = null;
+  mockArticleRepo = null;
+  mockErpReferenceRepo = null;
+  mockLogger = null;
+  mockInvoiceRepo = null;
+  mockPublisherRepo = null;
+  mockCatalogRepo = null;
+  mockInvoiceItemRepo = null;
+  mockTransactionRepo = null;
 });
 
 Given(/^one invoice with id "([\w-]+)"/, async (testInvoiceId: string) => {
