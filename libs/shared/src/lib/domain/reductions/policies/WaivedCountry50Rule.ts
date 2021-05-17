@@ -48,6 +48,7 @@ const WAIVER_POLICY_COUNTRIES = {
   UZ: { country: 'Uzbekistan' },
   VE: { country: 'Venezuela (Bolivarian Republic of)' },
   VN: { country: 'Viet Nam' },
+  PS: { country: 'West Bank and Gaza Strip' },
 };
 
 export class WaivedCountry50Rule implements ReductionRuleContract<Waiver> {
