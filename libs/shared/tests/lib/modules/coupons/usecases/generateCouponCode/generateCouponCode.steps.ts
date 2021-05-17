@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, Then, Before } from '@cucumber/cucumber';
+import { Given, Then, Before, After } from '@cucumber/cucumber';
 
 import { GenerateCouponCodeUsecase } from '../../../../../../src/lib/modules/coupons/usecases/generateCouponCode/generateCouponCode';
 import { GenerateCouponCodeResponse } from '../../../../../../src/lib/modules/coupons/usecases/generateCouponCode/generateCouponCodeResponse';
@@ -14,13 +14,18 @@ const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-let mockCouponRepo: MockCouponRepo;
-let usecase: GenerateCouponCodeUsecase;
-let response: GenerateCouponCodeResponse;
+let mockCouponRepo: MockCouponRepo = null;
+let usecase: GenerateCouponCodeUsecase = null;
+let response: GenerateCouponCodeResponse = null;
 
-Before(() => {
+Before({ tags: '@ValidateGenerateCouponCode' }, () => {
   mockCouponRepo = new MockCouponRepo();
   usecase = new GenerateCouponCodeUsecase(mockCouponRepo);
+});
+
+After({ tags: '@ValidateGenerateCouponCode' }, () => {
+  mockCouponRepo = null;
+  usecase = null;
 });
 
 Given(/^I call the execution of the usecase/, async () => {

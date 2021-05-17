@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
@@ -28,16 +28,19 @@ function makeNotificationData(
   });
 }
 
-let mockSentNotificationRepo: MockSentNotificationRepo;
-let notification: Notification;
-let notificationList: Notification[];
-let foundNotification: Notification;
-let addedNotification: Notification;
+let mockSentNotificationRepo: MockSentNotificationRepo = null;
+let notification: Notification = null;
+let notificationList: Notification[] = null;
+let foundNotification: Notification = null;
+let addedNotification: Notification = null;
 
-Before(async () => {
+Before({ tags: '@ValidateKnexSentNotification' }, async () => {
   mockSentNotificationRepo = new MockSentNotificationRepo();
 });
 
+After({ tags: '@ValidateKnexSentNotification' }, () => {
+  mockSentNotificationRepo = null;
+});
 Given(
   /^a notification with the id "([\w-]+)" and invoice id "([\w-]+)"$/,
   async (testNotificationId: string, testInvoiceId: string) => {

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
@@ -23,16 +23,20 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
   });
 }
 
-let mockCouponRepo: MockCouponRepo;
-let coupon: Coupon;
-let incrementedCoupon: Coupon;
-let updatedCoupon: Coupon;
-let couponList: Coupon[];
-let result: CouponAssignedCollection;
-let resultUsedCode: boolean;
+let mockCouponRepo: MockCouponRepo = null;
+let coupon: Coupon = null;
+let incrementedCoupon: Coupon = null;
+let updatedCoupon: Coupon = null;
+let couponList: Coupon[] = null;
+let result: CouponAssignedCollection = null;
+let resultUsedCode: boolean = null;
 
-Before(async () => {
+Before({ tags: '@ValidateKnexCouponRepo' }, async () => {
   mockCouponRepo = new MockCouponRepo();
+});
+
+After({ tags: '@ValidateKnexCouponRepo' }, () => {
+  mockCouponRepo = null;
 });
 
 Given(

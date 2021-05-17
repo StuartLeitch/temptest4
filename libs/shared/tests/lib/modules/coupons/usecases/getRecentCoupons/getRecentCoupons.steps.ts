@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, Then, Before, When } from '@cucumber/cucumber';
+import { Given, Then, Before, When, After } from '@cucumber/cucumber';
 
 import { GetRecentCouponsUsecase } from '../../../../../../src/lib/modules/coupons/usecases/getRecentCoupons/getRecentCoupons';
 import { GetRecentCouponsResponse } from '../../../../../../src/lib/modules/coupons/usecases/getRecentCoupons/getRecentCouponsResponse';
@@ -29,16 +29,20 @@ const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-let coupon: Coupon;
-let mockCouponRepo: MockCouponRepo;
-let usecase: GetRecentCouponsUsecase;
-let response: GetRecentCouponsResponse;
+let coupon: Coupon = null;
+let mockCouponRepo: MockCouponRepo = null;
+let usecase: GetRecentCouponsUsecase = null;
+let response: GetRecentCouponsResponse = null;
 
-Before(() => {
+Before({ tags: '@ValidateGetRecentCoupons' }, () => {
   mockCouponRepo = new MockCouponRepo();
   usecase = new GetRecentCouponsUsecase(mockCouponRepo);
 });
 
+After({ tags: '@ValidateGetRecentCoupons' }, () => {
+  mockCouponRepo = null;
+  usecase = null;
+});
 Given(
   /^I have the coupon "([\w-]+)" with "([\w-]+)"/,
   async (testId: string, testCode: string) => {

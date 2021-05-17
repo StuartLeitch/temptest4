@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, Then, Before, When } from '@cucumber/cucumber';
+import { Given, Then, Before, When, After } from '@cucumber/cucumber';
 
 import { UpdateCouponUsecase } from '../../../../../../src/lib/modules/coupons/usecases/updateCoupon';
 import { UpdateCouponResponse } from '../../../../../../src/lib/modules/coupons/usecases/updateCoupon/updateCouponResponse';
@@ -30,14 +30,19 @@ const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-let coupon: Coupon;
-let mockCouponRepo: MockCouponRepo;
-let usecase: UpdateCouponUsecase;
-let response: UpdateCouponResponse;
+let coupon: Coupon = null;
+let mockCouponRepo: MockCouponRepo = null;
+let usecase: UpdateCouponUsecase = null;
+let response: UpdateCouponResponse = null;
 
-Before(() => {
+Before({ tags: '@ValidateUpdateCoupon' }, () => {
   mockCouponRepo = new MockCouponRepo();
   usecase = new UpdateCouponUsecase(mockCouponRepo);
+});
+
+After({ tags: '@ValidateUpdateCoupon' }, () => {
+  mockCouponRepo = null;
+  usecase = null;
 });
 
 Given(

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
@@ -79,34 +79,34 @@ function makeSingleUseCouponData(code: string, overwrites?: any): Coupon {
   });
 }
 
-let mockInvoiceRepo: MockInvoiceRepo;
-let mockInvoiceItemRepo: MockInvoiceItemRepo;
-let mockCouponRepo: MockCouponRepo;
-let mockTransactionRepo: MockTransactionRepo;
-let mockManuscriptRepo: MockArticleRepo;
-let mockAddressRepo: MockAddressRepo;
-let mockPayerRepo: MockPayerRepo;
-let mockCatalogRepo: MockCatalogRepo;
-let mockWaiverRepo: MockWaiverRepo;
-let mockPublisherRepo: MockPublisherRepo;
-let emailService: EmailService;
-let mockLogger: MockLogger;
-let mockVatService: any;
-let mailingDisabled: boolean;
-let fePath: string;
-let tenantName: string;
+let mockInvoiceRepo: MockInvoiceRepo = null;
+let mockInvoiceItemRepo: MockInvoiceItemRepo = null;
+let mockCouponRepo: MockCouponRepo = null;
+let mockTransactionRepo: MockTransactionRepo = null;
+let mockManuscriptRepo: MockArticleRepo = null;
+let mockAddressRepo: MockAddressRepo = null;
+let mockPayerRepo: MockPayerRepo = null;
+let mockCatalogRepo: MockCatalogRepo = null;
+let mockWaiverRepo: MockWaiverRepo = null;
+let mockPublisherRepo: MockPublisherRepo = null;
+let emailService: EmailService = null;
+let mockLogger: MockLogger = null;
+let mockVatService: any = null;
+let mailingDisabled: boolean = null;
+let fePath: string = null;
+let tenantName: string = null;
 
-let usecase: ApplyCouponToInvoiceUsecase;
-let response: ApplyCouponToInvoiceResponse;
+let usecase: ApplyCouponToInvoiceUsecase = null;
+let response: ApplyCouponToInvoiceResponse = null;
 
 const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-let invoice: Invoice;
-let coupon: Coupon;
+let invoice: Invoice = null;
+let coupon: Coupon = null;
 
-Before(() => {
+Before({ tags: '@ValidateApplyCoupon' }, () => {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockCouponRepo = new MockCouponRepo();
   mockTransactionRepo = new MockTransactionRepo();
@@ -140,6 +140,22 @@ Before(() => {
   );
 });
 
+After({ tags: '@ValidateApplyCoupon' }, () => {
+  mockInvoiceItemRepo = null;
+  mockCouponRepo = null;
+  mockTransactionRepo = null;
+  mockManuscriptRepo = null;
+  mockAddressRepo = null;
+  mockPayerRepo = null;
+  mockCatalogRepo = null;
+  mockPublisherRepo = null;
+  mockWaiverRepo = null;
+  emailService = null;
+  mockLogger = null;
+  mockInvoiceRepo = null;
+  mockVatService = null;
+  usecase = null;
+});
 Given(
   /^we have an Invoice with id "([\w-]+)"/,
   async (testInvoiceId: string) => {

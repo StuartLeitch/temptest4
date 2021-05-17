@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
@@ -7,15 +7,18 @@ import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/Inv
 import { NotificationPause } from '../../../../../../src/lib/modules/notifications/domain/NotificationPause';
 import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
 
-let mockPausedReminderRepo: MockPausedReminderRepo;
-let pausedNotification: NotificationPause;
-let foundPausedNotification: NotificationPause;
-let savedPausedNotification: NotificationPause;
+let mockPausedReminderRepo: MockPausedReminderRepo = null;
+let pausedNotification: NotificationPause = null;
+let foundPausedNotification: NotificationPause = null;
+let savedPausedNotification: NotificationPause = null;
 
-Before(async () => {
+Before({ tags: '@ValidateKnexPausedReminder' }, async () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
 });
 
+After({ tags: '@ValidateKnexPausedReminder' }, () => {
+  mockPausedReminderRepo = null;
+});
 Given(
   /^an invoice with id "([\w-]+)" and a paused notification item$/,
   async (testInvoiceId: string) => {
