@@ -268,6 +268,7 @@ pages:
   #   - mkdir -p reports/cucumber && chmod -R +x reports/cucumber
   #   - mkdir -p reports/coverage && chmod -R +x reports/coverage
   script:
+    - env
     - cp -r -a reports/* $CI_PROJECT_DIR/public/
     - cd $HOME
     - yarn run ci:coverage
