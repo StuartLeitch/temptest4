@@ -269,6 +269,8 @@ pages:
   #   - mkdir -p reports/coverage && chmod -R +x reports/coverage
   script:
     - env
+    - pwd
+    - ls -ail
     - cp -r -a reports/* $CI_PROJECT_DIR/public/
     - cd $HOME
     - yarn run ci:coverage
