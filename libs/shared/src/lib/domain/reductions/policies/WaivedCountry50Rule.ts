@@ -13,7 +13,6 @@ const WAIVER_POLICY_COUNTRIES = {
   BA: { country: 'Bosnia and Herzegovina' },
   BW: { country: 'Botswana' },
   CO: { country: 'Colombia' },
-  CU: { country: 'Cuba' },
   EC: { country: 'Ecuador' },
   EG: { country: 'Egypt' },
   SV: { country: 'El Salvador' },

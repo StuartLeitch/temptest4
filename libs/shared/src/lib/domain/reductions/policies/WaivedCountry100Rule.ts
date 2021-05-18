@@ -34,7 +34,6 @@ const WAIVER_POLICY_COUNTRIES = {
   GD: { country: 'Grenada' },
   GN: { country: 'Guinea' },
   GW: { country: 'Guinea-Bissau' },
-  GY: { country: 'Guyana' },
   HT: { country: 'Haiti' },
   IR: { country: 'Iran' },
   KE: { country: 'Kenya' },
