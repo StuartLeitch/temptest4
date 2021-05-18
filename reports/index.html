@@ -65,22 +65,22 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
     <script>
-      function resizeIFrameToFitContent( iFrame ) {
-        iFrame.width  = iFrame.contentWindow.document.body.scrollWidth;
-        iFrame.height = iFrame.contentWindow.document.body.scrollHeight;
+      function resizeIFrameToFitContent(iFrame) {
+        $(iFrame).height(`${this.window.screen.availHeight - 170}px`);
       }
 
       $(document).ready(function() {
+        const iFrame = document.getElementById('reportframe');
+
         $(".framer").on('click', function(e) {
           e.preventDefault();
           const { href } = e.target;
-          // console.info(href)
-          // console.info(window.frames)
 
-          const iFrame = $('#reportframe');
-          iFrame.attr('src', href);
+          iFrame.src = href;
           resizeIFrameToFitContent( iFrame );
         })
+
+        resizeIFrameToFitContent(iFrame)
       });
     </script>
     <script src="popper.min.js"></script>
