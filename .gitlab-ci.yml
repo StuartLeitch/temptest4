@@ -246,35 +246,14 @@ Deploy:hindawi-prod:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-# Pages:
-#   interruptible: true
-#   stage: deploy
-#   when: manual
-#   script:
-#     - cp -r report public/
-#     - mv public/index.html public/coverage.html
-#   artifacts:
-#     paths:
-#       - public/
-#   dependencies:
-#     - Test
 
 pages:
   interruptible: true
   stage: reports
-  # before_script:
-  #   - cd $HOME
-  #   - mkdir -p reports && chmod -R +x reports
-  #   - mkdir -p reports/cucumber && chmod -R +x reports/cucumber
-  #   - mkdir -p reports/coverage && chmod -R +x reports/coverage
   script:
-    #- env
-    #- pwd
-    #- ls -ail
     - cp -r -a reports/* $HOME/reports/
     - cd $HOME
     - yarn run ci:coverage
-    # - rm -r $CI_PROJECT_DIR/public/*
     - cp -r -a $HOME/reports/* $CI_PROJECT_DIR/public/
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   needs: [Test]
