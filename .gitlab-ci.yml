@@ -262,11 +262,14 @@ Deploy:hindawi-prod:
 pages:
   interruptible: true
   stage: reports
+  before_script:
+    - cd $HOME/reports
+    - mkdir -p coverage
+    - mkdir -p cucumber
   script:
-    - cd $HOME
-    - mkdir -p reports && chmod -R +x reports
-    - mkdir -p reports/cucumber && chmod -R +x reports/cucumber
-    - mkdir -p reports/coverage && chmod -R +x reports/coverage
+    - chmod -R +x reports
+    - chmod -R +x reports/cucumber
+    - chmod -R +x reports/coverage
     - yarn run ci:coverage
     - rm -r public/*
     - cp -r -a reports/* $CI_PROJECT_DIR/public/
