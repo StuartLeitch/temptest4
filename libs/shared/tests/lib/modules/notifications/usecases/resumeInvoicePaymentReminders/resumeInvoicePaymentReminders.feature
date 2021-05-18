@@ -1,4 +1,4 @@
-Feature: resumeInvoicePaymentReminderUsecase test
+Feature: Resume Invoice Payment Reminders Usecase test
 
     @ValidateResumeInvoicePaymentReminders
     Scenario: Resume payment reminders for given invoice

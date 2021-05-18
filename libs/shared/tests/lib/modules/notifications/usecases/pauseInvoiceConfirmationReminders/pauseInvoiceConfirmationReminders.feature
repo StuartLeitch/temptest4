@@ -1,4 +1,4 @@
-Feature: pauseInvoiceConfirmationRemindersUsecase test
+Feature: Pause Invoice Confirmation Reminders Usecase test
 
     Background:
         Given the invoice "testInvoice" id

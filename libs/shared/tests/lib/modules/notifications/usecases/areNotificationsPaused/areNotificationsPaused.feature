@@ -1,4 +1,4 @@
-Feature: areNotificationsPausedUsecase test 
+Feature: Are Notifications Paused Usecase test 
 
     Background: 
         Given an invoice with id "test-invoice" with confirmation reminder notification

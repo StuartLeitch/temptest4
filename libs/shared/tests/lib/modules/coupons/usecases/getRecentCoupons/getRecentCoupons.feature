@@ -1,4 +1,4 @@
-Feature: getRecentCouponsUsecase test
+Feature: Get Recent Coupons Usecase test
 
     @ValidateGetRecentCoupons
     Scenario: For a recently added coupon, I should be able to obtain it 

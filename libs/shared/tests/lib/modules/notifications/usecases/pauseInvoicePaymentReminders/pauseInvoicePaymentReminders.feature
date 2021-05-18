@@ -1,4 +1,4 @@
-Feature: pauseInvoicePaymentReminderUsecase test
+Feature: Pause Invoice Payment Reminders Usecase test
 
     Background:
         Given invoice with the "test-invoice" id

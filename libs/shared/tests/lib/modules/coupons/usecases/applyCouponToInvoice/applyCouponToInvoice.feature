@@ -1,4 +1,4 @@
-Feature: applyCouponToInvoiceUsecase test
+Feature: Apply Coupon to Invoice Usecase test
 
     Background:
         Given we have an Invoice with id "test-invoice"

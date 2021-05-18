@@ -1,4 +1,4 @@
-Feature: createCuponUsecase test
+Feature: Create Coupon Usecase test
 
     @ValidateCreateCoupon
     Scenario: For coupon details, create a coupon

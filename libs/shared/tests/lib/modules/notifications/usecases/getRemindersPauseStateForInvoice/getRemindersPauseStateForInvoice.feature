@@ -1,4 +1,4 @@
-Feature: getRemindersPauseStateForInvoiceUsecase test
+Feature: Get Reminders Pause State For Invoice Usecase test
 
     @ValidateGetRemindersPauseState
     Scenario: Fetch reminders for a certain invoice

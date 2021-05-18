@@ -1,4 +1,4 @@
-Feature: resumeInvoiceConfirmationReminderUsecase test 
+Feature: Resume Invoice Confirmation Reminders Usecase test 
 
     @ValidateResumeInvoiceConfirmationReminders
     Scenario: Resume confirmation reminders for given invoice

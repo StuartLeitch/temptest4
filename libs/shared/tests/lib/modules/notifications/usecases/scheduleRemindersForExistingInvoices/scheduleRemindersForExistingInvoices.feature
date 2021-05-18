@@ -1,4 +1,4 @@
-Feature: scheduleRemindersForExistingInvoicesUsecase test
+Feature: Schedule Reminders For Existing Invoices Usecase test
 
     @ValidateScheduleReminders
     Scenario: Schedule Reminders for Invoice

@@ -1,4 +1,4 @@
-Feature: addEmptyStateForInvoiceUsecase test
+Feature: Add Empty State For Invoice Usecase test
 
     Background:
         Given an invoice with the id "test-invoice"

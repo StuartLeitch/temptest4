@@ -1,4 +1,4 @@
-Feature: getCouponDetailsByCodeUsecase test
+Feature: Get Coupon Details by Code Usecase test
 
     Background: 
         Given I have a coupon "coup1" with code "SMBGPLM"

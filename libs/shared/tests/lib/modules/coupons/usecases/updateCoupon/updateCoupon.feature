@@ -1,4 +1,4 @@
-Feature: updateCouponUsecase test
+Feature: Update Coupon Usecase test
 
     Background:
         Given the coupon "coupon" with "RRERTF"

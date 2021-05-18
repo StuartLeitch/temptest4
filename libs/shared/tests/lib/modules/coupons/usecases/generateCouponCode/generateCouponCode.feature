@@ -1,4 +1,4 @@
-Feature: generateCouponCodeUsecase test
+Feature: Generate Coupon Code Usecase test
 
     @ValidateGenerateCouponCode
     Scenario: 
