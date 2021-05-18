@@ -268,12 +268,10 @@ pages:
   #   - mkdir -p reports/cucumber && chmod -R +x reports/cucumber
   #   - mkdir -p reports/coverage && chmod -R +x reports/coverage
   script:
-    - ls -ail reports
-    - pwd
-    - echo $HOME
-    - ls -ail $HOME
+    - cp -r -a reports/* $CI_PROJECT_DIR/public/
+    - cd $HOME
     - yarn run ci:coverage
-    - rm -r public/*
+    - rm -r $CI_PROJECT_DIR/public/*
     - cp -r -a reports/* $CI_PROJECT_DIR/public/
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   needs: [Test]
