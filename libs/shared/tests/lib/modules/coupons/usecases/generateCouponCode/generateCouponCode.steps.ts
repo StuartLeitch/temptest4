@@ -28,9 +28,12 @@ After({ tags: '@ValidateGenerateCouponCode' }, () => {
   usecase = null;
 });
 
-Given(/^I call the execution of the usecase/, async () => {
-  response = await usecase.execute(context);
-});
+Given(
+  /^I call the execution of the usecase generateCouponCodeUsecase/,
+  async () => {
+    response = await usecase.execute(context);
+  }
+);
 
 Then(/^I expect a coupon code to be generated/, () => {
   expect(response.isRight()).to.be.true;

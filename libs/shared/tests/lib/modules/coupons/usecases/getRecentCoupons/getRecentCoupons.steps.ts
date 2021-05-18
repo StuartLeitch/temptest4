@@ -51,7 +51,8 @@ Given(
   }
 );
 
-When(/^I execute getRecenCouponsUsecase/, async () => {
+Given(/^I have no recently added coupons/, () => {});
+When(/^I execute getRecentCouponsUsecase/, async () => {
   response = await usecase.execute({}, context);
 });
 
