@@ -8,9 +8,6 @@ import { banner } from './lib/banner';
 import { env } from './env';
 import { LoggerBuilder } from '@hindawi/shared';
 
-console.info(env);
-
-
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
  * ----------------------------------------
