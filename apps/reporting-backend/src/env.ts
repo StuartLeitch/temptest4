@@ -11,6 +11,8 @@ import {
   toNumber,
 } from './lib/env';
 
+console.info(process.env);
+
 const everyDayCron = '0 0 * * *';
 const everySatAnd1stOfMonthCron = '0 14 1 * sat';
 const isRestEnabled = toBool(getOsEnvOptional('REST_ENABLED') || 'false');
@@ -18,7 +20,7 @@ export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
   isTest: process.env.NODE_ENV === 'test',
-  isDevelopment: process.env.NODE_ENV === 'development',
+  isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'qa',
   app: {
     name: getOsEnv('SERVICE_NAME'),
     version: (pkg as any).version,
