@@ -98,6 +98,24 @@ const InvoiceDownloadLink = ({ payer }) => {
   return null;
 };
 
+const renderError = (error) => {
+  if (!error) {
+    return null;
+  }
+
+  let errorText = error;
+
+  if (error.indexOf("INSTRUMENT_DECLINED") > -1) {
+    errorText = 'Payment declined, please choose other payment method from PayPal or choose Credit Card payment.';
+  }
+
+  return (<Text type="warning">{errorText}</Text>);
+}
+
+const ServerErrorContext = React.createContext({
+  serverError: null
+});
+
 const InvoicePayment: React.FunctionComponent<Props> = ({
   invoice,
   error,
@@ -148,58 +166,54 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     );
   } else {
     body = [
-      <Label key={"invoice-download-link"} my="4" ml="4">
-        Your Invoice
-        <InvoiceDownloadLink payer={invoice.payer} />
-      </Label>,
-      <Formik
-        key={"invoice-payment-form"}
-        validate={validateFn(methods)}
-        initialValues={{
-          paymentMethodId: null,
-          payerId: invoice && invoice.payer && invoice.payer.id,
-          amount: invoiceCharge,
-        }}
-        onSubmit={payByCardSubmit}
-      >
-        {({ setFieldValue, values }) => {
-          return (
-            <Root>
-              <ChoosePayment
-                methods={parsedMethods}
-                setFieldValue={setFieldValue}
-                values={values}
-              />
-              {methods[values.paymentMethodId] === "Credit Card" && (
-                <CreditCardForm
-                  ccToken={ccToken}
-                  payerId={invoice && invoice.payer && invoice.payer.id}
-                  paymentMethodId={values.paymentMethodId}
-                  handleSubmit={payByCardSubmit}
-                  total={calculateTotalToBePaid(invoice)}
-                  loading={loading}
-                />
-              )}
-              {methods[values.paymentMethodId] === "Bank Transfer" && (
-                <BankTransfer invoiceReference={invoice.referenceNumber}/>
-              )}
-              {methods[values.paymentMethodId] === "Paypal" && (
-                <Paypal
-                  createPayPalOrder={createPayPalOrder}
-                  onSuccess={payByPayPalSubmit}
-                />
-              )}
-              {error && (
-                <Text type="warning">
-                  {error.indexOf("INSTRUMENT_DECLINED") > -1
-                    ? "Payment declined, please chose other payment method from PayPal or chose Credit Card payment."
-                    : error}
-                </Text>
-              )}
-            </Root>
-          );
-        }}
-      </Formik>,
+        <Label key={"invoice-download-link"} my="4" ml="4">
+          Your Invoice
+          <InvoiceDownloadLink payer={invoice.payer} />
+        </Label>,
+        <Formik
+          key={"invoice-payment-form"}
+          validate={validateFn(methods)}
+          initialValues={{
+            paymentMethodId: null,
+            payerId: invoice && invoice.payer && invoice.payer.id,
+            amount: invoiceCharge,
+          }}
+          onSubmit={payByCardSubmit}
+        >
+          {({ setFieldValue, values }) => {
+            return (
+                <Root>
+                    <ChoosePayment
+                      methods={parsedMethods}
+                      setFieldValue={setFieldValue}
+                      values={values}
+                    />
+                    {methods[values.paymentMethodId] === "Credit Card" && [
+                      <CreditCardForm
+                        ccToken={ccToken}
+                        payerId={invoice && invoice.payer && invoice.payer.id}
+                        paymentMethodId={values.paymentMethodId}
+                        handleSubmit={payByCardSubmit}
+                        total={calculateTotalToBePaid(invoice)}
+                        serverError={error}
+                        loading={loading}
+                      />
+                    ]}
+                    {methods[values.paymentMethodId] === "Bank Transfer" && [
+                      <BankTransfer invoiceReference={invoice.referenceNumber}/>,
+                      renderError(error)
+                    ]}
+                    {methods[values.paymentMethodId] === "Paypal" && [
+                      <Paypal
+                        createPayPalOrder={createPayPalOrder}
+                        onSuccess={payByPayPalSubmit}
+                      />,
+                      renderError(error)
+                    ]}
+                </Root>
+            );
+          }}
+        </Formik>
     ];
   }
 

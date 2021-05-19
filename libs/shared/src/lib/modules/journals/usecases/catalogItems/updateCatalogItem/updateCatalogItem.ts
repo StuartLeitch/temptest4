@@ -109,7 +109,9 @@ export class UpdateCatalogItemToCatalogUseCase
         issn,
         journalId: rawJournalId,
         journalTitle,
-        publisherId: publisher.publisherId.id.toString(),
+        publisherId: catalogItem.publisherId
+          ? catalogItem.publisherId.id.toString()
+          : publisher.publisherId.id.toString(),
       });
 
       // * This is where all the magic happens

@@ -7,9 +7,7 @@ import {
   map,
 } from "rxjs/operators";
 import { isActionOf, RootEpic } from "typesafe-actions";
-import { ajax } from "rxjs/ajax";
 import { of, from } from "rxjs";
-import { config } from "../../../../config";
 
 import { queries, mutations } from "./graphql";
 

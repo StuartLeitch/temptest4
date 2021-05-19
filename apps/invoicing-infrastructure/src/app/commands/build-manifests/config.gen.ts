@@ -17,6 +17,10 @@ import { values as demoInvoicingGraphqlValues } from 'apps/invoicing-graphql/cha
 import { values as demoInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/demo';
 import { values as demoInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/demo';
 
+import { values as demoSalesInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/demo-sales';
+import { values as demoSalesInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/demo-sales';
+import { values as demoSalesInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/demo-sales';
+
 import { values as gswDemoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/gsw/demo';
 import { values as gswDemoInvoicingWebValues } from 'apps/invoicing-web/chart/gsw/demo';
 import { values as gswDemoInvoicingAdminValues } from 'apps/invoicing-admin/chart/gsw/demo';
@@ -47,6 +51,11 @@ const masterConfig: {
       [App.graphql]: demoInvoicingGraphqlValues,
       [App.admin]: demoInvoicingAdminValues,
       [App.web]: demoInvoicingWebValues,
+    },
+    'demo-sales': {
+      [App.graphql]: demoSalesInvoicingGraphqlValues,
+      [App.admin]: demoSalesInvoicingAdminValues,
+      [App.web]: demoSalesInvoicingWebValues,
     },
     qa: {
       [App.graphql]: qaInvoicingGraphqlValues,

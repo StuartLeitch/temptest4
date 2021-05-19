@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import PaymentIcon from "./PaymentIcon";
-import { Flex, Label, Button, th } from "@hindawi/react-components";
+import { Flex, Label, Button, Text, th } from "@hindawi/react-components";
 import { Braintree, HostedField } from "react-braintree-fields";
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
   paymentMethodId: string;
   payerId: string;
   total: number;
+  serverError: string;
 }
 
 class CreditCardForm extends React.PureComponent<Props, {}> {
@@ -33,6 +34,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   state = {
     isBraintreeReady: false,
     numberFocused: false,
+    error: null
   };
 
   onError(error: any) {
@@ -69,6 +71,53 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         <pre>{JSON.stringify(obj, null, 4)}</pre>
       </div>
     );
+  }
+
+  renderError(title: string, obj: any) {
+    if (!obj && !this.props.serverError) {
+      return null;
+    }
+
+    if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
+      return (
+        <Text type="warning">{'All fields are empty'}</Text>
+        );
+    } else if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
+      const map = []
+      if (obj.details && 'invalidFields' in obj.details) {
+        const invalids = Object.values(obj.details.invalidFieldKeys).reduce((acc: any[], invalidFieldKey) => {
+          let txt = '';
+          if (invalidFieldKey === 'number') {
+            txt = '\u2022 Please enter a valid credit card number'
+          }
+          if (invalidFieldKey === 'expirationDate') {
+            txt = '\u2022 Please enter a valid expiration date'
+          }
+          if (invalidFieldKey === 'cvv') {
+            txt = '\u2022 Please enter a valid CVV'
+          }
+          if (invalidFieldKey === 'postalCode') {
+            txt = '\u2022 Please enter a valid postal code'
+          }
+          acc.push(<Text type="warning">{txt}</Text>)
+          return acc;
+        }, []);
+
+        return ([
+          <Text key={'msg'} type="warning">{'Some payment input fields are invalid: '}</Text>
+        ] as any).concat(invalids)
+      }
+    } else if (this.props.serverError && !obj && !obj) {
+      let errorText = this.props.serverError;
+      // Eliminate duplicated text, as this is how it's being returned from Braintree
+      if (this.props.serverError.indexOf('Postal code can only contain letters, numbers, spaces, and hyphens') > -1) {
+        errorText = 'Postal code can only contain letters, numbers, spaces and hyphens.';
+      }
+
+      return (
+        <Text type="warning">{errorText}</Text>
+      );
+    }
   }
 
   onAuthorizationSuccess() {
@@ -159,6 +208,8 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
             </Button>
           </CardContainer>
         </Braintree>
+
+        {this.renderError('Error', this.state.error)}
       </Flex>
     );
   }

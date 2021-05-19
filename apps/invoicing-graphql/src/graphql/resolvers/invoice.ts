@@ -543,6 +543,10 @@ export const invoice: Resolvers<Context> = {
         sanctionedCountryNotificationSender,
       } = env.app;
 
+      const usecaseContext = {
+        roles: [Roles.PAYER],
+      };
+
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
         invoiceRepo,
         invoiceItemRepo,
@@ -557,12 +561,15 @@ export const invoice: Resolvers<Context> = {
         loggerService
       );
 
-      const result = await applyCouponUsecase.execute({
-        couponCode: args.couponCode,
-        invoiceId: args.invoiceId,
-        sanctionedCountryNotificationReceiver,
-        sanctionedCountryNotificationSender,
-      });
+      const result = await applyCouponUsecase.execute(
+        {
+          couponCode: args.couponCode,
+          invoiceId: args.invoiceId,
+          sanctionedCountryNotificationReceiver,
+          sanctionedCountryNotificationSender,
+        },
+        usecaseContext
+      );
 
       if (result.isLeft()) {
         throw new Error(result.value.errorValue().message);

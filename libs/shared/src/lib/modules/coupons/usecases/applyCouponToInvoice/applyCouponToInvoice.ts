@@ -336,7 +336,14 @@ export class ApplyCouponToInvoiceUsecase
     const { couponRepo } = this;
 
     request.couponCode = request.couponCode.toUpperCase().trim();
-    const couponCode = CouponCode.create(request.couponCode).getValue();
+    const couponCodeResult = CouponCode.create(request.couponCode);
+
+    let couponCode;
+    if (couponCodeResult.isSuccess) {
+      couponCode = couponCodeResult.getValue();
+    } else {
+      return new CouponNotFoundError(request.couponCode);
+    }
 
     const coupon = await couponRepo.getCouponByCode(couponCode);
 
