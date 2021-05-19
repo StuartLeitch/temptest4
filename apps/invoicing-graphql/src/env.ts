@@ -11,6 +11,8 @@ import {
   toBool,
 } from './lib/env';
 
+console.info(process.env);
+
 export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
