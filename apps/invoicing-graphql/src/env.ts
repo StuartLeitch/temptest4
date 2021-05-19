@@ -15,7 +15,7 @@ export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
   isTest: process.env.NODE_ENV === 'test',
-  isDevelopment: process.env.NODE_ENV === 'development',
+  isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'qa',
   app: {
     name: getOsEnv('SERVICE_NAME'),
     version: (pkg as any).version,
