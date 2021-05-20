@@ -451,7 +451,7 @@ export const invoice: Resolvers<Context> = {
       const result = await usecase.execute({ invoiceId: parent.invoiceId }, usecaseContext);
 
       if (result.isLeft()) {
-        console.log(result.value);
+        console.error(result.value);
         throw result.value.errorValue;
       }
 
