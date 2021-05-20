@@ -52,7 +52,7 @@ export const payments: Resolvers<Context> = {
       } else {
         const err = result.value;
         logger.error(
-          `While getting the braintree client token an error ocurred {${err.message}}`,
+          `While getting the Braintree client token an error ocurred {${err.message}}`,
           err
         );
         throw new Error(`Can't get client token.`);
@@ -222,7 +222,8 @@ export const payments: Resolvers<Context> = {
           ExternalOrderId.create(paymentReference)
         );
       } catch (err) {
-        // do nothing, just let it go
+        // TODO: throw an error
+        // * do nothing, just let it go
       }
 
       if (alreadyUsedPaymentReference) {

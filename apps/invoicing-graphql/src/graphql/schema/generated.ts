@@ -316,12 +316,6 @@ export type InvoiceFilters = {
   invoiceItem?: Maybe<InvoiceItemFilters>;
 };
 
-export type StatisticsInvoiceFilters = {
-  status?: Maybe<Array<Maybe<InvoiceStatus>>>;
-  from: Scalars['String'];
-  to: Scalars['String'];
-};
-
 export type Pagination = {
   page?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -369,7 +363,6 @@ export type Query = {
   echo?: Maybe<Scalars['String']>;
   remindersStatus?: Maybe<RemindersStatus>;
   remindersSent?: Maybe<Array<Maybe<SentReminder>>>;
-  countInvoices?: Maybe<Statistics>;
 };
 
 
@@ -420,16 +413,6 @@ export type QueryRemindersStatusArgs = {
 
 export type QueryRemindersSentArgs = {
   invoiceId: Scalars['ID'];
-};
-
-
-export type QueryCountInvoicesArgs = {
-  filters?: Maybe<StatisticsInvoiceFilters>;
-};
-
-export type Statistics = {
-  __typename?: 'Statistics';
-  draftInvoicesCount?: Maybe<Scalars['Int']>;
 };
 
 export type Mutation = {
@@ -688,13 +671,11 @@ export type ResolversTypes = {
   ArticleFilters: ArticleFilters;
   InvoiceItemFilters: InvoiceItemFilters;
   InvoiceFilters: InvoiceFilters;
-  StatisticsInvoiceFilters: StatisticsInvoiceFilters;
   Pagination: Pagination;
   MigratePayerAddress: MigratePayerAddress;
   MigratePayer: MigratePayer;
   MigrateAPC: MigrateApc;
   Query: ResolverTypeWrapper<{}>;
-  Statistics: ResolverTypeWrapper<Statistics>;
   Mutation: ResolverTypeWrapper<{}>;
 };
 
@@ -738,13 +719,11 @@ export type ResolversParentTypes = {
   ArticleFilters: ArticleFilters;
   InvoiceItemFilters: InvoiceItemFilters;
   InvoiceFilters: InvoiceFilters;
-  StatisticsInvoiceFilters: StatisticsInvoiceFilters;
   Pagination: Pagination;
   MigratePayerAddress: MigratePayerAddress;
   MigratePayer: MigratePayer;
   MigrateAPC: MigrateApc;
   Query: {};
-  Statistics: Statistics;
   Mutation: {};
 };
 
@@ -991,12 +970,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryEchoArgs, never>>;
   remindersStatus?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<QueryRemindersStatusArgs, 'invoiceId'>>;
   remindersSent?: Resolver<Maybe<Array<Maybe<ResolversTypes['SentReminder']>>>, ParentType, ContextType, RequireFields<QueryRemindersSentArgs, 'invoiceId'>>;
-  countInvoices?: Resolver<Maybe<ResolversTypes['Statistics']>, ParentType, ContextType, RequireFields<QueryCountInvoicesArgs, never>>;
-};
-
-export type StatisticsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Statistics'] = ResolversParentTypes['Statistics']> = {
-  draftInvoicesCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -1048,7 +1021,6 @@ export type Resolvers<ContextType = any> = {
   RemindersStatus?: RemindersStatusResolvers<ContextType>;
   SentReminder?: SentReminderResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  Statistics?: StatisticsResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
 };
 
