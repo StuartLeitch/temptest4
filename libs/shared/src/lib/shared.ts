@@ -54,6 +54,8 @@ export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDe
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTOs';
 export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
 export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction.dto';
+export * from './modules/transactions/usecases/getTransactionByInvoiceId/getTransactionByInvoiceId';
+export * from './modules/transactions/usecases/getTransactionByInvoiceId/getTransactionByInvoiceIdDTO';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';

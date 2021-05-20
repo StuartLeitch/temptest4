@@ -27,6 +27,7 @@ import {
   PayerMap,
   Roles,
   GetInvoicesIdsErrors,
+  GetTransactionByInvoiceIdUsecase
 } from '@hindawi/shared';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
@@ -440,18 +441,28 @@ export const invoice: Resolvers<Context> = {
       const {
         repos: { transaction: transactionRepo },
       } = context;
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
 
-      const transaction = await transactionRepo.getTransactionByInvoiceId(
-        invoiceId
-      );
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
+      const usecase = new GetTransactionByInvoiceIdUsecase(transactionRepo);
+
+      const result = await usecase.execute({ invoiceId: parent.invoiceId }, usecaseContext);
+
+      if (result.isLeft()) {
+        console.log(result.value);
+        throw result.value.errorValue;
+      }
+
+      const transaction = result.value;
 
       if (!transaction) {
         return null;
       }
+
       return TransactionMap.toPersistence(transaction);
+
     },
   },
   InvoiceItem: {
@@ -479,6 +490,7 @@ export const invoice: Resolvers<Context> = {
           InvoiceItemId.create(new UniqueEntityID(parent.id))
         )
         .then((coupons) => coupons.map((c) => c.coupon));
+
       return coupons.map(CouponMap.toPersistence);
     },
 
@@ -580,14 +592,12 @@ export const invoice: Resolvers<Context> = {
     async createCreditNote(parent, args, context): Promise<any> {
       const {
         repos: {
-          // payment: paymentRepo,
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           transaction: transactionRepo,
           coupon: couponRepo,
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
-          // manuscript: manuscriptRepo,
         },
         services: { waiverService },
       } = context;
@@ -595,9 +605,7 @@ export const invoice: Resolvers<Context> = {
       const { invoiceId, createDraft, reason } = args;
 
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
-        // paymentRepo,
         invoiceRepo,
-        // manuscriptRepo,
         invoiceItemRepo,
         transactionRepo,
         couponRepo,
@@ -617,7 +625,6 @@ export const invoice: Resolvers<Context> = {
       );
 
       if (result.isLeft()) {
-        // console.log(result.value.errorValue());
         return null;
       }
 
