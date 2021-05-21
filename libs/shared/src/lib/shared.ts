@@ -101,6 +101,8 @@ export * from './modules/invoices/usecases/publishEvents/publishInvoiceFinalized
 export * from './modules/invoices/usecases/publishEvents/publishInvoicePaid/publishInvoicePaid';
 export * from './modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 export * from './modules/invoices/usecases/ERP/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
+export * from './modules/invoices/usecases/getVATNote/getVATNoteDTO';
+export * from './modules/invoices/usecases/getVATNote/getVATNote';
 
 export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';

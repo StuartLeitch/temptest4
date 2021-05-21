@@ -26,8 +26,9 @@ import {
   WaiverMap,
   PayerMap,
   Roles,
-  GetInvoicesIdsErrors,
-  GetTransactionByInvoiceIdUsecase
+  GetTransactionByInvoiceIdUsecase,
+  GetPaymentsByInvoiceIdUsecase,
+  GetVATNoteUsecase
 } from '@hindawi/shared';
 
 import { Resolvers, Invoice, PayerType } from '../schema';
@@ -294,6 +295,10 @@ export const invoice: Resolvers<Context> = {
         services: { exchangeRateService, vatService },
       } = context;
 
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
         invoiceItemRepo,
         couponRepo,
@@ -328,43 +333,39 @@ export const invoice: Resolvers<Context> = {
         }
       }
 
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
-
-      const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
-
       let vatnote = ' ';
-      if (payer && payer.billingAddressId) {
-        const address = await addressRepo.findById(payer.billingAddressId);
-        // * Get the VAT note for the invoice item
-        const { template } = vatService.getVATNote(
-          {
-            postalCode: address.postalCode,
-            countryCode: address.country,
-            stateCode: address.state,
-          },
-          payer.type !== PayerType.INSTITUTION,
-          new Date(parent.dateIssued)
-        );
-        vatnote = template;
+      const getVatNoteUsecase = new GetVATNoteUsecase(payerRepo, addressRepo, vatService);
+      const getVatNoteResult = await getVatNoteUsecase.execute({
+        invoiceId: parent.invoiceId,
+        dateIssued: parent.dateIssued
+      }, usecaseContext)
+
+      if (getVatNoteResult.isRight()) {
+        vatnote = getVatNoteResult.value;
       }
 
-      // if (!rawItem) {
-      //   return null;
-      // }
 
       return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
     },
     async payment(parent: Invoice, args, context) {
       const {
-        repos: { payment: paymentRepo, erpReference: erpReferenceRepo },
+        repos: { payment: paymentRepo, invoice: invoiceRepo },
       } = context;
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
 
-      const payment = await paymentRepo.getPaymentByInvoiceId(invoiceId);
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
+      const usecase = new GetPaymentsByInvoiceIdUsecase(invoiceRepo, paymentRepo);
+
+      const result = await usecase.execute({ invoiceId: parent.invoiceId }, usecaseContext);
+
+      if (result.isLeft()) {
+        console.error(result.value);
+        throw result.value.message;
+      }
+
+      const payment = result.value[0];
 
       if (!payment) {
         return null;
@@ -373,17 +374,28 @@ export const invoice: Resolvers<Context> = {
     },
     async payments(parent: Invoice, args, context) {
       const {
-        repos: { payment: paymentRepo },
+        repos: { invoice: invoiceRepo, payment: paymentRepo },
       } = context;
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
 
-      const payments = await paymentRepo.getPaymentsByInvoiceId(invoiceId);
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
+      const usecase = new GetPaymentsByInvoiceIdUsecase(invoiceRepo, paymentRepo);
+
+      const result = await usecase.execute({ invoiceId: parent.invoiceId }, usecaseContext);
+
+      if (result.isLeft()) {
+        console.error(result.value);
+        throw result.value.message;
+      }
+
+      const payments = result.value;
 
       if (!payments) {
         return null;
       }
+
       return payments.map((p) => PaymentMap.toPersistence(p));
     },
     async creditNote(parent: Invoice, args, context) {
