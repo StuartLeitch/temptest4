@@ -398,7 +398,7 @@ Then(
 );
 
 Then(
-  /The tax code selected for the Invoice with the ID "([\w-]+)" is ([\d]+)/,
+  /The tax code selected for the Invoice with the ID "([\w-]+)" is ([\d\w_-]+)/,
   function (invoiceId: string, taxRate: string) {
     expect(response.isRight()).to.be.true;
     const netsuiteData = mockErpService.getInvoice(invoiceId);
