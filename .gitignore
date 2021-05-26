@@ -4,6 +4,7 @@
 /dev/data
 /apps/invoicing-graphql/src/environments/*
 /apps/reporting-backend/src/environments/*
+/tools/scripts/netsuite/node_modules
 /tools/scripts/netsuite/data/*
 
 # compiled output
