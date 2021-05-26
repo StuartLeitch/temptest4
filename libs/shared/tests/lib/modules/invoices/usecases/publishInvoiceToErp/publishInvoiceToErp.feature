@@ -16,14 +16,14 @@ Feature: Publish invoice to erp system
 
         Examples:
             | payerCountry | payerType   | taxRate |
-            | GB           | INDIVIDUAL  | 53      |
-            | GB           | INSTITUTION | 53      |
-            | UK           | INDIVIDUAL  | 53      |
-            | UK           | INSTITUTION | 53      |
-            | RO           | INDIVIDUAL  | 55      |
-            | RO           | INSTITUTION | 55      |
-            | CH           | INDIVIDUAL  | 55      |
-            | CH           | INSTITUTION | 55      |
+            | GB           | INDIVIDUAL  | GB_SR   |
+            | GB           | INSTITUTION | GB_SR   |
+            | UK           | INDIVIDUAL  | GB_SR   |
+            | UK           | INSTITUTION | GB_SR   |
+            | RO           | INDIVIDUAL  | GB_ZR   |
+            | RO           | INSTITUTION | GB_ZR   |
+            | CH           | INDIVIDUAL  | GB_ZR   |
+            | CH           | INSTITUTION | GB_ZR   |
 
     @ValidatePublishInvoiceToErp
     Scenario: Fully discounted invoices are not sent to sage
