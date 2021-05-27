@@ -33,3 +33,14 @@ The script will lookup for a specific `.csv` file, following the next rules:
 * when `RECORD_TYPE=creditmemo` it will delete the ids from `data/CreditMemos.csv`
 * when `RECORD_TYPE=customer` it will delete the ids from `data/Customers.csv`
 * when `RECORD_TYPE=customerpayment` it will delete the ids from `data/Payments.csv`
+
+## Dockerization
+
+```sh
+docker build -t 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.4.0 -f Dockerfile .
+```
+
+```sh
+docker push 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.4.0
+```
+
