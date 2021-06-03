@@ -1,6 +1,6 @@
 Feature: UK VAT Business rules
     @ValidateVAT
-    Scenario Outline: UK VAT rates calculation for an APC with new Brexit rules
+    Scenario Outline: VAT rates calculation for an APC with new Brexit rules
         Given The Payer is an <payerType> in <payerCountry>
         When  The payer will pay for an APC of <invoiceNetValue>
         Then  The invoice total amount should be <invoiceTotalValue>
