@@ -1,9 +1,9 @@
 Feature: Get VAT Note
     @ValidateVATNote
     Scenario Outline: VAT notes calculation for an APC with new Brexit rules
-        Given The Payer is in <payerCountry>
-        When  The VAT note is generated
-        Then  The VAT note should be <vatNote>
+        Given The Payer is from <payerCountry>
+        When  The VAT note is calculated
+        Then  The final VAT note should be <vatNote>
 
         Examples:
             | payerCountry | vatNote |

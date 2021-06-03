@@ -138,7 +138,7 @@ Before(() => {
 });
 
 Given(
-  /^The Payer is in (\w+)$/,
+  /^The Payer is from (\w+)$/,
   (country: string) => {
     APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
     policiesRegister.registerPolicy(APCPolicy);
@@ -154,12 +154,12 @@ Given(
   }
 );
 
-When('The VAT note is generated', () => {
+When('The VAT note is calculated', () => {
   VATNote = calculateVAT.getVATNote();
 });
 
 Then(
-  /^The VAT note should be (.*)$/,
+  /^The final VAT note should be (.*)$/,
   (expectedVATNote) => {
 
     if (typeof expectedVATNote === 'undefined') {
