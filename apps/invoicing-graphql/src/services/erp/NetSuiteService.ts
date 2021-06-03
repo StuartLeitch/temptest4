@@ -794,6 +794,9 @@ export class NetSuiteService implements ErpServiceContract {
       case 'change-payer-details':
         memo = 'Change Payer Details';
         break;
+      case 'bad-debt':
+        memo = 'Bad Debt';
+        break;
     }
 
     const patchCreditNotePayload: Record<string, any> = {
