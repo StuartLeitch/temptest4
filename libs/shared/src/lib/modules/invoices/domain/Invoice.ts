@@ -1,4 +1,5 @@
 import { getYear } from 'date-fns';
+import getMonth from 'date-fns/getMonth';
 import isAfter from 'date-fns/isAfter';
 import isBefore from 'date-fns/isBefore';
 
@@ -416,6 +417,12 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
         .toString()
         .padStart(6, '0');
       referenceYear = getYear(this.props.dateIssued);
+
+      // * getMonth returns a number corresponding to each month,
+      // * so January is 0, February is 1, May is 5
+      if (getMonth(this.props.dateIssued) > 5) {
+        referenceYear += 1;
+      }
     }
 
     return `${referenceNumberPadded}/${referenceYear}`;
