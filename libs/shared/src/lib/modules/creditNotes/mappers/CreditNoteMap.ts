@@ -9,13 +9,18 @@ import { InvoiceId } from '../../invoices/domain/InvoiceId';
 // * to be updated with GuardFailure
 export class CreditNoteMap extends Mapper<CreditNote> {
   public static toDomain(raw: any): CreditNote {
-    const maybeCreditNote = CreditNote.create({
-      invoiceId: InvoiceId.create(new UniqueEntityID(raw.invoiceId)).getValue(),
-      creationReason: raw.creationReason ?? null,
-      dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
-      dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
-      dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
-    });
+    const maybeCreditNote = CreditNote.create(
+      {
+        invoiceId: InvoiceId.create(
+          new UniqueEntityID(raw.invoiceId)
+        ).getValue(),
+        creationReason: raw.creationReason ?? null,
+        dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
+        dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
+        dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
+      },
+      new UniqueEntityID(raw.id)
+    );
 
     maybeCreditNote.isFailure ? console.log(maybeCreditNote) : '';
 
@@ -25,7 +30,7 @@ export class CreditNoteMap extends Mapper<CreditNote> {
   public static toPersistence(creditNote: CreditNote): any {
     return {
       id: creditNote.id.toString(),
-      invoiceId: creditNote.invoiceId.toString(),
+      invoiceId: creditNote.invoiceId.id.toString(),
       creationReason: creditNote.creationReason,
       dateCreated: creditNote.dateCreated,
       dateIssued: creditNote.dateIssued,
