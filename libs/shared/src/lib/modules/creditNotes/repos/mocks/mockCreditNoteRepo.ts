@@ -10,6 +10,10 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 export class MockCreditNoteRepo
   extends BaseMockRepo<CreditNote>
   implements CreditNoteRepoContract {
+  constructor() {
+    super();
+  }
+
   public async getCreditNoteByInvoiceId(
     invoiceId: InvoiceId
   ): Promise<CreditNote> {

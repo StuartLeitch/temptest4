@@ -18,11 +18,7 @@ import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 export class KnexCreditNoteRepo
   extends AbstractBaseDBRepo<Knex, CreditNote>
   implements CreditNoteRepoContract {
-  constructor(
-    protected db: Knex,
-    protected logger?: any,
-    private invoiceRepo?: InvoiceRepoContract
-  ) {
+  constructor(protected db: Knex, protected logger?: any) {
     super(db, logger);
   }
 
