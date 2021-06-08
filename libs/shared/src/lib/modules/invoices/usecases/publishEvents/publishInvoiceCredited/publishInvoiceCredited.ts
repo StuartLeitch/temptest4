@@ -58,7 +58,7 @@ export class PublishInvoiceCreditedUsecase
       manuscript,
       payments,
       payer,
-      invoice
+      invoice,
     } = request;
 
     const erpReference = creditNote
@@ -83,6 +83,8 @@ export class PublishInvoiceCreditedUsecase
       manuscriptAcceptedDate: creditNote?.dateAccepted?.toISOString(),
       invoiceCreatedDate: creditNote?.dateCreated?.toISOString(),
       invoiceIssuedDate: creditNote?.dateIssued?.toISOString(),
+
+      reason: invoice?.creationReason,
 
       costs: formatCosts(invoiceItems, payments, creditNote),
 

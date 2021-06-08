@@ -49,7 +49,7 @@ export class PublishInvoiceFinalizedUsecase
     const validRequest = this.verifyInput(request);
 
     if (validRequest.isLeft()) {
-     return validRequest;
+      return validRequest;
     }
 
     const {
@@ -87,6 +87,7 @@ export class PublishInvoiceFinalizedUsecase
       invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
 
+      reason: invoice?.creationReason,
       costs: formatCosts(invoiceItems, payments, invoice),
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
       payer: payer ? formatPayer(payer, billingAddress) : null,
