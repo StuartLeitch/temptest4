@@ -6,14 +6,21 @@ import { Result } from '../../../core/logic/Result';
 // *Subdomains
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { CreditNoteId } from '../domain/CreditNoteId';
-import { InvoiceItem } from '../../invoices/domain/InvoiceItem';
-import { InvoiceItems } from '../../invoices/domain/InvoiceItems';
 
+export enum CreationReason {
+  WITHDRAWN_MANUSCRIPT = 'withdrawn-manuscript',
+  REDUCTION_APPLIED = 'reduction-applied',
+  WAIVED_MANUSCRIPT = 'waived-manuscript',
+  CHANGED_PAYER_DETAILS = 'changed-payer-details',
+  BAD_DEBT = 'bad-debt',
+  OTHER = 'other',
+}
 interface CreditNoteProps {
   invoiceId: InvoiceId;
-  creationReason?: string;
-  invoiceItems?: InvoiceItems;
-  totalNumInvoiceItems?: number;
+  creationReason?: CreationReason;
+  vat: number;
+  price: number;
+  persistentReferenceNumber?: string;
   dateCreated?: Date;
   dateIssued?: Date;
   dateUpdated?: Date;
@@ -34,12 +41,36 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     this.props.invoiceId = invoiceId;
   }
 
-  get creationReason(): string {
+  get creationReason(): CreationReason {
     return this.props.creationReason;
   }
 
-  set creationReason(creationReason: string) {
+  set creationReason(creationReason: CreationReason) {
     this.props.creationReason = creationReason;
+  }
+
+  get vat(): number {
+    return this.props.vat;
+  }
+
+  set vat(vat: number) {
+    this.props.vat = vat;
+  }
+
+  get price(): number {
+    return this.props.price;
+  }
+
+  set price(price: number) {
+    this.props.price = price;
+  }
+
+  get persistentReferenceNumber(): string {
+    return this.props.persistentReferenceNumber;
+  }
+
+  set persistentReferenceNumber(persistentReferenceNumber: string) {
+    this.props.persistentReferenceNumber = persistentReferenceNumber;
   }
 
   get dateCreated(): Date {
@@ -66,10 +97,6 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     this.props.dateUpdated = dateUpdated;
   }
 
-  get invoiceItems(): InvoiceItems {
-    return this.props.invoiceItems;
-  }
-
   private constructor(props: CreditNoteProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -86,21 +113,5 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     const creditNote = new CreditNote(defaultValues, id);
 
     return Result.ok<CreditNote>(creditNote);
-  }
-
-  private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
-    if (this.props.invoiceItems.exists(invoiceItem)) {
-      this.props.invoiceItems.remove(invoiceItem);
-    }
-  }
-  public addInvoiceItem(invoiceItem: InvoiceItem): Result<void> {
-    this.removeInvoiceItemIfExists(invoiceItem);
-    this.props.invoiceItems.add(invoiceItem);
-    this.props.totalNumInvoiceItems++;
-    return Result.ok<void>();
-  }
-
-  public addItems(invoiceItems: InvoiceItem[] | InvoiceItems): void {
-    invoiceItems.forEach(this.addInvoiceItem, this);
   }
 }

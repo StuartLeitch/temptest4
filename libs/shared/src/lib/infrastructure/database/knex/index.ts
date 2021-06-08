@@ -9,7 +9,7 @@ export enum TABLES {
   ARTICLES = 'articles',
   CATALOG = 'catalog',
   COUPONS = 'coupons',
-  CREDITNOTES = 'credit_notes',
+  CREDIT_NOTES = 'credit_notes',
   INVOICES = 'invoices',
   INVOICE_ITEMS = 'invoice_items',
   INVOICES_WAIVERS = 'invoices_waivers',

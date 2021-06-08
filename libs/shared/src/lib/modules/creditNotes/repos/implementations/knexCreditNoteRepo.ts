@@ -31,7 +31,7 @@ export class KnexCreditNoteRepo
   ): Promise<CreditNote> {
     const { db } = this;
 
-    const creditNote = await db(TABLES.CREDITNOTES)
+    const creditNote = await db(TABLES.CREDIT_NOTES)
       .select()
       .where('id', invoiceId.id.toString())
       .first();
@@ -51,7 +51,7 @@ export class KnexCreditNoteRepo
   ): Promise<CreditNote> {
     const { logger, db } = this;
 
-    const creditNote = await db(TABLES.CREDITNOTES)
+    const creditNote = await db(TABLES.CREDIT_NOTES)
       .select()
       .where('id', creditNoteId.id.toString())
       .first();
@@ -69,7 +69,7 @@ export class KnexCreditNoteRepo
   async update(creditNote: CreditNote): Promise<CreditNote> {
     const { db } = this;
     const updateObject = CreditNoteMap.toPersistence(creditNote);
-    const updated = await db(TABLES.CREDITNOTES)
+    const updated = await db(TABLES.CREDIT_NOTES)
       .where('id', creditNote.creditNoteId.id.toString())
       .update(updateObject);
 
@@ -101,7 +101,7 @@ export class KnexCreditNoteRepo
     const rawCreditNote = CreditNoteMap.toPersistence(creditNote);
 
     try {
-      await db(TABLES.CREDITNOTES).insert(rawCreditNote);
+      await db(TABLES.CREDIT_NOTES).insert(rawCreditNote);
     } catch (error) {
       throw RepoError.fromDBError(error);
     }
