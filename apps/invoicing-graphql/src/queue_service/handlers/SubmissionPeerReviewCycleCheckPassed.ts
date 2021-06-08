@@ -62,9 +62,13 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
       if (manuscript) {
         const { journalId } = manuscripts[0];
 
+        await helpers.restore(manuscript.id.toString());
+
         if (journalId !== manuscript.journalId) {
           await helpers.updateInvoicePrice(manuscript.customId, journalId);
         }
+
+        await helpers.updateManuscript(manuscript, data);
       }
 
       const maxVersion = manuscripts.reduce((max, m) => {
