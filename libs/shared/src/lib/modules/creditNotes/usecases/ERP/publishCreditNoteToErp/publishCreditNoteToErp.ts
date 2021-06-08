@@ -4,6 +4,7 @@
 import { UseCase } from '../../../../../core/domain/UseCase';
 import { right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
 import {
@@ -15,14 +16,20 @@ import {
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { PublishCreditNoteToErpResponse } from './publishCreditNoteToErpResponse';
+
+import { CreditNote } from '../../../domain/CreditNote';
+import { CreditNoteId } from '../../../domain/CreditNoteId';
+import { CreditNoteRepoContract } from '../../../repos/creditNoteRepo';
+
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
-import { InvoiceId } from '../../../domain/InvoiceId';
-import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
-import { Invoice } from '../../../domain/Invoice';
-import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
-import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
+
+import { InvoiceId } from '../../../../invoices/domain/InvoiceId';
+import { Invoice } from '../../../../invoices/domain/Invoice';
+import { InvoiceRepoContract } from '../../../../invoices/repos/invoiceRepo';
+import { InvoiceItemRepoContract } from '../../../../invoices/repos/invoiceItemRepo';
+
+import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
@@ -44,6 +51,7 @@ export class PublishCreditNoteToErpUsecase
     > {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
+    private creditNoteRepo: CreditNoteRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
@@ -63,18 +71,18 @@ export class PublishCreditNoteToErpUsecase
   ): Promise<PublishCreditNoteToErpResponse> {
     this.loggerService.info('PublishCreditNoteToERP Request', request);
 
-    let creditNote: Invoice;
+    let creditNote: CreditNote;
     let originalInvoice: Invoice;
 
     try {
-      creditNote = await this.invoiceRepo.getInvoiceById(
-        InvoiceId.create(new UniqueEntityID(request.creditNoteId)).getValue()
+      creditNote = await this.creditNoteRepo.getCreditNoteById(
+        CreditNoteId.create(new UniqueEntityID(request.creditNoteId)).getValue()
       );
       this.loggerService.info('PublishCreditNoteToERP credit note', creditNote);
 
       originalInvoice = await this.invoiceRepo.getInvoiceById(
         InvoiceId.create(
-          new UniqueEntityID(creditNote.cancelledInvoiceReference)
+          new UniqueEntityID(creditNote.invoiceId.toString())
         ).getValue()
       );
       this.loggerService.info(
@@ -131,7 +139,7 @@ export class PublishCreditNoteToErpUsecase
       creditNote.addItems(invoiceItems);
 
       try {
-        await this.invoiceRepo.update(creditNote);
+        await this.creditNoteRepo.update(creditNote);
         this.loggerService.debug(
           'PublishCreditNoteToERP full credit note',
           creditNote
@@ -150,7 +158,9 @@ export class PublishCreditNoteToErpUsecase
           )
           .find(Boolean);
 
-        const isOriginalInvoiceRegistered = await this.erpService.checkInvoiceExists(originalNSErpReference.value);
+        const isOriginalInvoiceRegistered = await this.erpService.checkInvoiceExists(
+          originalNSErpReference.value
+        );
 
         if (!isOriginalInvoiceRegistered) {
           const erpReference = ErpReferenceMap.toDomain({
@@ -163,9 +173,12 @@ export class PublishCreditNoteToErpUsecase
           });
           await this.erpReferenceRepo.save(erpReference);
 
-          return left(new UnexpectedError('Non-existent invoice',
-            `Referenced credit note's invoice having reference ${originalNSErpReference.value} does not exist in the ERP system.`
-          )); // this business is done
+          return left(
+            new UnexpectedError(
+              'Non-existent invoice',
+              `Referenced credit note's invoice having reference ${originalNSErpReference.value} does not exist in the ERP system.`
+            )
+          ); // this business is done
         }
 
         const erpResponse = await this.erpService.registerCreditNote(erpData);

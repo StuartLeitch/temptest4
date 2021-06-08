@@ -6,10 +6,14 @@ import { Result } from '../../../core/logic/Result';
 // *Subdomains
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { CreditNoteId } from '../domain/CreditNoteId';
+import { InvoiceItem } from '../../invoices/domain/InvoiceItem';
+import { InvoiceItems } from '../../invoices/domain/InvoiceItems';
 
 interface CreditNoteProps {
   invoiceId: InvoiceId;
   creationReason?: string;
+  invoiceItems?: InvoiceItems;
+  totalNumInvoiceItems?: number;
   dateCreated?: Date;
   dateIssued?: Date;
   dateUpdated?: Date;
@@ -19,7 +23,7 @@ export type CreditNoteCollection = CreditNote[];
 
 export class CreditNote extends AggregateRoot<CreditNoteProps> {
   get creditNoteId(): CreditNoteId {
-    return CreditNoteId.create(this._id);
+    return CreditNoteId.create(this._id).getValue();
   }
 
   get invoiceId(): InvoiceId {
@@ -62,6 +66,10 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     this.props.dateUpdated = dateUpdated;
   }
 
+  get invoiceItems(): InvoiceItems {
+    return this.props.invoiceItems;
+  }
+
   private constructor(props: CreditNoteProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -78,5 +86,21 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     const creditNote = new CreditNote(defaultValues, id);
 
     return Result.ok<CreditNote>(creditNote);
+  }
+
+  private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
+    if (this.props.invoiceItems.exists(invoiceItem)) {
+      this.props.invoiceItems.remove(invoiceItem);
+    }
+  }
+  public addInvoiceItem(invoiceItem: InvoiceItem): Result<void> {
+    this.removeInvoiceItemIfExists(invoiceItem);
+    this.props.invoiceItems.add(invoiceItem);
+    this.props.totalNumInvoiceItems++;
+    return Result.ok<void>();
+  }
+
+  public addItems(invoiceItems: InvoiceItem[] | InvoiceItems): void {
+    invoiceItems.forEach(this.addInvoiceItem, this);
   }
 }

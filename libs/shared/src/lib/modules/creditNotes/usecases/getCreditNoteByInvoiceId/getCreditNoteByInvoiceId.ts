@@ -13,15 +13,17 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { Invoice } from '../../domain/Invoice';
-import { InvoiceId } from '../../domain/InvoiceId';
-import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { Invoice } from '../../../invoices/domain/Invoice';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { CreditNote } from '../../domain/CreditNote';
+import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
 import { GetCreditNoteByInvoiceIdResponse } from './getCreditNoteByInvoiceIdResponse';
 import { GetCreditNoteByInvoiceIdErrors } from './getCreditNoteByInvoiceIdErrors';
 import { GetCreditNoteByInvoiceIdDTO } from './getCreditNoteByInvoiceIdDTO';
 
+// to be modified with Guard/Either
 export class GetCreditNoteByInvoiceIdUsecase
   implements
     UseCase<
@@ -36,7 +38,7 @@ export class GetCreditNoteByInvoiceIdUsecase
     > {
   constructor(
     // private articleRepo: ArticleRepoContract,
-    private invoiceRepo: InvoiceRepoContract
+    private creditNoteRepo: CreditNoteRepoContract
   ) {}
 
   private async getAccessControlContext(request, context?) {
@@ -49,12 +51,12 @@ export class GetCreditNoteByInvoiceIdUsecase
   ): Promise<GetCreditNoteByInvoiceIdResponse> {
     const { invoiceId } = request;
 
-    let creditNote: Invoice;
+    let creditNote: CreditNote;
 
     try {
       try {
         // * System identifies invoice by cancelled Invoice reference
-        creditNote = await this.invoiceRepo.findByCancelledInvoiceReference(
+        creditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
           InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
         );
       } catch (e) {
@@ -63,7 +65,7 @@ export class GetCreditNoteByInvoiceIdUsecase
         );
       }
 
-      return right(Result.ok<Invoice>(creditNote));
+      return right(Result.ok<CreditNote>(creditNote));
     } catch (err) {
       return left(new UnexpectedError(err));
     }
