@@ -84,8 +84,6 @@ export class PublishInvoiceCreditedUsecase
       invoiceCreatedDate: creditNote?.dateCreated?.toISOString(),
       invoiceIssuedDate: creditNote?.dateIssued?.toISOString(),
 
-      reason: invoice?.creationReason,
-
       costs: formatCosts(invoiceItems, payments, creditNote),
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),

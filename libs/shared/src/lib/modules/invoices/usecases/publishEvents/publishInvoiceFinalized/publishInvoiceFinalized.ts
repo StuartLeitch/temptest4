@@ -87,7 +87,6 @@ export class PublishInvoiceFinalizedUsecase
       invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
 
-      reason: invoice?.creationReason,
       costs: formatCosts(invoiceItems, payments, invoice),
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
       payer: payer ? formatPayer(payer, billingAddress) : null,
