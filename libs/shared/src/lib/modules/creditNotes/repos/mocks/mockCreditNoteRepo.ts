@@ -18,6 +18,9 @@ export class MockCreditNoteRepo
     invoiceId: InvoiceId
   ): Promise<CreditNote> {
     const match = this._items.find((i) => i.invoiceId.equals(invoiceId));
+    if (!match) {
+      return null;
+    }
     return match;
   }
 
@@ -25,6 +28,9 @@ export class MockCreditNoteRepo
     creditNoteId: CreditNoteId
   ): Promise<CreditNote> {
     const match = this._items.find((i) => i.creditNoteId.equals(creditNoteId));
+    if (!match) {
+      return null;
+    }
     return match;
   }
 
