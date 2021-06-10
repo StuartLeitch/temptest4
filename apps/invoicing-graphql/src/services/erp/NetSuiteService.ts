@@ -11,6 +11,7 @@ import {
   PaymentMethod,
   InvoiceItem,
   Manuscript,
+  Address,
   Invoice,
   Payment,
   Payer,
@@ -23,6 +24,7 @@ import {
   ErpInvoiceRequest,
   ErpRevRecResponse,
   ErpRevRecRequest,
+  ErpTaxDetails,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
@@ -36,6 +38,8 @@ export class NetSuiteService implements ErpServiceContract {
     private customSegmentFieldName: string,
     private customExternalPaymentReference: string,
     private customUniquePaymentReference: string,
+    private taxDetailsUkStandard: ErpTaxDetails,
+    private taxDetailsUkZero: ErpTaxDetails,
     readonly referenceMappings?: Record<string, any>
   ) {}
 
@@ -48,7 +52,9 @@ export class NetSuiteService implements ErpServiceContract {
     loggerBuilder: LoggerBuilderContract,
     customSegmentFieldName: string,
     customExternalPaymentReference: string,
-    customUniquePaymentReference: string
+    customUniquePaymentReference: string,
+    taxDetailsUkStandard: ErpTaxDetails,
+    taxDetailsUkZero: ErpTaxDetails
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
@@ -64,6 +70,8 @@ export class NetSuiteService implements ErpServiceContract {
       customSegmentFieldName,
       customExternalPaymentReference,
       customUniquePaymentReference,
+      taxDetailsUkStandard,
+      taxDetailsUkZero,
       referenceMappings
     );
 
@@ -88,7 +96,7 @@ export class NetSuiteService implements ErpServiceContract {
       items: data.items,
       journalName: data.journalName,
       manuscript: data.manuscript,
-      taxRateId: data.taxRateId,
+      billingAddress: data.billingAddress,
     });
     return {
       tradeDocumentId: String(response),
@@ -312,9 +320,9 @@ export class NetSuiteService implements ErpServiceContract {
     manuscript: Manuscript;
     journalName: string;
     customSegmentId: string;
-    taxRateId: string;
     itemId: string;
     customerId: string;
+    billingAddress: Address;
   }) {
     const {
       connection: { config, oauth, token },
@@ -327,13 +335,21 @@ export class NetSuiteService implements ErpServiceContract {
       customerId,
       customSegmentId,
       itemId,
-      taxRateId,
+      billingAddress,
     } = data;
 
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice`,
       method: 'POST',
     };
+
+    let taxDetails: ErpTaxDetails = null;
+
+    if (billingAddress.country === 'GB' || billingAddress.country === 'UK') {
+      taxDetails = this.taxDetailsUkStandard;
+    } else {
+      taxDetails = this.taxDetailsUkZero;
+    }
 
     const createInvoicePayload: Record<string, any> = {
       tranDate: format(
@@ -370,12 +386,12 @@ export class NetSuiteService implements ErpServiceContract {
       taxDetails: {
         items: [
           {
-            taxDetailsReference: 'NEW1',
-            taxType: '2',
-            taxCode: '53',
-            taxBasis: 600,
-            taxRate: 20,
-            taxAmount: 120,
+            taxDetailsReference: taxDetails.taxDetailsReference,
+            taxCode: taxDetails.taxCode,
+            taxType: taxDetails.taxType,
+            taxBasis: item.calculateNetPrice(),
+            taxAmount: item.calculateVat(),
+            taxRate: item.vat,
           },
         ],
       },

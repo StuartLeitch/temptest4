@@ -149,32 +149,40 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     super(props, id);
   }
 
-  public calculateNetPrice(withReductions?: Reduction<unknown>[]): number {
-    return this.price - this.calculateDiscount(withReductions);
+  public calculateNetPrice(
+    withAdditionalReductions?: Reduction<unknown>[]
+  ): number {
+    return this.price - this.calculateDiscount(withAdditionalReductions);
   }
 
-  public calculateDiscount(withReductions?: Reduction<unknown>[]): number {
-    const totalDiscount = this.calculateTotalDiscountPercentage(withReductions);
+  public calculateDiscount(
+    withAdditionalReductions?: Reduction<unknown>[]
+  ): number {
+    const totalDiscount = this.calculateTotalDiscountPercentage(
+      withAdditionalReductions
+    );
 
     if (totalDiscount >= 100) return this.price;
 
     return (totalDiscount * this.price) / 100;
   }
 
-  public calculateVat(withReductions?: Reduction<unknown>[]): number {
-    const net = this.calculateNetPrice(withReductions);
+  public calculateVat(withAdditionalReductions?: Reduction<unknown>[]): number {
+    const net = this.calculateNetPrice(withAdditionalReductions);
 
     return (this.vat * net) / 100;
   }
 
-  public calculateTotalPrice(withReductions?: Reduction<unknown>[]): number {
-    const net = this.calculateNetPrice(withReductions);
+  public calculateTotalPrice(
+    withAdditionalReductions?: Reduction<unknown>[]
+  ): number {
+    const net = this.calculateNetPrice(withAdditionalReductions);
 
     return net + (net * this.vat) / 100;
   }
 
   public calculateTotalDiscountPercentage(
-    withReductions?: Reduction<unknown>[]
+    withAdditionalReductions?: Reduction<unknown>[]
   ): number {
     const reductions: Reduction<unknown>[] = [];
     if (this.assignedCoupons) {
@@ -183,8 +191,8 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     if (this.assignedWaivers) {
       reductions.push(...this.assignedWaivers.waivers);
     }
-    if (withReductions) {
-      reductions.push(...withReductions);
+    if (withAdditionalReductions) {
+      reductions.push(...withAdditionalReductions);
     }
 
     const totalDiscount = reductions.reduce(
