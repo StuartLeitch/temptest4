@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../core/logic/AppError';
@@ -13,54 +11,49 @@ import {
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { CreditNoteId } from '../../domain/CreditNoteId';
 import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
-import { GetCreditNoteByInvoiceIdResponse } from './getCreditNoteByInvoiceIdResponse';
-import { GetCreditNoteByInvoiceIdErrors } from './getCreditNoteByInvoiceIdErrors';
-import { GetCreditNoteByInvoiceIdDTO } from './getCreditNoteByInvoiceIdDTO';
+import { GetCreditNoteByIdResponse } from './getCreditNoteByIdResponse';
+import { GetCreditNoteByIdErrors } from './getCreditNoteByIdErrors';
+import { GetCreditNoteByIdDTO } from './getCreditNoteByIdDTO';
 
-// to be modified with Guard/Either
-export class GetCreditNoteByInvoiceIdUsecase
+export class GetCreditNoteByIdUsecase
   implements
     UseCase<
-      GetCreditNoteByInvoiceIdDTO,
-      Promise<GetCreditNoteByInvoiceIdResponse>,
+      GetCreditNoteByIdDTO,
+      Promise<GetCreditNoteByIdResponse>,
       UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
-      GetCreditNoteByInvoiceIdDTO,
+      GetCreditNoteByIdDTO,
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
-  constructor(
-    // private articleRepo: ArticleRepoContract,
-    private creditNoteRepo: CreditNoteRepoContract
-  ) {}
+  constructor(private creditNoteRepo: CreditNoteRepoContract) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
   }
 
   public async execute(
-    request: GetCreditNoteByInvoiceIdDTO,
+    request: GetCreditNoteByIdDTO,
     context?: UsecaseAuthorizationContext
-  ): Promise<GetCreditNoteByInvoiceIdResponse> {
-    const { invoiceId } = request;
+  ): Promise<GetCreditNoteByIdResponse> {
+    const { creditNoteId } = request;
 
     let creditNote: CreditNote;
 
     try {
       try {
-        // * System identifies invoice by cancelled Invoice reference
-        creditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
-          InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+        creditNote = await this.creditNoteRepo.getCreditNoteById(
+          CreditNoteId.create(new UniqueEntityID(creditNoteId)).getValue()
         );
-      } catch (e) {
+      } catch (err) {
         return left(
-          new GetCreditNoteByInvoiceIdErrors.CreditNoteNotFoundError(invoiceId)
+          new GetCreditNoteByIdErrors.CreditNoteNotFoundError(creditNoteId)
         );
       }
 
