@@ -420,7 +420,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
       // * getMonth returns a number corresponding to each month,
       // * so January is 0, February is 1, May is 5
-      if (getMonth(this.props.dateIssued) > 5) {
+      if (getMonth(this.props.dateIssued) >= 5) {
         referenceYear += 1;
       }
     }
