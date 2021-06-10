@@ -34,6 +34,19 @@ export class MockCreditNoteRepo
     return match;
   }
 
+  async existsWithId(creditNoteId: CreditNoteId): Promise<boolean> {
+    const match = this._items.filter((i) => i.invoiceId.equals(creditNoteId));
+    return match.length !== 0;
+  }
+
+  public async getUnregisteredErpCreditNotes(): Promise<CreditNoteId[]> {
+    return null;
+  }
+
+  public async getCreditNoteByCustomId(customId: string): Promise<CreditNote> {
+    return null;
+  }
+
   public async update(creditNote: CreditNote): Promise<CreditNote> {
     const alreadyExists = await this.exists(creditNote);
 

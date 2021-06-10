@@ -1,11 +1,8 @@
-import { AbstractBaseDBRepo } from 'libs/shared/src/lib/infrastructure/AbstractBaseDBRepo';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Either, left, right } from '../../../../core/logic/Either';
 import { Guard } from '../../../../core/logic/Guard';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
-import {
-  RepoError,
-  RepoErrorCode,
-} from 'libs/shared/src/lib/infrastructure/RepoError';
+import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
 import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
@@ -13,7 +10,7 @@ import { CreditNoteRepoContract } from './../creditNoteRepo';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // to be updated with GuardFailure
 export class KnexCreditNoteRepo

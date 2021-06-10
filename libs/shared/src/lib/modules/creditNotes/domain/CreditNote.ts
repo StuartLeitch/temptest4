@@ -116,4 +116,8 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
 
     return Result.ok<CreditNote>(creditNote);
   }
+
+  public getErpReference(): ErpReference {
+    return this.props.erpReference;
+  }
 }

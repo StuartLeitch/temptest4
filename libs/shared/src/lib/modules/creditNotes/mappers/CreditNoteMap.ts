@@ -22,12 +22,12 @@ export class CreditNoteMap extends Mapper<CreditNote> {
         dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
         dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
-        erpReference:
-          raw.erpReference ?? ErpReferenceMap.toDomain(raw.erpReference),
+        erpReference: raw.erpReference
+          ? ErpReferenceMap.toDomain(raw.erpReference)
+          : null,
       },
       new UniqueEntityID(raw.id)
     );
-
     maybeCreditNote.isFailure ? console.log(maybeCreditNote) : '';
 
     return maybeCreditNote.isSuccess ? maybeCreditNote.getValue() : null;
@@ -38,9 +38,9 @@ export class CreditNoteMap extends Mapper<CreditNote> {
       id: creditNote.id.toString(),
       invoiceId: creditNote.invoiceId.id.toString(),
       creationReason: creditNote.creationReason,
-      vat: creditNote,
-      price: creditNote,
-      persistentReferenceNumber: creditNote,
+      vat: creditNote.vat,
+      price: creditNote.price,
+      persistentReferenceNumber: creditNote.persistentReferenceNumber,
       dateCreated: creditNote.dateCreated,
       dateIssued: creditNote.dateIssued,
       dateUpdated: creditNote.dateUpdated,

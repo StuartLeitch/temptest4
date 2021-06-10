@@ -247,6 +247,12 @@ export * from './modules/authors/mappers/AuthorMap';
 export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetails';
 export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetailsDTO';
 
+// * Export Credit Note Subdomain
+export * from './modules/creditNotes/domain/CreditNote';
+export * from './modules/creditNotes/domain/CreditNoteId';
+export * from './modules/creditNotes/repos/creditNoteRepo';
+export * from './modules/creditNotes/repos/implementations/knexCreditNoteRepo';
+
 // * Export user Subdomain
 export * from './modules/users/domain/User';
 export * from './modules/users/domain/UserId';
