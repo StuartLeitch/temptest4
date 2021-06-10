@@ -366,12 +366,16 @@ export class NetSuiteService implements ErpServiceContract {
           },
         ],
       },
+      taxDetailsOverride: true,
       taxDetails: {
         items: [
           {
-            taxCode: {
-              id: taxRateId,
-            },
+            taxDetailsReference: 'NEW1',
+            taxType: '2',
+            taxCode: '53',
+            taxBasis: 600,
+            taxRate: 20,
+            taxAmount: 120,
           },
         ],
       },
@@ -637,76 +641,6 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       console.error(err);
       return { err } as unknown;
-    }
-  }
-
-  private async patchInvoice(data: { invoice: Invoice; journalId: string }) {
-    const {
-      connection: { config, oauth, token },
-    } = this;
-    const { invoice, journalId } = data;
-
-    const nsErpReference = invoice
-      .getErpReferences()
-      .getItems()
-      .filter(
-        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
-      )
-      .find(Boolean);
-
-    if (nsErpReference.value === 'NON_INVOICEABLE') {
-      this.logger.warn({
-        message: `Invoice patch in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
-      });
-      return;
-    }
-
-    const invoiceExistsRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
-      method: 'GET',
-    };
-
-    try {
-      await axios({
-        ...invoiceExistsRequestOpts,
-        headers: oauth.toHeader(
-          oauth.authorize(invoiceExistsRequestOpts, token)
-        ),
-        data: {},
-      } as AxiosRequestConfig);
-    } catch (err) {
-      this.logger.error({
-        message: 'No invoice found.',
-        response: err?.response?.data,
-      });
-      return; // no business to be done
-    }
-
-    const invoiceRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
-      method: 'PATCH',
-    };
-
-    const patchInvoicePayload: Record<string, unknown> = {
-      custbody_bbs_revenue_journal: {
-        id: journalId,
-        refName: `Journal #${journalId}`,
-      },
-    };
-
-    try {
-      await axios({
-        ...invoiceRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(invoiceRequestOpts, token)),
-        data: patchInvoicePayload,
-      } as AxiosRequestConfig);
-    } catch (err) {
-      this.logger.error({
-        message: 'Failed to update invoice',
-        response: err?.response?.data,
-        request: patchInvoicePayload,
-      });
-      throw err;
     }
   }
 
