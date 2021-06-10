@@ -181,6 +181,12 @@ export const env = {
     customUniquePaymentReference: nonEmptyOsEnv(
       'NETSUITE_CUSTOM_UNIQUE_PAYMENT_REFERENCE'
     ),
+    netsuiteTaxDetailsUkStandard: toObject(
+      nonEmptyOsEnv('NETSUITE_TAX_DETAILS_UK_STANDARD')
+    ),
+    netsuiteTaxDetailsUkZero: toObject(
+      nonEmptyOsEnv('NETSUITE_TAX_DETAILS_UK_ZERO')
+    ),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),

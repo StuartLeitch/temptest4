@@ -12,18 +12,18 @@ Feature: Publish invoice to erp system
         Given There is an existing Invoice with the ID "tax-invoice"
         And The payer is from "<payerCountry>" and their type is "<payerType>"
         When The Invoice with the ID "tax-invoice" is published
-        Then The tax code selected for the Invoice with the ID "tax-invoice" is <taxRate>
+        Then The tax code selected for the Invoice with the ID "tax-invoice" is <taxCode>
 
         Examples:
-            | payerCountry | payerType   | taxRate |
-            | GB           | INDIVIDUAL  | GB_SR   |
-            | GB           | INSTITUTION | GB_SR   |
-            | UK           | INDIVIDUAL  | GB_SR   |
-            | UK           | INSTITUTION | GB_SR   |
-            | RO           | INDIVIDUAL  | GB_ZR   |
-            | RO           | INSTITUTION | GB_ZR   |
-            | CH           | INDIVIDUAL  | GB_ZR   |
-            | CH           | INSTITUTION | GB_ZR   |
+            | payerCountry | payerType   | taxCode |
+            | GB           | INDIVIDUAL  | 53      |
+            | GB           | INSTITUTION | 53      |
+            | UK           | INDIVIDUAL  | 53      |
+            | UK           | INSTITUTION | 53      |
+            | RO           | INDIVIDUAL  | 55      |
+            | RO           | INSTITUTION | 55      |
+            | CH           | INDIVIDUAL  | 55      |
+            | CH           | INSTITUTION | 55      |
 
     @ValidatePublishInvoiceToErp
     Scenario: Fully discounted invoices are not sent to sage
