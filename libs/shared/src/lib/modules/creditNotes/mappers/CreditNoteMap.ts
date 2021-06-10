@@ -5,6 +5,7 @@ import { Guard } from '../../../core/logic/Guard';
 
 import { CreditNote } from '../domain/CreditNote';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
+import { ErpReferenceMap } from '../../vendors/mapper/ErpReference';
 
 // * to be updated with GuardFailure
 export class CreditNoteMap extends Mapper<CreditNote> {
@@ -21,6 +22,8 @@ export class CreditNoteMap extends Mapper<CreditNote> {
         dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
         dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
+        erpReference:
+          raw.erpReference ?? ErpReferenceMap.toDomain(raw.erpReference),
       },
       new UniqueEntityID(raw.id)
     );

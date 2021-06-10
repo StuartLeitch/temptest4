@@ -6,6 +6,7 @@ import { Result } from '../../../core/logic/Result';
 // *Subdomains
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { CreditNoteId } from '../domain/CreditNoteId';
+import { ErpReference } from '../../vendors/domain/ErpReference';
 
 export enum CreationReason {
   WITHDRAWN_MANUSCRIPT = 'withdrawn-manuscript',
@@ -24,6 +25,7 @@ interface CreditNoteProps {
   dateCreated?: Date;
   dateIssued?: Date;
   dateUpdated?: Date;
+  erpReference?: ErpReference;
 }
 
 export type CreditNoteCollection = CreditNote[];
