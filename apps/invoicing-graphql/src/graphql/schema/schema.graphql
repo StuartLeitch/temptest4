@@ -59,6 +59,15 @@ enum PaymentStatus {
   CREATED
 }
 
+enum CreationReason {
+  WITHDRAWN_MANUSCRIPT
+  REDUCTION_APPLIED
+  WAIVED_MANUSCRIPT
+  CHANGED_PAYER_DETAILS
+  BAD_DEBT
+  OTHER
+}
+
 type InvoiceItem @model(id: "invoice_items") {
   id: String
   invoiceId: ID
@@ -101,6 +110,19 @@ type Invoice @model(id: "invoices") {
   creditNote: Invoice
   transaction: Transaction
 }
+
+# type CreditNote @model(id: "credit_notes") {
+#   id: String
+#   invoiceId: ID
+#   creationReason: CreationReason
+#   vat: Float
+#   price: Float
+#   persistentReferenceNumber: ReferenceNumber @filter
+#   dateCreated: Date
+#   dateIssued: Date
+#   dateUpdated: Date
+#   erpReference: ErpReference
+# }
 
 type InvoiceVat {
   vatPercentage: Float
@@ -335,7 +357,7 @@ type Query {
   echo(value: String): String
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]
-  countInvoices(filters: StatisticsInvoiceFilters):  Statistics
+  countInvoices(filters: StatisticsInvoiceFilters): Statistics
 }
 
 type Statistics {
