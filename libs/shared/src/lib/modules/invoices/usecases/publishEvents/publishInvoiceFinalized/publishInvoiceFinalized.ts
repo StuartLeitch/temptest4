@@ -49,7 +49,7 @@ export class PublishInvoiceFinalizedUsecase
     const validRequest = this.verifyInput(request);
 
     if (validRequest.isLeft()) {
-     return validRequest;
+      return validRequest;
     }
 
     const {

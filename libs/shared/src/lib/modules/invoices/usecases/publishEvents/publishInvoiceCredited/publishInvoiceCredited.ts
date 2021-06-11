@@ -58,7 +58,7 @@ export class PublishInvoiceCreditedUsecase
       manuscript,
       payments,
       payer,
-      invoice
+      invoice,
     } = request;
 
     const erpReference = creditNote
