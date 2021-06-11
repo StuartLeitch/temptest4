@@ -15,6 +15,7 @@ import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/l
 import { Context } from '../../builders';
 
 import { EventHandler } from '../event-handler';
+import { SubmissionSubmittedHelpers } from './submission-submitted/helpers';
 
 import { env } from '../../env';
 
@@ -50,6 +51,16 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
 
       if (manuscripts[0]?.articleType?.name in ManuscriptTypeNotInvoiceable) {
         return;
+      }
+
+      const helpers = new SubmissionSubmittedHelpers(context);
+      const manuscript = await helpers.getExistingManuscript(submissionId);
+      if (manuscript) {
+        const { journalId } = manuscripts[0];
+
+        if (journalId !== manuscript.journalId) {
+          await helpers.updateInvoicePrice(manuscript.customId, journalId);
+        }
       }
 
       const maxVersion = manuscripts.reduce((max, m) => {

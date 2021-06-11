@@ -15,6 +15,8 @@ function renderSwitch(reason) {
       return 'Waived Manuscript';
     case 'change-payer-details':
       return 'Change Payer Details';
+    case 'bad-debt':
+      return 'Bad Debt';
     default:
       return 'Other';
   }

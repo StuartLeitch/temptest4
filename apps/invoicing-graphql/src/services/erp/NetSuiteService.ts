@@ -779,9 +779,8 @@ export class NetSuiteService implements ErpServiceContract {
       method: 'PATCH',
     };
 
-    const { creationReason } = creditNote;
     let memo = 'Other';
-    switch (creationReason) {
+    switch (creditNote.creationReason) {
       case 'withdrawn-manuscript':
         memo = 'Withdrawn Manuscript';
         break;
@@ -793,6 +792,9 @@ export class NetSuiteService implements ErpServiceContract {
         break;
       case 'change-payer-details':
         memo = 'Change Payer Details';
+        break;
+      case 'bad-debt':
+        memo = 'Bad Debt';
         break;
     }
 
