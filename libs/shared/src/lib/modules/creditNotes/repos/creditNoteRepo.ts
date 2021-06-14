@@ -10,6 +10,7 @@ import { InvoiceId } from '../../invoices/domain/InvoiceId';
 export interface CreditNoteRepoContract extends Repo<CreditNote> {
   getCreditNoteByInvoiceId(invoiceId: InvoiceId): Promise<CreditNote>;
   getCreditNoteById(creditNoteId: CreditNoteId): Promise<CreditNote>;
+  getRecentCreditNotes(args?: any): Promise<any>;
   getUnregisteredErpCreditNotes(): Promise<CreditNoteId[]>;
   getCreditNoteByCustomId(customId: string): Promise<CreditNote>;
   existsWithId(creditNoteId: CreditNoteId): Promise<boolean>;

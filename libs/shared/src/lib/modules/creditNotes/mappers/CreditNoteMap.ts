@@ -22,9 +22,8 @@ export class CreditNoteMap extends Mapper<CreditNote> {
         dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
         dateIssued: raw.dateIssued ? new Date(raw.dateIssued) : null,
         dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
-        erpReference: raw.erpReference
-          ? ErpReferenceMap.toDomain(raw.erpReference)
-          : null,
+        erpReference:
+          raw.erpReference ?? ErpReferenceMap.toDomain(raw.erpReference),
       },
       new UniqueEntityID(raw.id)
     );

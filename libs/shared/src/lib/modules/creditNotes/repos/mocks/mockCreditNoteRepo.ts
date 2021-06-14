@@ -47,6 +47,10 @@ export class MockCreditNoteRepo
     return null;
   }
 
+  async getRecentCreditNotes(): Promise<any[]> {
+    return cloneDeep(this._items);
+  }
+
   public async update(creditNote: CreditNote): Promise<CreditNote> {
     const alreadyExists = await this.exists(creditNote);
 

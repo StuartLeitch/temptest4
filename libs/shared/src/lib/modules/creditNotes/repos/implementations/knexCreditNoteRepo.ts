@@ -9,8 +9,8 @@ import { CreditNoteId } from '../../domain/CreditNoteId';
 import { CreditNoteRepoContract } from './../creditNoteRepo';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { applyFilters } from './utils';
 
 // to be updated with GuardFailure
 export class KnexCreditNoteRepo
@@ -198,5 +198,29 @@ export class KnexCreditNoteRepo
     }
 
     return result;
+  }
+
+  async getRecentCreditNotes(args?: any): Promise<any> {
+    const { pagination, filters } = args;
+    const { db } = this;
+
+    const getModel = () => db(TABLES.CREDIT_NOTES);
+
+    const totalCount = await applyFilters(getModel(), filters).count(
+      `${TABLES.CREDIT_NOTES}.id`
+    );
+
+    const offset = pagination.offset * pagination.limit;
+
+    const creditNotes = await applyFilters(getModel(), filters)
+      .orderBy(`${TABLES.CREDIT_NOTES}.dateCreated`, 'desc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit)
+      .select([`${TABLES.CREDIT_NOTES}.*`]);
+
+    return {
+      totalCount: totalCount[0]['count'],
+      creditNotes: creditNotes.map((i) => CreditNoteMap.toDomain(i)),
+    };
   }
 }
