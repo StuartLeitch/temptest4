@@ -138,7 +138,6 @@ export class KnexInvoiceRepo
     });
 
     const invoice = await sql;
-
     if (!invoice) {
       throw RepoError.createEntityNotFoundError(
         'invoice',
@@ -365,9 +364,7 @@ export class KnexInvoiceRepo
     return result[0];
   }
 
-  async getInvoicePayments(
-    invoiceId: InvoiceId
-  ): Promise<any[]> {
+  async getInvoicePayments(invoiceId: InvoiceId): Promise<any[]> {
     const results = await this.db
       .select(
         'invoices.id as invoiceId',

@@ -47,7 +47,7 @@ Given(/^a credit note with the id "([\w-]+)"/, async (creditNoteId: string) => {
 When(
   /^GetCreditNoteByIdUsecase is executed for credit note "([\w-]+)"/,
   async (creditNoteId: string) => {
-    result = await usecase.execute({ creditNoteId });
+    result = await usecase.execute({ creditNoteId }, defaultContext);
   }
 );
 

@@ -6,6 +6,8 @@ import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { InvoiceMap } from '../../../invoices/mappers/InvoiceMap';
+import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 
 export class MockCreditNoteRepo
   extends BaseMockRepo<CreditNote>
@@ -27,11 +29,15 @@ export class MockCreditNoteRepo
   public async getCreditNoteById(
     creditNoteId: CreditNoteId
   ): Promise<CreditNote> {
-    const match = this._items.find((i) => i.creditNoteId.equals(creditNoteId));
-    if (!match) {
+    let filterCreditNoteById = null;
+    filterCreditNoteById = this.filterCreditNoteById(creditNoteId);
+    if (!filterCreditNoteById) {
       return null;
     }
-    return match;
+
+    return CreditNoteMap.toDomain({
+      ...CreditNoteMap.toPersistence(filterCreditNoteById),
+    });
   }
 
   public async getCreditNoteByReferenceNumber(
@@ -93,7 +99,6 @@ export class MockCreditNoteRepo
     } else {
       this._items.push(creditNote);
     }
-
     return cloneDeep(creditNote);
   }
 
@@ -106,5 +111,15 @@ export class MockCreditNoteRepo
 
   public compareMockItems(a: CreditNote, b: CreditNote): boolean {
     return a.id.equals(b.id);
+  }
+
+  private filterCreditNoteById(creditNoteId: CreditNoteId) {
+    const found = this._items.find((item) => item.id.equals(creditNoteId.id));
+
+    if (!found) {
+      return null;
+    }
+
+    return found;
   }
 }
