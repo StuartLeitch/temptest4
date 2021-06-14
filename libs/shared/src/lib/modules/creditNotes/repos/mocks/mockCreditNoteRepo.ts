@@ -34,6 +34,18 @@ export class MockCreditNoteRepo
     return match;
   }
 
+  public async getCreditNoteByReferenceNumber(
+    referenceNumber: string
+  ): Promise<CreditNote> {
+    const match = this._items.find(
+      (i) => i.persistentReferenceNumber === referenceNumber
+    );
+    if (!match) {
+      return null;
+    }
+    return match;
+  }
+
   async existsWithId(creditNoteId: CreditNoteId): Promise<boolean> {
     const match = this._items.filter((i) => i.invoiceId.equals(creditNoteId));
     return match.length !== 0;

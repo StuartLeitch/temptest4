@@ -63,6 +63,22 @@ export class KnexCreditNoteRepo
     return CreditNoteMap.toDomain(creditNote);
   }
 
+  public async getCreditNoteByReferenceNumber(
+    referenceNumber: string
+  ): Promise<CreditNote> {
+    const { db } = this;
+    const creditNote = await db(TABLES.CREDIT_NOTES)
+      .select()
+      .where({ persistentReferenceNumber: referenceNumber })
+      .first();
+
+    if (!creditNote) {
+      throw RepoError.createEntityNotFoundError('creditNote', referenceNumber);
+    }
+
+    return CreditNoteMap.toDomain(creditNote);
+  }
+
   public async getCreditNoteById(
     creditNoteId: CreditNoteId
   ): Promise<CreditNote> {
