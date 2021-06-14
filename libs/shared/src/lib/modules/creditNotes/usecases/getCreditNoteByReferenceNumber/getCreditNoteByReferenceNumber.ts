@@ -3,6 +3,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { Result, left, right } from '../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import {
@@ -45,19 +46,22 @@ export class GetCreditNoteByReferenceNumberUsecase
     const { referenceNumber } = request;
 
     let creditNote: CreditNote;
-
     try {
-      // * System identifies credit note by  invoice reference number
-      creditNote = await this.creditNoteRepo.getCreditNoteByReferenceNumber(
-        referenceNumber
-      );
+      try {
+        // * System identifies credit note by  invoice reference number
+        creditNote = await this.creditNoteRepo.getCreditNoteByReferenceNumber(
+          referenceNumber
+        );
+      } catch (err) {
+        return left(
+          new GetCreditNoteByReferenceNumberErrors.CreditNoteNotFoundError(
+            referenceNumber
+          )
+        );
+      }
       return right(Result.ok<CreditNote>(creditNote));
     } catch (err) {
-      return left(
-        new GetCreditNoteByReferenceNumberErrors.CreditNoteNotFoundError(
-          referenceNumber
-        )
-      );
+      return left(new UnexpectedError(err));
     }
   }
 }

@@ -54,7 +54,7 @@ export class GetCreditNoteByInvoiceIdUsecase
 
     try {
       try {
-        // * System identifies invoice by cancelled Invoice reference
+        // * System identifies credit note by invoice id
         creditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
           InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
         );

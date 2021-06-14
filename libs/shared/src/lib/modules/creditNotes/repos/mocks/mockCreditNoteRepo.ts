@@ -43,13 +43,10 @@ export class MockCreditNoteRepo
   public async getCreditNoteByReferenceNumber(
     referenceNumber: string
   ): Promise<CreditNote> {
-    const match = this._items.find(
-      (i) => i.persistentReferenceNumber === referenceNumber
+    const match = this._items.find((i) =>
+      i.persistentReferenceNumber.includes(referenceNumber)
     );
-    if (!match) {
-      return null;
-    }
-    return match;
+    return match ? match : null;
   }
 
   async existsWithId(creditNoteId: CreditNoteId): Promise<boolean> {
