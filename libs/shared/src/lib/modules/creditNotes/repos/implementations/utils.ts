@@ -69,7 +69,6 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
     switch (toPath(keyList)) {
       case '/invoiceItem/article/journalId':
         here = here.whereIn(`${TABLES.ARTICLES}.journalId`, filter);
-        //         .whereIn(`${TABLES.CATALOG}.id`, filter);
         break;
 
       case '/invoiceItem/article/customId':
@@ -85,7 +84,6 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
         break;
 
       case '/referenceNumber':
-        // [invoiceNumber, creationYear] = ParseUtils.parseRefNumber(filter[0]);
         const invoiceRef = filter[0];
         here = here.where({ persistentReferenceNumber: invoiceRef });
         break;
