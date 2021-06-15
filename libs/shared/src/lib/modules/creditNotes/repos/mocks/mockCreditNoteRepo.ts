@@ -1,12 +1,12 @@
 import { cloneDeep } from 'lodash';
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
+import { GetRecentCreditNotesSuccessResponse } from '../../usecases/getRecentCreditNotes/getRecentCreditNotesResponse';
 import { CreditNoteRepoContract } from './../creditNoteRepo';
 import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { InvoiceMap } from '../../../invoices/mappers/InvoiceMap';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 
 export class MockCreditNoteRepo
@@ -60,8 +60,11 @@ export class MockCreditNoteRepo
     return null;
   }
 
-  async getRecentCreditNotes(): Promise<any[]> {
-    return cloneDeep(this._items);
+  async getRecentCreditNotes(): Promise<GetRecentCreditNotesSuccessResponse> {
+    return {
+      totalCount: this._items.length,
+      creditNotes: this._items,
+    };
   }
 
   public async update(creditNote: CreditNote): Promise<CreditNote> {

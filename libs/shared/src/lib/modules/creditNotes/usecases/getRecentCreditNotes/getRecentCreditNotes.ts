@@ -44,7 +44,7 @@ export class GetRecentCreditNotesUesecase
       const paginatedResult = await this.creditNoteRepo.getRecentCreditNotes(
         request
       );
-      return right(Result.ok<any>(paginatedResult));
+      return right(Result.ok(paginatedResult));
     } catch (err) {
       return left(new GetRecentCreditNotesErrors.CreditNotesListFailure(err));
     }
