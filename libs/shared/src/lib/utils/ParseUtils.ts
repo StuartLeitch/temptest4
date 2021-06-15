@@ -1,4 +1,4 @@
-import {Result} from '../core/logic/Result';
+import { Either, right, left } from '../core/logic/Either';
 
 type ParseDataType = 'number' | 'string' | 'object';
 type EventName = [string, string?];
@@ -29,15 +29,15 @@ export class ParseUtils {
     return JSON.parse(raw);
   }
 
-  public static parseObject(raw: any): Result<any> {
+  public static parseObject(raw: any): Either<Error, any> {
     let returnData: any;
     try {
       returnData = JSON.parse(raw);
     } catch (err) {
-      return Result.fail(err);
+      return left(err);
     }
 
-    return Result.ok<any>(returnData);
+    return right(returnData);
   }
 
   public static parseArray(rawArrayString: any): ParseArrayConfig {
@@ -45,7 +45,10 @@ export class ParseUtils {
   }
 
   public static parseEvent(name: string): EventName {
-    const [m/* aka. 'matched string' */, ...captures] = /^\s*(\S+?)(?:\.(\S+))?\s*$/.exec(name);
+    const [
+      m /* aka. 'matched string' */,
+      ...captures
+    ] = /^\s*(\S+?)(?:\.(\S+))?\s*$/.exec(name);
     return captures as EventName;
   }
 

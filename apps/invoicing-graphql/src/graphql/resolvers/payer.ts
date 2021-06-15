@@ -1,7 +1,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   ConfirmInvoiceUsecase,
-  GetAddressUseCase,
+  GetAddressUsecase,
   AddressMap,
   PayerMap,
   Roles,
@@ -49,7 +49,7 @@ export const payer: Resolvers<Context> = {
       );
 
       if (updatedPayer.isLeft()) {
-        throw new Error(`Error: ${updatedPayer.value.errorValue().message}`);
+        throw new Error(`Error: ${updatedPayer.value.message}`);
       }
 
       return PayerMap.toPersistence(updatedPayer.value);
@@ -57,7 +57,7 @@ export const payer: Resolvers<Context> = {
   },
   Payer: {
     async address(payer: any, args: any, context) {
-      const getAddressUseCase = new GetAddressUseCase(context.repos.address);
+      const getAddressUseCase = new GetAddressUsecase(context.repos.address);
 
       const address = await getAddressUseCase.execute({
         billingAddressId: payer.billingAddressId,
@@ -67,7 +67,7 @@ export const payer: Resolvers<Context> = {
         throw new Error(`Can't get address for payer ${payer.id}`);
       }
 
-      return AddressMap.toPersistence(address.value.getValue());
+      return AddressMap.toPersistence(address.value);
     },
   },
 };

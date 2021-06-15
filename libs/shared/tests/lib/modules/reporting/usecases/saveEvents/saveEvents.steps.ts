@@ -21,7 +21,7 @@ let mockEvents: EventDTO[];
 
 let useCase: SaveEventsUsecase;
 
-Before(function () {
+Before({ tags: '@ValidateSaveEvents' }, function () {
   mockEventsRepo = new MockEventsRepo();
   registry = new EventMappingdefaultRegistry();
 

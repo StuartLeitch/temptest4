@@ -18,6 +18,7 @@ export * from './modules/addresses/mappers/AddressMap';
 export * from './modules/addresses/repos/implementations/knexAddressRepo';
 export * from './modules/addresses/repos/mocks/mockAddressRepo';
 export * from './modules/addresses/mappers/AddressMap';
+export * from './modules/addresses/usecases/getAddress';
 
 // * Export Article Subdomain
 export * from './modules/manuscripts/domain/Article';
@@ -25,6 +26,7 @@ export * from './modules/manuscripts/mappers/ArticleMap';
 export * from './modules/manuscripts/mappers/ManuscriptMap';
 export * from './modules/manuscripts/domain/ArticleId';
 export * from './modules/manuscripts/domain/ManuscriptTypes';
+export * from './modules/manuscripts/domain/ManuscriptId';
 export * from './modules/manuscripts/domain/Manuscript';
 export * from './modules/manuscripts/repos';
 export * from './modules/manuscripts/usecases/getArticleDetails/getArticleDetails';
@@ -35,6 +37,7 @@ export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getMan
 export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptIdDTO';
 export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
 export * from './modules/manuscripts/usecases/editManuscript/editManuscriptDTO';
+export * from './modules/manuscripts/usecases/existsManuscriptById';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -45,13 +48,13 @@ export * from './modules/transactions/usecases/createTransaction/createTransacti
 
 export * from './modules/transactions/mappers/TransactionMap';
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
-export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTOs';
+export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTO';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
 export * from './modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
 export * from './modules/transactions/usecases/createTransaction/createTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
-export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTOs';
+export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTO';
 export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
 export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction.dto';
 export * from './modules/transactions/usecases/getTransactionByInvoiceId/getTransactionByInvoiceId';
@@ -62,7 +65,6 @@ export * from './modules/invoices/domain/Invoice';
 export * from './modules/invoices/domain/InvoiceId';
 export * from './modules/invoices/domain/InvoiceItem';
 export * from './modules/invoices/domain/InvoiceItemId';
-export * from './modules/invoices/domain/ManuscriptId';
 
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 
@@ -151,17 +153,16 @@ export * from './modules/journals/repos';
 export * from './modules/journals/mappers/CatalogMap';
 export * from './modules/journals/mappers/EditorMap';
 export * from './modules/journals/mappers/JournalEventMap';
-export * from './modules/journals/usecases/catalogItems/getAllCatalogItems/getAllCatalogItemsUseCase';
 export * from './modules/journals/usecases/journals/getJournal/getJournal';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 export * from './modules/journals/usecases/editorialBoards/getEditorsByJournal/getEditorsByJournal';
 export * from './modules/journals/usecases/editorialBoards/removeEditorsFromJournal/removeEditorsFromJournal';
 export * from './modules/journals/usecases/journals/getJournalList/getJournalList';
-export * from './modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
 export * from './modules/journals/usecases/journals/getJournal/getJournal';
 export * from './modules/journals/usecases/journals/getJournal/getJournalDTO';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
-export * from './modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+export * from './modules/journals/usecases/addCatalogItemToCatalog/addCatalogItemToCatalog';
+export * from './modules/journals/usecases/updateCatalogItemToCatalog';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
@@ -252,9 +253,6 @@ export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetails';
 export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetailsDTO';
 
 // * Export user Subdomain
-export * from './modules/users/domain/User';
-export * from './modules/users/domain/UserId';
-export * from './modules/users/mappers/UserMap';
 
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
 export * from './modules/payments/usecases/retryPaymentsRegistration/retryPaymentRegistration';

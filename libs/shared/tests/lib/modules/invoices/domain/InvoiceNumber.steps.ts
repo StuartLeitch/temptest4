@@ -1,22 +1,21 @@
+import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
 
-import { Result } from './../../../../../src/lib/core/logic/Result';
 import { UniqueEntityID } from '../../../../../src/lib/core/domain/UniqueEntityID';
-import { Invoice, InvoiceStatus } from './../../../../../src/lib/modules/invoices/domain/Invoice';
+
 import { InvoiceNumber } from './../../../../../src/lib/modules/invoices/domain/InvoiceNumber';
 import { InvoiceMap } from './../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import {
+  InvoiceStatus,
+  Invoice,
+} from './../../../../../src/lib/modules/invoices/domain/Invoice';
 
-let invoiceOrError: Result<Invoice>;
-let invoice = null;
-let invoiceNumber = null;
+let invoiceNumber: InvoiceNumber = null;
+let invoice: Invoice = null;
 let lastInvoiceNumber = 1;
 
-Before(function () {
-  invoiceOrError = null;
-});
-
-Given(/^The last generated invoice number is "([\w-]+)"$/,
+Given(
+  /^The last generated invoice number is "([\w-]+)"$/,
   function (setInvoiceNumber: string) {
     lastInvoiceNumber = Number.parseInt(setInvoiceNumber, 10);
   }
@@ -27,21 +26,38 @@ When(
   function (testInvoiceId: string) {
     const invoiceId = new UniqueEntityID(testInvoiceId);
 
-    invoice = InvoiceMap.toDomain({
-      id:invoiceId,
+    const maybeInvoice = InvoiceMap.toDomain({
+      id: invoiceId,
       status: InvoiceStatus.DRAFT,
       dateCreated: new Date(),
       deleted: 0,
-    })
+    });
 
-    invoiceNumber = InvoiceNumber.create({ value: lastInvoiceNumber }).getValue();
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
+
+    const maybeInvoiceNumber = InvoiceNumber.create({
+      value: lastInvoiceNumber,
+    });
+
+    if (maybeInvoiceNumber.isLeft()) {
+      throw maybeInvoiceNumber.value;
+    }
+
+    invoiceNumber = maybeInvoiceNumber.value;
+
     invoice.assignInvoiceNumber(invoiceNumber.value);
   }
 );
 
-Then(/^The InvoiceNumber for ID "([\w-]+)" should be "([\d-]+)"$/, function (
-  testInvoiceId: string,
-  expectedInvoiceNumber: string
-) {
-  expect(invoice.invoiceNumber).to.equal(Number.parseInt(expectedInvoiceNumber, 10));
-});
+Then(
+  /^The InvoiceNumber for ID "([\w-]+)" should be "([\d-]+)"$/,
+  function (testInvoiceId: string, expectedInvoiceNumber: string) {
+    expect(invoice.invoiceNumber).to.equal(
+      Number.parseInt(expectedInvoiceNumber, 10)
+    );
+  }
+);

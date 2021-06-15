@@ -1,5 +1,9 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
 import { Mapper } from '../../../infrastructure/Mapper';
+
 import { Event } from '../domain/Event';
 
 export interface EventPersistenceDTO {
@@ -10,11 +14,13 @@ export interface EventPersistenceDTO {
 }
 
 export class EventMap extends Mapper<Event> {
-  public static toDomain(raw: EventPersistenceDTO): Event {
+  public static toDomain(
+    raw: EventPersistenceDTO
+  ): Either<GuardFailure, Event> {
     return Event.create(
       { ...raw, time: raw.time ? new Date(raw.time) : null },
       new UniqueEntityID(raw.id)
-    ).getValue();
+    );
   }
 
   public static toPersistence(event: Event): EventPersistenceDTO {
@@ -22,7 +28,7 @@ export class EventMap extends Mapper<Event> {
       id: event.id.toString(),
       time: event.time,
       type: event.type,
-      payload: event.payload
+      payload: event.payload,
     };
   }
 }

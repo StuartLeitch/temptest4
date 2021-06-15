@@ -1,4 +1,8 @@
-import { GetRecentCouponsSuccessResponse } from './../../usecases/getRecentCoupons/getRecentCouponsResponse';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
+import { RepoError } from '../../../../infrastructure/RepoError';
+
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 
 import { CouponAssignedCollection } from '../../domain/CouponAssignedCollection';
@@ -9,6 +13,8 @@ import { CouponId } from '../../domain/CouponId';
 import { Coupon } from '../../domain/Coupon';
 
 import { CouponRepoContract } from '../couponRepo';
+
+import { GetRecentCouponsSuccessResponse } from './../../usecases/getRecentCoupons/getRecentCouponsResponse';
 
 export class MockCouponRepo
   extends BaseMockRepo<Coupon>
@@ -21,15 +27,19 @@ export class MockCouponRepo
     super();
   }
 
-  async getCouponCollection(): Promise<Coupon[]> {
-    return this._items;
+  async getCouponCollection(): Promise<
+    Either<GuardFailure | RepoError, Coupon[]>
+  > {
+    return right(this._items);
   }
 
-  async getRecentCoupons(): Promise<GetRecentCouponsSuccessResponse> {
-    return {
+  async getRecentCoupons(): Promise<
+    Either<GuardFailure | RepoError, GetRecentCouponsSuccessResponse>
+  > {
+    return right({
       totalCount: this._items.length,
       coupons: this._items,
-    };
+    });
   }
 
   addMockCouponToInvoiceItem(
@@ -47,62 +57,91 @@ export class MockCouponRepo
 
   async getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<CouponAssignedCollection> {
+  ): Promise<Either<GuardFailure | RepoError, CouponAssignedCollection>> {
     const couponIds = this.invoiceItemToCouponMapper[
       invoiceItemId.id.toString()
     ];
     if (!couponIds) {
-      return CouponAssignedCollection.create();
+      return right(CouponAssignedCollection.create());
     }
     const coupons = this._items.filter((item) =>
       couponIds.includes(item.id.toString())
     );
-    return CouponAssignedCollection.create(
-      coupons.map((coupon) =>
-        CouponAssigned.create({
-          invoiceItemId,
-          coupon,
-          dateAssigned: null,
-        })
+    return right(
+      CouponAssignedCollection.create(
+        coupons.map((coupon) =>
+          CouponAssigned.create({
+            invoiceItemId,
+            coupon,
+            dateAssigned: null,
+          })
+        )
       )
     );
   }
 
-  async getCouponById(couponId: CouponId): Promise<Coupon> {
+  async getCouponById(
+    couponId: CouponId
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const match = this._items.find((item) => item.couponId.equals(couponId));
-    return match ? match : null;
+
+    if (!match) {
+      return left(
+        RepoError.createEntityNotFoundError('coupon', couponId.toString())
+      );
+    }
+
+    return right(match);
   }
 
-  async getCouponByCode(code: CouponCode): Promise<Coupon> {
+  async getCouponByCode(
+    code: CouponCode
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const match = this._items.find((item) => item.code.equals(code));
     if (!match) {
-      throw Error('Coupon not found');
+      return left(
+        RepoError.createEntityNotFoundError('coupon by code', code.toString())
+      );
     }
-    return match || null;
+    return right(match);
   }
 
-  async incrementRedeemedCount(coupon: Coupon): Promise<Coupon> {
+  async incrementRedeemedCount(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const match = this._items.find((item) => item.id.equals(coupon.id));
     if (!match) {
-      throw Error('not existing');
+      return left(
+        RepoError.createEntityNotFoundError('coupon', coupon.id.toString())
+      );
     }
     Object.defineProperty(match, 'redeemCount', {
       value: match.redeemCount + 1,
       writable: true,
     });
 
-    return match;
+    return right(match);
   }
 
   async assignCouponToInvoiceItem(
     coupon: Coupon,
     invoiceItemId: InvoiceItemId
-  ): Promise<Coupon> {
-    return coupon;
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
+    return right(coupon);
   }
 
-  async update(coupon: Coupon): Promise<Coupon> {
-    const alreadyExists = await this.exists(coupon);
+  async update(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
+    const maybeAlreadyExists = await this.exists(coupon);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items.map((i) => {
@@ -114,27 +153,43 @@ export class MockCouponRepo
       });
     }
 
-    return coupon;
+    return right(coupon);
   }
 
-  public async save(coupon: Coupon): Promise<Coupon> {
-    if (await this.exists(coupon)) {
-      throw Error('duplicate coupon');
+  public async save(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
+    const maybeAlreadyExists = await this.exists(coupon);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
+
+    if (alreadyExists) {
+      return left(RepoError.fromDBError(new Error('duplicate coupon')));
     }
 
     this._items.push(coupon);
-    return coupon;
+    return right(coupon);
   }
 
-  async isCodeUsed(code: CouponCode | string): Promise<boolean> {
+  async isCodeUsed(
+    code: CouponCode | string
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const val = typeof code === 'string' ? code : code.value;
     const found = this._items.filter((item) => item.code.value === val);
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
-  public async exists(coupon: Coupon): Promise<boolean> {
+  public async exists(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const found = this._items.filter((i) => this.compareMockItems(i, coupon));
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
   public compareMockItems(a: Coupon, b: Coupon): boolean {

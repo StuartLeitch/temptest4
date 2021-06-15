@@ -1,5 +1,5 @@
-import {File} from '../../domain/File';
-import {Mapper} from '../Mapper';
+import { File } from '../../domain/File';
+import { Mapper } from '../Mapper';
 
 export interface FilePersistenceDTO {
   src: string;
@@ -17,13 +17,13 @@ export class FileMap extends Mapper<File> {
     //   console.log(result);
     // }
 
-    return result.isSuccess ? result.getValue() : null;
+    return result.isRight() ? result.value : null;
   }
 
   public static toPersistence(file: File): FilePersistenceDTO {
     return {
       src: file.src,
-      name: file.name
+      name: file.name,
     };
   }
 }

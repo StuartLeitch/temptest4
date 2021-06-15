@@ -44,8 +44,8 @@ function addEditorEventHandlerFactory<T extends EnvType>(eventName: string) {
         });
 
         if (assignEditorResponse.isLeft()) {
-          logger.error(assignEditorResponse.value.errorValue().message);
-          throw assignEditorResponse.value.error;
+          logger.error(assignEditorResponse.value.message);
+          throw assignEditorResponse.value;
         }
 
         logger.info(`Successfully executed event ${eventName}`);

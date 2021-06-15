@@ -1,17 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Result, left } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
@@ -19,6 +13,7 @@ import { CouponRepoContract } from '../../repos/couponRepo';
 import { InvoiceItemType } from '../../../invoices/domain/InvoiceItem';
 
 import { CreateCouponResponse } from './createCouponResponse';
+import { CouponNotSavedError } from './createCouponErrors';
 import { CreateCouponDTO } from './createCouponDTO';
 
 import { CouponCode } from '../../domain/CouponCode';
@@ -37,63 +32,62 @@ export class CreateCouponUsecase
       CreateCouponDTO,
       Promise<CreateCouponResponse>,
       UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      CreateCouponDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
     > {
-  constructor(private couponRepo: CouponRepoContract) {}
+  constructor(private couponRepo: CouponRepoContract) {
+    this.createCoupon = this.createCoupon.bind(this);
+    this.saveCoupon = this.saveCoupon.bind(this);
+  }
 
-  // @Authorize('coupon:create')
   public async execute(
     request: CreateCouponDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<CreateCouponResponse> {
     try {
-      const maybeSaneRequest = await sanityChecksRequestParameters(
-        request,
-        this.couponRepo
-      );
+      const finalResult = await new AsyncEither(request)
+        .then(sanityChecksRequestParameters(this.couponRepo))
+        .then(this.createCoupon)
+        .then(this.saveCoupon)
+        .execute();
 
-      const maybeSavedCoupon = await map(
-        [this.createCoupon.bind(this), this.saveCoupon.bind(this)],
-        maybeSaneRequest
-      );
-
-      const finalResult = maybeSavedCoupon.map((coupon) => Result.ok(coupon));
-
-      return (finalResult as unknown) as CreateCouponResponse;
+      return finalResult;
     } catch (err) {
       return left(new UnexpectedError(err));
     }
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  private async createCoupon(request: CreateCouponDTO): Promise<Coupon> {
+  private async createCoupon(request: CreateCouponDTO) {
     const { code, invoiceItemType, expirationDate, type, status } = request;
-    const couponCode = CouponCode.create(code).getValue();
-    const now = new Date();
-    const props: CouponProps = {
-      ...request,
-      invoiceItemType: invoiceItemType as InvoiceItemType,
-      expirationDate: expirationDate ? new Date(expirationDate) : null,
-      couponType: CouponType[type],
-      status: CouponStatus[status],
-      dateCreated: now,
-      dateUpdated: now,
-      redeemCount: 0,
-      code: couponCode,
-    };
 
-    const coupon = Coupon.create(props);
-    return coupon.getValue();
+    return CouponCode.create(code)
+      .map((code) => {
+        const now = new Date();
+        const props: CouponProps = {
+          ...request,
+          invoiceItemType: invoiceItemType as InvoiceItemType,
+          expirationDate: expirationDate ? new Date(expirationDate) : null,
+          couponType: CouponType[type],
+          status: CouponStatus[status],
+          dateCreated: now,
+          dateUpdated: now,
+          redeemCount: 0,
+          code,
+        };
+        return props;
+      })
+      .chain((props) => Coupon.create(props));
   }
 
-  private async saveCoupon(coupon: Coupon): Promise<Coupon> {
-    return this.couponRepo.save(coupon);
+  private async saveCoupon(
+    coupon: Coupon
+  ): Promise<Either<CouponNotSavedError, Coupon>> {
+    try {
+      const result = await this.couponRepo.save(coupon);
+      if (result.isLeft()) {
+        return left(new CouponNotSavedError(new Error(result.value.message)));
+      }
+      return right(result.value);
+    } catch (err) {
+      return left(new CouponNotSavedError(err));
+    }
   }
 }

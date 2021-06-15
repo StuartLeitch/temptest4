@@ -1,5 +1,6 @@
+import { Either, right, left } from '../core/logic/Either';
+import { GuardFailure } from '../core/logic/GuardFailure';
 import { ValueObject } from '../core/domain/ValueObject';
-import { Result } from '../core/logic/Result';
 import { Guard } from '../core/logic/Guard';
 
 interface EditorRoleProps {
@@ -20,18 +21,20 @@ export class EditorRole extends ValueObject<EditorRoleProps> {
     super(props);
   }
 
-  public static create(props: EditorRoleProps): Result<EditorRole> {
+  public static create(
+    props: EditorRoleProps
+  ): Either<GuardFailure, EditorRole> {
     const nullGuard = Guard.againstNullOrUndefinedBulk([
-      { argument: props.type, argumentName: 'type' }
+      { argument: props.type, argumentName: 'type' },
     ]);
 
     if (!nullGuard.succeeded) {
-      return Result.fail<EditorRole>(nullGuard.message);
+      return left(new GuardFailure(nullGuard.message));
     }
 
-    return Result.ok<EditorRole>(
+    return right(
       new EditorRole({
-        ...props
+        ...props,
       })
     );
   }

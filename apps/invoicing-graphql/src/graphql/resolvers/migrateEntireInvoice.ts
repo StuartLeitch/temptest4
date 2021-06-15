@@ -74,7 +74,7 @@ export const migrateEntireInvoice: Resolvers<Context> = {
 
         if (maybeResult.isLeft()) {
           console.log(maybeResult.value);
-          throw new Error(maybeResult.value.errorValue().message);
+          throw new Error(maybeResult.value.message);
         }
       } catch (err) {
         console.info(err);

@@ -1,10 +1,11 @@
 import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { Either, Result } from '../../../../../core/logic/Result';
+import { Either } from '../../../../../core/logic/Either';
 
-import { GetJournalErrors } from './getJournalErrors';
 import { CatalogItem } from './../../../domain/CatalogItem';
 
+import * as Errors from './getJournalErrors';
+
 export type GetJournalResponse = Either<
-  GetJournalErrors.JournalDoesntExistError | UnexpectedError,
-  Result<CatalogItem>
+  Errors.JournalDoesntExistError | UnexpectedError,
+  CatalogItem
 >;

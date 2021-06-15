@@ -37,17 +37,17 @@ import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
-import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
+import { CreateAddressUsecase } from '../../../addresses/usecases/createAddress/createAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
 import {
   ChangeInvoiceStatusErrors,
   ChangeInvoiceStatus,
-} from '../changeInvoiceStatus/';
+} from '../changeInvoiceStatus';
 import {
   CreatePayerRequestDTO,
   CreatePayerUsecase,
-} from '../../../payers/usecases/createPayer/createPayer';
+} from '../../../payers/usecases/createPayer';
 
 // * Usecase specific
 
@@ -156,7 +156,29 @@ export class ConfirmInvoiceUsecase
       try {
         const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
         invoice.assignInvoiceNumber(lastInvoiceNumber);
-        payerData.invoice = await this.invoiceRepo.update(invoice);
+        const maybeUpdated = await this.invoiceRepo.update(invoice);
+
+        if (maybeUpdated.isLeft()) {
+          return left(
+            new Errors.InvoiceNumberAssignationError(
+              invoice.id.toString(),
+              new Error(maybeUpdated.value.message)
+            )
+          );
+        }
+
+        payerData.invoice = maybeUpdated.value;
+
+        const aa = await this.getInvoiceItems(
+          { invoiceId: invoice.id.toString() },
+          context
+        )(payerData);
+
+        if (aa.isLeft()) {
+          return aa;
+        } else {
+          payerData.invoice = aa.value.invoice;
+        }
       } catch (e) {
         return left(
           new Errors.InvoiceNumberAssignationError(invoice.id.toString(), e)
@@ -227,16 +249,16 @@ export class ConfirmInvoiceUsecase
 
       const result = await usecase.execute({ transactionId }, context);
 
-      if (result.isFailure) {
+      if (result.isLeft()) {
         return left(
           new Errors.TransactionNotFoundError(
             transactionId,
-            result.errorValue() as any
+            new Error(result.value.message)
           )
         );
       }
 
-      return right({ ...data, transaction: result.getValue() });
+      return right({ ...data, transaction: result.value });
     };
   }
 
@@ -295,9 +317,9 @@ export class ConfirmInvoiceUsecase
         { invoiceId },
         context
       );
-      return maybeDetails.map((invoiceResult) => ({
+      return maybeDetails.map((invoice) => ({
         ...payerData,
-        invoice: invoiceResult.getValue(),
+        invoice,
       }));
     };
   }
@@ -314,9 +336,9 @@ export class ConfirmInvoiceUsecase
         { invoiceId },
         context
       );
-      return maybeDetails.map((invoiceItemsResult) => {
-        const items = invoiceItemsResult.getValue();
-        items.forEach((ii) => payerData.invoice.addInvoiceItem(ii));
+      return maybeDetails.map((items) => {
+        // items.forEach((ii) => payerData.invoice.addInvoiceItem(ii));
+        payerData.invoice.addItems(items);
         return payerData;
       });
     };
@@ -338,12 +360,12 @@ export class ConfirmInvoiceUsecase
 
       return (
         await createPayerUseCase.execute(payerDTO, context)
-      ).map((payerResult) => ({ ...payerData, payer: payerResult.getValue() }));
+      ).map((payerResult) => ({ ...payerData, payer: payerResult }));
     };
   }
 
   private createAddress({ address }: PayerInput) {
-    const usecase = new CreateAddress(this.addressRepo);
+    const usecase = new CreateAddressUsecase(this.addressRepo);
     const addressDTO = {
       addressLine1: address.addressLine1,
       country: address.country,
@@ -356,7 +378,7 @@ export class ConfirmInvoiceUsecase
       this.loggerService.info(`Create Address for ${address}`);
       return new AsyncEither(addressDTO)
         .then((data) => usecase.execute(data))
-        .map((result) => ({ ...payerData, address: result.getValue() }))
+        .map((address) => ({ ...payerData, address }))
         .execute();
     };
   }
@@ -369,8 +391,10 @@ export class ConfirmInvoiceUsecase
         vatNumber: payer.vatId,
       });
 
-      if (!vatResult.valid) {
-        this.loggerService.info(`VAT ${payer.vatId} is not valid.`);
+      if (!(vatResult instanceof Error)) {
+        if (!vatResult.valid) {
+          this.loggerService.info(`VAT ${payer.vatId} is not valid.`);
+        }
       }
     }
   }
@@ -382,13 +406,9 @@ export class ConfirmInvoiceUsecase
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );
-    const maybePendingInvoice = await changeInvoiceStatusUseCase.execute({
+    return await changeInvoiceStatusUseCase.execute({
       invoiceId: invoice.id.toString(),
       status: InvoiceStatus.PENDING,
-    });
-    return maybePendingInvoice.map((pendingInvoiceResult) => {
-      const pendingInvoice = pendingInvoiceResult.getValue();
-      return pendingInvoice;
     });
   }
 
@@ -400,12 +420,10 @@ export class ConfirmInvoiceUsecase
     const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
       this.invoiceRepo
     );
-    return (
-      await changeInvoiceStatusUseCase.execute({
-        invoiceId: invoice.id.toString(),
-        status: InvoiceStatus.ACTIVE,
-      })
-    ).map((resultInvoice) => resultInvoice.getValue());
+    return changeInvoiceStatusUseCase.execute({
+      invoiceId: invoice.id.toString(),
+      status: InvoiceStatus.ACTIVE,
+    });
   }
 
   private async markInvoiceAsFinal(invoice: Invoice) {
@@ -417,12 +435,10 @@ export class ConfirmInvoiceUsecase
 
     await this.invoiceRepo.update(invoice);
 
-    return (
-      await changeInvoiceStatusUseCase.execute({
-        invoiceId: invoice.id.toString(),
-        status: InvoiceStatus.FINAL,
-      })
-    ).map((resultInvoice) => resultInvoice.getValue());
+    return changeInvoiceStatusUseCase.execute({
+      invoiceId: invoice.id.toString(),
+      status: InvoiceStatus.FINAL,
+    });
   }
 
   private applyVatToInvoice(context: Context) {

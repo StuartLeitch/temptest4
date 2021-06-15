@@ -12,23 +12,6 @@ export const getInvoice: ASTNode = gql`
   ${invoiceFragment}
 `;
 
-export const getInvoices: ASTNode = gql`
-  query fetchInvoices($offset: Int, $limit: Int) {
-    invoices(offset: $offset, limit: $limit) {
-      totalCount
-      invoices {
-        id: invoiceId
-        status
-        manuscriptTitle: title
-        type
-        price
-        customId
-        dateCreated
-      }
-    }
-  }
-`;
-
 export const getInvoiceVat: ASTNode = gql`
   query invoiceWithVat(
     $invoiceId: ID

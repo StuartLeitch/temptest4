@@ -39,8 +39,13 @@ async function generateMockEditor(editorsLength: number) {
       };
 
       const editor = EditorMap.toDomain(rawEditor);
-      await mockEditorRepo.save(editor);
-      journalEditors.push(editor);
+
+      if (editor.isLeft()) {
+        throw editor.value;
+      }
+
+      await mockEditorRepo.save(editor.value);
+      journalEditors.push(editor.value);
     })
   );
   return journalEditors;
@@ -48,7 +53,7 @@ async function generateMockEditor(editorsLength: number) {
 
 const { handler } = JournalEditorAssignedHandler;
 
-Before(function () {
+Before({ tags: '@ValidateJournalEditorAssigned' }, function () {
   mockLogger = new MockLogger();
   mockEditorRepo = new MockEditorRepo();
   mockCatalogRepo = new MockCatalogRepo();
@@ -64,23 +69,28 @@ Before(function () {
   };
 });
 
-After(function () {
+After({ tags: '@ValidateJournalEditorAssigned' }, function () {
   journalEditors = [];
 });
 
-Given(/^There is a Journal "([\w-]+)"$/, async function (
-  testJournalId: string
-) {
-  journalId = testJournalId;
+Given(
+  /^There is a Journal "([\w-]+)"$/,
+  async function (testJournalId: string) {
+    journalId = testJournalId;
 
-  await mockCatalogRepo.save(
-    CatalogMap.toDomain({
+    const catalog = CatalogMap.toDomain({
       journalId,
       type: 'mock',
       amount: 666,
-    })
-  );
-});
+    });
+
+    if (catalog.isLeft()) {
+      throw catalog.value;
+    }
+
+    await mockCatalogRepo.save(catalog.value);
+  }
+);
 
 Given(
   /^The journal id from the JournalEditorAssigned event data is "([\w-]+)"$/,
@@ -95,6 +105,7 @@ Given(
   /^All editors list from event data contains (\d+) entries$/,
   async (eventEditorsLength: number) => {
     const eventEditors = await generateMockEditor(eventEditorsLength);
+
     eventData.editors = eventEditors.map(EditorMap.toPersistence);
   }
 );

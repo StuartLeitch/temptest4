@@ -13,7 +13,7 @@ import {
 } from '../../../../../../src/lib/shared';
 
 function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const coupon = CouponMap.toDomain({
     id,
     code,
     status: 'ACTIVE',
@@ -24,6 +24,12 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
     name: 'test-coupon',
     ...overwrites,
   });
+
+  if (coupon.isLeft()) {
+    throw coupon.value;
+  }
+
+  return coupon.value;
 }
 
 const context: UsecaseAuthorizationContext = {
@@ -49,7 +55,13 @@ Given(
   /^the coupon "([\w-]+)" with "([\w-]+)"/,
   async (testId: string, testCode: string) => {
     coupon = makeCouponData(testId, testCode);
-    coupon = await mockCouponRepo.save(coupon);
+    const maybeCoupon = await mockCouponRepo.save(coupon);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    coupon = maybeCoupon.value;
   }
 );
 
@@ -66,7 +78,7 @@ When(
 
 Then(/^I should see the modification on coupon/, () => {
   expect(response.isRight()).to.be.true;
-  expect(response.value.getValue())
+  expect(response.value)
     .to.have.property('props')
     .to.have.property('reduction')
     .to.equal(30);
@@ -81,7 +93,7 @@ When(
 
 Then(/^I should see the original details on coupon/, () => {
   expect(response.isRight()).to.be.true;
-  expect(response.value.getValue())
+  expect(response.value)
     .to.have.property('props')
     .to.have.property('reduction')
     .to.equal(20);

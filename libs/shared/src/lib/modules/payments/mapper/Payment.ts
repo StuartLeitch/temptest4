@@ -1,5 +1,7 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { Mapper } from '../../../infrastructure/Mapper';
+import { Either } from '../../../core/logic/Either';
 import { Amount } from '../../../domain/Amount';
 
 import { ExternalOrderId } from '../domain/external-order-id';
@@ -9,34 +11,32 @@ import { Payment, PaymentStatus } from '../domain/Payment';
 import { PayerId } from '../../payers/domain/PayerId';
 
 export class PaymentMap extends Mapper<Payment> {
-  public static toDomain(raw: any): Payment {
-    const paymentOrError = Payment.create(
-      {
-        payerId: raw.payerId
-          ? PayerId.create(new UniqueEntityID(raw.payerId))
-          : null,
-        invoiceId: InvoiceId.create(
-          new UniqueEntityID(raw.invoiceId)
-        ).getValue(),
-        amount: Amount.create(raw.amount).getValue(),
-        paymentMethodId: PaymentMethodId.create(
-          new UniqueEntityID(raw.paymentMethodId)
-        ),
-        foreignPaymentId: raw.foreignPaymentId
-          ? ExternalOrderId.create(raw.foreignPaymentId)
-          : null,
-        datePaid: raw.datePaid ? new Date(raw.datePaid) : new Date(),
-        status: raw.status ? raw.status : PaymentStatus.COMPLETED,
-        paymentProof: raw.paymentProof
-          ? ExternalOrderId.create(raw.paymentProof)
-          : null,
-      },
-      new UniqueEntityID(raw.id)
+  public static toDomain(raw: any): Either<GuardFailure, Payment> {
+    const paymentOrError = Amount.create(raw.amount).chain((amount) =>
+      Payment.create(
+        {
+          amount,
+          payerId: raw.payerId
+            ? PayerId.create(new UniqueEntityID(raw.payerId))
+            : null,
+          invoiceId: InvoiceId.create(new UniqueEntityID(raw.invoiceId)),
+          paymentMethodId: PaymentMethodId.create(
+            new UniqueEntityID(raw.paymentMethodId)
+          ),
+          foreignPaymentId: raw.foreignPaymentId
+            ? ExternalOrderId.create(raw.foreignPaymentId)
+            : null,
+          datePaid: raw.datePaid ? new Date(raw.datePaid) : new Date(),
+          status: raw.status ? raw.status : PaymentStatus.COMPLETED,
+          paymentProof: raw.paymentProof
+            ? ExternalOrderId.create(raw.paymentProof)
+            : null,
+        },
+        new UniqueEntityID(raw.id)
+      )
     );
 
-    paymentOrError.isFailure ? console.log(paymentOrError) : '';
-
-    return paymentOrError.isSuccess ? paymentOrError.getValue() : null;
+    return paymentOrError;
   }
 
   public static toPersistence(payment: Payment): any {

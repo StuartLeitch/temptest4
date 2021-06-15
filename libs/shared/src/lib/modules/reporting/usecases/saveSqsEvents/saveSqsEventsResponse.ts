@@ -1,4 +1,4 @@
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
 
-export type SaveSqsEventsResponse = Either<UnexpectedError, Result<void>>;
+export type SaveSqsEventsResponse = Either<UnexpectedError, void>;

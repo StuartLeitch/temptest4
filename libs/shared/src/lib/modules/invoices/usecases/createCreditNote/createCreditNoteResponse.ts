@@ -1,13 +1,16 @@
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
 
 import { Invoice } from '../../domain/Invoice';
-import { CreateCreditNoteErrors } from './createCreditNoteErrors';
+
+import * as Errors from './createCreditNoteErrors';
 
 export type CreateCreditNoteResponse = Either<
-  | CreateCreditNoteErrors.TransactionNotFoundError
-  | CreateCreditNoteErrors.InvoiceNotFoundError
-  | CreateCreditNoteErrors.InvoiceIsDraftError
-  | UnexpectedError,
-  Result<Invoice>
+  | Errors.TransactionNotFoundError
+  | Errors.InvoiceNotFoundError
+  | Errors.InvoiceIsDraftError
+  | UnexpectedError
+  | GuardFailure,
+  Invoice
 >;

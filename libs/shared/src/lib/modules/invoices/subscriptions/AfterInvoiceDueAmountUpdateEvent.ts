@@ -64,7 +64,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
           `Invoice ${event.invoiceId.id.toString()} does not exist.`
         );
       }
-      const invoice = maybeInvoice.value.getValue();
+      const invoice = maybeInvoice.value;
 
       const maybeInvoiceItems = await getInvoiceItems.execute(
         {
@@ -77,7 +77,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
           `Invoice ${event.invoiceId.id.toString()} has no invoice items.`
         );
       }
-      const invoiceItems = maybeInvoiceItems.value.getValue();
+      const invoiceItems = maybeInvoiceItems.value;
 
       const manuscriptId = invoiceItems[0].manuscriptId.id.toString();
       const maybeManuscript = await getManuscript.execute(
@@ -91,7 +91,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
           `Invoice ${event.invoiceId.id.toString()} has no manuscripts associated.`
         );
       }
-      const manuscript = maybeManuscript.value.getValue();
+      const manuscript = maybeManuscript.value;
 
       if (invoice.status === 'DRAFT') {
         const result = await this.publishInvoiceDraftDueAmountUpdated.execute(
@@ -104,7 +104,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
         );
 
         if (result.isLeft()) {
-          throw new Error(result.value.errorValue().message);
+          throw new Error(result.value.message);
         }
       }
     } catch (err) {

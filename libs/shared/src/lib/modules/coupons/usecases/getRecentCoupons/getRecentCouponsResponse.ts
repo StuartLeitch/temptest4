@@ -1,5 +1,6 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
+
 import { Coupon } from '../../domain/Coupon';
 
 export interface GetRecentCouponsSuccessResponse {
@@ -9,5 +10,5 @@ export interface GetRecentCouponsSuccessResponse {
 
 export type GetRecentCouponsResponse = Either<
   UnexpectedError,
-  Result<GetRecentCouponsSuccessResponse>
+  GetRecentCouponsSuccessResponse
 >;

@@ -42,31 +42,46 @@ export class AfterInvoiceCreatedEvent
   private async onInvoiceCreatedEvent(event: InvoiceCreated): Promise<any> {
     // Get invoice from repo
     try {
-      const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
-      if (!invoice) {
+      const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+        event.invoiceId
+      );
+      if (maybeInvoice.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} does not exist.`
         );
       }
 
-      const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+      const invoice = maybeInvoice.value;
+
+      const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
         event.invoiceId
       );
+
+      if (maybeInvoiceItems.isLeft()) {
+        throw new Error(
+          `Invoice items not found for invoice ${event.invoiceId.toString()}`
+        );
+      }
+
+      const invoiceItems = maybeInvoiceItems.value;
+
       if (!invoiceItems || invoiceItems.length === 0) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} has no invoice items.`
         );
       }
 
-      const manuscript = await this.manuscriptRepo.findById(
+      const maybeManuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
 
-      if (!manuscript) {
+      if (maybeManuscript.isLeft()) {
         throw new Error(
           `Invoice ${event.invoiceId.id.toString()} has no manuscripts associated.`
         );
       }
+
+      const manuscript = maybeManuscript.value;
 
       const result = await this.publishInvoiceCreated.execute({
         invoice,
@@ -75,7 +90,7 @@ export class AfterInvoiceCreatedEvent
       });
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
       //* schedule new job
@@ -101,12 +116,6 @@ export class AfterInvoiceCreatedEvent
         this.confirmationReminderQueueName,
         newTimer
       );
-
-      // if (invoice) {
-      // Get all payers interested in this invoice
-      // for payer in payers
-      // Craft and send 'You got an invoice!' email with invoice link included
-      // }
 
       console.log(
         `[AfterInvoiceCreated]: Successfully executed onInvoiceCreatedEvent use case InvoiceCreatedEvent`

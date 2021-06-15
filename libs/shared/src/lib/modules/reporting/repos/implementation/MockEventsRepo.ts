@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { Either, left } from '../../../../core/logic/Either';
 
-// import Knex from 'knex';
-// import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { Event } from '../../domain/Event';
+
 import { EventsRepoContract } from '../EventsRepo';
 
 export class MockEventsRepo implements EventsRepoContract {
@@ -30,10 +30,10 @@ export class MockEventsRepo implements EventsRepoContract {
   async clear() {
     this.eventMap = {};
   }
-  exists(e: Event): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async exists(e: Event): Promise<Either<RepoError, boolean>> {
+    return left(RepoError.methodNotImplemented('MockEventsRepo.exists'));
   }
-  save(e: Event): Promise<Event> {
-    throw new Error('Method not implemented.');
+  async save(e: Event): Promise<Either<RepoError, Event>> {
+    return left(RepoError.methodNotImplemented('MockEventsRepo.save'));
   }
 }

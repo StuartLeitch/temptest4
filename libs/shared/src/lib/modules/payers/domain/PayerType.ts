@@ -1,5 +1,6 @@
-import {ValueObject} from '../../../core/domain/ValueObject';
-import {Result} from '../../../core/logic/Result';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { ValueObject } from '../../../core/domain/ValueObject';
 
 interface PayerTypeProps {
   value: string;
@@ -14,11 +15,11 @@ export class PayerType extends ValueObject<PayerTypeProps> {
     super(props);
   }
 
-  public static create(type: string): Result<PayerType> {
+  public static create(type: string): Either<GuardFailure, PayerType> {
     if (!!type === false || type.length === 0) {
-      return Result.fail<PayerType>('Must provide a payer type');
+      return left(new GuardFailure('Must provide a payer type'));
     } else {
-      return Result.ok<PayerType>(new PayerType({value: type}));
+      return right(new PayerType({ value: type }));
     }
   }
 }

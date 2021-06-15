@@ -1,20 +1,22 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
-import {
-  Transaction,
-  TransactionStatus,
-} from '../../../../../src/lib/modules/transactions/domain/Transaction';
-import { Result } from './../../../../../src/lib/core/logic/Result';
-import { InvoiceMap } from '../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
-import { UniqueEntityID } from '../../../../../src/lib/core/domain/UniqueEntityID';
+import { GuardFailure } from './../../../../../src/lib/core/logic/GuardFailure';
+import { Either } from './../../../../../src/lib/core/logic/Either';
 
-let transactionOrError: Result<Transaction>;
+import {
+  TransactionStatus,
+  Transaction,
+} from '../../../../../src/lib/modules/transactions/domain/Transaction';
+
+import { InvoiceMap } from '../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+
+let transactionOrError: Either<GuardFailure, Transaction>;
 let transaction: Transaction;
 
-Before(function () {
-  transactionOrError = {} as Result<Transaction>;
-  transaction = {} as Transaction;
+Before({ tags: '@ValidateTransaction' }, function () {
+  transactionOrError = null;
+  transaction = null;
 });
 
 Given('There is a Transaction Domain Entity', function () {
@@ -36,33 +38,60 @@ When(
       status: 'DRAFT',
     });
 
-    transaction = Transaction.create({
-      status: TransactionStatus.DRAFT,
-    }).getValue();
+    if (invoice.isLeft()) {
+      throw invoice.value;
+    }
 
-    transaction.addInvoice(invoice);
+    const maybeTransaction = Transaction.create({
+      status: TransactionStatus.DRAFT,
+    });
+
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    transaction = maybeTransaction.value;
+
+    transaction.addInvoice(invoice.value);
   }
 );
 
 When('I try to change the Transaction status to ACTIVE', function () {
-  transaction = Transaction.create({
+  const maybeTransaction = Transaction.create({
     status: TransactionStatus.DRAFT,
-  }).getValue();
+  });
+
+  if (maybeTransaction.isLeft()) {
+    throw maybeTransaction.value;
+  }
+
+  transaction = maybeTransaction.value;
 
   transaction.markAsActive();
 });
 
 When('I try to change the Transaction status to FINAL', function () {
-  transaction = Transaction.create({
+  const maybeTransaction = Transaction.create({
     status: TransactionStatus.DRAFT,
-  }).getValue();
+  });
+
+  if (maybeTransaction.isLeft()) {
+    throw maybeTransaction.value;
+  }
+
+  transaction = maybeTransaction.value;
 
   transaction.markAsFinal();
 });
 
 Then('A new DRAFT Transaction is successfully created', function () {
-  expect(transactionOrError.isSuccess).to.equal(true);
-  transaction = transactionOrError.getValue();
+  expect(transactionOrError.isRight()).to.equal(true);
+
+  if (transactionOrError.isLeft()) {
+    throw transactionOrError.value;
+  }
+
+  transaction = transactionOrError.value;
   expect(transaction.status).to.equal(TransactionStatus.DRAFT);
 });
 

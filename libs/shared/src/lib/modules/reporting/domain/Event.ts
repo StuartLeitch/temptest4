@@ -1,7 +1,8 @@
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 export interface EventProps {
   type: string;
@@ -30,8 +31,11 @@ export class Event extends AggregateRoot<EventProps> {
     super(props, id);
   }
 
-  public static create(props: EventProps, id?: UniqueEntityID): Result<Event> {
+  public static create(
+    props: EventProps,
+    id?: UniqueEntityID
+  ): Either<GuardFailure, Event> {
     const event = new Event(props, id);
-    return Result.ok<Event>(event);
+    return right(event);
   }
 }

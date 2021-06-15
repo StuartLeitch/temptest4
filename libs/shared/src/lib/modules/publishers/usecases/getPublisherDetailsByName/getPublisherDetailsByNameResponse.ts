@@ -1,10 +1,11 @@
-import { Result, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetPublisherDetailsByNameErrors } from './getPublisherDetailsByNameErrors';
 import { Publisher } from '../../domain/Publisher';
 
+import * as Errors from './getPublisherDetailsByNameErrors';
+
 export type GetPublisherDetailsByNameResponse = Either<
-  GetPublisherDetailsByNameErrors.PublisherNotFoundError | UnexpectedError,
-  Result<Publisher>
+  Errors.PublisherNotFoundError | UnexpectedError,
+  Publisher
 >;

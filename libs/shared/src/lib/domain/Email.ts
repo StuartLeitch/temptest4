@@ -1,5 +1,6 @@
+import { Either, right, left } from '../core/logic/Either';
+import { GuardFailure } from '../core/logic/GuardFailure';
 import { ValueObject } from '../core/domain/ValueObject';
-import { Result } from '../core/logic/Result';
 import { Guard } from '../core/logic/Guard';
 
 interface EmailProps {
@@ -15,14 +16,14 @@ export class Email extends ValueObject<EmailProps> {
     super(props);
   }
 
-  public static create(props: EmailProps): Result<Email> {
+  public static create(props: EmailProps): Either<GuardFailure, Email> {
     const guardResult = Guard.againstInvalidEmail(props.value);
 
     if (!guardResult.succeeded) {
-      return Result.fail<Email>(guardResult.message);
+      return left(new GuardFailure(guardResult.message));
     }
 
-    return Result.ok<Email>(new Email(props));
+    return right(new Email(props));
   }
 
   toString(): string {

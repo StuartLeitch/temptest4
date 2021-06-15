@@ -1,4 +1,5 @@
 export enum RepoErrorCode {
+  METHOD_NOT_IMPLEMENTED,
   ENTITY_NOT_FOUND,
   DB_ERROR,
 }
@@ -20,9 +21,13 @@ export class RepoError extends Error {
   }
 
   static fromDBError(error: Error): RepoError {
+    return new RepoError(RepoErrorCode.DB_ERROR, error.message);
+  }
+
+  static methodNotImplemented(methodName: string): RepoError {
     return new RepoError(
-      RepoErrorCode.DB_ERROR,
-      error.message,
+      RepoErrorCode.METHOD_NOT_IMPLEMENTED,
+      `Method ${methodName} is not implemented`
     );
   }
 }

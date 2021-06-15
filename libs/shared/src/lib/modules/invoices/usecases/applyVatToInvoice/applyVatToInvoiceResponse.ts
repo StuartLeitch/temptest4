@@ -1,7 +1,7 @@
-import { Result, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetItemsForInvoiceErrors } from '../getItemsForInvoice/getItemsForInvoiceErrors';
+import { GetItemsForInvoiceErrors } from '../getItemsForInvoice';
 import { UpdateInvoiceItemsErrors } from '../updateInvoiceItems';
 
 export type ApplyVatToInvoiceResponse = Either<
@@ -9,5 +9,5 @@ export type ApplyVatToInvoiceResponse = Either<
   | UpdateInvoiceItemsErrors.InvoiceItemNotFound
   | GetItemsForInvoiceErrors.InvoiceHasNoItems
   | UnexpectedError,
-  Result<void>
+  void
 >;

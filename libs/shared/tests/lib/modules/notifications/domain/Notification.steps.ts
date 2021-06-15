@@ -1,19 +1,22 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
-import { Result } from './../../../../../src/lib/core/logic/Result';
 import { UniqueEntityID } from '../../../../../src/lib/core/domain/UniqueEntityID';
-import {
-  Notification,
-  NotificationType,
-} from './../../../../../src/lib/modules/notifications/domain/Notification';
+import { GuardFailure } from './../../../../../src/lib/core/logic/GuardFailure';
+import { UseCaseError } from './../../../../../src/lib/core/logic/UseCaseError';
+import { Either } from './../../../../../src/lib/core/logic/Either';
+
 import { InvoiceId } from './../../../../../src/lib/modules/invoices/domain/InvoiceId';
+import {
+  NotificationType,
+  Notification,
+} from './../../../../../src/lib/modules/notifications/domain/Notification';
 
-let notificationOrError: Result<Notification>;
-let notification;
+let maybeNotification: Either<GuardFailure | UseCaseError, Notification>;
+let notification: Notification;
 
-Before(function () {
-  notificationOrError = null;
+Before({ tags: '@ValidateNotification' }, function () {
+  maybeNotification = null;
 });
 
 Given('There is a Notification Domain Entity', function () {
@@ -25,8 +28,8 @@ When(
   function (testNotificationId: string) {
     const notificationId = new UniqueEntityID(testNotificationId);
     const invoiceUUID = new UniqueEntityID();
-    const invoiceId = InvoiceId.create(invoiceUUID).getValue();
-    notificationOrError = Notification.create(
+    const invoiceId = InvoiceId.create(invoiceUUID);
+    maybeNotification = Notification.create(
       {
         recipientEmail: 'test-recipient',
         type: NotificationType.INVOICE_CREATED,
@@ -40,8 +43,13 @@ When(
 Then(
   /^A new Notification is successfully created with ID "([\w-]+)"$/,
   function (testNotificationId: string) {
-    expect(notificationOrError.isSuccess).to.equal(true);
-    notification = notificationOrError.getValue();
+    expect(maybeNotification.isRight()).to.equal(true);
+
+    if (maybeNotification.isLeft()) {
+      throw maybeNotification.value;
+    }
+
+    notification = maybeNotification.value;
     expect(notification.id.toValue()).to.equal(testNotificationId);
   }
 );

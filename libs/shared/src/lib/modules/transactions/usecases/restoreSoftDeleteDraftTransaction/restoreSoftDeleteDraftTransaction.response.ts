@@ -1,18 +1,18 @@
-import { Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
+
 import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
 
 export type RestoreSoftDeleteDraftTransactionResponse = Either<
-  | Errors.InvoiceRestoreError
   | Errors.TransactionNotFoundError
-  | Errors.InvoiceNotFoundError
   | Errors.InvoiceItemNotFoundError
-  | Errors.ManuscriptNotFoundError
   | Errors.InvoiceItemRestoreError
-  | Errors.InvoiceRestoreError
-  | Errors.ManuscriptRestoreError
-  | Errors.TransactionRestoreError
+  | Errors.ManuscriptNotFoundError
   | Errors.ManuscriptRequiredError
+  | Errors.TransactionRestoreError
+  | Errors.ManuscriptRestoreError
+  | Errors.InvoiceNotFoundError
+  | Errors.InvoiceRestoreError
   | UnexpectedError,
   void
 >;

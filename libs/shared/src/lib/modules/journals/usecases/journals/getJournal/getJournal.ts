@@ -1,64 +1,49 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../../core/domain/UseCase';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
-import { Result, left, right } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { right, left } from '../../../../../core/logic/Either';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { CatalogItem } from '../../../domain/CatalogItem';
 import { JournalId } from '../../../domain/JournalId';
 
-import { GetJournalDTO } from './getJournalDTO';
-import { GetJournalResponse } from './getJournalResponse';
-import { GetJournalErrors } from './getJournalErrors';
+import { GetJournalResponse as Response } from './getJournalResponse';
+import { GetJournalDTO as DTO } from './getJournalDTO';
+import * as Errors from './getJournalErrors';
 
-export class GetJournal
-  implements
-    UseCase<
-      GetJournalDTO,
-      Promise<GetJournalResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetJournalDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+export class GetJournalUsecase
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private journalRepo: CatalogRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  public async execute(
-    request: GetJournalDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetJournalResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let journal: CatalogItem;
 
-    const journalId = JournalId.create(
-      new UniqueEntityID(request.journalId)
-    ).getValue();
+    const journalId = JournalId.create(new UniqueEntityID(request.journalId));
 
     try {
       try {
-        journal = await this.journalRepo.getCatalogItemByJournalId(journalId);
+        const maybeJournal = await this.journalRepo.getCatalogItemByJournalId(
+          journalId
+        );
+
+        if (maybeJournal.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeJournal.value.message))
+          );
+        }
+
+        journal = maybeJournal.value;
       } catch (e) {
         return left(
-          new GetJournalErrors.JournalDoesntExistError(journalId.id.toString())
+          new Errors.JournalDoesntExistError(journalId.id.toString())
         );
       }
 
-      return right(Result.ok(journal));
+      return right(journal);
     } catch (e) {
       return left(new UnexpectedError(e));
     }

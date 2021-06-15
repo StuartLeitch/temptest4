@@ -1,20 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
+import { NotificationType, Notification } from '../../domain/Notification';
+import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
@@ -29,12 +27,8 @@ import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsFo
 import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails/getInvoiceDetails';
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetSentNotificationForInvoiceUsecase } from '../getSentNotificationForInvoice';
-import { GetJournal } from '../../../journals/usecases/journals/getJournal/getJournal';
+import { GetJournalUsecase } from '../../../journals/usecases/journals/getJournal/getJournal';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
-
-import { NotificationType, Notification } from '../../domain/Notification';
-import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 
 import { notificationsSentInLastDelay } from '../usecase-utils';
 
@@ -50,13 +44,7 @@ import {
 } from './utils';
 
 export class SendInvoiceCreditControlReminderUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -85,17 +73,9 @@ export class SendInvoiceCreditControlReminderUsecase
     this.sendEmail = this.sendEmail.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const execution = new AsyncEither<null, DTO>(request)
+      const execution = await new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
         .advanceOrEnd(this.isNotificationEnabled)
         .then(this.getInvoice(context))
@@ -106,10 +86,11 @@ export class SendInvoiceCreditControlReminderUsecase
         .then(this.getPaymentNotificationsSent(context))
         .advanceOrEnd(this.shouldSendEmail, this.noReminderSentRecently)
         .then(this.sendEmail)
-        .then(this.saveNotification);
+        .then(this.saveNotification)
+        .map(() => null)
+        .execute();
 
-      const maybeResult = await execution.execute();
-      return maybeResult.map(() => Result.ok(null));
+      return execution;
     } catch (e) {
       return left(new UnexpectedError(e));
     }
@@ -153,7 +134,7 @@ export class SendInvoiceCreditControlReminderUsecase
     return right(true);
   }
 
-  private getInvoice(context: UsecaseAuthorizationContext) {
+  private getInvoice(context: Context) {
     return async (request: DTO) => {
       this.loggerService.info(
         `Get the details of invoice with id ${request.invoiceId}`
@@ -163,16 +144,16 @@ export class SendInvoiceCreditControlReminderUsecase
 
       const execution = new AsyncEither<null, string>(request.invoiceId)
         .then((invoiceId) => invoiceUsecase.execute({ invoiceId }, context))
-        .map((result) => ({
+        .map((invoice) => ({
           ...request,
-          invoice: result.getValue(),
+          invoice,
         }));
 
       return execution.execute();
     };
   }
 
-  private attachItemsToInvoice(context: UsecaseAuthorizationContext) {
+  private attachItemsToInvoice(context: Context) {
     const usecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
       this.couponRepo,
@@ -183,7 +164,6 @@ export class SendInvoiceCreditControlReminderUsecase
       const { invoice } = request;
       const execution = new AsyncEither(invoice.id.toString())
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
         .map((items) => {
           items.forEach((item) => invoice.addInvoiceItem(item));
           return invoice;
@@ -196,7 +176,7 @@ export class SendInvoiceCreditControlReminderUsecase
     };
   }
 
-  private getManuscript(context: UsecaseAuthorizationContext) {
+  private getManuscript(context: Context) {
     return async (request: DTO & { invoice: Invoice }) => {
       this.loggerService.info(
         `Get manuscript for invoice with id ${request.invoiceId}`
@@ -208,13 +188,13 @@ export class SendInvoiceCreditControlReminderUsecase
       );
       const execution = new AsyncEither<null, string>(request.invoiceId)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue()[0])
+        .map((result) => result[0])
         .map((manuscript) => ({ ...request, manuscript }));
       return execution.execute();
     };
   }
 
-  private getCatalogItem(context: UsecaseAuthorizationContext) {
+  private getCatalogItem(context: Context) {
     return async (
       request: DTO & { invoice: Invoice; manuscript: Manuscript }
     ) => {
@@ -222,19 +202,19 @@ export class SendInvoiceCreditControlReminderUsecase
         `Get the journal data for manuscript with custom id ${request.manuscript.customId}`
       );
 
-      const usecase = new GetJournal(this.journalRepo);
+      const usecase = new GetJournalUsecase(this.journalRepo);
       const execution = new AsyncEither(request.manuscript)
         .map((manuscript) => manuscript.journalId)
         .then((journalId) => usecase.execute({ journalId }, context))
-        .map((journalResult) => ({
+        .map((journal) => ({
           ...request,
-          journal: journalResult.getValue(),
+          journal,
         }));
       return execution.execute();
     };
   }
 
-  private getPauseStatus(context: UsecaseAuthorizationContext) {
+  private getPauseStatus(context: Context) {
     return async (request: CompoundData) => {
       this.loggerService.info(
         `Get the paused status of reminders of type ${
@@ -256,14 +236,14 @@ export class SendInvoiceCreditControlReminderUsecase
         context
       );
 
-      return maybeResult.map((result) => ({
+      return maybeResult.map((paused) => ({
         ...request,
-        paused: result.getValue(),
+        paused,
       }));
     };
   }
 
-  private getPaymentNotificationsSent(context: UsecaseAuthorizationContext) {
+  private getPaymentNotificationsSent(context: Context) {
     return async (request: CompoundData) => {
       this.loggerService.info(
         `Get the reminders of type ${NotificationType.REMINDER_PAYMENT} already sent for the invoice with id {${request.invoiceId}}`
@@ -282,7 +262,6 @@ export class SendInvoiceCreditControlReminderUsecase
         .then((invoiceId) =>
           getNotificationsUsecase.execute({ invoiceId }, context)
         )
-        .map((result) => result.getValue())
         .map((notifications) => notifications.filter(filterPayment))
         .map((notificationsSent) => ({
           ...request,
@@ -355,14 +334,20 @@ export class SendInvoiceCreditControlReminderUsecase
       } was sent, for invoice with id ${request.invoice.id.toString()}`
     );
 
-    const notification = Notification.create({
+    const maybeNotification = Notification.create({
       type: NotificationType.REMINDER_PAYMENT,
       recipientEmail: request.recipientEmail,
       invoiceId: request.invoice.invoiceId,
-    }).getValue();
+    });
+
+    if (maybeNotification.isLeft()) {
+      return left(
+        new UnexpectedError(new Error(maybeNotification.value.message))
+      );
+    }
 
     try {
-      await this.sentNotificationRepo.addNotification(notification);
+      await this.sentNotificationRepo.addNotification(maybeNotification.value);
       return right(request);
     } catch (e) {
       return left(new Errors.NotificationDbSaveError(e));

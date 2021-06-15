@@ -1,9 +1,13 @@
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
 import { Mapper } from '../../../infrastructure/Mapper';
+
 import { ErpReference } from '../domain/ErpReference';
 
 export class ErpReferenceMap implements Mapper<ErpReference> {
-  public static toDomain(raw: any): ErpReference {
-    const erpReferenceOrError = ErpReference.create({
+  public static toDomain(raw: any): Either<GuardFailure, ErpReference> {
+    const maybeErpReference = ErpReference.create({
       entity_id: raw.entity_id,
       vendor: raw.vendor,
       entity_type: raw.type || raw.entity_type,
@@ -11,11 +15,7 @@ export class ErpReferenceMap implements Mapper<ErpReference> {
       value: raw.value ?? null,
     });
 
-    if (erpReferenceOrError.isLeft()) {
-      throw new Error(erpReferenceOrError.value.toString());
-    }
-
-    return erpReferenceOrError.value;
+    return maybeErpReference;
   }
 
   public static toPersistence(erpReference: ErpReference): any {

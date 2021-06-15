@@ -1,19 +1,19 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import * as SendInvoicePaymentReminderErrors from './sendInvoicePaymentReminderErrors';
+import * as Errors from './sendInvoicePaymentReminderErrors';
 
 export type SendInvoicePaymentReminderResponse = Either<
-  | SendInvoicePaymentReminderErrors.RecipientEmailRequiredError
-  | SendInvoicePaymentReminderErrors.RecipientNameRequiredError
-  | SendInvoicePaymentReminderErrors.SenderEmailRequiredError
-  | SendInvoicePaymentReminderErrors.SenderNameRequiredError
-  | SendInvoicePaymentReminderErrors.NotificationDbSaveError
-  | SendInvoicePaymentReminderErrors.InvoiceIdRequiredError
-  | SendInvoicePaymentReminderErrors.InvoiceNotFoundError
-  | SendInvoicePaymentReminderErrors.RescheduleTaskFailed
-  | SendInvoicePaymentReminderErrors.EmailSendingFailure
-  | SendInvoicePaymentReminderErrors.ManuscriptNotFound
+  | Errors.RecipientEmailRequiredError
+  | Errors.RecipientNameRequiredError
+  | Errors.SenderEmailRequiredError
+  | Errors.SenderNameRequiredError
+  | Errors.NotificationDbSaveError
+  | Errors.InvoiceIdRequiredError
+  | Errors.InvoiceNotFoundError
+  | Errors.RescheduleTaskFailed
+  | Errors.EmailSendingFailure
+  | Errors.ManuscriptNotFound
   | UnexpectedError,
-  Result<void>
+  void
 >;

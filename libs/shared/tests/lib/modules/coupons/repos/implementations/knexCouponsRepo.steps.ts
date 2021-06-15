@@ -13,7 +13,7 @@ import { InvoiceItemId } from '../../../../../../src/lib/modules/invoices/domain
 import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 
 function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const maybeCoupon = CouponMap.toDomain({
     id,
     code,
     status: 'ACTIVE',
@@ -21,6 +21,12 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
     dateCreated: new Date(),
     ...overwrites,
   });
+
+  if (maybeCoupon.isLeft()) {
+    throw maybeCoupon.value;
+  }
+
+  return maybeCoupon.value;
 }
 
 let mockCouponRepo: MockCouponRepo = null;
@@ -43,12 +49,24 @@ Given(
   /^a coupon "([\w-]+)" with code "([\w-]+)"/,
   async (testCouponId: string, testCode: string) => {
     coupon = makeCouponData(testCouponId, testCode);
-    coupon = await mockCouponRepo.save(coupon);
+    const maybeCoupon = await mockCouponRepo.save(coupon);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    coupon = maybeCoupon.value;
   }
 );
 
 When(/^we call getCouponCollection/, async () => {
-  couponList = await mockCouponRepo.getCouponCollection();
+  const maybeCouponList = await mockCouponRepo.getCouponCollection();
+
+  if (maybeCouponList.isLeft()) {
+    throw maybeCouponList.value;
+  }
+
+  couponList = maybeCouponList.value;
 });
 
 Then(/^it should get a list of coupons/, () => {
@@ -59,9 +77,17 @@ When(/^we call getCouponsByInvoiceItemId/, async () => {
   const invoiceItemId = InvoiceItemId.create(
     new UniqueEntityID('testInvoiceItemId')
   );
-  await mockCouponRepo.addMockCouponToInvoiceItem(coupon, invoiceItemId);
+  mockCouponRepo.addMockCouponToInvoiceItem(coupon, invoiceItemId);
 
-  result = await mockCouponRepo.getCouponsByInvoiceItemId(invoiceItemId);
+  const maybeResult = await mockCouponRepo.getCouponsByInvoiceItemId(
+    invoiceItemId
+  );
+
+  if (maybeResult.isLeft()) {
+    throw maybeResult.value;
+  }
+
+  result = maybeResult.value;
 });
 
 Then(/^it should add the coupons to invoice item/, () => {
@@ -69,8 +95,14 @@ Then(/^it should add the coupons to invoice item/, () => {
 });
 
 When(/^we call getCouponById for "([\w-]+)"/, async (testCouponId: string) => {
-  const couponId = CouponId.create(new UniqueEntityID(testCouponId)).getValue();
-  coupon = await mockCouponRepo.getCouponById(couponId);
+  const couponId = CouponId.create(new UniqueEntityID(testCouponId));
+  const maybeCoupon = await mockCouponRepo.getCouponById(couponId);
+
+  if (maybeCoupon.isLeft()) {
+    throw maybeCoupon.value;
+  }
+
+  coupon = maybeCoupon.value;
 });
 
 Then(/^it should return the coupon "([\w-]+)"/, (testCouponId: string) => {
@@ -81,13 +113,32 @@ Then(/^it should return the coupon "([\w-]+)"/, (testCouponId: string) => {
 When(
   /^we call getCouponByCode for code "([\w-]+)"/,
   async (testCode: string) => {
-    const codeCoupon = CouponCode.create(testCode).getValue();
-    coupon = await mockCouponRepo.getCouponByCode(codeCoupon);
+    const codeCoupon = CouponCode.create(testCode);
+
+    if (codeCoupon.isLeft()) {
+      throw codeCoupon.value;
+    }
+
+    const maybeCoupon = await mockCouponRepo.getCouponByCode(codeCoupon.value);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    coupon = maybeCoupon.value;
   }
 );
 
 When(/^we call incrementRedeemedCount/, async () => {
-  incrementedCoupon = await mockCouponRepo.incrementRedeemedCount(coupon);
+  const maybeIncrementedCoupon = await mockCouponRepo.incrementRedeemedCount(
+    coupon
+  );
+
+  if (maybeIncrementedCoupon.isLeft()) {
+    throw maybeIncrementedCoupon.value;
+  }
+
+  incrementedCoupon = maybeIncrementedCoupon.value;
 });
 
 Then(/^redeem count should be higher with 1/, () => {
@@ -95,7 +146,13 @@ Then(/^redeem count should be higher with 1/, () => {
 });
 
 When(/^we call update method/, async () => {
-  updatedCoupon = await mockCouponRepo.update(coupon);
+  const maybeUpdatedCoupon = await mockCouponRepo.update(coupon);
+
+  if (maybeUpdatedCoupon.isLeft()) {
+    throw maybeUpdatedCoupon.value;
+  }
+
+  updatedCoupon = maybeUpdatedCoupon.value;
 });
 
 Then(/^the coupon "([\w-]+)" should be updated/, (testCoupon: string) => {
@@ -104,7 +161,13 @@ Then(/^the coupon "([\w-]+)" should be updated/, (testCoupon: string) => {
 });
 
 When(/^we call isCodeUsed with "([\w-]+)"/, async (testCode: string) => {
-  resultUsedCode = await mockCouponRepo.isCodeUsed(testCode);
+  const maybeResultUsedCode = await mockCouponRepo.isCodeUsed(testCode);
+
+  if (maybeResultUsedCode.isLeft()) {
+    throw maybeResultUsedCode.value;
+  }
+
+  resultUsedCode = maybeResultUsedCode.value;
 });
 
 Then(/^it should return true/, () => {

@@ -1,4 +1,4 @@
-import { Result } from '../../../core/logic/Result';
+import { left } from '../../../core/logic/Either';
 import { accessControl } from '../AccessControl';
 import type { AccessControlContext } from '../AccessControlContext';
 
@@ -38,7 +38,7 @@ const Authorize = <R, C extends AuthorizationContext>(action: string) => (
     );
 
     if (!permission.granted) {
-      return Result.fail<Authorization>('UnauthorizedUserException');
+      return left('UnauthorizedUserException');
     }
 
     const result = await method.call(this, request, context, permission);

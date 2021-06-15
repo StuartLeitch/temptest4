@@ -1,4 +1,7 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { PaymentRepoContract } from '../paymentRepo';
@@ -15,31 +18,42 @@ export class MockPaymentRepo
     super();
   }
 
-  public async getPaymentById(paymentId: PaymentId): Promise<Payment> {
+  public async getPaymentById(
+    paymentId: PaymentId
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const matches = this._items.filter((p) => p.paymentId.equals(paymentId));
     if (matches.length !== 0) {
-      return matches[0];
+      return right(matches[0]);
     } else {
-      return null;
+      return left(
+        RepoError.createEntityNotFoundError('payment', paymentId.toString())
+      );
     }
   }
 
-  public async getPaymentCollection() {
-    return this._items;
-  }
-
-  public async getPaymentByInvoiceId(invoiceId: InvoiceId): Promise<Payment> {
+  public async getPaymentByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const match = this._items.find((item) => item.invoiceId.equals(invoiceId));
-    return match ? match : null;
+    if (match) {
+      return right(match);
+    } else {
+      return left(
+        RepoError.createEntityNotFoundError(
+          'payment by invoice id',
+          invoiceId.toString()
+        )
+      );
+    }
   }
 
   public async getPaymentsByInvoiceId(
     invoiceId: InvoiceId
-  ): Promise<Payment[]> {
+  ): Promise<Either<GuardFailure | RepoError, Payment[]>> {
     const match = this._items.filter((item) =>
       item.invoiceId.equals(invoiceId)
     );
-    return match;
+    return right(match);
   }
 
   public async getUnregisteredErpPayments(): Promise<InvoiceId[]> {
@@ -47,7 +61,13 @@ export class MockPaymentRepo
   }
 
   public async update(payment: Payment): Promise<Payment> {
-    const alreadyExists = await this.exists(payment);
+    const maybeAlreadyExists = await this.exists(payment);
+
+    if (maybeAlreadyExists.isLeft()) {
+      throw RepoError.fromDBError(new Error(maybeAlreadyExists.value.message));
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items.map((p) => {
@@ -63,23 +83,35 @@ export class MockPaymentRepo
 
   async getPaymentByForeignId(
     foreignPaymentId: ExternalOrderId
-  ): Promise<Payment> {
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const result = this._items.find((item) =>
       item.foreignPaymentId.equals(foreignPaymentId)
     );
 
     if (!result) {
-      throw RepoError.createEntityNotFoundError(
-        'payment by foreignPaymentId',
-        foreignPaymentId.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'payment by foreignPaymentId',
+          foreignPaymentId.toString()
+        )
       );
     }
 
-    return result;
+    return right(result);
   }
 
-  public async updatePayment(payment: Payment): Promise<Payment> {
-    const alreadyExists = await this.exists(payment);
+  public async updatePayment(
+    payment: Payment
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
+    const maybeAlreadyExists = await this.exists(payment);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (!alreadyExists) {
       throw RepoError.createEntityNotFoundError(
@@ -92,11 +124,21 @@ export class MockPaymentRepo
 
     this._items[index] = payment;
 
-    return payment;
+    return this.getPaymentById(payment.paymentId);
   }
 
-  public async save(payment: Payment): Promise<Payment> {
-    const alreadyExists = await this.exists(payment);
+  public async save(
+    payment: Payment
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
+    const maybeAlreadyExists = await this.exists(payment);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items.map((p) => {
@@ -110,16 +152,18 @@ export class MockPaymentRepo
       this._items.push(payment);
     }
 
-    return payment;
+    return this.getPaymentById(payment.paymentId);
   }
 
   public async delete(payment: Payment): Promise<boolean> {
     return true;
   }
 
-  public async exists(payment: Payment): Promise<boolean> {
+  public async exists(
+    payment: Payment
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const found = this._items.filter((p) => this.compareMockItems(p, payment));
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
   public compareMockItems(a: Payment, b: Payment): boolean {

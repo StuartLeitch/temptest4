@@ -11,16 +11,22 @@ import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEn
 let mockArticleRepo: MockArticleRepo;
 let article: Article;
 let foundArticle: Article | Manuscript;
-let ArticleExists: boolean;
-let saveArticle;
+let articleExists: boolean;
+let saveArticle: Article | Manuscript;
 
 function makeArticleData(overwrites?: any): Article {
-  return ArticleMap.toDomain({
+  const article = ArticleMap.toDomain({
     ...overwrites,
   });
+
+  if (article.isLeft()) {
+    throw article.value;
+  }
+
+  return article.value;
 }
 
-Before(async () => {
+Before({ tags: '@ValidateKnexArticleRepo' }, async () => {
   mockArticleRepo = new MockArticleRepo();
 });
 
@@ -31,7 +37,13 @@ Given(/^a article with the id "([\w-]+)"$/, async (articleId: string) => {
 
 When(/^we call findById for "([\w-]+)"$/, async (articleId: string) => {
   const articleIdObj = ArticleId.create(new UniqueEntityID(articleId));
-  foundArticle = await mockArticleRepo.findById(articleIdObj);
+  const maybeFoundArticle = await mockArticleRepo.findById(articleIdObj);
+
+  if (maybeFoundArticle.isLeft()) {
+    throw maybeFoundArticle.value;
+  }
+
+  foundArticle = maybeFoundArticle.value;
 });
 
 Then('findById returns the article', async () => {
@@ -42,7 +54,13 @@ When(
   /^we call findById for an un-existent article "([\w-]+)"$/,
   async (wrongArticleId: string) => {
     const id = ArticleId.create(new UniqueEntityID(wrongArticleId));
-    foundArticle = await mockArticleRepo.findById(id);
+    const maybeFoundArticle = await mockArticleRepo.findById(id);
+
+    if (maybeFoundArticle.isLeft()) {
+      throw maybeFoundArticle.value;
+    }
+
+    foundArticle = maybeFoundArticle.value;
   }
 );
 
@@ -52,15 +70,29 @@ Then('findById returns null', async () => {
 
 When(/^we call exists for ([\w-]+) article id$/, async (articleId: string) => {
   const id = ArticleId.create(new UniqueEntityID(articleId));
-  foundArticle = await mockArticleRepo.findById(id);
-  if (!foundArticle) {
-    foundArticle = await makeArticleData({ id: articleId });
+  const maybeFoundArticle = await mockArticleRepo.findById(id);
+
+  if (maybeFoundArticle.isLeft()) {
+    throw maybeFoundArticle.value;
   }
-  ArticleExists = await mockArticleRepo.exists(foundArticle);
+
+  foundArticle = maybeFoundArticle.value;
+
+  if (!foundArticle) {
+    foundArticle = makeArticleData({ id: articleId });
+  }
+
+  const maybeArticleExists = await mockArticleRepo.exists(foundArticle);
+
+  if (maybeArticleExists.isLeft()) {
+    throw maybeArticleExists.value;
+  }
+
+  articleExists = maybeArticleExists.value;
 });
 
 Then(/^Article.exists returns (.*)$/, async (exists: string) => {
-  expect(ArticleExists).to.equal(exists === 'true');
+  expect(articleExists).to.equal(exists === 'true');
 });
 
 Given(
@@ -71,9 +103,15 @@ Given(
 );
 
 When('we call Article.save on the article object', async () => {
-  saveArticle = await mockArticleRepo.save(article);
+  const maybeArticle = await mockArticleRepo.save(article);
+
+  if (maybeArticle.isLeft()) {
+    throw maybeArticle.value;
+  }
+
+  saveArticle = maybeArticle.value;
 });
 
 Then('the article object should be saved', async () => {
-  expect(saveArticle).to.equal(article);
+  expect(saveArticle).to.eql(article);
 });

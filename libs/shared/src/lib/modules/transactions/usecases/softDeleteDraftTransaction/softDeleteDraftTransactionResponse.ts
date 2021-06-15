@@ -1,5 +1,5 @@
-import { Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import * as Errors from './softDeleteDraftTransactionErrors';
 

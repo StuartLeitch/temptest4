@@ -1,6 +1,7 @@
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 import { PublisherCustomValues } from './PublisherCustomValues';
 import { PublisherId } from './PublisherId';
@@ -14,7 +15,7 @@ interface PublisherProps {
 
 export class Publisher extends AggregateRoot<PublisherProps> {
   get publisherId(): PublisherId {
-    return PublisherId.create(this._id).getValue();
+    return PublisherId.create(this._id);
   }
 
   get name(): string {
@@ -42,15 +43,15 @@ export class Publisher extends AggregateRoot<PublisherProps> {
   public static create(
     props: PublisherProps,
     id?: UniqueEntityID
-  ): Result<Publisher> {
+  ): Either<GuardFailure, Publisher> {
     const defaultValues = {
       ...props,
       dateCreated: props.dateCreated || new Date(),
-      dateUpdated: props.dateUpdated || new Date()
+      dateUpdated: props.dateUpdated || new Date(),
     };
 
     const publisher = new Publisher(defaultValues, id);
 
-    return Result.ok(publisher);
+    return right(publisher);
   }
 }

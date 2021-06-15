@@ -1,5 +1,6 @@
 Feature: Domain Events
 
+    @ValidateDomainEvents
     Scenario: CouponPublish available Events
         Given and a CouponPublish handler class
         When we set up a CouponPublish subscription
@@ -7,6 +8,7 @@ Feature: Domain Events
         And There should be exactly one handler subscribed to the CouponCreatedEvent
         And There should be exactly one handler subscribed to the CreatedUpdatedEvent
 
+    @ValidateDomainEvents
     Scenario: Domain Events handle 1
         Given and a CouponPublish handler class
         When we set up a CouponPublish subscription
@@ -16,6 +18,7 @@ Feature: Domain Events
         When we dispatch the DomainEvents for id "foo-coupon"
         Then the marked aggregate list should be empty
 
+    @ValidateDomainEvents
     Scenario: Domain Events handle 2
         Given and a CouponPublish handler class
         When we set up a CouponPublish subscription

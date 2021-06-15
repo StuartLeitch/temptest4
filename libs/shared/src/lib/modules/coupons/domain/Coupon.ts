@@ -1,6 +1,7 @@
 // * Core Domain
-import { Result } from '../../../core/logic/Result';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 import { InvoiceItemType } from '../../invoices/domain/InvoiceItem';
 import { CouponCode } from './CouponCode';
@@ -41,7 +42,7 @@ export class Coupon extends Reduction<CouponProps> {
   }
 
   public get couponId(): CouponId {
-    return CouponId.create(this._id).getValue();
+    return CouponId.create(this._id);
   }
 
   public get reductionType(): ReductionType {
@@ -119,9 +120,9 @@ export class Coupon extends Reduction<CouponProps> {
   public static create(
     props: CouponProps,
     id?: UniqueEntityID
-  ): Result<Coupon> {
+  ): Either<GuardFailure, Coupon> {
     const coupon = new Coupon(props, id);
 
-    return Result.ok<Coupon>(coupon);
+    return right(coupon);
   }
 }

@@ -1,10 +1,11 @@
-import { Either, Result } from '../../../../core/logic/Result';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 import { Address } from '../../domain/Address';
 
-import { CreateAddressErrors } from './createAddressErrors';
+import * as Errors from './createAddressErrors';
 
 export type CreateAddressResponse = Either<
-  CreateAddressErrors.InvalidPostalCode | UnexpectedError,
-  Result<Address>
+  Errors.InvalidPostalCode | UnexpectedError | GuardFailure,
+  Address
 >;

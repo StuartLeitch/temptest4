@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // * Core Domain
 import { Either, left, right } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
@@ -24,8 +23,6 @@ import * as Errors from './get-payment-by-foreign-payment-id.errors';
 interface WithForeignId {
   foreignPaymentId: string;
 }
-
-type Context = UsecaseAuthorizationContext;
 
 export class GetPaymentByForeignPaymentIdUsecase
   implements
@@ -68,11 +65,15 @@ export class GetPaymentByForeignPaymentIdUsecase
     request: T
   ): Promise<Either<Errors.DbCommunicationError, T & { payment: Payment }>> {
     try {
-      const payment = await this.paymentRepo.getPaymentByForeignId(
+      const maybePayment = await this.paymentRepo.getPaymentByForeignId(
         ExternalOrderId.create(request.foreignPaymentId)
       );
 
-      return right({ ...request, payment });
+      if (maybePayment.isLeft()) {
+        return left(new UnexpectedError(new Error(maybePayment.value.message)));
+      }
+
+      return right({ ...request, payment: maybePayment.value });
     } catch (e) {
       return left(new Errors.DbCommunicationError(e, request.foreignPaymentId));
     }

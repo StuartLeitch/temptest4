@@ -2,6 +2,7 @@ Feature: Register Revenue Recognition in ERP
   Some ERP systems require multiple attempts
   when register invoices or revenue recognition.
 
+  @ValidateRetryRevRec
   Scenario: Credit Note created
     Given There is an Invoice with the ID "normal-invoice"
     When A credit note is created from it

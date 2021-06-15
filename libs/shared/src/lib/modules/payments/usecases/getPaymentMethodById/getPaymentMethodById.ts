@@ -1,63 +1,43 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { left, right } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+
+import { PaymentMethodId } from '../../domain/PaymentMethodId';
 
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
-import { PaymentMethodId } from '../../domain/PaymentMethodId';
-import { PaymentMethod } from '../../domain/PaymentMethod';
 
 // * Usecase specific
-import { GetPaymentMethodByIdResponse } from './getPaymentMethodByIdResponse';
-import { GetPaymentMethodByIdErrors } from './getPaymentMethodByIdErrors';
-import { GetPaymentMethodByIdDTO } from './getPaymentMethodByIdDTO';
+import { GetPaymentMethodByIdResponse as Response } from './getPaymentMethodByIdResponse';
+import { GetPaymentMethodByIdDTO as DTO } from './getPaymentMethodByIdDTO';
+import * as Errors from './getPaymentMethodByIdErrors';
 
 export class GetPaymentMethodByIdUsecase
-  implements
-    UseCase<
-      GetPaymentMethodByIdDTO,
-      Promise<GetPaymentMethodByIdResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetPaymentMethodByIdDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private paymentMethodRepo: PaymentMethodRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('payment-method:read')
-  public async execute(
-    request: GetPaymentMethodByIdDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetPaymentMethodByIdResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const paymentMethodId = request.paymentMethodId;
 
     try {
       try {
-        const paymentMethod = await this.paymentMethodRepo.getPaymentMethodById(
+        const maybePaymentMethod = await this.paymentMethodRepo.getPaymentMethodById(
           PaymentMethodId.create(new UniqueEntityID(paymentMethodId))
         );
 
-        return right(Result.ok<PaymentMethod>(paymentMethod));
+        if (maybePaymentMethod.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybePaymentMethod.value.message))
+          );
+        }
+
+        return right(maybePaymentMethod.value);
       } catch (e) {
-        return left(
-          new GetPaymentMethodByIdErrors.NoPaymentMethodFound(paymentMethodId)
-        );
+        return left(new Errors.NoPaymentMethodFound(paymentMethodId));
       }
     } catch (e) {
       return left(new UnexpectedError(e));

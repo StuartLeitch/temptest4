@@ -1,11 +1,11 @@
-import { Result, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
 
-import { GetPublisherCustomValuesErrors } from './getPublisherCustomValuesErrors';
+import * as Errors from './getPublisherCustomValuesErrors';
 
 export type GetPublisherCustomValuesResponse = Either<
-  GetPublisherCustomValuesErrors.PublisherNotFount | UnexpectedError,
-  Result<PublisherCustomValues>
+  Errors.PublisherNotFount | UnexpectedError,
+  PublisherCustomValues
 >;

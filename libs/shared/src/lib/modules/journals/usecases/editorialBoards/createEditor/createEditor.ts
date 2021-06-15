@@ -1,52 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../../core/logic/Result';
-import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../../../core/logic/GuardFailure';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { Left, right, left } from '../../../../../core/logic/Either';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { EditorRole } from './../../../../../domain/EditorRole';
 import { Email } from './../../../../../domain/Email';
 import { Name } from './../../../../../domain/Name';
 
-import { EditorRepoContract } from '../../../repos/editorRepo';
 import { Editor, EditorProps } from '../../../domain/Editor';
-
-import { CreateEditorDTO } from './createEditorDTO';
-import { CreateEditorResponse } from './createEditorResponse';
-import { JournalId } from '../../../domain/JournalId';
 import { UserId } from '../../../../users/domain/UserId';
+import { JournalId } from '../../../domain/JournalId';
 
-export class CreateEditor
-  implements
-  UseCase<
-  CreateEditorDTO,
-  Promise<CreateEditorResponse>,
-  UsecaseAuthorizationContext
-  >,
-  AccessControlledUsecase<
-  CreateEditorDTO,
-  UsecaseAuthorizationContext,
-  AccessControlContext
-  > {
-  constructor(private editorRepo: EditorRepoContract) { }
+import { EditorRepoContract } from '../../../repos/editorRepo';
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
+import { CreateEditorResponse as Response } from './createEditorResponse';
+import { CreateEditorDTO as DTO } from './createEditorDTO';
 
-  public async execute(
-    request: CreateEditorDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<CreateEditorResponse> {
+export class CreateEditor implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private editorRepo: EditorRepoContract) {}
+
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let editor: Editor;
     let editorRole: EditorRole;
     let editorName: Name;
@@ -55,38 +33,33 @@ export class CreateEditor
     let userId: UserId;
 
     try {
-      // console.info(request);
-
       const nameOrError = Name.create({
-        value: request.givenNames || request.surname ? `${request.givenNames} ${request.surname}` : request.name,
+        value:
+          request.givenNames || request.surname
+            ? `${request.givenNames} ${request.surname}`
+            : request.name,
       });
-      if (nameOrError.isFailure) {
-        return left(nameOrError);
+      if (nameOrError.isLeft()) {
+        return createError(nameOrError);
       }
-      editorName = nameOrError.getValue();
+      editorName = nameOrError.value;
 
       const emailOrError = Email.create({ value: request.email });
-      if (emailOrError.isFailure) {
-        return left(emailOrError);
+      if (emailOrError.isLeft()) {
+        return createError(emailOrError);
       }
-      editorEmail = emailOrError.getValue();
+      editorEmail = emailOrError.value;
 
       const editorRoleOrError = EditorRole.create({
         label: request?.role?.label || request.roleLabel,
         type: request?.role?.type || request.roleType,
       });
-      if (editorRoleOrError.isFailure) {
-        return left(editorRoleOrError);
+      if (editorRoleOrError.isLeft()) {
+        return createError(editorRoleOrError);
       }
-      editorRole = editorRoleOrError.getValue();
+      editorRole = editorRoleOrError.value;
 
-      const journalIdOrError = JournalId.create(
-        new UniqueEntityID(request.journalId)
-      );
-      if (journalIdOrError.isFailure) {
-        return left(journalIdOrError);
-      }
-      journalId = journalIdOrError.getValue();
+      const journalId = JournalId.create(new UniqueEntityID(request.journalId));
 
       userId = UserId.create(new UniqueEntityID(request.userId));
 
@@ -104,19 +77,22 @@ export class CreateEditor
         editorProps,
         new UniqueEntityID(request.editorId)
       );
-      // console.info(editorOrError);
 
-      if (editorOrError.isFailure) {
-        return left(editorOrError);
+      if (editorOrError.isLeft()) {
+        return createError(editorOrError);
       }
 
-      editor = editorOrError.getValue();
+      editor = editorOrError.value;
 
       await this.editorRepo.save(editor);
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err));
     }
   }
+}
+
+function createError(err: Left<GuardFailure, any>): Left<UnexpectedError, any> {
+  return left(new UnexpectedError(new Error(err.value.message)));
 }

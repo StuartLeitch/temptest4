@@ -1,18 +1,25 @@
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
-import { InvoiceId } from '../../domain/InvoiceId';
-import { InvoiceItem } from '../../domain/InvoiceItem';
-import { ManuscriptId } from '../../domain/ManuscriptId';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 import { InvoiceItemId } from '../../domain/InvoiceItemId';
-import { InvoiceItemRepoContract } from '../invoiceItemRepo';
+import { InvoiceItem } from '../../domain/InvoiceItem';
+import { InvoiceId } from '../../domain/InvoiceId';
+
 import { InvoiceItemMap } from '../../mappers/InvoiceItemMap';
+
+import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 
 export class KnexInvoiceItemRepo
   extends AbstractBaseDBRepo<Knex, InvoiceItem>
   implements InvoiceItemRepoContract {
-  async getInvoiceItemById(invoiceItemId: InvoiceItemId): Promise<InvoiceItem> {
+  async getInvoiceItemById(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem>> {
     const { db } = this;
 
     const invoiceItem = await db(TABLES.INVOICE_ITEMS)
@@ -21,9 +28,11 @@ export class KnexInvoiceItemRepo
       .first();
 
     if (!invoiceItem) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice item',
-        invoiceItemId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoice item',
+          invoiceItemId.id.toString()
+        )
       );
     }
 
@@ -32,7 +41,7 @@ export class KnexInvoiceItemRepo
 
   public async getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
-  ): Promise<InvoiceItem[]> {
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem[]>> {
     const { db, logger } = this;
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
@@ -50,18 +59,22 @@ export class KnexInvoiceItemRepo
     try {
       invoiceItems = await sql;
     } catch (e) {
-      throw RepoError.createEntityNotFoundError(
-        'manuscriptId',
-        typeof manuscriptId === 'string'
-          ? manuscriptId
-          : manuscriptId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'manuscriptId',
+          typeof manuscriptId === 'string'
+            ? manuscriptId
+            : manuscriptId.id.toString()
+        )
       );
     }
 
-    return invoiceItems.map(InvoiceItemMap.toDomain);
+    return flatten(invoiceItems.map(InvoiceItemMap.toDomain));
   }
 
-  async update(invoiceItem: InvoiceItem): Promise<InvoiceItem> {
+  async update(
+    invoiceItem: InvoiceItem
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem>> {
     const { db } = this;
 
     const updated = await db(TABLES.INVOICE_ITEMS)
@@ -74,16 +87,18 @@ export class KnexInvoiceItemRepo
       });
 
     if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice item',
-        invoiceItem.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoice item',
+          invoiceItem.id.toString()
+        )
       );
     }
 
-    return invoiceItem;
+    return this.getInvoiceItemById(invoiceItem.invoiceItemId);
   }
 
-  async delete(invoiceItem: InvoiceItem): Promise<void> {
+  async delete(invoiceItem: InvoiceItem): Promise<Either<RepoError, void>> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.INVOICE_ITEMS)
@@ -91,14 +106,18 @@ export class KnexInvoiceItemRepo
       .update({ ...InvoiceItemMap.toPersistence(invoiceItem), deleted: 1 });
 
     if (!deletedRows) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice item',
-        invoiceItem.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoice item',
+          invoiceItem.id.toString()
+        )
       );
     }
+
+    return right(null);
   }
 
-  async restore(invoiceItem: InvoiceItem): Promise<void> {
+  async restore(invoiceItem: InvoiceItem): Promise<Either<RepoError, void>> {
     const { db } = this;
 
     const restoredRows = await db(TABLES.INVOICE_ITEMS)
@@ -106,28 +125,34 @@ export class KnexInvoiceItemRepo
       .update({ ...InvoiceItemMap.toPersistence(invoiceItem), deleted: 0 });
 
     if (!restoredRows) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice item',
-        invoiceItem.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoice item',
+          invoiceItem.id.toString()
+        )
       );
     }
+
+    return right(null);
   }
 
-  async exists(invoiceItem: InvoiceItem): Promise<boolean> {
+  async exists(invoiceItem: InvoiceItem): Promise<Either<RepoError, boolean>> {
     try {
       await this.getInvoiceItemById(invoiceItem.invoiceItemId);
     } catch (e) {
       if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
+        return right(false);
       }
 
-      throw e;
+      return left(RepoError.fromDBError(e));
     }
 
-    return true;
+    return right(true);
   }
 
-  async save(invoiceItem: InvoiceItem): Promise<InvoiceItem> {
+  async save(
+    invoiceItem: InvoiceItem
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem>> {
     const { db } = this;
 
     const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
@@ -135,17 +160,35 @@ export class KnexInvoiceItemRepo
     try {
       await db(TABLES.INVOICE_ITEMS).insert(rawInvoiceItem);
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
 
     return this.getInvoiceItemById(invoiceItem.invoiceItemId);
   }
 
-  getInvoiceItemCollection(): Promise<InvoiceItem[] | any> {
-    return Promise.resolve(42);
+  async getInvoiceItemCollection(): Promise<
+    Either<GuardFailure, InvoiceItem[]>
+  > {
+    const { db, logger } = this;
+
+    const sql = db(TABLES.INVOICE_ITEMS).select();
+
+    const correlationId =
+      'correlationId' in this ? (this as any).correlationId : null;
+
+    logger.debug('getItemsByInvoiceId', {
+      correlationId,
+      sql: sql.toString(),
+    });
+
+    const items = await sql;
+
+    return flatten(items.map((item) => InvoiceItemMap.toDomain(item)));
   }
 
-  async getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]> {
+  async getItemsByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem[]>> {
     const { db, logger } = this;
 
     const sql = db(TABLES.INVOICE_ITEMS)
@@ -163,12 +206,14 @@ export class KnexInvoiceItemRepo
     const items = await sql;
 
     if (!items) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice-items',
-        invoiceId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoice-items',
+          invoiceId.id.toString()
+        )
       );
     }
 
-    return items.map((item) => InvoiceItemMap.toDomain(item));
+    return flatten(items.map((item) => InvoiceItemMap.toDomain(item)));
   }
 }

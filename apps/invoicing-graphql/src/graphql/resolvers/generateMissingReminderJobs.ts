@@ -50,7 +50,7 @@ export const generateMissingReminderJobs: Resolvers<Context> = {
       );
 
       if (maybeResult.isLeft()) {
-        throw maybeResult.value.errorValue();
+        throw maybeResult.value;
       }
 
       return 'ok';

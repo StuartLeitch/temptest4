@@ -1,38 +1,39 @@
+import { Before, After, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
+import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
+import {
+  UsecaseAuthorizationContext,
+  Roles,
+} from '../../../../../../src/lib/shared';
 
-import { PauseInvoicePaymentRemindersUsecase } from '../../../../../../src/lib/modules/notifications/usecases/pauseInvoicePaymentReminders';
 import { PauseInvoicePaymentRemindersResponse } from '../../../../../../src/lib/modules/notifications/usecases/pauseInvoicePaymentReminders/pauseInvoicePaymentRemindersResponse';
+import { PauseInvoicePaymentRemindersUsecase } from '../../../../../../src/lib/modules/notifications/usecases/pauseInvoicePaymentReminders';
 
 import {
   NotificationType,
   Notification,
 } from '../../../../../../src/lib/modules/notifications/domain/Notification';
 import { NotificationMap } from '../../../../../../src/lib/modules/notifications/mappers/NotificationMap';
-import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
-import { MockSentNotificationRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockSentNotificationRepo';
-import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
-import {
-  Roles,
-  UsecaseAuthorizationContext,
-} from '../../../../../../src/lib/shared';
+import { NotificationPause } from '../../../../../../src/lib/modules/notifications/domain/NotificationPause';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
-import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
-import { NotificationPause } from '../../../../../../src/lib/modules/notifications/domain/NotificationPause';
+
+import { MockSentNotificationRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockSentNotificationRepo';
+import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
+import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
+import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 
 function makeNotificationData(
   id: string,
   invoiceId: string,
   overwrites?: any
 ): Notification {
-  return NotificationMap.toDomain({
+  const notification = NotificationMap.toDomain({
     recipientEmail: 'test-email',
     dateSent: new Date(),
     type: NotificationType.REMINDER_PAYMENT,
@@ -40,6 +41,12 @@ function makeNotificationData(
     invoiceId,
     ...overwrites,
   });
+
+  if (notification.isLeft()) {
+    throw notification.value;
+  }
+
+  return notification.value;
 }
 
 let mockPausedReminderRepo: MockPausedReminderRepo = null;
@@ -93,21 +100,39 @@ Given(/^invoice with the "([\w-]+)" id/, async (testInvoiceId: string) => {
     id: testInvoiceId,
   });
 
-  await mockInvoiceRepo.save(invoice);
+  if (invoice.isLeft()) {
+    throw invoice.value;
+  }
+
+  await mockInvoiceRepo.save(invoice.value);
 });
 
 Given(
   /^a notification with "([\w-]+)" id for the invoice "([\w-]+)"/,
   async (testNotificationId: string, testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
     notification = makeNotificationData(testNotificationId, testInvoiceId);
-    notification = await mockSentNotificationRepo.save(notification);
+
+    const maybeNotification = await mockSentNotificationRepo.save(notification);
+
+    if (maybeNotification.isLeft()) {
+      throw maybeNotification.value;
+    }
+
+    notification = maybeNotification.value;
 
     pausedReminder = { invoiceId, confirmation: false, payment: false };
-    pausedReminder = await mockPausedReminderRepo.save(pausedReminder);
+
+    const maybePausedReminder = await mockPausedReminderRepo.save(
+      pausedReminder
+    );
+
+    if (maybePausedReminder.isLeft()) {
+      throw maybePausedReminder.value;
+    }
+
+    pausedReminder = maybePausedReminder.value;
   }
 );
 
@@ -124,7 +149,9 @@ Then(/^the payment reminder should be paused/, () => {
 
 Then(/^the error that no pause state exists for reminder occurs/, () => {
   expect(response.isLeft()).to.be.true;
-  expect(response.value.error)
+  expect(response.value)
     .to.have.property('message')
-    .to.equal('While saving the pause state an error ocurred: does not exist');
+    .to.equal(
+      'While saving the pause state an error ocurred: Entity(pause) with id[test-invoice-2] not found'
+    );
 });

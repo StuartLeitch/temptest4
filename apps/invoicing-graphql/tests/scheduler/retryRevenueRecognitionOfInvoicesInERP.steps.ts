@@ -38,7 +38,7 @@ let context: UsecaseAuthorizationContext;
 let invoiceId: string;
 let manuscript: any;
 
-Before(function () {
+Before({ tags: '@ValidateRetryRevRec' }, function () {
   mockManuscriptRepo = new MockArticleRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
@@ -77,60 +77,97 @@ Before(function () {
     mockTransactionRepo,
     mockCouponRepo,
     mockWaiverRepo,
-    null,
     null
   );
 });
 
-Given(/^There is an Invoice with the ID "([\w-]+)"$/, async function (
-  testInvoiceId: string
-) {
-  invoiceId = testInvoiceId;
-  const transactionId = 'transaction-id';
-  manuscript = ManuscriptMap.toDomain({
-    id: '8888',
-    title: 'manuscript-test',
-    customId: 'custom-manuscript',
-  });
-  const transaction = TransactionMap.toDomain({
-    id: transactionId,
-  });
-  const invoice = InvoiceMap.toDomain({
-    transactionId: 'transaction-id',
-    dateCreated: new Date(),
-    id: testInvoiceId,
-    // * Makes sure it is EP registered already!
-    erpReference: 'ERP',
-  });
-  const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: testInvoiceId,
-    manuscriptId: '8888',
-    price: 100,
-  });
+Given(
+  /^There is an Invoice with the ID "([\w-]+)"$/,
+  async function (testInvoiceId: string) {
+    invoiceId = testInvoiceId;
+    const transactionId = 'transaction-id';
+    const maybeManuscript = ManuscriptMap.toDomain({
+      id: '8888',
+      title: 'manuscript-test',
+      customId: 'custom-manuscript',
+    });
 
-  const erpReference = ErpReferenceMap.toDomain({
-    entity_id: testInvoiceId,
-    entity_type: 'invoice',
-    vendor: 'testVendor',
-    attribute: 'confirmation',
-    value: 'FOO',
-  });
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
 
-  invoice.addInvoiceItem(invoiceItem);
-  transaction.addInvoice(invoice);
-  await mockTransactionRepo.save(transaction);
-  await mockInvoiceRepo.save(invoice);
-  await mockInvoiceItemRepo.save(invoiceItem);
-  await mockManuscriptRepo.save(manuscript);
-  await mockErpReferenceRepo.save(erpReference);
-});
+    manuscript = maybeManuscript.value;
+
+    const maybeTransaction = TransactionMap.toDomain({
+      id: transactionId,
+    });
+
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    const transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
+      transactionId,
+      dateCreated: new Date(),
+      id: testInvoiceId,
+      // * Makes sure it is EP registered already!
+      erpReference: 'ERP',
+    });
+
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    const invoice = maybeInvoice.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
+      invoiceId: testInvoiceId,
+      manuscriptId: '8888',
+      price: 100,
+    });
+
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const invoiceItem = maybeInvoiceItem.value;
+
+    const maybeErpReference = ErpReferenceMap.toDomain({
+      entity_id: testInvoiceId,
+      entity_type: 'invoice',
+      vendor: 'testVendor',
+      attribute: 'confirmation',
+      value: 'FOO',
+    });
+
+    if (maybeErpReference.isLeft()) {
+      throw maybeErpReference.value;
+    }
+
+    const erpReference = maybeErpReference.value;
+
+    invoice.addInvoiceItem(invoiceItem);
+    transaction.addInvoice(invoice);
+    await mockTransactionRepo.save(transaction);
+    await mockInvoiceRepo.save(invoice);
+    await mockInvoiceItemRepo.save(invoiceItem);
+    await mockManuscriptRepo.save(manuscript);
+    await mockErpReferenceRepo.save(erpReference);
+  }
+);
 
 When('A credit note is created from it', async function () {
   const payload = {
     invoiceId,
     createDraft: false, // don't create draft invoice
   };
-  await createCreditNoteUsecase.execute(payload, context);
+  const maybeResult = await createCreditNoteUsecase.execute(payload, context);
+
+  if (maybeResult.isLeft()) {
+    throw maybeResult.value;
+  }
 });
 
 When(
@@ -144,6 +181,11 @@ Then(
   'It should not enlist the credit note for revenue recognition',
   async function () {
     const invoices = await mockInvoiceRepo.getUnrecognizedNetsuiteErpInvoices();
-    expect(invoices.length).to.equal(1);
+
+    if (invoices.isLeft()) {
+      throw invoices.value;
+    }
+
+    expect(invoices.value.length).to.equal(1);
   }
 );

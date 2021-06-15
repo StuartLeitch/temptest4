@@ -1,4 +1,6 @@
-export { EpicOnArticlePublishedErrors } from './epicOnArticlePublishedErrors';
-export type { EpicOnArticlePublishedDTO } from './epicOnArticlePublishedDTO';
+import * as EpicOnArticlePublishedErrors from './epicOnArticlePublishedErrors';
+
 export * from './epicOnArticlePublishedResponse';
+export * from './epicOnArticlePublishedDTO';
 export * from './epicOnArticlePublished';
+export { EpicOnArticlePublishedErrors };

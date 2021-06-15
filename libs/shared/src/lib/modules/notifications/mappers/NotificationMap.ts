@@ -1,4 +1,7 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
 import { Mapper } from '../../../infrastructure/Mapper';
 
 import { NotificationProps, Notification } from '../domain/Notification';
@@ -10,26 +13,23 @@ type MappingProps = Omit<NotificationProps, 'invoiceId'> & {
 };
 
 export class NotificationMap extends Mapper<Notification> {
-  public static toDomain(raw: MappingProps): Notification {
+  public static toDomain(
+    raw: MappingProps
+  ): Either<GuardFailure, Notification> {
     const invoiceUUID = new UniqueEntityID(raw.invoiceId);
-    const invoiceId = InvoiceId.create(invoiceUUID).getValue();
+    const invoiceId = InvoiceId.create(invoiceUUID);
     const id = new UniqueEntityID(raw.id);
 
     const props: NotificationProps = {
       recipientEmail: raw.recipientEmail,
       dateSent: raw.dateSent,
       type: raw.type,
-      invoiceId
+      invoiceId,
     };
 
-    const notificationOrError = Notification.create(props, id);
+    const maybeNotification = Notification.create(props, id);
 
-    if (notificationOrError.isFailure) {
-      console.log(notificationOrError);
-      return null;
-    } else {
-      return notificationOrError.getValue();
-    }
+    return maybeNotification;
   }
 
   public static toPersistence(notification: Notification): MappingProps {
@@ -38,7 +38,7 @@ export class NotificationMap extends Mapper<Notification> {
       recipientEmail: notification.recipientEmail,
       dateSent: notification.dateSent,
       id: notification.id.toString(),
-      type: notification.type
+      type: notification.type,
     };
   }
 }

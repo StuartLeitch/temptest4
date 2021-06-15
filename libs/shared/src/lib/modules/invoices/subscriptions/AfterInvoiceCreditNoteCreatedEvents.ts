@@ -28,6 +28,7 @@ import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publis
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
+import { Payer } from '../../payers/domain/Payer';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
@@ -64,9 +65,16 @@ export class AfterInvoiceCreditNoteCreatedEvent
   ): Promise<any> {
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
-      const creditNote = await this.invoiceRepo.getInvoiceById(
+      const maybeCreditNote = await this.invoiceRepo.getInvoiceById(
         event.creditNoteId
       );
+
+      if (maybeCreditNote.isLeft()) {
+        throw new Error(`Credit note with id ${event.creditNoteId} not found.`);
+      }
+
+      const creditNote = maybeCreditNote.value;
+
       let invoiceItems = creditNote.invoiceItems.currentItems;
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -84,38 +92,46 @@ export class AfterInvoiceCreditNoteCreatedEvent
           );
         }
 
-        invoiceItems = invoiceItemsResult.value.getValue();
+        invoiceItems = invoiceItemsResult.value;
       }
 
-      const manuscript = await this.manuscriptRepo.findById(
+      const maybeManuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
-      if (!manuscript) {
+      if (maybeManuscript.isLeft()) {
         throw new Error(
           `CreditNote ${creditNote.id} has no manuscripts associated.`
         );
       }
 
-      let payer = await this.payerRepo.getPayerByInvoiceId(
+      const manuscript = maybeManuscript.value;
+
+      let maybePayer = await this.payerRepo.getPayerByInvoiceId(
         creditNote.invoiceId
       );
+      let payer: Payer;
 
-      if (!payer) {
+      if (maybePayer.isLeft()) {
         if (creditNote.cancelledInvoiceReference) {
           const invoiceId = InvoiceId.create(
             new UniqueEntityID(creditNote.cancelledInvoiceReference)
-          ).getValue();
-          payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-          if (!payer) {
+          );
+
+          maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+          if (maybePayer.isLeft()) {
             throw new Error(
               `Credit Note ${creditNote.id.toString()} has no payers.`
             );
+          } else {
+            payer = maybePayer.value;
           }
         } else {
           throw new Error(
             `Credit Note ${creditNote.id.toString()} has no payers.`
           );
         }
+      } else {
+        payer = maybePayer.value;
       }
 
       const paymentMethodsUsecase = new GetPaymentMethodsUseCase(
@@ -127,9 +143,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
 
       if (paymentMethods.isLeft()) {
         throw new Error(
-          `Payment methods could not be accessed: ${
-            paymentMethods.value.errorValue().message
-          }`
+          `Payment methods could not be accessed: ${paymentMethods.value.message}`
         );
       }
 
@@ -137,9 +151,21 @@ export class AfterInvoiceCreditNoteCreatedEvent
         creditNote.invoiceId
       );
 
+      if (payments.isLeft()) {
+        throw new Error(
+          `Payments could not be accessed: ${payments.value.message}`
+        );
+      }
+
       const billingAddress = await this.addressRepo.findById(
         payer.billingAddressId
       );
+
+      if (billingAddress.isLeft()) {
+        throw new Error(
+          `Billing address could not be accessed: ${billingAddress.value.message}`
+        );
+      }
 
       // * Get Invoice ID
       const invoiceId = creditNote.cancelledInvoiceReference;
@@ -155,21 +181,21 @@ export class AfterInvoiceCreditNoteCreatedEvent
       if (maybeInvoice.isLeft()) {
         throw new Error(`Couldn't find Invoice Values for ID: ${invoiceId}`);
       }
-      const invoice = maybeInvoice.value.getValue();
+      const invoice = maybeInvoice.value;
 
       const publishResult = await this.publishInvoiceCredited.execute({
-        paymentMethods: paymentMethods.value.getValue(),
-        billingAddress,
+        paymentMethods: paymentMethods.value,
+        billingAddress: billingAddress.value,
+        payments: payments.value,
         invoiceItems,
         creditNote,
         manuscript,
-        payments,
         invoice,
         payer,
       });
 
       if (publishResult.isLeft()) {
-        throw publishResult.value.errorValue();
+        throw publishResult.value;
       }
 
       this.loggerService.info(

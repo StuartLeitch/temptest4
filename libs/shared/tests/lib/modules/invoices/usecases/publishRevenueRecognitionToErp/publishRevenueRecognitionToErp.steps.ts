@@ -1,5 +1,3 @@
-// tslint:disable: no-unused-expression
-
 import { expect } from 'chai';
 import { Before, Given, Then, When } from '@cucumber/cucumber';
 
@@ -47,7 +45,6 @@ let mockWaiverRepo: MockWaiverRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockCatalogRepo: MockCatalogRepo;
 let mockSalesforceService: MockErpService;
-// let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
 let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
@@ -60,7 +57,7 @@ const context: UsecaseAuthorizationContext = {
   roles: [Roles.ADMIN],
 };
 
-Before(function () {
+Before({ tags: '@ValidatePublishRevRecToErp' }, function () {
   invoice = null;
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockAddressRepo = new MockAddressRepo();
@@ -71,7 +68,6 @@ Before(function () {
   mockCatalogRepo = new MockCatalogRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockSalesforceService = new MockErpService();
-  // mockNetsuiteService = new MockErpService();
   mockPublisherRepo = new MockPublisherRepo();
   mockLogger = new MockLogger();
   mockInvoiceRepo = new MockInvoiceRepo(
@@ -98,78 +94,137 @@ Before(function () {
   );
 });
 
-Given(/There is an Invoice with the ID "([\w-]+)" created/, async function (
-  invoiceId: string
-) {
-  const transaction = TransactionMap.toDomain({
-    status: TransactionStatus.ACTIVE,
-    deleted: 0,
-    dateCreated: new Date(),
-    dateUpdated: new Date(),
-  });
-  invoice = InvoiceMap.toDomain({
-    transactionId: transaction.id.toValue(),
-    dateCreated: new Date(),
-    id: invoiceId,
-  });
+Given(
+  /There is an Invoice with the ID "([\w-]+)" created/,
+  async function (invoiceId: string) {
+    const maybeTransaction = TransactionMap.toDomain({
+      status: TransactionStatus.ACTIVE,
+      deleted: 0,
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
+    });
 
-  const publisher = PublisherMap.toDomain({
-    id: 'publisher1',
-    customValues: {},
-  } as any);
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
 
-  const catalog = CatalogMap.toDomain({
-    publisherId: publisher.publisherId.id.toString(),
-    isActive: true,
-    journalId: 'journal1',
-  });
+    const transaction = maybeTransaction.value;
 
-  const datePublished = new Date();
-  const manuscript = ArticleMap.toDomain({
-    customId: '8888',
-    journalId: catalog.journalId.id.toValue(),
-    datePublished: datePublished.setDate(datePublished.getDate() - 1),
-  });
+    const maybeInvoice = InvoiceMap.toDomain({
+      transactionId: transaction.id.toValue(),
+      dateCreated: new Date(),
+      id: invoiceId,
+    });
 
-  const invoiceItem = InvoiceItemMap.toDomain({
-    invoiceId: invoiceId,
-    manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
-    price: 100,
-    vat: 0,
-  });
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
 
-  invoice.addItems([invoiceItem]);
+    invoice = maybeInvoice.value;
 
-  const erpReference = ErpReferenceMap.toDomain({
-    entity_id: invoiceId,
-    entity_type: 'invoice',
-    vendor: 'testVendor',
-    attribute: 'confirmation',
-    value: 'FOO',
-  });
+    const maybePublisher = PublisherMap.toDomain({
+      id: 'publisher1',
+      customValues: {},
+    } as any);
 
-  await mockInvoiceRepo.save(invoice);
-  await mockInvoiceItemRepo.save(invoiceItem);
-  await mockManuscriptRepo.save(manuscript);
-  mockPublisherRepo.addMockItem(publisher);
-  mockCatalogRepo.addMockItem(catalog);
-  mockErpReferenceRepo.addMockItem(erpReference);
+    if (maybePublisher.isLeft()) {
+      throw maybePublisher.value;
+    }
 
-  transaction.addInvoice(invoice);
-});
+    const publisher = maybePublisher.value;
+
+    const maybeCatalog = CatalogMap.toDomain({
+      publisherId: publisher.publisherId.id.toString(),
+      isActive: true,
+      journalId: 'journal1',
+    });
+
+    if (maybeCatalog.isLeft()) {
+      throw maybeCatalog.value;
+    }
+
+    const catalog = maybeCatalog.value;
+
+    const datePublished = new Date();
+
+    const maybeManuscript = ArticleMap.toDomain({
+      customId: '8888',
+      journalId: catalog.journalId.id.toValue(),
+      datePublished: datePublished.setDate(datePublished.getDate() - 1),
+    });
+
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    const manuscript = maybeManuscript.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
+      invoiceId: invoiceId,
+      manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
+      price: 100,
+      vat: 0,
+    });
+
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const invoiceItem = maybeInvoiceItem.value;
+
+    invoice.addItems([invoiceItem]);
+
+    const maybeErpReference = ErpReferenceMap.toDomain({
+      entity_id: invoiceId,
+      entity_type: 'invoice',
+      vendor: 'testVendor',
+      attribute: 'confirmation',
+      value: 'FOO',
+    });
+
+    if (maybeErpReference.isLeft()) {
+      throw maybeErpReference.value;
+    }
+
+    const erpReference = maybeErpReference.value;
+
+    await mockInvoiceRepo.save(invoice);
+    await mockInvoiceItemRepo.save(invoiceItem);
+    await mockManuscriptRepo.save(manuscript);
+    mockPublisherRepo.addMockItem(publisher);
+    mockCatalogRepo.addMockItem(catalog);
+    mockErpReferenceRepo.addMockItem(erpReference);
+
+    transaction.addInvoice(invoice);
+  }
+);
 
 Given(
   /The payer country is "([\w-]+)" and their type is "([\w-]+)"/,
   async function (country: string, payerType: string) {
-    const address = AddressMap.toDomain({
+    const maybeAddress = AddressMap.toDomain({
       country,
     });
-    const payer = PayerMap.toDomain({
+
+    if (maybeAddress.isLeft()) {
+      throw maybeAddress.value;
+    }
+
+    const address = maybeAddress.value;
+
+    const maybePayer = PayerMap.toDomain({
       name: 'John',
       addressId: address.id.toValue(),
       invoiceId: invoice.invoiceId.id.toValue(),
       type: payerType,
     });
+
+    if (maybePayer.isLeft()) {
+      throw maybePayer.value;
+    }
+
+    const payer = maybePayer.value;
+
     mockPayerRepo.addMockItem(payer);
     mockAddressRepo.addMockItem(address);
   }
@@ -178,36 +233,67 @@ Given(
 Given(
   /There is a fully discounted Invoice with the ID "([\w-]+)" created/,
   async function (invoiceId: string) {
-    const transaction = TransactionMap.toDomain({
+    const maybeTransaction = TransactionMap.toDomain({
       status: TransactionStatus.ACTIVE,
       deleted: 0,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
-    invoice = InvoiceMap.toDomain({
+
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    const transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       transactionId: transaction.id.toValue(),
       dateCreated: new Date(),
       id: invoiceId,
     });
 
-    const publisher = PublisherMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
+
+    const maybePublisher = PublisherMap.toDomain({
       id: 'publisher1',
       customValues: {},
     } as any);
 
-    const catalog = CatalogMap.toDomain({
+    if (maybePublisher.isLeft()) {
+      throw maybePublisher.value;
+    }
+
+    const publisher = maybePublisher.value;
+
+    const maybeCatalog = CatalogMap.toDomain({
       publisherId: publisher.publisherId.id.toString(),
       isActive: true,
       journalId: 'journal1',
     });
 
-    const manuscript = ArticleMap.toDomain({
+    if (maybeCatalog.isLeft()) {
+      throw maybeCatalog.value;
+    }
+
+    const catalog = maybeCatalog.value;
+
+    const maybeManuscript = ArticleMap.toDomain({
       customId: '8888',
       journalId: catalog.journalId.id.toValue(),
       datePublished: new Date(),
     });
 
-    const invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    const manuscript = maybeManuscript.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       invoiceId: invoiceId,
       id: 'inv-item',
       manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
@@ -215,28 +301,50 @@ Given(
       vat: 0,
     });
 
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const invoiceItem = maybeInvoiceItem.value;
+
+    const maybeCoupon = CouponMap.toDomain({
+      code: 'ASD1123',
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
+      id: 'coup1',
+      invoiceItemType: 'APC',
+      name: 'coup',
+      redeemCount: 1,
+      reduction: 50,
+      status: 'active',
+      type: 'SINGLE_USE',
+    });
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    const coupon = maybeCoupon.value;
+
     mockCouponRepo.addMockCouponToInvoiceItem(
-      CouponMap.toDomain({
-        code: 'ASD1123',
-        dateCreated: new Date(),
-        dateUpdated: new Date(),
-        id: 'coup1',
-        invoiceItemType: 'APC',
-        name: 'coup',
-        redeemCount: 1,
-        reduction: 50,
-        status: 'active',
-        type: 'SINGLE_USE',
-      }),
+      coupon,
       invoiceItem.invoiceItemId
     );
 
+    const maybeWaiver = WaiverMap.toDomain({
+      waiverType: 'EDITOR_DISCOUT',
+      reduction: 50,
+      isActive: true,
+    });
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    const waiver = maybeWaiver.value;
+
     mockWaiverRepo.addMockWaiverForInvoiceItem(
-      WaiverMap.toDomain({
-        waiverType: 'EDITOR_DISCOUT',
-        reduction: 50,
-        isActive: true,
-      }),
+      waiver,
       invoiceItem.invoiceItemId
     );
 
@@ -265,9 +373,16 @@ Then(
     const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.true;
 
-    const testInvoice = await mockInvoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+    const maybeTestInvoice = await mockInvoiceRepo.getInvoiceById(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
     );
+
+    if (maybeTestInvoice.isLeft()) {
+      throw maybeTestInvoice.value;
+    }
+
+    const testInvoice = maybeTestInvoice.value;
+
     const erpReferences = testInvoice.getErpReferences().getItems();
 
     expect(
@@ -283,14 +398,22 @@ Then(
     const revenueData = mockSalesforceService.getRevenue(invoiceId);
     expect(!!revenueData).to.be.false;
 
-    const testInvoice = await mockInvoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+    const maybeTestInvoice = await mockInvoiceRepo.getInvoiceById(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
     );
+
+    if (maybeTestInvoice.isLeft()) {
+      throw maybeTestInvoice.value;
+    }
+
+    const testInvoice = maybeTestInvoice.value;
+
     const erpReferences = testInvoice.getErpReferences().getItems();
 
     expect(erpReferences.length).to.equal(1);
 
     const [nonInvoiceable] = erpReferences;
+
     expect(nonInvoiceable.value).to.equal('NON_INVOICEABLE');
   }
 );

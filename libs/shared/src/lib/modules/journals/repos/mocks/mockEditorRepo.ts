@@ -1,8 +1,13 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
-import { Editor } from '../../domain/Editor';
-import { EditorId } from '../../domain/EditorId';
+import { RepoError } from '../../../../infrastructure/RepoError';
+
 import { JournalId } from '../../domain/JournalId';
+import { EditorId } from '../../domain/EditorId';
+import { Editor } from '../../domain/Editor';
+
 import { EditorRepoContract } from '../editorRepo';
 
 export class MockEditorRepo
@@ -12,36 +17,52 @@ export class MockEditorRepo
     super();
   }
 
-  public async getEditorById(editorId: EditorId): Promise<Editor> {
+  public async getEditorById(
+    editorId: EditorId
+  ): Promise<Either<GuardFailure | RepoError, Editor>> {
     const match = this._items.find((i) => i.editorId.equals(editorId));
-    return match ? match : null;
+    return right(match);
   }
 
   public async getEditorCollection(): Promise<Editor[]> {
     return this._items;
   }
 
-  public async getEditorsByJournalId(journalId: JournalId): Promise<Editor[]> {
+  public async getEditorsByJournalId(
+    journalId: JournalId
+  ): Promise<Either<GuardFailure | RepoError, Editor[]>> {
     const match = this._items.filter((e) => e.journalId.equals(journalId));
-    return match ? match : null;
+    return right(match);
   }
 
   public async getEditorListRolesByEmails(
     editorsEmails: string[]
-  ): Promise<Editor[]> {
+  ): Promise<Either<GuardFailure | RepoError, Editor[]>> {
     const match = this._items.filter((i) =>
       editorsEmails.includes(i.email.value)
     );
-    return match ? match : null;
+    return right(match);
   }
 
-  public async exists(editor: Editor): Promise<boolean> {
+  public async exists(
+    editor: Editor
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const found = this._items.filter((e) => this.compareMockItems(e, editor));
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
-  public async save(editor: Editor): Promise<Editor> {
-    const alreadyExists = await this.exists(editor);
+  public async save(
+    editor: Editor
+  ): Promise<Either<GuardFailure | RepoError, Editor>> {
+    const maybeAlreadyExists = await this.exists(editor);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items.map((e) => {
@@ -55,11 +76,15 @@ export class MockEditorRepo
       this._items.push(editor);
     }
 
-    return editor;
+    return right(editor);
   }
 
-  public async delete(editor: Editor): Promise<void> {
+  public async delete(
+    editor: Editor
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     this.removeMockItem(editor);
+
+    return right(null);
   }
 
   public compareMockItems(a: Editor, b: Editor): boolean {

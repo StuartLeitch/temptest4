@@ -1,10 +1,11 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetInvoiceDetailsErrors } from './getInvoiceDetailsErrors';
+import * as Errors from './getInvoiceDetailsErrors';
 import { Invoice } from './../../domain/Invoice';
 
 export type GetInvoiceDetailsResponse = Either<
-  GetInvoiceDetailsErrors.InvoiceNotFoundError | UnexpectedError,
-  Result<Invoice>
+  Errors.InvoiceNotFoundError | UnexpectedError | GuardFailure,
+  Invoice
 >;

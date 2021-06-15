@@ -1,54 +1,43 @@
 // * Core Domain
-import { Result } from '../../../../core/logic/Result';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { chain } from '../../../../core/logic/EitherChain';
 
 // * Authorization Logic
-import {
-  UsecaseAuthorizationContext,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 // * Usecase specific
 import { PayerType } from '../../../payers/domain/Payer';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 
-import type { ApplyVatToInvoiceDTO } from './applyVatToInvoiceDTO';
-import type { ApplyVatToInvoiceResponse } from './applyVatToInvoiceResponse';
-
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
+import { CouponRepoContract } from '../../../coupons/repos';
+import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { UpdateInvoiceItemsUsecase } from '../updateInvoiceItems';
 
 import { VATService } from '../../../../domain/services/VATService';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
+
+import type { ApplyVatToInvoiceDTO } from './applyVatToInvoiceDTO';
+import type { ApplyVatToInvoiceResponse } from './applyVatToInvoiceResponse';
 
 export class ApplyVatToInvoiceUsecase
   implements
-    UseCase<
-      ApplyVatToInvoiceDTO,
-      Promise<ApplyVatToInvoiceResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      ApplyVatToInvoiceDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<ApplyVatToInvoiceDTO, Promise<ApplyVatToInvoiceResponse>, Context> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private vatService: VATService
-  ) {}
+  ) {
+    this.attachVatToApcItems = this.attachVatToApcItems.bind(this);
+    this.updateInvoiceItems = this.updateInvoiceItems.bind(this);
+    this.getInvoiceItems = this.getInvoiceItems.bind(this);
+  }
 
-  // @Authorize('payer:read')
   public async execute(
     request: ApplyVatToInvoiceDTO,
-    context?: UsecaseAuthorizationContext
+    context?: Context
   ): Promise<ApplyVatToInvoiceResponse> {
     const { postalCode, payerType, invoiceId, country, state } = request;
     const vat = this.vatService.calculateVAT(
@@ -61,13 +50,12 @@ export class ApplyVatToInvoiceUsecase
       new Date()
     );
 
-    const maybeApcItemsWithVat = (await this.getInvoiceItems(invoiceId)).map(
-      this.attachVatToApcItems.bind(null, vat)
-    );
-
-    return (
-      await chain([this.updateInvoiceItems.bind(this)], maybeApcItemsWithVat)
-    ).map(() => Result.ok<void>());
+    const execution = await new AsyncEither(invoiceId)
+      .then(this.getInvoiceItems)
+      .map(this.attachVatToApcItems(vat))
+      .then(this.updateInvoiceItems)
+      .execute();
+    return execution;
   }
 
   private async getInvoiceItems(invoiceId: string) {
@@ -88,16 +76,14 @@ export class ApplyVatToInvoiceUsecase
     return await updateInvoiceItemsUsecase.execute({ invoiceItems });
   }
 
-  private attachVatToApcItems(
-    vat: number,
-    invoiceItemsResult: Result<InvoiceItem[]>
-  ) {
-    return invoiceItemsResult
-      .getValue()
-      .filter((item) => item.type === 'APC')
-      .map((apcItem) => {
-        apcItem.vat = vat;
-        return apcItem;
-      });
+  private attachVatToApcItems(vat: number) {
+    return (invoiceItemsResult: InvoiceItem[]) => {
+      return invoiceItemsResult
+        .filter((item) => item.type === 'APC')
+        .map((apcItem) => {
+          apcItem.vat = vat;
+          return apcItem;
+        });
+    };
   }
 }

@@ -1,55 +1,77 @@
 import { cloneDeep } from 'lodash';
 
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
+import { RepoError } from '../../../../infrastructure/RepoError';
+
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { NotificationType } from '../../domain/Notification';
 
 import { PausedReminderRepoContract } from '../PausedReminderRepo';
 import { NotificationPause } from '../../domain/NotificationPause';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { NotificationType } from '../../domain/Notification';
 
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'confirmation',
   [NotificationType.REMINDER_PAYMENT]: 'payment',
 };
 
-export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
+export class MockPausedReminderRepo
+  extends BaseMockRepo<NotificationPause>
   implements PausedReminderRepoContract {
   constructor() {
     super();
   }
 
-  async save(pause: NotificationPause): Promise<NotificationPause> {
-    const alreadyExists = await this.exists(pause);
+  async save(
+    pause: NotificationPause
+  ): Promise<Either<GuardFailure | RepoError, NotificationPause>> {
+    const maybeAlreadyExists = await this.exists(pause);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
-      throw new Error('duplicate');
+      return left(
+        RepoError.createEntityNotFoundError('pause', pause.invoiceId.toString())
+      );
     }
 
     this._items.push(cloneDeep(pause));
 
-    return pause;
+    return right(pause);
   }
 
-  async exists(pause: NotificationPause): Promise<boolean> {
+  async exists(
+    pause: NotificationPause
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const match = this._items.find((item) =>
       this.compareMockItems(item, pause)
     );
 
-    return !!match;
+    return right(!!match);
   }
 
   async getNotificationPausedStatus(
     invoiceId: InvoiceId
-  ): Promise<NotificationPause> {
+  ): Promise<Either<GuardFailure | RepoError, NotificationPause>> {
     const found = this._items.find((pause) =>
       pause.invoiceId.equals(invoiceId)
     );
 
     if (!found) {
-      throw new Error('does not exist');
+      return left(
+        RepoError.createEntityNotFoundError('pause', invoiceId.toString())
+      );
     }
 
-    return found;
+    return right(found);
   }
 
   async insertBasePause(invoiceId: InvoiceId) {
@@ -66,7 +88,7 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     invoiceId: InvoiceId,
     state: boolean,
     type: NotificationType
-  ): Promise<void> {
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     const index = this._items.findIndex((item) =>
       item.invoiceId.equals(invoiceId)
     );
@@ -76,10 +98,13 @@ export class MockPausedReminderRepo extends BaseMockRepo<NotificationPause>
     }
 
     if (index == -1) {
-      throw new Error('does not exist');
+      return left(
+        RepoError.createEntityNotFoundError('pause', invoiceId.toString())
+      );
     }
 
     this._items[index][notificationTypeToPersistance[type]] = state;
+    return right(null);
   }
 
   async *invoiceIdsWithNoPauseSettings(): AsyncGenerator<

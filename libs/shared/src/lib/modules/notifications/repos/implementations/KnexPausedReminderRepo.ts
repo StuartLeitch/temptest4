@@ -1,7 +1,10 @@
-import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { NotificationPause } from '../../domain/NotificationPause';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
@@ -28,46 +31,54 @@ export class KnexPausedReminderRepo
   implements PausedReminderRepoContract {
   async getNotificationPausedStatus(
     invoiceId: InvoiceId
-  ): Promise<NotificationPause> {
+  ): Promise<Either<GuardFailure | RepoError, NotificationPause>> {
     const pause = await this.db(TABLES.PAUSED_REMINDERS)
       .select()
       .where('invoiceId', invoiceId.id.toString())
       .first();
 
     if (!pause) {
-      throw new Error(
-        `No pause found for invoice with id {${invoiceId.id.toString()}}`
+      return left(
+        RepoError.createEntityNotFoundError('pause', invoiceId.id.toString())
       );
     }
 
-    return mapPauseToDomain(invoiceId, pause);
+    return right(mapPauseToDomain(invoiceId, pause));
   }
 
   async setReminderPauseState(
     invoiceId: InvoiceId,
     state: boolean,
     type: NotificationType
-  ): Promise<void> {
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     const alreadyExists = await this.existsPauseForInvoice(invoiceId);
 
     if (!alreadyExists) {
-      throw new Error(
-        `No pause found for invoice with id {${invoiceId.id.toString()}}`
+      return left(
+        RepoError.createEntityNotFoundError('pause', invoiceId.id.toString())
       );
     }
 
     if (!notificationTypeToPersistance[type]) {
-      return;
+      return right(null);
     }
 
-    await this.db(TABLES.PAUSED_REMINDERS)
-      .where('invoiceId', invoiceId.id.toString())
-      .update({
-        [notificationTypeToPersistance[type]]: state,
-      });
+    try {
+      await this.db(TABLES.PAUSED_REMINDERS)
+        .where('invoiceId', invoiceId.id.toString())
+        .update({
+          [notificationTypeToPersistance[type]]: state,
+        });
+    } catch (err) {
+      return left(RepoError.fromDBError(err));
+    }
+
+    return right(null);
   }
 
-  async insertBasePause(invoiceId: InvoiceId): Promise<NotificationPause> {
+  async insertBasePause(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, NotificationPause>> {
     const rawPause = emptyPause(invoiceId);
 
     try {
@@ -79,7 +90,9 @@ export class KnexPausedReminderRepo
     return this.getNotificationPausedStatus(invoiceId);
   }
 
-  async save(pause: NotificationPause): Promise<NotificationPause> {
+  async save(
+    pause: NotificationPause
+  ): Promise<Either<GuardFailure | RepoError, NotificationPause>> {
     const rawPause = mapPauseToPersistance(pause);
 
     try {
@@ -91,12 +104,18 @@ export class KnexPausedReminderRepo
     return this.getNotificationPausedStatus(pause.invoiceId);
   }
 
-  async exists(pause: NotificationPause): Promise<boolean> {
-    const result = await this.db(TABLES.PAUSED_REMINDERS)
-      .select()
-      .where('invoiceId', pause.invoiceId)
-      .first();
-    return !!result;
+  async exists(
+    pause: NotificationPause
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+    try {
+      const result = await this.db(TABLES.PAUSED_REMINDERS)
+        .select()
+        .where('invoiceId', pause.invoiceId)
+        .first();
+      return right(!!result);
+    } catch (err) {
+      return left(RepoError.fromDBError(err));
+    }
   }
 
   private async existsPauseForInvoice(invoiceId: InvoiceId): Promise<boolean> {
@@ -116,7 +135,7 @@ export class KnexPausedReminderRepo
       objectMode: true,
       transform(invoice, encoding, callback) {
         const uuid = new UniqueEntityID(invoice.id);
-        const invoiceId = InvoiceId.create(uuid).getValue();
+        const invoiceId = InvoiceId.create(uuid);
         callback(null, invoiceId);
       },
     });

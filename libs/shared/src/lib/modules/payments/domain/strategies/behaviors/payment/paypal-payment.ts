@@ -1,6 +1,6 @@
 import { StrategyError } from '../../../../../../core/logic/strategy-error';
 import { AsyncEither } from '../../../../../../core/logic/AsyncEither';
-import { Either } from '../../../../../../core/logic/Either';
+import { Either, left } from '../../../../../../core/logic/Either';
 
 import {
   PayPalServiceContract,
@@ -15,6 +15,12 @@ import {
   PaymentDTO,
 } from './payment-behavior';
 
+export class PayPalPaymentError extends StrategyError {
+  constructor(msg: string) {
+    super(msg, 'PayPal.createPayment');
+  }
+}
+
 export class PayPalPayment extends PaymentBehavior {
   constructor(private paypalService: PayPalServiceContract) {
     super();
@@ -22,7 +28,7 @@ export class PayPalPayment extends PaymentBehavior {
 
   async makePayment(
     request: PaymentDTO
-  ): Promise<Either<StrategyError, PaymentResponse>> {
+  ): Promise<Either<PayPalPaymentError, PaymentResponse>> {
     const transactionData: PayPalOrderRequest = {
       netAmountBeforeDiscount: request.netAmountBeforeDiscount,
       invoiceReferenceNumber: request.invoiceReferenceNumber,
@@ -34,12 +40,18 @@ export class PayPalPayment extends PaymentBehavior {
       vatAmount: request.vatAmount,
     };
 
-    return new AsyncEither(transactionData)
+    const maybeResult = await new AsyncEither(transactionData)
       .then((data) => this.paypalService.createOrder(data))
       .map((foreignPaymentId) => ({
         status: PaymentStatus.CREATED,
         foreignPaymentId,
       }))
       .execute();
+
+    if (maybeResult.isLeft()) {
+      return left(new PayPalPaymentError(maybeResult.value.toString()));
+    }
+
+    return maybeResult;
   }
 }

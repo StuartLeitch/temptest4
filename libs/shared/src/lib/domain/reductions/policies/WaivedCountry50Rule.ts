@@ -59,10 +59,16 @@ export class WaivedCountry50Rule implements ReductionRuleContract<Waiver> {
     if (
       this.correspondingAuthorInstitutionCountryCode in WAIVER_POLICY_COUNTRIES
     ) {
-      return Waiver.create({
+      const waiver = Waiver.create({
         reduction: -0.5,
         waiverType: WaiverType.WAIVED_COUNTRY_50,
-      }).getValue();
+      });
+
+      if (waiver.isLeft()) {
+        throw waiver.value;
+      }
+
+      return waiver.value;
     }
   }
 }

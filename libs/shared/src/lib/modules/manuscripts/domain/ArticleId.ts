@@ -1,5 +1,5 @@
-import {Entity} from '../../../core/domain/Entity';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Entity } from '../../../core/domain/Entity';
 
 export class ArticleId extends Entity<any> {
   get id(): UniqueEntityID {

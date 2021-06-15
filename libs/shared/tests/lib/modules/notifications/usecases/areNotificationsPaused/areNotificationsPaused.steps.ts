@@ -27,7 +27,7 @@ function makeNotificationData(
   invoiceId: string,
   overwrites?: any
 ): Notification {
-  return NotificationMap.toDomain({
+  const notification = NotificationMap.toDomain({
     recipientEmail: 'test-email',
     dateSent: new Date(),
     type: NotificationType.REMINDER_CONFIRMATION,
@@ -35,6 +35,12 @@ function makeNotificationData(
     invoiceId,
     ...overwrites,
   });
+
+  if (notification.isLeft()) {
+    throw notification.value;
+  }
+
+  return notification.value;
 }
 
 let mockPausedReminderRepo: MockPausedReminderRepo = null;
@@ -66,14 +72,28 @@ After({ tags: '@ValidateNotificationsPaused' }, () => {
 Given(
   /^an invoice with id "([\w-]+)" with confirmation reminder notification/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
     pausedNotification = { invoiceId, confirmation: false, payment: false };
-    pausedNotification = await mockPausedReminderRepo.save(pausedNotification);
+
+    const maybePausedNotification = await mockPausedReminderRepo.save(
+      pausedNotification
+    );
+
+    if (maybePausedNotification.isLeft()) {
+      throw maybePausedNotification.value;
+    }
+
+    pausedNotification = maybePausedNotification.value;
 
     notification = makeNotificationData('testNotificationId', testInvoiceId);
-    notification = await mockSentNotificationRepo.save(notification);
+
+    const maybeNotification = await mockSentNotificationRepo.save(notification);
+
+    if (maybeNotification.isLeft()) {
+      throw maybeNotification.value;
+    }
+
+    notification = maybeNotification.value;
   }
 );
 
@@ -95,13 +115,17 @@ Then(
   async (testInvoiceId: string) => {
     expect(response.isRight()).to.be.true;
 
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
-    const pausedReminder = await mockPausedReminderRepo.getNotificationPausedStatus(
+    const maybePausedReminder = await mockPausedReminderRepo.getNotificationPausedStatus(
       invoiceId
     );
+
+    if (maybePausedReminder.isLeft()) {
+      throw maybePausedReminder.value;
+    }
+
+    const pausedReminder = maybePausedReminder.value;
 
     expect(!!pausedReminder).to.be.true;
   }

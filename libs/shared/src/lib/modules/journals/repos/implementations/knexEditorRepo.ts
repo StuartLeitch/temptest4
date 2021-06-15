@@ -1,19 +1,26 @@
 import Knex from 'knex';
 
-import { TABLES } from '../../../../infrastructure/database/knex/index';
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
+import { TABLES } from '../../../../infrastructure/database/knex/index';
 
 import { JournalId } from '../../domain/JournalId';
-import { Editor } from '../../domain/Editor';
 import { EditorId } from '../../domain/EditorId';
+import { Editor } from '../../domain/Editor';
+
 import { EditorMap } from '../../mappers/EditorMap';
+
 import { EditorRepoContract } from '../editorRepo';
 
 export class KnexEditorRepo
   extends AbstractBaseDBRepo<Knex, Editor>
   implements EditorRepoContract {
-  async getEditorListRolesByEmails(editorsEmails: string[]): Promise<Editor[]> {
+  async getEditorListRolesByEmails(
+    editorsEmails: string[]
+  ): Promise<Either<GuardFailure | RepoError, Editor[]>> {
     const { db } = this;
 
     const editors = await db(TABLES.EDITORS)
@@ -21,10 +28,12 @@ export class KnexEditorRepo
       .whereIn('email', editorsEmails)
       .where('deleted', 0);
 
-    return editors.map((editor) => EditorMap.toDomain(editor));
+    return flatten(editors.map((editor) => EditorMap.toDomain(editor)));
   }
 
-  async getEditorById(editorId: EditorId): Promise<Editor> {
+  async getEditorById(
+    editorId: EditorId
+  ): Promise<Either<GuardFailure | RepoError, Editor>> {
     const { db } = this;
 
     const editor = await db(TABLES.EDITORS)
@@ -34,29 +43,31 @@ export class KnexEditorRepo
       .first();
 
     if (!editor) {
-      throw RepoError.createEntityNotFoundError(
-        'editor',
-        editorId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError('editor', editorId.id.toString())
       );
     }
     return EditorMap.toDomain(editor);
   }
 
-  async exists(editor: Editor): Promise<boolean> {
+  async exists(
+    editor: Editor
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       await this.getEditorById(editor.editorId);
+      return right(true);
     } catch (e) {
       if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
+        return right(false);
       }
 
-      throw e;
+      return left(RepoError.fromDBError(e));
     }
-
-    return true;
   }
 
-  async save(editor: Editor): Promise<Editor> {
+  async save(
+    editor: Editor
+  ): Promise<Either<GuardFailure | RepoError, Editor>> {
     const { db } = this;
 
     const rawEditor = EditorMap.toPersistence(editor);
@@ -67,13 +78,15 @@ export class KnexEditorRepo
     try {
       await db.raw(`? ON CONFLICT (id) DO ?`, [insert, update]);
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
 
     return this.getEditorById(editor.editorId);
   }
 
-  async getEditorsByJournalId(journalId: JournalId): Promise<Editor[]> {
+  async getEditorsByJournalId(
+    journalId: JournalId
+  ): Promise<Either<GuardFailure | RepoError, Editor[]>> {
     const { db } = this;
 
     const editors = await db(TABLES.EDITORS)
@@ -81,10 +94,12 @@ export class KnexEditorRepo
       .where('journalId', journalId.id.toString())
       .where('deleted', 0);
 
-    return editors.map(EditorMap.toDomain);
+    return flatten(editors.map(EditorMap.toDomain));
   }
 
-  async delete(editor: Editor): Promise<unknown> {
+  async delete(
+    editor: Editor
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.EDITORS)
@@ -96,9 +111,11 @@ export class KnexEditorRepo
       });
 
     if (!deletedRows) {
-      throw RepoError.createEntityNotFoundError('editor', editor.id.toString());
+      return left(
+        RepoError.createEntityNotFoundError('editor', editor.id.toString())
+      );
     }
 
-    return deletedRows;
+    return right(null);
   }
 }

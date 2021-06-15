@@ -1,5 +1,5 @@
-import {Entity} from '../../../core/domain/Entity';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Entity } from '../../../core/domain/Entity';
 
 export class CatalogId extends Entity<any> {
   get id(): UniqueEntityID {
@@ -12,5 +12,9 @@ export class CatalogId extends Entity<any> {
 
   public static create(id?: UniqueEntityID): CatalogId {
     return new CatalogId(id);
+  }
+
+  toString(): string {
+    return this._id.toString();
   }
 }

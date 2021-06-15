@@ -1,9 +1,10 @@
-import { Entity } from '../../../core/domain/Entity';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
+import { Entity } from '../../../core/domain/Entity';
 
-import { CatalogId } from './CatalogId';
 import { CatalogItem } from './CatalogItem';
+import { CatalogId } from './CatalogId';
 
 export interface CatalogProps {
   name: string;
@@ -34,12 +35,12 @@ export class Catalog extends Entity<CatalogProps> {
   public static create(
     props: CatalogProps,
     id?: UniqueEntityID
-  ): Result<Catalog> {
-    return Result.ok<Catalog>(
+  ): Either<GuardFailure, Catalog> {
+    return right(
       new Catalog(
         {
           ...props,
-          items: props.items ? props.items : []
+          items: props.items ? props.items : [],
         },
         id
       )
@@ -47,7 +48,7 @@ export class Catalog extends Entity<CatalogProps> {
   }
 
   public addCatalogItem(catalogItem: CatalogItem): void {
-    const alreadyAdded = this.props.items.find(i =>
+    const alreadyAdded = this.props.items.find((i) =>
       i.id.equals(catalogItem.id)
     );
 
@@ -58,7 +59,7 @@ export class Catalog extends Entity<CatalogProps> {
 
   public removeCatalogItem(catalogItem: CatalogItem): void {
     this.props.items = this.props.items.filter(
-      p => !p.id.equals(catalogItem.id)
+      (p) => !p.id.equals(catalogItem.id)
     );
   }
 }

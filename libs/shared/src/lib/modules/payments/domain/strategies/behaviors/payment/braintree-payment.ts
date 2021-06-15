@@ -1,5 +1,4 @@
 import { StrategyError } from '../../../../../../core/logic/strategy-error';
-import { AsyncEither } from '../../../../../../core/logic/AsyncEither';
 import { Either, right, left } from '../../../../../../core/logic/Either';
 
 import {
@@ -35,13 +34,13 @@ export class BraintreePayment extends PaymentBehavior {
     if (result.isLeft()) {
       return left({
         message: result.value.message,
-        behavior: result.value.originatingService
+        behavior: result.value.originatingService,
       });
     }
 
     return right({
       status: PaymentStatus.COMPLETED,
-      foreignPaymentId: result.value
+      foreignPaymentId: result.value,
     });
   }
 }

@@ -1,16 +1,12 @@
 import { InvoiceDraftDeleted } from '@hindawi/phenom-events';
 
-import { Either, right, left } from '../../../../../core/logic/Result';
+import { Either, right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 import { EventUtils } from '../../../../../utils/EventUtils';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import { formatInvoiceItems, formatCosts } from '../eventFormatters';
@@ -22,19 +18,10 @@ import * as Errors from './publishInvoiceDraftDeleted.errors';
 const INVOICE_DRAFT_DELETED = 'InvoiceDraftDeleted';
 
 export class PublishInvoiceDraftDeletedUseCase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private publishService: SQSPublishServiceContract) {}
 
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const maybeValidRequest = this.verifyInput(request);
     if (maybeValidRequest.isLeft()) {
       return maybeValidRequest;

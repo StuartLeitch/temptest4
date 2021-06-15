@@ -1,17 +1,17 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import * as ResumeInvoicePaymentRemindersErrors from './resumeInvoicePaymentRemindersErrors';
+import * as Errors from './resumeInvoicePaymentRemindersErrors';
 
 export type ResumeInvoicePaymentRemindersResponse = Either<
-  | ResumeInvoicePaymentRemindersErrors.CouldNotGetTransactionForInvoiceError
-  | ResumeInvoicePaymentRemindersErrors.PaymentRemindersNotPausedError
-  | ResumeInvoicePaymentRemindersErrors.ReminderDelayRequiredError
-  | ResumeInvoicePaymentRemindersErrors.ReminderResumeSaveDbError
-  | ResumeInvoicePaymentRemindersErrors.InvoiceIdRequiredError
-  | ResumeInvoicePaymentRemindersErrors.QueueNameRequiredError
-  | ResumeInvoicePaymentRemindersErrors.InvoiceNotFoundError
-  | ResumeInvoicePaymentRemindersErrors.ScheduleTaskFailed
+  | Errors.CouldNotGetTransactionForInvoiceError
+  | Errors.PaymentRemindersNotPausedError
+  | Errors.ReminderDelayRequiredError
+  | Errors.ReminderResumeSaveDbError
+  | Errors.InvoiceIdRequiredError
+  | Errors.QueueNameRequiredError
+  | Errors.InvoiceNotFoundError
+  | Errors.ScheduleTaskFailed
   | UnexpectedError,
-  Result<void>
+  void
 >;

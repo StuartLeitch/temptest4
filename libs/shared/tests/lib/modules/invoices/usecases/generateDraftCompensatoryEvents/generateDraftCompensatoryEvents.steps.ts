@@ -102,7 +102,11 @@ Given(/^A manuscript with custom id "([\w\d]+)"$/, (customId: string) => {
     customId,
   });
 
-  context.repos.manuscript.addMockItem(manuscript);
+  if (manuscript.isLeft()) {
+    throw manuscript.value;
+  }
+
+  context.repos.manuscript.addMockItem(manuscript.value);
 });
 
 Given(
@@ -114,14 +118,23 @@ Given(
       status: 'DRAFT',
       id: invoiceId,
     });
+
+    if (invoice.isLeft()) {
+      throw invoice.value;
+    }
+
     const invoiceItem = InvoiceItemMap.toDomain({
       invoiceId,
       manuscriptId,
       price: Number.parseFloat(price),
     });
 
-    context.repos.invoiceItem.addMockItem(invoiceItem);
-    context.repos.invoice.addMockItem(invoice);
+    if (invoiceItem.isLeft()) {
+      throw invoiceItem.value;
+    }
+
+    context.repos.invoiceItem.addMockItem(invoiceItem.value);
+    context.repos.invoice.addMockItem(invoice.value);
   }
 );
 
@@ -174,13 +187,23 @@ Given(
       isActive: true,
     });
 
-    const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
-    const [invoiceItem] = await context.repos.invoiceItem.getItemsByInvoiceId(
+    if (waiver.isLeft()) {
+      throw waiver.value;
+    }
+
+    const invoiceId = InvoiceId.create(new UniqueEntityID(id));
+    const maybeInvoiceItems = await context.repos.invoiceItem.getItemsByInvoiceId(
       invoiceId
     );
 
+    if (maybeInvoiceItems.isLeft()) {
+      throw maybeInvoiceItems.value;
+    }
+
+    const [invoiceItem] = maybeInvoiceItems.value;
+
     context.repos.waiver.addMockWaiverForInvoiceItem(
-      waiver,
+      waiver.value,
       invoiceItem.invoiceItemId,
       new Date(dateOfWaiver)
     );
@@ -199,14 +222,30 @@ Then(
 );
 
 Given(/^Invoice with id "([\w\d-]+)" is deleted$/, async (id: string) => {
-  const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
+  const invoiceId = InvoiceId.create(new UniqueEntityID(id));
   const invoice = await context.repos.invoice.getInvoiceById(invoiceId);
-  await context.repos.invoice.delete(invoice);
+
+  if (invoice.isLeft()) {
+    throw invoice.value;
+  }
+
+  const maybeResult = await context.repos.invoice.delete(invoice.value);
+
+  if (maybeResult.isLeft()) {
+    throw maybeResult.value;
+  }
 });
 
 Given(/^Invoice with id "([\w\d-]+)" is accepted$/, async (id: string) => {
-  const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
-  const invoice = await context.repos.invoice.getInvoiceById(invoiceId);
+  const invoiceId = InvoiceId.create(new UniqueEntityID(id));
+  const maybeInvoice = await context.repos.invoice.getInvoiceById(invoiceId);
+
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
+  }
+
+  const invoice = maybeInvoice.value;
+
   invoice.props.dateAccepted = new Date(invoiceAcceptanceDate);
   await context.repos.invoice.update(invoice);
 });

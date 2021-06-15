@@ -1,67 +1,45 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+
+import { PublisherId } from '../../domain/PublisherId';
 
 import { PublisherRepoContract } from '../../repos/publisherRepo';
 
 // * Usecase specific
-import { GetPublisherCustomValuesResponse } from './getPublisherCustomValuesResponse';
-import { GetPublisherCustomValuesErrors } from './getPublisherCustomValuesErrors';
-import { GetPublisherCustomValuesDTO } from './getPublisherCustomValuesDTO';
-import { PublisherId } from '../../domain/PublisherId';
+import { GetPublisherCustomValuesResponse as Response } from './getPublisherCustomValuesResponse';
+import { GetPublisherCustomValuesDTO as DTO } from './getPublisherCustomValuesDTO';
+import * as Errors from './getPublisherCustomValuesErrors';
 
 export class GetPublisherCustomValuesUsecase
-  implements
-    UseCase<
-      GetPublisherCustomValuesDTO,
-      Promise<GetPublisherCustomValuesResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetPublisherCustomValuesDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private publisherRepo: PublisherRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: GetPublisherCustomValuesDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetPublisherCustomValuesResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const id = PublisherId.create(
-        new UniqueEntityID(request.publisherId)
-      ).getValue();
+      const id = PublisherId.create(new UniqueEntityID(request.publisherId));
 
       const exists = await this.publisherRepo.publisherWithIdExists(id);
       if (!exists) {
+        return left(new Errors.PublisherNotFount(request.publisherId));
+      }
+
+      const maybeCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
+        id
+      );
+
+      if (maybeCustomValues.isLeft()) {
         return left(
-          new GetPublisherCustomValuesErrors.PublisherNotFount(
-            request.publisherId
-          )
+          new UnexpectedError(new Error(maybeCustomValues.value.message))
         );
       }
 
-      const customValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        id
-      );
-      return right(Result.ok(customValues));
+      return right(maybeCustomValues.value);
     } catch (e) {
       return left(new UnexpectedError(e));
     }

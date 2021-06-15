@@ -1,9 +1,9 @@
-import { Result, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { UpdateInvoiceItemsErrors } from './updateInvoiceItemsErrors';
+import * as Errors from './updateInvoiceItemsErrors';
 
 export type UpdateInvoiceItemsResponse = Either<
-  UpdateInvoiceItemsErrors.InvoiceItemNotFound | UnexpectedError,
-  Result<void>
+  Errors.InvoiceItemNotFound | UnexpectedError,
+  void
 >;

@@ -99,7 +99,12 @@ export function addInvoices(invoicesRepo: MockInvoiceRepo) {
 
   for (const props of invoicesProps) {
     const invoice = InvoiceMap.toDomain(props);
-    invoicesRepo.addMockItem(invoice);
+
+    if (invoice.isLeft()) {
+      throw invoice.value;
+    }
+
+    invoicesRepo.addMockItem(invoice.value);
   }
 }
 
@@ -148,7 +153,12 @@ export function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
 
   for (const props of invoiceItemsProps) {
     const invoiceItem = InvoiceItemMap.toDomain(props);
-    invoiceItemRepo.addMockItem(invoiceItem);
+
+    if (invoiceItem.isLeft()) {
+      throw invoiceItem.value;
+    }
+
+    invoiceItemRepo.addMockItem(invoiceItem.value);
   }
 }
 
@@ -206,7 +216,12 @@ export function addManuscripts(manuscriptRepo: MockArticleRepo) {
 
   for (const props of manuscriptsProps) {
     const manuscript = ArticleMap.toDomain(props);
-    manuscriptRepo.addMockItem(manuscript);
+
+    if (manuscript.isLeft()) {
+      throw manuscript.value;
+    }
+
+    manuscriptRepo.addMockItem(manuscript.value);
   }
 }
 
@@ -256,7 +271,12 @@ export function addPayers(payerRepo: MockPayerRepo) {
 
   for (const props of payersProps) {
     const payer = PayerMap.toDomain(props);
-    payerRepo.addMockItem(payer);
+
+    if (payer.isLeft()) {
+      throw payer.value;
+    }
+
+    payerRepo.addMockItem(payer.value);
   }
 }
 
@@ -282,7 +302,12 @@ export function addPayments(paymentRepo: MockPaymentRepo) {
 
   for (const props of paymentsProps) {
     const payment = PaymentMap.toDomain(props);
-    paymentRepo.addMockItem(payment);
+
+    if (payment.isLeft()) {
+      throw payment.value;
+    }
+
+    paymentRepo.addMockItem(payment.value);
   }
 }
 
@@ -304,7 +329,13 @@ export function addCoupons(couponRepo: MockCouponRepo) {
   ];
 
   for (const props of couponsProps) {
-    const coupon = CouponMap.toDomain(props);
+    const maybeCoupon = CouponMap.toDomain(props);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    const coupon = maybeCoupon.value;
 
     if (props.invoiceItemId) {
       const invoiceItemId = InvoiceItemId.create(
@@ -329,7 +360,13 @@ export function addWaivers(waiverRepo: MockWaiverRepo) {
   ];
 
   for (const props of waiversProps) {
-    const waiver = WaiverMap.toDomain(props);
+    const maybeWaiver = WaiverMap.toDomain(props);
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    const waiver = maybeWaiver.value;
 
     if (props.invoiceItemId) {
       const invoiceItemId = InvoiceItemId.create(
@@ -353,7 +390,12 @@ export function addPaymentMethods(paymentMethodRepo: MockPaymentMethodRepo) {
 
   for (const props of paymentMethodsProps) {
     const paymentMethod = PaymentMethodMap.toDomain(props);
-    paymentMethodRepo.addMockItem(paymentMethod);
+
+    if (paymentMethod.isLeft()) {
+      throw paymentMethod.value;
+    }
+
+    paymentMethodRepo.addMockItem(paymentMethod.value);
   }
 }
 
@@ -387,7 +429,12 @@ export function addBillingAddresses(addressRepo: MockAddressRepo) {
 
   for (const props of addressProps) {
     const address = AddressMap.toDomain(props);
-    addressRepo.addMockItem(address);
+
+    if (address.isLeft()) {
+      throw address.value;
+    }
+
+    addressRepo.addMockItem(address.value);
   }
 }
 
@@ -453,6 +500,11 @@ export function addErpReferences(erpReferenceRepo: MockErpReferenceRepo): void {
 
   for (const props of erpReferenceProps) {
     const erpReference = ErpReferenceMap.toDomain(props);
-    erpReferenceRepo.addMockItem(erpReference);
+
+    if (erpReference.isLeft()) {
+      throw erpReference.value;
+    }
+
+    erpReferenceRepo.addMockItem(erpReference.value);
   }
 }

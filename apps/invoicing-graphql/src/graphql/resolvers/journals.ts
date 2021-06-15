@@ -19,10 +19,11 @@ export const journals: Resolvers<Context> = {
       const result = await usecase.execute(args, usecaseContext);
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      const journalsList = result.value.getValue();
+      const journalsList = result.value;
+
       return journalsList.map(CatalogMap.toPersistence);
     },
   },

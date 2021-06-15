@@ -14,7 +14,12 @@ import {
 } from '../../../../domain/authorization';
 
 // * Usecase specific
-import { Payment } from '../../domain/Payment';
+import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
+import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
+import { InvoiceStatus } from '../../../invoices/domain/Invoice';
+import { ExternalOrderId } from '../../domain/external-order-id';
+import { PaymentDTO } from '../../domain/strategies/behaviors';
+import { PaymentStatus, Payment } from '../../domain/Payment';
 
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
@@ -33,12 +38,6 @@ import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getP
 import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 import { CreatePaymentUsecase } from '../createPayment';
 
-import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
-import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
-import { ExternalOrderId } from '../../domain/external-order-id';
-import { PaymentDTO } from '../../domain/strategies/behaviors';
-import { PaymentStatus } from '../../domain/Payment';
-
 import {
   WithExistingPayments,
   WithPaymentMethodId,
@@ -53,7 +52,6 @@ import {
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
-import { InvoiceStatus } from '../../../invoices/domain/Invoice';
 
 export class RecordPaymentUsecase
   implements
@@ -125,7 +123,6 @@ export class RecordPaymentUsecase
 
       return new AsyncEither(request.invoiceId)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
         .map((invoice) => ({
           ...request,
           invoice,
@@ -144,7 +141,6 @@ export class RecordPaymentUsecase
 
       return new AsyncEither(request.invoice.id.toString())
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
         .map((items) => {
           request.invoice.addItems(items);
           return { ...request, invoiceItems: items };
@@ -216,7 +212,6 @@ export class RecordPaymentUsecase
 
       return new AsyncEither(request.invoiceId)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue())
         .map((payer) => ({ ...request, payer }))
         .execute();
     };
@@ -231,7 +226,7 @@ export class RecordPaymentUsecase
 
       return new AsyncEither(request.invoiceId)
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => result.getValue()[0])
+        .map((manuscripts) => manuscripts[0])
         .map((manuscript) => ({ ...request, manuscript }))
         .execute();
     };
@@ -317,13 +312,21 @@ export class RecordPaymentUsecase
 
   private async updatePayment<T extends UpdatePayment>(
     request: T
-  ): Promise<Either<Errors.PaymentUpdateDbError, Payment>> {
+  ): Promise<Either<Errors.PaymentUpdateDbError | UnexpectedError, Payment>> {
     try {
       if (request.paymentDetails.status !== request.payment.status) {
         request.payment.status = request.paymentDetails.status;
       }
 
-      const updated = await this.paymentRepo.updatePayment(request.payment);
+      const maybeUpdated = await this.paymentRepo.updatePayment(
+        request.payment
+      );
+
+      if (maybeUpdated.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeUpdated.value.message)));
+      }
+
+      const updated = maybeUpdated.value;
 
       if (updated.status === PaymentStatus.COMPLETED) {
         updated.addCompletedEvent(request.isFinalPayment);

@@ -1,88 +1,69 @@
-import { Result } from '../../../../core/logic/Result';
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
 
-export class CouponAlreadyUsedError extends Result<UseCaseError> {
+export class CouponAlreadyUsedError extends UseCaseError {
   constructor(couponCode: string) {
-    super(false, {
-      message: `Coupon ${couponCode} has already been used.`,
-    });
+    super(`Coupon ${couponCode} has already been used.`);
   }
 }
 
-export class CouponAlreadyUsedForInvoiceError extends Result<UseCaseError> {
+export class CouponAlreadyUsedForInvoiceError extends UseCaseError {
   constructor(couponCode: string) {
-    super(false, {
-      message: `Coupon ${couponCode} has already been used for this invoice.`,
-    });
+    super(`Coupon ${couponCode} has already been used for this invoice.`);
   }
 }
 
-export class CouponExpiredError extends Result<UseCaseError> {
+export class CouponExpiredError extends UseCaseError {
   constructor(couponCode: string) {
-    super(false, {
-      message: `Coupon ${couponCode} is expired.`,
-    });
+    super(`Coupon ${couponCode} is expired.`);
   }
 }
 
-export class InvoiceNotFoundError extends Result<UseCaseError> {
+export class InvoiceNotFoundError extends UseCaseError {
   constructor(invoiceId: string) {
-    super(false, {
-      message: `Couldn't find an invoice with code ${invoiceId}.`,
-    });
+    super(`Couldn't find an invoice with code ${invoiceId}.`);
   }
 }
 
-export class CouponNotFoundError extends Result<UseCaseError> {
+export class CouponNotFoundError extends UseCaseError {
   constructor(couponCode: string) {
-    super(false, {
-      message: `Couldn't find a coupon with code ${couponCode}.`,
-    });
+    super(`Couldn't find a coupon with code ${couponCode}.`);
   }
 }
 
-export class CouponInvalidError extends Result<UseCaseError> {
+export class CouponInvalidError extends UseCaseError {
   constructor(couponCode: string, invoiceId: string) {
-    super(false, {
-      message: `Coupon ${couponCode} can not be assigned to invoice ${invoiceId}.`,
-    });
+    super(`Coupon ${couponCode} can not be assigned to invoice ${invoiceId}.`);
   }
 }
 
-export class CouponInactiveError extends Result<UseCaseError> {
+export class CouponInactiveError extends UseCaseError {
   constructor(couponCode: string) {
-    super(false, {
-      message: `Coupon ${couponCode} is inactive.`,
-    });
+    super(`Coupon ${couponCode} is inactive.`);
   }
 }
 
-export class InvoiceStatusInvalidError extends Result<UseCaseError> {
+export class InvoiceStatusInvalidError extends UseCaseError {
   constructor(couponCode: string, invoiceReferenceNumber: string) {
-    super(false, {
-      message: `Coupon ${couponCode} can not be assigned to invoice ${invoiceReferenceNumber} as it is already confirmed, please refresh the page.`,
-    });
+    super(
+      `Coupon ${couponCode} can not be assigned to invoice ${invoiceReferenceNumber} as it is already confirmed, please refresh the page.`
+    );
   }
 }
 
-export class TransactionNotFoundError extends Result<UseCaseError> {
+export class TransactionNotFoundError extends UseCaseError {
   constructor(invoiceId: string) {
-    super(false, {
-      message: `Couldn't find a Transaction for Invoice id {${invoiceId}}.`,
-    });
+    super(`Couldn't find a Transaction for Invoice id {${invoiceId}}.`);
   }
 }
 
-export class ManuscriptNotFoundError extends Result<UseCaseError> {
+export class ManuscriptNotFoundError extends UseCaseError {
   constructor(manuscriptId: string) {
-    super(false, {
-      message: `Couldn't find a Manuscript with id {${manuscriptId}}.`,
-    });
+    super(`Couldn't find a Manuscript with id {${manuscriptId}}.`);
   }
 }
 
-export class InvoiceConfirmationFailed extends Result<UseCaseError> {
+export class InvoiceConfirmationFailed extends UseCaseError {
   constructor(message: string) {
-    super(false, { message });
+    super(message);
   }
 }

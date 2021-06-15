@@ -1,13 +1,14 @@
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
-import {Guard} from '../../../core/logic/Guard';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Guard } from '../../../core/logic/Guard';
 
-import {Email} from './../../../domain/Email';
-import {Name} from './../../../domain/Name';
+import { Email } from './../../../domain/Email';
+import { Name } from './../../../domain/Name';
 
-import {EditorialBoard} from './EditorialBoard';
-import {JournalId} from './JournalId';
+import { EditorialBoard } from './EditorialBoard';
+import { JournalId } from './JournalId';
 
 export interface JournalProps {
   name: Name;
@@ -23,7 +24,7 @@ export type JournalCollection = Journal[];
 
 export class Journal extends AggregateRoot<JournalProps> {
   get journalId(): JournalId {
-    return JournalId.create(this._id).getValue();
+    return JournalId.create(this._id);
   }
 
   get name(): Name {
@@ -65,24 +66,24 @@ export class Journal extends AggregateRoot<JournalProps> {
   public static create(
     props: JournalProps,
     id?: UniqueEntityID
-  ): Result<Journal> {
+  ): Either<GuardFailure, Journal> {
     const nullGuard = Guard.againstNullOrUndefinedBulk([
-      {argument: props.name, argumentName: 'journal name'},
-      {argument: props.email, argumentName: 'journal email'},
-      {argument: props.code, argumentName: 'journal code'},
-      {argument: props.issn, argumentName: 'journal issn'}
+      { argument: props.name, argumentName: 'journal name' },
+      { argument: props.email, argumentName: 'journal email' },
+      { argument: props.code, argumentName: 'journal code' },
+      { argument: props.issn, argumentName: 'journal issn' },
     ]);
 
     if (!nullGuard.succeeded) {
-      return Result.fail<Journal>(nullGuard.message);
+      return left(new GuardFailure(nullGuard.message));
     } else {
       const defaultJournalProps: JournalProps = {
-        ...props
+        ...props,
       };
 
       const journal = new Journal(defaultJournalProps, id);
 
-      return Result.ok<Journal>(journal);
+      return right(journal);
     }
   }
 }

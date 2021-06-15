@@ -1,11 +1,6 @@
-import type { UpdateInvoiceItemsResponse } from './updateInvoiceItemsResponse';
-import { UpdateInvoiceItemsErrors } from './updateInvoiceItemsErrors';
-import type { UpdateInvoiceItemsDTO } from './updateInvoiceItemsDTO';
-import { UpdateInvoiceItemsUsecase } from './updateInvoiceItems';
+import * as UpdateInvoiceItemsErrors from './updateInvoiceItemsErrors';
 
-export {
-  UpdateInvoiceItemsResponse,
-  UpdateInvoiceItemsUsecase,
-  UpdateInvoiceItemsErrors,
-  UpdateInvoiceItemsDTO,
-};
+export * from './updateInvoiceItemsResponse';
+export * from './updateInvoiceItemsDTO';
+export * from './updateInvoiceItems';
+export { UpdateInvoiceItemsErrors };

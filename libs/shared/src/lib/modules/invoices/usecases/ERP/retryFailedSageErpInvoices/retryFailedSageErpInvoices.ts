@@ -1,16 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-import { Either, right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+
 // * Authorization Logic
-import {
-  UsecaseAuthorizationContext,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
@@ -24,30 +19,17 @@ import { WaiverRepoContract } from '../../../../waivers/repos';
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { VATService } from '@hindawi/shared';
+import { VATService } from '../../../../../domain/services/VATService';
 
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
-export type RetryFailedSageErpInvoicesResponse = Either<
-  UnexpectedError,
-  ErpInvoiceResponse[]
->;
+import { RetryFailedSageErpInvoicesResponse as Response } from './retryFailedSageErpInvoicesResponse';
+import { RetryFailedSageErpInvoicesDTO as DTO } from './retryFailedSageErpInvoicesDTO';
 
 export class RetryFailedSageErpInvoicesUsecase
-  implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<RetryFailedSageErpInvoicesResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      Record<string, unknown>,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   private publishToErpUsecase: PublishInvoiceToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -81,17 +63,19 @@ export class RetryFailedSageErpInvoicesUsecase
     );
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('zzz:zzz')
-  public async execute(
-    request?: Record<string, unknown>,
-    context?: UsecaseAuthorizationContext
-  ): Promise<RetryFailedSageErpInvoicesResponse> {
+  public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      const failedErpInvoicesIds = await this.invoiceRepo.getFailedSageErpInvoices();
+      const maybeFailedErpInvoicesIds = await this.invoiceRepo.getFailedSageErpInvoices();
+
+      if (maybeFailedErpInvoicesIds.isLeft()) {
+        return left(
+          new UnexpectedError(
+            new Error(maybeFailedErpInvoicesIds.value.message)
+          )
+        );
+      }
+
+      const failedErpInvoicesIds = maybeFailedErpInvoicesIds.value;
 
       const updatedInvoices: ErpInvoiceResponse[] = [];
 

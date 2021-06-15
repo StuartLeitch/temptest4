@@ -1,50 +1,37 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-import {
-  UsecaseAuthorizationContext,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
-import { RegisterPaymentResponse } from '../../../../domain/services/ErpService';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { right, Result, left, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
+
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+
 import { ErrorUtils } from '../../../../utils/ErrorUtils';
 
-import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
-import { PaymentRepoContract } from './../../repos/paymentRepo';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
+
+import {
+  RegisterPaymentResponse,
+  ErpServiceContract,
+} from '../../../../domain/services/ErpService';
+
+import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
+
+import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
+import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
+import { PaymentMethodRepoContract } from './../../repos/paymentMethodRepo';
+import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
+import { PayerRepoContract } from './../../../payers/repos/payerRepo';
+import { PaymentRepoContract } from './../../repos/paymentRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
-import { ErpServiceContract } from '../../../../domain/services/ErpService';
-import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
-import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
-import { PayerRepoContract } from './../../../payers/repos/payerRepo';
-import { ErpReferenceRepoContract } from './../../../vendors/repos/ErpReferenceRepo';
 
 import { PublishPaymentToErpUsecase } from '../publishPaymentToErp/publishPaymentToErp';
 
-export type RetryPaymentsRegistrationToErpResponse = Either<
-  UnexpectedError,
-  Result<RegisterPaymentResponse[]>
->;
+import { RetryPaymentsRegistrationToErpResponse as Response } from './retryPaymentRegistrationResponse';
+import { RetryPaymentsRegistrationToErpDTO as DTO } from './retryPaymentRegistrationDTO';
 
 export class RetryPaymentsRegistrationToErpUsecase
-  implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<RetryPaymentsRegistrationToErpResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      Record<string, unknown>,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   private publishPaymentToErpUsecase: PublishPaymentToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -76,22 +63,14 @@ export class RetryPaymentsRegistrationToErpUsecase
     );
   }
 
-  private async getAccessControlContext(_request: any, _context?: any) {
-    return {};
-  }
-
-  // @Authorize('zzz:zzz')
-  public async execute(
-    request?: Record<string, unknown>,
-    context?: UsecaseAuthorizationContext
-  ): Promise<RetryPaymentsRegistrationToErpResponse> {
+  public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
       const paymentIds = await this.paymentRepo.getUnregisteredErpPayments();
       const registeredPayments: RegisterPaymentResponse[] = [];
 
       if (paymentIds.length === 0) {
         this.loggerService.info('No registered payments to be register!');
-        return right(Result.ok<RegisterPaymentResponse[]>(registeredPayments));
+        return right(registeredPayments);
       }
 
       this.loggerService.info(
@@ -118,9 +97,6 @@ export class RetryPaymentsRegistrationToErpUsecase
           );
           registeredPayments.push(publishedPaymentResponse.value);
         }
-
-        // ! Only process one payment!
-        // process.exit();
       }
 
       if (errs.length > 0) {
@@ -128,7 +104,7 @@ export class RetryPaymentsRegistrationToErpUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
-      return right(Result.ok<RegisterPaymentResponse[]>(registeredPayments));
+      return right(registeredPayments);
     } catch (err) {
       this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));

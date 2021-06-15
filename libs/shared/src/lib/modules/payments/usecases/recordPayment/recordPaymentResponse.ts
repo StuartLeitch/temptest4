@@ -1,5 +1,5 @@
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Either } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
 
 import { Payment } from '../../../payments/domain/Payment';
 import * as Errors from './recordPaymentErrors';

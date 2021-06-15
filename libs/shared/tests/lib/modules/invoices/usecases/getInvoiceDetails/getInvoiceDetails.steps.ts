@@ -2,13 +2,18 @@ import { expect } from 'chai';
 import { Given, When, Then } from '@cucumber/cucumber';
 
 import {
-  Roles,
   UsecaseAuthorizationContext,
-} from '../../../../../../../shared/src/lib/domain/authorization';
+  Roles,
+} from '../../../../../../src/lib/domain/authorization';
+import { UseCaseError } from '../../../../../../src/lib/core/logic/UseCaseError';
+import { Either } from '../../../../../../src/lib/core/logic/Either';
+
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+
 import {
   InvoiceCollection,
   InvoiceStatus,
+  Invoice,
 } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
@@ -18,7 +23,7 @@ const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
 const usecase: GetInvoiceDetailsUsecase = new GetInvoiceDetailsUsecase(
   mockInvoiceRepo
 );
-let result: any;
+let result: Either<UseCaseError, Invoice>;
 
 let invoiceCollection: InvoiceCollection;
 
@@ -32,7 +37,12 @@ Given(/^A invoice with the id "([\w-]+)"$/, (invoiceId: string) => {
     transactionId: 'transaction-2',
     status: InvoiceStatus.DRAFT,
   });
-  mockInvoiceRepo.save(invoice);
+
+  if (invoice.isLeft()) {
+    throw invoice.value;
+  }
+
+  mockInvoiceRepo.save(invoice.value);
 });
 
 When(
@@ -50,5 +60,5 @@ When(
 );
 
 Then('the details of the invoice will be returned', async () => {
-  expect(result.value.isSuccess).to.equal(true);
+  expect(result.isRight()).to.equal(true);
 });

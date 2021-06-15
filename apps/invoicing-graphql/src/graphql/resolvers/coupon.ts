@@ -33,10 +33,10 @@ export const coupon: Resolvers<Context> = {
       const result = await usecase.execute(request, usecaseContext);
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      return CouponMap.toPersistence(result.value.getValue());
+      return CouponMap.toPersistence(result.value);
     },
     async coupons(parent, args: GetRecentCouponsDTO, context) {
       const { repos } = context;
@@ -48,10 +48,10 @@ export const coupon: Resolvers<Context> = {
 
       const result = await usecase.execute(args, usecaseContext);
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      const couponsList = result.value.getValue();
+      const couponsList = result.value;
 
       return {
         totalCount: +couponsList.totalCount,
@@ -64,10 +64,10 @@ export const coupon: Resolvers<Context> = {
 
       const result = await usecase.execute();
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      const code = result.value.getValue().value;
+      const code = result.value.value;
       return { code };
     },
   },
@@ -82,10 +82,10 @@ export const coupon: Resolvers<Context> = {
       const result = await createCouponUsecase.execute(args.coupon as any);
 
       if (result.isLeft()) {
-        throw new Error(result?.value?.errorValue().message);
+        throw new Error(result?.value?.message);
       }
 
-      return CouponMap.toPersistence(result.value.getValue());
+      return CouponMap.toPersistence(result.value);
     },
     async updateCoupon(parent, args, context) {
       const {
@@ -97,10 +97,10 @@ export const coupon: Resolvers<Context> = {
       const result = await updateCouponUsecase.execute(args.coupon);
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      return CouponMap.toPersistence(result.value.getValue());
+      return CouponMap.toPersistence(result.value);
     },
   },
 };

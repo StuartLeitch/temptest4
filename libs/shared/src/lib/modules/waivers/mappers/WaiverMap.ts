@@ -1,4 +1,7 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, flatten, right } from '../../../core/logic/Either';
+
 import { Mapper } from '../../../infrastructure/Mapper';
 
 import { WaiverAssignedProps, WaiverAssigned } from '../domain/WaiverAssigned';
@@ -7,34 +10,41 @@ import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
 import { Waiver } from '../domain/Waiver';
 
 export class WaiverMap extends Mapper<Waiver> {
-  public static toDomain(raw: any): Waiver {
-    const waiverOrError = Waiver.create(
+  public static toDomain(raw: any): Either<GuardFailure, Waiver> {
+    const maybeWaiver = Waiver.create(
       {
         waiverType: raw.type_id,
         reduction: raw.reduction,
         isActive: raw.isActive,
-        //metadata: raw.metadata
       },
       new UniqueEntityID(raw.id)
     );
 
-    return waiverOrError.isSuccess ? waiverOrError.getValue() : null;
+    return maybeWaiver;
   }
 
-  public static toDomainCollection(raw: any[]): WaiverAssignedCollection {
-    const domainItems = raw
-      .map((item) => {
-        return {
+  public static toDomainCollection(
+    raw: any[]
+  ): Either<GuardFailure, WaiverAssignedCollection> {
+    const maybeWaivers = flatten(
+      raw.map((item) =>
+        WaiverMap.toDomain(item).map((waiver) => ({ waiver, item }))
+      )
+    );
+
+    const maybeItemsList = maybeWaivers.map((list) =>
+      list
+        .map(({ waiver, item }) => ({
           invoiceItemId: InvoiceItemId.create(
             new UniqueEntityID(item.invoiceItemId)
           ),
-          waiver: WaiverMap.toDomain(item),
           dateAssigned: item.dateAssigned,
-        };
-      })
-      .map((item: WaiverAssignedProps) => WaiverAssigned.create(item));
+          waiver,
+        }))
+        .map((item: WaiverAssignedProps) => WaiverAssigned.create(item))
+    );
 
-    return WaiverAssignedCollection.create(domainItems);
+    return maybeItemsList.map(WaiverAssignedCollection.create);
   }
 
   public static toPersistence(waiver: Waiver): any {

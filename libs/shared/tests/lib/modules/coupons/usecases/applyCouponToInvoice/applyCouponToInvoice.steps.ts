@@ -8,10 +8,7 @@ import { setupVatService } from '../../../../../../src/lib/domain/services/mocks
 import { ApplyCouponToInvoiceUsecase } from '../../../../../../src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 import { ApplyCouponToInvoiceResponse } from '../../../../../../src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoiceResponse';
 
-import {
-  Coupon,
-  CouponType,
-} from '../../../../../../src/lib/modules/coupons/domain/Coupon';
+import { Coupon } from '../../../../../../src/lib/modules/coupons/domain/Coupon';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
@@ -41,7 +38,7 @@ import {
 } from '../../../../../../src/lib/shared';
 
 function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const maybeCoupon = CouponMap.toDomain({
     id,
     code,
     status: 'ACTIVE',
@@ -51,9 +48,15 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
     name: 'test-coupon',
     ...overwrites,
   });
+
+  if (maybeCoupon.isLeft()) {
+    throw maybeCoupon.value;
+  }
+
+  return maybeCoupon.value;
 }
 function makeInactiveCouponData(code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const maybeCoupon = CouponMap.toDomain({
     id: 'inactivecoupon',
     code,
     status: 'INACTIVE',
@@ -63,20 +66,12 @@ function makeInactiveCouponData(code: string, overwrites?: any): Coupon {
     name: 'test-coupon',
     ...overwrites,
   });
-}
 
-function makeSingleUseCouponData(code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
-    id: 'usedcoupon',
-    code,
-    status: 'ACTIVE',
-    couponType: 'SINGLE_USE',
-    redeemCount: 1,
-    dateCreated: new Date(),
-    invoiceItemType: 'APC',
-    name: 'test-coupon',
-    ...overwrites,
-  });
+  if (maybeCoupon.isLeft()) {
+    throw maybeCoupon.value;
+  }
+
+  return maybeCoupon.value;
 }
 
 let mockInvoiceRepo: MockInvoiceRepo = null;
@@ -159,53 +154,104 @@ After({ tags: '@ValidateApplyCoupon' }, () => {
 Given(
   /^we have an Invoice with id "([\w-]+)"/,
   async (testInvoiceId: string) => {
-    const transaction = TransactionMap.toDomain({
+    const maybeTransaction = TransactionMap.toDomain({
       status: TransactionStatus.ACTIVE,
       deleted: 0,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
-    invoice = InvoiceMap.toDomain({
+
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    const transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       transactionId: transaction.id.toValue(),
       status: 'DRAFT',
       dateCreated: new Date(),
       id: testInvoiceId,
     });
 
-    const publisher = PublisherMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
+
+    const maybePublisher = PublisherMap.toDomain({
       id: 'publisher1',
       customValues: {},
     } as any);
 
-    const catalog = CatalogMap.toDomain({
+    if (maybePublisher.isLeft()) {
+      throw maybePublisher.value;
+    }
+
+    const publisher = maybePublisher.value;
+
+    const maybeCatalog = CatalogMap.toDomain({
       publisherId: publisher.publisherId.id.toString(),
       isActive: true,
       journalId: 'journal1',
     });
 
+    if (maybeCatalog.isLeft()) {
+      throw maybeCatalog.value;
+    }
+
+    const catalog = maybeCatalog.value;
+
     const datePublished = new Date();
-    const manuscript = ArticleMap.toDomain({
+
+    const maybeManuscript = ArticleMap.toDomain({
       customId: '8888',
       journalId: catalog.journalId.id.toValue(),
       datePublished: datePublished.setDate(datePublished.getDate() - 1),
     });
 
-    const invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    const manuscript = maybeManuscript.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       invoiceId: testInvoiceId,
       manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
       price: 100,
       vat: 0,
     });
 
-    const address = AddressMap.toDomain({
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const invoiceItem = maybeInvoiceItem.value;
+
+    const maybeAddress = AddressMap.toDomain({
       country: 'RO',
     });
-    const payer = PayerMap.toDomain({
+
+    if (maybeAddress.isLeft()) {
+      throw maybeAddress.value;
+    }
+
+    const address = maybeAddress.value;
+
+    const maybePayer = PayerMap.toDomain({
       name: 'Silvestru',
       addressId: address.id.toValue(),
       invoiceId: invoice.invoiceId.id.toValue(),
       type: PayerType.INDIVIDUAL,
     });
+
+    if (maybePayer.isLeft()) {
+      throw maybePayer.value;
+    }
+
+    const payer = maybePayer.value;
 
     mockPayerRepo.addMockItem(payer);
     mockAddressRepo.addMockItem(address);
@@ -224,7 +270,13 @@ Given(
   /^a coupon with id "([\w-]+)" with code "([\w-]+)"/,
   async (testCouponId: string, testCode: string) => {
     coupon = makeCouponData(testCouponId, testCode);
-    coupon = await mockCouponRepo.save(coupon);
+    const maybeCoupon = await mockCouponRepo.save(coupon);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    coupon = maybeCoupon.value;
   }
 );
 
@@ -249,7 +301,13 @@ When(
   /^I apply inactive coupon for invoice "([\w-]+)" with code "([\w-]+)"/,
   async (testInvoiceId: string, testCode: string) => {
     let inactiveCoupon = makeInactiveCouponData(testCode);
-    inactiveCoupon = await mockCouponRepo.save(inactiveCoupon);
+    const maybeInactiveCoupon = await mockCouponRepo.save(inactiveCoupon);
+
+    if (maybeInactiveCoupon.isLeft()) {
+      throw maybeInactiveCoupon.value;
+    }
+
+    inactiveCoupon = maybeInactiveCoupon.value;
 
     response = await usecase.execute({
       invoiceId: testInvoiceId,

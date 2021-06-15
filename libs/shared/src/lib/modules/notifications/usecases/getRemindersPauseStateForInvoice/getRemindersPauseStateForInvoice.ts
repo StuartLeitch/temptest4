@@ -1,26 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { NotificationPause } from '../../domain/NotificationPause';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 
-import { NotificationPause } from '../../domain/NotificationPause';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { GetRemindersPauseStateForInvoiceResponse as Response } from './getRemindersPauseStateForInvoiceResponse';
@@ -28,13 +26,7 @@ import { GetRemindersPauseStateForInvoiceDTO as DTO } from './getRemindersPauseS
 import * as Errors from './getRemindersPauseStateForInvoiceErrors';
 
 export class GetRemindersPauseStateForInvoiceUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedRemindersRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -45,22 +37,14 @@ export class GetRemindersPauseStateForInvoiceUsecase
     this.validateRequest = this.validateRequest.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const execution = new AsyncEither<null, DTO>(request)
+      const execution = await new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
         .then(this.fetchPauseState)
-        .map((notifications) => Result.ok(notifications));
+        .execute();
 
-      return execution.execute();
+      return execution;
     } catch (e) {
       return left(new UnexpectedError(e));
     }
@@ -86,7 +70,7 @@ export class GetRemindersPauseStateForInvoiceUsecase
     this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
 
     const uuid = new UniqueEntityID(id);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     return await this.invoiceRepo.existsWithId(invoiceId);
   }
@@ -99,13 +83,20 @@ export class GetRemindersPauseStateForInvoiceUsecase
     );
 
     const uuid = new UniqueEntityID(request.invoiceId);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     try {
       const result = await this.pausedRemindersRepo.getNotificationPausedStatus(
         invoiceId
       );
-      return right(result);
+
+      if (result.isLeft()) {
+        return left(
+          new Errors.GetRemindersPauseDbError(new Error(result.value.message))
+        );
+      }
+
+      return right(result.value);
     } catch (e) {
       return left(new Errors.GetRemindersPauseDbError(e));
     }

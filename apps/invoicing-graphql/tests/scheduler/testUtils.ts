@@ -97,8 +97,10 @@ export function addInvoices(invoicesRepo: MockInvoiceRepo) {
   ];
 
   for (const props of invoicesProps) {
-    const invoice = InvoiceMap.toDomain(props);
-    invoicesRepo.addMockItem(invoice);
+    const maybeInvoice = InvoiceMap.toDomain(props);
+    if (maybeInvoice.isRight()) {
+      invoicesRepo.addMockItem(maybeInvoice.value);
+    }
   }
 }
 
@@ -146,8 +148,10 @@ export function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
   ];
 
   for (const props of invoiceItemsProps) {
-    const invoiceItem = InvoiceItemMap.toDomain(props);
-    invoiceItemRepo.addMockItem(invoiceItem);
+    const maybeInvoiceItem = InvoiceItemMap.toDomain(props);
+    if (maybeInvoiceItem.isRight()) {
+      invoiceItemRepo.addMockItem(maybeInvoiceItem.value);
+    }
   }
 }
 
@@ -204,8 +208,13 @@ export function addManuscripts(manuscriptRepo: MockArticleRepo) {
   ];
 
   for (const props of manuscriptsProps) {
-    const manuscript = ArticleMap.toDomain(props);
-    manuscriptRepo.addMockItem(manuscript);
+    const maybeManuscript = ArticleMap.toDomain(props);
+
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    manuscriptRepo.addMockItem(maybeManuscript.value);
   }
 }
 
@@ -245,7 +254,12 @@ export function addPayers(payerRepo: MockPayerRepo) {
 
   for (const props of payersProps) {
     const payer = PayerMap.toDomain(props);
-    payerRepo.addMockItem(payer);
+
+    if (payer.isLeft()) {
+      throw payer.value;
+    }
+
+    payerRepo.addMockItem(payer.value);
   }
 }
 
@@ -271,7 +285,12 @@ export function addPayments(paymentRepo: MockPaymentRepo) {
 
   for (const props of paymentsProps) {
     const payment = PaymentMap.toDomain(props);
-    paymentRepo.addMockItem(payment);
+
+    if (payment.isLeft()) {
+      throw payment.value;
+    }
+
+    paymentRepo.addMockItem(payment.value);
   }
 }
 
@@ -293,15 +312,17 @@ export function addCoupons(couponRepo: MockCouponRepo) {
   ];
 
   for (const props of couponsProps) {
-    const coupon = CouponMap.toDomain(props);
+    const maybeCoupon = CouponMap.toDomain(props);
 
-    if (props.invoiceItemId) {
-      const invoiceItemId = InvoiceItemId.create(
-        new UniqueEntityID(props.invoiceItemId)
-      );
-      couponRepo.addMockCouponToInvoiceItem(coupon, invoiceItemId);
-    } else {
-      couponRepo.addMockItem(coupon);
+    if (maybeCoupon.isRight()) {
+      if (props.invoiceItemId) {
+        const invoiceItemId = InvoiceItemId.create(
+          new UniqueEntityID(props.invoiceItemId)
+        );
+        couponRepo.addMockCouponToInvoiceItem(maybeCoupon.value, invoiceItemId);
+      } else {
+        couponRepo.addMockItem(maybeCoupon.value);
+      }
     }
   }
 }
@@ -320,13 +341,17 @@ export function addWaivers(waiverRepo: MockWaiverRepo) {
   for (const props of waiversProps) {
     const waiver = WaiverMap.toDomain(props);
 
+    if (waiver.isLeft()) {
+      throw waiver.value;
+    }
+
     if (props.invoiceItemId) {
       const invoiceItemId = InvoiceItemId.create(
         new UniqueEntityID(props.invoiceItemId)
       );
-      waiverRepo.addMockWaiverForInvoiceItem(waiver, invoiceItemId);
+      waiverRepo.addMockWaiverForInvoiceItem(waiver.value, invoiceItemId);
     } else {
-      waiverRepo.addMockItem(waiver);
+      waiverRepo.addMockItem(waiver.value);
     }
   }
 }
@@ -342,7 +367,12 @@ export function addPaymentMethods(paymentMethodRepo: MockPaymentMethodRepo) {
 
   for (const props of paymentMethodsProps) {
     const paymentMethod = PaymentMethodMap.toDomain(props);
-    paymentMethodRepo.addMockItem(paymentMethod);
+
+    if (paymentMethod.isLeft()) {
+      throw paymentMethod.value;
+    }
+
+    paymentMethodRepo.addMockItem(paymentMethod.value);
   }
 }
 
@@ -375,7 +405,9 @@ export function addBillingAddresses(addressRepo: MockAddressRepo) {
   ];
 
   for (const props of addressProps) {
-    const address = AddressMap.toDomain(props);
-    addressRepo.addMockItem(address);
+    const maybeAddress = AddressMap.toDomain(props);
+    if (maybeAddress.isRight()) {
+      addressRepo.addMockItem(maybeAddress.value);
+    }
   }
 }

@@ -1,10 +1,11 @@
-import { Result, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetPaymentMethodByIdErrors } from './getPaymentMethodByIdErrors';
 import { PaymentMethod } from '../../domain/PaymentMethod';
 
+import * as Errors from './getPaymentMethodByIdErrors';
+
 export type GetPaymentMethodByIdResponse = Either<
-  GetPaymentMethodByIdErrors.NoPaymentMethodFound | UnexpectedError,
-  Result<PaymentMethod>
+  Errors.NoPaymentMethodFound | UnexpectedError,
+  PaymentMethod
 >;

@@ -1,8 +1,9 @@
 import { createHash, randomBytes } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { ValueObject } from '../../../core/domain/ValueObject';
-import { Result } from '../../../core/logic/Result';
 
 interface CouponCodeProps {
   value: string;
@@ -22,11 +23,11 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
       .reduce((acc, v) => acc * v, 1);
   }
 
-  public static create(value: string): Result<CouponCode> {
+  public static create(value: string): Either<GuardFailure, CouponCode> {
     if (!CouponCode.isValid(value)) {
-      return Result.fail<CouponCode>('Must provide a valid coupon code');
+      return left(new GuardFailure('Must provide a valid coupon code'));
     }
-    return Result.ok<CouponCode>(new CouponCode({ value }));
+    return right(new CouponCode({ value }));
   }
 
   public static isValid(code: string | CouponCode): boolean {
@@ -54,7 +55,7 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
     );
   }
 
-  static generateCouponCode(): CouponCode {
+  static generateCouponCode(): Either<GuardFailure, CouponCode> {
     const salt = randomBytes(CouponCode.SALT_SIZE);
     const hash = createHash('sha256');
 
@@ -67,7 +68,7 @@ export class CouponCode extends ValueObject<CouponCodeProps> {
       .replace('/', '')
       .replace('+', '')
       .slice(0, CouponCode.getRandomCouponCodeLength());
-    return CouponCode.create(rawCode).getValue();
+    return CouponCode.create(rawCode);
   }
 
   get value(): string {

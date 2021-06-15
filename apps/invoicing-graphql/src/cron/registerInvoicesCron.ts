@@ -56,7 +56,7 @@ export class RegisterInvoicesCron {
 
     const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute();
     if (maybeResponse.isLeft()) {
-      loggerService.error(maybeResponse.value.errorValue().message);
+      loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;
     }
   }

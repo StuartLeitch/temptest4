@@ -1,44 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-import {
-  UsecaseAuthorizationContext,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
-import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
-import { UseCase } from '../../../../../core/domain/UseCase';
-import { right, Result, left, Either } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { ErrorUtils } from './../../../../../utils/ErrorUtils';
+import { right, left } from '../../../../../core/logic/Either';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
+
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+
+import { ErrorUtils } from './../../../../../utils/ErrorUtils';
+
+import {
+  ErpInvoiceResponse,
+  ErpServiceContract,
+} from '../../../../../domain/services/ErpService';
+
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
+import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
-import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { ErpReferenceRepoContract } from '../../../../vendors/repos';
+
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErp';
 
-export type RetryCreditNotesResponse = Either<
-  UnexpectedError,
-  Result<ErpInvoiceResponse[]>
->;
+import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
+import { RetryCreditNotesDTO as DTO } from './retryCreditNotesDTO';
 
 export class RetryCreditNotesUsecase
-  implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<RetryCreditNotesResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      Record<string, unknown>,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   private publishCreditNoteToErpUsecase: PublishCreditNoteToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -60,22 +47,25 @@ export class RetryCreditNotesUsecase
     );
   }
 
-  private async getAccessControlContext(_request: any, _context?: any) {
-    return {};
-  }
-
-  // @Authorize('zzz:zzz')
-  public async execute(
-    request?: Record<string, unknown>,
-    context?: UsecaseAuthorizationContext
-  ): Promise<RetryCreditNotesResponse> {
+  public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      const unregisteredErpCreditNotesIds = await this.invoiceRepo.getUnregisteredErpCreditNotes();
+      const maybeUnregisteredErpCreditNotesIds = await this.invoiceRepo.getUnregisteredErpCreditNotes();
       const registeredCreditNotes: ErpInvoiceResponse[] = [];
+
+      if (maybeUnregisteredErpCreditNotesIds.isLeft()) {
+        return left(
+          new UnexpectedError(
+            new Error(maybeUnregisteredErpCreditNotesIds.value.message)
+          )
+        );
+      }
+
+      const unregisteredErpCreditNotesIds =
+        maybeUnregisteredErpCreditNotesIds.value;
 
       if (unregisteredErpCreditNotesIds.length === 0) {
         this.loggerService.info('No registered credit notes!');
-        return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
+        return right(registeredCreditNotes);
       }
 
       this.loggerService.info(
@@ -112,7 +102,7 @@ export class RetryCreditNotesUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
-      return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
+      return right(registeredCreditNotes);
     } catch (err) {
       this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));

@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -26,12 +24,8 @@ import * as Errors from './getPaymentInfoErrors';
 
 export class GetPaymentInfoUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private paymentRepo: PaymentRepoContract
@@ -42,17 +36,14 @@ export class GetPaymentInfoUsecase
   }
 
   @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());
     }
 
     try {
       const uuid = new UniqueEntityID(request.invoiceId);
-      const id = InvoiceId.create(uuid).getValue();
+      const id = InvoiceId.create(uuid);
 
       const invoiceExists = await this.invoiceRepo.existsWithId(id);
 
@@ -61,7 +52,15 @@ export class GetPaymentInfoUsecase
       }
 
       try {
-        const payments = await this.paymentRepo.getPaymentsByInvoiceId(id);
+        const maybePayments = await this.paymentRepo.getPaymentsByInvoiceId(id);
+
+        if (maybePayments.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybePayments.value.message))
+          );
+        }
+
+        const payments = maybePayments.value;
 
         if (payments.length === 0) {
           return left(new Errors.NoPaymentFoundError(request.invoiceId));
@@ -71,8 +70,17 @@ export class GetPaymentInfoUsecase
       }
 
       try {
-        const paymentInfo = await this.invoiceRepo.getInvoicePaymentInfo(id);
-        return right(Result.ok(paymentInfo));
+        const maybePaymentInfo = await this.invoiceRepo.getInvoicePaymentInfo(
+          id
+        );
+
+        if (maybePaymentInfo.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybePaymentInfo.value.message))
+          );
+        }
+
+        return right(maybePaymentInfo.value);
       } catch (e) {
         return left(new Errors.PaymentInfoDbError(request.invoiceId, e));
       }

@@ -1,5 +1,7 @@
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
+
 import { Coupon } from '../../../../modules/coupons/domain/Coupon';
 
 import {
@@ -28,6 +30,7 @@ export type ApplyCouponToInvoiceResponse = Either<
   | CouponNotFoundError
   | CouponExpiredError
   | CouponInvalidError
-  | UnexpectedError,
-  Result<Coupon>
+  | UnexpectedError
+  | GuardFailure,
+  Coupon
 >;

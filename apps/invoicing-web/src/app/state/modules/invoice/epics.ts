@@ -66,18 +66,6 @@ const updatePayerEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   );
 };
 
-const fetchInvoicesEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
-  return action$.pipe(
-    filter(isActionOf(getInvoices.request)),
-    delay(250),
-    switchMap((action) =>
-      graphqlAdapter.send(queries.getInvoices, action.payload),
-    ),
-    map((r) => getInvoices.success(r.data.invoices)),
-    catchError((err) => of(getInvoices.failure(err.message))),
-  );
-};
-
 const getInvoiceVatEpic: RootEpic = (action$, _, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(getInvoiceVat.request)),
@@ -98,13 +86,17 @@ const applyCouponEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(applyCouponAction.request)),
     switchMap((action) =>
-      from(graphqlAdapter.send(mutations.applyCoupon, {
-        invoiceId: action.payload.invoiceId,
-        couponCode: action.payload.couponCode,
-      })).pipe(
+      from(
+        graphqlAdapter.send(mutations.applyCoupon, {
+          invoiceId: action.payload.invoiceId,
+          couponCode: action.payload.couponCode,
+        }),
+      ).pipe(
         withLatestFrom(state$.pipe(map(invoice)), state$.pipe(map(reductions))),
         mergeMap(([r, invoice, reductions]) => {
-          let returnPipe: any[] = [applyCouponAction.success(r.data.applyCoupon)];
+          let returnPipe: any[] = [
+            applyCouponAction.success(r.data.applyCoupon),
+          ];
 
           let totalReduction: number =
             reductions.reduce((acc, curr) => acc + curr.reduction, 0) +
@@ -115,16 +107,15 @@ const applyCouponEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
           }
           return from(returnPipe);
         }),
-        catchError((error) => of(applyCouponAction.failure(error.message)))
-      )
-    )
+        catchError((error) => of(applyCouponAction.failure(error.message))),
+      ),
+    ),
   );
 };
 
 export default [
   fetchInvoiceEpic,
   updatePayerEpic,
-  fetchInvoicesEpic,
   getInvoiceVatEpic,
   applyCouponEpic,
 ];

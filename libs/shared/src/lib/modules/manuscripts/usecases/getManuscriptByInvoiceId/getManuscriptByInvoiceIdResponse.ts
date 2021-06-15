@@ -1,14 +1,14 @@
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, Either } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
 
 import { Manuscript } from '../../domain/Manuscript';
 
-import { GetManuscriptByInvoiceIdErrors } from './getManuscriptByInvoiceIdErrors';
+import * as Errors from './getManuscriptByInvoiceIdErrors';
 
 export type GetManuscriptByInvoiceIdResponse = Either<
-  | GetManuscriptByInvoiceIdErrors.ApcHasNoManuscript
-  | GetManuscriptByInvoiceIdErrors.InvalidInvoiceId
-  | GetManuscriptByInvoiceIdErrors.NoApcForInvoice
+  | Errors.ApcHasNoManuscript
+  | Errors.InvalidInvoiceId
+  | Errors.NoApcForInvoice
   | UnexpectedError,
-  Result<Manuscript[]>
+  Manuscript[]
 >;

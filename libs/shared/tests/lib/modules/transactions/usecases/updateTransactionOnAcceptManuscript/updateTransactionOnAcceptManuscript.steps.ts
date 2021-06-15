@@ -17,40 +17,43 @@ import {
   TransactionStatus,
 } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
 
-import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscripts/repos/articleRepo';
 import { TransactionRepoContract } from '../../../../../../src/lib/modules/transactions/repos/transactionRepo';
 import { InvoiceItemRepoContract } from '../../../../../../src/lib/modules/invoices/repos/invoiceItemRepo';
+import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscripts/repos/articleRepo';
+import { AddressRepoContract } from '../../../../../../src/lib/modules/addresses/repos/addressRepo';
 import { InvoiceRepoContract } from '../../../../../../src/lib/modules/invoices/repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../../../src/lib/modules/journals/repos/catalogRepo';
-// import { WaiverRepoContract } from '../../../../../../src/lib/modules/waivers/repos/waiverRepo';
 import { EditorRepoContract } from '../../../../../../src/lib/modules/journals/repos/editorRepo';
-import { PayerRepoContract } from '../../../../../../src/lib/modules/payers/repos/payerRepo';
 import { CouponRepoContract } from '../../../../../../src/lib/modules/coupons/repos/couponRepo';
+import { PayerRepoContract } from '../../../../../../src/lib/modules/payers/repos/payerRepo';
+import { WaiverRepoContract } from '../../../../../../src/lib/modules/waivers/repos';
 
-import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
-import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
-import { CatalogMap } from '../../../../../../src/lib/modules/journals/mappers/CatalogMap';
+import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import { CatalogMap } from '../../../../../../src/lib/modules/journals/mappers/CatalogMap';
+import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { WaiverMap } from '../../../../../../src/lib/modules/waivers/mappers/WaiverMap';
 
 import { MockTransactionRepo } from '../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
-import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
-import { MockEditorRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
-import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
+import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockCatalogRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockEditorRepo } from '../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
+import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 
-import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
 import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
+import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
 import { VATService } from '../../../../../../src/lib/domain/services/VATService';
 
-import { UpdateTransactionOnAcceptManuscriptUsecase } from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscript';
-import { AddressRepoContract } from '../../../../../../src/lib/modules/addresses/repos/addressRepo';
+import {
+  UpdateTransactionOnAcceptManuscriptUsecase,
+  UpdateTransactionOnAcceptManuscriptResponse,
+} from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
@@ -61,7 +64,7 @@ const mockInvoiceRepo: InvoiceRepoContract = new MockInvoiceRepo();
 const mockCatalogRepo: CatalogRepoContract = new MockCatalogRepo();
 const mockInvoiceItemRepo: InvoiceItemRepoContract = new MockInvoiceItemRepo();
 const mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
-const mockWaiverRepo = new MockWaiverRepo();
+const mockWaiverRepo: WaiverRepoContract = new MockWaiverRepo();
 const mockEditorRepo: EditorRepoContract = new MockEditorRepo();
 const mockAddressRepo: AddressRepoContract = new MockAddressRepo();
 const mockPayerRepo: PayerRepoContract = new MockPayerRepo();
@@ -96,32 +99,35 @@ const usecase: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactio
   loggerService
 );
 
+let result: UpdateTransactionOnAcceptManuscriptResponse;
 let transaction: Transaction;
-let invoice: Invoice;
 let invoiceItem: InvoiceItem;
 let catalogItem: CatalogItem;
 let manuscript: Article;
-let result: any;
+let invoice: Invoice;
 let waiver: Waiver;
 
 let manuscriptId;
 let journalId;
 let price;
 
-// BeforeAll(function () {
-
-// });
-
 Given(
   /^A Journal "([\w-]+)" with the APC price of (\d+)$/,
   async (journalTestId: string, priceTest: number) => {
     journalId = journalTestId;
     price = priceTest;
-    catalogItem = CatalogMap.toDomain({
+    const maybeCatalogItem = CatalogMap.toDomain({
       journalId,
       type: 'APC',
       amount: price,
     });
+
+    if (maybeCatalogItem.isLeft()) {
+      throw maybeCatalogItem.value;
+    }
+
+    catalogItem = maybeCatalogItem.value;
+
     mockCatalogRepo.save(catalogItem);
   }
 );
@@ -135,7 +141,7 @@ Given(
     const authorSurname = 'Author Surname';
 
     manuscriptId = manuscriptTestId;
-    manuscript = ArticleMap.toDomain({
+    const maybeManuscript = ArticleMap.toDomain({
       id: manuscriptId,
       title,
       articleTypeId,
@@ -143,28 +149,60 @@ Given(
       authorSurname,
       journalId: journalId,
     });
+
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    manuscript = maybeManuscript.value;
+
     mockArticleRepo.save(manuscript);
 
-    transaction = TransactionMap.toDomain({
+    const maybeTransaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT,
       deleted: 0,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
-    invoice = InvoiceMap.toDomain({
+
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       status: InvoiceStatus.DRAFT,
       transactionId: transaction.transactionId.id.toString(),
     });
-    invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       manuscriptId,
       invoiceId: invoice.invoiceId.id.toString(),
       price: price,
     });
-    waiver = WaiverMap.toDomain({
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    invoiceItem = maybeInvoiceItem.value;
+
+    const maybeWaiver = WaiverMap.toDomain({
       type_id: 'WAIVED_COUNTRY',
       reduction: 100,
       isActive: true,
     });
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    waiver = maybeWaiver.value;
 
     invoice.addInvoiceItem(invoiceItem);
     transaction.addInvoice(invoice);
@@ -200,10 +238,18 @@ When(
 Then(
   'The Transaction associated with the manuscript should be ACTIVE',
   async () => {
-    expect(result.value.isSuccess).to.equal(true);
+    console.log(result);
+    expect(result.isRight()).to.equal(true);
 
     const transactions = await mockTransactionRepo.getTransactionCollection();
-    const [associatedTransaction] = transactions;
+    const maybeAssociatedTransactions = transactions;
+
+    if (maybeAssociatedTransactions.isLeft()) {
+      throw maybeAssociatedTransactions.value;
+    }
+
+    const [associatedTransaction] = maybeAssociatedTransactions.value;
+
     expect(associatedTransaction.status).to.equal(TransactionStatus.ACTIVE);
   }
 );
@@ -211,7 +257,14 @@ Then(
 Then(
   'The Invoice Item associated with the manuscript should have the price of {int}',
   async (finalPrice: number) => {
-    const invoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+    const maybeInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+
+    if (maybeInvoiceItems.isLeft()) {
+      throw maybeInvoiceItems.value;
+    }
+
+    const invoiceItems = maybeInvoiceItems.value;
+
     const [associatedInvoiceItem] = invoiceItems;
     expect(associatedInvoiceItem.price).to.equal(finalPrice);
   }

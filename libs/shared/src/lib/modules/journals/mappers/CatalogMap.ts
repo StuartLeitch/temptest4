@@ -1,35 +1,31 @@
-// import {Money, Currencies} from 'ts-money';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
 
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { PublisherId } from '../../publishers/domain/PublisherId';
 import { Mapper } from '../../../infrastructure/Mapper';
 import { CatalogItem } from '../domain/CatalogItem';
 import { JournalId } from '../domain/JournalId';
-import { PublisherId } from '../../publishers/domain/PublisherId';
-// import {TransactionStatus} from '../domain/Transaction';
 
 export class CatalogMap extends Mapper<CatalogItem> {
-  public static toDomain(raw: any): CatalogItem {
-    const catalogOrError = CatalogItem.create(
+  public static toDomain(raw: any): Either<GuardFailure, CatalogItem> {
+    return CatalogItem.create(
       {
         type: raw.type,
         amount: raw.amount,
-        journalId: JournalId.create(
-          new UniqueEntityID(raw.journalId)
-        ).getValue(),
+        journalId: JournalId.create(new UniqueEntityID(raw.journalId)),
         created: raw.created ? new Date(raw.created) : null,
         updated: raw.updated ? new Date(raw.updated) : null,
         currency: raw.currency,
         isActive: !!raw.isActive,
         journalTitle: raw.journalTitle,
         publisherId: raw.publisherId
-          ? PublisherId.create(new UniqueEntityID(raw.publisherId)).getValue()
+          ? PublisherId.create(new UniqueEntityID(raw.publisherId))
           : null,
         issn: raw.issn,
       },
       new UniqueEntityID(raw.id)
     );
-
-    return catalogOrError.isSuccess ? catalogOrError.getValue() : null;
   }
 
   public static toPersistence(catalogItem: CatalogItem): any {

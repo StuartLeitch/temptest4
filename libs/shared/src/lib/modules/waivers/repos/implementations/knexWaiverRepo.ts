@@ -1,3 +1,6 @@
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
@@ -15,7 +18,7 @@ export class KnexWaiverRepo
   implements WaiverRepoContract {
   async getWaiversByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<WaiverAssignedCollection> {
+  ): Promise<Either<GuardFailure | RepoError, WaiverAssignedCollection>> {
     const waivers = await this.db
       .select(
         `${TABLES.INVOICE_ITEMS_TO_WAIVERS}.dateCreated as dateAssigned`,
@@ -39,17 +42,17 @@ export class KnexWaiverRepo
     return WaiverMap.toDomainCollection(waivers);
   }
 
-  async getWaivers(): Promise<Waiver[]> {
+  async getWaivers(): Promise<Either<GuardFailure | RepoError, Waiver[]>> {
     const waivers = await this.db.select().from(TABLES.WAIVERS);
 
-    return waivers.map((w) => WaiverMap.toDomain(w));
+    return flatten(waivers.map((w) => WaiverMap.toDomain(w)));
   }
 
   async attachWaiverToInvoiceItem(
     waiverType: WaiverType,
     invoiceItemId: InvoiceItemId,
     dateCreated?: Date
-  ): Promise<Waiver> {
+  ): Promise<Either<GuardFailure | RepoError, Waiver>> {
     let toInsert: any = {
       invoiceItemId: invoiceItemId.id.toString(),
       waiverId: waiverType,
@@ -63,33 +66,47 @@ export class KnexWaiverRepo
       console.log(JSON.stringify(toInsert, null, 2));
       await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS).insert(toInsert);
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
 
-    return await this.getWaiversByTypes([waiverType])[0];
+    const result = await this.getWaiversByTypes([waiverType]);
+
+    if (result.isRight()) {
+      return right(result.value[0]);
+    } else {
+      return left(result.value);
+    }
   }
 
-  async removeInvoiceItemWaivers(invoiceItemId: InvoiceItemId): Promise<void> {
+  async removeInvoiceItemWaivers(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     const itemsIds = [invoiceItemId.id.toString()];
     try {
       await this.db(TABLES.INVOICE_ITEMS_TO_WAIVERS)
         .whereIn('invoiceItemId', itemsIds)
         .del();
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
+
+    return right(null);
   }
 
-  async getWaiversByTypes(waiverTypes: WaiverType[]): Promise<Waiver[]> {
+  async getWaiversByTypes(
+    waiverTypes: WaiverType[]
+  ): Promise<Either<GuardFailure | RepoError, Waiver[]>> {
     const waivers = await this.db
       .select()
       .from(TABLES.WAIVERS)
       .whereIn('type_id', waiverTypes);
 
-    return waivers.map((w) => WaiverMap.toDomain(w));
+    return flatten(waivers.map((w) => WaiverMap.toDomain(w)));
   }
 
-  async getWaiverByType(waiverType: WaiverType): Promise<Waiver> {
+  async getWaiverByType(
+    waiverType: WaiverType
+  ): Promise<Either<GuardFailure | RepoError, Waiver>> {
     const waiver = await this.db
       .select()
       .from(TABLES.WAIVERS)
@@ -97,22 +114,26 @@ export class KnexWaiverRepo
       .first();
 
     if (!waiver) {
-      throw RepoError.createEntityNotFoundError('waiver', waiverType);
+      return left(RepoError.createEntityNotFoundError('waiver', waiverType));
     }
 
-    return waiver;
+    return WaiverMap.toDomain(waiver);
   }
 
-  async exists(waiver: Waiver): Promise<boolean> {
+  async exists(
+    waiver: Waiver
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       this.getWaiverByType(waiver.waiverType);
     } catch (error) {
-      return false;
+      return right(false);
     }
-    return true;
+    return right(true);
   }
 
-  async save(waiver: Waiver): Promise<Waiver> {
+  async save(
+    waiver: Waiver
+  ): Promise<Either<GuardFailure | RepoError, Waiver>> {
     const { db } = this;
 
     const rawWaiver = WaiverMap.toPersistence(waiver);
@@ -120,7 +141,7 @@ export class KnexWaiverRepo
     try {
       await db(TABLES.WAIVERS).insert(rawWaiver);
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
 
     return this.getWaiverByType(waiver.waiverType);

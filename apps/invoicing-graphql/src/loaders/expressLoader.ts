@@ -69,15 +69,17 @@ export const expressLoader: MicroframeworkLoader = (
       );
 
       if (pdfEither.isLeft()) {
-        return res.status(400).send(pdfEither.value.errorValue());
+        return res.status(400).send(pdfEither.value.message);
       }
 
-      const { fileName, file } = pdfEither.value.getValue();
+      const { fileName, file } = pdfEither.value;
+
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename=${fileName}`,
         'Content-Length': file.length,
       });
+
       res.end(file);
     });
 

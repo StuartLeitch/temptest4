@@ -22,24 +22,34 @@ After({ tags: '@ValidateKnexPausedReminder' }, () => {
 Given(
   /^an invoice with id "([\w-]+)" and a paused notification item$/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
     pausedNotification = { invoiceId, confirmation: true, payment: false };
-    pausedNotification = await mockPausedReminderRepo.save(pausedNotification);
+    const maybePausedNotification = await mockPausedReminderRepo.save(
+      pausedNotification
+    );
+
+    if (maybePausedNotification.isLeft()) {
+      throw maybePausedNotification.value;
+    }
+
+    pausedNotification = maybePausedNotification.value;
   }
 );
 
 When(
   /^we call getNotificationPausedStatus for "([\w-]+)"$/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
-    foundPausedNotification = await mockPausedReminderRepo.getNotificationPausedStatus(
+    const maybeFoundPausedNotification = await mockPausedReminderRepo.getNotificationPausedStatus(
       invoiceId
     );
+
+    if (maybeFoundPausedNotification.isLeft()) {
+      throw maybeFoundPausedNotification.value;
+    }
+
+    foundPausedNotification = maybeFoundPausedNotification.value;
   }
 );
 
@@ -58,13 +68,17 @@ Then(
 When(
   /^we call insertBasePause for "([\w-]+)"$/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
-    savedPausedNotification = await mockPausedReminderRepo.insertBasePause(
+    const maybeSavedPausedNotification = await mockPausedReminderRepo.insertBasePause(
       invoiceId
     );
+
+    if (maybeSavedPausedNotification.isLeft()) {
+      throw maybeSavedPausedNotification.value;
+    }
+
+    savedPausedNotification = maybeSavedPausedNotification.value;
   }
 );
 

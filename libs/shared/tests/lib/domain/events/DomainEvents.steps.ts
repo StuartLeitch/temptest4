@@ -10,15 +10,13 @@ import { MockCouponAggregateRoot } from './../../../../src/lib/core/domain/event
 import { MockCouponAggregateRootId } from './../../../../src/lib/core/domain/events/mocks/domain/mockCouponAggregateRootId';
 import { MockCouponPublish } from './../../../../src/lib/core/domain/events/mocks/services/mockCouponPublish';
 
-let publish: MockCouponPublish;
 let coupon: MockCouponAggregateRoot;
-let spy: sinon.spy;
+let publish: MockCouponPublish;
 
-Before(() => {
+Before({ tags: '@ValidateDomainEvents' }, () => {
   publish = null;
   DomainEvents.clearHandlers();
   DomainEvents.clearMarkedAggregates();
-  spy = null;
   coupon = null;
 });
 

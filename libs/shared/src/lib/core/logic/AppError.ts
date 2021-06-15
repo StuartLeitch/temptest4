@@ -1,22 +1,23 @@
-import { Result } from './Result';
 import { UseCaseError } from './UseCaseError';
 
-export class UnexpectedError extends Result<UseCaseError> {
-  private _message: string;
+export class UnexpectedError extends UseCaseError {
+  public constructor(err: Error, message?: string);
+  public constructor(errs: Array<Error>, message?: string);
+  public constructor(errs: Error | Array<Error>, message?: string) {
+    const msg = message ? `\nAdditional message to Error: ${message}` : '';
 
-  get message(): string {
-    return this._message;
-  }
-
-  public constructor(err: any, message?: string) {
-    const msg = message ?? `Error additional message: ${message}`;
-
-    super(false, {
-      message: `${msg} \n An unexpected error ocurred: ${err.message}, with stack: ${err.stack}`,
-      err,
-    } as UseCaseError);
-
-    this._message = msg;
+    if (Array.isArray(errs)) {
+      super(
+        `${errs.length} unexpected errors ocurred: \n${errs.map(
+          (err, index) =>
+            `Error ${index}: ${err.message}, with stack: ${err.stack}\n`
+        )}${msg}`
+      );
+    } else {
+      super(
+        `An unexpected error ocurred: ${errs.message}, with stack: ${errs.stack}${msg}`
+      );
+    }
   }
 
   public static create(err: Error, message?: string): UnexpectedError {

@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
@@ -12,23 +10,19 @@ import { GetRecentInvoicesResponse } from './getRecentInvoicesResponse';
 import type { GetRecentInvoicesDTO } from './getRecentInvoicesDTO';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 export class GetRecentInvoicesUsecase
   implements
-    UseCase<
-      GetRecentInvoicesDTO,
-      Promise<GetRecentInvoicesResponse>,
-      UsecaseAuthorizationContext
-    >,
+    UseCase<GetRecentInvoicesDTO, Promise<GetRecentInvoicesResponse>, Context>,
     AccessControlledUsecase<
       GetRecentInvoicesDTO,
-      UsecaseAuthorizationContext,
+      Context,
       AccessControlContext
     > {
   constructor(private invoiceRepo: InvoiceRepoContract) {}
@@ -40,12 +34,21 @@ export class GetRecentInvoicesUsecase
   @Authorize('invoice:read')
   public async execute(
     request: GetRecentInvoicesDTO,
-    context?: UsecaseAuthorizationContext
+    context?: Context
   ): Promise<GetRecentInvoicesResponse> {
     // TODO: add proper DDD types to the paginated result
     try {
-      const paginatedResult = await this.invoiceRepo.getRecentInvoices(request);
-      return right(Result.ok<any>(paginatedResult));
+      const maybePaginatedResult = await this.invoiceRepo.getRecentInvoices(
+        request
+      );
+
+      if (maybePaginatedResult.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(maybePaginatedResult.value.message))
+        );
+      }
+
+      return right(maybePaginatedResult.value);
     } catch (err) {
       return left(new UnexpectedError(err, 'Getting recent invoices failed'));
     }

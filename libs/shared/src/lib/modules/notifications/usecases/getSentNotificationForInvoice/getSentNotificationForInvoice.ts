@@ -1,26 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { Notification } from '../../domain/Notification';
 
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { Notification } from '../../domain/Notification';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { GetSentNotificationForInvoiceResponse as Response } from './getSentNotificationForInvoiceResponse';
@@ -28,13 +26,7 @@ import { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationFo
 import * as Errors from './getSentNotificationForInvoiceErrors';
 
 export class GetSentNotificationForInvoiceUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -45,22 +37,14 @@ export class GetSentNotificationForInvoiceUsecase
     this.validateRequest = this.validateRequest.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const execution = new AsyncEither<null, DTO>(request)
+      const execution = await new AsyncEither<null, DTO>(request)
         .then(this.validateRequest)
         .then(this.fetchNotifications)
-        .map((notifications) => Result.ok(notifications));
+        .execute();
 
-      return execution.execute();
+      return execution;
     } catch (e) {
       return left(new UnexpectedError(e));
     }
@@ -86,7 +70,7 @@ export class GetSentNotificationForInvoiceUsecase
     this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
 
     const uuid = new UniqueEntityID(id);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     return await this.invoiceRepo.existsWithId(invoiceId);
   }
@@ -99,14 +83,24 @@ export class GetSentNotificationForInvoiceUsecase
     );
 
     const uuid = new UniqueEntityID(request.invoiceId);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
     try {
       const results = await this.sentNotificationRepo.getNotificationsByInvoiceId(
         invoiceId
       );
-      return right(results);
+
+      if (results.isLeft()) {
+        return left(
+          new Errors.EncounteredDbError(
+            invoiceId.toString(),
+            new Error(results.value.message)
+          )
+        );
+      }
+
+      return right(results.value);
     } catch (e) {
-      return left(new Errors.EncounteredDbError(invoiceId.id.toString(), e));
+      return left(new Errors.EncounteredDbError(invoiceId.toString(), e));
     }
   }
 }

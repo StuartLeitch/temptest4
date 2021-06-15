@@ -1,22 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { ErpReference } from '../../domain/ErpReference';
-import { ErpReferenceRepoContract } from '../ErpReferenceRepo';
 import { InvoiceErpReferences } from './../../../invoices/domain/InvoiceErpReferences';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { ErpReferenceMap } from './../../mapper/ErpReference';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { ErpReference } from '../../domain/ErpReference';
+
+import { ErpReferenceRepoContract } from '../ErpReferenceRepo';
 
 export class KnexErpReferenceRepo
   extends AbstractBaseDBRepo<Knex, ErpReference>
   implements ErpReferenceRepoContract {
   public async getErpReferencesByInvoiceId(
     invoiceId: InvoiceId
-  ): Promise<InvoiceErpReferences> {
+  ): Promise<Either<GuardFailure | RepoError, InvoiceErpReferences>> {
     const { db, logger } = this;
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
@@ -30,24 +32,25 @@ export class KnexErpReferenceRepo
       sql: sql.toString(),
     });
 
-    let erpReferences;
     try {
-      erpReferences = await sql;
+      const erpReferences = await sql;
+
+      return flatten(erpReferences.map(ErpReferenceMap.toDomain)).map(
+        InvoiceErpReferences.create
+      );
     } catch (e) {
-      throw RepoError.createEntityNotFoundError(
-        'invoiceId',
-        typeof invoiceId === 'string' ? invoiceId : invoiceId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoiceId',
+          typeof invoiceId === 'string' ? invoiceId : invoiceId.id.toString()
+        )
       );
     }
-
-    return InvoiceErpReferences.create(
-      erpReferences.map((ef) => ErpReferenceMap.toDomain(ef))
-    );
   }
 
-  public async getErpReferenceById(
+  public async getErpReferencesById(
     ids: UniqueEntityID[]
-  ): Promise<ErpReference> {
+  ): Promise<Either<GuardFailure | RepoError, ErpReference[]>> {
     const { db, logger } = this;
     const idList = ids.map((i) => i.toString());
 
@@ -57,31 +60,53 @@ export class KnexErpReferenceRepo
       sql: sql.toString(),
     });
 
-    let erpReferences;
     try {
-      erpReferences = await sql;
+      const erpReferences = await sql;
+
+      return flatten(erpReferences.map(ErpReferenceMap.toDomain));
     } catch (e) {
-      throw new Error(e.message);
+      return left(RepoError.fromDBError(e));
     }
-    return erpReferences;
   }
 
-  async delete(erpReference: ErpReference): Promise<void> {
-    // * do nothing yet!
+  public async getErpReferenceById(
+    id: UniqueEntityID
+  ): Promise<Either<GuardFailure | RepoError, ErpReference>> {
+    const { db, logger } = this;
+
+    const sql = db(TABLES.ERP_REFERENCES)
+      .select()
+      .where('entity_id', id.toString());
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    try {
+      const erpReference = await sql;
+
+      return ErpReferenceMap.toDomain(erpReference);
+    } catch (e) {
+      return left(RepoError.fromDBError(e));
+    }
   }
 
-  async exists(erpReference: ErpReference): Promise<boolean> {
-    return false;
+  async exists(
+    erpReference: ErpReference
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+    return right(false);
   }
 
-  async save(erpReference: ErpReference): Promise<ErpReference> {
+  async save(
+    erpReference: ErpReference
+  ): Promise<Either<GuardFailure | RepoError, ErpReference>> {
     const { db } = this;
     const rawErpReference = ErpReferenceMap.toPersistence(erpReference);
     try {
       await db(TABLES.ERP_REFERENCES).insert(rawErpReference);
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
-    return erpReference;
+    return this.getErpReferenceById(new UniqueEntityID(erpReference.entity_id));
   }
 }
