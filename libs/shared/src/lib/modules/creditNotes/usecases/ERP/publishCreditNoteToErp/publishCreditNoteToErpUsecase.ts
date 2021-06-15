@@ -14,7 +14,6 @@ import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { CreditNote } from '../../../domain/CreditNote';
 import { CreditNoteId } from '../../../domain/CreditNoteId';
 import { Invoice } from '../../../../invoices/domain/Invoice';
-import { InvoiceId } from '../../../../invoices/domain/InvoiceId';
 import { InvoiceRepoContract } from '../../../../invoices/repos/invoiceRepo';
 import { CreditNoteRepoContract } from '../../../repos/creditNoteRepo';
 import { InvoiceItemRepoContract } from '../../../../invoices/repos/invoiceItemRepo';
